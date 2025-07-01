@@ -1,0 +1,45 @@
+{
+  "title": "Module 06: Visual Tools & Version Control",
+  "pages": [
+    {
+      "slug": "README.md",
+      "title": "Module 06: Visual Tools & Version Control"
+    },
+    {
+      "slug": "00_introduction.md",
+      "title": "Chapter 0: Introduction to Visual Tools & Version Control"
+    },
+    {
+      "slug": "01_concepts.md",
+      "title": "Chapter 1: Core Concepts - Visual Thinking & Version Control"
+    },
+    {
+      "slug": "02_hands_on.md",
+      "title": "02_hands_on - Module 06: Visual Tools & Version Control"
+    },
+    {
+      "slug": "03_exercises.md",
+      "title": "03_exercises - Module 06: Visual Tools & Version Control"
+    },
+    {
+      "slug": "04_project.md",
+      "title": "04_project - Module 06: Visual Tools & Version Control"
+    },
+    {
+      "slug": "05_assessment.md",
+      "title": "05_assessment - Module 06: Visual Tools & Version Control"
+    },
+    {
+      "slug": "06_resources.md",
+      "title": "06_resources - Module 06: Visual Tools & Version Control"
+    },
+    {
+      "slug": "objectives.md",
+      "title": "Learning Objectives - Module 06"
+    },
+    {
+      "slug": "prerequisites.md",
+      "title": "Prerequisites - Module 06"
+    }
+  ]
+}

@@ -248,7 +248,7 @@ const Contact = () => {
         <div className="container">
           <div className="flex flex-col md:flex-row justify-between items-center border-t border-muted pt-8">
             <p className="text-sm text-muted-foreground">
-              &copy; {new Date().getFullYear()} The DreamLab UK. All rights reserved.
+              &copy; {new Date().getFullYear()} DreamLab AI Consulting Ltd. All rights reserved.
             </p>
             <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6">
               <div className="flex space-x-6">

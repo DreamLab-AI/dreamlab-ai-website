@@ -21,42 +21,37 @@ const Team = () => {
     const loadTeamMembers = async () => {
       setLoading(true);
       try {
-        // Increased from 20 to 50 team members
-        const maxMembersToTry = 50;
-        const memberPromises = [];
-        
-        for (let i = 1; i <= maxMembersToTry; i++) {
-          const id = i.toString().padStart(2, '0'); // Format as 01, 02, etc.
-          memberPromises.push(
-            (async () => {
-              try {
-                const markdownResponse = await fetch(`/data/team/${id}.md`);
-                if (!markdownResponse.ok) {
-                  return null;
-                }
-                
-                const markdownText = await markdownResponse.text();
-                const { headline, fullDetails } = parseTeamMarkdown(markdownText);
-
-                const imageResponse = await fetch(`/data/team/${id}.png`);
-                if (!imageResponse.ok) {
-                  console.warn(`Image not found for team member ${id}, but markdown exists`);
-                  return null;
-                }
-
-                return {
-                  id,
-                  imageSrc: `/data/team/${id}.png`,
-                  headline,
-                  fullDetails
-                };
-              } catch (error) {
-                console.error(`Error loading team member ${id}:`, error);
+        // Only load John O'Hare (04.md)
+        const johnOHareId = '04';
+        const memberPromises = [
+          (async () => {
+            try {
+              const markdownResponse = await fetch(`/data/team/${johnOHareId}.md`);
+              if (!markdownResponse.ok) {
                 return null;
               }
-            })()
-          );
-        }
+              
+              const markdownText = await markdownResponse.text();
+              const { headline, fullDetails } = parseTeamMarkdown(markdownText);
+
+              const imageResponse = await fetch(`/data/team/${johnOHareId}.png`);
+              if (!imageResponse.ok) {
+                console.warn(`Image not found for team member ${johnOHareId}, but markdown exists`);
+                return null;
+              }
+
+              return {
+                id: johnOHareId,
+                imageSrc: `/data/team/${johnOHareId}.png`,
+                headline,
+                fullDetails
+              };
+            } catch (error) {
+              console.error(`Error loading team member ${johnOHareId}:`, error);
+              return null;
+            }
+          })()
+        ];
         
         const loadedMembers = await Promise.all(memberPromises);
         const validMembers = loadedMembers.filter(Boolean) as TeamMemberData[];
@@ -162,7 +157,7 @@ const Team = () => {
         <div className="container">
           <div className="flex flex-col md:flex-row justify-between items-center border-t border-muted pt-8">
             <p className="text-sm text-muted-foreground">
-              &copy; {new Date().getFullYear()} The DreamLab UK. All rights reserved.
+              &copy; {new Date().getFullYear()} DreamLab AI Consulting Ltd. All rights reserved.
             </p>
             <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6">
               <div className="flex space-x-6">

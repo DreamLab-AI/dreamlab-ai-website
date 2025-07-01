@@ -1,6 +1,7 @@
-# DreamLab Website
+# DreamLab AI Consulting Ltd. Website
 
-DreamLab website landing page - A React + Vite application with ThreeJS integration.
+
+DreamLab AI Consulting Ltd. website landing page - A React + Vite application with ThreeJS integration.
 
 ## 🚀 Live Site
 

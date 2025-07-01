@@ -1,0 +1,45 @@
+{
+  "title": "Module 09: Local AI Models",
+  "pages": [
+    {
+      "slug": "README.md",
+      "title": "Module 09: Local AI Models"
+    },
+    {
+      "slug": "00_introduction.md",
+      "title": "00_introduction - Module 09: Local AI Models"
+    },
+    {
+      "slug": "01_concepts.md",
+      "title": "01_concepts - Module 09: Local AI Models"
+    },
+    {
+      "slug": "02_hands_on.md",
+      "title": "02_hands_on - Module 09: Local AI Models"
+    },
+    {
+      "slug": "03_exercises.md",
+      "title": "03_exercises - Module 09: Local AI Models"
+    },
+    {
+      "slug": "04_project.md",
+      "title": "04_project - Module 09: Local AI Models"
+    },
+    {
+      "slug": "05_assessment.md",
+      "title": "05_assessment - Module 09: Local AI Models"
+    },
+    {
+      "slug": "06_resources.md",
+      "title": "06_resources - Module 09: Local AI Models"
+    },
+    {
+      "slug": "objectives.md",
+      "title": "Learning Objectives - Module 09"
+    },
+    {
+      "slug": "prerequisites.md",
+      "title": "Prerequisites - Module 09"
+    }
+  ]
+}

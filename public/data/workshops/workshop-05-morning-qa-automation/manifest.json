@@ -1,0 +1,45 @@
+{
+  "title": "Module 13: Quality Assurance & Automation",
+  "pages": [
+    {
+      "slug": "README.md",
+      "title": "Module 13: Quality Assurance & Automation"
+    },
+    {
+      "slug": "00_introduction.md",
+      "title": "00_introduction - Module 13: Quality Assurance & Automation"
+    },
+    {
+      "slug": "01_concepts.md",
+      "title": "01_concepts - Module 13: Quality Assurance & Automation"
+    },
+    {
+      "slug": "02_hands_on.md",
+      "title": "02_hands_on - Module 13: Quality Assurance & Automation"
+    },
+    {
+      "slug": "03_exercises.md",
+      "title": "03_exercises - Module 13: Quality Assurance & Automation"
+    },
+    {
+      "slug": "04_project.md",
+      "title": "04_project - Module 13: Quality Assurance & Automation"
+    },
+    {
+      "slug": "05_assessment.md",
+      "title": "05_assessment - Module 13: Quality Assurance & Automation"
+    },
+    {
+      "slug": "06_resources.md",
+      "title": "06_resources - Module 13: Quality Assurance & Automation"
+    },
+    {
+      "slug": "objectives.md",
+      "title": "Learning Objectives - Module 13"
+    },
+    {
+      "slug": "prerequisites.md",
+      "title": "Prerequisites - Module 13"
+    }
+  ]
+}

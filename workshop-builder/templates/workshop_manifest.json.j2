@@ -1,0 +1,8 @@
+{
+  "id": "workshop-{{ workshop_number }}-{{ topic_slug }}",
+  "title": "Workshop: {{ topic_title }}",
+  "description": "A workshop on {{ topic_title }}.",
+  "files": [
+    {% for file_info in files %}"{{ file_info.name }}"{% if not loop.last %},{% endif %}{% endfor %}
+  ]
+}

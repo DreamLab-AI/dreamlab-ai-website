@@ -15,8 +15,7 @@ jobs:
     steps:
       - name: Check out the code
         uses: actions/checkout@v3
-        with:
-          persist-credentials: false
+        # persist-credentials defaults to true, so we can drop the override.
 
       - name: Use Node
         uses: actions/setup-node@v3
@@ -31,13 +30,9 @@ jobs:
           echo "VITE_SUPABASE_URL=${{ secrets.VITE_SUPABASE_URL }}" > .env
           echo "VITE_SUPABASE_ANON_KEY=${{ secrets.VITE_SUPABASE_ANON_KEY }}" >> .env
 
-      # More explicit data copying steps
       - name: Prepare team data
         run: |
-          # Ensure directories exist
           mkdir -p public/data/team
-          
-          # Copy all team assets from src to public
           if [ -d "src/data/team" ]; then
             cp -rv src/data/team/* public/data/team/
             echo "Copied team data from src to public"
@@ -47,7 +42,6 @@ jobs:
       - name: Build
         run: npm run build
 
-      # Copy 404.html to dist if it exists in public
       - name: Copy 404.html
         run: |
           if [ -f "public/404.html" ]; then
@@ -57,25 +51,20 @@ jobs:
             echo "❌ 404.html not found in public directory"
           fi
 
-      # Ensure team data is in dist
       - name: Copy team data to dist
         run: |
           mkdir -p dist/data/team
           cp -rv public/data/team/* dist/data/team/ || echo "No team data to copy"
 
-      # Verify the build output
       - name: Verify build artifacts
         run: |
           echo "Contents of dist/data/team:"
           ls -la dist/data/team/ || echo "dist/data/team directory not found!"
-          
-          # Check specific files
           if [ -f "dist/data/team/06.md" ]; then
             echo "✅ 06.md exists in build output"
           else
             echo "❌ 06.md missing from build output"
           fi
-          
           if [ -f "dist/data/team/06.png" ]; then
             echo "✅ 06.png exists in build output"
           else

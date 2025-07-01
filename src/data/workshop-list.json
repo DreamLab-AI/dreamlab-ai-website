@@ -1,0 +1,67 @@
+[
+  {
+    "id": "vscode-learning-pathway",
+    "name": "Vscode Learning Pathway",
+    "path": "/workshops/vscode-learning-pathway"
+  },
+  {
+    "id": "workshop-00-infra",
+    "name": "00 - Infra",
+    "path": "/workshops/workshop-00-infra"
+  },
+  {
+    "id": "workshop-01-afternoon-visual-version-control",
+    "name": "01 - Afternoon Visual Version Control",
+    "path": "/workshops/workshop-01-afternoon-visual-version-control"
+  },
+  {
+    "id": "workshop-01-morning-vscode-setup",
+    "name": "01 - Morning Vscode Setup",
+    "path": "/workshops/workshop-01-morning-vscode-setup"
+  },
+  {
+    "id": "workshop-02-afternoon-vibe-coding",
+    "name": "02 - Afternoon Vibe Coding",
+    "path": "/workshops/workshop-02-afternoon-vibe-coding"
+  },
+  {
+    "id": "workshop-02-morning-ai-api-access",
+    "name": "02 - Morning Ai Api Access",
+    "path": "/workshops/workshop-02-morning-ai-api-access"
+  },
+  {
+    "id": "workshop-03-afternoon-rag-system",
+    "name": "03 - Afternoon Rag System",
+    "path": "/workshops/workshop-03-afternoon-rag-system"
+  },
+  {
+    "id": "workshop-03-morning-local-ai",
+    "name": "03 - Morning Local Ai",
+    "path": "/workshops/workshop-03-morning-local-ai"
+  },
+  {
+    "id": "workshop-04-afternoon-orchestration",
+    "name": "04 - Afternoon Orchestration",
+    "path": "/workshops/workshop-04-afternoon-orchestration"
+  },
+  {
+    "id": "workshop-04-morning-ai-agents",
+    "name": "04 - Morning Ai Agents",
+    "path": "/workshops/workshop-04-morning-ai-agents"
+  },
+  {
+    "id": "workshop-05-afternoon-publishing",
+    "name": "05 - Afternoon Publishing",
+    "path": "/workshops/workshop-05-afternoon-publishing"
+  },
+  {
+    "id": "workshop-05-morning-qa-automation",
+    "name": "05 - Morning Qa Automation",
+    "path": "/workshops/workshop-05-morning-qa-automation"
+  },
+  {
+    "id": "workshop-06-codex",
+    "name": "06 - Codex",
+    "path": "/workshops/workshop-06-codex"
+  }
+]

@@ -1,0 +1,107 @@
+version: '3.8'
+
+services:
+  workshop-builder:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    image: workshop-builder-app:latest
+    container_name: workshop-builder-dev
+    
+    # Security configuration
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - DAC_OVERRIDE
+    read_only: true
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.25'
+    
+    # Environment configuration
+    env_file:
+      - .env
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PYTHONDONTWRITEBYTECODE=1
+      - LOG_LEVEL=INFO
+    
+    # Volume mounts
+    volumes:
+      - ../:/app:rw
+      - workshop-tmp:/tmp
+    
+    # Working directory
+    working_dir: /app/workshop-builder
+    
+    # Interactive mode for CLI usage
+    stdin_open: true
+    tty: true
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    
+    # Network configuration
+    networks:
+      - workshop-network
+    
+    # Restart policy
+    restart: unless-stopped
+
+  # Development service with additional debugging tools
+  workshop-builder-dev:
+    extends: workshop-builder
+    container_name: workshop-builder-debug
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PYTHONDONTWRITEBYTECODE=1
+      - LOG_LEVEL=DEBUG
+      - PYTHONPATH=/app/workshop-builder
+    
+    # Override for development - remove read-only restriction
+    read_only: false
+    
+    # Additional development volumes
+    volumes:
+      - ../:/app:rw
+      - workshop-tmp:/tmp
+      - workshop-cache:/app/workshop-builder/.cache
+    
+    # Development command override
+    command: ["python", "cli.py", "--help"]
+    
+    profiles:
+      - dev
+
+volumes:
+  workshop-tmp:
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+      o: size=100m,uid=1000,gid=1000
+  
+  workshop-cache:
+    driver: local
+
+networks:
+  workshop-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

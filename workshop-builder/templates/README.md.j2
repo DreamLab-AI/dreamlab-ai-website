@@ -1,0 +1,26 @@
+# Workshop {{ workshop_number }}: {{ topic_title }}
+
+Welcome to the workshop on **{{ topic_title }}**!
+
+This workshop will guide you through the fundamental concepts and practical applications of {{ topic_title }}. By the end of this module, you will have a better understanding of [mention key learning outcomes, e.g., "how to implement X", "the core principles of Y", "best practices for Z"].
+
+## Workshop Structure
+
+This workshop is divided into the following sections:
+
+{% for file_info in files %}
+- **[{{ file_info.title | default(file_info.name | replace(".md", "") | replace("_", " ") | title) }}](./{{ file_info.name }})**: {{ file_info.description | default("Covers " + (file_info.title | default(file_info.name | replace(".md", "") | replace("_", " ") | title)) + ".") }}
+{%- endfor %}
+
+## Prerequisites
+
+(To be filled in by the CompilerAgent based on content, or a generic placeholder)
+- Basic understanding of [relevant prerequisite technology/concept].
+- Access to a computer with [necessary software, e.g., Python 3.x, a text editor].
+
+## Getting Started
+
+To begin, please navigate to the first section:
+- [{{ files[0].title | default(files[0].name | replace(".md", "") | replace("_", " ") | title) }}](./{{ files[0].name }})
+
+We hope you find this workshop informative and engaging!

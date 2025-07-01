@@ -4,9 +4,14 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger
+  DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, ChevronRight } from "lucide-react";
+import workshopList from '@/data/workshop-list.json';
 import { Link } from "react-router-dom";
 
 /**
@@ -38,7 +43,7 @@ export const Header = () => {
           <DropdownMenuTrigger asChild>
             <div className="flex items-center gap-2 cursor-pointer">
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600"></div>
-              <span className="font-bold text-xl tracking-tight">CLICK FOR MORE</span>
+              <span className="font-bold text-xl tracking-tight">DREAMLAB AI CONSULTING</span>
               <ChevronDown className="h-4 w-4 text-muted-foreground" />
             </div>
           </DropdownMenuTrigger>
@@ -49,18 +54,30 @@ export const Header = () => {
             <DropdownMenuItem asChild>
               <Link to="/team" className="w-full">Team</Link>
             </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>
+                <span>Workshops</span>
+                {/* ChevronRight removed, shadcn/ui provides its own */}
+              </DropdownMenuSubTrigger>
+              <DropdownMenuSubContent className="w-52"> {/* Adjusted width */}
+                {workshopList.length > 0 ? (
+                  workshopList.map(workshop => (
+                    <DropdownMenuItem key={workshop.id} asChild>
+                      <Link to={workshop.path} className="w-full">{workshop.name}</Link>
+                    </DropdownMenuItem>
+                  ))
+                ) : (
+                  <DropdownMenuItem disabled>No workshops available</DropdownMenuItem>
+                )}
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link to="/work" className="w-full">Previous Work</Link>
+            </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link to="/contact" className="w-full">Contact</Link>
-            </DropdownMenuItem>
-            <div className="py-1">
-              <div className="border-t border-gray-200 dark:border-gray-700 my-1" />
-              <div className="px-3 py-1 text-xs text-muted-foreground font-semibold uppercase tracking-wider">Affiliate Partners</div>
-            </div>
-            <DropdownMenuItem asChild>
-              <a href="https://dreamlab-ai.com" target="_blank" rel="noopener noreferrer" className="w-full">DreamLab AI Consulting</a>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <a href="https://agenticalliance.com/" target="_blank" rel="noopener noreferrer" className="w-full">Agentic Alliance</a>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

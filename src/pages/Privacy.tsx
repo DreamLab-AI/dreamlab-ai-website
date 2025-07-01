@@ -65,6 +65,33 @@ const Privacy = () => {
           </section>
         </div>
       </main>
+      
+      {/* Footer */}
+      <footer className="py-8 bg-background">
+        <div className="container">
+          <div className="flex flex-col md:flex-row justify-between items-center border-t border-muted pt-8">
+            <p className="text-sm text-muted-foreground">
+              &copy; {new Date().getFullYear()} DreamLab AI Consulting Ltd. All rights reserved.
+            </p>
+            <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6">
+              <div className="flex space-x-6">
+                <a href="https://bsky.app/profile/thedreamlab.bsky.social" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Bluesky
+                </a>
+                <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Instagram
+                </a>
+                <a href="https://www.linkedin.com/company/dreamlabinstitute/?" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+                  LinkedIn
+                </a>
+              </div>
+              <a href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                Privacy Policy
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };

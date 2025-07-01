@@ -7,7 +7,9 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Privacy from "./pages/Privacy";
 import Team from "./pages/Team";
+import Work from "./pages/Work";
 import Contact from "./pages/Contact";
+import WorkshopPage from "./pages/WorkshopPage"; // New import for workshop pages
 
 // Initialize React Query client
 const queryClient = new QueryClient();
@@ -32,6 +34,13 @@ const App = () => (
           <Route path="/" element={<Index />} />
           {/* Team page route */}
           <Route path="/team" element={<Team />} />
+          {/* Previous Work route */}
+          <Route path="/work" element={<Work />} />
+          
+          {/* Workshop Routes */}
+          <Route path="/workshops/:workshopId" element={<WorkshopPage />} />
+          <Route path="/workshops/:workshopId/:pageSlug" element={<WorkshopPage />} />
+
           {/* Contact form route */}
           <Route path="/contact" element={<Contact />} />
           {/* Privacy Policy route */}

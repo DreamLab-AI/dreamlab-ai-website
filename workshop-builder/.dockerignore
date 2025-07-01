@@ -1,0 +1,47 @@
+# .dockerignore
+
+# Python virtual environment
+.venv/
+venv/
+
+# Python bytecode and caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+
+# IDE and editor specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Local .env file (should be mounted or passed as env vars at runtime)
+.env
+
+# Test reports
+htmlcov/
+.coverage
+
+# Temporary research data (if it gets created locally during dev)
+temp_research_data/
+temp_research_data_test/
+
+# Test workshop output (if created locally)
+public/data/workshops_test/
+public/data/workshops_compile_test/
+delete_me_test_workshops_git/
+
+# Git directory
+.git/

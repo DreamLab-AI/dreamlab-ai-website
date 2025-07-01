@@ -1,0 +1,210 @@
+import logging
+import os
+import json
+import google.generativeai as genai
+from typing import List
+
+from ..orchestrator.config import AppConfig
+
+class ResearchAgentError(Exception):
+    """Custom exception for ResearchAgent errors."""
+    pass
+
+class ResearchAgent:
+    def __init__(self, config: AppConfig, temp_data_dir: str):
+        self.config = config
+        self.logger = config.get_logger(__name__)
+        self.temp_data_dir = temp_data_dir
+        self.logger.info(f"ResearchAgent initialized. Temp data dir: {self.temp_data_dir}")
+
+        if not self.config.gemini_api_key:
+            self.logger.error("Gemini API key is not configured.")
+            raise ResearchAgentError("Gemini API key missing.")
+        
+        # Configure Gemini Flash 2.5
+        genai.configure(api_key=self.config.gemini_api_key)
+        self.model = genai.GenerativeModel('gemini-2.0-flash-exp')
+        self.logger.info("Gemini Flash 2.5 model configured successfully.")
+
+    def _generate_research_prompts(self, topic: str) -> List[str]:
+        """Generate comprehensive research prompts for deep investigation of the topic."""
+        return [
+            f"""Provide a comprehensive overview of {topic}. Include:
+            - Definition and core concepts
+            - Historical context and evolution
+            - Key principles and fundamentals
+            - Why it's important in its field
+            - Current state and relevance
+            
+            Focus on accuracy and depth. Provide detailed explanations suitable for educational content.""",
+            
+            f"""Analyze the practical applications and implementation aspects of {topic}. Cover:
+            - Real-world use cases and examples
+            - Step-by-step implementation guidance
+            - Best practices and common patterns
+            - Tools, frameworks, and technologies involved
+            - Common challenges and solutions
+            
+            Provide concrete examples and actionable insights.""",
+            
+            f"""Explore the advanced concepts and future directions of {topic}. Include:
+            - Advanced techniques and methodologies
+            - Current research and developments
+            - Industry trends and future outlook
+            - Integration with other technologies
+            - Expert-level considerations
+            
+            Focus on cutting-edge information and forward-looking perspectives.""",
+            
+            f"""Provide educational structure and learning path for {topic}. Cover:
+            - Prerequisites and foundational knowledge
+            - Learning objectives and outcomes
+            - Structured progression from basic to advanced
+            - Hands-on exercises and practical projects
+            - Assessment criteria and milestones
+            
+            Design this as a comprehensive curriculum framework."""
+        ]
+
+    def fetch_unstructured_data(self, topic: str) -> List[str]:
+        """
+        Fetches unstructured data related to the topic using Gemini Flash 2.5.
+        Performs deep research through multiple targeted prompts.
+        Saves the data into files within the temp_data_dir.
+        Returns a list of paths to the created data files.
+        """
+        self.logger.info(f"Performing deep research for topic: {topic} using Gemini Flash 2.5...")
+        
+        try:
+            # Ensure temp_data_dir exists
+            os.makedirs(self.temp_data_dir, exist_ok=True)
+            
+            research_prompts = self._generate_research_prompts(topic)
+            file_paths = []
+            
+            for i, prompt in enumerate(research_prompts):
+                self.logger.info(f"Executing research query {i+1}/{len(research_prompts)}")
+                
+                try:
+                    # Generate content using Gemini Flash 2.5
+                    response = self.model.generate_content(prompt)
+                    
+                    if not response.text:
+                        self.logger.warning(f"Empty response for research query {i+1}")
+                        continue
+                    
+                    # Create descriptive filename based on research focus
+                    focus_areas = ["overview", "practical_applications", "advanced_concepts", "learning_structure"]
+                    filename = f"{topic.replace(' ', '_').lower()}_{focus_areas[i]}.txt"
+                    file_path = os.path.join(self.temp_data_dir, filename)
+                    
+                    # Save research data
+                    with open(file_path, "w", encoding="utf-8") as f:
+                        f.write(f"# Deep Research: {topic} - {focus_areas[i].replace('_', ' ').title()}\n\n")
+                        f.write(f"Research Query: {prompt}\n\n")
+                        f.write("=" * 80 + "\n\n")
+                        f.write(response.text)
+                        f.write("\n\n" + "=" * 80 + "\n")
+                        f.write(f"Generated by Gemini Flash 2.5 for Workshop Builder\n")
+                    
+                    file_paths.append(file_path)
+                    self.logger.info(f"Saved research data to: {file_path}")
+                    
+                except Exception as e:
+                    self.logger.error(f"Failed to generate content for research query {i+1}: {e}")
+                    continue
+            
+            # Generate a research summary
+            if file_paths:
+                summary_path = os.path.join(self.temp_data_dir, f"{topic.replace(' ', '_').lower()}_research_summary.json")
+                summary_data = {
+                    "topic": topic,
+                    "research_files": [os.path.basename(fp) for fp in file_paths],
+                    "total_files": len(file_paths),
+                    "research_areas": ["overview", "practical_applications", "advanced_concepts", "learning_structure"][:len(file_paths)]
+                }
+                
+                with open(summary_path, "w", encoding="utf-8") as f:
+                    json.dump(summary_data, f, indent=2)
+                
+                file_paths.append(summary_path)
+                self.logger.info(f"Generated research summary: {summary_path}")
+
+        except Exception as e:
+            self.logger.error(f"Failed to perform research for topic '{topic}': {e}", exc_info=True)
+            raise ResearchAgentError(f"Research operation failed: {e}")
+
+        if not file_paths:
+            self.logger.error(f"No research data was generated for topic: {topic}")
+            raise ResearchAgentError(f"No research data could be fetched for topic: {topic}")
+
+        self.logger.info(f"Successfully completed deep research for '{topic}'. Generated {len(file_paths)} data files.")
+        return file_paths
+
+if __name__ == '__main__':
+    print("Testing ResearchAgent (requires .env file in workshop-builder directory)")
+    
+    # This direct test requires AppConfig to be loadable, which means .env needs to be set up.
+    # The orchestrator's test is more comprehensive for integration.
+    if not os.path.exists(os.path.join(os.path.dirname(__file__), '..', '.env')):
+        print("Creating a dummy .env for ResearchAgent test...")
+        with open(os.path.join(os.path.dirname(__file__), '..', '.env'), 'w') as f:
+            f.write('GEMINI_API_KEY="dummy_gemini_key_for_test"\n')
+            # Add other necessary dummy keys if AppConfig complains
+            f.write('OPENAI_API_KEY="dummy"\nGITHUB_TOKEN="dummy"\nGITHUB_REPO_OWNER="dummy"\nGITHUB_REPO_NAME="dummy"\n')
+            f.write('LOG_LEVEL="DEBUG"\n')
+            f.write('TEMP_DATA_DIR="temp_research_data_test"\n')
+
+
+    try:
+        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        
+        # Resolve temp_data_dir relative to workshop-builder for this test
+        script_dir = os.path.dirname(os.path.abspath(__file__)) # agents directory
+        temp_dir_for_test = os.path.join(script_dir, '..', "temp_research_data_test")
+        temp_dir_for_test = os.path.normpath(temp_dir_for_test)
+
+        # Clean up before test
+        if os.path.exists(temp_dir_for_test):
+            import shutil
+            shutil.rmtree(temp_dir_for_test)
+        os.makedirs(temp_dir_for_test, exist_ok=True)
+        
+        config = AppConfig() # Will load from .env
+        
+        # Override temp_data_dir for this specific test if it was set in .env
+        # config.temp_data_dir = temp_dir_for_test # The orchestrator normally sets this absolute path
+
+        agent = ResearchAgent(config, temp_dir_for_test) # Pass the resolved temp_dir_for_test
+        paths = agent.fetch_unstructured_data("Test Topic Research")
+        print(f"ResearchAgent test created files: {paths}")
+        for p in paths:
+            if os.path.exists(p):
+                with open(p, "r") as f_read:
+                    print(f"--- Contents of {p} ---")
+                    print(f_read.read())
+                    print("--- End of Contents ---")
+            else:
+                print(f"Error: File {p} was not created.")
+        
+        print("ResearchAgent test completed.")
+
+    except ResearchAgentError as rae:
+        print(f"ResearchAgent Error: {rae}")
+    except ValueError as ve: # For AppConfig issues
+        print(f"Configuration Error: {ve}")
+    except Exception as e:
+        print(f"ResearchAgent test failed: {e}")
+        import traceback
+        traceback.print_exc()
+    finally:
+        # Clean up dummy .env and temp dir
+        dummy_env_path = os.path.join(os.path.dirname(__file__), '..', '.env')
+        if "dummy_gemini_key_for_test" in open(dummy_env_path).read(): # Check if it's our dummy
+             os.remove(dummy_env_path)
+             print("Removed dummy .env used for ResearchAgent test.")
+        
+        if os.path.exists(temp_dir_for_test) and "temp_research_data_test" in temp_dir_for_test:
+            import shutil
+            shutil.rmtree(temp_dir_for_test)
+            print(f"Cleaned up test temp directory: {temp_dir_for_test}")
