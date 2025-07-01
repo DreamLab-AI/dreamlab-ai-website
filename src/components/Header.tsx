@@ -33,7 +33,7 @@ export const Header = () => {
   }, []);
 
   return (
-    <header 
+    <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled ? "bg-background/90 backdrop-blur-md py-3 shadow-md" : "bg-transparent py-5"
       }`}
@@ -43,7 +43,7 @@ export const Header = () => {
           <DropdownMenuTrigger asChild>
             <div className="flex items-center gap-2 cursor-pointer">
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600"></div>
-              <span className="font-bold text-xl tracking-tight">DREAMLAB AI CONSULTING</span>
+              <span className="font-bold text-xl tracking-tight">MENU</span>
               <ChevronDown className="h-4 w-4 text-muted-foreground" />
             </div>
           </DropdownMenuTrigger>
@@ -81,7 +81,7 @@ export const Header = () => {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        
+
         <Button variant="ghost" asChild>
           <a href="mailto:info@thedreamlab.uk">Contact</a>
         </Button>
