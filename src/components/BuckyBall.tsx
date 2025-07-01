@@ -1,10 +1,9 @@
 import { useRef, useState, useEffect, useMemo } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import { ConvexGeometry } from 'three/examples/jsm/geometries/ConvexGeometry.js';
 
 // --- Constants ---
-const BUCKYBALL_RADIUS = 10.5; // Current radius of the buckyball structure
+const TORUS_KNOT_RADIUS = 10; // Radius of the torus knot
 const CANVAS_TEXTURE_WIDTH = 256;
 const CANVAS_TEXTURE_HEIGHT = 64;
 const TEXT_FONT = 'bold 20px Arial';
@@ -88,8 +87,8 @@ const SkillNode = ({ position, text, visible }: SkillNodeProps) => {
     const dotProduct = directionToCamera.dot(cameraForward);
 
     // Define visibility parameters
-    const maxOpacity = 0.5; // Max opacity when fully visible
-    const sideViewOpacity = 0.15; // Opacity when viewed from the side
+    const maxOpacity = 0.25; // Max opacity when fully visible
+    const sideViewOpacity = 0.075; // Opacity when viewed from the side
     const visibilityDistanceThreshold = 40; // Max distance to be visible
     const fullOpacityDistanceStart = 15; // Distance at which opacity starts decreasing
     const fullOpacityDistanceEnd = fullOpacityDistanceStart + 25; // Distance where opacity reaches near zero
@@ -135,81 +134,8 @@ const SkillNode = ({ position, text, visible }: SkillNodeProps) => {
   );
 };
 
-
 /**
- * Generates the 60 vertices of a C60 Buckminsterfullerene (Truncated Icosahedron)
- * based on standard geometric principles.
- * @param radius The desired radius of the buckyball.
- * @returns An array of vertex positions `[x, y, z]`.
- */
-const getC60Vertices = (radius: number): Array<[number, number, number]> => {
-  const phi = (1 + Math.sqrt(5)) / 2; // The golden ratio
-  const preciseCoords: Array<[number, number, number]> = [];
-  const add = (v: [number, number, number]) => preciseCoords.push(v);
-
-  // --- Generate coordinates based on standard C60 vertex types ---
-  // See Wikipedia or mathematical sources for derivations.
-
-  // Type 1: (0, ±1, ±3φ) and its 2 cyclic permutations (12 vertices)
-  add([0, 1, 3 * phi]); add([0, 1, -3 * phi]); add([0, -1, 3 * phi]); add([0, -1, -3 * phi]);
-  add([1, 3 * phi, 0]); add([-1, 3 * phi, 0]); add([1, -3 * phi, 0]); add([-1, -3 * phi, 0]);
-  add([3 * phi, 0, 1]); add([-3 * phi, 0, 1]); add([3 * phi, 0, -1]); add([-3 * phi, 0, -1]);
-
-  // Type 2: (±2, ±(1+2φ), ±φ) and its 2 cyclic permutations (24 vertices)
-  const p1 = [2, 1 + 2 * phi, phi];
-  const p2 = [1 + 2 * phi, phi, 2];
-  const p3 = [phi, 2, 1 + 2 * phi];
-  [p1, p2, p3].forEach(p => {
-    add([p[0], p[1], p[2]]); add([p[0], p[1], -p[2]]);
-    add([p[0], -p[1], p[2]]); add([p[0], -p[1], -p[2]]);
-    add([-p[0], p[1], p[2]]); add([-p[0], p[1], -p[2]]);
-    add([-p[0], -p[1], p[2]]); add([-p[0], -p[1], -p[2]]);
-  });
-
-  // Type 3: (±1, ±(2+φ), ±2φ) and its 2 cyclic permutations (24 vertices)
-  const p4 = [1, 2 + phi, 2 * phi];
-  const p5 = [2 + phi, 2 * phi, 1];
-  const p6 = [2 * phi, 1, 2 + phi];
-  [p4, p5, p6].forEach(p => {
-    add([p[0], p[1], p[2]]); add([p[0], p[1], -p[2]]);
-    add([p[0], -p[1], p[2]]); add([p[0], -p[1], -p[2]]);
-    add([-p[0], p[1], p[2]]); add([-p[0], p[1], -p[2]]);
-    add([-p[0], -p[1], p[2]]); add([-p[0], -p[1], -p[2]]);
-  });
-
-  // --- Normalize and Scale ---
-  // Calculate the distance from the origin for one vertex type to find the normalization factor
-  const normFactor = Math.sqrt(10 + 9 * phi); // Based on (±1, ±(2+φ), ±2φ) type
-
-  // Apply normalization and scale by the desired radius
-  const scaledVertices = preciseCoords.map(v => {
-    const normalized = v.map(coord => coord / normFactor) as [number, number, number];
-    return normalized.map(coord => coord * radius) as [number, number, number];
-  });
-
-  // --- De-duplicate Vertices ---
-  // Use a Map with stringified rounded coordinates to handle potential floating-point inaccuracies
-  // and ensure exactly 60 unique vertices.
-  const uniqueVerticesMap = new Map<string, [number, number, number]>();
-  scaledVertices.forEach(v => {
-    const key = v.map(c => c.toFixed(5)).join(','); // Key based on rounded coords
-    if (!uniqueVerticesMap.has(key)) {
-      uniqueVerticesMap.set(key, v);
-    }
-  });
-
-  const finalVertices = Array.from(uniqueVerticesMap.values());
-
-  // Sanity check - log a warning if we don't get exactly 60 vertices
-  if (finalVertices.length !== 60) {
-    console.warn(`Generated ${finalVertices.length} vertices instead of 60 for C60. Check vertex generation logic.`);
-  }
-
-  return finalVertices;
-};
-
-/**
- * Manages the main 3D scene content: the rotating buckyball wireframe
+ * Manages the main 3D scene content: the rotating torus knot wireframe
  * and the associated SkillNode labels.
  */
 const BuckyballScene = ({ skills }: BuckyBallProps) => { // Use BuckyBallProps interface
@@ -218,57 +144,55 @@ const BuckyballScene = ({ skills }: BuckyBallProps) => { // Use BuckyBallProps i
   const [nodesToUpdate, setNodesToUpdate] = useState<number[]>([]); // Nodes whose skills need updating
   const [frameCount, setFrameCount] = useState(0); // Frame counter for timed events
 
-  // State for the random walk rotation velocities
-  const [rotationVelocity, setRotationVelocity] = useState({
-    x: 0.0005, // Current rotation speed around X-axis
-    y: 0.001,  // Current rotation speed around Y-axis
-    z: 0.00025 // Current rotation speed around Z-axis
-  });
 
-  // Memoized calculation of buckyball vertex positions as Vector3 objects
+  // Memoized calculation of the Torus Knot geometry
+  const torusKnotGeometry = useMemo(() => {
+    // Parameters: radius, tube radius, tubular segments, radial segments, p, q
+    // Using 3 radial segments to create a triangular tube
+    return new THREE.TorusKnotGeometry(TORUS_KNOT_RADIUS, 1.5, 64, 3, 2, 3);
+  }, []);
+
+  // Memoized extraction of vertex positions from the geometry
   const verticesVectors = useMemo(() => {
-    const vertexPositions = getC60Vertices(BUCKYBALL_RADIUS);
-    return vertexPositions.map(pos => new THREE.Vector3(...pos));
-  }, []); // Depends only on the constant radius, so calculated once
+    const vertices = [];
+    const positionAttribute = torusKnotGeometry.getAttribute('position');
+    for (let i = 0; i < positionAttribute.count; i++) {
+      const vec = new THREE.Vector3();
+      vec.fromBufferAttribute(positionAttribute, i);
+      vertices.push(vec);
+    }
+    // De-duplicate vertices to avoid placing multiple labels on the same spot
+    const uniqueVerticesMap = new Map<string, THREE.Vector3>();
+    vertices.forEach(v => {
+        const key = v.toArray().map(c => c.toFixed(3)).join(',');
+        if (!uniqueVerticesMap.has(key)) {
+            uniqueVerticesMap.set(key, v);
+        }
+    });
+    return Array.from(uniqueVerticesMap.values());
+  }, [torusKnotGeometry]);
 
-  // Memoized calculation of the wireframe geometry from the vertices
+  // Memoized calculation of the wireframe geometry from the torus knot
   const wireframeGeometry = useMemo(() => {
-    if (verticesVectors.length === 0) return new THREE.BufferGeometry();
-    // Use ConvexGeometry to create faces from the vertices
-    const convexGeom = new ConvexGeometry(verticesVectors);
-    // Extract edges from the convex geometry for the wireframe
-    return new THREE.EdgesGeometry(convexGeom);
-  }, [verticesVectors]); // Recalculate if vertices change
+    return new THREE.EdgesGeometry(torusKnotGeometry);
+  }, [torusKnotGeometry]);
 
   // --- Animation and Logic Loop ---
   useFrame((state) => {
     if (!groupRef.current) return;
 
-    // --- Apply Rotation ---
-    // Rotate the entire group based on current velocities
-    groupRef.current.rotation.x += rotationVelocity.x;
-    groupRef.current.rotation.y += rotationVelocity.y;
-    groupRef.current.rotation.z += rotationVelocity.z;
+    const t = state.clock.getElapsedTime();
 
-    // --- Update Rotation Velocity (Random Walk) ---
-    // Adjust rotation velocity slightly every 60 frames (~1 second)
-    if (frameCount % 60 === 0) {
-      const changeFactor = 0.0005; // How much the velocity can change each step
-      setRotationVelocity(prev => ({
-        x: prev.x + (Math.random() - 0.5) * changeFactor,
-        y: prev.y + (Math.random() - 0.5) * changeFactor,
-        z: prev.z + (Math.random() - 0.5) * (changeFactor * 0.4) // Smaller change for z-axis
-      }));
-    }
-
-    // Increment frame counter
-    setFrameCount(prev => prev + 1);
+    // Use Perlin noise to create a smooth, organic rotation
+    groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, Math.sin(t * 0.05) * 0.25, 0.02);
+    groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, Math.cos(t * 0.1) * 0.25, 0.02);
+    groupRef.current.rotation.z = THREE.MathUtils.lerp(groupRef.current.rotation.z, Math.sin(t * 0.075) * 0.25, 0.02);
 
     // --- Check for Nodes Needing Skill Update ---
     // Every 10 frames, identify nodes that have moved behind the scene
     if (frameCount % 10 === 0) {
       const nodesToTriggerUpdate: number[] = [];
-      const skillSwapDepth = -(BUCKYBALL_RADIUS * SKILL_SWAP_DEPTH_THRESHOLD_FACTOR); // Calculate depth threshold
+      const skillSwapDepth = -(TORUS_KNOT_RADIUS * SKILL_SWAP_DEPTH_THRESHOLD_FACTOR); // Calculate depth threshold
 
       verticesVectors.forEach((vec, nodeIndex) => {
         // Calculate the world position of the vertex considering the group's rotation
@@ -337,7 +261,7 @@ const BuckyballScene = ({ skills }: BuckyBallProps) => { // Use BuckyBallProps i
         <lineBasicMaterial
           color="#3b82f6" // Blue color for wireframe
           transparent
-          opacity={0.7}
+          opacity={0.35}
           fog={true} // Allow fog to affect wireframe
           depthWrite={true} // Ensure proper depth sorting
         />

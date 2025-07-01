@@ -11,11 +11,10 @@ console.log('Supabase initialization:', {
   key: supabaseAnonKey?.slice(0, 5) + '...' // Only log first 5 chars of key for security
 });
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
-}
+let supabase;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+if (supabaseUrl && supabaseAnonKey) {
+  supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: false,
@@ -27,4 +26,11 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
       'Authorization': `Bearer ${supabaseAnonKey}`
     }
   }
-}); 
+  });
+} else {
+  console.warn('Supabase environment variables are not set. Supabase client not initialized.');
+  // Provide a mock/dummy client if needed, or just leave it undefined
+  supabase = null;
+}
+
+export { supabase };
