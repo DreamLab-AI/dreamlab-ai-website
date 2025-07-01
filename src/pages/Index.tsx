@@ -1,4 +1,4 @@
-import { BuckyBall } from "@/components/BuckyBall";
+import { TorusKnot } from "@/components/TorusKnot";
 import { EmailSignupForm } from "@/components/EmailSignupForm";
 import { Header } from "@/components/Header";
 import skillsData from "@/data/skills.json";
@@ -16,14 +16,14 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background text-foreground overflow-hidden">
       <Header />
-      
+
       {/* Hero section with buckyball */}
       <section className="relative min-h-screen overflow-hidden flex flex-col items-center justify-center">
-        {/* Buckyball container */}
+        {/* TorusKnot container */}
         <div className="absolute inset-0 z-0">
-          <BuckyBall skills={skills} />
+          <TorusKnot skills={skills} />
         </div>
-        
+
         {/* Content overlay */}
         <div className="container relative z-10 mt-16 flex flex-col items-center text-center">
           <h1 className="text-4xl md:text-6xl font-bold mb-6 animate-fade-in bg-gradient-to-r from-blue-400 via-purple-500 to-blue-500 inline-block text-transparent bg-clip-text animate-text-shimmer bg-300% max-w-3xl">
@@ -36,11 +36,11 @@ const Index = () => {
 
         {/* Scroll indicator */}
         <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2 z-10 animate-bounce">
-          <ChevronDown className="w-10 h-10 text-muted-foreground/70 hover:text-foreground transition-colors cursor-pointer" 
+          <ChevronDown className="w-10 h-10 text-muted-foreground/70 hover:text-foreground transition-colors cursor-pointer"
             onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })} />
         </div>
       </section>
-      
+
       {/* Email signup section */}
       <section className="relative py-20 bg-secondary/50">
         <div className="container flex flex-col items-center">
@@ -50,7 +50,7 @@ const Index = () => {
           <EmailSignupForm />
         </div>
       </section>
-      
+
       {/* Footer */}
       <footer className="py-8 bg-background">
         <div className="container">
