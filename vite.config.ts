@@ -4,7 +4,7 @@ import path from "path";
 import fs from 'fs';
 
 export default defineConfig({
-  base: '/dreamlab-ai-website/',
+  base: '/',
   plugins: [
     react(),
     {
