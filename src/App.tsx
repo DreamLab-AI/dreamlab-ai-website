@@ -14,6 +14,7 @@ const Team = lazy(() => import("./pages/Team"));
 const Work = lazy(() => import("./pages/Work"));
 const Contact = lazy(() => import("./pages/Contact"));
 const WorkshopPage = lazy(() => import("./pages/WorkshopPage"));
+const WorkshopIndex = lazy(() => import("./pages/WorkshopIndex"));
 
 // Initialize React Query client
 const queryClient = new QueryClient();
@@ -33,26 +34,29 @@ const App = () => (
       <Sonner />
       {/* Set up client-side routing */}
       <BrowserRouter>
-        <Routes>
-          {/* Main index route */}
-          <Route path="/" element={<Index />} />
-          {/* Team page route */}
-          <Route path="/team" element={<Team />} />
-          {/* Previous Work route */}
-          <Route path="/work" element={<Work />} />
-          
-          {/* Workshop Routes */}
-          <Route path="/workshops/:workshopId" element={<WorkshopPage />} />
-          <Route path="/workshops/:workshopId/:pageSlug" element={<WorkshopPage />} />
+        <Suspense fallback={<RouteLoader />}>
+          <Routes>
+            {/* Main index route */}
+            <Route path="/" element={<Index />} />
+            {/* Team page route */}
+            <Route path="/team" element={<Team />} />
+            {/* Previous Work route */}
+            <Route path="/work" element={<Work />} />
 
-          {/* Contact form route */}
-          <Route path="/contact" element={<Contact />} />
-          {/* Privacy Policy route */}
-          <Route path="/privacy" element={<Privacy />} />
-          {/* --- Add Custom Routes Above This Line --- */}
-          {/* Catch-all route for pages not found */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+            {/* Workshop Routes */}
+            <Route path="/workshops" element={<WorkshopIndex />} />
+            <Route path="/workshops/:workshopId" element={<WorkshopPage />} />
+            <Route path="/workshops/:workshopId/:pageSlug" element={<WorkshopPage />} />
+
+            {/* Contact form route */}
+            <Route path="/contact" element={<Contact />} />
+            {/* Privacy Policy route */}
+            <Route path="/privacy" element={<Privacy />} />
+            {/* --- Add Custom Routes Above This Line --- */}
+            {/* Catch-all route for pages not found */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
