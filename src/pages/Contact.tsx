@@ -4,13 +4,13 @@ import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { 
-  Form, 
-  FormControl, 
-  FormField, 
-  FormItem, 
-  FormLabel, 
-  FormMessage 
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -38,7 +38,7 @@ const Contact = () => {
   const { toast } = useToast();
   const [selectedTeam, setSelectedTeam] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   // Parse query params to get selected team members
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -47,7 +47,7 @@ const Contact = () => {
       setSelectedTeam(team);
     }
   }, [location]);
-  
+
   // Set up form
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -59,18 +59,18 @@ const Contact = () => {
       message: ""
     }
   });
-  
+
   // Update team members field when selectedTeam changes
   useEffect(() => {
     form.setValue("teamMembers", selectedTeam);
   }, [selectedTeam, form]);
-  
+
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
-    
+
     try {
       console.log("Submitting contact form:", data);
-      
+
       const { error } = await supabase
         .from('contact_submissions')
         .insert([{
@@ -91,22 +91,22 @@ const Contact = () => {
         });
         throw error;
       }
-      
+
       // Also add email to subscribers list if not already there
       await supabase
         .from('email_subscribers')
-        .upsert([{ email: data.email }], { 
+        .upsert([{ email: data.email }], {
           onConflict: 'email',
           ignoreDuplicates: true
         });
-      
+
       // Show success message
       toast({
         title: "Success!",
         description: SUCCESS_MESSAGE,
         duration: 5000
       });
-      
+
       // Reset form
       form.reset();
     } catch (error) {
@@ -121,11 +121,11 @@ const Contact = () => {
       setIsSubmitting(false);
     }
   };
-  
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Header />
-      
+
       {/* Contact header */}
       <section className="pt-24 pb-8 bg-secondary/20">
         <div className="container">
@@ -135,7 +135,7 @@ const Contact = () => {
           </p>
         </div>
       </section>
-      
+
       {/* Contact form */}
       <section className="py-12">
         <div className="container max-w-2xl">
@@ -154,7 +154,7 @@ const Contact = () => {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="email"
@@ -168,7 +168,7 @@ const Contact = () => {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="projectType"
@@ -193,7 +193,7 @@ const Contact = () => {
                   </FormItem>
                 )}
               />
-              
+
               {selectedTeam && (
                 <FormField
                   control={form.control}
@@ -202,10 +202,10 @@ const Contact = () => {
                     <FormItem>
                       <FormLabel>Selected Team Members</FormLabel>
                       <FormControl>
-                        <Input 
-                          {...field} 
-                          value={selectedTeam} 
-                          readOnly 
+                        <Input
+                          {...field}
+                          value={selectedTeam}
+                          readOnly
                           className="bg-muted cursor-not-allowed"
                           disabled={isSubmitting}
                         />
@@ -215,7 +215,7 @@ const Contact = () => {
                   )}
                 />
               )}
-              
+
               <FormField
                 control={form.control}
                 name="message"
@@ -223,10 +223,10 @@ const Contact = () => {
                   <FormItem>
                     <FormLabel>Message</FormLabel>
                     <FormControl>
-                      <Textarea 
-                        placeholder="Tell us about your project or inquiry..." 
-                        className="min-h-32" 
-                        {...field} 
+                      <Textarea
+                        placeholder="Tell us about your project or inquiry..."
+                        className="min-h-32"
+                        {...field}
                         disabled={isSubmitting}
                       />
                     </FormControl>
@@ -234,7 +234,7 @@ const Contact = () => {
                   </FormItem>
                 )}
               />
-              
+
               <Button type="submit" className="w-full md:w-auto" disabled={isSubmitting}>
                 {isSubmitting ? "Sending..." : "Send Message"}
               </Button>
@@ -242,7 +242,7 @@ const Contact = () => {
           </Form>
         </div>
       </section>
-      
+
       {/* Footer */}
       <footer className="py-8 bg-background">
         <div className="container">
@@ -258,7 +258,7 @@ const Contact = () => {
                 <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
                   Instagram
                 </a>
-                <a href="https://www.linkedin.com/company/dreamlabinstitute/?" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+                <a href="https://www.linkedin.com/company/dreamlab-ai-consulting/?" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
                   LinkedIn
                 </a>
               </div>
@@ -273,4 +273,4 @@ const Contact = () => {
   );
 };
 
-export default Contact; 
+export default Contact;

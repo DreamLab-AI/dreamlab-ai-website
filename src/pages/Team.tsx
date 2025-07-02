@@ -30,7 +30,7 @@ const Team = () => {
               if (!markdownResponse.ok) {
                 return null;
               }
-              
+
               const markdownText = await markdownResponse.text();
               const { headline, fullDetails } = parseTeamMarkdown(markdownText);
 
@@ -52,13 +52,13 @@ const Team = () => {
             }
           })()
         ];
-        
+
         const loadedMembers = await Promise.all(memberPromises);
         const validMembers = loadedMembers.filter(Boolean) as TeamMemberData[];
-        
+
         // Sort members by ID to maintain consistent order
         validMembers.sort((a, b) => parseInt(a.id) - parseInt(b.id));
-        
+
         console.log(`Loaded ${validMembers.length} team members`);
         setTeamMembers(validMembers);
       } catch (error) {
@@ -67,13 +67,13 @@ const Team = () => {
         setLoading(false);
       }
     };
-    
+
     loadTeamMembers();
   }, []);
 
   const handleToggleSelect = (id: string) => {
-    setSelectedMembers(prev => 
-      prev.includes(id) 
+    setSelectedMembers(prev =>
+      prev.includes(id)
         ? prev.filter(memberId => memberId !== id)
         : [...prev, id]
     );
@@ -81,7 +81,7 @@ const Team = () => {
 
   const handleEnquire = () => {
     if (selectedMembers.length === 0) return;
-    
+
     // Get names of selected team members
     const selectedNames = selectedMembers
       .map(id => {
@@ -90,7 +90,7 @@ const Team = () => {
       })
       .filter(Boolean)
       .join(", ");
-    
+
     // Redirect to contact page with pre-selected team members
     window.location.href = `/contact?team=${encodeURIComponent(selectedNames)}`;
   };
@@ -98,24 +98,24 @@ const Team = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Header />
-      
+
       {/* Team header */}
       <section className="pt-24 pb-8 bg-secondary/20">
         <div className="container">
           <h1 className="text-3xl md:text-4xl font-bold mb-4">Our Team</h1>
           <p className="text-lg text-muted-foreground max-w-3xl">
-            Meet our talented professionals. Click on a team member's photo to select 
+            Meet our talented professionals. Click on a team member's photo to select
             them for your project.
           </p>
-          
+
           {/* Selection controls */}
           <div className="mt-6 flex flex-wrap items-center gap-4">
             <span className="text-sm font-medium">
               {selectedMembers.length} team member{selectedMembers.length !== 1 ? 's' : ''} selected
             </span>
-            
-            <Button 
-              onClick={handleEnquire} 
+
+            <Button
+              onClick={handleEnquire}
               disabled={selectedMembers.length === 0}
               size="sm"
               className="gap-1"
@@ -126,7 +126,7 @@ const Team = () => {
           </div>
         </div>
       </section>
-      
+
       {/* Team grid */}
       <section className="py-12">
         <div className="container">
@@ -151,7 +151,7 @@ const Team = () => {
           )}
         </div>
       </section>
-      
+
       {/* Footer */}
       <footer className="py-8 bg-background">
         <div className="container">
@@ -167,7 +167,7 @@ const Team = () => {
                 <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
                   Instagram
                 </a>
-                <a href="https://www.linkedin.com/company/dreamlabinstitute/?" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+                <a href="https://www.linkedin.com/company/dreamlab-ai-consulting/?" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
                   LinkedIn
                 </a>
               </div>
@@ -182,4 +182,4 @@ const Team = () => {
   );
 };
 
-export default Team; 
+export default Team;

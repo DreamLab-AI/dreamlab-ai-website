@@ -37,7 +37,7 @@ const Work = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Header />
-      
+
       {/* Work header */}
       <section className="pt-24 pb-8 bg-secondary/20">
         <div className="container">
@@ -47,7 +47,7 @@ const Work = () => {
           </p>
         </div>
       </section>
-      
+
       {/* Work showcase */}
       <section className="py-12">
         <div className="container">
@@ -84,7 +84,7 @@ const Work = () => {
           )}
         </div>
       </section>
-      
+
       {/* Footer */}
       <footer className="py-8 bg-background">
         <div className="container">
@@ -100,7 +100,7 @@ const Work = () => {
                 <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
                   Instagram
                 </a>
-                <a href="https://www.linkedin.com/company/dreamlabinstitute/?" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+                <a href="https://www.linkedin.com/company/dreamlab-ai-consulting/?" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
                   LinkedIn
                 </a>
               </div>
@@ -115,4 +115,4 @@ const Work = () => {
   );
 };
 
-export default Work; 
+export default Work;

@@ -64,6 +64,26 @@ export const Header = () => {
             <DropdownMenuItem asChild>
               <Link to="/contact" className="w-full">Contact</Link>
             </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>
+                <span>Affiliate Partners</span>
+              </DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                <DropdownMenuItem asChild>
+                  <a href="https://thedreamlab.uk" target="_blank" rel="noopener noreferrer" className="w-full">DreamLab Creative Tech</a>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <a href="https://agenticalliance.com/" target="_blank" rel="noopener noreferrer" className="w-full">Agentic Alliance</a>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <a href="https://www.narrativegoldmine.com" target="_blank" rel="noopener noreferrer" className="w-full">Narrative Goldmine</a>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <a href="https://www.visionflow.com" target="_blank" rel="noopener noreferrer" className="w-full">Visionflow</a>
+                </DropdownMenuItem>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
           </DropdownMenuContent>
         </DropdownMenu>
 

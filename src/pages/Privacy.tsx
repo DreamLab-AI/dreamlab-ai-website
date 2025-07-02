@@ -4,10 +4,10 @@ const Privacy = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Header />
-      
+
       <main className="container py-20 mt-16">
         <h1 className="text-3xl md:text-4xl font-bold mb-8">Privacy Policy</h1>
-        
+
         <div className="prose prose-invert max-w-none">
           <p className="text-muted-foreground mb-8">
             Last updated: {new Date().toLocaleDateString()}
@@ -65,7 +65,7 @@ const Privacy = () => {
           </section>
         </div>
       </main>
-      
+
       {/* Footer */}
       <footer className="py-8 bg-background">
         <div className="container">
@@ -81,7 +81,7 @@ const Privacy = () => {
                 <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
                   Instagram
                 </a>
-                <a href="https://www.linkedin.com/company/dreamlabinstitute/?" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+                <a href="https://www.linkedin.com/company/dreamlab-ai-consulting/?" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
                   LinkedIn
                 </a>
               </div>
@@ -96,4 +96,4 @@ const Privacy = () => {
   );
 };
 
-export default Privacy; 
+export default Privacy;
