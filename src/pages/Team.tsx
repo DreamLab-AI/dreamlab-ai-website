@@ -21,42 +21,47 @@ const Team = () => {
     const loadTeamMembers = async () => {
       setLoading(true);
       try {
-        // Only load John O'Hare (04.md)
-        const johnOHareId = '04';
-        const memberPromises = [
+        // Attempt to load all potential team members up to a reasonable limit
+        const maxMemberId = 50; // Assuming IDs go up to 50
+        const memberIdsToTry = Array.from({ length: maxMemberId }, (_, i) =>
+          (i + 1).toString().padStart(2, '0')
+        );
+
+        const memberPromises = memberIdsToTry.map(id =>
           (async () => {
             try {
-              const markdownResponse = await fetch(`/data/team/${johnOHareId}.md`);
-              if (!markdownResponse.ok) {
+              // Fetch markdown and image in parallel to be efficient
+              const [markdownResponse, imageResponse] = await Promise.all([
+                fetch(`/data/team/${id}.md`),
+                fetch(`/data/team/${id}.png`),
+              ]);
+
+              // A team member is only valid if both markdown and image files exist
+              if (!markdownResponse.ok || !imageResponse.ok) {
                 return null;
               }
 
               const markdownText = await markdownResponse.text();
               const { headline, fullDetails } = parseTeamMarkdown(markdownText);
 
-              const imageResponse = await fetch(`/data/team/${johnOHareId}.png`);
-              if (!imageResponse.ok) {
-                console.warn(`Image not found for team member ${johnOHareId}, but markdown exists`);
-                return null;
-              }
-
               return {
-                id: johnOHareId,
-                imageSrc: `/data/team/${johnOHareId}.png`,
+                id,
+                imageSrc: `/data/team/${id}.png`,
                 headline,
-                fullDetails
+                fullDetails,
               };
             } catch (error) {
-              console.error(`Error loading team member ${johnOHareId}:`, error);
+              // This will catch network errors or other issues during fetch for a specific member
+              // We can safely ignore these and assume the member doesn't exist.
               return null;
             }
           })()
-        ];
+        );
 
         const loadedMembers = await Promise.all(memberPromises);
         const validMembers = loadedMembers.filter(Boolean) as TeamMemberData[];
 
-        // Sort members by ID to maintain consistent order
+        // Sorting is already in place, which is good.
         validMembers.sort((a, b) => parseInt(a.id) - parseInt(b.id));
 
         console.log(`Loaded ${validMembers.length} team members`);
