@@ -37,12 +37,23 @@ const Team = () => {
               ]);
 
               // A team member is only valid if both markdown and image files exist
+              // and the markdown file is not empty.
               if (!markdownResponse.ok || !imageResponse.ok) {
                 return null;
               }
 
               const markdownText = await markdownResponse.text();
+              if (!markdownText) {
+                return null; // File is empty
+              }
+
               const { headline, fullDetails } = parseTeamMarkdown(markdownText);
+
+              // Ensure a headline was actually parsed and is not just whitespace.
+              // This is a stronger guarantee that the content is a valid team member file.
+              if (!headline || headline.trim() === '') {
+                return null;
+              }
 
               return {
                 id,
