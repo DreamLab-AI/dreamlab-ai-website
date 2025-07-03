@@ -21,39 +21,31 @@ const Team = () => {
     const loadTeamMembers = async () => {
       setLoading(true);
       try {
-        // Attempt to load all potential team members up to a reasonable limit
-        const maxMemberId = 50; // Assuming IDs go up to 50
-        const memberIdsToTry = Array.from({ length: maxMemberId }, (_, i) =>
-          (i + 1).toString().padStart(2, '0')
-        );
+        // Step 1: Fetch the manifest file to get the list of valid member IDs.
+        const manifestResponse = await fetch('/data/team/manifest.json');
+        if (!manifestResponse.ok) {
+          throw new Error('Failed to load team manifest');
+        }
+        const manifest = await manifestResponse.json();
+        const memberIds = manifest.members || [];
 
-        const memberPromises = memberIdsToTry.map(id =>
+        // Step 2: Fetch details for each member listed in the manifest.
+        const memberPromises = memberIds.map((id: string) =>
           (async () => {
             try {
-              // Fetch markdown and image in parallel to be efficient
               const [markdownResponse, imageResponse] = await Promise.all([
                 fetch(`/data/team/${id}.md`),
                 fetch(`/data/team/${id}.png`),
               ]);
 
-              // A team member is only valid if both markdown and image files exist
-              // and the markdown file is not empty.
+              // A member is only valid if both their markdown and image files are found.
               if (!markdownResponse.ok || !imageResponse.ok) {
+                console.warn(`Data missing for team member ${id}. Skipping.`);
                 return null;
               }
 
               const markdownText = await markdownResponse.text();
-              if (!markdownText) {
-                return null; // File is empty
-              }
-
               const { headline, fullDetails } = parseTeamMarkdown(markdownText);
-
-              // Ensure a headline was actually parsed and is not just whitespace.
-              // This is a stronger guarantee that the content is a valid team member file.
-              if (!headline || headline.trim() === '') {
-                return null;
-              }
 
               return {
                 id,
@@ -62,8 +54,7 @@ const Team = () => {
                 fullDetails,
               };
             } catch (error) {
-              // This will catch network errors or other issues during fetch for a specific member
-              // We can safely ignore these and assume the member doesn't exist.
+              console.error(`Error loading data for team member ${id}:`, error);
               return null;
             }
           })()
@@ -72,13 +63,13 @@ const Team = () => {
         const loadedMembers = await Promise.all(memberPromises);
         const validMembers = loadedMembers.filter(Boolean) as TeamMemberData[];
 
-        // Sorting is already in place, which is good.
+        // Sort members by ID to maintain a consistent order.
         validMembers.sort((a, b) => parseInt(a.id) - parseInt(b.id));
 
-        console.log(`Loaded ${validMembers.length} team members`);
         setTeamMembers(validMembers);
       } catch (error) {
         console.error("Error loading team members:", error);
+        setTeamMembers([]); // Clear team members on error
       } finally {
         setLoading(false);
       }
