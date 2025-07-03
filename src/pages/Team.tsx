@@ -140,18 +140,20 @@ const Team = () => {
           ) : teamMembers.length === 0 ? (
             <div className="text-center py-12">No team members found.</div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
-              {teamMembers.map(member => (
-                <TeamMember
-                  key={member.id}
-                  id={member.id}
-                  imageSrc={member.imageSrc}
-                  headline={member.headline}
-                  fullDetails={member.fullDetails}
-                  isSelected={selectedMembers.includes(member.id)}
-                  onToggleSelect={() => handleToggleSelect(member.id)}
-                />
-              ))}
+            <div className="text-center">
+              <div className="inline-grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6 text-left">
+                {teamMembers.map(member => (
+                  <TeamMember
+                    key={member.id}
+                    id={member.id}
+                    imageSrc={member.imageSrc}
+                    headline={member.headline}
+                    fullDetails={member.fullDetails}
+                    isSelected={selectedMembers.includes(member.id)}
+                    onToggleSelect={() => handleToggleSelect(member.id)}
+                  />
+                ))}
+              </div>
             </div>
           )}
         </div>
