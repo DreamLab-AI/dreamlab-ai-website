@@ -55,6 +55,9 @@ export const Header = () => {
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
+              <Link to="/residential-training" className="w-full">Residential Training</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
               <Link to="/workshops" className="w-full">Workshops</Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />

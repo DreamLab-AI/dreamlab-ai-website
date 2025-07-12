@@ -15,6 +15,7 @@ const Work = lazy(() => import("./pages/Work"));
 const Contact = lazy(() => import("./pages/Contact"));
 const WorkshopPage = lazy(() => import("./pages/WorkshopPage"));
 const WorkshopIndex = lazy(() => import("./pages/WorkshopIndex"));
+const ResidentialTraining = lazy(() => import("./pages/ResidentialTraining"));
 
 // Initialize React Query client
 const queryClient = new QueryClient();
@@ -47,6 +48,9 @@ const App = () => (
             <Route path="/workshops" element={<WorkshopIndex />} />
             <Route path="/workshops/:workshopId" element={<WorkshopPage />} />
             <Route path="/workshops/:workshopId/:pageSlug" element={<WorkshopPage />} />
+
+            {/* Residential Training route */}
+            <Route path="/residential-training" element={<ResidentialTraining />} />
 
             {/* Contact form route */}
             <Route path="/contact" element={<Contact />} />

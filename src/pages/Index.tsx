@@ -29,9 +29,17 @@ const Index = () => {
           <h1 className="text-4xl md:text-6xl font-bold mb-6 animate-fade-in bg-gradient-to-r from-blue-400 via-purple-500 to-blue-500 inline-block text-transparent bg-clip-text animate-text-shimmer bg-300% max-w-3xl">
             DREAMLAB AI CONSULTING
           </h1>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mb-12 animate-fade-in">
-            Bespoke AI, Training & Consulting
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mb-8 animate-fade-in">
+            Where Creative Vision Meets Engineering Precision
           </p>
+          <div className="flex flex-col sm:flex-row gap-4 animate-fade-in">
+            <a href="/residential-training" className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+              Explore Training Programs
+            </a>
+            <a href="/team" className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+              Meet Our Team
+            </a>
+          </div>
         </div>
 
         {/* Scroll indicator */}
@@ -44,9 +52,13 @@ const Index = () => {
       {/* Email signup section */}
       <section className="relative py-20 bg-secondary/50">
         <div className="container flex flex-col items-center">
-          <h2 className="text-2xl md:text-3xl font-semibold mb-8 text-center">
-            Join Our Network
+          <h2 className="text-2xl md:text-3xl font-semibold mb-4 text-center">
+            Join the Creative Technology Revolution
           </h2>
+          <p className="text-lg text-muted-foreground text-center mb-8 max-w-2xl">
+            Stay updated on our latest training programs in virtual production, AI/ML, 
+            gaussian splatting, and agentic engineering.
+          </p>
           <EmailSignupForm />
         </div>
       </section>
