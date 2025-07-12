@@ -344,7 +344,7 @@ const ResidentialTraining = () => {
 
             <div className="relative aspect-video rounded-lg overflow-hidden">
               <img
-                src="/data/media/399341a6-bd87-4930-8c97-7b9f82f7e557.png"
+                src="/data/media/labview.png"
                 alt="DreamLab Residential Training Facility"
                 className="w-full h-full object-cover"
               />
