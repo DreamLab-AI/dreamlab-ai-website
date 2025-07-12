@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CheckCircle2, MapPin, Home, Zap, Users, Award, Calendar } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 /**
  * Residential Training page showcasing DreamLab's immersive training programs
@@ -12,6 +13,20 @@ import { useNavigate } from "react-router-dom";
  */
 const ResidentialTraining = () => {
   const navigate = useNavigate();
+
+  const images = [
+    "/data/media/labview.png",
+    "/data/media/labview2.png",
+    "/data/media/labview3.png",
+  ];
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
+    }, 3000); // Change image every 3 seconds
+    return () => clearInterval(timer);
+  }, []);
 
   const trainingPrograms = [
     {
@@ -142,9 +157,11 @@ const ResidentialTraining = () => {
               <Button size="lg" onClick={() => navigate("/contact")}>
                 Book Your Training
               </Button>
-              <Button size="lg" variant="outline">
-                Download Brochure
-              </Button>
+              <a href="/data/media/ai-placeholder.pdf" download>
+                <Button size="lg" variant="outline">
+                  Download Brochure
+                </Button>
+              </a>
             </div>
           </div>
         </div>
@@ -343,11 +360,16 @@ const ResidentialTraining = () => {
             </div>
 
             <div className="relative aspect-video rounded-lg overflow-hidden">
-              <img
-                src="/data/media/labview.png"
-                alt="DreamLab Residential Training Facility"
-                className="w-full h-full object-cover"
-              />
+              {images.map((src, index) => (
+                <img
+                  key={src}
+                  src={src}
+                  alt="DreamLab Residential Training Facility"
+                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${
+                    index === currentImageIndex ? "opacity-100" : "opacity-0"
+                  }`}
+                />
+              ))}
             </div>
           </div>
         </div>
