@@ -124,7 +124,7 @@ const ResidentialTraining = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
+
       {/* Hero Section */}
       <section className="relative pt-24 pb-16 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-950/20 to-purple-950/20" />
@@ -135,7 +135,7 @@ const ResidentialTraining = () => {
               Where Creative Vision Meets Engineering Precision
             </h1>
             <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-              Transform your skills at the UK's premier facility combining virtual production, 
+              Transform your skills at the UK's premier facility combining virtual production,
               engineering simulation, and cutting-edge AI technologies in an immersive residential setting.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -181,7 +181,7 @@ const ResidentialTraining = () => {
               Immersive Training Programs
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Hands-on courses designed for professionals ready to master the intersection 
+              Hands-on courses designed for professionals ready to master the intersection
               of creative technology and engineering excellence.
             </p>
           </div>
@@ -238,8 +238,8 @@ const ResidentialTraining = () => {
                       </div>
                     </CardContent>
                     <CardFooter>
-                      <Button 
-                        className="w-full" 
+                      <Button
+                        className="w-full"
                         variant={program.featured ? "default" : "outline"}
                         onClick={() => navigate("/contact")}
                       >
@@ -299,18 +299,18 @@ const ResidentialTraining = () => {
                 Premium Lake District Accommodation
               </h2>
               <p className="text-lg text-muted-foreground mb-8">
-                Experience the perfect blend of focused learning and natural inspiration. 
-                Our 5-bedroom luxury facility provides an ideal environment for intensive 
+                Experience the perfect blend of focused learning and natural inspiration.
+                Our 5-bedroom luxury facility provides an ideal environment for intensive
                 training, networking, and creative breakthroughs.
               </p>
-              
+
               <div className="space-y-4 mb-8">
                 <div className="flex items-start gap-3">
                   <MapPin className="w-6 h-6 text-primary mt-1" />
                   <div>
                     <h3 className="font-semibold">Prime Location</h3>
                     <p className="text-muted-foreground">
-                      Nestled in the Lake District, offering stunning views and a peaceful 
+                      Nestled in the Lake District, offering stunning views and a peaceful
                       environment for focused learning
                     </p>
                   </div>
@@ -320,7 +320,7 @@ const ResidentialTraining = () => {
                   <div>
                     <h3 className="font-semibold">Luxury Amenities</h3>
                     <p className="text-muted-foreground">
-                      En-suite rooms, professional kitchen, dedicated training spaces, 
+                      En-suite rooms, professional kitchen, dedicated training spaces,
                       and social areas for networking
                     </p>
                   </div>
@@ -330,7 +330,7 @@ const ResidentialTraining = () => {
                   <div>
                     <h3 className="font-semibold">Flexible Booking</h3>
                     <p className="text-muted-foreground">
-                      Available for training programs or corporate retreats, 
+                      Available for training programs or corporate retreats,
                       with weekend and peak season rates
                     </p>
                   </div>
@@ -341,11 +341,13 @@ const ResidentialTraining = () => {
                 Check Availability
               </Button>
             </div>
-            
-            <div className="relative aspect-video rounded-lg overflow-hidden bg-gradient-to-br from-blue-900/20 to-purple-900/20">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <p className="text-muted-foreground">Accommodation Gallery Coming Soon</p>
-              </div>
+
+            <div className="relative aspect-video rounded-lg overflow-hidden">
+              <img
+                src="/data/media/399341a6-bd87-4930-8c97-7b9f82f7e557.png"
+                alt="DreamLab Residential Training Facility"
+                className="w-full h-full object-cover"
+              />
             </div>
           </div>
         </div>
@@ -359,7 +361,7 @@ const ResidentialTraining = () => {
               Ready to Transform Your Skills?
             </h2>
             <p className="text-lg mb-8 max-w-2xl mx-auto opacity-90">
-              Join industry leaders and innovators at our residential training facility. 
+              Join industry leaders and innovators at our residential training facility.
               Limited spaces available for upcoming programs.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
