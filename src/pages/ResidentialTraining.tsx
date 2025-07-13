@@ -18,6 +18,10 @@ const ResidentialTraining = () => {
     "/data/media/labview.png",
     "/data/media/labview2.png",
     "/data/media/labview3.png",
+    "/data/media/aerial.jpeg",
+    "/data/media/bedroom.jpeg",
+    "/data/media/view.jpeg",
+    "/data/media/view2.jpeg",
   ];
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
