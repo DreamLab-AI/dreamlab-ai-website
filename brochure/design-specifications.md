@@ -22,7 +22,7 @@
 ### 3. About DreamLab (Pages 3-4)
 - **Company Overview**: Mission, vision, unique position
 - **Facility Features**: LED Volume, Motion Capture, Gaussian Splatting Lab
-- **Location**: Wales, UK with map visualization
+- **Location**: Cumbria, UK with map visualization
 - **Team Expertise**: Key capabilities and industry experience
 
 ### 4. Training Programs (Pages 5-10)

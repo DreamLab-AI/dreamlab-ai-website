@@ -72,7 +72,7 @@
 │  │  technical       │   │   └─────────────────┘   │
 │  │  capabilities"   │   │                         │
 │  └──────────────────┘   │   Location:             │
-│                         │   [Wales Map Icon]      │
+│                         │   [Cubria Map Icon]      │
 │  Industry Experience    │   Cardiff Area          │
 │  • Film & VFX          │                         │
 │  • Engineering Viz      │   Team: 20+ experts     │
@@ -136,7 +136,7 @@
 │  LinkedIn | Bluesky | Instagram         │
 │                                         │
 │  DreamLab AI Consulting Ltd.            │
-│  Wales, United Kingdom                  │
+│  Cumbria, United Kingdom                  │
 │                                         │
 └─────────────────────────────────────────┘
 ```

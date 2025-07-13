@@ -51,7 +51,7 @@
 - **Holographic Displays**: Latest telepresence technology
 
 ### Location Benefits
-- **Wales, UK**: Inspiring natural setting near Cardiff
+- **Cumbria, UK**: Inspiring natural setting near Cardiff
 - **5-Bedroom Luxury Accommodation**: On-site residential facilities
 - **Dedicated Training Wing**: Purpose-built learning spaces
 - **Easy Access**: 2 hours from London, 45 mins from Bristol
@@ -160,7 +160,7 @@
 
 **Address**:
 DreamLab AI Consulting Ltd.
-Wales, United Kingdom
+Cumbria, United Kingdom
 
 **Follow Us**:
 LinkedIn: /dreamlab-ai-consulting
