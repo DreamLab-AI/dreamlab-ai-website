@@ -157,7 +157,7 @@ const ResidentialTraining = () => {
               <Button size="lg" onClick={() => navigate("/contact")}>
                 Book Your Training
               </Button>
-              <a href="/data/media/ai-placeholder.pdf" download>
+              <a href="/data/media/draft.pdf" download>
                 <Button size="lg" variant="outline">
                   Download Brochure
                 </Button>
