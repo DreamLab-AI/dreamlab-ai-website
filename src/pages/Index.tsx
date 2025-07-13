@@ -30,7 +30,7 @@ const Index = () => {
             DREAMLAB AI CONSULTING
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mb-8 animate-fade-in">
-            Where Creative Vision Meets Engineering Precision
+            Deep Learning : No Distractions
           </p>
           <div className="flex flex-col sm:flex-row gap-4 animate-fade-in">
             <a href="/residential-training" className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
@@ -56,7 +56,7 @@ const Index = () => {
             Join the Creative Technology Revolution
           </h2>
           <p className="text-lg text-muted-foreground text-center mb-8 max-w-2xl">
-            Stay updated on our latest training programs in virtual production, AI/ML, 
+            Stay updated on our latest training programs in virtual production, AI/ML,
             gaussian splatting, and agentic engineering.
           </p>
           <EmailSignupForm />

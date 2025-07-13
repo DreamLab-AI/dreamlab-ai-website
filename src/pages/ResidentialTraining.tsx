@@ -147,7 +147,7 @@ const ResidentialTraining = () => {
           <div className="max-w-4xl mx-auto text-center">
             <Badge className="mb-4" variant="secondary">Residential Training</Badge>
             <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-400 via-purple-500 to-blue-500 inline-block text-transparent bg-clip-text">
-              Where Creative Vision Meets Engineering Precision
+              Deep Learning : No Distractions
             </h1>
             <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
               Transform your skills at the UK's premier facility combining virtual production,
