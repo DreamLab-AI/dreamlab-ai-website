@@ -3,7 +3,7 @@
 ## Page 1: Cover
 - **Hero Visual**: Abstract neural network visualization with blue/purple gradients
 - **Main Title**: DREAMLAB AI CONSULTING
-- **Tagline**: Deep Learning : No Distractions
+- **Tagline**: Deep Learning - No Distractions
 - **Subtext**: Transform Your Skills at the UK's Premier Tech Training Facility
 - **Footer**: Website and email
 
