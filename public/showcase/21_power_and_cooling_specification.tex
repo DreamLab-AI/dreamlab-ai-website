@@ -1,0 +1,488 @@
+\chapter{Power and Cooling Specification}
+
+\section{Overview}
+
+The power and cooling infrastructure forms the critical foundation for reliable operation of our world-class immersive system, requiring careful design to handle substantial loads while maintaining efficiency and resilience.
+
+\section{Power Requirements Analysis}
+
+\subsection{Load Calculations}
+
+% \begin{figure}[H]
+% \centering
+% \begin{tikzpicture}[scale=0.8]
+%     % Pie chart of power distribution
+%     \pie[
+%         text=legend,
+%         radius=3,
+%         color={dreamlabPrimary!70, dreamlabAccent!70, dreamlabSecondary!70, dreamlabDark!70, dreamlabLight!70}
+%     ]{
+%         30/Display System,
+%         25/Compute Cluster,
+%         15/Audio System,
+%         10/Tracking \& Capture,
+%         20/HVAC \& Auxiliary
+%     }
+%
+%     \node[below] at (0,-4) {\textbf{Power Distribution by System}};
+% \end{tikzpicture}
+% \caption{Breakdown of facility power consumption}
+% \end{figure}
+
+\begin{requirement}{PWR-001}{Total facility power capacity of 150kVA with N+1 redundancy}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{@{}lXrr@{}}
+\toprule
+\textbf{System} & \textbf{Components} & \textbf{Peak (kW)} & \textbf{Typical (kW)} \\
+\midrule
+Display - Projection & 10× laser projectors @ 3kW & 30.0 & 20.0 \\
+Display - LED Option & 6 walls @ 5kW per wall & 30.0 & 15.0 \\
+Compute Cluster & 4 nodes × 8 GPUs @ 3kW & 12.0 & 10.0 \\
+Storage Systems & 8 servers + disk arrays & 4.0 & 3.5 \\
+Network Equipment & Switches, routers, firewalls & 2.0 & 1.8 \\
+Audio System & Amplifiers for 256 channels & 5.0 & 2.0 \\
+Tracking Cameras & 80 cameras with PoE++ & 2.0 & 1.8 \\
+Workstations & Control room systems & 2.0 & 1.5 \\
+Lighting & House and emergency & 3.0 & 1.0 \\
+\midrule
+\textbf{IT/AV Subtotal} & & \textbf{60.0} & \textbf{41.6} \\
+\midrule
+HVAC Systems & Chillers, pumps, fans & 25.0 & 20.0 \\
+UPS Losses & Efficiency losses @ 95\% & 3.0 & 2.1 \\
+Future Expansion & 30\% headroom & 18.0 & -- \\
+\midrule
+\textbf{Total Load} & & \textbf{106.0} & \textbf{63.7} \\
+\bottomrule
+\end{tabularx}
+\caption{Detailed power load analysis}
+\end{table}
+
+\section{Electrical Distribution Design}
+
+\subsection{Primary Power Infrastructure}
+
+\begin{requirement}{PWR-002}{Dual independent power feeds from separate transformers}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.7]
+    % Utility feeds
+    \node[draw, fill=dreamlabPrimary!30] (util1) at (0,8) {Utility Feed A};
+    \node[draw, fill=dreamlabPrimary!30] (util2) at (6,8) {Utility Feed B};
+
+    % Transformers
+    \node[draw, fill=dreamlabAccent!30] (trans1) at (0,6) {Transformer 1};
+    \node[draw, fill=dreamlabAccent!30] (trans2) at (6,6) {Transformer 2};
+
+    % Main panels
+    \node[draw, fill=dreamlabSecondary!30] (panel1) at (0,4) {Main Panel A};
+    \node[draw, fill=dreamlabSecondary!30] (panel2) at (6,4) {Main Panel B};
+
+    % ATS
+    \node[draw, fill=red!30] (ats) at (3,3) {Auto Transfer Switch};
+
+    % UPS Systems
+    \node[draw, fill=dreamlabPrimary!30] (ups1) at (1,1) {UPS 1};
+    \node[draw, fill=dreamlabPrimary!30] (ups2) at (5,1) {UPS 2};
+
+    % Critical loads
+    \node[draw, fill=dreamlabDark!30] (critical) at (3,-1) {Critical Loads};
+
+    % Connections
+    \draw[thick] (util1) -- (trans1);
+    \draw[thick] (util2) -- (trans2);
+    \draw[thick] (trans1) -- (panel1);
+    \draw[thick] (trans2) -- (panel2);
+    \draw[thick] (panel1) -- (ats);
+    \draw[thick] (panel2) -- (ats);
+    \draw[thick] (ats) -- (ups1);
+    \draw[thick] (ats) -- (ups2);
+    \draw[thick] (ups1) -- (critical);
+    \draw[thick] (ups2) -- (critical);
+
+    \node[below] at (3,-2) {\textbf{Redundant Power Distribution}};
+\end{tikzpicture}
+\caption{High-level electrical distribution architecture}
+\end{figure}
+
+\subsection{Distribution Specifications}
+
+\begin{itemize}
+    \item \textbf{Service Entrance}: 2× 415V 3-phase 200A feeds
+    \item \textbf{Main Distribution}: Form 4 Type 2 switchboards
+    \item \textbf{Sub-Distribution}: Local panels in each technical area
+    \item \textbf{Earthing}: TN-S system with dedicated technical earth
+    \item \textbf{Surge Protection}: Type 1+2 SPDs at main panels
+\end{itemize}
+
+\section{Uninterruptible Power Supply (UPS)}
+
+\subsection{UPS System Design}
+
+\begin{requirement}{PWR-003}{Minimum 15 minutes runtime at full load}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{@{}lX@{}}
+\toprule
+\textbf{Parameter} & \textbf{Specification} \\
+\midrule
+Configuration & Parallel redundant (N+1) \\
+Capacity & 2× 80kVA modules = 160kVA total \\
+Technology & Double-conversion online \\
+Efficiency & >96\% in ECO mode \\
+Battery Type & VRLA or Lithium-ion \\
+Runtime & 15 minutes at 100\% load \\
+Input THD & <3\% at full load \\
+Output Voltage & 415/240V ±1\% \\
+Transfer Time & 0ms (online topology) \\
+\bottomrule
+\end{tabularx}
+\caption{UPS system specifications}
+\end{table}
+
+\subsection{Battery System}
+
+\begin{itemize}
+    \item \textbf{Configuration}: Separate battery rooms with ventilation
+    \item \textbf{Monitoring}: Individual cell voltage and temperature
+    \item \textbf{Maintenance}: Quarterly impedance testing
+    \item \textbf{Replacement}: 5-year design life (VRLA) or 10-year (Li-ion)
+    \item \textbf{Safety}: Hydrogen detection and ventilation
+\end{itemize}
+
+\section{Power Distribution Units (PDUs)}
+
+\subsection{Rack-Level Distribution}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.8]
+    % Rack outline
+    \draw[thick] (0,0) rectangle (3,6);
+    \node at (1.5,5.5) {\textbf{42U Rack}};
+
+    % PDUs
+    \draw[fill=dreamlabPrimary!30] (0.2,0.2) rectangle (0.5,5.8);
+    \draw[fill=dreamlabPrimary!30] (2.5,0.2) rectangle (2.8,5.8);
+    \node[rotate=90] at (0.35,3) {\tiny PDU A};
+    \node[rotate=90] at (2.65,3) {\tiny PDU B};
+
+    % Equipment
+    \foreach \y in {1,2,3,4} {
+        \draw[fill=dreamlabAccent!20] (0.6,\y) rectangle (2.4,\y+0.8);
+    }
+
+    % Power connections
+    \draw[red, thick] (-1,5) -- (0.2,5) node[left] at (-1,5) {\small A Feed};
+    \draw[blue, thick] (4,5) -- (2.8,5) node[right] at (4,5) {\small B Feed};
+
+    \node[below] at (1.5,-0.5) {\textbf{Dual-Feed PDU Configuration}};
+\end{tikzpicture}
+\caption{Redundant power distribution in equipment racks}
+\end{figure}
+
+\begin{requirement}{PWR-004}{All critical equipment with dual power supplies on separate feeds}
+
+\subsubsection{PDU Specifications}
+\begin{itemize}
+    \item \textbf{Type}: Intelligent switched PDUs
+    \item \textbf{Capacity}: 32A 3-phase per PDU
+    \item \textbf{Outlets}: IEC C13/C19 mix
+    \item \textbf{Monitoring}: Per-outlet power metering
+    \item \textbf{Control}: Remote outlet switching
+    \item \textbf{Redundancy}: A/B feed configuration
+\end{itemize}
+
+\section{Cooling System Design}
+
+\subsection{Heat Load Analysis}
+
+\begin{requirement}{PWR-005}{N+1 cooling capacity for worst-case heat loads}
+
+\begin{figure}[H]
+\centering
+\pgfplotsset{width=10cm, height=6cm}
+\begin{tikzpicture}
+\begin{axis}[
+    ybar,
+    bar width=0.8cm,
+    xlabel={System Component},
+    ylabel={Heat Load (kW)},
+    ymin=0,
+    ymax=35,
+    xtick=data,
+    xticklabels={Display, Compute, Network, Audio, Tracking, Other},
+    xticklabel style={rotate=45, anchor=east},
+    nodes near coords,
+    nodes near coords align={vertical},
+    grid=major,
+    grid style={dashed, gray!30}
+]
+\addplot[fill=dreamlabSecondary!70] coordinates {
+    (1,28) (2,12) (3,2) (4,5) (5,2) (6,5)
+};
+\end{axis}
+\end{tikzpicture}
+\caption{Cooling load distribution by system}
+\end{figure}
+
+\subsection{Cooling Architecture}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{@{}lX@{}}
+\toprule
+\textbf{Zone} & \textbf{Cooling Strategy} \\
+\midrule
+CAVE Space & Displacement ventilation with precise control \\
+Equipment Room & In-row cooling with hot aisle containment \\
+Control Room & Standard DX comfort cooling \\
+Projection Room & Dedicated air handlers for light engines \\
+\bottomrule
+\end{tabularx}
+\caption{Zone-based cooling strategies}
+\end{table}
+
+\section{CAVE Space Cooling}
+
+\subsection{Environmental Requirements}
+
+\begin{requirement}{PWR-006}{Temperature control ±1°C, humidity ±5\% RH}
+
+\begin{itemize}
+    \item \textbf{Temperature}: 20°C ±1°C year-round
+    \item \textbf{Humidity}: 50\% RH ±5\%
+    \item \textbf{Air Changes}: 6-10 per hour
+    \item \textbf{Filtration}: MERV 13 minimum
+    \item \textbf{Noise Level}: NC-25 maximum
+\end{itemize}
+
+\subsection{Air Distribution Design}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.6]
+    % Room section
+    \draw[thick] (0,0) rectangle (10,6);
+
+    % Displacement diffusers
+    \foreach \x in {1,3,5,7,9} {
+        \draw[fill=dreamlabPrimary!30] (\x-0.3,0) rectangle (\x+0.3,0.5);
+        \draw[dreamlabPrimary, ->] (\x,0.5) -- (\x,1.5);
+    }
+
+    % Return air
+    \foreach \x in {2,4,6,8} {
+        \draw[fill=dreamlabAccent!30] (\x-0.3,5.5) rectangle (\x+0.3,6);
+        \draw[dreamlabAccent, ->] (\x,5) -- (\x,5.5);
+    }
+
+    % Temperature stratification
+    \draw[dashed, dreamlabSecondary] (0,1.5) -- (10,1.5) node[right] {\small Occupied Zone};
+    \draw[dashed, dreamlabSecondary] (0,4) -- (10,4);
+
+    % People
+    \foreach \x in {2,4,6,8} {
+        \draw[fill=dreamlabDark!30] (\x,0.5) circle (0.2);
+        \draw[dreamlabDark] (\x,0.5) -- (\x,1.5);
+    }
+
+    \node[below] at (5,-0.5) {\textbf{Displacement Ventilation Strategy}};
+\end{tikzpicture}
+\caption{Low-velocity air distribution for user comfort}
+\end{figure}
+
+\section{Equipment Room Cooling}
+
+\subsection{High-Density Cooling Solution}
+
+\begin{requirement}{PWR-007}{40kW/rack cooling capacity for GPU clusters}
+
+\begin{itemize}
+    \item \textbf{Technology}: In-row cooling units
+    \item \textbf{Capacity}: 40kW per unit
+    \item \textbf{Redundancy}: N+1 configuration
+    \item \textbf{Control}: Variable speed fans with pressure sensors
+    \item \textbf{Efficiency}: Free cooling when ambient <10°C
+\end{itemize}
+
+\subsection{Containment Strategy}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.5]
+    % Rack rows
+    \foreach \x in {0,4,8} {
+        \draw[fill=dreamlabPrimary!20] (\x,0) rectangle (\x+1.5,4);
+        \draw[fill=dreamlabPrimary!20] (\x,5) rectangle (\x+1.5,9);
+    }
+
+    % Cold aisles
+    \foreach \x in {0,4,8} {
+        \draw[fill=cyan!20] (\x-1,0) rectangle (\x,9);
+        \node[rotate=90] at (\x-0.5,4.5) {\small Cold Aisle};
+    }
+
+    % Hot aisles with containment
+    \foreach \x in {1.5,5.5} {
+        \draw[fill=red!20] (\x,0) rectangle (\x+2.5,9);
+        \draw[thick] (\x,9) -- (\x+2.5,9);
+        \node[rotate=90] at (\x+1.25,4.5) {\small Hot Aisle};
+    }
+
+    % Cooling units
+    \foreach \x in {2.25,6.25} {
+        \draw[fill=dreamlabAccent!30] (\x,3.5) rectangle (\x+1,5.5);
+        \node[rotate=90] at (\x+0.5,4.5) {\tiny CRAC};
+    }
+
+    \node[below] at (4.5,-0.5) {\textbf{Hot Aisle Containment Layout}};
+\end{tikzpicture}
+\caption{Efficient cooling with aisle containment}
+\end{figure}
+
+\section{Chilled Water System}
+
+\subsection{Central Plant Design}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{@{}lX@{}}
+\toprule
+\textbf{Component} & \textbf{Specification} \\
+\midrule
+Chillers & 2× 200kW air-cooled units (N+1) \\
+Configuration & Primary/secondary pumping \\
+Flow Temperature & 7°C supply, 12°C return \\
+Pumps & Variable speed with VFDs \\
+Piping & Closed loop with glycol \\
+Controls & BMS integration with trending \\
+\bottomrule
+\end{tabularx}
+\caption{Chilled water system specifications}
+\end{table}
+
+\subsection{Distribution Network}
+
+\begin{itemize}
+    \item Pre-insulated pipework to minimise losses
+    \item Isolation valves for maintenance flexibility
+    \item Pressure independent control valves
+    \item Ultrasonic flow meters for monitoring
+    \item Automatic air vents and strainers
+\end{itemize}
+
+\section{Emergency Power Systems}
+
+\subsection{Generator Backup}
+
+\begin{requirement}{PWR-008}{Optional standby generator for extended outages}
+
+\begin{itemize}
+    \item \textbf{Capacity}: 150kVA diesel generator
+    \item \textbf{Start Time}: <15 seconds
+    \item \textbf{Fuel Storage}: 24-hour runtime
+    \item \textbf{Testing}: Monthly no-load, quarterly on-load
+    \item \textbf{Integration}: Automatic transfer on mains failure
+\end{itemize}
+
+\subsection{Life Safety Power}
+
+\begin{itemize}
+    \item Separate life safety panel
+    \item 3-hour central battery system
+    \item Emergency lighting throughout
+    \item Exit signs with integral batteries
+    \item Fire alarm system power
+\end{itemize}
+
+\section{Power Quality}
+
+\subsection{Power Conditioning}
+
+\begin{requirement}{PWR-009}{THD <5\% for sensitive electronic loads}
+
+\begin{itemize}
+    \item \textbf{Harmonic Filters}: Active filters for non-linear loads
+    \item \textbf{Power Factor}: Correction to maintain >0.95
+    \item \textbf{Isolation}: Transformers for sensitive equipment
+    \item \textbf{Grounding}: Separate technical earth system
+    \item \textbf{Monitoring}: Power quality meters with alarming
+\end{itemize}
+
+\subsection{Transient Protection}
+
+\begin{itemize}
+    \item Coordinated SPD installation
+    \item Type 1 at service entrance
+    \item Type 2 at distribution panels
+    \item Type 3 at sensitive equipment
+    \item Regular testing programme
+\end{itemize}
+
+\section{Energy Efficiency}
+
+\subsection{Efficiency Measures}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{@{}lXr@{}}
+\toprule
+\textbf{Measure} & \textbf{Description} & \textbf{Saving} \\
+\midrule
+Free Cooling & Use ambient air when suitable & 30\% \\
+Variable Speed & VFDs on all motors & 20\% \\
+LED Lighting & Throughout facility & 60\% \\
+High-Efficiency UPS & ECO mode operation & 5\% \\
+Heat Recovery & Capture waste heat for reheat & 15\% \\
+\bottomrule
+\end{tabularx}
+\caption{Energy efficiency initiatives}
+\end{table}
+
+\subsection{Monitoring and Optimisation}
+
+\begin{itemize}
+    \item Real-time PUE calculation
+    \item Sub-metering by system
+    \item Automated efficiency reports
+    \item Continuous commissioning
+    \item Annual energy audits
+\end{itemize}
+
+\section{Maintenance and Reliability}
+
+\subsection{Preventive Maintenance Schedule}
+
+\begin{requirement}{PWR-010}{Comprehensive maintenance programme for >99.9\% availability}
+
+\begin{itemize}
+    \item \textbf{Daily}: Visual inspections, alarm checks
+    \item \textbf{Weekly}: Filter inspections, battery tests
+    \item \textbf{Monthly}: Full system tests, IR scanning
+    \item \textbf{Quarterly}: Detailed PM procedures
+    \item \textbf{Annual}: Shutdown maintenance
+\end{itemize}
+
+\subsection{Critical Spares}
+
+\begin{itemize}
+    \item UPS power modules
+    \item Cooling unit components
+    \item Circuit breakers
+    \item Control cards
+    \item Filters and belts
+\end{itemize}
+
+\begin{center}
+\begin{tikzpicture}
+\node[rectangle, draw=dreamlabPrimary, fill=dreamlabLight!20, text width=14cm, inner sep=15pt, rounded corners] {
+\centering
+\textbf{\large\color{dreamlabPrimary}Power and Cooling Summary}\\[0.5cm]
+Our power and cooling infrastructure provides the robust foundation necessary for continuous operation of this world-class facility. With full redundancy, efficient cooling strategies, and comprehensive power conditioning, the system ensures that cutting-edge technology operates reliably while maintaining energy efficiency and sustainability targets.
+};
+\end{tikzpicture}
+\end{center}

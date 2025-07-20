@@ -16,6 +16,8 @@ const Contact = lazy(() => import("./pages/Contact"));
 const WorkshopPage = lazy(() => import("./pages/WorkshopPage"));
 const WorkshopIndex = lazy(() => import("./pages/WorkshopIndex"));
 const ResidentialTraining = lazy(() => import("./pages/ResidentialTraining"));
+const SystemDesign = lazy(() => import("./pages/SystemDesign"));
+const ResearchPaper = lazy(() => import("./pages/ResearchPaper"));
 
 // Initialize React Query client
 const queryClient = new QueryClient();
@@ -56,6 +58,10 @@ const App = () => (
             <Route path="/contact" element={<Contact />} />
             {/* Privacy Policy route */}
             <Route path="/privacy" element={<Privacy />} />
+            {/* System Design route */}
+            <Route path="/system-design" element={<SystemDesign />} />
+            {/* Research Paper route */}
+            <Route path="/research-paper" element={<ResearchPaper />} />
             {/* --- Add Custom Routes Above This Line --- */}
             {/* Catch-all route for pages not found */}
             <Route path="*" element={<NotFound />} />

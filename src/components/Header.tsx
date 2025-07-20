@@ -65,6 +65,9 @@ export const Header = () => {
               <Link to="/work" className="w-full">Previous Work</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
+              <Link to="/system-design" className="w-full">System Design</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
               <Link to="/contact" className="w-full">Contact</Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />

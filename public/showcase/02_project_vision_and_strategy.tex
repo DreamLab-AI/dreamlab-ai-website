@@ -1,0 +1,316 @@
+\chapter{Project Vision and Strategy}
+
+\section{Strategic Vision}
+
+\subsection{Mission Statement}
+
+To establish the UK's premier immersive visualisation facility that transforms how researchers, engineers, and innovators collaborate, analyse, and solve complex challenges through unprecedented multi-user virtual reality experiences.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=1.2]
+    % Vision elements
+    \node[circle, draw=dreamlabPrimary, fill=dreamlabPrimary!20, minimum size=3cm] (vision) at (0,0) {\textbf{Vision}};
+
+    % Surrounding elements
+    \node[rectangle, draw=dreamlabSecondary, fill=white, rounded corners] (innovation) at (0,3) {Innovation Leadership};
+    \node[rectangle, draw=dreamlabSecondary, fill=white, rounded corners] (collaboration) at (3,1.5) {Global Collaboration};
+    \node[rectangle, draw=dreamlabSecondary, fill=white, rounded corners] (research) at (3,-1.5) {Research Excellence};
+    \node[rectangle, draw=dreamlabSecondary, fill=white, rounded corners] (industry) at (0,-3) {Industry Partnership};
+    \node[rectangle, draw=dreamlabSecondary, fill=white, rounded corners] (education) at (-3,-1.5) {Educational Impact};
+    \node[rectangle, draw=dreamlabSecondary, fill=white, rounded corners] (society) at (-3,1.5) {Societal Benefit};
+
+    % Connections
+    \foreach \dest in {innovation,collaboration,research,industry,education,society}
+        \draw[thick, dreamlabAccent, ->] (vision) -- (\dest);
+\end{tikzpicture}
+\caption{Strategic vision framework}
+\end{figure}
+
+\subsection{Core Objectives}
+
+\begin{enumerate}
+    \item \textbf{Research Excellence}: Create a platform enabling breakthrough discoveries in critical domains including nuclear decommissioning, autonomous systems, and advanced manufacturing
+
+    \item \textbf{Collaborative Innovation}: Foster unprecedented multi-disciplinary collaboration through shared immersive experiences
+
+    \item \textbf{Industry Leadership}: Attract and retain world-leading industrial partnerships worth £500k+ annually
+
+    \item \textbf{Educational Transformation}: Revolutionise teaching and training through immersive learning experiences
+
+    \item \textbf{National Infrastructure}: Establish a facility of national significance supporting UK strategic priorities
+\end{enumerate}
+
+\section{Strategic Alignment}
+
+\subsection{Institutional Strategy 2025-2030}
+
+The immersive facility directly supports our institution's five strategic pillars:
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Strategic Pillar} & \textbf{Facility Contribution} \\
+\midrule
+\textcolor{dreamlabPrimary}{Research Excellence} &
+\begin{itemize}[leftmargin=*, topsep=0pt]
+    \item Enables world-first research capabilities
+    \item Attracts top researchers and funding
+    \item Supports REF impact case studies
+\end{itemize} \\
+\midrule
+\textcolor{dreamlabPrimary}{Industry Partnerships} &
+\begin{itemize}[leftmargin=*, topsep=0pt]
+    \item Unique platform for commercial R\&D
+    \item Training and simulation services
+    \item Innovation showcase for partners
+\end{itemize} \\
+\midrule
+\textcolor{dreamlabPrimary}{Student Experience} &
+\begin{itemize}[leftmargin=*, topsep=0pt]
+    \item Cutting-edge teaching facilities
+    \item Unique research opportunities
+    \item Competitive advantage for graduates
+\end{itemize} \\
+\midrule
+\textcolor{dreamlabPrimary}{Global Engagement} &
+\begin{itemize}[leftmargin=*, topsep=0pt]
+    \item International collaboration platform
+    \item Remote presence capabilities
+    \item Global showcase facility
+\end{itemize} \\
+\midrule
+\textcolor{dreamlabPrimary}{Sustainability} &
+\begin{itemize}[leftmargin=*, topsep=0pt]
+    \item Reduces need for physical prototypes
+    \item Virtual site visits replace travel
+    \item Energy-efficient design choices
+\end{itemize} \\
+\bottomrule
+\end{tabularx}
+\caption{Alignment with institutional strategy}
+\end{table}
+
+\subsection{National Strategic Alignment}
+
+\subsubsection{UK Industrial Strategy}
+
+The facility directly addresses four Grand Challenges:
+
+\begin{itemize}
+    \item \textbf{Artificial Intelligence \& Data}: Advanced visualisation of AI systems and big data
+    \item \textbf{Clean Growth}: Virtual prototyping for sustainable technologies
+    \item \textbf{Future of Mobility}: Autonomous vehicle testing and validation
+    \item \textbf{Ageing Society}: Medical training and therapy applications
+\end{itemize}
+
+\subsubsection{Levelling Up Agenda}
+
+\begin{itemize}
+    \item Creates high-skilled jobs in the region
+    \item Attracts international investment
+    \item Provides unique training opportunities
+    \item Establishes regional technology leadership
+\end{itemize}
+
+\section{Competitive Landscape Analysis}
+
+\subsection{Global Benchmarking}
+
+Our comprehensive analysis of world-leading facilities reveals both the current state-of-the-art and opportunities for leadership:
+
+\subsubsection{Curtin University HIVE, Australia}
+
+\begin{itemize}
+    \item \textbf{Technology}: World's first Digital Projection Satellite MLS installation
+    \item \textbf{Configuration}: Cylindrical and dome displays, 4K 120Hz stereo
+    \item \textbf{Strengths}: Remote light engines, multi-disciplinary use
+    \item \textbf{Our Advantage}: Full 6-sided environment, volumetric capture
+\end{itemize}
+
+\subsubsection{University of Leeds HIKER Lab, UK}
+
+\begin{itemize}
+    \item \textbf{Technology}: Large-scale pedestrian simulation CAVE
+    \item \textbf{Configuration}: 9m × 4m walkable area, laser projectors
+    \item \textbf{Strengths}: Europe's largest CAVE, autonomous vehicle research
+    \item \textbf{Our Advantage}: Multi-user support, higher resolution, WFS audio
+\end{itemize}
+
+\subsubsection{CAVE2 - University of Illinois Chicago, USA}
+
+\begin{itemize}
+    \item \textbf{Technology}: 320-degree cylindrical LCD panel array
+    \item \textbf{Configuration}: 72 panels, 37 megapixels per eye
+    \item \textbf{Strengths}: Ultra-high resolution, passive stereo
+    \item \textbf{Our Advantage}: Full immersion (6 sides), individual user tracking
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+    \begin{axis}[
+        xlabel={Resolution (Megapixels)},
+        ylabel={Simultaneous Users},
+        width=12cm,
+        height=8cm,
+        grid=major,
+        xmin=0, xmax=200,
+        ymin=0, ymax=7,
+        legend pos=north west,
+    ]
+
+    % Current facilities
+    \addplot[only marks, mark=*, mark size=3pt, color=gray] coordinates {
+        (8, 1)   % Standard CAVE
+        (16, 1)  % Leeds HIKER
+        (74, 1)  % CAVE2
+        (32, 2)  % Mechdyne
+    };
+
+    % Our system
+    \addplot[only marks, mark=star, mark size=8pt, color=dreamlabPrimary, ultra thick] coordinates {
+        (150, 6) % Our facility
+    };
+
+    % Labels
+    \node[anchor=south] at (axis cs:8,1.1) {\small Standard};
+    \node[anchor=south] at (axis cs:16,1.1) {\small Leeds};
+    \node[anchor=south] at (axis cs:74,1.1) {\small CAVE2};
+    \node[anchor=south] at (axis cs:32,2.1) {\small Mechdyne};
+    \node[anchor=south, color=dreamlabPrimary] at (axis cs:150,6.2) {\textbf{Our System}};
+
+    \end{axis}
+\end{tikzpicture}
+\caption{Competitive positioning: Resolution vs multi-user capability}
+\end{figure}
+
+\subsection{Market Differentiation}
+
+\requirement{USP-001}{Our facility will be the world's first to combine ALL of the following: 6-sided full immersion, 6-person simultaneous tracking with individual perspectives, 8K resolution per surface, Wave Field Synthesis audio, real-time volumetric capture, and sub-millimetre tracking precision.}
+
+\section{Expected Outcomes and Impact}
+
+\subsection{Research Impact}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{@{}lp{8cm}l@{}}
+\toprule
+\textbf{Domain} & \textbf{Expected Breakthroughs} & \textbf{Timeline} \\
+\midrule
+Nuclear & Remote handling validation, decommissioning planning & Year 1 \\
+Autonomous Systems & Multi-agent coordination, safety validation & Year 1-2 \\
+Manufacturing & Digital twin integration, assembly optimisation & Year 2 \\
+Healthcare & Collaborative surgery planning, therapy protocols & Year 2-3 \\
+Climate Science & Large-scale data visualisation, scenario modelling & Year 3+ \\
+\bottomrule
+\end{tabular}
+\caption{Expected research breakthroughs by domain}
+\end{table}
+
+\subsection{Economic Impact}
+
+\begin{itemize}
+    \item \textbf{Direct Revenue}: £500k+ annual industry contracts
+    \item \textbf{Indirect Benefits}:
+    \begin{itemize}
+        \item Enhanced grant competitiveness (est. £2M+ additional funding)
+        \item Spin-out company potential
+        \item Regional economic development
+    \end{itemize}
+    \item \textbf{Cost Savings}: Reduced need for physical prototypes and travel
+\end{itemize}
+
+\subsection{Societal Impact}
+
+\begin{enumerate}
+    \item \textbf{Skills Development}: Training next-generation engineers and scientists
+    \item \textbf{Public Engagement}: Inspiring STEM interest through demonstrations
+    \item \textbf{Safety Enhancement}: Better preparation for hazardous environments
+    \item \textbf{Accessibility}: Virtual access to dangerous or remote locations
+\end{enumerate}
+
+\section{Success Metrics and KPIs}
+
+\subsection{Quantitative Metrics}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Metric} & \textbf{Year 1} & \textbf{Year 3} & \textbf{Year 5} \\
+\midrule
+Utilisation Rate & 50\% & 70\% & 85\% \\
+Research Papers & 5 & 15 & 25 \\
+Industry Partners & 3 & 8 & 15 \\
+Student Projects & 10 & 30 & 50 \\
+Revenue Generated & £200k & £500k & £750k \\
+\bottomrule
+\end{tabular}
+\caption{Five-year success metrics}
+\end{table}
+
+\subsection{Qualitative Indicators}
+
+\begin{itemize}
+    \item International recognition as a centre of excellence
+    \item Attraction and retention of world-class researchers
+    \item Industry testimonials and case studies
+    \item Student satisfaction and employment outcomes
+    \item Media coverage and public engagement metrics
+\end{itemize}
+
+\section{Risk Mitigation Strategy}
+
+\subsection{Strategic Risks}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{@{}lXl@{}}
+\toprule
+\textbf{Risk} & \textbf{Mitigation} & \textbf{Owner} \\
+\midrule
+Technology obsolescence & Modular design, 3-year refresh cycle & CTO \\
+Competitor facilities & Continuous innovation, unique features & Director \\
+Funding shortfalls & Diverse revenue streams, phased implementation & CFO \\
+Skills shortage & Training programme, vendor partnerships & HR \\
+Low adoption & Change management, demonstration programme & Operations \\
+\bottomrule
+\end{tabularx}
+\caption{Strategic risk register}
+\end{table}
+
+\section{Implementation Roadmap}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[x=0.7cm, y=0.8cm]
+    % Phase boxes
+    \draw[fill=dreamlabPrimary!20] (0,0) rectangle (6,1) node[midway] {\textbf{Phase 1: Foundation}};
+    \draw[fill=dreamlabSecondary!20] (0,-1.5) rectangle (12,-.5) node[midway] {\textbf{Phase 2: Implementation}};
+    \draw[fill=dreamlabAccent!20] (0,-3) rectangle (18,-2) node[midway] {\textbf{Phase 3: Operation}};
+    \draw[fill=dreamlabPrimary!40] (0,-4.5) rectangle (24,-3.5) node[midway] {\textbf{Phase 4: Excellence}};
+
+    % Timeline
+    \draw[thick, ->] (0,-6) -- (25,-6);
+    \foreach \x/\label in {0/Q1, 6/Q2, 12/Q3, 18/Q4, 24/Y2} {
+        \draw (\x,-6) -- (\x,-6.3);
+        \node[below] at (\x,-6.3) {\label};
+    }
+
+    % Milestones
+    \node[right] at (6.5,0.5) {\small Stakeholder approval, funding secured};
+    \node[right] at (12.5,-1) {\small System installed, testing complete};
+    \node[right] at (18.5,-2.5) {\small Full operation, first projects};
+    \node[right] at (24.5,-4) {\small International recognition};
+\end{tikzpicture}
+\caption{Strategic implementation roadmap}
+\end{figure}
+
+\section{Conclusion}
+
+This world-class facility represents more than infrastructure investment – it embodies our commitment to research leadership, innovation, and societal impact. By creating an unparalleled platform for collaborative visualisation, we position our institution at the forefront of global technological advancement whilst addressing critical national challenges.
+
+The convergence of cutting-edge display technology, advanced computing, and innovative tracking systems creates unprecedented opportunities for breakthrough research and transformative education. With careful implementation and strong stakeholder support, this facility will deliver exceptional value for decades to come.

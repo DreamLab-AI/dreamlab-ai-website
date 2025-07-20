@@ -1,0 +1,367 @@
+\chapter{Audio System Specification}
+
+\section{Overview}
+
+The audio system represents a revolutionary advancement in spatial sound reproduction, utilising Wave Field Synthesis (WFS) to create physically accurate sound fields that multiple users can experience simultaneously without headphones.
+
+\section{Wave Field Synthesis Architecture}
+
+\subsection{Fundamental Principles}
+
+Wave Field Synthesis recreates the physical wavefronts of sound sources, enabling true spatial audio for all listeners regardless of their position within the space.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.8]
+    % Room outline
+    \draw[dreamlabPrimary, ultra thick] (0,0) rectangle (8,6);
+
+    % Speaker arrays
+    \foreach \x in {0.5,1,1.5,2,2.5,3,3.5,4,4.5,5,5.5,6,6.5,7,7.5} {
+        \draw[fill=dreamlabAccent] (\x,0) circle (0.1);
+        \draw[fill=dreamlabAccent] (\x,6) circle (0.1);
+    }
+    \foreach \y in {0.5,1,1.5,2,2.5,3,3.5,4,4.5,5,5.5} {
+        \draw[fill=dreamlabAccent] (0,\y) circle (0.1);
+        \draw[fill=dreamlabAccent] (8,\y) circle (0.1);
+    }
+
+    % Virtual sound source
+    \draw[dreamlabSecondary, fill=dreamlabSecondary!30] (3,3) circle (0.3);
+    \node[above] at (3,3.3) {\small Virtual Source};
+
+    % Wave fronts
+    \foreach \r in {0.8,1.6,2.4} {
+        \draw[dreamlabSecondary, dashed] (3,3) circle (\r);
+    }
+
+    % Users
+    \foreach \pos in {(2,1.5), (5,2), (4,4.5), (6,1)} {
+        \draw[fill=dreamlabPrimary!30] \pos circle (0.25);
+    }
+
+    \node[below] at (4,-0.5) {\textbf{Wave Field Synthesis Creates Natural Sound Fields}};
+\end{tikzpicture}
+\caption{WFS principle: coherent wavefronts from distributed speakers}
+\end{figure}
+
+\begin{requirement}{AUD-001}{Minimum 128 independently driven loudspeakers, expandable to 512}
+
+\begin{requirement}{AUD-002}{Spatial accuracy: sound source localisation error <1° for all listener positions}
+
+\subsection{Speaker Array Configuration}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{@{}lX@{}}
+\toprule
+\textbf{Parameter} & \textbf{Specification} \\
+\midrule
+Array Topology & Horizontal ring at ear level (1.2m) plus elevated ring (2.4m) \\
+Speaker Spacing & 20-30cm maximum ($\lambda$/2 at 8kHz) \\
+Driver Type & 4" full-range coaxial with controlled dispersion \\
+Frequency Response & 100Hz - 20kHz ±3dB per driver \\
+Power Handling & 50W RMS per channel \\
+Coverage Pattern & 90° horizontal × 45° vertical \\
+\bottomrule
+\end{tabularx}
+\caption{WFS speaker array specifications}
+\end{table}
+
+\section{System Components}
+
+\subsection{Loudspeaker Specifications}
+
+\begin{requirement}{AUD-003}{Custom-designed drivers optimised for WFS application}
+
+\begin{itemize}
+    \item \textbf{Transducer}: Coaxial design for point-source behaviour
+    \item \textbf{Enclosure}: Sealed, anti-resonant construction
+    \item \textbf{Mounting}: Flush integration with room surfaces
+    \item \textbf{Connection}: Bi-amp capable with DSP crossover
+\end{itemize}
+
+\subsection{Subwoofer Integration}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.6]
+    % Room
+    \draw[dreamlabPrimary, thick] (0,0) rectangle (10,8);
+
+    % Subwoofers in corners
+    \foreach \pos in {(0.5,0.5), (9.5,0.5), (0.5,7.5), (9.5,7.5)} {
+        \draw[fill=dreamlabSecondary!50] \pos rectangle ++(0.8,0.8);
+    }
+
+    % Labels
+    \node at (1,1) {\tiny Sub};
+    \node at (9,1) {\tiny Sub};
+    \node at (1,7) {\tiny Sub};
+    \node at (9,7) {\tiny Sub};
+
+    % Coverage pattern
+    \draw[dreamlabSecondary, dashed] (5,4) ellipse (4.5 and 3.5);
+
+    \node[below] at (5,-0.5) {\textbf{Distributed Subwoofer Array}};
+\end{tikzpicture}
+\caption{Corner-loaded subwoofer configuration for uniform LF coverage}
+\end{figure}
+
+\begin{itemize}
+    \item 4× 18" high-excursion subwoofers
+    \item Frequency range: 20Hz - 120Hz
+    \item DSP-controlled for room mode cancellation
+    \item Time-aligned with WFS array
+\end{itemize}
+
+\section{Processing and Amplification}
+
+\subsection{WFS Processing Engine}
+
+\begin{requirement}{AUD-004}{Real-time processing for 256+ channels at 96kHz/32-bit}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{@{}lX@{}}
+\toprule
+\textbf{Component} & \textbf{Specification} \\
+\midrule
+Processing Platform & Dedicated WFS server with GPU acceleration \\
+Algorithm & Kirchhoff-Helmholtz integral implementation \\
+Latency & <5ms input to output \\
+Update Rate & 1000Hz for moving sources \\
+Object Capacity & 64 simultaneous 3D sound sources \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Amplification Architecture}
+
+\begin{itemize}
+    \item \textbf{Topology}: Class D multi-channel amplifiers
+    \item \textbf{Configuration}: 16 channels per amplifier module
+    \item \textbf{Power}: 50W × 16 channels per unit
+    \item \textbf{DSP}: Per-channel EQ, delay, and limiting
+    \item \textbf{Networking}: Dante or AVB for audio distribution
+    \item \textbf{Redundancy}: Hot-swappable amplifier modules
+\end{itemize}
+
+\section{Acoustic Design Integration}
+
+\subsection{Room Acoustic Treatment}
+
+\begin{requirement}{AUD-005}{RT60 < 0.3 seconds (500Hz-2kHz) for optimal WFS performance}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.7]
+    % Room section
+    \draw[thick] (0,0) rectangle (8,5);
+
+    % Acoustic panels
+    \foreach \x in {1,3,5,7} {
+        \draw[pattern=north east lines, pattern color=dreamlabDark] (\x-0.4,4.5) rectangle (\x+0.4,5);
+    }
+
+    % Bass traps
+    \draw[pattern=crosshatch, pattern color=dreamlabSecondary] (0,0) -- (0.5,0) -- (0,0.5) -- cycle;
+    \draw[pattern=crosshatch, pattern color=dreamlabSecondary] (8,0) -- (7.5,0) -- (8,0.5) -- cycle;
+
+    % Labels
+    \node[right] at (8.5,4.7) {\small Broadband Absorbers};
+    \node[right] at (8.5,0.3) {\small Bass Traps};
+
+    % WFS speakers
+    \foreach \x in {0.5,1.5,2.5,3.5,4.5,5.5,6.5,7.5} {
+        \draw[fill=dreamlabAccent] (\x,2) circle (0.15);
+    }
+
+    \node[below] at (4,-0.5) {\textbf{Acoustic Treatment Strategy}};
+\end{tikzpicture}
+\caption{Strategic placement of acoustic treatment}
+\end{figure}
+
+\subsection{Speaker Integration Details}
+
+\begin{itemize}
+    \item Flush-mounted speakers with minimal baffle
+    \item Acoustically transparent covering where needed
+    \item Vibration isolation from building structure
+    \item Cable management within wall cavities
+\end{itemize}
+
+\section{Control and Calibration}
+
+\subsection{System Calibration}
+
+\begin{requirement}{AUD-006}{Automated room calibration using measurement microphone array}
+
+\begin{itemize}
+    \item 3D acoustic measurement at 64+ positions
+    \item Per-speaker frequency response correction
+    \item Time alignment to sub-sample accuracy
+    \item Room mode identification and correction
+    \item Validation of WFS synthesis accuracy
+\end{itemize}
+
+\subsection{User Interface}
+
+\begin{itemize}
+    \item \textbf{Touch Panel Control}: Source selection and routing
+    \item \textbf{Software Interface}: 3D sound object positioning
+    \item \textbf{Preset Management}: Scene storage and recall
+    \item \textbf{Monitoring}: Real-time system health display
+\end{itemize}
+
+\section{Integration with Visual System}
+
+\subsection{Synchronisation}
+
+\begin{requirement}{AUD-007}{Audio-visual synchronisation within ±1 video frame}
+
+\begin{itemize}
+    \item Hardware clock synchronisation with render cluster
+    \item Predictive audio rendering for moving objects
+    \item Automatic delay compensation
+    \item Frame-accurate triggering
+\end{itemize}
+
+\subsection{Spatial Mapping}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{@{}lX@{}}
+\toprule
+\textbf{Integration Feature} & \textbf{Implementation} \\
+\midrule
+Coordinate System & Unified 3D space with visual tracking \\
+Object Tracking & Real-time audio position updates from visual objects \\
+Occlusion Modelling & Frequency-dependent attenuation for hidden sources \\
+Distance Attenuation & Physically accurate 1/r² law with air absorption \\
+Doppler Effects & Automatic pitch shift for moving sources \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Advanced Audio Features}
+
+\subsection{Acoustic Simulation}
+
+\begin{itemize}
+    \item \textbf{Early Reflections}: Ray-traced first-order reflections
+    \item \textbf{Reverberation}: Convolution with measured/modelled IRs
+    \item \textbf{Material Properties}: Frequency-dependent absorption
+    \item \textbf{Dynamic Environments}: Real-time acoustic updates
+\end{itemize}
+
+\subsection{Binaural Recording}
+
+\begin{requirement}{AUD-008}{Ambisonic microphone array for spatial audio capture}
+
+\begin{itemize}
+    \item 32-channel spherical microphone array
+    \item 4th order ambisonic encoding
+    \item Binaural rendering for headphone playback
+    \item Integration with volumetric video capture
+\end{itemize}
+
+\section{Audio Content Workflow}
+
+\subsection{Supported Formats}
+
+\begin{itemize}
+    \item \textbf{Object-based}: ADM, Dolby Atmos, DTS:X
+    \item \textbf{Channel-based}: Up to 22.2 discrete channels
+    \item \textbf{Scene-based}: Higher-order ambisonics (HOA)
+    \item \textbf{Live Input}: Multi-channel microphone arrays
+\end{itemize}
+
+\subsection{Authoring Tools}
+
+\begin{itemize}
+    \item Native WFS panning plugins for major DAWs
+    \item Real-time preview in scaled model room
+    \item Game engine integration (Unreal, Unity)
+    \item Max/MSP patches for experimental work
+\end{itemize}
+
+\section{Performance Specifications}
+
+\subsection{System Performance Metrics}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{@{}lXr@{}}
+\toprule
+\textbf{Parameter} & \textbf{Specification} & \textbf{Target} \\
+\midrule
+Frequency Response & 20Hz - 20kHz ±3dB & ±1.5dB \\
+Maximum SPL & 105dB continuous & 110dB peak \\
+Dynamic Range & >96dB & >110dB \\
+THD+N & <0.5\% at 90dB SPL & <0.1\% \\
+Channel Separation & >60dB & >80dB \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Spatial Performance}
+
+\begin{itemize}
+    \item Localisation accuracy: ±5° azimuth, ±10° elevation
+    \item Effective listening area: 80\% of room volume
+    \item Minimum source distance: 0.5m from listener
+    \item Maximum simultaneous sources: 64 (128 with reduced quality)
+\end{itemize}
+
+\section{Maintenance and Reliability}
+
+\subsection{Preventive Maintenance}
+
+\begin{itemize}
+    \item Monthly: Automated frequency sweep testing
+    \item Quarterly: Physical inspection of all drivers
+    \item Annually: Full acoustic recalibration
+    \item Continuous: Real-time monitoring of driver health
+\end{itemize}
+
+\subsection{Redundancy Measures}
+
+\begin{requirement}{AUD-009}{System remains operational with up to 10\% speaker failure}
+
+\begin{itemize}
+    \item Automatic gain redistribution for failed speakers
+    \item Hot-spare amplifier channels
+    \item Redundant signal paths
+    \item Graceful degradation algorithms
+\end{itemize}
+
+\section{Safety and Compliance}
+
+\subsection{Acoustic Safety}
+
+\begin{itemize}
+    \item SPL limiting to prevent hearing damage
+    \item Emergency mute capability
+    \item Compliance with workplace noise regulations
+    \item Optional personal limit settings
+\end{itemize}
+
+\subsection{Electrical Safety}
+
+\begin{itemize}
+    \item All equipment CE/UKCA marked
+    \item Proper earthing and isolation
+    \item Emergency power disconnection
+    \item Regular PAT testing schedule
+\end{itemize}
+
+\begin{center}
+\begin{tikzpicture}
+\node[rectangle, draw=dreamlabPrimary, fill=dreamlabLight!20, text width=14cm, inner sep=15pt, rounded corners] {
+\centering
+\textbf{\large\color{dreamlabPrimary}Audio System Summary}\\[0.5cm]
+Our Wave Field Synthesis audio system sets a new standard for spatial sound reproduction, enabling multiple users to experience perfectly positioned 3D audio without headphones. With 128-512 speakers creating coherent wavefronts, every listener hears accurate spatial sound regardless of their position, revolutionising collaborative immersive experiences.
+};
+\end{tikzpicture}
+\end{center}

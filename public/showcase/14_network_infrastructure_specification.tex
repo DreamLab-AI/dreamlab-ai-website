@@ -1,0 +1,443 @@
+\chapter{Network Infrastructure Specification}
+
+\section{Overview}
+
+The network infrastructure forms the digital backbone of our immersive system, enabling seamless data flow between rendering clusters, tracking systems, storage arrays, and external collaborators with ultra-low latency and massive bandwidth.
+
+\section{Network Architecture}
+
+\subsection{Core Design Principles}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.8]
+    % Core switches
+    \node[draw, fill=dreamlabSecondary!30, minimum width=2cm, minimum height=1cm] (core1) at (3,6) {Core SW1};
+    \node[draw, fill=dreamlabSecondary!30, minimum width=2cm, minimum height=1cm] (core2) at (7,6) {Core SW2};
+    \draw[very thick, dreamlabSecondary] (core1) -- (core2);
+
+    % Spine switches
+    \node[draw, fill=dreamlabPrimary!30, minimum width=2cm, minimum height=1cm] (spine1) at (2,4) {Spine 1};
+    \node[draw, fill=dreamlabPrimary!30, minimum width=2cm, minimum height=1cm] (spine2) at (5,4) {Spine 2};
+    \node[draw, fill=dreamlabPrimary!30, minimum width=2cm, minimum height=1cm] (spine3) at (8,4) {Spine 3};
+
+    % Leaf switches
+    \foreach \xpos/\xname/\label in {0/0/Compute,2.5/2p5/Storage,5/5/Tracking,7.5/7p5/Display,10/10/Mgmt} {
+        \node[draw, fill=dreamlabAccent!30, minimum width=1.5cm, minimum height=0.8cm] (leaf\xname) at (\xpos,2) {\small\label};
+    }
+
+    % Connections
+    \foreach \spine in {spine1,spine2,spine3} {
+        \draw[thick] (core1) -- (\spine);
+        \draw[thick] (core2) -- (\spine);
+    }
+
+    \foreach \leaf in {leaf0,leaf2p5,leaf5,leaf7p5,leaf10} {
+        \foreach \spine in {spine1,spine2,spine3} {
+            \draw[dreamlabDark] (\spine) -- (\leaf);
+        }
+    }
+
+    % Devices
+    \foreach \x in {0,2.5,5,7.5,10} {
+        \draw[fill=dreamlabDark!20] (\x-0.3,0.5) rectangle (\x+0.3,1);
+    }
+
+    % External connection
+    \draw[ultra thick, dreamlabPrimary, ->] (5,7) -- (5,8) node[above] {\textbf{Campus/Internet}};
+
+    \node[below] at (5,-0.5) {\textbf{Non-Blocking Spine-Leaf Architecture}};
+\end{tikzpicture}
+\caption{High-performance network topology}
+\end{figure}
+
+\begin{requirement}{NET-001}{Full non-blocking architecture with line-rate forwarding}
+
+\begin{requirement}{NET-002}{Sub-5 microsecond port-to-port latency}
+
+\subsection{Network Segregation}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{@{}lXr@{}}
+\toprule
+\textbf{Network} & \textbf{Purpose} & \textbf{Bandwidth} \\
+\midrule
+Compute Fabric & GPU cluster interconnect & 400Gb/s \\
+Storage Network & High-speed data access & 200Gb/s \\
+Tracking Network & Camera and sensor data & 100Gb/s \\
+Display Network & Video signal distribution & 100Gb/s \\
+Management & Control and monitoring & 10Gb/s \\
+Campus Uplink & External connectivity & 2×100Gb/s \\
+\bottomrule
+\end{tabularx}
+\caption{Network segmentation strategy}
+\end{table}
+
+\section{Core Infrastructure}
+
+\subsection{Switch Specifications}
+
+\begin{requirement}{NET-003}{Enterprise-grade switches with deep buffers and RDMA support}
+
+\subsubsection{Core/Spine Switches}
+\begin{itemize}
+    \item \textbf{Model}: Arista 7800R3 Series or equivalent
+    \item \textbf{Ports}: 32× 400GbE QSFP-DD
+    \item \textbf{Switching Capacity}: 25.6 Tbps
+    \item \textbf{Latency}: <1 microsecond
+    \item \textbf{Buffer}: 64GB shared memory
+    \item \textbf{Features}: VXLAN, EVPN, segment routing
+\end{itemize}
+
+\subsubsection{Leaf Switches}
+\begin{itemize}
+    \item \textbf{Model}: Arista 7050X3 Series or equivalent
+    \item \textbf{Ports}: 48× 25GbE + 8× 100GbE uplinks
+    \item \textbf{Switching Capacity}: 3.2 Tbps
+    \item \textbf{Features}: Cut-through switching, PTP support
+\end{itemize}
+
+\subsection{InfiniBand Option}
+
+For ultimate compute performance, parallel InfiniBand deployment:
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{@{}lX@{}}
+\toprule
+\textbf{Component} & \textbf{Specification} \\
+\midrule
+Technology & InfiniBand HDR200 (200Gb/s per port) \\
+Switch & NVIDIA Quantum-2 QM8700 \\
+Adapters & NVIDIA ConnectX-6 HDR \\
+Topology & Fat-tree with 1:1 oversubscription \\
+Features & GPUDirect RDMA, adaptive routing \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{High-Performance Features}
+
+\subsection{RDMA Implementation}
+
+\begin{requirement}{NET-004}{Remote Direct Memory Access for compute and storage}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.8]
+    % Traditional vs RDMA
+    \node[draw, fill=dreamlabPrimary!20] (cpu1) at (0,3) {CPU};
+    \node[draw, fill=dreamlabAccent!20] (mem1) at (0,1) {Memory};
+    \node[draw, fill=dreamlabPrimary!20] (cpu2) at (6,3) {CPU};
+    \node[draw, fill=dreamlabAccent!20] (mem2) at (6,1) {Memory};
+
+    % Traditional path
+    \draw[thick, dreamlabSecondary] (mem1) -- (cpu1) -- (3,3) -- (cpu2) -- (mem2);
+    \node[above] at (3,3) {\small Traditional};
+
+    % RDMA path
+    \draw[thick, dreamlabPrimary, dashed] (mem1) .. controls (3,0) .. (mem2);
+    \node[below] at (3,0) {\small RDMA};
+
+    \node[below] at (3,-1) {\textbf{RDMA Bypasses CPU for Direct Memory Access}};
+\end{tikzpicture}
+\caption{RDMA architecture benefit}
+\end{figure}
+
+\begin{itemize}
+    \item \textbf{RoCE v2}: RDMA over Converged Ethernet
+    \item \textbf{PFC}: Priority Flow Control for lossless transport
+    \item \textbf{ECN}: Explicit Congestion Notification
+    \item \textbf{DCQCN}: Data Center QCN for congestion control
+\end{itemize}
+
+\subsection{Time Synchronisation}
+
+\begin{requirement}{NET-005}{Precision Time Protocol (PTP) for sub-microsecond synchronisation}
+
+\begin{itemize}
+    \item \textbf{Grandmaster Clock}: GPS-disciplined oscillator
+    \item \textbf{Accuracy}: <100 nanoseconds across network
+    \item \textbf{Boundary Clocks}: In all switches
+    \item \textbf{Monitoring}: Continuous offset tracking
+\end{itemize}
+
+\section{Storage Network}
+
+\subsection{Dedicated Storage Fabric}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{@{}lX@{}}
+\toprule
+\textbf{Feature} & \textbf{Implementation} \\
+\midrule
+Protocol & NVMe over Fabrics (NVMe-oF) \\
+Transport & RoCE v2 or InfiniBand \\
+Bandwidth & 40GB/s aggregate throughput \\
+Latency & <100 microseconds to first byte \\
+Redundancy & Dual-path with automatic failover \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Storage Area Network Details}
+
+\begin{itemize}
+    \item \textbf{Metadata Network}: Separate 25GbE for Lustre/BeeGFS
+    \item \textbf{Object Storage}: 100GbE per storage node
+    \item \textbf{Backup Network}: Isolated 10GbE for snapshots
+    \item \textbf{Replication}: Dedicated link for DR site
+\end{itemize}
+
+\section{Camera and Sensor Networks}
+
+\subsection{Tracking Network Architecture}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.7]
+    % PoE switches
+    \node[draw, fill=dreamlabAccent!30, minimum width=3cm] (poe1) at (0,2) {PoE Switch 1};
+    \node[draw, fill=dreamlabAccent!30, minimum width=3cm] (poe2) at (5,2) {PoE Switch 2};
+    \node[draw, fill=dreamlabAccent!30, minimum width=3cm] (poe3) at (10,2) {PoE Switch 3};
+
+    % Cameras
+    \foreach \x in {-1,0,1} {
+        \draw[fill=dreamlabPrimary!20] (\x,0) rectangle (\x+0.5,0.5);
+        \draw[->] (\x+0.25,0.5) -- (\x+0.25,1.5);
+    }
+    \foreach \x in {4,5,6} {
+        \draw[fill=dreamlabPrimary!20] (\x,0) rectangle (\x+0.5,0.5);
+        \draw[->] (\x+0.25,0.5) -- (\x+0.25,1.5);
+    }
+    \foreach \x in {9,10,11} {
+        \draw[fill=dreamlabPrimary!20] (\x,0) rectangle (\x+0.5,0.5);
+        \draw[->] (\x+0.25,0.5) -- (\x+0.25,1.5);
+    }
+
+    % Aggregation
+    \node[draw, fill=dreamlabSecondary!30, minimum width=4cm] (agg) at (5,4) {Aggregation Switch};
+    \draw[thick] (poe1) -- (agg);
+    \draw[thick] (poe2) -- (agg);
+    \draw[thick] (poe3) -- (agg);
+
+    % Processing
+    \node[draw, fill=dreamlabPrimary!30] (proc) at (5,6) {Processing Cluster};
+    \draw[ultra thick] (agg) -- (proc);
+
+    \node[below] at (5,-0.5) {\textbf{Camera Network Topology}};
+\end{tikzpicture}
+\caption{Distributed PoE infrastructure for cameras}
+\end{figure}
+
+\begin{itemize}
+    \item \textbf{PoE++ Support}: 90W per port for powered devices
+    \item \textbf{10GigE Vision}: Camera data protocol support
+    \item \textbf{Multicast}: Efficient distribution of tracking data
+    \item \textbf{QoS}: Priority queuing for tracking packets
+\end{itemize}
+
+\section{External Connectivity}
+
+\subsection{Campus Network Integration}
+
+\begin{requirement}{NET-006}{Dual diverse 100GbE uplinks to campus core}
+
+\begin{itemize}
+    \item \textbf{Primary Path}: Direct fiber to data centre
+    \item \textbf{Secondary Path}: Diverse route via alternate building
+    \item \textbf{Routing}: BGP with campus AS
+    \item \textbf{Filtering}: Stateful firewall at boundary
+\end{itemize}
+
+\subsection{Remote Collaboration Support}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{@{}lX@{}}
+\toprule
+\textbf{Service} & \textbf{Implementation} \\
+\midrule
+Video Streaming & WebRTC with TURN/STUN servers \\
+Remote Rendering & NVIDIA CloudXR or similar \\
+File Transfer & GridFTP for large datasets \\
+API Access & REST/GraphQL via reverse proxy \\
+VPN & IPSec for secure remote access \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Security Architecture}
+
+\subsection{Network Security Layers}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.8]
+    % Zones
+    \draw[thick, dreamlabSecondary] (0,0) rectangle (10,1.5);
+    \node at (5,0.75) {\textbf{Public DMZ}};
+
+    \draw[thick, dreamlabPrimary] (0,2) rectangle (10,3.5);
+    \node at (5,2.75) {\textbf{Research Network}};
+
+    \draw[thick, dreamlabAccent] (0,4) rectangle (10,5.5);
+    \node at (5,4.75) {\textbf{Compute Core}};
+
+    % Firewalls
+    \draw[fill=red!30] (4.5,1.5) rectangle (5.5,2);
+    \draw[fill=red!30] (4.5,3.5) rectangle (5.5,4);
+
+    \node[right] at (10.5,0.75) {Web services};
+    \node[right] at (10.5,2.75) {User access};
+    \node[right] at (10.5,4.75) {Protected systems};
+
+    \node[below] at (5,-0.5) {\textbf{Defence in Depth Security Model}};
+\end{tikzpicture}
+\caption{Security zone architecture}
+\end{figure}
+
+\subsection{Security Features}
+
+\begin{itemize}
+    \item \textbf{Micro-segmentation}: VXLAN-based isolation
+    \item \textbf{Access Control}: 802.1X with RADIUS
+    \item \textbf{Encryption}: MACsec on critical links
+    \item \textbf{DDoS Protection}: Hardware-based mitigation
+    \item \textbf{IDS/IPS}: Inline threat detection
+\end{itemize}
+
+\section{Quality of Service}
+
+\subsection{Traffic Classification}
+
+\begin{requirement}{NET-007}{Strict QoS prioritisation for real-time traffic}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{@{}lXr@{}}
+\toprule
+\textbf{Traffic Class} & \textbf{Applications} & \textbf{Priority} \\
+\midrule
+Real-time Control & Tracking, sync signals & Highest \\
+Render Data & GPU cluster traffic & High \\
+Storage I/O & File system operations & Medium \\
+Management & Monitoring, logs & Low \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{QoS Implementation}
+
+\begin{itemize}
+    \item \textbf{DSCP Marking}: At ingress points
+    \item \textbf{Priority Queues}: 8 hardware queues
+    \item \textbf{Rate Limiting}: Per-flow policers
+    \item \textbf{Buffer Management}: Dynamic thresholds
+\end{itemize}
+
+\section{Management and Monitoring}
+
+\subsection{Network Management System}
+
+\begin{itemize}
+    \item \textbf{DCIM}: Integrated with facility management
+    \item \textbf{Configuration}: Ansible automation
+    \item \textbf{Monitoring}: Prometheus + Grafana
+    \item \textbf{Flow Analysis}: sFlow/NetFlow collection
+    \item \textbf{Performance}: Real-time latency tracking
+\end{itemize}
+
+\subsection{Monitoring Metrics}
+
+\begin{requirement}{NET-008}{Comprehensive monitoring with 1-second granularity}
+
+\begin{itemize}
+    \item Port utilisation and error rates
+    \item Latency histograms per path
+    \item Buffer utilisation
+    \item PTP clock offset
+    \item RDMA congestion events
+    \item Security event correlation
+\end{itemize}
+
+\section{Cabling Infrastructure}
+
+\subsection{Fiber Optic Specifications}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{@{}lX@{}}
+\toprule
+\textbf{Type} & \textbf{Application} \\
+\midrule
+OS2 Single-mode & Long runs, campus uplinks \\
+OM5 Multi-mode & Spine-leaf connections \\
+MPO/MTP Trunks & High-density backbone \\
+AOC Cables & Top-of-rack connections \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Structured Cabling}
+
+\begin{itemize}
+    \item \textbf{Cable Management}: Overhead ladder trays
+    \item \textbf{Labelling}: Automated documentation system
+    \item \textbf{Testing}: OTDR certification for all fiber
+    \item \textbf{Redundancy}: Diverse physical paths
+\end{itemize}
+
+\section{Resilience and Redundancy}
+
+\subsection{High Availability Features}
+
+\begin{itemize}
+    \item \textbf{Switch Redundancy}: MLAG/VARP configurations
+    \item \textbf{Link Redundancy}: LAG with min-links
+    \item \textbf{Power}: Dual PSU from separate PDUs
+    \item \textbf{Cooling}: N+1 fan modules
+\end{itemize}
+
+\subsection{Failure Scenarios}
+
+\begin{requirement}{NET-009}{Zero downtime for single component failure}
+
+\begin{itemize}
+    \item Switch failure: <50ms convergence
+    \item Link failure: Sub-second LACP failover
+    \item Power failure: Seamless PSU transition
+    \item Software failure: Hitless upgrades
+\end{itemize}
+
+\section{Future Expansion}
+
+\subsection{Scalability Provisions}
+
+\begin{itemize}
+    \item 50\% port capacity reserved for growth
+    \item 400GbE/800GbE upgrade path
+    \item Additional spine switches pre-cabled
+    \item Power and cooling headroom
+\end{itemize}
+
+\subsection{Emerging Technologies}
+
+\begin{itemize}
+    \item \textbf{P4 Programmability}: Custom packet processing
+    \item \textbf{Network Slicing}: Guaranteed SLA per application
+    \item \textbf{AI/ML Integration}: Predictive failure detection
+    \item \textbf{Quantum Networking}: Research provisions
+\end{itemize}
+
+\begin{center}
+\begin{tikzpicture}
+\node[rectangle, draw=dreamlabPrimary, fill=dreamlabLight!20, text width=14cm, inner sep=15pt, rounded corners] {
+\centering
+\textbf{\large\color{dreamlabPrimary}Network Infrastructure Summary}\\[0.5cm]
+Our network architecture delivers the ultra-low latency and massive bandwidth required for real-time immersive experiences. With non-blocking switching, RDMA support, and comprehensive redundancy, the infrastructure ensures that data flows seamlessly between all system components while maintaining the sub-millisecond timing precision essential for multi-user immersion.
+};
+\end{tikzpicture}
+\end{center}

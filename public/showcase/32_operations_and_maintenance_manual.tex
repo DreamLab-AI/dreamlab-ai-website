@@ -1,0 +1,526 @@
+\chapter{Operations and Maintenance Manual}
+
+\section{Overview}
+
+This chapter provides comprehensive guidance for the operation and maintenance of the world-class immersive facility, ensuring optimal performance, safety, and longevity of all systems.
+
+\section{Facility Operations}
+
+\subsection{Operating Modes}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    mode/.style={draw, rounded corners, minimum width=3.5cm, minimum height=1.5cm, align=center, text width=3cm},
+    research/.style={mode, fill=dreamlabPrimary!30},
+    demo/.style={mode, fill=dreamlabAccent!30},
+    maint/.style={mode, fill=dreamlabSecondary!30},
+    emergency/.style={mode, fill=red!30}
+]
+    % Modes
+    \node[research] (res) at (0,3) {\textbf{Research Mode}\\Standard Operation};
+    \node[demo] (demo) at (5,3) {\textbf{Demo Mode}\\Visitor Friendly};
+    \node[maint] (maint) at (0,0) {\textbf{Maintenance}\\Service Access};
+    \node[emergency] (emerg) at (5,0) {\textbf{Emergency}\\Safety Priority};
+
+    % Transitions
+    \draw[<->, thick] (res) -- (demo);
+    \draw[<->, thick] (res) -- (maint);
+    \draw[->, thick, red] (res) -- (emerg);
+    \draw[->, thick, red] (demo) -- (emerg);
+
+    \node[below] at (2.5,-1.5) {\textbf{Facility Operating Modes}};
+\end{tikzpicture}
+\caption{Operating mode transitions}
+\end{figure}
+
+\requirement{OPS-001}{Clear procedures for all operating modes}
+
+\subsection{Standard Operating Procedures}
+
+\subsubsection{Daily Startup Sequence}
+
+\begin{enumerate}
+    \item \textbf{Pre-Checks} (15 minutes)
+        \begin{itemize}
+            \item Visual inspection of facility
+            \item Check emergency exits clear
+            \item Verify safety systems active
+            \item Review previous session logs
+        \end{itemize}
+
+    \item \textbf{Power-Up Sequence} (20 minutes)
+        \begin{itemize}
+            \item Enable main power breakers
+            \item Start UPS systems
+            \item Boot network infrastructure
+            \item Initialise compute cluster
+            \item Power display systems
+        \end{itemize}
+
+    \item \textbf{System Verification} (15 minutes)
+        \begin{itemize}
+            \item Run automated diagnostics
+            \item Verify tracking calibration
+            \item Test audio system
+            \item Check display alignment
+            \item Confirm network connectivity
+        \end{itemize}
+
+    \item \textbf{Environment Preparation} (10 minutes)
+        \begin{itemize}
+            \item Set HVAC to operational mode
+            \item Dim house lighting
+            \item Load default content
+            \item Prepare user equipment
+        \end{itemize}
+\end{enumerate}
+
+\subsubsection{Shutdown Sequence}
+
+\begin{enumerate}
+    \item Save all session data
+    \item Graceful application shutdown
+    \item Power down display systems
+    \item Shut down compute nodes
+    \item Disable non-critical power
+    \item Secure facility
+\end{enumerate}
+
+\section{User Operations}
+
+\subsection{Session Management}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.8]
+    % Timeline
+    \draw[thick] (0,0) -- (12,0);
+
+    % Session phases
+    \draw[fill=dreamlabPrimary!30] (0,0.5) rectangle (2,1.5) node[midway] {\small Briefing};
+    \draw[fill=dreamlabAccent!30] (2,0.5) rectangle (4,1.5) node[midway] {\small Setup};
+    \draw[fill=dreamlabSecondary!30] (4,0.5) rectangle (10,1.5) node[midway] {\small Active Session};
+    \draw[fill=dreamlabPrimary!30] (10,0.5) rectangle (12,1.5) node[midway] {\small Debrief};
+
+    % Time markers
+    \foreach \x/\time in {0/0, 2/15, 4/30, 10/120, 12/135} {
+        \draw (\x,0) -- (\x,-0.3);
+        \node[below] at (\x,-0.3) {\tiny\time min};
+    }
+
+    \node[below] at (6,-1) {\textbf{Typical Session Timeline}};
+\end{tikzpicture}
+\caption{Standard session workflow}
+\end{figure}
+
+\subsection{User Roles and Responsibilities}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{@{}lX@{}}
+\toprule
+\textbf{Role} & \textbf{Responsibilities} \\
+\midrule
+Lead Researcher & Session planning, safety briefing, research direction \\
+Operator & System control, technical support, monitoring \\
+Participants & Follow safety guidelines, report issues \\
+Observer & Remain in designated areas, minimal interaction \\
+\bottomrule
+\end{tabularx}
+\caption{User roles during sessions}
+\end{table}
+
+\section{Safety Procedures}
+
+\subsection{Emergency Response}
+
+\requirement{OPS-002}{Comprehensive safety protocols for all scenarios}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    box/.style={draw, rounded corners, minimum width=4cm, minimum height=1cm},
+    alert/.style={box, fill=red!30},
+    action/.style={box, fill=samiaOrange!30},
+    safe/.style={box, fill=samiaGreen!30}
+]
+    % Flow
+    \node[alert] (detect) at (0,4) {Emergency Detected};
+    \node[action] (stop) at (0,2) {Emergency Stop Activated};
+    \node[action] (lights) at (-3,0) {Lights On};
+    \node[action] (unlock) at (0,0) {Doors Unlock};
+    \node[action] (announce) at (3,0) {PA Announcement};
+    \node[safe] (evac) at (0,-2) {Evacuation if Required};
+
+    % Connections
+    \draw[->, thick] (detect) -- (stop);
+    \draw[->, thick] (stop) -- (lights);
+    \draw[->, thick] (stop) -- (unlock);
+    \draw[->, thick] (stop) -- (announce);
+    \draw[->, thick] (lights) -- (evac);
+    \draw[->, thick] (unlock) -- (evac);
+    \draw[->, thick] (announce) -- (evac);
+\end{tikzpicture}
+\caption{Emergency response flowchart}
+\end{figure}
+
+\subsection{Safety Equipment}
+
+\begin{itemize}
+    \item \textbf{Emergency Stop Buttons}: Located on all walls
+    \item \textbf{First Aid Kit}: In control room and entry area
+    \item \textbf{Eye Wash Station}: For projection systems
+    \item \textbf{Fire Extinguishers}: CO$_2$ type for electrical fires
+    \item \textbf{Emergency Lighting}: Battery-backed illumination
+    \item \textbf{Communication}: Emergency phone in CAVE
+\end{itemize}
+
+\section{System Administration}
+
+\subsection{Control Room Operations}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.7]
+    % Workstation layout
+    \draw[thick] (0,0) rectangle (10,6);
+
+    % Operator stations
+    \draw[fill=dreamlabPrimary!20] (1,1) rectangle (3,2);
+    \node at (2,1.5) {\small Station 1};
+    \draw[fill=dreamlabPrimary!20] (4,1) rectangle (6,2);
+    \node at (5,1.5) {\small Station 2};
+    \draw[fill=dreamlabPrimary!20] (7,1) rectangle (9,2);
+    \node at (8,1.5) {\small Station 3};
+
+    % Monitors
+    \foreach \x in {2,5,8} {
+        \draw[fill=dreamlabAccent!20] (\x-0.8,2.5) rectangle (\x+0.8,3.5);
+    }
+
+    % Video wall
+    \draw[fill=dreamlabSecondary!20] (2,4) rectangle (8,5.5);
+    \node at (5,4.75) {System Status Display};
+
+    \node[below] at (5,-0.5) {\textbf{Control Room Layout}};
+\end{tikzpicture}
+\caption{Operator workstation configuration}
+\end{figure}
+
+\subsection{System Monitoring}
+
+Real-time monitoring requirements:
+
+\begin{itemize}
+    \item \textbf{Display Status}: All projectors/panels operational
+    \item \textbf{Compute Health}: GPU temperatures and utilisation
+    \item \textbf{Network Traffic}: Bandwidth and latency
+    \item \textbf{Tracking Quality}: Camera coverage and accuracy
+    \item \textbf{Environmental}: Temperature, humidity, power
+    \item \textbf{User Safety}: Positions and emergency status
+\end{itemize}
+
+\section{Routine Maintenance}
+
+\subsection{Daily Tasks}
+
+\requirement{OPS-003}{Preventive maintenance schedule to ensure reliability}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{@{}lXr@{}}
+\toprule
+\textbf{Task} & \textbf{Description} & \textbf{Time} \\
+\midrule
+Visual Inspection & Check all equipment for damage & 10 min \\
+Cleanliness & Wipe displays, vacuum floors & 15 min \\
+Log Review & Check system logs for errors & 10 min \\
+Consumables & Verify glasses charged, supplies stocked & 5 min \\
+\bottomrule
+\end{tabularx}
+\caption{Daily maintenance checklist}
+\end{table}
+
+\subsection{Weekly Maintenance}
+
+\begin{enumerate}
+    \item \textbf{Display Systems}
+        \begin{itemize}
+            \item Clean projection lenses/LED surfaces
+            \item Verify colour calibration
+            \item Check alignment patterns
+        \end{itemize}
+
+    \item \textbf{Tracking System}
+        \begin{itemize}
+            \item Clean camera lenses
+            \item Verify calibration accuracy
+            \item Test marker detection
+        \end{itemize}
+
+    \item \textbf{Audio System}
+        \begin{itemize}
+            \item Test all speaker channels
+            \item Verify WFS sweet spot
+            \item Check amplifier temperatures
+        \end{itemize}
+\end{enumerate}
+
+\subsection{Monthly Procedures}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[x=1.2cm, y=0.4cm]
+    % Task list
+    \node[left] at (0,10) {\small Full Calibration};
+    \node[left] at (0,9) {\small Filter Changes};
+    \node[left] at (0,8) {\small Deep Cleaning};
+    \node[left] at (0,7) {\small Software Updates};
+    \node[left] at (0,6) {\small Backup Verify};
+    \node[left] at (0,5) {\small UPS Test};
+    \node[left] at (0,4) {\small Emergency Test};
+    \node[left] at (0,3) {\small Documentation};
+
+    % Schedule bars
+    \foreach \y/\week in {10/1, 9/1, 8/2, 7/2, 6/3, 5/3, 4/4, 3/4} {
+        \draw[fill=dreamlabPrimary!50] (\week-0.4,\y-0.3) rectangle (\week+0.4,\y+0.3);
+    }
+
+    % Timeline
+    \draw[thick] (0,2) -- (5,2);
+    \foreach \x in {1,2,3,4} {
+        \draw (\x,1.8) -- (\x,2.2);
+        \node[below] at (\x,1.8) {Week \x};
+    }
+
+    \node[below] at (2.5,0.5) {\textbf{Monthly Maintenance Schedule}};
+\end{tikzpicture}
+\caption{Monthly maintenance task distribution}
+\end{figure}
+
+\section{Troubleshooting Guide}
+
+\subsection{Common Issues and Solutions}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{@{}lXX@{}}
+\toprule
+\textbf{Symptom} & \textbf{Possible Cause} & \textbf{Solution} \\
+\midrule
+Display dark & Power failure & Check breakers, UPS status \\
+Tracking jitter & Calibration drift & Run calibration routine \\
+Audio distortion & Amplifier overload & Reduce levels, check speakers \\
+Network lag & Bandwidth saturation & Check active transfers \\
+System crash & Software conflict & Restart in safe mode \\
+\bottomrule
+\end{tabularx}
+\caption{Common troubleshooting scenarios}
+\end{table}
+
+\subsection{Diagnostic Tools}
+
+Available diagnostic utilities:
+
+\begin{itemize}
+    \item \textbf{System Dashboard}: Real-time status overview
+    \item \textbf{Log Analyser}: Pattern detection in error logs
+    \item \textbf{Network Monitor}: Traffic analysis tools
+    \item \textbf{Thermal Imaging}: IR camera for hot spots
+    \item \textbf{Test Patterns}: Display and audio test suites
+\end{itemize}
+
+\section{Consumables and Spares}
+
+\subsection{Inventory Management}
+
+\requirement{OPS-004}{Maintain adequate spare parts inventory}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{@{}lXrr@{}}
+\toprule
+\textbf{Item} & \textbf{Description} & \textbf{Min Stock} & \textbf{Reorder} \\
+\midrule
+Tracking Glasses & Active shutter glasses & 12 pairs & 6 pairs \\
+Tracking Markers & Reflective markers & 50 units & 20 units \\
+Projector Filters & Dust filters & 20 units & 10 units \\
+Cleaning Supplies & Lens cleaners, cloths & 1 month & 2 weeks \\
+Batteries & For controllers/glasses & 24 units & 12 units \\
+\bottomrule
+\end{tabularx}
+\caption{Consumables inventory levels}
+\end{table}
+
+\subsection{Critical Spares}
+
+\begin{itemize}
+    \item \textbf{Display}: Spare projector or LED modules
+    \item \textbf{Compute}: Hot-spare GPU and memory
+    \item \textbf{Network}: Switch modules and cables
+    \item \textbf{Tracking}: Spare cameras (2 minimum)
+    \item \textbf{Power}: Circuit breakers and PDU modules
+\end{itemize}
+
+\section{Documentation and Records}
+
+\subsection{Required Documentation}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    doc/.style={draw, rounded corners, minimum width=3cm, minimum height=1cm},
+    ops/.style={doc, fill=dreamlabPrimary!30},
+    tech/.style={doc, fill=dreamlabAccent!30},
+    safety/.style={doc, fill=dreamlabSecondary!30}
+]
+    % Document categories
+    \node[ops] (sop) at (0,3) {SOPs};
+    \node[ops] (log) at (3,3) {Log Books};
+    \node[ops] (schedule) at (6,3) {Schedules};
+
+    \node[tech] (manual) at (0,1.5) {Manuals};
+    \node[tech] (diagram) at (3,1.5) {Diagrams};
+    \node[tech] (config) at (6,1.5) {Configs};
+
+    \node[safety] (risk) at (0,0) {Risk Assess};
+    \node[safety] (emergency) at (3,0) {Emergency};
+    \node[safety] (training) at (6,0) {Training};
+
+    \node[below] at (3,-1) {\textbf{Documentation Categories}};
+\end{tikzpicture}
+\caption{Essential documentation structure}
+\end{figure}
+
+\subsection{Record Keeping}
+
+Mandatory records to maintain:
+
+\begin{itemize}
+    \item Daily operation logs
+    \item Maintenance activities
+    \item System modifications
+    \item Incident reports
+    \item Training records
+    \item Visitor logs
+    \item Performance metrics
+\end{itemize}
+
+\section{Training Programme}
+
+\subsection{Operator Training Curriculum}
+
+\requirement{OPS-005}{Comprehensive training for all operators}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{@{}lXr@{}}
+\toprule
+\textbf{Module} & \textbf{Content} & \textbf{Duration} \\
+\midrule
+Foundation & System overview, safety & 1 day \\
+Operations & Control systems, procedures & 3 days \\
+Maintenance & Routine tasks, diagnostics & 2 days \\
+Advanced & Troubleshooting, optimisation & 2 days \\
+Practicum & Supervised operation & 2 days \\
+\bottomrule
+\end{tabularx}
+\caption{Operator training modules}
+\end{table}
+
+\subsection{Competency Assessment}
+
+\begin{itemize}
+    \item Written examination on procedures
+    \item Practical demonstration of operations
+    \item Emergency response simulation
+    \item Maintenance task completion
+    \item Annual recertification
+\end{itemize}
+
+\section{Performance Monitoring}
+
+\subsection{Key Performance Indicators}
+
+\begin{figure}[H]
+\centering
+\pgfplotsset{width=10cm, height=6cm}
+\begin{tikzpicture}
+\begin{axis}[
+    xlabel={Month},
+    ylabel={Percentage (\%)},
+    legend pos=north west,
+    grid=major,
+    grid style={dashed, gray!30},
+    xmin=1, xmax=12,
+    ymin=90, ymax=100,
+    xtick={1,2,3,4,5,6,7,8,9,10,11,12}
+]
+% Uptime data
+\addplot[color=dreamlabPrimary, mark=square*, thick] coordinates {
+    (1,95) (2,96) (3,97) (4,98) (5,97) (6,98)
+    (7,99) (8,99) (9,98) (10,99) (11,99) (12,99.5)
+};
+\addlegendentry{System Uptime}
+
+% Target line
+\addplot[color=red, dashed, thick] coordinates {
+    (1,99) (12,99)
+};
+\addlegendentry{Target (99\%)}
+\end{axis}
+\end{tikzpicture}
+\caption{System uptime performance tracking}
+\end{figure}
+
+\subsection{Continuous Improvement}
+
+\begin{itemize}
+    \item Monthly performance reviews
+    \item User satisfaction surveys
+    \item Incident analysis and lessons learned
+    \item Technology refresh planning
+    \item Best practice sharing
+\end{itemize}
+
+\section{Lifecycle Management}
+
+\subsection{Technology Refresh Schedule}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{@{}lXr@{}}
+\toprule
+\textbf{Component} & \textbf{Expected Lifecycle} & \textbf{Refresh Year} \\
+\midrule
+Projector Light Sources & 20,000 hours & Year 3-4 \\
+GPU Hardware & 3-4 years & Year 4 \\
+Tracking Cameras & 5-7 years & Year 6 \\
+Network Equipment & 5-7 years & Year 6 \\
+Audio Components & 7-10 years & Year 8 \\
+UPS Batteries & 3-5 years & Year 4 \\
+\bottomrule
+\end{tabularx}
+\caption{Component lifecycle planning}
+\end{table}
+
+\subsection{End-of-Life Planning}
+
+\begin{itemize}
+    \item Component disposal procedures
+    \item Data sanitisation requirements
+    \item Environmental compliance
+    \item Upgrade path strategies
+    \item Budget allocation planning
+\end{itemize}
+
+\begin{center}
+\begin{tikzpicture}
+\node[rectangle, draw=dreamlabPrimary, fill=dreamlabLight!20, text width=14cm, inner sep=15pt, rounded corners] {
+\centering
+\textbf{\large\color{dreamlabPrimary}Operations and Maintenance Summary}\\[0.5cm]
+This comprehensive operations and maintenance framework ensures the world-class immersive facility operates at peak performance throughout its lifecycle. By combining detailed procedures, proactive maintenance, thorough training, and continuous monitoring, we create a sustainable operational model that maximises system availability while ensuring user safety and satisfaction.
+};
+\end{tikzpicture}
+\end{center}
