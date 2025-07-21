@@ -45,15 +45,6 @@ jobs:
       - name: Create .nojekyll file
         run: touch dist/.nojekyll
 
-      - name: Copy CNAME file
-        run: |
-          if [ -f "CNAME" ]; then
-            cp CNAME dist/CNAME
-            echo "✅ CNAME copied to dist"
-          else
-            echo "❌ CNAME not found in root directory"
-          fi
-
       - name: Copy 404.html
         run: |
           if [ -f "public/404.html" ]; then
@@ -117,4 +108,5 @@ jobs:
           publish_dir: ./dist
           publish_branch: gh-pages
           force_orphan: true
-          commit_message: "Deploy from GitHub Actions"
+          cname: dreamlab-ai.com
+          commit_message: "Deploy from GitHub Actions ${{ github.sha }}"
