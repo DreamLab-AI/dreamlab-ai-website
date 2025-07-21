@@ -147,8 +147,8 @@ const ResearchPaper = () => {
           <h2 className="text-3xl font-bold mb-8 text-cyan-300">Real-World Impact</h2>
           <Card className="p-8 bg-black/30 backdrop-blur-md border-blue-500/30 space-y-6">
             <p className="text-lg text-blue-200">
-              Example: Nuclear decommissioning planning reduced from 8 hours (traditional) to 2 hours (our approach),
-              with better outcomes and less fatigue.
+              Example: Nuclear decommissioning planning significantly streamlined with our collaborative approach,
+              delivering better outcomes and reduced fatigue for specialist teams.
             </p>
 
             <div className="grid md:grid-cols-3 gap-4 my-8">
@@ -262,26 +262,26 @@ const ResearchPaper = () => {
             </div>
 
             <div className="mt-8 p-6 bg-gradient-to-r from-green-800/30 to-emerald-800/30 rounded-lg">
-              <p className="text-lg font-bold text-green-300 mb-4">Outcomes:</p>
+              <p className="text-lg font-bold text-green-300 mb-4">Expected Outcomes:</p>
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="flex items-center gap-2">
-                  <span className="text-2xl font-bold text-green-400">10x</span>
-                  <span className="text-green-200">faster planning</span>
+                  <span className="text-2xl font-bold text-green-400">⚡</span>
+                  <span className="text-green-200">Faster planning processes</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-2xl font-bold text-green-400">90%</span>
-                  <span className="text-green-200">fewer translation errors</span>
+                  <span className="text-2xl font-bold text-green-400">🎯</span>
+                  <span className="text-green-200">Fewer translation errors</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-2xl font-bold text-green-400">50%</span>
-                  <span className="text-green-200">less training time</span>
+                  <span className="text-2xl font-bold text-green-400">⏱️</span>
+                  <span className="text-green-200">Reduced training time</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-2xl font-bold text-green-400">£1bn+</span>
-                  <span className="text-green-200">savings</span>
+                  <span className="text-2xl font-bold text-green-400">💰</span>
+                  <span className="text-green-200">Significant cost savings</span>
                 </div>
               </div>
-              <p className="text-green-200 mt-4">Improved safety across all operations</p>
+              <p className="text-green-200 mt-4">Enhanced safety across all operations</p>
             </div>
           </Card>
         </section>
@@ -297,7 +297,7 @@ const ResearchPaper = () => {
               </li>
               <li className="text-lg text-blue-200 flex items-start">
                 <span className="text-cyan-400 mr-2">•</span>
-                Addresses £100bn nuclear challenge, complex legacy systems, and critical infrastructure.
+                Addresses significant nuclear challenges, complex legacy systems, and critical infrastructure.
               </li>
               <li className="text-lg text-blue-200 flex items-start">
                 <span className="text-cyan-400 mr-2">•</span>
@@ -317,44 +317,207 @@ const ResearchPaper = () => {
           </Card>
         </section>
 
-        {/* See Octave 2007 - 2023 */}
+        {/* Research Demonstrations - Octave 2007 - 2023 */}
         <section className="mb-16">
-          <h2 className="text-3xl font-bold mb-8 text-cyan-300">See Octave 2007 - 2023</h2>
-          <div className="grid md:grid-cols-3 gap-6">
+          <h2 className="text-3xl font-bold mb-8 text-cyan-300">Research Demonstrations - Octave 2007 - 2023</h2>
+
+          {/* Main Featured Videos */}
+          <div className="grid md:grid-cols-2 gap-8 mb-12">
             <Card className="overflow-hidden bg-black/30 backdrop-blur-md border-blue-500/30">
               <div className="aspect-video">
-                <iframe
-                  src="https://www.youtube.com/embed/eV6_J_rAVs4"
-                  title="Octave System Overview"
-                  className="w-full h-full"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
+                <video
+                  controls
+                  className="w-full h-full object-cover"
+                  poster="/data/media/unity-vr-thumb.jpg"
+                >
+                  <source src="/data/media/videos/unity-vr.mp4" type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+              <div className="p-4">
+                <h3 className="text-lg font-bold text-cyan-300 mb-2">Immersive VR Collaboration</h3>
+                <p className="text-sm text-blue-200">Multi-viewpoint virtual reality system enabling natural collaboration</p>
               </div>
             </Card>
             <Card className="overflow-hidden bg-black/30 backdrop-blur-md border-blue-500/30">
               <div className="aspect-video">
-                <iframe
-                  src="https://www.youtube.com/embed/vlV1vRD4jrY"
-                  title="Collaborative Environment Demo"
-                  className="w-full h-full"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
+                <video
+                  controls
+                  className="w-full h-full object-cover"
+                  poster="/data/media/nuclear-robot-thumb.jpg"
+                >
+                  <source src="/data/media/videos/nuclear-robot.mp4" type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+              <div className="p-4">
+                <h3 className="text-lg font-bold text-cyan-300 mb-2">Nuclear Decommissioning Robot</h3>
+                <p className="text-sm text-blue-200">Collaborative planning for complex nuclear operations</p>
               </div>
             </Card>
-            <Card className="overflow-hidden bg-black/30 backdrop-blur-md border-blue-500/30">
-              <div className="aspect-video">
-                <iframe
-                  src="https://www.youtube.com/embed/Y-DZLTY6Hok"
-                  title="Technical Architecture"
-                  className="w-full h-full"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
+          </div>
+
+          {/* Interactive Systems Gallery */}
+          <div className="mb-8">
+            <h3 className="text-2xl font-bold mb-6 text-cyan-400">Interactive Systems & Interfaces</h3>
+            <div className="grid md:grid-cols-3 gap-6">
+              <Card className="overflow-hidden bg-black/30 backdrop-blur-md border-blue-500/30">
+                <div className="aspect-video">
+                  <video
+                    controls
+                    className="w-full h-full object-cover"
+                    poster="/data/media/hand-interact-thumb.jpg"
+                  >
+                    <source src="/data/media/videos/hand-interact.mp4" type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+                <div className="p-3">
+                  <h4 className="font-bold text-cyan-300 mb-1">Hand Gesture Interface</h4>
+                  <p className="text-xs text-blue-200">Natural hand tracking and spatial interaction</p>
+                </div>
+              </Card>
+              <Card className="overflow-hidden bg-black/30 backdrop-blur-md border-blue-500/30">
+                <div className="aspect-video">
+                  <video
+                    controls
+                    className="w-full h-full object-cover"
+                    poster="/data/media/box-interact-thumb.jpg"
+                  >
+                    <source src="/data/media/videos/box-interact.mp4" type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+                <div className="p-3">
+                  <h4 className="font-bold text-cyan-300 mb-1">Spatial Object Manipulation</h4>
+                  <p className="text-xs text-blue-200">3D interaction and object placement systems</p>
+                </div>
+              </Card>
+              <Card className="overflow-hidden bg-black/30 backdrop-blur-md border-blue-500/30">
+                <div className="aspect-video">
+                  <video
+                    controls
+                    className="w-full h-full object-cover"
+                    poster="/data/media/fisheye-test-thumb.jpg"
+                  >
+                    <source src="/data/media/videos/fisheye-test.mp4" type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+                <div className="p-3">
+                  <h4 className="font-bold text-cyan-300 mb-1">Multi-Perspective Views</h4>
+                  <p className="text-xs text-blue-200">Advanced camera systems and viewpoint control</p>
+                </div>
+              </Card>
+            </div>
+          </div>
+
+          {/* Real-World Applications */}
+          <div className="mb-8">
+            <h3 className="text-2xl font-bold mb-6 text-cyan-400">Real-World Applications</h3>
+            <div className="grid md:grid-cols-4 gap-4">
+              <Card className="overflow-hidden bg-black/30 backdrop-blur-md border-blue-500/30">
+                <div className="aspect-video">
+                  <video
+                    controls
+                    className="w-full h-full object-cover"
+                    poster="/data/media/bigdata-viz-thumb.jpg"
+                  >
+                    <source src="/data/media/videos/bigdata-viz.mp4" type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+                <div className="p-3">
+                  <h4 className="font-bold text-cyan-300 mb-1">Data Visualization</h4>
+                  <p className="text-xs text-blue-200">Large-scale data analysis and visualization</p>
+                </div>
+              </Card>
+              <Card className="overflow-hidden bg-black/30 backdrop-blur-md border-blue-500/30">
+                <div className="aspect-video">
+                  <video
+                    controls
+                    className="w-full h-full object-cover"
+                    poster="/data/media/robot-arm-thumb.jpg"
+                  >
+                    <source src="/data/media/videos/robot-arm.mp4" type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+                <div className="p-3">
+                  <h4 className="font-bold text-cyan-300 mb-1">Robotic Control</h4>
+                  <p className="text-xs text-blue-200">Precise robotic manipulation and control</p>
+                </div>
+              </Card>
+              <Card className="overflow-hidden bg-black/30 backdrop-blur-md border-blue-500/30">
+                <div className="aspect-video">
+                  <video
+                    controls
+                    className="w-full h-full object-cover"
+                    poster="/data/media/pit-room-thumb.jpg"
+                  >
+                    <source src="/data/media/videos/pit-room.mp4" type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+                <div className="p-3">
+                  <h4 className="font-bold text-cyan-300 mb-1">Facility Planning</h4>
+                  <p className="text-xs text-blue-200">Virtual facility layout and planning</p>
+                </div>
+              </Card>
+              <Card className="overflow-hidden bg-black/30 backdrop-blur-md border-blue-500/30">
+                <div className="aspect-video">
+                  <video
+                    controls
+                    className="w-full h-full object-cover"
+                    poster="/data/media/motorway-sim-thumb.jpg"
+                  >
+                    <source src="/data/media/videos/motorway-sim.mp4" type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+                <div className="p-3">
+                  <h4 className="font-bold text-cyan-300 mb-1">Traffic Simulation</h4>
+                  <p className="text-xs text-blue-200">Large-scale traffic and infrastructure modeling</p>
+                </div>
+              </Card>
+            </div>
+          </div>
+
+          {/* Historical Context */}
+          <div className="mt-12">
+            <Card className="p-8 bg-gradient-to-r from-indigo-800/40 to-purple-800/40 backdrop-blur-md border-indigo-500/30">
+              <div className="grid md:grid-cols-2 gap-8 items-center">
+                <div>
+                  <h3 className="text-2xl font-bold mb-4 text-cyan-300">16 Years of Research Excellence</h3>
+                  <p className="text-lg text-indigo-200 mb-4">
+                    From 2007 to 2023, the Octave project has continuously pushed the boundaries of collaborative immersive systems.
+                  </p>
+                  <ul className="space-y-2 text-indigo-200">
+                    <li className="flex items-start">
+                      <span className="text-cyan-400 mr-2">•</span>
+                      Early pioneering work in multi-user VR collaboration
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-cyan-400 mr-2">•</span>
+                      Development of specialized hardware and software systems
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-cyan-400 mr-2">•</span>
+                      Real-world applications in nuclear, robotics, and urban planning
+                    </li>
+                  </ul>
+                </div>
+                <div className="aspect-video">
+                  <video
+                    controls
+                    className="w-full h-full object-cover rounded-lg"
+                    poster="/data/media/student-2015-thumb.jpg"
+                  >
+                    <source src="/data/media/videos/student-2015.mp4" type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
+                  <p className="text-sm text-cyan-300 mt-2 text-center">Student research presentation (2015)</p>
+                </div>
               </div>
             </Card>
           </div>
