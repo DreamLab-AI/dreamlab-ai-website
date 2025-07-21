@@ -58,8 +58,8 @@ const Privacy = () => {
             <h2 className="text-2xl font-semibold mb-4">Contact Us</h2>
             <p>
               If you have any questions about this privacy policy or our data practices, please contact us at{" "}
-              <a href="mailto:info@thedreamlab.uk" className="text-primary hover:underline">
-                info@thedreamlab.uk
+              <a href="mailto:info@dreamlab-ai.com" className="text-primary hover:underline">
+                info@dreamlab-ai.com
               </a>
             </p>
           </section>

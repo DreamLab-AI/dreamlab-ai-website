@@ -77,7 +77,7 @@ export const Header = () => {
               </DropdownMenuSubTrigger>
               <DropdownMenuSubContent>
                 <DropdownMenuItem asChild>
-                  <a href="https://thedreamlab.uk" target="_blank" rel="noopener noreferrer" className="w-full">DreamLab Creative Tech</a>
+                  <a href="https://dreamlab-ai.com" target="_blank" rel="noopener noreferrer" className="w-full">DreamLab Creative Tech</a>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <a href="https://agenticalliance.com/" target="_blank" rel="noopener noreferrer" className="w-full">Agentic Alliance</a>
@@ -94,7 +94,7 @@ export const Header = () => {
         </DropdownMenu>
 
         <Button variant="ghost" asChild>
-          <a href="mailto:info@thedreamlab.uk">Contact</a>
+          <a href="mailto:info@dreamlab-ai.com">Contact</a>
         </Button>
       </div>
     </header>
