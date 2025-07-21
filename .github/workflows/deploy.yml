@@ -60,15 +60,42 @@ jobs:
             echo "❌ 404.html not found in public directory"
           fi
 
-      - name: Copy team data to dist
+      - name: Copy all data files to dist
         run: |
-          mkdir -p dist/data/team
-          cp -rv public/data/team/* dist/data/team/ || echo "No team data to copy"
+          echo "Copying all public/data to dist/data..."
+          mkdir -p dist/data
+          cp -rv public/data/* dist/data/ || echo "No data to copy"
+
+          echo "Contents of dist/data:"
+          find dist/data -type f | head -20
+
+          echo "Video files in dist/data/media/videos:"
+          ls -la dist/data/media/videos/ || echo "No video files found"
+
+          echo "Thumbnail files in dist/data/media:"
+          ls -la dist/data/media/*-thumb.jpg || echo "No thumbnail files found"
 
       - name: Verify build artifacts
         run: |
-          echo "Contents of dist/data/team:"
+          echo "Verifying team data:"
           ls -la dist/data/team/ || echo "dist/data/team directory not found!"
+
+          echo "Verifying video files:"
+          if [ -d "dist/data/media/videos" ]; then
+            echo "✅ Videos directory exists"
+            ls -la dist/data/media/videos/
+          else
+            echo "❌ Videos directory missing"
+          fi
+
+          echo "Verifying thumbnail files:"
+          if ls dist/data/media/*-thumb.jpg 1> /dev/null 2>&1; then
+            echo "✅ Thumbnail files exist:"
+            ls -la dist/data/media/*-thumb.jpg
+          else
+            echo "❌ Thumbnail files missing"
+          fi
+
           if [ -f "dist/data/team/06.md" ]; then
             echo "✅ 06.md exists in build output"
           else
