@@ -1,0 +1,45 @@
+{
+  "title": "Module 11: Specialized AI Agents",
+  "pages": [
+    {
+      "slug": "README.md",
+      "title": "Module 11: Specialized AI Agents"
+    },
+    {
+      "slug": "00_introduction.md",
+      "title": "00_introduction - Module 11: Specialized AI Agents"
+    },
+    {
+      "slug": "01_concepts.md",
+      "title": "01_concepts - Module 11: Specialized AI Agents"
+    },
+    {
+      "slug": "02_hands_on.md",
+      "title": "02_hands_on - Module 11: Specialized AI Agents"
+    },
+    {
+      "slug": "03_exercises.md",
+      "title": "03_exercises - Module 11: Specialized AI Agents"
+    },
+    {
+      "slug": "04_project.md",
+      "title": "04_project - Module 11: Specialized AI Agents"
+    },
+    {
+      "slug": "05_assessment.md",
+      "title": "05_assessment - Module 11: Specialized AI Agents"
+    },
+    {
+      "slug": "06_resources.md",
+      "title": "06_resources - Module 11: Specialized AI Agents"
+    },
+    {
+      "slug": "objectives.md",
+      "title": "Learning Objectives - Module 11"
+    },
+    {
+      "slug": "prerequisites.md",
+      "title": "Prerequisites - Module 11"
+    }
+  ]
+}

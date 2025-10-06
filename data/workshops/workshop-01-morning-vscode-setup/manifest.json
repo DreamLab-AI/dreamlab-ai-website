@@ -1,0 +1,45 @@
+{
+  "title": "Module 05: VS Code as AI Command Centre",
+  "pages": [
+    {
+      "slug": "README.md",
+      "title": "Module 05: VS Code as AI Command Centre"
+    },
+    {
+      "slug": "00_introduction.md",
+      "title": "Chapter 0: Introduction to VS Code as Your AI Command Centre"
+    },
+    {
+      "slug": "01_concepts.md",
+      "title": "Chapter 1: Core Concepts - Understanding Your New Universe"
+    },
+    {
+      "slug": "02_hands_on.md",
+      "title": "Chapter 2: Hands-On Setup - Building Your Command Centre"
+    },
+    {
+      "slug": "03_exercises.md",
+      "title": "Chapter 3: Practical Exercises - Flex Your New Powers"
+    },
+    {
+      "slug": "04_project.md",
+      "title": "Chapter 4: Real Project Application - Your First AI-Enhanced Deliverable"
+    },
+    {
+      "slug": "05_assessment.md",
+      "title": "05_assessment - Module 05: VS Code as AI Command Center"
+    },
+    {
+      "slug": "06_resources.md",
+      "title": "06_resources - Module 05: VS Code as AI Command Center"
+    },
+    {
+      "slug": "objectives.md",
+      "title": "Learning Objectives - Module 05"
+    },
+    {
+      "slug": "prerequisites.md",
+      "title": "Prerequisites - Module 05"
+    }
+  ]
+}
