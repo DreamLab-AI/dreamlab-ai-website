@@ -42,13 +42,13 @@ const ResidentialTraining = () => {
       capacity: "6-8 Participants",
       category: "Creative Tech",
       featured: true,
-      description: "Master LED volume workflows and real-time visualization for engineering simulation data.",
+      description: "Master LED volume workflows and real-time visualisation for engineering simulation data, bridging creative and technical domains.",
       modules: [
-        "LED Volume Operations & ICVFX",
-        "Real-time Rendering for CAE/CFD Data",
-        "Unreal Engine for Engineering Viz",
-        "Motion Control & Camera Tracking",
-        "Virtual Production Pipeline Integration"
+        "LED Volume Operations & ICVFX Fundamentals",
+        "Real-time Rendering for CAE/CFD Data Visualisation",
+        "Unreal Engine for Engineering & Scientific Viz",
+        "Motion Control & Camera Tracking Systems",
+        "Virtual Production Pipeline Integration & Workflow"
       ]
     },
     {
@@ -58,13 +58,13 @@ const ResidentialTraining = () => {
       price: "£2,995",
       capacity: "4-6 Participants",
       category: "Emerging Tech",
-      description: "Learn cutting-edge 3D reconstruction techniques from photogrammetry to neural radiance fields.",
+      description: "Learn cutting-edge 3D reconstruction techniques from photogrammetry to neural radiance fields for next-generation content creation.",
       modules: [
-        "Photogrammetry Fundamentals",
-        "Neural Radiance Fields (NeRF)",
-        "Gaussian Splatting Techniques",
-        "3D Reconstruction for Engineering",
-        "Real-time Neural Rendering"
+        "Advanced Photogrammetry & Point Cloud Processing",
+        "Neural Radiance Fields (NeRF) Implementation",
+        "Gaussian Splatting Capture & Optimisation",
+        "3D Reconstruction for Engineering Applications",
+        "Real-time Neural Rendering & Deployment"
       ]
     },
     {
@@ -74,13 +74,13 @@ const ResidentialTraining = () => {
       price: "£2,495",
       capacity: "4-6 Participants",
       category: "Communication Tech",
-      description: "Build holographic communication systems and XR collaboration platforms for distributed teams.",
+      description: "Build holographic communication systems and XR collaboration platforms for distributed teams and immersive experiences.",
       modules: [
-        "Holographic Display Technologies",
-        "XR Collaboration Platforms",
-        "Remote Presence Systems",
-        "Spatial Audio Integration",
-        "Enterprise Telepresence Solutions"
+        "Holographic Display Technologies & Light Fields",
+        "XR Collaboration Platforms Architecture",
+        "Remote Presence Systems & Avatar Solutions",
+        "Spatial Audio Integration & Binaural Processing",
+        "Enterprise Telepresence Infrastructure & Scale"
       ]
     },
     {
@@ -91,13 +91,13 @@ const ResidentialTraining = () => {
       capacity: "8-10 Participants",
       category: "AI/ML",
       featured: true,
-      description: "Integrate generative AI and ML into production pipelines for automated workflows.",
+      description: "Integrate generative AI and ML into production pipelines for automated workflows and intelligent content generation.",
       modules: [
-        "Generative AI in Production",
-        "ML for Automated VFX",
-        "AI-Powered Compositing",
-        "Neural Style Transfer",
-        "Ethical AI in Creative Industries"
+        "Generative AI Models in Production Pipelines",
+        "ML for Automated VFX & Rotoscoping",
+        "AI-Powered Compositing & Style Transfer",
+        "Neural Networks for Creative Enhancement",
+        "Ethical AI Implementation & Governance"
       ]
     },
     {
@@ -107,14 +107,32 @@ const ResidentialTraining = () => {
       price: "£2,795",
       capacity: "6-8 Participants",
       category: "Advanced Engineering",
-      description: "Design and deploy autonomous agent systems for engineering and creative applications.",
+      description: "Design and deploy autonomous agent systems for engineering workflows and intelligent automation in creative applications.",
       modules: [
-        "Agent Architecture Design",
-        "Multi-Agent Coordination",
-        "Autonomous Creative Systems",
-        "Engineering Process Automation",
-        "Human-Agent Collaboration"
+        "Agent Architecture Design Patterns",
+        "Multi-Agent Coordination & Orchestration",
+        "Autonomous Creative Systems Development",
+        "Engineering Process Automation & Optimisation",
+        "Human-Agent Collaboration Interfaces"
       ]
+    },
+    {
+      id: "decentralised-infrastructure",
+      title: "Decentralised Agent Infrastructure",
+      duration: "4 Days",
+      price: "£3,295",
+      capacity: "6-8 Participants",
+      category: "Web3 Tech",
+      featured: true,
+      description: "Build sovereign, cryptographically-secured agent systems using Bitcoin, Lightning, RGB protocols and decentralised identity for the next internet.",
+      modules: [
+        "Bitcoin & Lightning Network for Agent Payments",
+        "RGB Protocol for Smart Contract Implementation",
+        "Nostr Protocol & Decentralised Identity (DID)",
+        "Private Contract Negotiation & Single-Use Seals",
+        "Agent-First Architecture & Cryptographic Proofs"
+      ],
+      partnership: "Partnering with GlobalBlock liquidity provider: secure API endpoints for agentic actors"
     }
   ];
 
@@ -209,11 +227,12 @@ const ResidentialTraining = () => {
           </div>
 
           <Tabs defaultValue="all" className="w-full">
-            <TabsList className="grid w-full max-w-md mx-auto grid-cols-4 mb-8">
+            <TabsList className="grid w-full max-w-md mx-auto grid-cols-5 mb-8">
               <TabsTrigger value="all">All</TabsTrigger>
               <TabsTrigger value="creative">Creative</TabsTrigger>
               <TabsTrigger value="engineering">Engineering</TabsTrigger>
               <TabsTrigger value="ai">AI/ML</TabsTrigger>
+              <TabsTrigger value="web3">Web3</TabsTrigger>
             </TabsList>
 
             <TabsContent value="all">
@@ -257,6 +276,13 @@ const ResidentialTraining = () => {
                             ))}
                           </ul>
                         </div>
+                        {program.partnership && (
+                          <div className="pt-2">
+                            <p className="text-[10px] text-muted-foreground/70 italic">
+                              {program.partnership}
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </CardContent>
                     <CardFooter>
@@ -301,6 +327,18 @@ const ResidentialTraining = () => {
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {trainingPrograms
                   .filter(p => p.category === "AI/ML")
+                  .map((program) => (
+                    <Card key={program.id} className={program.featured ? "border-primary" : ""}>
+                      {/* Same card content as above */}
+                    </Card>
+                  ))}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="web3">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {trainingPrograms
+                  .filter(p => p.category === "Web3 Tech")
                   .map((program) => (
                     <Card key={program.id} className={program.featured ? "border-primary" : ""}>
                       {/* Same card content as above */}
