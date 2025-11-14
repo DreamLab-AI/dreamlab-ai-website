@@ -12,7 +12,7 @@
 ### 1. Cover Page
 - **Hero Image**: Abstract visualization of interconnected technology nodes (neural network style)
 - **Title**: "DREAMLAB AI" with gradient text effect
-- **Tagline**: "Deep learning with no distractionss"
+- **Tagline**: "Deep learning with no distractions"
 - **Bottom**: Contact info and website URL
 
 ### 2. Table of Contents
