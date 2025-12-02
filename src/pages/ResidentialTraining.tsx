@@ -16,8 +16,8 @@ const ResidentialTraining = () => {
 
   const images = [
     "/data/media/labview.png",
-    "/data/media/labview2.png",
-    "/data/media/labview3.png",
+    "/data/media/labview2.jpg",
+    "/data/media/labview3.jpg",
     "/data/media/aerial.jpeg",
     "/data/media/bedroom.jpeg",
     "/data/media/view.jpeg",
