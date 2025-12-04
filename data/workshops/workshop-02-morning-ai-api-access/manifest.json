@@ -1,0 +1,45 @@
+{
+  "title": "Module 07: Direct AI API Access",
+  "pages": [
+    {
+      "slug": "README.md",
+      "title": "Module 07: Direct AI API Access"
+    },
+    {
+      "slug": "00_introduction.md",
+      "title": "Chapter 0: Introduction to Direct AI API Access"
+    },
+    {
+      "slug": "01_concepts.md",
+      "title": "Chapter 1: Core Concepts - Understanding AI APIs"
+    },
+    {
+      "slug": "02_hands_on.md",
+      "title": "Chapter 2: Hands-On API Setup - Building Your Multi-Model Command Centre"
+    },
+    {
+      "slug": "03_exercises.md",
+      "title": "Chapter 3: Practical Exercises - Model Mastery"
+    },
+    {
+      "slug": "04_project.md",
+      "title": "04_project - Module 07: Direct AI API Access"
+    },
+    {
+      "slug": "05_assessment.md",
+      "title": "05_assessment - Module 07: Direct AI API Access"
+    },
+    {
+      "slug": "06_resources.md",
+      "title": "06_resources - Module 07: Direct AI API Access"
+    },
+    {
+      "slug": "objectives.md",
+      "title": "Learning Objectives - Module 07"
+    },
+    {
+      "slug": "prerequisites.md",
+      "title": "Prerequisites - Module 07"
+    }
+  ]
+}
