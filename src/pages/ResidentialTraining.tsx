@@ -15,14 +15,17 @@ const ResidentialTraining = () => {
   const navigate = useNavigate();
 
   const images = [
-    "/data/media/labview.png",
-    "/data/media/labview2.jpg",
-    "/data/media/labview3.jpg",
     "/data/media/aerial.jpeg",
-    "/data/media/bedroom.jpeg",
+    "/data/media/fairfield-front.jpg",
+    "/data/media/fairfield-back.jpeg",
     "/data/media/view.jpeg",
     "/data/media/view2.jpeg",
     "/data/media/view3.jpeg",
+    "/data/media/bedroom.jpeg",
+    "/data/media/bedroom-two.jpeg",
+    "/data/media/main-bedroom.jpeg",
+    "/data/media/labview2.jpg",
+    "/data/media/labview3.jpg",
     "/data/media/wine.png",
   ];
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
