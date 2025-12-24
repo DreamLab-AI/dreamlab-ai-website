@@ -124,10 +124,13 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-primary focus:text-primary-foreground">
+        Skip to main content
+      </a>
       <Header />
 
       {/* Contact header */}
-      <section className="pt-24 pb-8 bg-secondary/20">
+      <section id="main-content" className="pt-24 pb-8 bg-secondary/20">
         <div className="container">
           <h1 className="text-3xl md:text-4xl font-bold mb-4">Contact Us</h1>
           <p className="text-lg text-muted-foreground max-w-3xl">
@@ -137,10 +140,10 @@ const Contact = () => {
       </section>
 
       {/* Contact form */}
-      <section className="py-12">
+      <section className="py-12" aria-label="Contact form">
         <div className="container max-w-2xl">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" aria-label="Contact us form">
               <FormField
                 control={form.control}
                 name="name"
@@ -244,24 +247,32 @@ const Contact = () => {
       </section>
 
       {/* Footer */}
-      <footer className="py-8 bg-background">
+      <footer className="py-8 bg-background" role="contentinfo">
         <div className="container">
           <div className="flex flex-col md:flex-row justify-between items-center border-t border-muted pt-8">
             <p className="text-sm text-muted-foreground">
               &copy; {new Date().getFullYear()} DreamLab AI Consulting Ltd. All rights reserved.
             </p>
             <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6">
-              <div className="flex space-x-6">
-                <a href="https://bsky.app/profile/thedreamlab.bsky.social" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Bluesky
-                </a>
-                <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Instagram
-                </a>
-                <a href="https://www.linkedin.com/company/dreamlab-ai-consulting/?" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
-                  LinkedIn
-                </a>
-              </div>
+              <nav aria-label="Social media links">
+                <ul className="flex space-x-6">
+                  <li>
+                    <a href="https://bsky.app/profile/thedreamlab.bsky.social" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+                      Bluesky<span className="sr-only"> (opens in new window)</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="text-muted-foreground hover:text-foreground transition-colors" aria-label="Instagram (coming soon)">
+                      Instagram
+                    </a>
+                  </li>
+                  <li>
+                    <a href="https://www.linkedin.com/company/dreamlab-ai-consulting/?" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+                      LinkedIn<span className="sr-only"> (opens in new window)</span>
+                    </a>
+                  </li>
+                </ul>
+              </nav>
               <a href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Privacy Policy
               </a>

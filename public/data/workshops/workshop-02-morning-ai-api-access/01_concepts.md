@@ -56,29 +56,37 @@ mindmap
       GPT-4o-mini
         Fast & cheap
         Good for simple tasks
+      o1
+        Advanced reasoning
+        Complex problem solving
     Anthropic
-      Claude 3.5 Sonnet
-        Best writing
+      Claude 4 Opus
+        Best writing & reasoning
         200k context
         Nuanced understanding
-      Claude 3 Haiku
+      Claude 4 Sonnet
+        Balanced performance
+        Fast & capable
+      Claude 4 Haiku
         Lightning fast
         Cost effective
     Google
-      Gemini 1.5 Pro
-        1M+ context window
-        Multimodal
+      Gemini 2.0 Pro
+        2M context window
+        Multimodal excellence
         Research tasks
-      Gemini 1.5 Flash
+      Gemini 2.0 Flash
         Quick responses
-        Efficient
+        Highly efficient
     Open Models
-      Llama 3
+      Llama 3.3
         Free to use
         Privacy focused
-      Mistral
+      Mistral Large 2
         European
-        Balanced performance
+        Strong performance
+      Qwen 2.5
+        Multilingual excellence
 ```
 
 ### Model Strengths Comparison
@@ -86,10 +94,12 @@ mindmap
 | Model | Best For | Context Window | Cost | Speed |
 |-------|----------|----------------|------|-------|
 | GPT-4o | Complex reasoning, coding | 128k tokens | £££ | Medium |
-| Claude 3.5 Sonnet | Writing, analysis | 200k tokens | £££ | Medium |
-| Gemini 1.5 Pro | Research, long documents | 1M+ tokens | ££ | Fast |
+| Claude 4 Opus | Writing, deep analysis | 200k tokens | £££ | Medium |
+| Claude 4 Sonnet | Balanced tasks, coding | 200k tokens | ££ | Fast |
+| Gemini 2.0 Pro | Research, long documents | 2M tokens | ££ | Fast |
 | GPT-4o-mini | Simple tasks, drafts | 128k tokens | £ | Very Fast |
-| Llama 3 70B | Privacy-sensitive work | 8k tokens | Free* | Fast |
+| Llama 3.3 70B | Privacy-sensitive work | 128k tokens | Free* | Fast |
+| o1 | Complex reasoning | 200k tokens | ££££ | Slower |
 
 *When self-hosted or via free providers
 
@@ -138,10 +148,10 @@ graph TD
 - Output: 200 tokens (full email)
 - Cost: £0.0035
 
-**Document Analysis (Claude 3.5):**
+**Document Analysis (Claude 4 Sonnet):**
 - Input: 5,000 tokens (full document)
 - Output: 500 tokens (summary)
-- Cost: £0.021
+- Cost: £0.018
 
 **Monthly Comparison:**
 - ChatGPT Plus: £20 (unlimited*)
@@ -192,7 +202,7 @@ The context window is how much the AI can "see" at once:
 
 ```mermaid
 graph TD
-    subgraph "Small Context (GPT-3.5)"
+    subgraph "Small Context (Legacy Models)"
         S[4k tokens] --> S1[~3 pages]
     end
     
@@ -200,12 +210,12 @@ graph TD
         M[128k tokens] --> M1[~96 pages]
     end
     
-    subgraph "Large Context (Claude 3.5)"
+    subgraph "Large Context (Claude 4)"
         L[200k tokens] --> L1[~150 pages]
     end
-    
-    subgraph "Massive Context (Gemini 1.5)"
-        G[1M+ tokens] --> G1[~750+ pages]
+
+    subgraph "Massive Context (Gemini 2.0)"
+        G[2M tokens] --> G1[~1500 pages]
     end
     
     style G fill:#4fc3f7,stroke:#01579b,stroke-width:3px
@@ -297,14 +307,14 @@ sequenceDiagram
 
 ```mermaid
 graph TD
-    Task{Task Type} -->|Complex Analysis| Expensive[GPT-4o/Claude 3.5]
-    Task -->|Simple Writing| Cheap[GPT-4o-mini/Haiku]
-    Task -->|Long Context| Efficient[Gemini 1.5]
-    Task -->|Privacy Sensitive| Free[Local Llama]
-    
+    Task{Task Type} -->|Complex Analysis| Expensive[GPT-4o/Claude 4 Opus]
+    Task -->|Simple Writing| Cheap[GPT-4o-mini/Claude 4 Haiku]
+    Task -->|Long Context| Efficient[Gemini 2.0 Pro]
+    Task -->|Privacy Sensitive| Free[Local Llama 3.3]
+
     Expensive --> E1[£0.01-0.03/1k tokens]
     Cheap --> C1[£0.0001-0.001/1k tokens]
-    Efficient --> F1[£0.002-0.007/1k tokens]
+    Efficient --> F1[£0.001-0.005/1k tokens]
     Free --> F2[£0.00/1k tokens]
     
     style Cheap fill:#4fc3f7,stroke:#01579b,stroke-width:3px
@@ -335,12 +345,13 @@ graph TD
 
 | Need | Best Provider | Model | Why |
 |------|---------------|-------|-----|
-| Best writing | Anthropic | Claude 3.5 Sonnet | Nuanced, natural prose |
-| Complex reasoning | OpenAI | GPT-4o | Strong logical analysis |
-| Long documents | Google | Gemini 1.5 Pro | 1M+ token context |
-| Fast & cheap | OpenAI | GPT-4o-mini | Best bang for buck |
-| Privacy | Local | Llama 3 | Runs on your machine |
-| Code generation | OpenAI | GPT-4o | Excellent programming |
+| Best writing | Anthropic | Claude 4 Opus | Nuanced, natural prose |
+| Complex reasoning | OpenAI | o1 | Advanced reasoning capabilities |
+| Long documents | Google | Gemini 2.0 Pro | 2M token context window |
+| Fast & cheap | OpenAI | GPT-4o-mini | Best value proposition |
+| Privacy | Local | Llama 3.3 | Runs on your machine |
+| Code generation | Anthropic | Claude 4 Sonnet | Excellent programming |
+| Balanced tasks | Anthropic | Claude 4 Sonnet | Speed + capability |
 
 ## Key Takeaways
 

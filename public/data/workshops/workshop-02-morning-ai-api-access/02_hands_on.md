@@ -159,9 +159,15 @@ Add to your Continue config.json:
 
 ```json
 {
-  "title": "Claude 3.5 Sonnet",
+  "title": "Claude 4 Sonnet",
   "provider": "anthropic",
-  "model": "claude-3-5-sonnet-20241022",
+  "model": "claude-sonnet-4-20250514",
+  "apiKey": "YOUR_ANTHROPIC_API_KEY_HERE"
+},
+{
+  "title": "Claude 4 Opus",
+  "provider": "anthropic",
+  "model": "claude-opus-4-20250514",
   "apiKey": "YOUR_ANTHROPIC_API_KEY_HERE"
 }
 ```
@@ -170,10 +176,11 @@ Add to your Continue config.json:
 
 ### Why Add Gemini?
 
-- Massive context window (1M+ tokens)
-- Free tier available
+- Massive context window (2M tokens)
+- Generous free tier available
 - Excellent for research
-- Multimodal capabilities
+- Advanced multimodal capabilities
+- Deep Think mode for complex reasoning
 
 ### Step 1: Get Gemini API Key
 
@@ -192,15 +199,21 @@ Add to Continue config:
 
 ```json
 {
-  "title": "Gemini 1.5 Pro",
+  "title": "Gemini 2.0 Pro",
   "provider": "gemini",
-  "model": "gemini-1.5-pro-latest",
+  "model": "gemini-2.0-pro-latest",
   "apiKey": "YOUR_GEMINI_API_KEY_HERE"
 },
 {
-  "title": "Gemini 1.5 Flash",
+  "title": "Gemini 2.0 Flash",
   "provider": "gemini",
-  "model": "gemini-1.5-flash-latest",
+  "model": "gemini-2.0-flash-latest",
+  "apiKey": "YOUR_GEMINI_API_KEY_HERE"
+},
+{
+  "title": "Gemini 2.0 Flash Thinking",
+  "provider": "gemini",
+  "model": "gemini-2.0-flash-thinking-exp",
   "apiKey": "YOUR_GEMINI_API_KEY_HERE"
 }
 ```
@@ -215,9 +228,15 @@ Add to Continue config:
 
 ```json
 {
-  "title": "Llama 3.1 70B (Groq)",
+  "title": "Llama 3.3 70B (Groq)",
   "provider": "groq",
-  "model": "llama-3.1-70b-versatile",
+  "model": "llama-3.3-70b-versatile",
+  "apiKey": "YOUR_GROQ_API_KEY_HERE"
+},
+{
+  "title": "DeepSeek R1 (Groq)",
+  "provider": "groq",
+  "model": "deepseek-r1-distill-llama-70b",
   "apiKey": "YOUR_GROQ_API_KEY_HERE"
 }
 ```
@@ -230,9 +249,15 @@ Add to Continue config:
 
 ```json
 {
-  "title": "Mixtral 8x7B",
+  "title": "Qwen 2.5 72B",
   "provider": "together",
-  "model": "mistralai/Mixtral-8x7B-Instruct-v0.1",
+  "model": "Qwen/Qwen2.5-72B-Instruct-Turbo",
+  "apiKey": "YOUR_TOGETHER_API_KEY_HERE"
+},
+{
+  "title": "Mistral Large 2",
+  "provider": "together",
+  "model": "mistralai/Mistral-Large-2-Instruct",
   "apiKey": "YOUR_TOGETHER_API_KEY_HERE"
 }
 ```
@@ -259,21 +284,21 @@ Here's what your complete configuration should look like:
       "apiKey": "sk-proj-..."
     },
     {
-      "title": "Claude 3.5 Sonnet",
+      "title": "Claude 4 Sonnet",
       "provider": "anthropic",
-      "model": "claude-3-5-sonnet-20241022",
+      "model": "claude-sonnet-4-20250514",
       "apiKey": "sk-ant-..."
     },
     {
-      "title": "Gemini 1.5 Pro",
+      "title": "Gemini 2.0 Flash",
       "provider": "gemini",
-      "model": "gemini-1.5-pro-latest",
+      "model": "gemini-2.0-flash-latest",
       "apiKey": "AIza..."
     },
     {
-      "title": "Llama 3.1 70B",
+      "title": "Llama 3.3 70B",
       "provider": "groq",
-      "model": "llama-3.1-70b-versatile",
+      "model": "llama-3.3-70b-versatile",
       "apiKey": "gsk_..."
     }
   ],
@@ -307,13 +332,13 @@ Explain blockchain technology in exactly 3 sentences for a business executive.
 ### GPT-4o Response:
 [Test here]
 
-### Claude 3.5 Response:
+### Claude 4 Sonnet Response:
 [Test here]
 
-### Gemini 1.5 Response:
+### Gemini 2.0 Flash Response:
 [Test here]
 
-### Llama 3.1 Response:
+### Llama 3.3 Response:
 [Test here]
 ```
 
@@ -355,9 +380,9 @@ In VS Code, create `ai-costs.md`:
 
 ## Model Performance Notes
 - GPT-4o: Best for...
-- Claude 3.5: Best for...
-- Gemini 1.5: Best for...
-- Llama 3.1: Best for...
+- Claude 4 Sonnet: Best for...
+- Gemini 2.0: Best for...
+- Llama 3.3: Best for...
 ```
 
 ## 2.10 Productivity Shortcuts

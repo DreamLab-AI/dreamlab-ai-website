@@ -75,8 +75,8 @@ export const EmailSignupForm = () => {
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-md space-y-4">
       <div className="space-y-3">
-        <div>
-          <Label htmlFor="name-signup" className="text-sm mb-1 block">
+        <div className="animate-slide-in-left" style={{ animationDelay: '0.1s' }}>
+          <Label htmlFor="name-signup" className="text-sm mb-1 block text-muted-foreground/90">
             Name (optional)
           </Label>
           <Input
@@ -85,13 +85,13 @@ export const EmailSignupForm = () => {
             placeholder="Your name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="rounded-md bg-muted/30 border-muted placeholder:text-muted-foreground/70"
+            className="rounded-lg bg-background/60 backdrop-blur-sm border-purple-500/30 placeholder:text-muted-foreground/50 focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300"
             disabled={isSubmitting}
           />
         </div>
-        
-        <div>
-          <Label htmlFor="email-signup" className="text-sm mb-1 block">
+
+        <div className="animate-slide-in-right" style={{ animationDelay: '0.2s' }}>
+          <Label htmlFor="email-signup" className="text-sm mb-1 block text-muted-foreground/90">
             Email Address
           </Label>
           <Input
@@ -100,33 +100,34 @@ export const EmailSignupForm = () => {
             placeholder="Your email address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="rounded-md bg-muted/30 border-muted placeholder:text-muted-foreground/70"
+            className="rounded-lg bg-background/60 backdrop-blur-sm border-purple-500/30 placeholder:text-muted-foreground/50 focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300"
             required
             disabled={isSubmitting}
           />
         </div>
         
-        <div className="flex items-start gap-2 mt-2">
-          <Checkbox 
-            id="consent" 
+        <div className="flex items-start gap-2 mt-2 animate-scale-in" style={{ animationDelay: '0.3s' }}>
+          <Checkbox
+            id="consent"
             checked={hasConsent}
             onCheckedChange={(checked) => setHasConsent(checked === true)}
             disabled={isSubmitting}
-            className="mt-1"
+            className="mt-1 border-purple-500/50 data-[state=checked]:bg-purple-600 data-[state=checked]:border-purple-600"
           />
-          <Label 
-            htmlFor="consent" 
-            className="text-xs text-muted-foreground leading-tight cursor-pointer"
+          <Label
+            htmlFor="consent"
+            className="text-xs text-muted-foreground/80 leading-tight cursor-pointer hover:text-muted-foreground transition-colors"
           >
-            I agree to receive emails from DreamLab about projects, opportunities, and news. You can unsubscribe at any time. See our <a href="/privacy" className="underline hover:text-foreground">Privacy Policy</a> for more information.
+            I agree to receive emails from DreamLab about projects, opportunities, and news. You can unsubscribe at any time. See our <a href="/privacy" className="underline hover:text-purple-400 transition-colors">Privacy Policy</a> for more information.
           </Label>
         </div>
       </div>
-      
+
       <Button
         type="submit"
         disabled={isSubmitting}
-        className="w-full bg-primary hover:bg-primary/80 text-white font-medium"
+        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-purple-600 hover:to-pink-600 text-white font-medium rounded-lg transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/50 hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 disabled:hover:shadow-none animate-scale-in"
+        style={{ animationDelay: '0.4s' }}
       >
         {isSubmitting ? SUBMITTING_TEXT : SUBMIT_TEXT}
       </Button>

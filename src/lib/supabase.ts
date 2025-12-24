@@ -4,12 +4,14 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-console.log('Supabase initialization:', {
-  hasUrl: !!supabaseUrl,
-  hasKey: !!supabaseAnonKey,
-  url: supabaseUrl,
-  key: supabaseAnonKey?.slice(0, 5) + '...' // Only log first 5 chars of key for security
-});
+// Security: Removed logging of API keys and URLs in production
+if (import.meta.env.DEV) {
+  console.log('Supabase initialization:', {
+    hasUrl: !!supabaseUrl,
+    hasKey: !!supabaseAnonKey,
+    // Never log actual values, even in development
+  });
+}
 
 let supabase;
 

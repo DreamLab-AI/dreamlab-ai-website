@@ -26,11 +26,12 @@ The Codex CLI allows users to select other OpenAI models or even models from dif
     *   **Often Default for:** Codex CLI.
     *   **Positioning:** A faster and more affordable reasoning model from OpenAI's `o` series (presumably `o4` or `o4.x` family).
 
-*   **`gpt-4.1` (and variants like `gpt-4o`, `gpt-4-turbo`)**:
+*   **`gpt-4o` and `o1` series**:
     *   **Availability:** Can be specified in the Codex CLI.
-    *   **Strengths:** Flagship OpenAI models known for handling complex tasks, with notable enhancements in code generation, interpretation, and debugging capabilities. `gpt-4o` is often used in ChatGPT Plus for coding tasks.
+    *   **Strengths:** Current flagship OpenAI models known for handling complex tasks, with notable enhancements in code generation, interpretation, and debugging capabilities. `gpt-4o` provides excellent balanced performance, while `o1` offers advanced reasoning for complex problem-solving. Both are commonly used in ChatGPT Plus for coding tasks.
     *   The workshop mentioned the impact of such models:
         > "recently we released GPT 4.1 like really good coding model and again that was like based on like working we were like hey we want to invest better in this area let's hang out with a bunch of developers understand their feedback how things work um you know create some evals and you know like you said this is like it's a lot of work to do that um but then we end up with a great model" - Alexander, OpenAI
+    *   Note: OpenAI continues to improve their models, with o1 representing the latest advancement in reasoning capabilities for coding tasks.
 
 ## Considerations for Model Selection (Primarily for CLI)
 

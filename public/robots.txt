@@ -1,3 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /*.json$
+
 User-agent: Googlebot
 Allow: /
 
@@ -10,5 +16,8 @@ Allow: /
 User-agent: facebookexternalhit
 Allow: /
 
-User-agent: *
-Allow: /
+# Crawl-delay
+Crawl-delay: 1
+
+# Sitemap
+Sitemap: https://dreamlab-ai.com/sitemap.xml

@@ -19,10 +19,10 @@ While both specialised Codex tools (Cloud Agent and CLI) and general GPT models 
     *   Generating pull requests directly from the AI's work is desired (Cloud Agent).
     *   Terminal-based workflows, local file manipulation, and automation/scripting are preferred (CLI).
 
-## General GPT Models (e.g., GPT-4 via API)
+## General GPT Models (e.g., GPT-4o, o1 via API)
 
 *   **Strengths:**
-    *   **Broad Capabilities:** Models like GPT-4 are highly capable at a wide range of natural language and code-related tasks, including generation, explanation, refactoring, and translation.
+    *   **Broad Capabilities:** Models like GPT-4o and o1 are highly capable at a wide range of natural language and code-related tasks, including generation, explanation, refactoring, and translation. The o1 model offers enhanced reasoning for complex problem-solving.
     *   **Versatile Access:** Typically accessed via an API for integration into custom applications or used in conversational interfaces like the general ChatGPT.
     *   **Extensive Knowledge Base:** Possess a broad knowledge base from general training.
     *   **Foundation for Custom Tools:** Excellent for building custom developer tools that require powerful language and code understanding without needing the AI to directly execute commands in a specific environment.
@@ -54,7 +54,7 @@ This spectrum suggests a strategic direction towards increasingly autonomous AI 
 | Feature                 | Codex Cloud Agent                      | Codex CLI                                                                 | General GPT API (e.g., GPT-4)        |
 | :---------------------- | :------------------------------------- | :------------------------------------------------------------------------ | :----------------------------------- |
 | **Primary Interface**   | ChatGPT Sidebar (Web UI)               | Terminal / Command Line                                                   | HTTP API, SDKs                       |
-| **Primary Model(s)**    | `codex-1` (specialised `o3`)           | `codex-mini-latest`, `o4-mini` (default), other GPT/provider models       | Various (GPT-4, GPT-4.1, etc.)       |
+| **Primary Model(s)**    | `codex-1` (specialised `o3`)           | `codex-mini-latest`, `o4-mini` (default), other GPT/provider models       | Various (GPT-4o, o1, etc.)       |
 | **Repo Interaction**    | Deep (clones repo, reads/writes files) | Deep (operates on local repo files)                                       | Indirect (via prompt context)        |
 | **Code Execution**      | Yes (tests, linters, commands)         | Yes (commands in local sandbox)                                           | No (generates code, doesn't execute) |
 | **Sandboxing**          | Yes (isolated cloud micro-VMs)         | Yes (OS-level or Docker)                                                  | Not applicable (API endpoint)        |

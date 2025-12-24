@@ -23,9 +23,9 @@ Write a 50-word description of a rainy day that evokes emotion without using the
 1. **Select** the prompt
 2. **Test each model**:
    - GPT-4o
-   - Claude 3.5 Sonnet
-   - Gemini 1.5 Pro
-   - Llama 3.1
+   - Claude 4 Sonnet
+   - Gemini 2.0 Flash
+   - Llama 3.3
 3. **Document** responses below each other
 4. **Compare** for:
    - Creativity
@@ -56,8 +56,8 @@ Test how different models handle long documents.
 
 ### Test Sequence
 1. **GPT-4o**: Note any truncation warnings
-2. **Claude 3.5**: Should handle full document
-3. **Gemini 1.5 Pro**: Best for very long content
+2. **Claude 4 Sonnet**: Should handle full document (200k context)
+3. **Gemini 2.0 Pro**: Best for very long content (2M context)
 4. **Compare** comprehensiveness of summaries
 
 ### Learning Points
@@ -87,8 +87,8 @@ Write a Python function to calculate compound interest.
 ```
 
 ### Testing Matrix
-| Task | GPT-4o-mini | GPT-4o | Claude 3.5 | Your Rating |
-|------|-------------|--------|------------|-------------|
+| Task | GPT-4o-mini | GPT-4o | Claude 4 Sonnet | Your Rating |
+|------|-------------|--------|-----------------|-------------|
 | Email | [Test] | [Test] | [Test] | Speed/Quality/Cost |
 | Analysis | [Test] | [Test] | [Test] | Speed/Quality/Cost |
 | Code | [Test] | [Test] | [Test] | Speed/Quality/Cost |
@@ -106,7 +106,7 @@ Build a workflow using different models for their strengths.
 
 ### Scenario: Research Report Creation
 
-1. **Research Phase** (Gemini 1.5 Pro)
+1. **Research Phase** (Gemini 2.0 Pro)
    ```
    Prompt: Research and summarise current trends in [your industry]
    ```
@@ -116,7 +116,7 @@ Build a workflow using different models for their strengths.
    Prompt: Create a detailed outline for a report on these trends
    ```
 
-3. **Writing Phase** (Claude 3.5)
+3. **Writing Phase** (Claude 4 Sonnet)
    ```
    Prompt: Write the introduction section based on this outline
    ```
@@ -158,11 +158,11 @@ Learn to minimise costs while maintaining quality.
 ### Approach 2: Smart Mix
 - Outline: GPT-4o-mini (200 tokens)
 - First draft: GPT-4o-mini (800 tokens)
-- Polish: Claude 3.5 (500 tokens)
+- Polish: Claude 4 Sonnet (500 tokens)
 - Total cost: £[calculate]
 
 ### Approach 3: Free Options
-- Model: Llama 3.1 via Groq
+- Model: Llama 3.3 via Groq
 - Cost: £0.00
 - Quality comparison: [test and note]
 ```
@@ -240,11 +240,12 @@ Savings: £___ (___%)
 
 ## Pro Tips from Exercises
 
-1. **Claude 3.5** often wins for natural writing
-2. **GPT-4o** excels at logical analysis
-3. **Gemini 1.5** is unbeatable for long documents
+1. **Claude 4 Sonnet** often wins for natural writing and coding
+2. **GPT-4o** excels at logical analysis and balanced tasks
+3. **Gemini 2.0** is unbeatable for long documents (2M context)
 4. **Mini models** are perfect for simple tasks
 5. **Mixing models** optimises cost/quality
+6. **o1** provides best reasoning for complex problems
 
 ## Common Patterns Discovered
 
@@ -258,9 +259,9 @@ Savings: £___ (___%)
 graph TD
     A[Task Size] --> B{Choose Model}
     B -->|< 2 pages| C[Any Model]
-    B -->|2-50 pages| D[GPT-4o/Claude]
-    B -->|50-500 pages| E[Gemini 1.5 Pro]
-    B -->|500+ pages| F[Gemini 1.5 Pro Only]
+    B -->|2-50 pages| D[GPT-4o/Claude 4]
+    B -->|50-500 pages| E[Gemini 2.0 Pro]
+    B -->|500-1500 pages| F[Gemini 2.0 Pro Only]
     
     style F fill:#4fc3f7,stroke:#01579b,stroke-width:3px
 ```

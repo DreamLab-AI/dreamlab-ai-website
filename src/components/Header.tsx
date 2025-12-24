@@ -33,18 +33,21 @@ export const Header = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? "bg-background/90 backdrop-blur-md py-3 shadow-md" : "bg-transparent py-5"
+      role="banner"
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        scrolled
+          ? "bg-background/80 backdrop-blur-xl py-3 shadow-xl shadow-purple-500/10 border-b border-purple-500/20"
+          : "bg-transparent py-5"
       }`}
     >
       <div className="container flex items-center justify-between">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <div className="flex items-center gap-2 cursor-pointer">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600"></div>
-              <span className="font-bold text-xl tracking-tight">MENU</span>
-              <ChevronDown className="h-4 w-4 text-muted-foreground" />
-            </div>
+            <button className="flex items-center gap-2 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded" aria-label="Main navigation menu">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all duration-300 group-hover:scale-110 animate-glow-pulse" aria-hidden="true"></div>
+              <span className="font-bold text-xl tracking-tight group-hover:text-purple-400 transition-colors duration-300">MENU</span>
+              <ChevronDown className="h-4 w-4 text-muted-foreground group-hover:text-purple-400 transition-all duration-300 group-hover:rotate-180" aria-hidden="true" />
+            </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-48">
             <DropdownMenuItem asChild>
@@ -77,23 +80,35 @@ export const Header = () => {
               </DropdownMenuSubTrigger>
               <DropdownMenuSubContent>
                 <DropdownMenuItem asChild>
-                  <a href="https://dreamlab-ai.com" target="_blank" rel="noopener noreferrer" className="w-full">DreamLab Creative Tech</a>
+                  <a href="https://dreamlab-ai.com" target="_blank" rel="noopener noreferrer" className="w-full">
+                    DreamLab Creative Tech<span className="sr-only"> (opens in new window)</span>
+                  </a>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <a href="https://agenticalliance.com/" target="_blank" rel="noopener noreferrer" className="w-full">Agentic Alliance</a>
+                  <a href="https://agenticalliance.com/" target="_blank" rel="noopener noreferrer" className="w-full">
+                    Agentic Alliance<span className="sr-only"> (opens in new window)</span>
+                  </a>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <a href="https://www.narrativegoldmine.com" target="_blank" rel="noopener noreferrer" className="w-full">Narrative Goldmine</a>
+                  <a href="https://www.narrativegoldmine.com" target="_blank" rel="noopener noreferrer" className="w-full">
+                    Narrative Goldmine<span className="sr-only"> (opens in new window)</span>
+                  </a>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <a href="https://www.visionflow.com" target="_blank" rel="noopener noreferrer" className="w-full">Visionflow</a>
+                  <a href="https://www.visionflow.com" target="_blank" rel="noopener noreferrer" className="w-full">
+                    Visionflow<span className="sr-only"> (opens in new window)</span>
+                  </a>
                 </DropdownMenuItem>
               </DropdownMenuSubContent>
             </DropdownMenuSub>
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <Button variant="ghost" asChild>
+        <Button
+          variant="ghost"
+          asChild
+          className="hover:bg-purple-500/10 hover:text-purple-400 transition-all duration-300 hover:scale-105"
+        >
           <a href="mailto:info@dreamlab-ai.com">Contact</a>
         </Button>
       </div>

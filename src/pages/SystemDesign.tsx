@@ -97,21 +97,21 @@ const SystemDesign = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 text-white">
       {/* Hero Section */}
-      <div className="container mx-auto px-4 py-16">
-        <div className="text-center mb-16">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+      <div className="container mx-auto px-4 py-12 sm:py-16">
+        <div className="text-center mb-12 sm:mb-16">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent px-4">
             Multi-Viewpoint Immersive AI Research Platform
           </h1>
-          <p className="text-xl md:text-2xl text-blue-200 max-w-4xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-blue-200 max-w-4xl mx-auto leading-relaxed px-4">
             World-first: Multiple specialists collaborate in a single immersive space,
             each with their own stereoscopic viewpoint
           </p>
         </div>
 
         {/* Image Carousel */}
-        <div className="relative mb-20 max-w-5xl mx-auto">
+        <div className="relative mb-12 sm:mb-16 md:mb-20 max-w-5xl mx-auto">
           <Card className="overflow-hidden shadow-2xl bg-black/30 backdrop-blur-md border-blue-500/30">
-            <div className="relative h-[500px]">
+            <div className="relative h-[250px] sm:h-[350px] md:h-[450px] lg:h-[500px]">
               <img
                 src={currentImage.src}
                 alt={currentImage.title}
@@ -121,21 +121,22 @@ const SystemDesign = () => {
                   target.src = '/showcase/image.png';
                 }}
               />
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent p-8">
-                <h3 className="text-2xl font-bold mb-2">{currentImage.title}</h3>
-                <p className="text-blue-200 text-lg">{currentImage.description}</p>
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent p-4 sm:p-6 md:p-8">
+                <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-1 sm:mb-2">{currentImage.title}</h3>
+                <p className="text-blue-200 text-sm sm:text-base md:text-lg">{currentImage.description}</p>
               </div>
             </div>
           </Card>
           {/* Image indicators */}
-          <div className="flex justify-center mt-6 space-x-2">
+          <div className="flex justify-center mt-4 sm:mt-6 space-x-2">
             {systemImages.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentImageIndex(index)}
-                className={`w-3 h-3 rounded-full transition-all ${
-                  index === currentImageIndex ? 'bg-cyan-400 w-8' : 'bg-blue-600'
+                className={`h-3 rounded-full transition-all min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 sm:h-3 touch-manipulation ${
+                  index === currentImageIndex ? 'bg-cyan-400 w-8' : 'bg-blue-600 w-3'
                 }`}
+                aria-label={`View image ${index + 1} of ${systemImages.length}`}
               />
             ))}
           </div>
@@ -241,24 +242,24 @@ const SystemDesign = () => {
         </div>
 
         {/* Technical Summary Table */}
-        <div className="mb-20">
-          <h2 className="text-4xl font-bold text-center mb-12 text-cyan-300">Technical Summary</h2>
+        <div className="mb-12 sm:mb-16 md:mb-20">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-8 sm:mb-12 text-cyan-300 px-4">Technical Summary</h2>
           <Card className="overflow-hidden shadow-2xl bg-black/30 backdrop-blur-md border-blue-500/30 max-w-6xl mx-auto">
             <div className="overflow-x-auto">
-              <table className="w-full">
+              <table className="w-full min-w-[640px]">
                 <thead className="bg-gradient-to-r from-blue-800 to-indigo-800">
                   <tr>
-                    <th className="px-6 py-4 text-left text-lg">Component</th>
-                    <th className="px-6 py-4 text-left text-lg">Enables</th>
-                    <th className="px-6 py-4 text-left text-lg">AI Learns</th>
+                    <th className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 text-left text-sm sm:text-base md:text-lg">Component</th>
+                    <th className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 text-left text-sm sm:text-base md:text-lg">Enables</th>
+                    <th className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 text-left text-sm sm:text-base md:text-lg">AI Learns</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-blue-500/20">
                   {technicalSpecs.map((spec, index) => (
                     <tr key={index} className="hover:bg-blue-800/20 transition-colors">
-                      <td className="px-6 py-4 font-semibold text-cyan-300">{spec.component}</td>
-                      <td className="px-6 py-4 text-blue-200">{spec.enables}</td>
-                      <td className="px-6 py-4 text-green-300">{spec.learns}</td>
+                      <td className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 font-semibold text-cyan-300 text-xs sm:text-sm md:text-base">{spec.component}</td>
+                      <td className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 text-blue-200 text-xs sm:text-sm md:text-base">{spec.enables}</td>
+                      <td className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 text-green-300 text-xs sm:text-sm md:text-base">{spec.learns}</td>
                     </tr>
                   ))}
                 </tbody>

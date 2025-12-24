@@ -135,7 +135,7 @@ const TorusKnotScene = ({ skills }: TorusKnotProps) => {
     }
   }, [skills, vertices, nodeSkills.length]);
 
-  useFrame((state, delta) => {
+  useFrame((state) => {
     if (!groupRef.current) return;
 
     const t = state.clock.getElapsedTime();
@@ -143,8 +143,7 @@ const TorusKnotScene = ({ skills }: TorusKnotProps) => {
     groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, Math.cos(t * 0.1) * 0.25, 0.02);
     groupRef.current.rotation.z = THREE.MathUtils.lerp(groupRef.current.rotation.z, Math.sin(t * 0.075) * 0.25, 0.02);
 
-    // Skill swapping logic, checked periodically
-    if (Math.floor(t) % 2 === 0) { // Check every couple of seconds
+    if (Math.floor(t) % 2 === 0) {
         const skillSwapDepth = -(TORUS_KNOT_RADIUS * SKILL_SWAP_DEPTH_THRESHOLD_FACTOR);
         const nodesToUpdate: number[] = [];
 
@@ -165,6 +164,8 @@ const TorusKnotScene = ({ skills }: TorusKnotProps) => {
             });
         }
     }
+
+    state.invalidate();
   });
 
   return (
@@ -195,19 +196,24 @@ const TorusKnotScene = ({ skills }: TorusKnotProps) => {
  */
 export const TorusKnot = ({ skills }: TorusKnotProps) => {
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full" role="img" aria-label="Interactive 3D visualization of skills and technologies">
       <Canvas
         camera={{ position: [0, 0, 20], fov: 65 }}
-        gl={{ antialias: true }}
+        gl={{
+          antialias: true,
+          powerPreference: "high-performance",
+          alpha: false,
+          stencil: false,
+          depth: true
+        }}
         dpr={[1, 2]}
+        frameloop="demand"
+        performance={{ min: 0.5 }}
       >
         <fog attach="fog" args={['#080820', 15, 25]} />
         <ambientLight intensity={0.5} />
         <pointLight position={[10, 10, 10]} intensity={1} />
         <TorusKnotScene skills={skills} />
-        {/* <EffectComposer>
-          <Bloom luminanceThreshold={0.2} luminanceSmoothing={0.9} height={300} />
-        </EffectComposer> */}
       </Canvas>
     </div>
   );

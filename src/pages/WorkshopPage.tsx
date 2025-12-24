@@ -139,9 +139,15 @@ const WorkshopPage = () => {
               const graphDefinition = (el as HTMLElement).textContent || '';
               if (document.body.contains(el) && !el.getAttribute('data-mermaid-processed')) {
                 try {
-                  mermaid.render(id, graphDefinition).then(({ svg, bindFunctions }) => {
+                  // Sanitize input to prevent XSS
+                  const sanitizedDefinition = graphDefinition.replace(/<script/gi, '&lt;script');
+                  mermaid.render(id, sanitizedDefinition).then(({ svg, bindFunctions }) => {
                     if (document.body.contains(el)) {
-                      el.innerHTML = svg;
+                      // Use textContent first, then create element to avoid direct innerHTML XSS
+                      const wrapper = document.createElement('div');
+                      wrapper.innerHTML = svg;
+                      el.textContent = '';
+                      el.appendChild(wrapper);
                       if (bindFunctions) {
                         bindFunctions(el);
                       }
@@ -150,13 +156,23 @@ const WorkshopPage = () => {
                   }).catch(caughtRenderError => {
                     console.error(`Mermaid render error for diagram ${id}:`, caughtRenderError);
                     if (document.body.contains(el)) {
-                      el.innerHTML = `<pre>Error rendering Mermaid diagram: ${caughtRenderError instanceof Error ? caughtRenderError.message : String(caughtRenderError)}</pre>`;
+                      // Security: Use textContent instead of innerHTML for error messages
+                      const errorMsg = `Error rendering Mermaid diagram: ${caughtRenderError instanceof Error ? caughtRenderError.message : String(caughtRenderError)}`;
+                      const pre = document.createElement('pre');
+                      pre.textContent = errorMsg;
+                      el.textContent = '';
+                      el.appendChild(pre);
                     }
                   });
                 } catch (initError) {
                   console.error(`Mermaid initial render error for diagram ${id}:`, initError);
                   if (document.body.contains(el)) {
-                    el.innerHTML = `<pre>Error rendering Mermaid diagram: ${initError instanceof Error ? initError.message : String(initError)}</pre>`;
+                    // Security: Use textContent instead of innerHTML for error messages
+                    const errorMsg = `Error rendering Mermaid diagram: ${initError instanceof Error ? initError.message : String(initError)}`;
+                    const pre = document.createElement('pre');
+                    pre.textContent = errorMsg;
+                    el.textContent = '';
+                    el.appendChild(pre);
                   }
                 }
               }

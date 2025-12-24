@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Header } from "@/components/Header";
 import { TeamMember } from "@/components/TeamMember";
 import { parseTeamMarkdown } from "@/lib/markdown";
@@ -21,7 +21,6 @@ const Team = () => {
     const loadTeamMembers = async () => {
       setLoading(true);
       try {
-        // Step 1: Fetch the manifest file to get the list of valid member IDs.
         const manifestResponse = await fetch('/data/team/manifest.json');
         if (!manifestResponse.ok) {
           throw new Error('Failed to load team manifest');
@@ -29,7 +28,6 @@ const Team = () => {
         const manifest = await manifestResponse.json();
         const memberIds = manifest.members || [];
 
-        // Step 2: Fetch details for each member listed in the manifest.
         const memberPromises = memberIds.map((id: string) =>
           (async () => {
             try {
@@ -38,9 +36,7 @@ const Team = () => {
                 fetch(`/data/team/${id}.png`),
               ]);
 
-              // A member is only valid if both their markdown and image files are found.
               if (!markdownResponse.ok || !imageResponse.ok) {
-                console.warn(`Data missing for team member ${id}. Skipping.`);
                 return null;
               }
 
@@ -54,7 +50,6 @@ const Team = () => {
                 fullDetails,
               };
             } catch (error) {
-              console.error(`Error loading data for team member ${id}:`, error);
               return null;
             }
           })()
@@ -62,14 +57,11 @@ const Team = () => {
 
         const loadedMembers = await Promise.all(memberPromises);
         const validMembers = loadedMembers.filter(Boolean) as TeamMemberData[];
-
-        // Sort members by ID to maintain a consistent order.
         validMembers.sort((a, b) => parseInt(a.id) - parseInt(b.id));
 
         setTeamMembers(validMembers);
       } catch (error) {
-        console.error("Error loading team members:", error);
-        setTeamMembers([]); // Clear team members on error
+        setTeamMembers([]);
       } finally {
         setLoading(false);
       }
@@ -78,13 +70,13 @@ const Team = () => {
     loadTeamMembers();
   }, []);
 
-  const handleToggleSelect = (id: string) => {
+  const handleToggleSelect = useCallback((id: string) => {
     setSelectedMembers(prev =>
       prev.includes(id)
         ? prev.filter(memberId => memberId !== id)
         : [...prev, id]
     );
-  };
+  }, []);
 
   const handleEnquire = () => {
     if (selectedMembers.length === 0) return;
@@ -104,10 +96,13 @@ const Team = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-primary focus:text-primary-foreground">
+        Skip to main content
+      </a>
       <Header />
 
       {/* Team header */}
-      <section className="pt-24 pb-8 bg-secondary/20">
+      <section id="main-content" className="pt-24 pb-8 bg-secondary/20">
         <div className="container">
           <h1 className="text-3xl md:text-4xl font-bold mb-4">Our Team</h1>
           <p className="text-lg text-muted-foreground max-w-3xl">
@@ -126,8 +121,9 @@ const Team = () => {
               disabled={selectedMembers.length === 0}
               size="sm"
               className="gap-1"
+              aria-label={`Enquire about availability for ${selectedMembers.length} selected team member${selectedMembers.length !== 1 ? 's' : ''}`}
             >
-              <Send className="h-4 w-4" />
+              <Send className="h-4 w-4" aria-hidden="true" />
               Enquire About Availability
             </Button>
           </div>
@@ -135,15 +131,15 @@ const Team = () => {
       </section>
 
       {/* Team grid */}
-      <section className="py-12">
+      <section className="py-12" aria-label="Team members">
         <div className="container">
           {loading ? (
-            <div className="text-center py-12">Loading team members...</div>
+            <div className="text-center py-12" role="status" aria-live="polite">Loading team members...</div>
           ) : teamMembers.length === 0 ? (
             <div className="text-center py-12">No team members found.</div>
           ) : (
             <div className="text-center">
-              <div className="inline-grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-6 text-left">
+              <div className="inline-grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-6 text-left" role="list">
                 {teamMembers.map(member => (
                   <TeamMember
                     key={member.id}
@@ -162,24 +158,32 @@ const Team = () => {
       </section>
 
       {/* Footer */}
-      <footer className="py-8 bg-background">
+      <footer className="py-8 bg-background" role="contentinfo">
         <div className="container">
           <div className="flex flex-col md:flex-row justify-between items-center border-t border-muted pt-8">
             <p className="text-sm text-muted-foreground">
               &copy; {new Date().getFullYear()} DreamLab AI Consulting Ltd. All rights reserved.
             </p>
             <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6">
-              <div className="flex space-x-6">
-                <a href="https://bsky.app/profile/thedreamlab.bsky.social" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Bluesky
-                </a>
-                <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Instagram
-                </a>
-                <a href="https://www.linkedin.com/company/dreamlab-ai-consulting/?" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
-                  LinkedIn
-                </a>
-              </div>
+              <nav aria-label="Social media links">
+                <ul className="flex space-x-6">
+                  <li>
+                    <a href="https://bsky.app/profile/thedreamlab.bsky.social" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+                      Bluesky<span className="sr-only"> (opens in new window)</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="text-muted-foreground hover:text-foreground transition-colors" aria-label="Instagram (coming soon)">
+                      Instagram
+                    </a>
+                  </li>
+                  <li>
+                    <a href="https://www.linkedin.com/company/dreamlab-ai-consulting/?" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+                      LinkedIn<span className="sr-only"> (opens in new window)</span>
+                    </a>
+                  </li>
+                </ul>
+              </nav>
               <a href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Privacy Policy
               </a>

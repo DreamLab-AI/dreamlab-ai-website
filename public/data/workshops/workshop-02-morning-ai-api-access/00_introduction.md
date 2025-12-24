@@ -69,10 +69,10 @@ graph LR
 
 Connect and compare the giants:
 
-- **OpenAI GPT-4o**: Best for complex reasoning
-- **Anthropic Claude 3.5**: Superior for writing and analysis
-- **Google Gemini 1.5**: Massive context windows
-- **Mistral & Llama**: Fast, cost-effective alternatives
+- **OpenAI GPT-4o & o1**: Best for complex reasoning and problem-solving
+- **Anthropic Claude 4**: Superior for writing, analysis, and coding
+- **Google Gemini 2.0**: Massive 2M context windows, multimodal excellence
+- **Mistral, Llama & Qwen**: Fast, cost-effective alternatives
 
 ### 2. API Fundamentals (No Coding Required!)
 
