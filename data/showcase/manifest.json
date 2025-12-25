@@ -1,0 +1,36 @@
+{
+  "projects": [
+    {
+      "id": "work-1",
+      "title": "Interactive Art Installation",
+      "client": "National Gallery",
+      "year": "2023",
+      "description": "Holding Item",
+      "imageUrl": "https://img.freepik.com/free-photo/forest-website-layout-blank-banner_53876-132285.jpg?ga=GA1.1.42484267.1747921681&semt=ais_hybrid&w=740"
+    },
+    {
+      "id": "work-2",
+      "title": "VR Training Platform",
+      "client": "Medical Research Institute",
+      "year": "2022",
+      "description": "A virtual reality platform for medical students to practice surgical procedures in a risk-free environment.",
+      "imageUrl": "https://placehold.co/600x400/1a1a2e/ffffff?text=VR+Training"
+    },
+    {
+      "id": "work-3",
+      "title": "Interactive Data Visualization",
+      "client": "Climate Research Center",
+      "year": "2022",
+      "description": "A real-time data visualization dashboard that helps researchers understand complex climate patterns.",
+      "imageUrl": "https://placehold.co/600x400/1a1a2e/ffffff?text=Data+Visualization"
+    },
+    {
+      "id": "work-4",
+      "title": "AR Educational App",
+      "client": "National Science Museum",
+      "year": "2021",
+      "description": "An augmented reality application that brings scientific concepts to life for museum visitors.",
+      "imageUrl": "https://placehold.co/600x400/1a1a2e/ffffff?text=AR+Education"
+    }
+  ]
+}
