@@ -1,9 +1,9 @@
 {
-  "title": "Mastering OpenAI Codex",
+  "title": "Workshop 06: Mastering AI-Powered Code Generation with Modern AI Coding Tools (2025 Edition)",
   "pages": [
     {
       "slug": "README.md",
-      "title": "Mastering OpenAI Codex"
+      "title": "Workshop 06: Mastering AI-Powered Code Generation with Modern AI Coding Tools (2025 Edition)"
     },
     {
       "slug": "00_introduction.md",
@@ -11,11 +11,11 @@
     },
     {
       "slug": "01_understanding_the_codex_ecosystem.md",
-      "title": "Chapter 1: Understanding the Codex Ecosystem: Cloud Agent vs. CLI"
+      "title": "Chapter 1: Understanding the Modern AI Coding Ecosystem"
     },
     {
       "slug": "02_a_accessing_the_codex_cloud_agent.md",
-      "title": "2.a: Accessing the Codex Cloud Agent"
+      "title": "2.a: Accessing ChatGPT for Code (2025)"
     },
     {
       "slug": "02_b_setting_up_the_codex_cli.md",

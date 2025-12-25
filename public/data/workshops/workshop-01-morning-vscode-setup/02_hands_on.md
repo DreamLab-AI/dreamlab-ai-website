@@ -1,328 +1,683 @@
-# Chapter 2: Hands-On Setup - Building Your Command Centre
+# Chapter 2: Hands-On Setup - Building Your AI-Enhanced Command Centre
 
-## Your 90-Minute Transformation Begins Now
+⏱️ **Estimated Time**: 90 minutes
+🎯 **Difficulty**: Beginner
+📋 **Prerequisites**: VS Code installed, internet connection
 
-This chapter will take you from zero to a fully configured AI command centre. Follow each step carefully—screenshots and clear instructions guide you through every click.
+## Your Transformation Journey
 
-## 2.1 Installing VS Code
-
-### Step 1: Download VS Code
-
-1. **Navigate to**: https://code.visualstudio.com/
-2. **Click**: The big blue "Download" button
-3. **Select**: Your operating system (Windows/Mac/Linux)
-4. **Run**: The installer when download completes
-
-### Step 2: First Launch
-
-When VS Code opens for the first time:
-
-1. **Welcome Screen**: You'll see a welcome tab
-2. **Theme Selection**: Choose your preferred colour theme
-3. **Skip Sync**: We'll set this up properly later
+By the end of this hands-on session, you'll have a production-ready development environment with AI coding assistants, modern tooling, and professional workflows.
 
 ```mermaid
 graph LR
-    A[Download] --> B[Install]
-    B --> C[Launch]
-    C --> D[Configure]
-    
-    style D fill:#4fc3f7,stroke:#01579b,stroke-width:3px
+    A[Fresh VS Code] --> B[Essential Extensions]
+    B --> C[AI Assistants]
+    C --> D[Settings & Config]
+    D --> E[Pro Environment]
+
+    style E fill:#4fc3f7,stroke:#01579b,stroke-width:3px
 ```
-
-## 2.2 Essential Extensions Installation
-
-### The Power-Up Process
-
-Think of this as installing essential apps on a new phone. Each extension adds specific superpowers.
-
-### Step 1: Open Extensions Panel
-
-- **Method 1**: Click the Extensions icon in the left sidebar (looks like 4 squares)
-- **Method 2**: Press `Ctrl+Shift+X` (Windows/Linux) or `Cmd+Shift+X` (Mac)
-
-### Step 2: Install Core Extensions
-
-Search for and install these essential extensions:
-
-#### 1. **Continue - AI Assistant** (Free Tier Available)
-```
-Search: Continue
-Publisher: Continue
-Purpose: Connect to multiple AI models
-Install: Click "Install"
-```
-
-#### 2. **Markdown All in One**
-```
-Search: Markdown All in One
-Publisher: Yu Zhang
-Purpose: Enhanced document editing
-Install: Click "Install"
-```
-
-#### 3. **Mermaid Markdown Syntax Highlighting**
-```
-Search: Mermaid
-Publisher: Brian Hung
-Purpose: Create diagrams from text
-Install: Click "Install"
-```
-
-#### 4. **GitLens**
-```
-Search: GitLens
-Publisher: GitKraken
-Purpose: Supercharged version control
-Install: Click "Install"
-```
-
-#### 5. **Live Preview**
-```
-Search: Live Preview
-Publisher: Microsoft
-Purpose: See changes in real-time
-Install: Click "Install"
-```
-
-### Step 3: Verify Installation
-
-After installing, you should see:
-- New icons in your sidebar
-- Extension welcome pages (can close these)
-- "Installed" checkmarks in Extensions panel
-
-## 2.3 Container Setup (Your Perfect Workspace)
-
-### Understanding Containers
-
-Before we set up, remember: A container is like a perfect workspace that:
-- Comes with all tools pre-installed
-- Works the same on every computer
-- Can't mess up your main system
-
-### Step 1: Install Docker Desktop
-
-1. **Navigate to**: https://www.docker.com/products/docker-desktop
-2. **Download**: For your operating system
-3. **Install**: Run the installer
-4. **Start Docker**: Launch Docker Desktop
-5. **Wait**: For "Docker Desktop is running" message
-
-### Step 2: Install Dev Containers Extension
-
-Back in VS Code:
-1. **Open**: Extensions panel (`Ctrl+Shift+X`)
-2. **Search**: "Dev Containers"
-3. **Publisher**: Microsoft
-4. **Install**: Click "Install"
-
-### Step 3: Create Your First Container
-
-1. **Open Command Palette**: `Ctrl+Shift+P` (or `Cmd+Shift+P` on Mac)
-2. **Type**: "Dev Containers: New"
-3. **Select**: "Dev Containers: New Dev Container..."
-4. **Choose**: "Python 3" (works for any document type)
-5. **Select**: "3.11-bullseye" or latest version
-6. **Wait**: 2-3 minutes for first-time setup
-
-You'll know it's working when:
-- Bottom-left shows "Dev Container: Python 3"
-- Terminal shows a Linux prompt
-- Everything feels snappier
-
-## 2.4 AI Integration Setup
-
-### Connecting Your AI Brain
-
-Now for the exciting part—connecting AI directly to your workspace.
-
-### Step 1: Configure Continue
-
-1. **Click**: Continue icon in sidebar (looks like `>>`)
-2. **First Run**: Click "Get Started"
-3. **Select Model Provider**: We'll start with free options
-
-### Step 2: Free AI Options
-
-#### Option A: Groq (Recommended for Speed)
-1. **Visit**: https://console.groq.com/
-2. **Sign Up**: Create free account
-3. **Get API Key**: Dashboard → API Keys → Create
-4. **Copy Key**: Keep this safe!
-
-In Continue:
-1. **Click**: Settings (gear icon)
-2. **Add Provider**: 
-   ```json
-   {
-     "provider": "groq",
-     "apiKey": "YOUR_API_KEY_HERE",
-     "model": "llama-3.1-70b"
-   }
-   ```
-
-#### Option B: Google Gemini (Good for Long Context)
-1. **Visit**: https://makersuite.google.com/app/apikey
-2. **Create Key**: Click "Create API Key"
-3. **Copy Key**: Save securely
-
-In Continue:
-```json
-{
-  "provider": "gemini",
-  "apiKey": "YOUR_API_KEY_HERE",
-  "model": "gemini-1.5-flash"
-}
-```
-
-### Step 3: Test Your AI
-
-1. **Open**: Any text file (or create new)
-2. **Type**: "Hello AI, can you help me?"
-3. **Select**: Your text
-4. **Press**: `Ctrl+I` (or `Cmd+I`)
-5. **Watch**: AI responds directly in your editor!
-
-## 2.5 Project Organisation
-
-### Creating Your First AI-Enhanced Project
-
-Let's set up a real project structure:
-
-### Step 1: Create Project Folder
-
-1. **File Menu**: File → Open Folder
-2. **Create New Folder**: Name it "my-ai-workspace"
-3. **Open**: Select the folder
-
-### Step 2: Initialize Structure
-
-Create these folders (right-click in Explorer panel):
-
-```
-my-ai-workspace/
-├── documents/      # Your main work
-├── research/       # Reference materials
-├── templates/      # Reusable formats
-├── outputs/        # AI-generated content
-└── .vscode/        # Settings (auto-created)
-```
-
-### Step 3: Create Your First Document
-
-1. **Right-click** `documents` folder
-2. **New File**: `project-plan.md`
-3. **Add Content**:
-   ```markdown
-   # My First AI-Enhanced Project
-   
-   ## Objective
-   Learn to use VS Code as my AI command centre
-   
-   ## Today's Goals
-   - [ ] Complete VS Code setup
-   - [ ] Connect AI assistant
-   - [ ] Create first AI-enhanced document
-   - [ ] Test automation features
-   ```
-
-### Step 4: Enable AI Features
-
-1. **Open** your new file
-2. **Select** a line of text
-3. **Right-click** → "Continue: Edit"
-4. **Type**: "Add more detail to this section"
-5. **Watch** AI enhance your content!
-
-## 2.6 Customization for Your Profession
-
-### Tailoring to Your Needs
-
-Based on your profession, add specific extensions:
-
-#### For Academics
-- **LaTeX Workshop**: Full LaTeX support
-- **Zotero Integration**: Reference management
-- **Pandoc**: Document conversion
-
-#### For Business Professionals
-- **Excel Viewer**: Spreadsheet preview
-- **Draw.io Integration**: Diagramming
-- **TODO Highlight**: Task management
-
-#### For Creative Professionals
-- **Image Preview**: Visual assets
-- **Color Highlight**: Design work
-- **Lorem Ipsum**: Placeholder text
-
-### Quick Settings Adjustment
-
-1. **Open Settings**: `Ctrl+,` (or `Cmd+,`)
-2. **Search** for these and adjust:
-   - `editor.fontSize`: Set to comfortable size (14-16)
-   - `editor.wordWrap`: Turn on for documents
-   - `files.autoSave`: Set to "afterDelay"
-
-## 2.7 Verification Checklist
-
-### Confirm Everything Works
-
-Run through this checklist:
-
-- [ ] VS Code launches successfully
-- [ ] Extensions panel shows installed extensions
-- [ ] Docker Desktop is running (if using containers)
-- [ ] Continue sidebar appears with AI ready
-- [ ] Can create and edit files
-- [ ] AI responds to prompts
-- [ ] Project folder structure created
-
-### Quick Tests
-
-1. **Create Test File**: `test.md`
-2. **Type**: "AI, write a haiku about productivity"
-3. **Select & Press**: `Ctrl+I`
-4. **Success**: If AI responds, you're ready!
-
-## Common Issues & Solutions
-
-### "Cannot connect to Docker"
-- **Solution**: Ensure Docker Desktop is running
-- **Alternative**: Work without containers initially
-
-### "AI not responding"
-- **Check**: API key is correctly entered
-- **Verify**: Internet connection active
-- **Try**: Different AI provider
-
-### "Extensions not working"
-- **Reload**: `Ctrl+Shift+P` → "Reload Window"
-- **Update**: Check for VS Code updates
-
-## Your Achievement Unlocked!
-
-Congratulations! You now have:
-
-✅ Professional AI command centre  
-✅ Direct access to multiple AI models  
-✅ Organized project structure  
-✅ Tools that professional developers use  
-✅ Complete control over your AI workflow  
-
-## Next Steps
-
-With your command centre ready, let's practice using these powerful tools. The next section contains hands-on exercises to cement your new skills.
-
-### Pro Tips Before Moving On
-
-1. **Keyboard Shortcuts**: Start memorizing `Ctrl+I` for AI
-2. **Explore**: Click around, you can't break anything
-3. **Experiment**: Try different AI prompts
-4. **Save Often**: `Ctrl+S` is your friend
 
 ---
 
-Next: [Chapter 3: Practical Exercises - Flex Your New Powers](./03_exercises.md)
+## 2.1 Essential Extensions 2025
+
+### 🤖 AI Coding Assistants
+
+#### 1. GitHub Copilot (Premium, Recommended)
+
+💡 **Best for**: Production code, enterprise teams, comprehensive AI pair programming
+
+```
+Extension ID: GitHub.copilot
+Features:
+  - Inline code suggestions
+  - Chat interface
+  - Context-aware completions
+  - 50+ language support
+Cost: $10/month ($100/year for individuals)
+```
+
+**Installation:**
+1. Open Extensions (`Ctrl+Shift+X`)
+2. Search: "GitHub Copilot"
+3. Click **Install**
+4. Sign in with GitHub account
+5. Activate subscription
+
+**Quick Test:**
+```javascript
+// Type this comment and press Enter:
+// Function to calculate fibonacci sequence
+
+// Copilot will suggest complete implementation!
+```
+
+#### 2. Claude Dev (Anthropic's Official Extension)
+
+💡 **Best for**: Complex reasoning, refactoring, documentation
+
+```
+Extension ID: saoudrizwan.claude-dev
+Features:
+  - Chat with Claude 3.5 Sonnet
+  - Edit files directly
+  - Terminal command execution
+  - Multi-file awareness
+Cost: Pay-per-use (Anthropic API)
+```
+
+**Setup:**
+1. Install extension
+2. Get API key from [console.anthropic.com](https://console.anthropic.com)
+3. `Ctrl+Shift+P` → "Claude Dev: Set API Key"
+4. Start chatting in sidebar!
+
+#### 3. Continue (Open Source AI)
+
+💡 **Best for**: Free tier, multiple model support, customization
+
+```
+Extension ID: Continue.continue
+Features:
+  - Free tier with Groq/Gemini
+  - Support for 20+ AI models
+  - Tab autocomplete
+  - Custom model integration
+Cost: FREE (with free API keys)
+```
+
+**Configuration for 2025:**
+```json
+{
+  "models": [
+    {
+      "title": "Claude 3.5 Sonnet",
+      "provider": "anthropic",
+      "model": "claude-3-5-sonnet-20241022",
+      "apiKey": "YOUR_KEY"
+    },
+    {
+      "title": "GPT-4 Turbo",
+      "provider": "openai",
+      "model": "gpt-4-turbo-preview",
+      "apiKey": "YOUR_KEY"
+    },
+    {
+      "title": "Gemini 2.0 Flash (FREE)",
+      "provider": "gemini",
+      "model": "gemini-2.0-flash",
+      "apiKey": "YOUR_FREE_KEY"
+    }
+  ],
+  "tabAutocompleteModel": {
+    "title": "Gemini Flash",
+    "provider": "gemini",
+    "model": "gemini-2.0-flash"
+  }
+}
+```
+
+#### 4. Cody by Sourcegraph
+
+💡 **Best for**: Codebase understanding, large context windows
+
+```
+Extension ID: sourcegraph.cody-ai
+Features:
+  - Free tier: 500 completions/month
+  - Understands entire codebase
+  - Smart code search
+  - Multi-repo awareness
+Cost: FREE tier, Pro $9/month
+```
+
+<details>
+<summary>🎯 <strong>Exercise: AI Assistant Speed Test</strong></summary>
+
+**Try this with each AI assistant:**
+
+1. Create `test-ai.js`
+2. Type: `// Create a React component for a todo list with add/delete`
+3. Press `Tab` or `Ctrl+I`
+4. Compare speed and quality!
+
+**Expected Results:**
+- **Copilot**: Instant, high quality
+- **Claude Dev**: Thoughtful, well-documented
+- **Continue**: Fast with free models
+- **Cody**: Context-aware suggestions
+
+</details>
+
+---
+
+### 🛠️ Essential Productivity Extensions
+
+#### 5. GitLens — Git Supercharged
+
+```
+Extension ID: eamodio.gitlens
+Why: See who changed what, when, and why
+Features:
+  - Inline blame annotations
+  - File history
+  - Visual commit graph
+  - Compare branches
+```
+
+#### 6. Error Lens
+
+```
+Extension ID: usernamehw.errorlens
+Why: See errors INLINE immediately
+Before: Hover to see error
+After: Error displayed directly in editor
+```
+
+#### 7. TODO Highlight
+
+```
+Extension ID: wayou.vscode-todo-highlight
+Why: Never lose track of TODOs
+Highlights: TODO, FIXME, NOTE, HACK
+```
+
+#### 8. Live Server
+
+```
+Extension ID: ritwickdey.LiveServer
+Why: Instant preview for HTML/web projects
+Launch: Right-click HTML → "Open with Live Server"
+```
+
+#### 9. Prettier - Code Formatter
+
+```
+Extension ID: esbenp.prettier-vscode
+Why: Auto-format on save
+Supports: JavaScript, TypeScript, HTML, CSS, JSON, Markdown
+```
+
+#### 10. Path Intellisense
+
+```
+Extension ID: christian-kohler.path-intellisense
+Why: Autocomplete file paths
+Super useful for: imports, links, images
+```
+
+📝 **Quick Install All:**
+```bash
+# Copy-paste into terminal (Ctrl+`)
+code --install-extension GitHub.copilot
+code --install-extension saoudrizwan.claude-dev
+code --install-extension Continue.continue
+code --install-extension sourcegraph.cody-ai
+code --install-extension eamodio.gitlens
+code --install-extension usernamehw.errorlens
+code --install-extension wayou.vscode-todo-highlight
+code --install-extension ritwickdey.LiveServer
+code --install-extension esbenp.prettier-vscode
+code --install-extension christian-kohler.path-intellisense
+```
+
+---
+
+## 2.2 Settings & Configuration for AI Coding
+
+### Essential settings.json Configuration
+
+Open Settings JSON: `Ctrl+Shift+P` → "Preferences: Open User Settings (JSON)"
+
+```json
+{
+  // Editor Settings
+  "editor.fontSize": 14,
+  "editor.lineHeight": 22,
+  "editor.fontFamily": "'Fira Code', 'Cascadia Code', Consolas, monospace",
+  "editor.fontLigatures": true,
+  "editor.wordWrap": "on",
+  "editor.minimap.enabled": true,
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+  // AI Coding Settings
+  "github.copilot.enable": {
+    "*": true,
+    "markdown": true,
+    "plaintext": true
+  },
+  "github.copilot.editor.enableAutoCompletions": true,
+
+  // Inline Suggestions (works with all AI)
+  "editor.inlineSuggest.enabled": true,
+  "editor.suggestSelection": "first",
+  "editor.quickSuggestions": {
+    "other": true,
+    "comments": true,
+    "strings": true
+  },
+
+  // File Management
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 1000,
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+
+  // Git Integration
+  "git.enableSmartCommit": true,
+  "git.confirmSync": false,
+  "git.autofetch": true,
+  "gitlens.currentLine.enabled": true,
+
+  // Terminal
+  "terminal.integrated.fontSize": 13,
+  "terminal.integrated.defaultProfile.windows": "Git Bash",
+
+  // Error Lens
+  "errorLens.enabled": true,
+  "errorLens.enabledDiagnosticLevels": ["error", "warning"],
+
+  // Prettier
+  "prettier.singleQuote": true,
+  "prettier.semi": true,
+  "prettier.tabWidth": 2,
+
+  // Security
+  "security.workspace.trust.enabled": true,
+
+  // Performance
+  "files.exclude": {
+    "**/.git": true,
+    "**/node_modules": true,
+    "**/.DS_Store": true
+  }
+}
+```
+
+💡 **Tip**: Copy this entire JSON block and paste into your settings!
+
+---
+
+## 2.3 Keyboard Shortcuts for Productivity
+
+### Essential Shortcuts (2025 Edition)
+
+| Action | Windows/Linux | Mac | Description |
+|--------|--------------|-----|-------------|
+| **AI Chat** | `Ctrl+I` | `Cmd+I` | Open inline AI chat |
+| **Copilot Panel** | `Ctrl+Shift+I` | `Cmd+Shift+I` | Open Copilot sidebar |
+| **Command Palette** | `Ctrl+Shift+P` | `Cmd+Shift+P` | Access all commands |
+| **Quick Open** | `Ctrl+P` | `Cmd+P` | Open file by name |
+| **Terminal** | `Ctrl+`` | `Ctrl+`` | Toggle terminal |
+| **Multi-cursor** | `Alt+Click` | `Option+Click` | Edit multiple lines |
+| **Format Document** | `Shift+Alt+F` | `Shift+Option+F` | Auto-format |
+| **Go to Definition** | `F12` | `F12` | Jump to code |
+| **Rename Symbol** | `F2` | `F2` | Rename everywhere |
+
+<details>
+<summary>🎯 <strong>Exercise: Keyboard Shortcut Challenge</strong></summary>
+
+**Complete these tasks using ONLY keyboard shortcuts:**
+
+1. Open Command Palette
+2. Create new file
+3. Ask AI to generate a function
+4. Format the code
+5. Open terminal
+6. Save file
+
+**Time yourself!** Goal: <30 seconds
+
+</details>
+
+---
+
+## 2.4 Remote Development Setup
+
+### SSH, Containers, and WSL
+
+#### Option 1: Remote - SSH
+
+💡 **Best for**: Working on remote servers, cloud instances
+
+```
+Extension: ms-vscode-remote.remote-ssh
+
+Use cases:
+- Edit files on Linux servers
+- Develop on cloud VMs
+- Access remote dev environments
+```
+
+#### Option 2: Dev Containers
+
+💡 **Best for**: Consistent environments, team projects
+
+```
+Extension: ms-vscode-remote.remote-containers
+
+Benefits:
+- Project-specific environments
+- Shareable configurations
+- No "works on my machine"
+```
+
+**Quick Start Dev Container:**
+
+Create `.devcontainer/devcontainer.json`:
+```json
+{
+  "name": "Node.js AI Dev",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:20",
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "GitHub.copilot",
+        "Continue.continue",
+        "esbenp.prettier-vscode"
+      ]
+    }
+  },
+  "postCreateCommand": "npm install",
+  "forwardPorts": [3000]
+}
+```
+
+#### Option 3: WSL (Windows Only)
+
+💡 **Best for**: Windows users wanting Linux environment
+
+```
+Extension: ms-vscode-remote.remote-wsl
+
+Setup:
+1. Install WSL2
+2. Install VS Code WSL extension
+3. Open folder in WSL
+4. Full Linux + VS Code integration!
+```
+
+---
+
+## 2.5 Workspace vs User Settings
+
+### Understanding the Hierarchy
+
+```mermaid
+graph TD
+    A[Settings Hierarchy] --> B[Default Settings]
+    B --> C[User Settings]
+    C --> D[Workspace Settings]
+    D --> E[Folder Settings]
+
+    F[Most General] --> B
+    G[Most Specific] --> E
+
+    style E fill:#4fc3f7,stroke:#01579b,stroke-width:3px
+```
+
+### When to Use Each
+
+**User Settings** (`.config/Code/User/settings.json`):
+- Personal preferences
+- AI API keys
+- Theme and font choices
+- Applies to ALL projects
+
+**Workspace Settings** (`.vscode/settings.json`):
+- Project-specific config
+- Team formatting rules
+- Language-specific settings
+- Committed to Git
+
+**Example Workspace Settings:**
+```json
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[javascript]": {
+    "editor.tabSize": 2
+  },
+  "[python]": {
+    "editor.tabSize": 4,
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  },
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/node_modules": true
+  }
+}
+```
+
+<details>
+<summary>⚠️ <strong>Warning: API Keys in Settings</strong></summary>
+
+**NEVER commit API keys to workspace settings!**
+
+❌ **Bad** (workspace settings):
+```json
+{
+  "anthropic.apiKey": "sk-ant-xxx"
+}
+```
+
+✅ **Good** (user settings):
+```json
+{
+  "anthropic.apiKey": "sk-ant-xxx"
+}
+```
+
+Or use environment variables:
+```json
+{
+  "anthropic.apiKey": "${env:ANTHROPIC_API_KEY}"
+}
+```
+
+</details>
+
+---
+
+## 2.6 Project Setup Best Practices
+
+### Professional Project Structure
+
+```
+my-project/
+├── .vscode/
+│   ├── settings.json       # Team settings
+│   ├── extensions.json     # Recommended extensions
+│   └── launch.json         # Debug configurations
+├── .devcontainer/
+│   └── devcontainer.json   # Container config
+├── src/
+│   └── index.js
+├── tests/
+│   └── index.test.js
+├── docs/
+│   └── README.md
+├── .gitignore
+├── .prettierrc
+└── package.json
+```
+
+### Recommended Extensions File
+
+Create `.vscode/extensions.json`:
+```json
+{
+  "recommendations": [
+    "github.copilot",
+    "continue.continue",
+    "eamodio.gitlens",
+    "esbenp.prettier-vscode",
+    "usernamehw.errorlens"
+  ]
+}
+```
+
+💡 **When teammates open the project**, VS Code will suggest installing these!
+
+---
+
+## 2.7 AI Coding Best Practices
+
+### Getting the Most from AI Assistants
+
+#### 1. Write Clear Comments
+
+❌ **Vague**:
+```javascript
+// make function
+```
+
+✅ **Specific**:
+```javascript
+// Create async function that fetches user data from API,
+// handles errors with try-catch, and returns formatted user object
+```
+
+#### 2. Use AI Chat for Planning
+
+```
+You: "I need to build a REST API for user authentication"
+
+Claude Dev:
+1. First, let's plan the architecture
+2. We'll need these endpoints: /register, /login, /logout
+3. Here's the file structure I recommend...
+4. Let's start with...
+```
+
+#### 3. Iterate and Refine
+
+```
+You: "Make this function more efficient"
+AI: [suggests optimization]
+
+You: "Add error handling"
+AI: [adds try-catch]
+
+You: "Add JSDoc comments"
+AI: [adds documentation]
+```
+
+#### 4. Use AI for Learning
+
+```
+You: "Explain this code line by line"
+You: "What's a better way to do this?"
+You: "What are the edge cases I should test?"
+```
+
+---
+
+## 2.8 Verification Checklist
+
+### Confirm Your Setup
+
+- [ ] VS Code installed and updated
+- [ ] At least one AI assistant working
+- [ ] GitLens showing file history
+- [ ] Error Lens displaying inline
+- [ ] Auto-save enabled
+- [ ] Format on save working
+- [ ] Terminal accessible
+- [ ] Project structure created
+- [ ] Can use `Ctrl+I` for AI chat
+- [ ] Keyboard shortcuts working
+
+### Quick AI Test
+
+Create `test.js`:
+```javascript
+// Type this and let AI complete:
+// Function to validate email address with regex
+
+// Expected: AI generates complete validation function
+```
+
+---
+
+## 2.9 Common Issues & Solutions
+
+### AI Assistant Not Working
+
+**Issue**: No AI suggestions appearing
+
+**Solutions**:
+1. Check API key: `Ctrl+Shift+P` → "Settings" → Search "api key"
+2. Verify internet connection
+3. Reload window: `Ctrl+Shift+P` → "Reload Window"
+4. Check extension logs: Output panel → Select extension
+
+### Format On Save Not Working
+
+**Issue**: File doesn't format when saving
+
+**Solutions**:
+1. Verify Prettier is default formatter:
+   ```json
+   "editor.defaultFormatter": "esbenp.prettier-vscode"
+   ```
+2. Check format on save enabled:
+   ```json
+   "editor.formatOnSave": true
+   ```
+3. Install language-specific formatter
+
+### Extensions Slow
+
+**Issue**: VS Code feels sluggish
+
+**Solutions**:
+1. Disable unused extensions
+2. Check extension performance: `Ctrl+Shift+P` → "Developer: Show Running Extensions"
+3. Increase memory limit:
+   ```json
+   "extensions.experimental.useUtilityProcess": true
+   ```
+
+---
+
+## 🎉 Achievement Unlocked!
+
+**You now have:**
+✅ Production-ready VS Code environment
+✅ Multiple AI coding assistants
+✅ Professional settings and shortcuts
+✅ Remote development capabilities
+✅ Best practices workflow
+
+### Next Steps
+
+1. **Practice** keyboard shortcuts daily
+2. **Experiment** with different AI assistants
+3. **Customize** settings to your preferences
+4. **Explore** extensions marketplace
+5. **Share** your setup with `.vscode/extensions.json`
+
+---
+
+**Pro Tips:**
+
+💡 Switch AI models based on task:
+- **Quick fixes**: Gemini Flash (free & fast)
+- **Complex logic**: Claude 3.5 Sonnet (best reasoning)
+- **Production code**: GitHub Copilot (enterprise quality)
+
+📝 Create keyboard shortcut cheat sheet and pin it near monitor
+
+🚀 **You're now equipped like a professional developer!**
+
+---
+
+**Next**: [Chapter 3: Practical Exercises](./03_exercises.md)
 
 [Back to Concepts](./01_concepts.md) | [Back to Module Overview](README.md)

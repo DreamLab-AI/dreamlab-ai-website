@@ -7,39 +7,39 @@
     },
     {
       "slug": "00_introduction.md",
-      "title": "00_introduction - Module 13: Quality Assurance & Automation"
+      "title": "Module 13: AI-Powered QA Automation"
     },
     {
       "slug": "01_concepts.md",
-      "title": "01_concepts - Module 13: Quality Assurance & Automation"
+      "title": "Testing Concepts & Best Practices"
     },
     {
       "slug": "02_hands_on.md",
-      "title": "02_hands_on - Module 13: Quality Assurance & Automation"
+      "title": "Hands-On: Setting Up Your Testing Environment"
     },
     {
       "slug": "03_exercises.md",
-      "title": "03_exercises - Module 13: Quality Assurance & Automation"
+      "title": "Exercises: Build Your Testing Pipeline"
     },
     {
       "slug": "04_project.md",
-      "title": "04_project - Module 13: Quality Assurance & Automation"
+      "title": "Project: Complete QA Automation Pipeline"
     },
     {
       "slug": "05_assessment.md",
-      "title": "05_assessment - Module 13: Quality Assurance & Automation"
+      "title": "Assessment: QA Automation Knowledge Check"
     },
     {
       "slug": "06_resources.md",
-      "title": "06_resources - Module 13: Quality Assurance & Automation"
+      "title": "Resources: QA Automation Tools & Learning"
     },
     {
       "slug": "objectives.md",
-      "title": "Learning Objectives - Module 13"
+      "title": "Learning Objectives - AI-Powered QA Automation"
     },
     {
       "slug": "prerequisites.md",
-      "title": "Prerequisites - Module 13"
+      "title": "Prerequisites - AI-Powered QA Automation"
     }
   ]
 }

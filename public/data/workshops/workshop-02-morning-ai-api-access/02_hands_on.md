@@ -1,511 +1,606 @@
-# Chapter 2: Hands-On API Setup - Building Your Multi-Model Command Centre
+# Chapter 2: Hands-On API Setup - Building Your Multi-Model Command Centre (2025)
 
-## Your 90-Minute Journey to AI Mastery
+⏱️ **Estimated time**: 90 minutes
+🎯 **Difficulty**: Beginner-friendly
+💡 **What you'll achieve**: Direct access to 5+ leading AI models in VS Code
 
-This hands-on session will transform you from an AI consumer to an AI commander. We'll set up access to multiple AI providers, configure everything in VS Code, and start saving money immediately.
+## Your Journey to AI Mastery
 
-## 2.1 Preparation Checklist
-
-Before we begin, ensure you have:
-
-- [x] VS Code open and running
-- [x] Continue extension installed (from Module 05)
-- [x] Internet browser ready
-- [x] Email access for verifications
-- [x] About 90 minutes of focused time
-
-## 2.2 Getting Your First API Key (OpenAI)
-
-### Why Start with OpenAI?
-
-- Most mature API platform
-- Excellent documentation
-- Wide model selection
-- Industry standard
-
-### Step-by-Step OpenAI Setup
-
-#### Step 1: Create OpenAI Account
-
-1. **Navigate to**: https://platform.openai.com/signup
-2. **Sign up** using email or Google account
-3. **Verify** your email address
-4. **Complete** profile information
-
-#### Step 2: Navigate to API Keys
-
-1. **Once logged in**, click your profile (top right)
-2. **Select** "View API keys" or go to: https://platform.openai.com/api-keys
-3. **You'll see** the API keys dashboard
+Transform from AI consumer to AI commander. We'll set up multiple providers, configure everything in VS Code with Claude Code or Continue, and start saving money immediately.
 
 ```mermaid
 graph LR
-    A[OpenAI Platform] --> B[Profile Menu]
-    B --> C[API Keys]
-    C --> D[Create New Key]
-    D --> E[Copy & Save]
-    
-    style E fill:#4fc3f7,stroke:#01579b,stroke-width:3px
+    A[Start] --> B[OpenAI Setup]
+    B --> C[Anthropic Claude]
+    C --> D[Google Gemini]
+    D --> E[Free Models]
+    E --> F[Multi-Model Master!]
+
+    style F fill:#4fc3f7,stroke:#01579b,stroke-width:3px
 ```
 
-#### Step 3: Create Your API Key
+## Preparation Checklist
 
-1. **Click** "Create new secret key"
-2. **Name it** (e.g., "VS Code Integration")
-3. **Important**: Copy the key immediately!
-   ```
-   sk-proj-abc123xyz... (example format)
-   ```
-4. **Save it** temporarily in a secure note
+Before we begin:
 
-⚠️ **Critical**: You cannot view this key again after closing the window!
+- [x] VS Code open and running
+- [x] Claude Code CLI or Continue extension installed
+- [x] Internet browser ready
+- [x] Email access for verifications
+- [x] 90 minutes of focused time
+- [x] Credit/debit card for API billing (start with $5-10)
 
-#### Step 4: Set Up Billing
+💡 **Tip**: You'll spend ~$3-5/month vs £60/month for subscriptions. The ROI is immediate!
 
-1. **Navigate to** Billing settings
-2. **Add payment method** (credit/debit card)
-3. **Set monthly limit**: Start with $5-10
-4. **Enable** usage alerts
+## Option A: Claude Code CLI (Recommended for 2025)
 
-### Cost Reality Check
+### Setting Up Claude Code
 
-```mermaid
-graph TD
-    A[Monthly Usage] --> B{Typical Costs}
-    B --> C[Light Use: $2-3]
-    B --> D[Regular Use: $5-8]
-    B --> E[Heavy Use: $10-15]
-    
-    F[ChatGPT Plus: $20] --> G[You Save 50-85%!]
-    
-    style G fill:#4fc3f7,stroke:#01579b,stroke-width:3px
+```bash
+# Install Claude Code globally
+npm install -g @anthropic-ai/claude-code
+
+# Verify installation
+claude --version
+
+# Initialize configuration
+claude config init
 ```
 
-## 2.3 Configuring OpenAI in VS Code
+### Adding Multiple Providers to Claude Code
 
-### Step 1: Open Continue Settings
+```bash
+# Add Anthropic (Claude models)
+claude config add-api-key anthropic
+# Paste your API key when prompted
 
-1. **Click** Continue icon in sidebar (looks like `>>`)
-2. **Click** the gear icon (settings)
-3. **You'll see** `config.json` file open
+# Add OpenAI
+claude config add-api-key openai
 
-### Step 2: Add OpenAI Configuration
+# Add Google (Gemini)
+claude config add-api-key google
+
+# Add Groq (free fast inference)
+claude config add-api-key groq
+```
+
+### Test Your Setup
+
+```bash
+# Test with different models
+claude chat --model claude-sonnet-4-20250514 "Hello!"
+claude chat --model gpt-4o "Explain APIs briefly"
+claude chat --model gemini-2.0-flash "What's 2+2?"
+```
+
+## Option B: Continue Extension (Classic Method)
+
+### Opening Continue Settings
+
+1. Click Continue icon in VS Code sidebar (`>>`)
+2. Click gear icon (settings)
+3. `config.json` opens automatically
+
+### Complete 2025 Configuration
 
 ```json
 {
   "models": [
     {
-      "title": "GPT-4o",
-      "provider": "openai",
-      "model": "gpt-4o",
-      "apiKey": "YOUR_OPENAI_API_KEY_HERE"
-    },
-    {
-      "title": "GPT-4o Mini",
-      "provider": "openai",
-      "model": "gpt-4o-mini",
-      "apiKey": "YOUR_OPENAI_API_KEY_HERE"
-    }
-  ],
-  "tabAutocompleteModel": {
-    "title": "GPT-4o Mini",
-    "provider": "openai",
-    "model": "gpt-4o-mini",
-    "apiKey": "YOUR_OPENAI_API_KEY_HERE"
-  }
-}
-```
-
-### Step 3: Test Your Connection
-
-1. **Save** the config file
-2. **Open** any text file
-3. **Type**: "Hello AI"
-4. **Select** the text
-5. **Press** `Ctrl+I` (or `Cmd+I`)
-6. **Choose** GPT-4o from the model dropdown
-7. **Type**: "Respond with a friendly greeting"
-8. **Success!** You should see a response
-
-## 2.4 Adding Anthropic Claude
-
-### Why Add Claude?
-
-- Superior writing quality
-- Larger context window (200k tokens)
-- Different strengths than GPT
-- More natural prose
-
-### Step 1: Create Anthropic Account
-
-1. **Navigate to**: https://console.anthropic.com
-2. **Sign up** with email
-3. **Verify** email address
-4. **Complete** onboarding
-
-### Step 2: Get Claude API Key
-
-1. **Go to**: API Keys section
-2. **Click**: "Create Key"
-3. **Name it**: "VS Code Integration"
-4. **Copy** the key:
-   ```
-   sk-ant-api03-abc123... (example format)
-   ```
-
-### Step 3: Add to VS Code Config
-
-Add to your Continue config.json:
-
-```json
-{
-  "title": "Claude 4 Sonnet",
-  "provider": "anthropic",
-  "model": "claude-sonnet-4-20250514",
-  "apiKey": "YOUR_ANTHROPIC_API_KEY_HERE"
-},
-{
-  "title": "Claude 4 Opus",
-  "provider": "anthropic",
-  "model": "claude-opus-4-20250514",
-  "apiKey": "YOUR_ANTHROPIC_API_KEY_HERE"
-}
-```
-
-## 2.5 Adding Google Gemini
-
-### Why Add Gemini?
-
-- Massive context window (2M tokens)
-- Generous free tier available
-- Excellent for research
-- Advanced multimodal capabilities
-- Deep Think mode for complex reasoning
-
-### Step 1: Get Gemini API Key
-
-1. **Navigate to**: https://makersuite.google.com/app/apikey
-2. **Sign in** with Google account
-3. **Click**: "Create API Key"
-4. **Select**: "Create API key for new project"
-5. **Copy** the key:
-   ```
-   AIzaSy... (example format)
-   ```
-
-### Step 2: Configure in VS Code
-
-Add to Continue config:
-
-```json
-{
-  "title": "Gemini 2.0 Pro",
-  "provider": "gemini",
-  "model": "gemini-2.0-pro-latest",
-  "apiKey": "YOUR_GEMINI_API_KEY_HERE"
-},
-{
-  "title": "Gemini 2.0 Flash",
-  "provider": "gemini",
-  "model": "gemini-2.0-flash-latest",
-  "apiKey": "YOUR_GEMINI_API_KEY_HERE"
-},
-{
-  "title": "Gemini 2.0 Flash Thinking",
-  "provider": "gemini",
-  "model": "gemini-2.0-flash-thinking-exp",
-  "apiKey": "YOUR_GEMINI_API_KEY_HERE"
-}
-```
-
-## 2.6 Adding Free/Open Models
-
-### Option A: Groq (Recommended for Speed)
-
-1. **Sign up at**: https://console.groq.com
-2. **Get API key** from dashboard
-3. **Add to config**:
-
-```json
-{
-  "title": "Llama 3.3 70B (Groq)",
-  "provider": "groq",
-  "model": "llama-3.3-70b-versatile",
-  "apiKey": "YOUR_GROQ_API_KEY_HERE"
-},
-{
-  "title": "DeepSeek R1 (Groq)",
-  "provider": "groq",
-  "model": "deepseek-r1-distill-llama-70b",
-  "apiKey": "YOUR_GROQ_API_KEY_HERE"
-}
-```
-
-### Option B: Together AI
-
-1. **Sign up at**: https://api.together.xyz
-2. **Get API key**
-3. **Add multiple models**:
-
-```json
-{
-  "title": "Qwen 2.5 72B",
-  "provider": "together",
-  "model": "Qwen/Qwen2.5-72B-Instruct-Turbo",
-  "apiKey": "YOUR_TOGETHER_API_KEY_HERE"
-},
-{
-  "title": "Mistral Large 2",
-  "provider": "together",
-  "model": "mistralai/Mistral-Large-2-Instruct",
-  "apiKey": "YOUR_TOGETHER_API_KEY_HERE"
-}
-```
-
-## 2.7 Complete Configuration
-
-### Your Final config.json
-
-Here's what your complete configuration should look like:
-
-```json
-{
-  "models": [
-    {
-      "title": "GPT-4o",
-      "provider": "openai",
-      "model": "gpt-4o",
-      "apiKey": "sk-proj-..."
-    },
-    {
-      "title": "GPT-4o Mini",
-      "provider": "openai",
-      "model": "gpt-4o-mini",
-      "apiKey": "sk-proj-..."
-    },
-    {
-      "title": "Claude 4 Sonnet",
+      "title": "Claude Sonnet 4.5 ⭐",
       "provider": "anthropic",
       "model": "claude-sonnet-4-20250514",
-      "apiKey": "sk-ant-..."
+      "apiKey": "YOUR_ANTHROPIC_KEY"
     },
     {
-      "title": "Gemini 2.0 Flash",
+      "title": "Claude Opus 4.5 (Premium)",
+      "provider": "anthropic",
+      "model": "claude-opus-4-20250514",
+      "apiKey": "YOUR_ANTHROPIC_KEY"
+    },
+    {
+      "title": "Claude Haiku 3.5 (Fast)",
+      "provider": "anthropic",
+      "model": "claude-3-5-haiku-20241022",
+      "apiKey": "YOUR_ANTHROPIC_KEY"
+    },
+    {
+      "title": "GPT-4o",
+      "provider": "openai",
+      "model": "gpt-4o",
+      "apiKey": "YOUR_OPENAI_KEY"
+    },
+    {
+      "title": "GPT-4o Mini (Cheap)",
+      "provider": "openai",
+      "model": "gpt-4o-mini",
+      "apiKey": "YOUR_OPENAI_KEY"
+    },
+    {
+      "title": "o3-mini (Reasoning)",
+      "provider": "openai",
+      "model": "o3-mini",
+      "apiKey": "YOUR_OPENAI_KEY"
+    },
+    {
+      "title": "Gemini 2.0 Flash ⚡",
       "provider": "gemini",
-      "model": "gemini-2.0-flash-latest",
-      "apiKey": "AIza..."
+      "model": "gemini-2.0-flash-exp",
+      "apiKey": "YOUR_GEMINI_KEY"
     },
     {
-      "title": "Llama 3.3 70B",
+      "title": "Gemini 2.0 Flash Thinking",
+      "provider": "gemini",
+      "model": "gemini-2.0-flash-thinking-exp-1219",
+      "apiKey": "YOUR_GEMINI_KEY"
+    },
+    {
+      "title": "Gemini 2.0 Pro (2M Context)",
+      "provider": "gemini",
+      "model": "gemini-2.0-pro-exp",
+      "apiKey": "YOUR_GEMINI_KEY"
+    },
+    {
+      "title": "Llama 3.3 70B (Free via Groq)",
       "provider": "groq",
       "model": "llama-3.3-70b-versatile",
-      "apiKey": "gsk_..."
+      "apiKey": "YOUR_GROQ_KEY"
+    },
+    {
+      "title": "DeepSeek R1 (Free Reasoning)",
+      "provider": "groq",
+      "model": "deepseek-r1-distill-llama-70b",
+      "apiKey": "YOUR_GROQ_KEY"
     }
   ],
   "tabAutocompleteModel": {
-    "title": "GPT-4o Mini",
-    "provider": "openai",
-    "model": "gpt-4o-mini",
-    "apiKey": "sk-proj-..."
+    "title": "Haiku 3.5 Autocomplete",
+    "provider": "anthropic",
+    "model": "claude-3-5-haiku-20241022",
+    "apiKey": "YOUR_ANTHROPIC_KEY"
   },
-  "allowAnonymousTelemetry": false,
   "embeddingsProvider": {
     "provider": "openai",
     "model": "text-embedding-3-small",
-    "apiKey": "sk-proj-..."
+    "apiKey": "YOUR_OPENAI_KEY"
   }
 }
 ```
 
-## 2.8 Testing Your Multi-Model Setup
+## Provider Setup Guide (2025 Edition)
 
-### The Model Comparison Test
+### 1. OpenAI (GPT-4o, o1, o3-mini)
 
-Create a new file `model-test.md`:
+**Why start here?**
+- Industry standard
+- Reliable performance
+- Great documentation
+- Wide model selection
 
-```markdown
-# AI Model Comparison
+#### Step-by-Step Setup
 
-## Test Prompt
-Explain blockchain technology in exactly 3 sentences for a business executive.
+**A. Create Account**
+1. Visit: https://platform.openai.com/signup
+2. Sign up with email or Google
+3. Verify email address
 
-### GPT-4o Response:
-[Test here]
+**B. Get API Key**
+1. Go to: https://platform.openai.com/api-keys
+2. Click "Create new secret key"
+3. Name it: "VS Code - Workshop 02"
+4. Copy key immediately (starts with `sk-proj-...`)
 
-### Claude 4 Sonnet Response:
-[Test here]
+⚠️ **Critical**: You can't view this key again after closing!
 
-### Gemini 2.0 Flash Response:
-[Test here]
+**C. Set Up Billing**
+1. Navigate to: https://platform.openai.com/settings/organization/billing
+2. Add payment method
+3. Set monthly limit: Start with **$10**
+4. Enable usage alerts at 50% and 80%
 
-### Llama 3.3 Response:
-[Test here]
-```
+**D. Understand Tiers**
 
-### Running the Test
+| Tier | How to Reach | Benefits |
+|------|--------------|----------|
+| Free | Default | 3 RPM, 40K TPM |
+| Tier 1 | Spend $5 | 500 RPM, 200K TPM |
+| Tier 2 | Spend $50 | 5,000 RPM, 2M TPM |
+| Tier 3 | Spend $1,000 | Higher limits |
 
-1. **Select** the test prompt
-2. **Press** `Ctrl+I`
-3. **Choose** first model
-4. **Submit** prompt
-5. **Repeat** for each model
-6. **Compare** results
+💡 **Tip**: You'll automatically upgrade as you spend. Start small!
 
-### What to Look For
+### 2. Anthropic (Claude Opus/Sonnet/Haiku)
 
-- **Clarity**: Which explains best?
-- **Conciseness**: Who follows instructions?
-- **Style**: Which tone do you prefer?
-- **Speed**: Which responds fastest?
+**Why add Claude?**
+- Best-in-class writing quality
+- Superior coding assistance
+- 200K context window (all models)
+- More natural conversational style
 
-## 2.9 Cost Monitoring Setup
+#### Setup Steps
 
-### OpenAI Usage Dashboard
+**A. Create Account**
+1. Visit: https://console.anthropic.com
+2. Sign up with email
+3. Verify email
 
-1. **Visit**: https://platform.openai.com/usage
-2. **View**: Daily costs
-3. **Set**: Email alerts at 80% of limit
+**B. Get API Key**
+1. Navigate to: API Keys section
+2. Click "Create Key"
+3. Name: "VS Code Workshop"
+4. Copy key (starts with `sk-ant-api03-...`)
 
-### Create a Cost Tracking Sheet
+**C. Add Credits**
+1. Go to Billing
+2. Add $10 minimum
+3. Set auto-refill (optional)
 
-In VS Code, create `ai-costs.md`:
+**D. Model Pricing (Jan 2025)**
 
-```markdown
-# AI Usage Tracking
+| Model | Input | Output | Speed | Use Case |
+|-------|--------|---------|-------|----------|
+| Opus 4.5 | $15/1M | $75/1M | Slow | Best quality |
+| Sonnet 4.5 | $3/1M | $15/1M | Fast | **Best value** ⭐ |
+| Haiku 3.5 | $0.25/1M | $1.25/1M | Fastest | High volume |
 
-## Daily Costs
-| Date | OpenAI | Anthropic | Google | Total |
-|------|--------|-----------|--------|-------|
-| Today | £0.00 | £0.00 | £0.00 | £0.00 |
+🎯 **Recommendation**: Start with Sonnet 4.5 for most tasks.
 
-## Model Performance Notes
-- GPT-4o: Best for...
-- Claude 4 Sonnet: Best for...
-- Gemini 2.0: Best for...
-- Llama 3.3: Best for...
-```
+### 3. Google (Gemini 2.0 Flash/Pro)
 
-## 2.10 Productivity Shortcuts
+**Why add Gemini?**
+- **Massive 1M-2M context windows**
+- Incredibly cheap ($0.075/1M input!)
+- Free tier available
+- Excellent multimodal capabilities
+- "Thinking" mode for reasoning
 
-### Quick Model Switching
+#### Setup Steps
 
-1. **Continue Panel**: Click model name to switch
-2. **Keyboard**: `Ctrl+Shift+M` for model menu
-3. **Default Model**: Set in config for common tasks
+**A. Get Free API Key**
+1. Visit: https://aistudio.google.com/apikey
+2. Sign in with Google account
+3. Click "Create API Key"
+4. Select "Create API key in new project"
+5. Copy key (starts with `AIzaSy...`)
 
-### Custom Prompts Setup
+**B. Free Tier Limits**
 
-Add to your config:
+- 15 requests per minute
+- 1,500 requests per day
+- 1.5M tokens per day
+
+💡 **Tip**: Gemini's free tier is VERY generous. Perfect for experimentation!
+
+**C. Enable Pay-as-you-go (Optional)**
+1. Go to Google Cloud Console
+2. Enable billing
+3. Activate Gemini API
+4. Set budget alerts
+
+**D. Model Comparison**
+
+| Model | Context | Input | Output | Special Feature |
+|-------|---------|--------|---------|----------------|
+| 2.0 Flash | 1M | $0.075 | $0.30 | Fastest, cheapest |
+| 2.0 Flash Thinking | 1M | $0.075 | $0.30 | Shows reasoning |
+| 2.0 Pro | **2M** | $1.25 | $5.00 | Entire codebases! |
+
+🎯 **Use case**: Gemini 2.0 Pro can analyze your ENTIRE project in one prompt!
+
+### 4. Groq (Free Fast Inference)
+
+**Why add Groq?**
+- **Free tier** with generous limits
+- Ultra-fast inference (150+ tokens/sec)
+- Access to Llama 3.3 70B
+- DeepSeek R1 reasoning model
+- No credit card required
+
+#### Setup Steps
+
+**A. Create Account**
+1. Visit: https://console.groq.com
+2. Sign up (no payment needed!)
+3. Verify email
+
+**B. Get API Key**
+1. Go to API Keys
+2. Create new key
+3. Copy (starts with `gsk_...`)
+
+**C. Free Tier Limits**
+
+- 30 requests per minute
+- 14,400 tokens per minute
+- 14,400 tokens per day
+
+⚠️ **Note**: Lower daily limits, but FAST. Perfect for quick tasks!
+
+**D. Available Models**
 
 ```json
-"customCommands": [
-  {
-    "name": "improve",
-    "prompt": "Improve this text for clarity and professionalism",
-    "description": "Enhance writing quality"
-  },
-  {
-    "name": "summarize",
-    "prompt": "Summarize this in 3 bullet points",
-    "description": "Quick summary"
-  },
-  {
-    "name": "explain",
-    "prompt": "Explain this concept simply",
-    "description": "ELI5 explanation"
-  }
-]
+{
+  "title": "Llama 3.3 70B",
+  "provider": "groq",
+  "model": "llama-3.3-70b-versatile",
+  "apiKey": "YOUR_GROQ_KEY"
+},
+{
+  "title": "DeepSeek R1 70B (Reasoning)",
+  "provider": "groq",
+  "model": "deepseek-r1-distill-llama-70b",
+  "apiKey": "YOUR_GROQ_KEY"
+},
+{
+  "title": "Mixtral 8x7B",
+  "provider": "groq",
+  "model": "mixtral-8x7b-32768",
+  "apiKey": "YOUR_GROQ_KEY"
+}
 ```
 
-## 2.11 Security Best Practices
+### 5. Together AI (Optional - More Open Models)
 
-### Protecting Your API Keys
+**Bonus provider** for advanced users:
 
-```mermaid
-graph TD
-    A[API Key Security] --> B[Never commit to Git]
-    A --> C[Use environment variables]
-    A --> D[Rotate if exposed]
-    A --> E[Set spending limits]
-    
-    B --> B1[Add to .gitignore]
-    C --> C1[Store in .env file]
-    D --> D1[Regenerate immediately]
-    E --> E1[Start small, increase gradually]
-    
-    style A fill:#ff6b6b,stroke:#c92a2a,stroke-width:3px
+1. Visit: https://api.together.xyz
+2. Sign up, get $5 free credits
+3. Access 50+ open-source models
+4. Pay-as-you-go after credits
+
+## Testing Your Multi-Model Setup
+
+### Quick Test Protocol
+
+Create `test-models.md`:
+
+```markdown
+# Multi-Model API Test
+
+## Prompt
+Explain quantum computing in exactly 2 sentences.
+
+### Claude Sonnet 4.5:
+[Select prompt, Ctrl+I, choose model, test]
+
+### GPT-4o:
+[Test here]
+
+### Gemini 2.0 Flash:
+[Test here]
+
+### Llama 3.3 (Groq):
+[Test here]
+
+## Speed Test Results
+- Fastest: ___
+- Most detailed: ___
+- Most natural: ___
 ```
 
-### Environment Variables (Advanced)
+### Model Comparison Exercise
 
-For better security, use `.env` file:
+Test each model with:
 
-1. **Create** `.env` in project root
-2. **Add** keys:
-   ```env
-   OPENAI_API_KEY=sk-proj-...
-   ANTHROPIC_API_KEY=sk-ant-...
-   ```
-3. **Reference** in config:
-   ```json
-   "apiKey": "${OPENAI_API_KEY}"
-   ```
+1. **Creative task**: "Write a haiku about coffee"
+2. **Technical task**: "Explain async/await in JavaScript"
+3. **Analysis task**: "List pros/cons of remote work"
 
-## 2.12 Troubleshooting Common Issues
+📝 **Note**: Notice how models differ in style, speed, and depth!
 
-### "Invalid API Key"
-- Check for extra spaces
-- Ensure key is active
-- Verify billing is set up
+## Cost Monitoring Setup
 
-### "Rate Limit Exceeded"
-- Wait a few minutes
-- Switch to different model
-- Check usage dashboard
+### OpenAI Dashboard
 
-### "Model Not Found"
-- Update model names (they change)
-- Check provider documentation
-- Use latest Continue version
+1. Visit: https://platform.openai.com/usage
+2. View real-time costs
+3. Set up email alerts
+
+### Anthropic Console
+
+1. Visit: https://console.anthropic.com/settings/billing
+2. Monitor credit balance
+3. Set auto-refill threshold
+
+### Create Cost Tracking Spreadsheet
+
+```markdown
+# AI API Cost Tracking - January 2025
+
+| Date | OpenAI | Anthropic | Google | Groq | Total | Notes |
+|------|--------|-----------|--------|------|-------|-------|
+| Jan 25 | $0.12 | $0.08 | $0.00 | $0.00 | $0.20 | Blog posts |
+| Jan 26 | $0.05 | $0.15 | $0.01 | $0.00 | $0.21 | Code review |
+
+## Monthly Budget
+- Target: $10/month
+- Current: $0.41
+- Remaining: $9.59
+
+## Model Preferences
+- Writing: Claude Sonnet 4.5 (best prose)
+- Coding: Claude Sonnet 4.5 or GPT-4o
+- Research: Gemini 2.0 Pro (massive context)
+- Quick tasks: Haiku 3.5 or GPT-4o-mini
+- Free testing: Llama 3.3 via Groq
+```
+
+## Security Best Practices (2025 Edition)
+
+### Environment Variables Method
+
+**Step 1**: Create `.env` file
+
+```bash
+# In your project root
+touch .env
+```
+
+**Step 2**: Add keys
+
+```bash
+# .env file
+OPENAI_API_KEY=sk-proj-abc123...
+ANTHROPIC_API_KEY=sk-ant-api03-xyz...
+GOOGLE_API_KEY=AIzaSy...
+GROQ_API_KEY=gsk_...
+```
+
+**Step 3**: Add to `.gitignore`
+
+```bash
+# .gitignore
+.env
+.env.local
+*.key
+```
+
+**Step 4**: Reference in config
+
+```json
+{
+  "models": [
+    {
+      "title": "Claude Sonnet",
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-20250514",
+      "apiKey": "${ANTHROPIC_API_KEY}"
+    }
+  ]
+}
+```
+
+### API Key Rotation Schedule
+
+📅 **Recommended schedule**:
+- Every 90 days: Rotate all keys
+- Monthly: Review usage patterns
+- Weekly: Check spending
+- Daily: Monitor for unusual activity
+
+## Productivity Shortcuts
+
+### Continue Extension Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| `Ctrl+I` (Windows/Linux) | Open AI chat |
+| `Cmd+I` (Mac) | Open AI chat |
+| `Ctrl+Shift+M` | Switch model |
+| `Ctrl+L` | Clear conversation |
+
+### Custom Commands (Advanced)
+
+```json
+{
+  "customCommands": [
+    {
+      "name": "improve",
+      "prompt": "Improve this text for clarity, professionalism, and impact",
+      "description": "Enhance writing quality"
+    },
+    {
+      "name": "summarize",
+      "prompt": "Summarize this in 3 concise bullet points",
+      "description": "Quick summary"
+    },
+    {
+      "name": "explain-code",
+      "prompt": "Explain this code line-by-line for a beginner",
+      "description": "Code explanation"
+    },
+    {
+      "name": "refactor",
+      "prompt": "Refactor this code for better readability and performance",
+      "description": "Improve code quality"
+    },
+    {
+      "name": "tests",
+      "prompt": "Generate comprehensive unit tests for this code",
+      "description": "Create test suite"
+    }
+  ]
+}
+```
+
+## Troubleshooting Common Issues
+
+### Error: "Invalid API Key"
+
+**Solutions**:
+- ✅ Check for extra spaces when copying
+- ✅ Ensure key hasn't been revoked
+- ✅ Verify billing is set up
+- ✅ Try regenerating key
+
+### Error: "Rate Limit Exceeded"
+
+**Solutions**:
+- ⏸️ Wait 60 seconds
+- 🔄 Switch to different model/provider
+- 📊 Check usage dashboard
+- 💳 Upgrade tier if needed frequently
+
+### Error: "Model Not Found"
+
+**Solutions**:
+- 📝 Check model name spelling
+- 🔄 Update to latest model IDs
+- 📚 Consult provider documentation
+- ⬆️ Update Continue extension
+
+### Error: "Context Length Exceeded"
+
+**Solutions**:
+- ✂️ Trim conversation history
+- 📉 Reduce input text size
+- 🔄 Switch to model with larger context (Gemini 2.0 Pro)
+- 🧹 Clear old messages
 
 ## Your Achievements Unlocked!
 
 ### You Now Have:
 
-✅ **Multi-Model Access**: 5+ AI models at your fingertips  
-✅ **Cost Control**: 90% savings vs subscriptions  
-✅ **Direct Integration**: No more copy-paste  
-✅ **Model Comparison**: Know which AI to use when  
-✅ **Professional Setup**: Enterprise-grade configuration  
+✅ **Multi-Model Access**: 5+ leading AI models at your fingertips
+✅ **Cost Control**: 90% savings vs subscriptions
+✅ **Direct Integration**: No more copy-paste workflows
+✅ **Model Comparison**: Know which AI excels at what
+✅ **Professional Setup**: Enterprise-grade configuration
+✅ **Security**: Proper API key management
 
-### Quick Stats
+### Before vs After
 
 ```mermaid
 graph LR
-    A[Before] --> B[After]
-    
-    A1[1 model] --> B1[5+ models]
-    A2[£20/month] --> B2[£3-5/month]
-    A3[Web interface] --> B3[IDE integration]
-    A4[Limited access] --> B4[Unlimited power]
-    
-    style B fill:#4fc3f7,stroke:#01579b,stroke-width:3px
+    subgraph Before
+        A1[1 model] --> A2[£20/month] --> A3[Web interface]
+    end
+
+    subgraph After
+        B1[8+ models] --> B2[£3-5/month] --> B3[IDE integration]
+    end
+
+    A3 -.Upgrade.-> B1
+
+    style B3 fill:#4fc3f7,stroke:#01579b,stroke-width:3px
 ```
 
 ## Next Steps
 
-With your multi-model command centre ready, let's put it to work! The exercises will show you how to leverage each model's strengths for maximum productivity.
+🎯 **Immediate**: Test each model with real work tasks
+📊 **This week**: Track costs for 7 days
+🧪 **Ongoing**: Experiment with different models for different tasks
 
-### Pro Tips Before Moving On
+### Pro Tips
 
 1. **Bookmark** all provider dashboards
-2. **Save** your config.json backup
-3. **Test** each model with your real work
-4. **Track** costs for first week
-5. **Experiment** with different models
+2. **Export** your config.json as backup
+3. **Document** which models work best for your needs
+4. **Set calendar reminder** for 90-day key rotation
+5. **Join communities**: r/ClaudeAI, r/OpenAI for tips
 
 ---
 
-Next: [Chapter 3: Practical Exercises - Model Mastery](./03_exercises.md)
+**Next**: [Chapter 3: Practical Exercises - Model Mastery](./03_exercises.md)
 
-[Back to Concepts](./01_concepts.md) | [Back to Module Overview](README.md)
+[← Back to Concepts](./01_concepts.md) | [Module Overview](README.md)

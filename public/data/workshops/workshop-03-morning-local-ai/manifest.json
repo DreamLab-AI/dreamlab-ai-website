@@ -7,15 +7,15 @@
     },
     {
       "slug": "00_introduction.md",
-      "title": "00_introduction - Module 09: Local AI Models"
+      "title": "Introduction to Local AI Models"
     },
     {
       "slug": "01_concepts.md",
-      "title": "01_concepts - Module 09: Local AI Models"
+      "title": "Core Concepts: Running AI Models Locally"
     },
     {
       "slug": "02_hands_on.md",
-      "title": "02_hands_on - Module 09: Local AI Models"
+      "title": "Hands-On Practice: Setting Up Local AI"
     },
     {
       "slug": "03_exercises.md",
@@ -23,15 +23,15 @@
     },
     {
       "slug": "04_project.md",
-      "title": "04_project - Module 09: Local AI Models"
+      "title": "Project: Build a Local AI Assistant"
     },
     {
       "slug": "05_assessment.md",
-      "title": "05_assessment - Module 09: Local AI Models"
+      "title": "Assessment: Local AI Models Mastery"
     },
     {
       "slug": "06_resources.md",
-      "title": "06_resources - Module 09: Local AI Models"
+      "title": "Resources: Local AI Models"
     },
     {
       "slug": "objectives.md",

@@ -15,7 +15,7 @@
     },
     {
       "slug": "02_hands_on.md",
-      "title": "Chapter 2: Hands-On Setup - Building Your Command Centre"
+      "title": "Chapter 2: Hands-On Setup - Building Your AI-Enhanced Command Centre"
     },
     {
       "slug": "03_exercises.md",
@@ -27,19 +27,19 @@
     },
     {
       "slug": "05_assessment.md",
-      "title": "05_assessment - Module 05: VS Code as AI Command Center"
+      "title": "Chapter 5: Assessment - Validating Your Mastery"
     },
     {
       "slug": "06_resources.md",
-      "title": "06_resources - Module 05: VS Code as AI Command Center"
+      "title": "Chapter 6: Resources & Continued Learning"
     },
     {
       "slug": "objectives.md",
-      "title": "Learning Objectives - Module 05"
+      "title": "Learning Objectives - Workshop 01 Morning: VS Code Setup"
     },
     {
       "slug": "prerequisites.md",
-      "title": "Prerequisites - Module 05"
+      "title": "Prerequisites - Workshop 01 Morning: VS Code Setup"
     }
   ]
 }

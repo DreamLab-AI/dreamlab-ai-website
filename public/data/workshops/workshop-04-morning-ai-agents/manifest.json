@@ -1,41 +1,41 @@
 {
-  "title": "Module 11: Specialized AI Agents",
+  "title": "Workshop 04 - Morning Session: AI Agents",
   "pages": [
     {
       "slug": "README.md",
-      "title": "Module 11: Specialized AI Agents"
+      "title": "Workshop 04 - Morning Session: AI Agents"
     },
     {
       "slug": "00_introduction.md",
-      "title": "00_introduction - Module 11: Specialized AI Agents"
+      "title": "Introduction to AI Agents"
     },
     {
       "slug": "01_concepts.md",
-      "title": "01_concepts - Module 11: Specialized AI Agents"
+      "title": "Core Agent Concepts (2025)"
     },
     {
       "slug": "02_hands_on.md",
-      "title": "02_hands_on - Module 11: Specialized AI Agents"
+      "title": "Hands-on Agent Development"
     },
     {
       "slug": "03_exercises.md",
-      "title": "03_exercises - Module 11: Specialized AI Agents"
+      "title": "Practical Exercises"
     },
     {
       "slug": "04_project.md",
-      "title": "04_project - Module 11: Specialized AI Agents"
+      "title": "Final Project: Advanced Research Agent"
     },
     {
       "slug": "05_assessment.md",
-      "title": "05_assessment - Module 11: Specialized AI Agents"
+      "title": "Assessment: AI Agents Knowledge Check"
     },
     {
       "slug": "06_resources.md",
-      "title": "06_resources - Module 11: Specialized AI Agents"
+      "title": "Resources for AI Agents"
     },
     {
       "slug": "objectives.md",
-      "title": "Learning Objectives - Module 11"
+      "title": "Learning Objectives - AI Agents Workshop"
     },
     {
       "slug": "prerequisites.md",
