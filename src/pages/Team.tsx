@@ -105,9 +105,9 @@ const Team = () => {
       <section id="main-content" className="pt-24 pb-8 bg-secondary/20">
         <div className="container">
           <h1 className="text-3xl md:text-4xl font-bold mb-4">Our Team</h1>
-          <p className="text-lg text-muted-foreground max-w-3xl">
-            Meet our talented professionals. Click on a team member's photo to select
-            them for your project.
+          <p className="text-lg text-muted-foreground max-w-3xl mb-4">
+            43+ specialists including Emmy nominees, PhD researchers, and BAFTA-recognised talent.
+            Click on a team member to select them for your project.
           </p>
 
           {/* Selection controls */}

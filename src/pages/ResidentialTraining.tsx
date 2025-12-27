@@ -37,129 +37,224 @@ const ResidentialTraining = () => {
     return () => clearInterval(timer);
   }, []);
 
+  // Confluence Training Packs - Multi-instructor delivery with premium residential experience
+  // Pricing validated against Oxford Saïd (£34,310), MyWorld VP Bootcamp (£6,000)
+  // Our pricing reflects: multi-instructor delivery, Lake District residential, state-of-art facilities
   const trainingPrograms = [
     {
-      id: "virtual-production",
-      title: "Virtual Production & Engineering Viz",
+      id: "ai-commander-week",
+      title: "AI Commander Week",
       duration: "5 Days",
-      price: "£4,995",
+      price: "£5,500",
+      capacity: "6-8 Participants",
+      category: "AI/ML",
+      featured: true,
+      description: "Master agentic engineering from protocol level to production. Learn to orchestrate AI agents, multi-model architectures, and autonomous systems from practitioners who build at the cutting edge.",
+      modules: [
+        "Agentic Architecture & Protocol Design",
+        "Multi-Agent Orchestration & Swarm Intelligence",
+        "LLM Integration & Fine-Tuning Workflows",
+        "Production Deployment & Scaling",
+        "Human-AI Collaboration Interfaces"
+      ],
+      instructors: "Pete Woodbridge (CTO), Dr John O'Hare (CHO), Jing Li, Kriss Dunk"
+    },
+    {
+      id: "virtual-production-master",
+      title: "Virtual Production Master",
+      duration: "5 Days",
+      price: "£6,200",
       capacity: "6-8 Participants",
       category: "Creative Tech",
       featured: true,
-      description: "Master LED volume workflows and real-time visualisation for engineering simulation data, bridging creative and technical domains.",
+      description: "Complete LED volume workflow mastery. From camera tracking to real-time compositing, learn from Emmy-nominated professionals with credits spanning Star Wars to Formula 1.",
       modules: [
         "LED Volume Operations & ICVFX Fundamentals",
-        "Real-time Rendering for CAE/CFD Data Visualisation",
-        "Unreal Engine for Engineering & Scientific Viz",
+        "Unreal Engine for Real-Time Production",
         "Motion Control & Camera Tracking Systems",
-        "Virtual Production Pipeline Integration & Workflow"
-      ]
+        "Real-Time Compositing & Colour Science",
+        "Virtual Production Pipeline Integration"
+      ],
+      instructors: "Pete Woodbridge, Roger McKinley, Thadeous Letitia, Bradley Harris (Emmy-nom)"
     },
     {
-      id: "gaussian-splatting",
-      title: "Gaussian Splatting & Neural Rendering",
-      duration: "3 Days",
-      price: "£2,995",
-      capacity: "4-6 Participants",
-      category: "Emerging Tech",
-      description: "Learn cutting-edge 3D reconstruction techniques from photogrammetry to neural radiance fields for next-generation content creation.",
-      modules: [
-        "Advanced Photogrammetry & Point Cloud Processing",
-        "Neural Radiance Fields (NeRF) Implementation",
-        "Gaussian Splatting Capture & Optimisation",
-        "3D Reconstruction for Engineering Applications",
-        "Real-time Neural Rendering & Deployment"
-      ]
-    },
-    {
-      id: "telepresence-xr",
-      title: "Telepresence & Remote Collaboration",
-      duration: "3 Days",
-      price: "£2,495",
-      capacity: "4-6 Participants",
-      category: "Communication Tech",
-      description: "Build holographic communication systems and XR collaboration platforms for distributed teams and immersive experiences.",
-      modules: [
-        "Holographic Display Technologies & Light Fields",
-        "XR Collaboration Platforms Architecture",
-        "Remote Presence Systems & Avatar Solutions",
-        "Spatial Audio Integration & Binaural Processing",
-        "Enterprise Telepresence Infrastructure & Scale"
-      ]
-    },
-    {
-      id: "ai-creative",
-      title: "AI for Creative Production",
-      duration: "4 Days",
-      price: "£3,495",
-      capacity: "8-10 Participants",
-      category: "AI/ML",
-      featured: true,
-      description: "Integrate generative AI and ML into production pipelines for automated workflows and intelligent content generation.",
-      modules: [
-        "Generative AI Models in Production Pipelines",
-        "ML for Automated VFX & Rotoscoping",
-        "AI-Powered Compositing & Style Transfer",
-        "Neural Networks for Creative Enhancement",
-        "Ethical AI Implementation & Governance"
-      ]
-    },
-    {
-      id: "agentic-engineering",
-      title: "Agentic Engineering Systems",
-      duration: "3 Days",
-      price: "£2,795",
+      id: "xr-innovation-intensive",
+      title: "XR Innovation Intensive",
+      duration: "5 Days",
+      price: "£5,500",
       capacity: "6-8 Participants",
-      category: "Advanced Engineering",
-      description: "Design and deploy autonomous agent systems for engineering workflows and intelligent automation in creative applications.",
+      category: "XR/VR",
+      featured: true,
+      description: "Immersive experience development from concept to deployment. Apple Vision Pro, Meta Quest, and industrial applications with PhD-level guidance.",
       modules: [
-        "Agent Architecture Design Patterns",
-        "Multi-Agent Coordination & Orchestration",
-        "Autonomous Creative Systems Development",
-        "Engineering Process Automation & Optimisation",
-        "Human-Agent Collaboration Interfaces"
-      ]
+        "Unity & Unreal for XR Development",
+        "Apple Vision Pro & Spatial Computing",
+        "Industrial XR Training Systems",
+        "Mixed Reality Interface Design",
+        "Healthcare & Engineering XR Applications"
+      ],
+      instructors: "Dr Arpana Sherpa (PhD), Christian Frost, Dr David Tully, Lewis Hackett"
     },
     {
-      id: "decentralised-infrastructure",
+      id: "digital-human-mocap",
+      title: "Digital Human & MoCap",
+      duration: "3 Days",
+      price: "£3,800",
+      capacity: "4-6 Participants",
+      category: "Creative Tech",
+      description: "Professional motion capture and digital human creation. Learn from Emmy-nominated specialists with credits on Star Wars, Marvel, and major game titles.",
+      modules: [
+        "Motion Capture System Operation",
+        "Performance Capture & Retargeting",
+        "Digital Human Creation Pipeline",
+        "Real-Time Character Animation",
+        "MetaHuman & Facial Capture"
+      ],
+      instructors: "Bradley Harris (Emmy-nom), Garth Williams, Christian Frost"
+    },
+    {
+      id: "spatial-audio-production",
+      title: "Spatial Audio Production",
+      duration: "5 Days",
+      price: "£4,800",
+      capacity: "4-6 Participants",
+      category: "Audio",
+      description: "Master immersive audio for XR, cinema, and installations. Dolby Atmos certification preparation with industry-leading audio professionals.",
+      modules: [
+        "Dolby Atmos Mixing & Mastering",
+        "Binaural Audio for VR/AR",
+        "Spatial Audio Engine Implementation",
+        "Field Recording for Immersive Media",
+        "Game Audio & Procedural Sound Design"
+      ],
+      instructors: "Bernard Steer (Dolby Atmos), Noelle Nurdin, Dr Sean Hill"
+    },
+    {
+      id: "engineering-visualisation",
+      title: "Engineering Visualisation",
+      duration: "5 Days",
+      price: "£5,200",
+      capacity: "6-8 Participants",
+      category: "Engineering",
+      description: "Transform CAE/CFD data into real-time interactive visualisations. Bridge engineering simulation and creative technology with PhD-level expertise.",
+      modules: [
+        "CAE/CFD Data Import & Optimisation",
+        "Real-Time Scientific Visualisation",
+        "Unreal Engine for Engineering Viz",
+        "Interactive Simulation Interfaces",
+        "Nuclear & Energy Sector Applications"
+      ],
+      instructors: "Marco Ghilardi (PhD Nuclear), Dr Sean Hill, Daniel Maktabi"
+    },
+    {
+      id: "neural-content-creation",
+      title: "Neural Content Creation",
+      duration: "3 Days",
+      price: "£3,400",
+      capacity: "6-8 Participants",
+      category: "Emerging Tech",
+      description: "Cutting-edge 3D reconstruction from photogrammetry to neural radiance fields. Gaussian splatting capture and real-time neural rendering.",
+      modules: [
+        "Gaussian Splatting Capture Pipeline",
+        "NeRF Implementation & Optimisation",
+        "Photogrammetry for Production",
+        "Real-Time Neural Rendering",
+        "Asset Integration & Deployment"
+      ],
+      instructors: "Will Sheridan, Zack Lewis, James Berry"
+    },
+    {
+      id: "cyber-infrastructure",
+      title: "Cyber Infrastructure",
+      duration: "3 Days",
+      price: "£3,600",
+      capacity: "6-8 Participants",
+      category: "Engineering",
+      description: "Industrial-grade network architecture and cybersecurity. Design secure infrastructure for creative and engineering environments.",
+      modules: [
+        "Enterprise Network Architecture",
+        "Zero-Trust Security Implementation",
+        "Cloud & Hybrid Infrastructure",
+        "Industrial Control System Security",
+        "Secure Remote Production Workflows"
+      ],
+      instructors: "Ste Moyler (CCO), David Sherpa, Pete Woodbridge"
+    },
+    {
+      id: "decentralised-agents",
       title: "Decentralised Agent Infrastructure",
       duration: "4 Days",
-      price: "£3,295",
+      price: "£4,200",
       capacity: "6-8 Participants",
       category: "Web3 Tech",
-      featured: true,
-      description: "Build sovereign, cryptographically-secured agent systems using Bitcoin, Lightning, RGB protocols and decentralised identity for the next internet.",
+      description: "Build sovereign, cryptographically-secured agent systems using Bitcoin, Lightning, RGB protocols and decentralised identity.",
       modules: [
-        "Bitcoin & Lightning Network for Agent Payments",
-        "RGB Protocol for Smart Contract Implementation",
-        "Nostr Protocol & Decentralised Identity (DID)",
-        "Private Contract Negotiation & Single-Use Seals",
-        "Agent-First Architecture & Cryptographic Proofs"
+        "Bitcoin & Lightning for Agent Payments",
+        "RGB Protocol & Smart Contracts",
+        "Nostr Protocol & Decentralised Identity",
+        "Private Contract Negotiation",
+        "Agent-First Architecture Design"
       ],
-      partnership: "Partnering with GlobalBlock liquidity provider: secure API endpoints for agentic actors"
+      instructors: "Pete Woodbridge, Kriss Dunk, Jing Li",
+      partnership: "Partnering with GlobalBlock liquidity provider for secure API endpoints"
+    },
+    {
+      id: "creative-technology-fundamentals",
+      title: "Creative Technology Fundamentals",
+      duration: "5 Days",
+      price: "£4,500",
+      capacity: "8-10 Participants",
+      category: "Foundation",
+      description: "Comprehensive introduction to creative technology for career changers and newcomers. From version control to AI-assisted workflows.",
+      modules: [
+        "Development Environment Setup",
+        "Git & Collaborative Workflows",
+        "AI-Assisted Development (Claude, Copilot)",
+        "Project Structure & Best Practices",
+        "Publishing & Deployment"
+      ],
+      instructors: "Pete Woodbridge, Dr Arpana Sherpa, Marcus Sherpa"
+    },
+    {
+      id: "corporate-immersive",
+      title: "Corporate Immersive Retreat",
+      duration: "3 Days",
+      price: "£12,500",
+      capacity: "10-12 Participants",
+      category: "Enterprise",
+      featured: true,
+      description: "Bespoke executive experience combining strategic AI briefings, hands-on technology demos, and Lake District hospitality. Tailored for C-suite and senior leadership.",
+      modules: [
+        "AI Strategy for Enterprise",
+        "Hands-On Technology Demonstrations",
+        "Innovation Workshop Facilitation",
+        "Team Building & Networking",
+        "Strategic Roadmap Development"
+      ],
+      instructors: "Pete Woodbridge, Dr John O'Hare, Stephen Moyler"
     }
   ];
 
   const facilityFeatures = [
     {
       icon: <Zap className="w-6 h-6" />,
-      title: "6m × 2.5m LED Volume",
-      description: "State-of-the-art virtual production screen for immersive training scenarios"
+      title: "The Dream Team",
+      description: "43+ specialists: Emmy nominees, PhDs, BAFTA talent on every programme"
     },
     {
       icon: <Users className="w-6 h-6" />,
-      title: "Motion Capture Studio",
-      description: "Professional Vicon/OptiTrack system for performance capture training"
+      title: "Enterprise Tech Stack",
+      description: "LED volume, motion capture, 8×RTX GPU cluster, Dolby Atmos studio"
     },
     {
       icon: <Award className="w-6 h-6" />,
-      title: "Gaussian Splatting Lab",
-      description: "Multi-camera array for cutting-edge 3D reconstruction techniques"
+      title: "6.3kW Solar + 10G Network",
+      description: "Sustainable infrastructure with enterprise-grade connectivity"
     },
     {
       icon: <Home className="w-6 h-6" />,
-      title: "5-Bedroom Accommodation",
-      description: "Luxury residential facility with dedicated training wing"
+      title: "Lake District Residential",
+      description: "5-bedroom luxury accommodation with stunning mountain views"
     }
   ];
 
@@ -177,8 +272,8 @@ const ResidentialTraining = () => {
               Deep learning with no distractions
             </h1>
             <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-6 sm:mb-8 max-w-3xl mx-auto px-4">
-              Transform your skills at the UK's premier facility combining virtual production,
-              engineering simulation, and cutting-edge AI technologies in an immersive residential setting. These pages were auto generated by VisionFlow Agentic AI and are therefore AI slop. Come back soon or sign up to see the real thing.
+              Train with the DreamLab collective — 43+ specialists including Emmy nominees, PhD researchers,
+              and BAFTA-recognised talent. Multi-instructor delivery at our Lake District residential facility.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4">
               <Button size="lg" onClick={() => navigate("/contact")} className="min-h-[44px] touch-manipulation w-full sm:w-auto">
@@ -225,18 +320,21 @@ const ResidentialTraining = () => {
               Immersive Training Programs
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Hands-on courses designed for professionals ready to master the intersection
-              of creative technology and engineering excellence.
+              Multi-instructor delivery from our 43+ specialist collective. Each programme combines
+              complementary expertise for comprehensive, hands-on skill transfer.
             </p>
           </div>
 
           <Tabs defaultValue="all" className="w-full px-4">
-            <TabsList className="grid w-full max-w-md mx-auto grid-cols-5 mb-6 sm:mb-8 h-auto">
+            <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-4 sm:grid-cols-8 mb-6 sm:mb-8 h-auto">
               <TabsTrigger value="all" className="text-xs sm:text-sm min-h-[44px] touch-manipulation">All</TabsTrigger>
-              <TabsTrigger value="creative" className="text-xs sm:text-sm min-h-[44px] touch-manipulation">Creative</TabsTrigger>
-              <TabsTrigger value="engineering" className="text-xs sm:text-sm min-h-[44px] touch-manipulation">Eng</TabsTrigger>
               <TabsTrigger value="ai" className="text-xs sm:text-sm min-h-[44px] touch-manipulation">AI/ML</TabsTrigger>
+              <TabsTrigger value="creative" className="text-xs sm:text-sm min-h-[44px] touch-manipulation">VP</TabsTrigger>
+              <TabsTrigger value="xr" className="text-xs sm:text-sm min-h-[44px] touch-manipulation">XR</TabsTrigger>
+              <TabsTrigger value="audio" className="text-xs sm:text-sm min-h-[44px] touch-manipulation">Audio</TabsTrigger>
+              <TabsTrigger value="engineering" className="text-xs sm:text-sm min-h-[44px] touch-manipulation">Eng</TabsTrigger>
               <TabsTrigger value="web3" className="text-xs sm:text-sm min-h-[44px] touch-manipulation">Web3</TabsTrigger>
+              <TabsTrigger value="enterprise" className="text-xs sm:text-sm min-h-[44px] touch-manipulation">Corp</TabsTrigger>
             </TabsList>
 
             <TabsContent value="all">
@@ -280,6 +378,13 @@ const ResidentialTraining = () => {
                             ))}
                           </ul>
                         </div>
+                        {program.instructors && (
+                          <div className="pt-2 border-t">
+                            <p className="text-xs text-muted-foreground">
+                              <span className="font-medium">Instructors:</span> {program.instructors}
+                            </p>
+                          </div>
+                        )}
                         {program.partnership && (
                           <div className="pt-2">
                             <p className="text-[10px] text-muted-foreground/70 italic">
@@ -303,53 +408,84 @@ const ResidentialTraining = () => {
               </div>
             </TabsContent>
 
-            <TabsContent value="creative">
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {trainingPrograms
-                  .filter(p => p.category === "Creative Tech")
-                  .map((program) => (
-                    <Card key={program.id} className={program.featured ? "border-primary" : ""}>
-                      {/* Same card content as above */}
-                    </Card>
-                  ))}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="engineering">
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {trainingPrograms
-                  .filter(p => p.category === "Advanced Engineering" || p.category === "Emerging Tech")
-                  .map((program) => (
-                    <Card key={program.id} className={program.featured ? "border-primary" : ""}>
-                      {/* Same card content as above */}
-                    </Card>
-                  ))}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="ai">
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {trainingPrograms
-                  .filter(p => p.category === "AI/ML")
-                  .map((program) => (
-                    <Card key={program.id} className={program.featured ? "border-primary" : ""}>
-                      {/* Same card content as above */}
-                    </Card>
-                  ))}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="web3">
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {trainingPrograms
-                  .filter(p => p.category === "Web3 Tech")
-                  .map((program) => (
-                    <Card key={program.id} className={program.featured ? "border-primary" : ""}>
-                      {/* Same card content as above */}
-                    </Card>
-                  ))}
-              </div>
-            </TabsContent>
+            {["ai", "creative", "xr", "audio", "engineering", "web3", "enterprise"].map(tab => {
+              const categoryMap: Record<string, string[]> = {
+                ai: ["AI/ML"],
+                creative: ["Creative Tech"],
+                xr: ["XR/VR"],
+                audio: ["Audio"],
+                engineering: ["Engineering", "Emerging Tech"],
+                web3: ["Web3 Tech"],
+                enterprise: ["Enterprise", "Foundation"]
+              };
+              return (
+                <TabsContent key={tab} value={tab}>
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {trainingPrograms
+                      .filter(p => categoryMap[tab].includes(p.category))
+                      .map((program) => (
+                        <Card key={program.id} className={program.featured ? "border-primary" : ""}>
+                          <CardHeader>
+                            <div className="flex justify-between items-start mb-2">
+                              <Badge variant={program.featured ? "default" : "secondary"}>
+                                {program.category}
+                              </Badge>
+                              {program.featured && (
+                                <Badge variant="outline">Featured</Badge>
+                              )}
+                            </div>
+                            <CardTitle>{program.title}</CardTitle>
+                            <CardDescription>{program.description}</CardDescription>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="space-y-4">
+                              <div className="flex justify-between text-sm">
+                                <span className="text-muted-foreground">Duration</span>
+                                <span className="font-medium">{program.duration}</span>
+                              </div>
+                              <div className="flex justify-between text-sm">
+                                <span className="text-muted-foreground">Investment</span>
+                                <span className="font-medium">{program.price}</span>
+                              </div>
+                              <div className="flex justify-between text-sm">
+                                <span className="text-muted-foreground">Group Size</span>
+                                <span className="font-medium">{program.capacity}</span>
+                              </div>
+                              <div className="pt-4 border-t">
+                                <p className="text-sm font-medium mb-2">Key Modules:</p>
+                                <ul className="space-y-1">
+                                  {program.modules.slice(0, 3).map((module, idx) => (
+                                    <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
+                                      <CheckCircle2 className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                                      <span>{module}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                              {program.instructors && (
+                                <div className="pt-2 border-t">
+                                  <p className="text-xs text-muted-foreground">
+                                    <span className="font-medium">Instructors:</span> {program.instructors}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                          </CardContent>
+                          <CardFooter>
+                            <Button
+                              className="w-full"
+                              variant={program.featured ? "default" : "outline"}
+                              onClick={() => navigate("/contact")}
+                            >
+                              Learn More
+                            </Button>
+                          </CardFooter>
+                        </Card>
+                      ))}
+                  </div>
+                </TabsContent>
+              );
+            })}
           </Tabs>
         </div>
       </section>

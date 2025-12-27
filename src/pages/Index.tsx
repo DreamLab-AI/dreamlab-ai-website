@@ -101,7 +101,7 @@ const Index = () => {
             </h2>
             <p className="text-lg text-muted-foreground/90 text-center mb-10 max-w-2xl mx-auto leading-relaxed">
               Stay updated on our latest training programs in virtual production, AI/ML,
-              gaussian splatting, and agentic engineering.
+              spatial audio, and agentic engineering.
             </p>
             <EmailSignupForm />
           </div>
