@@ -32,7 +32,6 @@ yarn-error.log*
 *.sln
 *.sw?
 .DS_Store
-.claude-flow-swarm-course-task
 
 # TypeScript
 *.tsbuildinfo
@@ -43,5 +42,8 @@ coverage
 # Vite
 vite.config.ts.timestamp-*
 
-# Claude Flow Swarm files
+# Claude Flow / Swarm / Agent files
+.claude-flow/
 .claude-flow-swarm/
+.swarm/
+.claude-flow-swarm-course-task
