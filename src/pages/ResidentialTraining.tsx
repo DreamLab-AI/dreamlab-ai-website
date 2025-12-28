@@ -45,8 +45,9 @@ const ResidentialTraining = () => {
       id: "ai-commander-week",
       title: "AI Commander Week",
       duration: "5 Days",
-      price: "£5,500",
-      capacity: "6-8 Participants",
+      price: "£3,800",
+      priceNote: "Team of 4 (bulk rate)",
+      capacity: "4 Participants",
       category: "AI/ML",
       featured: true,
       description: "Master agentic engineering from protocol level to production. Learn to orchestrate AI agents, multi-model architectures, and autonomous systems from practitioners who build at the cutting edge.",
@@ -63,8 +64,9 @@ const ResidentialTraining = () => {
       id: "virtual-production-master",
       title: "Virtual Production Master",
       duration: "5 Days",
-      price: "£6,200",
-      capacity: "6-8 Participants",
+      price: "£4,200",
+      priceNote: "Team of 4 (bulk rate)",
+      capacity: "4 Participants",
       category: "Creative Tech",
       featured: true,
       description: "Complete LED volume workflow mastery. From camera tracking to real-time compositing, learn from Emmy-nominated professionals with credits spanning Star Wars to Formula 1.",
@@ -81,8 +83,9 @@ const ResidentialTraining = () => {
       id: "xr-innovation-intensive",
       title: "XR Innovation Intensive",
       duration: "5 Days",
-      price: "£5,500",
-      capacity: "6-8 Participants",
+      price: "£3,800",
+      priceNote: "Team of 4 (bulk rate)",
+      capacity: "4 Participants",
       category: "XR/VR",
       featured: true,
       description: "Immersive experience development from concept to deployment. Apple Vision Pro, Meta Quest, and industrial applications with PhD-level guidance.",
@@ -99,8 +102,9 @@ const ResidentialTraining = () => {
       id: "digital-human-mocap",
       title: "Digital Human & MoCap",
       duration: "3 Days",
-      price: "£3,800",
-      capacity: "4-6 Participants",
+      price: "£2,800",
+      priceNote: "Team of 4 (bulk rate)",
+      capacity: "4 Participants",
       category: "Creative Tech",
       description: "Professional motion capture and digital human creation. Learn from Emmy-nominated specialists with credits on Star Wars, Marvel, and major game titles.",
       modules: [
@@ -116,8 +120,9 @@ const ResidentialTraining = () => {
       id: "spatial-audio-production",
       title: "Spatial Audio Production",
       duration: "5 Days",
-      price: "£4,800",
-      capacity: "4-6 Participants",
+      price: "£3,400",
+      priceNote: "Team of 4 (bulk rate)",
+      capacity: "4 Participants",
       category: "Audio",
       description: "Master immersive audio for XR, cinema, and installations. Dolby Atmos certification preparation with industry-leading audio professionals.",
       modules: [
@@ -133,8 +138,9 @@ const ResidentialTraining = () => {
       id: "engineering-visualisation",
       title: "Engineering Visualisation",
       duration: "5 Days",
-      price: "£5,200",
-      capacity: "6-8 Participants",
+      price: "£3,600",
+      priceNote: "Team of 4 (bulk rate)",
+      capacity: "4 Participants",
       category: "Engineering",
       description: "Transform CAE/CFD data into real-time interactive visualisations. Bridge engineering simulation and creative technology with PhD-level expertise.",
       modules: [
@@ -150,8 +156,9 @@ const ResidentialTraining = () => {
       id: "neural-content-creation",
       title: "Neural Content Creation",
       duration: "3 Days",
-      price: "£3,400",
-      capacity: "6-8 Participants",
+      price: "£2,400",
+      priceNote: "Team of 4 (bulk rate)",
+      capacity: "4 Participants",
       category: "Emerging Tech",
       description: "Cutting-edge 3D reconstruction from photogrammetry to neural radiance fields. Gaussian splatting capture and real-time neural rendering.",
       modules: [
@@ -167,8 +174,9 @@ const ResidentialTraining = () => {
       id: "cyber-infrastructure",
       title: "Cyber Infrastructure",
       duration: "3 Days",
-      price: "£3,600",
-      capacity: "6-8 Participants",
+      price: "£2,600",
+      priceNote: "Team of 4 (bulk rate)",
+      capacity: "4 Participants",
       category: "Engineering",
       description: "Industrial-grade network architecture and cybersecurity. Design secure infrastructure for creative and engineering environments.",
       modules: [
@@ -184,8 +192,9 @@ const ResidentialTraining = () => {
       id: "decentralised-agents",
       title: "Decentralised Agent Infrastructure",
       duration: "4 Days",
-      price: "£4,200",
-      capacity: "6-8 Participants",
+      price: "£3,000",
+      priceNote: "Team of 4 (bulk rate)",
+      capacity: "4 Participants",
       category: "Web3 Tech",
       description: "Build sovereign, cryptographically-secured agent systems using Bitcoin, Lightning, RGB protocols and decentralised identity.",
       modules: [
@@ -202,8 +211,9 @@ const ResidentialTraining = () => {
       id: "creative-technology-fundamentals",
       title: "Creative Technology Fundamentals",
       duration: "5 Days",
-      price: "£4,500",
-      capacity: "8-10 Participants",
+      price: "£3,200",
+      priceNote: "Team of 4 (bulk rate)",
+      capacity: "4 Participants",
       category: "Foundation",
       description: "Comprehensive introduction to creative technology for career changers and newcomers. From version control to AI-assisted workflows.",
       modules: [
@@ -219,8 +229,9 @@ const ResidentialTraining = () => {
       id: "corporate-immersive",
       title: "Corporate Immersive Retreat",
       duration: "3 Days",
-      price: "£12,500",
-      capacity: "10-12 Participants",
+      price: "£8,500",
+      priceNote: "Team of 4 (bulk rate)",
+      capacity: "4 Participants",
       category: "Enterprise",
       featured: true,
       description: "Bespoke executive experience combining strategic AI briefings, hands-on technology demos, and Lake District hospitality. Tailored for C-suite and senior leadership.",
@@ -361,7 +372,12 @@ const ResidentialTraining = () => {
                         </div>
                         <div className="flex justify-between text-sm">
                           <span className="text-muted-foreground">Investment</span>
-                          <span className="font-medium">{program.price}</span>
+                          <div className="text-right">
+                            <span className="font-medium">{program.price}</span>
+                            {program.priceNote && (
+                              <p className="text-xs text-muted-foreground">{program.priceNote}</p>
+                            )}
+                          </div>
                         </div>
                         <div className="flex justify-between text-sm">
                           <span className="text-muted-foreground">Group Size</span>
@@ -445,7 +461,12 @@ const ResidentialTraining = () => {
                               </div>
                               <div className="flex justify-between text-sm">
                                 <span className="text-muted-foreground">Investment</span>
-                                <span className="font-medium">{program.price}</span>
+                                <div className="text-right">
+                                  <span className="font-medium">{program.price}</span>
+                                  {program.priceNote && (
+                                    <p className="text-xs text-muted-foreground">{program.priceNote}</p>
+                                  )}
+                                </div>
                               </div>
                               <div className="flex justify-between text-sm">
                                 <span className="text-muted-foreground">Group Size</span>
@@ -520,7 +541,7 @@ const ResidentialTraining = () => {
                   <div>
                     <h3 className="font-semibold">Luxury Amenities</h3>
                     <p className="text-muted-foreground">
-                      En-suite rooms, professional kitchen, dedicated training spaces,
+                      Private bedrooms, professional kitchen, dedicated training spaces,
                       and social areas for networking
                     </p>
                   </div>
