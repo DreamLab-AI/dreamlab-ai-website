@@ -243,6 +243,25 @@ const ResidentialTraining = () => {
         "Strategic Roadmap Development"
       ],
       instructors: "Pete Woodbridge, Dr John O'Hare, Stephen Moyler"
+    },
+    {
+      id: "visionflow-power-user",
+      title: "VisionFlow Power User",
+      duration: "4 Days",
+      price: "£3,400",
+      priceNote: "Team of 4 (bulk rate)",
+      capacity: "4 Participants",
+      category: "AI/ML",
+      featured: true,
+      description: "Master self-sovereign knowledge management with VisionFlow. Deploy autonomous AI agent teams that research, analyse, and visualise your data corpus in stunning 3D—all on your own infrastructure.",
+      modules: [
+        "Self-Sovereign Data Architecture & Privacy",
+        "Multi-Agent Orchestration with MCP Protocol",
+        "GraphRAG & Knowledge Graph Construction",
+        "3D Visualisation with Three.js & Neo4j",
+        "On-Premise Deployment & Security Hardening"
+      ],
+      instructors: "Pete Woodbridge (CTO), Kriss Dunk, Jing Li"
     }
   ];
 
