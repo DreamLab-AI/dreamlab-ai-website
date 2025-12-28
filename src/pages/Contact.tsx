@@ -17,6 +17,8 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/lib/supabase";
+import { useOGMeta } from "@/hooks/useOGMeta";
+import { PAGE_OG_CONFIGS } from "@/lib/og-meta";
 
 // --- Constants ---
 const SUCCESS_MESSAGE = "Message sent! We'll get back to you as soon as possible.";
@@ -34,6 +36,9 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 const Contact = () => {
+  // Set OG meta tags for contact page
+  useOGMeta(PAGE_OG_CONFIGS.contact);
+
   const location = useLocation();
   const { toast } = useToast();
   const [selectedTeam, setSelectedTeam] = useState("");

@@ -1,9 +1,43 @@
 import { TorusKnot } from "@/components/TorusKnot";
 import { EmailSignupForm } from "@/components/EmailSignupForm";
 import { Header } from "@/components/Header";
+import { TestimonialMoments } from "@/components/TestimonialMoments";
+import { FeaturedInstructors } from "@/components/FeaturedInstructors";
+import { ExclusivityBanner } from "@/components/ExclusivityBanner";
+import { CaseStudyNarrative } from "@/components/CaseStudyNarrative";
 import skillsData from "@/data/skills.json";
 import { ChevronDown } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
+import { useOGMeta } from "@/hooks/useOGMeta";
+import { PAGE_OG_CONFIGS } from "@/lib/og-meta";
+
+/**
+ * Custom hook to detect if viewport is mobile width.
+ * Uses matchMedia for efficient media query listening.
+ */
+const useIsMobile = (breakpoint = 768): boolean => {
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.innerWidth < breakpoint;
+  });
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia(`(max-width: ${breakpoint - 1}px)`);
+
+    const handleChange = (e: MediaQueryListEvent) => {
+      setIsMobile(e.matches);
+    };
+
+    // Set initial value
+    setIsMobile(mediaQuery.matches);
+
+    // Modern browsers
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, [breakpoint]);
+
+  return isMobile;
+};
 
 /**
  * Represents the main index/home page of the website.
@@ -11,19 +45,33 @@ import { useEffect, useRef, useState } from "react";
  * an email signup form, and a standard footer.
  */
 const Index = () => {
+  // Set OG meta tags for home page
+  useOGMeta(PAGE_OG_CONFIGS.home);
+
   // Load skills from JSON file
   const skills = skillsData.skills;
   const heroRef = useRef<HTMLDivElement>(null);
   const [scrollY, setScrollY] = useState(0);
+  const isMobile = useIsMobile();
+
+  const handleScroll = useCallback(() => {
+    // Only update scroll position if parallax is enabled (desktop)
+    if (!isMobile) {
+      setScrollY(window.scrollY);
+    }
+  }, [isMobile]);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-    };
-
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [handleScroll]);
+
+  // Reset scrollY when switching to mobile to prevent stuck transforms
+  useEffect(() => {
+    if (isMobile) {
+      setScrollY(0);
+    }
+  }, [isMobile]);
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-hidden">
@@ -45,11 +93,12 @@ const Index = () => {
           <div className="absolute bottom-20 -right-20 w-96 h-96 bg-gradient-to-br from-purple-500/20 to-pink-600/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
         </div>
 
-        {/* TorusKnot container with parallax */}
+        {/* TorusKnot container with parallax (disabled on mobile) */}
         <div
           className="absolute inset-0 z-0"
           style={{
-            transform: `translateY(${scrollY * 0.5}px)`,
+            transform: isMobile ? "none" : `translateY(${scrollY * 0.5}px)`,
+            willChange: isMobile ? "auto" : "transform",
           }}
         >
           <TorusKnot skills={skills} />
@@ -60,8 +109,11 @@ const Index = () => {
           <h1 className="text-4xl md:text-7xl font-bold mb-6 animate-slide-up bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 inline-block text-transparent bg-clip-text animate-gradient-shift bg-400% max-w-4xl drop-shadow-2xl">
             DREAMLAB AI
           </h1>
-          <p className="text-lg md:text-2xl text-muted-foreground/90 max-w-2xl mb-10 animate-slide-up font-light tracking-wide" style={{ animationDelay: '0.1s' }}>
+          <p className="text-lg md:text-2xl text-foreground/80 max-w-2xl mb-4 animate-slide-up font-light tracking-wide" style={{ animationDelay: '0.1s' }}>
             Deep learning with no distractions
+          </p>
+          <p className="text-base md:text-lg text-muted-foreground max-w-xl mb-10 animate-slide-up font-light" style={{ animationDelay: '0.15s' }}>
+            Immersive residential training where mountains meet machines
           </p>
           <div className="flex flex-col sm:flex-row gap-4 animate-scale-in" style={{ animationDelay: '0.2s' }}>
             <a href="/residential-training" className="group relative inline-flex items-center justify-center rounded-lg text-sm font-medium ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:shadow-xl hover:shadow-purple-500/50 hover:scale-105 h-12 px-8 py-3 overflow-hidden">
@@ -79,12 +131,24 @@ const Index = () => {
           <button
             onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
             aria-label="Scroll down to next section"
-            className="text-muted-foreground/70 hover:text-purple-400 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded hover:scale-110"
+            className="text-foreground/60 hover:text-purple-400 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded hover:scale-110"
           >
             <ChevronDown className="w-10 h-10" aria-hidden="true" />
           </button>
         </div>
       </section>
+
+      {/* Testimonial moments section */}
+      <TestimonialMoments />
+
+      {/* Featured instructors section */}
+      <FeaturedInstructors />
+
+      {/* Exclusivity/Waitlist section */}
+      <ExclusivityBanner />
+
+      {/* Case study narrative */}
+      <CaseStudyNarrative />
 
       {/* Email signup section */}
       <section className="relative py-24 overflow-hidden" aria-label="Email signup">
@@ -95,11 +159,11 @@ const Index = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 animate-gradient-shift bg-400%"></div>
 
         <div className="container relative z-10 flex flex-col items-center">
-          <div className="bg-background/40 backdrop-blur-xl rounded-2xl border border-purple-500/20 shadow-2xl shadow-purple-500/10 p-12 max-w-3xl w-full">
+          <div className="bg-background/60 backdrop-blur-xl rounded-2xl border border-purple-500/30 shadow-2xl shadow-purple-500/10 p-12 max-w-3xl w-full">
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-center bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 text-transparent bg-clip-text animate-gradient-shift bg-400%">
               Join the Creative Technology Revolution
             </h2>
-            <p className="text-lg text-muted-foreground/90 text-center mb-10 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-lg text-foreground/85 text-center mb-10 max-w-2xl mx-auto leading-relaxed">
               Stay updated on our latest training programs in virtual production, AI/ML,
               spatial audio, and agentic engineering.
             </p>
@@ -115,30 +179,30 @@ const Index = () => {
 
         <div className="container relative z-10">
           <div className="flex flex-col md:flex-row justify-between items-center border-t border-purple-500/20 pt-8 gap-6">
-            <p className="text-sm text-muted-foreground/80 transition-colors hover:text-muted-foreground">
+            <p className="text-sm text-muted-foreground transition-colors hover:text-foreground/90">
               &copy; {new Date().getFullYear()} DreamLab AI Consulting Ltd. All rights reserved.
             </p>
             <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6">
               <nav aria-label="Social media links">
                 <ul className="flex space-x-6">
                   <li>
-                    <a href="https://bsky.app/profile/thedreamlab.bsky.social" target="_blank" rel="noopener noreferrer" className="text-muted-foreground/80 hover:text-blue-400 transition-all duration-300 hover:scale-110 inline-block">
+                    <a href="https://bsky.app/profile/thedreamlab.bsky.social" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-blue-400 transition-all duration-300 hover:scale-110 inline-block">
                       Bluesky<span className="sr-only"> (opens in new window)</span>
                     </a>
                   </li>
                   <li>
-                    <a href="#" className="text-muted-foreground/80 hover:text-pink-400 transition-all duration-300 hover:scale-110 inline-block" aria-label="Instagram (coming soon)">
+                    <a href="#" className="text-muted-foreground hover:text-pink-400 transition-all duration-300 hover:scale-110 inline-block" aria-label="Instagram (coming soon)">
                       Instagram
                     </a>
                   </li>
                   <li>
-                    <a href="https://www.linkedin.com/company/dreamlab-ai-consulting/?" target="_blank" rel="noopener noreferrer" className="text-muted-foreground/80 hover:text-blue-400 transition-all duration-300 hover:scale-110 inline-block">
+                    <a href="https://www.linkedin.com/company/dreamlab-ai-consulting/?" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-blue-400 transition-all duration-300 hover:scale-110 inline-block">
                       LinkedIn<span className="sr-only"> (opens in new window)</span>
                     </a>
                   </li>
                 </ul>
               </nav>
-              <a href="/privacy" className="text-sm text-muted-foreground/80 hover:text-purple-400 transition-all duration-300 hover:scale-105 inline-block">
+              <a href="/privacy" className="text-sm text-muted-foreground hover:text-purple-400 transition-all duration-300 hover:scale-105 inline-block">
                 Privacy Policy
               </a>
             </div>

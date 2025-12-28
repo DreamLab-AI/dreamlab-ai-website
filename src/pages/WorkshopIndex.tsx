@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { LearningPathDiagram } from '@/components/LearningPathDiagram';
 import { Button } from '@/components/ui/button';
+import { useOGMeta } from '@/hooks/useOGMeta';
+import { PAGE_OG_CONFIGS } from '@/lib/og-meta';
 import {
   BookOpen,
   Code,
@@ -39,6 +41,9 @@ interface WorkshopDay {
 }
 
 const WorkshopIndex = () => {
+  // Set OG meta tags for workshops page
+  useOGMeta(PAGE_OG_CONFIGS.workshops);
+
   const [hoveredDay, setHoveredDay] = useState<number | null>(null);
 
   const workshopDays: WorkshopDay[] = [

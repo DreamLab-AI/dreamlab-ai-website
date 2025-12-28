@@ -1,17 +1,23 @@
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CheckCircle2, MapPin, Home, Zap, Users, Award, Calendar } from "lucide-react";
+import { MapPin, Home, Zap, Users, Award, Calendar, CheckCircle2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { CourseCard } from "@/components/CourseCard";
+import { useOGMeta } from "@/hooks/useOGMeta";
+import { PAGE_OG_CONFIGS } from "@/lib/og-meta";
 
 /**
  * Residential Training page showcasing DreamLab's immersive training programs
  * combining creative technology with engineering precision
  */
 const ResidentialTraining = () => {
+  // Set OG meta tags for residential training page
+  useOGMeta(PAGE_OG_CONFIGS.residentialTraining);
+
   const navigate = useNavigate();
 
   const images = [
@@ -39,15 +45,16 @@ const ResidentialTraining = () => {
 
   // Confluence Training Packs - Multi-instructor delivery with premium residential experience
   // Q1 2025 Special: ~50% of market median pricing (Imperial £5,950+, VP Bootcamps £4,500+)
-  // Bulk pricing for team of 4 - includes full-board accommodation & meals
+  // Per-person pricing with 15% team discount for groups of 4 - includes full-board accommodation & meals
   const trainingPrograms = [
     {
       id: "ai-commander-week",
       title: "AI Commander Week",
       duration: "5 Days",
-      price: "£9,800",
-      priceNote: "team of 4 (incl. full board)",
-      capacity: "4 Participants",
+      pricePerPerson: "£2,750",
+      teamPrice: "£9,350",
+      teamSaving: "Save £650",
+      capacity: "Up to 4",
       category: "AI/ML",
       featured: true,
       description: "Master agentic engineering from protocol level to production. Learn to orchestrate AI agents, multi-model architectures, and autonomous systems from practitioners who build at the cutting edge.",
@@ -64,9 +71,10 @@ const ResidentialTraining = () => {
       id: "virtual-production-master",
       title: "Virtual Production Master",
       duration: "5 Days",
-      price: "£10,500",
-      priceNote: "team of 4 (incl. full board)",
-      capacity: "4 Participants",
+      pricePerPerson: "£2,950",
+      teamPrice: "£9,995",
+      teamSaving: "Save £805",
+      capacity: "Up to 4",
       category: "Creative Tech",
       featured: true,
       description: "Complete LED volume workflow mastery. From camera tracking to real-time compositing, learn from Emmy-nominated professionals with credits spanning Star Wars to Formula 1.",
@@ -83,9 +91,10 @@ const ResidentialTraining = () => {
       id: "xr-innovation-intensive",
       title: "XR Innovation Intensive",
       duration: "5 Days",
-      price: "£9,800",
-      priceNote: "team of 4 (incl. full board)",
-      capacity: "4 Participants",
+      pricePerPerson: "£2,750",
+      teamPrice: "£9,350",
+      teamSaving: "Save £650",
+      capacity: "Up to 4",
       category: "XR/VR",
       featured: true,
       description: "Immersive experience development from concept to deployment. Apple Vision Pro, Meta Quest, and industrial applications with PhD-level guidance.",
@@ -102,9 +111,10 @@ const ResidentialTraining = () => {
       id: "digital-human-mocap",
       title: "Digital Human & MoCap",
       duration: "3 Days",
-      price: "£5,995",
-      priceNote: "team of 4 (incl. full board)",
-      capacity: "4 Participants",
+      pricePerPerson: "£1,695",
+      teamPrice: "£5,750",
+      teamSaving: "Save £530",
+      capacity: "Up to 4",
       category: "Creative Tech",
       description: "Professional motion capture and digital human creation. Learn from Emmy-nominated specialists with credits on Star Wars, Marvel, and major game titles.",
       modules: [
@@ -120,9 +130,10 @@ const ResidentialTraining = () => {
       id: "spatial-audio-production",
       title: "Spatial Audio Production",
       duration: "5 Days",
-      price: "£9,800",
-      priceNote: "team of 4 (incl. full board)",
-      capacity: "4 Participants",
+      pricePerPerson: "£2,750",
+      teamPrice: "£9,350",
+      teamSaving: "Save £650",
+      capacity: "Up to 4",
       category: "Audio",
       description: "Master immersive audio for XR, cinema, and installations. Dolby Atmos certification preparation with industry-leading audio professionals.",
       modules: [
@@ -138,9 +149,10 @@ const ResidentialTraining = () => {
       id: "engineering-visualisation",
       title: "Engineering Visualisation",
       duration: "5 Days",
-      price: "£9,800",
-      priceNote: "team of 4 (incl. full board)",
-      capacity: "4 Participants",
+      pricePerPerson: "£2,750",
+      teamPrice: "£9,350",
+      teamSaving: "Save £650",
+      capacity: "Up to 4",
       category: "Engineering",
       description: "Transform CAE/CFD data into real-time interactive visualisations. Bridge engineering simulation and creative technology with PhD-level expertise.",
       modules: [
@@ -156,9 +168,10 @@ const ResidentialTraining = () => {
       id: "neural-content-creation",
       title: "Neural Content Creation",
       duration: "3 Days",
-      price: "£5,995",
-      priceNote: "team of 4 (incl. full board)",
-      capacity: "4 Participants",
+      pricePerPerson: "£1,695",
+      teamPrice: "£5,750",
+      teamSaving: "Save £530",
+      capacity: "Up to 4",
       category: "Emerging Tech",
       description: "Cutting-edge 3D reconstruction from photogrammetry to neural radiance fields. Gaussian splatting capture and real-time neural rendering.",
       modules: [
@@ -174,9 +187,10 @@ const ResidentialTraining = () => {
       id: "cyber-infrastructure",
       title: "Cyber Infrastructure",
       duration: "3 Days",
-      price: "£5,995",
-      priceNote: "team of 4 (incl. full board)",
-      capacity: "4 Participants",
+      pricePerPerson: "£1,695",
+      teamPrice: "£5,750",
+      teamSaving: "Save £530",
+      capacity: "Up to 4",
       category: "Engineering",
       description: "Industrial-grade network architecture and cybersecurity. Design secure infrastructure for creative and engineering environments.",
       modules: [
@@ -192,9 +206,10 @@ const ResidentialTraining = () => {
       id: "decentralised-agents",
       title: "Decentralised Agent Infrastructure",
       duration: "4 Days",
-      price: "£7,800",
-      priceNote: "team of 4 (incl. full board)",
-      capacity: "4 Participants",
+      pricePerPerson: "£2,195",
+      teamPrice: "£7,450",
+      teamSaving: "Save £580",
+      capacity: "Up to 4",
       category: "Web3 Tech",
       description: "Build sovereign, cryptographically-secured agent systems using Bitcoin, Lightning, RGB protocols and decentralised identity.",
       modules: [
@@ -211,9 +226,10 @@ const ResidentialTraining = () => {
       id: "creative-technology-fundamentals",
       title: "Creative Technology Fundamentals",
       duration: "5 Days",
-      price: "£8,995",
-      priceNote: "team of 4 (incl. full board)",
-      capacity: "4 Participants",
+      pricePerPerson: "£2,495",
+      teamPrice: "£8,495",
+      teamSaving: "Save £685",
+      capacity: "Up to 4",
       category: "Foundation",
       description: "Comprehensive introduction to creative technology for career changers and newcomers. From version control to AI-assisted workflows.",
       modules: [
@@ -229,9 +245,10 @@ const ResidentialTraining = () => {
       id: "corporate-immersive",
       title: "Corporate Immersive Retreat",
       duration: "3 Days",
-      price: "£14,500",
-      priceNote: "team of 4 (incl. full board)",
-      capacity: "4 Participants",
+      pricePerPerson: "£3,995",
+      teamPrice: "£13,595",
+      teamSaving: "Save £985",
+      capacity: "Up to 4",
       category: "Enterprise",
       featured: true,
       description: "Bespoke executive experience combining strategic AI briefings, hands-on technology demos, and Lake District hospitality. Tailored for C-suite and senior leadership.",
@@ -248,9 +265,10 @@ const ResidentialTraining = () => {
       id: "visionflow-power-user",
       title: "VisionFlow Power User",
       duration: "4 Days",
-      price: "£7,800",
-      priceNote: "team of 4 (incl. full board)",
-      capacity: "4 Participants",
+      pricePerPerson: "£2,195",
+      teamPrice: "£7,450",
+      teamSaving: "Save £580",
+      capacity: "Up to 4",
       category: "AI/ML",
       featured: true,
       description: "Master self-sovereign knowledge management with VisionFlow. Deploy autonomous AI agent teams that research, analyse, and visualise your data corpus in stunning 3D—all on your own infrastructure.",
@@ -377,77 +395,25 @@ const ResidentialTraining = () => {
             </TabsList>
 
             <TabsContent value="all">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                {trainingPrograms.map((program) => (
-                  <Card key={program.id} className={program.featured ? "border-primary" : ""}>
-                    <CardHeader>
-                      <div className="flex justify-between items-start mb-2">
-                        <Badge variant={program.featured ? "default" : "secondary"}>
-                          {program.category}
-                        </Badge>
-                        {program.featured && (
-                          <Badge variant="outline">Featured</Badge>
-                        )}
-                      </div>
-                      <CardTitle>{program.title}</CardTitle>
-                      <CardDescription>{program.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Duration</span>
-                          <span className="font-medium">{program.duration}</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Investment</span>
-                          <div className="text-right">
-                            <span className="font-medium">{program.price}</span>
-                            {program.priceNote && (
-                              <p className="text-xs text-muted-foreground">{program.priceNote}</p>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Group Size</span>
-                          <span className="font-medium">{program.capacity}</span>
-                        </div>
-                        <div className="pt-4 border-t">
-                          <p className="text-sm font-medium mb-2">Key Modules:</p>
-                          <ul className="space-y-1">
-                            {program.modules.slice(0, 3).map((module, idx) => (
-                              <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
-                                <CheckCircle2 className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                                <span>{module}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                        {program.instructors && (
-                          <div className="pt-2 border-t">
-                            <p className="text-xs text-muted-foreground">
-                              <span className="font-medium">Instructors:</span> {program.instructors}
-                            </p>
-                          </div>
-                        )}
-                        {program.partnership && (
-                          <div className="pt-2">
-                            <p className="text-[10px] text-muted-foreground/70 italic">
-                              {program.partnership}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    </CardContent>
-                    <CardFooter>
-                      <Button
-                        className="w-full"
-                        variant={program.featured ? "default" : "outline"}
-                        onClick={() => navigate("/contact")}
-                      >
-                        Learn More
-                      </Button>
-                    </CardFooter>
-                  </Card>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                {trainingPrograms.map((program, index) => (
+                  <CourseCard
+                    key={program.id}
+                    id={program.id}
+                    title={program.title}
+                    duration={program.duration}
+                    pricePerPerson={program.pricePerPerson}
+                    teamPrice={program.teamPrice}
+                    teamSaving={program.teamSaving}
+                    capacity={program.capacity}
+                    category={program.category}
+                    description={program.description}
+                    modules={program.modules}
+                    instructors={program.instructors}
+                    featured={program.featured}
+                    partnership={program.partnership}
+                    index={index}
+                  />
                 ))}
               </div>
             </TabsContent>
@@ -462,75 +428,29 @@ const ResidentialTraining = () => {
                 web3: ["Web3 Tech"],
                 enterprise: ["Enterprise", "Foundation"]
               };
+              const filteredPrograms = trainingPrograms.filter(p => categoryMap[tab].includes(p.category));
               return (
                 <TabsContent key={tab} value={tab}>
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {trainingPrograms
-                      .filter(p => categoryMap[tab].includes(p.category))
-                      .map((program) => (
-                        <Card key={program.id} className={program.featured ? "border-primary" : ""}>
-                          <CardHeader>
-                            <div className="flex justify-between items-start mb-2">
-                              <Badge variant={program.featured ? "default" : "secondary"}>
-                                {program.category}
-                              </Badge>
-                              {program.featured && (
-                                <Badge variant="outline">Featured</Badge>
-                              )}
-                            </div>
-                            <CardTitle>{program.title}</CardTitle>
-                            <CardDescription>{program.description}</CardDescription>
-                          </CardHeader>
-                          <CardContent>
-                            <div className="space-y-4">
-                              <div className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">Duration</span>
-                                <span className="font-medium">{program.duration}</span>
-                              </div>
-                              <div className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">Investment</span>
-                                <div className="text-right">
-                                  <span className="font-medium">{program.price}</span>
-                                  {program.priceNote && (
-                                    <p className="text-xs text-muted-foreground">{program.priceNote}</p>
-                                  )}
-                                </div>
-                              </div>
-                              <div className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">Group Size</span>
-                                <span className="font-medium">{program.capacity}</span>
-                              </div>
-                              <div className="pt-4 border-t">
-                                <p className="text-sm font-medium mb-2">Key Modules:</p>
-                                <ul className="space-y-1">
-                                  {program.modules.slice(0, 3).map((module, idx) => (
-                                    <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
-                                      <CheckCircle2 className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                                      <span>{module}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                              {program.instructors && (
-                                <div className="pt-2 border-t">
-                                  <p className="text-xs text-muted-foreground">
-                                    <span className="font-medium">Instructors:</span> {program.instructors}
-                                  </p>
-                                </div>
-                              )}
-                            </div>
-                          </CardContent>
-                          <CardFooter>
-                            <Button
-                              className="w-full"
-                              variant={program.featured ? "default" : "outline"}
-                              onClick={() => navigate("/contact")}
-                            >
-                              Learn More
-                            </Button>
-                          </CardFooter>
-                        </Card>
-                      ))}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                    {filteredPrograms.map((program, index) => (
+                      <CourseCard
+                        key={program.id}
+                        id={program.id}
+                        title={program.title}
+                        duration={program.duration}
+                        pricePerPerson={program.pricePerPerson}
+                        teamPrice={program.teamPrice}
+                        teamSaving={program.teamSaving}
+                        capacity={program.capacity}
+                        category={program.category}
+                        description={program.description}
+                        modules={program.modules}
+                        instructors={program.instructors}
+                        featured={program.featured}
+                        partnership={program.partnership}
+                        index={index}
+                      />
+                    ))}
                   </div>
                 </TabsContent>
               );

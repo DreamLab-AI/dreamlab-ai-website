@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DreamLab AI - OG Image Generator</title>
+  <style>
+    /* Reset and Base Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      background: #0f0f1a;
+      color: white;
+    }
+
+    /* OG Image Container - 1200x630 standard size */
+    .og-image {
+      width: 1200px;
+      height: 630px;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16162a 100%);
+    }
+
+    /* Background Elements */
+    .bg-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.4;
+    }
+
+    .bg-orb-1 {
+      width: 400px;
+      height: 400px;
+      top: -100px;
+      left: -100px;
+      background: linear-gradient(135deg, #8B5CF6, #A855F7);
+    }
+
+    .bg-orb-2 {
+      width: 500px;
+      height: 500px;
+      bottom: -150px;
+      right: -150px;
+      background: linear-gradient(135deg, #A855F7, #EC4899);
+    }
+
+    .bg-orb-3 {
+      width: 300px;
+      height: 300px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+      opacity: 0.2;
+    }
+
+    /* Mesh Grid Overlay */
+    .mesh-overlay {
+      position: absolute;
+      inset: 0;
+      opacity: 0.1;
+      background-image:
+        linear-gradient(rgba(139, 92, 246, 0.3) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(139, 92, 246, 0.3) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    /* Content Container */
+    .content {
+      position: relative;
+      z-index: 10;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 48px;
+    }
+
+    /* Header Section */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    /* Logo */
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, #8B5CF6, #EC4899);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-text {
+      font-size: 24px;
+      font-weight: 700;
+      background: linear-gradient(90deg, #fff, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .logo-subtitle {
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.6);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-top: 2px;
+    }
+
+    /* Category Badge */
+    .category-badge {
+      padding: 8px 20px;
+      border-radius: 100px;
+      font-size: 14px;
+      font-weight: 500;
+      background: rgba(139, 92, 246, 0.2);
+      color: #c4b5fd;
+      border: 1px solid rgba(139, 92, 246, 0.3);
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+    }
+
+    .text-content {
+      flex: 1;
+      padding-right: 48px;
+    }
+
+    /* Title */
+    .title {
+      font-size: 64px;
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 24px;
+      background: linear-gradient(135deg, #fff 0%, #c4b5fd 50%, #f0abfc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      max-width: 800px;
+    }
+
+    .title.small {
+      font-size: 48px;
+    }
+
+    /* Subtitle */
+    .subtitle {
+      font-size: 24px;
+      color: rgba(255, 255, 255, 0.7);
+      line-height: 1.5;
+      max-width: 700px;
+    }
+
+    /* Feature Image */
+    .feature-image {
+      width: 280px;
+      height: 280px;
+      border-radius: 24px;
+      overflow: hidden;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .feature-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Footer */
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .website {
+      font-size: 16px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .tag {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .tag-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10B981;
+    }
+
+    /* Accent Bar */
+    .accent-bar {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 4px;
+      height: 100%;
+      background: linear-gradient(180deg, #8B5CF6 0%, transparent 50%, #EC4899 100%);
+    }
+
+    /* Variant Styles */
+    .og-image.workshop .bg-orb-1 {
+      background: linear-gradient(135deg, #6366F1, #8B5CF6);
+    }
+
+    .og-image.course .bg-orb-1 {
+      background: linear-gradient(135deg, #3B82F6, #6366F1);
+    }
+
+    .og-image.team .bg-orb-1 {
+      background: linear-gradient(135deg, #EC4899, #F472B6);
+    }
+
+    /* Stats Bar */
+    .stats-bar {
+      display: flex;
+      gap: 32px;
+      margin-top: 32px;
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .stat-icon {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(139, 92, 246, 0.2);
+      border-radius: 10px;
+      color: #c4b5fd;
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    /* Neural Network Decoration */
+    .neural-decoration {
+      position: absolute;
+      right: 48px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 300px;
+      height: 300px;
+      opacity: 0.3;
+    }
+
+    .node {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: linear-gradient(135deg, #8B5CF6, #EC4899);
+      border-radius: 50%;
+    }
+
+    .node-1 { top: 0; left: 50%; }
+    .node-2 { top: 30%; left: 0; }
+    .node-3 { top: 30%; left: 100%; }
+    .node-4 { top: 60%; left: 20%; }
+    .node-5 { top: 60%; left: 80%; }
+    .node-6 { top: 100%; left: 50%; }
+
+    .connection {
+      position: absolute;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(139, 92, 246, 0.5), rgba(236, 72, 153, 0.5));
+      transform-origin: left center;
+    }
+  </style>
+</head>
+<body>
+  <!-- Default OG Image Template -->
+  <div id="og-default" class="og-image">
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+    <div class="bg-orb bg-orb-3"></div>
+    <div class="mesh-overlay"></div>
+    <div class="accent-bar"></div>
+
+    <div class="content">
+      <div class="header">
+        <div class="logo">
+          <div class="logo-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="3" fill="white"/>
+              <circle cx="6" cy="6" r="2" fill="white" opacity="0.7"/>
+              <circle cx="18" cy="6" r="2" fill="white" opacity="0.7"/>
+              <circle cx="6" cy="18" r="2" fill="white" opacity="0.7"/>
+              <circle cx="18" cy="18" r="2" fill="white" opacity="0.7"/>
+              <line x1="12" y1="12" x2="6" y2="6" stroke="white" stroke-width="1" opacity="0.5"/>
+              <line x1="12" y1="12" x2="18" y2="6" stroke="white" stroke-width="1" opacity="0.5"/>
+              <line x1="12" y1="12" x2="6" y2="18" stroke="white" stroke-width="1" opacity="0.5"/>
+              <line x1="12" y1="12" x2="18" y2="18" stroke="white" stroke-width="1" opacity="0.5"/>
+            </svg>
+          </div>
+          <div>
+            <div class="logo-text">DREAMLAB</div>
+            <div class="logo-subtitle">AI Consulting</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main-content">
+        <div class="text-content">
+          <h1 class="title">Deep Learning With No Distractions</h1>
+          <p class="subtitle">Immersive residential training where mountains meet machines</p>
+        </div>
+      </div>
+
+      <div class="footer">
+        <span class="website">dreamlab-ai.com</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Residential Training Template -->
+  <div id="og-residential" class="og-image course" style="margin-top: 40px;">
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+    <div class="mesh-overlay"></div>
+    <div class="accent-bar"></div>
+
+    <div class="content">
+      <div class="header">
+        <div class="logo">
+          <div class="logo-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="3" fill="white"/>
+              <circle cx="6" cy="6" r="2" fill="white" opacity="0.7"/>
+              <circle cx="18" cy="6" r="2" fill="white" opacity="0.7"/>
+              <circle cx="6" cy="18" r="2" fill="white" opacity="0.7"/>
+              <circle cx="18" cy="18" r="2" fill="white" opacity="0.7"/>
+              <line x1="12" y1="12" x2="6" y2="6" stroke="white" stroke-width="1" opacity="0.5"/>
+              <line x1="12" y1="12" x2="18" y2="6" stroke="white" stroke-width="1" opacity="0.5"/>
+              <line x1="12" y1="12" x2="6" y2="18" stroke="white" stroke-width="1" opacity="0.5"/>
+              <line x1="12" y1="12" x2="18" y2="18" stroke="white" stroke-width="1" opacity="0.5"/>
+            </svg>
+          </div>
+          <div>
+            <div class="logo-text">DREAMLAB</div>
+            <div class="logo-subtitle">AI Consulting</div>
+          </div>
+        </div>
+        <div class="category-badge">Residential Training</div>
+      </div>
+
+      <div class="main-content">
+        <div class="text-content">
+          <h1 class="title small">Residential AI Training in the Lake District</h1>
+          <p class="subtitle">Train with 43+ specialists including Emmy nominees and PhD researchers</p>
+          <div class="stats-bar">
+            <div class="stat-item">
+              <div class="stat-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                  <circle cx="9" cy="7" r="4"/>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+              </div>
+              <div>
+                <div class="stat-value">43+</div>
+                <div class="stat-label">Specialists</div>
+              </div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                  <line x1="16" y1="2" x2="16" y2="6"/>
+                  <line x1="8" y1="2" x2="8" y2="6"/>
+                  <line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+              </div>
+              <div>
+                <div class="stat-value">5 Days</div>
+                <div class="stat-label">Immersive</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <span class="website">dreamlab-ai.com</span>
+        <div class="tag">
+          <span class="tag-dot"></span>
+          <span>Multi-Instructor Delivery</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Workshops Template -->
+  <div id="og-workshops" class="og-image workshop" style="margin-top: 40px;">
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+    <div class="mesh-overlay"></div>
+    <div class="accent-bar"></div>
+
+    <div class="content">
+      <div class="header">
+        <div class="logo">
+          <div class="logo-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="3" fill="white"/>
+              <circle cx="6" cy="6" r="2" fill="white" opacity="0.7"/>
+              <circle cx="18" cy="6" r="2" fill="white" opacity="0.7"/>
+              <circle cx="6" cy="18" r="2" fill="white" opacity="0.7"/>
+              <circle cx="18" cy="18" r="2" fill="white" opacity="0.7"/>
+              <line x1="12" y1="12" x2="6" y2="6" stroke="white" stroke-width="1" opacity="0.5"/>
+              <line x1="12" y1="12" x2="18" y2="6" stroke="white" stroke-width="1" opacity="0.5"/>
+              <line x1="12" y1="12" x2="6" y2="18" stroke="white" stroke-width="1" opacity="0.5"/>
+              <line x1="12" y1="12" x2="18" y2="18" stroke="white" stroke-width="1" opacity="0.5"/>
+            </svg>
+          </div>
+          <div>
+            <div class="logo-text">DREAMLAB</div>
+            <div class="logo-subtitle">AI Consulting</div>
+          </div>
+        </div>
+        <div class="category-badge">Workshop Series</div>
+      </div>
+
+      <div class="main-content">
+        <div class="text-content">
+          <h1 class="title small">AI-Powered Knowledge Work</h1>
+          <p class="subtitle">Transform from AI consumer to AI commander in 5 days with 14 comprehensive modules</p>
+          <div class="stats-bar">
+            <div class="stat-item">
+              <div class="stat-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                </svg>
+              </div>
+              <div>
+                <div class="stat-value">14</div>
+                <div class="stat-label">Modules</div>
+              </div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+              </div>
+              <div>
+                <div class="stat-value">5 Days</div>
+                <div class="stat-label">Intensive</div>
+              </div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                </svg>
+              </div>
+              <div>
+                <div class="stat-value">Hands-On</div>
+                <div class="stat-label">Projects</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <span class="website">dreamlab-ai.com</span>
+        <div class="tag">
+          <span class="tag-dot"></span>
+          <span>Interactive Learning</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Team Template -->
+  <div id="og-team" class="og-image team" style="margin-top: 40px;">
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+    <div class="mesh-overlay"></div>
+    <div class="accent-bar"></div>
+
+    <div class="content">
+      <div class="header">
+        <div class="logo">
+          <div class="logo-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="3" fill="white"/>
+              <circle cx="6" cy="6" r="2" fill="white" opacity="0.7"/>
+              <circle cx="18" cy="6" r="2" fill="white" opacity="0.7"/>
+              <circle cx="6" cy="18" r="2" fill="white" opacity="0.7"/>
+              <circle cx="18" cy="18" r="2" fill="white" opacity="0.7"/>
+              <line x1="12" y1="12" x2="6" y2="6" stroke="white" stroke-width="1" opacity="0.5"/>
+              <line x1="12" y1="12" x2="18" y2="6" stroke="white" stroke-width="1" opacity="0.5"/>
+              <line x1="12" y1="12" x2="6" y2="18" stroke="white" stroke-width="1" opacity="0.5"/>
+              <line x1="12" y1="12" x2="18" y2="18" stroke="white" stroke-width="1" opacity="0.5"/>
+            </svg>
+          </div>
+          <div>
+            <div class="logo-text">DREAMLAB</div>
+            <div class="logo-subtitle">AI Consulting</div>
+          </div>
+        </div>
+        <div class="category-badge">Our Team</div>
+      </div>
+
+      <div class="main-content">
+        <div class="text-content">
+          <h1 class="title small">Meet The DreamLab Collective</h1>
+          <p class="subtitle">43+ specialists including Emmy nominees, PhD researchers, and BAFTA-recognised talent</p>
+        </div>
+      </div>
+
+      <div class="footer">
+        <span class="website">dreamlab-ai.com</span>
+        <div class="tag">
+          <span class="tag-dot"></span>
+          <span>Industry Experts</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * OG Image Generator Script
+     *
+     * Usage with Puppeteer/Playwright:
+     *
+     * 1. Navigate to this page
+     * 2. Select element by ID (e.g., #og-default, #og-residential, etc.)
+     * 3. Capture screenshot at 1200x630
+     *
+     * Example Puppeteer script:
+     *
+     * const puppeteer = require('puppeteer');
+     *
+     * async function generateOGImage(templateId, outputPath) {
+     *   const browser = await puppeteer.launch();
+     *   const page = await browser.newPage();
+     *   await page.setViewport({ width: 1200, height: 630 });
+     *   await page.goto('file://path/to/og-template.html');
+     *
+     *   const element = await page.$(`#${templateId}`);
+     *   await element.screenshot({ path: outputPath });
+     *
+     *   await browser.close();
+     * }
+     *
+     * generateOGImage('og-default', 'og-home.png');
+     * generateOGImage('og-residential', 'og-residential-training.png');
+     * generateOGImage('og-workshops', 'og-workshops.png');
+     * generateOGImage('og-team', 'og-team.png');
+     */
+
+    // Dynamic template generator function
+    function generateDynamicTemplate(config) {
+      const {
+        title,
+        subtitle,
+        category,
+        variant = 'default',
+        accentColor = 'purple'
+      } = config;
+
+      const template = document.getElementById('og-default').cloneNode(true);
+      template.id = 'og-dynamic';
+
+      const titleEl = template.querySelector('.title');
+      const subtitleEl = template.querySelector('.subtitle');
+
+      if (titleEl) titleEl.textContent = title;
+      if (subtitleEl) subtitleEl.textContent = subtitle;
+
+      if (category) {
+        const header = template.querySelector('.header');
+        const badge = document.createElement('div');
+        badge.className = 'category-badge';
+        badge.textContent = category;
+        header.appendChild(badge);
+      }
+
+      document.body.appendChild(template);
+      return template;
+    }
+
+    // Expose to window for external script access
+    window.generateDynamicTemplate = generateDynamicTemplate;
+  </script>
+</body>
+</html>

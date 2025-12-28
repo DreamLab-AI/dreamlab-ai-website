@@ -21,7 +21,11 @@
     --secondary-foreground: 0 0% 98%;
 
     --muted: 240 4% 16%;
-    --muted-foreground: 240 5% 64.9%;
+    --muted-foreground: 240 5% 75%;
+
+    /* Accessible text variants for glassmorphism contexts */
+    --glass-text: 240 5% 82%;
+    --glass-text-subtle: 240 5% 72%;
 
     --accent: 240 4.8% 95.9%;
     --accent-foreground: 240 5.9% 10%;

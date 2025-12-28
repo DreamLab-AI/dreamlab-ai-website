@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { Header } from "@/components/Header";
+import { useOGMeta } from "@/hooks/useOGMeta";
+import { PAGE_OG_CONFIGS } from "@/lib/og-meta";
 
 interface WorkItem {
   id: string;
@@ -11,6 +13,9 @@ interface WorkItem {
 }
 
 const Work = () => {
+  // Set OG meta tags for work page
+  useOGMeta(PAGE_OG_CONFIGS.work);
+
   const [previousWorks, setPreviousWorks] = useState<WorkItem[]>([]);
   const [loading, setLoading] = useState(true);
 

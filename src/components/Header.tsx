@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -13,32 +13,56 @@ import {
 import { ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
 
+const SCROLL_THRESHOLD = 100;
+
 /**
- * Renders the fixed website header.
- * Features a logo/title with dropdown menu and a contact button.
- * Changes appearance on scroll for better visibility.
+ * Renders the fixed website header with reveal-on-scroll behavior.
+ * Nav is transparent and hidden initially, reveals with slide-down
+ * animation after scrolling past threshold.
  */
 export const Header = () => {
-  const [scrolled, setScrolled] = useState(false);
+  const [isRevealed, setIsRevealed] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  const handleScroll = useCallback(() => {
+    const currentScrollY = window.scrollY;
+
+    // Reveal nav after scrolling past threshold
+    if (currentScrollY > SCROLL_THRESHOLD) {
+      setIsRevealed(true);
+      // Hide on scroll down, show on scroll up (after initial reveal)
+      if (currentScrollY > lastScrollY && currentScrollY > SCROLL_THRESHOLD + 50) {
+        setIsVisible(false);
+      } else {
+        setIsVisible(true);
+      }
+    } else {
+      setIsRevealed(false);
+      setIsVisible(true);
+    }
+
+    setLastScrollY(currentScrollY);
+  }, [lastScrollY]);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const isScrolled = window.scrollY > 20;
-      setScrolled(isScrolled);
-    };
-
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [handleScroll]);
 
   return (
     <header
       role="banner"
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled
-          ? "bg-background/80 backdrop-blur-xl py-3 shadow-xl shadow-purple-500/10 border-b border-purple-500/20"
-          : "bg-transparent py-5"
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-out ${
+        isRevealed
+          ? `bg-background/80 backdrop-blur-xl py-3 shadow-xl shadow-purple-500/10 border-b border-purple-500/20 ${
+              isVisible ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
+            }`
+          : "bg-transparent py-5 opacity-0 pointer-events-none"
       }`}
+      style={{
+        transform: isRevealed && isVisible ? "translateY(0)" : isRevealed ? "translateY(-100%)" : "translateY(-20px)",
+      }}
     >
       <div className="container flex items-center justify-between">
         <DropdownMenu>

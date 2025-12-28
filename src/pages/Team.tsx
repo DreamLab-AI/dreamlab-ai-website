@@ -4,6 +4,8 @@ import { TeamMember } from "@/components/TeamMember";
 import { parseTeamMarkdown } from "@/lib/markdown";
 import { Button } from "@/components/ui/button";
 import { Send } from "lucide-react";
+import { useOGMeta } from "@/hooks/useOGMeta";
+import { PAGE_OG_CONFIGS } from "@/lib/og-meta";
 
 interface TeamMemberData {
   id: string;
@@ -13,6 +15,9 @@ interface TeamMemberData {
 }
 
 const Team = () => {
+  // Set OG meta tags for team page
+  useOGMeta(PAGE_OG_CONFIGS.team);
+
   const [teamMembers, setTeamMembers] = useState<TeamMemberData[]>([]);
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
