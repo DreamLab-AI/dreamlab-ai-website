@@ -1,0 +1,1 @@
+import{r as e}from"./vendor-DLXM1qRr.js";import{updateOGMetaTags as r}from"./og-meta-DYOSMNZX.js";function s(t){e.useEffect(()=>(r(t),()=>{}),[t.title,t.description,t.url,t.image,t.type])}export{s as u};
