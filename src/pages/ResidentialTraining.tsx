@@ -38,15 +38,15 @@ const ResidentialTraining = () => {
   }, []);
 
   // Confluence Training Packs - Multi-instructor delivery with premium residential experience
-  // Pricing validated against Oxford Saïd (£34,310), MyWorld VP Bootcamp (£6,000)
-  // Our pricing reflects: multi-instructor delivery, Lake District residential, state-of-art facilities
+  // Q1 2025 Special: ~50% of market median pricing (Imperial £5,950+, VP Bootcamps £4,500+)
+  // Bulk pricing for team of 4 - includes full-board accommodation & meals
   const trainingPrograms = [
     {
       id: "ai-commander-week",
       title: "AI Commander Week",
       duration: "5 Days",
-      price: "£3,800",
-      priceNote: "Team of 4 (bulk rate)",
+      price: "£9,800",
+      priceNote: "team of 4 (incl. full board)",
       capacity: "4 Participants",
       category: "AI/ML",
       featured: true,
@@ -64,8 +64,8 @@ const ResidentialTraining = () => {
       id: "virtual-production-master",
       title: "Virtual Production Master",
       duration: "5 Days",
-      price: "£4,200",
-      priceNote: "Team of 4 (bulk rate)",
+      price: "£10,500",
+      priceNote: "team of 4 (incl. full board)",
       capacity: "4 Participants",
       category: "Creative Tech",
       featured: true,
@@ -83,8 +83,8 @@ const ResidentialTraining = () => {
       id: "xr-innovation-intensive",
       title: "XR Innovation Intensive",
       duration: "5 Days",
-      price: "£3,800",
-      priceNote: "Team of 4 (bulk rate)",
+      price: "£9,800",
+      priceNote: "team of 4 (incl. full board)",
       capacity: "4 Participants",
       category: "XR/VR",
       featured: true,
@@ -102,8 +102,8 @@ const ResidentialTraining = () => {
       id: "digital-human-mocap",
       title: "Digital Human & MoCap",
       duration: "3 Days",
-      price: "£2,800",
-      priceNote: "Team of 4 (bulk rate)",
+      price: "£5,995",
+      priceNote: "team of 4 (incl. full board)",
       capacity: "4 Participants",
       category: "Creative Tech",
       description: "Professional motion capture and digital human creation. Learn from Emmy-nominated specialists with credits on Star Wars, Marvel, and major game titles.",
@@ -120,8 +120,8 @@ const ResidentialTraining = () => {
       id: "spatial-audio-production",
       title: "Spatial Audio Production",
       duration: "5 Days",
-      price: "£3,400",
-      priceNote: "Team of 4 (bulk rate)",
+      price: "£9,800",
+      priceNote: "team of 4 (incl. full board)",
       capacity: "4 Participants",
       category: "Audio",
       description: "Master immersive audio for XR, cinema, and installations. Dolby Atmos certification preparation with industry-leading audio professionals.",
@@ -138,8 +138,8 @@ const ResidentialTraining = () => {
       id: "engineering-visualisation",
       title: "Engineering Visualisation",
       duration: "5 Days",
-      price: "£3,600",
-      priceNote: "Team of 4 (bulk rate)",
+      price: "£9,800",
+      priceNote: "team of 4 (incl. full board)",
       capacity: "4 Participants",
       category: "Engineering",
       description: "Transform CAE/CFD data into real-time interactive visualisations. Bridge engineering simulation and creative technology with PhD-level expertise.",
@@ -156,8 +156,8 @@ const ResidentialTraining = () => {
       id: "neural-content-creation",
       title: "Neural Content Creation",
       duration: "3 Days",
-      price: "£2,400",
-      priceNote: "Team of 4 (bulk rate)",
+      price: "£5,995",
+      priceNote: "team of 4 (incl. full board)",
       capacity: "4 Participants",
       category: "Emerging Tech",
       description: "Cutting-edge 3D reconstruction from photogrammetry to neural radiance fields. Gaussian splatting capture and real-time neural rendering.",
@@ -174,8 +174,8 @@ const ResidentialTraining = () => {
       id: "cyber-infrastructure",
       title: "Cyber Infrastructure",
       duration: "3 Days",
-      price: "£2,600",
-      priceNote: "Team of 4 (bulk rate)",
+      price: "£5,995",
+      priceNote: "team of 4 (incl. full board)",
       capacity: "4 Participants",
       category: "Engineering",
       description: "Industrial-grade network architecture and cybersecurity. Design secure infrastructure for creative and engineering environments.",
@@ -192,8 +192,8 @@ const ResidentialTraining = () => {
       id: "decentralised-agents",
       title: "Decentralised Agent Infrastructure",
       duration: "4 Days",
-      price: "£3,000",
-      priceNote: "Team of 4 (bulk rate)",
+      price: "£7,800",
+      priceNote: "team of 4 (incl. full board)",
       capacity: "4 Participants",
       category: "Web3 Tech",
       description: "Build sovereign, cryptographically-secured agent systems using Bitcoin, Lightning, RGB protocols and decentralised identity.",
@@ -211,8 +211,8 @@ const ResidentialTraining = () => {
       id: "creative-technology-fundamentals",
       title: "Creative Technology Fundamentals",
       duration: "5 Days",
-      price: "£3,200",
-      priceNote: "Team of 4 (bulk rate)",
+      price: "£8,995",
+      priceNote: "team of 4 (incl. full board)",
       capacity: "4 Participants",
       category: "Foundation",
       description: "Comprehensive introduction to creative technology for career changers and newcomers. From version control to AI-assisted workflows.",
@@ -229,8 +229,8 @@ const ResidentialTraining = () => {
       id: "corporate-immersive",
       title: "Corporate Immersive Retreat",
       duration: "3 Days",
-      price: "£8,500",
-      priceNote: "Team of 4 (bulk rate)",
+      price: "£14,500",
+      priceNote: "team of 4 (incl. full board)",
       capacity: "4 Participants",
       category: "Enterprise",
       featured: true,
@@ -248,8 +248,8 @@ const ResidentialTraining = () => {
       id: "visionflow-power-user",
       title: "VisionFlow Power User",
       duration: "4 Days",
-      price: "£3,400",
-      priceNote: "Team of 4 (bulk rate)",
+      price: "£7,800",
+      priceNote: "team of 4 (incl. full board)",
       capacity: "4 Participants",
       category: "AI/ML",
       featured: true,
@@ -291,6 +291,15 @@ const ResidentialTraining = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
+
+      {/* Availability Banner */}
+      <section className="bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-amber-500/10 border-b border-amber-500/20">
+        <div className="container py-3 px-4">
+          <p className="text-center text-sm text-amber-200/90">
+            <span className="font-semibold">Q1 2025 fully booked</span> — Q2 sessions available at reduced rates during facility upgrades
+          </p>
+        </div>
+      </section>
 
       {/* Hero Section */}
       <section className="relative pt-20 sm:pt-24 pb-12 sm:pb-16 overflow-hidden">
