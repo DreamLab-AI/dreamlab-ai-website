@@ -109,6 +109,23 @@ function parseInstructors(instructorString: string): Instructor[] {
 }
 
 // Hero images mapped by category
+// Course-specific AI-generated hero images (FLUX2 via ComfyUI, converted to WebP)
+const courseHeroImages: Record<string, string> = {
+  'ai-commander-week': '/images/heroes/ai-commander-week.webp',
+  'virtual-production-master': '/images/heroes/virtual-production-master.webp',
+  'xr-innovation-intensive': '/images/heroes/xr-innovation-intensive.webp',
+  'digital-human-mocap': '/images/heroes/digital-human-mocap.webp',
+  'spatial-audio-production': '/images/heroes/spatial-audio-production.webp',
+  'engineering-visualisation': '/images/heroes/engineering-visualisation.webp',
+  'neural-content-creation': '/images/heroes/neural-content-creation.webp',
+  'cyber-infrastructure': '/images/heroes/cyber-infrastructure.webp',
+  'decentralised-agents': '/images/heroes/decentralised-agents.webp',
+  'creative-technology-fundamentals': '/images/heroes/creative-technology-fundamentals.webp',
+  'corporate-immersive': '/images/heroes/corporate-immersive.webp',
+  'visionflow-power-user': '/images/heroes/visionflow-power-user.webp',
+};
+
+// Fallback category images
 const categoryImages: Record<string, string> = {
   'AI/ML': '/data/media/labview2.jpg',
   'Creative Tech': '/data/media/labview3.jpg',
@@ -160,7 +177,8 @@ export function CourseCard({
 
   const config = categoryConfig[category] || categoryConfig['Foundation'];
   const parsedInstructors = parseInstructors(instructors);
-  const heroImage = categoryImages[category] || '/data/media/aerial.jpeg';
+  // Use course-specific hero image if available, fall back to category image
+  const heroImage = courseHeroImages[id] || categoryImages[category] || '/data/media/aerial.jpeg';
 
   // Calculate animation delay based on index
   const animationDelay = `${index * 100}ms`;
