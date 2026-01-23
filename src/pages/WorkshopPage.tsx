@@ -4,6 +4,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import mermaid from 'mermaid';
+import DOMPurify from 'dompurify';
 import { fetchMarkdown, getDataPath } from '@/lib/markdown';
 import { Header } from '@/components/Header';
 import { WorkshopHeader, WorkshopCategory, DifficultyLevel } from '@/components/WorkshopHeader';
@@ -165,9 +166,14 @@ const WorkshopPage = () => {
                   const sanitizedDefinition = graphDefinition.replace(/<script/gi, '&lt;script');
                   mermaid.render(id, sanitizedDefinition).then(({ svg, bindFunctions }) => {
                     if (document.body.contains(el)) {
-                      // Use textContent first, then create element to avoid direct innerHTML XSS
+                      // Sanitize SVG output with DOMPurify to prevent XSS
+                      const sanitizedSvg = DOMPurify.sanitize(svg, {
+                        USE_PROFILES: { svg: true, svgFilters: true },
+                        ADD_TAGS: ['use'],
+                        ADD_ATTR: ['xlink:href']
+                      });
                       const wrapper = document.createElement('div');
-                      wrapper.innerHTML = svg;
+                      wrapper.innerHTML = sanitizedSvg;
                       el.textContent = '';
                       el.appendChild(wrapper);
                       if (bindFunctions) {

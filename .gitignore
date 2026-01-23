@@ -47,3 +47,11 @@ vite.config.ts.timestamp-*
 .claude-flow-swarm/
 .swarm/
 .claude-flow-swarm-course-task
+
+# Original large media source files (keep WebP versions)
+public/data/media/*.jpg
+public/data/media/*.jpeg
+public/data/media/*.png
+!public/data/media/*.webp
+public/showcase/*.png
+!public/showcase/*.webp

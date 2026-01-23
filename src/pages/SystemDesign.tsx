@@ -24,37 +24,37 @@ const SystemDesign = () => {
   // Images based on the critical text
   const systemImages = [
     {
-      src: '/showcase/image (9).png',
+      src: '/showcase/image (9).webp',
       title: 'Multi-Viewpoint Immersive AI Research Platform',
       description: 'Revolutionary collaborative intelligence system'
     },
     {
-      src: '/showcase/image (6).png',
+      src: '/showcase/image (6).webp',
       title: 'Narrative Fusion',
       description: 'AI observes all communication channels in real-time'
     },
     {
-      src: '/showcase/image (1).png',
+      src: '/showcase/image (1).webp',
       title: 'Immersive Collaboration',
       description: 'Natural spatial interaction preserved'
     },
     {
-      src: '/showcase/image (2).png',
+      src: '/showcase/image (2).webp',
       title: 'Flow State',
       description: 'Peak performance through optimized data presentation'
     },
     {
-      src: '/showcase/image.png',
+      src: '/showcase/image.webp',
       title: 'AI Learning System',
       description: 'Building multi-viewpoint knowledge graphs'
     },
     {
-      src: '/showcase/image (3).png',
+      src: '/showcase/image (3).webp',
       title: 'Knowledge Graph',
       description: 'Living ontology richer than any single perspective'
     },
     {
-      src: '/showcase/image (7).png',
+      src: '/showcase/image (7).webp',
       title: 'Real-World Applications',
       description: 'Transforming complex planning and collaboration'
     }
@@ -118,7 +118,7 @@ const SystemDesign = () => {
                 className="w-full h-full object-cover transition-all duration-1000"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
-                  target.src = '/showcase/image.png';
+                  target.src = '/showcase/image.webp';
                 }}
               />
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent p-4 sm:p-6 md:p-8">

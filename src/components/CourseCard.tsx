@@ -125,15 +125,15 @@ const courseHeroImages: Record<string, string> = {
   'visionflow-power-user': '/images/heroes/visionflow-power-user.webp',
 };
 
-// Fallback category images
+// Fallback category images (WebP for modern browsers)
 const categoryImages: Record<string, string> = {
-  'AI/ML': '/data/media/labview2.jpg',
-  'Creative Tech': '/data/media/labview3.jpg',
+  'AI/ML': '/data/media/labview2.webp',
+  'Creative Tech': '/data/media/labview3.webp',
   'XR/VR': '/data/media/bedroom.jpeg',
-  'Audio': '/data/media/wine.png',
+  'Audio': '/data/media/wine.webp',
   'Engineering': '/data/media/view.jpeg',
   'Emerging Tech': '/data/media/view2.jpeg',
-  'Web3 Tech': '/data/media/view3.jpeg',
+  'Web3 Tech': '/data/media/view3.webp',
   'Enterprise': '/data/media/fairfield-front.jpg',
   'Foundation': '/data/media/aerial.jpeg',
 };

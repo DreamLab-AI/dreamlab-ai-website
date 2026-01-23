@@ -19,7 +19,7 @@ const ResearchPaper = () => {
         {/* Header Image */}
         <div className="mb-12 text-center">
           <img
-            src="/showcase/image (9).png"
+            src="/showcase/image (9).webp"
             alt="Multi-Viewpoint Immersive AI Research Platform"
             className="mx-auto rounded-lg shadow-2xl max-w-2xl w-full"
           />
@@ -45,7 +45,7 @@ const ResearchPaper = () => {
             <div className="grid md:grid-cols-3 gap-4 my-8">
               <div>
                 <img
-                  src="/showcase/image (6).png"
+                  src="/showcase/image (6).webp"
                   alt="Narrative Fusion"
                   className="w-full h-48 object-cover rounded-lg"
                 />
@@ -53,7 +53,7 @@ const ResearchPaper = () => {
               </div>
               <div>
                 <img
-                  src="/showcase/image (1).png"
+                  src="/showcase/image (1).webp"
                   alt="Immersive Collaboration"
                   className="w-full h-48 object-cover rounded-lg"
                 />
@@ -95,7 +95,7 @@ const ResearchPaper = () => {
             <div className="grid md:grid-cols-3 gap-4 my-8">
               <div>
                 <img
-                  src="/showcase/image (2).png"
+                  src="/showcase/image (2).webp"
                   alt="Flow State"
                   className="w-full h-48 object-cover rounded-lg"
                 />
@@ -130,7 +130,7 @@ const ResearchPaper = () => {
             <div className="grid md:grid-cols-3 gap-4 my-8">
               <div>
                 <img
-                  src="/showcase/image.png"
+                  src="/showcase/image.webp"
                   alt="AI Learning System"
                   className="w-full h-48 object-cover rounded-lg"
                 />
@@ -154,7 +154,7 @@ const ResearchPaper = () => {
             <div className="grid md:grid-cols-3 gap-4 my-8">
               <div>
                 <img
-                  src="/showcase/image (3).png"
+                  src="/showcase/image (3).webp"
                   alt="Knowledge Graph"
                   className="w-full h-48 object-cover rounded-lg"
                 />
@@ -162,7 +162,7 @@ const ResearchPaper = () => {
               </div>
               <div>
                 <img
-                  src="/showcase/image (7).png"
+                  src="/showcase/image (7).webp"
                   alt="Real-World Applications"
                   className="w-full h-48 object-cover rounded-lg"
                 />
@@ -225,7 +225,7 @@ const ResearchPaper = () => {
             <div className="grid md:grid-cols-3 gap-4 p-6">
               <div>
                 <img
-                  src="/showcase/image (10).png"
+                  src="/showcase/image (10).webp"
                   alt="Ontology Engine"
                   className="w-full h-48 object-cover rounded-lg"
                 />
@@ -233,7 +233,7 @@ const ResearchPaper = () => {
               </div>
               <div>
                 <img
-                  src="/showcase/image (1).png"
+                  src="/showcase/image (1).webp"
                   alt="System Architecture"
                   className="w-full h-48 object-cover rounded-lg"
                 />
