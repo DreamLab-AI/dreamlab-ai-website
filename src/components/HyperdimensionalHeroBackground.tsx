@@ -1,26 +1,33 @@
 import { useEffect, useState } from "react";
-import { TesseractProjection } from "./TesseractProjection";
+import { VoronoiGoldenHero } from "./VoronoiGoldenHero";
 
 /**
- * HyperdimensionalHeroBackground - Authentic 4D Mathematical Visualization
+ * HyperdimensionalHeroBackground - Mathematical Elegance in Bronze and Gold
  *
- * DESIGN PHILOSOPHY (from DeepSeek reasoning):
- * - STRUCTURE over BLUR: Sharp geometric wireframes signal "mathematics"
- * - Not gradients: Real 4D projection math creates the visual
- * - Tesseract: 4D hypercube with mathematically correct W-rotation
- * - Premium intellectual feel for £2999 course
+ * DESIGN PHILOSOPHY (from swarm research synthesis):
+ * - Voronoi tessellation with golden ratio (φ) seed placement
+ * - Based on Vogel's model: θ = n × 137.508° (golden angle)
+ * - Signals "we understand advanced mathematics" without being showy
+ * - "Premium intellectual warmth" - £2999 course aesthetic
  *
- * MATHEMATICAL IMPLEMENTATION:
- * - 16 vertices of tesseract at (±1, ±1, ±1, ±1)
- * - 32 edges connecting vertices differing in one coordinate
- * - 4D→3D projection: scale = hyperplane / (hyperplane + w)
- * - W-axis rotations (XW, YW, ZW) create "impossible" transformations
+ * MATHEMATICAL FOUNDATION:
+ * - Golden angle: 137.508° = 360° × (1 - 1/φ) where φ = (1 + √5) / 2
+ * - Fermat's spiral: r = c × √n for uniform density
+ * - Voronoi: Each cell contains all points closest to its seed
+ * - Delaunay triangulation dual for edge rendering
+ * - Perlin noise for organic, non-random animation
+ *
+ * COLOR PALETTE (research-validated):
+ * - Background: #0e0e11 (deep anthracite, not pure black)
+ * - Bronze: #CD7F32 (outer cells)
+ * - Gold: #D4A574 (middle cells)
+ * - Bright Gold: #FFD700 (inner cells, accents)
  *
  * DIFFERENTIATION FROM GENERIC AI OUTPUT:
  * - NO purple gradient blurs
- * - NO ambient glow circles
- * - YES wireframe precision
- * - YES mathematically-correct vertex movement
+ * - NO sci-fi particle effects
+ * - YES mathematical precision (Fibonacci, golden ratio)
+ * - YES slow, deliberate motion (suggests quality and weight)
  */
 
 export const HyperdimensionalHeroBackground = () => {
@@ -44,8 +51,8 @@ export const HyperdimensionalHeroBackground = () => {
       aria-hidden="true"
       style={{ perspective: "1500px" }}
     >
-      {/* Primary: Authentic tesseract 4D projection */}
-      <TesseractProjection />
+      {/* Primary: Voronoi tessellation with golden ratio seed placement */}
+      <VoronoiGoldenHero seedCount={80} goldMode={true} />
 
       {/* Minimal mathematical grid - geometric precision, not blur */}
       <div
