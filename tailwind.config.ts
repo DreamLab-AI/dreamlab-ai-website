@@ -326,17 +326,110 @@ export default {
 						transform: 'scale(1)',
 					}
 				},
+				// 4D Hyperdimensional Hero Animations
+				'hyperdimensional-float': {
+					'0%, 100%': {
+						transform: 'translateY(0) translateX(0) scale(1)',
+						opacity: '0.12',
+					},
+					'16.67%': {
+						transform: 'translateY(-8px) translateX(4px) scale(1.02)',
+						opacity: '0.14',
+					},
+					'33.33%': {
+						transform: 'translateY(-12px) translateX(-2px) scale(0.98)',
+						opacity: '0.10',
+					},
+					'50%': {
+						transform: 'translateY(-6px) translateX(-6px) scale(1.03)',
+						opacity: '0.13',
+					},
+					'66.67%': {
+						transform: 'translateY(-10px) translateX(3px) scale(0.97)',
+						opacity: '0.11',
+					},
+					'83.33%': {
+						transform: 'translateY(-4px) translateX(5px) scale(1.01)',
+						opacity: '0.12',
+					},
+				},
+				'w-drift': {
+					'0%, 100%': {
+						transform: 'translateZ(0) scale(1) rotateX(0deg) rotateY(0deg)',
+						opacity: '0.08',
+					},
+					'25%': {
+						transform: 'translateZ(20px) scale(1.05) rotateX(0.5deg) rotateY(-0.5deg)',
+						opacity: '0.12',
+					},
+					'50%': {
+						transform: 'translateZ(-10px) scale(0.95) rotateX(-0.3deg) rotateY(0.3deg)',
+						opacity: '0.06',
+					},
+					'75%': {
+						transform: 'translateZ(10px) scale(1.02) rotateX(0.2deg) rotateY(-0.2deg)',
+						opacity: '0.10',
+					},
+				},
+				'node-breathe': {
+					'0%, 100%': {
+						transform: 'scale(1)',
+						opacity: '0.08',
+					},
+					'50%': {
+						transform: 'scale(1.15)',
+						opacity: '0.14',
+					},
+				},
+				'connection-flow': {
+					'0%': {
+						backgroundPosition: '200% 0',
+						opacity: '0.04',
+					},
+					'50%': {
+						opacity: '0.08',
+					},
+					'100%': {
+						backgroundPosition: '-200% 0',
+						opacity: '0.04',
+					},
+				},
+				'tesseract-project': {
+					'0%, 100%': {
+						transform: 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)',
+					},
+					'25%': {
+						transform: 'perspective(1000px) rotateX(1deg) rotateY(0.5deg) scale3d(1.01, 0.99, 1)',
+					},
+					'50%': {
+						transform: 'perspective(1000px) rotateX(0.5deg) rotateY(1deg) scale3d(0.99, 1.01, 1)',
+					},
+					'75%': {
+						transform: 'perspective(1000px) rotateX(-0.5deg) rotateY(0.5deg) scale3d(1, 1, 1)',
+					},
+				},
+				'dimensional-shimmer': {
+					'0%, 100%': {
+						filter: 'hue-rotate(0deg) brightness(1)',
+					},
+					'33%': {
+						filter: 'hue-rotate(15deg) brightness(1.02)',
+					},
+					'66%': {
+						filter: 'hue-rotate(-10deg) brightness(0.98)',
+					},
+				},
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
-				'fade-in': 'fade-in 0.5s ease-out',
-				'fade-out': 'fade-out 0.5s ease-out',
+				'fade-in': 'fade-in 0.5s ease-out forwards',
+				'fade-out': 'fade-out 0.5s ease-out forwards',
 				'text-shimmer': 'text-shimmer 2.5s ease-in-out infinite',
-				'slide-up': 'slide-up 0.6s ease-out',
-				'slide-in-left': 'slide-in-left 0.6s ease-out',
-				'slide-in-right': 'slide-in-right 0.6s ease-out',
-				'scale-in': 'scale-in 0.5s ease-out',
+				'slide-up': 'slide-up 0.6s ease-out forwards',
+				'slide-in-left': 'slide-in-left 0.6s ease-out forwards',
+				'slide-in-right': 'slide-in-right 0.6s ease-out forwards',
+				'scale-in': 'scale-in 0.5s ease-out forwards',
 				'glow-pulse': 'glow-pulse 3s ease-in-out infinite',
 				'float': 'float 3s ease-in-out infinite',
 				'gradient-shift': 'gradient-shift 5s ease-in-out infinite',
@@ -349,6 +442,13 @@ export default {
 				'skill-unlock': 'skill-unlock 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards',
 				'timeline-reveal': 'timeline-reveal 0.8s ease-out forwards',
 				'badge-pop': 'badge-pop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards',
+				// 4D Hyperdimensional Hero Animations
+				'hyperdimensional-float': 'hyperdimensional-float 12s cubic-bezier(0.4, 0, 0.2, 1) infinite',
+				'w-drift': 'w-drift 16s cubic-bezier(0.4, 0, 0.2, 1) infinite',
+				'node-breathe': 'node-breathe 8s ease-in-out infinite',
+				'connection-flow': 'connection-flow 12s linear infinite',
+				'tesseract-project': 'tesseract-project 20s cubic-bezier(0.4, 0, 0.2, 1) infinite',
+				'dimensional-shimmer': 'dimensional-shimmer 15s ease-in-out infinite',
 			},
 			// Animation delay utilities
 			animationDelay: {

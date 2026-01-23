@@ -5,6 +5,14 @@ import fs from 'fs';
 
 export default defineConfig({
   base: '/',
+  optimizeDeps: {
+    // Force development mode for React JSX runtime
+    esbuildOptions: {
+      define: {
+        'process.env.NODE_ENV': '"development"'
+      }
+    }
+  },
   plugins: [
     react(),
     {

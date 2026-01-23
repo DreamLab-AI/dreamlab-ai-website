@@ -1,77 +1,25 @@
-import { TorusKnot } from "@/components/TorusKnot";
+import { HyperdimensionalHeroBackground } from "@/components/HyperdimensionalHeroBackground";
 import { EmailSignupForm } from "@/components/EmailSignupForm";
 import { Header } from "@/components/Header";
 import { TestimonialMoments } from "@/components/TestimonialMoments";
 import { FeaturedInstructors } from "@/components/FeaturedInstructors";
 import { ExclusivityBanner } from "@/components/ExclusivityBanner";
 import { CaseStudyNarrative } from "@/components/CaseStudyNarrative";
-import skillsData from "@/data/skills.json";
 import { ChevronDown } from "lucide-react";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useRef } from "react";
 import { useOGMeta } from "@/hooks/useOGMeta";
 import { PAGE_OG_CONFIGS } from "@/lib/og-meta";
 
 /**
- * Custom hook to detect if viewport is mobile width.
- * Uses matchMedia for efficient media query listening.
- */
-const useIsMobile = (breakpoint = 768): boolean => {
-  const [isMobile, setIsMobile] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return window.innerWidth < breakpoint;
-  });
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia(`(max-width: ${breakpoint - 1}px)`);
-
-    const handleChange = (e: MediaQueryListEvent) => {
-      setIsMobile(e.matches);
-    };
-
-    // Set initial value
-    setIsMobile(mediaQuery.matches);
-
-    // Modern browsers
-    mediaQuery.addEventListener("change", handleChange);
-    return () => mediaQuery.removeEventListener("change", handleChange);
-  }, [breakpoint]);
-
-  return isMobile;
-};
-
-/**
  * Represents the main index/home page of the website.
- * Features a hero section with the BuckyBall visualization,
- * an email signup form, and a standard footer.
+ * Features a hero section promoting the AI Agent Masterclass,
+ * testimonials, instructors, and email signup.
  */
 const Index = () => {
   // Set OG meta tags for home page
   useOGMeta(PAGE_OG_CONFIGS.home);
 
-  // Load skills from JSON file
-  const skills = skillsData.skills;
   const heroRef = useRef<HTMLDivElement>(null);
-  const [scrollY, setScrollY] = useState(0);
-  const isMobile = useIsMobile();
-
-  const handleScroll = useCallback(() => {
-    // Only update scroll position if parallax is enabled (desktop)
-    if (!isMobile) {
-      setScrollY(window.scrollY);
-    }
-  }, [isMobile]);
-
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [handleScroll]);
-
-  // Reset scrollY when switching to mobile to prevent stuck transforms
-  useEffect(() => {
-    if (isMobile) {
-      setScrollY(0);
-    }
-  }, [isMobile]);
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-hidden">
@@ -80,49 +28,61 @@ const Index = () => {
       </a>
       <Header />
 
-      {/* Hero section with buckyball */}
+      {/* Hero section - AI Agent Masterclass */}
       <section
         id="main-content"
         ref={heroRef}
         className="relative min-h-screen overflow-hidden flex flex-col items-center justify-center"
         aria-label="Hero section"
       >
-        {/* Gradient orbs background */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 -left-20 w-72 h-72 bg-gradient-to-br from-blue-500/20 to-purple-600/20 rounded-full blur-3xl animate-float"></div>
-          <div className="absolute bottom-20 -right-20 w-96 h-96 bg-gradient-to-br from-purple-500/20 to-pink-600/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
-        </div>
-
-        {/* TorusKnot container with parallax (disabled on mobile) */}
-        <div
-          className="absolute inset-0 z-0"
-          style={{
-            transform: isMobile ? "none" : `translateY(${scrollY * 0.5}px)`,
-            willChange: isMobile ? "auto" : "transform",
-          }}
-        >
-          <TorusKnot skills={skills} />
-        </div>
+        {/* 4D-inspired hyperdimensional background - subtle, classy, mathematically elegant */}
+        <HyperdimensionalHeroBackground />
 
         {/* Content overlay */}
-        <div className="container relative z-10 mt-16 flex flex-col items-center text-center">
-          <h1 className="text-4xl md:text-7xl font-bold mb-6 animate-slide-up bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 inline-block text-transparent bg-clip-text animate-gradient-shift bg-400% max-w-4xl drop-shadow-2xl">
-            DREAMLAB AI
+        <div className="container relative z-10 mt-16 flex flex-col items-center text-center px-4">
+          {/* Trust indicator */}
+          <div className="mb-6 animate-slide-up">
+            <span className="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-medium bg-blue-500/10 border border-blue-500/30 text-blue-300">
+              <span className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse" />
+              Limited to 15 participants per cohort
+            </span>
+          </div>
+
+          <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold mb-6 animate-slide-up bg-gradient-to-r from-cyan-400 via-blue-500 to-orange-400 inline-block text-transparent bg-clip-text bg-300% max-w-5xl leading-tight">
+            Build Production-Grade AI Agents That Outperform Standard Tools by 30%
           </h1>
-          <p className="text-lg md:text-2xl text-foreground/80 max-w-2xl mb-4 animate-slide-up font-light tracking-wide" style={{ animationDelay: '0.1s' }}>
-            Deep learning with no distractions
+
+          <p className="text-lg md:text-xl lg:text-2xl text-foreground/85 max-w-3xl mb-4 animate-slide-up font-light tracking-wide" style={{ animationDelay: '0.1s' }}>
+            In one day, walk away with a working agent, reusable templates, and frameworks to build the next one yourself.
           </p>
-          <p className="text-base md:text-lg text-muted-foreground max-w-xl mb-10 animate-slide-up font-light" style={{ animationDelay: '0.15s' }}>
-            Immersive residential training where mountains meet machines
+
+          <p className="text-base md:text-lg text-muted-foreground max-w-2xl mb-8 animate-slide-up font-light" style={{ animationDelay: '0.15s' }}>
+            Deep agentic AI training for CTOs, tech leads, and technical founders who want AI doing real work — not just demos.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 animate-scale-in" style={{ animationDelay: '0.2s' }}>
-            <a href="/residential-training" className="group relative inline-flex items-center justify-center rounded-lg text-sm font-medium ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:shadow-xl hover:shadow-purple-500/50 hover:scale-105 h-12 px-8 py-3 overflow-hidden">
-              <span className="relative z-10">Explore Training Programs</span>
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+          {/* Primary CTA - above fold */}
+          <div className="flex flex-col sm:flex-row gap-4 animate-scale-in mb-8" style={{ animationDelay: '0.2s' }}>
+            <a
+              href="/residential-training"
+              className="group relative inline-flex items-center justify-center rounded-lg text-base font-semibold ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white hover:shadow-xl hover:shadow-blue-500/50 hover:scale-105 h-14 px-10 py-3 overflow-hidden"
+            >
+              <span className="relative z-10">Get the AI Agent Masterclass →</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-orange-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </a>
-            <a href="/team" className="group relative inline-flex items-center justify-center rounded-lg text-sm font-medium ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border-2 border-purple-500/50 bg-background/50 backdrop-blur-sm hover:bg-purple-500/10 hover:border-purple-400 hover:scale-105 h-12 px-8 py-3">
-              <span className="relative z-10">Meet Our Team</span>
+            <a
+              href="/team"
+              className="group relative inline-flex items-center justify-center rounded-lg text-base font-medium ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border-2 border-blue-500/50 bg-background/50 backdrop-blur-sm hover:bg-blue-500/10 hover:border-cyan-400 hover:scale-105 h-14 px-10 py-3"
+            >
+              <span className="relative z-10">Meet Dr. John O'Hare</span>
             </a>
+          </div>
+
+          {/* Trust bar */}
+          <div className="animate-slide-up text-sm text-muted-foreground" style={{ animationDelay: '0.25s' }}>
+            <p className="mb-2">Trusted by engineers building production AI systems</p>
+            <p className="text-xs text-muted-foreground/70">
+              £2999 · One-day intensive · Full-board residential option available
+            </p>
           </div>
         </div>
 
