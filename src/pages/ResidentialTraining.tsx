@@ -26,7 +26,7 @@ const ResidentialTraining = () => {
     "/data/media/fairfield-back.jpeg",
     "/data/media/view.jpeg",
     "/data/media/view2.jpeg",
-    "/data/media/view3.jpeg",
+    "/data/media/view3.webp",
     "/data/media/bedroom.jpeg",
     "/data/media/bedroom-two.jpeg",
     "/data/media/main-bedroom.jpeg",

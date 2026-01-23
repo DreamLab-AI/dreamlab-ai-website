@@ -48,10 +48,11 @@ vite.config.ts.timestamp-*
 .swarm/
 .claude-flow-swarm-course-task
 
-# Original large media source files (keep WebP versions)
-public/data/media/*.jpg
-public/data/media/*.jpeg
-public/data/media/*.png
-!public/data/media/*.webp
+# Large media source files converted to WebP (keep originals that are <500KB)
+# Converted: labview2.jpg (8.6MB), labview3.jpg (7.4MB), view3.jpeg (3.1MB), wine.png (2.2MB)
+public/data/media/labview*.jpg
+public/data/media/wine.png
+
+# Showcase images converted to WebP
 public/showcase/*.png
 !public/showcase/*.webp
