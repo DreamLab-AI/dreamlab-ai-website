@@ -73,11 +73,11 @@ const Index = () => {
           <div className="animate-slide-up flex flex-col sm:flex-row gap-6 text-sm text-muted-foreground" style={{ animationDelay: '0.25s' }}>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 bg-cyan-400 rounded-full" />
-              <span>2-day residential · max 4 people · £4,999</span>
+              <span>1-day workshop · up to 6 people · £2,995 pp</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 bg-blue-400 rounded-full" />
-              <span>1-day workshop · up to 6 people · £2,999</span>
+              <span className="w-2 h-2 bg-purple-400 rounded-full" />
+              <span>2-day residential · max 4 people · £1,695 pp</span>
             </div>
           </div>
         </div>

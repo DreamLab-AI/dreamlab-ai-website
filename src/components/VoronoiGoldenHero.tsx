@@ -545,7 +545,32 @@ export const VoronoiGoldenHero = ({
         ctx.fill();
       }
 
+      // === MIST FADE EFFECT - back 30% fading into black ===
+      // Creates depth by fading the outer/distant areas into darkness
+      const mistGradient = ctx.createRadialGradient(
+        width / 2, height / 2, Math.min(width, height) * 0.35, // Start fade at 35% radius
+        width / 2, height / 2, Math.min(width, height) * 0.55  // Full black by 55%
+      );
+      mistGradient.addColorStop(0, "rgba(14, 14, 17, 0)");
+      mistGradient.addColorStop(0.5, "rgba(14, 14, 17, 0.4)");
+      mistGradient.addColorStop(0.8, "rgba(14, 14, 17, 0.75)");
+      mistGradient.addColorStop(1, "rgba(14, 14, 17, 0.95)");
+      ctx.fillStyle = mistGradient;
+      ctx.fillRect(0, 0, width, height);
+
+      // Additional subtle vignette for polish
+      const vignetteGradient = ctx.createRadialGradient(
+        width / 2, height / 2, 0,
+        width / 2, height / 2, Math.max(width, height) * 0.7
+      );
+      vignetteGradient.addColorStop(0, "rgba(14, 14, 17, 0)");
+      vignetteGradient.addColorStop(0.6, "rgba(14, 14, 17, 0.1)");
+      vignetteGradient.addColorStop(1, "rgba(14, 14, 17, 0.4)");
+      ctx.fillStyle = vignetteGradient;
+      ctx.fillRect(0, 0, width, height);
+
       // === LIGHT MOTES traveling along edges ===
+      // Rendered AFTER mist/vignette so they appear on top
       if (!prefersReducedMotion && motesRef.current.length > 0 && edges.length > 0) {
         const motes = motesRef.current;
 
@@ -577,27 +602,27 @@ export const VoronoiGoldenHero = ({
           const pulse = 0.7 + 0.3 * Math.sin(mote.pulsePhase);
           const brightness = mote.brightness * pulse;
 
-          // Distance-based visibility (fade out toward edges)
+          // Distance-based visibility (gentler fade for visibility)
           const distFromCenter = Math.sqrt(
             (moteX - width / 2) ** 2 + (moteY - height / 2) ** 2
           );
           const maxDist = Math.min(width, height) * 0.5;
-          const distFade = Math.max(0, 1 - distFromCenter / maxDist);
+          const distFade = Math.max(0.3, 1 - (distFromCenter / maxDist) * 0.7);
 
           // Draw mote with radial gradient glow
           const moteRadius = mote.size * (1 + 0.2 * Math.sin(mote.pulsePhase));
-          const glowRadius = moteRadius * 4;
+          const glowRadius = moteRadius * 5;
 
           const moteGradient = ctx.createRadialGradient(
             moteX, moteY, 0,
             moteX, moteY, glowRadius
           );
 
-          // Golden glow color
-          const glowAlpha = brightness * distFade * 0.8;
+          // Golden glow color - brighter to show through
+          const glowAlpha = brightness * distFade;
           moteGradient.addColorStop(0, `rgba(255, 215, 0, ${glowAlpha})`);
-          moteGradient.addColorStop(0.3, `rgba(255, 200, 50, ${glowAlpha * 0.5})`);
-          moteGradient.addColorStop(0.6, `rgba(212, 165, 116, ${glowAlpha * 0.2})`);
+          moteGradient.addColorStop(0.25, `rgba(255, 200, 50, ${glowAlpha * 0.6})`);
+          moteGradient.addColorStop(0.5, `rgba(212, 165, 116, ${glowAlpha * 0.3})`);
           moteGradient.addColorStop(1, "rgba(212, 165, 116, 0)");
 
           ctx.beginPath();
@@ -608,34 +633,10 @@ export const VoronoiGoldenHero = ({
           // Bright core
           ctx.beginPath();
           ctx.arc(moteX, moteY, moteRadius, 0, TWO_PI);
-          ctx.fillStyle = `rgba(255, 248, 220, ${brightness * distFade * 0.9})`;
+          ctx.fillStyle = `rgba(255, 248, 220, ${brightness * distFade})`;
           ctx.fill();
         }
       }
-
-      // === MIST FADE EFFECT - back 30% fading into black ===
-      // Creates depth by fading the outer/distant areas into darkness
-      const mistGradient = ctx.createRadialGradient(
-        width / 2, height / 2, Math.min(width, height) * 0.35, // Start fade at 35% radius
-        width / 2, height / 2, Math.min(width, height) * 0.55  // Full black by 55%
-      );
-      mistGradient.addColorStop(0, "rgba(14, 14, 17, 0)");
-      mistGradient.addColorStop(0.5, "rgba(14, 14, 17, 0.4)");
-      mistGradient.addColorStop(0.8, "rgba(14, 14, 17, 0.75)");
-      mistGradient.addColorStop(1, "rgba(14, 14, 17, 0.95)");
-      ctx.fillStyle = mistGradient;
-      ctx.fillRect(0, 0, width, height);
-
-      // Additional subtle vignette for polish
-      const vignetteGradient = ctx.createRadialGradient(
-        width / 2, height / 2, 0,
-        width / 2, height / 2, Math.max(width, height) * 0.7
-      );
-      vignetteGradient.addColorStop(0, "rgba(14, 14, 17, 0)");
-      vignetteGradient.addColorStop(0.6, "rgba(14, 14, 17, 0.1)");
-      vignetteGradient.addColorStop(1, "rgba(14, 14, 17, 0.4)");
-      ctx.fillStyle = vignetteGradient;
-      ctx.fillRect(0, 0, width, height);
 
       // Continue animation
       animationRef.current = requestAnimationFrame(render);

@@ -1,8 +1,22 @@
 {
-  "name": "vite_react_shadcn_ts",
+  "name": "dreamlab-ai-website",
+  "description": "DreamLab AI - Deep Agentic AI Training Platform for businesses and professionals",
+  "version": "1.0.0",
   "private": true,
-  "version": "0.0.0",
   "type": "module",
+  "author": "DreamLab AI",
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DreamLab-AI/dreamlab-ai-website"
+  },
+  "keywords": [
+    "ai-training",
+    "ai-agents",
+    "masterclass",
+    "agentic-ai",
+    "residential-training"
+  ],
   "scripts": {
     "dev": "node scripts/generate-workshop-list.mjs && vite",
     "build": "node scripts/generate-workshop-list.mjs && vite build",

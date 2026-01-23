@@ -215,10 +215,10 @@ const Masterclass = () => {
           <div className="bg-background/60 backdrop-blur-xl rounded-2xl border border-purple-500/20 p-8 md:p-12">
             <div className="prose prose-lg prose-invert max-w-none">
               <p className="text-lg text-foreground/85 leading-relaxed mb-6">
-                <strong className="text-foreground">John O'Hare</strong> has spent two decades building products and teams at the intersection of technology and creativity. As CTO of the company behind Unreal Engine's flagship third-party plugins, he shipped tools used by AAA game studios and Hollywood productions.
+                <strong className="text-foreground">Dr John O'Hare</strong> is an HP AI Lighthouse Partner with over 25 years building products and teams at the intersection of technology and creativity. As CTO of the company behind Unreal Engine's flagship third-party plugins, he shipped tools used by AAA game studios and Hollywood productions.
               </p>
               <p className="text-lg text-foreground/85 leading-relaxed mb-6">
-                Now he helps organisations understand what's actually possible with AI agents—not the hype, but the practical reality of automation that works.
+                From AI systems for autonomous marine vessels to immersive media at scale, his approach is always the same: understand the problem, build what works, and ship it.
               </p>
               <p className="text-lg text-foreground/85 leading-relaxed">
                 This isn't a course about prompting chatbots. It's about building systems that do real work: reading emails, updating databases, making decisions, and taking action—while keeping humans in the loop where it matters.
