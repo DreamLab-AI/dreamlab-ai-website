@@ -1,14 +1,23 @@
+import { lazy, Suspense, useRef } from "react";
 import { HyperdimensionalHeroBackground } from "@/components/HyperdimensionalHeroBackground";
-import { EmailSignupForm } from "@/components/EmailSignupForm";
 import { Header } from "@/components/Header";
-import { TestimonialMoments } from "@/components/TestimonialMoments";
-import { FeaturedInstructors } from "@/components/FeaturedInstructors";
-import { ExclusivityBanner } from "@/components/ExclusivityBanner";
-import { CaseStudyNarrative } from "@/components/CaseStudyNarrative";
 import { ChevronDown } from "lucide-react";
-import { useRef } from "react";
 import { useOGMeta } from "@/hooks/useOGMeta";
 import { PAGE_OG_CONFIGS } from "@/lib/og-meta";
+
+// Lazy-load below-fold components for better initial load performance
+const TestimonialMoments = lazy(() => import("@/components/TestimonialMoments").then(m => ({ default: m.TestimonialMoments })));
+const FeaturedInstructors = lazy(() => import("@/components/FeaturedInstructors").then(m => ({ default: m.FeaturedInstructors })));
+const ExclusivityBanner = lazy(() => import("@/components/ExclusivityBanner").then(m => ({ default: m.ExclusivityBanner })));
+const CaseStudyNarrative = lazy(() => import("@/components/CaseStudyNarrative").then(m => ({ default: m.CaseStudyNarrative })));
+const EmailSignupForm = lazy(() => import("@/components/EmailSignupForm").then(m => ({ default: m.EmailSignupForm })));
+
+// Minimal loading skeleton for below-fold content
+const SectionSkeleton = () => (
+  <div className="w-full py-24 flex items-center justify-center">
+    <div className="w-8 h-8 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin" />
+  </div>
+);
 
 /**
  * Represents the main index/home page of the website.
@@ -98,17 +107,26 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Testimonial moments section */}
-      <TestimonialMoments />
+      {/* Below-fold content - lazy loaded for performance */}
+      <Suspense fallback={<SectionSkeleton />}>
+        {/* Testimonial moments section */}
+        <TestimonialMoments />
+      </Suspense>
 
-      {/* Featured instructors section */}
-      <FeaturedInstructors />
+      <Suspense fallback={<SectionSkeleton />}>
+        {/* Featured instructors section */}
+        <FeaturedInstructors />
+      </Suspense>
 
-      {/* Exclusivity/Waitlist section */}
-      <ExclusivityBanner />
+      <Suspense fallback={<SectionSkeleton />}>
+        {/* Exclusivity/Waitlist section */}
+        <ExclusivityBanner />
+      </Suspense>
 
-      {/* Case study narrative */}
-      <CaseStudyNarrative />
+      <Suspense fallback={<SectionSkeleton />}>
+        {/* Case study narrative */}
+        <CaseStudyNarrative />
+      </Suspense>
 
       {/* Email signup section */}
       <section className="relative py-24 overflow-hidden" aria-label="Email signup">
@@ -127,7 +145,9 @@ const Index = () => {
               Stay updated on our latest training programs in virtual production, AI/ML,
               spatial audio, and agentic engineering.
             </p>
-            <EmailSignupForm />
+            <Suspense fallback={<div className="h-12 w-full bg-muted/20 rounded animate-pulse" />}>
+              <EmailSignupForm />
+            </Suspense>
           </div>
         </div>
       </section>

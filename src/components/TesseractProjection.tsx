@@ -165,9 +165,19 @@ interface TesseractProjectionProps {
 
 export const TesseractProjection = ({ className = "" }: TesseractProjectionProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const animationRef = useRef<number>(0);
   const particlesRef = useRef<Particle[]>([]);
+  const canvasSizeRef = useRef<{ width: number; height: number; dpr: number }>({ width: 0, height: 0, dpr: 1 });
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  // Pre-allocated buffers to avoid GC pressure
+  const projectedVerticesBuffer = useRef<ProjectedPoint[]>(
+    Array.from({ length: 16 }, () => ({ x: 0, y: 0, scale: 0, w: 0 }))
+  );
+  const sortedEdgesBuffer = useRef<Array<{ edge: Edge; depth: number }>>(
+    Array.from({ length: 32 }, () => ({ edge: { from: 0, to: 0 }, depth: 0 }))
+  );
 
   // Memoized geometry
   const vertices = useMemo(() => generateTesseractVertices(), []);
@@ -208,9 +218,11 @@ export const TesseractProjection = ({ className = "" }: TesseractProjectionProps
     particlesRef.current = particles;
   }, [particleColors, prefersReducedMotion]);
 
-  // Update particles
+  // Update particles - optimized with for loop
   const updateParticles = useCallback((width: number, height: number, centerX: number, centerY: number) => {
-    particlesRef.current.forEach((p) => {
+    const particles = particlesRef.current;
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
       p.x += p.vx;
       p.y += p.vy;
       p.life++;
@@ -218,10 +230,11 @@ export const TesseractProjection = ({ className = "" }: TesseractProjectionProps
       // Gentle drift toward center (gravity well around tesseract)
       const dx = centerX - p.x;
       const dy = centerY - p.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist > 200) {
-        p.vx += dx * 0.00005;
-        p.vy += dy * 0.00005;
+      const distSq = dx * dx + dy * dy; // Avoid sqrt when possible
+      if (distSq > 40000) { // 200^2
+        const invDist = 0.00005;
+        p.vx += dx * invDist;
+        p.vy += dy * invDist;
       }
 
       // Respawn if life exceeded or out of bounds
@@ -235,21 +248,26 @@ export const TesseractProjection = ({ className = "" }: TesseractProjectionProps
         p.life = 0;
         p.alpha = 0.1 + Math.random() * 0.3;
       }
-    });
+    }
   }, []);
 
-  // Draw particles with subtle glow
+  // Draw particles with subtle glow - optimized with for loop and cached PI*2
   const drawParticles = useCallback((ctx: CanvasRenderingContext2D) => {
-    particlesRef.current.forEach((p) => {
+    const particles = particlesRef.current;
+    const TWO_PI = Math.PI * 2;
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
       const fadeIn = Math.min(1, p.life / 30);
       const fadeOut = Math.max(0, 1 - (p.life - p.maxLife + 30) / 30);
       const alpha = p.alpha * fadeIn * fadeOut;
 
       ctx.beginPath();
-      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-      ctx.fillStyle = p.color.replace(/[\d.]+\)$/, `${alpha})`);
+      ctx.arc(p.x, p.y, p.size, 0, TWO_PI);
+      // Avoid regex in hot path - use substring manipulation instead
+      const lastParen = p.color.lastIndexOf(",");
+      ctx.fillStyle = p.color.substring(0, lastParen + 1) + alpha + ")";
       ctx.fill();
-    });
+    }
   }, []);
 
   // Check for reduced motion preference
@@ -263,6 +281,46 @@ export const TesseractProjection = ({ className = "" }: TesseractProjectionProps
 
     mediaQuery.addEventListener("change", handleChange);
     return () => mediaQuery.removeEventListener("change", handleChange);
+  }, []);
+
+  // Reset particles when reduced motion preference changes
+  useEffect(() => {
+    particlesRef.current = [];
+  }, [prefersReducedMotion]);
+
+  // Handle canvas resize with ResizeObserver (not every frame!)
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const handleResize = () => {
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+
+      if (
+        canvasSizeRef.current.width !== rect.width ||
+        canvasSizeRef.current.height !== rect.height ||
+        canvasSizeRef.current.dpr !== dpr
+      ) {
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.scale(dpr, dpr);
+          ctxRef.current = ctx;
+        }
+        canvasSizeRef.current = { width: rect.width, height: rect.height, dpr };
+        particlesRef.current = []; // Reinit particles on resize
+      }
+    };
+
+    // Initial sizing
+    handleResize();
+
+    const resizeObserver = new ResizeObserver(handleResize);
+    resizeObserver.observe(canvas);
+
+    return () => resizeObserver.disconnect();
   }, []);
 
   // Color based on W-coordinate - BLUE PRIMARY with warm accent (per design experts)
@@ -282,27 +340,20 @@ export const TesseractProjection = ({ className = "" }: TesseractProjectionProps
     }
   }, []);
 
-  // Main render loop
+  // Main render loop - OPTIMIZED: uses cached context and pre-allocated buffers
   const render = useCallback(
     (time: number) => {
       const canvas = canvasRef.current;
-      if (!canvas) return;
+      const ctx = ctxRef.current;
+      if (!canvas || !ctx) return;
 
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
+      // Use cached dimensions (ResizeObserver handles updates)
+      const { width, height } = canvasSizeRef.current;
+      if (width === 0 || height === 0) return;
 
-      // Handle DPI scaling
-      const dpr = window.devicePixelRatio || 1;
-      const rect = canvas.getBoundingClientRect();
-      canvas.width = rect.width * dpr;
-      canvas.height = rect.height * dpr;
-      ctx.scale(dpr, dpr);
-
-      const width = rect.width;
-      const height = rect.height;
       const centerX = width / 2;
       const centerY = height / 2;
-      const scale = Math.min(width, height) * 0.12; // Size of tesseract
+      const scale = Math.min(width, height) * 0.12;
 
       // Clear canvas
       ctx.clearRect(0, 0, width, height);
@@ -317,34 +368,85 @@ export const TesseractProjection = ({ className = "" }: TesseractProjectionProps
       drawParticles(ctx);
 
       // Rotation angles - slow, subtle movement
-      // Key: We rotate through W dimension which creates "impossible" transformations
       const baseSpeed = prefersReducedMotion ? 0 : 0.00008;
-      const xwAngle = time * baseSpeed * 0.7; // Primary W-rotation
-      const ywAngle = time * baseSpeed * 0.5; // Secondary W-rotation
-      const zwAngle = time * baseSpeed * 0.3; // Tertiary W-rotation
-      const xyAngle = time * baseSpeed * 0.2; // Subtle 3D rotation
+      const xwAngle = time * baseSpeed * 0.7;
+      const ywAngle = time * baseSpeed * 0.5;
+      const zwAngle = time * baseSpeed * 0.3;
+      const xyAngle = time * baseSpeed * 0.2;
 
-      // Project all vertices
-      const projectedVertices: ProjectedPoint[] = vertices.map((v) => {
-        // Apply 4D rotations (order matters!)
-        let rotated = rotateXW(v, xwAngle);
-        rotated = rotateYW(rotated, ywAngle);
-        rotated = rotateZW(rotated, zwAngle);
-        rotated = rotateXY(rotated, xyAngle);
+      // Pre-compute trig functions ONCE per frame (not per-vertex)
+      const cosXW = Math.cos(xwAngle), sinXW = Math.sin(xwAngle);
+      const cosYW = Math.cos(ywAngle), sinYW = Math.sin(ywAngle);
+      const cosZW = Math.cos(zwAngle), sinZW = Math.sin(zwAngle);
+      const cosXY = Math.cos(xyAngle), sinXY = Math.sin(xyAngle);
 
-        // Project to 2D
-        return project4Dto2D(rotated, 2.0, 4.0);
-      });
+      // Project all vertices using pre-allocated buffer
+      const projectedVertices = projectedVerticesBuffer.current;
+      for (let i = 0; i < vertices.length; i++) {
+        const v = vertices[i];
 
-      // Sort edges by average depth for proper rendering
-      const sortedEdges = [...edges].sort((a, b) => {
-        const depthA = (projectedVertices[a.from].scale + projectedVertices[a.to].scale) / 2;
-        const depthB = (projectedVertices[b.from].scale + projectedVertices[b.to].scale) / 2;
-        return depthA - depthB; // Far edges first (lower scale = farther)
-      });
+        // Apply 4D rotations with pre-computed trig (inlined for performance)
+        // XW rotation
+        let x = v.x * cosXW - v.w * sinXW;
+        let y = v.y;
+        let z = v.z;
+        let w = v.x * sinXW + v.w * cosXW;
+
+        // YW rotation
+        const y2 = y * cosYW - w * sinYW;
+        const w2 = y * sinYW + w * cosYW;
+        y = y2;
+        w = w2;
+
+        // ZW rotation
+        const z2 = z * cosZW - w * sinZW;
+        const w3 = z * sinZW + w * cosZW;
+        z = z2;
+        w = w3;
+
+        // XY rotation
+        const x2 = x * cosXY - y * sinXY;
+        const y3 = x * sinXY + y * cosXY;
+        x = x2;
+        y = y3;
+
+        // 4D to 2D projection (inlined)
+        const wScale = 2.0 / (2.0 + w);
+        const x3d = x * wScale;
+        const y3d = y * wScale;
+        const z3d = z * wScale;
+        const zScale = 4.0 / (4.0 + z3d);
+
+        // Write to pre-allocated buffer (no object creation)
+        projectedVertices[i].x = x3d * zScale;
+        projectedVertices[i].y = y3d * zScale;
+        projectedVertices[i].scale = wScale * zScale;
+        projectedVertices[i].w = w;
+      }
+
+      // Sort edges using pre-allocated buffer with insertion sort (fast for small N=32)
+      const sortedEdges = sortedEdgesBuffer.current;
+      for (let i = 0; i < edges.length; i++) {
+        const edge = edges[i];
+        const depth = (projectedVertices[edge.from].scale + projectedVertices[edge.to].scale) / 2;
+        sortedEdges[i].edge = edge;
+        sortedEdges[i].depth = depth;
+      }
+      // Insertion sort (O(n) for nearly sorted, better than Array.sort for n=32)
+      for (let i = 1; i < sortedEdges.length; i++) {
+        const current = sortedEdges[i];
+        let j = i - 1;
+        while (j >= 0 && sortedEdges[j].depth > current.depth) {
+          sortedEdges[j + 1] = sortedEdges[j];
+          j--;
+        }
+        sortedEdges[j + 1] = current;
+      }
 
       // Draw edges with depth-based opacity and BLOOM effect
-      sortedEdges.forEach((edge) => {
+      // Use for loop instead of forEach for better performance
+      for (let i = 0; i < sortedEdges.length; i++) {
+        const { edge } = sortedEdges[i];
         const p1 = projectedVertices[edge.from];
         const p2 = projectedVertices[edge.to];
 
@@ -356,59 +458,107 @@ export const TesseractProjection = ({ className = "" }: TesseractProjectionProps
 
         // Depth-based opacity (closer = more visible)
         const avgScale = (p1.scale + p2.scale) / 2;
-        const baseAlpha = 0.35; // Increased for bloom visibility
+        const baseAlpha = 0.6; // HEAVY GLOW: increased base alpha
         const alpha = baseAlpha * avgScale * avgScale; // Quadratic falloff
 
-        // Line width based on depth
-        const lineWidth = Math.max(0.8, avgScale * 1.8);
+        // Line width based on depth - thicker for heavier glow
+        const lineWidth = Math.max(1.2, avgScale * 2.5);
 
-        // BLOOM EFFECT via shadowBlur (GPU-accelerated, cheap)
-        const bloomIntensity = prefersReducedMotion ? 0 : Math.min(12, avgScale * 15);
-        const edgeColor = getEdgeColor(p1.w, p2.w, Math.min(alpha, 0.35));
+        // HEAVY BLOOM EFFECT - multi-layer glow
+        const bloomIntensity = prefersReducedMotion ? 0 : Math.min(35, avgScale * 45);
+        const edgeColor = getEdgeColor(p1.w, p2.w, Math.min(alpha, 0.65));
 
+        // PASS 1: Outer glow (large, soft)
+        if (bloomIntensity > 0) {
+          ctx.beginPath();
+          ctx.moveTo(x1, y1);
+          ctx.lineTo(x2, y2);
+          ctx.strokeStyle = edgeColor;
+          ctx.lineWidth = lineWidth * 3;
+          ctx.lineCap = "round";
+          ctx.shadowColor = edgeColor;
+          ctx.shadowBlur = bloomIntensity * 1.5;
+          ctx.globalAlpha = 0.3;
+          ctx.stroke();
+          ctx.globalAlpha = 1;
+        }
+
+        // PASS 2: Mid glow
+        if (bloomIntensity > 0) {
+          ctx.beginPath();
+          ctx.moveTo(x1, y1);
+          ctx.lineTo(x2, y2);
+          ctx.strokeStyle = edgeColor;
+          ctx.lineWidth = lineWidth * 1.8;
+          ctx.shadowBlur = bloomIntensity;
+          ctx.globalAlpha = 0.5;
+          ctx.stroke();
+          ctx.globalAlpha = 1;
+        }
+
+        // PASS 3: Core edge (sharp, bright)
         ctx.beginPath();
         ctx.moveTo(x1, y1);
         ctx.lineTo(x2, y2);
         ctx.strokeStyle = edgeColor;
         ctx.lineWidth = lineWidth;
         ctx.lineCap = "round";
-
-        // Apply bloom glow
-        if (bloomIntensity > 0) {
-          ctx.shadowColor = edgeColor;
-          ctx.shadowBlur = bloomIntensity;
-        }
-
+        ctx.shadowColor = edgeColor;
+        ctx.shadowBlur = bloomIntensity * 0.5;
         ctx.stroke();
 
         // Reset shadow for next element
         ctx.shadowBlur = 0;
-      });
+      }
 
-      // Draw vertices as small points with bloom
-      projectedVertices.forEach((p) => {
+      // Draw vertices as glowing points - HEAVY GLOW
+      // Use for loop instead of forEach
+      const TWO_PI_VERT = Math.PI * 2;
+      for (let i = 0; i < projectedVertices.length; i++) {
+        const p = projectedVertices[i];
         const x = centerX + p.x * scale;
         const y = centerY + p.y * scale;
 
-        // Vertex size based on depth
-        const radius = Math.max(1.5, p.scale * 2.5);
-        const alpha = Math.min(0.5, p.scale * 0.35);
+        // Vertex size based on depth - larger for heavier glow
+        const radius = Math.max(2.5, p.scale * 4);
+        const alpha = Math.min(0.8, p.scale * 0.6);
         const vertexColor = getEdgeColor(p.w, p.w, alpha);
 
-        // Bloom glow for vertices
-        const vertexBloom = prefersReducedMotion ? 0 : Math.min(8, p.scale * 10);
+        // HEAVY bloom glow for vertices
+        const vertexBloom = prefersReducedMotion ? 0 : Math.min(25, p.scale * 30);
+
+        // PASS 1: Outer halo
         if (vertexBloom > 0) {
+          ctx.beginPath();
+          ctx.arc(x, y, radius * 3, 0, TWO_PI_VERT);
+          ctx.fillStyle = vertexColor;
           ctx.shadowColor = vertexColor;
-          ctx.shadowBlur = vertexBloom;
+          ctx.shadowBlur = vertexBloom * 2;
+          ctx.globalAlpha = 0.2;
+          ctx.fill();
+          ctx.globalAlpha = 1;
         }
 
+        // PASS 2: Mid glow
+        if (vertexBloom > 0) {
+          ctx.beginPath();
+          ctx.arc(x, y, radius * 1.5, 0, TWO_PI_VERT);
+          ctx.shadowBlur = vertexBloom;
+          ctx.globalAlpha = 0.4;
+          ctx.fill();
+          ctx.globalAlpha = 1;
+        }
+
+        // PASS 3: Core vertex (bright center)
         ctx.beginPath();
-        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.arc(x, y, radius, 0, TWO_PI_VERT);
         ctx.fillStyle = vertexColor;
+        ctx.shadowColor = vertexColor;
+        ctx.shadowBlur = vertexBloom * 0.5;
         ctx.fill();
 
         ctx.shadowBlur = 0;
-      });
+      }
 
       // Continue animation
       animationRef.current = requestAnimationFrame(render);
@@ -423,6 +573,8 @@ export const TesseractProjection = ({ className = "" }: TesseractProjectionProps
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }
+      // Clear particles on unmount to prevent memory leak
+      particlesRef.current = [];
     };
   }, [render]);
 
