@@ -16,6 +16,7 @@ const Contact = lazy(() => import("./pages/Contact"));
 const WorkshopPage = lazy(() => import("./pages/WorkshopPage"));
 const WorkshopIndex = lazy(() => import("./pages/WorkshopIndex"));
 const ResidentialTraining = lazy(() => import("./pages/ResidentialTraining"));
+const Masterclass = lazy(() => import("./pages/Masterclass"));
 const SystemDesign = lazy(() => import("./pages/SystemDesign"));
 const ResearchPaper = lazy(() => import("./pages/ResearchPaper"));
 
@@ -53,6 +54,9 @@ const App = () => (
 
             {/* Residential Training route */}
             <Route path="/residential-training" element={<ResidentialTraining />} />
+
+            {/* AI Agent Masterclass route */}
+            <Route path="/masterclass" element={<Masterclass />} />
 
             {/* Contact form route */}
             <Route path="/contact" element={<Contact />} />

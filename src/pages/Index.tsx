@@ -49,49 +49,36 @@ const Index = () => {
 
         {/* Content overlay */}
         <div className="container relative z-10 mt-16 flex flex-col items-center text-center px-4">
-          {/* Trust indicator */}
-          <div className="mb-6 animate-slide-up">
-            <span className="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-medium bg-blue-500/10 border border-blue-500/30 text-blue-300">
-              <span className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse" />
-              Limited to 15 participants per cohort
-            </span>
-          </div>
-
-          <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold mb-6 animate-slide-up bg-gradient-to-r from-cyan-400 via-blue-500 to-orange-400 inline-block text-transparent bg-clip-text bg-300% max-w-5xl leading-tight">
-            Build Production-Grade AI Agents That Outperform Standard Tools by 30%
+          {/* Headline */}
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 animate-slide-up max-w-4xl leading-tight">
+            Build AI agents for your business
           </h1>
 
-          <p className="text-lg md:text-xl lg:text-2xl text-foreground/85 max-w-3xl mb-4 animate-slide-up font-light tracking-wide" style={{ animationDelay: '0.1s' }}>
-            In one day, walk away with a working agent, reusable templates, and frameworks to build the next one yourself.
-          </p>
-
-          <p className="text-base md:text-lg text-muted-foreground max-w-2xl mb-8 animate-slide-up font-light" style={{ animationDelay: '0.15s' }}>
-            Deep agentic AI training for CTOs, tech leads, and technical founders who want AI doing real work — not just demos.
+          <p className="text-lg md:text-xl lg:text-2xl text-foreground/85 max-w-3xl mb-8 animate-slide-up font-light tracking-wide" style={{ animationDelay: '0.1s' }}>
+            One day. One working agent. Real impact.
           </p>
 
           {/* Primary CTA - above fold */}
           <div className="flex flex-col sm:flex-row gap-4 animate-scale-in mb-8" style={{ animationDelay: '0.2s' }}>
             <a
-              href="/residential-training"
+              href="/masterclass"
               className="group relative inline-flex items-center justify-center rounded-lg text-base font-semibold ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white hover:shadow-xl hover:shadow-blue-500/50 hover:scale-105 h-14 px-10 py-3 overflow-hidden"
             >
-              <span className="relative z-10">Get the AI Agent Masterclass →</span>
+              <span className="relative z-10">Get the AI Agent Masterclass now →</span>
               <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-orange-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            </a>
-            <a
-              href="/team"
-              className="group relative inline-flex items-center justify-center rounded-lg text-base font-medium ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border-2 border-blue-500/50 bg-background/50 backdrop-blur-sm hover:bg-blue-500/10 hover:border-cyan-400 hover:scale-105 h-14 px-10 py-3"
-            >
-              <span className="relative z-10">Meet Dr. John O'Hare</span>
             </a>
           </div>
 
-          {/* Trust bar */}
-          <div className="animate-slide-up text-sm text-muted-foreground" style={{ animationDelay: '0.25s' }}>
-            <p className="mb-2">Trusted by engineers building production AI systems</p>
-            <p className="text-xs text-muted-foreground/70">
-              £2999 · One-day intensive · Full-board residential option available
-            </p>
+          {/* Course options summary */}
+          <div className="animate-slide-up flex flex-col sm:flex-row gap-6 text-sm text-muted-foreground" style={{ animationDelay: '0.25s' }}>
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 bg-cyan-400 rounded-full" />
+              <span>2-day residential · max 4 people · £4,999</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 bg-blue-400 rounded-full" />
+              <span>1-day workshop · up to 6 people · £2,999</span>
+            </div>
           </div>
         </div>
 
