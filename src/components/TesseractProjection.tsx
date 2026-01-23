@@ -1,21 +1,28 @@
 import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 
 /**
- * TesseractProjection - Authentic 4D Mathematical Visualization
+ * TesseractProjection - Authentic 4D Mathematical Visualization (OPTIMIZED)
  *
  * This component implements REAL 4D geometry mathematics:
  * - Actual tesseract (4D hypercube) vertex coordinates
  * - True 4D→3D→2D projection using: scale = hyperplane / (hyperplane + w)
  * - Mathematically correct W-axis (XW, YW, ZW) rotations
- * - Canvas bloom effect via shadowBlur (GPU-accelerated)
+ * - OPTIMIZED: Single-pass glow with offscreen canvas compositing
  * - Lightweight particle system around vertices
+ *
+ * Performance Optimizations (v2):
+ * - Offscreen canvas for glow layer (single composite vs 3 passes per edge)
+ * - Batched path drawing (all edges in one stroke call)
+ * - Pre-computed color strings (avoid runtime string ops)
+ * - Optional 30fps throttle for heavy glow mode
+ * - CSS filter fallback for outer glow
  *
  * Design Philosophy:
  * - STRUCTURE over BLUR (differentiates from generic AI gradients)
- * - Blue primary (#3B82F6) with warm accent - NO PURPLE
+ * - Deep gold primary with 50% alpha - HEAVY GLOW
  * - Wireframe precision for intellectual premium feel
  * - W-axis foreshortening creates "impossible" depth
- * - Subtle, classy - not sci-fi cheesy
+ * - Smooth 60fps target
  */
 
 // Particle type for ambient floating particles
@@ -161,13 +168,24 @@ const project4Dto2D = (v: Vec4, hyperplane: number, viewDistance: number): Proje
 
 interface TesseractProjectionProps {
   className?: string;
+  /** Target 30fps instead of 60fps for heavy glow on slower devices */
+  throttle30fps?: boolean;
+  /** Deep gold color mode (default: blue) */
+  goldMode?: boolean;
 }
 
-export const TesseractProjection = ({ className = "" }: TesseractProjectionProps) => {
+export const TesseractProjection = ({
+  className = "",
+  throttle30fps = false,
+  goldMode = true  // Default to deep gold per user request
+}: TesseractProjectionProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const glowCanvasRef = useRef<HTMLCanvasElement | null>(null); // Offscreen glow layer
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
+  const glowCtxRef = useRef<CanvasRenderingContext2D | null>(null);
   const animationRef = useRef<number>(0);
   const particlesRef = useRef<Particle[]>([]);
+  const lastFrameTimeRef = useRef<number>(0); // For 30fps throttling
   const canvasSizeRef = useRef<{ width: number; height: number; dpr: number }>({ width: 0, height: 0, dpr: 1 });
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
@@ -309,6 +327,15 @@ export const TesseractProjection = ({ className = "" }: TesseractProjectionProps
           ctx.scale(dpr, dpr);
           ctxRef.current = ctx;
         }
+
+        // Also resize offscreen glow canvas
+        if (glowCanvasRef.current) {
+          glowCanvasRef.current.width = rect.width * dpr;
+          glowCanvasRef.current.height = rect.height * dpr;
+          // Re-acquire context after resize
+          glowCtxRef.current = glowCanvasRef.current.getContext("2d");
+        }
+
         canvasSizeRef.current = { width: rect.width, height: rect.height, dpr };
         particlesRef.current = []; // Reinit particles on resize
       }
@@ -323,26 +350,56 @@ export const TesseractProjection = ({ className = "" }: TesseractProjectionProps
     return () => resizeObserver.disconnect();
   }, []);
 
-  // Color based on W-coordinate - BLUE PRIMARY with warm accent (per design experts)
-  // NO PURPLE - use blue #3B82F6 as primary, warm accent rgba(246, 130, 59)
+  // Pre-computed color palette to avoid runtime string operations
+  // Gold mode: Deep gold with amber/bronze depth coding
+  // Blue mode: Blue primary with cyan/orange depth coding
+  const colorPalette = useMemo(() => {
+    if (goldMode) {
+      return {
+        far: { r: 205, g: 133, b: 63 },    // Bronze (far in 4D, w < -0.3)
+        mid: { r: 218, g: 165, b: 32 },    // Deep Gold (middle)
+        near: { r: 255, g: 215, b: 0 },    // Bright Gold (near in 4D, w > 0.3)
+        glow: "rgba(218, 165, 32, 0.8)",   // Glow color for shadowBlur
+      };
+    }
+    return {
+      far: { r: 34, g: 211, b: 238 },      // Cyan-400
+      mid: { r: 59, g: 130, b: 246 },      // Blue-500
+      near: { r: 246, g: 130, b: 59 },     // Warm accent
+      glow: "rgba(59, 130, 246, 0.8)",
+    };
+  }, [goldMode]);
+
+  // Optimized color function - returns pre-interpolated RGBA string
   const getEdgeColor = useCallback((w1: number, w2: number, alpha: number): string => {
     const avgW = (w1 + w2) / 2;
-    // Map W from [-1, 1] to color spectrum
-    // Negative W (far in 4D): cool cyan
-    // Middle W: primary blue
-    // Positive W (near in 4D): warm accent (mathematical surprise)
-    if (avgW < -0.3) {
-      return `rgba(34, 211, 238, ${alpha})`; // cyan-400
-    } else if (avgW > 0.3) {
-      return `rgba(246, 130, 59, ${alpha})`; // warm accent (orange)
-    } else {
-      return `rgba(59, 130, 246, ${alpha})`; // blue-500 (#3B82F6)
-    }
-  }, []);
+    const palette = colorPalette;
+    let color;
 
-  // Main render loop - OPTIMIZED: uses cached context and pre-allocated buffers
+    if (avgW < -0.3) {
+      color = palette.far;
+    } else if (avgW > 0.3) {
+      color = palette.near;
+    } else {
+      color = palette.mid;
+    }
+
+    return `rgba(${color.r}, ${color.g}, ${color.b}, ${alpha})`;
+  }, [colorPalette]);
+
+  // Main render loop - OPTIMIZED v2: Single-pass glow with offscreen compositing
   const render = useCallback(
     (time: number) => {
+      // 30fps throttling (skip every other frame)
+      if (throttle30fps) {
+        const delta = time - lastFrameTimeRef.current;
+        if (delta < 33.33) { // ~30fps = 33.33ms per frame
+          animationRef.current = requestAnimationFrame(render);
+          return;
+        }
+        lastFrameTimeRef.current = time;
+      }
+
       const canvas = canvasRef.current;
       const ctx = ctxRef.current;
       if (!canvas || !ctx) return;
@@ -351,12 +408,24 @@ export const TesseractProjection = ({ className = "" }: TesseractProjectionProps
       const { width, height } = canvasSizeRef.current;
       if (width === 0 || height === 0) return;
 
+      // Initialize offscreen glow canvas if needed
+      if (!glowCanvasRef.current) {
+        glowCanvasRef.current = document.createElement("canvas");
+        glowCanvasRef.current.width = canvas.width;
+        glowCanvasRef.current.height = canvas.height;
+        glowCtxRef.current = glowCanvasRef.current.getContext("2d");
+      }
+      const glowCtx = glowCtxRef.current;
+
       const centerX = width / 2;
       const centerY = height / 2;
       const scale = Math.min(width, height) * 0.12;
 
-      // Clear canvas
+      // Clear both canvases
       ctx.clearRect(0, 0, width, height);
+      if (glowCtx) {
+        glowCtx.clearRect(0, 0, canvas.width, canvas.height);
+      }
 
       // Initialize and update particles
       initParticles(width, height);
@@ -443,127 +512,119 @@ export const TesseractProjection = ({ className = "" }: TesseractProjectionProps
         sortedEdges[j + 1] = current;
       }
 
-      // Draw edges with depth-based opacity and BLOOM effect
-      // Use for loop instead of forEach for better performance
+      // ===== OPTIMIZED SINGLE-PASS GLOW RENDERING =====
+      // Strategy: Draw glow to offscreen canvas, then composite
+
+      const dpr = canvasSizeRef.current.dpr;
+      const glowColor = colorPalette.glow;
+
+      // PASS 1: Draw thick glow lines to offscreen canvas (SINGLE shadowBlur)
+      if (glowCtx && !prefersReducedMotion) {
+        glowCtx.save();
+        glowCtx.scale(dpr, dpr);
+        glowCtx.lineCap = "round";
+        glowCtx.lineJoin = "round";
+
+        // Single shadow blur for entire glow pass
+        glowCtx.shadowColor = glowColor;
+        glowCtx.shadowBlur = 25;
+        glowCtx.globalAlpha = 0.5; // 50% alpha per user request
+
+        // Batch all edges into one path for glow
+        glowCtx.beginPath();
+        for (let i = 0; i < sortedEdges.length; i++) {
+          const { edge } = sortedEdges[i];
+          const p1 = projectedVertices[edge.from];
+          const p2 = projectedVertices[edge.to];
+
+          const x1 = centerX + p1.x * scale;
+          const y1 = centerY + p1.y * scale;
+          const x2 = centerX + p2.x * scale;
+          const y2 = centerY + p2.y * scale;
+
+          glowCtx.moveTo(x1, y1);
+          glowCtx.lineTo(x2, y2);
+        }
+        glowCtx.strokeStyle = glowColor;
+        glowCtx.lineWidth = 6; // Thick for glow spread
+        glowCtx.stroke();
+
+        // Draw vertex glow points
+        const TWO_PI = Math.PI * 2;
+        glowCtx.beginPath();
+        for (let i = 0; i < projectedVertices.length; i++) {
+          const p = projectedVertices[i];
+          const x = centerX + p.x * scale;
+          const y = centerY + p.y * scale;
+          const radius = Math.max(4, p.scale * 6);
+
+          glowCtx.moveTo(x + radius, y);
+          glowCtx.arc(x, y, radius, 0, TWO_PI);
+        }
+        glowCtx.fillStyle = glowColor;
+        glowCtx.fill();
+
+        glowCtx.restore();
+
+        // Composite glow layer onto main canvas (with blur effect)
+        ctx.save();
+        ctx.globalAlpha = 0.6;
+        ctx.filter = "blur(8px)"; // CSS filter for soft outer glow
+        ctx.drawImage(glowCanvasRef.current, 0, 0, width, height);
+        ctx.filter = "none";
+        ctx.globalAlpha = 0.4;
+        ctx.drawImage(glowCanvasRef.current, 0, 0, width, height); // Second pass sharper
+        ctx.restore();
+      }
+
+      // PASS 2: Draw crisp core edges (no shadow, fast)
+      ctx.lineCap = "round";
       for (let i = 0; i < sortedEdges.length; i++) {
         const { edge } = sortedEdges[i];
         const p1 = projectedVertices[edge.from];
         const p2 = projectedVertices[edge.to];
 
-        // Screen coordinates
         const x1 = centerX + p1.x * scale;
         const y1 = centerY + p1.y * scale;
         const x2 = centerX + p2.x * scale;
         const y2 = centerY + p2.y * scale;
 
-        // Depth-based opacity (closer = more visible)
         const avgScale = (p1.scale + p2.scale) / 2;
-        const baseAlpha = 0.6; // HEAVY GLOW: increased base alpha
-        const alpha = baseAlpha * avgScale * avgScale; // Quadratic falloff
+        const baseAlpha = 0.5; // 50% alpha per user request
+        const alpha = baseAlpha * avgScale * avgScale;
+        const lineWidth = Math.max(1.5, avgScale * 2.2);
 
-        // Line width based on depth - thicker for heavier glow
-        const lineWidth = Math.max(1.2, avgScale * 2.5);
+        const edgeColor = getEdgeColor(p1.w, p2.w, Math.min(alpha, 0.5));
 
-        // HEAVY BLOOM EFFECT - multi-layer glow
-        const bloomIntensity = prefersReducedMotion ? 0 : Math.min(35, avgScale * 45);
-        const edgeColor = getEdgeColor(p1.w, p2.w, Math.min(alpha, 0.65));
-
-        // PASS 1: Outer glow (large, soft)
-        if (bloomIntensity > 0) {
-          ctx.beginPath();
-          ctx.moveTo(x1, y1);
-          ctx.lineTo(x2, y2);
-          ctx.strokeStyle = edgeColor;
-          ctx.lineWidth = lineWidth * 3;
-          ctx.lineCap = "round";
-          ctx.shadowColor = edgeColor;
-          ctx.shadowBlur = bloomIntensity * 1.5;
-          ctx.globalAlpha = 0.3;
-          ctx.stroke();
-          ctx.globalAlpha = 1;
-        }
-
-        // PASS 2: Mid glow
-        if (bloomIntensity > 0) {
-          ctx.beginPath();
-          ctx.moveTo(x1, y1);
-          ctx.lineTo(x2, y2);
-          ctx.strokeStyle = edgeColor;
-          ctx.lineWidth = lineWidth * 1.8;
-          ctx.shadowBlur = bloomIntensity;
-          ctx.globalAlpha = 0.5;
-          ctx.stroke();
-          ctx.globalAlpha = 1;
-        }
-
-        // PASS 3: Core edge (sharp, bright)
         ctx.beginPath();
         ctx.moveTo(x1, y1);
         ctx.lineTo(x2, y2);
         ctx.strokeStyle = edgeColor;
         ctx.lineWidth = lineWidth;
-        ctx.lineCap = "round";
-        ctx.shadowColor = edgeColor;
-        ctx.shadowBlur = bloomIntensity * 0.5;
         ctx.stroke();
-
-        // Reset shadow for next element
-        ctx.shadowBlur = 0;
       }
 
-      // Draw vertices as glowing points - HEAVY GLOW
-      // Use for loop instead of forEach
+      // Draw vertices as bright points (single pass)
       const TWO_PI_VERT = Math.PI * 2;
       for (let i = 0; i < projectedVertices.length; i++) {
         const p = projectedVertices[i];
         const x = centerX + p.x * scale;
         const y = centerY + p.y * scale;
 
-        // Vertex size based on depth - larger for heavier glow
-        const radius = Math.max(2.5, p.scale * 4);
-        const alpha = Math.min(0.8, p.scale * 0.6);
+        const radius = Math.max(2, p.scale * 3.5);
+        const alpha = Math.min(0.5, p.scale * 0.4); // 50% max alpha
         const vertexColor = getEdgeColor(p.w, p.w, alpha);
 
-        // HEAVY bloom glow for vertices
-        const vertexBloom = prefersReducedMotion ? 0 : Math.min(25, p.scale * 30);
-
-        // PASS 1: Outer halo
-        if (vertexBloom > 0) {
-          ctx.beginPath();
-          ctx.arc(x, y, radius * 3, 0, TWO_PI_VERT);
-          ctx.fillStyle = vertexColor;
-          ctx.shadowColor = vertexColor;
-          ctx.shadowBlur = vertexBloom * 2;
-          ctx.globalAlpha = 0.2;
-          ctx.fill();
-          ctx.globalAlpha = 1;
-        }
-
-        // PASS 2: Mid glow
-        if (vertexBloom > 0) {
-          ctx.beginPath();
-          ctx.arc(x, y, radius * 1.5, 0, TWO_PI_VERT);
-          ctx.shadowBlur = vertexBloom;
-          ctx.globalAlpha = 0.4;
-          ctx.fill();
-          ctx.globalAlpha = 1;
-        }
-
-        // PASS 3: Core vertex (bright center)
         ctx.beginPath();
         ctx.arc(x, y, radius, 0, TWO_PI_VERT);
         ctx.fillStyle = vertexColor;
-        ctx.shadowColor = vertexColor;
-        ctx.shadowBlur = vertexBloom * 0.5;
         ctx.fill();
-
-        ctx.shadowBlur = 0;
       }
 
       // Continue animation
       animationRef.current = requestAnimationFrame(render);
     },
-    [vertices, edges, getEdgeColor, prefersReducedMotion, initParticles, updateParticles, drawParticles]
+    [vertices, edges, getEdgeColor, colorPalette, prefersReducedMotion, throttle30fps, initParticles, updateParticles, drawParticles]
   );
 
   // Start animation loop
@@ -573,8 +634,10 @@ export const TesseractProjection = ({ className = "" }: TesseractProjectionProps
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }
-      // Clear particles on unmount to prevent memory leak
+      // Clear particles and offscreen canvas on unmount to prevent memory leak
       particlesRef.current = [];
+      glowCanvasRef.current = null;
+      glowCtxRef.current = null;
     };
   }, [render]);
 
