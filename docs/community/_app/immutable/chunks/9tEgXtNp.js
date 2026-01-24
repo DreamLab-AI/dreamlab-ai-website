@@ -1,0 +1,4 @@
+function g(n){let t=0;for(let o=0;o<n.length;o++){const e=n.charCodeAt(o);t=(t<<5)-t+e,t=t&t}return Math.abs(t)}function u(n,t){const o=g(n+t.toString()),e=o%360,r=65+o%20,c=45+o%20;return`hsl(${e}, ${r}%, ${c}%)`}function d(n){return`hsl(${g(n)%360}, 30%, 90%)`}function $(n){const t=[],o=g(n);for(let e=0;e<5;e++){const r=[];for(let c=0;c<3;c++){const a=e*3+c,h=n.charCodeAt(a%n.length),s=(o>>a%32^h)&1;r.push(s===1)}r.push(r[1]),r.push(r[0]),t.push(r)}return t}function f(n,t=64){const o=$(n),e=u(n,0),r=d(n),c=t/5;let a="";for(let h=0;h<5;h++)for(let s=0;s<5;s++)if(o[h][s]){const l=s*c,i=h*c;a+=`<rect x="${l}" y="${i}" width="${c}" height="${c}" fill="${e}"/>`}return`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${t} ${t}" width="${t}" height="${t}">
+    <rect width="${t}" height="${t}" fill="${r}"/>
+    ${a}
+  </svg>`}function w(n,t=64){const o=f(n,t);return`data:image/svg+xml;base64,${btoa(o)}`}function x(n,t=64){return w(n,t)}export{x as g};
