@@ -206,7 +206,7 @@ const Index = () => {
             <div className="flex-shrink-0">
               <div className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center overflow-hidden shadow-2xl shadow-purple-500/30">
                 <img
-                  src="/images/team/jjohare.webp"
+                  src="/data/team/04.webp"
                   alt="Dr John O'Hare"
                   className="w-full h-full object-cover"
                   onError={(e) => {
@@ -567,7 +567,7 @@ const Index = () => {
             <div className="flex-shrink-0">
               <div className="w-48 h-48 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center overflow-hidden shadow-2xl shadow-purple-500/30">
                 <img
-                  src="/images/team/jjohare.webp"
+                  src="/data/team/04.webp"
                   alt="Dr John O'Hare"
                   className="w-full h-full object-cover"
                   onError={(e) => {
