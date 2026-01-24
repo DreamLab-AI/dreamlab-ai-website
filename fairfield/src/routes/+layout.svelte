@@ -31,6 +31,8 @@
 	import CalendarSidebar from '$lib/components/calendar/CalendarSidebar.svelte';
 	import CalendarSheet from '$lib/components/calendar/CalendarSheet.svelte';
 	import ZoneNav from '$lib/components/zones/ZoneNav.svelte';
+	import MobileBottomNav from '$lib/components/ui/MobileBottomNav.svelte';
+	import MobileZoneDrawer from '$lib/components/ui/MobileZoneDrawer.svelte';
 
 	const appConfig = getAppConfig();
 	const appName = appConfig.name.split(' - ')[0];
@@ -43,8 +45,9 @@
 	let sessionCleanup: (() => void) | undefined = undefined;
 	let isMobile = false;
 	let calendarSheetOpen = false;
-	let zoneNavCollapsed = true;
+	let zoneNavCollapsed = false;
 	let calendarCollapsed = true;
+	let mobileZoneDrawerOpen = false;
 
 	$: showNav = $page.url.pathname !== `${base}/` && $page.url.pathname !== base && $page.url.pathname !== `${base}/signup` && $page.url.pathname !== `${base}/login` && $page.url.pathname !== `${base}/pending`;
 
@@ -260,7 +263,7 @@
 					id="main-content"
 					role="main"
 					tabindex="-1"
-					class="flex-1 min-w-0"
+					class="flex-1 min-w-0 {isMobile && showNav && $isAuthenticated ? 'pb-20' : ''}"
 					in:fade={{ duration: 150, delay: 75 }}
 					out:fade={{ duration: 75 }}
 				>
@@ -272,6 +275,18 @@
 		<!-- Calendar Sheet (Mobile) -->
 		{#if showNav && $isAuthenticated && isMobile}
 			<CalendarSheet bind:isOpen={calendarSheetOpen} />
+		{/if}
+
+		<!-- Mobile Bottom Navigation -->
+		{#if showNav && $isAuthenticated && isMobile}
+			<MobileBottomNav
+				onZonesClick={() => mobileZoneDrawerOpen = true}
+				onProfileClick={toggleProfileModal}
+			/>
+			<MobileZoneDrawer
+				isOpen={mobileZoneDrawerOpen}
+				onClose={() => mobileZoneDrawerOpen = false}
+			/>
 		{/if}
 	{:else}
 		<div class="flex items-center justify-center min-h-screen" role="status" aria-live="polite" aria-label="Loading application">
