@@ -47,6 +47,15 @@ vite.config.ts.timestamp-*
 .claude-flow-swarm/
 .swarm/
 .claude-flow-swarm-course-task
+.claude/
+.aqe/
+
+# Test outputs
+test-results/
+mobile-audit/
+
+# Rust build artifacts
+wasm-voronoi/target/
 
 # Large media source files converted to WebP (keep originals that are <500KB)
 # Converted: labview2.jpg (8.6MB), labview3.jpg (7.4MB), view3.jpeg (3.1MB), wine.png (2.2MB)
