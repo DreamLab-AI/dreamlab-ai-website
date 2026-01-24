@@ -10,11 +10,11 @@
 
       if (path.startsWith('/community')) {
         // Community SvelteKit app - store path and redirect to community root
-        sessionStorage.redirect = path;
+        sessionStorage.setItem('redirect', path);
         location.replace('/community/');
       } else {
         // Main React app - redirect to root
-        sessionStorage.redirect = path;
+        sessionStorage.setItem('redirect', path);
         location.replace('/');
       }
     </script>

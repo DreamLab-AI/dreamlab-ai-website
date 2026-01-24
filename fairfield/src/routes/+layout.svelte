@@ -4,6 +4,7 @@
 	import { browser } from '$app/environment';
 	import { page } from '$app/stores';
 	import { base } from '$app/paths';
+	import { goto } from '$app/navigation';
 	import { fade } from 'svelte/transition';
 	import { authStore, isAuthenticated } from '$lib/stores/auth';
 	import { sessionStore } from '$lib/stores/session';
@@ -77,6 +78,20 @@
 
 		if (!browser) {
 			return;
+		}
+
+		// Handle GitHub Pages SPA redirect
+		// When 404.html redirects to /community/, it stores the original path in sessionStorage
+		const redirect = sessionStorage.getItem('redirect');
+		if (redirect) {
+			sessionStorage.removeItem('redirect');
+			// Extract path relative to base and navigate using SvelteKit router
+			const basePath = base || '/community';
+			if (redirect.startsWith(basePath) && redirect !== $page.url.pathname) {
+				const targetPath = redirect.slice(basePath.length) || '/';
+				// Use replaceState to avoid adding to history
+				goto(`${base}${targetPath}`, { replaceState: true });
+			}
 		}
 
 		const savedTheme = localStorage.getItem('theme');
