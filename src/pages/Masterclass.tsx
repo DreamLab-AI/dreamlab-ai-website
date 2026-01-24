@@ -204,7 +204,7 @@ const Masterclass = () => {
       </section>
 
       {/* About John Section */}
-      <section ref={contentRef} className="py-24 px-4 bg-gradient-to-b from-background to-purple-950/10">
+      <section id="content" ref={contentRef} className="py-24 px-4 bg-gradient-to-b from-background to-purple-950/10">
         <div className="container max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-6">
