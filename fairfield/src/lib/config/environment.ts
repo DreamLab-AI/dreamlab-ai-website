@@ -24,9 +24,10 @@ function getEnv(key: string, fallback?: string): string {
 
 /**
  * Nostr relay URL
- * Default: ws://localhost:8080 (development fallback only - production should set VITE_RELAY_URL)
+ * Default: production relay (wss://nostr-relay-617806532906.us-central1.run.app)
+ * Override with VITE_RELAY_URL for local development
  */
-export const RELAY_URL = getEnv('VITE_RELAY_URL', 'ws://localhost:8080');
+export const RELAY_URL = getEnv('VITE_RELAY_URL', 'wss://nostr-relay-617806532906.us-central1.run.app');
 
 /**
  * Admin public key (hex format)
