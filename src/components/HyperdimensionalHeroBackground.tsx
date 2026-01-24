@@ -52,8 +52,19 @@ export const HyperdimensionalHeroBackground = () => {
       style={{ perspective: "1500px" }}
     >
       {/* Primary: Voronoi tessellation with golden ratio seed placement */}
+      {/* Scaled 150% and centered to extend beyond text boundaries */}
       {/* pointer-events-auto to enable mouse interaction for gravitational effect */}
-      <VoronoiGoldenHero seedCount={80} goldMode={true} className="pointer-events-auto" />
+      <div
+        className="absolute pointer-events-auto"
+        style={{
+          top: '-25%',
+          left: '-25%',
+          width: '150%',
+          height: '150%',
+        }}
+      >
+        <VoronoiGoldenHero seedCount={104} goldMode={true} className="w-full h-full" />
+      </div>
 
       {/* Minimal mathematical grid - geometric precision, not blur */}
       <div

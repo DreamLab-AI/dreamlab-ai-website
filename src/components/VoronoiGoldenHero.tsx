@@ -113,12 +113,15 @@ class SimplexNoise {
   }
 }
 
-// Voronoi seed point with animation state
+// Voronoi seed point with animation state and physics
 interface VoronoiSeed {
   baseX: number;
   baseY: number;
   x: number;
   y: number;
+  // Velocity for smooth physics-based movement
+  vx: number;
+  vy: number;
   phase: number; // Animation phase offset
   colorIndex: number; // 0=bronze, 1=gold, 2=bright gold
 }
@@ -189,6 +192,8 @@ const generateGoldenSeeds = (
       baseY: y,
       x,
       y,
+      vx: 0, // Initial velocity
+      vy: 0,
       phase: (n / count) * Math.PI * 2, // Staggered animation phases
       colorIndex,
     });
@@ -563,15 +568,20 @@ export const VoronoiGoldenHero = ({
 
       // Mouse interaction parameters
       const mouse = mouseRef.current;
-      const mouseInfluenceRadius = 200; // Pixels - how far mouse affects seeds
-      const maxMouseDisplacement = 15; // Max pixels a seed can move toward mouse
+      const mouseInfluenceRadius = 250; // Pixels - how far mouse affects seeds
+      const mouseForceStrength = 0.8; // Force applied toward mouse (acceleration)
       const velocityScale = 50; // How much velocity amplifies effect (faster = more effect)
+
+      // Physics constants for smooth movement with momentum
+      const damping = 0.92; // Velocity decay per frame (0.92 = smooth deceleration with residual)
+      const returnForce = 0.08; // How strongly nodes return to rest position
+      const maxVelocity = 8; // Maximum velocity to prevent runaway
 
       // Track which seeds are near mouse this frame (for mote spawning)
       const nearSeedsThisFrame = new Set<number>();
-      const moteSpawnRadius = 30; // Pixels - how close mouse must be to spawn mote
+      const moteSpawnRadius = 40; // Pixels - how close mouse must be to spawn mote
 
-      // Update seed positions with Perlin noise + mouse perturbation
+      // Update seed positions with velocity-based physics
       for (let i = 0; i < seeds.length; i++) {
         const seed = seeds[i];
         const noiseX = noise.noise2D(
@@ -583,14 +593,20 @@ export const VoronoiGoldenHero = ({
           seed.baseY * noiseScale + time * timeScale + seed.phase
         );
 
-        // Base position from Perlin noise
-        let targetX = seed.baseX + noiseX * amplitude;
-        let targetY = seed.baseY + noiseY * amplitude;
+        // Rest position (base + perlin noise drift)
+        const restX = seed.baseX + noiseX * amplitude;
+        const restY = seed.baseY + noiseY * amplitude;
+
+        // Calculate force toward rest position (spring force)
+        const toRestX = restX - seed.x;
+        const toRestY = restY - seed.y;
+        let forceX = toRestX * returnForce;
+        let forceY = toRestY * returnForce;
 
         // Apply mouse gravitational pull if mouse is active
         if (mouse.active && !prefersReducedMotion) {
-          const dx = mouse.x - seed.baseX;
-          const dy = mouse.y - seed.baseY;
+          const dx = mouse.x - seed.x;
+          const dy = mouse.y - seed.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
 
           if (dist < mouseInfluenceRadius && dist > 0) {
@@ -598,17 +614,16 @@ export const VoronoiGoldenHero = ({
             const influence = 1 - (dist / mouseInfluenceRadius);
             // Velocity scaling: faster mouse = larger effect
             const velocityFactor = Math.min(1, mouse.speed * velocityScale);
-            // Combined intensity (quadratic falloff for smoother feel)
-            const intensity = influence * influence * (0.3 + 0.7 * velocityFactor);
+            // Combined intensity (cubic falloff for smooth acceleration)
+            const intensity = influence * influence * influence * (0.4 + 0.6 * velocityFactor);
 
-            // Direction toward mouse
+            // Direction toward mouse (normalized)
             const dirX = dx / dist;
             const dirY = dy / dist;
 
-            // Apply displacement (clamped to preserve geometry)
-            const displacement = intensity * maxMouseDisplacement;
-            targetX += dirX * displacement;
-            targetY += dirY * displacement;
+            // Add mouse attraction force (acceleration toward cursor)
+            forceX += dirX * intensity * mouseForceStrength;
+            forceY += dirY * intensity * mouseForceStrength;
 
             // Track if this seed is very close (for mote spawning)
             if (dist < moteSpawnRadius) {
@@ -617,8 +632,25 @@ export const VoronoiGoldenHero = ({
           }
         }
 
-        seed.x = targetX;
-        seed.y = targetY;
+        // Apply forces to velocity (acceleration)
+        seed.vx += forceX;
+        seed.vy += forceY;
+
+        // Apply damping (friction/decay) for smooth deceleration with residual momentum
+        seed.vx *= damping;
+        seed.vy *= damping;
+
+        // Clamp velocity to prevent runaway
+        const speed = Math.sqrt(seed.vx * seed.vx + seed.vy * seed.vy);
+        if (speed > maxVelocity) {
+          const scale = maxVelocity / speed;
+          seed.vx *= scale;
+          seed.vy *= scale;
+        }
+
+        // Apply velocity to position
+        seed.x += seed.vx;
+        seed.y += seed.vy;
       }
 
       // Spawn motes when cursor newly passes near vertices
