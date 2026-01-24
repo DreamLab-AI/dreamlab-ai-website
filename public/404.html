@@ -4,8 +4,19 @@
     <meta charset="utf-8">
     <title>DreamLab AI Consulting Ltd. - Redirecting...</title>
     <script>
-      sessionStorage.redirect = location.pathname + location.search + location.hash;
-      location.replace('/');
+      // SPA routing for GitHub Pages
+      // Handle both main site (/) and community app (/community/)
+      var path = location.pathname + location.search + location.hash;
+
+      if (path.startsWith('/community')) {
+        // Community SvelteKit app - store path and redirect to community root
+        sessionStorage.redirect = path;
+        location.replace('/community/');
+      } else {
+        // Main React app - redirect to root
+        sessionStorage.redirect = path;
+        location.replace('/');
+      }
     </script>
   </head>
   <body>
