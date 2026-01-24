@@ -1,4 +1,5 @@
 import { lazy, Suspense, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { HyperdimensionalHeroBackground } from "@/components/HyperdimensionalHeroBackground";
 import { Header } from "@/components/Header";
 import {
@@ -507,13 +508,13 @@ const Index = () => {
               </div>
               <p className="text-sm text-muted-foreground mb-8">One price for your whole team (up to 6 people)</p>
 
-              <a
-                href="mailto:info@dreamlab-ai.com?subject=AI%20Agent%20Masterclass%20Booking"
+              <Link
+                to="/contact"
                 className="inline-flex items-center justify-center rounded-lg text-lg font-semibold bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-xl hover:shadow-cyan-500/50 hover:scale-105 transition-all h-14 px-10"
               >
-                Book a call
+                Get in touch
                 <ArrowRight className="ml-2 w-5 h-5" />
-              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -630,13 +631,13 @@ const Index = () => {
               10 minutes • no prep • we will check scope, access, and whether this will work for your team
             </p>
 
-            <a
-              href="mailto:info@dreamlab-ai.com?subject=AI%20Agent%20Masterclass%20-%20Fit%20Call"
+            <Link
+              to="/contact"
               className="inline-flex items-center justify-center rounded-lg text-lg font-semibold bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-xl hover:shadow-cyan-500/50 hover:scale-105 transition-all h-14 px-10"
             >
-              Book the call now
+              Schedule a conversation
               <ArrowRight className="ml-2 w-5 h-5" />
-            </a>
+            </Link>
           </div>
         </div>
       </section>
@@ -678,7 +679,7 @@ const Index = () => {
                     </a>
                   </li>
                   <li>
-                    <a href="https://www.linkedin.com/company/dreamlab-ai-consulting/?" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-blue-400 transition-all duration-300 hover:scale-110 inline-block">
+                    <a href="https://www.linkedin.com/company/dreamlab-ai-consulting/" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-blue-400 transition-all duration-300 hover:scale-110 inline-block">
                       LinkedIn<span className="sr-only"> (opens in new window)</span>
                     </a>
                   </li>

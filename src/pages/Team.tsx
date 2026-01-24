@@ -186,7 +186,7 @@ const Team = () => {
                     </a>
                   </li>
                   <li>
-                    <a href="https://www.linkedin.com/company/dreamlab-ai-consulting/?" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+                    <a href="https://www.linkedin.com/company/dreamlab-ai-consulting/" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
                       LinkedIn<span className="sr-only"> (opens in new window)</span>
                     </a>
                   </li>

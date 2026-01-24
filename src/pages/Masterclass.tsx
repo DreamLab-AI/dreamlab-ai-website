@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { HyperdimensionalHeroBackground } from "@/components/HyperdimensionalHeroBackground";
 import { useOGMeta } from "@/hooks/useOGMeta";
@@ -446,14 +447,12 @@ const Masterclass = () => {
                 Build your first AI agent with real business impact in a single day.
               </p>
 
-              <a
-                href="https://cal.com/dreamlab/masterclass-discovery"
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                to="/contact"
                 className="block w-full py-3 px-6 rounded-lg bg-gradient-to-r from-cyan-600 to-cyan-500 text-white font-semibold text-center hover:shadow-lg hover:shadow-cyan-500/30 transition-all"
               >
-                Book a call <ArrowRight className="inline w-4 h-4 ml-2" />
-              </a>
+                Get in touch <ArrowRight className="inline w-4 h-4 ml-2" />
+              </Link>
             </div>
 
             {/* Residential Programme */}
@@ -641,14 +640,12 @@ const Masterclass = () => {
             Book a 15-minute discovery call. We'll identify the best automation opportunity for your business and answer any questions.
           </p>
 
-          <a
-            href="https://cal.com/dreamlab/masterclass-discovery"
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            to="/contact"
             className="inline-flex items-center justify-center rounded-lg text-base font-semibold ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white hover:shadow-xl hover:shadow-blue-500/50 hover:scale-105 h-14 px-10 py-3"
           >
-            Book your discovery call <ArrowRight className="ml-2 w-5 h-5" />
-          </a>
+            Contact us to discuss <ArrowRight className="ml-2 w-5 h-5" />
+          </Link>
 
           <p className="text-sm text-foreground/50 mt-4">
             No commitment. Just a conversation.
@@ -673,7 +670,7 @@ const Masterclass = () => {
                     </a>
                   </li>
                   <li>
-                    <a href="https://www.linkedin.com/company/dreamlab-ai-consulting/?" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-blue-400 transition-all duration-300">
+                    <a href="https://www.linkedin.com/company/dreamlab-ai-consulting/" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-blue-400 transition-all duration-300">
                       LinkedIn
                     </a>
                   </li>

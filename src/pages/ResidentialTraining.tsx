@@ -336,11 +336,9 @@ const ResidentialTraining = () => {
               <Button size="lg" onClick={() => navigate("/contact")} className="min-h-[44px] touch-manipulation w-full sm:w-auto">
                 Book Your Training
               </Button>
-              <a href="/data/media/" download className="w-full sm:w-auto">
-                <Button size="lg" variant="outline" className="min-h-[44px] touch-manipulation w-full">
-                  Download Brochure
-                </Button>
-              </a>
+              <Button size="lg" variant="outline" onClick={() => navigate("/contact")} className="min-h-[44px] touch-manipulation w-full sm:w-auto">
+                Request Brochure
+              </Button>
             </div>
           </div>
         </div>
@@ -561,7 +559,7 @@ const ResidentialTraining = () => {
               <a href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Privacy Policy
               </a>
-              <a href="/terms" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <a href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Terms of Service
               </a>
             </div>
