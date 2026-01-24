@@ -157,8 +157,13 @@ const Index = () => {
         <HyperdimensionalHeroBackground />
 
         <div className="container relative z-10 mt-16 flex flex-col items-center text-center px-4">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 animate-slide-up max-w-4xl leading-tight">
-            Learn how to build, deploy, and manage AI agents for your business.
+          <h1
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 animate-slide-up max-w-4xl leading-tight"
+            style={{
+              textShadow: '0 0 40px rgba(212, 165, 116, 0.4), 0 0 80px rgba(205, 127, 50, 0.2)'
+            }}
+          >
+            Learn how to build and manage AI agents
           </h1>
 
           <p className="text-lg md:text-xl lg:text-2xl text-foreground/85 max-w-3xl mb-8 animate-slide-up font-light tracking-wide" style={{ animationDelay: '0.1s' }}>
