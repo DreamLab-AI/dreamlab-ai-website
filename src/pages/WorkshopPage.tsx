@@ -1,9 +1,10 @@
 // src/pages/WorkshopPage.tsx
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import mermaid from 'mermaid';
+// Dynamic import for mermaid to reduce initial bundle size (679KB → loaded on demand)
+import type mermaidAPI from 'mermaid';
 import DOMPurify from 'dompurify';
 import { fetchMarkdown, getDataPath } from '@/lib/markdown';
 import { Header } from '@/components/Header';
@@ -42,9 +43,19 @@ const WorkshopPage = () => {
     return 'README.md'; // Default fallback
   }, [pageSlug, manifest]);
 
-  // Initialize Mermaid.js (only once)
+  // Dynamic mermaid import ref (reduces initial bundle by ~679KB)
+  const mermaidRef = useRef<typeof mermaidAPI | null>(null);
+
+  // Initialize Mermaid.js lazily (only when needed)
   useEffect(() => {
-    mermaid.initialize({ startOnLoad: false, theme: 'default' });
+    const loadMermaid = async () => {
+      if (!mermaidRef.current) {
+        const mermaidModule = await import('mermaid');
+        mermaidRef.current = mermaidModule.default;
+        mermaidRef.current.initialize({ startOnLoad: false, theme: 'default' });
+      }
+    };
+    loadMermaid();
   }, []);
 
   // Effect to load the workshop manifest (with cancellation support)
@@ -164,7 +175,9 @@ const WorkshopPage = () => {
                 try {
                   // Sanitize input to prevent XSS
                   const sanitizedDefinition = graphDefinition.replace(/<script/gi, '&lt;script');
-                  mermaid.render(id, sanitizedDefinition).then(({ svg, bindFunctions }) => {
+                  // Use dynamically loaded mermaid
+                  if (!mermaidRef.current) return;
+                  mermaidRef.current.render(id, sanitizedDefinition).then(({ svg, bindFunctions }) => {
                     if (document.body.contains(el)) {
                       // Sanitize SVG output with DOMPurify to prevent XSS
                       const sanitizedSvg = DOMPurify.sanitize(svg, {

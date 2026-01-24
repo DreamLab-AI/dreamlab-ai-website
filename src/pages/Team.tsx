@@ -36,21 +36,24 @@ const Team = () => {
         const memberPromises = memberIds.map((id: string) =>
           (async () => {
             try {
-              const [markdownResponse, imageResponse] = await Promise.all([
-                fetch(`/data/team/${id}.md`),
-                fetch(`/data/team/${id}.png`),
-              ]);
+              const markdownResponse = await fetch(`/data/team/${id}.md`);
 
-              if (!markdownResponse.ok || !imageResponse.ok) {
+              if (!markdownResponse.ok) {
                 return null;
               }
 
               const markdownText = await markdownResponse.text();
               const { headline, fullDetails } = parseTeamMarkdown(markdownText);
 
+              // Prefer WebP with PNG fallback for older browsers
+              const webpResponse = await fetch(`/data/team/${id}.webp`, { method: 'HEAD' });
+              const imageSrc = webpResponse.ok
+                ? `/data/team/${id}.webp`
+                : `/data/team/${id}.png`;
+
               return {
                 id,
-                imageSrc: `/data/team/${id}.png`,
+                imageSrc,
                 headline,
                 fullDetails,
               };

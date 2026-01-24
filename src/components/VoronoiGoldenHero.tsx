@@ -327,6 +327,10 @@ export const VoronoiGoldenHero = ({
   // Light motes traveling along edges
   const motesRef = useRef<LightMote[]>([]);
 
+  // Cached gradients (recreated on resize, not every frame)
+  const mistGradientRef = useRef<CanvasGradient | null>(null);
+  const vignetteGradientRef = useRef<CanvasGradient | null>(null);
+
   // Color palette - bronze/gold warmth
   const colorPalette = useMemo(() => ({
     background: "#0e0e11", // Deep anthracite
@@ -416,6 +420,33 @@ export const VoronoiGoldenHero = ({
           brightness: 0.6 + Math.random() * 0.4,
           pulsePhase: Math.random() * Math.PI * 2,
         }));
+
+        // Pre-compute gradients (cached, not recreated every frame)
+        if (ctx) {
+          const width = rect.width;
+          const height = rect.height;
+
+          // Mist gradient
+          const mistGradient = ctx.createRadialGradient(
+            width / 2, height / 2, Math.min(width, height) * 0.35,
+            width / 2, height / 2, Math.min(width, height) * 0.55
+          );
+          mistGradient.addColorStop(0, "rgba(14, 14, 17, 0)");
+          mistGradient.addColorStop(0.5, "rgba(14, 14, 17, 0.4)");
+          mistGradient.addColorStop(0.8, "rgba(14, 14, 17, 0.75)");
+          mistGradient.addColorStop(1, "rgba(14, 14, 17, 0.95)");
+          mistGradientRef.current = mistGradient;
+
+          // Vignette gradient
+          const vignetteGradient = ctx.createRadialGradient(
+            width / 2, height / 2, 0,
+            width / 2, height / 2, Math.max(width, height) * 0.7
+          );
+          vignetteGradient.addColorStop(0, "rgba(14, 14, 17, 0)");
+          vignetteGradient.addColorStop(0.6, "rgba(14, 14, 17, 0.1)");
+          vignetteGradient.addColorStop(1, "rgba(14, 14, 17, 0.4)");
+          vignetteGradientRef.current = vignetteGradient;
+        }
       }
     };
 
@@ -546,28 +577,17 @@ export const VoronoiGoldenHero = ({
       }
 
       // === MIST FADE EFFECT - back 30% fading into black ===
-      // Creates depth by fading the outer/distant areas into darkness
-      const mistGradient = ctx.createRadialGradient(
-        width / 2, height / 2, Math.min(width, height) * 0.35, // Start fade at 35% radius
-        width / 2, height / 2, Math.min(width, height) * 0.55  // Full black by 55%
-      );
-      mistGradient.addColorStop(0, "rgba(14, 14, 17, 0)");
-      mistGradient.addColorStop(0.5, "rgba(14, 14, 17, 0.4)");
-      mistGradient.addColorStop(0.8, "rgba(14, 14, 17, 0.75)");
-      mistGradient.addColorStop(1, "rgba(14, 14, 17, 0.95)");
-      ctx.fillStyle = mistGradient;
-      ctx.fillRect(0, 0, width, height);
+      // Uses cached gradient (created on resize, not every frame)
+      if (mistGradientRef.current) {
+        ctx.fillStyle = mistGradientRef.current;
+        ctx.fillRect(0, 0, width, height);
+      }
 
-      // Additional subtle vignette for polish
-      const vignetteGradient = ctx.createRadialGradient(
-        width / 2, height / 2, 0,
-        width / 2, height / 2, Math.max(width, height) * 0.7
-      );
-      vignetteGradient.addColorStop(0, "rgba(14, 14, 17, 0)");
-      vignetteGradient.addColorStop(0.6, "rgba(14, 14, 17, 0.1)");
-      vignetteGradient.addColorStop(1, "rgba(14, 14, 17, 0.4)");
-      ctx.fillStyle = vignetteGradient;
-      ctx.fillRect(0, 0, width, height);
+      // Additional subtle vignette for polish (cached)
+      if (vignetteGradientRef.current) {
+        ctx.fillStyle = vignetteGradientRef.current;
+        ctx.fillRect(0, 0, width, height);
+      }
 
       // === LIGHT MOTES traveling along edges ===
       // Rendered AFTER mist/vignette so they appear on top

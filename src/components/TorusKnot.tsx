@@ -29,6 +29,13 @@ const SkillNode = ({ position, text }: SkillNodeProps) => {
   const spriteRef = useRef<THREE.Sprite>(null);
   const [opacity, setOpacity] = useState(0.25);
 
+  // Pre-allocated vectors to avoid GC pressure in useFrame
+  const tempVectors = useMemo(() => ({
+    worldPos: new THREE.Vector3(),
+    directionToCamera: new THREE.Vector3(),
+    cameraForward: new THREE.Vector3(),
+  }), []);
+
   const textTexture = useMemo(() => {
     const canvas = document.createElement('canvas');
     canvas.width = CANVAS_TEXTURE_WIDTH;
@@ -60,10 +67,11 @@ const SkillNode = ({ position, text }: SkillNodeProps) => {
   useFrame((state) => {
     if (!spriteRef.current) return;
 
-    const worldPos = spriteRef.current.getWorldPosition(new THREE.Vector3());
+    // Use pre-allocated vectors to avoid GC pressure
+    const worldPos = spriteRef.current.getWorldPosition(tempVectors.worldPos);
     const distanceToCamera = worldPos.distanceTo(state.camera.position);
-    const directionToCamera = worldPos.clone().sub(state.camera.position).normalize();
-    const cameraForward = new THREE.Vector3(0, 0, -1).applyQuaternion(state.camera.quaternion);
+    const directionToCamera = tempVectors.directionToCamera.copy(worldPos).sub(state.camera.position).normalize();
+    const cameraForward = tempVectors.cameraForward.set(0, 0, -1).applyQuaternion(state.camera.quaternion);
     const dotProduct = directionToCamera.dot(cameraForward);
 
     const maxOpacity = 0.25;
