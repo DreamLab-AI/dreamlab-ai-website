@@ -568,14 +568,14 @@ export const VoronoiGoldenHero = ({
 
       // Mouse interaction parameters
       const mouse = mouseRef.current;
-      const mouseInfluenceRadius = 250; // Pixels - how far mouse affects seeds
-      const mouseForceStrength = 0.8; // Force applied toward mouse (acceleration)
-      const velocityScale = 50; // How much velocity amplifies effect (faster = more effect)
+      const mouseInfluenceRadius = 200; // Pixels - how far mouse affects seeds
+      const mouseForceStrength = 0.3; // Force applied toward mouse (gentle push)
+      const velocityScale = 30; // How much velocity amplifies effect
 
-      // Physics constants for smooth movement with momentum
-      const damping = 0.995; // Velocity decay per frame (0.995 = very slow decay, long momentum trails)
-      const returnForce = 0.02; // How strongly nodes return to rest position (reduced for longer drift)
-      const maxVelocity = 12; // Maximum velocity to prevent runaway
+      // Physics constants for calm, elegant movement
+      const damping = 0.92; // Velocity decay per frame (higher damping = faster deceleration)
+      const returnForce = 0.015; // How strongly nodes return to rest position
+      const maxVelocity = 5; // Maximum velocity cap for slower movement
 
       // Track which seeds are near mouse this frame (for mote spawning)
       const nearSeedsThisFrame = new Set<number>();
