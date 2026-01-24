@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import { goto } from '$app/navigation';
   import { base } from '$app/paths';
   import { page } from '$app/stores';
@@ -7,7 +7,7 @@
   import { userPermissionsStore } from '$lib/stores/userPermissions';
   import { whitelistStatusStore } from '$lib/stores/user';
   import { get } from 'svelte/store';
-  import { connectRelay, isConnected } from '$lib/nostr/relay';
+  import { connectRelay, isConnected, connectionState, ConnectionState } from '$lib/nostr/relay';
   import { RELAY_URL } from '$lib/config';
   import { fetchChannels, type CreatedChannel } from '$lib/nostr/channels';
   import { getSection } from '$lib/config';
@@ -34,6 +34,9 @@
   let loading = true;
   let error: string | null = null;
   let showSearch = false;
+  let retryCount = 0;
+  let retrying = false;
+  const MAX_RETRIES = 3;
 
   // Get active section from URL query params
   $: activeSection = $page.url.searchParams.get('section');
@@ -49,6 +52,11 @@
   $: pageDescription = sectionConfig
     ? sectionConfig.description
     : 'Join conversations in public channels';
+
+  // Connection status for UI feedback
+  $: connState = $connectionState;
+  $: isConnectionError = connState.state === ConnectionState.Error ||
+                         connState.state === ConnectionState.AuthFailed;
 
   async function handleSearchSelect(noteId: string) {
     // Search for the message in channels and navigate to it
@@ -68,18 +76,7 @@
     console.warn('Message not found in loaded channels:', noteId);
   }
 
-  onMount(async () => {
-    // Wait for auth store to be ready before checking authentication
-    await authStore.waitForReady();
-
-    if (!$authStore.isAuthenticated || !$authStore.publicKey) {
-      goto(`${base}/`);
-      return;
-    }
-
-    // Open registration: no pending approval check needed
-    // Users get minimoonoir welcome level access by default
-
+  async function loadChannels() {
     try {
       // Connect to relay with authentication
       if ($authStore.privateKey && !isConnected()) {
@@ -97,12 +94,51 @@
         userPubkey: $authStore.publicKey ?? undefined,
         isAdmin
       });
+
+      // Clear any previous error on success
+      error = null;
+      retryCount = 0;
     } catch (e) {
       console.error('Failed to load channels:', e);
       error = e instanceof Error ? e.message : 'Failed to load channels';
-    } finally {
-      loading = false;
+
+      // Show user-friendly error messages
+      if (error.includes('timeout') || error.includes('Timeout')) {
+        error = 'Connection timed out. The server may be temporarily unavailable.';
+      } else if (error.includes('Invalid private key')) {
+        error = 'Authentication failed. Please try logging out and back in.';
+      }
     }
+  }
+
+  async function retryConnection() {
+    if (retrying || retryCount >= MAX_RETRIES) return;
+
+    retrying = true;
+    retryCount++;
+    error = null;
+
+    try {
+      await loadChannels();
+    } finally {
+      retrying = false;
+    }
+  }
+
+  onMount(async () => {
+    // Wait for auth store to be ready before checking authentication
+    await authStore.waitForReady();
+
+    if (!$authStore.isAuthenticated || !$authStore.publicKey) {
+      goto(`${base}/`);
+      return;
+    }
+
+    // Open registration: no pending approval check needed
+    // Users get minimoonoir welcome level access by default
+
+    await loadChannels();
+    loading = false;
   });
 
   function formatDate(timestamp: number): string {
@@ -170,8 +206,42 @@
           <SkeletonLoader variant="channel" count={5} />
         </div>
       {:else if error}
-        <div class="alert alert-error">
-          <span>{error}</span>
+        <div class="card bg-base-200 shadow-lg">
+          <div class="card-body text-center py-8">
+            <div class="text-6xl mb-4">
+              {#if error.includes('timed out') || error.includes('unavailable')}
+                <span class="opacity-50">&#128268;</span>
+              {:else if error.includes('Authentication')}
+                <span class="opacity-50">&#128274;</span>
+              {:else}
+                <span class="opacity-50">&#9888;&#65039;</span>
+              {/if}
+            </div>
+            <h3 class="text-lg font-semibold text-error mb-2">Connection Issue</h3>
+            <p class="text-base-content/70 mb-4 max-w-md mx-auto">{error}</p>
+            <div class="flex flex-col sm:flex-row gap-2 justify-center">
+              {#if retryCount < MAX_RETRIES}
+                <button
+                  class="btn btn-primary btn-sm"
+                  on:click={retryConnection}
+                  disabled={retrying}
+                >
+                  {#if retrying}
+                    <span class="loading loading-spinner loading-xs"></span>
+                    Retrying...
+                  {:else}
+                    Retry Connection
+                  {/if}
+                </button>
+              {:else}
+                <p class="text-sm text-base-content/50">Max retries reached. Please refresh the page.</p>
+              {/if}
+              <a href="{base}/" class="btn btn-ghost btn-sm">Back to Home</a>
+            </div>
+            {#if retryCount > 0}
+              <p class="text-xs text-base-content/40 mt-2">Retry attempt {retryCount} of {MAX_RETRIES}</p>
+            {/if}
+          </div>
         </div>
       {:else if channels.length === 0}
         <div class="text-center">

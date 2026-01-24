@@ -43,7 +43,8 @@
 	let showUpdateBanner = false;
 	let showProfileModal = false;
 	let sessionCleanup: (() => void) | undefined = undefined;
-	let isMobile = false;
+	// Initialize isMobile from browser check if available (SSR-safe)
+	let isMobile = browser ? window.innerWidth < 768 : false;
 	let calendarSheetOpen = false;
 	let zoneNavCollapsed = false;
 	let calendarCollapsed = true;
