@@ -505,10 +505,10 @@ const Masterclass = () => {
               )}
 
               <a
-                href="/workshops"
+                href="/residential-training"
                 className="block w-full py-3 px-6 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold text-center hover:shadow-lg hover:shadow-purple-500/30 transition-all"
               >
-                Explore All Courses <ArrowRight className="inline w-4 h-4 ml-2" />
+                View Residential Details <ArrowRight className="inline w-4 h-4 ml-2" />
               </a>
             </div>
           </div>

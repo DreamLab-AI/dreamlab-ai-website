@@ -167,7 +167,7 @@ const Testimonials = () => {
               <ArrowRight className="ml-2 w-5 h-5" />
             </a>
             <a
-              href="/workshops"
+              href="/residential-training"
               className="inline-flex items-center justify-center px-8 py-4 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold hover:shadow-xl hover:shadow-purple-500/30 transition-all hover:scale-105"
             >
               Advanced Residential

@@ -123,6 +123,19 @@ interface VoronoiSeed {
   colorIndex: number; // 0=bronze, 1=gold, 2=bright gold
 }
 
+// Mouse state for interaction
+interface MouseState {
+  x: number;
+  y: number;
+  velocityX: number;
+  velocityY: number;
+  speed: number; // Magnitude of velocity
+  active: boolean; // Is mouse over the canvas?
+  lastX: number;
+  lastY: number;
+  lastTime: number;
+}
+
 // Delaunay triangulation edge
 interface DelaunayEdge {
   from: number;
@@ -327,6 +340,22 @@ export const VoronoiGoldenHero = ({
   // Light motes traveling along edges
   const motesRef = useRef<LightMote[]>([]);
 
+  // Mouse interaction state
+  const mouseRef = useRef<MouseState>({
+    x: 0,
+    y: 0,
+    velocityX: 0,
+    velocityY: 0,
+    speed: 0,
+    active: false,
+    lastX: 0,
+    lastY: 0,
+    lastTime: 0,
+  });
+
+  // Track seeds near mouse for mote spawning
+  const lastNearSeedsRef = useRef<Set<number>>(new Set());
+
   // Cached gradients (recreated on resize, not every frame)
   const mistGradientRef = useRef<CanvasGradient | null>(null);
   const vignetteGradientRef = useRef<CanvasGradient | null>(null);
@@ -342,6 +371,47 @@ export const VoronoiGoldenHero = ({
     glowGold: "rgba(212, 165, 116, 0.4)",
     glowBright: "rgba(255, 215, 0, 0.5)",
   }), []);
+
+  // Mouse event handlers for interaction
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const now = performance.now();
+    const mouse = mouseRef.current;
+
+    const newX = e.clientX - rect.left;
+    const newY = e.clientY - rect.top;
+
+    // Calculate velocity (pixels per millisecond)
+    const dt = now - mouse.lastTime;
+    if (dt > 0 && mouse.active) {
+      const dx = newX - mouse.lastX;
+      const dy = newY - mouse.lastY;
+      // Smoothed velocity (exponential moving average)
+      const smoothing = 0.3;
+      mouse.velocityX = mouse.velocityX * (1 - smoothing) + (dx / dt) * smoothing;
+      mouse.velocityY = mouse.velocityY * (1 - smoothing) + (dy / dt) * smoothing;
+      mouse.speed = Math.sqrt(mouse.velocityX ** 2 + mouse.velocityY ** 2);
+    }
+
+    mouse.lastX = mouse.x;
+    mouse.lastY = mouse.y;
+    mouse.x = newX;
+    mouse.y = newY;
+    mouse.lastTime = now;
+    mouse.active = true;
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    const mouse = mouseRef.current;
+    mouse.active = false;
+    // Decay velocity when mouse leaves
+    mouse.velocityX *= 0.5;
+    mouse.velocityY *= 0.5;
+    mouse.speed *= 0.5;
+  }, []);
 
   // Get color for edge based on seed colors
   const getEdgeColor = useCallback((seed1: VoronoiSeed, seed2: VoronoiSeed, alpha: number): string => {
@@ -491,7 +561,17 @@ export const VoronoiGoldenHero = ({
       const noiseScale = 0.003; // Spatial frequency
       const amplitude = prefersReducedMotion ? 0 : 8; // Max displacement in pixels
 
-      // Update seed positions with Perlin noise
+      // Mouse interaction parameters
+      const mouse = mouseRef.current;
+      const mouseInfluenceRadius = 200; // Pixels - how far mouse affects seeds
+      const maxMouseDisplacement = 15; // Max pixels a seed can move toward mouse
+      const velocityScale = 50; // How much velocity amplifies effect (faster = more effect)
+
+      // Track which seeds are near mouse this frame (for mote spawning)
+      const nearSeedsThisFrame = new Set<number>();
+      const moteSpawnRadius = 30; // Pixels - how close mouse must be to spawn mote
+
+      // Update seed positions with Perlin noise + mouse perturbation
       for (let i = 0; i < seeds.length; i++) {
         const seed = seeds[i];
         const noiseX = noise.noise2D(
@@ -503,8 +583,71 @@ export const VoronoiGoldenHero = ({
           seed.baseY * noiseScale + time * timeScale + seed.phase
         );
 
-        seed.x = seed.baseX + noiseX * amplitude;
-        seed.y = seed.baseY + noiseY * amplitude;
+        // Base position from Perlin noise
+        let targetX = seed.baseX + noiseX * amplitude;
+        let targetY = seed.baseY + noiseY * amplitude;
+
+        // Apply mouse gravitational pull if mouse is active
+        if (mouse.active && !prefersReducedMotion) {
+          const dx = mouse.x - seed.baseX;
+          const dy = mouse.y - seed.baseY;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < mouseInfluenceRadius && dist > 0) {
+            // Inverse distance falloff (closer = stronger pull)
+            const influence = 1 - (dist / mouseInfluenceRadius);
+            // Velocity scaling: faster mouse = larger effect
+            const velocityFactor = Math.min(1, mouse.speed * velocityScale);
+            // Combined intensity (quadratic falloff for smoother feel)
+            const intensity = influence * influence * (0.3 + 0.7 * velocityFactor);
+
+            // Direction toward mouse
+            const dirX = dx / dist;
+            const dirY = dy / dist;
+
+            // Apply displacement (clamped to preserve geometry)
+            const displacement = intensity * maxMouseDisplacement;
+            targetX += dirX * displacement;
+            targetY += dirY * displacement;
+
+            // Track if this seed is very close (for mote spawning)
+            if (dist < moteSpawnRadius) {
+              nearSeedsThisFrame.add(i);
+            }
+          }
+        }
+
+        seed.x = targetX;
+        seed.y = targetY;
+      }
+
+      // Spawn motes when cursor newly passes near vertices
+      if (mouse.active && !prefersReducedMotion && edges.length > 0) {
+        const lastNear = lastNearSeedsRef.current;
+        for (const seedIdx of nearSeedsThisFrame) {
+          if (!lastNear.has(seedIdx)) {
+            // New seed proximity - spawn a mote from an edge connected to this seed
+            const connectedEdges = edges
+              .map((e, idx) => ({ edge: e, idx }))
+              .filter(({ edge }) => edge.from === seedIdx || edge.to === seedIdx);
+
+            if (connectedEdges.length > 0 && motesRef.current.length < 20) {
+              const randomEdge = connectedEdges[Math.floor(Math.random() * connectedEdges.length)];
+              // Start mote from the seed we passed
+              const startProgress = randomEdge.edge.from === seedIdx ? 0 : 1;
+
+              motesRef.current.push({
+                edgeIndex: randomEdge.idx,
+                progress: startProgress,
+                speed: 0.001 + Math.random() * 0.001, // Faster than ambient motes
+                size: 3 + Math.random() * 2,
+                brightness: 0.8 + Math.random() * 0.2,
+                pulsePhase: Math.random() * Math.PI * 2,
+              });
+            }
+          }
+        }
+        lastNearSeedsRef.current = nearSeedsThisFrame;
       }
 
       // Draw subtle glow layer first
@@ -676,17 +819,19 @@ export const VoronoiGoldenHero = ({
 
   return (
     <div
-      className={`absolute inset-0 w-full h-full pointer-events-none ${className}`}
+      className={`absolute inset-0 w-full h-full ${className}`}
       aria-hidden="true"
       style={{
         // Tilt-shift effect: blur top and bottom edges for miniature/scale impression
         maskImage: "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)",
         WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)",
       }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
     >
       <canvas
         ref={canvasRef}
-        className="absolute inset-0 w-full h-full"
+        className="absolute inset-0 w-full h-full pointer-events-none"
         style={{
           opacity: 0.9,
           // Subtle tilt-shift blur via filter
