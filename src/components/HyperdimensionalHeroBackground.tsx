@@ -47,16 +47,17 @@ export const HyperdimensionalHeroBackground = () => {
 
   return (
     <div
-      className="absolute inset-0 overflow-hidden pointer-events-none"
+      className="absolute inset-0 overflow-hidden"
       aria-hidden="true"
       style={{ perspective: "1500px" }}
     >
       {/* Primary: Voronoi tessellation with golden ratio seed placement */}
-      <VoronoiGoldenHero seedCount={80} goldMode={true} />
+      {/* pointer-events-auto to enable mouse interaction for gravitational effect */}
+      <VoronoiGoldenHero seedCount={80} goldMode={true} className="pointer-events-auto" />
 
       {/* Minimal mathematical grid - geometric precision, not blur */}
       <div
-        className={`absolute inset-0 ${
+        className={`absolute inset-0 pointer-events-none ${
           prefersReducedMotion ? "opacity-[0.015]" : "opacity-[0.02]"
         }`}
         style={{
@@ -70,7 +71,7 @@ export const HyperdimensionalHeroBackground = () => {
 
       {/* Secondary grid layer - isometric for depth */}
       <div
-        className={`absolute inset-0 ${
+        className={`absolute inset-0 pointer-events-none ${
           prefersReducedMotion ? "opacity-[0.01]" : "opacity-[0.015]"
         }`}
         style={{
@@ -84,7 +85,7 @@ export const HyperdimensionalHeroBackground = () => {
 
       {/* Subtle radial vignette for content focus - NOT a gradient glow */}
       <div
-        className="absolute inset-0"
+        className="absolute inset-0 pointer-events-none"
         style={{
           background:
             "radial-gradient(ellipse 80% 70% at 50% 50%, transparent 0%, rgba(0,0,0,0.4) 100%)",
@@ -93,7 +94,7 @@ export const HyperdimensionalHeroBackground = () => {
 
       {/* Top fade for navbar integration */}
       <div
-        className="absolute inset-x-0 top-0 h-24"
+        className="absolute inset-x-0 top-0 h-24 pointer-events-none"
         style={{
           background: "linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, transparent 100%)",
         }}
