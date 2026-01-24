@@ -31,7 +31,7 @@ import {
 /**
  * AI Agent Masterclass page - Product Lead Format
  * Two course options:
- * - 2-day residential (max 4 people) - includes accommodation
+ * - Residential programme (max 4 people, 2-5 days) - includes full-board
  * - 1-day workshops (up to 6 people) - delivered anywhere in UK
  */
 const Masterclass = () => {
@@ -138,7 +138,7 @@ const Masterclass = () => {
     },
     {
       question: "What's the difference between the workshop and residential?",
-      answer: "The 1-day workshop gives you a working agent and the skills to build more. The 2-day residential goes deeper: multiple agents, complex workflows, and strategic planning for your whole automation roadmap."
+      answer: "The 1-day workshop gives you a working agent and the skills to build more. The residential goes deeper over multiple days: multiple agents, complex workflows, and strategic planning for your whole automation roadmap."
     },
     {
       question: "Can you come to our office?",
@@ -183,11 +183,11 @@ const Masterclass = () => {
           <div className="animate-slide-up flex flex-col sm:flex-row gap-6 text-sm text-muted-foreground" style={{ animationDelay: '0.25s' }}>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 bg-cyan-400 rounded-full" />
-              <span>1-day workshop · up to 6 people · at your location</span>
+              <span>1-day workshop · up to 6 people · £1,495 pp</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 bg-blue-400 rounded-full" />
-              <span>2-day residential · max 4 people · full-board included</span>
+              <span>Residential · max 4 people · from £995/day pp</span>
             </div>
           </div>
         </div>
@@ -215,13 +215,10 @@ const Masterclass = () => {
           <div className="bg-background/60 backdrop-blur-xl rounded-2xl border border-purple-500/20 p-8 md:p-12">
             <div className="prose prose-lg prose-invert max-w-none">
               <p className="text-lg text-foreground/85 leading-relaxed mb-6">
-                <strong className="text-foreground">Dr John O'Hare</strong> is an HP AI Lighthouse Partner with over 25 years building products and teams at the intersection of technology and creativity. As CTO of the company behind Unreal Engine's flagship third-party plugins, he shipped tools used by AAA game studios and Hollywood productions.
-              </p>
-              <p className="text-lg text-foreground/85 leading-relaxed mb-6">
-                From AI systems for autonomous marine vessels to immersive media at scale, his approach is always the same: understand the problem, build what works, and ship it.
+                <strong className="text-foreground">Dr John O'Hare</strong> — PhD, 25 years leading R&D at the intersection of AI, immersive tech, and product delivery. Built the UK's first Cave Automatic Virtual Environment. Directed technical teams on projects from IMAX documentaries to autonomous marine systems. £8M+ in research grants. Now runs a network of 42 specialist consultants.
               </p>
               <p className="text-lg text-foreground/85 leading-relaxed">
-                This isn't a course about prompting chatbots. It's about building systems that do real work: reading emails, updating databases, making decisions, and taking action—while keeping humans in the loop where it matters.
+                This isn't theory. It's building systems that do real work—reading emails, updating databases, making decisions, and taking action—while keeping humans in control.
               </p>
             </div>
           </div>
@@ -422,7 +419,7 @@ const Masterclass = () => {
               <p className="text-foreground/70 mb-6">At your location, anywhere in the UK</p>
 
               <div className="mb-6">
-                <span className="text-4xl font-bold">£2,995</span>
+                <span className="text-4xl font-bold">£1,495</span>
                 <span className="text-foreground/60 ml-2">per person</span>
               </div>
 
@@ -446,7 +443,7 @@ const Masterclass = () => {
               </ul>
 
               <p className="text-sm text-foreground/60 mb-6">
-                Perfect for teams who want to understand AI agents and build their first automation with real outcomes.
+                Build your first AI agent with real business impact in a single day.
               </p>
 
               <a
@@ -459,19 +456,19 @@ const Masterclass = () => {
               </a>
             </div>
 
-            {/* 2-Day Residential */}
+            {/* Residential Programme */}
             <div className="bg-background/60 backdrop-blur-xl rounded-2xl border border-purple-500/30 p-8 relative overflow-hidden">
               <div className="absolute top-4 right-4 px-3 py-1 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full text-purple-400 text-sm font-medium">
                 Advanced Platform
               </div>
 
-              <h3 className="text-2xl font-bold mb-2">2-Day Residential</h3>
+              <h3 className="text-2xl font-bold mb-2">Residential Programme</h3>
               <p className="text-foreground/70 mb-6">Full-board at DreamLab HQ</p>
 
               <div className="mb-6">
-                <span className="text-4xl font-bold">£1,695</span>
-                <span className="text-foreground/60 ml-2">per person</span>
-                <p className="text-sm text-foreground/50 mt-1">Team of 4: £5,750 (save £530)</p>
+                <span className="text-4xl font-bold">From £995</span>
+                <span className="text-foreground/60 ml-2">per person/day</span>
+                <p className="text-sm text-foreground/50 mt-1">Duration tailored to your objectives (2-5 days)</p>
               </div>
 
               <ul className="space-y-3 mb-6">
@@ -481,7 +478,7 @@ const Masterclass = () => {
                 </li>
                 <li className="flex items-center gap-3">
                   <Calendar className="w-5 h-5 text-purple-400" />
-                  <span>2 full days, full-board included</span>
+                  <span>Full-board accommodation included</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <Network className="w-5 h-5 text-purple-400" />
