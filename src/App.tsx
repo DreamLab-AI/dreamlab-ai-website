@@ -19,6 +19,7 @@ const ResidentialTraining = lazy(() => import("./pages/ResidentialTraining"));
 const Masterclass = lazy(() => import("./pages/Masterclass"));
 const SystemDesign = lazy(() => import("./pages/SystemDesign"));
 const ResearchPaper = lazy(() => import("./pages/ResearchPaper"));
+const Testimonials = lazy(() => import("./pages/Testimonials"));
 
 // Initialize React Query client
 const queryClient = new QueryClient();
@@ -66,6 +67,8 @@ const App = () => (
             <Route path="/system-design" element={<SystemDesign />} />
             {/* Research Paper route */}
             <Route path="/research-paper" element={<ResearchPaper />} />
+            {/* Testimonials route */}
+            <Route path="/testimonials" element={<Testimonials />} />
             {/* --- Add Custom Routes Above This Line --- */}
             {/* Catch-all route for pages not found */}
             <Route path="*" element={<NotFound />} />

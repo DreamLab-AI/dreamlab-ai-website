@@ -58,14 +58,21 @@ const Index = () => {
             One day. One working agent. Real impact.
           </p>
 
-          {/* Primary CTA - above fold */}
+          {/* Primary CTA - two paths */}
           <div className="flex flex-col sm:flex-row gap-4 animate-scale-in mb-8" style={{ animationDelay: '0.2s' }}>
             <a
-              href="/masterclass#content"
-              className="group relative inline-flex items-center justify-center rounded-lg text-base font-semibold ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white hover:shadow-xl hover:shadow-blue-500/50 hover:scale-105 h-14 px-10 py-3 overflow-hidden"
+              href="/masterclass#pricing"
+              className="group relative inline-flex items-center justify-center rounded-lg text-base font-semibold ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-xl hover:shadow-cyan-500/50 hover:scale-105 h-14 px-8 py-3 overflow-hidden"
             >
-              <span className="relative z-10">Get the AI Agent Masterclass now →</span>
-              <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-orange-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <span className="relative z-10">1-Day Workshop →</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            </a>
+            <a
+              href="/workshops"
+              className="group relative inline-flex items-center justify-center rounded-lg text-base font-semibold ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:shadow-xl hover:shadow-purple-500/50 hover:scale-105 h-14 px-8 py-3 overflow-hidden"
+            >
+              <span className="relative z-10">Advanced Residential →</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-pink-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </a>
           </div>
 

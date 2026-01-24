@@ -505,12 +505,10 @@ const Masterclass = () => {
               )}
 
               <a
-                href="https://cal.com/dreamlab/residential-discovery"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="/workshops"
                 className="block w-full py-3 px-6 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold text-center hover:shadow-lg hover:shadow-purple-500/30 transition-all"
               >
-                Book a call <ArrowRight className="inline w-4 h-4 ml-2" />
+                Explore All Courses <ArrowRight className="inline w-4 h-4 ml-2" />
               </a>
             </div>
           </div>
