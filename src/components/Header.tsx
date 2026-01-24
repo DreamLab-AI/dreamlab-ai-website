@@ -87,6 +87,11 @@ export const Header = () => {
             <DropdownMenuItem asChild>
               <Link to="/workshops" className="w-full">Workshops</Link>
             </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <a href="/community/dreamlab/dreamlab-lobby" target="_blank" rel="noopener noreferrer" className="w-full">
+                Community<span className="sr-only"> (opens DreamLab community forum in new tab)</span>
+              </a>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
               <Link to="/work" className="w-full">Previous Work</Link>
