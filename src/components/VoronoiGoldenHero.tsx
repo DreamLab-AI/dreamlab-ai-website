@@ -573,9 +573,9 @@ export const VoronoiGoldenHero = ({
       const velocityScale = 50; // How much velocity amplifies effect (faster = more effect)
 
       // Physics constants for smooth movement with momentum
-      const damping = 0.92; // Velocity decay per frame (0.92 = smooth deceleration with residual)
-      const returnForce = 0.08; // How strongly nodes return to rest position
-      const maxVelocity = 8; // Maximum velocity to prevent runaway
+      const damping = 0.995; // Velocity decay per frame (0.995 = very slow decay, long momentum trails)
+      const returnForce = 0.02; // How strongly nodes return to rest position (reduced for longer drift)
+      const maxVelocity = 12; // Maximum velocity to prevent runaway
 
       // Track which seeds are near mouse this frame (for mote spawning)
       const nearSeedsThisFrame = new Set<number>();

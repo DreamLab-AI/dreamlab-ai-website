@@ -158,11 +158,11 @@ const Index = () => {
 
         <div className="container relative z-10 mt-16 flex flex-col items-center text-center px-4">
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 animate-slide-up max-w-4xl leading-tight">
-            Learn how to build AI agents for your business, in a day
+            Learn how to build, deploy, and manage AI agents for your business.
           </h1>
 
           <p className="text-lg md:text-xl lg:text-2xl text-foreground/85 max-w-3xl mb-8 animate-slide-up font-light tracking-wide" style={{ animationDelay: '0.1s' }}>
-            In one day, we'll build a working agent together that has meaningful impact on your organisation.
+            In a few hours we'll give you the tools to deploy agents that can meaningfully impact your business and give you long term advantage.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 animate-scale-in mb-8" style={{ animationDelay: '0.2s' }}>

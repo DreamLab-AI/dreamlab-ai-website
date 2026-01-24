@@ -1,0 +1,444 @@
+# DreamLab AI Website Content
+# Structured text extraction for WASM-based rebuild
+# Generated: 2026-01-23
+
+meta:
+  company: "DreamLab AI Consulting Ltd"
+  email: "info@dreamlab-ai.com"
+  social:
+    bluesky: "https://bsky.app/profile/thedreamlab.bsky.social"
+    linkedin: "https://www.linkedin.com/company/dreamlab-ai-consulting/?"
+    instagram: "#" # Coming soon
+  affiliate_partners:
+    - name: "DreamLab Creative Tech"
+      url: "https://dreamlab-ai.com"
+    - name: "Agentic Alliance"
+      url: "https://agenticalliance.com/"
+    - name: "Narrative Goldmine"
+      url: "https://www.narrativegoldmine.com"
+    - name: "Visionflow"
+      url: "https://www.visionflow.com"
+
+navigation:
+  menu_items:
+    - label: "Home"
+      path: "/"
+    - label: "Team"
+      path: "/team"
+    - label: "Residential Training"
+      path: "/residential-training"
+    - label: "Workshops"
+      path: "/workshops"
+    - label: "Previous Work"
+      path: "/work"
+    - label: "System Design"
+      path: "/system-design"
+    - label: "Contact"
+      path: "/contact"
+
+pages:
+  home:
+    hero:
+      trust_badge: "Limited to 15 participants per cohort"
+      headline: "Build Production-Grade AI Agents That Outperform Standard Tools by 30%"
+      subheadline: "In one day, walk away with a working agent, reusable templates, and frameworks to build the next one yourself."
+      audience_description: "Deep agentic AI training for CTOs, tech leads, and technical founders who want AI doing real work — not just demos."
+      cta_primary:
+        text: "Get the AI Agent Masterclass →"
+        path: "/residential-training"
+      cta_secondary:
+        text: "Meet Dr. John O'Hare"
+        path: "/team"
+      trust_bar:
+        main: "Trusted by engineers building production AI systems"
+        pricing: "£2999 · One-day intensive · Full-board residential option available"
+      scroll_indicator: "Scroll down to next section"
+
+    email_signup:
+      headline: "Join the Creative Technology Revolution"
+      description: "Stay updated on our latest training programs in virtual production, AI/ML, spatial audio, and agentic engineering."
+      placeholder: "Your email address"
+      button_text: "Get Early Access"
+      consent_text: "Join hundreds of industry professionals staying ahead of the curve"
+
+    footer:
+      copyright: "© {year} DreamLab AI Consulting Ltd. All rights reserved."
+      privacy_link: "/privacy"
+
+  testimonials:
+    section_title: "Moments of Clarity"
+    section_description: "When the setting and the learning align, something shifts. Our alumni speak of breakthroughs that happened between sessions as much as during them."
+    items:
+      - id: "maya-chen"
+        name: "Maya Chen"
+        role: "Digital Sculptor"
+        quote: "I learned to wield VR tools while wind whipped off Derwentwater. Now I sculpt with the same raw power as those mountains—unafraid of rough edges."
+        location_detail: "Sunset sessions overlooking the lake"
+      - id: "tom-blackwood"
+        name: "Tom Blackwood"
+        role: "Interactive Installation Artist"
+        quote: "The generative algorithms made sense somewhere between morning mist and sheep-dotted hills. My pieces finally breathe like landscapes do."
+        location_detail: "Barn studio with stone walls and roaring fires"
+      - id: "samira-velasco"
+        name: "Samira Velasco"
+        role: "Motion Graphics Designer"
+        quote: "Real-time rendering clicked while rain drummed on the roof. I stopped overthinking everything and started making work that moves."
+        location_detail: "Converted mill with waterwheel views"
+
+  instructors:
+    section_badge: "The Collective"
+    section_title: "Learn From Those Who Ship"
+    section_description: "Our instructors aren't academics who lecture from slides. They're active practitioners who return from production to teach."
+    bottom_note: "Part of our 43+ specialist collective. Each programme features 3-4 complementary instructors."
+    items:
+      - id: "marcus-chen"
+        name: "Marcus Chen"
+        title: "Virtual Production Director"
+        credential: "Emmy-nominated for Outstanding Visual Effects"
+        bio: "Marcus brings a rare calm to high-pressure LED volume shoots, having led virtual production on projects spanning Star Wars episodic content to Formula 1 broadcasts. When not on set, you'll find him obsessing over camera tracking systems or hiking the fells."
+        accent: "amber-orange"
+      - id: "dr-elena-vasquez"
+        name: "Dr. Elena Vasquez"
+        title: "Spatial Audio Research Lead"
+        credential: "PhD Psychoacoustics, Cambridge | Dolby Fellow"
+        bio: "Elena's research into how humans perceive 3D sound has shaped immersive audio standards across gaming and cinema. She has a knack for making complex acoustics intuitive, often using her love of field recording to illustrate concepts through real-world soundscapes."
+        accent: "blue-cyan"
+      - id: "james-okonkwo"
+        name: "James Okonkwo"
+        title: "Motion Capture Director"
+        credential: "18 years | Marvel, Naughty Dog, ILM"
+        bio: "James has spent nearly two decades translating human performance into digital characters, from AAA game protagonists to blockbuster film creatures. He's known for his infectious enthusiasm on the mocap stage and his ability to coax authentic performances from first-time suit performers."
+        accent: "purple-pink"
+
+  exclusivity_banner:
+    badges:
+      - icon: "clock"
+        text: "Q1 2025 Fully Booked"
+        color: "amber"
+      - icon: "users"
+        text: "Max 4 per cohort"
+        color: "purple"
+    headline: "Curated Cohorts. Limited Seats."
+    description: "Our residential programmes operate at intimate scale by design. Each cohort is carefully assembled to maximise peer learning and instructor access. Join the waitlist for Q2 2025."
+    form:
+      placeholder: "Your email address"
+      button_text: "Join Waitlist"
+      button_loading: "Joining..."
+    disclaimer: "No spam. Priority notification when spaces open."
+    success_message: "You're on the list. We'll be in touch when Q2 opens."
+
+  case_study:
+    section_label: "A Story of Transformation"
+    section_title: "When the Technology Finally Made Sense"
+    narrative:
+      opening: "Sarah arrived with 15 years in post-production but had never touched an LED volume. She'd watched the industry shift beneath her feet, seen junior artists land jobs she couldn't even apply for because \"virtual production experience required\" had become the gatekeeping phrase of the decade. The drive up to the Lake District felt like admitting defeat."
+      journey: "The first two days were humbling. Unreal Engine's node graphs looked like conspiracy theory boards. The camera tracking system spoke a language that made her decades of After Effects mastery feel suddenly irrelevant. She stayed up late in the converted barn studio, rain drumming on the slate roof, trying to make a virtual sunset behave the way sunsets actually behave."
+      pull_quote:
+        text: "On day three, standing in front of that virtual sunset that finally responded to my camera moves in real-time, I understood why my traditional compositing workflow suddenly felt like archaeology."
+        attribution: "Sarah M., Senior Colourist turned VP Supervisor"
+      shift: "The breakthrough came not in a classroom but during a morning walk along Derwentwater. Something about watching fog lift off the water while mentally replaying the volumetric lighting tutorial from the night before. The real and the virtual stopped feeling like opposing forces. By the final session, she wasn't just operating the LED wall—she was choreographing light the way she'd always wanted to, just with tools that hadn't existed when she started her career."
+      result: "Six months later, Sarah leads virtual production integration at a mid-sized commercial house in Manchester. Her first VP job was a car commercial where the \"location\" was generated entirely from HDRI data she captured in the Lake District on that last morning—the same mountains she'd walked past, now wrapped around an LED volume, responding to camera moves she was calling."
+    cta:
+      link_text: "Explore our residential training programmes"
+      path: "/residential-training"
+      note: "Limited to 4 participants per cohort for genuine transformation"
+
+  residential_training:
+    availability_banner: "Q1 2025 fully booked — Q2 sessions available at reduced rates during facility upgrades"
+    hero:
+      badge: "Residential Training"
+      headline: "Deep learning with no distractions"
+      description: "Train with the DreamLab collective — 43+ specialists including Emmy nominees, PhD researchers, and BAFTA-recognised talent. Multi-instructor delivery at our Lake District residential facility."
+      cta_primary: "Book Your Training"
+      cta_secondary: "Download Brochure"
+
+    facility_features:
+      - icon: "zap"
+        title: "The Dream Team"
+        description: "43+ specialists: Emmy nominees, PhDs, BAFTA talent on every programme"
+      - icon: "users"
+        title: "Enterprise Tech Stack"
+        description: "LED volume, motion capture, 8×RTX GPU cluster, Dolby Atmos studio"
+      - icon: "award"
+        title: "6.3kW Solar + 10G Network"
+        description: "Sustainable infrastructure with enterprise-grade connectivity"
+      - icon: "home"
+        title: "Lake District Residential"
+        description: "5-bedroom luxury accommodation with stunning mountain views"
+
+    programs_section:
+      headline: "Immersive Training Programs"
+      description: "Multi-instructor delivery from our 43+ specialist collective. Each programme combines complementary expertise for comprehensive, hands-on skill transfer."
+      categories:
+        - id: "all"
+          label: "All"
+        - id: "ai"
+          label: "AI/ML"
+        - id: "creative"
+          label: "VP"
+        - id: "xr"
+          label: "XR"
+        - id: "audio"
+          label: "Audio"
+        - id: "engineering"
+          label: "Eng"
+        - id: "web3"
+          label: "Web3"
+        - id: "enterprise"
+          label: "Corp"
+
+    programs:
+      - id: "ai-commander-week"
+        title: "AI Commander Week"
+        duration: "5 Days"
+        price_per_person: "£2,750"
+        team_price: "£9,350"
+        team_saving: "Save £650"
+        capacity: "Up to 4"
+        category: "AI/ML"
+        featured: true
+        description: "Master agentic engineering from protocol level to production. Learn to orchestrate AI agents, multi-model architectures, and autonomous systems from practitioners who build at the cutting edge."
+        modules:
+          - "Agentic Architecture & Protocol Design"
+          - "Multi-Agent Orchestration & Swarm Intelligence"
+          - "LLM Integration & Fine-Tuning Workflows"
+          - "Production Deployment & Scaling"
+          - "Human-AI Collaboration Interfaces"
+        instructors: "Pete Woodbridge (CTO), Dr John O'Hare (CHO), Jing Li, Kriss Dunk"
+
+      - id: "virtual-production-master"
+        title: "Virtual Production Master"
+        duration: "5 Days"
+        price_per_person: "£2,950"
+        team_price: "£9,995"
+        team_saving: "Save £805"
+        capacity: "Up to 4"
+        category: "Creative Tech"
+        featured: true
+        description: "Complete LED volume workflow mastery. From camera tracking to real-time compositing, learn from Emmy-nominated professionals with credits spanning Star Wars to Formula 1."
+        modules:
+          - "LED Volume Operations & ICVFX Fundamentals"
+          - "Unreal Engine for Real-Time Production"
+          - "Motion Control & Camera Tracking Systems"
+          - "Real-Time Compositing & Colour Science"
+          - "Virtual Production Pipeline Integration"
+        instructors: "Pete Woodbridge, Roger McKinley, Thadeous Letitia, Bradley Harris (Emmy-nom)"
+
+      - id: "xr-innovation-intensive"
+        title: "XR Innovation Intensive"
+        duration: "5 Days"
+        price_per_person: "£2,750"
+        team_price: "£9,350"
+        team_saving: "Save £650"
+        capacity: "Up to 4"
+        category: "XR/VR"
+        featured: true
+        description: "Immersive experience development from concept to deployment. Apple Vision Pro, Meta Quest, and industrial applications with PhD-level guidance."
+        modules:
+          - "Unity & Unreal for XR Development"
+          - "Apple Vision Pro & Spatial Computing"
+          - "Industrial XR Training Systems"
+          - "Mixed Reality Interface Design"
+          - "Healthcare & Engineering XR Applications"
+        instructors: "Dr Arpana Sherpa (PhD), Christian Frost, Dr David Tully, Lewis Hackett"
+
+      - id: "digital-human-mocap"
+        title: "Digital Human & MoCap"
+        duration: "3 Days"
+        price_per_person: "£1,695"
+        team_price: "£5,750"
+        team_saving: "Save £530"
+        capacity: "Up to 4"
+        category: "Creative Tech"
+        description: "Professional motion capture and digital human creation. Learn from Emmy-nominated specialists with credits on Star Wars, Marvel, and major game titles."
+        modules:
+          - "Motion Capture System Operation"
+          - "Performance Capture & Retargeting"
+          - "Digital Human Creation Pipeline"
+          - "Real-Time Character Animation"
+          - "MetaHuman & Facial Capture"
+        instructors: "Bradley Harris (Emmy-nom), Garth Williams, Christian Frost"
+
+      - id: "spatial-audio-production"
+        title: "Spatial Audio Production"
+        duration: "5 Days"
+        price_per_person: "£2,750"
+        team_price: "£9,350"
+        team_saving: "Save £650"
+        capacity: "Up to 4"
+        category: "Audio"
+        description: "Master immersive audio for XR, cinema, and installations. Dolby Atmos certification preparation with industry-leading audio professionals."
+        modules:
+          - "Dolby Atmos Mixing & Mastering"
+          - "Binaural Audio for VR/AR"
+          - "Spatial Audio Engine Implementation"
+          - "Field Recording for Immersive Media"
+          - "Game Audio & Procedural Sound Design"
+        instructors: "Bernard Steer (Dolby Atmos), Noelle Nurdin, Dr Sean Hill"
+
+      - id: "engineering-visualisation"
+        title: "Engineering Visualisation"
+        duration: "5 Days"
+        price_per_person: "£2,750"
+        team_price: "£9,350"
+        team_saving: "Save £650"
+        capacity: "Up to 4"
+        category: "Engineering"
+        description: "Transform CAE/CFD data into real-time interactive visualisations. Bridge engineering simulation and creative technology with PhD-level expertise."
+        modules:
+          - "CAE/CFD Data Import & Optimisation"
+          - "Real-Time Scientific Visualisation"
+          - "Unreal Engine for Engineering Viz"
+          - "Interactive Simulation Interfaces"
+          - "Nuclear & Energy Sector Applications"
+        instructors: "Marco Ghilardi (PhD Nuclear), Dr Sean Hill, Daniel Maktabi"
+
+      - id: "neural-content-creation"
+        title: "Neural Content Creation"
+        duration: "3 Days"
+        price_per_person: "£1,695"
+        team_price: "£5,750"
+        team_saving: "Save £530"
+        capacity: "Up to 4"
+        category: "Emerging Tech"
+        description: "Cutting-edge 3D reconstruction from photogrammetry to neural radiance fields. Gaussian splatting capture and real-time neural rendering."
+        modules:
+          - "Gaussian Splatting Capture Pipeline"
+          - "NeRF Implementation & Optimisation"
+          - "Photogrammetry for Production"
+          - "Real-Time Neural Rendering"
+          - "Asset Integration & Deployment"
+        instructors: "Will Sheridan, Zack Lewis, James Berry"
+
+      - id: "cyber-infrastructure"
+        title: "Cyber Infrastructure"
+        duration: "3 Days"
+        price_per_person: "£1,695"
+        team_price: "£5,750"
+        team_saving: "Save £530"
+        capacity: "Up to 4"
+        category: "Engineering"
+        description: "Industrial-grade network architecture and cybersecurity. Design secure infrastructure for creative and engineering environments."
+        modules:
+          - "Enterprise Network Architecture"
+          - "Zero-Trust Security Implementation"
+          - "Cloud & Hybrid Infrastructure"
+          - "Industrial Control System Security"
+          - "Secure Remote Production Workflows"
+        instructors: "Ste Moyler (CCO), David Sherpa, Pete Woodbridge"
+
+      - id: "decentralised-agents"
+        title: "Decentralised Agent Infrastructure"
+        duration: "4 Days"
+        price_per_person: "£2,195"
+        team_price: "£7,450"
+        team_saving: "Save £580"
+        capacity: "Up to 4"
+        category: "Web3 Tech"
+        description: "Build sovereign, cryptographically-secured agent systems using Bitcoin, Lightning, RGB protocols and decentralised identity."
+        modules:
+          - "Bitcoin & Lightning for Agent Payments"
+          - "RGB Protocol & Smart Contracts"
+          - "Nostr Protocol & Decentralised Identity"
+          - "Private Contract Negotiation"
+          - "Agent-First Architecture Design"
+        instructors: "Pete Woodbridge, Kriss Dunk, Jing Li"
+        partnership: "Partnering with GlobalBlock liquidity provider for secure API endpoints"
+
+      - id: "creative-technology-fundamentals"
+        title: "Creative Technology Fundamentals"
+        duration: "5 Days"
+        price_per_person: "£2,495"
+        team_price: "£8,495"
+        team_saving: "Save £685"
+        capacity: "Up to 4"
+        category: "Foundation"
+        description: "Comprehensive introduction to creative technology for career changers and newcomers. From version control to AI-assisted workflows."
+        modules:
+          - "Development Environment Setup"
+          - "Git & Collaborative Workflows"
+          - "AI-Assisted Development (Claude, Copilot)"
+          - "Project Structure & Best Practices"
+          - "Publishing & Deployment"
+        instructors: "Pete Woodbridge, Dr Arpana Sherpa, Marcus Sherpa"
+
+      - id: "corporate-immersive"
+        title: "Corporate Immersive Retreat"
+        duration: "3 Days"
+        price_per_person: "£3,995"
+        team_price: "£13,595"
+        team_saving: "Save £985"
+        capacity: "Up to 4"
+        category: "Enterprise"
+        featured: true
+        description: "Bespoke executive experience combining strategic AI briefings, hands-on technology demos, and Lake District hospitality. Tailored for C-suite and senior leadership."
+        modules:
+          - "AI Strategy for Enterprise"
+          - "Hands-On Technology Demonstrations"
+          - "Innovation Workshop Facilitation"
+          - "Team Building & Networking"
+          - "Strategic Roadmap Development"
+        instructors: "Pete Woodbridge, Dr John O'Hare, Stephen Moyler"
+
+      - id: "visionflow-power-user"
+        title: "VisionFlow Power User"
+        duration: "4 Days"
+        price_per_person: "£2,195"
+        team_price: "£7,450"
+        team_saving: "Save £580"
+        capacity: "Up to 4"
+        category: "AI/ML"
+        featured: true
+        description: "Master self-sovereign knowledge management with VisionFlow. Deploy autonomous AI agent teams that research, analyse, and visualise your data corpus in stunning 3D—all on your own infrastructure."
+        modules:
+          - "Self-Sovereign Data Architecture & Privacy"
+          - "Multi-Agent Orchestration with MCP Protocol"
+          - "GraphRAG & Knowledge Graph Construction"
+          - "3D Visualisation with Three.js & Neo4j"
+          - "On-Premise Deployment & Security Hardening"
+        instructors: "Pete Woodbridge (CTO), Kriss Dunk, Jing Li"
+
+    accommodation:
+      headline: "Premium Lake District Accommodation"
+      description: "Experience the perfect blend of focused learning and natural inspiration. Our 5-bedroom luxury facility provides an ideal environment for intensive training, networking, and creative breakthroughs."
+      features:
+        - icon: "map-pin"
+          title: "Prime Location"
+          description: "Nestled in the Lake District, offering stunning views and a peaceful environment for focused learning"
+        - icon: "home"
+          title: "Luxury Amenities"
+          description: "Private bedrooms, professional kitchen, dedicated training spaces, and social areas for networking"
+        - icon: "calendar"
+          title: "Flexible Booking"
+          description: "Available for training programs or corporate retreats, with weekend and peak season rates"
+      cta: "Check Availability"
+
+    cta_section:
+      headline: "Ready to Transform Your Skills?"
+      description: "Join industry leaders and innovators at our residential training facility. Limited spaces available for upcoming programs."
+      cta_primary: "Book Your Training"
+      cta_secondary: "Schedule a Tour"
+
+  team:
+    headline: "Our Team"
+    description: "43+ specialists including Emmy nominees, PhD researchers, and BAFTA-recognised talent. Click on a team member to select them for your project."
+    selection_label: "{count} team member{s} selected"
+    enquire_button: "Enquire About Availability"
+
+# Color palette for graphics replacement
+design:
+  color_palette:
+    primary:
+      gold: "#D4A574"
+      bronze: "#CD7F32"
+      copper: "#B87333"
+    accent:
+      deep_gold: "#996515"
+      antique_bronze: "#665D1E"
+      warm_amber: "#FFBF00"
+    background:
+      dark_slate: "#0F172A"
+      charcoal: "#1E293B"
+    text:
+      light: "#F8FAFC"
+      muted: "#94A3B8"
