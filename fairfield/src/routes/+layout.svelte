@@ -50,10 +50,12 @@
 	let calendarCollapsed = true;
 	let mobileZoneDrawerOpen = false;
 
-	$: showNav = $page.url.pathname !== `${base}/` && $page.url.pathname !== base && $page.url.pathname !== `${base}/signup` && $page.url.pathname !== `${base}/login` && $page.url.pathname !== `${base}/pending`;
+	// Safe pathname access with fallbacks
+	$: pathname = $page?.url?.pathname ?? '';
+	$: showNav = pathname !== `${base}/` && pathname !== base && pathname !== `${base}/signup` && pathname !== `${base}/login` && pathname !== `${base}/pending` && pathname !== '';
 
-	// Extract current category and section from URL
-	$: pathParts = $page.url.pathname.replace(base, '').split('/').filter(Boolean);
+	// Extract current category and section from URL (with null checks)
+	$: pathParts = pathname ? pathname.replace(base || '', '').split('/').filter(Boolean) : [];
 	$: currentCategoryId = pathParts[0] || null;
 	$: currentSectionId = pathParts[1] || null;
 
@@ -86,16 +88,21 @@
 
 		// Handle GitHub Pages SPA redirect
 		// When 404.html redirects to /community/, it stores the original path in sessionStorage
-		const redirect = sessionStorage.getItem('redirect');
-		if (redirect) {
-			sessionStorage.removeItem('redirect');
-			// Extract path relative to base and navigate using SvelteKit router
-			const basePath = base || '/community';
-			if (redirect.startsWith(basePath) && redirect !== $page.url.pathname) {
-				const targetPath = redirect.slice(basePath.length) || '/';
-				// Use replaceState to avoid adding to history
-				goto(`${base}${targetPath}`, { replaceState: true });
+		try {
+			const redirect = sessionStorage.getItem('redirect');
+			if (redirect && typeof redirect === 'string') {
+				sessionStorage.removeItem('redirect');
+				// Extract path relative to base and navigate using SvelteKit router
+				const basePath = base || '/community';
+				const currentPath = $page?.url?.pathname ?? '';
+				if (redirect.startsWith(basePath) && redirect !== currentPath) {
+					const targetPath = redirect.slice(basePath.length) || '/';
+					// Use replaceState to avoid adding to history
+					goto(`${base}${targetPath}`, { replaceState: true });
+				}
 			}
+		} catch (e) {
+			console.warn('SPA redirect handling failed:', e);
 		}
 
 		const savedTheme = localStorage.getItem('theme');
@@ -259,7 +266,7 @@
 			{/if}
 
 			<!-- Main Content -->
-			{#key $page.url.pathname}
+			{#key pathname}
 				<main
 					id="main-content"
 					role="main"
