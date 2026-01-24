@@ -112,7 +112,7 @@ export const userStore: Readable<UserState> = derived(
         whitelistStatus = await verifyWhitelistStatus($auth.pubkey);
         whitelistStatusStore.set(whitelistStatus);
         console.log('[User] Whitelist status verified:', {
-          pubkey: $auth.pubkey.slice(0, 8) + '...',
+          pubkey: $auth.pubkey ? $auth.pubkey.slice(0, 8) + '...' : 'unknown',
           isAdmin: whitelistStatus.isAdmin,
           source: whitelistStatus.source
         });
@@ -177,7 +177,7 @@ export const userStore: Readable<UserState> = derived(
         error: null
       });
 
-      if (import.meta.env.DEV && $auth.pubkey) {
+      if (import.meta.env.DEV && $auth?.pubkey) {
         console.log('[User] Profile loaded from Nostr:', {
           pubkey: $auth.pubkey.slice(0, 8) + '...',
           displayName: verifiedProfile.displayName,

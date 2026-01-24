@@ -7,10 +7,12 @@
 	export let onZonesClick: () => void;
 	export let onProfileClick: () => void;
 
-	$: isChat = $page.url.pathname.startsWith(`${base}/chat`) ||
-	            $page.url.pathname.match(new RegExp(`^${base}/[^/]+/[^/]+$`));
-	$: isDM = $page.url.pathname.startsWith(`${base}/dm`);
-	$: isAdmin = $page.url.pathname === `${base}/admin`;
+	// Safe pathname access with fallback
+	$: pathname = $page?.url?.pathname ?? '';
+	$: isChat = pathname.startsWith(`${base}/chat`) ||
+	            (pathname && pathname.match(new RegExp(`^${base}/[^/]+/[^/]+$`)));
+	$: isDM = pathname.startsWith(`${base}/dm`);
+	$: isAdmin = pathname === `${base}/admin`;
 </script>
 
 <!-- Mobile Bottom Navigation - Fixed at bottom, always visible -->

@@ -15,6 +15,9 @@
 	// This ensures the derived callback runs and populates whitelistStatusStore
 	$: void $userStore;
 
+	// Safe pathname access with fallback
+	$: pathname = $page?.url?.pathname ?? '';
+
 	let mobileMenuOpen = false;
 
 	function toggleMobileMenu() {
@@ -60,10 +63,10 @@
 	<!-- Desktop Navigation (hidden on mobile) -->
 	<div class="navbar-center hidden md:flex">
 		<ul class="menu menu-horizontal px-1">
-			<li><a href="{base}/chat" class:active={$page.url.pathname.startsWith(`${base}/chat`)} class="min-h-11">Channels</a></li>
-			<li><a href="{base}/dm" class:active={$page.url.pathname.startsWith(`${base}/dm`)} class="min-h-11">Messages</a></li>
+			<li><a href="{base}/chat" class:active={pathname.startsWith(`${base}/chat`)} class="min-h-11">Channels</a></li>
+			<li><a href="{base}/dm" class:active={pathname.startsWith(`${base}/dm`)} class="min-h-11">Messages</a></li>
 			{#if $isAdminVerified}
-				<li><a href="{base}/admin" class:active={$page.url.pathname === `${base}/admin`} class="min-h-11">Admin</a></li>
+				<li><a href="{base}/admin" class:active={pathname === `${base}/admin`} class="min-h-11">Admin</a></li>
 			{/if}
 		</ul>
 	</div>
@@ -132,7 +135,7 @@
 				<li>
 					<a
 						href="{base}/chat"
-						class="min-h-11 text-base {$page.url.pathname.startsWith(`${base}/chat`) ? 'active' : ''}"
+						class="min-h-11 text-base {pathname.startsWith(`${base}/chat`) ? 'active' : ''}"
 						on:click={handleNavClick}
 					>
 						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-5 h-5">
@@ -144,7 +147,7 @@
 				<li>
 					<a
 						href="{base}/dm"
-						class="min-h-11 text-base {$page.url.pathname.startsWith(`${base}/dm`) ? 'active' : ''}"
+						class="min-h-11 text-base {pathname.startsWith(`${base}/dm`) ? 'active' : ''}"
 						on:click={handleNavClick}
 					>
 						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-5 h-5">
@@ -157,7 +160,7 @@
 					<li>
 						<a
 							href="{base}/admin"
-							class="min-h-11 text-base {$page.url.pathname === `${base}/admin` ? 'active' : ''}"
+							class="min-h-11 text-base {pathname === `${base}/admin` ? 'active' : ''}"
 							on:click={handleNavClick}
 						>
 							<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-5 h-5">

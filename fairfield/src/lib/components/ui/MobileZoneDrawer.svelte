@@ -14,8 +14,9 @@
 	$: isAdmin = $whitelistStatusStore?.isAdmin ?? $userStore.profile?.isAdmin ?? false;
 	$: isApproved = $whitelistStatusStore?.isWhitelisted ?? $userStore.profile?.isApproved ?? false;
 
-	// Extract current category/section from URL
-	$: pathParts = $page.url.pathname.replace(base, '').split('/').filter(Boolean);
+	// Extract current category/section from URL (with null safety)
+	$: pathname = $page?.url?.pathname ?? '';
+	$: pathParts = pathname ? pathname.replace(base || '', '').split('/').filter(Boolean) : [];
 	$: currentCategoryId = pathParts[0] || null;
 	$: currentSectionId = pathParts[1] || null;
 
