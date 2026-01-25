@@ -10,6 +10,8 @@ on:
       - main
     paths:
       - 'community-forum/services/nostr-relay/**'
+      - '!community-forum/services/nostr-relay/docs/**'
+      - '!community-forum/services/nostr-relay/*.md'
       - '.github/workflows/fairfield-relay.yml'
   workflow_dispatch:
     inputs:

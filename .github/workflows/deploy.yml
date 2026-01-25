@@ -43,7 +43,7 @@ jobs:
         run: npm run build
 
       - name: Build Fairfield community app
-        working-directory: fairfield
+        working-directory: community-forum
         env:
           BASE_PATH: '/community'
           VITE_RELAY_URL: ${{ vars.FAIRFIELD_RELAY_URL }}
