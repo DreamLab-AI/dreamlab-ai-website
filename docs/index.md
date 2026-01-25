@@ -259,6 +259,7 @@ docs/
 
 ## Quick Links
 
+- **[Documentation Overview](README.md)** - Master documentation hub with quick navigation by audience
 - **[Project README](../README.md)** - Main project overview with screenshots and quick start
 - **[User Documentation](user/index.md)** - End-user guides and tutorials
 - **[Developer Documentation](developer/index.md)** - Technical documentation for developers

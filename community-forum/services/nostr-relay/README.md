@@ -247,6 +247,37 @@ CREATE TABLE whitelist (
 - **Rate Limiting**: Per-IP limits prevent abuse
 - **NIP-98**: HTTP endpoints can require cryptographic authentication
 
+## Documentation
+
+Comprehensive documentation for the relay is maintained in the main documentation directory:
+
+### API & Protocol
+- **[WebSocket API Reference](../../docs/api/NOSTR_RELAY.md)** - Complete protocol documentation with examples
+  - NIP-01, NIP-11, NIP-16, NIP-33, NIP-98 implementation details
+  - Message types (EVENT, REQ, CLOSE, AUTH)
+  - Event validation and storage behavior
+  - Error handling and troubleshooting
+
+### Architecture & Design
+- **[Backend Services Architecture](../../docs/architecture/BACKEND_SERVICES.md)** - System design overview
+  - Relay architecture and component details
+  - Database schema and indexes
+  - Event processing pipeline
+  - Security architecture
+
+### Development & Deployment
+- **[Service Development Guide](../../docs/developer/SERVICE_DEVELOPMENT.md)** - Local development setup
+  - Project structure and dependencies
+  - Testing framework and best practices
+  - Code style guidelines
+  - Debugging and performance optimization
+
+- **[Cloud Services Deployment](../../docs/deployment/CLOUD_SERVICES.md)** - Production deployment
+  - Cloud Run configuration
+  - Cloud SQL database setup
+  - GitHub Actions workflow
+  - Monitoring and scaling
+
 ## Licence
 
 MIT
