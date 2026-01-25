@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'fairfield/services/image-api/**'
+      - 'community-forum/services/image-api/**'
       - '.github/workflows/fairfield-image-api.yml'
   workflow_dispatch:
     inputs:
@@ -18,7 +18,7 @@ env:
   SERVICE_NAME: image-api
   GCP_REGION: us-central1
   GCS_BUCKET: minimoonoir-images
-  WORKING_DIRECTORY: fairfield/services/image-api
+  WORKING_DIRECTORY: community-forum/services/image-api
 
 jobs:
   deploy:

@@ -9,7 +9,7 @@ on:
     branches:
       - main
     paths:
-      - 'fairfield/services/nostr-relay/**'
+      - 'community-forum/services/nostr-relay/**'
       - '.github/workflows/fairfield-relay.yml'
   workflow_dispatch:
     inputs:
@@ -24,7 +24,7 @@ on:
 
 env:
   NODE_VERSION: '20'
-  WORKING_DIRECTORY: fairfield/services/nostr-relay
+  WORKING_DIRECTORY: community-forum/services/nostr-relay
   SERVICE_NAME: nostr-relay
   GCP_REGION: us-central1
 

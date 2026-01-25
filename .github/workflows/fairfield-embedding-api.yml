@@ -10,7 +10,7 @@ on:
     branches:
       - main
     paths:
-      - 'fairfield/services/embedding-api/**'
+      - 'community-forum/services/embedding-api/**'
       - '.github/workflows/fairfield-embedding-api.yml'
   workflow_dispatch:
     inputs:
@@ -25,7 +25,7 @@ on:
 
 env:
   PYTHON_VERSION: '3.11'
-  WORKING_DIRECTORY: fairfield/services/embedding-api
+  WORKING_DIRECTORY: community-forum/services/embedding-api
   SERVICE_NAME: embedding-api
   GCP_REGION: us-central1
 

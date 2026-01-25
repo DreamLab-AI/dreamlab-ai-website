@@ -62,7 +62,7 @@ jobs:
       - name: Copy Fairfield build to community path
         run: |
           mkdir -p dist/community
-          cp -r fairfield/build/* dist/community/
+          cp -r community-forum/build/* dist/community/
           echo "✅ Fairfield app copied to dist/community/"
           ls -la dist/community/
 
