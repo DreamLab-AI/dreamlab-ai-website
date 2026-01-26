@@ -121,15 +121,15 @@ const FAQItem = ({ question, answer }: { question: string; answer: string }) => 
     <div className="border-b border-purple-500/20 last:border-b-0">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full py-5 flex items-center justify-between text-left hover:text-purple-400 transition-colors"
+        className="w-full py-4 md:py-5 flex items-center justify-between text-left hover:text-purple-400 transition-colors min-h-[56px]"
       >
-        <span className="font-medium pr-4">{question}</span>
+        <span className="font-medium pr-4 text-base md:text-lg">{question}</span>
         <ChevronRight
-          className={`w-5 h-5 flex-shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`}
+          className={`w-6 h-6 md:w-5 md:h-5 flex-shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`}
         />
       </button>
       {isOpen && (
-        <div className="pb-5 text-muted-foreground leading-relaxed">
+        <div className="pb-5 text-muted-foreground leading-relaxed text-base">
           {answer}
         </div>
       )}
@@ -157,9 +157,9 @@ const Index = () => {
       >
         <HyperdimensionalHeroBackground />
 
-        <div className="container relative z-10 mt-16 flex flex-col items-center text-center px-4">
+        <div className="container relative z-10 mt-16 flex flex-col items-center text-center px-5 md:px-4">
           <h1
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 animate-slide-up max-w-4xl leading-tight"
+            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-6 animate-slide-up max-w-4xl leading-tight"
             style={{
               textShadow: '0 0 40px rgba(212, 165, 116, 0.4), 0 0 80px rgba(205, 127, 50, 0.2)'
             }}
@@ -167,21 +167,21 @@ const Index = () => {
             Learn how to build and manage AI agents
           </h1>
 
-          <p className="text-lg md:text-xl lg:text-2xl text-foreground/85 max-w-3xl mb-8 animate-slide-up font-light tracking-wide" style={{ animationDelay: '0.1s' }}>
+          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-foreground/85 max-w-3xl mb-8 animate-slide-up font-light tracking-wide leading-relaxed" style={{ animationDelay: '0.1s' }}>
             In a few hours we'll give you the tools to deploy agents that can meaningfully impact your business and give you long term advantage.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 animate-scale-in mb-8" style={{ animationDelay: '0.2s' }}>
+          <div className="flex flex-col sm:flex-row gap-4 animate-scale-in mb-8 w-full sm:w-auto" style={{ animationDelay: '0.2s' }}>
             <a
               href="/masterclass#pricing"
-              className="group relative inline-flex items-center justify-center rounded-lg text-base font-semibold ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-xl hover:shadow-cyan-500/50 hover:scale-105 h-14 px-8 py-3 overflow-hidden"
+              className="group relative inline-flex items-center justify-center rounded-lg text-base md:text-lg font-semibold ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-xl hover:shadow-cyan-500/50 hover:scale-105 min-h-[56px] h-14 md:h-16 px-6 md:px-8 py-4 overflow-hidden"
             >
               <span className="relative z-10">Get the AI Agent Masterclass</span>
               <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </a>
           </div>
 
-          <div className="animate-slide-up flex flex-col sm:flex-row gap-6 text-sm text-muted-foreground" style={{ animationDelay: '0.25s' }}>
+          <div className="animate-slide-up flex flex-col sm:flex-row gap-6 text-sm md:text-base text-muted-foreground" style={{ animationDelay: '0.25s' }}>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 bg-cyan-400 rounded-full" />
               <span>1-day masterclass · up to 6 people · £2,999 + VAT</span>
@@ -189,23 +189,23 @@ const Index = () => {
           </div>
         </div>
 
-        <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2 z-10 animate-bounce">
+        <div className="absolute bottom-8 md:bottom-12 left-1/2 transform -translate-x-1/2 z-10 animate-bounce">
           <button
             onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
             aria-label="Scroll down to next section"
-            className="text-foreground/60 hover:text-purple-400 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded hover:scale-110"
+            className="text-foreground/60 hover:text-purple-400 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded hover:scale-110 p-3 min-h-[48px] min-w-[48px] flex items-center justify-center"
           >
-            <ChevronDown className="w-10 h-10" aria-hidden="true" />
+            <ChevronDown className="w-10 h-10 md:w-12 md:h-12" aria-hidden="true" />
           </button>
         </div>
       </section>
 
       {/* John's Introduction */}
-      <section className="py-20 relative overflow-hidden" aria-label="Introduction">
-        <div className="container max-w-4xl mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center gap-10">
+      <section className="py-16 md:py-20 relative overflow-hidden" aria-label="Introduction">
+        <div className="container max-w-4xl mx-auto px-5 md:px-4">
+          <div className="flex flex-col md:flex-row items-center gap-8 md:gap-10">
             <div className="flex-shrink-0">
-              <div className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center overflow-hidden shadow-2xl shadow-purple-500/30">
+              <div className="w-28 h-28 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center overflow-hidden shadow-2xl shadow-purple-500/30">
                 <img
                   src="/data/team/04.webp"
                   alt="Dr John O'Hare"
@@ -218,13 +218,13 @@ const Index = () => {
               </div>
             </div>
             <div className="text-center md:text-left">
-              <p className="text-xl md:text-2xl text-foreground/90 leading-relaxed mb-4">
+              <p className="text-lg sm:text-xl md:text-2xl text-foreground/90 leading-relaxed mb-4">
                 I'm John. I build practical AI systems for a living, and I run a hands-on training day for teams who want to apply AI inside their organisation.
               </p>
-              <p className="text-lg text-foreground/80 leading-relaxed mb-4">
+              <p className="text-base sm:text-lg text-foreground/80 leading-relaxed mb-4">
                 In this masterclass, we'll pick one workflow you can genuinely automate with AI, then build an agent you can run on demand. You'll leave with a working agent, plus templates, prompts, frameworks, and a starter repo so you can build the next one without starting from scratch.
               </p>
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground text-base">
                 <span className="font-semibold text-foreground">Dr John O'Hare</span> · Founder at DreamLab
               </p>
             </div>
@@ -233,45 +233,45 @@ const Index = () => {
       </section>
 
       {/* What You'll Walk Away With */}
-      <section className="py-20 bg-gradient-to-b from-background to-purple-950/10" aria-label="Outcomes">
-        <div className="container max-w-6xl mx-auto px-4">
-          <div className="text-center mb-16">
-            <p className="text-purple-400 font-medium mb-3">Turn AI into a repeatable advantage for your business</p>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+      <section className="py-16 md:py-20 bg-gradient-to-b from-background to-purple-950/10" aria-label="Outcomes">
+        <div className="container max-w-6xl mx-auto px-5 md:px-4">
+          <div className="text-center mb-12 md:mb-16">
+            <p className="text-purple-400 font-medium mb-3 text-base">Turn AI into a repeatable advantage for your business</p>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
               Here's what you'll walk away with:
             </h2>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-6 md:gap-8">
             {/* Outcome 1 */}
-            <div className="bg-background/50 backdrop-blur border border-purple-500/20 rounded-xl p-8 hover:border-purple-500/40 transition-colors">
-              <div className="w-14 h-14 bg-purple-500/10 rounded-xl flex items-center justify-center mb-6">
-                <Laptop className="w-7 h-7 text-purple-400" />
+            <div className="bg-background/50 backdrop-blur border border-purple-500/20 rounded-xl p-6 md:p-8 hover:border-purple-500/40 transition-colors">
+              <div className="w-12 h-12 md:w-14 md:h-14 bg-purple-500/10 rounded-xl flex items-center justify-center mb-5 md:mb-6">
+                <Laptop className="w-6 h-6 md:w-7 md:h-7 text-purple-400" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">A working setup on your computer</h3>
-              <p className="text-muted-foreground leading-relaxed">
+              <h3 className="text-lg md:text-xl font-semibold mb-3">A working setup on your computer</h3>
+              <p className="text-muted-foreground leading-relaxed text-base">
                 We will have set up a clean project you can keep and reuse and a git repo with a clear structure you can extend.
               </p>
             </div>
 
             {/* Outcome 2 */}
-            <div className="bg-background/50 backdrop-blur border border-purple-500/20 rounded-xl p-8 hover:border-purple-500/40 transition-colors">
-              <div className="w-14 h-14 bg-cyan-500/10 rounded-xl flex items-center justify-center mb-6">
-                <Play className="w-7 h-7 text-cyan-400" />
+            <div className="bg-background/50 backdrop-blur border border-purple-500/20 rounded-xl p-6 md:p-8 hover:border-purple-500/40 transition-colors">
+              <div className="w-12 h-12 md:w-14 md:h-14 bg-cyan-500/10 rounded-xl flex items-center justify-center mb-5 md:mb-6">
+                <Play className="w-6 h-6 md:w-7 md:h-7 text-cyan-400" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">A real agent you can run on demand</h3>
-              <p className="text-muted-foreground leading-relaxed">
+              <h3 className="text-lg md:text-xl font-semibold mb-3">A real agent you can run on demand</h3>
+              <p className="text-muted-foreground leading-relaxed text-base">
                 You will have an agent that takes real inputs and produces useful outputs that you can run repeatedly.
               </p>
             </div>
 
             {/* Outcome 3 */}
-            <div className="bg-background/50 backdrop-blur border border-purple-500/20 rounded-xl p-8 hover:border-purple-500/40 transition-colors">
-              <div className="w-14 h-14 bg-pink-500/10 rounded-xl flex items-center justify-center mb-6">
-                <Wrench className="w-7 h-7 text-pink-400" />
+            <div className="bg-background/50 backdrop-blur border border-purple-500/20 rounded-xl p-6 md:p-8 hover:border-purple-500/40 transition-colors">
+              <div className="w-12 h-12 md:w-14 md:h-14 bg-pink-500/10 rounded-xl flex items-center justify-center mb-5 md:mb-6">
+                <Wrench className="w-6 h-6 md:w-7 md:h-7 text-pink-400" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">The ability to build your own agents</h3>
-              <p className="text-muted-foreground leading-relaxed">
+              <h3 className="text-lg md:text-xl font-semibold mb-3">The ability to build your own agents</h3>
+              <p className="text-muted-foreground leading-relaxed text-base">
                 You'll leave with the fundamentals to repeat this again. I will include templates, checklists and prompts so you can build the next agent easily.
               </p>
             </div>
@@ -306,30 +306,30 @@ const Index = () => {
       </section>
 
       {/* Example Use Cases */}
-      <section className="py-20 bg-gradient-to-b from-background to-purple-950/10" aria-label="Use cases">
-        <div className="container max-w-6xl mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+      <section className="py-16 md:py-20 bg-gradient-to-b from-background to-purple-950/10" aria-label="Use cases">
+        <div className="container max-w-6xl mx-auto px-5 md:px-4">
+          <div className="text-center mb-12 md:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
               What you will learn to build
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
               We'll develop one small, safe, high-value automation. Here are some examples that are usually "day-one friendly":
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
             {useCases.map((useCase, index) => {
               const Icon = useCase.icon;
               return (
                 <div
                   key={index}
-                  className="bg-background/50 backdrop-blur border border-purple-500/20 rounded-xl p-6 hover:border-purple-500/40 transition-all hover:-translate-y-1"
+                  className="bg-background/50 backdrop-blur border border-purple-500/20 rounded-xl p-5 md:p-6 hover:border-purple-500/40 transition-all hover:-translate-y-1"
                 >
                   <div className="flex items-center gap-3 mb-4">
-                    <Icon className="w-5 h-5 text-purple-400" />
-                    <h3 className="font-semibold">{useCase.title}</h3>
+                    <Icon className="w-6 h-6 md:w-5 md:h-5 text-purple-400 flex-shrink-0" />
+                    <h3 className="font-semibold text-base md:text-lg">{useCase.title}</h3>
                   </div>
-                  <div className="space-y-3 text-sm">
+                  <div className="space-y-3 text-sm md:text-base">
                     <div>
                       <span className="text-muted-foreground">Input:</span>
                       <span className="ml-2 text-foreground/80">{useCase.input}</span>
@@ -510,7 +510,7 @@ const Index = () => {
 
               <Link
                 to="/contact"
-                className="inline-flex items-center justify-center rounded-lg text-lg font-semibold bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-xl hover:shadow-cyan-500/50 hover:scale-105 transition-all h-14 px-10"
+                className="inline-flex items-center justify-center rounded-lg text-base md:text-lg font-semibold bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-xl hover:shadow-cyan-500/50 hover:scale-105 transition-all min-h-[56px] h-14 md:h-16 px-8 md:px-10"
               >
                 Get in touch
                 <ArrowRight className="ml-2 w-5 h-5" />
@@ -601,15 +601,15 @@ const Index = () => {
       </section>
 
       {/* FAQ */}
-      <section className="py-20 bg-gradient-to-b from-background to-purple-950/10" aria-label="FAQ">
-        <div className="container max-w-3xl mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+      <section className="py-16 md:py-20 bg-gradient-to-b from-background to-purple-950/10" aria-label="FAQ">
+        <div className="container max-w-3xl mx-auto px-5 md:px-4">
+          <div className="text-center mb-12 md:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
               Frequently asked questions
             </h2>
           </div>
 
-          <div className="bg-background/50 backdrop-blur border border-purple-500/20 rounded-2xl p-6 md:p-8">
+          <div className="bg-background/50 backdrop-blur border border-purple-500/20 rounded-2xl p-5 md:p-8">
             {faqs.map((faq, index) => (
               <FAQItem key={index} question={faq.q} answer={faq.a} />
             ))}
@@ -618,22 +618,22 @@ const Index = () => {
       </section>
 
       {/* Final CTA */}
-      <section className="py-20" aria-label="Book a call">
-        <div className="container max-w-4xl mx-auto px-4 text-center">
-          <div className="bg-gradient-to-br from-purple-500/10 via-cyan-500/10 to-pink-500/10 border border-purple-500/30 rounded-2xl p-8 md:p-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+      <section className="py-16 md:py-20" aria-label="Book a call">
+        <div className="container max-w-4xl mx-auto px-5 md:px-4 text-center">
+          <div className="bg-gradient-to-br from-purple-500/10 via-cyan-500/10 to-pink-500/10 border border-purple-500/30 rounded-2xl p-6 md:p-12">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
               Book a 10-minute call
             </h2>
-            <p className="text-lg text-foreground/80 mb-6 max-w-2xl mx-auto">
+            <p className="text-base md:text-lg text-foreground/80 mb-6 max-w-2xl mx-auto">
               If you want to see if this is right for your team, start here. You'll speak to me directly.
             </p>
-            <p className="text-muted-foreground mb-8">
+            <p className="text-muted-foreground mb-8 text-base">
               10 minutes • no prep • we will check scope, access, and whether this will work for your team
             </p>
 
             <Link
               to="/contact"
-              className="inline-flex items-center justify-center rounded-lg text-lg font-semibold bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-xl hover:shadow-cyan-500/50 hover:scale-105 transition-all h-14 px-10"
+              className="inline-flex items-center justify-center rounded-lg text-base md:text-lg font-semibold bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-xl hover:shadow-cyan-500/50 hover:scale-105 transition-all min-h-[56px] h-14 md:h-16 px-8 md:px-10"
             >
               Schedule a conversation
               <ArrowRight className="ml-2 w-5 h-5" />
@@ -663,32 +663,32 @@ const Index = () => {
       </section>
 
       {/* Footer */}
-      <footer className="relative py-12 overflow-hidden" role="contentinfo">
+      <footer className="relative py-10 md:py-12 overflow-hidden" role="contentinfo">
         <div className="absolute inset-0 bg-gradient-to-t from-purple-950/20 to-transparent" />
-        <div className="container relative z-10">
+        <div className="container relative z-10 px-5 md:px-4">
           <div className="flex flex-col md:flex-row justify-between items-center border-t border-purple-500/20 pt-8 gap-6">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm md:text-base text-muted-foreground text-center md:text-left">
               &copy; {new Date().getFullYear()} DreamLab AI Consulting Ltd. All rights reserved.
             </p>
-            <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6">
+            <div className="flex flex-col md:flex-row items-center gap-5 md:gap-6">
               <nav aria-label="Social media links">
                 <ul className="flex space-x-6">
                   <li>
-                    <a href="https://bsky.app/profile/thedreamlab.bsky.social" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-blue-400 transition-all duration-300 hover:scale-110 inline-block">
+                    <a href="https://bsky.app/profile/thedreamlab.bsky.social" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-blue-400 transition-all duration-300 hover:scale-110 inline-block py-2 text-base min-h-[44px] flex items-center">
                       Bluesky<span className="sr-only"> (opens in new window)</span>
                     </a>
                   </li>
                   <li>
-                    <a href="https://www.linkedin.com/company/dreamlab-ai-consulting/" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-blue-400 transition-all duration-300 hover:scale-110 inline-block">
+                    <a href="https://www.linkedin.com/company/dreamlab-ai-consulting/" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-blue-400 transition-all duration-300 hover:scale-110 inline-block py-2 text-base min-h-[44px] flex items-center">
                       LinkedIn<span className="sr-only"> (opens in new window)</span>
                     </a>
                   </li>
                 </ul>
               </nav>
-              <a href="/privacy" className="text-sm text-muted-foreground hover:text-purple-400 transition-all duration-300 hover:scale-105 inline-block">
+              <a href="/privacy" className="text-sm md:text-base text-muted-foreground hover:text-purple-400 transition-all duration-300 hover:scale-105 inline-block py-2 min-h-[44px] flex items-center">
                 Privacy Policy
               </a>
-              <a href="/testimonials" className="text-sm text-muted-foreground hover:text-purple-400 transition-all duration-300 hover:scale-105 inline-block">
+              <a href="/testimonials" className="text-sm md:text-base text-muted-foreground hover:text-purple-400 transition-all duration-300 hover:scale-105 inline-block py-2 min-h-[44px] flex items-center">
                 Success Stories
               </a>
             </div>

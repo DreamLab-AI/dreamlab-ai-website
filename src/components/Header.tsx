@@ -41,16 +41,16 @@ export const Header = () => {
           : "bg-background/60 backdrop-blur-md"
       }`}
     >
-      <div className="container flex items-center justify-between">
+      <div className="container flex items-center justify-between px-4">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-2 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded" aria-label="Main navigation menu">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all duration-300 group-hover:scale-110 animate-glow-pulse" aria-hidden="true"></div>
-              <span className="font-bold text-xl tracking-tight group-hover:text-purple-400 transition-colors duration-300">MENU</span>
-              <ChevronDown className="h-4 w-4 text-muted-foreground group-hover:text-purple-400 transition-all duration-300 group-hover:rotate-180" aria-hidden="true" />
+            <button className="flex items-center gap-2 md:gap-3 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded min-h-[48px] min-w-[48px] px-3 py-2" aria-label="Main navigation menu">
+              <div className="w-10 h-10 md:w-8 md:h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all duration-300 group-hover:scale-110 animate-glow-pulse" aria-hidden="true"></div>
+              <span className="font-bold text-lg md:text-xl tracking-tight group-hover:text-purple-400 transition-colors duration-300">MENU</span>
+              <ChevronDown className="h-5 w-5 md:h-4 md:w-4 text-muted-foreground group-hover:text-purple-400 transition-all duration-300 group-hover:rotate-180" aria-hidden="true" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-48">
+          <DropdownMenuContent align="start" className="w-56 md:w-48">
             <DropdownMenuItem asChild>
               <Link to="/" className="w-full">Home</Link>
             </DropdownMenuItem>
@@ -113,7 +113,7 @@ export const Header = () => {
         <Button
           variant="ghost"
           asChild
-          className="hover:bg-purple-500/10 hover:text-purple-400 transition-all duration-300 hover:scale-105"
+          className="hover:bg-purple-500/10 hover:text-purple-400 transition-all duration-300 hover:scale-105 min-h-[48px] px-4 text-base md:text-sm"
         >
           <a href="mailto:info@dreamlab-ai.com">Contact</a>
         </Button>

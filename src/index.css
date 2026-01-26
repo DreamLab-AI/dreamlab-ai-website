@@ -46,9 +46,30 @@
     @apply border-border;
   }
 
+  html {
+    font-size: 16px;
+  }
+
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+    /* WCAG 2.2 - Ensure minimum readable text size on mobile */
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  /* WCAG 2.2 Touch Target Size - Minimum 44x44px for all interactive elements */
+  button, a, [role="button"], input[type="button"], input[type="submit"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Allow inline links to be smaller but with adequate padding */
+  p a, li a, span a {
+    min-height: auto;
+    min-width: auto;
+    padding: 0.25rem 0;
+    display: inline-block;
   }
 }
 
