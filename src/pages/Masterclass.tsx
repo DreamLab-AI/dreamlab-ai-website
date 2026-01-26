@@ -33,7 +33,7 @@ import {
  * AI Agent Masterclass page - Product Lead Format
  * Two course options:
  * - Residential programme (max 4 people, 2-5 days) - includes full-board
- * - 1-day workshops (up to 4 people) - delivered anywhere in UK
+ * - 1-day workshops (up to 10 people) - delivered anywhere in UK
  */
 const Masterclass = () => {
   useOGMeta(PAGE_OG_CONFIGS.masterclass || PAGE_OG_CONFIGS.home);
@@ -184,7 +184,7 @@ const Masterclass = () => {
           <div className="animate-slide-up flex flex-col sm:flex-row gap-6 text-sm text-muted-foreground" style={{ animationDelay: '0.25s' }}>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 bg-cyan-400 rounded-full" />
-              <span>1-day workshop · up to 4 people · £1,495 pp</span>
+              <span>1-day workshop · up to 10 people · £9,500 flat rate.</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 bg-blue-400 rounded-full" />
