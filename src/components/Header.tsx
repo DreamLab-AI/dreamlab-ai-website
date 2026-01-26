@@ -13,56 +13,33 @@ import {
 import { ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
 
-const SCROLL_THRESHOLD = 100;
+const SCROLL_THRESHOLD = 50;
 
 /**
- * Renders the fixed website header with reveal-on-scroll behavior.
- * Nav is transparent and hidden initially, reveals with slide-down
- * animation after scrolling past threshold.
+ * Renders the fixed website header that is always visible.
+ * Background becomes solid after scrolling past threshold.
  */
 export const Header = () => {
-  const [isRevealed, setIsRevealed] = useState(false);
-  const [isVisible, setIsVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
+  const [hasScrolled, setHasScrolled] = useState(false);
 
   const handleScroll = useCallback(() => {
-    const currentScrollY = window.scrollY;
-
-    // Reveal nav after scrolling past threshold
-    if (currentScrollY > SCROLL_THRESHOLD) {
-      setIsRevealed(true);
-      // Hide on scroll down, show on scroll up (after initial reveal)
-      if (currentScrollY > lastScrollY && currentScrollY > SCROLL_THRESHOLD + 50) {
-        setIsVisible(false);
-      } else {
-        setIsVisible(true);
-      }
-    } else {
-      setIsRevealed(false);
-      setIsVisible(true);
-    }
-
-    setLastScrollY(currentScrollY);
-  }, [lastScrollY]);
+    setHasScrolled(window.scrollY > SCROLL_THRESHOLD);
+  }, []);
 
   useEffect(() => {
     window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
 
   return (
     <header
       role="banner"
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-out ${
-        isRevealed
-          ? `bg-background/80 backdrop-blur-xl py-3 shadow-xl shadow-purple-500/10 border-b border-purple-500/20 ${
-              isVisible ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
-            }`
-          : "bg-transparent py-5 opacity-0 pointer-events-none"
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-out py-3 ${
+        hasScrolled
+          ? "bg-background/80 backdrop-blur-xl shadow-xl shadow-purple-500/10 border-b border-purple-500/20"
+          : "bg-background/60 backdrop-blur-md"
       }`}
-      style={{
-        transform: isRevealed && isVisible ? "translateY(0)" : isRevealed ? "translateY(-100%)" : "translateY(-20px)",
-      }}
     >
       <div className="container flex items-center justify-between">
         <DropdownMenu>
