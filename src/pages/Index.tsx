@@ -435,7 +435,7 @@ const Index = () => {
                   "An ops lead, RevOps lead, systems person, technical founder, or similar",
                   "Comfortable following steps in a terminal",
                   "Keen to move from \"AI experiments\" to \"AI doing work\"",
-                  "Able to bring 2-6 people who will actually use the system afterwards"
+                  "Able to bring up to 3 who will actually use the system afterwards"
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
                     <CheckCircle2 className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
