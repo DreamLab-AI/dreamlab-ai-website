@@ -47,7 +47,7 @@ Workshops are OS-agnostic and we'll help you set up on whatever you use.
 ### What's the difference between workshops and residential training?
 
 **Workshops (1 day, £500-1,500)**
-- Up to 6 people per session
+- up to 4 people per session
 - Delivered at your location or ours
 - Focused on specific topics
 - Morning (3 hours) or afternoon (3 hours) sessions
@@ -79,7 +79,7 @@ Check each workshop's details for specific prerequisites.
 
 ### How many people can attend a workshop?
 
-**Standard workshops:** Up to 6 people per session
+**Standard workshops:** up to 4 people per session
 
 For larger teams:
 - Book multiple sessions of the same workshop

@@ -105,7 +105,7 @@ const faqs = [
   },
   {
     q: "How many people can join?",
-    a: "Up to 6 people from your team for the flat fee."
+    a: "up to 4 people from your team for the flat fee."
   },
   {
     q: "Is the session recorded?",
@@ -184,7 +184,7 @@ const Index = () => {
           <div className="animate-slide-up flex flex-col sm:flex-row gap-6 text-sm md:text-base text-muted-foreground" style={{ animationDelay: '0.25s' }}>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 bg-cyan-400 rounded-full" />
-              <span>1-day masterclass · up to 6 people · £2,999 + VAT</span>
+              <span>1-day masterclass · up to 4 people · £2,999 + VAT</span>
             </div>
           </div>
         </div>
@@ -482,7 +482,7 @@ const Index = () => {
           <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/30 rounded-2xl p-8 md:p-12">
             <ul className="space-y-4 mb-10">
               {[
-                { item: "Live online training day for up to 6 people", value: "£3,500" },
+                { item: "Live online training day for up to 4 people", value: "£3,500" },
                 { item: "Instructor-led build support throughout the day", value: "£900" },
                 { item: "Workflow selection pack", value: "£450" },
                 { item: "Agent spec template (inputs, outputs, boundaries, checks)", value: "£350" },
@@ -506,7 +506,7 @@ const Index = () => {
                 <span className="bg-gradient-to-r from-cyan-400 to-purple-400 text-transparent bg-clip-text">£2,999</span>
                 <span className="text-lg font-normal text-muted-foreground ml-2">+ VAT</span>
               </div>
-              <p className="text-sm text-muted-foreground mb-8">One price for your whole team (up to 6 people)</p>
+              <p className="text-sm text-muted-foreground mb-8">One price for your whole team (up to 4 people)</p>
 
               <Link
                 to="/contact"

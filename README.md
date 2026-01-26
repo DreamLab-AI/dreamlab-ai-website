@@ -51,7 +51,7 @@ Immersive deep-dive into multi-agent AI systems at a luxury countryside estate. 
 <td width="33%" valign="top">
 
 ### 🏢 Corporate Workshop
-**1 Day · Up to 6 Participants**
+**1 Day · up to 4 Participants**
 
 We come to you. Your team builds a working AI agent on-site, using your actual business data and workflows.
 

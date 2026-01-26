@@ -39,7 +39,7 @@ See previous projects we've completed:
 
 #### Workshops Page
 View all available workshops:
-- 1-day corporate workshops (up to 6 people)
+- 1-day corporate workshops (up to 4 people)
 - Delivered at your location across the UK
 - Different focus areas (VS Code, Git, AI APIs, etc.)
 - Detailed curriculum for each workshop
@@ -47,7 +47,7 @@ View all available workshops:
 ## Services Overview
 
 ### Corporate Workshops
-**Duration:** 1 day | **Participants:** Up to 6 | **Location:** Your site or ours
+**Duration:** 1 day | **Participants:** up to 4 | **Location:** Your site or ours
 
 Perfect for teams wanting hands-on training. Workshops include:
 - Development environment setup

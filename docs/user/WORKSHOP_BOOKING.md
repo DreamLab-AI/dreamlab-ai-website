@@ -179,7 +179,7 @@ All workshops can be delivered:
 ### Standard Workshops
 - Price per workshop session varies by topic
 - Typically £500-1,500 per session depending on complexity
-- Groups of up to 6 people included in one price
+- Groups of up to 4 people included in one price
 - Delivery location doesn't affect price (UK-wide service)
 
 ### Residential Programs
@@ -226,7 +226,7 @@ A: Yes, all our workshops can be delivered online. Specify this in your booking 
 A: We can create custom workshops. Describe your needs in your inquiry and we'll suggest options.
 
 **Q: How many people can attend one workshop?**
-A: Standard workshops accommodate up to 6 people per session. Larger groups can book multiple sessions.
+A: Standard workshops accommodate up to 4 people per session. Larger groups can book multiple sessions.
 
 **Q: Are there discounts for multiple workshops or larger teams?**
 A: Yes, we offer package deals. Discuss your volume needs when you inquire.

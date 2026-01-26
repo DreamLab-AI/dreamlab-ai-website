@@ -90,7 +90,7 @@ docs/user/
 
 | Service | Duration | Group Size | Includes |
 |---------|----------|-----------|----------|
-| Workshops | 1 day (3-6 hrs) | Up to 6 | Instruction + materials |
+| Workshops | 1 day (3-6 hrs) | up to 4 | Instruction + materials |
 | Residential | 2-5 days | Up to 4 | Accommodation + meals + training |
 | Consulting | Varies | Custom | Custom implementation |
 
