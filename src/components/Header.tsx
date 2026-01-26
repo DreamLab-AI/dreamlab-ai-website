@@ -71,9 +71,6 @@ export const Header = () => {
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link to="/work" className="w-full">Previous Work</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
               <Link to="/testimonials" className="w-full">Success Stories</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
