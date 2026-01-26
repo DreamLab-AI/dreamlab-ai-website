@@ -168,7 +168,7 @@ const Index = () => {
           </h1>
 
           <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-foreground/85 max-w-3xl mb-8 animate-slide-up font-light tracking-wide leading-relaxed" style={{ animationDelay: '0.1s' }}>
-            In a few hours we'll give you the tools to deploy agents that can meaningfully impact your business and give you long term advantage.
+            The tools to deploy agents. Long term advantage for your business.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 animate-scale-in mb-8 w-full sm:w-auto" style={{ animationDelay: '0.2s' }}>
