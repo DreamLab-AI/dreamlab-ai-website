@@ -49,6 +49,7 @@ vite.config.ts.timestamp-*
 .claude-flow-swarm-course-task
 .claude/
 .aqe/
+.agentic-qe/
 
 # Test outputs
 test-results/
