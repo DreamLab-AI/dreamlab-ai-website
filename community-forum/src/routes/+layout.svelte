@@ -313,12 +313,12 @@
 		overscroll-behavior: none;
 	}
 
-	/* Skip to main content link */
+	/* Skip to main content link — aligned with DreamLab cyan */
 	.skip-to-main {
 		position: absolute;
 		top: -40px;
 		left: 0;
-		background: #667eea;
+		background: #0ea5e9;
 		color: white;
 		padding: 8px 16px;
 		text-decoration: none;
@@ -329,7 +329,7 @@
 
 	.skip-to-main:focus {
 		top: 0;
-		outline: 3px solid #fbbf24;
+		outline: 3px solid #a855f7;
 		outline-offset: 2px;
 	}
 
@@ -346,9 +346,9 @@
 		border-width: 0;
 	}
 
-	/* Focus visible styles */
+	/* Focus visible styles — aligned with DreamLab purple accent */
 	:global(*:focus-visible) {
-		outline: 2px solid #667eea;
+		outline: 2px solid #a855f7;
 		outline-offset: 2px;
 		border-radius: 2px;
 	}

@@ -44,7 +44,7 @@
 </script>
 
 <!-- Desktop/Mobile Navigation Bar -->
-<nav class="navbar bg-base-200 shadow-lg" role="navigation" aria-label="Main navigation">
+<nav class="navbar bg-base-200/80 backdrop-blur-md border-b border-base-300/50 sticky top-0 z-40" role="navigation" aria-label="Main navigation">
 	<div class="navbar-start">
 		<!-- Mobile hamburger menu -->
 		<button
@@ -57,6 +57,12 @@
 				<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
 			</svg>
 		</button>
+		<a href="/" class="btn btn-ghost btn-sm text-xs text-base-content/50 hidden md:inline-flex" aria-label="Back to DreamLab main site">
+			<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-4 h-4" aria-hidden="true">
+				<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+			</svg>
+			DreamLab
+		</a>
 		<a href="{base}/chat" class="btn btn-ghost text-xl">{appConfig.name.split(' - ')[0]}</a>
 	</div>
 
@@ -132,6 +138,21 @@
 			</div>
 
 			<ul class="menu p-4 gap-2">
+				<li>
+					<a
+						href="/"
+						class="min-h-11 text-base text-base-content/60"
+						on:click={handleNavClick}
+					>
+						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-5 h-5">
+							<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+						</svg>
+						Back to DreamLab
+					</a>
+				</li>
+
+				<div class="divider my-1"></div>
+
 				<li>
 					<a
 						href="{base}/chat"

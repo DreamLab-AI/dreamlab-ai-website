@@ -8,10 +8,10 @@
 		   MD3 DESIGN SYSTEM TOKENS
 		   ======================================== */
 
-		/* Brand Colors */
-		--color-primary: #5568d3;
-		--color-primary-hover: #4456c2;
-		--color-secondary: #764ba2;
+		/* Brand Colors — aligned with main DreamLab site (cyan → purple) */
+		--color-primary: #0ea5e9;
+		--color-primary-hover: #0284c7;
+		--color-secondary: #a855f7;
 		--color-success: #10b981;
 		--color-error: #ef4444;
 		--color-warning: #f59e0b;
@@ -525,17 +525,17 @@
 
 	.gradient-mesh {
 		background:
-			radial-gradient(at 0% 0%, rgba(85, 104, 211, 0.1) 0px, transparent 50%),
-			radial-gradient(at 100% 0%, rgba(118, 75, 162, 0.1) 0px, transparent 50%),
-			radial-gradient(at 100% 100%, rgba(85, 104, 211, 0.1) 0px, transparent 50%),
-			radial-gradient(at 0% 100%, rgba(118, 75, 162, 0.1) 0px, transparent 50%);
+			radial-gradient(at 0% 0%, rgba(14, 165, 233, 0.1) 0px, transparent 50%),
+			radial-gradient(at 100% 0%, rgba(168, 85, 247, 0.1) 0px, transparent 50%),
+			radial-gradient(at 100% 100%, rgba(14, 165, 233, 0.1) 0px, transparent 50%),
+			radial-gradient(at 0% 100%, rgba(168, 85, 247, 0.1) 0px, transparent 50%);
 	}
 
 	.gradient-hero {
 		background: linear-gradient(135deg,
-			rgba(85, 104, 211, 0.05) 0%,
-			rgba(118, 75, 162, 0.05) 50%,
-			rgba(85, 104, 211, 0.05) 100%);
+			rgba(14, 165, 233, 0.05) 0%,
+			rgba(168, 85, 247, 0.05) 50%,
+			rgba(14, 165, 233, 0.05) 100%);
 		background-size: 200% 200%;
 		animation: gradient-shift 15s ease infinite;
 	}
