@@ -1,0 +1,25 @@
+{
+  "name": "visionflow-bridge",
+  "version": "1.0.0",
+  "description": "VisionFlow agent bridge - connects AI agents to Nostr relay via tiered DMs",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "ts-node src/server.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@noble/curves": "^1.4.0",
+    "@noble/hashes": "^2.0.1",
+    "dotenv": "^16.3.1",
+    "nostr-tools": "^2.19.3",
+    "ws": "^8.14.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.27",
+    "@types/ws": "^8.18.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
