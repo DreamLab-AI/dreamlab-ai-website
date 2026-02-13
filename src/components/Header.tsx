@@ -54,15 +54,28 @@ export const Header = () => {
             <DropdownMenuItem asChild>
               <Link to="/" className="w-full">Home</Link>
             </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>
+                <span>Training</span>
+              </DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                <DropdownMenuItem asChild>
+                  <a href="/#training-options" className="w-full">Overview</a>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/residential-training" className="w-full">Residential Programmes</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/workshops" className="w-full">Self-Guided Workshops</Link>
+                </DropdownMenuItem>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
             <DropdownMenuItem asChild>
               <Link to="/team" className="w-full">Team</Link>
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link to="/residential-training" className="w-full">Residential Training</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link to="/workshops" className="w-full">Workshops</Link>
+              <Link to="/testimonials" className="w-full">Success Stories</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <a href="/community/dreamlab/dreamlab-lobby" target="_blank" rel="noopener noreferrer" className="w-full">
@@ -70,12 +83,6 @@ export const Header = () => {
               </a>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-              <Link to="/testimonials" className="w-full">Success Stories</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link to="/system-design" className="w-full">System Design</Link>
-            </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link to="/contact" className="w-full">Contact</Link>
             </DropdownMenuItem>
@@ -110,13 +117,21 @@ export const Header = () => {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <Button
-          variant="ghost"
-          asChild
-          className="hover:bg-purple-500/10 hover:text-purple-400 transition-all duration-300 hover:scale-105 min-h-[48px] px-4 text-base md:text-sm"
-        >
-          <a href="mailto:info@dreamlab-ai.com">Contact</a>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            asChild
+            className="hover:bg-purple-500/10 hover:text-purple-400 transition-all duration-300 hover:scale-105 min-h-[48px] px-4 text-base md:text-sm hidden sm:inline-flex"
+          >
+            <Link to="/contact">Contact</Link>
+          </Button>
+          <Button
+            asChild
+            className="bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transition-all duration-300 min-h-[48px] px-4 text-base md:text-sm"
+          >
+            <a href="/#training-options">Training</a>
+          </Button>
+        </div>
       </div>
     </header>
   );

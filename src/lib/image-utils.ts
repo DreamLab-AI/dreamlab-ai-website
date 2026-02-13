@@ -284,7 +284,7 @@ export const parseImageDimensions = (
 /**
  * Debounce function for resize handlers
  */
-export const debounce = <T extends (...args: any[]) => void>(
+export const debounce = <T extends (...args: unknown[]) => void>(
   fn: T,
   delay: number
 ): ((...args: Parameters<T>) => void) => {
@@ -298,7 +298,7 @@ export const debounce = <T extends (...args: any[]) => void>(
 /**
  * Throttle function for scroll handlers
  */
-export const throttle = <T extends (...args: any[]) => void>(
+export const throttle = <T extends (...args: unknown[]) => void>(
   fn: T,
   limit: number
 ): ((...args: Parameters<T>) => void) => {

@@ -105,7 +105,7 @@ const faqs = [
   },
   {
     q: "How many people can join?",
-    a: "up to 4 people from your team for the flat fee."
+    a: "Up to 4 people from your team for a single engagement fee. Get in touch for details."
   },
   {
     q: "Is the session recorded?",
@@ -173,10 +173,10 @@ const Index = () => {
 
           <div className="flex flex-col sm:flex-row gap-4 animate-scale-in mb-8 w-full sm:w-auto" style={{ animationDelay: '0.2s' }}>
             <a
-              href="/masterclass#pricing"
+              href="#training-options"
               className="group relative inline-flex items-center justify-center rounded-lg text-base md:text-lg font-semibold ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-xl hover:shadow-cyan-500/50 hover:scale-105 min-h-[56px] h-14 md:h-16 px-6 md:px-8 py-4 overflow-hidden"
             >
-              <span className="relative z-10">Get the AI Agent Masterclass</span>
+              <span className="relative z-10">See training options</span>
               <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </a>
           </div>
@@ -184,7 +184,7 @@ const Index = () => {
           <div className="animate-slide-up flex flex-col sm:flex-row gap-6 text-sm md:text-base text-muted-foreground" style={{ animationDelay: '0.25s' }}>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 bg-cyan-400 rounded-full" />
-              <span>1-day masterclass · up to 4 people · £2,999 + VAT</span>
+              <span>1-day workshops · residential programmes · expert retainer</span>
             </div>
           </div>
         </div>
@@ -467,53 +467,115 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Pricing / What's Included */}
-      <section id="pricing" className="py-20" aria-label="Pricing">
-        <div className="container max-w-4xl mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Here's everything I've included in the Masterclass
+      {/* Training Options */}
+      <section id="training-options" className="py-16 md:py-20" aria-label="Training options">
+        <div className="container max-w-6xl mx-auto px-5 md:px-4">
+          <div className="text-center mb-12 md:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
+              Choose your training format
             </h2>
-            <p className="text-lg text-muted-foreground">
-              You are not just paying for a day of teaching. You are paying for a result and a kit you can reuse.
+            <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
+              Every engagement starts with a conversation. We'll tailor the format and scope to your team's needs.
             </p>
           </div>
 
-          <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/30 rounded-2xl p-8 md:p-12">
-            <ul className="space-y-4 mb-10">
-              {[
-                { item: "Live online training day for up to 4 people", value: "£3,500" },
-                { item: "Instructor-led build support throughout the day", value: "£900" },
-                { item: "Workflow selection pack", value: "£450" },
-                { item: "Agent spec template (inputs, outputs, boundaries, checks)", value: "£350" },
-                { item: "Starter repo + project structure", value: "£750" },
-                { item: "Terminal quickstart for non-developers", value: "£200" },
-                { item: "Git quickstart (the minimum you need)", value: "£250" },
-                { item: "Prompt patterns for agent workflows", value: "£400" },
-                { item: "Evaluation checklist", value: "£450" },
-                { item: "Recording of the training day", value: "£300" }
-              ].map((line, i) => (
-                <li key={i} className="flex items-center justify-between py-2 border-b border-purple-500/20 last:border-b-0">
-                  <span className="text-foreground/90">{line.item}</span>
-                  <span className="text-muted-foreground text-sm ml-4">Worth: {line.value}</span>
-                </li>
-              ))}
-            </ul>
-
-            <div className="text-center">
-              <div className="text-muted-foreground mb-2">Total worth: <span className="line-through">£7,500</span></div>
-              <div className="text-4xl md:text-5xl font-bold mb-2">
-                <span className="bg-gradient-to-r from-cyan-400 to-purple-400 text-transparent bg-clip-text">£2,999</span>
-                <span className="text-lg font-normal text-muted-foreground ml-2">+ VAT</span>
+          <div className="grid md:grid-cols-3 gap-6 md:gap-8">
+            {/* 1-Day Workshop */}
+            <div className="bg-background/50 backdrop-blur border border-cyan-500/30 rounded-2xl p-6 md:p-8 hover:border-cyan-500/50 transition-colors relative">
+              <div className="absolute top-4 right-4 px-3 py-1 bg-cyan-500/20 rounded-full text-cyan-400 text-xs font-medium">
+                Most Popular
               </div>
-              <p className="text-sm text-muted-foreground mb-8">One price for your whole team (up to 4 people)</p>
-
+              <h3 className="text-xl md:text-2xl font-bold mb-2">1-Day Workshop</h3>
+              <p className="text-muted-foreground mb-6 text-sm">At your location, anywhere in the UK</p>
+              <ul className="space-y-3 mb-8 text-sm md:text-base">
+                <li className="flex items-start gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-cyan-400 flex-shrink-0 mt-0.5" />
+                  <span>Up to 4 people from your team</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-cyan-400 flex-shrink-0 mt-0.5" />
+                  <span>One working agent, built on your data</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-cyan-400 flex-shrink-0 mt-0.5" />
+                  <span>Starter repo, templates, and recording</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-cyan-400 flex-shrink-0 mt-0.5" />
+                  <span>2 weeks of async follow-up support</span>
+                </li>
+              </ul>
               <Link
                 to="/contact"
-                className="inline-flex items-center justify-center rounded-lg text-base md:text-lg font-semibold bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-xl hover:shadow-cyan-500/50 hover:scale-105 transition-all min-h-[56px] h-14 md:h-16 px-8 md:px-10"
+                className="block w-full py-3 px-6 rounded-lg bg-gradient-to-r from-cyan-600 to-cyan-500 text-white font-semibold text-center hover:shadow-lg hover:shadow-cyan-500/30 transition-all min-h-[48px]"
               >
-                Get in touch
-                <ArrowRight className="ml-2 w-5 h-5" />
+                Get in touch <ArrowRight className="inline w-4 h-4 ml-1" />
+              </Link>
+            </div>
+
+            {/* Residential Programme */}
+            <div className="bg-background/50 backdrop-blur border border-purple-500/30 rounded-2xl p-6 md:p-8 hover:border-purple-500/50 transition-colors relative">
+              <div className="absolute top-4 right-4 px-3 py-1 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full text-purple-400 text-xs font-medium">
+                Deep Immersion
+              </div>
+              <h3 className="text-xl md:text-2xl font-bold mb-2">Residential Programme</h3>
+              <p className="text-muted-foreground mb-6 text-sm">Full-board at our Lake District facility</p>
+              <ul className="space-y-3 mb-8 text-sm md:text-base">
+                <li className="flex items-start gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" />
+                  <span>Multi-day immersive training (2-5 days)</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" />
+                  <span>Multi-agent orchestration and advanced platform</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" />
+                  <span>Accommodation and meals included</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" />
+                  <span>Strategic roadmap + 4 weeks support</span>
+                </li>
+              </ul>
+              <Link
+                to="/residential-training"
+                className="block w-full py-3 px-6 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold text-center hover:shadow-lg hover:shadow-purple-500/30 transition-all min-h-[48px]"
+              >
+                View programmes <ArrowRight className="inline w-4 h-4 ml-1" />
+              </Link>
+            </div>
+
+            {/* Expert Retainer */}
+            <div className="bg-background/50 backdrop-blur border border-blue-500/30 rounded-2xl p-6 md:p-8 hover:border-blue-500/50 transition-colors relative">
+              <div className="absolute top-4 right-4 px-3 py-1 bg-blue-500/20 rounded-full text-blue-400 text-xs font-medium">
+                Ongoing
+              </div>
+              <h3 className="text-xl md:text-2xl font-bold mb-2">Expert Retainer</h3>
+              <p className="text-muted-foreground mb-6 text-sm">Flexible monthly or annual support hours</p>
+              <ul className="space-y-3 mb-8 text-sm md:text-base">
+                <li className="flex items-start gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                  <span>Agreed hours of consulting and development</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                  <span>Monthly or annual commitment (30% annual saving)</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                  <span>Direct access to our specialist network</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                  <span>Strategy, builds, troubleshooting, and training</span>
+                </li>
+              </ul>
+              <Link
+                to="/contact"
+                className="block w-full py-3 px-6 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 text-white font-semibold text-center hover:shadow-lg hover:shadow-blue-500/30 transition-all min-h-[48px]"
+              >
+                Discuss a retainer <ArrowRight className="inline w-4 h-4 ml-1" />
               </Link>
             </div>
           </div>
@@ -537,7 +599,7 @@ const Index = () => {
                   If you complete the prep checklist and attend the day, and we do not get a working on-demand run of the agent in your environment by the end of the day, I will book an additional 90-minute follow-up session at no cost to get it over the line.
                 </p>
                 <p className="text-foreground/90 mb-6 leading-relaxed">
-                  If we still cannot get a working proof after that follow-up, I will refund the full £2,999 fee.
+                  If we still cannot get a working proof after that follow-up, I will refund the full fee.
                 </p>
 
                 <h4 className="font-semibold mb-2">Fair boundary (so nobody gets surprised):</h4>

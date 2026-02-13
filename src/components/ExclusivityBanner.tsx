@@ -60,7 +60,7 @@ export const ExclusivityBanner = () => {
           <div className="flex items-center justify-center gap-4 mb-8 flex-wrap">
             <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/20">
               <Clock className="w-4 h-4 text-amber-400" aria-hidden="true" />
-              <span className="text-sm font-medium text-amber-200">Q1 2025 Fully Booked</span>
+              <span className="text-sm font-medium text-amber-200">Limited Availability</span>
             </div>
             <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/20">
               <Users className="w-4 h-4 text-purple-400" aria-hidden="true" />
@@ -77,7 +77,7 @@ export const ExclusivityBanner = () => {
           <p className="text-lg text-slate-300 mb-8 leading-relaxed">
             Our residential programmes operate at intimate scale by design.
             Each cohort is carefully assembled to maximise peer learning and
-            instructor access. Join the waitlist for Q2 2025.
+            instructor access. Join the waitlist for upcoming sessions.
           </p>
 
           {/* Simple email signup */}

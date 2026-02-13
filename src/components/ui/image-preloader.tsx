@@ -74,7 +74,7 @@ class PreloadManager {
       if (crossOrigin) link.crossOrigin = crossOrigin;
       if (media) link.media = media;
       if (type) link.type = type;
-      if (fetchPriority) (link as any).fetchPriority = fetchPriority;
+      if (fetchPriority) (link as HTMLLinkElement & { fetchPriority: string }).fetchPriority = fetchPriority;
       if (srcset) link.setAttribute("imagesrcset", srcset);
       if (sizes) link.setAttribute("imagesizes", sizes);
 

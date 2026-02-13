@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { RouteLoader } from "@/components/RouteLoader";
 
 // Lazy load all route components for code splitting
@@ -16,7 +16,7 @@ const Contact = lazy(() => import("./pages/Contact"));
 const WorkshopPage = lazy(() => import("./pages/WorkshopPage"));
 const WorkshopIndex = lazy(() => import("./pages/WorkshopIndex"));
 const ResidentialTraining = lazy(() => import("./pages/ResidentialTraining"));
-const Masterclass = lazy(() => import("./pages/Masterclass"));
+// Masterclass page consolidated into landing page — /masterclass now redirects to /
 const SystemDesign = lazy(() => import("./pages/SystemDesign"));
 const ResearchPaper = lazy(() => import("./pages/ResearchPaper"));
 const Testimonials = lazy(() => import("./pages/Testimonials"));
@@ -56,8 +56,8 @@ const App = () => (
             {/* Residential Training route */}
             <Route path="/residential-training" element={<ResidentialTraining />} />
 
-            {/* AI Agent Masterclass route */}
-            <Route path="/masterclass" element={<Masterclass />} />
+            {/* Legacy /masterclass redirects to landing page */}
+            <Route path="/masterclass" element={<Navigate to="/#training-options" replace />} />
 
             {/* Contact form route */}
             <Route path="/contact" element={<Contact />} />

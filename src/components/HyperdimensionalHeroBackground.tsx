@@ -8,7 +8,7 @@ import { VoronoiGoldenHero } from "./VoronoiGoldenHero";
  * - Voronoi tessellation with golden ratio (φ) seed placement
  * - Based on Vogel's model: θ = n × 137.508° (golden angle)
  * - Signals "we understand advanced mathematics" without being showy
- * - "Premium intellectual warmth" - £2999 course aesthetic
+ * - "Premium intellectual warmth" - signals expertise and precision
  *
  * MATHEMATICAL FOUNDATION:
  * - Golden angle: 137.508° = 360° × (1 - 1/φ) where φ = (1 + √5) / 2

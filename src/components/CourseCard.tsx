@@ -299,43 +299,23 @@ export function CourseCard({
             {description}
           </p>
 
-          {/* Pricing Section */}
+          {/* Programme Details */}
           <div className={cn(
             "p-4 rounded-xl mb-4",
             "bg-gradient-to-br from-secondary/80 to-secondary/40",
             "border border-border/30"
           )}>
-            {/* Per Person Price */}
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-muted-foreground">Per person</span>
-              <span className="text-lg font-bold text-foreground">{pricePerPerson}</span>
+              <span className="text-sm text-muted-foreground">Duration</span>
+              <span className="text-sm font-semibold text-foreground">{duration}</span>
             </div>
-
-            {/* Divider */}
             <div className="h-px bg-border/50 my-2" />
-
-            {/* Team Price with Savings */}
             <div className="flex items-center justify-between">
-              <div className="flex flex-col">
-                <span className="text-sm text-muted-foreground">Team of 4</span>
-                <span className={cn(
-                  "text-xs font-semibold px-2 py-0.5 rounded-full mt-1 w-fit",
-                  "bg-green-500/20 text-green-400 border border-green-500/30"
-                )}>
-                  {teamSaving}
-                </span>
-              </div>
-              <span className={cn(
-                "text-xl font-bold",
-                "bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent"
-              )}>
-                {teamPrice}
-              </span>
+              <span className="text-sm text-muted-foreground">Group size</span>
+              <span className="text-sm font-semibold text-foreground">{capacity}</span>
             </div>
-
-            {/* Included Note */}
             <p className="text-[10px] text-muted-foreground/70 text-center mt-3 italic">
-              Includes full-board accommodation & meals
+              Full-board accommodation & meals included
             </p>
           </div>
 
@@ -457,7 +437,7 @@ export function CourseCard({
             )} />
 
             <span className="relative flex items-center justify-center gap-2">
-              <span>Book This Programme</span>
+              <span>Enquire</span>
               <ChevronRight className={cn(
                 "w-4 h-4 transition-transform duration-300",
                 "group-hover/btn:translate-x-1"
