@@ -122,6 +122,15 @@ cohorts:
     name: 'Trainees'
     description: 'Users receiving training'
 
+  # AI Agent access cohorts
+  - id: 'agent'
+    name: 'AI Agents'
+    description: 'VisionFlow AI agent service accounts'
+
+  - id: 'visionflow-full'
+    name: 'VisionFlow Full Access'
+    description: 'Users with access to full VisionFlow intelligence (Tier 3)'
+
 # 3-Tier Structure: Categories (Zones) → Sections → Forums
 categories:
   # ============================================
@@ -446,6 +455,85 @@ categories:
         ui:
           color: '#f97316'
         showStats: false
+        allowForumCreation: false
+
+  # ============================================
+  # ZONE 4: AI AGENTS (VisionFlow Bridge)
+  # ============================================
+  - id: 'ai-agents'
+    name: 'AI Agents'
+    description: 'VisionFlow AI agents - tiered intelligence via Nostr DM'
+    icon: '🤖'
+    order: 4
+
+    # Zone-level access control
+    access:
+      visibleToCohorts: ['business', 'trainers', 'trainees', 'minimoonoir-business', 'cross-access']
+      hiddenFromCohorts: ['family-only']
+      strictIsolation: false
+
+    # Zone branding
+    branding:
+      displayName: 'VisionFlow AI'
+      tagline: 'Intelligent Agents'
+      primaryColor: '#0ea5e9'
+      accentColor: '#38bdf8'
+
+    ui:
+      color: '#0ea5e9'
+
+    sections:
+      - id: 'ai-general'
+        name: 'General Assistant'
+        description: 'Quick answers from VisionFlow z ai - no memory, no agentic tasks'
+        icon: '💬'
+        order: 1
+        access:
+          requiresApproval: false
+          defaultRole: 'guest'
+          autoApprove: true
+        calendar:
+          access: 'none'
+          canCreate: false
+        ui:
+          color: '#0ea5e9'
+        showStats: true
+        allowForumCreation: false
+
+      - id: 'ai-claude-flow'
+        name: 'Claude Flow Agent'
+        description: 'Agentic AI with Claude Flow - task execution, reasoning, session memory'
+        icon: '🧠'
+        order: 2
+        access:
+          requiresApproval: true
+          defaultRole: 'member'
+          autoApprove: false
+          requiredCohorts: ['business', 'trainers', 'trainees', 'minimoonoir-business', 'cross-access']
+        calendar:
+          access: 'none'
+          canCreate: false
+        ui:
+          color: '#8b5cf6'
+        showStats: true
+        allowForumCreation: false
+
+      - id: 'ai-visionflow'
+        name: 'VisionFlow Intelligence'
+        description: 'Full VisionFlow AI - knowledge graph, memory, deep intelligence'
+        icon: '🔮'
+        order: 3
+        access:
+          requiresApproval: true
+          defaultRole: 'member'
+          autoApprove: false
+          requiredCohorts: ['cross-access', 'visionflow-full']
+        calendar:
+          access: 'none'
+          canCreate: false
+        ui:
+          color: '#ec4899'
+        showStats: true
         allowForumCreation: false
 
 # Calendar access levels
