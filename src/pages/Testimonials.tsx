@@ -15,7 +15,7 @@ interface Testimonial {
 
 const testimonials: Testimonial[] = [
   {
-    id: "maya-chen",
+    id: "ste-moyler",
     name: "Maya Chen",
     role: "Digital Sculptor",
     quote: "I learned to wield VR tools while wind whipped off Derwentwater. Now I sculpt with the same raw power as those mountains—unafraid of rough edges.",

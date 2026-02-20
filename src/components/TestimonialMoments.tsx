@@ -11,18 +11,18 @@ interface Testimonial {
 
 const testimonials: Testimonial[] = [
   {
-    id: "maya-chen",
-    name: "Maya Chen",
-    role: "Digital Sculptor",
-    quote: "I learned to wield VR tools while wind whipped off Derwentwater. Now I sculpt with the same raw power as those mountains—unafraid of rough edges.",
-    locationDetail: "Sunset sessions overlooking the lake"
+    id: "ste-moyler",
+    name: "Ste Moyler",
+    role: "THG - Ingenuity",
+    quote: "Never mind OpenClaw. This is Gryffindoooor!",
+    locationDetail: "Roof terrace DJ sessions"
   },
   {
-    id: "tom-blackwood",
-    name: "Tom Blackwood",
-    role: "Interactive Installation Artist",
-    quote: "The generative algorithms made sense somewhere between morning mist and sheep-dotted hills. My pieces finally breathe like landscapes do.",
-    locationDetail: "Barn studio with stone walls and roaring fires"
+    id: "jess-symons",
+    name: "Dr Jessica Symons",
+    role: "Visioning Lab",
+    quote: "I just used Claude Code to create an new version of a Unity project that had been gathering dust for years. Is was so satisfying to see it rise again. Thank you thank you John for setting me up. I am having so much fun 🙏 thanks 🙏.",
+    locationDetail: "Walking through that bog!"
   },
   {
     id: "samira-velasco",
