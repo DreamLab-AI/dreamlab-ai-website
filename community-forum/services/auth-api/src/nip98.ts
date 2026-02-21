@@ -108,10 +108,21 @@ export async function verifyNip98(req: Request): Promise<{ pubkey: string } | nu
   // Pubkey shape
   if (!event.pubkey || typeof event.pubkey !== 'string' || event.pubkey.length !== 64) return null;
 
-  // Reconstruct full request URL
-  const protocol = (req.headers['x-forwarded-proto'] as string) || req.protocol || 'https';
-  const host = req.headers['x-forwarded-host'] as string || req.headers.host || '';
-  const fullUrl = `${protocol}://${host}${req.originalUrl}`;
+  // M-5: Reconstruct full request URL from the pre-configured RP_ORIGIN rather than
+  // trusting x-forwarded-host, which an attacker could spoof to bypass URL validation.
+  // RP_ORIGIN is the canonical HTTPS origin of this service (e.g. https://auth.dreamlab-ai.com).
+  const rpOrigin = process.env.RP_ORIGIN || '';
+  let baseOrigin: string;
+  if (rpOrigin) {
+    // Strip any trailing slash from the origin
+    baseOrigin = rpOrigin.replace(/\/$/, '');
+  } else {
+    // Fallback for local dev: reconstruct from host header only (no forwarded headers)
+    const protocol = req.protocol || 'http';
+    const host = req.headers.host || 'localhost';
+    baseOrigin = `${protocol}://${host}`;
+  }
+  const fullUrl = `${baseOrigin}${req.originalUrl}`;
 
   // URL tag must match (exact match, or trailing slash normalization only)
   const eventUrl = getTagValue(event, 'u');

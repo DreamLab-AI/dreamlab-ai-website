@@ -55,7 +55,10 @@ app.use((req: Request, _res: Response, next: NextFunction) => {
   if (Buffer.isBuffer(req.body)) {
     (req as any).rawBody = req.body;
     try {
-      req.body = JSON.parse(req.body.toString());
+      const parsed: unknown = JSON.parse(req.body.toString());
+      // Treat null / non-object JSON payloads as empty objects to avoid
+      // destructuring errors in route handlers (M-1: null body → 500).
+      req.body = parsed !== null && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
     } catch {
       req.body = {};
     }

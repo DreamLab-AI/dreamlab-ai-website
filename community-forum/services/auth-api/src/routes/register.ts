@@ -95,7 +95,8 @@ router.post('/verify', async (req: Request, res: Response): Promise<void> => {
         res.status(400).json({ error: 'webId must use the https scheme' });
         return;
       }
-      if (rawClientWebId.includes('..') || rawClientWebId.includes('%2e%2e') || rawClientWebId.includes('%2E%2E')) {
+      // M-2: check all case variants of percent-encoded ".." to prevent path traversal
+      if (rawClientWebId.includes('..') || /%2e%2e/i.test(rawClientWebId)) {
         res.status(400).json({ error: 'webId contains invalid path sequences' });
         return;
       }
@@ -126,14 +127,22 @@ router.post('/verify', async (req: Request, res: Response): Promise<void> => {
     return;
   }
 
+  // H-4: reject duplicate registrations before consuming the challenge
+  const existing = await getCredentialByPubkey(pubkey).catch(() => null);
+  if (existing) {
+    res.status(409).json({ error: 'Pubkey already registered' });
+    return;
+  }
+
   const challengeRow = await consumeChallenge(challengeBase64).catch(() => null);
   if (!challengeRow) {
     res.status(400).json({ error: 'Challenge not found, expired, or already used' });
     return;
   }
 
-  // Ensure the challenge was issued for this pubkey
-  if (challengeRow.pubkey && challengeRow.pubkey !== pubkey) {
+  // Ensure the challenge was issued for this pubkey (login challenges bind to a pubkey;
+  // registration challenges have pubkey = null since it is derived from PRF output).
+  if (challengeRow.pubkey !== null && challengeRow.pubkey !== pubkey) {
     res.status(400).json({ error: 'Challenge pubkey mismatch' });
     return;
   }

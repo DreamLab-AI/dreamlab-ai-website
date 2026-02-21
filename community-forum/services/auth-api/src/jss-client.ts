@@ -56,15 +56,45 @@ export async function provisionPod(pubkey: string): Promise<PodInfo | null> {
   }
 
   // JSS returns webId and podBaseUrl (or podUrl) in the response
-  const webId =
+  const rawWebId =
     (data.webId as string) ||
     (data.webid as string) ||
     `${jssBaseUrl.replace(/\/$/, '')}/${pubkey}/profile/card#me`;
 
-  const podUrl =
+  const rawPodUrl =
     (data.podBaseUrl as string) ||
     (data.podUrl as string) ||
     `${jssBaseUrl.replace(/\/$/, '')}/${pubkey}/`;
+
+  // M-4: validate that JSS-returned values use https and originate from the
+  // expected JSS host to prevent open-redirect or stored-XSS via a rogue JSS response.
+  const expectedHost = new URL(jssBaseUrl).host;
+  function validateJssUrl(raw: unknown, label: string): string {
+    if (typeof raw !== 'string') throw new Error(`JSS returned non-string ${label}`);
+    let parsed: URL;
+    try {
+      parsed = new URL(raw);
+    } catch {
+      throw new Error(`JSS returned invalid URL for ${label}: ${raw}`);
+    }
+    if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') {
+      throw new Error(`JSS returned non-http(s) scheme for ${label}: ${parsed.protocol}`);
+    }
+    if (parsed.host !== expectedHost) {
+      throw new Error(`JSS returned unexpected host for ${label}: ${parsed.host} (expected ${expectedHost})`);
+    }
+    return parsed.toString();
+  }
+
+  let webId: string;
+  let podUrl: string;
+  try {
+    webId = validateJssUrl(rawWebId, 'webId');
+    podUrl = validateJssUrl(rawPodUrl, 'podUrl');
+  } catch (err) {
+    console.error('[jss-client] JSS URL validation failed:', err);
+    return null;
+  }
 
   return { webId, podUrl };
 }
