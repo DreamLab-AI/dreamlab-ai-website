@@ -108,7 +108,34 @@ public/
 
 community-forum/        # SvelteKit app (separate package.json)
   src/routes/           # 16 Svelte routes (channels, DMs, calendar, profiles)
-  services/             # 4 microservices (nostr-relay, embedding-api, image-api, link-preview-api)
+  src/lib/auth/
+    passkey.ts          # WebAuthn PRF registration/authentication + HKDF key derivation
+    nip98-client.ts     # NIP-98 kind:27235 token creation + fetchWithNip98()
+  src/lib/stores/
+    auth.ts             # Auth store: _privkeyMem closure, passkey login/register
+  src/lib/components/auth/
+    AuthFlow.svelte     # Orchestrates signup→nickname→pending-approval steps
+    Signup.svelte       # Passkey registration UI
+    Login.svelte        # Passkey (primary) / NIP-07 / nsec (advanced) login
+    NicknameSetup.svelte # Profile setup after registration
+    NsecBackup.svelte   # One-time privkey download (gets key from auth store)
+  services/
+    auth-api/           # Cloud Run: WebAuthn server (Express + @simplewebauthn/server)
+      src/db.ts         # PostgreSQL pool, webauthn_credentials/challenges schema
+      src/nip98.ts      # NIP-98 event verification (server-side)
+      src/webauthn.ts   # Registration/authentication option generators
+      src/server.ts     # Express app, CORS, raw body capture, env validation
+      src/jss-client.ts # JSS pod provisioning client
+      src/routes/
+        register.ts     # POST /auth/register/options + /verify
+        authenticate.ts # POST /auth/login/options + /verify
+    jss/                # Cloud Run: JavaScript Solid Server (pod storage)
+      Dockerfile        # node:20-slim, @solid/community-server@7.1.8, USER node
+      entrypoint.sh     # css --port 8080 --baseUrl $JSS_BASE_URL
+    nostr-relay/        # Cloud Run: Nostr relay (existing)
+    embedding-api/      # Cloud Run: Embedding API (existing)
+    image-api/          # Cloud Run: Image API (existing)
+    link-preview-api/   # Cloud Run: Link preview (existing)
   tests/                # Vitest unit + Playwright e2e
 
 wasm-voronoi/           # Rust WASM (Cargo.toml, src/lib.rs)
@@ -119,10 +146,13 @@ scripts/
   optimize-images.sh          # Image compression
 
 .github/workflows/
-  deploy.yml                  # Main CI/CD → GitHub Pages
+  deploy.yml                  # Main CI/CD → GitHub Pages + forum build
+  auth-api.yml                # Cloud Run: auth-api (WebAuthn server)
+  jss.yml                     # Cloud Run: JSS (Solid pod server)
   fairfield-relay.yml         # Cloud Run: Nostr relay
   fairfield-embedding-api.yml # Cloud Run: Embedding API
   fairfield-image-api.yml     # Cloud Run: Image API
+  SECRETS_SETUP.md            # 8-step GCP bootstrap guide
 ```
 
 ## Routing
@@ -169,18 +199,54 @@ All routes are lazy-loaded via `React.lazy()` in `src/App.tsx`:
 
 ## Environment Variables
 
-Required in `.env` (never commit):
+### Main site `.env` (never commit)
 ```
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key-here
+VITE_AUTH_API_URL=https://auth-api-xxx-uc.a.run.app
+```
+
+### community-forum `.env` (never commit)
+```
+VITE_AUTH_API_URL=https://auth-api-xxx-uc.a.run.app
+```
+
+### auth-api `.env` (Cloud Run secrets in production)
+```
+DATABASE_URL=postgresql://user:pass@host/db?sslmode=require
+RELAY_URL=wss://relay.dreamlab-ai.com
+RP_ID=dreamlab-ai.com
+RP_NAME=DreamLab Community
+EXPECTED_ORIGIN=https://dreamlab-ai.com
+JSS_BASE_URL=https://jss-xxx-uc.a.run.app
+```
+
+### jss `.env` (Cloud Run env var)
+```
+JSS_BASE_URL=https://jss-xxx-uc.a.run.app/
 ```
 
 ## Deployment
 
 - **Static site:** `npm run build` → `dist/` → GitHub Pages (gh-pages branch)
 - **Community forum:** SvelteKit static adapter → `dist/community/`
-- **Backend:** Cloud Run containers (relay, embedding, image, link-preview APIs)
+- **Backend:** Cloud Run containers — see GCP project `cumbriadreamlab`, region `us-central1`
 - **Custom domain:** dreamlab-ai.com (CNAME file in public/)
+
+### Cloud Run Services
+
+| Service | Workflow | Purpose |
+|---------|----------|---------|
+| auth-api | auth-api.yml | WebAuthn registration/authentication, NIP-98 gating, JSS provisioning |
+| jss | jss.yml | JavaScript Solid Server — WebID + pod storage per pubkey |
+| nostr-relay | fairfield-relay.yml | Nostr relay (NIP-01, NIP-98 verified) |
+| embedding-api | fairfield-embedding-api.yml | Vector embeddings |
+| image-api | fairfield-image-api.yml | Image resizing/serving |
+
+### First-time GCP Bootstrap
+See `.github/workflows/SECRETS_SETUP.md` for the full 8-step sequence.
+Key chicken-and-egg: auth-api and JSS each need their own Cloud Run URL as a secret
+before CI can wire them together. Use `--no-traffic` on first deploy.
 
 ## Behavioral Rules
 
@@ -213,6 +279,75 @@ VITE_SUPABASE_ANON_KEY=your-anon-key-here
 - `/public/data/` for runtime-loaded content (markdown, manifests)
 - `/scripts/` for build and utility scripts
 - `/docs/` for project documentation
+
+## Forum Auth Architecture
+
+### Overview: Passkey-first, privkey-never-stored
+
+The community forum uses WebAuthn PRF extension to derive a secp256k1 private key
+deterministically from the user's passkey. The privkey is **never stored** — it lives
+only in the auth store closure (`_privkeyMem: Uint8Array | null`) and is re-derived on
+each login. It is zeroed on `pagehide`.
+
+### Key derivation flow
+
+```
+WebAuthn PRF output (32 bytes, HMAC-SHA-256 from authenticator)
+  → HKDF(SHA-256, salt=[], info="nostr-secp256k1-v1")
+  → 32-byte secp256k1 private key
+  → getPublicKey() → hex pubkey (Nostr identity)
+```
+
+**Critical constraints:**
+- Same passkey credential + same PRF salt → same privkey (deterministic)
+- Cross-device QR auth produces DIFFERENT PRF output → cannot derive key → blocked
+- Windows Hello has no PRF support → blocked with error message
+- PRF salt is generated at registration and stored server-side in `webauthn_credentials.prf_salt`
+
+### Auth flow
+
+```
+Registration:
+  1. Client: navigator.credentials.create() with PRF extension
+  2. Client: check extensions.prf.enabled (abort if false)
+  3. Client: HKDF(PRF output) → privkey → pubkey
+  4. Server: store credential + prf_salt in Postgres
+  5. Server: provision Solid pod via JSS POST /idp/register/
+  6. Server: return { didNostr, webId, podUrl }
+  7. Client: store pubkey in auth state, privkey in closure
+
+Authentication:
+  1. Client: fetch /auth/login/options (returns stored prf_salt in extensions)
+  2. Client: navigator.credentials.get() with same prf_salt
+  3. Client: check authenticatorAttachment !== 'cross-platform'
+  4. Client: HKDF(PRF output) → privkey (same result as registration)
+  5. Server: verify assertion, verify counter advanced, update counter
+  6. Client: privkey in closure, ready to sign NIP-98 tokens
+```
+
+### NIP-98 HTTP Auth
+
+Every state-mutating API call uses NIP-98 `Authorization: Nostr <base64(event)>`:
+- `kind: 27235`, tags: `u` (URL), `method`, optional `payload` (SHA-256 of body)
+- Schnorr-signed with privkey from auth store closure
+- Server recomputes event ID from NIP-01 canonical form and verifies independently
+- Payload hash uses raw body bytes (server captures via `express.raw` before JSON parsing)
+
+### Identity
+
+- Nostr pubkey (hex) is the primary identity
+- `did:nostr:<pubkey>` for DID-based interop
+- WebID at `{jss-url}/{pubkey}/profile/card#me` (Solid/Linked Data)
+
+### Key files
+
+| File | Role |
+|------|------|
+| `community-forum/src/lib/auth/passkey.ts` | WebAuthn PRF ceremony, HKDF derivation |
+| `community-forum/src/lib/auth/nip98-client.ts` | NIP-98 token creation + fetch wrapper |
+| `community-forum/src/lib/stores/auth.ts` | Auth state, privkey closure, passkey hooks |
+| `community-forum/services/auth-api/src/` | Cloud Run WebAuthn server |
+| `community-forum/services/jss/` | Cloud Run Solid pod server |
 
 ## Claude Flow V3 Integration
 
