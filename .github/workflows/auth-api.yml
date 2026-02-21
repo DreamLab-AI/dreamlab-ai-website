@@ -1,0 +1,156 @@
+name: Deploy Auth API to GCP Cloud Run
+
+# Required GitHub Secrets:
+# - GCP_PROJECT_ID: Google Cloud Project ID
+# - GCP_SA_KEY: Service Account JSON key with Cloud Run Admin and Artifact Registry Writer roles
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'community-forum/services/auth-api/**'
+      - '!community-forum/services/auth-api/docs/**'
+      - '!community-forum/services/auth-api/*.md'
+      - '.github/workflows/auth-api.yml'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: false
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+
+env:
+  NODE_VERSION: '20'
+  WORKING_DIRECTORY: community-forum/services/auth-api
+  SERVICE_NAME: auth-api
+  GCP_REGION: us-central1
+
+jobs:
+  test:
+    name: Test and Validate
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ${{ env.WORKING_DIRECTORY }}/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript type checking
+        run: npm run typecheck
+
+      - name: Build project
+        run: npm run build
+
+      - name: Validate build output
+        run: |
+          if [ ! -d dist ]; then
+            echo "Error: dist directory not generated"
+            exit 1
+          fi
+          echo "Build output validated successfully"
+
+  build-and-deploy:
+    name: Build and Deploy to Cloud Run
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Enable required GCP APIs
+        run: |
+          gcloud services enable \
+            sqladmin.googleapis.com \
+            run.googleapis.com \
+            artifactregistry.googleapis.com \
+            secretmanager.googleapis.com \
+            --project ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Configure Docker for Artifact Registry
+        run: |
+          gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev
+
+      - name: Build Docker image
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        run: |
+          docker build \
+            -t ${{ env.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/minimoonoir/${{ env.SERVICE_NAME }}:${{ github.sha }} \
+            -t ${{ env.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/minimoonoir/${{ env.SERVICE_NAME }}:latest \
+            .
+
+      - name: Push Docker image to Artifact Registry
+        run: |
+          docker push ${{ env.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/minimoonoir/${{ env.SERVICE_NAME }}:${{ github.sha }}
+          docker push ${{ env.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/minimoonoir/${{ env.SERVICE_NAME }}:latest
+
+      # IMPORTANT: Set VITE_AUTH_API_URL in repository secrets (GitHub Actions)
+      # and in .env for local development: VITE_AUTH_API_URL=https://auth-api-xxx-uc.a.run.app
+      # This is consumed by the SvelteKit frontend build
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy ${{ env.SERVICE_NAME }} \
+            --image ${{ env.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/minimoonoir/${{ env.SERVICE_NAME }}:${{ github.sha }} \
+            --platform managed \
+            --region ${{ env.GCP_REGION }} \
+            --allow-unauthenticated \
+            --service-account fairfield-applications@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com \
+            --add-cloudsql-instances ${{ secrets.GCP_PROJECT_ID }}:${{ env.GCP_REGION }}:nostr-db \
+            --set-secrets DATABASE_URL=nostr-db-url:latest \
+            --set-secrets JSS_BASE_URL=jss-base-url:latest \
+            --set-env-vars RP_ID=dreamlab-ai.com,RP_NAME=DreamLab Community,RP_ORIGIN=https://dreamlab-ai.com,NODE_ENV=production \
+            --memory 512Mi \
+            --cpu 1 \
+            --min-instances 0 \
+            --max-instances 3 \
+            --port 8080
+
+      - name: Get service URL
+        id: get-url
+        run: |
+          SERVICE_URL=$(gcloud run services describe ${{ env.SERVICE_NAME }} \
+            --region ${{ env.GCP_REGION }} \
+            --format 'value(status.url)')
+          echo "service_url=$SERVICE_URL" >> $GITHUB_OUTPUT
+          echo "Service URL: $SERVICE_URL"
+
+      - name: Deployment summary
+        run: |
+          SERVICE_URL="${{ steps.get-url.outputs.service_url }}"
+          echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Service**: ${{ env.SERVICE_NAME }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Region**: ${{ env.GCP_REGION }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Service URL**: $SERVICE_URL" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Next Steps" >> $GITHUB_STEP_SUMMARY
+          echo "1. Test WebAuthn registration and authentication flows" >> $GITHUB_STEP_SUMMARY
+          echo "2. Verify \`JSS_BASE_URL\` secret is set in Secret Manager" >> $GITHUB_STEP_SUMMARY

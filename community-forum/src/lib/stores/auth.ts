@@ -2,27 +2,28 @@ import { writable, derived, get } from 'svelte/store';
 import type { Writable } from 'svelte/store';
 import { browser } from '$app/environment';
 import { base } from '$app/paths';
-import { encryptPrivateKey, decryptPrivateKey, isEncryptionAvailable } from '$lib/utils/key-encryption';
 import { isPWAInstalled, checkIfPWA } from '$lib/stores/pwa';
 import { hasNip07Extension, getPublicKeyFromExtension, getExtensionName, waitForNip07 } from '$lib/nostr/nip07';
 import { setNip07Signer, clearSigner } from '$lib/nostr/ndk';
+import { registerPasskey, authenticatePasskey } from '$lib/auth/passkey';
+import type { PasskeyRegistrationResult, PasskeyAuthResult } from '$lib/auth/passkey';
 
 export interface AuthState {
   state: 'unauthenticated' | 'authenticating' | 'authenticated';
   pubkey: string | null;
   isAuthenticated: boolean;
   publicKey: string | null;
-  privateKey: string | null;
   nickname: string | null;
   avatar: string | null;
   isPending: boolean;
   error: string | null;
-  isEncrypted: boolean;
   accountStatus: 'incomplete' | 'complete';
   nsecBackedUp: boolean;
   isReady: boolean;
   /** Whether using NIP-07 browser extension for signing */
   isNip07: boolean;
+  /** Whether authenticated via PRF passkey (privkey lives in memory only) */
+  isPasskey: boolean;
   /** Name of the NIP-07 extension if available */
   extensionName: string | null;
 }
@@ -32,37 +33,28 @@ const initialState: AuthState = {
   pubkey: null,
   isAuthenticated: false,
   publicKey: null,
-  privateKey: null,
   nickname: null,
   avatar: null,
   isPending: false,
   error: null,
-  isEncrypted: false,
   accountStatus: 'incomplete',
   nsecBackedUp: false,
   isReady: false,
   isNip07: false,
-  extensionName: null
+  isPasskey: false,
+  extensionName: null,
 };
 
+// Stores only non-secret profile/status fields — never keys
 const STORAGE_KEY = 'nostr_bbs_keys';
-const SESSION_KEY = 'nostr_bbs_session';
 const COOKIE_KEY = 'nostr_bbs_auth';
 const KEEP_SIGNED_IN_KEY = 'nostr_bbs_keep_signed_in';
-const PWA_AUTH_KEY = 'nostr_bbs_pwa_auth';
 
-/**
- * Check if running as installed PWA
- */
 function isRunningAsPWA(): boolean {
   if (!browser) return false;
-  // Check current state or stored PWA mode
   return get(isPWAInstalled) || checkIfPWA() || localStorage.getItem('nostr_bbs_pwa_mode') === 'true';
 }
 
-/**
- * Cookie utilities for persistent auth
- */
 function setCookie(name: string, value: string, days: number): void {
   if (!browser) return;
   const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
@@ -80,40 +72,19 @@ function deleteCookie(name: string): void {
   document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Strict; Secure`;
 }
 
-/**
- * Check if user wants persistent login
- */
 function shouldKeepSignedIn(): boolean {
   if (!browser) return false;
   return localStorage.getItem(KEEP_SIGNED_IN_KEY) !== 'false';
 }
 
-
-/**
- * Get or generate session encryption key
- * Session key is stored in sessionStorage (cleared on tab close)
- */
-function getSessionKey(): string {
-  if (!browser) return '';
-
-  let sessionKey = sessionStorage.getItem(SESSION_KEY);
-  if (!sessionKey) {
-    // Generate a random session key
-    const array = new Uint8Array(32);
-    crypto.getRandomValues(array);
-    sessionKey = btoa(String.fromCharCode(...array));
-    sessionStorage.setItem(SESSION_KEY, sessionKey);
-  }
-  return sessionKey;
-}
-
 function createAuthStore() {
   const { subscribe, set, update }: Writable<AuthState> = writable(initialState);
 
-  // Promise that resolves when session restore is complete
+  // In-memory private key — never persisted to disk, storage, or any external location
+  let _privkeyMem: Uint8Array | null = null;
+
   let readyPromise: Promise<void> | null = null;
 
-  // Helper to sync state and pubkey with isAuthenticated and publicKey
   function syncStateFields(updates: Partial<AuthState>): Partial<AuthState> {
     const result = { ...updates };
     if (updates.isAuthenticated !== undefined) {
@@ -125,175 +96,128 @@ function createAuthStore() {
     return result;
   }
 
-  // Restore from localStorage on init
-  async function restoreSession() {
-    if (!browser) {
-      update(state => ({ ...state, ...syncStateFields({ isReady: true }) }));
-      return;
-    }
-
-    // Check for PWA persistent auth first (no session expiry)
-    const pwaAuth = localStorage.getItem(PWA_AUTH_KEY);
-    if (pwaAuth && isRunningAsPWA()) {
-      try {
-        const pwaData = JSON.parse(pwaAuth);
-        if (pwaData.publicKey && pwaData.privateKey) {
-          console.log('[Auth] Restoring PWA persistent session');
-          update(state => ({
-            ...state,
-            ...syncStateFields({
-              publicKey: pwaData.publicKey,
-              privateKey: pwaData.privateKey,
-              nickname: pwaData.nickname || null,
-              avatar: pwaData.avatar || null,
-              isAuthenticated: true,
-              isEncrypted: false,
-              nsecBackedUp: pwaData.nsecBackedUp || false,
-              isReady: true
-            })
-          }));
-          return;
-        }
-      } catch {
-        // Invalid PWA auth data, continue with normal flow
+  /**
+   * Wire up pagehide to zero-fill the in-memory private key when the page is
+   * being unloaded (navigation away, tab/window close). Uses pagehide rather
+   * than visibilitychange to avoid clearing the key on every tab switch while
+   * the user is still actively using the page.
+   */
+  function clearPrivkeyOnPageHide(): void {
+    if (!browser) return;
+    window.addEventListener('pagehide', () => {
+      if (_privkeyMem) {
+        _privkeyMem.fill(0);
+        _privkeyMem = null;
       }
+    });
+  }
+
+  /**
+   * Restore session on page load.
+   * Only pubkey and profile metadata are restored from localStorage.
+   * Passkey users must re-authenticate to re-derive the privkey.
+   */
+  async function restoreSession(): Promise<void> {
+    if (!browser) {
+      update((s) => ({ ...s, ...syncStateFields({ isReady: true }) }));
+      return;
     }
 
     const stored = localStorage.getItem(STORAGE_KEY);
     if (!stored) {
-      update(state => ({ ...state, ...syncStateFields({ isReady: true }) }));
+      update((s) => ({ ...s, ...syncStateFields({ isReady: true }) }));
       return;
     }
 
     try {
-      const parsed = JSON.parse(stored);
+      const parsed = JSON.parse(stored) as {
+        publicKey?: string;
+        isNip07?: boolean;
+        isPasskey?: boolean;
+        extensionName?: string;
+        nickname?: string;
+        avatar?: string;
+        accountStatus?: 'incomplete' | 'complete';
+        nsecBackedUp?: boolean;
+      };
 
-      // Check if using NIP-07 extension mode
-      if (parsed.isNip07) {
-        // Verify extension is still available
+      // NIP-07 extension path — re-verify extension is still reachable
+      if (parsed.isNip07 && parsed.publicKey) {
         const extensionReady = await waitForNip07(1000);
         if (extensionReady) {
           try {
-            // Re-verify public key from extension
             const currentPubkey = await getPublicKeyFromExtension();
             if (currentPubkey === parsed.publicKey) {
-              // Set NDK to use NIP-07 extension signer
               setNip07Signer();
-
-              update(state => ({
-                ...state,
+              update((s) => ({
+                ...s,
                 ...syncStateFields({
-                  publicKey: parsed.publicKey,
-                  privateKey: null,
-                  nickname: parsed.nickname || null,
-                  avatar: parsed.avatar || null,
+                  publicKey: parsed.publicKey ?? null,
+                  nickname: parsed.nickname ?? null,
+                  avatar: parsed.avatar ?? null,
                   isAuthenticated: true,
-                  isEncrypted: false,
-                  accountStatus: parsed.accountStatus || 'complete',
+                  accountStatus: parsed.accountStatus ?? 'complete',
                   nsecBackedUp: true,
                   isNip07: true,
+                  isPasskey: false,
                   extensionName: getExtensionName(),
-                  isReady: true
-                })
+                  isReady: true,
+                }),
               }));
               return;
             }
           } catch {
-            // Extension denied access or pubkey mismatch - need to re-auth
+            // Extension denied or pubkey mismatch — fall through
           }
         }
-        // Extension not available or pubkey mismatch - clear NIP-07 state
-        update(state => ({
-          ...state,
+        // Extension unavailable or mismatched
+        update((s) => ({
+          ...s,
           ...syncStateFields({
-            publicKey: parsed.publicKey,
-            nickname: parsed.nickname || null,
-            avatar: parsed.avatar || null,
+            publicKey: parsed.publicKey ?? null,
+            nickname: parsed.nickname ?? null,
+            avatar: parsed.avatar ?? null,
             isAuthenticated: false,
             isNip07: false,
-            error: 'Nostr extension not detected. Please unlock your extension or login with nsec.',
-            isReady: true
-          })
+            isPasskey: false,
+            error: 'Nostr extension not detected. Please unlock your extension or sign in again.',
+            isReady: true,
+          }),
         }));
         return;
       }
 
-      // Check if data is encrypted
-      if (parsed.encryptedPrivateKey && isEncryptionAvailable()) {
-        const sessionKey = getSessionKey();
-        try {
-          const privateKey = await decryptPrivateKey(parsed.encryptedPrivateKey, sessionKey);
-          update(state => ({
-            ...state,
-            ...syncStateFields({
-              publicKey: parsed.publicKey,
-              privateKey,
-              nickname: parsed.nickname || null,
-              avatar: parsed.avatar || null,
-              isAuthenticated: true,
-              isEncrypted: true,
-              accountStatus: parsed.accountStatus || 'incomplete',
-              nsecBackedUp: parsed.nsecBackedUp || false,
-              isReady: true
-            })
-          }));
-        } catch {
-          // Session key changed (new session) - need to re-authenticate
-          // But if we're in PWA mode, try to use the stored keys directly
-          if (isRunningAsPWA() && parsed.publicKey) {
-            // For PWA, prompt user to re-enter password once to migrate
-            update(state => ({
-              ...state,
-              ...syncStateFields({
-                publicKey: parsed.publicKey,
-                nickname: parsed.nickname || null,
-                avatar: parsed.avatar || null,
-                isAuthenticated: false,
-                isEncrypted: true,
-                error: 'Please unlock to enable persistent PWA login.',
-                isReady: true
-              })
-            }));
-          } else {
-            update(state => ({
-              ...state,
-              ...syncStateFields({
-                publicKey: parsed.publicKey,
-                nickname: parsed.nickname || null,
-                avatar: parsed.avatar || null,
-                isAuthenticated: false,
-                isEncrypted: true,
-                error: 'Session expired. Please enter your password to unlock.',
-                isReady: true
-              })
-            }));
-          }
-        }
-      } else if (parsed.privateKey) {
-        // Legacy unencrypted data - migrate on next save
-        update(state => ({
-          ...state,
+      // Passkey path — restore profile metadata only; privkey not available until re-auth
+      if (parsed.isPasskey && parsed.publicKey) {
+        update((s) => ({
+          ...s,
           ...syncStateFields({
-            ...parsed,
-            isAuthenticated: true,
-            isEncrypted: false,
-            accountStatus: parsed.accountStatus || 'incomplete',
-            nsecBackedUp: parsed.nsecBackedUp || false,
-            isReady: true
-          })
+            publicKey: parsed.publicKey ?? null,
+            nickname: parsed.nickname ?? null,
+            avatar: parsed.avatar ?? null,
+            isAuthenticated: false,
+            isPasskey: false,
+            isNip07: false,
+            accountStatus: parsed.accountStatus ?? 'incomplete',
+            nsecBackedUp: parsed.nsecBackedUp ?? false,
+            error: null,
+            isReady: true,
+          }),
         }));
-      } else {
-        update(state => ({ ...state, ...syncStateFields({ isReady: true }) }));
+        return;
       }
+
+      // Unknown or legacy state — clear and start fresh
+      update((s) => ({ ...s, ...syncStateFields({ isReady: true }) }));
     } catch {
       localStorage.removeItem(STORAGE_KEY);
-      update(state => ({ ...state, ...syncStateFields({ isReady: true }) }));
+      update((s) => ({ ...s, ...syncStateFields({ isReady: true }) }));
     }
   }
 
-  // Initialize restoration
   if (browser) {
     readyPromise = restoreSession();
+    clearPrivkeyOnPageHide();
   } else {
     readyPromise = Promise.resolve();
   }
@@ -301,21 +225,202 @@ function createAuthStore() {
   return {
     subscribe,
 
-    /**
-     * Wait for the auth store to be ready (session restored)
-     */
-    waitForReady: () => readyPromise || Promise.resolve(),
+    /** Wait for the auth store to be ready (session restored) */
+    waitForReady: (): Promise<void> => readyPromise ?? Promise.resolve(),
 
     /**
-     * Login using NIP-07 browser extension
-     * @returns Object with publicKey on success, or throws on failure
+     * Get the in-memory private key (passkey path only).
+     * Returns null if not authenticated via passkey, or after page hide.
      */
-    loginWithExtension: async (): Promise<{ publicKey: string }> => {
-      if (!browser) {
-        throw new Error('Browser environment required');
+    getPrivkey: (): Uint8Array | null => _privkeyMem,
+
+    /**
+     * Set keys from a completed passkey PRF derivation.
+     * Persists pubkey and profile metadata to localStorage — the privkey is never written.
+     */
+    setKeysFromPasskey: (
+      pubkey: string,
+      privkey: Uint8Array,
+      meta: {
+        nickname?: string | null;
+        avatar?: string | null;
+        accountStatus?: 'incomplete' | 'complete';
+        nsecBackedUp?: boolean;
+        didNostr?: string;
+        webId?: string | null;
+        podUrl?: string | null;
+      } = {},
+    ): void => {
+      _privkeyMem = privkey;
+
+      if (browser) {
+        const existing = localStorage.getItem(STORAGE_KEY);
+        let existingData: { nickname?: string; avatar?: string; accountStatus?: string; nsecBackedUp?: boolean } = {};
+        if (existing) {
+          try { existingData = JSON.parse(existing); } catch { /* ignore */ }
+        }
+        const storageData = {
+          publicKey: pubkey,
+          isPasskey: true,
+          isNip07: false,
+          nickname: meta.nickname ?? existingData.nickname ?? null,
+          avatar: meta.avatar ?? existingData.avatar ?? null,
+          accountStatus: meta.accountStatus ?? existingData.accountStatus ?? 'incomplete',
+          nsecBackedUp: meta.nsecBackedUp ?? existingData.nsecBackedUp ?? false,
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(storageData));
+        if (shouldKeepSignedIn()) {
+          setCookie(COOKIE_KEY, pubkey, 30);
+        }
       }
 
-      // Wait for extension to be ready
+      update((s) => ({
+        ...s,
+        ...syncStateFields({
+          publicKey: pubkey,
+          nickname: meta.nickname ?? s.nickname,
+          avatar: meta.avatar ?? s.avatar,
+          isAuthenticated: true,
+          isPending: false,
+          error: null,
+          accountStatus: meta.accountStatus ?? s.accountStatus,
+          nsecBackedUp: meta.nsecBackedUp ?? s.nsecBackedUp,
+          isNip07: false,
+          isPasskey: true,
+        }),
+      }));
+    },
+
+    /**
+     * Register a new passkey and derive Nostr keypair from PRF output.
+     * The privkey is held in memory only and never written to any storage.
+     */
+    registerWithPasskey: async (displayName: string): Promise<PasskeyRegistrationResult> => {
+      if (!browser) throw new Error('Browser environment required');
+
+      update((s) => ({ ...s, isPending: true, error: null, state: 'authenticating' as const }));
+
+      try {
+        const result = await registerPasskey(displayName);
+        _privkeyMem = result.privkey;
+
+        const existing = localStorage.getItem(STORAGE_KEY);
+        let existingNickname: string | null = displayName;
+        let existingAvatar: string | null = null;
+        if (existing) {
+          try {
+            const d = JSON.parse(existing) as { nickname?: string; avatar?: string };
+            existingNickname = d.nickname ?? displayName;
+            existingAvatar = d.avatar ?? null;
+          } catch { /* ignore */ }
+        }
+
+        const storageData = {
+          publicKey: result.pubkey,
+          isPasskey: true,
+          isNip07: false,
+          nickname: existingNickname,
+          avatar: existingAvatar,
+          accountStatus: 'incomplete' as const,
+          nsecBackedUp: false,
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(storageData));
+
+        if (shouldKeepSignedIn()) {
+          setCookie(COOKIE_KEY, result.pubkey, 30);
+        }
+
+        update((s) => ({
+          ...s,
+          ...syncStateFields({
+            publicKey: result.pubkey,
+            nickname: existingNickname,
+            avatar: existingAvatar,
+            isAuthenticated: true,
+            isPending: false,
+            error: null,
+            accountStatus: 'incomplete',
+            nsecBackedUp: false,
+            isNip07: false,
+            isPasskey: true,
+          }),
+        }));
+
+        return result;
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Passkey registration failed';
+        update((s) => ({ ...s, isPending: false, error: message, state: 'unauthenticated' as const }));
+        throw error;
+      }
+    },
+
+    /**
+     * Authenticate with an existing passkey, re-deriving the Nostr privkey from PRF.
+     * The privkey is held in memory only and never written to any storage.
+     */
+    loginWithPasskey: async (pubkey?: string): Promise<PasskeyAuthResult> => {
+      if (!browser) throw new Error('Browser environment required');
+
+      update((s) => ({ ...s, isPending: true, error: null, state: 'authenticating' as const }));
+
+      try {
+        const result = await authenticatePasskey(pubkey);
+        _privkeyMem = result.privkey;
+
+        const existing = localStorage.getItem(STORAGE_KEY);
+        let existingData: {
+          nickname?: string;
+          avatar?: string;
+          accountStatus?: 'incomplete' | 'complete';
+          nsecBackedUp?: boolean;
+        } = {};
+        if (existing) {
+          try { existingData = JSON.parse(existing); } catch { /* ignore */ }
+        }
+
+        const storageData = {
+          publicKey: result.pubkey,
+          isPasskey: true,
+          isNip07: false,
+          nickname: existingData.nickname ?? null,
+          avatar: existingData.avatar ?? null,
+          accountStatus: existingData.accountStatus ?? 'incomplete',
+          nsecBackedUp: existingData.nsecBackedUp ?? false,
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(storageData));
+
+        if (shouldKeepSignedIn()) {
+          setCookie(COOKIE_KEY, result.pubkey, 30);
+        }
+
+        update((s) => ({
+          ...s,
+          ...syncStateFields({
+            publicKey: result.pubkey,
+            nickname: storageData.nickname,
+            avatar: storageData.avatar,
+            isAuthenticated: true,
+            isPending: false,
+            error: null,
+            accountStatus: storageData.accountStatus,
+            nsecBackedUp: storageData.nsecBackedUp,
+            isNip07: false,
+            isPasskey: true,
+          }),
+        }));
+
+        return result;
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Passkey authentication failed';
+        update((s) => ({ ...s, isPending: false, error: message, state: 'unauthenticated' as const }));
+        throw error;
+      }
+    },
+
+    /** Login using NIP-07 browser extension */
+    loginWithExtension: async (): Promise<{ publicKey: string }> => {
+      if (!browser) throw new Error('Browser environment required');
+
       const extensionReady = await waitForNip07(2000);
       if (!extensionReady) {
         throw new Error('No NIP-07 extension found. Please install Alby, nos2x, or another Nostr signer.');
@@ -325,127 +430,99 @@ function createAuthStore() {
         const publicKey = await getPublicKeyFromExtension();
         const extensionName = getExtensionName();
 
-        // Store NIP-07 mode in localStorage
         const storageData = {
           publicKey,
           isNip07: true,
+          isPasskey: false,
           extensionName,
-          accountStatus: 'complete', // Extension users are presumed to be existing Nostr users
-          nsecBackedUp: true // Extension manages keys
+          accountStatus: 'complete' as const,
+          nsecBackedUp: true,
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(storageData));
-
-        // Set NDK to use NIP-07 extension signer
         setNip07Signer();
 
-        // Update store state
-        update(state => ({
-          ...state,
+        update((s) => ({
+          ...s,
           ...syncStateFields({
             publicKey,
-            privateKey: null, // No private key stored - extension handles signing
             isAuthenticated: true,
             isPending: false,
             error: null,
-            isEncrypted: false,
             accountStatus: 'complete',
             nsecBackedUp: true,
             isNip07: true,
-            extensionName
-          })
+            isPasskey: false,
+            extensionName,
+          }),
         }));
 
         return { publicKey };
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Failed to connect to extension';
-        update(state => ({ ...state, error: message }));
+        update((s) => ({ ...s, error: message }));
         throw error;
       }
     },
 
-    /**
-     * Check if NIP-07 extension is available
-     */
-    hasExtension: () => hasNip07Extension(),
+    /** Check if NIP-07 extension is available */
+    hasExtension: (): boolean => hasNip07Extension(),
 
     /**
-     * Set keys with encryption
+     * Set keys for the NIP-07 path (pubkey only — no private key stored).
+     * Retained for backward compatibility with callers that set keys post-extension sign-in.
+     * The privateKey parameter is accepted but never stored.
      */
     setKeys: async (
       publicKey: string,
-      privateKey: string,
+      _privateKey: string,
       accountStatus: 'incomplete' | 'complete' = 'incomplete',
-      nsecBackedUp: boolean = false
-    ) => {
-      const sessionKey = getSessionKey();
-
-      const authData: Partial<AuthState> = {
-        publicKey,
-        privateKey,
-        isAuthenticated: true,
-        isPending: false,
-        error: null,
-        isEncrypted: isEncryptionAvailable(),
-        accountStatus,
-        nsecBackedUp
-      };
-
-      if (browser) {
-        const existing = localStorage.getItem(STORAGE_KEY);
-        let existingData: { nickname?: string; avatar?: string; accountStatus?: string; nsecBackedUp?: boolean } = {};
-        if (existing) {
-          try { existingData = JSON.parse(existing); } catch { /* ignore */ }
-        }
-
-        const storageData: Record<string, unknown> = {
-          publicKey,
-          nickname: existingData.nickname || null,
-          avatar: existingData.avatar || null,
-          accountStatus: accountStatus,
-          nsecBackedUp: nsecBackedUp
-        };
-
-        // Encrypt private key if available
-        if (isEncryptionAvailable()) {
-          storageData.encryptedPrivateKey = await encryptPrivateKey(privateKey, sessionKey);
-        } else {
-          // Fallback for environments without Web Crypto (shouldn't happen in modern browsers)
-          storageData.privateKey = privateKey;
-        }
-
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(storageData));
-
-        // If keep signed in is enabled, also set a cookie for persistence
-        if (shouldKeepSignedIn()) {
-          setCookie(COOKIE_KEY, publicKey, 30); // 30 day cookie
-        }
-
-        // For PWA mode: store persistent auth that survives session changes
-        if (isRunningAsPWA()) {
-          const pwaAuthData = {
-            publicKey,
-            privateKey,
-            nickname: existingData.nickname || null,
-            avatar: existingData.avatar || null,
-            nsecBackedUp: existingData.nsecBackedUp || false
-          };
-          localStorage.setItem(PWA_AUTH_KEY, JSON.stringify(pwaAuthData));
-          console.log('[Auth] PWA persistent auth stored');
+      nsecBackedUp = false,
+    ): Promise<void> => {
+      if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
+        if (_privateKey) {
+          console.warn('[Auth] setKeys called with privateKey param - this is ignored in passkey mode. Use setKeysFromPasskey() instead.');
         }
       }
 
-      update(state => ({ ...state, ...syncStateFields(authData) }));
+      if (browser) {
+        const existing = localStorage.getItem(STORAGE_KEY);
+        let existingData: { nickname?: string; avatar?: string } = {};
+        if (existing) {
+          try { existingData = JSON.parse(existing); } catch { /* ignore */ }
+        }
+        const storageData = {
+          publicKey,
+          isNip07: false,
+          isPasskey: false,
+          nickname: existingData.nickname ?? null,
+          avatar: existingData.avatar ?? null,
+          accountStatus,
+          nsecBackedUp,
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(storageData));
+        if (shouldKeepSignedIn()) {
+          setCookie(COOKIE_KEY, publicKey, 30);
+        }
+      }
+
+      update((s) => ({
+        ...s,
+        ...syncStateFields({
+          publicKey,
+          isAuthenticated: true,
+          isPending: false,
+          error: null,
+          accountStatus,
+          nsecBackedUp,
+          isNip07: false,
+          isPasskey: false,
+        }),
+      }));
     },
 
-    /**
-     * Mark nsec as backed up
-     */
-    confirmNsecBackup: () => {
-      update(state => ({
-        ...state,
-        nsecBackedUp: true
-      }));
-
+    /** Mark nsec as backed up */
+    confirmNsecBackup: (): void => {
+      update((s) => ({ ...s, nsecBackedUp: true }));
       if (browser) {
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
@@ -458,15 +535,9 @@ function createAuthStore() {
       }
     },
 
-    /**
-     * Mark account signup as complete
-     */
-    completeSignup: () => {
-      update(state => ({
-        ...state,
-        accountStatus: 'complete'
-      }));
-
+    /** Mark account signup as complete */
+    completeSignup: (): void => {
+      update((s) => ({ ...s, accountStatus: 'complete' }));
       if (browser) {
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
@@ -479,58 +550,7 @@ function createAuthStore() {
       }
     },
 
-    /**
-     * Unlock with password (for encrypted storage)
-     */
-    unlock: async (password: string) => {
-      if (!browser) return false;
-
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (!stored) return false;
-
-      try {
-        const parsed = JSON.parse(stored);
-        if (!parsed.encryptedPrivateKey) return false;
-
-        const privateKey = await decryptPrivateKey(parsed.encryptedPrivateKey, password);
-
-        // Re-encrypt with session key for this session
-        const sessionKey = getSessionKey();
-        const newEncrypted = await encryptPrivateKey(privateKey, sessionKey);
-        parsed.encryptedPrivateKey = newEncrypted;
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
-
-        // For PWA mode: store persistent auth that survives session changes
-        if (isRunningAsPWA()) {
-          const pwaAuthData = {
-            publicKey: parsed.publicKey,
-            privateKey,
-            nickname: parsed.nickname || null,
-            avatar: parsed.avatar || null,
-            nsecBackedUp: parsed.nsecBackedUp || false
-          };
-          localStorage.setItem(PWA_AUTH_KEY, JSON.stringify(pwaAuthData));
-          console.log('[Auth] PWA persistent auth stored after unlock');
-        }
-
-        update(state => ({
-          ...state,
-          ...syncStateFields({
-            privateKey,
-            publicKey: parsed.publicKey,
-            isAuthenticated: true,
-            error: null
-          })
-        }));
-
-        return true;
-      } catch {
-        update(state => ({ ...state, error: 'Invalid password' }));
-        return false;
-      }
-    },
-
-    setProfile: (nickname: string | null, avatar: string | null) => {
+    setProfile: (nickname: string | null, avatar: string | null): void => {
       if (browser) {
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
@@ -542,42 +562,51 @@ function createAuthStore() {
           } catch { /* ignore */ }
         }
       }
-      update(state => ({ ...state, nickname, avatar }));
+      update((s) => ({ ...s, nickname, avatar }));
     },
 
-    setPending: (isPending: boolean) => {
-      update(state => ({ ...state, isPending }));
+    setPending: (isPending: boolean): void => {
+      update((s) => ({ ...s, isPending }));
     },
 
-    setError: (error: string) => {
-      update(state => ({ ...state, error }));
+    setError: (error: string): void => {
+      update((s) => ({ ...s, error }));
     },
 
-    clearError: () => {
-      update(state => ({ ...state, error: null }));
+    clearError: (): void => {
+      update((s) => ({ ...s, error: null }));
     },
 
-    logout: async () => {
+    logout: async (): Promise<void> => {
+      // Zero-fill private key before clearing reference
+      if (_privkeyMem) {
+        _privkeyMem.fill(0);
+        _privkeyMem = null;
+      }
+
       set(initialState);
-      if (browser) {
-        // Clear NDK signer
-        clearSigner();
 
+      if (browser) {
+        clearSigner();
         localStorage.removeItem(STORAGE_KEY);
-        localStorage.removeItem(PWA_AUTH_KEY);
-        sessionStorage.removeItem(SESSION_KEY);
         deleteCookie(COOKIE_KEY);
         const { goto } = await import('$app/navigation');
         goto(`${base}/`);
       }
     },
 
-    reset: () => set(initialState)
+    reset: (): void => {
+      if (_privkeyMem) {
+        _privkeyMem.fill(0);
+        _privkeyMem = null;
+      }
+      set(initialState);
+    },
   };
 }
 
 export const authStore = createAuthStore();
-export const isAuthenticated = derived(authStore, $auth => $auth.isAuthenticated);
-export const isReady = derived(authStore, $auth => $auth.isReady);
-export const isReadOnly = derived(authStore, $auth => $auth.accountStatus === 'incomplete');
-export const accountStatus = derived(authStore, $auth => $auth.accountStatus);
+export const isAuthenticated = derived(authStore, ($auth) => $auth.isAuthenticated);
+export const isReady = derived(authStore, ($auth) => $auth.isReady);
+export const isReadOnly = derived(authStore, ($auth) => $auth.accountStatus === 'incomplete');
+export const accountStatus = derived(authStore, ($auth) => $auth.accountStatus);

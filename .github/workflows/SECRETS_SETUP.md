@@ -11,6 +11,7 @@ Go to your repository: **Settings → Secrets and variables → Actions**
 | `GCP_PROJECT_ID` | Your Google Cloud Project ID | Run: `gcloud config get-value project` |
 | `GCP_SA_KEY` | Service Account JSON key | See "Generate Service Account Key" below |
 | `GCP_REGION` | GCP region for deployments | Example: `us-central1` |
+| `VITE_AUTH_API_URL` | Auth API Cloud Run URL | Set after first auth-api deploy (step 6) |
 
 ### Repository Variables
 
@@ -20,31 +21,123 @@ Go to your repository: **Settings → Secrets and variables → Actions**
 | `EMBEDDING_API_URL` | Cloud Run embedding API URL | Yes - from deploy output |
 | `ADMIN_PUBKEY` | Nostr admin public key | Keep existing value |
 
-## Step-by-Step Setup
+## Bootstrap Sequence (8 Steps — Order Matters)
 
-### 1. Set Your Project ID
+Services have circular dependencies (auth-api needs the JSS URL; JSS needs its own URL as a
+secret). Follow these steps in order to break the chicken-and-egg cycle.
+
 ```bash
 export PROJECT_ID="your-project-id"
+export REGION="us-central1"
 gcloud config set project $PROJECT_ID
 ```
 
-### 2. Enable Required APIs
+### Step 1 — Enable Required GCP APIs
 ```bash
 gcloud services enable \
   run.googleapis.com \
   artifactregistry.googleapis.com \
+  secretmanager.googleapis.com \
+  sqladmin.googleapis.com \
+  iam.googleapis.com \
   storage.googleapis.com \
-  iam.googleapis.com
+  --project $PROJECT_ID
 ```
 
-### 3. Create GitHub Actions Service Account
+### Step 2 — Create Artifact Registry Repository (minimoonoir)
+```bash
+gcloud artifacts repositories create minimoonoir \
+  --repository-format=docker \
+  --location=$REGION \
+  --description="Docker images for DreamLab community services" \
+  --project $PROJECT_ID
+```
+
+### Step 3 — Create Cloud SQL Instance
+```bash
+gcloud sql instances create nostr-db \
+  --database-version=POSTGRES_15 \
+  --tier=db-f1-micro \
+  --region=$REGION \
+  --project $PROJECT_ID
+
+gcloud sql databases create nostr --instance=nostr-db --project $PROJECT_ID
+gcloud sql users create nostr-user --instance=nostr-db --password=<STRONG_PASSWORD> --project $PROJECT_ID
+```
+
+### Step 4 — Create DATABASE_URL Secret
+```bash
+echo -n "postgresql://nostr-user:<PASSWORD>@localhost/nostr?host=/cloudsql/$PROJECT_ID:$REGION:nostr-db" \
+  | gcloud secrets create nostr-db-url --data-file=- --project $PROJECT_ID
+```
+
+### Step 5 — First Deploy auth-api (no-traffic) to Get Its URL
+```bash
+# Push the image first (trigger the workflow, or build/push manually), then:
+gcloud run deploy auth-api \
+  --image $REGION-docker.pkg.dev/$PROJECT_ID/minimoonoir/auth-api:latest \
+  --no-traffic \
+  --platform managed \
+  --region $REGION \
+  --allow-unauthenticated \
+  --project $PROJECT_ID
+
+AUTH_API_URL=$(gcloud run services describe auth-api \
+  --region $REGION \
+  --format 'value(status.url)' \
+  --project $PROJECT_ID)
+echo "auth-api URL: $AUTH_API_URL"
+```
+
+### Step 6 — Store auth-api URL as Secret
+```bash
+# Store as GitHub Actions repository secret (via UI or gh CLI):
+gh secret set VITE_AUTH_API_URL --body "$AUTH_API_URL"
+
+# Also store in Secret Manager if consumed by other Cloud Run services:
+echo -n "$AUTH_API_URL" \
+  | gcloud secrets create auth-api-url --data-file=- --project $PROJECT_ID
+```
+
+### Step 7 — First Deploy JSS (no-traffic) to Get Its URL
+```bash
+# Push the image first (trigger the workflow, or build/push manually), then:
+gcloud run deploy jss \
+  --image $REGION-docker.pkg.dev/$PROJECT_ID/minimoonoir/jss:latest \
+  --no-traffic \
+  --platform managed \
+  --region $REGION \
+  --allow-unauthenticated \
+  --project $PROJECT_ID
+
+JSS_URL=$(gcloud run services describe jss \
+  --region $REGION \
+  --format 'value(status.url)' \
+  --project $PROJECT_ID)
+echo "JSS URL: $JSS_URL"
+```
+
+### Step 8 — Store JSS URL as Secret, then Re-deploy Both with Traffic
+```bash
+# Create the jss-base-url secret (trailing slash required by @solid/community-server):
+echo -n "$JSS_URL/" \
+  | gcloud secrets create jss-base-url --data-file=- --project $PROJECT_ID
+
+# Now re-run both workflows (or deploy manually with --traffic=100):
+gcloud run services update-traffic jss --to-latest --region $REGION --project $PROJECT_ID
+gcloud run services update-traffic auth-api --to-latest --region $REGION --project $PROJECT_ID
+```
+
+## Step-by-Step Setup (Service Account & Permissions)
+
+### Create GitHub Actions Service Account
 ```bash
 gcloud iam service-accounts create github-actions \
   --display-name="GitHub Actions Deployment" \
   --description="Service account for GitHub Actions CI/CD"
 ```
 
-### 4. Grant Required Permissions
+### Grant Required Permissions
 ```bash
 # Cloud Run Admin
 gcloud projects add-iam-policy-binding $PROJECT_ID \
@@ -61,13 +154,18 @@ gcloud projects add-iam-policy-binding $PROJECT_ID \
   --member="serviceAccount:github-actions@$PROJECT_ID.iam.gserviceaccount.com" \
   --role="roles/artifactregistry.writer"
 
+# Secret Manager Accessor
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+  --member="serviceAccount:github-actions@$PROJECT_ID.iam.gserviceaccount.com" \
+  --role="roles/secretmanager.secretAccessor"
+
 # Service Account User
 gcloud projects add-iam-policy-binding $PROJECT_ID \
   --member="serviceAccount:github-actions@$PROJECT_ID.iam.gserviceaccount.com" \
   --role="roles/iam.serviceAccountUser"
 ```
 
-### 5. Create Embedding API Service Account
+### Create Embedding API Service Account
 ```bash
 gcloud iam service-accounts create embedding-api \
   --display-name="Embedding API Runtime" \
@@ -79,18 +177,10 @@ gcloud projects add-iam-policy-binding $PROJECT_ID \
   --role="roles/storage.objectViewer"
 ```
 
-### 6. Create Artifact Registry Repository
-```bash
-gcloud artifacts repositories create nosflare \
-  --repository-format=docker \
-  --location=us-central1 \
-  --description="Docker images for Nosflare relay and embedding API"
-```
-
-### 7. Create Storage Bucket
+### Create Storage Bucket
 ```bash
 gcloud storage buckets create gs://Nostr-BBS-vectors \
-  --location=us-central1 \
+  --location=$REGION \
   --uniform-bucket-level-access
 
 # Make bucket publicly readable (for frontend access)
@@ -99,7 +189,7 @@ gcloud storage buckets add-iam-policy-binding gs://Nostr-BBS-vectors \
   --role="roles/storage.objectViewer"
 ```
 
-### 8. Generate Service Account Key
+### Generate Service Account Key
 ```bash
 gcloud iam service-accounts keys create github-actions-key.json \
   --iam-account=github-actions@$PROJECT_ID.iam.gserviceaccount.com
@@ -110,7 +200,7 @@ echo ""
 cat github-actions-key.json
 ```
 
-### 9. Add Secrets to GitHub
+### Add Secrets to GitHub
 
 1. Go to: `https://github.com/YOUR_USERNAME/YOUR_REPO/settings/secrets/actions`
 2. Click "New repository secret"
@@ -118,13 +208,11 @@ cat github-actions-key.json
 
 **GCP_PROJECT_ID:**
 ```bash
-# Copy this value:
 echo $PROJECT_ID
 ```
 
 **GCP_SA_KEY:**
 ```bash
-# Copy the entire JSON from this file:
 cat github-actions-key.json
 ```
 
@@ -133,7 +221,12 @@ cat github-actions-key.json
 us-central1
 ```
 
-### 10. Verify Setup
+**VITE_AUTH_API_URL** (set after Step 6 above):
+```bash
+echo $AUTH_API_URL
+```
+
+### Verify Setup
 ```bash
 # List service accounts
 gcloud iam service-accounts list
@@ -146,8 +239,8 @@ gcloud projects get-iam-policy $PROJECT_ID \
 # Check bucket exists
 gcloud storage buckets list | grep Nostr-BBS-vectors
 
-# Check Artifact Registry
-gcloud artifacts repositories list --location=us-central1
+# Check Artifact Registry (minimoonoir)
+gcloud artifacts repositories list --location=$REGION
 ```
 
 ## Security Best Practices
@@ -187,9 +280,13 @@ gcloud iam service-accounts keys create github-actions-key-new.json \
 - Ensure service account key is correctly copied to GitHub secret
 
 ### Docker push fails
-- Verify Artifact Registry repository exists
+- Verify Artifact Registry repository `minimoonoir` exists (not `nosflare`)
 - Check repository location matches GCP_REGION
 - Ensure github-actions SA has artifactregistry.writer role
+
+### Cloud Run deployment fails with "jss-base-url secret not found"
+- Follow the bootstrap sequence above (Steps 5-8)
+- The secret must be created manually before the first full deployment
 
 ### Cloud Run deployment fails
 - Check if github-actions SA has run.admin role
@@ -204,8 +301,9 @@ gcloud iam service-accounts keys create github-actions-key-new.json \
 ## Next Steps
 
 After setup:
-1. Push code to trigger workflows
-2. Monitor GitHub Actions runs
-3. Copy Cloud Run URLs from deployment outputs
-4. Update repository variables (RELAY_URL, EMBEDDING_API_URL)
-5. Re-deploy frontend with updated URLs
+1. Follow the 8-step bootstrap sequence above in order
+2. Push code to trigger workflows after bootstrap is complete
+3. Monitor GitHub Actions runs
+4. Copy Cloud Run URLs from deployment outputs
+5. Update repository variables (RELAY_URL, EMBEDDING_API_URL)
+6. Re-deploy frontend with updated URLs

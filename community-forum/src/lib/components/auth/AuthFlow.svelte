@@ -3,80 +3,69 @@
    * AuthFlow - Multi-step authentication flow for signup and login
    *
    * Flow steps:
-   * 1. Signup - Generate new keys
-   * 2. NsecBackup - Show private key with copy/download options
-   * 3. NicknameSetup - Set display name
-   * 4. PendingApproval - Wait for admin whitelist approval
+   * Signup: PasskeySignup → (download inline in Signup) → NicknameSetup → PendingApproval
+   * Login:  PasskeyLogin | NIP-07 | nsec (advanced) → chat
    */
+  import { createEventDispatcher } from 'svelte';
   import { goto } from '$app/navigation';
   import { base } from '$app/paths';
   import { authStore } from '$lib/stores/auth';
   import Signup from './Signup.svelte';
-  import NsecBackup from './NsecBackup.svelte';
   import NicknameSetup from './NicknameSetup.svelte';
   import Login from './Login.svelte';
   import PendingApproval from './PendingApproval.svelte';
 
-  type FlowStep = 'signup' | 'nsec-backup' | 'nickname' | 'login' | 'pending-approval';
+  export let initialStep: 'signup' | 'login' = 'signup';
 
-  let currentStep: FlowStep = 'signup';
-  let tempKeys: {
-    publicKey: string;
-    privateKey: string;
-  } | null = null;
+  type FlowStep = 'signup' | 'nickname' | 'login' | 'pending-approval';
 
-  function handleSignupNext(event: CustomEvent<{ publicKey: string; privateKey: string }>) {
-    const { publicKey, privateKey } = event.detail;
+  let currentStep: FlowStep = initialStep;
+  let currentPublicKey = '';
 
-    if (publicKey && privateKey) {
-      tempKeys = { publicKey, privateKey };
-      currentStep = 'nsec-backup';
+  const dispatch = createEventDispatcher<{ complete: { publicKey: string } }>();
+
+  function handleSignupNext(event: CustomEvent<{ publicKey: string }>) {
+    const { publicKey } = event.detail;
+
+    if (publicKey) {
+      currentPublicKey = publicKey;
+      currentStep = 'nickname';
     } else {
+      // Empty publicKey signals "already have an account" — go to login
       currentStep = 'login';
     }
   }
 
-  async function handleBackupContinue() {
-    if (tempKeys) {
-      await authStore.setKeys(tempKeys.publicKey, tempKeys.privateKey, 'incomplete', false);
-      authStore.confirmNsecBackup();
-      currentStep = 'nickname';
-    }
-  }
-
   async function handleNicknameContinue() {
-    if (tempKeys) {
-      const { publicKey, privateKey } = tempKeys;
+    if (!currentPublicKey) return;
 
-      // Check if user is already approved or admin - skip pending approval
-      try {
-        const { checkWhitelistStatus } = await import('$lib/nostr/whitelist');
-        const status = await checkWhitelistStatus(publicKey);
-        if (status.isApproved || status.isAdmin) {
-          await goto(`${base}/chat`);
-          return;
-        }
-      } catch (e) {
-        console.warn('[AuthFlow] Failed to check whitelist status:', e);
+    try {
+      const { checkWhitelistStatus } = await import('$lib/nostr/whitelist');
+      const status = await checkWhitelistStatus(currentPublicKey);
+      if (status.isApproved || status.isAdmin) {
+        dispatch('complete', { publicKey: currentPublicKey });
+        await goto(`${base}/chat`);
+        return;
       }
-
-      authStore.setPending(true);
-      currentStep = 'pending-approval';
+    } catch (e) {
+      console.warn('[AuthFlow] Failed to check whitelist status:', e);
     }
+
+    authStore.setPending(true);
+    currentStep = 'pending-approval';
   }
 
-  async function handleLoginSuccess(event: CustomEvent<{ publicKey: string; privateKey: string }>) {
-    const { publicKey, privateKey } = event.detail;
+  async function handleLoginSuccess(event: CustomEvent<{ publicKey: string }>) {
+    const { publicKey } = event.detail;
 
-    if (publicKey && privateKey) {
-      tempKeys = { publicKey, privateKey };
-      await authStore.setKeys(publicKey, privateKey);
+    if (publicKey) {
+      currentPublicKey = publicKey;
 
-      // Check if user is already approved or admin - skip pending approval
       try {
         const { checkWhitelistStatus } = await import('$lib/nostr/whitelist');
         const status = await checkWhitelistStatus(publicKey);
         if (status.isApproved || status.isAdmin) {
+          dispatch('complete', { publicKey });
           await goto(`${base}/chat`);
           return;
         }
@@ -90,28 +79,33 @@
     }
   }
 
+  function handleLoginPending(event: CustomEvent<{ publicKey: string }>) {
+    const { publicKey } = event.detail;
+    currentPublicKey = publicKey;
+    authStore.setPending(true);
+    currentStep = 'pending-approval';
+  }
+
   async function handleApproved() {
     authStore.setPending(false);
+    dispatch('complete', { publicKey: currentPublicKey });
     await goto(`${base}/chat`);
   }
 </script>
 
 {#if currentStep === 'signup'}
   <Signup on:next={handleSignupNext} />
-{:else if currentStep === 'nsec-backup' && tempKeys}
-  <NsecBackup
-    publicKey={tempKeys.publicKey}
-    privateKey={tempKeys.privateKey}
-    on:continue={handleBackupContinue}
-  />
-{:else if currentStep === 'nickname' && tempKeys}
+{:else if currentStep === 'nickname' && currentPublicKey}
   <NicknameSetup
-    publicKey={tempKeys.publicKey}
-    privateKey={tempKeys.privateKey}
+    publicKey={currentPublicKey}
     on:continue={handleNicknameContinue}
   />
 {:else if currentStep === 'login'}
-  <Login on:success={handleLoginSuccess} />
-{:else if currentStep === 'pending-approval' && tempKeys}
-  <PendingApproval publicKey={tempKeys.publicKey} on:approved={handleApproved} />
+  <Login
+    on:success={handleLoginSuccess}
+    on:pending={handleLoginPending}
+    on:signup={() => { currentStep = 'signup'; }}
+  />
+{:else if currentStep === 'pending-approval' && currentPublicKey}
+  <PendingApproval publicKey={currentPublicKey} on:approved={handleApproved} />
 {/if}

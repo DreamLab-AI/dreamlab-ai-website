@@ -1,5 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
+  import { bytesToHex } from '@noble/hashes/utils';
   import { authStore } from '$lib/stores/auth';
   import { profileCache } from '$lib/stores/profiles';
   import { ndk, connectRelay, isConnected } from '$lib/nostr/relay';
@@ -7,7 +8,6 @@
   import { NDKEvent } from '@nostr-dev-kit/ndk';
 
   export let publicKey: string;
-  export let privateKey: string;
 
   const dispatch = createEventDispatcher<{ continue: { nickname: string } }>();
 
@@ -31,7 +31,9 @@
     try {
       // Connect to relay if not already connected
       if (!isConnected()) {
-        await connectRelay(RELAY_URL, privateKey);
+        const privkeyBytes = authStore.getPrivkey();
+        const privkeyHex = privkeyBytes ? bytesToHex(privkeyBytes) : '';
+        await connectRelay(RELAY_URL, privkeyHex);
       }
 
       const ndkInstance = ndk();

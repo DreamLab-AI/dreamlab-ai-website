@@ -55,6 +55,7 @@ jobs:
           VITE_ADMIN_PUBKEY: ${{ vars.FAIRFIELD_ADMIN_PUBKEY }}
           VITE_APP_NAME: 'DreamLab Community'
           VITE_NDK_DEBUG: 'false'
+          VITE_AUTH_API_URL: ${{ secrets.VITE_AUTH_API_URL }}
         run: |
           npm ci || npm install
           npm run build
