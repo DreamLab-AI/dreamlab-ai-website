@@ -1,0 +1,51 @@
+[
+  {
+    "id": "ste-moyler",
+    "name": "Ste Moyler",
+    "role": "THG - Ingenuity",
+    "quote": "Never mind OpenClaw. This is Gryffindoooor!",
+    "location_detail": "Roof terrace DJ sessions",
+    "featured": true
+  },
+  {
+    "id": "jess-symons",
+    "name": "Dr Jessica Symons",
+    "role": "Visioning Lab",
+    "quote": "I just used Claude Code to create an new version of a Unity project that had been gathering dust for years. Is was so satisfying to see it rise again. Thank you thank you John for setting me up. I am having so much fun 🙏 thanks 🙏.",
+    "location_detail": "Walking through that bog!",
+    "featured": true
+  },
+  {
+    "id": "james-harrison",
+    "name": "James Harrison",
+    "role": "Operations Director, FinTech",
+    "quote": "In one day, we built an AI agent that now handles 40% of our customer queries. The hands-on approach meant I left with something real, not just slides.",
+    "location_detail": "On-site at our London office",
+    "programme": "1-Day Workshop",
+    "featured": true
+  },
+  {
+    "id": "elena-rodriguez",
+    "name": "Elena Rodriguez",
+    "role": "Founder, Creative Agency",
+    "quote": "The residential programme gave us space to think differently. By day three, we'd prototyped three AI tools that are now core to our client offering.",
+    "location_detail": "Lake District retreat with fell views",
+    "programme": "Residential Training"
+  },
+  {
+    "id": "david-okonkwo",
+    "name": "David Okonkwo",
+    "role": "Head of Innovation",
+    "quote": "JJ and the team don't just teach—they build alongside you. The multi-agent system we created together is now saving us 20 hours per week.",
+    "location_detail": "Private residential venue",
+    "programme": "Advanced Workshop"
+  },
+  {
+    "id": "samira-velasco",
+    "name": "Samira Velasco",
+    "role": "Motion Graphics Designer",
+    "quote": "Real-time rendering clicked while rain drummed on the roof. I stopped overthinking everything and started making work that moves.",
+    "location_detail": "Converted mill with waterwheel views",
+    "programme": "1-Day Workshop"
+  }
+]

@@ -1,37 +1,17 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Quote, MapPin } from "lucide-react";
+import allTestimonials from "@/data/testimonials.json";
 
 interface Testimonial {
   id: string;
   name: string;
   role: string;
   quote: string;
-  locationDetail: string;
+  location_detail: string;
+  featured?: boolean;
 }
 
-const testimonials: Testimonial[] = [
-  {
-    id: "ste-moyler",
-    name: "Ste Moyler",
-    role: "THG - Ingenuity",
-    quote: "Never mind OpenClaw. This is Gryffindoooor!",
-    locationDetail: "Roof terrace DJ sessions"
-  },
-  {
-    id: "jess-symons",
-    name: "Dr Jessica Symons",
-    role: "Visioning Lab",
-    quote: "I just used Claude Code to create an new version of a Unity project that had been gathering dust for years. Is was so satisfying to see it rise again. Thank you thank you John for setting me up. I am having so much fun 🙏 thanks 🙏.",
-    locationDetail: "Walking through that bog!"
-  },
-  {
-    id: "samira-velasco",
-    name: "Samira Velasco",
-    role: "Motion Graphics Designer",
-    quote: "Real-time rendering clicked while rain drummed on the roof. I stopped overthinking everything and started making work that moves.",
-    locationDetail: "Converted mill with waterwheel views"
-  }
-];
+const testimonials: Testimonial[] = allTestimonials.filter(t => t.featured);
 
 export const TestimonialMoments = () => {
   return (
@@ -81,7 +61,7 @@ export const TestimonialMoments = () => {
                   {/* Location detail */}
                   <div className="flex items-center gap-2 text-xs text-purple-400">
                     <MapPin className="w-3 h-3" aria-hidden="true" />
-                    <span>{testimonial.locationDetail}</span>
+                    <span>{testimonial.location_detail}</span>
                   </div>
                 </div>
               </CardContent>

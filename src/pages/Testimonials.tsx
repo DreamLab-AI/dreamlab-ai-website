@@ -3,66 +3,17 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Quote, MapPin, Star, ArrowRight } from "lucide-react";
 import { useOGMeta } from "@/hooks/useOGMeta";
 import { PAGE_OG_CONFIGS } from "@/lib/og-meta";
+import testimonials from "@/data/testimonials.json";
 
 interface Testimonial {
   id: string;
   name: string;
   role: string;
   quote: string;
-  locationDetail: string;
+  location_detail: string;
   programme?: string;
+  featured?: boolean;
 }
-
-const testimonials: Testimonial[] = [
-  {
-    id: "ste-moyler",
-    name: "Maya Chen",
-    role: "Digital Sculptor",
-    quote: "I learned to wield VR tools while wind whipped off Derwentwater. Now I sculpt with the same raw power as those mountains—unafraid of rough edges.",
-    locationDetail: "Sunset sessions overlooking the lake",
-    programme: "Residential Training"
-  },
-  {
-    id: "tom-blackwood",
-    name: "Tom Blackwood",
-    role: "Interactive Installation Artist",
-    quote: "The generative algorithms made sense somewhere between morning mist and sheep-dotted hills. My pieces finally breathe like landscapes do.",
-    locationDetail: "Barn studio with stone walls and roaring fires",
-    programme: "Advanced Workshop"
-  },
-  {
-    id: "samira-velasco",
-    name: "Samira Velasco",
-    role: "Motion Graphics Designer",
-    quote: "Real-time rendering clicked while rain drummed on the roof. I stopped overthinking everything and started making work that moves.",
-    locationDetail: "Converted mill with waterwheel views",
-    programme: "1-Day Workshop"
-  },
-  {
-    id: "james-harrison",
-    name: "James Harrison",
-    role: "Operations Director, FinTech",
-    quote: "In one day, we built an AI agent that now handles 40% of our customer queries. The hands-on approach meant I left with something real, not just slides.",
-    locationDetail: "On-site at our London office",
-    programme: "1-Day Workshop"
-  },
-  {
-    id: "elena-rodriguez",
-    name: "Elena Rodriguez",
-    role: "Founder, Creative Agency",
-    quote: "The residential programme gave us space to think differently. By day three, we'd prototyped three AI tools that are now core to our client offering.",
-    locationDetail: "Lake District retreat with fell views",
-    programme: "Residential Training"
-  },
-  {
-    id: "david-okonkwo",
-    name: "David Okonkwo",
-    role: "Head of Innovation",
-    quote: "JJ and the team don't just teach—they build alongside you. The multi-agent system we created together is now saving us 20 hours per week.",
-    locationDetail: "Private residential venue",
-    programme: "Advanced Workshop"
-  }
-];
 
 const Testimonials = () => {
   useOGMeta({
@@ -136,7 +87,7 @@ const Testimonials = () => {
                     {/* Location detail */}
                     <div className="flex items-center gap-2 text-xs text-purple-400">
                       <MapPin className="w-3 h-3" aria-hidden="true" />
-                      <span>{testimonial.locationDetail}</span>
+                      <span>{testimonial.location_detail}</span>
                     </div>
                   </div>
                 </CardContent>
