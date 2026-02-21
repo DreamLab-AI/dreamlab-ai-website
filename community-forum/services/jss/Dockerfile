@@ -10,6 +10,8 @@ COPY css-config.json /css-config.json
 # Install custom config into the CSS package so @css: imports resolve correctly
 RUN cp /css-config.json /usr/local/lib/node_modules/@solid/community-server/config/dreamlab.json
 RUN chmod +x /entrypoint.sh && chown node:node /seed.json /css-config.json
+# Cap Node heap to leave headroom for OS and I/O buffers within the 1Gi Cloud Run limit.
+ENV NODE_OPTIONS="--max-old-space-size=768"
 EXPOSE 8080
 # NOTE: Pod storage is ephemeral — data is lost on container restart.
 # For production, mount a persistent volume at /data/pods.

@@ -57,7 +57,7 @@ jobs:
           VITE_NDK_DEBUG: 'false'
           VITE_AUTH_API_URL: ${{ secrets.VITE_AUTH_API_URL }}
         run: |
-          npm ci || npm install
+          npm ci
           npm run build
 
       - name: Copy Fairfield build to community path
