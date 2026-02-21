@@ -12,7 +12,9 @@ export function getDb(): pg.Pool {
     }
     pool = new Pool({
       connectionString,
-      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: true } : false,
+      // Cloud SQL Unix socket connections (?host=/cloudsql/...) don't use SSL.
+      // Only enable SSL for direct TCP connections (local dev with sslmode=require).
+      ssl: process.env.DATABASE_URL?.includes('sslmode=require') ? { rejectUnauthorized: true } : false,
       max: 10,
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 5000,
@@ -26,6 +28,8 @@ export function getDb(): pg.Pool {
 }
 
 const MIGRATIONS = `
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 CREATE TABLE IF NOT EXISTS webauthn_credentials (
   credential_id TEXT PRIMARY KEY,
   pubkey TEXT NOT NULL UNIQUE,
