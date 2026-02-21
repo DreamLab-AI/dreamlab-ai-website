@@ -3,6 +3,7 @@
 import { sha256 } from '@noble/hashes/sha256';
 import { bytesToHex } from '@noble/hashes/utils';
 import { getPublicKey } from 'nostr-tools';
+import { secp256k1 } from '@noble/curves/secp256k1';
 import { browser } from '$app/environment';
 import { fetchWithNip98 } from '$lib/auth/nip98-client';
 
@@ -56,7 +57,14 @@ async function derivePrivkeyFromPrf(prfOutput: ArrayBuffer): Promise<Uint8Array>
     keyMaterial,
     256
   );
-  return new Uint8Array(privkeyBits);
+  const key = new Uint8Array(privkeyBits);
+  // secp256k1 requires 0 < key < n (curve order, slightly < 2^256).
+  // The probability of an invalid key is ~2^-128, but we handle it
+  // deterministically by re-hashing rather than risking a permanent lockout.
+  if (!secp256k1.utils.isValidPrivateKey(key)) {
+    return derivePrivkeyFromPrf(await crypto.subtle.digest('SHA-256', key));
+  }
+  return key;
 }
 
 /**

@@ -39,6 +39,11 @@ function isPrivateUrl(url) {
 
     const hostname = parsed.hostname.toLowerCase();
 
+    // Block non-standard IP obfuscation (integer/hex) that may bypass
+    // the dotted-decimal regex on URL implementations that don't normalize them.
+    if (/^\d+$/.test(hostname)) return true;           // pure integer (e.g., 2130706433 = 127.0.0.1)
+    if (/^0x[0-9a-f]+$/i.test(hostname)) return true; // pure hex (e.g., 0x7f000001)
+
     // Loopback / localhost
     if (hostname === 'localhost' || hostname.endsWith('.localhost')) return true;
 

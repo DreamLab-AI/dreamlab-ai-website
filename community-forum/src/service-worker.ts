@@ -467,6 +467,50 @@ self.addEventListener('fetch', (event) => {
 });
 
 /**
+ * Publish a Nostr event to a relay via WebSocket, waiting for the NIP-01
+ * ["OK", id, true, ""] acknowledgement. Returns true only when confirmed.
+ * Using HTTP POST here would 404/426 since relays are WebSocket-only.
+ */
+async function publishEventViaWebSocket(relayUrl: string, event: NostrEventSW): Promise<boolean> {
+  return new Promise((resolve) => {
+    let settled = false;
+    let ws: WebSocket;
+    try {
+      ws = new WebSocket(relayUrl);
+    } catch {
+      resolve(false);
+      return;
+    }
+
+    const done = (result: boolean) => {
+      if (!settled) {
+        settled = true;
+        clearTimeout(timeoutId);
+        try { ws.close(); } catch { /* ignore */ }
+        resolve(result);
+      }
+    };
+
+    const timeoutId = setTimeout(() => done(false), 10_000);
+
+    ws.onopen = () => {
+      try { ws.send(JSON.stringify(['EVENT', event])); } catch { done(false); }
+    };
+    ws.onmessage = (msg: MessageEvent) => {
+      try {
+        const data = JSON.parse(msg.data as string);
+        // NIP-01: ["OK", <event-id>, <accepted>, <message>]
+        if (Array.isArray(data) && data[0] === 'OK' && data[1] === event.id && data[2] === true) {
+          done(true);
+        }
+      } catch { /* ignore malformed relay messages */ }
+    };
+    ws.onerror = () => done(false);
+    ws.onclose = () => done(false);
+  });
+}
+
+/**
  * Background sync event - process queued messages
  */
 self.addEventListener('sync', (event) => {
@@ -481,19 +525,17 @@ self.addEventListener('sync', (event) => {
 
           for (const message of messages) {
             try {
-              // Send message to all specified relays
+              // Send via WebSocket (Nostr relays do not accept HTTP POST).
+              // Dequeue only when at least one relay sends ["OK", id, true, ...].
               const responses = await Promise.allSettled(
                 message.relayUrls.map(url =>
-                  fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(['EVENT', message.event])
-                  })
+                  publishEventViaWebSocket(url, message.event)
                 )
               );
 
-              // Remove from queue if at least one relay succeeded
-              const hasSuccess = responses.some(r => r.status === 'fulfilled');
+              const hasSuccess = responses.some(
+                r => r.status === 'fulfilled' && r.value === true
+              );
               if (hasSuccess) {
                 await dequeueMessage(message.id);
               }

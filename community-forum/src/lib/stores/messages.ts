@@ -217,52 +217,56 @@ function createMessageStore() {
         const subscription = ndkSubscribe(filter, { closeOnEose: false });
 
         subscription.on('event', async (ndkEvent: NDKEvent) => {
-          const event = ndkEventToEvent(ndkEvent);
-          // Check if already deleted
-          const isDeleted = await db.isMessageDeleted(event.id);
-          if (isDeleted) return;
+          try {
+            const event = ndkEventToEvent(ndkEvent);
+            // Check if already deleted
+            const isDeleted = await db.isMessageDeleted(event.id);
+            if (isDeleted) return;
 
-          // Handle encrypted content
-          let content = event.content;
-          if (isEncrypted) {
-            // NIP-04 removed - show placeholder for legacy encrypted content
-            content = handleLegacyEncryptedMessage();
-          }
-
-          // Cache message
-          const dbMsg: DBMessage = {
-            id: event.id,
-            channelId,
-            pubkey: event.pubkey,
-            content,
-            created_at: event.created_at,
-            encrypted: isEncrypted,
-            deleted: false,
-            kind: event.kind,
-            tags: event.tags,
-            sig: event.sig
-          };
-
-          await db.messages.put(dbMsg);
-
-          // Index for search (async, don't block)
-          indexNewMessage(dbMsg).catch(err =>
-            console.error('Failed to index message for search:', err)
-          );
-
-          // Update store
-          const appMsg = await dbMessageToMessage(dbMsg);
-
-          update(state => {
-            const exists = state.messages.some(m => m.id === appMsg.id);
-            if (!exists) {
-              return {
-                ...state,
-                messages: [...state.messages, appMsg].sort((a, b) => a.created_at - b.created_at)
-              };
+            // Handle encrypted content
+            let content = event.content;
+            if (isEncrypted) {
+              // NIP-04 removed - show placeholder for legacy encrypted content
+              content = handleLegacyEncryptedMessage();
             }
-            return state;
-          });
+
+            // Cache message
+            const dbMsg: DBMessage = {
+              id: event.id,
+              channelId,
+              pubkey: event.pubkey,
+              content,
+              created_at: event.created_at,
+              encrypted: isEncrypted,
+              deleted: false,
+              kind: event.kind,
+              tags: event.tags,
+              sig: event.sig
+            };
+
+            await db.messages.put(dbMsg);
+
+            // Index for search (async, don't block)
+            indexNewMessage(dbMsg).catch(err =>
+              console.error('Failed to index message for search:', err)
+            );
+
+            // Update store
+            const appMsg = await dbMessageToMessage(dbMsg);
+
+            update(state => {
+              const exists = state.messages.some(m => m.id === appMsg.id);
+              if (!exists) {
+                return {
+                  ...state,
+                  messages: [...state.messages, appMsg].sort((a, b) => a.created_at - b.created_at)
+                };
+              }
+              return state;
+            });
+          } catch (err) {
+            console.error('[messages] Failed to process incoming event:', err);
+          }
         });
 
         update(state => ({
@@ -459,46 +463,50 @@ function createMessageStore() {
         });
 
         subscription1.on('event', async (ndkEvent: NDKEvent) => {
-          const event = ndkEventToEvent(ndkEvent);
-          // Handle new message
-          let content = event.content;
-          if (isEncrypted) {
-            // NIP-04 removed - show placeholder for legacy encrypted content
-            content = handleLegacyEncryptedMessage();
-          }
-
-          const dbMsg: DBMessage = {
-            id: event.id,
-            channelId,
-            pubkey: event.pubkey,
-            content,
-            created_at: event.created_at,
-            encrypted: isEncrypted,
-            deleted: false,
-            kind: event.kind,
-            tags: event.tags,
-            sig: event.sig
-          };
-
-          await db.messages.put(dbMsg);
-
-          // Index for search (async, don't block)
-          indexNewMessage(dbMsg).catch(err =>
-            console.error('Failed to index message for search:', err)
-          );
-
-          const appMsg = await dbMessageToMessage(dbMsg);
-
-          update(state => {
-            const exists = state.messages.some(m => m.id === appMsg.id);
-            if (!exists && state.currentChannelId === channelId) {
-              return {
-                ...state,
-                messages: [...state.messages, appMsg].sort((a, b) => a.created_at - b.created_at)
-              };
+          try {
+            const event = ndkEventToEvent(ndkEvent);
+            // Handle new message
+            let content = event.content;
+            if (isEncrypted) {
+              // NIP-04 removed - show placeholder for legacy encrypted content
+              content = handleLegacyEncryptedMessage();
             }
-            return state;
-          });
+
+            const dbMsg: DBMessage = {
+              id: event.id,
+              channelId,
+              pubkey: event.pubkey,
+              content,
+              created_at: event.created_at,
+              encrypted: isEncrypted,
+              deleted: false,
+              kind: event.kind,
+              tags: event.tags,
+              sig: event.sig
+            };
+
+            await db.messages.put(dbMsg);
+
+            // Index for search (async, don't block)
+            indexNewMessage(dbMsg).catch(err =>
+              console.error('Failed to index message for search:', err)
+            );
+
+            const appMsg = await dbMessageToMessage(dbMsg);
+
+            update(state => {
+              const exists = state.messages.some(m => m.id === appMsg.id);
+              if (!exists && state.currentChannelId === channelId) {
+                return {
+                  ...state,
+                  messages: [...state.messages, appMsg].sort((a, b) => a.created_at - b.created_at)
+                };
+              }
+              return state;
+            });
+          } catch (err) {
+            console.error('[messages] Failed to process channel event:', err);
+          }
         });
 
         const subId2 = `del_${channelId}_${Date.now()}`;
@@ -616,44 +624,48 @@ function createMessageStore() {
           }, 5000);
 
           subscription.on('event', async (ndkEvent: NDKEvent) => {
-            const event = ndkEventToEvent(ndkEvent);
-            const isDeleted = await db.isMessageDeleted(event.id);
-            if (isDeleted) return;
+            try {
+              const event = ndkEventToEvent(ndkEvent);
+              const isDeleted = await db.isMessageDeleted(event.id);
+              if (isDeleted) return;
 
-            let content = event.content;
-            if (isEncrypted) {
-              // NIP-04 removed - show placeholder for legacy encrypted content
-              content = handleLegacyEncryptedMessage();
-            }
-
-            const dbMsg: DBMessage = {
-              id: event.id,
-              channelId,
-              pubkey: event.pubkey,
-              content,
-              created_at: event.created_at,
-              encrypted: isEncrypted,
-              deleted: false,
-              kind: event.kind,
-              tags: event.tags,
-              sig: event.sig
-            };
-
-            await db.messages.put(dbMsg);
-
-            const appMsg = await dbMessageToMessage(dbMsg);
-
-            update(state => {
-              const exists = state.messages.some(m => m.id === appMsg.id);
-              if (!exists) {
-                foundMessages++;
-                return {
-                  ...state,
-                  messages: [...state.messages, appMsg].sort((a, b) => a.created_at - b.created_at)
-                };
+              let content = event.content;
+              if (isEncrypted) {
+                // NIP-04 removed - show placeholder for legacy encrypted content
+                content = handleLegacyEncryptedMessage();
               }
-              return state;
-            });
+
+              const dbMsg: DBMessage = {
+                id: event.id,
+                channelId,
+                pubkey: event.pubkey,
+                content,
+                created_at: event.created_at,
+                encrypted: isEncrypted,
+                deleted: false,
+                kind: event.kind,
+                tags: event.tags,
+                sig: event.sig
+              };
+
+              await db.messages.put(dbMsg);
+
+              const appMsg = await dbMessageToMessage(dbMsg);
+
+              update(state => {
+                const exists = state.messages.some(m => m.id === appMsg.id);
+                if (!exists) {
+                  foundMessages++;
+                  return {
+                    ...state,
+                    messages: [...state.messages, appMsg].sort((a, b) => a.created_at - b.created_at)
+                  };
+                }
+                return state;
+              });
+            } catch (err) {
+              console.error('[messages] Failed to process older event:', err);
+            }
           });
 
           subscription.on('eose', () => {

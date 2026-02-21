@@ -233,7 +233,11 @@ export async function encryptKeyForRecipients(
   const recipientKeys: RecipientKey[] = [];
   const errors: Array<{ pubkey: string; error: string }> = [];
 
-  for (const recipientPubkey of recipientPubkeys) {
+  for (let i = 0; i < recipientPubkeys.length; i++) {
+    // Yield to the main thread every 5 recipients to prevent UI freeze
+    // during CPU-intensive ECDH scalar multiplication on large channels.
+    if (i > 0 && i % 5 === 0) await new Promise(r => setTimeout(r, 0));
+    const recipientPubkey = recipientPubkeys[i];
     try {
       // Validate pubkey format
       if (!/^[0-9a-f]{64}$/i.test(recipientPubkey)) {
