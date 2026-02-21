@@ -264,16 +264,20 @@ class MinimoomaNoirDB extends Dexie {
         .count();
 
       if (messageCount > maxMessagesPerChannel) {
-        // Keep only the newest messages
-        const oldestToKeep = await this.messages
-          .where('channelId')
-          .equals(channel.id)
+        // Order by the compound [channelId+created_at] index so .reverse() gives
+        // newest-first; skip the newest maxMessagesPerChannel entries; delete the rest.
+        const toDelete = await this.messages
+          .where('[channelId+created_at]')
+          .between(
+            [channel.id, Dexie.minKey],
+            [channel.id, Dexie.maxKey]
+          )
           .reverse()
           .offset(maxMessagesPerChannel)
           .toArray();
 
-        if (oldestToKeep.length > 0) {
-          const idsToDelete = oldestToKeep.map(m => m.id);
+        if (toDelete.length > 0) {
+          const idsToDelete = toDelete.map(m => m.id);
           await this.messages.bulkDelete(idsToDelete);
           pruned.messages += idsToDelete.length;
 

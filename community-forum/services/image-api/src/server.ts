@@ -333,12 +333,14 @@ app.post('/upload-batch', upload.array('images', 10), async (req, res) => {
  */
 app.delete('/image/:imageId', async (req, res) => {
   try {
-    // Verify NIP-98 authentication
+    // Verify NIP-98 authentication — DELETE has no body, pass empty Buffer so the
+    // payload tag (if any) is verified against sha256("").
     const requestUrl = getRequestUrl(req);
     const authResult = await verifyNip98Auth(
       req.headers.authorization,
       requestUrl,
-      'DELETE'
+      'DELETE',
+      Buffer.alloc(0)
     );
 
     if (!authResult.valid) {
@@ -425,7 +427,8 @@ interface Nip98Event {
 async function verifyNip98Auth(
   authHeader: string | undefined,
   requestUrl: string,
-  method: string
+  method: string,
+  rawBody?: Buffer  // pass Buffer.alloc(0) for bodyless requests; undefined = skip (multipart)
 ): Promise<{ valid: boolean; pubkey?: string; error?: string }> {
   if (!authHeader) {
     return { valid: false, error: 'Missing Authorization header' };
@@ -507,6 +510,27 @@ async function verifyNip98Auth(
     }
   } catch (err) {
     return { valid: false, error: `Signature verification failed: ${err}` };
+  }
+
+  // Verify payload hash when raw body bytes are provided.
+  // rawBody === undefined means multipart — payload verification is skipped because
+  // multer has already consumed the stream and we cannot recompute the body hash.
+  const payloadTag = event.tags.find(t => t[0] === 'payload');
+  if (rawBody !== undefined) {
+    const expectedPayload = bytesToHex(sha256(new Uint8Array(rawBody)));
+    if (rawBody.length > 0) {
+      if (!payloadTag || !payloadTag[1]) {
+        return { valid: false, error: 'Missing payload tag for non-empty request body' };
+      }
+      if (payloadTag[1] !== expectedPayload) {
+        return { valid: false, error: 'Payload hash mismatch' };
+      }
+    } else {
+      // Empty body (e.g. DELETE) — payload tag should be absent or match sha256("")
+      if (payloadTag && payloadTag[1] !== expectedPayload) {
+        return { valid: false, error: 'Unexpected payload tag for empty body' };
+      }
+    }
   }
 
   return { valid: true, pubkey: event.pubkey };

@@ -4,6 +4,7 @@ import { sha256 } from '@noble/hashes/sha256';
 import { bytesToHex } from '@noble/hashes/utils';
 import { getPublicKey } from 'nostr-tools';
 import { browser } from '$app/environment';
+import { fetchWithNip98 } from '$lib/auth/nip98-client';
 
 const PRF_LABEL = new TextEncoder().encode('dreamlab-nostr-key-v1');
 const AUTH_API_BASE = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_AUTH_API_URL) ?? '';
@@ -187,15 +188,20 @@ export async function authenticatePasskey(pubkey?: string): Promise<PasskeyAuthR
   const privkey = await derivePrivkeyFromPrf(prfOutput);
   const derivedPubkey = getPublicKey(privkey);
 
-  // Verify with server
-  const verifyRes = await fetch(`${AUTH_API_BASE}/auth/login/verify`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      response: encodeAssertionResponse(assertion),
-      pubkey: derivedPubkey,
-    }),
+  // Verify with server — include NIP-98 auth; the endpoint requires it to confirm
+  // the caller controls the derived Nostr privkey.
+  const verifyUrl = AUTH_API_BASE
+    ? `${AUTH_API_BASE}/auth/login/verify`
+    : `${window.location.origin}/auth/login/verify`;
+  const verifyBody = JSON.stringify({
+    response: encodeAssertionResponse(assertion),
+    pubkey: derivedPubkey,
   });
+  const verifyRes = await fetchWithNip98(
+    verifyUrl,
+    { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: verifyBody },
+    privkey,
+  );
   if (!verifyRes.ok) {
     const err = await verifyRes.json().catch(() => ({})) as { error?: string };
     throw new Error(err.error ?? `Login failed: ${verifyRes.statusText}`);

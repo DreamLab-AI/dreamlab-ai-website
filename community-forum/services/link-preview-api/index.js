@@ -25,6 +25,55 @@ await fastify.register(cors, {
   methods: ['GET', 'OPTIONS']
 });
 
+/**
+ * SSRF protection: block private/internal/loopback addresses.
+ * Checked against literal hostnames; does not resolve DNS (DNS rebinding is a
+ * separate concern that would require an egress proxy).
+ */
+function isPrivateUrl(url) {
+  try {
+    const parsed = new URL(url);
+
+    // Only allow HTTP(S) outbound
+    if (!['http:', 'https:'].includes(parsed.protocol)) return true;
+
+    const hostname = parsed.hostname.toLowerCase();
+
+    // Loopback / localhost
+    if (hostname === 'localhost' || hostname.endsWith('.localhost')) return true;
+
+    // GCP / cloud metadata endpoints
+    if (
+      hostname === '169.254.169.254' ||
+      hostname === 'metadata.google.internal' ||
+      hostname === 'metadata.goog'
+    ) return true;
+
+    // Plain IPv4 — block private, loopback, and link-local ranges
+    const ipv4 = hostname.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+    if (ipv4) {
+      const [a, b] = [Number(ipv4[1]), Number(ipv4[2])];
+      if (a === 10) return true;                              // 10.0.0.0/8
+      if (a === 127) return true;                             // 127.0.0.0/8 loopback
+      if (a === 172 && b >= 16 && b <= 31) return true;      // 172.16.0.0/12
+      if (a === 192 && b === 168) return true;                // 192.168.0.0/16
+      if (a === 169 && b === 254) return true;                // 169.254.0.0/16 link-local
+      if (a === 0) return true;                               // 0.0.0.0/8
+      if (a >= 240) return true;                              // 240.0.0.0/4 reserved
+    }
+
+    // IPv6 loopback / ULA / link-local (bracket form)
+    const host = hostname.replace(/^\[/, '').replace(/\]$/, '');
+    if (host === '::1') return true;
+    if (host.startsWith('fc') || host.startsWith('fd')) return true; // ULA fc00::/7
+    if (host.startsWith('fe80')) return true;                         // link-local
+
+    return false;
+  } catch {
+    return true; // unparseable URL → block
+  }
+}
+
 function isTwitterUrl(url) {
   try {
     const parsed = new URL(url);
@@ -198,6 +247,10 @@ fastify.get('/preview', async (request, reply) => {
     new URL(targetUrl);
   } catch {
     return reply.code(400).send({ error: 'Invalid URL' });
+  }
+
+  if (isPrivateUrl(targetUrl)) {
+    return reply.code(400).send({ error: 'URL not allowed (private or internal address)' });
   }
 
   const isTwitter = isTwitterUrl(targetUrl);
