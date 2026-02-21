@@ -14,14 +14,14 @@
     "css:config/identity/handler/default.json",
     "css:config/identity/oidc/default.json",
     "css:config/identity/ownership/token.json",
-    "css:config/identity/pod/static.json",
+    "css:config/identity/pod/dynamic.json",
     "css:config/ldp/authentication/dpop-bearer.json",
     "css:config/ldp/authorization/webacl.json",
     "css:config/ldp/handler/default.json",
     "css:config/ldp/metadata-parser/default.json",
     "css:config/ldp/metadata-writer/default.json",
     "css:config/ldp/modes/default.json",
-    "css:config/storage/backend/file.json",
+    "css:config/storage/backend/dynamic.json",
     "css:config/storage/key-value/resource-store.json",
     "css:config/storage/location/pod.json",
     "css:config/storage/middleware/default.json",
@@ -30,12 +30,21 @@
     "css:config/util/index/default.json",
     "css:config/util/logging/winston.json",
     "css:config/util/representation-conversion/default.json",
-    "css:config/util/resource-locker/file.json",
     "css:config/util/variables/default.json"
   ],
   "@graph": [
     {
-      "comment": "file.json with initialize-root instead of initialize-intro — skips setup wizard, enables public pod registration."
+      "comment": "Dynamic pod config with memory locker and extended 120s lock expiration for Components.js pod instantiation.",
+      "@id": "urn:solid-server:default:ResourceLocker",
+      "@type": "WrappedExpiringReadWriteLocker",
+      "locker": {
+        "@type": "GreedyReadWriteLocker",
+        "locker": {
+          "@type": "MemoryResourceLocker"
+        },
+        "storage": { "@id": "urn:solid-server:default:LockStorage" }
+      },
+      "expiration": 120000
     }
   ]
 }

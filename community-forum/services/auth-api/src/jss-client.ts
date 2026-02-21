@@ -161,7 +161,7 @@ export async function provisionPod(pubkey: string): Promise<PodInfo | null> {
         'Content-Type': 'application/json',
         Authorization: `CSS-Account-Token ${accountToken}`,
       },
-      body: JSON.stringify({ name: podName }),
+      body: JSON.stringify({ name: podName, settings: { template: 'filesystem.json' } }),
       signal: AbortSignal.timeout(15_000),
     });
     if (!res.ok) {
