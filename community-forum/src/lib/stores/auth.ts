@@ -109,7 +109,7 @@ function createAuthStore() {
         _privkeyMem.fill(0);
         _privkeyMem = null;
       }
-    });
+    }, { once: true });
   }
 
   /**

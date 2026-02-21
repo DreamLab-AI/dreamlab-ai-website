@@ -28,7 +28,8 @@ export async function generateRegistrationOpts(
   rpId: string,
   rpName: string,
   _origin: string,
-  displayName?: string
+  displayName?: string,
+  prfSalt?: Uint8Array,
 ): Promise<{ options: PublicKeyCredentialCreationOptionsJSON; challenge: string }> {
   const { randomBytes } = await import('crypto');
   // Convert Buffer to strict Uint8Array backed by ArrayBuffer (required by simplewebauthn)
@@ -50,7 +51,7 @@ export async function generateRegistrationOpts(
     extensions: {
       prf: {
         eval: {
-          first: new Uint8Array(Buffer.from('dreamlab-nostr-key-derivation', 'utf8')),
+          first: prfSalt ?? new Uint8Array(Buffer.from('dreamlab-nostr-key-derivation', 'utf8')),
         },
       },
     } as Record<string, unknown>,
@@ -83,7 +84,8 @@ export async function verifyRegistration(
  */
 export async function generateAuthenticationOpts(
   rpId: string,
-  credentialId?: string
+  credentialId?: string,
+  prfSalt?: Uint8Array,
 ): Promise<{ options: PublicKeyCredentialRequestOptionsJSON; challenge: string }> {
   const allowCredentials: GenerateAuthenticationOptionsOptsAllowCredentials =
     credentialId ? [{ id: credentialId }] : [];
@@ -95,7 +97,7 @@ export async function generateAuthenticationOpts(
     extensions: {
       prf: {
         eval: {
-          first: new Uint8Array(Buffer.from('dreamlab-nostr-key-derivation', 'utf8')),
+          first: prfSalt ?? new Uint8Array(Buffer.from('dreamlab-nostr-key-derivation', 'utf8')),
         },
       },
     } as Record<string, unknown>,

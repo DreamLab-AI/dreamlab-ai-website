@@ -59,7 +59,7 @@ jobs:
           echo "entrypoint.sh validated successfully"
 
       - name: Validate Docker build
-        run: docker build -t jss-test community-forum/services/jss/
+        run: docker build -t jss-test .
 
   build-and-deploy:
     name: Build and Deploy to Cloud Run

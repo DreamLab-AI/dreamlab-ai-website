@@ -189,11 +189,11 @@ export async function getCredentialByPubkey(pubkey: string): Promise<CredentialR
 export async function updateCredentialCounter(credentialId: string, counter: number): Promise<void> {
   const db = getDb();
   const result = await db.query(
-    `UPDATE webauthn_credentials SET counter = $1 WHERE credential_id = $2`,
+    `UPDATE webauthn_credentials SET counter = $1 WHERE credential_id = $2 AND counter < $1`,
     [counter, credentialId]
   );
   if (result.rowCount === 0) {
-    throw new Error(`updateCredentialCounter: no credential found with id ${credentialId}`);
+    throw new Error(`updateCredentialCounter: counter regression or credential not found for id ${credentialId}`);
   }
 }
 

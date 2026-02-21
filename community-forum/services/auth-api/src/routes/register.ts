@@ -44,7 +44,7 @@ router.post('/options', async (req: Request, res: Response): Promise<void> => {
   const prfSalt = crypto.randomBytes(32);
 
   try {
-    ({ options, challenge } = await generateRegistrationOpts(rpId, rpName, origin, userName));
+    ({ options, challenge } = await generateRegistrationOpts(rpId, rpName, origin, userName, new Uint8Array(prfSalt)));
   } catch (err) {
     console.error('[register/options] Failed to generate options:', err);
     res.status(500).json({ error: 'Failed to generate registration options' });
@@ -60,7 +60,7 @@ router.post('/options', async (req: Request, res: Response): Promise<void> => {
     return;
   }
 
-  res.json({ ...options, prfSalt });
+  res.json({ options, prfSalt: prfSalt.toString('base64url') });
 });
 
 /**

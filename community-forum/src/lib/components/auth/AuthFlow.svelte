@@ -7,8 +7,6 @@
    * Login:  PasskeyLogin | NIP-07 | nsec (advanced) → chat
    */
   import { createEventDispatcher } from 'svelte';
-  import { goto } from '$app/navigation';
-  import { base } from '$app/paths';
   import { authStore } from '$lib/stores/auth';
   import Signup from './Signup.svelte';
   import NicknameSetup from './NicknameSetup.svelte';
@@ -44,7 +42,6 @@
       const status = await checkWhitelistStatus(currentPublicKey);
       if (status.isApproved || status.isAdmin) {
         dispatch('complete', { publicKey: currentPublicKey });
-        await goto(`${base}/chat`);
         return;
       }
     } catch (e) {
@@ -66,7 +63,6 @@
         const status = await checkWhitelistStatus(publicKey);
         if (status.isApproved || status.isAdmin) {
           dispatch('complete', { publicKey });
-          await goto(`${base}/chat`);
           return;
         }
       } catch (e) {
@@ -89,7 +85,6 @@
   async function handleApproved() {
     authStore.setPending(false);
     dispatch('complete', { publicKey: currentPublicKey });
-    await goto(`${base}/chat`);
   }
 </script>
 

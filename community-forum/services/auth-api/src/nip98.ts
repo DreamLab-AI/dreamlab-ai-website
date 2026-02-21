@@ -122,9 +122,9 @@ export async function verifyNip98(req: Request): Promise<{ pubkey: string } | nu
 
   if (normalizedEvent !== normalizedFull) return null;
 
-  // Method tag must match (or be wildcard)
+  // Method tag must be present and match (or be wildcard)
   const eventMethod = getTagValue(event, 'method');
-  if (eventMethod && eventMethod !== '*' && eventMethod.toUpperCase() !== req.method.toUpperCase()) {
+  if (!eventMethod || (eventMethod !== '*' && eventMethod.toUpperCase() !== req.method.toUpperCase())) {
     return null;
   }
 

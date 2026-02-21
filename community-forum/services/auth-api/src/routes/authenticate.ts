@@ -46,18 +46,12 @@ router.post('/options', async (req: Request, res: Response): Promise<void> => {
   let challenge: string;
 
   try {
-    ({ options, challenge } = await generateAuthenticationOpts(rpId, credential.credential_id));
+    ({ options, challenge } = await generateAuthenticationOpts(rpId, credential.credential_id, new Uint8Array(storedPrfSalt)));
   } catch (err) {
     console.error('[login/options] Failed to generate options:', err);
     res.status(500).json({ error: 'Failed to generate authentication options' });
     return;
   }
-
-  // Inject PRF salt into extensions
-  (options as any).extensions = {
-    ...((options as any).extensions ?? {}),
-    prf: { eval: { first: storedPrfSalt } },
-  };
 
   try {
     await storeChallenge(challenge, pubkey);
@@ -67,7 +61,7 @@ router.post('/options', async (req: Request, res: Response): Promise<void> => {
     return;
   }
 
-  res.json({ ...options, prfSalt: storedPrfSalt });
+  res.json({ options, prfSalt: storedPrfSalt.toString('base64url') });
 });
 
 /**

@@ -3,7 +3,7 @@ import 'dotenv/config';
 import express, { type Request, type Response, type NextFunction } from 'express';
 import cors from 'cors';
 import type { CorsOptionsDelegate, CorsRequest } from 'cors';
-import { runMigrations } from './db.js';
+import { runMigrations, purgeExpiredChallenges } from './db.js';
 import { registerRouter } from './routes/register.js';
 import { authenticateRouter } from './routes/authenticate.js';
 
@@ -34,7 +34,8 @@ if (process.env.NODE_ENV !== 'production') {
 const corsDelegate: CorsOptionsDelegate<CorsRequest> = (req, callback) => {
   const origin = (req as Request).headers.origin;
   if (!origin) {
-    callback(null, { origin: true, methods: ['GET', 'POST', 'OPTIONS'], allowedHeaders: ['Content-Type', 'Authorization'], credentials: true });
+    // No-origin requests (curl, server-to-server) — do not grant credentials
+    callback(null, { origin: true, methods: ['GET', 'POST', 'OPTIONS'], allowedHeaders: ['Content-Type', 'Authorization'], credentials: false });
     return;
   }
   if (allowedOrigins.includes(origin)) {
@@ -112,6 +113,11 @@ async function start(): Promise<void> {
     console.log(`[auth-api] RP_ID=${process.env.RP_ID}`);
     console.log(`[auth-api] RP_ORIGIN=${process.env.RP_ORIGIN}`);
   });
+
+  // Purge expired challenges every 60 seconds to prevent unbounded table growth
+  setInterval(() => {
+    purgeExpiredChallenges().catch((err) => console.error('[server] purgeExpiredChallenges error:', err));
+  }, 60_000);
 
   const shutdown = (signal: string) => {
     console.log(`[auth-api] Received ${signal}, shutting down gracefully`);

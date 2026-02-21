@@ -71,20 +71,21 @@ async function derivePrivkeyFromPrf(prfOutput: ArrayBuffer): Promise<Uint8Array>
 export async function registerPasskey(displayName: string): Promise<PasskeyRegistrationResult> {
   if (!browser) throw new Error('Browser environment required');
 
-  // Step 1: Get options from server
+  // Step 1: Get options from server (includes per-user prfSalt as base64url)
   const optRes = await fetch(`${AUTH_API_BASE}/auth/register/options`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ displayName }),
   });
   if (!optRes.ok) throw new Error(`Registration options failed: ${optRes.statusText}`);
-  const { options: optionsJSON } = await optRes.json() as { options: any; challenge: string };
+  const { options: optionsJSON, prfSalt: prfSaltB64 } = await optRes.json() as { options: any; prfSalt: string };
+  if (!prfSaltB64) throw new Error('Server did not return prfSalt in registration options');
 
-  // Step 2: Create passkey with PRF extension
+  // Step 2: Create passkey with server-provided PRF salt
   const publicKeyOptions: PublicKeyCredentialCreationOptions = {
     ...decodeCreationOptions(optionsJSON),
     extensions: {
-      prf: { eval: { first: getPrfSalt() } },
+      prf: { eval: { first: base64urlToBuffer(prfSaltB64) } },
     } as AuthenticationExtensionsClientInputs,
   };
 
@@ -148,20 +149,21 @@ export async function registerPasskey(displayName: string): Promise<PasskeyRegis
 export async function authenticatePasskey(pubkey?: string): Promise<PasskeyAuthResult> {
   if (!browser) throw new Error('Browser environment required');
 
-  // Get authentication options
+  // Get authentication options (includes stored per-user prfSalt as base64url)
   const optRes = await fetch(`${AUTH_API_BASE}/auth/login/options`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ pubkey: pubkey ?? '' }),
   });
   if (!optRes.ok) throw new Error(`Login options failed: ${optRes.statusText}`);
-  const { options: optionsJSON } = await optRes.json() as { options: any };
+  const { options: optionsJSON, prfSalt: prfSaltB64 } = await optRes.json() as { options: any; prfSalt: string };
+  if (!prfSaltB64) throw new Error('Server did not return prfSalt in login options');
 
-  // Authenticate with PRF extension
+  // Authenticate with the same PRF salt used during registration
   const publicKeyOptions: PublicKeyCredentialRequestOptions = {
     ...decodeRequestOptions(optionsJSON),
     extensions: {
-      prf: { eval: { first: getPrfSalt() } },
+      prf: { eval: { first: base64urlToBuffer(prfSaltB64) } },
     } as AuthenticationExtensionsClientInputs,
   };
 
