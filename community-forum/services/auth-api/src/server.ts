@@ -10,7 +10,7 @@ import { authenticateRouter } from './routes/authenticate.js';
 // ---------------------------------------------------------------------------
 // Startup environment variable validation
 // ---------------------------------------------------------------------------
-const REQUIRED_ENV_VARS = ['DATABASE_URL', 'RELAY_URL', 'RP_ID', 'RP_NAME', 'EXPECTED_ORIGIN'];
+const REQUIRED_ENV_VARS = ['DATABASE_URL', 'RELAY_URL', 'RP_ID', 'RP_NAME', 'RP_ORIGIN'];
 const missingEnvVars = REQUIRED_ENV_VARS.filter((v) => !process.env[v]);
 if (missingEnvVars.length > 0) {
   console.error(`[auth-api] Missing required environment variables: ${missingEnvVars.join(', ')}`);

@@ -27,19 +27,12 @@ function isValidPubkey(pubkey: unknown): pubkey is string {
  * Returns WebAuthn registration options for the given Nostr pubkey.
  */
 router.post('/options', async (req: Request, res: Response): Promise<void> => {
-  const { pubkey } = req.body as { pubkey?: unknown };
-
-  if (!isValidPubkey(pubkey)) {
-    res.status(400).json({ error: 'Invalid pubkey: must be 64 hex characters' });
-    return;
-  }
-
-  // Reject if already registered
-  const existing = await getCredentialByPubkey(pubkey).catch(() => null);
-  if (existing) {
-    res.status(409).json({ error: 'Pubkey already registered' });
-    return;
-  }
+  // pubkey is not known at registration time — it is derived from the PRF output
+  // during the WebAuthn ceremony and only provided at the /verify step.
+  const { displayName } = req.body as { displayName?: unknown };
+  const userName = typeof displayName === 'string' && displayName.trim()
+    ? displayName.trim().slice(0, 64)
+    : 'DreamLab User';
 
   const rpId = process.env.RP_ID!;
   const rpName = process.env.RP_NAME!;
@@ -51,7 +44,7 @@ router.post('/options', async (req: Request, res: Response): Promise<void> => {
   const prfSalt = crypto.randomBytes(32);
 
   try {
-    ({ options, challenge } = await generateRegistrationOpts(rpId, rpName, origin));
+    ({ options, challenge } = await generateRegistrationOpts(rpId, rpName, origin, userName));
   } catch (err) {
     console.error('[register/options] Failed to generate options:', err);
     res.status(500).json({ error: 'Failed to generate registration options' });
@@ -59,7 +52,8 @@ router.post('/options', async (req: Request, res: Response): Promise<void> => {
   }
 
   try {
-    await storeChallenge(challenge, pubkey, prfSalt);
+    // Store challenge with null pubkey — pubkey is bound at /verify time
+    await storeChallenge(challenge, undefined, prfSalt);
   } catch (err) {
     console.error('[register/options] Failed to store challenge:', err);
     res.status(500).json({ error: 'Failed to store challenge' });

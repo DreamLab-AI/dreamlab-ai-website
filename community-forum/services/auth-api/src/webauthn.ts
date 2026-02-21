@@ -27,19 +27,21 @@ export type { PublicKeyCredentialCreationOptionsJSON, PublicKeyCredentialRequest
 export async function generateRegistrationOpts(
   rpId: string,
   rpName: string,
-  _origin: string
+  _origin: string,
+  displayName?: string
 ): Promise<{ options: PublicKeyCredentialCreationOptionsJSON; challenge: string }> {
   const { randomBytes } = await import('crypto');
   // Convert Buffer to strict Uint8Array backed by ArrayBuffer (required by simplewebauthn)
   const buf = randomBytes(32);
   const userId = new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength);
+  const userHandle = `nostr-user-${Buffer.from(userId).toString('hex').slice(0, 8)}`;
 
   const options = await generateRegistrationOptions({
     rpName,
     rpID: rpId,
     userID: userId,
-    userName: `nostr-user-${Buffer.from(userId).toString('hex').slice(0, 8)}`,
-    userDisplayName: 'DreamLab Community User',
+    userName: userHandle,
+    userDisplayName: displayName ?? 'DreamLab Community User',
     attestationType: 'none',
     authenticatorSelection: {
       residentKey: 'preferred',
