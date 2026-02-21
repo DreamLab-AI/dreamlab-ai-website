@@ -113,6 +113,7 @@ const SkillNode = ({ position, text }: SkillNodeProps) => {
 const TorusKnotScene = ({ skills }: TorusKnotProps) => {
   const groupRef = useRef<THREE.Group>(null);
   const [nodeSkills, setNodeSkills] = useState<number[]>([]);
+  const lastUpdateSecond = useRef(-1);
 
   const { vertices, wireframe } = useMemo(() => {
     const geometry = new THREE.TorusKnotGeometry(TORUS_KNOT_RADIUS, 1.5, 64, 3, 2, 3);
@@ -151,7 +152,9 @@ const TorusKnotScene = ({ skills }: TorusKnotProps) => {
     groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, Math.cos(t * 0.1) * 0.25, 0.02);
     groupRef.current.rotation.z = THREE.MathUtils.lerp(groupRef.current.rotation.z, Math.sin(t * 0.075) * 0.25, 0.02);
 
-    if (Math.floor(t) % 2 === 0) {
+    const currentSecond = Math.floor(t);
+    if (currentSecond % 2 === 0 && currentSecond !== lastUpdateSecond.current) {
+        lastUpdateSecond.current = currentSecond;
         const skillSwapDepth = -(TORUS_KNOT_RADIUS * SKILL_SWAP_DEPTH_THRESHOLD_FACTOR);
         const nodesToUpdate: number[] = [];
 

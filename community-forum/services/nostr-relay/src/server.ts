@@ -211,20 +211,40 @@ class NostrRelay {
     // Add user to whitelist
     if (url.pathname === '/api/whitelist/add' && req.method === 'POST') {
       try {
-        const body = await readJsonBody();
-        const { pubkey, cohorts, adminPubkey } = body;
-
-        // Validate required fields
-        if (!pubkey || !adminPubkey) {
-          res.writeHead(400, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ error: 'Missing pubkey or adminPubkey' }));
+        // Require NIP-98 signature — prevents auth bypass via spoofed adminPubkey in body
+        const headers: Record<string, string | string[] | undefined> = {};
+        for (const [key, value] of Object.entries(req.headers)) { headers[key] = value; }
+        if (!hasNostrAuth(headers)) {
+          res.writeHead(401, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'NIP-98 authentication required' }));
           return;
         }
-
-        // Verify admin authorization
-        if (!isAdminPubkey(adminPubkey)) {
+        const authResult = await verifyNostrAuth({
+          method: req.method || 'POST',
+          url: req.url || '/',
+          headers,
+          protocol: 'http',
+          hostname: req.headers.host
+        });
+        if (authResult.error) {
+          res.writeHead(401, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: authResult.error }));
+          return;
+        }
+        if (!isAdminPubkey(authResult.pubkey!)) {
           res.writeHead(403, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ error: 'Not authorized' }));
+          return;
+        }
+        const verifiedAdminPubkey = authResult.pubkey!;
+
+        const body = await readJsonBody();
+        const { pubkey, cohorts } = body;
+
+        // Validate required fields
+        if (!pubkey) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Missing pubkey' }));
           return;
         }
 
@@ -232,7 +252,7 @@ class NostrRelay {
         const success = await this.db.addToWhitelist(
           pubkey,
           cohorts || ['approved'],
-          adminPubkey
+          verifiedAdminPubkey
         );
 
         if (success) {
@@ -253,20 +273,40 @@ class NostrRelay {
     // Update user cohorts
     if (url.pathname === '/api/whitelist/update-cohorts' && req.method === 'POST') {
       try {
-        const body = await readJsonBody();
-        const { pubkey, cohorts, adminPubkey } = body;
-
-        // Validate required fields
-        if (!pubkey || !cohorts || !adminPubkey) {
-          res.writeHead(400, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ error: 'Missing pubkey, cohorts, or adminPubkey' }));
+        // Require NIP-98 signature — prevents auth bypass via spoofed adminPubkey in body
+        const headers: Record<string, string | string[] | undefined> = {};
+        for (const [key, value] of Object.entries(req.headers)) { headers[key] = value; }
+        if (!hasNostrAuth(headers)) {
+          res.writeHead(401, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'NIP-98 authentication required' }));
           return;
         }
-
-        // Verify admin authorization
-        if (!isAdminPubkey(adminPubkey)) {
+        const authResult = await verifyNostrAuth({
+          method: req.method || 'POST',
+          url: req.url || '/',
+          headers,
+          protocol: 'http',
+          hostname: req.headers.host
+        });
+        if (authResult.error) {
+          res.writeHead(401, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: authResult.error }));
+          return;
+        }
+        if (!isAdminPubkey(authResult.pubkey!)) {
           res.writeHead(403, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ error: 'Not authorized' }));
+          return;
+        }
+        const verifiedAdminPubkey = authResult.pubkey!;
+
+        const body = await readJsonBody();
+        const { pubkey, cohorts } = body;
+
+        // Validate required fields
+        if (!pubkey || !cohorts) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Missing pubkey or cohorts' }));
           return;
         }
 
@@ -274,7 +314,7 @@ class NostrRelay {
         const success = await this.db.addToWhitelist(
           pubkey,
           cohorts,
-          adminPubkey
+          verifiedAdminPubkey
         );
 
         if (success) {

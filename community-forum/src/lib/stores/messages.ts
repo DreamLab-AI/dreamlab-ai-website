@@ -609,9 +609,11 @@ function createMessageStore() {
         let foundMessages = 0;
 
         await new Promise<void>((resolve, reject) => {
-          const timeout = setTimeout(() => resolve(), 5000);
-
           const subscription = ndkSubscribe(filter, { closeOnEose: true });
+          const timeout = setTimeout(() => {
+            subscription.stop(); // prevent orphaned WebSocket listener on slow/silent relay
+            resolve();
+          }, 5000);
 
           subscription.on('event', async (ndkEvent: NDKEvent) => {
             const event = ndkEventToEvent(ndkEvent);

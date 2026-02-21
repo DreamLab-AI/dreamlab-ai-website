@@ -191,6 +191,7 @@ export class NostrDatabase {
       }
 
       // Filter by tags using JSONB containment (e.g., #e, #p)
+      // NIP-01: multiple values for one tag are OR'd — event matches if it contains ANY of them.
       for (const [key, values] of Object.entries(filter)) {
         if (key.startsWith('#') && Array.isArray(values)) {
           const tagName = key.substring(1);
@@ -199,14 +200,16 @@ export class NostrDatabase {
             continue;
           }
 
+          const tagConditions: string[] = [];
           for (const value of values) {
             if (typeof value !== 'string' || value.length === 0) {
               continue;
             }
-
-            // Use JSONB containment operator for tag filtering
-            conditions.push(`tags @> $${paramIndex++}::jsonb`);
+            tagConditions.push(`tags @> $${paramIndex++}::jsonb`);
             params.push(JSON.stringify([[tagName, value]]));
+          }
+          if (tagConditions.length > 0) {
+            conditions.push(`(${tagConditions.join(' OR ')})`);
           }
         }
       }

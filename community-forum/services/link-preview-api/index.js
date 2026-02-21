@@ -68,6 +68,21 @@ function isPrivateUrl(url) {
     if (host.startsWith('fc') || host.startsWith('fd')) return true; // ULA fc00::/7
     if (host.startsWith('fe80')) return true;                         // link-local
 
+    // IPv4-mapped IPv6 (::ffff:a.b.c.d) — check embedded IPv4 against private ranges
+    const v4mapped = host.match(/^::ffff:(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/i);
+    if (v4mapped) {
+      const [a, b] = [Number(v4mapped[1]), Number(v4mapped[2])];
+      if (a === 10) return true;
+      if (a === 127) return true;
+      if (a === 172 && b >= 16 && b <= 31) return true;
+      if (a === 192 && b === 168) return true;
+      if (a === 169 && b === 254) return true;
+      if (a === 0) return true;
+      if (a >= 240) return true;
+    }
+    // Any other ::ffff: form (hex groups like ::ffff:7f00:1) — block as unmappable without a full parser
+    if (/^::ffff:/i.test(host)) return true;
+
     return false;
   } catch {
     return true; // unparseable URL → block
