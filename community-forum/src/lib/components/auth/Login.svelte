@@ -1,19 +1,10 @@
 <script lang="ts">
   import { createEventDispatcher, onMount } from 'svelte';
   import { browser } from '$app/environment';
-  import { restoreFromNsecOrHex } from '$lib/nostr/keys';
   import { authStore } from '$lib/stores/auth';
   import { checkWhitelistStatus } from '$lib/nostr/whitelist';
   import { waitForNip07 } from '$lib/nostr/nip07';
   import InfoTooltip from '$lib/components/ui/InfoTooltip.svelte';
-
-  function hexToBytes(hex: string): Uint8Array {
-    const bytes = new Uint8Array(hex.length / 2);
-    for (let i = 0; i < bytes.length; i++) {
-      bytes[i] = parseInt(hex.slice(i * 2, i * 2 + 2), 16);
-    }
-    return bytes;
-  }
 
   const dispatch = createEventDispatcher<{
     success: { publicKey: string };
@@ -28,6 +19,7 @@
   let validationError = '';
   let isCheckingWhitelist = false;
   let hasExtension = false;
+  let rememberMe = false;
 
   onMount(async () => {
     if (browser) {
@@ -95,24 +87,19 @@
       await new Promise(resolve => setTimeout(resolve, 100));
 
       if (!privateKeyInput.trim()) {
-        validationError = 'Please enter your private key (nsec or hex format)';
+        validationError = 'Please enter your private key';
         return;
       }
 
-      const { publicKey, privateKey } = restoreFromNsecOrHex(privateKeyInput);
+      const { publicKey } = await authStore.loginWithLocalKey(privateKeyInput.trim(), rememberMe);
       privateKeyInput = '';
 
       isCheckingWhitelist = true;
       const whitelistStatus = await checkWhitelistStatus(publicKey);
       isCheckingWhitelist = false;
 
-      // Store the private key in memory via setKeysFromPasskey so signing works.
-      const privkeyBytes = hexToBytes(privateKey);
-      const accountStatus = (whitelistStatus.isApproved || whitelistStatus.isAdmin) ? 'complete' : 'incomplete';
-      const nsecBackedUp = whitelistStatus.isApproved || whitelistStatus.isAdmin;
-      authStore.setKeysFromPasskey(publicKey, privkeyBytes, { accountStatus, nsecBackedUp });
-
       if (whitelistStatus.isApproved || whitelistStatus.isAdmin) {
+        authStore.completeSignup();
         dispatch('success', { publicKey });
       } else {
         dispatch('pending', { publicKey });
@@ -173,11 +160,11 @@
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
               </svg>
-              Sign in with Nostr extension
+              Sign in with browser extension
             {/if}
           </button>
           <p class="text-xs text-center text-base-content/60 mt-1">
-            Use your browser extension (Alby, nos2x, etc.)
+            Use a compatible browser extension (Alby, nos2x, etc.)
           </p>
         </div>
       {/if}
@@ -192,7 +179,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-5 h-5">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
-            <span class="text-xs">Enter your private key (nsec or hex) to access your account</span>
+            <span class="text-xs">Enter your private key to access your account</span>
           </div>
 
           <div class="form-control mb-3">
@@ -200,7 +187,7 @@
               <span class="label-text font-medium flex items-center gap-2">
                 Private Key
                 <InfoTooltip
-                  text="Your private key (nsec) is the secret credential that proves you own your account. It starts with 'nsec1' or can be 64 hex characters. NEVER share this with anyone."
+                  text="Your private key is the secret credential that proves you own your account. It starts with 'nsec1' or can be 64 hex characters. NEVER share this with anyone."
                   position="top"
                   maxWidth="350px"
                   inline={true}
@@ -220,9 +207,22 @@
             />
             <label class="label">
               <span id="private-key-hint" class="label-text-alt text-base-content/50">
-                Supports nsec format (nsec1...) or raw 64-character hex
+                Accepts nsec1... format or 64-character hex
               </span>
             </label>
+          </div>
+
+          <div class="form-control mb-3">
+            <label class="cursor-pointer label justify-start gap-2">
+              <input type="checkbox" class="checkbox checkbox-sm" bind:checked={rememberMe} disabled={isBusy} />
+              <span class="label-text">Remember me on this device</span>
+            </label>
+            {#if rememberMe}
+              <div class="alert alert-warning py-2 mt-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                <span class="text-xs">Your private key will be stored locally. Anyone with access to this browser can use your account.</span>
+              </div>
+            {/if}
           </div>
 
           <button

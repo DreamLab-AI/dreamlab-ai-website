@@ -20,10 +20,10 @@
     const privkeyHex = bytesToHex(privkeyBytes);
     const nsec = nip19.nsecEncode(privkeyBytes);
 
-    const content = `DreamLab Community - Nostr Identity Backup
-Public key (npub): ${npub}
+    const content = `DreamLab Community - Identity Backup
+Public key: ${npub}
 Public key (hex): ${publicKey}
-Private key (nsec): ${nsec}
+Private key: ${nsec}
 Private key (hex): ${privkeyHex}
 Generated: ${new Date().toISOString()}
 KEEP THIS FILE SECURE. Never share the private key.
@@ -57,13 +57,13 @@ KEEP THIS FILE SECURE. Never share the private key.
         </svg>
         <div class="text-sm">
           <p class="font-bold mb-1">One-time backup opportunity</p>
-          <p>Your Nostr private key is derived from your passkey. This download is the only copy. If you lose your passkey AND this file, you cannot recover your account.</p>
+          <p>Your private key is derived from your passkey. This download is the only copy. If you lose your passkey AND this file, you cannot recover your account.</p>
         </div>
       </div>
 
       <!-- Public key display -->
       <div class="bg-base-200 rounded-lg p-4 mb-6">
-        <p class="text-xs text-base-content/60 mb-1 font-medium">Your public key (npub)</p>
+        <p class="text-xs text-base-content/60 mb-1 font-medium">Your public key</p>
         <p class="font-mono text-xs break-all">{npub}</p>
       </div>
 

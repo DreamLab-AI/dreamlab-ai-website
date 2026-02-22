@@ -24,6 +24,8 @@ export interface AuthState {
   isNip07: boolean;
   /** Whether authenticated via PRF passkey (privkey lives in memory only) */
   isPasskey: boolean;
+  /** Whether authenticated via local key (privkey in sessionStorage or localStorage) */
+  isLocalKey: boolean;
   /** Name of the NIP-07 extension if available */
   extensionName: string | null;
 }
@@ -42,6 +44,7 @@ const initialState: AuthState = {
   isReady: false,
   isNip07: false,
   isPasskey: false,
+  isLocalKey: false,
   extensionName: null,
 };
 
@@ -134,6 +137,7 @@ function createAuthStore() {
         publicKey?: string;
         isNip07?: boolean;
         isPasskey?: boolean;
+        isLocalKey?: boolean;
         extensionName?: string;
         nickname?: string;
         avatar?: string;
@@ -198,6 +202,7 @@ function createAuthStore() {
             isAuthenticated: false,
             isPasskey: false,
             isNip07: false,
+            isLocalKey: false,
             accountStatus: parsed.accountStatus ?? 'incomplete',
             nsecBackedUp: parsed.nsecBackedUp ?? false,
             error: null,
@@ -205,6 +210,43 @@ function createAuthStore() {
           }),
         }));
         return;
+      }
+
+      // Local Key path — restore privkey from session/localStorage
+      if (parsed.isLocalKey && parsed.publicKey) {
+        const privkeyHex = sessionStorage.getItem('nostr_bbs_session_privkey') || localStorage.getItem('nostr_bbs_local_privkey');
+        if (privkeyHex) {
+          const { hexToBytes } = await import('@noble/hashes/utils');
+          _privkeyMem = hexToBytes(privkeyHex);
+          update((s) => ({
+            ...s,
+            ...syncStateFields({
+              publicKey: parsed.publicKey ?? null,
+              nickname: parsed.nickname ?? null,
+              avatar: parsed.avatar ?? null,
+              isAuthenticated: true,
+              accountStatus: parsed.accountStatus ?? 'complete',
+              nsecBackedUp: parsed.nsecBackedUp ?? false,
+              isNip07: false,
+              isPasskey: false,
+              isLocalKey: true,
+              error: null,
+              isReady: true,
+            }),
+          }));
+          return;
+        } else {
+          // Key lost from storage, demote to unauthenticated
+          update((s) => ({
+            ...s,
+            ...syncStateFields({
+              isAuthenticated: false,
+              isReady: true,
+              error: 'Local session expired. Please log in again.'
+            })
+          }));
+          return;
+        }
       }
 
       // Unknown or legacy state — clear and start fresh
@@ -417,6 +459,133 @@ function createAuthStore() {
       }
     },
 
+    /**
+     * Authenticate with a local key (session or local storage)
+     */
+    loginWithLocalKey: async (privkeyHex: string, rememberMe: boolean = false): Promise<{ publicKey: string }> => {
+      if (!browser) throw new Error('Browser environment required');
+      update((s) => ({ ...s, isPending: true, error: null, state: 'authenticating' as const }));
+
+      try {
+        const { restoreFromNsecOrHex } = await import('$lib/nostr/keys');
+        const { hexToBytes } = await import('@noble/hashes/utils');
+
+        const { publicKey, privateKey } = restoreFromNsecOrHex(privkeyHex);
+        _privkeyMem = hexToBytes(privateKey);
+
+        const existing = localStorage.getItem(STORAGE_KEY);
+        let existingData: { nickname?: string; avatar?: string; accountStatus?: string; nsecBackedUp?: boolean } = {};
+        if (existing) {
+          try { existingData = JSON.parse(existing); } catch { /* ignore */ }
+        }
+
+        const storageData = {
+          publicKey,
+          isPasskey: false,
+          isNip07: false,
+          isLocalKey: true,
+          nickname: existingData.nickname ?? null,
+          avatar: existingData.avatar ?? null,
+          accountStatus: existingData.accountStatus ?? 'complete',
+          nsecBackedUp: true,
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(storageData));
+
+        if (rememberMe) {
+          localStorage.setItem('nostr_bbs_local_privkey', privateKey);
+          sessionStorage.removeItem('nostr_bbs_session_privkey');
+        } else {
+          sessionStorage.setItem('nostr_bbs_session_privkey', privateKey);
+          localStorage.removeItem('nostr_bbs_local_privkey');
+        }
+
+        if (shouldKeepSignedIn()) {
+          setCookie(COOKIE_KEY, publicKey, 30);
+        }
+
+        update((s) => ({
+          ...s,
+          ...syncStateFields({
+            publicKey,
+            nickname: storageData.nickname,
+            avatar: storageData.avatar,
+            isAuthenticated: true,
+            isPending: false,
+            error: null,
+            accountStatus: storageData.accountStatus as 'incomplete' | 'complete',
+            nsecBackedUp: true,
+            isNip07: false,
+            isPasskey: false,
+            isLocalKey: true,
+          }),
+        }));
+
+        return { publicKey };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Local key authentication failed';
+        update((s) => ({ ...s, isPending: false, error: message, state: 'unauthenticated' as const }));
+        throw error;
+      }
+    },
+
+    /**
+     * Register a new account using a local key
+     */
+    registerWithLocalKey: async (displayName: string): Promise<{ pubkey: string; privkeyHex: string }> => {
+      if (!browser) throw new Error('Browser environment required');
+      update((s) => ({ ...s, isPending: true, error: null, state: 'authenticating' as const }));
+
+      try {
+        const { generateSimpleKeys } = await import('$lib/nostr/keys');
+        const { hexToBytes } = await import('@noble/hashes/utils');
+
+        const { publicKey, privateKey } = generateSimpleKeys();
+        _privkeyMem = hexToBytes(privateKey);
+
+        const storageData = {
+          publicKey,
+          isPasskey: false,
+          isNip07: false,
+          isLocalKey: true,
+          nickname: displayName,
+          avatar: null,
+          accountStatus: 'incomplete' as const,
+          nsecBackedUp: false,
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(storageData));
+        // Default to session storage until user explicitly chooses "remember me" on login
+        sessionStorage.setItem('nostr_bbs_session_privkey', privateKey);
+        localStorage.removeItem('nostr_bbs_local_privkey');
+
+        if (shouldKeepSignedIn()) {
+          setCookie(COOKIE_KEY, publicKey, 30);
+        }
+
+        update((s) => ({
+          ...s,
+          ...syncStateFields({
+            publicKey,
+            nickname: displayName,
+            avatar: null,
+            isAuthenticated: true,
+            isPending: false,
+            error: null,
+            accountStatus: 'incomplete',
+            nsecBackedUp: false,
+            isNip07: false,
+            isPasskey: false,
+            isLocalKey: true,
+          }),
+        }));
+
+        return { pubkey: publicKey, privkeyHex: privateKey };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Local key registration failed';
+        update((s) => ({ ...s, isPending: false, error: message, state: 'unauthenticated' as const }));
+        throw error;
+      }
+    },
+
     /** Login using NIP-07 browser extension */
     loginWithExtension: async (): Promise<{ publicKey: string }> => {
       if (!browser) throw new Error('Browser environment required');
@@ -589,6 +758,8 @@ function createAuthStore() {
       if (browser) {
         clearSigner();
         localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem('nostr_bbs_local_privkey');
+        sessionStorage.removeItem('nostr_bbs_session_privkey');
         deleteCookie(COOKIE_KEY);
         const { goto } = await import('$app/navigation');
         goto(`${base}/`);

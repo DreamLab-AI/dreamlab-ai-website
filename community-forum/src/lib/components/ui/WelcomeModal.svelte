@@ -7,23 +7,23 @@
   let currentSlide = 0;
   const slides = [
     {
-      title: 'Welcome to Nostr',
-      content: 'Nostr is a simple, open protocol for decentralized social networking. No central authority, no censorship.',
+      title: 'Welcome to the Community',
+      content: 'A private, invite-only space for DreamLab members. Discuss ideas, share projects, and connect with peers — with your privacy intact.',
       icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />`
     },
     {
       title: 'Your Keys, Your Identity',
-      content: 'You control your identity with cryptographic keys. Your public key (npub) is like your username - safe to share. Your private key (nsec) must be kept secret.',
+      content: 'You own your identity here. Your public key is like a username — safe to share. Your private key is your password — keep it secret and back it up.',
       icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />`
     },
     {
-      title: 'Relays Connect You',
-      content: 'Relays are servers that store and forward messages. Connect to multiple relays for better reach and reliability. Messages are encrypted end-to-end.',
-      icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />`
+      title: 'End-to-End Encrypted',
+      content: 'Private messages are encrypted so only you and your recipients can read them. No one — not even the server — can access your private conversations.',
+      icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />`
     },
     {
       title: 'Get Started',
-      content: 'Create your account to get started. You\'ll receive a 12-word recovery phrase - write it down and keep it safe. This is the only way to recover your account.',
+      content: 'Create your account with a passkey for the most secure experience, or use a private key if you prefer. Download your backup key and keep it somewhere safe.',
       icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />`
     }
   ];

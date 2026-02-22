@@ -43,16 +43,35 @@
     }
   }
 
+  async function handleCreateLocalAccount() {
+    if (!displayName.trim()) {
+      displayName = 'New User';
+    }
+    step = 'registering';
+    authStore.clearError();
+    prfUnsupported = false;
+
+    try {
+      const result = await authStore.registerWithLocalKey(displayName.trim());
+      publicKey = result.pubkey;
+      step = 'download';
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : 'Registration failed';
+      authStore.setError(msg);
+      step = 'idle';
+    }
+  }
+
   function downloadPrivkey() {
     const privkeyBytes = authStore.getPrivkey();
     if (!privkeyBytes) return;
 
     const privkeyHex = bytesToHex(privkeyBytes);
     const nsec = nip19.nsecEncode(privkeyBytes);
-    const content = `DreamLab Community - Nostr Identity Backup
-Public key (npub): ${npub}
+    const content = `DreamLab Community - Identity Backup
+Public key: ${npub}
 Public key (hex): ${publicKey}
-Private key (nsec): ${nsec}
+Private key: ${nsec}
 Private key (hex): ${privkeyHex}
 Generated: ${new Date().toISOString()}
 KEEP THIS FILE SECURE. Never share the private key.
@@ -98,9 +117,7 @@ KEEP THIS FILE SECURE. Never share the private key.
               <p class="font-bold">Passkey PRF not supported</p>
               <p>
                 Your browser or authenticator does not support the PRF extension required for passkey-based accounts.
-                Install a
-                <a href="https://github.com/nicktacular/WebAuthn-PRF-Notes" target="_blank" rel="noopener noreferrer" class="link link-primary">NIP-07 Nostr extension</a>
-                and use the login page instead.
+                Try <strong>Create account with local key</strong> below, or use an existing account on the login page.
               </p>
             </div>
           </div>
@@ -145,12 +162,29 @@ KEEP THIS FILE SECURE. Never share the private key.
 
         <div class="divider">OR</div>
 
-        <button
-          class="btn btn-ghost btn-sm"
-          on:click={() => dispatch('next', { publicKey: '' })}
-        >
-          Already have an account?
-        </button>
+        <div class="card-actions justify-center">
+          <button
+            class="btn btn-outline btn-warning w-full gap-2"
+            on:click={handleCreateLocalAccount}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+            </svg>
+            Create account with local key
+          </button>
+          <p class="text-xs text-base-content/50 mt-1 text-center">
+            Generates a standard key pair. Your private key will be cached in this browser.
+          </p>
+        </div>
+
+        <div class="mt-4 text-center">
+          <button
+            class="btn btn-ghost btn-sm"
+            on:click={() => dispatch('next', { publicKey: '' })}
+          >
+            Already have an account?
+          </button>
+        </div>
 
       {:else if step === 'registering'}
         <div class="flex flex-col items-center gap-4 py-6">
@@ -170,7 +204,7 @@ KEEP THIS FILE SECURE. Never share the private key.
         </div>
 
         <div class="bg-base-200 rounded-lg p-4 mb-4">
-          <p class="text-xs text-base-content/60 mb-1">Your public key (npub)</p>
+          <p class="text-xs text-base-content/60 mb-1">Your public key</p>
           <p class="font-mono text-xs break-all">{npub}</p>
         </div>
 
