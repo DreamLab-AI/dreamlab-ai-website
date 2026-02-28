@@ -58,7 +58,7 @@ export const AIChatFab = () => {
   }, [showTierMenu]);
 
   const requestNostrAuth = useCallback(async (): Promise<string | null> => {
-    const nostr = (window as any).nostr;
+    const nostr = (window as Record<string, unknown>).nostr as { getPublicKey: () => Promise<string> } | undefined;
     if (!nostr) return null;
     try {
       const pk = await nostr.getPublicKey();
@@ -136,7 +136,7 @@ export const AIChatFab = () => {
     }
 
     try {
-      const body: Record<string, any> = {
+      const body: Record<string, unknown> = {
         message: trimmed,
         session_id: sessionId,
         tier,

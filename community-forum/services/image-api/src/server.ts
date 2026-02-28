@@ -12,10 +12,7 @@ import multer from 'multer';
 import sharp from 'sharp';
 import { Storage } from '@google-cloud/storage';
 import { v4 as uuidv4 } from 'uuid';
-import crypto from 'crypto';
-import { schnorr } from '@noble/curves/secp256k1';
-import { sha256 } from '@noble/hashes/sha256';
-import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
+import { verifyNip98 as sharedVerify } from '../../../packages/nip98/verify.js';
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -407,133 +404,34 @@ app.get('/info/:category/:pubkey/:imageId', async (req, res) => {
 });
 
 // =============================================================================
-// NIP-98 HTTP Authentication
+// NIP-98 HTTP Authentication (uses shared packages/nip98 module)
 // =============================================================================
 
-interface Nip98Event {
-  id: string;
-  pubkey: string;
-  created_at: number;
-  kind: number;
-  tags: string[][];
-  content: string;
-  sig: string;
-}
-
 /**
- * Verify NIP-98 HTTP Auth event
- * @see https://github.com/nostr-protocol/nips/blob/master/98.md
+ * Verify NIP-98 HTTP Auth — adapter for shared module.
+ * rawBody === undefined means multipart (payload verification skipped).
  */
 async function verifyNip98Auth(
   authHeader: string | undefined,
   requestUrl: string,
   method: string,
-  rawBody?: Buffer  // pass Buffer.alloc(0) for bodyless requests; undefined = skip (multipart)
+  rawBody?: Buffer,
 ): Promise<{ valid: boolean; pubkey?: string; error?: string }> {
   if (!authHeader) {
     return { valid: false, error: 'Missing Authorization header' };
   }
 
-  // Parse "Nostr <base64-encoded-event>"
-  const match = authHeader.match(/^Nostr\s+(.+)$/i);
-  if (!match) {
-    return { valid: false, error: 'Invalid Authorization header format. Expected: Nostr <base64>' };
+  const result = await sharedVerify(authHeader, {
+    url: requestUrl,
+    method,
+    rawBody: rawBody ? new Uint8Array(rawBody) : undefined,
+  });
+
+  if (!result) {
+    return { valid: false, error: 'NIP-98 verification failed' };
   }
 
-  let event: Nip98Event;
-  try {
-    const decoded = Buffer.from(match[1], 'base64').toString('utf-8');
-    event = JSON.parse(decoded);
-  } catch {
-    return { valid: false, error: 'Failed to decode/parse NIP-98 event' };
-  }
-
-  // Validate event structure
-  if (event.kind !== 27235) {
-    return { valid: false, error: `Invalid event kind: ${event.kind}. Expected 27235` };
-  }
-
-  // Check timestamp (must be within 60 seconds)
-  const now = Math.floor(Date.now() / 1000);
-  const timeDiff = Math.abs(now - event.created_at);
-  if (timeDiff > 60) {
-    return { valid: false, error: `Event timestamp too old or in future: ${timeDiff}s drift` };
-  }
-
-  // Validate required tags
-  const urlTag = event.tags.find(t => t[0] === 'u');
-  const methodTag = event.tags.find(t => t[0] === 'method');
-
-  if (!urlTag || !urlTag[1]) {
-    return { valid: false, error: 'Missing "u" (URL) tag in NIP-98 event' };
-  }
-
-  if (!methodTag || !methodTag[1]) {
-    return { valid: false, error: 'Missing "method" tag in NIP-98 event' };
-  }
-
-  // Verify URL matches (normalize trailing slashes)
-  const normalizeUrl = (u: string) => u.replace(/\/+$/, '').toLowerCase();
-  if (normalizeUrl(urlTag[1]) !== normalizeUrl(requestUrl)) {
-    return { valid: false, error: `URL mismatch: event has ${urlTag[1]}, request is ${requestUrl}` };
-  }
-
-  // Verify method matches
-  if (methodTag[1].toUpperCase() !== method.toUpperCase()) {
-    return { valid: false, error: `Method mismatch: event has ${methodTag[1]}, request is ${method}` };
-  }
-
-  // Verify event ID (hash of serialized event)
-  const serialized = JSON.stringify([
-    0,
-    event.pubkey,
-    event.created_at,
-    event.kind,
-    event.tags,
-    event.content
-  ]);
-  const expectedId = bytesToHex(sha256(new TextEncoder().encode(serialized)));
-
-  if (event.id !== expectedId) {
-    return { valid: false, error: 'Invalid event ID (hash mismatch)' };
-  }
-
-  // Verify Schnorr signature
-  try {
-    const sigBytes = hexToBytes(event.sig);
-    const idBytes = hexToBytes(event.id);
-    const pubkeyBytes = hexToBytes(event.pubkey);
-
-    const isValid = schnorr.verify(sigBytes, idBytes, pubkeyBytes);
-    if (!isValid) {
-      return { valid: false, error: 'Invalid signature' };
-    }
-  } catch (err) {
-    return { valid: false, error: `Signature verification failed: ${err}` };
-  }
-
-  // Verify payload hash when raw body bytes are provided.
-  // rawBody === undefined means multipart — payload verification is skipped because
-  // multer has already consumed the stream and we cannot recompute the body hash.
-  const payloadTag = event.tags.find(t => t[0] === 'payload');
-  if (rawBody !== undefined) {
-    const expectedPayload = bytesToHex(sha256(new Uint8Array(rawBody)));
-    if (rawBody.length > 0) {
-      if (!payloadTag || !payloadTag[1]) {
-        return { valid: false, error: 'Missing payload tag for non-empty request body' };
-      }
-      if (payloadTag[1] !== expectedPayload) {
-        return { valid: false, error: 'Payload hash mismatch' };
-      }
-    } else {
-      // Empty body (e.g. DELETE) — payload tag should be absent or match sha256("")
-      if (payloadTag && payloadTag[1] !== expectedPayload) {
-        return { valid: false, error: 'Unexpected payload tag for empty body' };
-      }
-    }
-  }
-
-  return { valid: true, pubkey: event.pubkey };
+  return { valid: true, pubkey: result.pubkey };
 }
 
 /**

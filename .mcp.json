@@ -15,6 +15,17 @@
         "CLAUDE_FLOW_MEMORY_BACKEND": "hybrid"
       },
       "autoStart": false
+    },
+    "ruvector": {
+      "command": "bash",
+      "args": [
+        "/home/devuser/workspace/project2/scripts/start-ruvector.sh"
+      ],
+      "env": {
+        "RUVECTOR_PORT": "8100",
+        "RUVECTOR_DIMENSIONS": "384"
+      },
+      "autoStart": false
     }
   }
 }
