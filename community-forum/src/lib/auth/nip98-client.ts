@@ -3,9 +3,9 @@
  * Retains fetchWithNip98() wrapper for the SvelteKit forum.
  */
 
-import { createNip98Token, hashRawBody } from '../../packages/nip98/sign.js';
+import { createNip98Token } from '../../../packages/nip98/sign.js';
 
-export { createNip98Token } from '../../packages/nip98/sign.js';
+export { createNip98Token } from '../../../packages/nip98/sign.js';
 
 /** Fetch with NIP-98 Authorization header */
 export async function fetchWithNip98(
