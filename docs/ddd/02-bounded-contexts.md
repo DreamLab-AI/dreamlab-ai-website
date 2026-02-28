@@ -1,10 +1,10 @@
 ---
 title: "Bounded Contexts"
-description: "## Context Map"
+description: "Domain-driven design bounded contexts for the DreamLab AI platform"
 category: explanation
-tags: ['ddd', 'developer', 'user']
+tags: ['ddd', 'developer']
 difficulty: beginner
-last-updated: 2026-01-16
+last-updated: 2026-02-28
 ---
 
 # Bounded Contexts
@@ -14,245 +14,195 @@ last-updated: 2026-01-16
 ```mermaid
 graph TB
     subgraph Upstream["UPSTREAM CONTEXTS"]
-        Identity["Identity Context<br/>━━━━━━━━━━<br/>Keypair<br/>Profile<br/>Session"]
-    end
-
-    subgraph Supporting["SUPPORTING CONTEXTS"]
-        Access["Access Context<br/>━━━━━━━━━━<br/>Cohort<br/>Role<br/>Whitelist"]
-        Organization["Organization Context<br/>━━━━━━━━━━<br/>Category<br/>Section<br/>Forum"]
+        Identity["Identity Context<br/>----------<br/>Passkey<br/>Pubkey / DID / WebID<br/>Profile"]
     end
 
     subgraph Core["CORE DOMAIN"]
-        Messaging["Messaging Context<br/>━━━━━━━━━━<br/>Message<br/>DM<br/>Thread<br/>Reaction"]
+        Community["Community Context<br/>----------<br/>Channel<br/>Message / DM<br/>Thread / Reaction<br/>Calendar Event"]
     end
 
-    subgraph Downstream["DOWNSTREAM CONTEXTS"]
-        Search["Search Context<br/>━━━━━━━━━━<br/>Index<br/>Query"]
-        Calendar["Calendar Context<br/>━━━━━━━━━━<br/>Event<br/>RSVP"]
+    subgraph Supporting["SUPPORTING CONTEXTS"]
+        Content["Content Context<br/>----------<br/>Workshop<br/>Team Profile<br/>Case Study"]
+        Storage["Storage Context<br/>----------<br/>Pod / File<br/>ACL<br/>Image"]
     end
 
-    Identity -->|Published<br/>Language| Access
-    Access -->|OHS| Organization
-    Access -->|ACL| Messaging
-    Organization -->|OHS| Messaging
-    Messaging --> Search
-    Messaging --> Calendar
+    Identity -->|Published<br/>Language| Community
+    Identity -->|ACL| Storage
+    Community -->|Events| Storage
+    Content -.->|Independent| Community
 
     style Identity fill:#e1f5fe
-    style Access fill:#fff9c4
-    style Organization fill:#fff9c4
-    style Messaging fill:#c8e6c9
-    style Search fill:#f8bbd0
-    style Calendar fill:#f8bbd0
+    style Community fill:#c8e6c9
+    style Content fill:#fff9c4
+    style Storage fill:#f8bbd0
 ```
 
-*Domain-Driven Design context map showing upstream identity, core messaging domain, and downstream contexts*
+*Domain-driven design context map showing upstream identity, core community domain, and supporting contexts.*
 
 ## Context Definitions
 
 ### 1. Identity Context
 
-**Purpose**: Manage cryptographic identity and user profiles.
+**Purpose**: Manage cryptographic identity, authentication, and user profiles.
 
 **Responsibilities**:
-- Keypair generation and storage
-- Profile metadata (NIP-01 kind 0)
-- Session management
-- NIP-07 extension integration
+- WebAuthn PRF passkey registration and authentication
+- HKDF key derivation (PRF output to secp256k1 private key)
+- In-memory private key lifecycle (closure-held, zero-filled on page hide)
+- NIP-98 HTTP auth token creation and verification
+- Profile metadata (kind:0 events)
+- DID and WebID identity resolution
+- NIP-07 browser extension integration
 
 **Language**:
+
 | Term | Definition |
 |------|------------|
-| Keypair | secp256k1 private/public key pair |
-| Pubkey | 64-char hex public key |
-| Npub | Bech32-encoded public key |
-| Nsec | Bech32-encoded private key |
-| Profile | NIP-01 kind 0 metadata |
+| Passkey | WebAuthn credential with PRF extension support |
+| Pubkey | 64-char hex secp256k1 public key (primary identity) |
+| DID | `did:nostr:{pubkey}` -- W3C decentralised identifier |
+| WebID | `{pod-url}/profile/card#me` -- Solid Linked Data profile |
+| PRF | Pseudo-Random Function extension for deterministic key derivation |
+| NIP-98 Token | Schnorr-signed kind:27235 event for HTTP authentication |
 
 **Integrations**:
-- **Outbound**: Publishes `MemberIdentified` to Access Context
-- **Technology**: nostr-tools, @scure/bip39
+- **Outbound**: publishes pubkey and DID to Community and Storage contexts
+- **Technology**: WebAuthn API, Web Crypto (HKDF), nostr-tools, @noble/hashes
 
 ```typescript
 // Identity Context Public API
 interface IdentityService {
-  generateKeypair(): Keypair;
-  restoreFromMnemonic(mnemonic: string): Keypair;
-  getProfile(pubkey: Pubkey): Promise<Profile>;
-  updateProfile(profile: Profile): Promise<void>;
+  registerPasskey(displayName: string): Promise<PasskeyRegistrationResult>;
+  authenticatePasskey(pubkey?: string): Promise<PasskeyAuthResult>;
+  loginWithExtension(): Promise<{ publicKey: string }>;
+  loginWithLocalKey(privkeyHex: string, rememberMe: boolean): Promise<{ publicKey: string }>;
+  getPrivkey(): Uint8Array | null;
+  createNip98Token(privkey: Uint8Array, url: string, method: string, body?: Uint8Array): Promise<string>;
+  verifyNip98(authHeader: string, opts: VerifyOptions): Promise<VerifyResult | null>;
 }
 ```
 
 ---
 
-### 2. Access Context
+### 2. Community Context
 
-**Purpose**: Control who can access what resources.
-
-**Responsibilities**:
-- Whitelist management
-- Cohort membership
-- Section role assignment
-- Permission evaluation
-
-**Language**:
-| Term | Definition |
-|------|------------|
-| Cohort | Named group of members (e.g., "admin", "guests") |
-| Role | Permission level within a section |
-| Whitelist | PostgreSQL table of allowed pubkeys |
-| Permission | Capability to perform an action |
-
-**Integrations**:
-- **Inbound**: Receives pubkey from Identity Context
-- **Outbound**: Provides permissions to Organisation Context
-- **Technology**: PostgreSQL, NIP-42
-
-```typescript
-// Access Context Public API
-interface AccessService {
-  checkWhitelist(pubkey: Pubkey): Promise<WhitelistEntry | null>;
-  addToWhitelist(pubkey: Pubkey, cohorts: CohortId[]): Promise<void>;
-  canAccess(pubkey: Pubkey, section: SectionId): Promise<boolean>;
-  getPermissions(pubkey: Pubkey): Promise<UserPermissions>;
-}
-```
-
----
-
-### 3. Organisation Context
-
-**Purpose**: Structure the BBS hierarchy.
+**Purpose**: Handle all community interactions -- messaging, channels, events, and moderation.
 
 **Responsibilities**:
-- Category/Section/Forum configuration
-- Navigation structure
-- Forum lifecycle management
-
-**Language**:
-| Term | Definition |
-|------|------------|
-| Category | Top-level grouping (UI only) |
-| Section | Access-controlled container for forums |
-| Forum | NIP-28 channel for messages |
-| Channel | Synonym for Forum |
-
-**Integrations**:
-- **Inbound**: Permissions from Access Context
-- **Outbound**: Structure to Messaging Context
-- **Technology**: sections.yaml, NIP-28/29
-
-```typescript
-// Organisation Context Public API
-interface OrganisationService {
-  getCategories(): Category[];
-  getSections(categoryId?: CategoryId): Section[];
-  getForums(sectionId: SectionId): Forum[];
-  createForum(sectionId: SectionId, name: string): Promise<Forum>;
-}
-```
-
----
-
-### 4. Messaging Context (Core Domain)
-
-**Purpose**: Handle all message exchange.
-
-**Responsibilities**:
-- Message posting and retrieval
-- Thread management
-- Direct messages (NIP-17)
+- Channel (NIP-28) message posting and retrieval
+- Thread management (replies)
+- Direct messages (NIP-17, encrypted with NIP-44)
 - Reactions (NIP-25)
-- Message deletion (NIP-09)
+- Calendar events (NIP-52) and RSVPs
+- Zone/section/forum hierarchy navigation
+- Cohort-based access control (whitelist membership)
+- Admin approval workflows (kind:9024 registration, kind:9023 approval)
 
 **Language**:
+
 | Term | Definition |
 |------|------------|
-| Message | Nostr event in a forum channel |
+| Zone (Category) | Top-level context boundary (e.g., DreamLab) |
+| Section | Topical grouping within a zone, access-controlled by cohort |
+| Forum (Channel) | NIP-28 channel for discussions within a section |
+| Message | Nostr event posted to a forum channel |
 | Thread | Chain of reply messages |
-| DM | Encrypted direct message (NIP-17) |
-| Reaction | Emoji response to message |
-| Gift Wrap | NIP-59 privacy envelope |
+| DM | Encrypted direct message (NIP-17 + NIP-44 + NIP-59 gift wrap) |
+| Reaction | Emoji response to a message (NIP-25) |
+| Cohort | Named group of members controlling section access |
+| Calendar Event | Scheduled happening (NIP-52 kind:31922 or kind:31923) |
 
 **Integrations**:
-- **Inbound**: Structure from Organisation, Identity from Identity
-- **Outbound**: Content to Search Context
-- **Technology**: NDK, NIP-01/17/25/28/44/59
+- **Inbound**: receives pubkey and auth tokens from Identity Context
+- **Outbound**: sends message content to Storage Context (images, attachments)
+- **Technology**: NDK, SvelteKit, NIP-01/17/25/28/42/44/52/59
 
 ```typescript
-// Messaging Context Public API
-interface MessagingService {
-  postMessage(content: string, forumId: ChannelId): Promise<Message>;
-  replyTo(content: string, parentId: EventId): Promise<Message>;
-  sendDM(content: string, recipient: Pubkey): Promise<DirectMessage>;
-  react(messageId: EventId, emoji: string): Promise<Reaction>;
-  deleteMessage(messageId: EventId): Promise<void>;
+// Community Context Public API
+interface CommunityService {
+  postMessage(content: string, channelId: string): Promise<Message>;
+  replyTo(content: string, parentId: string): Promise<Message>;
+  sendDM(content: string, recipient: string): Promise<DirectMessage>;
+  react(messageId: string, emoji: string): Promise<Reaction>;
+  getChannels(sectionId: string): Promise<Channel[]>;
+  createCalendarEvent(event: CalendarEventInput): Promise<CalendarEvent>;
+  rsvp(eventId: string, status: RSVPStatus): Promise<void>;
 }
 ```
 
 ---
 
-### 5. Search Context
+### 3. Content Context
 
-**Purpose**: Enable content discovery.
+**Purpose**: Manage marketing site content -- workshops, team profiles, and case studies.
 
 **Responsibilities**:
-- HNSW index management
-- Query embedding
-- Result ranking
-- WiFi-only sync
+- Workshop content loading and rendering (Markdown from `public/data/workshops/`)
+- Workshop list generation (`scripts/generate-workshop-list.mjs`)
+- Team profile management (44 expert profiles in `public/data/team/`)
+- Case study / portfolio content (`src/data/work/`)
+- Residential training and masterclass page content
 
 **Language**:
+
 | Term | Definition |
 |------|------------|
-| Index | HNSW vector index |
-| Embedding | 384-dim vector representation |
-| Query | User search input |
-| Result | Ranked list of event IDs |
+| Workshop | Multi-page training programme with Markdown content |
+| Workshop Manifest | Auto-generated JSON listing pages within a workshop |
+| Team Profile | Expert biography loaded from Markdown at runtime |
+| Case Study | Portfolio project with description and outcomes |
 
 **Integrations**:
-- **Inbound**: Message content from Messaging Context
-- **Technology**: WASM, HNSW, all-MiniLM-L6-v2
+- **Independent**: does not depend on Identity or Community contexts
+- **Technology**: React, Vite, Markdown processing, workshop generation script
 
 ```typescript
-// Search Context Public API
-interface SearchService {
-  initialize(): Promise<void>;
-  search(query: string, limit?: number): Promise<SearchResult[]>;
-  syncIndex(): Promise<void>;
-  getIndexStatus(): IndexStatus;
+// Content Context Public API
+interface ContentService {
+  getWorkshopList(): WorkshopSummary[];
+  getWorkshopManifest(workshopId: string): Promise<WorkshopManifest>;
+  getWorkshopPage(workshopId: string, pageSlug: string): Promise<string>;
+  getTeamProfiles(): Promise<TeamProfile[]>;
+  getCaseStudies(): Promise<CaseStudy[]>;
 }
 ```
 
 ---
 
-### 6. Calendar Context
+### 4. Storage Context
 
-**Purpose**: Event scheduling for sections.
+**Purpose**: Manage per-user pod storage, file uploads, and access control.
 
 **Responsibilities**:
-- Calendar event creation (NIP-52)
-- RSVP management
-- Event discovery
+- Solid pod provisioning per pubkey (via JSS / pod-api)
+- File storage and retrieval (R2 on Cloudflare, filesystem on Cloud Run)
+- Web Access Control (WAC) document evaluation
+- Image upload, resizing, and serving
+- ACL management (owner-restricted by default)
+- Link preview metadata extraction
 
 **Language**:
+
 | Term | Definition |
 |------|------------|
-| CalendarEvent | Scheduled happening (NIP-52) |
-| RSVP | Response to calendar event |
-| DateEvent | All-day event (kind 31922) |
-| TimeEvent | Specific time event (kind 31923) |
+| Pod | Per-user Solid storage container identified by pubkey |
+| ACL | Access Control List document (WAC / JSON-LD) |
+| WebID | Solid profile URI used for ACL agent matching |
+| Resource | File or directory within a pod |
+| Container | Directory within a pod |
 
 **Integrations**:
-- **Inbound**: Section access from Access Context
-- **Technology**: NIP-52
+- **Inbound**: receives pubkey and auth tokens from Identity Context; receives file uploads from Community Context
+- **Technology**: Cloudflare R2 + KV (target), JSS/CSS (current), NIP-98 gating
 
 ```typescript
-// Calendar Context Public API
-interface CalendarService {
-  createEvent(event: CalendarEventInput): Promise<CalendarEvent>;
-  getEvents(sectionId: SectionId): Promise<CalendarEvent[]>;
-  rsvp(eventId: EventId, status: RSVPStatus): Promise<void>;
+// Storage Context Public API
+interface StorageService {
+  provisionPod(pubkey: string): Promise<{ podUrl: string; webId: string }>;
+  putResource(podUrl: string, path: string, body: Blob, contentType: string): Promise<void>;
+  getResource(podUrl: string, path: string): Promise<Response>;
+  evaluateACL(aclDoc: ACLDocument, agent: string, mode: AccessMode): boolean;
+  uploadImage(file: File, privkey: Uint8Array): Promise<string>;
 }
 ```
 
@@ -260,39 +210,33 @@ interface CalendarService {
 
 ### Anticorruption Layer (ACL)
 
-Used between Access and Messaging contexts to translate permission models.
+Used between Identity and Community contexts to translate NIP-98 auth tokens into community permissions.
 
 ```typescript
-// ACL: Translate whitelist entry to messaging permissions
-class MessagingPermissionAdapter {
-  constructor(private accessService: AccessService) {}
+// ACL: Translate NIP-98 verification result to community permissions
+class CommunityPermissionAdapter {
+  constructor(private identityService: IdentityService) {}
 
-  async canPost(pubkey: Pubkey, forumId: ChannelId): Promise<boolean> {
-    const section = await this.getSectionForForum(forumId);
-    return this.accessService.canAccess(pubkey, section.id);
+  async canPost(authHeader: string, channelId: string): Promise<boolean> {
+    const result = await this.identityService.verifyNip98(authHeader, { url, method: 'POST' });
+    if (!result) return false;
+    return this.checkWhitelist(result.pubkey, channelId);
   }
 }
 ```
 
-### Open Host Service (OHS)
-
-Organisation Context exposes structure via well-defined API.
-
-```typescript
-// OHS: Organisation Context public interface
-const organisationApi = {
-  '/categories': () => getCategories(),
-  '/sections/:id': (id) => getSection(id),
-  '/sections/:id/forums': (id) => getForums(id)
-};
-```
-
 ### Published Language
 
-Identity Context publishes standard Nostr types.
+Identity Context publishes standard types consumed by all other contexts.
 
 ```typescript
-// Published Language: Standard Nostr types
-export type { Pubkey, EventId, Signature, NostrEvent };
-export { validateEvent, verifySignature };
+// Published Language: Standard identity types
+export type Pubkey = string;          // 64-char hex
+export type DidNostr = string;        // did:nostr:{pubkey}
+export type WebId = string;           // {pod-url}/profile/card#me
+export type Nip98Token = string;      // base64-encoded signed event
 ```
+
+### Context Independence
+
+The Content Context is deliberately independent of Identity and Community. Workshop content, team profiles, and case studies are publicly accessible and do not require authentication. This separation allows the marketing site to function without backend services.

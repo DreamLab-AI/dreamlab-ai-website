@@ -1,645 +1,482 @@
-# Authentication & Identity
+# Authentication and Identity
 
-**Last Updated:** 2026-01-25
+**Last Updated:** 2026-02-28
 
-This document details the authentication mechanisms, identity management, and key handling in the Fairfield platform.
+Detailed specification of the DreamLab AI authentication system: WebAuthn PRF-based key derivation, NIP-98 HTTP authentication, and session management.
 
 ---
 
 ## Table of Contents
 
 1. [Authentication Methods](#authentication-methods)
-2. [NIP-07 Browser Extension Authentication](#nip-07-browser-extension-authentication)
-3. [Key-Based Authentication](#key-based-authentication)
-4. [NIP-42 Relay Authentication](#nip-42-relay-authentication)
-5. [Session Management](#session-management)
-6. [Key Recovery](#key-recovery)
-7. [Security Considerations](#security-considerations)
+2. [WebAuthn PRF Registration](#webauthn-prf-registration)
+3. [WebAuthn PRF Authentication](#webauthn-prf-authentication)
+4. [Key Derivation](#key-derivation)
+5. [NIP-98 HTTP Auth](#nip-98-http-auth)
+6. [Consolidated NIP-98 Module](#consolidated-nip-98-module)
+7. [Session Management](#session-management)
+8. [Fallback Mechanisms](#fallback-mechanisms)
+9. [Identity Model](#identity-model)
+10. [Security Considerations](#security-considerations)
 
 ---
 
 ## Authentication Methods
 
-The platform supports two authentication methods:
+DreamLab uses a passkey-first model. The private key is never stored; it is derived deterministically from the WebAuthn PRF extension output and held only in memory.
 
-| Method | Security Level | User Experience | Use Case |
-|--------|----------------|-----------------|----------|
-| **NIP-07 Extension** | Highest | Best | Primary (hardware key support) |
-| **nsec Login** | High | Good | Fallback, mobile |
+| Method | Priority | Key Management | PRF Required |
+|--------|---------|---------------|-------------|
+| **WebAuthn PRF (Passkey)** | Primary | Derived in closure, zeroed on pagehide | Yes |
+| **NIP-07 Extension** | Advanced fallback | Extension-managed (Alby, nos2x) | No |
+| **nsec Direct Entry** | Last resort | User-managed, one-time download | No |
 
 ### Method Selection
 
-```typescript
-// src/lib/stores/auth.ts
-export async function detectAuthMethod(): Promise<'nip07' | 'nsec' | 'none'> {
-  // 1. Check for NIP-07 extension
-  if (await waitForNip07(2000)) {
-    return 'nip07';
-  }
+On page load, the auth store attempts to restore a session:
 
-  // 2. Check for stored encrypted key
-  const stored = localStorage.getItem(STORAGE_KEY);
-  if (stored) {
-    const data = JSON.parse(stored);
-    if (data.encryptedPrivateKey || data.privateKey) {
-      return 'nsec';
-    }
-  }
-
-  return 'none';
-}
-```
+1. If `isPasskey` flag is set in localStorage, the user must re-authenticate with their passkey to re-derive the private key.
+2. If `isNip07` flag is set, the store attempts to reconnect to the NIP-07 extension and verify the pubkey still matches.
+3. If `isLocalKey` flag is set, the locally-held key is used (nsec fallback path).
 
 ---
 
-## NIP-07 Browser Extension Authentication
+## WebAuthn PRF Registration
 
-### Overview
+### Flow Diagram
 
-NIP-07 defines a standard interface for Nostr signing extensions. Private keys remain in the extension's secure storage and never touch the application code.
+```
+Browser                         auth-api                      PostgreSQL
+  |                                |                              |
+  |-- POST /auth/register/options -|                              |
+  |   { displayName }             |                              |
+  |                                |-- generate PRF salt (32 B) --|
+  |                                |-- generate challenge --------|
+  |                                |-- store challenge + salt --->|
+  |<-- { options, prfSalt (b64u) } |                              |
+  |                                |                              |
+  |-- navigator.credentials.create()                              |
+  |   extensions: { prf: { eval: { first: prfSalt } } }          |
+  |                                                               |
+  |-- Check prf.enabled === true                                  |
+  |-- Extract prf.results.first (32 bytes)                        |
+  |-- HKDF(SHA-256, salt=[], info="nostr-secp256k1-v1")          |
+  |   -> 32-byte secp256k1 privkey                                |
+  |-- getPublicKey(privkey) -> pubkey                             |
+  |                                |                              |
+  |-- POST /auth/register/verify --|                              |
+  |   { response, pubkey }         |                              |
+  |                                |-- verify WebAuthn response --|
+  |                                |-- reject if pubkey exists -->|
+  |                                |-- consume challenge -------->|
+  |                                |-- provision Solid pod -------|
+  |                                |-- store credential + salt -->|
+  |<-- { didNostr, webId, podUrl } |                              |
+  |                                |                              |
+  |-- Store pubkey in auth state                                  |
+  |-- Hold privkey in _privkeyMem closure                         |
+  |-- Register pagehide listener to zero privkey                  |
+```
 
-### Supported Extensions
+### Step-by-Step
 
-| Extension | URL | Features |
-|-----------|-----|----------|
-| **Alby** | https://getalby.com | Lightning, hardware key support |
-| **nos2x** | https://github.com/fiatjaf/nos2x | Lightweight, open source |
-| **Nostore** | https://nostore.org | Mobile support |
-| **Flamingo** | https://flamingo.me | Desktop integration |
+1. **Client sends display name** to `POST /auth/register/options`.
+2. **Server generates**:
+   - A random 32-byte PRF salt (`crypto.randomBytes(32)`)
+   - WebAuthn registration options via `@simplewebauthn/server`
+   - A challenge string stored in `webauthn_challenges` table (5-minute expiry)
+3. **Server returns** options and PRF salt (base64url-encoded) to the client.
+4. **Client calls `navigator.credentials.create()`** with the PRF extension requesting evaluation of the server-provided salt.
+5. **Client checks** `extensions.prf.enabled === true`. If false, registration is aborted with an error (authenticator does not support PRF).
+6. **Client extracts** `extensions.prf.results.first` (32-byte PRF output).
+7. **Client derives** the secp256k1 private key via HKDF and computes the public key.
+8. **Client sends** the WebAuthn response and derived pubkey to `POST /auth/register/verify`.
+9. **Server verifies** the WebAuthn response, rejects duplicate pubkeys (HTTP 409), consumes the challenge, provisions a Solid pod via JSS, and stores the credential with the PRF salt.
+10. **Server returns** `didNostr`, `webId`, and `podUrl`.
+11. **Client stores** pubkey and profile metadata in localStorage. The private key is held only in `_privkeyMem`.
 
-### Extension Detection
+### Server-Side Validation (Registration)
+
+- WebAuthn response verified via `@simplewebauthn/server` `verifyRegistrationResponse()`
+- `requireUserVerification: true` enforced
+- `expectedRPID: dreamlab-ai.com` and `expectedOrigin: https://dreamlab-ai.com` checked
+- Pubkey validated as 64-character lowercase hex
+- Duplicate pubkey check before challenge consumption (prevents race conditions)
+- Client-supplied `webId` sanitised: must use `https:` scheme, no `..` or `%2e%2e` path sequences
+
+---
+
+## WebAuthn PRF Authentication
+
+### Flow Diagram
+
+```
+Browser                         auth-api                      PostgreSQL
+  |                                |                              |
+  |-- POST /auth/login/options ----|                              |
+  |   { pubkey }                   |                              |
+  |                                |-- lookup credential -------->|
+  |                                |-- retrieve stored prfSalt -->|
+  |                                |-- generate challenge --------|
+  |                                |-- store challenge + pubkey ->|
+  |<-- { options, prfSalt (b64u) } |                              |
+  |                                |                              |
+  |-- navigator.credentials.get()                                 |
+  |   extensions: { prf: { eval: { first: prfSalt } } }          |
+  |                                                               |
+  |-- Block if authenticatorAttachment === 'cross-platform'       |
+  |-- Extract prf.results.first (32 bytes)                        |
+  |-- HKDF(SHA-256, salt=[], info="nostr-secp256k1-v1")          |
+  |   -> same 32-byte secp256k1 privkey                           |
+  |-- getPublicKey(privkey) -> derivedPubkey                      |
+  |                                |                              |
+  |-- POST /auth/login/verify -----|                              |
+  |   Authorization: Nostr <token> |                              |
+  |   { response, pubkey }         |                              |
+  |                                |-- verify NIP-98 token -------|
+  |                                |-- check NIP-98 pubkey match -|
+  |                                |-- verify WebAuthn assertion -|
+  |                                |-- validate counter advanced -|
+  |                                |-- update counter ----------->|
+  |<-- { didNostr, webId, podUrl } |                              |
+  |                                |                              |
+  |-- Store pubkey in auth state                                  |
+  |-- Hold privkey in _privkeyMem closure                         |
+```
+
+### Step-by-Step
+
+1. **Client sends** stored pubkey to `POST /auth/login/options`.
+2. **Server looks up** the credential by pubkey, retrieves the stored PRF salt, generates a challenge, and binds it to the pubkey.
+3. **Server returns** authentication options with `allowCredentials` set to the stored credential ID, and the PRF salt.
+4. **Client calls `navigator.credentials.get()`** with the same PRF salt used during registration.
+5. **Client blocks cross-device QR auth**: if `assertion.authenticatorAttachment === 'cross-platform'`, an error is thrown. Cross-device QR produces a different PRF output, making the derived key inconsistent.
+6. **Client extracts** PRF output, derives the private key via HKDF, and computes the public key. Because the same passkey and same PRF salt are used, the result is identical to registration.
+7. **Client sends** the WebAuthn assertion response, the derived pubkey, and a NIP-98 `Authorization` header (signed with the derived key) to `POST /auth/login/verify`.
+8. **Server verifies** the NIP-98 token first, confirming the caller controls the Nostr private key.
+9. **Server verifies** the NIP-98 pubkey matches the claimed pubkey in the request body.
+10. **Server verifies** the WebAuthn assertion via `@simplewebauthn/server`.
+11. **Server validates** the credential counter has advanced (prevents replay).
+12. **Server updates** the stored counter and returns identity information.
+
+### Counter Validation
+
+The WebAuthn credential counter is checked on every login:
 
 ```typescript
-// src/lib/nostr/nip07.ts
-export function hasNip07Extension(): boolean {
-  return typeof window.nostr !== 'undefined';
-}
-
-export async function waitForNip07(timeout = 2000): Promise<boolean> {
-  if (hasNip07Extension()) return true;
-
-  return new Promise((resolve) => {
-    const start = Date.now();
-
-    const check = () => {
-      if (hasNip07Extension()) {
-        resolve(true);
-      } else if (Date.now() - start > timeout) {
-        resolve(false);
-      } else {
-        setTimeout(check, 100);
-      }
-    };
-
-    check();
-  });
+const newCounter = verification.authenticationInfo.newCounter;
+if (newCounter <= Number(credential.counter)) {
+  res.status(401).json({ error: 'Credential counter did not advance' });
+  return;
 }
 ```
 
-### Login Flow
+This prevents replay of previously captured authentication responses.
 
-```mermaid
-sequenceDiagram
-    participant U as User
-    participant A as Application
-    participant E as Extension
-    participant R as Relay
+---
 
-    U->>A: Click "Login with Extension"
-    A->>E: Request public key
-    E->>U: Show permission prompt
-    U->>E: Approve
-    E->>A: Return public key
-    A->>A: Validate format (64 hex)
-    A->>A: Store session (no privkey)
-    A->>R: Authenticate (NIP-42)
-    R->>A: Challenge
-    A->>E: Sign challenge
-    E->>U: Show sign prompt
-    U->>E: Approve
-    E->>A: Signed event
-    A->>R: Submit signed event
-    R->>R: Verify signature
-    R->>R: Check whitelist
-    R->>A: OK (authenticated)
-    A->>U: Redirect to dashboard
+## Key Derivation
+
+### Derivation Pipeline
+
+```
+WebAuthn PRF output (32 bytes)
+  |
+  |  Input to Web Crypto HKDF
+  |
+  v
+crypto.subtle.importKey('raw', prfOutput, 'HKDF', false, ['deriveBits'])
+  |
+  v
+crypto.subtle.deriveBits({
+  name: 'HKDF',
+  hash: 'SHA-256',
+  salt: new Uint8Array(0),       // empty salt
+  info: 'nostr-secp256k1-v1'     // UTF-8 encoded
+}, keyMaterial, 256)
+  |
+  v
+32-byte candidate key
+  |
+  |  Validate: 0 < key < secp256k1 curve order n
+  |  (probability of invalid key: ~2^-128)
+  |
+  v
+Valid secp256k1 private key
+  |
+  v
+nostr-tools getPublicKey() -> hex pubkey
 ```
 
 ### Implementation
 
 ```typescript
-// src/lib/stores/auth.ts
-export async function loginWithExtension(): Promise<{ publicKey: string }> {
-  // 1. Wait for extension to load
-  const extensionReady = await waitForNip07(2000);
-  if (!extensionReady) {
-    throw new Error('No NIP-07 extension found. Please install Alby, nos2x, or another Nostr signer.');
-  }
-
-  // 2. Request public key (triggers user prompt)
-  const publicKey = await getPublicKeyFromExtension();
-
-  // 3. Get extension name for UI
-  const extensionName = getExtensionName();
-
-  // 4. Store session data (no private key)
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({
-    publicKey,
-    isNip07: true,
-    extensionName,
-    accountStatus: 'complete',
-    nsecBackedUp: true // Extension manages keys
-  }));
-
-  // 5. Configure NDK to use extension signer
-  setNip07Signer();
-
-  // 6. Update auth store
-  authStore.update(state => ({
-    ...state,
-    publicKey,
-    privateKey: null,
-    isAuthenticated: true,
-    isNip07: true,
-    extensionName
-  }));
-
-  return { publicKey };
-}
-```
-
-### Extension Signing
-
-```typescript
-// src/lib/nostr/nip07.ts
-export async function signEventWithExtension(event: {
-  kind: number;
-  content: string;
-  tags: string[][];
-  created_at: number;
-  pubkey: string;
-}): Promise<SignedEvent> {
-  if (!window.nostr) {
-    throw new Error('No NIP-07 extension available');
-  }
-
-  try {
-    // Extension handles signing
-    const signedEvent = await window.nostr.signEvent(event);
-    return signedEvent;
-  } catch (error) {
-    if (error.message.includes('User rejected')) {
-      throw new Error('Signing rejected by user');
-    }
-    throw error;
-  }
-}
-```
-
-### Security Benefits
-
-1. **Private Key Isolation**: Key never leaves extension
-2. **User Approval**: Each signing operation requires explicit approval
-3. **Hardware Key Support**: Extensions like Alby support YubiKey, Ledger
-4. **Audit Trail**: Extensions log all signing requests
-5. **Revocable Access**: User can revoke app permissions in extension
-
----
-
-## Key-Based Authentication
-
-### Overview
-
-When NIP-07 extension is unavailable, users can login directly with their nsec (private key). The private key is encrypted before storage.
-
-### Key Generation
-
-```typescript
-// Generate new key pair
-import { generatePrivateKey, getPublicKey } from 'nostr-tools/pure';
-
-const privateKey = generatePrivateKey(); // 32 bytes random
-const publicKey = getPublicKey(privateKey);
-```
-
-**With BIP-39 Recovery:**
-
-```typescript
-import { generateMnemonic, mnemonicToSeed } from '@scure/bip39';
-import { HDKey } from '@scure/bip32';
-
-// 1. Generate 12-word mnemonic
-const mnemonic = generateMnemonic(wordlist, 128);
-
-// 2. Derive seed
-const seed = await mnemonicToSeed(mnemonic);
-
-// 3. Derive key using NIP-06 path
-const hdKey = HDKey.fromMasterSeed(seed);
-const derived = hdKey.derive("m/44'/1237'/0'/0/0");
-
-const privateKey = bytesToHex(derived.privateKey);
-const publicKey = getPublicKey(privateKey);
-```
-
-### Session Key Encryption
-
-Private keys are encrypted with a session-specific key before storage:
-
-```typescript
-// src/lib/stores/auth.ts
-async function setKeys(
-  publicKey: string,
-  privateKey: string
-): Promise<void> {
-  // 1. Generate or retrieve session key
-  const sessionKey = getSessionKey();
-
-  // 2. Encrypt private key
-  const encryptedPrivateKey = await encryptPrivateKey(
-    privateKey,
-    sessionKey
+// community-forum/src/lib/auth/passkey.ts
+async function derivePrivkeyFromPrf(prfOutput: ArrayBuffer): Promise<Uint8Array> {
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw', prfOutput, 'HKDF', false, ['deriveBits']
   );
-
-  // 3. Store encrypted key
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({
-    publicKey,
-    encryptedPrivateKey,
-    isEncrypted: true
-  }));
-
-  // 4. Update auth state
-  authStore.update(state => ({
-    ...state,
-    publicKey,
-    privateKey, // In-memory only
-    isAuthenticated: true,
-    isEncrypted: true
-  }));
+  const privkeyBits = await crypto.subtle.deriveBits(
+    {
+      name: 'HKDF',
+      hash: 'SHA-256',
+      salt: new Uint8Array(0),
+      info: new TextEncoder().encode('nostr-secp256k1-v1'),
+    },
+    keyMaterial,
+    256
+  );
+  const key = new Uint8Array(privkeyBits);
+  if (!secp256k1.utils.isValidPrivateKey(key)) {
+    return derivePrivkeyFromPrf(await crypto.subtle.digest('SHA-256', key));
+  }
+  return key;
 }
 ```
 
-### Session Key Generation
+### Critical Constraints
 
-```typescript
-// src/lib/stores/auth.ts
-function getSessionKey(): string {
-  let sessionKey = sessionStorage.getItem(SESSION_KEY);
-
-  if (!sessionKey) {
-    // Generate random 32-byte key
-    const array = new Uint8Array(32);
-    crypto.getRandomValues(array);
-    sessionKey = btoa(String.fromCharCode(...array));
-
-    // Store in sessionStorage (cleared on tab close)
-    sessionStorage.setItem(SESSION_KEY, sessionKey);
-  }
-
-  return sessionKey;
-}
-```
-
-### Session Restoration
-
-```typescript
-// src/lib/stores/auth.ts
-async function restoreSession(): Promise<void> {
-  const stored = localStorage.getItem(STORAGE_KEY);
-  if (!stored) {
-    authStore.update(state => ({ ...state, isReady: true }));
-    return;
-  }
-
-  const parsed = JSON.parse(stored);
-
-  // Check for NIP-07 mode
-  if (parsed.isNip07) {
-    const extensionReady = await waitForNip07(1000);
-    if (extensionReady) {
-      const currentPubkey = await getPublicKeyFromExtension();
-      if (currentPubkey === parsed.publicKey) {
-        setNip07Signer();
-        authStore.update(state => ({
-          ...state,
-          publicKey: parsed.publicKey,
-          isAuthenticated: true,
-          isNip07: true,
-          isReady: true
-        }));
-        return;
-      }
-    }
-  }
-
-  // Check for encrypted private key
-  if (parsed.encryptedPrivateKey) {
-    const sessionKey = getSessionKey();
-    try {
-      const privateKey = await decryptPrivateKey(
-        parsed.encryptedPrivateKey,
-        sessionKey
-      );
-
-      authStore.update(state => ({
-        ...state,
-        publicKey: parsed.publicKey,
-        privateKey,
-        isAuthenticated: true,
-        isEncrypted: true,
-        isReady: true
-      }));
-    } catch {
-      // Session key changed - need re-authentication
-      authStore.update(state => ({
-        ...state,
-        publicKey: parsed.publicKey,
-        isAuthenticated: false,
-        error: 'Session expired. Please enter your password to unlock.',
-        isReady: true
-      }));
-    }
-  }
-}
-```
+- **Deterministic**: Same passkey credential + same PRF salt always produces the same private key.
+- **Cross-device QR blocked**: A different authenticator produces a different PRF output. The client explicitly rejects `authenticatorAttachment === 'cross-platform'`.
+- **Windows Hello blocked**: Windows Hello does not implement the PRF extension. An error message is shown.
+- **PRF salt is per-user**: Generated at registration, stored server-side in `webauthn_credentials.prf_salt`, and returned to the client on each login.
 
 ---
 
-## NIP-42 Relay Authentication
+## NIP-98 HTTP Auth
 
-### Overview
-
-NIP-42 defines relay authentication using challenge-response protocol. The relay sends a random challenge string, and the client signs it to prove key ownership.
-
-### Protocol Flow
-
-```
-Client                          Relay
-   │                               │
-   ├─── WebSocket Connect ────────>│
-   │                               │
-   │<────── AUTH challenge ─────────┤
-   │        (random string)        │
-   │                               │
-   ├─ Sign challenge with privkey ─┤
-   │                               │
-   ├─── AUTH response ────────────>│
-   │    (signed event kind 22242)  │
-   │                               │
-   │                               ├─ Verify signature
-   │                               ├─ Check whitelist
-   │                               │
-   │<────── OK (authenticated) ─────┤
-   │           OR                  │
-   │<────── NOTICE (rejected) ──────┤
-   │                               │
-```
-
-### Event Structure
+### Token Creation (Client-Side)
 
 ```typescript
-// AUTH challenge
-["AUTH", "<random-challenge-string>"]
+// community-forum/packages/nip98/sign.ts
+import { getToken } from 'nostr-tools/nip98';
 
-// AUTH response
-{
-  kind: 22242,
-  pubkey: "<user-pubkey>",
-  created_at: <unix-timestamp>,
-  tags: [
-    ["relay", "<relay-url>"],
-    ["challenge", "<challenge-string>"]
-  ],
-  content: "",
-  sig: "<schnorr-signature>"
+export async function createNip98Token(
+  privkey: Uint8Array,
+  url: string,
+  method: string,
+  body?: Uint8Array | ArrayBuffer,
+): Promise<string> {
+  const payload = body ? await hashRawBody(body) : undefined;
+  return getToken(url, method, createSigner(privkey), true, payload);
 }
 ```
 
-### Implementation
+The resulting token is a base64-encoded Nostr event:
+
+```json
+{
+  "kind": 27235,
+  "pubkey": "<64-char hex>",
+  "created_at": 1740700000,
+  "tags": [
+    ["u", "https://auth-api-xxx.run.app/auth/login/verify"],
+    ["method", "POST"],
+    ["payload", "<sha256-hex-of-raw-body>"]
+  ],
+  "content": "",
+  "id": "<sha256-of-canonical-form>",
+  "sig": "<schnorr-signature>"
+}
+```
+
+### Token Verification (Server-Side)
 
 ```typescript
-// src/lib/nostr/ndk.ts
-import NDK, { type NDKAuthPolicy } from '@nostr-dev-kit/ndk';
-
-const authPolicy: NDKAuthPolicy = async (relay, challenge) => {
-  const $auth = get(authStore);
-
-  if (!$auth.privateKey) {
-    throw new Error('Not authenticated');
-  }
-
-  // Create auth event
-  const event = {
-    kind: 22242,
-    created_at: Math.floor(Date.now() / 1000),
-    tags: [
-      ['relay', relay.url],
-      ['challenge', challenge]
-    ],
-    content: ''
-  };
-
-  // Sign with private key
-  const signedEvent = finalizeEvent(event, hexToBytes($auth.privateKey));
-
-  return signedEvent;
-};
-
-// Configure NDK
-const ndk = new NDK({
-  explicitRelayUrls: RELAY_URLS,
-  authPolicy
-});
+// community-forum/packages/nip98/verify.ts
+export async function verifyNip98(
+  authHeader: string,
+  opts: VerifyOptions,
+): Promise<VerifyResult | null>
 ```
+
+The server performs the following checks in order:
+
+1. Extract token from `Nostr <base64>` header (or `Basic nostr:<base64>` fallback)
+2. Decode and parse the JSON event (reject if > 64KB)
+3. Verify `kind === 27235`
+4. Check timestamp within +/- 60 seconds of server time
+5. Validate pubkey is 64-character hex
+6. Match the `u` tag against the expected URL (using RP_ORIGIN, not request headers)
+7. Match the `method` tag against the request method
+8. Verify event integrity (id + sig) via `nostr-tools` `verifyEvent()`
+9. If `payload` tag present and raw body available, compute SHA-256 of raw body bytes and compare
+
+### Anti-SSRF: RP_ORIGIN URL Reconstruction
+
+The auth-api reconstructs the full request URL from the `RP_ORIGIN` environment variable rather than trusting `req.headers.host` or `x-forwarded-host`:
+
+```typescript
+const rpOrigin = process.env.RP_ORIGIN || '';
+const baseOrigin = rpOrigin.replace(/\/$/, '');
+const fullUrl = `${baseOrigin}${req.originalUrl}`;
+```
+
+This prevents an attacker from spoofing the Host header to bypass URL validation.
+
+---
+
+## Consolidated NIP-98 Module
+
+The NIP-98 implementation is consolidated in `community-forum/packages/nip98/`:
+
+| File | Role | Runtime |
+|------|------|---------|
+| `sign.ts` | Token creation via `nostr-tools/nip98` `getToken()` | Browser + Node |
+| `verify.ts` | Token verification with `verifyEvent()`, URL matching, payload hash | Node + Workers |
+| `types.ts` | `VerifyOptions`, `VerifyResult`, `Nip98Event` type definitions | Shared |
+| `index.ts` | Re-exports | Shared |
+
+### Consumer Modules
+
+| Consumer | Import Path | Usage |
+|----------|------------|-------|
+| Forum client | `../../../packages/nip98/sign.js` | `createNip98Token()` via `fetchWithNip98()` |
+| auth-api | `../../../packages/nip98/verify.js` | `verifyNip98()` with RP_ORIGIN |
+| nostr-relay | `../../../packages/nip98/verify.js` | Event verification on publish |
+| image-api | `../../../packages/nip98/verify.js` | Upload authorisation |
 
 ---
 
 ## Session Management
 
-### Session Lifetime
+### Stateless Architecture
 
-| Storage | Lifetime | Security | Use Case |
-|---------|----------|----------|----------|
-| `sessionStorage` | Tab session | High | Session keys |
-| `localStorage` | Persistent | Medium | Encrypted keys |
-| Memory (variables) | Page lifetime | Highest | Decrypted keys |
+DreamLab does not use server-side sessions. Every request is independently authenticated via NIP-98 tokens signed with the client-held private key. There are no session cookies, JWTs, or server-side session stores.
 
-### PWA Persistent Auth
+### Client-Side State
 
-For installed PWAs, authentication can persist across app restarts:
+| Storage | Data | Lifetime |
+|---------|------|----------|
+| `_privkeyMem` (closure) | secp256k1 private key (Uint8Array) | Until pagehide event |
+| `localStorage` (`nostr_bbs_keys`) | pubkey, nickname, avatar, auth method flags | Persistent across sessions |
+| No `sessionStorage` usage | -- | -- |
+
+### Pagehide Zeroing
+
+When the page is being unloaded (navigation away, tab close, window close), the private key is overwritten with zeros:
 
 ```typescript
-// src/lib/stores/auth.ts
-function isRunningAsPWA(): boolean {
-  return (
-    window.matchMedia('(display-mode: standalone)').matches ||
-    localStorage.getItem('nostr_bbs_pwa_mode') === 'true'
-  );
-}
-
-async function setKeys(publicKey: string, privateKey: string): Promise<void> {
-  // Standard encryption for all users
-  const sessionKey = getSessionKey();
-  const encryptedPrivateKey = await encryptPrivateKey(privateKey, sessionKey);
-
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({
-    publicKey,
-    encryptedPrivateKey
-  }));
-
-  // For PWA: also store persistent auth
-  if (isRunningAsPWA()) {
-    localStorage.setItem(PWA_AUTH_KEY, JSON.stringify({
-      publicKey,
-      privateKey, // Encrypted by browser's origin-bound storage
-      timestamp: Date.now()
-    }));
+window.addEventListener('pagehide', () => {
+  if (_privkeyMem) {
+    _privkeyMem.fill(0);
+    _privkeyMem = null;
   }
-
-  authStore.update(state => ({
-    ...state,
-    publicKey,
-    privateKey,
-    isAuthenticated: true
-  }));
-}
+}, { once: true });
 ```
 
-### Logout
+This uses `pagehide` rather than `visibilitychange` to avoid clearing the key on every tab switch.
 
-```typescript
-// src/lib/stores/auth.ts
-async function logout(): Promise<void> {
-  // 1. Clear NDK signer
-  clearSigner();
+### Session Restoration
 
-  // 2. Clear all storage
-  localStorage.removeItem(STORAGE_KEY);
-  localStorage.removeItem(PWA_AUTH_KEY);
-  sessionStorage.removeItem(SESSION_KEY);
-  deleteCookie(COOKIE_KEY);
+On page load:
 
-  // 3. Reset auth state
-  authStore.set({
-    state: 'unauthenticated',
-    pubkey: null,
-    isAuthenticated: false,
-    publicKey: null,
-    privateKey: null,
-    isNip07: false,
-    isReady: true
-  });
-
-  // 4. Redirect to home
-  goto('/');
-}
-```
+- **Passkey users**: Profile metadata (pubkey, nickname) is restored from localStorage, but the private key is not available until the user re-authenticates with their passkey. The UI shows a "re-authenticate" prompt.
+- **NIP-07 users**: The store attempts to reconnect to the extension and verify the pubkey matches. If the extension is unavailable, the user is prompted to sign in again.
+- **nsec users**: Not applicable in the current architecture; this path is deprecated in favour of passkeys.
 
 ---
 
-## Key Recovery
+## Fallback Mechanisms
 
-### nsec Format (NIP-19)
+### Basic nostr: Encoding
 
-Private keys can be encoded as bech32 strings for backup:
-
-```typescript
-import { nip19 } from 'nostr-tools';
-
-// Encode private key
-const nsec = nip19.nsecEncode(privateKeyHex);
-// Result: nsec1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq...
-
-// Decode for recovery
-const { type, data } = nip19.decode(nsec);
-if (type === 'nsec') {
-  const privateKey = data; // hex string
-}
-```
-
-### BIP-39 Mnemonic Recovery
+If a proxy or CDN strips the `Nostr ` prefix from the Authorization header, the client can fall back to `Basic nostr:<base64-token>` encoding. The server's `extractToken()` function handles both formats:
 
 ```typescript
-import { mnemonicToSeed } from '@scure/bip39';
-import { HDKey } from '@scure/bip32';
-
-async function recoverFromMnemonic(mnemonic: string): Promise<{
-  privateKey: string;
-  publicKey: string;
-}> {
-  // 1. Validate mnemonic
-  if (!validateMnemonic(mnemonic, wordlist)) {
-    throw new Error('Invalid mnemonic phrase');
+function extractToken(authHeader: string, allowBasicNostr: boolean): string | null {
+  if (authHeader.startsWith('Nostr ')) return authHeader.slice(6).trim();
+  if (allowBasicNostr && authHeader.startsWith('Basic ')) {
+    const decoded = atob(authHeader.slice(6));
+    if (decoded.startsWith('nostr:')) return decoded.slice(6);
   }
-
-  // 2. Derive seed
-  const seed = await mnemonicToSeed(mnemonic);
-
-  // 3. Derive keys using NIP-06 path
-  const hdKey = HDKey.fromMasterSeed(seed);
-  const derived = hdKey.derive("m/44'/1237'/0'/0/0");
-
-  const privateKey = bytesToHex(derived.privateKey);
-  const publicKey = getPublicKey(privateKey);
-
-  return { privateKey, publicKey };
+  return null;
 }
 ```
+
+### NIP-07 Browser Extension
+
+For users who prefer hardware-backed keys (YubiKey) or existing Nostr signing extensions:
+
+1. Extension detected via `window.nostr` availability
+2. Public key obtained via `window.nostr.getPublicKey()`
+3. Events signed via `window.nostr.signEvent()` (triggers user approval prompt)
+4. No private key ever touches the application
+
+### nsec Direct Entry
+
+As a last-resort fallback, users can enter their nsec (bech32-encoded private key) directly. This is offered during the login flow as an "advanced" option. The key is held in the `_privkeyMem` closure and zeroed on pagehide, identical to the passkey path.
+
+---
+
+## Identity Model
+
+### Primary Identity: Nostr Pubkey
+
+The 64-character hex Nostr public key is the canonical identity across all DreamLab systems.
+
+### DID Identifier
+
+```
+did:nostr:<pubkey>
+```
+
+Used for DID-based interoperability. Generated at registration time and stored in `webauthn_credentials.did_nostr`.
+
+### WebID (Solid)
+
+```
+{jss-url}/{pubkey}/profile/card#me
+```
+
+A Solid WebID pointing to the user's profile document in their JSS pod. Used for Linked Data interoperability. Generated during pod provisioning.
 
 ---
 
 ## Security Considerations
 
-### Key Storage Security
+### Why PRF, Not a Stored Key
 
-1. **Never store plaintext keys in localStorage**
-   ```typescript
-   // ❌ WRONG
-   localStorage.setItem('privkey', privateKey);
+Storing a private key (even encrypted) creates a target. The WebAuthn PRF approach means:
 
-   // ✅ CORRECT
-   const encrypted = await encryptPrivateKey(privateKey, sessionKey);
-   localStorage.setItem('privkey', encrypted);
-   ```
+- The private key is **never stored** anywhere (not localStorage, not IndexedDB, not cookies, not the server).
+- A database breach yields only PRF salts and WebAuthn credentials, neither of which can derive the private key.
+- The authenticator's internal HMAC-SHA-256 computation uses a device-bound secret that never leaves the hardware.
 
-2. **Clear sensitive data from memory**
-   ```typescript
-   // After use, overwrite with zeros (best effort)
-   let privateKey = '...';
-   // ... use key ...
-   privateKey = '0'.repeat(64);
-   privateKey = null;
-   ```
+### Timestamp Tolerance
 
-3. **Session-bound encryption**
-   - Session keys in `sessionStorage` cleared on tab close
-   - Requires re-authentication on new session
-   - PWA mode can persist with user consent
+NIP-98 uses a +/- 60 second tolerance. This is a trade-off:
 
-### Extension Security
+- Too tight: clock skew causes legitimate requests to fail
+- Too loose: increases the replay window
 
-1. **Verify extension authenticity**
-   - Install only from official browser stores
-   - Check developer signatures
-   - Read community reviews
+Combined with WebAuthn counter validation and single-use challenges, the 60-second window provides adequate protection.
 
-2. **Permission management**
-   - Review permissions before granting
-   - Revoke unused app permissions
-   - Monitor signing requests
+### Raw Body Hashing
 
-### User Education
+The `payload` tag in NIP-98 events contains a SHA-256 hash of the raw request body bytes. The server captures these bytes via `express.raw()` **before** JSON parsing to ensure the hash matches exactly. This prevents:
 
-**Critical warnings shown to users:**
+- JSON re-serialisation altering whitespace or key ordering
+- Middleware transforms changing the body between hashing and verification
 
-1. **nsec Backup Warning:**
-   > Your nsec is your master key. Anyone with access can impersonate you and read your encrypted messages. Store it securely offline.
+---
 
-2. **Extension Permission:**
-   > This extension will handle all cryptographic signing. Only approve if you trust this extension.
+## Key Files
 
-3. **Phishing Warning:**
-   > Always verify the URL. Never enter your nsec on unfamiliar sites.
+| File | Role |
+|------|------|
+| `community-forum/src/lib/auth/passkey.ts` | WebAuthn PRF ceremony, HKDF derivation |
+| `community-forum/src/lib/auth/nip98-client.ts` | NIP-98 token creation + `fetchWithNip98()` wrapper |
+| `community-forum/src/lib/stores/auth.ts` | Auth state, `_privkeyMem` closure, pagehide zeroing |
+| `community-forum/packages/nip98/sign.ts` | Shared NIP-98 token signing |
+| `community-forum/packages/nip98/verify.ts` | Shared NIP-98 token verification |
+| `community-forum/services/auth-api/src/server.ts` | Express server, CORS, raw body capture |
+| `community-forum/services/auth-api/src/routes/register.ts` | Registration endpoints |
+| `community-forum/services/auth-api/src/routes/authenticate.ts` | Login endpoints |
+| `community-forum/services/auth-api/src/nip98.ts` | Server-side NIP-98 verification (wraps shared module) |
+| `community-forum/services/auth-api/src/webauthn.ts` | WebAuthn option generation and response verification |
+| `community-forum/services/auth-api/src/db.ts` | PostgreSQL schema, challenge/credential CRUD |
+| `community-forum/services/auth-api/src/jss-client.ts` | JSS pod provisioning via CSS 7.x REST API |
 
 ---
 
@@ -647,9 +484,9 @@ async function recoverFromMnemonic(mnemonic: string): Promise<{
 
 - [Security Overview](./SECURITY_OVERVIEW.md)
 - [Data Protection](./DATA_PROTECTION.md)
-- [Key Encryption Implementation](../../community-forum/src/lib/utils/key-encryption.ts)
-- [NIP-07 Implementation](../../community-forum/src/lib/nostr/nip07.ts)
+- [Auth API Reference](../api/AUTH_API.md)
+- [Deployment: Cloud Services](../deployment/CLOUD_SERVICES.md)
 
 ---
 
-**Security Note**: This authentication system provides strong security when used correctly. Users must protect their nsec/mnemonic like a master password.
+*This document is version-controlled. Last major revision: 2026-02-28.*

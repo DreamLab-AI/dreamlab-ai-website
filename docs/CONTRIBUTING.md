@@ -1,423 +1,249 @@
----
-title: "Contributing to Documentation"
-description: "Guidelines for contributing to documentation ensuring consistency and quality with Diataxis framework"
-category: howto
-tags: [documentation, contributing, guide, diataxis]
-difficulty: beginner
-related-docs:
-  - ./MAINTENANCE.md
-  - ./developer/contributing/index.md
-last-updated: 2026-01-16
+# Contributing to DreamLab AI
+
+Last updated: 2026-02-28
+
+Guidelines for contributing to the DreamLab AI website and platform.
+
 ---
 
-# Contributing to Documentation
+## Getting started
 
-Thank you for contributing to our documentation. This guide ensures consistency and quality across all documentation.
+1. Read [docs/developer/GETTING_STARTED.md](./developer/GETTING_STARTED.md) to set up your development environment.
+2. Read [docs/developer/CODE_STYLE.md](./developer/CODE_STYLE.md) to understand coding conventions.
+3. Read [docs/developer/PROJECT_STRUCTURE.md](./developer/PROJECT_STRUCTURE.md) to understand the directory layout.
 
-## Quick Start
-
-1. **Choose the right category** (see [Diátaxis Framework](#diataxis-framework))
-2. **Create file with kebab-case name** (`my-guide.md`)
-3. **Add required front matter** (see [Front Matter](#front-matter))
-4. **Write content** following principles
-5. **Run validators** before committing
-6. **Submit pull request**
-
-## Diátaxis Framework
-
-All documentation follows the [Diátaxis framework](https://diataxis.fr/), which organises content into four categories:
-
-### 📚 Tutorials (`docs/tutorials/`)
-
-**Purpose:** Learning-oriented, step-by-step lessons for beginners
-
-**Characteristics:**
-- Assumes no prior knowledge
-- Provides complete, working examples
-- Focuses on learning, not production use
-- Has clear learning outcomes
-
-**Example topics:**
-- "Your First API Integration"
-- "Building a Simple Authentication System"
-- "Getting Started with Testing"
-
-**Template:**
-```markdown
----
-title: Tutorial Title
-description: What the learner will build
-category: main-topic
-difficulty: beginner
-duration: "30 minutes"
-prerequisites:
-  - Basic JavaScript knowledge
-  - Node.js installed
 ---
 
-# Tutorial Title
+## Development setup
 
-## What You'll Build
+### Prerequisites
 
-Brief description of the end result.
+- Node.js 20+
+- npm 10+
+- Git 2+
 
-## Prerequisites
-
-- Prerequisite 1
-- Prerequisite 2
-
-## Step 1: Setup
-
-Clear instructions...
-
-## Step 2: Implementation
-
-Clear instructions...
-
-## What You Learned
-
-Summary of key concepts.
-
-## Next Steps
-
-- [Related Tutorial](../related.md)
-```
-
-### 🔧 How-To Guides (`docs/how-to/`)
-
-**Purpose:** Task-oriented, problem-solving guides for specific goals
-
-**Characteristics:**
-- Assumes reader has context
-- Focuses on solving a specific problem
-- Practical and action-oriented
-- Flexible (reader adapts to their needs)
-
-**Example topics:**
-- "How to Deploy with Docker"
-- "How to Configure Authentication"
-- "How to Debug Performance Issues"
-
-**Template:**
-```markdown
----
-title: How to [Achieve Goal]
-description: Brief description of what this achieves
-category: main-topic
-applies_to:
-  - Component/system this applies to
-prerequisites:
-  - Optional prerequisite
----
-
-# How to [Achieve Goal]
-
-## Overview
-
-Brief context: when would someone need this?
-
-## Prerequisites
-
-- What you need before starting
-
-## Steps
-
-### 1. First Action
-
-Clear instructions...
-
-### 2. Second Action
-
-Clear instructions...
-
-## Verification
-
-How to verify it worked.
-
-## Troubleshooting
-
-Common issues and solutions.
-
-## Related Guides
-
-- [Related How-To](../related.md)
-```
-
-### 📖 Reference (`docs/reference/`)
-
-**Purpose:** Information-oriented, technical descriptions
-
-**Characteristics:**
-- Factual and precise
-- Comprehensive coverage
-- Neutral tone
-- Structured for lookup
-
-**Example topics:**
-- "API Reference"
-- "CLI Command Reference"
-- "Architecture Overview"
-- "Glossary of Terms"
-
-**Template:**
-```markdown
----
-title: Reference Title
-description: What this reference covers
-category: main-topic
-type: api  # or cli, architecture, glossary
----
-
-# Reference Title
-
-## Overview
-
-Brief description of scope.
-
-## [Item 1]
-
-### Description
-What it is/does.
-
-### Parameters
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| name | string | Yes | Description |
-
-### Example
-\`\`\`javascript
-// Code example
-\`\`\`
-
-## [Item 2]
-
-...
-```
-
-### 💡 Explanation (`docs/explanation/`)
-
-**Purpose:** Understanding-oriented, conceptual discussions
-
-**Characteristics:**
-- Explains why things are the way they are
-- Provides context and background
-- Discusses alternatives and trade-offs
-- Deepens understanding
-
-**Example topics:**
-- "Understanding Authentication Strategies"
-- "Security Architecture Explained"
-- "Why We Chose This Approach"
-
-**Template:**
-```markdown
----
-title: Understanding [Concept]
-description: What this explains
-category: main-topic
-concepts:
-  - concept-1
-  - concept-2
-related_topics:
-  - related-topic
----
-
-# Understanding [Concept]
-
-## Introduction
-
-Why this concept matters.
-
-## Background
-
-Historical context or motivation.
-
-## Key Concepts
-
-### Concept 1
-
-Explanation...
-
-### Concept 2
-
-Explanation...
-
-## How It Works
-
-Deeper dive into mechanisms.
-
-## Trade-offs
-
-What are the advantages and disadvantages?
-
-## Alternatives
-
-Other approaches and when to use them.
-
-## Further Reading
-
-- [Related Explanation](../related.md)
-- [External Resource](https://example.com)
-```
-
-## Front Matter
-
-Every document must include YAML front matter. See [MAINTENANCE.md](MAINTENANCE.md#2-front-matter-validation) for complete requirements.
-
-## Writing Guidelines
-
-### UK English
-
-Use British English spelling throughout:
-
-✅ **Correct:**
-- behaviour, colour, favour
-- optimise, organise, recognise
-- centre, defence, licence (noun)
-
-❌ **Incorrect:**
-- behavior, color, favor
-- optimize, organize, recognize
-- center, defense, license (noun)
-
-**Exception:** Code identifiers, API names, and library names may use US spelling.
-
-### Tone and Voice
-
-- **Tutorials:** Encouraging and supportive ("Let's build...", "You'll learn...")
-- **How-To:** Direct and imperative ("Configure the service", "Run the command")
-- **Reference:** Neutral and factual ("The API returns...", "The parameter accepts...")
-- **Explanation:** Thoughtful and exploratory ("This approach offers...", "Consider the trade-offs...")
-
-### Code Examples
-
-**Always provide:**
-- Complete, runnable examples
-- Expected output
-- Explanation of what's happening
-
-**Example:**
-```markdown
-\`\`\`javascript
-// Authenticate user with email and password
-const user = await authenticateUser({
-  email: 'user@example.com',
-  password: 'secure-password'
-});
-
-console.log(user.id); // Output: 'usr_1234567890'
-\`\`\`
-
-This creates an authenticated session and returns the user object.
-```
-
-### Links
-
-**Internal links:**
-```markdown
-[Link Text](../category/document.md)
-[Same Category](./document.md)
-```
-
-**External links:**
-```markdown
-[External Resource](https://example.com)
-```
-
-**Anchors:**
-```markdown
-[Section in Same Document](#section-heading)
-[Section in Other Document](../other.md#section-heading)
-```
-
-## Validation
-
-Before submitting:
+### Install and run
 
 ```bash
-# Make scripts executable (first time only)
-chmod +x docs/scripts/*.sh
-
-# Run all validators
-./docs/scripts/validate-all.sh
+git clone https://github.com/DreamLab-AI/dreamlab-ai-website.git
+cd dreamlab-ai-website
+npm install
+npm run dev
 ```
 
-Fix any errors before committing.
+The development server starts at `http://localhost:5173`.
 
-## Pull Request Process
+---
 
-1. **Create feature branch:** `git checkout -b docs/your-topic`
-2. **Write documentation** following guidelines
-3. **Run validators:** `./docs/scripts/validate-all.sh`
-4. **Commit changes:** `git commit -m "docs: add guide for X"`
-5. **Push branch:** `git push origin docs/your-topic`
-6. **Open pull request** on GitHub
-7. **Wait for validation** (GitHub Actions runs automatically)
-8. **Address feedback** from reviewers
-9. **Merge** when approved and validated
+## Making contributions
 
-## Commit Message Format
+### 1. Create a branch
 
-Use conventional commits:
-
-```
-docs(category): brief description
-
-Longer explanation if needed.
-
-- Detail 1
-- Detail 2
+```bash
+git checkout main
+git pull origin main
+git checkout -b feature/your-feature-name
 ```
 
-**Examples:**
+Branch naming conventions:
+
+| Prefix | Purpose |
+|--------|---------|
+| `feature/` | New features |
+| `fix/` | Bug fixes |
+| `refactor/` | Code restructuring |
+| `docs/` | Documentation changes |
+| `chore/` | Maintenance, dependency updates |
+
+### 2. Make your changes
+
+- Follow the [Code Style Guide](./developer/CODE_STYLE.md).
+- Keep changes focused. One logical change per branch.
+- Run the linter and build before committing.
+
+### 3. Verify your changes
+
+```bash
+# Lint
+npm run lint
+
+# Build
+npm run build
+
+# Preview production build
+npm run preview
 ```
-docs(tutorials): add getting started guide
-docs(reference): update API documentation for v2
-docs(how-to): add deployment with Docker guide
-docs(explanation): explain authentication architecture
+
+For community forum changes:
+
+```bash
+cd community-forum
+npm run validate
 ```
 
-## Review Checklist
+### 4. Commit
 
-Before submitting, verify:
+Follow the [Conventional Commits](https://www.conventionalcommits.org/) specification:
 
-- [ ] Correct category (tutorials/how-to/reference/explanation)
-- [ ] Kebab-case filename (`my-guide.md`)
-- [ ] Complete front matter with required fields
-- [ ] UK English spelling
-- [ ] Working code examples
-- [ ] Valid internal links
-- [ ] Added to relevant `INDEX.md`
-- [ ] All validators pass
-- [ ] Clear, concise writing
-- [ ] Follows Diátaxis principles
+```bash
+git add src/components/NewFeature.tsx
+git commit -m "feat: add new feature component"
+```
 
-## Getting Help
+Commit types:
 
-- **Framework questions:** [Diátaxis documentation](https://diataxis.fr/)
-- **Validation errors:** See [MAINTENANCE.md](MAINTENANCE.md#troubleshooting)
-- **Writing questions:** Check existing docs in the category
-- **Technical questions:** Open an issue with `documentation` label
+| Type | Description |
+|------|-------------|
+| `feat` | New feature |
+| `fix` | Bug fix |
+| `docs` | Documentation |
+| `style` | Formatting (no logic change) |
+| `refactor` | Code restructuring (no behaviour change) |
+| `perf` | Performance improvement |
+| `test` | Adding or updating tests |
+| `chore` | Maintenance |
 
-## File Locations
+### 5. Push and open a pull request
 
-| Type | Location | INDEX Required |
-|------|----------|----------------|
-| Tutorials | `docs/tutorials/` | ✅ |
-| How-To | `docs/how-to/` | ✅ |
-| Reference | `docs/reference/` | ✅ |
-| Explanation | `docs/explanation/` | ✅ |
-| Scripts | `docs/scripts/` | ❌ |
-| Assets | `docs/assets/` | ❌ |
+```bash
+git push -u origin feature/your-feature-name
+```
 
-## Quality Standards
+Open a pull request on GitHub, or use the `gh` CLI:
 
-All documentation must:
+```bash
+gh pr create --title "feat: add new feature" --body "Description of what this change does and why."
+```
 
-1. **Be accurate** - Test all code examples
-2. **Be clear** - Use simple language, avoid jargon
-3. **Be complete** - Cover the topic thoroughly
-4. **Be consistent** - Follow framework and style
-5. **Be maintained** - Update `last_updated` field when changed
+---
 
-Thank you for helping improve our documentation.
+## Pull request process
+
+### Before submitting
+
+- [ ] Branch is up to date with `main`
+- [ ] `npm run lint` passes
+- [ ] `npm run build` succeeds
+- [ ] Changes render correctly in the browser
+- [ ] No console errors
+- [ ] Responsive design works (mobile and desktop)
+
+### PR description
+
+Include:
+
+- **What** the change does
+- **Why** the change is needed
+- **How** to test it (manual steps or test commands)
+- Screenshots for visual changes
+
+### Review
+
+All pull requests require at least one approval before merging. Reviewers will check:
+
+- [ ] Code follows the [Code Style Guide](./developer/CODE_STYLE.md)
+- [ ] TypeScript types are correct and meaningful
+- [ ] No `console.log` in production code
+- [ ] Error handling is present for async operations
+- [ ] No hardcoded secrets or credentials
+- [ ] Responsive design works
+- [ ] Accessibility: keyboard navigation, ARIA attributes
+- [ ] Build succeeds
+- [ ] Changes are appropriately scoped
+
+### Merging
+
+After approval, the PR author merges. Use "Squash and merge" for feature branches to keep the commit history clean.
+
+---
+
+## Code review standards
+
+### What we look for
+
+1. **Correctness** -- does the code do what it claims?
+2. **Clarity** -- can another developer understand this without extra context?
+3. **Consistency** -- does it follow existing patterns in the codebase?
+4. **Security** -- are inputs validated? Are secrets handled safely?
+5. **Performance** -- are there obvious inefficiencies?
+
+### Giving feedback
+
+- Be specific. Point to the line and explain the concern.
+- Suggest alternatives when requesting changes.
+- Distinguish between blocking issues and suggestions.
+
+### Receiving feedback
+
+- Respond to all comments.
+- Ask for clarification if feedback is unclear.
+- Make requested changes or explain why you disagree.
+
+---
+
+## File organisation
+
+| Content type | Location |
+|-------------|----------|
+| Page components | `src/pages/` |
+| Reusable components | `src/components/` |
+| UI primitives (shadcn/ui) | `src/components/ui/` |
+| Custom hooks | `src/hooks/` |
+| Utilities | `src/lib/` |
+| Static data | `src/data/` |
+| Runtime content (markdown) | `public/data/` |
+| Build scripts | `scripts/` |
+| Documentation | `docs/` |
+| Tests (forum) | `community-forum/tests/` |
+
+Never save files to the project root directory. Use the appropriate subdirectory.
+
+---
+
+## Documentation contributions
+
+Documentation uses UK English spelling (behaviour, colour, organise, centre).
+
+When contributing documentation:
+
+1. Place files in the appropriate `docs/` subdirectory.
+2. Use kebab-case file names (`my-guide.md`).
+3. Include a "Last updated" date.
+4. Link to related documentation at the end of each file.
+5. Test all code examples.
+
+---
+
+## Reporting issues
+
+Open an issue on [GitHub](https://github.com/DreamLab-AI/dreamlab-ai-website/issues) with:
+
+- A clear title
+- Steps to reproduce (for bugs)
+- Expected vs actual behaviour
+- Browser and OS information (for UI issues)
+- Screenshots (for visual issues)
+
+---
+
+## Security
+
+If you discover a security vulnerability, **do not open a public issue**. Contact the maintainers privately via the repository's security advisory feature.
+
+Never commit:
+
+- API keys or secrets
+- `.env` files
+- Credentials or passwords
+- Private keys
+
+---
+
+## Related documentation
+
+- [docs/developer/GETTING_STARTED.md](./developer/GETTING_STARTED.md) -- environment setup
+- [docs/developer/DEVELOPMENT_WORKFLOW.md](./developer/DEVELOPMENT_WORKFLOW.md) -- daily workflow
+- [docs/developer/CODE_STYLE.md](./developer/CODE_STYLE.md) -- coding standards
+- [docs/developer/TESTING_GUIDE.md](./developer/TESTING_GUIDE.md) -- testing practices
+- [docs/developer/PROJECT_STRUCTURE.md](./developer/PROJECT_STRUCTURE.md) -- directory layout
+- [docs/reference/tech-stack.md](./reference/tech-stack.md) -- technology reference

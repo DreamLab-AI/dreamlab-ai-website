@@ -1,681 +1,308 @@
----
-title: "API Reference"
-description: "Complete API documentation for internal services, utilities, and the Fairfield Nostr Relay"
-category: reference
-tags: [api, reference, developer, nostr, relay]
-difficulty: advanced
-related-docs:
-  - ../developer/reference/api.md
-  - ../developer/reference/stores.md
-last-updated: 2026-01-16
----
-
 # API Reference
 
-Complete API documentation for internal services, utilities, and the Fairfield Nostr Relay.
+Last updated: 2026-02-28
+
+Complete API documentation for the DreamLab AI backend services.
 
 ---
 
 ## Overview
 
-The platform's APIs are organized into:
+The platform runs six backend services, currently deployed on Google Cloud Run (region `us-central1`, GCP project `cumbriadreamlab`). A migration to Cloudflare Workers is planned.
 
-- **[Client-Side APIs](#client-side-apis)** - Stores, services, and utilities for the PWA
-- **[Relay WebSocket API](#relay-websocket-api)** - Nostr protocol implementation
-- **[Relay HTTP API](#relay-http-api)** - REST endpoints for relay management
-- **[NIP-98 Authentication](#nip-98-authentication)** - HTTP authentication using Nostr events
+| Service | Base URL | Auth required |
+|---------|----------|---------------|
+| auth-api | `https://auth-api-xxx-uc.a.run.app` | No (public endpoints) |
+| jss | `https://jss-xxx-uc.a.run.app` | NIP-98 |
+| nostr-relay | `wss://relay.dreamlab-ai.com` | Whitelist (writes only) |
+| embedding-api | `https://embedding-api-xxx-uc.a.run.app` | NIP-98 |
+| image-api | `https://image-api-xxx-uc.a.run.app` | NIP-98 |
+| link-preview-api | `https://link-preview-xxx-uc.a.run.app` | None |
 
 ---
 
-## Client-Side APIs
+## Auth API
 
-### Stores
+Express application handling WebAuthn registration and authentication with NIP-98 integration.
 
-Reactive state containers using Svelte stores.
+### Environment variables
 
-#### Auth Store
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `DATABASE_URL` | Yes | PostgreSQL connection string |
+| `RELAY_URL` | Yes | Nostr relay WebSocket URL |
+| `RP_ID` | Yes | WebAuthn relying party ID (e.g. `dreamlab-ai.com`) |
+| `RP_NAME` | Yes | WebAuthn relying party name |
+| `RP_ORIGIN` | Yes | Expected origin for WebAuthn ceremonies |
+| `JSS_BASE_URL` | Yes | JavaScript Solid Server base URL |
+| `PORT` | No | Server port (default: 8080) |
 
-```typescript
-// src/lib/stores/auth.ts
+### GET /health
 
-interface AuthState {
-  user: NDKUser | null;
-  pubkey: string | null;
-  privkey: Uint8Array | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  cohorts: string[];
+Health check endpoint. No authentication required.
+
+**Response (200)**:
+
+```json
+{
+  "ok": true,
+  "service": "auth-api"
 }
-
-const auth: Writable<AuthState>;
-
-// Derived stores
-const currentUser: Readable<NDKUser | null>;
-const isAuthenticated: Readable<boolean>;
-const userCohorts: Readable<string[]>;
 ```
 
-**Methods:**
+### POST /auth/register/options
 
-| Method | Parameters | Returns | Description |
-|--------|------------|---------|-------------|
-| `login` | `privkey: string` | `Promise<void>` | Authenticate with private key |
-| `loginWithMnemonic` | `mnemonic: string` | `Promise<void>` | Authenticate with recovery phrase |
-| `logout` | — | `void` | Clear session |
-| `updateProfile` | `profile: Partial<Profile>` | `Promise<void>` | Update user metadata |
+Generate WebAuthn registration options for a new user.
 
----
+**Request body**:
 
-#### Messages Store
-
-```typescript
-// src/lib/stores/messages.ts
-
-interface MessagesState {
-  messages: Map<string, NDKEvent[]>;
-  loading: Map<string, boolean>;
-  hasMore: Map<string, boolean>;
+```json
+{
+  "username": "alice"
 }
-
-const messages: CustomStore<MessagesState>;
-
-// Derived
-function channelMessages(channelId: string): Readable<NDKEvent[]>;
 ```
 
-**Methods:**
+**Response (200)**:
 
-| Method | Parameters | Description |
-|--------|------------|-------------|
-| `addMessage` | `channelId: string, event: NDKEvent` | Add message to channel |
-| `removeMessage` | `channelId: string, eventId: string` | Remove message |
-| `replaceMessage` | `channelId: string, oldId: string, newEvent: NDKEvent` | Replace (for optimistic updates) |
-| `setLoading` | `channelId: string, loading: boolean` | Set loading state |
-| `clearChannel` | `channelId: string` | Clear all messages |
-
----
-
-#### Channels Store
-
-```typescript
-// src/lib/stores/channels.ts
-
-interface Channel {
-  id: string;
-  name: string;
-  description: string;
-  cohort: string;
-  visibility: 'listed' | 'unlisted' | 'preview';
-  memberCount: number;
-  isMember: boolean;
-  isAdmin: boolean;
-}
-
-interface ChannelsState {
-  channels: Map<string, Channel>;
-  loading: boolean;
-}
-
-const channels: CustomStore<ChannelsState>;
-
-// Derived
-const channelList: Readable<Channel[]>;
-function channelById(id: string): Readable<Channel | undefined>;
-function channelsByCohort(cohort: string): Readable<Channel[]>;
-```
-
----
-
-#### Calendar Store
-
-```typescript
-// src/lib/stores/calendar.ts
-
-interface CalendarEvent {
-  id: string;
-  dTag: string;
-  title: string;
-  description: string;
-  start: Date;
-  end?: Date;
-  location?: string;
-  timezone?: string;
-  channelId?: string;
-  cohort?: string;
-  rsvps: Map<string, RSVPStatus>;
-  pubkey: string;
-}
-
-type RSVPStatus = 'accepted' | 'declined' | 'tentative';
-
-interface CalendarState {
-  events: Map<string, CalendarEvent>;
-  loading: boolean;
-  viewDate: Date;
-  viewMode: 'month' | 'week' | 'day';
-}
-
-const calendar: CustomStore<CalendarState>;
-const visibleEvents: Readable<CalendarEvent[]>;
-```
-
----
-
-#### DM Store
-
-```typescript
-// src/lib/stores/dm.ts
-
-interface DMMessage {
-  id: string;
-  sender: string;
-  content: string;
-  timestamp: number;
-  isOwn: boolean;
-}
-
-interface Conversation {
-  pubkey: string;
-  messages: DMMessage[];
-  lastMessage: number;
-  unreadCount: number;
-}
-
-interface DMState {
-  conversations: Map<string, Conversation>;
-  loading: boolean;
-}
-
-const dmStore: CustomStore<DMState>;
-const sortedConversations: Readable<Conversation[]>;
-```
-
----
-
-### Services
-
-Business logic functions for core operations.
-
-#### Authentication Service
-
-```typescript
-// src/lib/services/auth/index.ts
-
-/**
- * Generate new keypair with mnemonic
- */
-function generateKeys(): {
-  mnemonic: string;
-  privkey: string;
-  pubkey: string;
-}
-
-/**
- * Recover keypair from mnemonic
- */
-function recoverFromMnemonic(mnemonic: string): {
-  privkey: string;
-  pubkey: string;
-}
-
-/**
- * Validate mnemonic phrase
- */
-function validateMnemonic(mnemonic: string): boolean;
-
-/**
- * Store encrypted private key
- */
-async function storeEncryptedKey(
-  pubkey: string,
-  privkey: string,
-  passphrase: string
-): Promise<void>
-
-/**
- * Retrieve and decrypt private key
- */
-async function getDecryptedKey(
-  pubkey: string,
-  passphrase: string
-): Promise<string | null>
-```
-
----
-
-#### Messaging Service
-
-```typescript
-// src/lib/services/messaging/messages.ts
-
-/**
- * Load messages for a channel
- */
-async function loadMessages(
-  channelId: string,
-  options?: {
-    limit?: number;
-    until?: number;
-    since?: number;
+```json
+{
+  "challenge": "<base64url>",
+  "rp": {
+    "name": "DreamLab Community",
+    "id": "dreamlab-ai.com"
+  },
+  "user": {
+    "id": "<base64url>",
+    "name": "alice",
+    "displayName": "alice"
+  },
+  "pubKeyCredParams": [
+    { "type": "public-key", "alg": -7 },
+    { "type": "public-key", "alg": -257 }
+  ],
+  "authenticatorSelection": {
+    "requireResidentKey": true,
+    "residentKey": "required",
+    "userVerification": "required"
+  },
+  "extensions": {
+    "prf": {
+      "eval": {
+        "first": "<base64url-prf-salt>"
+      }
+    }
   }
-): Promise<void>
+}
+```
 
-/**
- * Send a message to a channel
- */
-async function sendMessage(
-  channelId: string,
-  content: string,
-  options?: {
-    replyTo?: string;
+### POST /auth/register/verify
+
+Verify a WebAuthn registration response. On success, provisions a Solid pod via JSS.
+
+**Request body**:
+
+```json
+{
+  "id": "<credential-id>",
+  "rawId": "<base64url>",
+  "response": {
+    "attestationObject": "<base64url>",
+    "clientDataJSON": "<base64url>"
+  },
+  "type": "public-key",
+  "pubkey": "<64-char-hex-nostr-pubkey>"
+}
+```
+
+**Response (200)**:
+
+```json
+{
+  "verified": true,
+  "didNostr": "did:nostr:<pubkey>",
+  "webId": "https://jss-xxx-uc.a.run.app/<pubkey>/profile/card#me",
+  "podUrl": "https://jss-xxx-uc.a.run.app/<pubkey>/"
+}
+```
+
+**Response (400)**:
+
+```json
+{
+  "error": "Registration verification failed"
+}
+```
+
+### POST /auth/login/options
+
+Generate WebAuthn authentication options. Returns the stored PRF salt for the credential.
+
+**Request body**:
+
+```json
+{}
+```
+
+**Response (200)**:
+
+```json
+{
+  "challenge": "<base64url>",
+  "rpId": "dreamlab-ai.com",
+  "allowCredentials": [],
+  "userVerification": "required",
+  "extensions": {
+    "prf": {
+      "eval": {
+        "first": "<base64url-prf-salt>"
+      }
+    }
   }
-): Promise<NDKEvent>
-
-/**
- * Delete a message
- */
-async function deleteMessage(
-  channelId: string,
-  eventId: string,
-  isAdmin?: boolean
-): Promise<void>
-
-/**
- * Edit a message (delete + republish)
- */
-async function editMessage(
-  channelId: string,
-  eventId: string,
-  newContent: string
-): Promise<NDKEvent>
+}
 ```
 
----
+### POST /auth/login/verify
 
-#### Subscription Service
+Verify a WebAuthn authentication response.
 
-```typescript
-// src/lib/services/messaging/subscriptions.ts
+**Request body**:
 
-/**
- * Subscribe to real-time channel updates
- */
-function subscribeToChannel(channelId: string): void
-
-/**
- * Unsubscribe from channel updates
- */
-function unsubscribeFromChannel(channelId: string): void
-
-/**
- * Check if subscribed to a channel
- */
-function isSubscribed(channelId: string): boolean
-
-/**
- * Get all active subscriptions
- */
-function getActiveSubscriptions(): string[]
+```json
+{
+  "id": "<credential-id>",
+  "rawId": "<base64url>",
+  "response": {
+    "authenticatorData": "<base64url>",
+    "clientDataJSON": "<base64url>",
+    "signature": "<base64url>"
+  },
+  "type": "public-key"
+}
 ```
 
----
+**Response (200)**:
 
-#### DM Service
-
-```typescript
-// src/lib/services/messaging/dm-service.ts
-
-/**
- * Send an encrypted direct message
- */
-async function sendDM(
-  recipientPubkey: string,
-  content: string
-): Promise<void>
-
-/**
- * Load all DM conversations
- */
-async function loadDMs(): Promise<void>
-
-/**
- * Subscribe to incoming DMs
- */
-function subscribeToDMs(): void
-
-/**
- * Get conversation with a specific user
- */
-function getConversation(pubkey: string): Conversation | undefined
+```json
+{
+  "verified": true,
+  "pubkey": "<64-char-hex>"
+}
 ```
 
----
+**Response (401)**:
 
-#### Calendar Service
-
-```typescript
-// src/lib/services/calendar/events.ts
-
-/**
- * Load events for a date range
- */
-async function loadEvents(
-  startDate: Date,
-  endDate: Date,
-  cohort?: string
-): Promise<void>
-
-/**
- * Create a new calendar event
- */
-async function createEvent(
-  eventData: Omit<CalendarEvent, 'id' | 'rsvps' | 'pubkey'>
-): Promise<string>
-
-/**
- * Update an existing event
- */
-async function updateEvent(
-  dTag: string,
-  updates: Partial<CalendarEvent>
-): Promise<void>
-
-/**
- * Delete a calendar event
- */
-async function deleteEvent(dTag: string): Promise<void>
-```
-
----
-
-#### RSVP Service
-
-```typescript
-// src/lib/services/calendar/rsvp.ts
-
-/**
- * Submit RSVP for an event
- */
-async function submitRSVP(
-  eventDTag: string,
-  eventRef: string,
-  status: RSVPStatus,
-  message?: string
-): Promise<void>
-
-/**
- * Load RSVPs for an event
- */
-async function loadRSVPs(eventDTag: string): Promise<void>
-
-/**
- * Get user's RSVP for an event
- */
-function getUserRSVP(eventDTag: string): RSVPStatus | null
-```
-
----
-
-### Utilities
-
-Helper functions for common operations.
-
-#### Crypto Utilities
-
-```typescript
-// src/lib/utils/crypto.ts
-
-/**
- * NIP-44 encryption
- */
-function encrypt(
-  plaintext: string,
-  senderPrivkey: Uint8Array,
-  recipientPubkey: string
-): string
-
-/**
- * NIP-44 decryption
- */
-function decrypt(
-  ciphertext: string,
-  recipientPrivkey: Uint8Array,
-  senderPubkey: string
-): string
-
-/**
- * Generate random bytes
- */
-function randomBytes(length: number): Uint8Array
-
-/**
- * Hash data with SHA-256
- */
-function sha256(data: string | Uint8Array): Uint8Array
-```
-
----
-
-#### Formatting Utilities
-
-```typescript
-// src/lib/utils/formatting.ts
-
-/**
- * Format relative time (e.g., "5 minutes ago")
- */
-function formatRelativeTime(timestamp: number): string
-
-/**
- * Format absolute date
- */
-function formatDate(
-  date: Date,
-  format?: 'short' | 'medium' | 'long'
-): string
-
-/**
- * Format user display name
- */
-function formatDisplayName(
-  pubkey: string,
-  profile?: Profile
-): string
-
-/**
- * Truncate text with ellipsis
- */
-function truncate(text: string, maxLength: number): string
-
-/**
- * Format file size
- */
-function formatFileSize(bytes: number): string
-```
-
----
-
-#### Validation Utilities
-
-```typescript
-// src/lib/utils/validation.ts
-
-/**
- * Validate public key format
- */
-function isValidPubkey(pubkey: string): boolean
-
-/**
- * Validate event ID format
- */
-function isValidEventId(id: string): boolean
-
-/**
- * Validate relay URL
- */
-function isValidRelayUrl(url: string): boolean
-
-/**
- * Sanitise HTML content
- */
-function sanitiseHtml(html: string): string
-
-/**
- * Validate message content
- */
-function validateMessageContent(content: string): {
-  valid: boolean;
-  error?: string;
+```json
+{
+  "error": "Authentication verification failed"
 }
 ```
 
 ---
 
-#### Nostr Utilities
+## JavaScript Solid Server (JSS)
 
-```typescript
-// src/lib/utils/nostr.ts
+Provides WebID and pod storage per Nostr public key. Runs `@solid/community-server@7.1.8` in a Docker container.
 
-/**
- * Parse NIP-19 encoded string (npub, nsec, note, etc.)
- */
-function parseNip19(encoded: string): {
-  type: 'npub' | 'nsec' | 'note' | 'nevent' | 'nprofile' | 'naddr';
-  data: any;
-}
+### Pod URL format
 
-/**
- * Encode to NIP-19 format
- */
-function encodeNpub(pubkey: string): string
-function encodeNote(eventId: string): string
-
-/**
- * Extract tags from event
- */
-function getTagValue(event: NDKEvent, tagName: string): string | undefined
-function getTagValues(event: NDKEvent, tagName: string): string[]
-
-/**
- * Create event filter
- */
-function createFilter(options: {
-  kinds?: number[];
-  authors?: string[];
-  tags?: Record<string, string[]>;
-  since?: number;
-  until?: number;
-  limit?: number;
-}): NDKFilter
 ```
+https://jss-xxx-uc.a.run.app/<pubkey>/
+```
+
+### WebID
+
+```
+https://jss-xxx-uc.a.run.app/<pubkey>/profile/card#me
+```
+
+Pods are provisioned automatically during user registration via the auth-api.
 
 ---
 
-## Relay WebSocket API
+## Nostr Relay
 
-Connect via WebSocket at `ws://<host>:<port>/`
+WebSocket-based Nostr relay with PostgreSQL storage. Supports NIP-01, NIP-11, NIP-16, NIP-33, NIP-98.
 
-### Event Types
+### WebSocket connection
 
-#### EVENT - Publish an event
+```
+wss://relay.dreamlab-ai.com
+```
+
+### Client-to-relay messages
+
+#### EVENT -- publish an event
 
 ```json
 ["EVENT", <event>]
 ```
 
-**Event Structure:**
+Event structure:
+
 | Field | Type | Description |
 |-------|------|-------------|
-| `id` | string | 64-char hex SHA-256 of serialised event |
-| `pubkey` | string | 64-char hex public key |
-| `created_at` | number | Unix timestamp |
+| `id` | string | 64-char hex SHA-256 of the serialised event |
+| `pubkey` | string | 64-char hex secp256k1 public key |
+| `created_at` | number | Unix timestamp (seconds) |
 | `kind` | number | Event kind |
 | `tags` | array | Array of tag arrays |
 | `content` | string | Event content |
 | `sig` | string | 128-char hex Schnorr signature |
 
-**Response:**
+Relay response:
+
 ```json
-["OK", "<event-id>", true|false, "<message>"]
+["OK", "<event-id>", true, ""]
 ```
 
-**Error Messages:**
-- `"invalid: event validation failed"` - Malformed event
-- `"blocked: pubkey not whitelisted"` - Access denied
-- `"invalid: event id verification failed"` - Hash mismatch
-- `"invalid: signature verification failed"` - Bad signature
-- `"rate limit exceeded"` - Too many events
+Error responses:
 
----
+```json
+["OK", "<event-id>", false, "blocked: pubkey not whitelisted"]
+["OK", "<event-id>", false, "invalid: event id verification failed"]
+["OK", "<event-id>", false, "invalid: signature verification failed"]
+["OK", "<event-id>", false, "rate limit exceeded"]
+```
 
-#### REQ - Subscribe to events
+#### REQ -- subscribe to events
 
 ```json
 ["REQ", "<subscription-id>", <filter>, ...]
 ```
 
-**Filter Structure:**
+Filter fields:
+
 | Field | Type | Description |
 |-------|------|-------------|
-| `ids` | array | Event IDs to match |
-| `authors` | array | Pubkeys to match |
-| `kinds` | array | Event kinds to match |
-| `since` | number | Events after timestamp |
-| `until` | number | Events before timestamp |
+| `ids` | string[] | Event IDs to match |
+| `authors` | string[] | Public keys to match |
+| `kinds` | number[] | Event kinds to match |
+| `since` | number | Events after this timestamp |
+| `until` | number | Events before this timestamp |
 | `limit` | number | Maximum events (default: 500, max: 5000) |
-| `#<tag>` | array | Tag values to match |
+| `#<tag>` | string[] | Tag values to match |
 
-**Response:**
+Response:
+
 ```json
 ["EVENT", "<subscription-id>", <event>]
-...
 ["EOSE", "<subscription-id>"]
 ```
 
----
+After EOSE, the subscription remains open for live events.
 
-#### CLOSE - Unsubscribe
+#### CLOSE -- unsubscribe
 
 ```json
 ["CLOSE", "<subscription-id>"]
 ```
 
-No response is sent.
+No response.
 
----
+### HTTP endpoints
 
-### Protocol Flow
+#### GET /health
 
-```mermaid
-sequenceDiagram
-    participant C as Client
-    participant R as Relay
-
-    C->>R: Connect WebSocket
-    C->>R: ["REQ", "sub1", {"kinds": [1], "limit": 10}]
-    R-->>C: ["EVENT", "sub1", {...}]
-    R-->>C: ["EVENT", "sub1", {...}]
-    R-->>C: ["EOSE", "sub1"]
-
-    Note over C,R: Client now receives live events
-
-    C->>R: ["EVENT", {...}]
-    R-->>C: ["OK", "abc123", true, ""]
-    R-->>C: ["EVENT", "sub1", {...}]
-
-    C->>R: ["CLOSE", "sub1"]
-    C->>R: Close WebSocket
-```
-
----
-
-## Relay HTTP API
-
-### GET /health
-
-Health check and relay statistics.
-
-**Response:**
 ```json
 {
   "status": "healthy",
@@ -689,18 +316,10 @@ Health check and relay statistics.
 }
 ```
 
----
+#### GET /api/check-whitelist?pubkey=<hex>
 
-### GET /api/check-whitelist
+Check whitelist status.
 
-Check whitelist status for a pubkey.
-
-**Query Parameters:**
-| Parameter | Required | Description |
-|-----------|----------|-------------|
-| `pubkey` | Yes | 64-char hex public key |
-
-**Response (200 OK):**
 ```json
 {
   "isWhitelisted": true,
@@ -711,64 +330,17 @@ Check whitelist status for a pubkey.
 }
 ```
 
-**Response (400 Bad Request):**
+#### GET /.well-known/nostr.json
+
+NIP-11 relay information document. Request with `Accept: application/nostr+json`.
+
 ```json
 {
-  "error": "Invalid pubkey format"
-}
-```
-
----
-
-### GET /api/authenticated
-
-Example NIP-98 authenticated endpoint.
-
-**Headers:**
-```
-Authorization: Nostr <base64-encoded-event>
-```
-
-The event must be kind 27235 with:
-- `u` tag: URL being accessed
-- `method` tag: HTTP method (or `*`)
-- `created_at`: Within ±60 seconds of current time
-
-**Response (200 OK):**
-```json
-{
-  "authenticated": true,
-  "pubkey": "abc123...",
-  "didNostr": "did:nostr:abc123..."
-}
-```
-
-**Response (401 Unauthorized):**
-```json
-{
-  "error": "Invalid Schnorr signature"
-}
-```
-
----
-
-### GET /.well-known/nostr.json
-
-Relay information document (NIP-11).
-
-**Request Headers:**
-```
-Accept: application/nostr+json
-```
-
-**Response:**
-```json
-{
-  "name": "Fairfield Nostr Relay",
+  "name": "DreamLab Nostr Relay",
   "description": "Private whitelist-only relay with NIP-16/98 support",
-  "pubkey": "admin-pubkey-here",
+  "pubkey": "<admin-pubkey>",
   "supported_nips": [1, 11, 16, 33, 98],
-  "software": "fairfield-nostr-relay",
+  "software": "dreamlab-nostr-relay",
   "version": "2.2.0",
   "limitation": {
     "auth_required": false,
@@ -778,65 +350,9 @@ Accept: application/nostr+json
 }
 ```
 
----
+### Event kinds
 
-## NIP-98 Authentication
-
-### Creating an Auth Event
-
-```typescript
-import { schnorr } from '@noble/curves/secp256k1';
-import crypto from 'crypto';
-
-function createAuthEvent(privateKey: string, url: string, method: string) {
-  const pubkey = schnorr.getPublicKey(privateKey);
-  const created_at = Math.floor(Date.now() / 1000);
-
-  const event = {
-    pubkey: Buffer.from(pubkey).toString('hex'),
-    created_at,
-    kind: 27235,
-    tags: [
-      ['u', url],
-      ['method', method]
-    ],
-    content: ''
-  };
-
-  // Compute event ID
-  const serialised = JSON.stringify([
-    0, event.pubkey, event.created_at, event.kind, event.tags, event.content
-  ]);
-  const id = crypto.createHash('sha256').update(serialised).digest('hex');
-
-  // Sign
-  const sig = schnorr.sign(id, privateKey);
-
-  return { ...event, id, sig: Buffer.from(sig).toString('hex') };
-}
-
-// Usage
-const event = createAuthEvent(privateKey, 'http://localhost:8080/api/authenticated', 'GET');
-const token = Buffer.from(JSON.stringify(event)).toString('base64');
-
-fetch('http://localhost:8080/api/authenticated', {
-  headers: { 'Authorization': `Nostr ${token}` }
-});
-```
-
-### Alternative: Basic Auth Format
-
-For git clients that only support Basic auth:
-
-```
-Authorization: Basic <base64(nostr:<token>)>
-```
-
----
-
-## Event Kinds
-
-### Regular Events (Stored Permanently)
+**Regular events (stored permanently)**:
 
 | Kind | Description |
 |------|-------------|
@@ -846,7 +362,7 @@ Authorization: Basic <base64(nostr:<token>)>
 | 6 | Repost |
 | 7 | Reaction |
 
-### Replaceable Events (Latest Only)
+**Replaceable events (latest only)**:
 
 | Kind | Description |
 |------|-------------|
@@ -854,53 +370,193 @@ Authorization: Basic <base64(nostr:<token>)>
 | 3 | Contact list |
 | 10002 | Relay list metadata |
 
-### Ephemeral Events (Broadcast, Not Stored)
-
-| Kind | Description |
-|------|-------------|
-| 20000-29999 | Application-specific ephemeral |
-
-### Parameterized Replaceable (By d-tag)
+**Parameterised replaceable (by d-tag)**:
 
 | Kind | Description |
 |------|-------------|
 | 30023 | Long-form content |
 | 30078 | Application-specific data |
 
----
+### Rate limits
 
-## Rate Limits
-
-| Limit | Default | Description |
-|-------|---------|-------------|
-| Events per second | 10 | Per IP address |
-| Concurrent connections | 10 | Per IP address |
-| Query limit | 500 | Events per REQ filter |
-| Maximum query limit | 5000 | Hard cap |
+| Limit | Default |
+|-------|---------|
+| Events per second | 10 per IP |
+| Concurrent connections | 10 per IP |
+| Query limit | 500 events per REQ filter |
+| Maximum query limit | 5000 events |
 
 ---
 
-## Error Codes
+## Embedding API
 
-| HTTP Status | WebSocket | Description |
-|-------------|-----------|-------------|
-| 200 | `["OK", id, true, ""]` | Success |
-| 400 | `["NOTICE", "..."]` | Bad request |
-| 401 | - | NIP-98 auth failed |
-| 404 | - | Endpoint not found |
-| - | `["OK", id, false, "blocked: ..."]` | Whitelist rejected |
-| - | `["OK", id, false, "invalid: ..."]` | Validation failed |
-| - | `["NOTICE", "rate limit exceeded"]` | Rate limited |
+Vector embedding generation service. All state-mutating endpoints require NIP-98 authentication.
 
----
+### GET /health
 
-## Related Documentation
+Health check (no authentication).
 
-- [Authentication Reference](./authentication.md) - Authentication system
-- [Configuration Reference](./configuration.md) - Environment variables
-- [NIP Protocol Reference](./nip-protocol-reference.md) - Protocol specs
-- [Event Kinds](./event-kinds.md) - Nostr event types
+```json
+{
+  "ok": true,
+  "service": "embedding-api"
+}
+```
 
 ---
 
-[← Back to Reference](../index.md)
+## Image API
+
+Image resizing, format conversion, and serving. Upload endpoints require NIP-98 authentication.
+
+### GET /health
+
+Health check (no authentication).
+
+```json
+{
+  "ok": true,
+  "service": "image-api"
+}
+```
+
+---
+
+## Link Preview API
+
+URL metadata extraction for generating link previews. No authentication required.
+
+### GET /health
+
+Health check.
+
+```json
+{
+  "ok": true,
+  "service": "link-preview-api"
+}
+```
+
+---
+
+## NIP-98 HTTP authentication
+
+All state-mutating API calls to DreamLab services use NIP-98 authentication.
+
+### Header format
+
+```
+Authorization: Nostr <base64-encoded-event-json>
+```
+
+### Event structure
+
+```json
+{
+  "kind": 27235,
+  "created_at": 1709136000,
+  "tags": [
+    ["u", "https://api.dreamlab-ai.com/auth/register/verify"],
+    ["method", "POST"],
+    ["payload", "<sha256-hex-of-raw-request-body>"]
+  ],
+  "content": "",
+  "pubkey": "<64-char-hex>",
+  "id": "<sha256-of-serialised-event>",
+  "sig": "<128-char-hex-schnorr-signature>"
+}
+```
+
+### Required tags
+
+| Tag | Description |
+|-----|-------------|
+| `u` | Full URL being accessed |
+| `method` | HTTP method (`GET`, `POST`, etc.) or `*` |
+| `payload` | SHA-256 hex of the raw request body (optional, for POST/PUT) |
+
+### Timing constraint
+
+The `created_at` timestamp must be within 60 seconds of the server's current time.
+
+### Creating an auth token (client)
+
+```typescript
+import { createNip98Token } from "@/lib/auth/nip98-client";
+
+const token = await createNip98Token(
+  privkey,
+  "https://api.dreamlab-ai.com/endpoint",
+  "POST",
+  requestBody
+);
+
+const response = await fetch("https://api.dreamlab-ai.com/endpoint", {
+  method: "POST",
+  headers: {
+    "Authorization": `Nostr ${token}`,
+    "Content-Type": "application/json",
+  },
+  body: requestBody,
+});
+```
+
+### Server verification
+
+The server independently:
+
+1. Base64-decodes the token to get the event JSON.
+2. Recomputes the event ID from the NIP-01 canonical serialisation.
+3. Verifies the Schnorr signature against the pubkey.
+4. Checks `created_at` is within the time window.
+5. Verifies the `u` tag matches the request URL.
+6. Verifies the `method` tag matches the HTTP method.
+7. If present, verifies the `payload` tag matches the SHA-256 of the raw request body.
+
+### Fallback: Basic auth
+
+For clients that only support Basic authentication:
+
+```
+Authorization: Basic <base64("nostr:" + token)>
+```
+
+### Error responses
+
+| HTTP status | Description |
+|-------------|-------------|
+| 401 | Missing or malformed authorisation header |
+| 401 | Invalid Schnorr signature |
+| 401 | Timestamp outside allowed window |
+| 401 | URL mismatch |
+| 403 | CORS origin not allowed |
+
+---
+
+## Error code summary
+
+| HTTP status | Meaning |
+|-------------|---------|
+| 200 | Success |
+| 400 | Bad request (malformed input) |
+| 401 | Authentication failed |
+| 403 | Forbidden (CORS, whitelist) |
+| 404 | Endpoint not found |
+| 500 | Internal server error |
+
+WebSocket-specific (relay):
+
+| Message | Meaning |
+|---------|---------|
+| `["OK", id, true, ""]` | Event accepted |
+| `["OK", id, false, "blocked: ..."]` | Whitelist rejection |
+| `["OK", id, false, "invalid: ..."]` | Validation failure |
+| `["NOTICE", "rate limit exceeded"]` | Rate limited |
+
+---
+
+## Related documentation
+
+- [tech-stack.md](./tech-stack.md) -- complete technology reference
+- [../developer/GETTING_STARTED.md](../developer/GETTING_STARTED.md) -- setup and installation
+- [../developer/PROJECT_STRUCTURE.md](../developer/PROJECT_STRUCTURE.md) -- service source locations

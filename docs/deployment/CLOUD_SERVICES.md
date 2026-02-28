@@ -1,613 +1,388 @@
----
-title: Cloud Services Deployment
-description: GCP Cloud Run deployment for Nostr relay, embedding API, and image services
-last_updated: 2026-01-25
----
-
 # Cloud Services Deployment
 
-This document covers deployment of backend services to Google Cloud Platform (GCP) Cloud Run:
-- **Nostr Relay** - WebSocket-based Nostr protocol relay
-- **Embedding API** - Text embedding service with ML models
-- **Image API** - Image processing and storage service
-- **Link Preview API** - URL link preview generation (if applicable)
+**Last Updated:** 2026-02-28
 
-## Architecture Overview
+GCP Cloud Run backend services for the DreamLab AI platform. GCP project: `cumbriadreamlab`, region: `us-central1`.
+
+---
+
+## Architecture
 
 ```
-GitHub Repository
-    ↓
 GitHub Actions Workflows
-    ├─ fairfield-relay.yml
-    ├─ fairfield-embedding-api.yml
-    └─ fairfield-image-api.yml
-    ↓
-GCP Artifact Registry
-    ↓
-GCP Cloud Run
-    ├─ nostr-relay (ws://...)
-    ├─ embedding-api (http://...)
-    └─ image-api (http://...)
-    ↓
-Database: Cloud SQL PostgreSQL
-Storage: Google Cloud Storage (GCS)
+  |
+  +-- auth-api.yml ---------> auth-api (Express + WebAuthn)
+  |                              +-- Cloud SQL (PostgreSQL)
+  |                              +-- Secret Manager
+  |
+  +-- jss.yml --------------> jss (Community Solid Server 7.x)
+  |                              +-- Cloud Storage volume (dreamlab-pods)
+  |                              +-- Secret Manager
+  |
+  +-- fairfield-relay.yml ---> nostr-relay (Node.js WebSocket)
+  |                              +-- Cloud SQL (PostgreSQL)
+  |                              +-- Secret Manager
+  |
+  +-- fairfield-embedding-api.yml -> embedding-api (Python FastAPI)
+  |
+  +-- fairfield-image-api.yml ----> image-api (Node.js)
+                                      +-- Cloud Storage (images)
 ```
 
-## Prerequisites
+All Docker images are pushed to **Artifact Registry**: `us-central1-docker.pkg.dev/cumbriadreamlab/minimoonoir/`
 
-### GCP Project Setup
+---
 
-1. **Create GCP Project**
-   ```bash
-   gcloud projects create dreamlab-community --name="DreamLab Community"
-   gcloud config set project dreamlab-community
-   ```
+## Service: auth-api
 
-2. **Enable Required APIs**
-   ```bash
-   gcloud services enable \
-     run.googleapis.com \
-     artifactregistry.googleapis.com \
-     cloudbuild.googleapis.com \
-     sqladmin.googleapis.com \
-     storage.googleapis.com \
-     secretmanager.googleapis.com
-   ```
+WebAuthn registration and authentication server with NIP-98 verification and Solid pod provisioning.
 
-3. **Create Service Account**
-   ```bash
-   gcloud iam service-accounts create github-actions \
-     --display-name="GitHub Actions CI/CD"
+| Attribute | Value |
+|-----------|-------|
+| **Workflow** | `.github/workflows/auth-api.yml` |
+| **Source** | `community-forum/services/auth-api/` |
+| **Runtime** | Node.js 20, Express |
+| **Memory** | 512Mi |
+| **CPU** | 1 vCPU |
+| **Instances** | 0-3 (scale-to-zero) |
+| **Port** | 8080 |
+| **Service account** | `fairfield-applications@cumbriadreamlab.iam.gserviceaccount.com` |
 
-   # Grant necessary roles
-   gcloud projects add-iam-policy-binding PROJECT_ID \
-     --member="serviceAccount:github-actions@PROJECT_ID.iam.gserviceaccount.com" \
-     --role="roles/run.admin"
-
-   gcloud projects add-iam-policy-binding PROJECT_ID \
-     --member="serviceAccount:github-actions@PROJECT_ID.iam.gserviceaccount.com" \
-     --role="roles/artifactregistry.writer"
-
-   gcloud projects add-iam-policy-binding PROJECT_ID \
-     --member="serviceAccount:github-actions@PROJECT_ID.iam.gserviceaccount.com" \
-     --role="roles/iam.serviceAccountUser"
-   ```
-
-4. **Create and Download Service Account Key**
-   ```bash
-   gcloud iam service-accounts keys create github-key.json \
-     --iam-account=github-actions@PROJECT_ID.iam.gserviceaccount.com
-   ```
-
-### GitHub Secrets Configuration
-
-Store the following in GitHub repository secrets (Settings → Secrets and variables → Actions):
+### Environment Variables
 
 ```
-GCP_PROJECT_ID        # Your GCP project ID
-GCP_SA_KEY            # Contents of github-key.json (full JSON)
-```
-
-### Artifact Registry Setup
-
-```bash
-# Create Artifact Registry repository
-gcloud artifacts repositories create minimoonoir \
-  --repository-format=docker \
-  --location=us-central1 \
-  --description="Fairfield services"
-
-# Get artifact registry URL
-gcloud artifacts repositories describe minimoonoir \
-  --location=us-central1
-# Should output: us-central1-docker.pkg.dev/PROJECT_ID/minimoonoir
-```
-
-## Service: Nostr Relay
-
-### Overview
-
-The Fairfield Nostr relay is a whitelist-controlled WebSocket relay implementing the Nostr protocol with NIP-01, NIP-11, NIP-16, NIP-33, and NIP-98 support. It provides secure event storage, signature verification, and rate limiting.
-
-**Key Features**:
-- Whitelist-based access control with cohort membership
-- PostgreSQL persistence with JSONB indexing
-- NIP-16 event treatment (replaceable, ephemeral, parameterized)
-- NIP-98 HTTP authentication for secure endpoints
-- Rate limiting per IP address
-- did:nostr identity resolution
-
-### Deployment Workflow
-
-**Trigger**: Push to `main` branch with changes in `community-forum/services/nostr-relay/`
-
-**File**: `.github/workflows/fairfield-relay.yml`
-
-### Build Process
-
-1. **Test & Validate**
-   - Checkout code
-   - Setup Node.js 20
-   - Install dependencies: `npm ci`
-   - TypeScript type checking: `npm run typecheck`
-   - Build project: `npm run build`
-   - Verify dist directory exists
-
-2. **Build Docker Image**
-   - Multi-stage build (builder + runtime)
-   - Installs native dependencies (python3, make, g++)
-   - Compiles TypeScript to JavaScript
-   - Strips dev dependencies
-   - Final image: Node.js 20 slim + dist files
-
-3. **Push to Artifact Registry**
-   ```
-   us-central1-docker.pkg.dev/PROJECT_ID/minimoonoir/nostr-relay:COMMIT_SHA
-   us-central1-docker.pkg.dev/PROJECT_ID/minimoonoir/nostr-relay:latest
-   ```
-
-4. **Deploy to Cloud Run**
-   - Service name: `nostr-relay`
-   - Memory: 512Mi
-   - CPU: 1 vCPU
-   - Min instances: 1
-   - Max instances: 1
-   - Timeout: 3600s (1 hour for long-lived WebSocket connections)
-   - CPU throttling: Disabled
-   - Port: 8080
-
-### Configuration
-
-**Environment Variables**:
-```bash
+RP_ID=dreamlab-ai.com
+RP_NAME=DreamLab Community
+RP_ORIGIN=https://dreamlab-ai.com
 NODE_ENV=production
-PORT=8080
-HOST=0.0.0.0
-DATABASE_URL=[secret from Secret Manager]
-ADMIN_PUBKEYS=[secret from Secret Manager]
-RATE_LIMIT_EVENTS_PER_SEC=10
-RATE_LIMIT_MAX_CONNECTIONS=10
 ```
 
-**Cloud SQL Connection**:
-```
---add-cloudsql-instances PROJECT_ID:us-central1:nostr-db
-```
+### Secrets (from Secret Manager)
 
-**Service Account**:
 ```
-fairfield-applications@PROJECT_ID.iam.gserviceaccount.com
+DATABASE_URL=nostr-db-url:latest    # PostgreSQL connection string
+JSS_BASE_URL=jss-base-url:latest   # JSS Cloud Run URL
 ```
 
-### Database Schema
+### Cloud SQL Connection
 
-The relay stores events and whitelist data in Cloud SQL PostgreSQL:
-
-**events table**:
-```sql
-CREATE TABLE events (
-  id TEXT PRIMARY KEY,
-  pubkey TEXT NOT NULL,
-  created_at BIGINT NOT NULL,
-  kind INTEGER NOT NULL,
-  tags JSONB NOT NULL,
-  content TEXT NOT NULL,
-  sig TEXT NOT NULL,
-  received_at BIGINT
-);
-
-CREATE INDEX idx_pubkey ON events(pubkey);
-CREATE INDEX idx_kind ON events(kind);
-CREATE INDEX idx_created_at ON events(created_at DESC);
-CREATE INDEX idx_tags ON events USING GIN(tags);
+```
+--add-cloudsql-instances cumbriadreamlab:us-central1:nostr-db
 ```
 
-**whitelist table**:
-```sql
-CREATE TABLE whitelist (
-  pubkey TEXT PRIMARY KEY,
-  cohorts JSONB NOT NULL DEFAULT '[]',
-  added_at BIGINT,
-  added_by TEXT,
-  expires_at BIGINT,
-  notes TEXT
-);
+### Endpoints
+
+See [Auth API Reference](../api/AUTH_API.md) for full endpoint documentation.
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET | `/health` | Health check (unauthenticated) |
+| POST | `/auth/register/options` | WebAuthn registration options |
+| POST | `/auth/register/verify` | Registration verification + pod provisioning |
+| POST | `/auth/login/options` | WebAuthn authentication options |
+| POST | `/auth/login/verify` | Authentication verification (NIP-98 protected) |
+
+---
+
+## Service: jss
+
+JavaScript Solid Server (Community Solid Server 7.x) providing per-user pod storage.
+
+| Attribute | Value |
+|-----------|-------|
+| **Workflow** | `.github/workflows/jss.yml` |
+| **Source** | `community-forum/services/jss/` |
+| **Runtime** | Node.js 20 slim, `@solid/community-server@7.1.8` |
+| **Memory** | 1Gi |
+| **CPU** | 1 vCPU |
+| **Instances** | 0-2 (scale-to-zero) |
+| **Port** | 8080 |
+| **Storage** | Cloud Storage volume (`dreamlab-pods` bucket, mounted at `/data/pods`) |
+
+### Secrets
+
+```
+JSS_BASE_URL=jss-base-url:latest
 ```
 
-See [API Documentation](../api/NOSTR_RELAY.md) for complete protocol details.
+### Bootstrap: Chicken-and-Egg
 
-### Monitoring Nostr Relay
+JSS needs its own Cloud Run URL as the `JSS_BASE_URL` environment variable before it can start. But that URL only exists after the first deployment.
 
-**Check Deployment Status**:
-```bash
-gcloud run services describe nostr-relay --region=us-central1
-```
+**Resolution**:
 
-**View Logs**:
-```bash
-gcloud run services logs read nostr-relay --region=us-central1 --limit=50
-```
-
-**Test WebSocket Connection**:
-```bash
-# Get service URL
-SERVICE_URL=$(gcloud run services describe nostr-relay \
-  --region=us-central1 \
-  --format='value(status.url)')
-
-# WebSocket URL (replace https:// with wss://)
-echo "wss://${SERVICE_URL#https://}"
-
-# Test with wscat
-npm install -g wscat
-wscat -c wss://your-nostr-relay-url
-```
-
-## Service: Embedding API
-
-### Deployment Workflow
-
-**Trigger**: Push to `main` branch with changes in `community-forum/services/embedding-api/`
-
-**File**: `.github/workflows/fairfield-embedding-api.yml`
-
-### Build Process
-
-1. **Test & Validate**
-   - Checkout code
-   - Setup Python 3.11
-   - Install dependencies: `pip install -r requirements.txt`
-   - Lint with ruff: `ruff check main.py`
-   - Type check with mypy: `mypy main.py`
-
-2. **Build via Cloud Build**
-   - Uses `community-forum/services/embedding-api/cloudbuild.yaml`
-   - High-CPU machine (E2_HIGHCPU_8) for ML model loading
-   - Builds Docker image
-   - Pushes to Artifact Registry
-
-3. **Deploy to Cloud Run**
-   - Service name: `embedding-api`
-   - Memory: 2Gi (ML model requires ~2GB)
-   - CPU: 1 vCPU
-   - Max instances: 3 (scale up with demand)
-   - Min instances: 0 (cost optimization)
-   - Concurrency: 80 requests per instance
-   - Timeout: 60s
-   - Port: 8080
-
-### Configuration
-
-**Environment Variables**:
-```
-ALLOWED_ORIGINS=https://dreamlab-ai.github.io,https://jjohare.github.io,http://localhost:5173
-```
-
-**Cloud Build Settings**:
-- Machine Type: E2_HIGHCPU_8 (high CPU for embedding model)
-- Timeout: 1200s (20 minutes for large model loading)
-- Logging: CLOUD_LOGGING_ONLY
-
-### Monitoring Embedding API
-
-**Health Check**:
-```bash
-SERVICE_URL=$(gcloud run services describe embedding-api \
-  --region=us-central1 \
-  --format='value(status.url)')
-
-curl -s "${SERVICE_URL}/health" | jq .
-```
-
-**Test Endpoint**:
-```bash
-curl -X POST "${SERVICE_URL}/embed" \
-  -H "Content-Type: application/json" \
-  -d '{"text":"sample text"}'
-```
-
-**View Logs**:
-```bash
-gcloud run services logs read embedding-api --region=us-central1 --limit=50
-```
-
-**Monitor Scaling**:
-```bash
-gcloud run services describe embedding-api --region=us-central1 | grep -A 5 metrics
-```
-
-## Service: Image API
-
-### Deployment Workflow
-
-**Trigger**: Push to `main` branch with changes in `community-forum/services/image-api/`
-
-**File**: `.github/workflows/fairfield-image-api.yml`
-
-### Build Process
-
-1. **Build Docker Image**
-   - Node.js/Docker-based image processing
-   - Uses multi-stage build
-   - Installs only production dependencies
-
-2. **Push to Artifact Registry**
+1. Deploy with `--no-traffic` to get the service URL:
+   ```bash
+   gcloud run deploy jss --image <image> --no-traffic --region us-central1
    ```
-   us-central1-docker.pkg.dev/PROJECT_ID/minimoonoir/image-api:COMMIT_SHA
-   us-central1-docker.pkg.dev/PROJECT_ID/minimoonoir/image-api:latest
+2. Create the secret from the returned URL:
+   ```bash
+   echo -n "https://<SERVICE_URL>/" | \
+     gcloud secrets create jss-base-url --data-file=- --project=cumbriadreamlab
    ```
+3. Re-run the workflow.
 
-3. **Deploy to Cloud Run**
-   - Service name: `image-api`
-   - Memory: 512Mi
-   - CPU: 1 vCPU
-   - Max instances: 10 (handles image resizing/processing)
-   - Timeout: Not specified (default 300s)
-   - Port: 8080
+The `jss.yml` workflow includes a **bootstrap guard** that checks for the `jss-base-url` secret and fails with instructions if it is missing.
 
-### Configuration
+The auth-api has the same dependency: it needs `JSS_BASE_URL` from Secret Manager to provision pods. After the JSS service URL is created, re-deploy auth-api as well.
 
-**Environment Variables**:
+---
+
+## Service: nostr-relay
+
+Nostr protocol relay with NIP-01, NIP-16, NIP-28, NIP-33, NIP-42, and NIP-98 support.
+
+| Attribute | Value |
+|-----------|-------|
+| **Workflow** | `.github/workflows/fairfield-relay.yml` |
+| **Source** | `community-forum/services/nostr-relay/` |
+| **Runtime** | Node.js 20 |
+| **Memory** | 512Mi |
+| **CPU** | 1 vCPU |
+| **Instances** | 1-1 (always-on for WebSocket connections) |
+| **Timeout** | 3600s (1 hour, for long-lived WebSocket) |
+| **CPU throttling** | Disabled (`--no-cpu-throttling`) |
+| **Port** | 8080 |
+
+### Secrets
+
 ```
-GCS_BUCKET=minimoonoir-images
-GOOGLE_CLOUD_PROJECT=PROJECT_ID
+DATABASE_URL=nostr-db-url:latest
+ADMIN_PUBKEYS=admin-pubkey:latest
 ```
 
-**Service Account**:
+### Cloud SQL Connection
+
 ```
-fairfield-applications@PROJECT_ID.iam.gserviceaccount.com
+--add-cloudsql-instances cumbriadreamlab:us-central1:nostr-db
 ```
 
-**GCS Bucket Setup**:
+See [Nostr Relay API](../api/NOSTR_RELAY.md) for protocol documentation.
+
+---
+
+## Service: embedding-api
+
+Text embedding service for semantic search, using the all-MiniLM-L6-v2 model (384 dimensions).
+
+| Attribute | Value |
+|-----------|-------|
+| **Workflow** | `.github/workflows/fairfield-embedding-api.yml` |
+| **Source** | `community-forum/services/embedding-api/` |
+| **Runtime** | Python 3.11, FastAPI |
+| **Memory** | 2Gi (ML model requires ~2GB) |
+| **CPU** | 1 vCPU |
+| **Instances** | 0-3 (scale-to-zero) |
+| **Concurrency** | 80 requests per instance |
+| **Build** | Cloud Build (E2_HIGHCPU_8, 20-min timeout for model loading) |
+
+### Environment
+
+```
+ALLOWED_ORIGINS=https://dreamlab-ai.com,http://localhost:5173
+```
+
+See [Embedding Service API](../api/EMBEDDING_SERVICE.md) for documentation.
+
+---
+
+## Service: image-api
+
+Image upload, processing, and serving via Google Cloud Storage.
+
+| Attribute | Value |
+|-----------|-------|
+| **Workflow** | `.github/workflows/fairfield-image-api.yml` |
+| **Source** | `community-forum/services/image-api/` |
+| **Runtime** | Node.js 20 |
+| **Memory** | 512Mi |
+| **Instances** | 0-10 |
+| **Port** | 8080 |
+| **Storage** | GCS bucket (`minimoonoir-images`) |
+
+### NIP-98 Protection
+
+Image uploads require a valid NIP-98 `Authorization` header. The image-api uses the shared `packages/nip98/verify.js` module for token verification.
+
+---
+
+## GCP Project Setup
+
+### First-Time Bootstrap
+
+See `.github/workflows/SECRETS_SETUP.md` for the full 8-step GCP bootstrap sequence.
+
+Summary:
+
+1. Create GCP project (`cumbriadreamlab`)
+2. Enable required APIs (Cloud Run, Artifact Registry, Cloud SQL, Secret Manager, Cloud Storage)
+3. Create service account (`github-actions`) with Cloud Run Admin and Artifact Registry Writer roles
+4. Create and download service account key JSON
+5. Store key as `GCP_SA_KEY` GitHub secret
+6. Create Cloud SQL instance (`nostr-db`, PostgreSQL 15)
+7. Create database and user
+8. Store `DATABASE_URL` in Secret Manager
+
+### Service Account
+
+```
+fairfield-applications@cumbriadreamlab.iam.gserviceaccount.com
+```
+
+Roles:
+
+- `roles/run.admin`
+- `roles/artifactregistry.writer`
+- `roles/iam.serviceAccountUser`
+- `roles/cloudsql.client`
+- `roles/secretmanager.secretAccessor`
+
+---
+
+## Database: Cloud SQL PostgreSQL
+
+### Instance
+
+```
+Instance: nostr-db
+Version: PostgreSQL 15
+Region: us-central1
+Tier: db-g1-small
+Backups: Daily at 03:00 UTC, 7-day retention
+```
+
+### Schema
+
+The auth-api manages its schema via auto-migration on startup:
+
+**webauthn_credentials**:
+```sql
+CREATE TABLE webauthn_credentials (
+  credential_id TEXT PRIMARY KEY,
+  pubkey TEXT NOT NULL UNIQUE,
+  did_nostr TEXT NOT NULL,
+  webid TEXT,
+  pod_url TEXT,
+  public_key_bytes BYTEA NOT NULL,
+  counter BIGINT DEFAULT 0,
+  device_type TEXT DEFAULT 'singleDevice',
+  backed_up BOOLEAN DEFAULT false,
+  transports TEXT[],
+  prf_salt BYTEA NOT NULL DEFAULT gen_random_bytes(32),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+**webauthn_challenges**:
+```sql
+CREATE TABLE webauthn_challenges (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  challenge TEXT NOT NULL UNIQUE,
+  pubkey TEXT,
+  used BOOLEAN DEFAULT FALSE,
+  prf_salt BYTEA,
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+The nostr-relay manages its own `events` and `whitelist` tables (see [Nostr Relay API](../api/NOSTR_RELAY.md)).
+
+---
+
+## Secrets Management
+
+### GitHub Secrets
+
+Store in GitHub repository Settings > Secrets and variables > Actions:
+
+| Secret | Purpose |
+|--------|---------|
+| `GCP_PROJECT_ID` | `cumbriadreamlab` |
+| `GCP_SA_KEY` | Service account JSON key (full content) |
+| `VITE_SUPABASE_URL` | Supabase project URL |
+| `VITE_SUPABASE_ANON_KEY` | Supabase anonymous key |
+| `VITE_AUTH_API_URL` | Auth API Cloud Run URL |
+
+### GCP Secret Manager
+
+| Secret | Purpose |
+|--------|---------|
+| `nostr-db-url` | PostgreSQL connection string |
+| `jss-base-url` | JSS Cloud Run URL |
+| `admin-pubkey` | Admin Nostr pubkeys (comma-separated) |
+
+### Rotation
+
+- GCP service account keys: rotate quarterly
+- Database passwords: rotate on compromise or personnel change
+- Supabase keys: rotate on compromise
+
+---
+
+## Manual Deployment
+
+### Deploy auth-api
+
 ```bash
-# Create bucket
-gsutil mb -l us-central1 gs://minimoonoir-images
-
-# Configure CORS (if client-side uploads)
-gsutil cors set cors.json gs://minimoonoir-images
-
-# Set bucket lifecycle (optional - auto-delete old images)
-gsutil lifecycle set lifecycle.json gs://minimoonoir-images
+cd community-forum/services/auth-api
+npm ci && npm run build
+docker build -t auth-api:latest .
+docker tag auth-api:latest us-central1-docker.pkg.dev/cumbriadreamlab/minimoonoir/auth-api:latest
+docker push us-central1-docker.pkg.dev/cumbriadreamlab/minimoonoir/auth-api:latest
+gcloud run deploy auth-api \
+  --image us-central1-docker.pkg.dev/cumbriadreamlab/minimoonoir/auth-api:latest \
+  --region us-central1 \
+  --memory 512Mi --cpu 1 --port 8080
 ```
 
-### Monitoring Image API
-
-**Health Check**:
-```bash
-SERVICE_URL=$(gcloud run services describe image-api \
-  --region=us-central1 \
-  --format='value(status.url)')
-
-curl "${SERVICE_URL}/health"
-```
-
-**View Logs**:
-```bash
-gcloud run services logs read image-api --region=us-central1 --limit=50
-```
-
-## Database: Cloud SQL
-
-### PostgreSQL Instance Setup
+### Deploy nostr-relay
 
 ```bash
-# Create Cloud SQL instance
-gcloud sql instances create nostr-db \
-  --database-version=POSTGRES_15 \
-  --tier=db-g1-small \
-  --region=us-central1 \
-  --backup-start-time=03:00 \
-  --enable-bin-log \
-  --backup-location=us
-```
-
-### Create Database & User
-
-```bash
-# Create database
-gcloud sql databases create nostr \
-  --instance=nostr-db
-
-# Create user
-gcloud sql users create nostr-app \
-  --instance=nostr-db \
-  --password=STRONG_PASSWORD
-```
-
-### Connection Configuration
-
-**Store in Secret Manager**:
-```bash
-# Create secret for DATABASE_URL
-echo "postgresql://nostr-app:PASSWORD@/nostr?cloudSqlInstance=PROJECT_ID:us-central1:nostr-db&user=nostr-app&password=PASSWORD" | \
-  gcloud secrets create nostr-db-url --data-file=-
-
-# Create secret for admin pubkeys
-echo "ADMIN_PUBKEY_1,ADMIN_PUBKEY_2" | \
-  gcloud secrets create admin-pubkey --data-file=-
-```
-
-**Grant Cloud Run service account access**:
-```bash
-gcloud sql instances patch nostr-db \
-  --database-flags=cloudsql_iam_authentication=on
-
-gcloud projects add-iam-policy-binding PROJECT_ID \
-  --member="serviceAccount:fairfield-applications@PROJECT_ID.iam.gserviceaccount.com" \
-  --role="roles/cloudsql.client"
-```
-
-## Storage: Google Cloud Storage
-
-### Setup GCS Buckets
-
-```bash
-# Images bucket
-gsutil mb -l us-central1 gs://minimoonoir-images
-
-# Relay data backup (optional)
-gsutil mb -l us-central1 gs://minimoonoir-relay-backup
-
-# Configure versioning (optional)
-gsutil versioning set on gs://minimoonoir-images
-```
-
-### Access Control
-
-**Grant Cloud Run service account**:
-```bash
-gsutil iam ch serviceAccount:fairfield-applications@PROJECT_ID.iam.gserviceaccount.com:objectAdmin \
-  gs://minimoonoir-images
-```
-
-## Manual Deployment (if needed)
-
-### Deploy Nostr Relay
-
-```bash
-# Build locally
 cd community-forum/services/nostr-relay
-npm run build
-
-# Build image
+npm ci && npm run build
 docker build -t nostr-relay:latest .
-
-# Tag for Artifact Registry
-docker tag nostr-relay:latest \
-  us-central1-docker.pkg.dev/PROJECT_ID/minimoonoir/nostr-relay:latest
-
-# Push to registry
-docker push us-central1-docker.pkg.dev/PROJECT_ID/minimoonoir/nostr-relay:latest
-
-# Deploy to Cloud Run
+docker tag nostr-relay:latest us-central1-docker.pkg.dev/cumbriadreamlab/minimoonoir/nostr-relay:latest
+docker push us-central1-docker.pkg.dev/cumbriadreamlab/minimoonoir/nostr-relay:latest
 gcloud run deploy nostr-relay \
-  --image us-central1-docker.pkg.dev/PROJECT_ID/minimoonoir/nostr-relay:latest \
-  --platform managed \
+  --image us-central1-docker.pkg.dev/cumbriadreamlab/minimoonoir/nostr-relay:latest \
   --region us-central1 \
-  --memory 512Mi \
-  --cpu 1 \
-  --no-cpu-throttling \
-  --timeout 3600 \
-  --port 8080
+  --memory 512Mi --cpu 1 --no-cpu-throttling --timeout 3600
 ```
 
-### Deploy Embedding API
+---
+
+## Monitoring
+
+### Health Checks
 
 ```bash
-cd community-forum/services/embedding-api
+# auth-api
+curl https://<auth-api-url>/health
 
-# Deploy via Cloud Build
-gcloud builds submit . \
-  --config=cloudbuild.yaml \
-  --substitutions=COMMIT_SHA=manual-$(date +%s)
+# Check all Cloud Run services
+gcloud run services list --region=us-central1
 ```
 
-### Deploy Image API
+### Logs
 
 ```bash
-cd community-forum/services/image-api
-
-# Build and push
-docker build -t image-api:latest .
-docker tag image-api:latest \
-  us-central1-docker.pkg.dev/PROJECT_ID/minimoonoir/image-api:latest
-docker push us-central1-docker.pkg.dev/PROJECT_ID/minimoonoir/image-api:latest
-
-# Deploy
-gcloud run deploy image-api \
-  --image us-central1-docker.pkg.dev/PROJECT_ID/minimoonoir/image-api:latest \
-  --platform managed \
-  --region us-central1 \
-  --memory 512Mi \
-  --max-instances 10
+gcloud run services logs read auth-api --region=us-central1 --limit=50
+gcloud run services logs read nostr-relay --region=us-central1 --limit=50
+gcloud run services logs read jss --region=us-central1 --limit=50
 ```
 
-## Troubleshooting
-
-### Service Not Starting
-
-**Check Logs**:
-```bash
-gcloud run services logs read SERVICE_NAME --region=us-central1 --limit=100
-```
-
-**Common Issues**:
-- Image not found in Artifact Registry
-- Environment secrets not set correctly
-- Cloud SQL connection failed
-- Out of memory
-
-### High Latency
-
-**Check Metrics**:
-```bash
-gcloud monitoring read \
-  --filter='resource.type="cloud_run_revision"' \
-  --format=json
-```
-
-**Optimization**:
-- Increase memory allocation
-- Increase max instances
-- Enable concurrency limits
-- Cache frequent requests
-
-### Database Connection Issues
-
-**Test Connection**:
-```bash
-gcloud sql connect nostr-db --user=nostr-app
-```
-
-**Check Connection Quota**:
-```bash
-gcloud sql instances describe nostr-db | grep connections
-```
-
-## Security Best Practices
-
-1. **Secret Management**: Use Google Secret Manager for sensitive data
-2. **Service Accounts**: Use minimal IAM roles
-3. **Network**: Enable VPC Service Controls if needed
-4. **Monitoring**: Set up Cloud Logging and Cloud Monitoring alerts
-5. **Image Scanning**: Enable Container Analysis for vulnerability scanning
-6. **Backup**: Enable automated Cloud SQL backups
-
-## Performance Tuning
-
-### Nostr Relay
-- Increase max instances if WebSocket connections spike
-- Monitor memory usage (typically stable around 256Mi)
-- Consider regional failover setup
-
-### Embedding API
-- Pre-warm instances for consistent latency
-- Use concurrency limits to prevent overload
-- Monitor model loading time in logs
-
-### Image API
-- Enable CDN caching for processed images
-- Set appropriate cache headers
-- Monitor GCS bandwidth usage
-
-## Cost Optimization
-
-- Use min instances = 0 for non-critical services
-- Set max instances limits to prevent runaway costs
-- Use Cloud SQL shared-core tier for development
-- Enable automatic scaling based on metrics
-- Regularly review Cloud Run invocation logs
+---
 
 ## Related Documentation
 
-- [GitHub Pages Deployment](./GITHUB_PAGES.md) - Static site deployment
-- [Monitoring & Health Checks](./MONITORING.md) - Service health verification
-- [Rollback Procedures](./ROLLBACK.md) - Emergency recovery
-- [Environment Setup](./ENVIRONMENTS.md) - Configuration details
+- [Deployment Overview](./README.md)
+- [GitHub Pages](./GITHUB_PAGES.md)
+- [Cloudflare Workers](./CLOUDFLARE_WORKERS.md)
+- [Environments](./ENVIRONMENTS.md)
+- [Auth API Reference](../api/AUTH_API.md)
+- [Nostr Relay API](../api/NOSTR_RELAY.md)
 
-## References
+---
 
-- [GCP Cloud Run Documentation](https://cloud.google.com/run/docs)
-- [Artifact Registry Guide](https://cloud.google.com/artifact-registry/docs)
-- [Cloud Build Configuration](https://cloud.google.com/build/docs/build-config)
-- [Cloud SQL Connection](https://cloud.google.com/sql/docs/postgres/cloud-run-connections)
+*Last major revision: 2026-02-28.*

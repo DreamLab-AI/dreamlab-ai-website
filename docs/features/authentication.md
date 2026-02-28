@@ -1,489 +1,222 @@
 ---
 title: "Authentication System"
-description: "Fairfield uses a Nostr-native authentication system based on nsec private keys with secure local storage and optional read-only access."
+description: "WebAuthn PRF passkey-based authentication with HKDF key derivation and NIP-98 HTTP auth for the DreamLab AI community forum"
 category: tutorial
-tags: ['authentication', 'developer', 'user']
-difficulty: beginner
-last-updated: 2026-01-16
+tags: ['authentication', 'webauthn', 'passkey', 'nip-98', 'developer']
+difficulty: intermediate
+last-updated: 2026-02-28
 ---
 
 # Authentication System
 
-Fairfield uses a Nostr-native authentication system based on nsec private keys with secure local storage and optional read-only access.
+The DreamLab AI community forum uses a passwordless authentication system built on WebAuthn with the PRF (Pseudo-Random Function) extension. A user's Nostr secp256k1 private key is derived deterministically from hardware-backed biometric authentication and is never stored -- it exists only in a volatile in-memory closure during an active session.
 
 ## Overview
 
 The authentication system provides:
-- **Nsec/Hex Key-Based Login** - Direct Nostr private key authentication (no mnemonic phrases)
-- **Session-Based Key Encryption** - Private keys encrypted with session tokens using AES-256-GCM
-- **Account Status System** - Differentiated access for complete vs incomplete accounts
-- **Read-Only Mode** - Allows browsing without full signup completion
-- **Rate Limiting** - Protection against brute-force attacks
 
-## Authentication Flows
+- **WebAuthn PRF passkey registration** -- hardware-backed biometric login (FaceID, TouchID, YubiKey)
+- **Deterministic key derivation** -- HKDF-SHA-256 transforms PRF output into a secp256k1 private key
+- **NIP-98 HTTP auth** -- every state-mutating API call is Schnorr-signed with kind:27235 events
+- **In-memory key security** -- private key held only in a closure (`_privkeyMem`), zero-filled on `pagehide`
+- **Multiple login methods** -- passkey (primary), NIP-07 browser extension, manual nsec/hex key entry
+- **Solid pod provisioning** -- server-side pod creation via JSS on successful registration
 
-### New User Signup
+## Identity Model
+
+Each user's identity spans three layers:
+
+```
+secp256k1 pubkey (hex)
+  --> did:nostr:{pubkey}           (W3C DID for interop)
+  --> {jss-url}/{pubkey}/profile/card#me  (WebID for Solid/Linked Data)
+```
+
+| Layer | Format | Purpose |
+|-------|--------|---------|
+| **Nostr pubkey** | 64-char hex string | Primary identity, message signing |
+| **DID** | `did:nostr:{pubkey}` | Decentralised identifier |
+| **WebID** | `{pod-url}/profile/card#me` | Linked Data profile (Solid) |
+
+## Key Derivation
+
+```
+WebAuthn PRF output (32 bytes, HMAC-SHA-256 from authenticator)
+  --> HKDF(SHA-256, salt=[], info="nostr-secp256k1-v1")
+  --> 32-byte candidate key
+  --> secp256k1.isValidPrivateKey(key)?
+      YES --> private key
+      NO  --> SHA-256(key) --> recurse (probability ~2^-128)
+  --> getPublicKey(privkey) --> hex pubkey
+```
+
+The PRF salt is generated at registration time and stored server-side in the `webauthn_credentials.prf_salt` column. The same credential with the same PRF salt always produces the same private key.
+
+### Critical Constraints
+
+- **Same device required**: cross-device QR authentication produces a different PRF output and cannot derive the original key. The client checks `authenticatorAttachment !== 'cross-platform'` and rejects cross-device attempts.
+- **Windows Hello unsupported**: no PRF extension support. The client reports a clear error message.
+- **Device loss = key loss**: if a user loses the authenticator and did not back up their nsec, recovery is impossible. The UI warns during registration.
+
+## Registration Flow
 
 ```mermaid
 sequenceDiagram
     participant User
-    participant App as PWA
-    participant Crypto as Web Crypto API
-    participant Storage as localStorage
+    participant Client as SvelteKit Forum
+    participant AuthAPI as auth-api (Cloud Run)
+    participant JSS as JSS Pod Server
 
-    User->>App: 1. Click "Create Account"
-    App->>Crypto: 2. Generate random private key
-    Crypto-->>App: 3. Return 32-byte key
-    App->>App: 4. Derive public key (secp256k1)
-    App->>App: 5. Encode to nsec1... format (NIP-19)
-    App->>User: 6. Display NsecBackup component
+    User->>Client: 1. Click "Register with Passkey"
+    Client->>AuthAPI: 2. POST /auth/register/options { displayName }
+    AuthAPI-->>Client: 3. { options, prfSalt (base64url) }
 
-    Note over User,App: User MUST backup key before continuing
+    Client->>Client: 4. navigator.credentials.create() with PRF extension
+    Note over Client: PRF eval: { first: base64urlToBuffer(prfSalt) }
 
-    User->>App: 7. Click "Reveal" to see nsec
-    User->>App: 8. Click "Copy" or "Download"
-    App->>App: 9. Mark hasBackedUp = true
-    User->>App: 10. Check "I have backed up" checkbox
-    User->>App: 11. Click "Continue"
+    Client->>Client: 5. Check extensions.prf.enabled === true
+    Client->>Client: 6. Extract PRF output (32 bytes)
+    Client->>Client: 7. HKDF(PRF output) --> privkey --> getPublicKey() --> pubkey
 
-    App->>Crypto: 12. Generate session encryption key
-    App->>Crypto: 13. Encrypt private key (AES-256-GCM)
-    App->>Storage: 14. Store encrypted key + pubkey
-    App->>Storage: 15. Set account_status = 'complete'
-    App->>User: 16. Redirect to chat
+    Client->>AuthAPI: 8. POST /auth/register/verify { response, pubkey }
+    AuthAPI->>AuthAPI: 9. Verify attestation, store credential + prf_salt
+    AuthAPI->>JSS: 10. POST /idp/register/ { pubkey }
+    JSS-->>AuthAPI: 11. { webId, podUrl }
+    AuthAPI-->>Client: 12. { didNostr, webId, podUrl }
+
+    Client->>Client: 13. Store pubkey + metadata in localStorage
+    Note over Client: Private key held in _privkeyMem closure only
+    Client->>User: 14. Proceed to nickname setup
 ```
 
-### Login with Existing Key
+### Key Files
+
+| File | Role |
+|------|------|
+| `community-forum/src/lib/auth/passkey.ts` | `registerPasskey()` -- WebAuthn ceremony, HKDF derivation |
+| `community-forum/src/lib/stores/auth.ts` | `registerWithPasskey()` -- auth store integration |
+| `community-forum/services/auth-api/src/routes/register.ts` | Server-side attestation verification |
+| `community-forum/services/auth-api/src/jss-client.ts` | Solid pod provisioning |
+
+## Authentication Flow
 
 ```mermaid
 sequenceDiagram
     participant User
-    participant App as PWA
-    participant Validator as Key Validator
-    participant RateLimit as Rate Limiter
-    participant Storage as localStorage
+    participant Client as SvelteKit Forum
+    participant AuthAPI as auth-api (Cloud Run)
 
-    User->>App: 1. Enter nsec1... or hex key
-    App->>RateLimit: 2. Check rate limit (5/15min)
+    User->>Client: 1. Click "Log in with Passkey"
+    Client->>AuthAPI: 2. POST /auth/login/options { pubkey? }
+    AuthAPI-->>Client: 3. { options, prfSalt (base64url) }
 
-    alt Rate limit exceeded
-        RateLimit-->>App: Block request
-        App->>User: Show "Too many attempts" error
-    else Rate limit OK
-        RateLimit-->>App: Allow request
-        App->>Validator: 3. Validate key format
+    Client->>Client: 4. navigator.credentials.get() with PRF eval
+    Client->>Client: 5. Check authenticatorAttachment !== 'cross-platform'
+    Client->>Client: 6. Extract PRF output
+    Client->>Client: 7. HKDF(PRF output) --> privkey --> pubkey
 
-        alt Invalid key
-            Validator-->>App: Validation error
-            App->>User: Show "Invalid key" error
-        else Valid key
-            Validator-->>App: Valid nsec or hex
-            App->>App: 4. Decode to raw bytes
-            App->>App: 5. Derive public key
-            App->>App: 6. Encrypt with session key
-            App->>Storage: 7. Store encrypted key
-            App->>Storage: 8. Set account_status = 'complete'
-            App->>User: 9. Redirect to dashboard
-        end
-    end
+    Client->>AuthAPI: 8. POST /auth/login/verify { response, pubkey }
+    Note over Client,AuthAPI: Request includes NIP-98 Authorization header
+    AuthAPI->>AuthAPI: 9. Verify assertion, check counter, update counter
+    AuthAPI-->>Client: 10. { didNostr, webId }
+
+    Client->>Client: 11. privkey in _privkeyMem, ready to sign
+    Client->>User: 12. Authenticated -- navigate to forum
 ```
 
-### Read-Only Mode (Incomplete Account)
+## Alternative Login Methods
 
-Users who start browsing without completing signup get read-only access:
+### NIP-07 Browser Extension
 
-```mermaid
-graph TB
-    Start([User visits site]) --> HasKeys{Has stored keys?}
+Users with Alby, nos2x, or another Nostr signer extension can authenticate without a passkey. The extension provides the pubkey and handles event signing. No private key is exposed to the application.
 
-    HasKeys -->|No| FastSignup[FastSignup Component]
-    FastSignup --> GenerateTemp[Generate temporary keys]
-    GenerateTemp --> SetIncomplete[Set status = 'incomplete']
-    SetIncomplete --> ReadOnly[Read-Only Access]
+### Local Key (nsec / hex)
 
-    HasKeys -->|Yes| CheckStatus{Account status?}
-    CheckStatus -->|complete| FullAccess[Full Access]
-    CheckStatus -->|incomplete| ReadOnly
+Advanced users can paste an nsec or hex private key directly. The key is stored in `sessionStorage` (default) or `localStorage` (if "remember me" is selected). This path skips the WebAuthn ceremony entirely.
 
-    ReadOnly --> CanRead[Can read messages]
-    ReadOnly --> CannotPost[Cannot post/react]
-    ReadOnly --> ShowBanner[ReadOnlyBanner shown]
-    ShowBanner --> PromptComplete[Prompt to complete signup]
+## Session Management
 
-    PromptComplete -->|Complete signup| NsecBackup[NsecBackup Component]
-    NsecBackup -->|Backup complete| SetComplete[Set status = 'complete']
-    SetComplete --> FullAccess
+### In-Memory Key Storage
 
-    style ReadOnly fill:#f59e0b,color:#000
-    style FullAccess fill:#10b981,color:#fff
-```
-
-## Key Formats
-
-### Supported Input Formats
-
-| Format | Example | Description |
-|--------|---------|-------------|
-| **nsec** | `nsec1abc...xyz` | Bech32-encoded private key (NIP-19) |
-| **hex** | `64-char hex string` | Raw 32-byte private key in hex |
-
-### Key Validation
+When authenticated via passkey, the private key is held only in a volatile variable:
 
 ```typescript
-// Validation rules
-- nsec: Must start with 'nsec1', be lowercase, valid bech32
-- hex: Must be exactly 64 hexadecimal characters
-- Whitespace is trimmed automatically
-- Input is normalized to lowercase for nsec
+// In auth.ts createAuthStore()
+let _privkeyMem: Uint8Array | null = null;
 ```
 
-## Security Features
+- **Never written** to localStorage, sessionStorage, IndexedDB, or any persistent store
+- **Zero-filled** on logout (`_privkeyMem.fill(0); _privkeyMem = null`)
+- **Zero-filled** on `pagehide` event (tab close, navigation away)
+- **Not restored** on page reload -- passkey users must re-authenticate
 
-### Key Encryption
+### localStorage Schema
 
-Private keys are never stored in plaintext. The encryption process:
+Only non-secret profile metadata is persisted:
 
-1. **Session Key Generation**: Random 256-bit key via `crypto.getRandomValues()`
-2. **Encryption**: AES-256-GCM with random 12-byte IV
-3. **Storage**: Base64-encoded ciphertext stored in localStorage
-4. **Session Token**: Stored in sessionStorage (cleared on tab close)
+| Key | Type | Contents |
+|-----|------|----------|
+| `nostr_bbs_keys` | JSON | `{ publicKey, isPasskey, isNip07, isLocalKey, nickname, avatar, accountStatus, nsecBackedUp }` |
+
+### Session Restoration
+
+On page load, the auth store restores profile metadata from localStorage but does **not** restore the private key for passkey sessions. The user sees their profile but must re-authenticate to sign events.
+
+## NIP-98 HTTP Auth
+
+Every state-mutating API call uses NIP-98 `Authorization: Nostr <base64(event)>`:
+
+- Event kind: `27235`
+- Tags: `['u', url]`, `['method', method]`, optionally `['payload', sha256(body)]`
+- Schnorr-signed with the in-memory private key
+- Timestamp window: +/-60 seconds
+- Event size limit: 64KB
+
+See [NIP-98 Auth](./nip98-auth.md) for the shared module architecture and server-side verification.
+
+## Security Properties
+
+### What is Protected
+
+| Threat | Mitigation |
+|--------|------------|
+| Key theft from storage | Private key never written to any persistent store (passkey path) |
+| Key theft from memory | Zero-filled on logout and pagehide |
+| Cross-device PRF mismatch | `authenticatorAttachment` check rejects cross-platform assertions |
+| Replay attacks | NIP-98 timestamp window of +/-60s |
+| Body tampering | NIP-98 payload tag contains SHA-256 of raw request body |
+| SSRF via URL tag | RP_ORIGIN validation on server side |
+| Oversized events | 64KB hard limit on event size |
+| Brute-force registration | Rate limiting on auth-api endpoints |
+
+### What is Not Protected
+
+- **Device loss without backup**: if the authenticator is lost and the nsec was not backed up, the key is unrecoverable
+- **Authenticator compromise**: if the hardware authenticator is compromised, the derived key is compromised
+- **Extension compromise**: NIP-07 extensions manage their own key security; a compromised extension exposes the key
+
+## Auth Store API
 
 ```typescript
-// Encryption parameters
-Algorithm: AES-256-GCM
-Key Size: 256 bits
-IV Size: 96 bits (12 bytes)
-Tag Size: 128 bits (16 bytes)
-Key Derivation: PBKDF2-SHA256 (optional PIN protection)
-```
-
-### Rate Limiting
-
-Login attempts are rate-limited using a token bucket algorithm:
-
-| Action | Capacity | Refill Rate | Window |
-|--------|----------|-------------|--------|
-| Login | 5 attempts | 5 per 15 minutes | 15 min |
-| Signup | 3 attempts | 3 per hour | 1 hour |
-| Key operations | 10 attempts | 10 per minute | 1 min |
-
-### Privacy Protections
-
-- **No Server Storage**: Keys exist only in browser localStorage
-- **Session-Bound Encryption**: Keys encrypted with session tokens
-- **No Analytics**: No key-related data sent to external services
-- **Local Derivation**: Public keys derived locally using secp256k1
-
-## Components
-
-### NsecBackup
-
-Displays the private key with mandatory backup enforcement:
-
-```svelte
-<NsecBackup
-  nsec="nsec1..."
-  onConfirm={() => completeSignup()}
-/>
-```
-
-**Features:**
-- Key hidden by default (click to reveal)
-- Copy to clipboard with confirmation
-- Download as `.txt` backup file
-- Checkbox confirmation required
-- Continue button disabled until backup confirmed
-
-### ReadOnlyBanner
-
-Shows a dismissible warning for incomplete accounts:
-
-```svelte
-{#if $isReadOnly}
-  <ReadOnlyBanner />
-{/if}
-```
-
-**Features:**
-- Appears at top of chat/DM pages
-- Dismissible (for 1 hour) via localStorage
-- Links to signup completion
-- Yellow warning styling
-
-### Login Component
-
-Handles nsec/hex key input with validation:
-
-**Features:**
-- Password-type input (hidden by default)
-- Real-time format detection (nsec vs hex)
-- Whitespace trimming
-- Error messages for invalid keys
-- Rate limit feedback
-- Loading state during authentication
-
-## Account Status System
-
-### Status Values
-
-| Status | Description | Capabilities |
-|--------|-------------|--------------|
-| `complete` | Full signup completed with key backup | Full access to all features |
-| `incomplete` | Quick start without backup | Read-only access, can browse |
-| `null` | No account | Must signup or login |
-
-### Derived Stores
-
-```typescript
-// In auth.ts
-export const isAuthenticated = derived(authStore, ($auth) => !!$auth.pubkey);
-
-export const isReadOnly = derived(authStore, ($auth) =>
-  $auth.accountStatus === 'incomplete'
-);
-
-export const accountStatus = derived(authStore, ($auth) =>
-  $auth.accountStatus
-);
-```
-
-### Access Control by Feature
-
-| Feature | Complete | Incomplete | Unauthenticated |
-|---------|----------|------------|-----------------|
-| Browse channels | Yes | Yes | No |
-| Read messages | Yes | Yes | No |
-| Send messages | Yes | No | No |
-| React to messages | Yes | No | No |
-| Send DMs | Yes | No | No |
-| Create events | Yes | No | No |
-| Edit profile | Yes | No | No |
-| Admin panel | Yes (admin only) | No | No |
-
-## Storage Schema
-
-### localStorage Keys
-
-| Key | Type | Description |
-|-----|------|-------------|
-| `nostr_bbs_nostr_pubkey` | string | 64-char hex public key |
-| `nostr_bbs_nostr_encrypted_privkey` | string | Base64 encrypted private key |
-| `nostr_bbs_nostr_account_status` | string | 'complete' or 'incomplete' |
-| `nostr_bbs_nostr_relay_url` | string | Preferred relay URL |
-
-### sessionStorage Keys
-
-| Key | Type | Description |
-|-----|------|-------------|
-| `nostr_bbs_session_key` | string | Base64 session encryption key |
-
-## Migration Notes
-
-### From Mnemonic to Nsec (v2.0)
-
-The authentication system was refactored in v2.0 to remove BIP-39 mnemonic phrases:
-
-**What Changed:**
-- Removed 12-word recovery phrase generation
-- Removed mnemonic display and verification UI
-- Removed mnemonic-based key derivation
-- Added direct nsec/hex key backup
-- Added NsecBackup component with copy/download
-- Added account status system
-- Added read-only mode for incomplete accounts
-
-**Why:**
-- Simpler UX (no word verification step)
-- Faster signup flow
-- Native Nostr key format (nsec)
-- Better cross-client compatibility
-- Reduced code complexity
-
-**Backward Compatibility:**
-- Existing users with mnemonic-derived keys can still login with their nsec
-- Keys derived from mnemonics remain valid
-- No data migration required
-
-## Admin Security Hardening (v2.1)
-
-The authentication system includes hardened admin workflows:
-
-### Server-Side Verification
-
-All admin pages now use server-side verification via the relay API:
-
-```typescript
-import { verifyWhitelistStatus } from '$lib/nostr/whitelist';
-
-// In admin route/component
-const status = await verifyWhitelistStatus(userPubkey);
-
-if (!status.isAdmin) {
-  goto('/events');  // Redirect non-admins
-  return;
-}
-```
-
-**Important**: Never rely solely on client-side `$isAdmin` store for authorization.
-
-### Rate Limiting with Exponential Backoff
-
-Admin actions are protected by rate limiting:
-
-| Action Type | Max Attempts | Window | Backoff |
-|-------------|--------------|--------|---------|
-| Section Access | 5 | 1 minute | 2x |
-| Cohort Change | 3 | 1 hour | 3x |
-| Admin Action | 10 | 1 minute | 1.5x |
-
-```typescript
-import { checkRateLimit } from '$lib/nostr/admin-security';
-
-const result = checkRateLimit('cohortChange', userPubkey);
-if (!result.allowed) {
-  console.log(`Rate limited. Retry in ${result.retryAfterMs}ms`);
-}
-```
-
-### NIP-51 Pin List Verification
-
-Admin pin list events (kind 30001) are cryptographically verified:
-
-```typescript
-import { verifyPinListSignature } from '$lib/nostr/admin-security';
-
-const isValid = await verifyPinListSignature(pinListEvent);
-```
-
-### Signed Admin Requests
-
-Privileged operations require cryptographic signatures:
-
-```typescript
-import { createSignedAdminRequest, verifySignedAdminRequest } from '$lib/nostr/admin-security';
-
-const request = await createSignedAdminRequest({
-  action: 'cohort_change',
-  targetPubkey: userPubkey,
-  data: { cohort: 'approved' },
-  adminPrivkey: adminPrivateKey
-});
-```
-
-### Suspicious Activity Detection
-
-The system tracks and logs suspicious activity:
-
-| Event Type | Trigger |
-|------------|---------|
-| `rate_limit_exceeded` | Too many requests |
-| `invalid_signature` | Signature verification failed |
-| `unauthorized_action` | Non-admin attempting admin action |
-| `replay_attack` | Duplicate nonce detected |
-| `timestamp_drift` | Request timestamp too old/future |
-
-See [Admin Security](../security/admin-security.md) for complete documentation.
-
-## QE Audit Findings (v2.0)
-
-Security audit identified these items for the authentication system:
-
-### Implemented
-- AES-256-GCM key encryption
-- Rate limiting infrastructure
-- Account status differentiation
-- Read-only access control
-- Server-side admin verification (HIGH-001, HIGH-002 fixed)
-- URL injection prevention (MED-001 fixed)
-- NIP-51 signature verification
-- Suspicious activity logging
-
-### Recommendations (Future)
-- Add session timeout handling
-- Implement key backup reminders
-- Add password/PIN protection option
-
-## Testing
-
-### E2E Test Coverage
-
-The authentication system has comprehensive E2E tests:
-
-- `tests/e2e/auth.spec.ts` - Admin and user authentication flows
-- `tests/e2e/login.spec.ts` - Login validation and error handling
-- `tests/e2e/signup.spec.ts` - Signup flow and key backup
-- `tests/e2e/auth-extended.spec.ts` - Edge cases and cross-browser testing
-
-### Test Commands
-
-```bash
-# Run all auth tests
-npm run test:e2e -- --grep "auth|login|signup"
-
-# Run specific test file
-npm run test:e2e tests/e2e/auth.spec.ts
-
-# Run with UI
-npm run test:e2e -- --ui
-```
-
-## API Reference
-
-### authStore
-
-```typescript
-import { authStore, isReadOnly, isAuthenticated } from '$lib/stores/auth';
-
-// Read current state
-$authStore.pubkey      // Current public key
-$authStore.accountStatus // 'complete' | 'incomplete' | null
+import { authStore, isAuthenticated, isReady, isReadOnly } from '$lib/stores/auth';
+
+// Derived stores
+$isAuthenticated  // boolean: user has a pubkey and is signed in
+$isReady          // boolean: session restoration complete
+$isReadOnly       // boolean: account status is 'incomplete'
 
 // Actions
-authStore.setKeys(pubkey, privkey)  // Store encrypted keys
-authStore.clear()                    // Logout, clear all keys
-authStore.completeSignup()          // Mark account as complete
-```
-
-### Key Utilities
-
-```typescript
-import { generatePrivateKey, getPublicKey, nsecEncode, nsecDecode } from '$lib/nostr/keys';
-
-// Generate new keypair
-const privkey = generatePrivateKey();     // 32-byte Uint8Array
-const pubkey = getPublicKey(privkey);     // 64-char hex string
-
-// Encode/decode nsec
-const nsec = nsecEncode(privkey);         // 'nsec1...'
-const bytes = nsecDecode(nsec);           // Uint8Array
-```
-
-### Key Encryption
-
-```typescript
-import { encryptPrivateKey, decryptPrivateKey } from '$lib/utils/key-encryption';
-
-// Encrypt for storage
-const encrypted = await encryptPrivateKey(privkeyHex, sessionKey);
-
-// Decrypt for signing
-const decrypted = await decryptPrivateKey(encrypted, sessionKey);
-```
-
-### DID Integration
-
-```typescript
-import { pubkeyToDID, generateDIDDocument } from '$lib/nostr/did';
-
-// Convert pubkey to W3C DID
-const did = pubkeyToDID(pubkey);
-// Result: 'did:nostr:7e7e9c42...'
-
-// Generate DID Document
-const didDoc = generateDIDDocument(pubkey);
+authStore.registerWithPasskey(displayName)   // Full passkey registration
+authStore.loginWithPasskey(pubkey?)           // Re-derive key from passkey
+authStore.loginWithExtension()               // NIP-07 extension login
+authStore.loginWithLocalKey(privkeyHex, rememberMe)  // nsec/hex login
+authStore.getPrivkey()                       // Get in-memory Uint8Array | null
+authStore.logout()                           // Zero-fill and clear
+authStore.waitForReady()                     // Await session restoration
 ```
 
 ## Related Documentation
 
-- [Admin Security](../security/admin-security.md) - Admin workflow hardening
-- [Security Audit Report](../security-audit-report.md) - Full security findings
+- [NIP-98 Auth](./nip98-auth.md) -- shared NIP-98 module and server-side verification
+- [Community Forum](./community-forum.md) -- forum architecture and auth integration
+- [ADR-009](../adr/009-user-registration-flow.md) -- user registration flow decision

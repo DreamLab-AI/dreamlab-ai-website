@@ -1,298 +1,429 @@
+# DreamLab AI -- Architecture Overview
+
+**Last updated:** 2026-02-28
+
+This document describes the high-level architecture of the DreamLab AI platform. For detailed SPARC methodology documents, see the `architecture/` directory. For individual technology decisions, see the [ADR index](adr/README.md).
+
 ---
-title: "Fairfield Architecture Overview"
-description: "This document provides a high-level overview of the Fairfield application architecture. For detailed SPARC documentation, see the architecture files: - [01-specification.md](./architecture/01-specific"
-category: explanation
-tags: ['architecture', 'developer', 'user']
-difficulty: beginner
-last-updated: 2026-01-16
----
 
-# Fairfield Architecture Overview
+## System Context
 
-This document provides a high-level overview of the Fairfield application architecture. For detailed SPARC documentation, see the architecture files:
-- [01-specification.md](./architecture/01-specification.md)
-- [02-architecture.md](./architecture/02-architecture.md)
-- [03-pseudocode.md](./architecture/03-pseudocode.md)
-- [04-refinement.md](./architecture/04-refinement.md)
-- [05-completion.md](./architecture/05-completion.md)
-
-## System Architecture
-
-Fairfield is a decentralized chat and community application built on the Nostr protocol with the following core components:
+DreamLab AI consists of three deployment targets: a static frontend on GitHub Pages (migrating to Cloudflare Pages), backend services on GCP Cloud Run, and planned Cloudflare Workers services.
 
 ```mermaid
 graph TB
-    subgraph Client["CLIENT LAYER (PWA)"]
-        subgraph Modules["Application Modules"]
-            Auth["Auth Module<br/>- Keygen<br/>- NsecBackup<br/>- Storage"]
-            Chat["Chat Module<br/>- Channels<br/>- Messages<br/>- DMs"]
-            Admin["Admin Module<br/>- Users<br/>- Approvals<br/>- Moderation"]
-        end
-        NDK["Nostr SDK (NDK)<br/>Event Signing | NIP-44 Encryption | Subscriptions"]
-        Modules --> NDK
+    subgraph Users["Users"]
+        Browser["Web Browser"]
     end
 
-    NDK -->|WSS WebSocket| Relay
-
-    subgraph Relay["RELAY LAYER"]
-        subgraph RelayComponents["Relay Components"]
-            NIPAuth["NIP-42 AUTH<br/>- Whitelist<br/>- Challenge"]
-            GroupLogic["Group Logic<br/>- Membership<br/>- Roles"]
-            EventStore["Event Store<br/>- Messages<br/>- Metadata"]
-        end
+    subgraph GitHubPages["GitHub Pages (current) / Cloudflare Pages (target)"]
+        SPA["React SPA<br/>Vite + TypeScript + Tailwind"]
+        Forum["SvelteKit Forum<br/>at /community"]
     end
 
-    style Client fill:#e3f2fd
-    style Relay fill:#f3e5f5
-    style NDK fill:#fff3e0
+    subgraph CloudRun["GCP Cloud Run (us-central1)"]
+        AuthAPI["auth-api<br/>WebAuthn + NIP-98"]
+        JSS["JSS<br/>Solid Pod Storage"]
+        Relay["nostr-relay<br/>WebSocket + PostgreSQL"]
+        EmbeddingAPI["embedding-api<br/>Vector Embeddings"]
+        ImageAPI["image-api<br/>Image Resize/Serve"]
+        LinkPreviewAPI["link-preview-api<br/>URL Metadata"]
+    end
+
+    subgraph CloudflareWorkers["Cloudflare Workers (planned)"]
+        CFAuth["auth-api Worker<br/>D1 + KV"]
+        CFPod["pod-api Worker<br/>R2 + KV"]
+    end
+
+    subgraph External["External Services"]
+        Supabase["Supabase<br/>PostgreSQL + Auth"]
+    end
+
+    Browser --> SPA
+    Browser --> Forum
+    SPA --> Supabase
+    Forum --> AuthAPI
+    Forum --> Relay
+    Forum --> ImageAPI
+    Forum --> EmbeddingAPI
+    Forum --> LinkPreviewAPI
+    AuthAPI --> JSS
+    AuthAPI --> Relay
+
+    CFAuth -.->|"replaces"| AuthAPI
+    CFPod -.->|"replaces"| JSS
+
+    style CloudflareWorkers stroke-dasharray: 5 5
+    style CFAuth stroke-dasharray: 5 5
+    style CFPod stroke-dasharray: 5 5
 ```
 
-*Fairfield two-layer architecture: PWA client communicates with Nostr relay via WebSocket*
+*Dashed boxes indicate planned Cloudflare Workers services not yet deployed.*
 
-## Technology Stack
+---
 
-### Frontend
+## Frontend Architecture
 
-| Layer | Technology | Purpose |
-|-------|------------|---------|
-| Framework | SvelteKit | PWA with adapter-static |
-| Nostr SDK | NDK (@nostr-dev-kit/ndk) | Event handling, subscriptions |
-| Styling | Tailwind CSS | Utility-first CSS |
-| Storage | IndexedDB (Dexie) | Offline message cache |
-| Build | Vite | Development server, bundling |
+The platform has two frontend applications sharing the same domain:
 
-### Backend / Relay
+### React SPA (Main Site)
 
-| Component | Technology | Purpose |
-|-----------|------------|---------|
-| Relay | Cloudflare Workers | WebSocket endpoint, edge deployment |
-| Storage | Durable Objects | Persistent event storage |
-| Backup | R2 Storage | Event snapshots |
+The main site at `dreamlab-ai.com` is a React 18.3 single-page application built with Vite 5.4.
 
-## Nostr Protocol Integration
+| Concern | Implementation |
+|---------|---------------|
+| Routing | React Router DOM 6.26, 13 lazy-loaded routes |
+| Styling | Tailwind CSS 3.4 + shadcn/ui (Radix UI primitives) |
+| State | TanStack React Query 5.56 for server state |
+| Forms | React Hook Form 7.53 + Zod 3.23 validation |
+| 3D | Three.js 0.156 via @react-three/fiber (declarative) |
+| WASM | Rust Voronoi tessellation (`wasm-voronoi/`) |
+| Build | Vite SWC plugin, manual chunks (vendor, three, ui) |
+| Content | Markdown in `public/data/` loaded at runtime |
 
-### Supported NIPs
+**Routes:**
 
-| NIP | Purpose | Implementation |
-|-----|---------|----------------|
-| 01 | Basic protocol | Event creation, signing |
-| 02 | Follow list | Contact management |
-| 09 | Event deletion | Message removal |
-| 11 | Relay info | Relay metadata |
-| 17 | Private DMs | Gift-wrapped direct messages |
-| 19 | Bech32 encoding | nsec/npub keys |
-| 25 | Reactions | Message reactions |
-| 28 | Public chat | Channel messages |
-| 29 | Groups | NIP-29 group management |
-| 42 | Authentication | Challenge-response auth |
-| 44 | Encryption | NIP-44 ECDH encryption |
-| 52 | Calendar | Event scheduling |
-| 59 | Gift wrap | Metadata-protected DMs |
+| Path | Page | Description |
+|------|------|-------------|
+| `/` | Index | Landing page with hero, featured content, CTAs |
+| `/team` | Team | 44 expert profiles loaded from markdown |
+| `/work` | Work | Portfolio and case studies |
+| `/workshops` | WorkshopIndex | Workshop catalogue |
+| `/workshops/:workshopId` | WorkshopPage | Individual workshop |
+| `/workshops/:workshopId/:pageSlug` | WorkshopPage | Workshop sub-page |
+| `/residential-training` | ResidentialTraining | 2-day masterclass details |
+| `/masterclass` | Masterclass | AI agent training programme |
+| `/contact` | Contact | Contact form (React Hook Form + Zod) |
+| `/privacy` | Privacy | Privacy policy |
+| `/system-design` | SystemDesign | Architecture documentation |
+| `/research-paper` | ResearchPaper | Research content |
+| `/testimonials` | Testimonials | Customer reviews |
 
-### Event Kinds Used
+### SvelteKit Forum (Community)
 
-| Kind | NIP | Purpose |
-|------|-----|---------|
-| 0 | 01 | User profile metadata |
-| 1 | 01 | Channel messages |
-| 5 | 09 | Deletion requests |
-| 9-12 | 29 | Group operations |
-| 1059 | 59 | Gift-wrapped DMs |
-| 9000-9005 | 29 | Group management |
-| 30001 | 51 | Pin lists (whitelist) |
-| 31922-31923 | 52 | Calendar events |
+The community forum at `dreamlab-ai.com/community` is a SvelteKit 2.49 application with passkey-first authentication and Nostr-based messaging.
 
-## Security Architecture
+| Concern | Implementation |
+|---------|---------------|
+| Framework | SvelteKit 2.49, static adapter for GitHub Pages |
+| Auth | WebAuthn PRF + HKDF key derivation |
+| Protocol | Nostr (NDK 2.13) for messaging and identity |
+| Routes | 16 Svelte routes (channels, DMs, calendar, profiles) |
+| Testing | Vitest (unit) + Playwright (e2e) |
 
-### Authentication
+---
+
+## Backend Services
+
+### GCP Cloud Run (Current)
+
+Six services deployed on Cloud Run in `us-central1`, project `cumbriadreamlab`.
+
+| Service | Runtime | Storage | Purpose |
+|---------|---------|---------|---------|
+| **auth-api** | Express + @simplewebauthn/server | PostgreSQL (Cloud SQL) | WebAuthn registration/authentication, NIP-98 gating, JSS pod provisioning |
+| **jss** | @solid/community-server 7.1.8 | Ephemeral filesystem | Solid pod storage per pubkey (WebID + Linked Data) |
+| **nostr-relay** | Custom Node.js | PostgreSQL (Cloud SQL) | Nostr relay (NIP-01, NIP-98 verified) |
+| **embedding-api** | Node.js | Stateless | Vector embeddings for semantic search |
+| **image-api** | Node.js | Stateless | Image resizing and serving |
+| **link-preview-api** | Node.js | Stateless | URL metadata extraction |
+
+### Cloudflare Workers (Planned -- Code Only)
+
+Two Workers have been written in the `workers/` directory but are not yet deployed. See [ADR-010](adr/010-return-to-cloudflare.md) for the migration decision.
+
+| Service | Storage | Replaces |
+|---------|---------|----------|
+| **auth-api** (`workers/auth-api/`) | D1 + KV | Cloud Run auth-api |
+| **pod-api** (`workers/pod-api/`) | R2 + KV | Cloud Run JSS |
+
+Shared NIP-98 utilities live in `workers/shared/nip98.ts`.
+
+### Planned Retention on Cloud Run
+
+Per ADR-010, two services remain on Cloud Run due to Cloudflare Workers limitations:
+
+- **nostr-relay** -- persistent WebSocket connections with Cloud SQL (Durable Objects migration evaluated separately)
+- **embedding-api** -- ML inference requires CPU/memory beyond Workers limits
+
+---
+
+## Authentication Architecture
+
+DreamLab uses a passkey-first authentication model where the user's cryptographic identity is derived from WebAuthn PRF output. The private key is never stored -- it lives only in a JavaScript closure and is zeroed on `pagehide`.
+
+### Key Derivation
+
+```
+WebAuthn PRF output (32 bytes, HMAC-SHA-256 from authenticator)
+  --> HKDF(SHA-256, salt=[], info="nostr-secp256k1-v1")
+  --> 32-byte secp256k1 private key
+  --> getPublicKey() --> hex pubkey (Nostr identity)
+```
+
+### Registration Flow
 
 ```mermaid
 sequenceDiagram
     participant User
-    participant App
-    participant Crypto as Web Crypto API
-    participant Storage as Browser Storage
+    participant Browser
+    participant AuthAPI as auth-api (Cloud Run)
+    participant JSS as JSS (Cloud Run)
 
-    User->>App: 1. Enter nsec/hex key
-    App->>App: 2. Key validation (NIP-19 decode or hex verify)
-    App->>App: 3. Rate limit check (5 attempts / 15 min)
-    App->>Crypto: 4. Session key generation
-    Crypto-->>App: Random session key
-    App->>Crypto: 5. Key encryption (AES-256-GCM, PBKDF2 600k)
-    Crypto-->>App: Encrypted key
-    App->>Storage: 6. Store encrypted key (localStorage)<br/>Store session token (sessionStorage)
+    User->>Browser: Tap "Register" (passkey)
+    Browser->>AuthAPI: POST /auth/register/options
+    AuthAPI-->>Browser: Challenge + PRF salt
+
+    Browser->>Browser: navigator.credentials.create()<br/>with PRF extension
+    Browser->>Browser: Check extensions.prf.enabled<br/>(abort if false)
+    Browser->>Browser: HKDF(PRF output) --> privkey --> pubkey
+
+    Browser->>AuthAPI: POST /auth/register/verify<br/>(attestation + pubkey)
+    AuthAPI->>AuthAPI: Store credential + prf_salt<br/>in PostgreSQL
+    AuthAPI->>JSS: POST /idp/register/<br/>(provision Solid pod)
+    JSS-->>AuthAPI: { webId, podUrl }
+    AuthAPI-->>Browser: { didNostr, webId, podUrl }
+
+    Browser->>Browser: Store pubkey in auth state<br/>privkey in closure only
 ```
 
-*Authentication flow with client-side key encryption*
-
-### Key Security Features
-
-| Feature | Implementation | Location |
-|---------|----------------|----------|
-| Key Encryption | AES-256-GCM | `src/lib/utils/key-encryption.ts` |
-| Key Derivation | PBKDF2 (600k iterations) | `src/lib/utils/key-encryption.ts` |
-| Rate Limiting | Token bucket + exponential backoff | `src/lib/utils/rateLimit.ts` |
-| Input Validation | Regex + length limits | `src/lib/utils/validation.ts` |
-| XSS Prevention | Svelte auto-escaping | Components |
-| Admin Verification | Server-side relay API | `src/lib/nostr/whitelist.ts` |
-
-## Access Control
-
-### Cohort-Based Authorization
-
-| Cohort | Access Level | Self-Assignable |
-|--------|--------------|-----------------|
-| `admin` | Full administrative access | No |
-| `approved` | Standard member access | No |
-| `business` | Business section access | No |
-| `moomaa-tribe` | Community-specific access | No |
-
-### Section Hierarchy
-
-```mermaid
-graph TD
-    FG[Fairfield Guests - Open] --> FG1[Public channels<br/>no approval needed]
-
-    F[Fairfield - Requires Approval] --> F1[Member channels]
-    F --> F2[Full calendar visibility]
-
-    DL[DreamLab - Requires Approval] --> DL1[Private channels]
-    DL --> DL2[Limited calendar visibility<br/>dates only]
-
-    style FG fill:#a5d6a7
-    style F fill:#fff59d
-    style DL fill:#ef9a9a
-```
-
-*Access hierarchy from public guest area to restricted DreamLab section*
-
-## Data Flow
-
-### Message Flow
-
-```mermaid
-flowchart LR
-    Input[User Input] --> Validation --> Creation[Event Creation]
-    Creation --> Signing --> Relay
-    Relay --> Subs[Subscribers]
-    Relay --> Cache[IndexedDB Cache]
-    Subs --> UI[Real-time UI]
-    Cache --> Offline[Offline Access]
-
-    style Relay fill:#4fc3f7
-    style UI fill:#81c784
-    style Offline fill:#ffb74d
-```
-
-*Message lifecycle from user input to real-time display and offline caching*
-
-### DM Flow (NIP-17/59)
+### Authentication Flow
 
 ```mermaid
 sequenceDiagram
-    participant Sender
-    participant App
-    participant Relay
-    participant Recipient
+    participant User
+    participant Browser
+    participant AuthAPI as auth-api (Cloud Run)
 
-    Note over Sender,App: 1. Create sealed rumor (kind 14)
-    Sender->>App: Compose DM
-    App->>App: Encrypt with NIP-44<br/>Real timestamp
+    User->>Browser: Tap "Login" (passkey)
+    Browser->>AuthAPI: POST /auth/login/options
+    AuthAPI-->>Browser: Challenge + stored prf_salt
 
-    Note over App: 2. Wrap with gift-wrap (kind 1059)
-    App->>App: Random ephemeral key<br/>Fuzzed timestamp<br/>Encrypt sealed rumor
+    Browser->>Browser: navigator.credentials.get()<br/>with same prf_salt
+    Browser->>Browser: Check authenticatorAttachment<br/>!== 'cross-platform'
+    Browser->>Browser: HKDF(PRF output) --> privkey<br/>(same result as registration)
 
-    Note over App,Relay: 3. Publish to relay
-    App->>Relay: Encrypted blob<br/>No metadata leakage
+    Browser->>AuthAPI: POST /auth/login/verify<br/>(assertion)
+    AuthAPI->>AuthAPI: Verify assertion<br/>update counter
+    AuthAPI-->>Browser: OK
 
-    Note over Relay,Recipient: 4. Recipient unwraps
-    Relay->>Recipient: Encrypted event
-    Recipient->>Recipient: Decrypt gift-wrap<br/>Decrypt rumor<br/>Display message
+    Browser->>Browser: privkey in closure<br/>ready to sign NIP-98 tokens
 ```
 
-*Privacy-preserving direct message flow using NIP-17/59 gift wrapping*
+### NIP-98 HTTP Auth
 
-## File Structure
+Every state-mutating API call uses NIP-98 `Authorization: Nostr <base64(event)>`:
 
-```
-src/
-├── lib/
-│   ├── nostr/           # Nostr protocol implementation
-│   │   ├── keys.ts      # Key generation/validation
-│   │   ├── encryption.ts# NIP-44 encryption
-│   │   ├── dm.ts        # NIP-17/59 DMs
-│   │   ├── groups.ts    # NIP-29 groups
-│   │   ├── calendar.ts  # NIP-52 events
-│   │   ├── whitelist.ts # Access control
-│   │   └── admin-security.ts # Admin hardening
-│   │
-│   ├── stores/          # Svelte stores
-│   │   ├── auth.ts      # Authentication state
-│   │   ├── channels.ts  # Channel subscriptions
-│   │   ├── messages.ts  # Message cache
-│   │   └── session.ts   # Session management
-│   │
-│   ├── components/      # UI components
-│   │   ├── auth/        # Authentication UI
-│   │   ├── chat/        # Chat components
-│   │   ├── dm/          # Direct message UI
-│   │   ├── admin/       # Admin panel
-│   │   └── events/      # Calendar UI
-│   │
-│   └── utils/           # Utilities
-│       ├── validation.ts# Input validation
-│       ├── rateLimit.ts # Rate limiting
-│       └── key-encryption.ts # Crypto utilities
-│
-└── routes/              # SvelteKit routes
-    ├── +page.svelte     # Landing page
-    ├── chat/            # Chat routes
-    ├── dm/              # DM routes
-    ├── events/          # Calendar routes
-    ├── admin/           # Admin routes
-    └── signup/          # Onboarding
-```
+- **Event kind:** 27235
+- **Tags:** `u` (URL), `method`, optional `payload` (SHA-256 of body)
+- **Signing:** Schnorr signature with privkey from auth store closure
+- **Verification:** Server recomputes event ID from NIP-01 canonical form
+- **Payload hash:** Uses raw body bytes (server captures via `express.raw` before JSON parsing)
 
-## Deployment
+A consolidated shared NIP-98 module exists at `community-forum/packages/nip98/` (sign.ts, verify.ts, types.ts), built to replace the four independent implementations across services.
 
-### Static Site Generation
+### Identity Model
 
-```bash
-# Build static site
-npm run build
-
-# Output: build/ directory
-# Deploy: GitHub Pages, Cloudflare Pages, or any static host
-```
-
-### Environment Configuration
-
-| Variable | Purpose |
-|----------|---------|
-| `VITE_RELAY_URL` | Nostr relay WebSocket URL |
-| `VITE_ADMIN_PUBKEY` | Admin public key (hex) |
-| `VITE_ADMIN_PUBKEYS` | Multiple admin keys (comma-separated) |
-
-## Detailed Documentation
-
-For comprehensive technical details, see:
-
-| Document | Description |
-|----------|-------------|
-| [01-specification.md](./architecture/01-specification.md) | Requirements specification |
-| [02-architecture.md](./architecture/02-architecture.md) | Detailed architecture design |
-| [03-pseudocode.md](./architecture/03-pseudocode.md) | Implementation pseudocode |
-| [04-refinement.md](./architecture/04-refinement.md) | Design refinements |
-| [05-completion.md](./architecture/05-completion.md) | Completion checklist |
-
-## Related Documentation
-
-- [Authentication System](features/authentication.md) - Detailed auth flows
-- [Admin Security](security/admin-security.md) - Admin hardening measures
-- [User Guide](user-guide.md) - End-user documentation
-- [Admin Guide](admin-guide.md) - Administrator documentation
-- [Security Audit Report](security-audit-report.md) - Security findings
+| Layer | Format | Example |
+|-------|--------|---------|
+| Nostr pubkey | Hex (32 bytes) | `a1b2c3...` |
+| DID | `did:nostr:{pubkey}` | `did:nostr:a1b2c3...` |
+| WebID | `{jss-url}/{pubkey}/profile/card#me` | `https://jss.../a1b2c3.../profile/card#me` |
 
 ---
 
-*Last updated: January 2025*
+## Data Flow
+
+### Main Site
+
+```mermaid
+flowchart LR
+    Browser["Browser"] --> GHP["GitHub Pages<br/>(static assets)"]
+    GHP --> SPA["React SPA"]
+    SPA --> Supabase["Supabase<br/>(PostgreSQL + Auth)"]
+    SPA --> WS["Workshop Markdown<br/>(public/data/)"]
+    SPA --> Team["Team Profiles<br/>(public/data/team/)"]
+```
+
+### Community Forum
+
+```mermaid
+flowchart LR
+    Browser["Browser"] --> GHP["GitHub Pages<br/>(static assets)"]
+    GHP --> Forum["SvelteKit Forum"]
+    Forum -->|"WebAuthn + NIP-98"| AuthAPI["auth-api"]
+    Forum -->|"WSS"| Relay["nostr-relay"]
+    Forum -->|"NIP-98 auth"| ImageAPI["image-api"]
+    Forum -->|"NIP-98 auth"| EmbedAPI["embedding-api"]
+    AuthAPI --> JSS["JSS (Solid pods)"]
+    AuthAPI --> CloudSQL["Cloud SQL<br/>(PostgreSQL)"]
+    Relay --> CloudSQL
+```
+
+---
+
+## Technology Decisions
+
+All major technology decisions are documented as Architecture Decision Records:
+
+| ADR | Decision | Status |
+|-----|----------|--------|
+| [ADR-001](adr/001-nostr-protocol-foundation.md) | Nostr protocol as foundation for identity and messaging | Accepted |
+| [ADR-002](adr/002-three-tier-hierarchy.md) | Three-tier hierarchy (Zone > Section > Forum) | Accepted |
+| [ADR-003](adr/003-gcp-cloud-run-infrastructure.md) | GCP Cloud Run for backend services | **Superseded by ADR-010** |
+| [ADR-004](adr/004-zone-based-access-control.md) | Zone-based cohort access control | Accepted |
+| [ADR-005](adr/005-nip-44-encryption-mandate.md) | NIP-44 mandatory for new encryption | Accepted |
+| [ADR-006](adr/006-client-side-wasm-search.md) | Client-side WASM semantic search | Accepted |
+| [ADR-007](adr/007-sveltekit-ndk-frontend.md) | SvelteKit + NDK for forum frontend | Accepted |
+| [ADR-008](adr/008-postgresql-relay-storage.md) | PostgreSQL for relay event storage | Accepted |
+| [ADR-009](adr/009-user-registration-flow.md) | User registration and approval flow | Resolved |
+| [ADR-010](adr/010-return-to-cloudflare.md) | Return to Cloudflare platform (Workers, D1, KV, R2) | Accepted |
+
+---
+
+## Deployment Architecture
+
+### Current State
+
+```mermaid
+graph TB
+    subgraph GHP["GitHub Pages"]
+        ReactSPA["React SPA (dist/)"]
+        ForumStatic["SvelteKit Forum (dist/community/)"]
+    end
+
+    subgraph GCP["GCP Cloud Run (us-central1)"]
+        Auth["auth-api"]
+        JSS["jss"]
+        NRelay["nostr-relay"]
+        Embed["embedding-api"]
+        Img["image-api"]
+        Link["link-preview-api"]
+    end
+
+    subgraph GCPDB["GCP Cloud SQL"]
+        PG["PostgreSQL (nostr-db)"]
+    end
+
+    Auth --> PG
+    NRelay --> PG
+    Auth --> JSS
+```
+
+### Target State (ADR-010)
+
+```mermaid
+graph TB
+    subgraph CFPages["Cloudflare Pages"]
+        ReactSPA["React SPA"]
+        ForumStatic["SvelteKit Forum"]
+    end
+
+    subgraph CFWorkers["Cloudflare Workers"]
+        CFAuth["auth-api"]
+        CFPod["pod-api"]
+        CFImg["image-api"]
+        CFLink["link-preview-api"]
+    end
+
+    subgraph CFStorage["Cloudflare Storage"]
+        D1["D1 (credentials, challenges)"]
+        KV["KV (sessions, ACLs, metadata)"]
+        R2["R2 (pod files, images)"]
+    end
+
+    subgraph GCP["GCP Cloud Run (retained)"]
+        NRelay["nostr-relay"]
+        Embed["embedding-api"]
+    end
+
+    subgraph GCPDB["GCP Cloud SQL"]
+        PG["PostgreSQL"]
+    end
+
+    CFAuth --> D1
+    CFAuth --> KV
+    CFPod --> R2
+    CFPod --> KV
+    CFImg --> R2
+    NRelay --> PG
+```
+
+### CI/CD Workflows
+
+| Workflow | Trigger | Deploys To |
+|----------|---------|------------|
+| `deploy.yml` | Push to main | GitHub Pages (SPA + forum) |
+| `auth-api.yml` | Push to main (services/auth-api/) | Cloud Run: auth-api |
+| `jss.yml` | Push to main (services/jss/) | Cloud Run: JSS |
+| `fairfield-relay.yml` | Push to main | Cloud Run: nostr-relay |
+| `fairfield-embedding-api.yml` | Push to main | Cloud Run: embedding-api |
+| `fairfield-image-api.yml` | Push to main | Cloud Run: image-api |
+
+For first-time GCP bootstrap, see `.github/workflows/SECRETS_SETUP.md`.
+
+---
+
+## Project Structure
+
+```
+src/                          # React SPA source
+  App.tsx                     # Root: QueryClient, Router, lazy routes
+  main.tsx                    # Vite entry point
+  pages/                      # 13 route page components
+  components/                 # Reusable components
+    ui/                       # 50+ shadcn/ui primitives
+    VoronoiGoldenHero.tsx     # 3D golden ratio Voronoi
+    TesseractProjection.tsx   # 4D hyperdimensional visualisation
+  hooks/                      # Custom React hooks
+  lib/                        # Utilities, Supabase client, markdown
+  data/                       # Static data (skills.json, workshop-list.json)
+
+public/
+  data/                       # Runtime-loaded content
+    team/                     # 44 expert profiles (markdown + images)
+    workshops/                # 15 workshop directories
+    showcase/                 # Portfolio project manifests
+    media/                    # Videos, thumbnails
+  images/                     # Static image assets
+
+community-forum/              # SvelteKit forum (separate package.json)
+  src/routes/                 # 16 Svelte routes
+  src/lib/auth/               # WebAuthn PRF + NIP-98
+  src/lib/stores/             # Auth state, privkey closure
+  packages/nip98/             # Consolidated NIP-98 shared module
+  services/                   # Backend service source
+    auth-api/                 # WebAuthn server (Express)
+    jss/                      # Solid pod server (CSS 7.1.8)
+    nostr-relay/              # Nostr relay
+    embedding-api/            # Vector embeddings
+    image-api/                # Image serving
+    link-preview-api/         # URL metadata
+
+workers/                      # Cloudflare Workers (planned)
+  auth-api/                   # WebAuthn Worker (D1 + KV)
+  pod-api/                    # Pod storage Worker (R2 + KV)
+  shared/                     # Shared NIP-98 utilities
+
+wasm-voronoi/                 # Rust WASM (Cargo.toml, src/lib.rs)
+
+scripts/                      # Build and utility scripts
+docs/                         # Project documentation
+.github/workflows/            # CI/CD pipelines
+```
+
+---
+
+## Related Documents
+
+- [Feature status matrix](features/STATUS_MATRIX.md)
+- [Cloudflare migration PRD](prd-cloudflare-workers-migration.md)
+- [Security overview](security/SECURITY_OVERVIEW.md)
+- [Domain model](ddd/01-domain-model.md)
+- [Frontend architecture](architecture/FRONTEND_ARCHITECTURE.md)
+- [Backend services](architecture/BACKEND_SERVICES.md)
+- [Data flow](architecture/DATA_FLOW.md)
+
+---
+
+**Last updated:** 2026-02-28

@@ -1,318 +1,276 @@
----
-title: GitHub Pages Deployment
-description: Main site and Fairfield community app deployment to GitHub Pages
-last_updated: 2026-01-25
----
-
 # GitHub Pages Deployment
 
-This document covers the deployment of the main DreamLab AI website and Fairfield community application to GitHub Pages.
+**Last Updated:** 2026-02-28
+
+Deployment of the DreamLab AI main website (React SPA) and community forum (SvelteKit) to GitHub Pages.
+
+---
 
 ## Overview
 
-The GitHub Pages deployment process is automated via GitHub Actions workflow (`deploy.yml`):
+| Attribute | Value |
+|-----------|-------|
+| **Trigger** | Push to `main` branch or manual `workflow_dispatch` |
+| **Workflow** | `.github/workflows/deploy.yml` |
+| **Build tool** | Vite 5.4 (SWC plugin) |
+| **Target** | `gh-pages` branch |
+| **Custom domain** | `dreamlab-ai.com` (CNAME in `public/`) |
+| **Duration** | 5-10 minutes |
+| **Node version** | 20 |
 
-- **Trigger**: Push to `main` branch or manual workflow dispatch
-- **Target**: GitHub Pages (`gh-pages` branch)
-- **Custom Domain**: `dreamlab-ai.com`
-- **Build Duration**: ~5-10 minutes
-- **Deployment Type**: Static site (SvelteKit)
+---
 
-## Deployment Architecture
+## Build Process
 
-```
-Push to main
-    ↓
-GitHub Actions (deploy.yml)
-    ↓
-├─ Build main site (SvelteKit)
-├─ Build Fairfield app (SvelteKit)
-├─ Copy team data & assets
-├─ Generate dist/ directory
-    ↓
-GitHub Pages deploy action
-    ↓
-Deploy to gh-pages branch
-    ↓
-Serve at https://dreamlab-ai.com
-```
+### 1. Main Site Build
 
-## Workflow Details
+The React SPA is built using Vite:
 
-### Build Stage
+```bash
+# Pre-build step: generates workshop metadata
+node scripts/generate-workshop-list.mjs
 
-1. **Checkout Code**
-   - Fetches latest code from main branch
-   - Uses `actions/checkout@v3`
-
-2. **Setup Node Environment**
-   - Node version: 18 LTS
-   - Installs dependencies via npm
-
-3. **Environment Configuration**
-   - Creates `.env` file with Supabase secrets:
-     - `VITE_SUPABASE_URL`
-     - `VITE_SUPABASE_ANON_KEY`
-
-4. **Team Data Preparation**
-   - Copies team data from `src/data/team/` to `public/data/team/`
-   - Ensures team markdown and images are available in build
-
-5. **Main Site Build**
-   - Runs `npm run build`
-   - Generates optimized production build in `dist/`
-   - Includes all static assets
-
-6. **Fairfield Community App Build**
-   - Builds from `fairfield/` subdirectory
-   - Environment variables configured:
-     - `BASE_PATH: '/community'` - URL base path
-     - `VITE_RELAY_URL` - Nostr relay endpoint
-     - `VITE_EMBEDDING_API_URL` - Embedding service
-     - `VITE_LINK_PREVIEW_API_URL` - Link preview service
-     - `VITE_IMAGE_API_URL` - Image service
-     - `VITE_IMAGE_BUCKET` - GCS bucket name
-     - `VITE_IMAGE_ENCRYPTION_ENABLED: 'true'`
-     - `VITE_ADMIN_PUBKEY` - Admin Nostr public key
-   - Output to `community-forum/build/`
-
-7. **Asset Consolidation**
-   - Copies Fairfield build to `dist/community/`
-   - Adds `.nojekyll` file (disables Jekyll processing)
-   - Copies `404.html` for SPA routing
-   - Copies all data files to `dist/data/`
-
-8. **Build Verification**
-   - Verifies team data files exist
-   - Checks video files in `dist/data/media/videos/`
-   - Confirms thumbnail files are present
-
-### Deployment Stage
-
-- Uses `peaceiris/actions-gh-pages@v3` action
-- Pushes `dist/` to `gh-pages` branch
-- Sets CNAME record to `dreamlab-ai.com`
-- Creates orphan branch (clean history)
-- Includes commit message with SHA reference
-
-## Required Secrets
-
-All secrets must be configured in GitHub repository settings:
-
-```
-VITE_SUPABASE_URL      # Supabase project URL
-VITE_SUPABASE_ANON_KEY # Supabase anonymous key
-GITHUB_TOKEN           # Auto-provided by Actions
+# Production build
+npm run build
 ```
 
-## Required Variables
+This produces an optimised static bundle in `dist/` with:
 
-GitHub repository variables (Settings → Variables):
+- Vendor chunk splitting (vendor, three, ui)
+- Route-level code splitting via `React.lazy()`
+- CSS and JavaScript minification
+- Static assets from `public/` copied to `dist/`
 
+### 2. Workshop List Generation
+
+Before each build, `scripts/generate-workshop-list.mjs` scans `public/data/workshops/` and generates `src/data/workshop-list.json`. This runs automatically as part of `npm run dev` and `npm run build`.
+
+### 3. Team Data Preparation
+
+The workflow copies team profile data from `src/data/team/` to `public/data/team/` to ensure markdown files and images are available in the build output:
+
+```bash
+mkdir -p public/data/team
+cp -rv src/data/team/* public/data/team/
 ```
-FAIRFIELD_RELAY_URL              # wss://... Nostr relay endpoint
-FAIRFIELD_EMBEDDING_API_URL      # https://... embedding service
-FAIRFIELD_LINK_PREVIEW_API_URL   # https://... link preview service
-FAIRFIELD_IMAGE_API_URL          # https://... image service
-FAIRFIELD_IMAGE_BUCKET           # GCS bucket name
-FAIRFIELD_ADMIN_PUBKEY           # Nostr admin public key
+
+### 4. SvelteKit Community Forum Build
+
+The community forum is built as a separate SvelteKit project with the static adapter:
+
+```bash
+cd community-forum
+npm ci
+npm run build
 ```
 
-## Deployment Checklist
+**Environment variables** passed during the forum build:
 
-### Pre-Deployment
+| Variable | Purpose |
+|----------|---------|
+| `BASE_PATH=/community` | URL base path for the SPA |
+| `VITE_RELAY_URL` | Nostr relay WebSocket endpoint |
+| `VITE_EMBEDDING_API_URL` | Embedding service URL |
+| `VITE_LINK_PREVIEW_API_URL` | Link preview service URL |
+| `VITE_IMAGE_API_URL` | Image service URL |
+| `VITE_IMAGE_BUCKET` | GCS bucket for images |
+| `VITE_IMAGE_ENCRYPTION_ENABLED=true` | Enable image encryption |
+| `VITE_ADMIN_PUBKEY` | Admin Nostr pubkey |
+| `VITE_APP_NAME=DreamLab Community` | Application display name |
+| `VITE_AUTH_API_URL` | Auth API Cloud Run URL (from secrets) |
 
-- [ ] Verify all changes committed to `main` branch
-- [ ] Run local build: `npm run build`
-- [ ] Test SvelteKit app: `npm run preview`
-- [ ] Verify Fairfield build: `cd fairfield && npm run build`
-- [ ] Confirm team data files in `src/data/team/`
-- [ ] Check all environment variables are set
+### 5. Asset Consolidation
 
-### During Deployment
+After both builds, the workflow assembles the final output:
 
-- [ ] Monitor Actions workflow in GitHub
-- [ ] Check build logs for errors
-- [ ] Verify no asset copy failures
-- [ ] Confirm push to `gh-pages` branch succeeds
+```bash
+# Copy forum build into main site
+mkdir -p dist/community
+cp -r community-forum/build/* dist/community/
 
-### Post-Deployment
+# Add .nojekyll to prevent Jekyll processing
+touch dist/.nojekyll
 
-- [ ] Visit https://dreamlab-ai.com
-- [ ] Verify main site loads correctly
-- [ ] Navigate to /community for Fairfield app
-- [ ] Test responsive design on mobile
-- [ ] Check console for JavaScript errors
-- [ ] Verify team member profiles load
-- [ ] Test community forum functionality
+# Copy 404.html for SPA routing
+cp public/404.html dist/404.html
+
+# Copy all runtime data files
+cp -rv public/data/* dist/data/
+```
+
+### 6. Build Verification
+
+The workflow verifies critical assets:
+
+- Team data files exist in `dist/data/team/`
+- Video files present in `dist/data/media/videos/`
+- Thumbnail files present in `dist/data/media/`
+- Specific files checked (e.g., `06.md`, `06.png`)
+
+---
+
+## Deployment
+
+### GitHub Pages Deploy
+
+Uses `peaceiris/actions-gh-pages@v3`:
+
+```yaml
+- name: Deploy to gh-pages
+  uses: peaceiris/actions-gh-pages@v3
+  with:
+    github_token: ${{ secrets.GITHUB_TOKEN }}
+    publish_dir: ./dist
+    publish_branch: gh-pages
+    force_orphan: true
+    cname: dreamlab-ai.com
+    commit_message: "Deploy from GitHub Actions ${{ github.sha }}"
+```
+
+- **Orphan branch**: Each deployment creates a clean `gh-pages` branch (no history accumulation).
+- **CNAME**: Automatically sets the custom domain.
+
+### Cloudflare Pages Deploy (Gated)
+
+A Cloudflare Pages deployment step is included but gated:
+
+```yaml
+- name: Deploy to Cloudflare Pages
+  if: vars.CLOUDFLARE_PAGES_ENABLED == 'true'
+  uses: cloudflare/wrangler-action@v3
+  with:
+    apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+    accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    command: pages deploy dist/ --project-name=dreamlab-ai --commit-dirty=true
+```
+
+This step is currently inactive. Set `CLOUDFLARE_PAGES_ENABLED=true` in repository variables to enable dual deployment.
+
+---
 
 ## Build Output Structure
 
 ```
 dist/
-├── index.html              # Main site entry point
-├── 404.html                # SPA routing fallback
-├── .nojekyll               # Disables Jekyll processing
-├── _app/                   # SvelteKit app bundle
-├── community/              # Fairfield community app
-│   ├── index.html
-│   └── _app/
-├── data/
-│   ├── team/
-│   │   ├── 01.md
-│   │   ├── 01.png
-│   │   ├── 02.md
-│   │   ├── 02.png
-│   │   └── ...
-│   └── media/
-│       ├── videos/
-│       └── *-thumb.jpg
-└── [other static assets]
+  index.html                    # Main site entry point
+  404.html                      # SPA routing fallback
+  .nojekyll                     # Disable Jekyll processing
+  CNAME                         # Custom domain: dreamlab-ai.com
+  assets/                       # Vite-generated JS/CSS bundles
+  community/                    # SvelteKit forum app
+    index.html
+    _app/
+      immutable/                # Hashed assets (long-cache)
+      env.js
+      version.json
+  data/
+    team/                       # 44 expert profiles (markdown + images)
+      01.md, 01.png, ...
+    workshops/                  # 15 workshop directories
+    showcase/                   # Portfolio manifests
+    media/
+      videos/
+      *-thumb.jpg
+  images/                       # Static image assets
+  robots.txt
+  sitemap.xml
+  site.webmanifest
 ```
+
+---
+
+## Custom Domain Configuration
+
+### DNS
+
+`dreamlab-ai.com` is configured with a CNAME record pointing to GitHub Pages:
+
+```
+dreamlab-ai.com.  CNAME  dreamlab-ai.github.io.
+```
+
+GitHub Pages also responds to:
+
+```
+185.199.108.153
+185.199.109.153
+185.199.110.153
+185.199.111.153
+```
+
+### Alternative Domain
+
+`thedreamlab.uk` is configured as an alias and redirects to `dreamlab-ai.com`.
+
+### HTTPS
+
+GitHub Pages provides managed TLS certificates for custom domains. HTTPS is enforced (HTTP requests are redirected).
+
+---
+
+## Required Secrets
+
+| Secret | Purpose |
+|--------|---------|
+| `VITE_SUPABASE_URL` | Supabase project URL (written to `.env` during build) |
+| `VITE_SUPABASE_ANON_KEY` | Supabase anonymous key (written to `.env` during build) |
+| `VITE_AUTH_API_URL` | Auth API Cloud Run URL (passed to forum build) |
+| `GITHUB_TOKEN` | Auto-provided by Actions (for gh-pages push) |
+
+## Required Variables
+
+| Variable | Purpose |
+|----------|---------|
+| `FAIRFIELD_RELAY_URL` | Nostr relay endpoint (forum build) |
+| `FAIRFIELD_EMBEDDING_API_URL` | Embedding service (forum build) |
+| `FAIRFIELD_LINK_PREVIEW_API_URL` | Link preview service (forum build) |
+| `FAIRFIELD_IMAGE_API_URL` | Image service (forum build) |
+| `FAIRFIELD_IMAGE_BUCKET` | GCS bucket name (forum build) |
+| `FAIRFIELD_ADMIN_PUBKEY` | Admin Nostr pubkey (forum build) |
+| `CLOUDFLARE_PAGES_ENABLED` | Set to `true` to enable Cloudflare Pages deploy |
+
+---
 
 ## Troubleshooting
 
-### Build Failures
+| Problem | Cause | Solution |
+|---------|-------|---------|
+| Site not updating | Browser cache | Force refresh (Ctrl+Shift+R) or incognito |
+| Community forum 404 | Forum build not copied | Check `dist/community/` exists in build log |
+| Team data missing | `src/data/team/` not present | Verify directory exists with markdown files |
+| Env vars not found | Secrets/variables not configured | Check GitHub Settings > Secrets and Variables |
+| Build fails on Node | Wrong Node version | Workflow uses Node 20; check `package.json` engines |
 
-**Problem**: Node dependencies installation fails
-- **Solution**: Check Node version (18+), clear npm cache
-- **Command**: `npm cache clean --force && npm ci`
+---
 
-**Problem**: Fairfield build fails
-- **Solution**: Ensure `fairfield/` directory exists with package.json
-- **Command**: `cd fairfield && npm ci && npm run build`
-
-**Problem**: Team data not copied
-- **Solution**: Verify `src/data/team/` exists with markdown files
-- **Command**: `ls -la src/data/team/`
-
-### Deployment Issues
-
-**Problem**: Site not updating after deployment
-- **Solution**: Clear browser cache, check GitHub Pages settings
-- **Workaround**: Force refresh with Ctrl+Shift+R or visit in incognito window
-
-**Problem**: Community app returns 404
-- **Solution**: Verify Fairfield build copied to `dist/community/`
-- **Command**: `ls -la dist/community/`
-
-**Problem**: Environment variables not found
-- **Solution**: Verify all variables configured in repo settings
-- **Check**: GitHub → Settings → Environments/Variables
-
-## Performance Optimization
-
-### Build Caching
-
-Current setup uses npm built-in dependency caching. To optimize:
-
-```yaml
-- uses: actions/setup-node@v4
-  with:
-    node-version: 18
-    cache: 'npm'
-    cache-dependency-path: package-lock.json
-```
-
-### Asset Optimization
-
-- SvelteKit automatically optimizes assets in production build
-- CSS and JavaScript minified
-- Images referenced in public directory are copied as-is
-- Unused dependencies removed via `--omit=dev`
-
-### Size Reduction Tips
-
-1. Optimize images before committing
-2. Remove unused dependencies from package.json
-3. Use dynamic imports for large components
-4. Enable gzip compression in production
-
-## Custom Domain Setup
-
-The site is configured to use `dreamlab-ai.com`:
-
-1. **CNAME File**: Auto-generated during deployment
-2. **GitHub Pages Settings**: Must point to custom domain
-3. **DNS Records**: Point domain to GitHub Pages servers
-
-### Verify Custom Domain
-
-```bash
-# Check DNS resolution
-nslookup dreamlab-ai.com
-
-# Should resolve to GitHub Pages IP
-# 185.199.108.153
-# 185.199.109.153
-# 185.199.110.153
-# 185.199.111.153
-```
-
-## Rollback Procedure
-
-If deployment introduces issues:
+## Rollback
 
 ### Option 1: Revert Commit
+
 ```bash
-git revert <problematic-commit-sha>
+git revert <sha> --no-edit
 git push origin main
-# Workflow will automatically re-run with reverted code
+# Workflow re-runs with reverted code
 ```
 
-### Option 2: Manual Rollback
+### Option 2: Restore Previous gh-pages
+
 ```bash
+git log gh-pages --oneline | head -5
 git checkout gh-pages
-git revert HEAD~1
+git revert HEAD
 git push origin gh-pages
 ```
 
-### Option 3: Restore Previous Build
-```bash
-# If gh-pages history available
-git log gh-pages | head -5
-git reset --hard <previous-commit-sha>
-git push origin gh-pages --force-with-lease
-```
-
-## Monitoring & Alerts
-
-### Manual Workflow Check
-
-```bash
-# View latest deployment status
-gh workflow view deploy.yml --json status
-
-# Watch workflow progress
-gh workflow run deploy.yml --watch
-```
-
-### GitHub Actions Insights
-
-- Visit: Repository → Actions tab
-- Check: Latest workflow runs
-- Review: Build logs and deployment status
+---
 
 ## Related Documentation
 
-- [Cloud Services Deployment](./CLOUD_SERVICES.md) - Nostr relay & embedding API
-- [Monitoring & Health Checks](./MONITORING.md) - Site health verification
-- [Rollback Procedures](./ROLLBACK.md) - Emergency recovery steps
-- [Environment Setup](./ENVIRONMENTS.md) - Dev/staging/production configs
+- [Deployment Overview](./README.md)
+- [Cloud Services](./CLOUD_SERVICES.md)
+- [Environments](./ENVIRONMENTS.md)
+- [Cloudflare Workers](./CLOUDFLARE_WORKERS.md)
 
-## FAQ
+---
 
-**Q: How long does deployment take?**
-A: Typically 5-10 minutes from push to live, including build and deployment.
-
-**Q: Can I deploy manually?**
-A: Yes, use Actions → deploy workflow → "Run workflow" button.
-
-**Q: What if team data files are missing?**
-A: The workflow will fail verification. Check `src/data/team/` exists and contains markdown files.
-
-**Q: Does deployment auto-rollback on errors?**
-A: No. Failed builds don't affect current `gh-pages` branch. Fix issues and push again.
-
-**Q: Can I deploy to staging first?**
-A: Currently only production. Implement using GitHub environments feature if needed.
+*Last major revision: 2026-02-28.*

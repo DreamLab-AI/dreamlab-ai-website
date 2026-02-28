@@ -1,424 +1,192 @@
-# Nostr-BBS Documentation
+# DreamLab AI Documentation
 
-Complete documentation hub for Nostr-BBS - A decentralised community bulletin board system built on the Nostr protocol.
+**Last updated:** 2026-02-28 | **Version:** 2.0.0 | **Repository:** [DreamLab-AI/dreamlab-ai-website](https://github.com/DreamLab-AI/dreamlab-ai-website)
 
-**Latest Release**: 1.0.0 | **Last Updated**: 2026-01-25 | **Status**: Production Ready
-
----
-
-## Quick Navigation
-
-### For Different Audiences
-
-#### End Users
-Get started using the platform, explore features, and understand privacy/security.
-
-- **[User Getting Started](user/getting-started/index.md)** - Create account, first steps, basic navigation
-- **[User Features Guide](user/features/index.md)** - All available features and how to use them
-- **[Community Zones](user/zones/index.md)** - Join and participate in community zones
-- **[Safety & Privacy](user/safety/index.md)** - Account security, privacy controls, reporting
-
-#### Developers
-Understand the architecture, set up development environment, and contribute code.
-
-- **[Developer Hub](developer/index.md)** - Main development documentation
-- **[Development Setup](developer/getting-started/development-setup.md)** - Local environment configuration
-- **[Architecture Overview](developer/architecture/index.md)** - System design and components
-- **[Contributing Guide](developer/contributing/index.md)** - Code style, testing, pull requests
-- **[API Reference](developer/reference/api.md)** - Component and store documentation
-
-#### Operators & DevOps
-Deploy, configure, and maintain the system in production.
-
-- **[Deployment Guide](developer/deployment/index.md)** - All deployment options
-- **[Cloud Run Setup](developer/deployment/cloud-run.md)** - Google Cloud Run deployment
-- **[GitHub Pages Deployment](developer/deployment/github-pages.md)** - Static site hosting
-- **[Self-Hosting](developer/deployment/self-hosting.md)** - Run your own instance
-- **[Security Audit](security/security-audit-report.md)** - Security findings and recommendations
-
-#### Architects & Decision Makers
-Review system design, architectural decisions, and domain model.
-
-- **[Architecture Decisions](adr/README.md)** - 9 ADRs covering all major decisions
-- **[System Architecture](architecture.md)** - High-level system overview
-- **[Domain Model](ddd/01-domain-model.md)** - Domain-Driven Design documentation
-- **[PRD](prd.md)** - Product requirements document
-
----
-
-## Documentation Structure
-
-### Getting Started
-
-**New to the project?** Start here:
-
-- [User Getting Started](user/getting-started/index.md) - For end users
-- [Developer Getting Started](developer/getting-started/index.md) - For developers
-- [Quick Start Guide](guides/quick-start.md) - Implementation quick start
-- [Contributing Guide](CONTRIBUTING.md) - How to contribute
-
-### Core Documentation
-
-#### 📘 User Documentation (`/user`)
-End-user guides and feature documentation.
-
-```
-user/
-├── getting-started/          # Account creation, first steps
-├── features/                 # Feature guides (messaging, calendar, etc.)
-├── safety/                   # Privacy, security, reporting
-└── zones/                    # Community zone documentation
-```
-
-**Key Files:**
-- [Messaging Guide](user/features/messaging.md) - Using public channels and discussions
-- [Private Messages](user/features/private-messages.md) - NIP-17/59 encrypted DMs
-- [Calendar Events](user/features/calendar.md) - NIP-52 calendar event creation
-- [Semantic Search](developer/features/semantic-search.md) - Client-side WASM search
-- [Account Security](user/safety/account-security.md) - Protecting your account
-
-#### 👨‍💻 Developer Documentation (`/developer`)
-Technical documentation for implementation and development.
-
-```
-developer/
-├── getting-started/          # Setup and project structure
-├── architecture/             # Technical system design
-├── features/                 # Feature implementation guides
-├── contributing/             # Code guidelines and processes
-├── deployment/               # Deployment to production
-└── reference/                # API and configuration reference
-```
-
-**Key Files:**
-- [Development Setup](developer/getting-started/development-setup.md) - Configure local environment
-- [Project Structure](developer/getting-started/project-structure.md) - Directory organisation
-- [Architecture Guide](developer/architecture/index.md) - System design overview
-- [Component Reference](developer/reference/api.md) - Component documentation
-- [NIP Protocol Reference](developer/reference/nip-protocol-reference.md) - Nostr protocols used
-
-#### 🏗️ Architecture & Design (`/adr`, `/ddd`)
-System design decisions and domain model.
-
-```
-adr/                         # Architecture Decision Records
-├── 001-nostr-protocol-foundation.md
-├── 002-three-tier-hierarchy.md
-├── 003-gcp-cloud-run-infrastructure.md
-├── 004-zone-based-access-control.md
-├── 005-nip-44-encryption-mandate.md
-├── 006-client-side-wasm-search.md
-├── 007-sveltekit-ndk-frontend.md
-├── 008-postgresql-relay-storage.md
-└── 009-user-registration-flow.md
-
-ddd/                         # Domain-Driven Design
-├── 01-domain-model.md       # Core domain entities
-├── 02-bounded-contexts.md   # System boundaries
-├── 03-aggregates.md         # Data aggregates
-├── 04-domain-events.md      # Event model
-├── 05-value-objects.md      # Value types
-└── 06-ubiquitous-language.md # Terminology
-```
-
-**Key Files:**
-- [ADR Index](adr/README.md) - All architectural decisions
-- [Nostr Protocol Foundation](adr/001-nostr-protocol-foundation.md) - Why Nostr
-- [Three-Tier Hierarchy](adr/002-three-tier-hierarchy.md) - Architecture layers
-- [Infrastructure](adr/003-gcp-cloud-run-infrastructure.md) - Cloud deployment
-- [Domain Model](ddd/01-domain-model.md) - Core concepts
-
-#### 🔒 Security (`/security`)
-Security audit, recommendations, and admin security guidelines.
-
-```
-security/
-├── security-audit-report.md  # Full security audit findings
-├── security-audit.md         # Detailed security analysis
-├── quick-reference.md        # Security best practices
-├── admin-security.md         # Admin security guidelines
-└── summary.md                # Security summary
-```
-
-**Key Files:**
-- [Security Audit Report](security/security-audit-report.md) - Findings and recommendations
-- [Admin Security](security/admin-security.md) - For system administrators
-- [Quick Reference](security/quick-reference.md) - Security checklist
-
-#### 📚 Reference (`/reference`)
-API and configuration reference documentation.
-
-```
-reference/
-├── api-reference.md          # API endpoints
-├── architecture-reference.md # Architecture reference
-└── authentication.md         # Auth system reference
-```
-
----
-
-## Key Features
-
-Nostr-BBS implements the following Nostr protocols:
-
-| Protocol | Purpose | Docs |
-|----------|---------|------|
-| **NIP-01** | Basic event handling | [Reference](developer/reference/nip-protocol-reference.md) |
-| **NIP-17/59** | Encrypted direct messages (gift wrap) | [DM Implementation](developer/features/dm-implementation.md) |
-| **NIP-28** | Public channels and basic messaging | [Messaging](user/features/messaging.md) |
-| **NIP-44** | Encryption standard (mandatory) | [ADR-005](adr/005-nip-44-encryption-mandate.md) |
-| **NIP-52** | Calendar events | [Calendar](user/features/calendar.md) |
+DreamLab AI is a premium AI training and consulting platform at [dreamlab-ai.com](https://dreamlab-ai.com) (also [thedreamlab.uk](https://thedreamlab.uk)). The platform comprises a React single-page application with 3D visualisations, a SvelteKit community forum with passkey authentication, and backend services on GCP Cloud Run (with a planned migration to Cloudflare Workers).
 
 ---
 
 ## Technology Stack
 
-### Frontend
-- **Framework**: SvelteKit (SSR-disabled for GitHub Pages)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **Components**: shadcn/ui adaptations
-- **Search**: WASM-based semantic search (client-side)
-- **Mobile**: PWA with responsive design
-
-### Backend
-- **Runtime**: Node.js
-- **Relay**: Custom Nostr relay server
-- **Database**: PostgreSQL with pgvector
-- **Cloud**: Google Cloud Run (serverless)
-- **Storage**: Cloud Storage for files
-
-### Protocols & Libraries
-- **Nostr Client**: ndk (Nostr Development Kit)
-- **Encryption**: libsecp256k1, crypto-js
-- **Search**: TF-IDF vectors with WASM
+| Layer | Technology |
+|-------|-----------|
+| Frontend | React 18.3 + TypeScript 5.5 + Vite 5.4 (SWC) |
+| Styling | Tailwind CSS 3.4 + shadcn/ui (Radix UI) |
+| Routing | React Router DOM 6.26 (lazy-loaded, 13 routes) |
+| State | TanStack React Query 5.56 |
+| Forms | React Hook Form 7.53 + Zod 3.23 |
+| 3D | Three.js 0.156 + @react-three/fiber + @react-three/drei |
+| WASM | Rust (Voronoi tessellation in `wasm-voronoi/`) |
+| Forum | SvelteKit 2.49 (`community-forum/`) |
+| Protocol | Nostr (NDK 2.13) for community features |
+| Auth | WebAuthn PRF + HKDF + NIP-98 (nostr-tools 2.19.3) |
+| Database | Supabase (main site), PostgreSQL (auth-api) |
 
 ---
 
-## Documentation Standards
-
-This documentation follows systematic frameworks and standards:
-
-### Diataxis Framework
-Documentation is organised using [Diataxis principles](https://diataxis.fr/):
-
-- **Tutorials** - Learning-oriented step-by-step guides
-- **How-to Guides** - Task-oriented practical solutions
-- **Reference** - Information-oriented technical descriptions
-- **Explanations** - Understanding-oriented design discussion
-
-### Quality Standards
-
-✅ **UK English** - Consistent spelling and grammar throughout
-✅ **Mermaid Diagrams** - Architecture and flow visualisations
-✅ **YAML Metadata** - Title, description, tags, and last-updated in frontmatter
-✅ **100% Link Coverage** - All links validated and working
-✅ **Accessibility** - WCAG 2.1 Level AA compliance
-
-### File Organisation
-
-- **Breadcrumb Navigation** - Each page includes breadcrumb context
-- **Internal Cross-references** - Linked related documentation
-- **Metadata Headers** - YAML frontmatter with metadata
-- **Code Examples** - All examples are tested and current
-- **Last Updated Dates** - Track documentation freshness
-
----
-
-## Common Tasks
-
-### I want to...
-
-#### Deploy the application
-- **GitHub Pages**: [GitHub Pages Deployment](developer/deployment/github-pages.md)
-- **Google Cloud**: [Cloud Run Deployment](developer/deployment/cloud-run.md)
-- **Self-hosted**: [Self-Hosting Guide](developer/deployment/self-hosting.md)
-
-#### Understand the system
-- **High-level overview**: [Architecture Overview](architecture.md)
-- **Design decisions**: [Architecture Decision Records](adr/README.md)
-- **Domain model**: [Domain-Driven Design](ddd/01-domain-model.md)
-
-#### Contribute code
-- **Getting started**: [First Contribution](developer/getting-started/first-contribution.md)
-- **Code standards**: [Code Style Guide](developer/contributing/code-style.md)
-- **Testing**: [Testing Guide](developer/contributing/testing.md)
-- **PR process**: [Pull Requests](developer/contributing/pull-requests.md)
-
-#### Implement a feature
-- **Direct messages**: [DM Implementation](developer/features/dm-implementation.md)
-- **Semantic search**: [Semantic Search](developer/features/semantic-search.md)
-- **Mobile components**: [Mobile UI Components](features/mobile-ui-components.md)
-
-#### Secure the system
-- **Audit findings**: [Security Audit Report](security/security-audit-report.md)
-- **Admin guidelines**: [Admin Security](security/admin-security.md)
-- **Best practices**: [Security Quick Reference](security/quick-reference.md)
-
----
-
-## Navigation by Role
-
-### End User Journey
-1. [Creating an Account](user/getting-started/creating-account.md)
-2. [First Steps](user/getting-started/first-steps.md)
-3. Explore [Features](user/features/index.md)
-4. Join [Zones](user/zones/index.md)
-5. Learn [Safety](user/safety/index.md)
-
-### Developer Journey
-1. [Development Setup](developer/getting-started/development-setup.md)
-2. [Project Structure](developer/getting-started/project-structure.md)
-3. [Architecture Overview](developer/architecture/index.md)
-4. [Contributing Guide](developer/contributing/index.md)
-5. [Reference Documentation](developer/reference/api.md)
-
-### Operator Journey
-1. Choose [Deployment Option](developer/deployment/index.md)
-2. Follow deployment guide (Cloud Run, GitHub Pages, or Self-hosted)
-3. Review [Security Audit](security/security-audit-report.md)
-4. Configure [Admin Security](security/admin-security.md)
-5. Monitor application health
-
-### Architect Journey
-1. Read [Product Requirements](prd.md)
-2. Review [Architecture Decisions](adr/README.md)
-3. Study [System Architecture](architecture.md)
-4. Examine [Domain Model](ddd/01-domain-model.md)
-5. Review [Security Audit](security/security-audit-report.md)
-
----
-
-## Search & Discovery
-
-### By Topic
-- **Authentication**: [Auth System](features/authentication.md), [Auth Reference](reference/authentication.md)
-- **Messaging**: [User Guide](user/features/messaging.md), [DM Implementation](developer/features/dm-implementation.md)
-- **Calendar**: [User Guide](user/features/calendar.md)
-- **Search**: [Semantic Search](developer/features/semantic-search.md)
-- **Deployment**: [Deployment Guide](developer/deployment/index.md)
-- **Security**: [Security Audit](security/security-audit-report.md)
-
-### By Protocol
-- **NIP-01**: [Basics](developer/reference/nip-protocol-reference.md)
-- **NIP-17/59**: [Encrypted DMs](developer/features/dm-implementation.md)
-- **NIP-28**: [Public Channels](user/features/messaging.md)
-- **NIP-44**: [Encryption Mandate](adr/005-nip-44-encryption-mandate.md)
-- **NIP-52**: [Calendar Events](user/features/calendar.md)
-
-### By Audience
-- **Users**: [User Documentation](user/index.md)
-- **Developers**: [Developer Documentation](developer/index.md)
-- **Operators**: [Deployment Guides](developer/deployment/index.md)
-- **Architects**: [Architecture Records](adr/README.md)
-
----
-
-## External Resources
-
-### Official Links
-- **GitHub Repository**: [jjohare/Nostr-BBS](https://github.com/jjohare/Nostr-BBS)
-- **Live Site**: [nostr-bbs.com](https://nostr-bbs.com)
-- **Issue Tracking**: [GitHub Issues](https://github.com/jjohare/Nostr-BBS/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/jjohare/Nostr-BBS/discussions)
-
-### Nostr Protocol
-- **Nostr Overview**: [nostr.com](https://nostr.com)
-- **NIP Repository**: [github.com/nostr-protocol/nips](https://github.com/nostr-protocol/nips)
-- **ndk Library**: [NDK Documentation](https://docs.nostr.dev/ndk/)
-
----
-
-## Documentation Maintenance
-
-### Validation
-- **Link Status**: [Link Validation Report](link-validation-report.md) - Latest validation results
-- **Quality**: All documentation follows Diataxis framework standards
-- **Currency**: Last updated dates track documentation freshness
-
-### Issues & Feedback
-- **Report Issues**: [GitHub Issues](https://github.com/jjohare/Nostr-BBS/issues/new)
-- **Suggest Changes**: [GitHub Discussions](https://github.com/jjohare/Nostr-BBS/discussions)
-- **Security Concerns**: Contact [@jjohare](https://github.com/jjohare) privately
-
----
-
-## Quick Start
+## Quick Navigation
 
 ### For Users
-```bash
-1. Visit nostr-bbs.com
-2. Follow "Creating an Account" guide
-3. Explore zones and features
-```
+
+- [Website guide](user/WEBSITE_GUIDE.md) -- navigating the main site
+- [Workshop booking](user/WORKSHOP_BOOKING.md) -- booking AI training workshops
+- [FAQ](user/FAQ.md) -- frequently asked questions
 
 ### For Developers
-```bash
-1. Clone: git clone https://github.com/jjohare/Nostr-BBS.git
-2. Setup: npm install && npm run dev
-3. Read: developer/getting-started/development-setup.md
-```
 
-### For Deployment
-```bash
-1. Choose platform: GitHub Pages / Cloud Run / Self-hosted
-2. Follow relevant deployment guide in developer/deployment/
-3. Review security audit findings
-```
+- [Getting started](developer/GETTING_STARTED.md) -- local development environment
+- [Architecture overview](architecture.md) -- system design and components
+- [Development workflow](developer/DEVELOPMENT_WORKFLOW.md) -- day-to-day development
+- [Component development](developer/COMPONENT_DEVELOPMENT.md) -- building UI components
+- [Code style](developer/CODE_STYLE.md) -- coding standards
+- [Testing guide](developer/TESTING_GUIDE.md) -- writing and running tests
+- [Service development](developer/SERVICE_DEVELOPMENT.md) -- backend service development
+
+### For Operators
+
+- [Deployment overview](deployment/README.md) -- deployment strategies
+- [GitHub Pages deployment](deployment/GITHUB_PAGES.md) -- static site hosting
+- [Cloud services](deployment/CLOUD_SERVICES.md) -- GCP Cloud Run configuration
+- [Environments](deployment/ENVIRONMENTS.md) -- environment configuration
+- [Monitoring](deployment/MONITORING.md) -- observability and alerting
+- [Rollback procedures](deployment/ROLLBACK.md) -- incident recovery
+
+### For Architects
+
+- [Architecture overview](architecture.md) -- high-level system design
+- [Architecture Decision Records](adr/README.md) -- 10 ADRs covering all major decisions
+- [Domain model](ddd/01-domain-model.md) -- Domain-Driven Design documentation
+- [Feature status matrix](features/STATUS_MATRIX.md) -- what is running, planned, or broken
+- [Cloudflare migration PRD](prd-cloudflare-workers-migration.md) -- return to Cloudflare platform
+
+---
+
+## Feature Status
+
+| Feature | Status |
+|---------|--------|
+| Main React SPA (13 routes) | Running on GitHub Pages |
+| 3D visualisations (VoronoiGoldenHero, TesseractProjection) | Running |
+| Workshop content system (15 workshops) | Running |
+| Team profiles (44 experts) | Running |
+| Community forum (SvelteKit) | Builds and deploys to `/community` |
+| Auth API (WebAuthn + NIP-98) | Deployed on GCP Cloud Run |
+| JSS (Solid pod storage) | Deployed on GCP Cloud Run |
+| Nostr relay | Deployed on GCP Cloud Run |
+| Embedding API | Deployed on GCP Cloud Run |
+| Image API | Deployed on GCP Cloud Run |
+| Link preview API | Deployed on GCP Cloud Run |
+| NIP-98 shared module | Built (consolidated from 4 implementations) |
+| Cloudflare Workers (auth-api, pod-api) | Code only -- not yet deployed |
+
+For the full breakdown, see [features/STATUS_MATRIX.md](features/STATUS_MATRIX.md).
 
 ---
 
 ## Document Index
 
-**Total Documentation**: 80+ files organised in 12 categories
+### Core
 
-| Category | Files | Purpose |
-|----------|-------|---------|
-| User Getting Started | 3 | Onboarding end users |
-| User Features | 8 | Feature guides for users |
-| User Safety | 4 | Privacy and security for users |
-| User Zones | 4 | Community zone documentation |
-| Developer Getting Started | 4 | Development setup |
-| Developer Architecture | 4 | Technical design |
-| Developer Features | 4 | Feature implementation |
-| Developer Contributing | 4 | Code contribution |
-| Developer Deployment | 5 | Production deployment |
-| Developer Reference | 5 | API and configuration |
-| Architecture Decisions | 10 | ADRs with decisions |
-| Domain Model | 7 | DDD documentation |
-| Security | 5 | Security audit and guidelines |
-| Deployment | 3 | Deployment options |
-| Features | 4 | Developer feature docs |
-| Guides | 1 | Implementation guides |
-| Reference | 3 | API reference |
+| Document | Description |
+|----------|-------------|
+| [README.md](README.md) | This file -- master documentation hub |
+| [index.md](index.md) | Quick-navigation page |
+| [architecture.md](architecture.md) | High-level architecture overview |
+| [features/STATUS_MATRIX.md](features/STATUS_MATRIX.md) | Comprehensive feature status matrix |
+| [prd-cloudflare-workers-migration.md](prd-cloudflare-workers-migration.md) | Cloudflare migration PRD |
+
+### Architecture Decision Records
+
+| ADR | Title | Status |
+|-----|-------|--------|
+| [ADR-001](adr/001-nostr-protocol-foundation.md) | Nostr Protocol as Foundation | Accepted |
+| [ADR-002](adr/002-three-tier-hierarchy.md) | Three-Tier BBS Hierarchy | Accepted |
+| [ADR-003](adr/003-gcp-cloud-run-infrastructure.md) | GCP Cloud Run Infrastructure | Superseded by ADR-010 |
+| [ADR-004](adr/004-zone-based-access-control.md) | Zone-Based Access Control | Accepted |
+| [ADR-005](adr/005-nip-44-encryption-mandate.md) | NIP-44 Encryption Mandate | Accepted |
+| [ADR-006](adr/006-client-side-wasm-search.md) | Client-Side WASM Search | Accepted |
+| [ADR-007](adr/007-sveltekit-ndk-frontend.md) | SvelteKit + NDK Frontend | Accepted |
+| [ADR-008](adr/008-postgresql-relay-storage.md) | PostgreSQL Relay Storage | Accepted |
+| [ADR-009](adr/009-user-registration-flow.md) | User Registration Flow | Resolved |
+| [ADR-010](adr/010-return-to-cloudflare.md) | Return to Cloudflare Platform | Accepted |
+
+### Domain-Driven Design
+
+| Document | Description |
+|----------|-------------|
+| [Domain model](ddd/01-domain-model.md) | Core domain entities |
+| [Bounded contexts](ddd/02-bounded-contexts.md) | System boundaries |
+| [Aggregates](ddd/03-aggregates.md) | Data aggregates |
+| [Domain events](ddd/04-domain-events.md) | Event model |
+| [Value objects](ddd/05-value-objects.md) | Value types |
+| [Ubiquitous language](ddd/06-ubiquitous-language.md) | Terminology |
+
+### Security
+
+| Document | Description |
+|----------|-------------|
+| [Security overview](security/SECURITY_OVERVIEW.md) | Security posture summary |
+| [Authentication](security/AUTHENTICATION.md) | Auth system details |
+| [Data protection](security/DATA_PROTECTION.md) | Data handling policies |
+| [Vulnerability management](security/VULNERABILITY_MANAGEMENT.md) | Vulnerability response |
+| [Security audit report](security/security-audit-report.md) | Audit findings |
+| [Admin security](security/admin-security.md) | Administrator guidelines |
+
+### API
+
+| Document | Description |
+|----------|-------------|
+| [Embedding service](api/EMBEDDING_SERVICE.md) | Vector embedding API |
+| [Supabase schema](api/SUPABASE_SCHEMA.md) | Database schema reference |
+| [Nostr relay](api/NOSTR_RELAY.md) | Relay protocol reference |
+
+### Features
+
+| Document | Description |
+|----------|-------------|
+| [Authentication](features/authentication.md) | Auth system implementation |
+| [DM implementation](features/dm-implementation.md) | NIP-17/59 encrypted messaging |
+| [Mobile UI components](features/mobile-ui-components.md) | Touch-optimised components |
+| [Secure clipboard](features/secure-clipboard.md) | Memory-safe data handling |
+
+### Community Forum
+
+| Document | Description |
+|----------|-------------|
+| [Community overview](community/README.md) | Forum architecture |
+| [UI components](community/UI_COMPONENTS.md) | Forum component library |
 
 ---
 
-## Version History
+## Build Commands
 
-| Version | Date | Changes |
-|---------|------|---------|
-| 1.0.0 | 2026-01-25 | Master documentation hub created |
-| (Previous) | 2026-01-16 | Initial index.md |
+```bash
+# Development server (generates workshop list first)
+npm run dev
 
----
+# Production build
+npm run build
 
-## Support
+# Development build
+npm run build:dev
 
-### Documentation Support
-- **Questions**: Ask in [GitHub Discussions](https://github.com/jjohare/Nostr-BBS/discussions)
-- **Bugs**: Report in [GitHub Issues](https://github.com/jjohare/Nostr-BBS/issues)
-- **Security**: Contact [@jjohare](https://github.com/jjohare) privately
+# Lint (ESLint 9 flat config)
+npm run lint
 
-### Getting Help
-1. Search this documentation using Ctrl+F
-2. Check [GitHub Issues](https://github.com/jjohare/Nostr-BBS/issues) for similar problems
-3. Review [Troubleshooting](developer/getting-started/development-setup.md#troubleshooting)
-4. Ask in [GitHub Discussions](https://github.com/jjohare/Nostr-BBS/discussions)
+# Preview production build
+npm run preview
+```
 
 ---
 
-**Last Updated**: 2026-01-25
-**Documentation Version**: 1.0.0
-**Status**: ✅ Production Ready
-**Maintained By**: Nostr-BBS Project Team
+## Repository
+
+- **Source:** [github.com/DreamLab-AI/dreamlab-ai-website](https://github.com/DreamLab-AI/dreamlab-ai-website)
+- **Live site:** [dreamlab-ai.com](https://dreamlab-ai.com) / [thedreamlab.uk](https://thedreamlab.uk)
+- **Issues:** [GitHub Issues](https://github.com/DreamLab-AI/dreamlab-ai-website/issues)
+- **Forked from:** [TheDreamLabUK/website](https://github.com/TheDreamLabUK/website)
+
+---
+
+**Last updated:** 2026-02-28
+**Maintained by:** DreamLab AI Engineering

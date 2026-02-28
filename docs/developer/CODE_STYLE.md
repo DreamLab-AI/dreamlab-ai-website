@@ -1,384 +1,365 @@
 # Code Style Guide
 
-Coding standards and conventions for DreamLab AI.
+Last updated: 2026-02-28
 
-## General Principles
+Coding standards and conventions for the DreamLab AI codebase.
 
-### 1. Clarity Over Cleverness
+---
+
+## General principles
+
+1. **Clarity over cleverness** -- write code that reads well. Favour explicit names and straightforward logic over terse one-liners.
+2. **Consistency** -- follow the patterns already established in the codebase. When in doubt, match the style of surrounding code.
+3. **Simplicity** -- solve the problem at hand. Do not add abstractions or features before they are needed.
+
+---
+
+## TypeScript conventions
+
+### Configuration
+
+The project uses relaxed TypeScript settings (defined in `tsconfig.json`):
+
+- `noImplicitAny: false`
+- `strictNullChecks: false`
+- `noUnusedParameters: false`
+- `noUnusedLocals: false`
+- Target: ES2020
+- JSX: react-jsx
+
+Despite the relaxed compiler settings, aim for type safety in new code.
+
+### Type annotations
 
 ```typescript
-// ❌ Clever but unclear
-const x = arr.reduce((a,b)=>a+b.p,0);
-
-// ✅ Clear and readable
-const totalPrice = items.reduce((sum, item) => sum + item.price, 0);
-```
-
-### 2. Consistency
-
-- Follow existing patterns in the codebase
-- Use the same naming conventions
-- Match the formatting style
-- Keep similar things similar
-
-### 3. Simplicity
-
-- Write simple solutions first
-- Refactor for performance only when needed
-- Avoid premature optimization
-- Don't add features before they're needed
-
-## TypeScript
-
-### Type Annotations
-
-```typescript
-// ✅ Always type function parameters
-function calculateTotal(items: Item[], tax: number): number {
-  return items.reduce((sum, item) => sum + item.price, 0) * (1 + tax);
+// Type function parameters and return values
+function calculateTotal(items: Item[], taxRate: number): number {
+  return items.reduce((sum, item) => sum + item.price, 0) * (1 + taxRate);
 }
 
-// ✅ Type object properties
+// Use interfaces for object shapes
+interface WorkshopProps {
+  title: string;
+  description: string;
+  level: "beginner" | "intermediate" | "advanced";
+}
+
+// Use type aliases for unions and primitives
+type Status = "pending" | "active" | "completed";
+type ID = string | number;
+```
+
+### Prefer interfaces for objects, types for unions
+
+```typescript
+// Object shapes -- use interface
 interface User {
   id: string;
   name: string;
   email: string;
-  role: 'admin' | 'user';
+  role: "admin" | "user";
 }
 
-// ✅ Prefer interfaces over types for objects
-interface WorkshopProps {
-  title: string;
-  description: string;
-  level: 'beginner' | 'intermediate' | 'advanced';
-}
-
-// ✅ Use types for unions and primitives
-type Status = 'pending' | 'active' | 'completed';
-type ID = string | number;
+// Unions and computed types -- use type
+type UserRole = "admin" | "user";
+type Nullable<T> = T | null;
 ```
 
-### Type Safety
+### Null safety
 
 ```typescript
-// ❌ Avoid 'any'
+// Optional chaining
+const name = user?.profile?.name;
+
+// Nullish coalescing
+const displayName = name ?? "Anonymous";
+```
+
+### Avoid `any`
+
+```typescript
+// Avoid
 const data: any = fetchData();
 
-// ✅ Use proper types
+// Prefer
 interface ApiResponse {
   data: Workshop[];
   status: number;
 }
 const response: ApiResponse = await fetchData();
-
-// ❌ Don't use type assertions unnecessarily
-const value = getValue() as string;
-
-// ✅ Use type guards
-function isString(value: unknown): value is string {
-  return typeof value === 'string';
-}
-
-if (isString(value)) {
-  // TypeScript knows value is string here
-}
 ```
 
-### Null Safety
+---
+
+## React component patterns
+
+### Component structure
+
+Follow this order within a component file:
+
+1. Imports
+2. Types/interfaces
+3. Component function
+4. Hooks
+5. Event handlers
+6. Render helpers
+7. Return JSX
 
 ```typescript
-// ✅ Use optional chaining
-const name = user?.profile?.name;
-
-// ✅ Use nullish coalescing
-const displayName = name ?? 'Anonymous';
-
-// ✅ Check for null/undefined explicitly
-if (value !== null && value !== undefined) {
-  // Use value
-}
-```
-
-## React Components
-
-### Component Structure
-
-```typescript
-// Standard component order:
-// 1. Imports
-// 2. Types/Interfaces
-// 3. Component function
-// 4. Hooks
-// 5. Event handlers
-// 6. Render helpers
-// 7. Return JSX
-
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface WorkshopCardProps {
   title: string;
   description: string;
   className?: string;
-  onEnroll?: () => void;
+  onEnrol?: () => void;
 }
 
 export const WorkshopCard = ({
   title,
   description,
   className,
-  onEnroll
+  onEnrol,
 }: WorkshopCardProps) => {
-  // Hooks
+  // 1. Hooks
   const [isEnrolled, setIsEnrolled] = useState(false);
 
   useEffect(() => {
     // Effect logic
   }, []);
 
-  // Event handlers
-  const handleEnroll = () => {
+  // 2. Event handlers
+  const handleEnrol = () => {
     setIsEnrolled(true);
-    onEnroll?.();
+    onEnrol?.();
   };
 
-  // Render helpers
+  // 3. Render helpers (optional)
   const renderStatus = () => {
-    return isEnrolled ? 'Enrolled' : 'Available';
+    return isEnrolled ? "Enrolled" : "Available";
   };
 
-  // JSX
+  // 4. JSX
   return (
     <div className={cn("workshop-card", className)}>
       <h3>{title}</h3>
       <p>{description}</p>
       <span>{renderStatus()}</span>
-      <Button onClick={handleEnroll}>Enroll</Button>
+      <Button onClick={handleEnrol}>Enrol</Button>
     </div>
   );
 };
 ```
 
-### Naming Conventions
+### Export style
+
+- **Pages**: use `export default` (required for `React.lazy()`).
+- **Components, hooks, utilities**: use named exports.
+
+### Props
+
+- Destructure props in the function signature.
+- Always accept an optional `className` prop on presentational components.
+- Suffix props interfaces with `Props`: `WorkshopCardProps`.
 
 ```typescript
-// ✅ Components: PascalCase
-export const WorkshopCard = () => {};
-
-// ✅ Hooks: camelCase with 'use' prefix
-export const useWorkshopFilter = () => {};
-
-// ✅ Utilities: camelCase
-export const formatDate = () => {};
-
-// ✅ Constants: UPPER_SNAKE_CASE
-export const MAX_WORKSHOPS = 100;
-
-// ✅ Types/Interfaces: PascalCase
-export interface WorkshopData {}
-export type UserRole = 'admin' | 'user';
-
-// ✅ Props interfaces: ComponentName + 'Props'
-interface WorkshopCardProps {}
-```
-
-### Props Destructuring
-
-```typescript
-// ✅ Destructure props in function signature
+// Preferred
 export const Button = ({ children, onClick, disabled }: ButtonProps) => {
   return <button onClick={onClick} disabled={disabled}>{children}</button>;
 };
 
-// ❌ Don't use props object
+// Avoid
 export const Button = (props: ButtonProps) => {
   return <button onClick={props.onClick}>{props.children}</button>;
 };
 ```
 
-### Component Organization
+### shadcn/ui and Radix UI
 
-```
-src/components/
-├── ui/                  # Radix UI components
-│   ├── button.tsx
-│   ├── card.tsx
-│   └── dialog.tsx
-├── features/            # Feature-specific components
-│   ├── WorkshopCard.tsx
-│   ├── WorkshopFilter.tsx
-│   └── WorkshopList.tsx
-└── layout/              # Layout components
-    ├── Header.tsx
-    ├── Footer.tsx
-    └── Sidebar.tsx
-```
+The `src/components/ui/` directory contains shadcn/ui primitives built on Radix UI. These components follow a consistent pattern:
 
-## File Organization
+- Radix UI provides the accessible, unstyled primitive.
+- `class-variance-authority` (CVA) defines visual variants.
+- `cn()` merges Tailwind classes with consumer overrides.
 
-### File Naming
-
-```bash
-# ✅ Components: PascalCase
-WorkshopCard.tsx
-UserProfile.tsx
-
-# ✅ Utilities: kebab-case
-date-utils.ts
-string-helpers.ts
-
-# ✅ Hooks: kebab-case
-use-workshop-filter.ts
-use-auth.ts
-
-# ✅ Types: kebab-case
-workshop-types.ts
-user-types.ts
-```
-
-### File Location Rules
-
-```bash
-# ✅ CORRECT - Organized in subdirectories
-src/components/features/WorkshopCard.tsx
-src/lib/date-utils.ts
-src/hooks/use-auth.ts
-docs/developer/GUIDE.md
-tests/unit/workshop.test.ts
-
-# ❌ WRONG - Never save to root
-./WorkshopCard.tsx
-./utils.ts
-./test.md
-```
-
-## Imports
-
-### Import Order
+Example (simplified `button.tsx` pattern):
 
 ```typescript
-// 1. React and external libraries
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "@/lib/utils";
 
-// 2. Internal components
-import { Button } from '@/components/ui/button';
-import { WorkshopCard } from '@/components/features/WorkshopCard';
-
-// 3. Hooks
-import { useWorkshopFilter } from '@/hooks/use-workshop-filter';
-
-// 4. Utils and libraries
-import { cn } from '@/lib/utils';
-import { formatDate } from '@/lib/date-utils';
-
-// 5. Types
-import type { Workshop, WorkshopLevel } from '@/types';
-
-// 6. Styles (if any)
-import './styles.css';
+const buttonVariants = cva(
+  "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        outline: "border border-input bg-background hover:bg-accent",
+        ghost: "hover:bg-accent hover:text-accent-foreground",
+      },
+      size: {
+        default: "h-10 px-4 py-2",
+        sm: "h-9 rounded-md px-3",
+        lg: "h-11 rounded-md px-8",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  }
+);
 ```
 
-### Path Aliases
+Do not modify existing `ui/` components without good reason. Compose them via props and `className` instead.
+
+---
+
+## Tailwind CSS patterns
+
+### Class ordering
+
+Follow this general order: layout, spacing, sizing, appearance, interaction.
 
 ```typescript
-// ✅ Use @ alias for src
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-
-// ❌ Don't use relative paths
-import { Button } from '../../../components/ui/button';
-```
-
-## Styling
-
-### Tailwind CSS Classes
-
-```typescript
-// ✅ Order: Layout -> Spacing -> Sizing -> Appearance -> Interaction
 <div className="flex flex-col gap-4 w-full h-auto bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow" />
+```
 
-// ✅ Use cn() for conditional classes
+### Conditional classes with `cn()`
+
+Always use `cn()` (from `@/lib/utils`) for conditional classes. Never concatenate strings.
+
+```typescript
+// Correct
 <div className={cn(
-  "base-class",
-  isActive && "active-class",
-  error && "error-class",
+  "p-4 rounded-lg",
+  isActive && "bg-primary text-primary-foreground",
+  hasError && "border-destructive",
   className
 )} />
 
-// ❌ Don't concatenate strings
-<div className={"base-class" + (isActive ? " active-class" : "")} />
+// Avoid
+<div className={"p-4 rounded-lg" + (isActive ? " bg-primary" : "")} />
 ```
 
-### Responsive Design
+### Responsive design
+
+Use mobile-first breakpoints:
 
 ```typescript
-// ✅ Mobile-first approach
-<div className="
-  text-sm md:text-base lg:text-lg
-  p-4 md:p-6 lg:p-8
-  grid-cols-1 md:grid-cols-2 lg:grid-cols-3
-" />
+<div className="text-sm md:text-base lg:text-lg p-4 md:p-6 lg:p-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3" />
 ```
 
-### Dark Mode
+### Dark mode
+
+The project uses class-based dark mode (`darkMode: ["class"]` in `tailwind.config.ts`). Use the `dark:` prefix:
 
 ```typescript
-// ✅ Use dark: prefix
 <div className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white" />
 ```
 
+### Colour system
+
+Colours are defined as HSL CSS variables in `index.css` and referenced via the Tailwind theme. Use semantic names:
+
+```typescript
+// Use semantic colour names
+<div className="bg-background text-foreground" />
+<div className="bg-primary text-primary-foreground" />
+<div className="bg-muted text-muted-foreground" />
+<div className="border-border" />
+
+// Avoid raw colour values in components
+<div className="bg-slate-900" />  // only for one-off cases
+```
+
+---
+
+## File naming conventions
+
+| Type | Convention | Examples |
+|------|-----------|----------|
+| React components | PascalCase `.tsx` | `WorkshopCard.tsx`, `Header.tsx` |
+| Pages | PascalCase `.tsx` | `Index.tsx`, `WorkshopPage.tsx` |
+| Hooks | camelCase with `use-` prefix `.ts`/`.tsx` | `use-mobile.tsx`, `use-toast.ts` |
+| Utilities | kebab-case `.ts` | `image-utils.ts`, `og-meta.ts` |
+| UI primitives | kebab-case `.tsx` | `button.tsx`, `scroll-area.tsx` |
+| Type definitions | kebab-case `.ts` | `workshop-types.ts` |
+| Data files | kebab-case `.json` | `workshop-list.json`, `skills.json` |
+
+---
+
+## Import ordering
+
+Group imports in this order, separated by blank lines:
+
+```typescript
+// 1. React and external libraries
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+
+// 2. Internal components
+import { Button } from "@/components/ui/button";
+import { WorkshopCard } from "@/components/WorkshopCard";
+
+// 3. Hooks
+import { useMobile } from "@/hooks/use-mobile";
+
+// 4. Utilities and libraries
+import { cn } from "@/lib/utils";
+
+// 5. Types (use `import type` where possible)
+import type { Workshop } from "@/types";
+
+// 6. Data
+import workshopList from "@/data/workshop-list.json";
+```
+
+### Path aliases
+
+Always use the `@/` alias for imports from `src/`. Never use deep relative paths.
+
+```typescript
+// Correct
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+
+// Avoid
+import { Button } from "../../../components/ui/button";
+```
+
+---
+
 ## Functions
 
-### Function Length
+### Length
+
+Keep functions short and focused. Aim for under 50 lines. Extract complex logic into helper functions.
+
+### Arrow functions
+
+Use arrow functions for components, event handlers, and most utility functions:
 
 ```typescript
-// ✅ Keep functions short and focused (< 50 lines)
-const calculateTotal = (items: Item[]) => {
-  return items.reduce((sum, item) => sum + item.price, 0);
-};
+export const WorkshopCard = ({ title }: WorkshopCardProps) => { ... };
 
-// ✅ Extract complex logic into helper functions
-const processWorkshops = (workshops: Workshop[]) => {
-  const filtered = filterByLevel(workshops);
-  const sorted = sortByDate(filtered);
-  return paginate(sorted);
-};
+const handleClick = () => { ... };
+
+const calculateTotal = (items: Item[]) => { ... };
 ```
 
-### Arrow Functions vs Regular Functions
+### Parameters
+
+Limit positional parameters to three. Use an options object for functions with more:
 
 ```typescript
-// ✅ Use arrow functions for most cases
-const calculateTotal = (items: Item[]) => {
-  return items.reduce((sum, item) => sum + item.price, 0);
-};
-
-// ✅ Use regular functions for methods that need 'this'
-class WorkshopManager {
-  function calculateTotal(items: Item[]) {
-    return this.applyDiscount(items);
-  }
-}
-
-// ✅ Use arrow functions in components
-export const MyComponent = () => {
-  const handleClick = () => {
-    console.log('Clicked');
-  };
-
-  return <button onClick={handleClick}>Click</button>;
-};
-```
-
-### Function Parameters
-
-```typescript
-// ✅ Limit parameters (≤ 3)
+// Up to 3 parameters -- positional is fine
 const createWorkshop = (title: string, level: string, duration: number) => {};
 
-// ✅ Use object for many parameters
+// More than 3 -- use an object
 interface CreateWorkshopParams {
   title: string;
   level: string;
@@ -390,198 +371,175 @@ interface CreateWorkshopParams {
 const createWorkshop = (params: CreateWorkshopParams) => {};
 ```
 
+---
+
 ## Comments
 
-### When to Comment
+### When to comment
+
+Comment the **why**, not the **what**:
 
 ```typescript
-// ✅ Explain WHY, not WHAT
 // Calculate tax based on user's location (EU requires VAT)
 const tax = calculateTax(location);
-
-// ❌ Don't state the obvious
-// Set the count to 0
-const count = 0;
-
-// ✅ Document complex algorithms
-/**
- * Uses binary search to find workshop by ID.
- * Time complexity: O(log n)
- */
-const findWorkshop = (id: string) => {};
-
-// ✅ Mark temporary code
-// TODO: Replace with API call once endpoint is ready
-const mockData = [{ id: 1, name: 'Workshop' }];
-
-// ✅ Explain workarounds
-// HACK: Force re-render due to library bug
-// See: https://github.com/library/issues/123
-key={Math.random()}
 ```
 
-### Documentation Comments
+Do not state the obvious:
+
+```typescript
+// Avoid -- adds no information
+// Set the count to 0
+const count = 0;
+```
+
+### JSDoc
+
+Use JSDoc for exported functions with non-obvious behaviour:
 
 ```typescript
 /**
- * Filters workshops based on level and duration.
+ * Filters workshops by level and maximum duration.
  *
  * @param workshops - Array of workshops to filter
- * @param level - Workshop difficulty level
+ * @param level - Difficulty level to match
  * @param maxDuration - Maximum duration in hours
  * @returns Filtered array of workshops
- *
- * @example
- * const filtered = filterWorkshops(workshops, 'beginner', 20);
  */
 export const filterWorkshops = (
   workshops: Workshop[],
   level: string,
   maxDuration: number
 ): Workshop[] => {
-  return workshops.filter(w =>
-    w.level === level && w.duration <= maxDuration
-  );
+  return workshops.filter((w) => w.level === level && w.duration <= maxDuration);
 };
 ```
 
-## Error Handling
-
-### Graceful Error Handling
+### Markers
 
 ```typescript
-// ✅ Always handle errors
+// TODO: Replace with API call once endpoint is ready
+// HACK: Force re-render due to library bug (see https://github.com/library/issues/123)
+```
+
+---
+
+## Error handling
+
+### Components
+
+Use the `ErrorBoundary` component to catch rendering errors:
+
+```typescript
+<ErrorBoundary fallback={<ErrorMessage />}>
+  <RiskyComponent />
+</ErrorBoundary>
+```
+
+### Async operations
+
+Always handle errors in async code. Provide user-facing feedback:
+
+```typescript
 try {
   const data = await fetchWorkshops();
   return data;
 } catch (error) {
-  console.error('Failed to fetch workshops:', error);
+  console.error("Failed to fetch workshops:", error);
   return [];
 }
-
-// ✅ Provide user feedback
-const [error, setError] = useState<string | null>(null);
-
-try {
-  await enrollInWorkshop(id);
-} catch (err) {
-  setError('Failed to enroll. Please try again.');
-}
-
-// ✅ Use error boundaries for React errors
-<ErrorBoundary fallback={<ErrorMessage />}>
-  <MyComponent />
-</ErrorBoundary>
 ```
+
+### Form validation
+
+Use Zod schemas with React Hook Form for form validation:
+
+```typescript
+import { z } from "zod";
+
+const contactSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Invalid email address"),
+  message: z.string().min(10, "Message must be at least 10 characters"),
+});
+```
+
+---
 
 ## Security
 
-### Input Validation
+### Environment variables
 
 ```typescript
-// ✅ Validate user input
-const sanitizeInput = (input: string) => {
-  return input.trim().replace(/[<>]/g, '');
-};
+// Access via import.meta.env
+const apiUrl = import.meta.env.VITE_SUPABASE_URL;
 
-// ✅ Validate on both client and server
-if (!email.includes('@')) {
-  throw new Error('Invalid email');
-}
-```
-
-### Sensitive Data
-
-```typescript
-// ✅ Never log sensitive data
-if (import.meta.env.DEV) {
-  console.log('User logged in:', { id: user.id }); // OK
-}
-
-// ❌ Never log passwords, tokens, API keys
-console.log('Password:', password); // NEVER DO THIS
-```
-
-### Environment Variables
-
-```typescript
-// ✅ Use environment variables for secrets
-const apiKey = import.meta.env.VITE_API_KEY;
-
-// ✅ Check if variables exist
-if (!apiKey) {
-  console.error('API key not configured');
+// Check existence before use
+if (!apiUrl) {
+  console.error("Supabase URL not configured");
   return;
 }
-
-// ❌ Never hardcode secrets
-const apiKey = 'sk-1234567890'; // NEVER DO THIS
 ```
 
-## Performance
+### Sensitive data
 
-### Optimization Guidelines
+- Never hardcode secrets, API keys, or credentials in source files.
+- Never log sensitive values. Log only their presence:
 
 ```typescript
-// ✅ Memoize expensive computations
+if (import.meta.env.DEV) {
+  console.log("Has API key:", !!apiKey);
+}
+```
+
+### HTML sanitisation
+
+Use DOMPurify for any user-provided or markdown-rendered HTML:
+
+```typescript
+import DOMPurify from "dompurify";
+
+const sanitised = DOMPurify.sanitize(rawHtml);
+```
+
+---
+
+## Performance guidelines
+
+### Code splitting
+
+All route pages are lazy-loaded via `React.lazy()`. This is already configured in `App.tsx`. Follow the same pattern for any heavy component:
+
+```typescript
+const HeavyChart = lazy(() => import("./HeavyChart"));
+
+<Suspense fallback={<div>Loading...</div>}>
+  <HeavyChart />
+</Suspense>
+```
+
+### Memoisation
+
+Use `useMemo` and `useCallback` for expensive computations and stable callback references, but only when profiling shows a measurable benefit:
+
+```typescript
 const total = useMemo(() => {
   return items.reduce((sum, item) => sum + item.price, 0);
 }, [items]);
-
-// ✅ Memoize callbacks
-const handleClick = useCallback(() => {
-  console.log('Clicked');
-}, []);
-
-// ✅ Code split heavy components
-const HeavyChart = lazy(() => import('./HeavyChart'));
-
-// ❌ Don't optimize prematurely
-// Profile first, then optimize hot paths
 ```
 
-## Testing
+### Image optimisation
 
-See [TESTING_GUIDE.md](./TESTING_GUIDE.md) for comprehensive testing guidelines.
+Use the `useOptimizedImages` hook for lazy loading and srcset generation:
 
-## Linting
-
-### ESLint Configuration
-
-Project uses ESLint with TypeScript support:
-
-```bash
-# Run linter
-npm run lint
-
-# Auto-fix issues
-npm run lint -- --fix
+```typescript
+import { useOptimizedImages } from "@/hooks/use-optimized-images";
 ```
 
-### Common Rules
+---
 
-- No unused variables
-- No console.log in production
-- Prefer const over let
-- Use === instead of ==
-- Require semicolons
+## Commit messages
 
-## Git Commit Messages
-
-### Conventional Commits
-
-```bash
-feat: add workshop enrollment feature
-fix: resolve navigation state bug
-docs: update API reference
-style: format code with prettier
-refactor: simplify workshop filter logic
-perf: optimize image loading
-test: add workshop card tests
-chore: update dependencies
-```
-
-### Commit Message Format
+Follow the Conventional Commits specification:
 
 ```
 <type>(<scope>): <subject>
@@ -591,45 +549,35 @@ chore: update dependencies
 <footer>
 ```
 
-Example:
+Types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`.
+
+Examples:
+
 ```
-feat(workshops): add advanced filtering options
-
-- Add level filter dropdown
-- Add duration slider
-- Add search by title
-- Update workshop list display
-
-Closes #123
+feat(workshops): add advanced filtering by level and duration
+fix(auth): handle missing PRF extension gracefully
+docs: update developer getting started guide
+refactor: extract workshop filter into custom hook
 ```
 
-## Code Review Checklist
+---
 
-- [ ] Code follows style guide
-- [ ] TypeScript types are correct
-- [ ] No console.log statements
-- [ ] Error handling is present
-- [ ] Component is properly tested
-- [ ] No hardcoded values
-- [ ] Responsive design works
-- [ ] Accessibility considered
-- [ ] Performance optimized if needed
-- [ ] Documentation updated
+## Code review checklist
 
-## Resources
+- [ ] Code follows the patterns described in this guide
+- [ ] TypeScript types are correct and meaningful
+- [ ] No `console.log` statements in production code
+- [ ] Error handling is present for async operations
+- [ ] No hardcoded values that should be configuration
+- [ ] Responsive design works at mobile and desktop widths
+- [ ] Accessibility: keyboard navigation, ARIA attributes where needed
+- [ ] `npm run lint` passes
+- [ ] `npm run build` succeeds
 
-- React: https://react.dev
-- TypeScript: https://www.typescriptlang.org
-- Tailwind: https://tailwindcss.com
-- ESLint: https://eslint.org
+---
 
-## Summary
+## Related documentation
 
-1. **Clarity**: Write code others can understand
-2. **Consistency**: Follow existing patterns
-3. **Type Safety**: Use TypeScript properly
-4. **Organization**: Put files in right places
-5. **Testing**: Test your code
-6. **Security**: Handle data safely
-7. **Performance**: Optimize when needed
-8. **Documentation**: Comment complex code
+- [DEVELOPMENT_WORKFLOW.md](./DEVELOPMENT_WORKFLOW.md) -- daily workflow
+- [TESTING_GUIDE.md](./TESTING_GUIDE.md) -- testing practices
+- [PROJECT_STRUCTURE.md](./PROJECT_STRUCTURE.md) -- directory layout

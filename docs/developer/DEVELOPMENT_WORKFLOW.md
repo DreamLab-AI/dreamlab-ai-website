@@ -1,370 +1,384 @@
 # Development Workflow
 
-Day-to-day development practices for DreamLab AI.
+Last updated: 2026-02-28
 
-## Daily Development Cycle
+Day-to-day development practices for the DreamLab AI website and its subsystems.
 
-### 1. Start Your Day
+---
+
+## Daily development cycle
+
+### 1. Sync with upstream
 
 ```bash
-# Update local repository
 git checkout main
 git pull origin main
+```
 
-# Create feature branch
-git checkout -b feature/your-feature
+### 2. Create a feature branch
 
-# Start dev server
+```bash
+git checkout -b feature/your-feature-name
+```
+
+### 3. Start the development server
+
+```bash
 npm run dev
 ```
 
-### 2. Development Process
+The server starts at `http://localhost:5173` with hot module replacement. Changes to source files appear instantly in the browser.
 
-#### Making Changes
+### 4. Develop, verify, commit
 
-1. **Edit Files**: Use hot reload for instant feedback
-2. **Check Browser**: Changes appear automatically
-3. **Check Console**: Monitor for errors
-4. **Test Features**: Verify functionality works
+- Edit files in `src/`.
+- Check the browser -- Vite HMR updates components without a full page reload.
+- Watch the terminal and browser console for errors.
+- Run `npm run lint` periodically.
+- Run `npm run build` before committing to confirm the production build succeeds.
 
-#### File Organization Rules
+---
 
-**CRITICAL**: Never save working files to root directory.
+## Adding a new page/route
 
-```bash
-# ✅ CORRECT
-src/components/NewFeature.tsx
-src/lib/new-utility.ts
-public/data/new-content.json
-docs/new-guide.md
+### 1. Create the page component
 
-# ❌ WRONG
-./NewFeature.tsx           # Don't save to root
-./test-file.ts            # Don't save to root
-./debug.md                # Don't save to root
-```
-
-### 3. Testing Changes
-
-```bash
-# Build production version
-npm run build
-
-# Preview production build
-npm run preview
-
-# Run linter
-npm run lint
-```
-
-## Working with Components
-
-### Adding New Components
-
-Create in appropriate directory:
+Create a new file in `src/pages/`:
 
 ```typescript
-// src/components/features/MyFeature.tsx
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+// src/pages/NewPage.tsx
+import { Header } from "@/components/Header";
 
-interface MyFeatureProps {
+const NewPage = () => {
+  return (
+    <div className="min-h-screen bg-background">
+      <Header />
+      <main className="container mx-auto px-4 py-16">
+        <h1 className="text-4xl font-bold">New Page</h1>
+      </main>
+    </div>
+  );
+};
+
+export default NewPage;
+```
+
+Pages must use a **default export** for React.lazy() to work.
+
+### 2. Register the route
+
+Add a lazy import and route in `src/App.tsx`:
+
+```typescript
+// Add the lazy import with the other page imports
+const NewPage = lazy(() => import("./pages/NewPage"));
+
+// Add the route inside <Routes>, above the catch-all
+<Route path="/new-page" element={<NewPage />} />
+```
+
+### 3. Add navigation (optional)
+
+Update `src/components/Header.tsx` to include a link to the new page.
+
+---
+
+## Adding a new component
+
+### UI primitive (shadcn/ui)
+
+shadcn/ui components live in `src/components/ui/`. They follow a standard pattern: Radix UI primitive wrapped with Tailwind styling and the `cn()` utility.
+
+To add a new shadcn/ui component, follow the pattern of existing files such as `button.tsx` or `card.tsx`. Use `class-variance-authority` (CVA) for variant definitions.
+
+### Application component
+
+Custom components live directly in `src/components/`:
+
+```typescript
+// src/components/FeatureCard.tsx
+import { cn } from "@/lib/utils";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+interface FeatureCardProps {
   title: string;
+  description: string;
   className?: string;
 }
 
-export const MyFeature = ({ title, className }: MyFeatureProps) => {
-  const [isActive, setIsActive] = useState(false);
-
+export const FeatureCard = ({ title, description, className }: FeatureCardProps) => {
   return (
-    <div className={cn("p-4", className)}>
-      <h2>{title}</h2>
-      <Button onClick={() => setIsActive(!isActive)}>
-        Toggle
-      </Button>
-    </div>
+    <Card className={cn("transition-shadow hover:shadow-lg", className)}>
+      <CardHeader>
+        <CardTitle>{title}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p className="text-muted-foreground">{description}</p>
+      </CardContent>
+    </Card>
   );
 };
 ```
 
-### Using Existing UI Components
+Naming conventions:
+- File name matches the component name: `FeatureCard.tsx` exports `FeatureCard`.
+- Use PascalCase for component files.
+- Accept an optional `className` prop for composition.
 
-```typescript
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { Card } from '@/components/ui/card';
+---
 
-// Available UI components:
-// - Accordion, Alert, Avatar
-// - Badge, Breadcrumb, Button
-// - Calendar, Card, Carousel, Chart
-// - Checkbox, Command, Dialog
-// - Dropdown, Input, Label
-// - Popover, Progress, Scroll Area
-// - Select, Separator, Slider
-// - Switch, Tabs, Toast, Tooltip
-```
+## Working with workshop content
 
-## Working with Utilities
+Workshop content lives in `public/data/workshops/`. Each workshop is a directory containing markdown files.
 
-### Using Utils Library
-
-```typescript
-import { cn } from '@/lib/utils';
-
-// Combine Tailwind classes
-const classes = cn(
-  "base-class",
-  isActive && "active-class",
-  error && "error-class"
-);
-```
-
-### Supabase Integration
-
-```typescript
-import { supabase } from '@/lib/supabase';
-
-// Check if Supabase is available
-if (supabase) {
-  const { data, error } = await supabase
-    .from('table_name')
-    .select('*');
-}
-```
-
-**Security Note**: Never log API keys or sensitive data:
-
-```typescript
-// ✅ CORRECT
-if (import.meta.env.DEV) {
-  console.log('Has API key:', !!apiKey);
-}
-
-// ❌ WRONG
-console.log('API key:', apiKey);  // Never log actual values
-```
-
-## Git Workflow
-
-### Branch Naming
+After adding or modifying workshop content, regenerate the index:
 
 ```bash
-feature/add-workshop-calendar   # New features
-fix/navigation-bug              # Bug fixes
-refactor/simplify-routing       # Refactoring
-docs/api-reference              # Documentation
+node scripts/generate-workshop-list.mjs
 ```
 
-### Commit Messages
+This writes `src/data/workshop-list.json`, which is imported by `WorkshopIndex.tsx` and `WorkshopPage.tsx`. The script runs automatically during `npm run dev` and `npm run build`.
 
-Follow conventional commits:
+---
+
+## Working with team profiles
+
+Team profiles are markdown files in `public/data/team/`. The `Team.tsx` page fetches the directory listing from the Vite dev server middleware (configured in `vite.config.ts`) and renders each profile.
+
+To add a new team member, create a `.md` file in `public/data/team/`.
+
+---
+
+## Working with the community forum
+
+The community forum is a separate SvelteKit application in `community-forum/`.
+
+### Running locally
 
 ```bash
+cd community-forum
+npm install   # first time only
+npm run dev
+```
+
+### Key differences from the main site
+
+| Aspect | Main site | Community forum |
+|--------|-----------|-----------------|
+| Framework | React 18 | SvelteKit 2.49 |
+| Language | TypeScript | TypeScript |
+| Build tool | Vite | Vite (via SvelteKit) |
+| Auth | None (static site) | WebAuthn PRF + Nostr |
+| Protocol | HTTP | Nostr (NDK) |
+| Tests | None configured | Vitest + Playwright |
+
+### Shared NIP-98 module
+
+The `community-forum/packages/nip98/` module provides NIP-98 signing and verification used by both the forum client and backend services. Changes here affect multiple consumers.
+
+---
+
+## Working with backend services
+
+Backend services live in `community-forum/services/`. Each service is deployed as a separate Cloud Run container.
+
+### Running a service locally
+
+Example for `auth-api`:
+
+```bash
+cd community-forum/services/auth-api
+npm install
+cp .env.example .env   # create and configure .env
+npm run dev
+```
+
+The auth-api requires a PostgreSQL database (see `DATABASE_URL` in the env file).
+
+### Service overview
+
+| Service | Port | Purpose |
+|---------|------|---------|
+| auth-api | 8080 | WebAuthn registration/authentication, NIP-98 gating |
+| jss | 8080 | Solid pod server (WebID + storage per pubkey) |
+| nostr-relay | 8080 | Nostr relay (NIP-01, NIP-98 verified) |
+| embedding-api | 8080 | Vector embeddings |
+| image-api | 8080 | Image resizing and serving |
+| link-preview-api | 8080 | URL metadata extraction |
+| visionflow-bridge | 8080 | VisionFlow integration |
+
+---
+
+## Git workflow
+
+### Branch naming
+
+```
+feature/add-workshop-calendar     # New features
+fix/navigation-bug                # Bug fixes
+refactor/simplify-routing         # Refactoring
+docs/api-reference                # Documentation
+chore/update-dependencies         # Maintenance
+```
+
+### Commit messages
+
+Follow the Conventional Commits specification:
+
+```
 feat: add workshop calendar component
-fix: resolve navigation state bug
+fix: resolve navigation state bug on mobile
 refactor: simplify route configuration
-docs: update API reference
-style: format code with prettier
-perf: optimize image loading
+docs: update API reference for auth-api
+style: apply consistent formatting to components
+perf: optimise image loading with srcset
+chore: update Radix UI dependencies
 ```
 
-### Commit Frequency
+For scoped commits:
 
-- Commit logical units of work
-- Small, focused commits
-- Working code at each commit
-- Clear, descriptive messages
-
-### Example Workflow
-
-```bash
-# Start feature
-git checkout -b feature/workshop-filter
-
-# Make changes and commit
-git add src/components/WorkshopFilter.tsx
-git commit -m "feat: add workshop filter component"
-
-# Continue development
-git add src/pages/Workshops.tsx
-git commit -m "feat: integrate filter into workshops page"
-
-# Update from main
-git checkout main
-git pull origin main
-git checkout feature/workshop-filter
-git rebase main
-
-# Push changes
-git push origin feature/workshop-filter
+```
+feat(workshops): add advanced filtering options
+fix(auth): handle PRF extension unavailability
 ```
 
-## Code Quality
+### Commit frequency
 
-### Linting
+- Commit logical units of work.
+- Keep commits small and focused.
+- Ensure each commit leaves the build in a passing state.
+
+### Pull request workflow
 
 ```bash
-# Run ESLint
+# Create and switch to feature branch
+git checkout -b feature/my-feature
+
+# Make changes, commit
+git add src/components/NewFeature.tsx
+git commit -m "feat: add new feature component"
+
+# Push to remote
+git push -u origin feature/my-feature
+
+# Open a pull request via GitHub (or gh CLI)
+gh pr create --title "feat: add new feature component" --body "Description of changes"
+```
+
+Before opening a PR:
+
+- [ ] `npm run lint` passes
+- [ ] `npm run build` succeeds
+- [ ] No console errors in the browser
+- [ ] Changes render correctly at mobile and desktop widths
+
+---
+
+## Linting and type checking
+
+### ESLint
+
+```bash
+# Run the linter
 npm run lint
 
-# Auto-fix issues
+# Auto-fix where possible
 npm run lint -- --fix
 ```
 
-### Type Checking
+The ESLint configuration (`eslint.config.js`) uses:
+- `@eslint/js` recommended rules
+- `typescript-eslint` recommended rules
+- `eslint-plugin-react-hooks` for hooks rules
+- `eslint-plugin-react-refresh` for fast refresh compatibility
 
-TypeScript checks happen automatically during:
-- Development (Vite)
-- Build (TypeScript compiler)
-- Editor (VS Code)
+The `@typescript-eslint/no-unused-vars` rule is disabled.
 
-### Pre-commit Checklist
+### TypeScript
 
-- [ ] No console errors
-- [ ] No TypeScript errors
-- [ ] Code follows style guide
-- [ ] Components render correctly
-- [ ] Build succeeds
-- [ ] Commit message is clear
+TypeScript checking happens during:
+- Development (Vite reports errors in the terminal)
+- Build (`vite build` runs the TypeScript compiler)
+- Editor (VS Code provides inline diagnostics)
 
-## Environment Variables
+The project uses relaxed TypeScript settings:
+- `noImplicitAny: false`
+- `strictNullChecks: false`
+- `noUnusedParameters: false`
+- `noUnusedLocals: false`
 
-### Development
+These are set in `tsconfig.json`. The `@/*` path alias maps to `./src/*`.
 
-Create `.env` for local development:
+---
 
-```bash
-VITE_SUPABASE_URL=your_dev_url
-VITE_SUPABASE_ANON_KEY=your_dev_key
-```
+## Hot reload behaviour
 
-### Production
+Vite provides instant hot module replacement for most changes. Some changes trigger a full page reload:
 
-Production environment variables are set in deployment platform.
+| Change | Behaviour |
+|--------|-----------|
+| Component JSX/logic | HMR (state preserved) |
+| CSS/Tailwind classes | HMR (instant) |
+| `vite.config.ts` | Full server restart |
+| `.env` files | Full server restart |
+| `package.json` | Requires `npm install` + restart |
+| `tailwind.config.ts` | Full page reload |
+| Files in `public/` | Full page reload |
 
-**Security Rules**:
-- Never commit `.env` files
-- Never log API keys
-- Use `import.meta.env.DEV` for dev-only code
-- Check for environment variables before using
+---
 
-## Hot Reload and Fast Refresh
+## Build process details
 
-Vite provides instant updates:
+The `npm run build` command executes:
 
-```typescript
-// Changes to this file reflect immediately
-export const MyComponent = () => {
-  // Component state is preserved during updates
-  const [count, setCount] = useState(0);
+1. **Pre-build scripts** (via `prebuild` in package.json):
+   - `node scripts/generate-workshop-list.mjs` -- generates workshop index
+   - `node scripts/generate-testimonials.mjs` -- generates testimonials data
+2. **Vite build** (`vite build`):
+   - TypeScript compilation via SWC
+   - Tailwind CSS purging
+   - Manual chunk splitting (vendor, three, ui)
+   - Asset hashing
+   - Minification via esbuild
 
-  return <div>Count: {count}</div>;
-};
-```
+Output is written to `dist/` and deployed to GitHub Pages via the `deploy.yml` workflow.
 
-**What triggers full reload**:
-- Changes to `vite.config.ts`
-- Changes to environment variables
-- Changes to `package.json`
-- Import/export errors
+---
 
-## Build Process
-
-### Development Build
-
-```bash
-# Build with development optimizations
-npm run build:dev
-```
-
-### Production Build
-
-```bash
-# Run workshop list generator
-node scripts/generate-workshop-list.mjs
-
-# Build optimized production bundle
-npm run build
-```
-
-Build creates:
-- `dist/` - Production files
-- Code splitting (vendor, three, ui chunks)
-- Minified and optimized assets
-
-## Debugging
+## Debugging tips
 
 ### Browser DevTools
 
+Use conditional logging to avoid leaking data:
+
 ```typescript
-// Use conditional logging
 if (import.meta.env.DEV) {
-  console.log('Debug info:', data);
+  console.log("Debug info:", data);
 }
 ```
 
 ### React DevTools
 
-Install React DevTools extension:
-- Inspect component tree
-- Check props and state
-- Profile performance
+Install the React DevTools browser extension to inspect the component tree, props, state, and performance.
 
-### Common Issues
+### Common issues
 
-**Problem**: Changes not appearing
+**Changes not appearing**: Hard refresh with `Ctrl+Shift+R` (Linux/Windows) or `Cmd+Shift+R` (macOS).
+
+**Type errors in editor**: Restart the TypeScript server. In VS Code: `Cmd+Shift+P` > "TypeScript: Restart TS Server".
+
+**Module not found**: Delete `node_modules` and reinstall:
+
 ```bash
-# Solution: Hard refresh
-Ctrl+Shift+R  (Linux/Windows)
-Cmd+Shift+R   (Mac)
-```
-
-**Problem**: Type errors in editor
-```bash
-# Solution: Restart TypeScript server
-VS Code: Cmd+Shift+P > "TypeScript: Restart TS Server"
-```
-
-**Problem**: Module not found
-```bash
-# Solution: Reinstall dependencies
 rm -rf node_modules
 npm install
 ```
 
-## Performance Optimization
+---
 
-### Code Splitting
+## Related documentation
 
-Already configured in `vite.config.ts`:
-- Vendor chunk (React, Router)
-- Three.js chunk
-- UI components chunk
-
-### Image Optimization
-
-```typescript
-import { useOptimizedImages } from '@/hooks/use-optimized-images';
-
-const { images } = useOptimizedImages(['/path/to/image.jpg']);
-```
-
-### Lazy Loading
-
-```typescript
-import { lazy, Suspense } from 'react';
-
-const HeavyComponent = lazy(() => import('./HeavyComponent'));
-
-<Suspense fallback={<div>Loading...</div>}>
-  <HeavyComponent />
-</Suspense>
-```
-
-## Next Steps
-
-- See [COMPONENT_DEVELOPMENT.md](./COMPONENT_DEVELOPMENT.md) for component patterns
-- Check [TESTING_GUIDE.md](./TESTING_GUIDE.md) for testing strategies
-- Read [DEBUGGING.md](./DEBUGGING.md) for troubleshooting
+- [GETTING_STARTED.md](./GETTING_STARTED.md) -- initial setup
+- [PROJECT_STRUCTURE.md](./PROJECT_STRUCTURE.md) -- directory layout
+- [CODE_STYLE.md](./CODE_STYLE.md) -- coding standards
+- [TESTING_GUIDE.md](./TESTING_GUIDE.md) -- testing practices

@@ -1,593 +1,263 @@
----
-title: Environment Configuration
-description: Development, staging, and production environment setup and configuration
-last_updated: 2026-01-25
----
-
 # Environment Configuration
 
-This document defines the deployment environments, their configurations, and setup procedures.
+**Last Updated:** 2026-02-28
+
+Development, staging, and production environment setup for the DreamLab AI platform.
+
+---
 
 ## Environment Overview
 
-```
-┌─────────────────────────────────────────────────────────┐
-│ Development          Staging              Production    │
-├─────────────────────────────────────────────────────────┤
-│ Local machine        GCP (optional)        GCP prod      │
-│ npm run dev          Cloud Run (staging)   Cloud Run     │
-│ SQLite/Postgres      Cloud SQL (dev)       Cloud SQL     │
-│ Internal use         Beta testing          Public access │
-└─────────────────────────────────────────────────────────┘
-```
+| Aspect | Development | Staging | Production |
+|--------|-------------|---------|-----------|
+| **Location** | Local machine | Not configured | GitHub Pages + GCP Cloud Run |
+| **Main site** | `npm run dev` (localhost:5173) | -- | https://dreamlab-ai.com |
+| **Forum** | `npm run dev` (localhost:5174) | -- | https://dreamlab-ai.com/community |
+| **Backend** | Local services (optional) | -- | Cloud Run (us-central1) |
+| **Database** | Local PostgreSQL (optional) | -- | Cloud SQL |
+| **Build time** | ~1 min | -- | 5-10 min |
+| **Cost** | Free | -- | ~$50-100/month |
+
+---
 
 ## Development Environment
 
-### Local Setup
-
-#### Prerequisites
+### Prerequisites
 
 ```bash
-# Node.js 18+
-node --version
-
-# npm 9+
-npm --version
-
-# Git
-git --version
-
-# PostgreSQL (optional, for local backend testing)
-psql --version
-
-# GCP CLI (optional, for testing GCP integration)
-gcloud --version
+node --version   # 20+
+npm --version    # 9+
+git --version    # 2.x
 ```
 
-#### Installation
+### Installation
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/your-org/project.git
-cd project
+git clone https://github.com/DreamLab-AI/dreamlab-ai-website.git
+cd dreamlab-ai-website
 
-# 2. Install dependencies
+# 2. Install main site dependencies
 npm install
 
-# 3. Install Fairfield dependencies
-cd fairfield
+# 3. Install community forum dependencies
+cd community-forum
 npm install
 cd ..
-
-# 4. Install service dependencies (optional)
-cd community-forum/services/nostr-relay
-npm install
-cd ../../../
-
-cd community-forum/services/embedding-api
-pip install -r requirements.txt
-cd ../../../
 ```
 
-#### Environment Variables (.env)
+### Environment Variables
 
-Create `.env` file in project root:
+Create `.env` in the project root:
 
 ```env
-# Supabase Configuration
 VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-
-# Fairfield App Configuration (when testing locally)
-FAIRFIELD_RELAY_URL=http://localhost:8080
-FAIRFIELD_EMBEDDING_API_URL=http://localhost:8081
-FAIRFIELD_LINK_PREVIEW_API_URL=http://localhost:8082
-FAIRFIELD_IMAGE_API_URL=http://localhost:8083
-FAIRFIELD_IMAGE_BUCKET=local-test-bucket
-FAIRFIELD_ADMIN_PUBKEY=your-admin-pubkey
-
-# Node Environment
-NODE_ENV=development
+VITE_SUPABASE_ANON_KEY=your-anon-key-here
+VITE_AUTH_API_URL=https://auth-api-xxx-uc.a.run.app
 ```
 
-#### Running Development Server
+Create `.env` in `community-forum/`:
 
-```bash
-# Main site
-npm run dev
-# Runs on http://localhost:5173
-
-# In another terminal, Fairfield app
-cd fairfield
-npm run dev
-# Runs on http://localhost:5174 or http://localhost:5173/community
-
-# Optional: Run local backend services
-# Nostr Relay
-cd community-forum/services/nostr-relay
-npm run dev
-# Runs on ws://localhost:8080
-
-# Embedding API
-cd community-forum/services/embedding-api
-python -m uvicorn main:app --reload --port 8081
-# Runs on http://localhost:8081
-
-# Image API
-cd community-forum/services/image-api
-npm run dev
-# Runs on http://localhost:8083
+```env
+VITE_AUTH_API_URL=https://auth-api-xxx-uc.a.run.app
+VITE_RELAY_URL=wss://nostr-relay-xxx.run.app
+VITE_EMBEDDING_API_URL=https://embedding-api-xxx.run.app
+VITE_LINK_PREVIEW_API_URL=https://link-preview-xxx.run.app
+VITE_IMAGE_API_URL=https://image-api-xxx.run.app
+VITE_IMAGE_BUCKET=minimoonoir-images
+VITE_ADMIN_PUBKEY=<admin-pubkey-hex>
 ```
 
-#### Local Database Setup (PostgreSQL)
+### Running the Development Server
 
 ```bash
-# 1. Start PostgreSQL (if not running)
-# macOS with Homebrew:
-brew services start postgresql
-
-# Linux (systemd):
-sudo systemctl start postgresql
-
-# 2. Create local database
-psql -U postgres -c "CREATE DATABASE nostr_dev;"
-
-# 3. Create user
-psql -U postgres -c "CREATE USER nostr_app WITH PASSWORD 'dev_password';"
-psql -U postgres -c "ALTER USER nostr_app CREATEDB;"
-
-# 4. Update .env
-DATABASE_URL=postgresql://nostr_app:dev_password@localhost:5432/nostr_dev
-
-# 5. Run migrations (if applicable)
-npm run migrate:dev
-```
-
-#### Testing in Development
-
-```bash
-# Run tests
-npm run test
-
-# Run tests with coverage
-npm run test:coverage
-
-# Run type checking
-npm run typecheck
-
-# Run linting
-npm run lint
-
-# Format code
-npm run format
-
-# Build for preview
-npm run build
-npm run preview
-```
-
-### Development Troubleshooting
-
-**Port Already in Use**:
-```bash
-# Kill process on port
-lsof -ti:5173 | xargs kill -9
+# Main site (React SPA)
 npm run dev
+# Serves at http://localhost:5173
+
+# Community forum (in a separate terminal)
+cd community-forum
+npm run dev
+# Serves at http://localhost:5174
 ```
 
-**Dependencies Not Resolving**:
+The main site dev server automatically runs `scripts/generate-workshop-list.mjs` before starting.
+
+### Running Backend Services Locally (Optional)
+
 ```bash
-rm -rf node_modules package-lock.json
+# auth-api
+cd community-forum/services/auth-api
 npm install
+# Create .env with DATABASE_URL, RP_ID, RP_NAME, RP_ORIGIN, RELAY_URL
+npm run dev
+# Serves at http://localhost:8080
+
+# nostr-relay
+cd community-forum/services/nostr-relay
+npm install
+npm run dev
+# Serves at ws://localhost:8080
+
+# embedding-api
+cd community-forum/services/embedding-api
+pip install -r requirements.txt
+python -m uvicorn main:app --reload --port 8081
+# Serves at http://localhost:8081
 ```
 
-**Database Connection Errors**:
+### Building and Previewing
+
 ```bash
-# Check PostgreSQL running
-psql -U postgres -c "SELECT 1;"
+# Build production bundle
+npm run build
 
-# Verify credentials in .env
-# Reconnect with correct password
+# Preview production build
+npm run preview
+
+# Lint
+npm run lint
 ```
+
+---
 
 ## Staging Environment
 
-### Staging Configuration
+A staging environment is not currently configured. To add one:
 
-Staging is used for final testing before production deployment. Currently, production deployment is used directly; staging can be set up using GitHub environments.
+1. Create a GitHub environment named `staging` in repository settings
+2. Add environment-specific secrets and variables
+3. Modify `deploy.yml` to include a staging deployment job with environment protection rules
+4. Deploy backend services as separate Cloud Run revisions with staging-specific configuration
 
-#### GitHub Environments Setup
-
-```bash
-# Via GitHub CLI
-gh repo set-default <owner>/<repo>
-
-# Create staging environment
-gh api -X PUT repos/{owner}/{repo}/environments/staging
-
-# Add secrets to staging
-gh secret set VITE_SUPABASE_URL --env staging
-gh secret set VITE_SUPABASE_ANON_KEY --env staging
-```
-
-#### Staging Variables
-
-GitHub repository staging environment variables:
-
-```
-FAIRFIELD_RELAY_URL              # wss://staging-relay.example.com
-FAIRFIELD_EMBEDDING_API_URL      # https://staging-embedding.example.com
-FAIRFIELD_LINK_PREVIEW_API_URL   # https://staging-preview.example.com
-FAIRFIELD_IMAGE_API_URL          # https://staging-images.example.com
-FAIRFIELD_IMAGE_BUCKET           # staging-images-bucket
-FAIRFIELD_ADMIN_PUBKEY           # staging-admin-key
-```
-
-#### Staging Deployment
-
-To deploy to staging (if configured), modify workflow:
-
-```yaml
-# In .github/workflows/deploy.yml
-on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'src/**'
-      - 'fairfield/**'
-
-jobs:
-  deploy-staging:
-    runs-on: ubuntu-latest
-    environment:
-      name: staging
-      url: https://staging.dreamlab-ai.com
-    # ... staging deployment steps
-```
-
-### Manual Staging Deployment
-
-```bash
-# 1. Trigger manual workflow
-gh workflow run deploy.yml --ref main
-
-# 2. Wait for completion
-gh run watch
-
-# 3. Test staging site
-# Visit staging URL and verify functionality
-```
+---
 
 ## Production Environment
 
-### Production Infrastructure
+### Infrastructure
 
-```
-┌─────────────────────────────────────────────┐
-│ GitHub Repository (main branch)             │
-├─────────────────────────────────────────────┤
-│ Automatic Triggers:                         │
-│ - Push to main                              │
-│ - Manual workflow dispatch                  │
-├─────────────────────────────────────────────┤
-│ GitHub Pages                                │
-│ ├─ dreamlab-ai.com (primary)               │
-│ ├─ gh-pages branch (published)              │
-│ └─ SvelteKit static export                  │
-│                                              │
-│ GCP Cloud Run (Managed Services)            │
-│ ├─ us-central1 region                       │
-│ ├─ nostr-relay (wss://)                     │
-│ ├─ embedding-api (https://)                 │
-│ ├─ image-api (https://)                     │
-│ └─ Artifact Registry storage                │
-│                                              │
-│ Cloud SQL (PostgreSQL)                      │
-│ ├─ nostr-db (primary)                       │
-│ ├─ Daily backups (03:00 UTC)                │
-│ ├─ 7-day retention                          │
-│ └─ Automated failover                       │
-│                                              │
-│ Google Cloud Storage                        │
-│ ├─ minimoonoir-images bucket                │
-│ ├─ Image storage and serving                │
-│ └─ Versioning enabled                       │
-└─────────────────────────────────────────────┘
-```
+| Component | Service | URL/Endpoint |
+|-----------|---------|-------------|
+| Main site | GitHub Pages | https://dreamlab-ai.com |
+| Forum | GitHub Pages | https://dreamlab-ai.com/community |
+| auth-api | Cloud Run | `https://auth-api-<hash>-uc.a.run.app` |
+| jss | Cloud Run | `https://jss-<hash>-uc.a.run.app` |
+| nostr-relay | Cloud Run | `wss://nostr-relay-<hash>-uc.a.run.app` |
+| embedding-api | Cloud Run | `https://embedding-api-<hash>-uc.a.run.app` |
+| image-api | Cloud Run | `https://image-api-<hash>-uc.a.run.app` |
+| Database | Cloud SQL | `cumbriadreamlab:us-central1:nostr-db` |
+| Images | Cloud Storage | `gs://minimoonoir-images` |
+| Pods | Cloud Storage | `gs://dreamlab-pods` |
+
+### Deployment Process
+
+1. Push to `main` branch (or merge PR)
+2. GitHub Actions workflows trigger automatically
+3. Static site builds and deploys to `gh-pages` branch (5-10 min)
+4. Backend services build, push Docker images, and deploy to Cloud Run (3-5 min each, triggered only by path changes)
 
 ### Production Secrets
 
 **GitHub Repository Secrets**:
 
-```
-VITE_SUPABASE_URL              # Supabase project URL
-VITE_SUPABASE_ANON_KEY         # Supabase anonymous key
-GCP_PROJECT_ID                 # GCP project ID
-GCP_SA_KEY                      # Service account JSON key
-```
+| Secret | Purpose |
+|--------|---------|
+| `VITE_SUPABASE_URL` | Supabase project URL |
+| `VITE_SUPABASE_ANON_KEY` | Supabase anonymous key |
+| `VITE_AUTH_API_URL` | Auth API Cloud Run URL |
+| `GCP_PROJECT_ID` | `cumbriadreamlab` |
+| `GCP_SA_KEY` | Service account JSON key |
 
 **GCP Secret Manager**:
 
-```
-nostr-db-url                    # PostgreSQL connection string
-admin-pubkey                    # Nostr admin public key
-```
+| Secret | Purpose |
+|--------|---------|
+| `nostr-db-url` | PostgreSQL connection string |
+| `jss-base-url` | JSS Cloud Run URL |
+| `admin-pubkey` | Admin Nostr pubkeys |
 
-### Production Variables
+### Environment Variables Reference
 
-**GitHub Repository Variables** (not secrets):
+#### Main Site (.env, build-time)
 
-```
-FAIRFIELD_RELAY_URL             # Production relay endpoint
-FAIRFIELD_EMBEDDING_API_URL     # Production embedding service
-FAIRFIELD_LINK_PREVIEW_API_URL  # Production link preview service
-FAIRFIELD_IMAGE_API_URL         # Production image service
-FAIRFIELD_IMAGE_BUCKET          # minimoonoir-images
-FAIRFIELD_ADMIN_PUBKEY          # Production admin key (public)
-```
+| Variable | Required | Description |
+|----------|---------|-------------|
+| `VITE_SUPABASE_URL` | Yes | Supabase project URL |
+| `VITE_SUPABASE_ANON_KEY` | Yes | Supabase anonymous API key |
+| `VITE_AUTH_API_URL` | Yes | Auth API base URL |
 
-### Production Deployment Process
+#### auth-api (runtime)
 
-1. **Code Review & Approval**
-   - All changes require PR
-   - Minimum 1 approval
-   - CI/CD checks pass
+| Variable | Required | Source | Description |
+|----------|---------|--------|-------------|
+| `DATABASE_URL` | Yes | Secret Manager | PostgreSQL connection string |
+| `RELAY_URL` | Yes | Env var | Nostr relay WebSocket URL |
+| `RP_ID` | Yes | Env var | WebAuthn relying party ID (`dreamlab-ai.com`) |
+| `RP_NAME` | Yes | Env var | WebAuthn relying party name |
+| `RP_ORIGIN` | Yes | Env var | Expected origin (`https://dreamlab-ai.com`) |
+| `JSS_BASE_URL` | No | Secret Manager | JSS URL for pod provisioning |
+| `NODE_ENV` | No | Env var | `production` |
+| `PORT` | No | Env var | Default `8080` |
 
-2. **Merge to Main**
-   - PR squashed or rebased
-   - Commit message includes context
-   - GitHub Actions triggered automatically
+#### jss (runtime)
 
-3. **Automated Build**
-   - GitHub Pages: ~5-10 minutes
-   - Cloud Run: ~3-5 minutes (parallel)
+| Variable | Required | Source | Description |
+|----------|---------|--------|-------------|
+| `JSS_BASE_URL` | Yes | Secret Manager | Own Cloud Run URL |
+| `NODE_ENV` | No | Env var | `production` |
 
-4. **Verification**
-   - Site loads at https://dreamlab-ai.com
-   - Services responsive
-   - No critical errors in logs
+#### nostr-relay (runtime)
 
-5. **Monitoring**
-   - Check alerts
-   - Monitor error rates
-   - Verify user reports
+| Variable | Required | Source | Description |
+|----------|---------|--------|-------------|
+| `DATABASE_URL` | Yes | Secret Manager | PostgreSQL connection string |
+| `ADMIN_PUBKEYS` | Yes | Secret Manager | Comma-separated admin pubkeys |
+| `RATE_LIMIT_EVENTS_PER_SEC` | No | Env var | Default `10` |
+| `RATE_LIMIT_MAX_CONNECTIONS` | No | Env var | Default `10` |
+| `NODE_ENV` | No | Env var | `production` |
 
-### Production Deployment Restrictions
+#### Community Forum (build-time)
 
-**Protected Branch Rules** (main):
+| Variable | Required | Description |
+|----------|---------|-------------|
+| `BASE_PATH` | Yes | `/community` |
+| `VITE_RELAY_URL` | Yes | Nostr relay WebSocket URL |
+| `VITE_EMBEDDING_API_URL` | Yes | Embedding service URL |
+| `VITE_LINK_PREVIEW_API_URL` | Yes | Link preview service URL |
+| `VITE_IMAGE_API_URL` | Yes | Image service URL |
+| `VITE_IMAGE_BUCKET` | Yes | GCS bucket name |
+| `VITE_IMAGE_ENCRYPTION_ENABLED` | No | `true` to enable |
+| `VITE_ADMIN_PUBKEY` | Yes | Admin Nostr pubkey (hex) |
+| `VITE_APP_NAME` | No | `DreamLab Community` |
+| `VITE_AUTH_API_URL` | Yes | Auth API base URL |
 
-```
-- Require pull request reviews: 1
-- Require status checks to pass
-- Include administrators in restrictions
-- Restrict who can push: Release team only
-```
+---
 
-**Deployment Protection Rules**:
-
-```
-- Production deployments require approval
-- Reviewers: Platform leads
-- Approval timeout: 24 hours
-```
-
-### Production Monitoring
-
-**Continuous Monitoring**:
+## Health Checks
 
 ```bash
-# Check site status
-curl -I https://dreamlab-ai.com
+# Main site
+curl -s -o /dev/null -w "%{http_code}" https://dreamlab-ai.com
 
-# Check services
-gcloud run services list --region=us-central1
+# auth-api
+curl -s https://<auth-api-url>/health | jq .
 
-# View recent deployments
+# Cloud Run services
+gcloud run services list --region=us-central1 --format="table(metadata.name,status.url)"
+
+# Recent deployments
 gh run list --workflow=deploy.yml --limit=5
-
-# Check error rates
-gcloud run services logs read nostr-relay \
-  --region=us-central1 \
-  --format=json | grep -i error
 ```
 
-**Daily Checklist**:
-- [ ] All services responding (health checks pass)
-- [ ] No alerts or warnings
-- [ ] Error rate < 1%
-- [ ] Performance metrics normal
-- [ ] Backups completed
-- [ ] User reports checked
-
-## Configuration Comparison
-
-| Aspect | Development | Staging | Production |
-|--------|-------------|---------|-----------|
-| Location | Local | GCP (us-central1) | GCP (us-central1) |
-| Database | Local Postgres/SQLite | Cloud SQL (dev) | Cloud SQL (prod) |
-| Storage | Local filesystem | GCS (staging) | GCS (prod) |
-| URL | localhost:5173 | staging.domain.com | dreamlab-ai.com |
-| Build Time | ~1 min | ~3-5 min | ~5-10 min |
-| Deploy Time | Instant | ~2 min | ~2 min |
-| Secrets | .env file | GitHub secrets | GitHub secrets + GCP Secret Manager |
-| Monitoring | Manual | Cloud Logging | Cloud Monitoring + Alerts |
-| Backups | Manual | Daily | Daily + automated retention |
-| Cost | Free | ~$50-100/month | ~$200-500/month |
-
-## Environment-Specific Code
-
-Use environment variables to conditionally configure:
-
-```typescript
-// In your application
-const isProduction = process.env.NODE_ENV === 'production';
-const apiUrl = isProduction
-  ? 'https://api.dreamlab-ai.com'
-  : 'http://localhost:8080';
-
-// Conditional service configuration
-const relayUrl = process.env.VITE_RELAY_URL || 'ws://localhost:8080';
-```
-
-## Scaling for Production
-
-### Horizontal Scaling
-
-**Nostr Relay**:
-```bash
-# Increase max instances if WebSocket connections exceed capacity
-gcloud run services update nostr-relay \
-  --max-instances=5 \
-  --region=us-central1
-```
-
-**Embedding API**:
-```bash
-# Scale based on embedding request volume
-gcloud run services update embedding-api \
-  --min-instances=1 \
-  --max-instances=5 \
-  --region=us-central1
-```
-
-**Image API**:
-```bash
-# Scale for image processing load
-gcloud run services update image-api \
-  --min-instances=0 \
-  --max-instances=20 \
-  --region=us-central1
-```
-
-### Vertical Scaling
-
-```bash
-# Increase memory for resource-intensive tasks
-gcloud run services update embedding-api \
-  --memory=2Gi \
-  --cpu=1 \
-  --region=us-central1
-```
-
-### Database Scaling
-
-```bash
-# Upgrade Cloud SQL tier for higher load
-gcloud sql instances patch nostr-db \
-  --tier=db-n1-standard-4 \
-  --region=us-central1
-```
-
-## Disaster Recovery
-
-### Backup Strategy
-
-**GitHub Pages**:
-- Git history maintained indefinitely
-- gh-pages branch protected
-- Commit history available for rollback
-
-**Cloud Run**:
-- Previous revisions retained (auto-cleanup after 2000 revisions)
-- Image tags in Artifact Registry
-- Deployment history in Cloud Run console
-
-**Cloud SQL**:
-- Daily automated backups (3 AM UTC)
-- 7-day retention
-- Can restore to point-in-time
-
-**GCS**:
-- Versioning enabled for image bucket
-- Multi-region replication (optional)
-- Lifecycle policies for old versions
-
-### Recovery Time Objectives (RTO)
-
-| Component | RTO | Method |
-|-----------|-----|--------|
-| GitHub Pages | 2-5 min | Revert commit + redeploy |
-| Cloud Run | < 1 min | Route to previous revision |
-| Cloud SQL | 5-15 min | Restore from backup |
-| GCS | 1-2 min | Restore object version |
-
-### Recovery Point Objectives (RPO)
-
-| Component | RPO | Backup Frequency |
-|-----------|-----|------------------|
-| GitHub Pages | 0 min | Real-time (git) |
-| Cloud Run | 0 min (code), 24h (images) | Per deployment |
-| Cloud SQL | 1 day | Daily at 3 AM |
-| GCS | 1 day | Versioning enabled |
-
-## Cost Estimation
-
-### Development
-- Free (local development)
-- ~$0/month
-
-### Staging (if used)
-- Cloud Run: ~$50/month
-- Cloud SQL: ~$10/month
-- GCS: ~$5/month
-- **Total**: ~$65/month
-
-### Production
-- GitHub Pages: Free
-- Cloud Run: ~$150/month (3 services)
-- Cloud SQL: ~$100/month
-- GCS: ~$50/month
-- Monitoring: ~$50/month
-- **Total**: ~$350/month
-
-## Environment Checklist
-
-### Before Deploying to Production
-
-- [ ] All tests passing
-- [ ] Code reviewed and approved
-- [ ] Secrets configured in GitHub
-- [ ] Variables set in GitHub repo
-- [ ] GCP project credentials valid
-- [ ] Cloud SQL instance healthy
-- [ ] GCS buckets accessible
-- [ ] Monitoring alerts active
-- [ ] Backup verified recent
-
-### After Production Deployment
-
-- [ ] Site loads without errors
-- [ ] All services responding
-- [ ] No alerts or warnings
-- [ ] Error rate acceptable (< 1%)
-- [ ] Performance metrics normal
-- [ ] External monitoring confirms success
-- [ ] Team notified of deployment
+---
 
 ## Related Documentation
 
-- [GitHub Pages Deployment](./GITHUB_PAGES.md) - Static site deployment
-- [Cloud Services Deployment](./CLOUD_SERVICES.md) - GCP service setup
-- [Monitoring & Health Checks](./MONITORING.md) - Service observability
-- [Rollback Procedures](./ROLLBACK.md) - Emergency recovery
+- [Deployment Overview](./README.md)
+- [GitHub Pages](./GITHUB_PAGES.md)
+- [Cloud Services](./CLOUD_SERVICES.md)
+- [Cloudflare Workers](./CLOUDFLARE_WORKERS.md)
 
-## Quick Reference
+---
 
-```bash
-# Development
-npm install && npm run dev
-
-# Staging (manual)
-gh workflow run deploy.yml --ref main --environment staging
-
-# Production (automatic on push to main)
-git push origin main
-
-# Check deployment status
-gh run list --workflow=deploy.yml --limit=5
-
-# View production logs
-gcloud run services logs read nostr-relay --region=us-central1
-```
-
+*Last major revision: 2026-02-28.*
