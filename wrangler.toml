@@ -1,0 +1,45 @@
+name = "dreamlab-ai"
+compatibility_date = "2024-12-01"
+main = "workers/auth-api/index.ts"
+
+# D1 Database - WebAuthn credentials + challenges
+[[d1_databases]]
+binding = "DB"
+database_name = "dreamlab-auth"
+database_id = "placeholder-generate-after-creation"
+
+# KV Namespaces
+[[kv_namespaces]]
+binding = "SESSIONS"
+id = "placeholder-sessions"
+
+[[kv_namespaces]]
+binding = "POD_META"
+id = "placeholder-pod-meta"
+
+[[kv_namespaces]]
+binding = "CONFIG"
+id = "placeholder-config"
+
+# R2 Bucket - Pod storage
+[[r2_buckets]]
+binding = "PODS"
+bucket_name = "dreamlab-pods"
+
+[vars]
+RP_ID = "dreamlab-ai.com"
+RP_NAME = "DreamLab Community"
+EXPECTED_ORIGIN = "https://dreamlab-ai.com"
+RELAY_URL = "wss://relay.dreamlab-ai.com"
+
+# Environment-specific overrides
+[env.staging]
+name = "dreamlab-ai-staging"
+vars = { RP_ID = "staging.dreamlab-ai.com", EXPECTED_ORIGIN = "https://staging.dreamlab-ai.com" }
+
+[env.production]
+name = "dreamlab-ai"
+routes = [
+  { pattern = "api.dreamlab-ai.com/*", zone_name = "dreamlab-ai.com" },
+  { pattern = "pods.dreamlab-ai.com/*", zone_name = "dreamlab-ai.com" }
+]

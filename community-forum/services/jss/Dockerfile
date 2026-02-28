@@ -1,7 +1,7 @@
 FROM node:20-slim
 RUN npm install -g @solid/community-server@7.1.8
 RUN mkdir -p /data/pods && \
-    printf '@prefix acl: <http://www.w3.org/ns/auth/acl#>.\n@prefix foaf: <http://xmlns.com/foaf/0.1/>.\n<#authorization>\n    a               acl:Authorization;\n    acl:agentClass  foaf:Agent;\n    acl:mode        acl:Read, acl:Write, acl:Append, acl:Control;\n    acl:accessTo    <./>;\n    acl:default     <./>.\n' > /data/pods/.acl && \
+    printf '@prefix acl: <http://www.w3.org/ns/auth/acl#>.\n\n<#authenticated-read>\n    a               acl:Authorization;\n    acl:agentClass  acl:AuthenticatedAgent;\n    acl:mode        acl:Read;\n    acl:accessTo    <./>;\n    acl:default     <./>.\n' > /data/pods/.acl && \
     chown -R node:node /data
 WORKDIR /data
 COPY entrypoint.sh /entrypoint.sh

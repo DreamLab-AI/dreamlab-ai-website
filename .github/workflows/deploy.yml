@@ -135,3 +135,11 @@ jobs:
           force_orphan: true
           cname: dreamlab-ai.com
           commit_message: "Deploy from GitHub Actions ${{ github.sha }}"
+
+      - name: Deploy to Cloudflare Pages
+        if: vars.CLOUDFLARE_PAGES_ENABLED == 'true'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist/ --project-name=dreamlab-ai --commit-dirty=true

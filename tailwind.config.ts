@@ -1,5 +1,7 @@
-
 import type { Config } from "tailwindcss";
+import tailwindcssAnimate from "tailwindcss-animate";
+import tailwindcssTypography from "@tailwindcss/typography";
+import type { PluginAPI } from "tailwindcss/types/config";
 
 export default {
 	darkMode: ["class"],
@@ -478,10 +480,10 @@ export default {
 		}
 	},
 	plugins: [
-		require("tailwindcss-animate"),
-		require("@tailwindcss/typography"),
+		tailwindcssAnimate,
+		tailwindcssTypography,
 		// Custom plugin for animation utilities
-		function({ matchUtilities, theme }: any) {
+		function({ matchUtilities, theme }: PluginAPI) {
 			matchUtilities(
 				{
 					'animation-delay': (value: string) => ({
@@ -500,7 +502,7 @@ export default {
 			);
 		},
 		// Animation fill mode utilities
-		function({ addUtilities }: any) {
+		function({ addUtilities }: PluginAPI) {
 			addUtilities({
 				'.animation-fill-none': {
 					'animation-fill-mode': 'none',

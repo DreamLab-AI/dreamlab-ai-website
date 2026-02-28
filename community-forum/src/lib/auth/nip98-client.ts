@@ -1,50 +1,11 @@
-import { schnorr } from '@noble/curves/secp256k1';
-import { sha256 } from '@noble/hashes/sha256';
-import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
-import { getPublicKey } from 'nostr-tools';
+/**
+ * NIP-98 HTTP Auth client — uses shared packages/nip98 module.
+ * Retains fetchWithNip98() wrapper for the SvelteKit forum.
+ */
 
-/** Create a NIP-98 kind:27235 Authorization token for an HTTP request */
-export async function createNip98Token(
-  privkey: Uint8Array,
-  url: string,
-  method: string,
-  body?: string | Uint8Array | ArrayBuffer,
-): Promise<string> {
-  const pubkey = getPublicKey(privkey);
-  const created_at = Math.floor(Date.now() / 1000);
+import { createNip98Token, hashRawBody } from '../../packages/nip98/sign.js';
 
-  const tags: string[][] = [
-    ['u', url],
-    ['method', method.toUpperCase()],
-  ];
-
-  if (body !== undefined) {
-    let bytes: Uint8Array;
-    if (typeof body === 'string') {
-      bytes = new TextEncoder().encode(body);
-    } else if (body instanceof ArrayBuffer) {
-      bytes = new Uint8Array(body);
-    } else {
-      bytes = body;
-    }
-    const hash = bytesToHex(sha256(bytes));
-    tags.push(['payload', hash]);
-  }
-
-  const event: Nip98Event = {
-    pubkey,
-    created_at,
-    kind: 27235,
-    tags,
-    content: '',
-  };
-
-  const id = computeEventId(event);
-  const sig = bytesToHex(schnorr.sign(hexToBytes(id), privkey));
-
-  const signedEvent = { ...event, id, sig };
-  return btoa(JSON.stringify(signedEvent));
-}
+export { createNip98Token } from '../../packages/nip98/sign.js';
 
 /** Fetch with NIP-98 Authorization header */
 export async function fetchWithNip98(
@@ -57,7 +18,7 @@ export async function fetchWithNip98(
   // Compute body payload for the NIP-98 token only for hashable body types.
   // ReadableStream and FormData cannot be consumed without side-effects, so
   // we skip the `payload` tag for those types.
-  let bodyForToken: string | Uint8Array | ArrayBuffer | undefined;
+  let bodyForToken: Uint8Array | ArrayBuffer | undefined;
   const rawBody = options.body;
   if (rawBody === undefined || rawBody === null) {
     bodyForToken = undefined;
@@ -80,26 +41,4 @@ export async function fetchWithNip98(
       Authorization: `Nostr ${token}`,
     },
   });
-}
-
-// ── Internals ────────────────────────────────────────────────────────────────
-
-interface Nip98Event {
-  pubkey: string;
-  created_at: number;
-  kind: number;
-  tags: string[][];
-  content: string;
-}
-
-function computeEventId(event: Nip98Event): string {
-  const serialized = JSON.stringify([
-    0,
-    event.pubkey,
-    event.created_at,
-    event.kind,
-    event.tags,
-    event.content,
-  ]);
-  return bytesToHex(sha256(new TextEncoder().encode(serialized)));
 }
