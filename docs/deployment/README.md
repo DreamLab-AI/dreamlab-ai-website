@@ -14,7 +14,7 @@ Comprehensive guide to deploying and maintaining the DreamLab AI platform: a Rea
 | - React 18.3 SPA (Vite + TypeScript + Tailwind CSS)           |
 | - SvelteKit community forum (static adapter)                  |
 | - Workers code in workers/ (auth-api, pod-api, search-api)    |
-| - GCP service directories (retained: nostr-relay, embedding)  |
+| - GCP service directories (retained: embedding, image, jss)   |
 | - GitHub Actions CI/CD workflows                               |
 +----------+------------------+--------------------+------------+
            |                  |                    |
@@ -53,9 +53,9 @@ Comprehensive guide to deploying and maintaining the DreamLab AI platform: a Rea
 | **auth-api** | Cloudflare Worker + D1 | `workers-deploy.yml` | Deployed at `dreamlab-auth-api.solitary-paper-764d.workers.dev` |
 | **pod-api** | Cloudflare Worker + R2 | `workers-deploy.yml` | Deployed at `dreamlab-pod-api.solitary-paper-764d.workers.dev` |
 | **search-api** | Cloudflare Worker + WASM | `workers-deploy.yml` | Deployed at `dreamlab-search-api.solitary-paper-764d.workers.dev` |
-| **nostr-relay** | Node.js WebSocket relay | `fairfield-relay.yml` | Cloud Run (us-central1) -- retained |
-| **embedding-api** | Python (FastAPI) | `fairfield-embedding-api.yml` | Cloud Run (us-central1) -- retained |
-| **image-api** | Node.js | `fairfield-image-api.yml` | Cloud Run (us-central1) -- migration target |
+| **nostr-relay** | Cloudflare Worker + D1 + DO | `workers-deploy.yml` | Deployed at `dreamlab-nostr-relay.solitary-paper-764d.workers.dev` |
+| **embedding-api** | Python (FastAPI) | `fairfield-embedding-api.yml` | Cloud Run (us-central1) -- manual deploy only |
+| **image-api** | Node.js | `fairfield-image-api.yml` | Cloud Run (us-central1) -- manual deploy only |
 | **link-preview-api** | Node.js | (existing) | Cloud Run (us-central1) |
 | **Cloudflare Pages** | Static SPA | `deploy.yml` (gated) | Ready to enable |
 
@@ -77,20 +77,29 @@ Comprehensive guide to deploying and maintaining the DreamLab AI platform: a Rea
 | Workflow | Trigger Path | Duration |
 |----------|-------------|----------|
 | `deploy.yml` | Any push to main | 5-10 min |
-| `workers-deploy.yml` | `workers/**`, `community-forum/packages/nip98/**` | 3-5 min |
-| `auth-api.yml` | `community-forum/services/auth-api/**` | 3-5 min (legacy, being replaced) |
-| `jss.yml` | `community-forum/services/jss/**` | 3-5 min (legacy, being replaced) |
-| `fairfield-relay.yml` | `community-forum/services/nostr-relay/**` | 3-5 min |
-| `fairfield-embedding-api.yml` | `community-forum/services/embedding-api/**` | 10-15 min |
-| `fairfield-image-api.yml` | `community-forum/services/image-api/**` | 3-5 min |
+| `workers-deploy.yml` | `workers/**` | 3-5 min |
+
+### Manual Only (GCP Cloud Run -- requires GCP_SA_KEY)
+
+| Workflow | Service | Duration |
+|----------|---------|----------|
+| `visionflow-bridge.yml` | VisionFlow Bridge | 3-5 min |
+| `fairfield-embedding-api.yml` | Embedding API | 10-15 min |
+| `fairfield-image-api.yml` | Image API | 3-5 min |
+| `jss.yml` | JSS (Solid pods) | 3-5 min |
+
+### Removed Workflows
+
+| Workflow | Reason |
+|----------|--------|
+| `auth-api.yml` | Replaced by Cloudflare Worker in `workers-deploy.yml` |
+| `fairfield-relay.yml` | Replaced by Cloudflare Worker in `workers-deploy.yml` |
 
 ### Manual Trigger
 
-All workflows support `workflow_dispatch` for manual execution:
-
 ```bash
 gh workflow run deploy.yml --ref main
-gh workflow run auth-api.yml --ref main
+gh workflow run workers-deploy.yml --ref main
 gh run watch
 ```
 

@@ -1,5 +1,8 @@
 name: Deploy VisionFlow Bridge to GCP Cloud Run
 
+# NOTE: Auto-push trigger disabled — GCP credentials not configured.
+# Use workflow_dispatch (manual) when GCP_SA_KEY is available.
+#
 # Required GitHub Secrets:
 # - GCP_PROJECT_ID: Google Cloud Project ID
 # - GCP_SA_KEY: Service Account JSON key with Cloud Run Admin and Artifact Registry Writer roles
@@ -13,13 +16,6 @@ name: Deploy VisionFlow Bridge to GCP Cloud Run
 # - anthropic-api-key: Anthropic API key for Tier 2
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'community-forum/services/visionflow-bridge/**'
-      - '!community-forum/services/visionflow-bridge/*.md'
-      - '.github/workflows/visionflow-bridge.yml'
   workflow_dispatch:
     inputs:
       environment:

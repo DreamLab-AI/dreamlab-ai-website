@@ -10,7 +10,7 @@ Development, staging, and production environment setup for the DreamLab AI platf
 
 | Aspect | Development | Staging | Production |
 |--------|-------------|---------|-----------|
-| **Location** | Local machine | Not configured | GitHub Pages + GCP Cloud Run |
+| **Location** | Local machine | Not configured | GitHub Pages + Cloudflare Workers + GCP Cloud Run |
 | **Main site** | `npm run dev` (localhost:5173) | -- | https://dreamlab-ai.com |
 | **Forum** | `npm run dev` (localhost:5174) | -- | https://dreamlab-ai.com/community |
 | **Backend** | Local services (optional) | -- | Cloud Run (us-central1) |
@@ -140,12 +140,14 @@ A staging environment is not currently configured. To add one:
 |-----------|---------|-------------|
 | Main site | GitHub Pages | https://dreamlab-ai.com |
 | Forum | GitHub Pages | https://dreamlab-ai.com/community |
-| auth-api | Cloud Run | `https://auth-api-<hash>-uc.a.run.app` |
+| auth-api | Cloudflare Worker | `dreamlab-auth-api.solitary-paper-764d.workers.dev` |
+| pod-api | Cloudflare Worker | `dreamlab-pod-api.solitary-paper-764d.workers.dev` |
+| search-api | Cloudflare Worker | `dreamlab-search-api.solitary-paper-764d.workers.dev` |
+| nostr-relay | Cloudflare Worker + D1 + DO | `dreamlab-nostr-relay.solitary-paper-764d.workers.dev` |
 | jss | Cloud Run | `https://jss-<hash>-uc.a.run.app` |
-| nostr-relay | Cloud Run | `wss://nostr-relay-<hash>-uc.a.run.app` |
 | embedding-api | Cloud Run | `https://embedding-api-<hash>-uc.a.run.app` |
 | image-api | Cloud Run | `https://image-api-<hash>-uc.a.run.app` |
-| Database | Cloud SQL | `cumbriadreamlab:us-central1:nostr-db` |
+| Database | D1 (relay), Cloud SQL (legacy) | `dreamlab-relay`, `cumbriadreamlab:us-central1:nostr-db` |
 | Images | Cloud Storage | `gs://minimoonoir-images` |
 | Pods | Cloud Storage | `gs://dreamlab-pods` |
 
@@ -206,15 +208,15 @@ A staging environment is not currently configured. To add one:
 | `JSS_BASE_URL` | Yes | Secret Manager | Own Cloud Run URL |
 | `NODE_ENV` | No | Env var | `production` |
 
-#### nostr-relay (runtime)
+#### nostr-relay (Cloudflare Worker — wrangler.toml vars)
 
 | Variable | Required | Source | Description |
 |----------|---------|--------|-------------|
-| `DATABASE_URL` | Yes | Secret Manager | PostgreSQL connection string |
-| `ADMIN_PUBKEYS` | Yes | Secret Manager | Comma-separated admin pubkeys |
-| `RATE_LIMIT_EVENTS_PER_SEC` | No | Env var | Default `10` |
-| `RATE_LIMIT_MAX_CONNECTIONS` | No | Env var | Default `10` |
-| `NODE_ENV` | No | Env var | `production` |
+| `ADMIN_PUBKEYS` | Yes | wrangler.toml `[vars]` | Comma-separated admin pubkeys |
+| `RELAY_NAME` | No | wrangler.toml `[vars]` | Relay display name |
+| `ALLOWED_ORIGIN` | No | wrangler.toml `[vars]` | CORS origin |
+| `DB` | Yes | D1 binding | `dreamlab-relay` D1 database |
+| `RELAY` | Yes | DO binding | `NostrRelayDO` Durable Object |
 
 #### Community Forum (build-time)
 

@@ -1,12 +1,9 @@
 name: Deploy Fairfield Image API to Cloud Run
 
+# NOTE: Auto-push trigger disabled — GCP credentials not configured.
+# Use workflow_dispatch (manual) when GCP_SA_KEY is available.
+
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'community-forum/services/image-api/**'
-      - '.github/workflows/fairfield-image-api.yml'
   workflow_dispatch:
     inputs:
       environment:

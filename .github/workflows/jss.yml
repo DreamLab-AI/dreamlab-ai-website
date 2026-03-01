@@ -1,18 +1,13 @@
 name: Deploy JSS to GCP Cloud Run
 
+# NOTE: Auto-push trigger disabled — GCP credentials not configured.
+# Use workflow_dispatch (manual) when GCP_SA_KEY is available.
+#
 # Required GitHub Secrets:
 # - GCP_PROJECT_ID: Google Cloud Project ID
 # - GCP_SA_KEY: Service Account JSON key with Cloud Run Admin and Artifact Registry Writer roles
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'community-forum/services/jss/**'
-      - '!community-forum/services/jss/docs/**'
-      - '!community-forum/services/jss/*.md'
-      - '.github/workflows/jss.yml'
   workflow_dispatch:
     inputs:
       environment:
