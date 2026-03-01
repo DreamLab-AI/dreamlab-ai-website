@@ -6,8 +6,7 @@
   import { authStore } from '$lib/stores/auth';
   import { userStore } from '$lib/stores/user';
   import { userPermissionsStore } from '$lib/stores/userPermissions';
-  import { ndk, connectRelay, isConnected } from '$lib/nostr/relay';
-  import { RELAY_URL } from '$lib/config';
+  import { ndk, ensureRelayConnected, isConnected } from '$lib/nostr/relay';
   import { getSectionWithCategory, getBreadcrumbs } from '$lib/config';
   import { canCreateChannel } from '$lib/config/permissions';
   import Breadcrumb from '$lib/components/navigation/Breadcrumb.svelte';
@@ -118,9 +117,7 @@
     }
 
     try {
-      if (!isConnected() && $authStore.privateKey) {
-        await connectRelay(RELAY_URL, $authStore.privateKey);
-      }
+      await ensureRelayConnected($authStore);
       await loadForums();
     } catch (e) {
       console.error('Failed to connect:', e);

@@ -7,8 +7,7 @@
   import { userPermissionsStore } from '$lib/stores/userPermissions';
   import { whitelistStatusStore, isAdminVerified } from '$lib/stores/user';
   import { get } from 'svelte/store';
-  import { connectRelay, isConnected, connectionState, ConnectionState } from '$lib/nostr/relay';
-  import { RELAY_URL } from '$lib/config';
+  import { ensureRelayConnected, isConnected, connectionState, ConnectionState } from '$lib/nostr/relay';
   import { fetchChannels, type CreatedChannel } from '$lib/nostr/channels';
   import { getSection, getSections } from '$lib/config';
   import { canCreateChannel } from '$lib/config/permissions';
@@ -88,10 +87,8 @@
 
   async function loadChannels() {
     try {
-      // Connect to relay with authentication
-      if ($authStore.privateKey && !isConnected()) {
-        await connectRelay(RELAY_URL, $authStore.privateKey);
-      }
+      // Connect to relay with authentication (NIP-07 or private key)
+      await ensureRelayConnected($authStore);
 
       // Get user's cohorts from whitelist for channel filtering
       const whitelistStatus = get(whitelistStatusStore);

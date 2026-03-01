@@ -6,6 +6,7 @@
 import NDK, {
   NDKEvent,
   NDKPrivateKeySigner,
+  NDKNip07Signer,
   NDKRelay,
   NDKSubscription,
   type NDKFilter,
@@ -88,11 +89,25 @@ class RelayManager {
   }
 
   /**
-   * Initialize NDK with cache adapter
+   * Initialize NDK with cache adapter and a private key signer
    */
   private async initializeNDK(privateKey: string, relayUrl: string): Promise<NDK> {
     this._signer = new NDKPrivateKeySigner(privateKey);
+    return this._createNDK(relayUrl);
+  }
 
+  /**
+   * Initialize NDK with cache adapter and a NIP-07 extension signer
+   */
+  private async initializeNDKWithNip07(relayUrl: string): Promise<NDK> {
+    this._signer = new NDKNip07Signer() as any;
+    return this._createNDK(relayUrl);
+  }
+
+  /**
+   * Shared NDK creation logic
+   */
+  private _createNDK(relayUrl: string): NDK {
     if (NDK_CONFIG.cache.enabled && !this._cacheAdapter) {
       this._cacheAdapter = new NDKCacheAdapterDexie({
         dbName: NDK_CONFIG.cache.name
@@ -101,7 +116,7 @@ class RelayManager {
 
     const ndk = new NDK({
       explicitRelayUrls: [relayUrl],
-      signer: this._signer,
+      signer: this._signer as any,
       cacheAdapter: (this._cacheAdapter ?? undefined) as NDKCacheAdapter | undefined,
       enableOutboxModel: false
     });
@@ -174,6 +189,26 @@ class RelayManager {
   }
 
   /**
+   * Connect to relay using NIP-07 browser extension signer (no private key needed)
+   */
+  async connectRelayWithNip07(relayUrl: string): Promise<ConnectionStatus> {
+    try {
+      this.updateState(ConnectionState.Connecting, relayUrl);
+
+      if (this._ndk) {
+        await this.disconnectRelay();
+      }
+
+      this._ndk = await this.initializeNDKWithNip07(relayUrl);
+      return this._finishConnect(relayUrl);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Connection failed';
+      this.updateState(ConnectionState.Error, relayUrl, errorMessage);
+      throw error;
+    }
+  }
+
+  /**
    * Connect to relay with authentication
    */
   async connectRelay(relayUrl: string, privateKey: string): Promise<ConnectionStatus> {
@@ -185,53 +220,53 @@ class RelayManager {
       }
 
       this._ndk = await this.initializeNDK(privateKey, relayUrl);
-
-      const connectTimeout = new Promise<never>((_, reject) => {
-        setTimeout(() => reject(new Error('Connection timeout')), TIMEOUTS.connect);
-      });
-
-      const connectPromise = this._ndk.connect();
-
-      await Promise.race([connectPromise, connectTimeout]);
-
-      const relay = Array.from(this._ndk.pool.relays.values())[0];
-
-      if (!relay) {
-        throw new Error('No relay connected');
-      }
-
-      relay.on('auth', async (challenge: string) => {
-        this.updateState(ConnectionState.AuthRequired, relay.url);
-        try {
-          await this.handleAuthChallenge(relay, challenge);
-        } catch (error) {
-          console.error('[NDK] AUTH failed:', error);
-        }
-      });
-
-      // NDKRelayStatus: 5=CONNECTED, 6=AUTH_REQUESTED, 7=AUTHENTICATING, 8=AUTHENTICATED
-      const currentState = relay.connectivity.status >= 5
-        ? ConnectionState.Connected
-        : ConnectionState.Disconnected;
-
-      this.updateState(
-        currentState,
-        relayUrl,
-        undefined,
-        false
-      );
-
-      return {
-        state: currentState,
-        relay: relayUrl,
-        timestamp: Date.now(),
-        authenticated: false
-      };
+      return this._finishConnect(relayUrl);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Connection failed';
       this.updateState(ConnectionState.Error, relayUrl, errorMessage);
       throw error;
     }
+  }
+
+  /**
+   * Shared connect logic: wire up relay events and return status
+   */
+  private async _finishConnect(relayUrl: string): Promise<ConnectionStatus> {
+    if (!this._ndk) throw new Error('NDK not initialized');
+
+    const connectTimeout = new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error('Connection timeout')), TIMEOUTS.connect);
+    });
+
+    await Promise.race([this._ndk.connect(), connectTimeout]);
+
+    const relay = Array.from(this._ndk.pool.relays.values())[0];
+
+    if (!relay) {
+      throw new Error('No relay connected');
+    }
+
+    relay.on('auth', async (challenge: string) => {
+      this.updateState(ConnectionState.AuthRequired, relay.url);
+      try {
+        await this.handleAuthChallenge(relay, challenge);
+      } catch (error) {
+        console.error('[NDK] AUTH failed:', error);
+      }
+    });
+
+    const currentState = relay.connectivity.status >= 5
+      ? ConnectionState.Connected
+      : ConnectionState.Disconnected;
+
+    this.updateState(currentState, relayUrl, undefined, false);
+
+    return {
+      state: currentState,
+      relay: relayUrl,
+      timestamp: Date.now(),
+      authenticated: false
+    };
   }
 
   /**
@@ -409,10 +444,17 @@ export const ndk = (): NDK | null => relayManagerInstance.ndk;
 export const connectionState = relayManagerInstance.connectionState;
 
 /**
- * Connect to relay
+ * Connect to relay with private key signer
  */
 export const connectRelay = (relayUrl: string, privateKey: string): Promise<ConnectionStatus> => {
   return relayManagerInstance.connectRelay(relayUrl, privateKey);
+};
+
+/**
+ * Connect to relay with NIP-07 browser extension signer (no private key needed)
+ */
+export const connectRelayWithNip07 = (relayUrl: string): Promise<ConnectionStatus> => {
+  return relayManagerInstance.connectRelayWithNip07(relayUrl);
 };
 
 /**
@@ -449,6 +491,26 @@ export const disconnectRelay = (): Promise<void> => {
 export const isConnected = (): boolean => {
   return relayManagerInstance.isConnected();
 };
+
+/**
+ * Ensure relay is connected, using the appropriate signer.
+ * Reads auth state to decide between NIP-07, private key, or throws.
+ * Safe to call repeatedly — no-op when already connected.
+ */
+export async function ensureRelayConnected(authState: {
+  isNip07?: boolean;
+  privateKey?: string | null;
+}): Promise<void> {
+  if (relayManagerInstance.isConnected()) return;
+
+  if (authState.isNip07) {
+    await relayManagerInstance.connectRelayWithNip07(RELAY_URL);
+  } else if (authState.privateKey) {
+    await relayManagerInstance.connectRelay(RELAY_URL, authState.privateKey);
+  } else {
+    throw new Error('No signing method available');
+  }
+}
 
 /**
  * Get current user

@@ -5,7 +5,7 @@
   import { authStore } from '$lib/stores/auth';
   import { whitelistStatusStore } from '$lib/stores/user';
   import { verifyWhitelistStatus } from '$lib/nostr/whitelist';
-  import { ndk, connectRelay, isConnected, reconnectRelay } from '$lib/nostr/relay';
+  import { ndk, connectRelay, connectRelayWithNip07, isConnected, reconnectRelay } from '$lib/nostr/relay';
   import { RELAY_URL } from '$lib/config';
   import { createChannel, fetchChannels, type CreatedChannel } from '$lib/nostr/channels';
   import { settingsStore } from '$lib/stores/settings';
@@ -88,7 +88,9 @@
 
     try {
       await reconnectRelay();
-      if ($authStore.privateKey) {
+      if ($authStore.isNip07) {
+        await connectRelayWithNip07(RELAY_URL);
+      } else if ($authStore.privateKey) {
         await connectRelay(RELAY_URL, $authStore.privateKey);
       }
       relayStatus = 'connected';
@@ -101,7 +103,7 @@
   }
 
   async function initializeAdmin() {
-    if (!$authStore.privateKey) {
+    if (!$authStore.isAuthenticated) {
       error = 'Please login first to access admin features';
       return;
     }
@@ -115,7 +117,14 @@
       joinRequestsLoading = true;
 
       if (!isConnected()) {
-        await connectRelay(RELAY_URL, $authStore.privateKey);
+        if ($authStore.isNip07) {
+          await connectRelayWithNip07(RELAY_URL);
+        } else if ($authStore.privateKey) {
+          await connectRelay(RELAY_URL, $authStore.privateKey);
+        } else {
+          error = 'No signing method available. Please login again.';
+          return;
+        }
       }
       relayStatus = 'connected';
 

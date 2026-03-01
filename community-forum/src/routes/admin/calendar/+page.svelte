@@ -4,8 +4,7 @@
   import { base } from '$app/paths';
   import { authStore } from '$lib/stores/auth';
   import { isAdminVerified } from '$lib/stores/user';
-  import { ndk, connectRelay, isConnected } from '$lib/nostr/relay';
-  import { RELAY_URL } from '$lib/config';
+  import { ndk, ensureRelayConnected, isConnected } from '$lib/nostr/relay';
   import { fetchAllEvents, type CalendarEvent } from '$lib/nostr/calendar';
   import { fetchChannels, type CreatedChannel } from '$lib/nostr/channels';
   import EventCalendar from '$lib/components/events/EventCalendar.svelte';
@@ -57,9 +56,7 @@
     }
 
     try {
-      if (!isConnected() && $authStore.privateKey) {
-        await connectRelay(RELAY_URL, $authStore.privateKey);
-      }
+      await ensureRelayConnected($authStore);
 
       // Fetch channels and events in parallel (admin page: bypass cohort filtering)
       const [channelResults, eventResults] = await Promise.all([

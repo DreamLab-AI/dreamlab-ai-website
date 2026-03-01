@@ -3,8 +3,7 @@
   import { generateNewIdentity } from '$lib/nostr/keys';
   import { authStore } from '$lib/stores/auth';
   import { profileCache } from '$lib/stores/profiles';
-  import { ndk, connectRelay, isConnected } from '$lib/nostr/relay';
-  import { RELAY_URL } from '$lib/config';
+  import { ndk, ensureRelayConnected, isConnected } from '$lib/nostr/relay';
   import { NDKEvent } from '@nostr-dev-kit/ndk';
 
   const dispatch = createEventDispatcher<{
@@ -77,7 +76,7 @@
 
       // Connect to relay if not already connected
       if (!isConnected()) {
-        await connectRelay(RELAY_URL, privateKey);
+        await ensureRelayConnected({ privateKey });
       }
 
       const ndkInstance = ndk();

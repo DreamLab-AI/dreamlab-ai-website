@@ -5,8 +5,7 @@
   import { page } from '$app/stores';
   import { authStore } from '$lib/stores/auth';
   import { userStore } from '$lib/stores/user';
-  import { ndk, connectRelay, isConnected } from '$lib/nostr/relay';
-  import { RELAY_URL } from '$lib/config';
+  import { ndk, ensureRelayConnected, isConnected } from '$lib/nostr/relay';
   import { getSection, getSections } from '$lib/config';
   import {
     fetchSectionEvents,
@@ -62,9 +61,7 @@
     }
 
     try {
-      if (!isConnected() && $authStore.privateKey) {
-        await connectRelay(RELAY_URL, $authStore.privateKey);
-      }
+      await ensureRelayConnected($authStore);
 
       // Fetch section events
       const sectionEvents = await fetchSectionEvents(sectionId);

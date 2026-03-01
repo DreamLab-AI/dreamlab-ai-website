@@ -6,8 +6,7 @@
   import { authStore } from '$lib/stores/auth';
   import { whitelistStatusStore } from '$lib/stores/user';
   import { get } from 'svelte/store';
-  import { ndk, connectRelay, isConnected } from '$lib/nostr/relay';
-  import { RELAY_URL } from '$lib/config';
+  import { ndk, ensureRelayConnected, isConnected } from '$lib/nostr/relay';
   import { fetchAllEvents, fetchChannelEvents, type CalendarEvent } from '$lib/nostr/calendar';
   import { fetchChannels, type CreatedChannel } from '$lib/nostr/channels';
   import { fetchTribeBirthdayEvents } from '$lib/nostr/birthdays';
@@ -49,9 +48,7 @@
     }
 
     try {
-      if (!isConnected() && $authStore.privateKey) {
-        await connectRelay(RELAY_URL, $authStore.privateKey);
-      }
+      await ensureRelayConnected($authStore);
 
       // Get user's cohorts from whitelist for channel filtering
       const whitelistStatus = get(whitelistStatusStore);

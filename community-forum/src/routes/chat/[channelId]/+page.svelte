@@ -6,8 +6,7 @@
   import { authStore } from '$lib/stores/auth';
   import { whitelistStatusStore } from '$lib/stores/user';
   import { get } from 'svelte/store';
-  import { connectRelay, isConnected } from '$lib/nostr/relay';
-  import { RELAY_URL } from '$lib/config';
+  import { ensureRelayConnected, isConnected } from '$lib/nostr/relay';
   import {
     fetchChannelById,
     fetchChannelMessages,
@@ -65,9 +64,9 @@
     if (isConnected()) return true;
 
     // If layout hasn't triggered connection yet, connect directly as fallback
-    if ($authStore.privateKey && !isConnected()) {
+    if (!isConnected()) {
       try {
-        await connectRelay(RELAY_URL, $authStore.privateKey);
+        await ensureRelayConnected($authStore);
         return true;
       } catch {
         // Fall through to polling

@@ -3,8 +3,7 @@
   import { bytesToHex } from '@noble/hashes/utils';
   import { authStore } from '$lib/stores/auth';
   import { profileCache } from '$lib/stores/profiles';
-  import { ndk, connectRelay, isConnected } from '$lib/nostr/relay';
-  import { RELAY_URL } from '$lib/config';
+  import { ndk, ensureRelayConnected, isConnected } from '$lib/nostr/relay';
   import { NDKEvent } from '@nostr-dev-kit/ndk';
 
   export let publicKey: string;
@@ -32,8 +31,8 @@
       // Connect to relay if not already connected
       if (!isConnected()) {
         const privkeyBytes = authStore.getPrivkey();
-        const privkeyHex = privkeyBytes ? bytesToHex(privkeyBytes) : '';
-        await connectRelay(RELAY_URL, privkeyHex);
+        const privkeyHex = privkeyBytes ? bytesToHex(privkeyBytes) : null;
+        await ensureRelayConnected({ privateKey: privkeyHex });
       }
 
       const ndkInstance = ndk();

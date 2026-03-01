@@ -7,7 +7,7 @@
 	import { goto } from '$app/navigation';
 	import { fade } from 'svelte/transition';
 	import { authStore, isAuthenticated } from '$lib/stores/auth';
-	import { connectRelay, isConnected } from '$lib/nostr/relay';
+	import { connectRelay, connectRelayWithNip07, isConnected } from '$lib/nostr/relay';
 	import { RELAY_URL } from '$lib/config';
 	import { sessionStore } from '$lib/stores/session';
 	import { calendarStore, sidebarVisible, sidebarExpanded } from '$lib/stores/calendar';
@@ -53,12 +53,18 @@
 	let mobileZoneDrawerOpen = false;
 	let relayConnecting = false;
 
-	// Connect to Nostr relay when authenticated with a private key.
+	// Connect to Nostr relay when authenticated.
+	// Uses private key signer for passkey/local-key users, NIP-07 signer for extension users.
 	// Runs at the layout level so every page has NDK available without
 	// needing its own connectRelay() call in onMount.
-	$: if (browser && $authStore.isAuthenticated && $authStore.privateKey && !isConnected() && !relayConnecting) {
+	$: if (browser && $authStore.isAuthenticated && !isConnected() && !relayConnecting) {
 		relayConnecting = true;
-		connectRelay(RELAY_URL, $authStore.privateKey)
+		const connectPromise = $authStore.isNip07
+			? connectRelayWithNip07(RELAY_URL)
+			: $authStore.privateKey
+				? connectRelay(RELAY_URL, $authStore.privateKey)
+				: Promise.reject(new Error('No signing method available'));
+		connectPromise
 			.catch((err: unknown) => {
 				console.error('[Layout] Relay connection failed:', err);
 			})
