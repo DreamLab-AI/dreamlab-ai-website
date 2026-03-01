@@ -4,7 +4,7 @@ description: "Complete system architecture documentation consolidated from SPARC
 category: reference
 tags: ['architecture', 'sparc-methodology', 'system-design', 'deployment', 'testing']
 difficulty: intermediate
-last-updated: 2026-01-16
+last-updated: 2026-03-01
 related-docs:
   - docs/PRD.md
   - docs/reference/api-reference.md
@@ -14,12 +14,12 @@ related-docs:
 
 # System Architecture Reference
 
-Complete system architecture documentation for the Nostr-based chat system, consolidated from SPARC methodology specifications.
+Complete system architecture documentation for the DreamLab AI community forum (Nostr-based chat system), consolidated from SPARC methodology specifications.
 
 ## Overview
 
 This architecture implements a decentralized chat system built on Nostr protocol with:
-- **Three-zone structure**: Minimoonoir (social), DreamLab (business), Fairfield Family (family)
+- **Three-zone structure**: Minimoonoir (social), DreamLab (business), Family (family)
 - **Zone → Section → Forum hierarchy** for content organization
 - **PWA-based client** with offline support
 - **Private relay** with deletion capability
@@ -30,7 +30,7 @@ This architecture implements a decentralized chat system built on Nostr protocol
 | Decision | Rationale |
 |----------|-----------|
 | **SvelteKit Framework** | Smallest runtime (~15KB), compile-time reactivity, NDK integration |
-| **Cloudflare Workers Relay** | Serverless auto-scaling, Durable Objects for state |
+| **GCP Cloud Run Relay** (retained) | Container-based, persistent WebSocket connections, Cloud SQL storage |
 | **No Federation** | Enables true message deletion, full privacy control |
 | **Direct Key Generation** | crypto.getRandomValues for instant nsec creation |
 | **Hierarchical Topology** | Zone → Section → Forum provides clear structure |
@@ -54,7 +54,7 @@ graph TB
         end
     end
 
-    subgraph RelayLayer["RELAY LAYER (Google Cloud Run)"]
+    subgraph RelayLayer["RELAY LAYER (GCP Cloud Run, retained)"]
         subgraph Relay["Node.js Relay Service"]
             NIP42["NIP-42 AUTH<br/>- Pubkey whitelist<br/>- Challenge"]
             Groups["Group Logic<br/>- Membership<br/>- Roles<br/>- Moderation"]
@@ -237,14 +237,14 @@ graph TB
     end
 ```
 
-### Relay Configuration (Google Cloud Run)
+### Relay Configuration (GCP Cloud Run, retained)
 
 ```typescript
 // services/nostr-relay/src/config.ts
 export const relayConfig = {
   info: {
-    name: "Nostr-BBS Private Relay",
-    description: "Private relay for Nostr-BBS community",
+    name: "DreamLab Private Relay",
+    description: "Private relay for DreamLab community",
     supported_nips: [1, 2, 9, 11, 29, 42, 44, 59],
   },
 
@@ -365,10 +365,10 @@ interface NostrBBSDB {
 | Component | Technology | Rationale |
 |-----------|------------|-----------|
 | PWA Hosting | GitHub Pages | Free, fast CDN, simple deployment |
-| Relay Hosting | Google Cloud Run | Serverless containers, auto-scaling |
+| Relay Hosting | GCP Cloud Run (retained) | Container-based, persistent WebSockets. Migration to Cloudflare Workers in progress for other services. |
 | Database | Cloud SQL PostgreSQL | Managed DB, automatic backups, pgvector |
-| File Storage | Google Cloud Storage | Media files, vector indices |
-| Monitoring | Cloud Logging + Monitoring | Built-in GCP observability |
+| File Storage | Google Cloud Storage / Cloudflare R2 (target) | Media files, vector indices. R2 for pod and image storage in Workers migration. |
+| Monitoring | Cloud Logging + Monitoring | Built-in GCP observability (retained services) |
 
 ---
 
@@ -492,11 +492,11 @@ flowchart LR
 
 *Problem: No guarantee other relays honour deletion*
 
-**Nostr-BBS (Closed Relay)**
+**DreamLab (Closed Relay)**
 
 ```mermaid
 flowchart TB
-    User -->|msg| NostrBBSRelay["Nostr-BBS Relay (ONLY)"]
+    User -->|msg| NostrBBSRelay["DreamLab Relay (ONLY)"]
     User -->|delete| NostrBBSRelay
     NostrBBSRelay -->|"Event removed"| PG[(PostgreSQL)]
 ```

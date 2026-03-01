@@ -1,13 +1,15 @@
 # Nostr Relay WebSocket API
 
-**Last Updated:** 2026-02-28
+**Last Updated:** 2026-03-01
 
 WebSocket API for the DreamLab AI Nostr relay. Implements NIP-01 (basic protocol), NIP-16 (event treatment), NIP-28 (public channels), NIP-33 (parameterised replaceable events), NIP-42 (authentication), and NIP-98 (HTTP auth).
+
+> **Migration note:** This service is retained on GCP Cloud Run per ADR-010. Persistent WebSocket connections with Cloud SQL make it unsuitable for Cloudflare Workers at this time. Durable Objects migration is evaluated separately.
 
 **Protocol**: WebSocket (RFC 6455)
 **Transport**: WSS (TLS-encrypted)
 **Database**: PostgreSQL 15 with JSONB indexing
-**Deployment**: GCP Cloud Run (always-on, 1 instance, 3600s timeout)
+**Deployment**: GCP Cloud Run (always-on, 1 instance, 3600s timeout) -- retained on Cloud Run
 
 ---
 
@@ -322,4 +324,4 @@ NDK handles NIP-42 authentication automatically when configured with a signer.
 
 ---
 
-*Last major revision: 2026-02-28.*
+*Last major revision: 2026-03-01.*

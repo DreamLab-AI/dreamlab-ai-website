@@ -1,6 +1,6 @@
 # Backend Services Architecture -- DreamLab AI
 
-**Last Updated**: 2026-02-28
+**Last Updated**: 2026-03-01
 **Current Platform**: GCP Cloud Run (cumbriadreamlab project, us-central1)
 **Target Platform**: Hybrid -- Cloudflare Workers + GCP Cloud Run (ADR-010)
 
@@ -10,7 +10,7 @@ DreamLab AI operates a hybrid backend architecture:
 
 - **Main marketing site**: Supabase (managed PostgreSQL + Auth) for form submissions and email signups.
 - **Community forum**: Six GCP Cloud Run services providing WebAuthn authentication, Solid pod storage, Nostr relay messaging, vector embeddings, image processing, and link previews.
-- **Planned migration**: Four of the six Cloud Run services are being migrated to Cloudflare Workers (auth-api, pod-api, image-api, link-preview-api). Code exists in `workers/`.
+- **Workers migration**: Three Cloudflare Workers have code complete (auth-api, pod-api, search-api) with deployment pending Cloudflare account setup. Two additional Workers (image-api, link-preview-api) are planned. Code exists in `workers/`.
 
 ---
 
@@ -58,13 +58,14 @@ graph TB
     Relay --> SM
 ```
 
-### Planned Cloudflare Workers
+### Cloudflare Workers (Code Complete)
 
 ```mermaid
 graph TB
     subgraph CF["Cloudflare Workers"]
         CFAuth["auth-api Worker<br/>WebAuthn + NIP-98"]
         CFPod["pod-api Worker<br/>R2 pod storage + WAC"]
+        CFSearch["search-api Worker<br/>WASM vector search"]
     end
 
     subgraph CFStorage["Cloudflare Storage"]
@@ -72,14 +73,18 @@ graph TB
         KV1["KV: SESSIONS"]
         KV2["KV: POD_META"]
         KV3["KV: CONFIG"]
-        R2["R2: dreamlab-pods"]
+        KV4["KV: SEARCH_CONFIG"]
+        R2Pods["R2: dreamlab-pods"]
+        R2Vectors["R2: dreamlab-vectors"]
     end
 
     CFAuth --> D1
     CFAuth --> KV1
-    CFAuth --> R2
-    CFPod --> R2
+    CFAuth --> R2Pods
+    CFPod --> R2Pods
     CFPod --> KV2
+    CFSearch --> R2Vectors
+    CFSearch --> KV4
 ```
 
 ---
@@ -97,12 +102,13 @@ graph TB
 | **image-api** | `fairfield-image-api.yml` | Node.js 20, Express, Sharp | 512Mi, 1 CPU | 0--10 |
 | **link-preview-api** | (manual) | Node.js | 256Mi, 0.5 CPU | 0--5 |
 
-### Planned Cloudflare Workers
+### Cloudflare Workers (Code Complete)
 
-| Worker | File | Replaces | Storage | Routes |
-|--------|------|----------|---------|--------|
-| **auth-api** | `workers/auth-api/index.ts` | Cloud Run auth-api | D1 + KV (SESSIONS) | `api.dreamlab-ai.com/*` |
-| **pod-api** | `workers/pod-api/index.ts` | Cloud Run JSS | R2 (PODS) + KV (POD_META) | `pods.dreamlab-ai.com/*` |
+| Worker | File | Replaces | Storage | Routes | Status |
+|--------|------|----------|---------|--------|--------|
+| **auth-api** | `workers/auth-api/index.ts` | Cloud Run auth-api | D1 + KV (SESSIONS) | `api.dreamlab-ai.com/*` | Code complete |
+| **pod-api** | `workers/pod-api/index.ts` | Cloud Run JSS | R2 (PODS) + KV (POD_META) | `pods.dreamlab-ai.com/*` | Code complete |
+| **search-api** | `workers/search-api/index.ts` | New service | R2 (dreamlab-vectors) + KV (SEARCH_CONFIG) | `search.dreamlab-ai.com/*` | Code complete |
 
 ---
 
@@ -169,7 +175,7 @@ CREATE INDEX idx_challenges_pubkey ON challenges(pubkey);
 
 ---
 
-## 2. auth-api Worker (Cloudflare -- Planned)
+## 2. auth-api Worker (Cloudflare -- Code Complete)
 
 ### Purpose
 
@@ -220,7 +226,7 @@ When a user registers, the Worker provisions a Solid pod directly in R2:
 
 ---
 
-## 3. pod-api Worker (Cloudflare -- Planned)
+## 3. pod-api Worker (Cloudflare -- Code Complete)
 
 ### Purpose
 
@@ -279,6 +285,75 @@ Supported agent classes:
     }
   ]
 }
+```
+
+---
+
+## 10. search-api Worker (Cloudflare -- Code Complete)
+
+### Purpose
+
+WASM-powered vector similarity search service using the `@ruvector/rvf-wasm` microkernel. Provides cosine similarity search over 384-dimensional embeddings (all-MiniLM-L6-v2 compatible) with R2-backed persistence and KV-backed configuration.
+
+### Implementation (`workers/search-api/index.ts` + `rvf_wasm_bg.wasm`)
+
+The Worker loads a 42KB WASM module (`rvf_wasm_bg.wasm`) that implements the RuVector Format (`.rvf`) vector store with HNSW indexing. On cold start, the Worker loads the `.rvf` index file from R2 into the WASM store. Warm queries execute entirely in WASM with sub-millisecond latency.
+
+### Endpoints
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/search` | POST | Cosine similarity search over ingested vectors |
+| `/ingest` | POST | Ingest new vectors into the WASM store, persist to R2 |
+| `/status` | GET | Health check, vector count, index stats |
+
+### Storage
+
+| Backend | Resource | Purpose |
+|---------|----------|---------|
+| **R2** | `dreamlab-vectors` bucket, `.rvf` files | Persistent vector index storage |
+| **KV** | `SEARCH_CONFIG` namespace | Configuration, id-to-label mapping |
+
+### Architecture
+
+```
+Cold start:
+  1. Load .rvf file from R2 (dreamlab-vectors bucket)
+  2. Deserialize into WASM store via rvf-wasm module
+  3. Ready for queries
+
+Warm query path (sub-ms):
+  POST /search { "vector": [...384 floats...], "k": 10 }
+  -> WASM cosine similarity search
+  -> Return top-k results with scores
+
+Ingest path:
+  POST /ingest { "id": "...", "vector": [...], "label": "..." }
+  -> Insert into WASM store
+  -> Persist updated .rvf to R2
+  -> Store id<->label mapping in KV
+```
+
+### Performance
+
+| Metric | Value |
+|--------|-------|
+| WASM module size | 42KB (`rvf_wasm_bg.wasm`) |
+| Vector dimensions | 384 (all-MiniLM-L6-v2 compatible) |
+| Ingest throughput | 490K vec/sec |
+| Query latency (p50) | 0.47ms |
+| Cold start | Load .rvf from R2 + WASM init |
+| Warm queries | Sub-millisecond |
+
+### Bindings (from `wrangler.toml`)
+
+```toml
+[[r2_buckets]]
+binding = "VECTORS"
+bucket_name = "dreamlab-vectors"
+
+[[kv_namespaces]]
+binding = "SEARCH_CONFIG"
 ```
 
 ---
@@ -614,4 +689,4 @@ A separate, lighter implementation for Cloudflare Workers that:
 
 **Document Owner**: Backend Team
 **Review Cycle**: Quarterly
-**Last Review**: 2026-02-28
+**Last Review**: 2026-03-01

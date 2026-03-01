@@ -4,7 +4,7 @@ description: "WebAuthn PRF passkey-based authentication with HKDF key derivation
 category: tutorial
 tags: ['authentication', 'webauthn', 'passkey', 'nip-98', 'developer']
 difficulty: intermediate
-last-updated: 2026-02-28
+last-updated: 2026-03-01
 ---
 
 # Authentication System
@@ -20,7 +20,7 @@ The authentication system provides:
 - **NIP-98 HTTP auth** -- every state-mutating API call is Schnorr-signed with kind:27235 events
 - **In-memory key security** -- private key held only in a closure (`_privkeyMem`), zero-filled on `pagehide`
 - **Multiple login methods** -- passkey (primary), NIP-07 browser extension, manual nsec/hex key entry
-- **Solid pod provisioning** -- server-side pod creation via JSS on successful registration
+- **Solid pod provisioning** -- server-side pod creation via JSS on successful registration (Cloudflare Workers pod-api is code complete, deployment pending)
 
 ## Identity Model
 
@@ -64,8 +64,8 @@ The PRF salt is generated at registration time and stored server-side in the `we
 sequenceDiagram
     participant User
     participant Client as SvelteKit Forum
-    participant AuthAPI as auth-api (Cloud Run)
-    participant JSS as JSS Pod Server
+    participant AuthAPI as auth-api (Cloud Run / Workers)
+    participant JSS as JSS Pod Server (Cloud Run / pod-api Worker)
 
     User->>Client: 1. Click "Register with Passkey"
     Client->>AuthAPI: 2. POST /auth/register/options { displayName }
@@ -104,7 +104,7 @@ sequenceDiagram
 sequenceDiagram
     participant User
     participant Client as SvelteKit Forum
-    participant AuthAPI as auth-api (Cloud Run)
+    participant AuthAPI as auth-api (Cloud Run / Workers)
 
     User->>Client: 1. Click "Log in with Passkey"
     Client->>AuthAPI: 2. POST /auth/login/options { pubkey? }

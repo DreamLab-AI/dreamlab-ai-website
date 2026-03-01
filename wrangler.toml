@@ -1,45 +1,22 @@
-name = "dreamlab-ai"
-compatibility_date = "2024-12-01"
-main = "workers/auth-api/index.ts"
-
-# D1 Database - WebAuthn credentials + challenges
-[[d1_databases]]
-binding = "DB"
-database_name = "dreamlab-auth"
-database_id = "placeholder-generate-after-creation"
-
-# KV Namespaces
-[[kv_namespaces]]
-binding = "SESSIONS"
-id = "placeholder-sessions"
-
-[[kv_namespaces]]
-binding = "POD_META"
-id = "placeholder-pod-meta"
-
-[[kv_namespaces]]
-binding = "CONFIG"
-id = "placeholder-config"
-
-# R2 Bucket - Pod storage
-[[r2_buckets]]
-binding = "PODS"
-bucket_name = "dreamlab-pods"
-
-[vars]
-RP_ID = "dreamlab-ai.com"
-RP_NAME = "DreamLab Community"
-EXPECTED_ORIGIN = "https://dreamlab-ai.com"
-RELAY_URL = "wss://relay.dreamlab-ai.com"
-
-# Environment-specific overrides
-[env.staging]
-name = "dreamlab-ai-staging"
-vars = { RP_ID = "staging.dreamlab-ai.com", EXPECTED_ORIGIN = "https://staging.dreamlab-ai.com" }
-
-[env.production]
-name = "dreamlab-ai"
-routes = [
-  { pattern = "api.dreamlab-ai.com/*", zone_name = "dreamlab-ai.com" },
-  { pattern = "pods.dreamlab-ai.com/*", zone_name = "dreamlab-ai.com" }
-]
+# DreamLab AI — Multi-Worker Configuration
+#
+# Each worker has its own wrangler.toml with resource bindings.
+# Deploy individually:
+#   npx wrangler deploy -c workers/auth-api/wrangler.toml
+#   npx wrangler deploy -c workers/pod-api/wrangler.toml
+#   npx wrangler deploy -c workers/search-api/wrangler.toml
+#
+# Resource IDs (created 2026-03-01):
+#   D1:  dreamlab-auth       = e3981999-e8f0-4c07-9e4b-2e50859b8524
+#   KV:  SESSIONS            = 901345296c2848788066686aa67d5909
+#   KV:  POD_META            = 8ec8759ab40d4709a831bf6b0e5241eb
+#   KV:  CONFIG              = cbb857ac37424993a3aeafbabe9b808e
+#   KV:  SEARCH_CONFIG       = 440b1f07ff224fb8ad644e094c6766c0
+#   R2:  dreamlab-pods       (Standard storage)
+#   R2:  dreamlab-vectors    (Standard storage)
+#   Account: ccdf454d3f62f5a2f82350c65bac1052
+#
+# Production routes (requires zone DNS setup):
+#   api.dreamlab-ai.com/*    → dreamlab-auth-api
+#   pods.dreamlab-ai.com/*   → dreamlab-pod-api
+#   search.dreamlab-ai.com/* → dreamlab-search-api

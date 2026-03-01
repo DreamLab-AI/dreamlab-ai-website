@@ -4,7 +4,7 @@ description: "Decision to migrate services back to Cloudflare Workers, Pages, D1
 category: reference
 tags: [adr, cloudflare, workers, infrastructure, migration, devops]
 difficulty: advanced
-last-updated: 2026-02-28
+last-updated: 2026-03-01
 ---
 
 # ADR-010: Return to Cloudflare Platform
@@ -41,12 +41,13 @@ Return to the Cloudflare platform. Migrate the majority of services to Cloudflar
 
 ### Services migrated to Cloudflare Workers
 
-| Service | Storage Backend | Rationale |
-|---------|----------------|-----------|
-| **auth-api** | D1 (credentials, challenges) + KV (sessions) | WebAuthn + NIP-98 proven on Workers (paa.pub). PostgreSQL schema maps cleanly to D1 SQLite. |
-| **pod-api** (replaces JSS) | R2 (pod files) + KV (ACLs, metadata) | Replace CSS 7.x with custom Workers-native pod storage. Eliminates ephemeral storage and permissive ACL problems. |
-| **image-api** | R2 (uploads) | Image storage on R2. Transforms via Workers paid tier (30s CPU). |
-| **link-preview-api** | Stateless | Lightweight HTTP fetch + parse. Natural Workers fit. |
+| Service | Storage Backend | Rationale | Code Status |
+|---------|----------------|-----------|-------------|
+| **auth-api** | D1 (credentials, challenges) + KV (sessions) | WebAuthn + NIP-98 proven on Workers (paa.pub). PostgreSQL schema maps cleanly to D1 SQLite. | Code complete |
+| **pod-api** (replaces JSS) | R2 (pod files) + KV (ACLs, metadata) | Replace CSS 7.x with custom Workers-native pod storage. Eliminates ephemeral storage and permissive ACL problems. | Code complete |
+| **search-api** | R2 (dreamlab-vectors, .rvf files) + KV (SEARCH_CONFIG, id-to-label) | WASM-powered vector similarity search. 42KB rvf-wasm microkernel. 490K vec/sec ingest, 0.47ms p50 query. | Code complete |
+| **image-api** | R2 (uploads) | Image storage on R2. Transforms via Workers paid tier (30s CPU). | Planned |
+| **link-preview-api** | Stateless | Lightweight HTTP fetch + parse. Natural Workers fit. | Planned |
 
 ### Services retained on GCP Cloud Run
 
@@ -125,6 +126,27 @@ Deploy the existing Vite SPA to Cloudflare Pages with zero code changes. The `di
 
 - Mature ecosystem with broad service coverage
 - Rejected: higher complexity and cost than Cloudflare Workers; no advantage over current GCP setup
+
+## Progress Update (2026-03-01)
+
+### Completed
+
+- **Workers code for auth-api**: Full WebAuthn registration/authentication fetch handler with D1 storage and KV sessions (`workers/auth-api/index.ts`)
+- **Workers code for pod-api**: NIP-98-authenticated CRUD with WAC enforcement, R2 storage, KV metadata (`workers/pod-api/index.ts`)
+- **Workers code for search-api**: WASM-powered vector similarity search using `@ruvector/rvf-wasm` microkernel (42KB). Supports 384-dim embeddings (all-MiniLM-L6-v2 compatible). Benchmarks: 490K vec/sec ingest, 0.47ms p50 query latency. R2 for `.rvf` persistence, KV for id-to-label mapping (`workers/search-api/index.ts`)
+- **NIP-98 shared module consolidated**: `community-forum/packages/nip98/` with sign, verify, and types modules. Edge-compatible version at `workers/shared/nip98.ts`
+- **wrangler.toml**: Complete configuration with all D1, KV, R2, and route bindings for auth-api, pod-api, and search-api
+- **workers-deploy.yml**: GitHub Actions workflow for automated Workers deployment
+
+### Pending
+
+- **Cloudflare account setup**: API token creation, account ID configuration in GitHub Secrets
+- **D1 database creation**: `wrangler d1 create dreamlab-auth` + schema migration
+- **KV namespace creation**: SESSIONS, POD_META, CONFIG, SEARCH_CONFIG namespaces
+- **R2 bucket creation**: `dreamlab-pods` and `dreamlab-vectors` buckets
+- **DNS configuration**: CNAME/route records for `api.dreamlab-ai.com`, `pods.dreamlab-ai.com`, `search.dreamlab-ai.com`
+- **Production deployment and testing**: Deploy Workers, run health checks, verify end-to-end auth flow
+- **image-api and link-preview-api Workers**: Code not yet written
 
 ## References
 

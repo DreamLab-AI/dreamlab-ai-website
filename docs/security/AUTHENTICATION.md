@@ -1,6 +1,6 @@
 # Authentication and Identity
 
-**Last Updated:** 2026-02-28
+**Last Updated:** 2026-03-01
 
 Detailed specification of the DreamLab AI authentication system: WebAuthn PRF-based key derivation, NIP-98 HTTP authentication, and session management.
 
@@ -489,4 +489,4 @@ The `payload` tag in NIP-98 events contains a SHA-256 hash of the raw request bo
 
 ---
 
-*This document is version-controlled. Last major revision: 2026-02-28.*
+*This document is version-controlled. Last major revision: 2026-03-01.*

@@ -4,7 +4,7 @@ description: "**For:** Nostr chat app development team **Focus:** Build Phase 1 
 category: howto
 tags: ['developer', 'guide', 'security', 'user']
 difficulty: beginner
-last-updated: 2026-01-16
+last-updated: 2026-03-01
 ---
 
 # Progressive Security Onboarding: Implementation Quick Start Guide

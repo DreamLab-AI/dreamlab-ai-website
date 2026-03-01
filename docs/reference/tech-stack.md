@@ -1,6 +1,6 @@
 # Technology Reference
 
-Last updated: 2026-02-28
+Last updated: 2026-03-01
 
 Complete technology inventory for the DreamLab AI platform, covering the main website, community forum, and backend services.
 
@@ -196,7 +196,7 @@ All Radix UI primitives are used through shadcn/ui wrappers in `src/components/u
 
 ### auth-api
 
-Express application deployed to Cloud Run.
+Express application deployed to Cloud Run. A Cloudflare Workers version exists at `workers/auth-api/` (code complete, deployment pending).
 
 | Dependency | Purpose |
 |-----------|---------|
@@ -215,11 +215,11 @@ Express application deployed to Cloud Run.
 
 ### nostr-relay
 
-Custom Nostr relay with PostgreSQL storage. Supports NIP-01, NIP-11, NIP-16, NIP-33, NIP-98.
+Custom Nostr relay with PostgreSQL storage. Supports NIP-01, NIP-11, NIP-16, NIP-33, NIP-98. Retained on Cloud Run per ADR-010 (persistent WebSocket connections require Cloud SQL).
 
 ### embedding-api
 
-Vector embedding generation service.
+Vector embedding generation service. Retained on Cloud Run per ADR-010 (ML inference requires CPU/memory beyond Workers limits). Client-side WASM search (rvf-wasm) provides an alternative for forum search.
 
 ### image-api
 
@@ -231,14 +231,16 @@ URL metadata extraction for link previews.
 
 ---
 
-## Cloudflare Workers (planned)
+## Cloudflare Workers (code complete, deployment pending)
+
+auth-api and pod-api Workers are code complete. image-api and link-preview-api Workers are planned. See ADR-010 for migration details.
 
 | Technology | Purpose |
 |-----------|---------|
-| Cloudflare Workers | Serverless compute |
-| D1 | SQLite database (WebAuthn credentials) |
+| Cloudflare Workers | Serverless compute (auth-api, pod-api code complete) |
+| D1 | SQLite database (WebAuthn credentials, challenges) |
 | KV | Key-value storage (sessions, pod metadata, config) |
-| R2 | Object storage (pod data) |
+| R2 | Object storage (pod data, images) |
 | Wrangler | CLI tooling and configuration |
 
 Configuration is in `wrangler.toml`.
@@ -249,11 +251,14 @@ Configuration is in `wrangler.toml`.
 
 | Technology | Purpose |
 |-----------|---------|
-| Rust | Systems language for WASM module |
+| Rust | Systems language for WASM modules |
 | wasm-pack | Build tool for Rust-to-WASM compilation |
 | wasm-bindgen | Rust/JavaScript interop |
 
-The `wasm-voronoi/` module computes Voronoi tessellation for the 3D hero visualisation.
+| Module | Location | Purpose |
+|--------|----------|---------|
+| wasm-voronoi | `wasm-voronoi/` | Voronoi tessellation for the 3D hero visualisation |
+| rvf-wasm | `community-forum/packages/rvf-wasm/` | Client-side TF-IDF semantic search (replaces server-side embedding-api for forum search) |
 
 ---
 
@@ -295,11 +300,11 @@ The `wasm-voronoi/` module computes Voronoi tessellation for the 3D hero visuali
 |-----------|----------|-------|
 | Main site | GitHub Pages | Static build via `deploy.yml` |
 | Community forum | GitHub Pages | Static SvelteKit adapter, served at `/community/` |
-| auth-api | Google Cloud Run | `us-central1`, GCP project `cumbriadreamlab` |
-| jss | Google Cloud Run | Solid pod server |
-| nostr-relay | Google Cloud Run | WebSocket-capable |
-| embedding-api | Google Cloud Run | Vector embeddings |
-| image-api | Google Cloud Run | Image processing |
+| auth-api | Google Cloud Run (migration target: Cloudflare Workers) | `us-central1`, GCP project `cumbriadreamlab`. Workers version code complete. |
+| jss | Google Cloud Run (migration target: Cloudflare Workers pod-api) | Solid pod server. Workers pod-api code complete. |
+| nostr-relay | Google Cloud Run (retained) | WebSocket-capable. Remains on Cloud Run per ADR-010. |
+| embedding-api | Google Cloud Run (retained) | Vector embeddings. Remains on Cloud Run per ADR-010. |
+| image-api | Google Cloud Run (migration target: Cloudflare Workers) | Image processing. Workers version planned. |
 | DNS | Cloudflare | Domain: dreamlab-ai.com |
 
 ---

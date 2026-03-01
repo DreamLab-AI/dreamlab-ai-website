@@ -1,0 +1,19 @@
+name = "dreamlab-search-api"
+compatibility_date = "2024-12-01"
+main = "index.ts"
+
+[[r2_buckets]]
+binding = "VECTORS"
+bucket_name = "dreamlab-vectors"
+
+[[kv_namespaces]]
+binding = "SEARCH_CONFIG"
+id = "440b1f07ff224fb8ad644e094c6766c0"
+
+[[rules]]
+type = "CompiledWasm"
+globs = ["**/*.wasm"]
+
+[vars]
+ALLOWED_ORIGIN = "https://dreamlab-ai.com"
+RVF_STORE_KEY = "dreamlab.rvf"

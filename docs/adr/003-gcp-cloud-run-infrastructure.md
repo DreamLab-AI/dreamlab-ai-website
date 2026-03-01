@@ -4,14 +4,16 @@ description: "Decision to deploy relay on Google Cloud Run with PostgreSQL stora
 category: reference
 tags: ['adr', 'deployment', 'gcp', 'infrastructure', 'devops']
 difficulty: advanced
-last-updated: 2026-01-16
+last-updated: 2026-03-01
 ---
+
+> **Note:** This ADR has been superseded by ADR-010 (Return to Cloudflare Platform). The GCP Cloud Run infrastructure is being decommissioned for most services.
 
 # ADR-003: GCP Cloud Run Infrastructure
 
 ## Status
 
-Accepted
+Superseded by ADR-010
 
 ## Date
 

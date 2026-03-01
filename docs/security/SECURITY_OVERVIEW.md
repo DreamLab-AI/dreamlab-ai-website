@@ -1,8 +1,8 @@
 # Security Overview
 
-**Last Updated:** 2026-02-28
+**Last Updated:** 2026-03-01
 
-Comprehensive security architecture for the DreamLab AI platform (dreamlab-ai.com): a React SPA with SvelteKit community forum, GCP Cloud Run backend services, and WebAuthn PRF-based authentication.
+Comprehensive security architecture for the DreamLab AI platform (dreamlab-ai.com): a React SPA with SvelteKit community forum, backend services on GCP Cloud Run (migration to Cloudflare Workers in progress), and WebAuthn PRF-based authentication.
 
 ---
 
@@ -319,7 +319,7 @@ ACL documents are stored as JSON-LD within the pod. A custom WAC evaluator (plan
 | **Windows Hello blocked** | Windows Hello does not support the PRF extension | Users on Windows must use a FIDO2 security key (e.g., YubiKey) or fall back to NIP-07/nsec. An error message is shown when PRF is not available. |
 | **No key rotation** | Nostr protocol does not support key rotation natively | The identity is bound to the secp256k1 keypair. Changing keys requires social migration. |
 | **PRF support varies** | PRF extension requires Chrome 116+, Safari 17.4+, or equivalent | Older browsers will fail at registration with a descriptive error message. |
-| **Pod storage is Cloud Run ephemeral** | JSS pod data is stored on a Cloud Storage volume mount, but CSS in-memory state is lost on restart | Cloud Storage volume provides persistence; CSS state rebuild on startup. Migration to R2 planned. |
+| **Pod storage is Cloud Run ephemeral** | JSS pod data is stored on a Cloud Storage volume mount, but CSS in-memory state is lost on restart | Cloud Storage volume provides persistence; CSS state rebuild on startup. R2-backed pod-api Worker is code complete (deployment pending). |
 
 ---
 
@@ -409,6 +409,7 @@ ACL documents are stored as JSON-LD within the pod. A custom WAC evaluator (plan
 - **2026-01-16**: Full internal audit. 2 high-severity issues resolved, 1 medium resolved.
 - **2026-01-25**: GCP Cloud Run migration. SSRF and WebSocket security hardening.
 - **2026-02-28**: Documentation rewrite to reflect current WebAuthn PRF + NIP-98 architecture.
+- **2026-03-01**: Updated to reflect Cloudflare Workers migration status (in progress).
 
 ---
 
@@ -423,4 +424,4 @@ ACL documents are stored as JSON-LD within the pod. A custom WAC evaluator (plan
 
 **Security Contact**: security@dreamlab-ai.com (to be configured)
 
-*This document is version-controlled. Last major revision: 2026-02-28.*
+*This document is version-controlled. Last major revision: 2026-03-01.*

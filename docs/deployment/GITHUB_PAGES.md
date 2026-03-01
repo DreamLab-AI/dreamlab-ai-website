@@ -1,6 +1,6 @@
 # GitHub Pages Deployment
 
-**Last Updated:** 2026-02-28
+**Last Updated:** 2026-03-01
 
 Deployment of the DreamLab AI main website (React SPA) and community forum (SvelteKit) to GitHub Pages.
 
@@ -130,9 +130,9 @@ Uses `peaceiris/actions-gh-pages@v3`:
 - **Orphan branch**: Each deployment creates a clean `gh-pages` branch (no history accumulation).
 - **CNAME**: Automatically sets the custom domain.
 
-### Cloudflare Pages Deploy (Gated)
+### Cloudflare Pages Deploy (Gated -- Ready to Enable)
 
-A Cloudflare Pages deployment step is included but gated:
+A Cloudflare Pages deployment step is included and ready to enable. The only blockers are configuring two GitHub secrets: `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`.
 
 ```yaml
 - name: Deploy to Cloudflare Pages
@@ -144,7 +144,13 @@ A Cloudflare Pages deployment step is included but gated:
     command: pages deploy dist/ --project-name=dreamlab-ai --commit-dirty=true
 ```
 
-This step is currently inactive. Set `CLOUDFLARE_PAGES_ENABLED=true` in repository variables to enable dual deployment.
+To enable:
+
+1. Create `CLOUDFLARE_API_TOKEN` secret in GitHub repository settings (Cloudflare API token with Pages permissions)
+2. Create `CLOUDFLARE_ACCOUNT_ID` secret in GitHub repository settings
+3. Set repository variable `CLOUDFLARE_PAGES_ENABLED=true`
+
+Once enabled, every push to `main` will deploy to both GitHub Pages and Cloudflare Pages simultaneously.
 
 ---
 
@@ -214,20 +220,20 @@ GitHub Pages provides managed TLS certificates for custom domains. HTTPS is enfo
 |--------|---------|
 | `VITE_SUPABASE_URL` | Supabase project URL (written to `.env` during build) |
 | `VITE_SUPABASE_ANON_KEY` | Supabase anonymous key (written to `.env` during build) |
-| `VITE_AUTH_API_URL` | Auth API Cloud Run URL (passed to forum build) |
+| `VITE_AUTH_API_URL` | Auth API URL -- currently Cloud Run, will point to Cloudflare Worker after migration |
 | `GITHUB_TOKEN` | Auto-provided by Actions (for gh-pages push) |
 
 ## Required Variables
 
 | Variable | Purpose |
 |----------|---------|
-| `FAIRFIELD_RELAY_URL` | Nostr relay endpoint (forum build) |
-| `FAIRFIELD_EMBEDDING_API_URL` | Embedding service (forum build) |
+| `FAIRFIELD_RELAY_URL` | Nostr relay endpoint (forum build) -- retained on Cloud Run |
+| `FAIRFIELD_EMBEDDING_API_URL` | Embedding service (forum build) -- retained on Cloud Run |
 | `FAIRFIELD_LINK_PREVIEW_API_URL` | Link preview service (forum build) |
-| `FAIRFIELD_IMAGE_API_URL` | Image service (forum build) |
-| `FAIRFIELD_IMAGE_BUCKET` | GCS bucket name (forum build) |
+| `FAIRFIELD_IMAGE_API_URL` | Image service (forum build) -- will point to Cloudflare Worker after migration |
+| `FAIRFIELD_IMAGE_BUCKET` | GCS bucket name (forum build) -- will become R2 bucket after migration |
 | `FAIRFIELD_ADMIN_PUBKEY` | Admin Nostr pubkey (forum build) |
-| `CLOUDFLARE_PAGES_ENABLED` | Set to `true` to enable Cloudflare Pages deploy |
+| `CLOUDFLARE_PAGES_ENABLED` | Set to `true` to enable Cloudflare Pages deploy (ready to enable) |
 
 ---
 
@@ -273,4 +279,4 @@ git push origin gh-pages
 
 ---
 
-*Last major revision: 2026-02-28.*
+*Last major revision: 2026-03-01.*

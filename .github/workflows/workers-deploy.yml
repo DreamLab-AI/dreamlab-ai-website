@@ -1,0 +1,94 @@
+name: Deploy Cloudflare Workers
+
+# Deploys all 3 Workers using per-worker wrangler.toml configs.
+# Triggers on pushes to main that touch workers/ or wrangler configs,
+# or manually via workflow_dispatch.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'workers/**'
+      - 'wrangler.toml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  deploy:
+    name: Deploy Workers
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Deploy auth-api
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy -c workers/auth-api/wrangler.toml
+
+      - name: Deploy pod-api
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy -c workers/pod-api/wrangler.toml
+
+      - name: Deploy search-api
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy -c workers/search-api/wrangler.toml
+
+      - name: Health checks
+        run: |
+          echo "Waiting 10s for Workers to propagate..."
+          sleep 10
+
+          for worker in dreamlab-auth-api dreamlab-pod-api dreamlab-search-api; do
+            URL="https://${worker}.solitary-paper-764d.workers.dev/health"
+            if [ "$worker" = "dreamlab-search-api" ]; then
+              URL="https://${worker}.solitary-paper-764d.workers.dev/status"
+            fi
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 "$URL" || true)
+            echo "${worker}: HTTP ${STATUS}"
+            if [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 500 ]; then
+              echo "  PASS"
+            else
+              echo "::warning::${worker} health check returned HTTP ${STATUS}"
+            fi
+          done
+
+      - name: Deployment summary
+        run: |
+          cat >> $GITHUB_STEP_SUMMARY <<'EOF'
+          ## Cloudflare Workers Deployment
+
+          | Worker | URL |
+          |--------|-----|
+          | auth-api | `dreamlab-auth-api.solitary-paper-764d.workers.dev` |
+          | pod-api | `dreamlab-pod-api.solitary-paper-764d.workers.dev` |
+          | search-api | `dreamlab-search-api.solitary-paper-764d.workers.dev` |
+
+          - **Branch**: `${{ github.ref_name }}`
+          - **Commit**: `${{ github.sha }}`
+          - **Actor**: @${{ github.actor }}
+          EOF

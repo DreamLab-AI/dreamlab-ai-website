@@ -1,8 +1,8 @@
 # DreamLab AI Documentation
 
-**Last updated:** 2026-02-28 | **Version:** 2.0.0 | **Repository:** [DreamLab-AI/dreamlab-ai-website](https://github.com/DreamLab-AI/dreamlab-ai-website)
+**Last updated:** 2026-03-01 | **Version:** 2.0.0 | **Repository:** [DreamLab-AI/dreamlab-ai-website](https://github.com/DreamLab-AI/dreamlab-ai-website)
 
-DreamLab AI is a premium AI training and consulting platform at [dreamlab-ai.com](https://dreamlab-ai.com) (also [thedreamlab.uk](https://thedreamlab.uk)). The platform comprises a React single-page application with 3D visualisations, a SvelteKit community forum with passkey authentication, and backend services on GCP Cloud Run (with a planned migration to Cloudflare Workers).
+DreamLab AI is a premium AI training and consulting platform at [dreamlab-ai.com](https://dreamlab-ai.com) (also [thedreamlab.uk](https://thedreamlab.uk)). The platform comprises a React single-page application with 3D visualisations, a SvelteKit community forum with passkey authentication, and backend services on GCP Cloud Run (migration to Cloudflare Workers in progress -- auth-api and pod-api Workers are code complete, deployment pending).
 
 ---
 
@@ -57,7 +57,7 @@ DreamLab AI is a premium AI training and consulting platform at [dreamlab-ai.com
 - [Architecture Decision Records](adr/README.md) -- 10 ADRs covering all major decisions
 - [Domain model](ddd/01-domain-model.md) -- Domain-Driven Design documentation
 - [Feature status matrix](features/STATUS_MATRIX.md) -- what is running, planned, or broken
-- [Cloudflare migration PRD](prd-cloudflare-workers-migration.md) -- return to Cloudflare platform
+- [Cloudflare migration PRD](prd-cloudflare-workers-migration.md) -- return to Cloudflare platform (in progress)
 
 ---
 
@@ -77,7 +77,7 @@ DreamLab AI is a premium AI training and consulting platform at [dreamlab-ai.com
 | Image API | Deployed on GCP Cloud Run |
 | Link preview API | Deployed on GCP Cloud Run |
 | NIP-98 shared module | Built (consolidated from 4 implementations) |
-| Cloudflare Workers (auth-api, pod-api) | Code only -- not yet deployed |
+| Cloudflare Workers (auth-api, pod-api) | Code complete, deployment pending |
 
 For the full breakdown, see [features/STATUS_MATRIX.md](features/STATUS_MATRIX.md).
 
@@ -188,5 +188,5 @@ npm run preview
 
 ---
 
-**Last updated:** 2026-02-28
+**Last updated:** 2026-03-01
 **Maintained by:** DreamLab AI Engineering

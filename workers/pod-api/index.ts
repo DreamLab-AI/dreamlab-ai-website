@@ -106,15 +106,13 @@ export default {
         return new Response(object.body, { headers });
       }
 
-      case 'PUT': {
-        const contentType = request.headers.get('Content-Type') || 'application/octet-stream';
-        await env.PODS.put(r2Key, request.body, {
-          httpMetadata: { contentType },
-        });
-        return Response.json({ status: 'ok', key: r2Key }, { status: 201, headers: corsHeaders });
-      }
-
+      case 'PUT':
       case 'POST': {
+        const contentLength = parseInt(request.headers.get('Content-Length') || '0', 10);
+        const MAX_BODY_SIZE = 50 * 1024 * 1024; // 50MB
+        if (contentLength > MAX_BODY_SIZE) {
+          return Response.json({ error: `Body exceeds ${MAX_BODY_SIZE} byte limit` }, { status: 413, headers: corsHeaders });
+        }
         const contentType = request.headers.get('Content-Type') || 'application/octet-stream';
         await env.PODS.put(r2Key, request.body, {
           httpMetadata: { contentType },

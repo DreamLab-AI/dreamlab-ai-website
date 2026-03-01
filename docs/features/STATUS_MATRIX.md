@@ -1,6 +1,6 @@
 # DreamLab AI -- Feature Status Matrix
 
-**Last updated:** 2026-02-28
+**Last updated:** 2026-03-01
 
 This document tracks the status of every major feature and service in the DreamLab AI platform. It is the single source of truth for what is running, what is deployed but needs attention, what exists only as code, and what is broken.
 
@@ -54,21 +54,34 @@ This document tracks the status of every major feature and service in the DreamL
 | Secret Manager | **Running** | Stores DATABASE_URL, RELAY_URL, RP_ID, EXPECTED_ORIGIN, JSS_BASE_URL. |
 | IAM service accounts | **Configured** | Per-service accounts for Cloud Run. |
 
-## Backend Services -- Cloudflare Workers (Planned)
+## Backend Services -- Cloudflare Workers (Deployed)
 
-| Service | Status | Location | Replaces | Detail |
-|---------|--------|----------|----------|--------|
-| auth-api Worker | **Code only** | `workers/auth-api/index.ts` | Cloud Run auth-api | WebAuthn + NIP-98 on D1 + KV. Not yet deployed. Per ADR-010. |
-| pod-api Worker | **Code only** | `workers/pod-api/index.ts` | Cloud Run JSS | Pod storage on R2 + KV with custom JSON-LD ACL evaluator (`workers/pod-api/acl.ts`). Not yet deployed. Per ADR-010. |
+| Service | Status | URL | Replaces | Detail |
+|---------|--------|-----|----------|--------|
+| auth-api Worker | **Deployed** | `dreamlab-auth-api.solitary-paper-764d.workers.dev` | Cloud Run auth-api | WebAuthn + NIP-98 on D1 + KV. D1 tables migrated. Per ADR-010. |
+| pod-api Worker | **Deployed** | `dreamlab-pod-api.solitary-paper-764d.workers.dev` | Cloud Run JSS | Pod storage on R2 + KV with JSON-LD ACL evaluator. Fixes ephemeral pod storage. Per ADR-010. |
+| search-api Worker | **Deployed** | `dreamlab-search-api.solitary-paper-764d.workers.dev` | -- | WASM-powered vector search (42KB rvf-wasm, 384-dim cosine, 490K vec/sec ingest, 0.47ms p50 query). R2 + KV. |
 | image-api Worker | **Planned** | -- | Cloud Run image-api | Image storage on R2 with Workers transforms. No code written. |
 | link-preview-api Worker | **Planned** | -- | Cloud Run link-preview-api | Stateless HTTP fetch + parse. No code written. |
+
+### Cloudflare Resources (Provisioned 2026-03-01)
+
+| Resource | Type | ID |
+|----------|------|-----|
+| dreamlab-auth | D1 Database | `e3981999-e8f0-4c07-9e4b-2e50859b8524` |
+| SESSIONS | KV Namespace | `901345296c2848788066686aa67d5909` |
+| POD_META | KV Namespace | `8ec8759ab40d4709a831bf6b0e5241eb` |
+| CONFIG | KV Namespace | `cbb857ac37424993a3aeafbabe9b808e` |
+| SEARCH_CONFIG | KV Namespace | `440b1f07ff224fb8ad644e094c6766c0` |
+| dreamlab-pods | R2 Bucket | Standard storage |
+| dreamlab-vectors | R2 Bucket | Standard storage |
 
 ## Shared Modules
 
 | Module | Status | Location | Detail |
 |--------|--------|----------|--------|
 | NIP-98 shared package | **Built** | `community-forum/packages/nip98/` | Consolidated sign.ts, verify.ts, types.ts. Replaces 4 independent NIP-98 implementations (~330 lines removable). Uses `nostr-tools/nip98` (v2.19.3). |
-| NIP-98 Workers shared | **Code only** | `workers/shared/nip98.ts` | NIP-98 utilities for Cloudflare Workers runtime. |
+| NIP-98 Workers shared | **Code complete** | `workers/shared/nip98.ts` | NIP-98 utilities for Cloudflare Workers runtime. |
 | WASM Voronoi | **Built** | `wasm-voronoi/` | Rust WASM module for Voronoi tessellation. Compiled and used by VoronoiGoldenHero component. |
 
 ## Authentication
@@ -111,9 +124,10 @@ This document tracks the status of every major feature and service in the DreamL
 | `deploy.yml` | Push to main | GitHub Pages | **Running** |
 | `auth-api.yml` | Push to main (services/auth-api/) | Cloud Run: auth-api | **Running** |
 | `jss.yml` | Push to main (services/jss/) | Cloud Run: JSS | **Running** |
-| `fairfield-relay.yml` | Push to main | Cloud Run: nostr-relay | **Running** |
-| `fairfield-embedding-api.yml` | Push to main | Cloud Run: embedding-api | **Running** |
-| `fairfield-image-api.yml` | Push to main | Cloud Run: image-api | **Running** |
+| `relay.yml` | Push to main | Cloud Run: nostr-relay (retained) | **Running** |
+| `embedding-api.yml` | Push to main | Cloud Run: embedding-api (retained) | **Running** |
+| `image-api.yml` | Push to main | Cloud Run: image-api (migration target) | **Running** |
+| `workers-deploy.yml` | Push to main (workers/) | Cloudflare Workers: auth-api, pod-api, search-api | **Running** |
 
 ---
 
@@ -121,14 +135,15 @@ This document tracks the status of every major feature and service in the DreamL
 
 | Issue | Severity | Service | Detail |
 |-------|----------|---------|--------|
-| Ephemeral pod storage | Critical | JSS (Cloud Run) | Pod data at `/data/pods` lost on container restart or scale-down. No persistent volume. R2-backed pod-api Worker (ADR-010) is the planned fix. |
+| Ephemeral pod storage | Critical | JSS (Cloud Run) | Pod data at `/data/pods` lost on container restart or scale-down. **Fix deployed**: R2-backed pod-api Worker live at `dreamlab-pod-api.solitary-paper-764d.workers.dev`. Cutover pending DNS. |
 | World-writable root ACL | Critical | JSS (Cloud Run) | Root `.acl` grants Read/Write/Append/Control to `foaf:Agent`. All pods publicly writable. |
 | CSS password not persisted | Medium | JSS (Cloud Run) | Per-pod CSS password generated randomly at provisioning, never stored. Cannot re-authenticate to CSS. |
 | CSS auth mismatch | High | JSS (Cloud Run) | CSS uses Solid-OIDC (DPoP/Bearer). Forum uses NIP-98. CSS does not understand NIP-98 tokens. |
 | Pod frontend unused | Medium | Forum | `podUrl` and `webId` returned to client after registration but never used in UI for data I/O. |
 | Cold start latency | Medium | All Cloud Run | 1-10 seconds cold start on scale-to-zero services. Workers target: sub-5ms. |
 | RuVector offline | Medium | Infrastructure | Container not running. No vector search or cross-session memory. |
-| NIP-98 code duplication | Low | 4 services | ~680 lines across 4 implementations. Consolidated module built but not yet integrated into all services. |
+| NIP-98 code duplication | Low | 4 services | ~680 lines across 4 implementations. Consolidated module built. Workers use shared `workers/shared/nip98.ts`. Cloud Run services still use independent copies. |
+| Custom domain DNS | Medium | All Workers | 3 Workers deployed to `*.workers.dev`. Custom domain routes (`api.`, `pods.`, `search.dreamlab-ai.com`) require zone DNS setup. |
 
 ---
 
@@ -136,7 +151,7 @@ This document tracks the status of every major feature and service in the DreamL
 
 | Phase | Services | Target Platform | Status |
 |-------|----------|----------------|--------|
-| Phase 1 | auth-api, pod-api (replaces JSS) | Cloudflare Workers + D1 + KV + R2 | Code only |
+| Phase 1 | auth-api, pod-api, search-api | Cloudflare Workers + D1 + KV + R2 | **Deployed** to workers.dev (custom domain DNS pending) |
 | Phase 2 | image-api, link-preview-api | Cloudflare Workers + R2 | Planned |
 | Phase 3 | Static site (SPA + forum) | Cloudflare Pages | Planned |
 | Retained | nostr-relay, embedding-api | GCP Cloud Run | No change |
@@ -158,4 +173,4 @@ All technology choices are documented in ADRs. The most relevant to current feat
 
 ---
 
-**Last updated:** 2026-02-28
+**Last updated:** 2026-03-01

@@ -80,13 +80,16 @@ export default {
         if (!result) return jsonResponse({ error: 'Invalid NIP-98 token' }, 401);
 
         // Route authenticated requests
-        if (path === '/api/profile') {
+        if (path === '/api/profile' && request.method === 'GET') {
           return await handleProfile(result.pubkey, env);
         }
       }
 
       return jsonResponse({ error: 'Not found' }, 404);
     } catch (err) {
+      if (err instanceof SyntaxError) {
+        return jsonResponse({ error: 'Invalid JSON body' }, 400);
+      }
       console.error('Worker error:', err);
       return jsonResponse({ error: 'Internal server error' }, 500);
     }
@@ -101,12 +104,14 @@ async function handleRegisterOptions(request: Request, env: Env): Promise<Respon
 
   // Generate challenge
   const challenge = crypto.getRandomValues(new Uint8Array(32));
-  const challengeB64 = btoa(String.fromCharCode(...challenge));
+  const challengeB64 = btoa(String.fromCharCode.apply(null, Array.from(challenge)));
 
-  // Store challenge in D1 with TTL handling
-  await env.DB.prepare(
-    'INSERT INTO challenges (pubkey, challenge, created_at) VALUES (?, ?, ?)'
-  ).bind(body.pubkey, challengeB64, Date.now()).run();
+  // Clean expired challenges (>5 min old) and store new one
+  const fiveMinAgo = Date.now() - 5 * 60 * 1000;
+  await env.DB.batch([
+    env.DB.prepare('DELETE FROM challenges WHERE created_at < ?').bind(fiveMinAgo),
+    env.DB.prepare('INSERT INTO challenges (pubkey, challenge, created_at) VALUES (?, ?, ?)').bind(body.pubkey, challengeB64, Date.now()),
+  ]);
 
   return jsonResponse({
     rp: { name: env.RP_NAME, id: env.RP_ID },
@@ -143,16 +148,25 @@ async function handleRegisterVerify(request: Request, env: Env): Promise<Respons
     return jsonResponse({ error: 'No pending challenge' }, 400);
   }
 
+  // Validate required fields
+  const credentialId = typeof body.credentialId === 'string' ? body.credentialId : null;
+  const publicKey = typeof body.publicKey === 'string' ? body.publicKey : null;
+  if (!credentialId || !publicKey) {
+    return jsonResponse({ error: 'Missing credentialId or publicKey' }, 400);
+  }
+
+  const prfSalt = typeof body.prfSalt === 'string' ? body.prfSalt : null;
+
   // Store credential
   await env.DB.prepare(
     `INSERT INTO webauthn_credentials (pubkey, credential_id, public_key, counter, prf_salt, created_at)
      VALUES (?, ?, ?, ?, ?, ?)`
   ).bind(
     pubkey,
-    body.credentialId as string,
-    body.publicKey as string,
+    credentialId,
+    publicKey,
     0,
-    body.prfSalt as string ?? null,
+    prfSalt,
     Date.now(),
   ).run();
 
@@ -174,7 +188,7 @@ async function handleLoginOptions(request: Request, env: Env): Promise<Response>
 
   // Generate challenge
   const challenge = crypto.getRandomValues(new Uint8Array(32));
-  const challengeB64 = btoa(String.fromCharCode(...challenge));
+  const challengeB64 = btoa(String.fromCharCode.apply(null, Array.from(challenge)));
 
   const pubkey = body.pubkey;
   let prfSalt: string | null = null;
@@ -184,11 +198,15 @@ async function handleLoginOptions(request: Request, env: Env): Promise<Response>
       'SELECT prf_salt FROM webauthn_credentials WHERE pubkey = ? LIMIT 1'
     ).bind(pubkey).first();
     prfSalt = cred?.prf_salt as string | null;
-
-    await env.DB.prepare(
-      'INSERT INTO challenges (pubkey, challenge, created_at) VALUES (?, ?, ?)'
-    ).bind(pubkey, challengeB64, Date.now()).run();
   }
+
+  // Always store challenge (supports discoverable credential flows without pubkey)
+  const challengePubkey = pubkey || '__discoverable__';
+  const fiveMinAgo = Date.now() - 5 * 60 * 1000;
+  await env.DB.batch([
+    env.DB.prepare('DELETE FROM challenges WHERE created_at < ?').bind(fiveMinAgo),
+    env.DB.prepare('INSERT INTO challenges (pubkey, challenge, created_at) VALUES (?, ?, ?)').bind(challengePubkey, challengeB64, Date.now()),
+  ]);
 
   return jsonResponse({
     challenge: challengeB64,

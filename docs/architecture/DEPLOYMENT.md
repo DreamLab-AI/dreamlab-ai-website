@@ -1,12 +1,12 @@
 # Deployment Architecture -- DreamLab AI
 
-**Last Updated**: 2026-02-28
+**Last Updated**: 2026-03-01
 **CI/CD Platform**: GitHub Actions
-**Hosting**: GitHub Pages + GCP Cloud Run + Cloudflare Pages (opt-in) + Cloudflare Workers (planned)
+**Hosting**: GitHub Pages + GCP Cloud Run + Cloudflare Pages (opt-in) + Cloudflare Workers (code complete)
 
 ## Overview
 
-DreamLab AI uses a fully automated CI/CD pipeline with 9 GitHub Actions workflows deploying to multiple targets: GitHub Pages (static site), GCP Cloud Run (6 backend services), and optionally Cloudflare Pages (frontend) with planned Cloudflare Workers (backend).
+DreamLab AI uses a fully automated CI/CD pipeline with 10 GitHub Actions workflows deploying to multiple targets: GitHub Pages (static site), GCP Cloud Run (6 backend services), optionally Cloudflare Pages (frontend), and Cloudflare Workers (3 Workers with code complete, deployment pending account setup).
 
 ---
 
@@ -49,9 +49,10 @@ graph TB
             LinkSvc["link-preview-api"]
         end
 
-        subgraph CF["Cloudflare Workers (planned)"]
+        subgraph CF["Cloudflare Workers (code complete)"]
             CFAuth["auth-api Worker"]
             CFPod["pod-api Worker"]
+            CFSearch["search-api Worker"]
         end
     end
 
@@ -270,7 +271,7 @@ flowchart TB
 
 ---
 
-## 7. Planned Cloudflare Workers Deployment
+## 7. Cloudflare Workers Deployment (Code Complete)
 
 ### Wrangler Configuration (`wrangler.toml`)
 
@@ -327,14 +328,16 @@ npx wrangler kv namespace create CONFIG
 npx wrangler r2 bucket create dreamlab-pods
 ```
 
-### Planned Workflow
+### Deployment Workflow (`workers-deploy.yml`)
 
-A `workers-deploy.yml` workflow will automate Workers deployment:
+The `workers-deploy.yml` workflow automates Workers deployment:
 1. Run TypeScript type checking
 2. Run tests (if any)
 3. `wrangler deploy --env production`
 4. Run D1 migrations
 5. Verify health endpoints
+
+**Status**: Workflow file exists. Deployment is pending Cloudflare account setup (API token, resource creation).
 
 ---
 
@@ -352,6 +355,7 @@ A `workers-deploy.yml` workflow will automate Workers deployment:
 | **image-api** | `fairfield-image-api.yml` | Changes in `services/image-api/` | Cloud Run | ~3 min |
 | **docs-update** | `docs-update.yml` | Various | Documentation | ~1 min |
 | **embeddings** | `generate-embeddings.yml` | Various | Embedding generation | ~5 min |
+| **workers** | `workers-deploy.yml` | Push to `main` (workers changes) or manual | Cloudflare Workers (auth-api, pod-api, search-api) | ~2 min |
 | **visionflow** | `visionflow-bridge.yml` | Various | Bridge service | ~2 min |
 
 ### Workflow Dependency Graph
@@ -409,8 +413,9 @@ flowchart LR
 | Record | Value | Purpose |
 |--------|-------|---------|
 | `dreamlab-ai.com` | CNAME to GitHub Pages | Main site |
-| `api.dreamlab-ai.com` | Cloudflare Workers route (planned) | Auth API |
-| `pods.dreamlab-ai.com` | Cloudflare Workers route (planned) | Pod API |
+| `api.dreamlab-ai.com` | Cloudflare Workers route (code complete, DNS pending) | Auth API |
+| `pods.dreamlab-ai.com` | Cloudflare Workers route (code complete, DNS pending) | Pod API |
+| `search.dreamlab-ai.com` | Cloudflare Workers route (code complete, DNS pending) | Search API (WASM vector search) |
 | `relay.dreamlab-ai.com` | Cloud Run service URL | Nostr relay |
 
 ---
@@ -559,4 +564,4 @@ npm run build
 
 **Document Owner**: DevOps Team
 **Review Cycle**: Quarterly
-**Last Review**: 2026-02-28
+**Last Review**: 2026-03-01

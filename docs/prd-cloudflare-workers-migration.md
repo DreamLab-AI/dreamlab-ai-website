@@ -1,8 +1,8 @@
 # PRD: Return to Cloudflare Platform + Consolidated NIP-98 + Per-User Solid Storage
 
-**Status:** Draft v3
+**Status:** Draft v4 -- Implementation In Progress
 **Author:** Claude Code (research synthesis from 7 parallel research agents)
-**Date:** 2026-02-28
+**Date:** 2026-03-01
 **Stakeholders:** DreamLab AI Engineering
 
 ---
@@ -92,6 +92,11 @@ The `ruvector-postgres` container expected on the `docker_ragflow` network does 
                     │         │    ├─ R2 (pod files)       │
                     │         │    ├─ KV (ACLs, metadata)  │
                     │         │    └─ WAC enforcement      │
+                    │         │                            │
+                    │         ├── search-api (WASM search) │
+                    │         │    ├─ R2 (vectors, .rvf)   │
+                    │         │    ├─ KV (SEARCH_CONFIG)   │
+                    │         │    └─ rvf-wasm (42KB WASM) │
                     │         │                            │
                     │         ├── image-api                │
                     │         │    └─ R2 (uploads)         │
@@ -231,6 +236,7 @@ export async function verifyNip98(authHeader: string, opts: VerifyOptions): Prom
 |---|---|---|---|
 | **auth-api** | **Yes → Workers** | D1 + KV | WebAuthn + NIP-98 proven on Workers (paa.pub). PostgreSQL schema maps cleanly to D1 (SQLite). |
 | **jss → pod-api** | **Yes → Workers** | R2 + KV | Replace CSS 7.x with custom Workers-native pod storage. paa.pub proves the pattern. No UI needed — DreamLab has its own frontend. |
+| **search-api** | **Yes → Workers** | R2 + KV + WASM | WASM-powered vector similarity search. 42KB rvf-wasm microkernel. 490K vec/sec ingest, 0.47ms query. **Code complete.** |
 | **image-api** | **Yes → Workers** | R2 | Image storage on R2. Transforms via Workers paid tier (30s CPU). |
 | **link-preview-api** | **Yes → Workers** | (stateless) | Lightweight HTTP fetch + parse. Natural Workers fit. |
 | **nostr-relay** | **No → Keep Cloud Run** | Cloud SQL | Persistent WebSockets. Durable Objects possible but adds complexity. Evaluate separately. |
@@ -459,27 +465,27 @@ For production vector search requirements (e.g., embedding-api), the existing GC
 ### Phase 0: Immediate Fixes (Week 1)
 - [ ] Fix JSS ephemeral storage: mount GCS FUSE volume on Cloud Run JSS service
 - [ ] Fix JSS ACL: replace permissive root `.acl` with owner-restricted ACL in Dockerfile
-- [ ] Add `nostr-tools` to `services/auth-api/package.json`
+- [x] Add `nostr-tools` to `services/auth-api/package.json`
 - [ ] Restore `ruvector-postgres` container on `docker_ragflow` network (or create DB in `vircadia_world_postgres`)
 
 ### Phase 1: NIP-98 Consolidation (Weeks 1-2)
-- [ ] Create `community-forum/packages/nip98/` shared module
-- [ ] Refactor `nip98-client.ts` → use `packages/nip98/sign.ts` + `getToken()`
-- [ ] Refactor auth-api `nip98.ts` → use `packages/nip98/verify.ts` + RP_ORIGIN wrapper
-- [ ] Refactor relay `nip98.ts` → use shared verify + retain `Basic nostr:`/URL prefix matching
-- [ ] Refactor image-api `verifyNip98Auth()` → use shared verify + retain multipart handling
+- [x] Create `community-forum/packages/nip98/` shared module
+- [x] Refactor `nip98-client.ts` → use `packages/nip98/sign.ts` + `getToken()`
+- [x] Refactor auth-api `nip98.ts` → use `packages/nip98/verify.ts` + RP_ORIGIN wrapper
+- [x] Refactor relay `nip98.ts` → use shared verify + retain `Basic nostr:`/URL prefix matching
+- [x] Refactor image-api `verifyNip98Auth()` → use shared verify + retain multipart handling
 - [ ] Update tests (`nostr-relay/tests/unit/nip98.test.ts`)
 - [ ] E2E test: passkey register → login → NIP-98 protected endpoints
 
 ### Phase 2: Cloudflare Infrastructure Setup (Weeks 2-3)
 - [ ] Reactivate or create Cloudflare account (check if Nosflare-era account accessible)
-- [ ] Create Wrangler project (`wrangler.toml`)
-- [ ] Create D1 database: migrate `webauthn_credentials` + `challenges` schema
-- [ ] Create KV namespaces: `SESSIONS`, `POD_META`, `CONFIG`
-- [ ] Create R2 bucket: `dreamlab-pods`
+- [x] Create Wrangler project (`wrangler.toml`) -- complete with all bindings for auth-api, pod-api, search-api
+- [ ] Create D1 database: migrate `webauthn_credentials` + `challenges` schema (needs `wrangler d1 create`)
+- [ ] Create KV namespaces: `SESSIONS`, `POD_META`, `CONFIG`, `SEARCH_CONFIG` (needs `wrangler kv namespace create`)
+- [ ] Create R2 buckets: `dreamlab-pods`, `dreamlab-vectors` (needs `wrangler r2 bucket create`)
 - [ ] Set up Cloudflare Pages project for the SPA
-- [ ] Configure custom domains (`api.dreamlab-ai.com`, `pods.dreamlab-ai.com`)
-- [ ] Set up GitHub Actions with `cloudflare/wrangler-action@v3`
+- [ ] Configure custom domains (`api.dreamlab-ai.com`, `pods.dreamlab-ai.com`, `search.dreamlab-ai.com`)
+- [x] Set up GitHub Actions with `cloudflare/wrangler-action@v3` (`workers-deploy.yml` exists)
 
 ### Phase 3: Frontend to Cloudflare Pages (Week 3)
 - [ ] Add `_redirects` file for SPA routing (`/* /index.html 200`)
@@ -489,13 +495,13 @@ For production vector search requirements (e.g., embedding-api), the existing GC
 - [ ] Cut over DNS from GitHub Pages to Cloudflare Pages
 
 ### Phase 4: auth-api to Workers (Weeks 3-5)
-- [ ] Port Express routes to Workers fetch handler
-- [ ] Migrate PostgreSQL → D1 (`webauthn_credentials`, `challenges` tables)
-- [ ] Replace Express sessions with KV-backed sessions (paa.pub pattern)
-- [ ] Port WebAuthn registration/authentication (Web Crypto API compatible)
-- [ ] Port NIP-98 verification (use consolidated `packages/nip98`)
-- [ ] Replace JSS pod provisioning with direct R2 + KV writes
-- [ ] Deploy to Workers staging domain, test
+- [x] Port Express routes to Workers fetch handler (`workers/auth-api/index.ts`)
+- [x] Migrate PostgreSQL → D1 (`webauthn_credentials`, `challenges` tables) -- code written, D1 database needs creation
+- [x] Replace Express sessions with KV-backed sessions (paa.pub pattern)
+- [x] Port WebAuthn registration/authentication (Web Crypto API compatible)
+- [x] Port NIP-98 verification (use consolidated `packages/nip98` + `workers/shared/nip98.ts`)
+- [x] Replace JSS pod provisioning with direct R2 + KV writes
+- [ ] Deploy to Workers staging domain, test (pending Cloudflare account setup)
 - [ ] Cut over, decommission Cloud Run auth-api + JSS
 
 ### Phase 5: Pod Storage on Workers + R2 (Weeks 5-7)

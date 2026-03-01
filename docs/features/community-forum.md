@@ -4,7 +4,7 @@ description: "SvelteKit community forum with Nostr protocol, passkey authenticat
 category: reference
 tags: ['forum', 'sveltekit', 'nostr', 'community', 'developer']
 difficulty: intermediate
-last-updated: 2026-02-28
+last-updated: 2026-03-01
 ---
 
 # Community Forum
@@ -131,16 +131,16 @@ cd community-forum && npx playwright test
 
 ## Backend Services
 
-The forum depends on six Cloud Run services (with four planned to migrate to Cloudflare Workers per ADR-010):
+The forum depends on six Cloud Run services. Migration to Cloudflare Workers is in progress per ADR-010 (auth-api and pod-api Workers are code complete, deployment pending):
 
 | Service | Purpose | Storage | Migration Target |
 |---------|---------|---------|-----------------|
-| **auth-api** | WebAuthn registration/authentication, NIP-98 gating, pod provisioning | PostgreSQL | Cloudflare Workers + D1 |
-| **jss** | Solid pod storage (WebID, per-user files, ACLs) | Filesystem | Cloudflare Workers + R2 (pod-api) |
-| **nostr-relay** | Nostr event relay (NIP-01/28/98) | PostgreSQL | Remains on Cloud Run |
-| **embedding-api** | Vector embeddings for semantic search | -- | Remains on Cloud Run |
-| **image-api** | Image upload, resizing, serving | Filesystem | Cloudflare Workers + R2 |
-| **link-preview-api** | URL metadata extraction | -- | Cloudflare Workers |
+| **auth-api** | WebAuthn registration/authentication, NIP-98 gating, pod provisioning | PostgreSQL | Cloudflare Workers + D1 (code complete) |
+| **jss** | Solid pod storage (WebID, per-user files, ACLs) | Filesystem | Cloudflare Workers + R2 pod-api (code complete) |
+| **nostr-relay** | Nostr event relay (NIP-01/28/98) | PostgreSQL | Retained on Cloud Run |
+| **embedding-api** | Vector embeddings for semantic search | -- | Retained on Cloud Run |
+| **image-api** | Image upload, resizing, serving | Filesystem | Cloudflare Workers + R2 (planned) |
+| **link-preview-api** | URL metadata extraction | -- | Cloudflare Workers (planned) |
 
 ## Zone and Cohort Access Control
 

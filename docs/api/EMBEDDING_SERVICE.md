@@ -1,8 +1,10 @@
 # Embedding Service API
 
-**Last Updated:** 2026-02-28
+**Last Updated:** 2026-03-01
 
 The embedding service provides vector embeddings for semantic search capabilities in the DreamLab AI community forum. Embeddings are pre-computed and stored in Google Cloud Storage, then synced to client devices for local similarity search.
+
+> **Migration note:** This service is retained on GCP Cloud Run per ADR-010 (ML inference requires CPU/memory beyond Cloudflare Workers limits). Client-side WASM search via `rvf-wasm` (`community-forum/packages/rvf-wasm/`) provides a complementary local TF-IDF search capability that does not depend on this service.
 
 ---
 
@@ -208,7 +210,7 @@ Users can set sync preference:
 
 | Attribute | Value |
 |-----------|-------|
-| **Workflow** | `.github/workflows/fairfield-embedding-api.yml` |
+| **Workflow** | `.github/workflows/embedding-api.yml` |
 | **Source** | `community-forum/services/embedding-api/` |
 | **Runtime** | Python 3.11, FastAPI |
 | **Memory** | 2Gi (ML model ~2GB) |
@@ -224,4 +226,4 @@ Users can set sync preference:
 
 ---
 
-*Last major revision: 2026-02-28.*
+*Last major revision: 2026-03-01.*

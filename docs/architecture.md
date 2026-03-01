@@ -1,6 +1,6 @@
 # DreamLab AI -- Architecture Overview
 
-**Last updated:** 2026-02-28
+**Last updated:** 2026-03-01
 
 This document describes the high-level architecture of the DreamLab AI platform. For detailed SPARC methodology documents, see the `architecture/` directory. For individual technology decisions, see the [ADR index](adr/README.md).
 
@@ -8,7 +8,7 @@ This document describes the high-level architecture of the DreamLab AI platform.
 
 ## System Context
 
-DreamLab AI consists of three deployment targets: a static frontend on GitHub Pages (migrating to Cloudflare Pages), backend services on GCP Cloud Run, and planned Cloudflare Workers services.
+DreamLab AI consists of three deployment targets: a static frontend on GitHub Pages (migrating to Cloudflare Pages), backend services on GCP Cloud Run (migration to Cloudflare Workers in progress), and Cloudflare Workers services (code complete, deployment pending).
 
 ```mermaid
 graph TB
@@ -30,7 +30,7 @@ graph TB
         LinkPreviewAPI["link-preview-api<br/>URL Metadata"]
     end
 
-    subgraph CloudflareWorkers["Cloudflare Workers (planned)"]
+    subgraph CloudflareWorkers["Cloudflare Workers (code complete, deployment pending)"]
         CFAuth["auth-api Worker<br/>D1 + KV"]
         CFPod["pod-api Worker<br/>R2 + KV"]
     end
@@ -58,7 +58,7 @@ graph TB
     style CFPod stroke-dasharray: 5 5
 ```
 
-*Dashed boxes indicate planned Cloudflare Workers services not yet deployed.*
+*Dashed boxes indicate Cloudflare Workers services that are code complete but not yet deployed.*
 
 ---
 
@@ -128,9 +128,9 @@ Six services deployed on Cloud Run in `us-central1`, project `cumbriadreamlab`.
 | **image-api** | Node.js | Stateless | Image resizing and serving |
 | **link-preview-api** | Node.js | Stateless | URL metadata extraction |
 
-### Cloudflare Workers (Planned -- Code Only)
+### Cloudflare Workers (Code Complete, Deployment Pending)
 
-Two Workers have been written in the `workers/` directory but are not yet deployed. See [ADR-010](adr/010-return-to-cloudflare.md) for the migration decision.
+Two Workers have been written in the `workers/` directory and are code complete but not yet deployed. See [ADR-010](adr/010-return-to-cloudflare.md) for the migration decision.
 
 | Service | Storage | Replaces |
 |---------|---------|----------|
@@ -356,9 +356,9 @@ graph TB
 | `deploy.yml` | Push to main | GitHub Pages (SPA + forum) |
 | `auth-api.yml` | Push to main (services/auth-api/) | Cloud Run: auth-api |
 | `jss.yml` | Push to main (services/jss/) | Cloud Run: JSS |
-| `fairfield-relay.yml` | Push to main | Cloud Run: nostr-relay |
-| `fairfield-embedding-api.yml` | Push to main | Cloud Run: embedding-api |
-| `fairfield-image-api.yml` | Push to main | Cloud Run: image-api |
+| `relay.yml` | Push to main | Cloud Run: nostr-relay |
+| `embedding-api.yml` | Push to main | Cloud Run: embedding-api |
+| `image-api.yml` | Push to main | Cloud Run: image-api |
 
 For first-time GCP bootstrap, see `.github/workflows/SECRETS_SETUP.md`.
 
@@ -400,7 +400,7 @@ community-forum/              # SvelteKit forum (separate package.json)
     image-api/                # Image serving
     link-preview-api/         # URL metadata
 
-workers/                      # Cloudflare Workers (planned)
+workers/                      # Cloudflare Workers (code complete, deployment pending)
   auth-api/                   # WebAuthn Worker (D1 + KV)
   pod-api/                    # Pod storage Worker (R2 + KV)
   shared/                     # Shared NIP-98 utilities
@@ -426,4 +426,4 @@ docs/                         # Project documentation
 
 ---
 
-**Last updated:** 2026-02-28
+**Last updated:** 2026-03-01

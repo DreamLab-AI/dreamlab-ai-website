@@ -1,9 +1,9 @@
-# Cloudflare Workers Migration (Planned)
+# Cloudflare Workers Migration
 
-**Last Updated:** 2026-02-28
-**Status:** Planned. Currently gated by `CLOUDFLARE_PAGES_ENABLED` repository variable.
+**Last Updated:** 2026-03-01
+**Status:** Code Complete -- Deployment Pending Cloudflare Account Setup
 
-This document describes the planned migration from GCP Cloud Run to the Cloudflare platform (Workers, Pages, D1, KV, R2). See [docs/prd-cloudflare-workers-migration.md](../prd-cloudflare-workers-migration.md) for the full PRD.
+This document describes the migration from GCP Cloud Run to the Cloudflare platform (Workers, Pages, D1, KV, R2). See [docs/prd-cloudflare-workers-migration.md](../prd-cloudflare-workers-migration.md) for the full PRD and [ADR-010](../adr/010-return-to-cloudflare.md) for the architectural decision record.
 
 ---
 
@@ -13,7 +13,7 @@ DreamLab previously used Cloudflare Workers + R2 (relay called "Nosflare") befor
 
 ---
 
-## Planned Architecture
+## Architecture
 
 ```
 Cloudflare Edge (300+ PoPs)
@@ -30,13 +30,22 @@ Cloudflare Edge (300+ PoPs)
 |            |        +-- KV (ACL metadata cache)               |
 |            |        +-- WAC evaluator (JSON-LD, zero deps)    |
 |            |                                                   |
-|            +----- image-api                                    |
+|            +----- search-api (vector search + WASM)            |
+|            |        +-- WASM module (42KB, @ruvector/rvf-wasm) |
+|            |        +-- R2 (index persistence)                 |
+|            |        +-- KV (query cache)                       |
+|            |                                                   |
+|            +----- image-api (future)                           |
 |            |        +-- R2 (image uploads)                     |
 |            |                                                   |
-|            +----- nostr-relay (Durable Objects + WebSocket)    |
+|            +----- nostr-relay (future, Durable Objects)        |
 |                     +-- D1 (events, whitelist)                |
 |                     +-- Durable Objects (WebSocket state)     |
 +---------------------------------------------------------------+
+
+Retained on GCP Cloud Run (us-central1):
+  - nostr-relay (WebSocket, always-on)
+  - embedding-api (Python, ML model)
 ```
 
 ---
@@ -45,7 +54,28 @@ Cloudflare Edge (300+ PoPs)
 
 ### What Exists Today
 
-The `deploy.yml` workflow already includes a Cloudflare Pages deployment step, gated by a repository variable:
+**Workers code** (in `workers/` directory):
+
+| Worker | Source | Bindings | Status |
+|--------|--------|----------|--------|
+| auth-api | `workers/auth-api/` | D1, KV | Code complete |
+| pod-api | `workers/pod-api/` | R2, KV | Code complete |
+| search-api | `workers/search-api/` | WASM (42KB), R2, KV | Code complete |
+
+**Shared modules:**
+
+| Module | Location | Purpose |
+|--------|----------|---------|
+| NIP-98 | `community-forum/packages/nip98/` | Shared NIP-98 verification (used by all Workers) |
+
+**Configuration:**
+
+| File | Purpose |
+|------|---------|
+| `wrangler.toml` | Worker configuration with D1, KV, R2, WASM bindings |
+| `workers-deploy.yml` | GitHub Actions workflow for deploying all Workers |
+
+**Cloudflare Pages deploy** (in `deploy.yml`):
 
 ```yaml
 - name: Deploy to Cloudflare Pages
@@ -57,18 +87,19 @@ The `deploy.yml` workflow already includes a Cloudflare Pages deployment step, g
     command: pages deploy dist/ --project-name=dreamlab-ai --commit-dirty=true
 ```
 
-To enable: set `CLOUDFLARE_PAGES_ENABLED=true` in GitHub repository variables and configure `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` secrets.
+To enable Pages: set `CLOUDFLARE_PAGES_ENABLED=true` in GitHub repository variables and configure `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` secrets.
 
-### What Needs to Be Built
+### Migration Progress
 
 | Component | GCP Equivalent | Cloudflare Target | Status |
 |-----------|---------------|-------------------|--------|
-| Static site deploy | GitHub Pages | Cloudflare Pages | Gated, ready |
-| auth-api | Cloud Run (Express) | Worker + D1 | Not started |
-| pod-api | Cloud Run (CSS 7.x) | Worker + R2 + WAC evaluator | Not started |
-| nostr-relay | Cloud Run (Node.js) | Worker + Durable Objects + D1 | Not started |
+| Static site deploy | GitHub Pages | Cloudflare Pages | Gated, ready to enable |
+| auth-api | Cloud Run (Express) | Worker + D1 | Code complete |
+| pod-api | Cloud Run (CSS 7.x) | Worker + R2 + WAC evaluator | Code complete |
+| search-api | N/A (new service) | Worker + WASM + R2 + KV | Code complete |
 | image-api | Cloud Run (Node.js) | Worker + R2 | Not started |
-| embedding-api | Cloud Run (Python) | External (requires Python runtime) | Out of scope |
+| nostr-relay | Cloud Run (Node.js) | Worker + Durable Objects + D1 | Not started (retained on Cloud Run) |
+| embedding-api | Cloud Run (Python) | N/A (requires Python runtime) | Retained on Cloud Run |
 
 ---
 
@@ -160,9 +191,45 @@ No RDF libraries required. ACL documents are stored as JSON-LD with a fixed `@co
 
 ---
 
-## Worker: nostr-relay
+## Worker: search-api
 
-WebSocket relay using Cloudflare Durable Objects for connection state management.
+Vector search service powered by a 42KB WASM microkernel (`@ruvector/rvf-wasm`).
+
+### Performance
+
+| Metric | Value |
+|--------|-------|
+| Throughput | 490,000 vectors/sec |
+| Query latency (p50) | 0.47ms |
+| WASM module size | 42KB |
+
+### Bindings
+
+```toml
+[[r2_buckets]]
+binding = "INDEX_STORE"
+bucket_name = "dreamlab-search-indexes"
+
+[[kv_namespaces]]
+binding = "QUERY_CACHE"
+title = "dreamlab-search-cache"
+
+[wasm_modules]
+RVF_WASM = "rvf_wasm_bg.wasm"
+```
+
+### Architecture
+
+- **WASM microkernel**: `@ruvector/rvf-wasm` provides HNSW-based approximate nearest neighbor search compiled to WebAssembly
+- **R2 persistence**: Vector indexes are serialized and stored in R2 for durability across Worker restarts
+- **KV caching**: Frequent query results are cached in KV with TTL-based expiry
+- **Zero cold-start overhead**: The 42KB WASM module loads in <1ms
+
+---
+
+## Worker: nostr-relay (Future)
+
+WebSocket relay using Cloudflare Durable Objects for connection state management. Currently retained on GCP Cloud Run.
 
 ### Durable Objects
 
@@ -194,9 +261,49 @@ CREATE INDEX idx_events_created ON events(created_at DESC);
 
 ---
 
+## Deployment Requirements
+
+To deploy Workers, the following Cloudflare account setup is required:
+
+### 1. Cloudflare Account and API Credentials
+
+| Requirement | Purpose |
+|-------------|---------|
+| Cloudflare account | Workers, Pages, D1, KV, R2 access |
+| `CLOUDFLARE_API_TOKEN` | GitHub secret for wrangler CLI authentication |
+| `CLOUDFLARE_ACCOUNT_ID` | GitHub secret for targeting the correct account |
+
+### 2. Resource Creation (via wrangler CLI or dashboard)
+
+| Resource | Type | Binding Name | Notes |
+|----------|------|-------------|-------|
+| `dreamlab-auth` | D1 database | `DB` | WebAuthn credentials and challenges |
+| `dreamlab-pods` | R2 bucket | `PODS` | Pod file storage |
+| `dreamlab-acl-cache` | KV namespace | `ACL_CACHE` | ACL metadata cache |
+| `dreamlab-search-indexes` | R2 bucket | `INDEX_STORE` | Vector index persistence |
+| `dreamlab-search-cache` | KV namespace | `QUERY_CACHE` | Search query cache |
+
+### 3. GitHub Secrets Configuration
+
+```bash
+# Required for Workers deployment
+gh secret set CLOUDFLARE_API_TOKEN --body "<your-api-token>"
+gh secret set CLOUDFLARE_ACCOUNT_ID --body "<your-account-id>"
+```
+
+### 4. D1 Database Migration
+
+After creating the D1 database, run the schema migration:
+
+```bash
+wrangler d1 execute dreamlab-auth --file=workers/auth-api/schema.sql
+```
+
+---
+
 ## Migration Plan
 
-### Phase 1: Static Site (Low Risk)
+### Phase 1: Static Site (Low Risk) -- Ready to Enable
 
 1. Enable `CLOUDFLARE_PAGES_ENABLED=true`
 2. Configure Cloudflare API secrets
@@ -204,49 +311,49 @@ CREATE INDEX idx_events_created ON events(created_at DESC);
 4. Test Cloudflare Pages build
 5. Optionally: migrate DNS to Cloudflare for full CDN benefits
 
-### Phase 2: auth-api Worker (Medium Risk)
+### Phase 2: Workers Deployment (Code Complete, Pending Account Setup)
 
-1. Port Express routes to Worker fetch handler
-2. Replace `pg` with D1 bindings
-3. Verify WebAuthn ceremony works in Workers runtime
-4. Deploy as a separate Worker with its own D1 database
+1. Create Cloudflare account and API credentials
+2. Create D1 databases, R2 buckets, and KV namespaces
+3. Run D1 schema migrations
+4. Deploy auth-api, pod-api, and search-api Workers via `workers-deploy.yml`
 5. Test registration and authentication flows end-to-end
-6. Migrate DNS to point `VITE_AUTH_API_URL` to the Worker
+6. Migrate DNS to point `VITE_AUTH_API_URL` to the auth-api Worker
 
-### Phase 3: pod-api Worker (Medium Risk)
+### Phase 3: Data Migration
 
-1. Build WAC evaluator
-2. Port pod provisioning to R2 + KV
-3. Migrate existing pod data from Cloud Storage to R2
-4. Update auth-api to provision pods via the new pod-api Worker
+1. Migrate WebAuthn credentials from Cloud SQL to D1
+2. Migrate pod data from Cloud Storage to R2
+3. Migrate image assets from GCS to R2
+4. Verify data integrity
 
-### Phase 4: Relay and Image Workers (Higher Risk)
+### Phase 4: Remaining Services (Future)
 
-1. Port nostr-relay to Durable Objects + D1
-2. Port image-api to Worker + R2
-3. Migrate event data from Cloud SQL to D1
-4. Migrate images from GCS to R2
+1. Port image-api to Worker + R2
+2. Evaluate nostr-relay migration to Durable Objects + D1
+3. Migrate event data from Cloud SQL to D1 (if relay is migrated)
 
-### Phase 5: Decommission GCP
+### Phase 5: Decommission GCP (After Full Migration)
 
-1. Verify all services running on Cloudflare
-2. Remove GCP Cloud Run services
-3. Remove Cloud SQL instance
+1. Verify all migrated services running on Cloudflare
+2. Remove Cloud Run services for migrated workloads
+3. Remove Cloud SQL instance (after data migration confirmed)
 4. Remove Artifact Registry images
 5. Update all documentation
-6. Remove GCP-related GitHub secrets
+6. Remove GCP-related GitHub secrets (for decommissioned services only)
 
 ---
 
 ## Cost Comparison
 
-| Component | GCP (Current) | Cloudflare (Planned) |
+| Component | GCP (Current) | Cloudflare (Target) |
 |-----------|--------------|---------------------|
 | Static site | Free (GitHub Pages) | Free (Pages, 500 builds/month) |
 | auth-api | ~$2-5/month (Cloud Run) | Free tier (100K requests/day) |
 | pod-api (jss) | ~$2-5/month (Cloud Run) | ~$0.36/month (R2 storage) |
-| nostr-relay | ~$15-25/month (always-on) | ~$5/month (Durable Objects) |
-| image-api | ~$1-3/month (Cloud Run) | Free tier + R2 |
+| search-api | N/A | Free tier (Workers + WASM) |
+| nostr-relay | ~$15-25/month (always-on) | ~$5/month (Durable Objects) -- future |
+| image-api | ~$1-3/month (Cloud Run) | Free tier + R2 -- future |
 | Database | ~$10-30/month (Cloud SQL) | Free (D1, 5GB) |
 | **Total** | **~$50-100/month** | **~$5-15/month** |
 
@@ -262,4 +369,4 @@ CREATE INDEX idx_events_created ON events(created_at DESC);
 
 ---
 
-*Last major revision: 2026-02-28.*
+*Last major revision: 2026-03-01.*

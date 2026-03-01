@@ -1,0 +1,14 @@
+name = "dreamlab-pod-api"
+compatibility_date = "2024-12-01"
+main = "index.ts"
+
+[[r2_buckets]]
+binding = "PODS"
+bucket_name = "dreamlab-pods"
+
+[[kv_namespaces]]
+binding = "POD_META"
+id = "8ec8759ab40d4709a831bf6b0e5241eb"
+
+[vars]
+EXPECTED_ORIGIN = "https://dreamlab-ai.com"

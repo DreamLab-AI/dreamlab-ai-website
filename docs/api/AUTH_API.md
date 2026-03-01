@@ -1,8 +1,10 @@
 # Auth API Reference
 
-**Last Updated:** 2026-02-28
+**Last Updated:** 2026-03-01
 
 REST API for the DreamLab AI authentication service. Handles WebAuthn PRF-based registration and authentication, with NIP-98 HTTP auth and Solid pod provisioning.
+
+> **Migration note:** A Cloudflare Workers version of this service exists at `workers/auth-api/` (code complete, deployment pending). The Workers version uses D1 + KV instead of PostgreSQL. This reference documents the Cloud Run version currently in production.
 
 **Base URL**: Cloud Run service URL (set as `VITE_AUTH_API_URL`)
 **Protocol**: HTTPS
@@ -398,4 +400,4 @@ Expired challenges are purged every 60 seconds by a background interval.
 
 ---
 
-*Last major revision: 2026-02-28.*
+*Last major revision: 2026-03-01.*

@@ -1,6 +1,10 @@
 # Cloud Services Deployment
 
-**Last Updated:** 2026-02-28
+**Last Updated:** 2026-03-01
+
+> **Migration Notice (2026-03-01):** The following services are being migrated to Cloudflare Workers per [ADR-010](../adr/010-return-to-cloudflare.md): **auth-api**, **jss** (replaced by pod-api Worker), and **image-api**. Worker code is complete in `workers/` and deployment is pending Cloudflare account setup. See [CLOUDFLARE_WORKERS.md](./CLOUDFLARE_WORKERS.md) for details.
+>
+> Services **retained** on Cloud Run: **nostr-relay** (WebSocket, always-on), **embedding-api** (Python ML runtime).
 
 GCP Cloud Run backend services for the DreamLab AI platform. GCP project: `cumbriadreamlab`, region: `us-central1`.
 
@@ -34,6 +38,8 @@ All Docker images are pushed to **Artifact Registry**: `us-central1-docker.pkg.d
 ---
 
 ## Service: auth-api
+
+> **Migration target: Cloudflare Workers.** Worker code complete in `workers/auth-api/`. Deployment pending Cloudflare account setup. This Cloud Run service will be decommissioned after Workers deployment is verified.
 
 WebAuthn registration and authentication server with NIP-98 verification and Solid pod provisioning.
 
@@ -86,6 +92,8 @@ See [Auth API Reference](../api/AUTH_API.md) for full endpoint documentation.
 
 ## Service: jss
 
+> **Migration target: Cloudflare Workers.** Replaced by pod-api Worker in `workers/pod-api/` (R2 + WAC evaluator). Worker code complete. Deployment pending Cloudflare account setup. This Cloud Run service will be decommissioned after Workers deployment is verified.
+
 JavaScript Solid Server (Community Solid Server 7.x) providing per-user pod storage.
 
 | Attribute | Value |
@@ -130,6 +138,8 @@ The auth-api has the same dependency: it needs `JSS_BASE_URL` from Secret Manage
 
 ## Service: nostr-relay
 
+> **Retained on Cloud Run.** WebSocket always-on requirement and Durable Objects complexity make this service unsuitable for immediate migration. Future migration to Cloudflare Durable Objects may be evaluated.
+
 Nostr protocol relay with NIP-01, NIP-16, NIP-28, NIP-33, NIP-42, and NIP-98 support.
 
 | Attribute | Value |
@@ -163,6 +173,8 @@ See [Nostr Relay API](../api/NOSTR_RELAY.md) for protocol documentation.
 
 ## Service: embedding-api
 
+> **Retained on Cloud Run.** Requires Python runtime and ~2GB ML model. Not suitable for Cloudflare Workers.
+
 Text embedding service for semantic search, using the all-MiniLM-L6-v2 model (384 dimensions).
 
 | Attribute | Value |
@@ -187,6 +199,8 @@ See [Embedding Service API](../api/EMBEDDING_SERVICE.md) for documentation.
 ---
 
 ## Service: image-api
+
+> **Migration target: Cloudflare Workers.** Will be replaced by an image-api Worker using R2 for storage. Worker code not yet started.
 
 Image upload, processing, and serving via Google Cloud Storage.
 
@@ -322,21 +336,7 @@ Store in GitHub repository Settings > Secrets and variables > Actions:
 
 ## Manual Deployment
 
-### Deploy auth-api
-
-```bash
-cd community-forum/services/auth-api
-npm ci && npm run build
-docker build -t auth-api:latest .
-docker tag auth-api:latest us-central1-docker.pkg.dev/cumbriadreamlab/minimoonoir/auth-api:latest
-docker push us-central1-docker.pkg.dev/cumbriadreamlab/minimoonoir/auth-api:latest
-gcloud run deploy auth-api \
-  --image us-central1-docker.pkg.dev/cumbriadreamlab/minimoonoir/auth-api:latest \
-  --region us-central1 \
-  --memory 512Mi --cpu 1 --port 8080
-```
-
-### Deploy nostr-relay
+### Deploy nostr-relay (Retained on Cloud Run)
 
 ```bash
 cd community-forum/services/nostr-relay
@@ -348,6 +348,22 @@ gcloud run deploy nostr-relay \
   --image us-central1-docker.pkg.dev/cumbriadreamlab/minimoonoir/nostr-relay:latest \
   --region us-central1 \
   --memory 512Mi --cpu 1 --no-cpu-throttling --timeout 3600
+```
+
+### Legacy: Deploy auth-api (Cloud Run -- Being Replaced by Workers)
+
+> This deployment method will be retired after the auth-api Worker is deployed to Cloudflare.
+
+```bash
+cd community-forum/services/auth-api
+npm ci && npm run build
+docker build -t auth-api:latest .
+docker tag auth-api:latest us-central1-docker.pkg.dev/cumbriadreamlab/minimoonoir/auth-api:latest
+docker push us-central1-docker.pkg.dev/cumbriadreamlab/minimoonoir/auth-api:latest
+gcloud run deploy auth-api \
+  --image us-central1-docker.pkg.dev/cumbriadreamlab/minimoonoir/auth-api:latest \
+  --region us-central1 \
+  --memory 512Mi --cpu 1 --port 8080
 ```
 
 ---
@@ -385,4 +401,4 @@ gcloud run services logs read jss --region=us-central1 --limit=50
 
 ---
 
-*Last major revision: 2026-02-28.*
+*Last major revision: 2026-03-01.*

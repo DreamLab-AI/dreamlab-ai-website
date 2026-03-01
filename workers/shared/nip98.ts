@@ -64,11 +64,12 @@ export async function verifyNip98(
   if (!eventMethod || eventMethod.toUpperCase() !== opts.method.toUpperCase()) return null;
 
   // Verify event integrity via nostr-tools
-  if (!verifyEvent(event as any)) return null;
+  if (!verifyEvent(event as Parameters<typeof verifyEvent>[0])) return null;
 
-  // Payload hash check
+  // Payload hash check — enforce hash presence when body exists
   const payloadTag = getTag(event, 'payload');
-  if (payloadTag && opts.rawBody) {
+  if (opts.rawBody && opts.rawBody.byteLength > 0) {
+    if (!payloadTag) return null; // Body present but no payload tag → reject
     const hashBuffer = await crypto.subtle.digest('SHA-256', opts.rawBody);
     const hashHex = Array.from(new Uint8Array(hashBuffer))
       .map(b => b.toString(16).padStart(2, '0'))

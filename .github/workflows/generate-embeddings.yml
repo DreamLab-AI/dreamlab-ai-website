@@ -1,12 +1,16 @@
 name: Generate Note Embeddings
 
+# NOTE: This workflow is being migrated to use Cloudflare R2 storage
+# with the rvf-wasm search Worker instead of GCS. The GCS upload step
+# will be replaced once the R2 Worker is deployed.
+#
 # Required GitHub Secrets:
 # - GCP_PROJECT_ID: Google Cloud Project ID
 # - GCP_SA_KEY: Service Account JSON key with Storage Object Admin role
 # - GCP_REGION: GCP region (default: us-central1)
 #
 # Required GitHub Variables (Settings -> Secrets and variables -> Actions -> Variables):
-# - RELAY_URL: WebSocket URL of the Nostr relay (e.g., wss://nostr-relay-617806532906.us-central1.run.app)
+# - RELAY_URL: WebSocket URL of the relay (e.g., wss://relay.dreamlab-ai.com)
 #              REQUIRED: Must be set before first run. Workflow will fail without this variable.
 
 on:
@@ -25,7 +29,7 @@ env:
   PYTHON_VERSION: '3.11'
   EMBEDDING_MODEL: 'sentence-transformers/all-MiniLM-L6-v2'
   EMBEDDING_DIM: 384
-  GCS_BUCKET_NAME: 'Nostr-BBS-vectors'
+  GCS_BUCKET_NAME: 'dreamlab-vectors'
 
 jobs:
   generate-embeddings:

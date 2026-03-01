@@ -1,8 +1,8 @@
 # DreamLab AI System Architecture Overview
 
-**Last Updated**: 2026-02-28
-**Version**: 2.0.0
-**Status**: Production (GCP Cloud Run) + Migration In Progress (Cloudflare Workers)
+**Last Updated**: 2026-03-01
+**Version**: 2.1.0
+**Status**: Production (GCP + GitHub Pages) + Workers Code Complete (Cloudflare)
 
 ## Executive Summary
 
@@ -13,7 +13,7 @@ DreamLab AI is a premium AI training and consulting platform comprising two fron
 - 14 route pages (main site) + 21 route pages (community forum)
 - 50+ shadcn/ui primitives
 - 6 GCP Cloud Run backend services (current)
-- 2 planned Cloudflare Workers (auth-api, pod-api) with code in `workers/`
+- 3 Cloudflare Workers (auth-api, pod-api, search-api) with code complete in `workers/`
 - Consolidated NIP-98 module shared across 4 consumers
 
 ---
@@ -46,12 +46,13 @@ graph TB
         SupabaseAuth["Authentication"]
     end
 
-    subgraph CF["Cloudflare Workers (planned)"]
+    subgraph CF["Cloudflare Workers (code complete)"]
         CFAuth["auth-api Worker<br/>D1 + KV"]
         CFPod["pod-api Worker<br/>R2 + KV + WAC"]
+        CFSearch["search-api Worker<br/>WASM + R2 + KV"]
         D1["D1 Database<br/>(dreamlab-auth)"]
-        KV["KV Namespaces<br/>(SESSIONS, POD_META, CONFIG)"]
-        R2["R2 Bucket<br/>(dreamlab-pods)"]
+        KV["KV Namespaces<br/>(SESSIONS, POD_META, CONFIG, SEARCH_CONFIG)"]
+        R2["R2 Buckets<br/>(dreamlab-pods, dreamlab-vectors)"]
     end
 
     Browser --> MainSite
@@ -71,6 +72,8 @@ graph TB
     CFAuth --> KV
     CFPod --> R2
     CFPod --> KV
+    CFSearch --> R2
+    CFSearch --> KV
 ```
 
 ---
@@ -124,7 +127,7 @@ graph TB
         Actions["GitHub Actions<br/>(9 workflows)"]
         Pages["GitHub Pages<br/>+ Cloudflare Pages (opt-in)"]
         CloudRun["GCP Cloud Run<br/>(6 services)"]
-        Workers["Cloudflare Workers<br/>(planned)"]
+        Workers["Cloudflare Workers<br/>(code complete)"]
     end
 
     React --> UI
@@ -154,7 +157,7 @@ graph TB
 | **Router** | React Router DOM | 6.26.2 | Client-side navigation |
 | **UI Library** | Radix UI + Tailwind CSS | 3.4.11 | Accessible components, utility CSS |
 | **3D Graphics** | Three.js + @react-three/fiber | 0.156.1 | Hero animations, visualisations |
-| **WASM** | Rust (wasm-voronoi/) | - | Voronoi tessellation |
+| **WASM** | Rust (wasm-voronoi/) + @ruvector/rvf-wasm (42KB) | - | Voronoi tessellation + vector similarity search |
 | **Server State** | TanStack React Query | 5.56.2 | Data fetching + caching |
 | **Forms** | React Hook Form + Zod | 7.53 / 3.23 | Validation |
 | **Nostr Protocol** | NDK | 2.13.1 | Decentralised messaging |
@@ -162,7 +165,7 @@ graph TB
 | **Type Safety** | TypeScript | 5.5.3 | Static typing |
 | **Backend (Main)** | Supabase | 2.49.4 | Database, auth |
 | **Backend (Forum)** | GCP Cloud Run | - | 6 containerised services |
-| **Backend (Planned)** | Cloudflare Workers | - | Edge compute (D1/KV/R2) |
+| **Backend (Code Complete)** | Cloudflare Workers | - | Edge compute (D1/KV/R2), WASM search |
 | **Deployment** | GitHub Pages | - | Static hosting |
 | **CI/CD** | GitHub Actions | - | Automated deployment |
 
@@ -208,12 +211,13 @@ graph TB
 | **link-preview-api** | Cloud Run | Node.js | URL metadata extraction | HTTPS |
 | **Supabase** | Managed | PostgreSQL + Auth | Main site database | Managed |
 
-### 4. Planned Cloudflare Workers (ADR-010)
+### 4. Cloudflare Workers (Code Complete, ADR-010)
 
 | Worker | Storage | Replaces | Status |
 |--------|---------|----------|--------|
-| **auth-api** | D1 + KV (SESSIONS) | Cloud Run auth-api | Code in `workers/auth-api/` |
-| **pod-api** | R2 (PODS) + KV (POD_META) | Cloud Run JSS | Code in `workers/pod-api/` |
+| **auth-api** | D1 + KV (SESSIONS) | Cloud Run auth-api | Code complete in `workers/auth-api/` |
+| **pod-api** | R2 (PODS) + KV (POD_META) | Cloud Run JSS | Code complete in `workers/pod-api/` |
+| **search-api** | R2 (dreamlab-vectors) + KV (SEARCH_CONFIG) | New service (WASM vector search) | Code complete in `workers/search-api/` |
 
 ---
 
@@ -269,7 +273,7 @@ WebAuthn PRF output (32 bytes, HMAC-SHA-256 from authenticator)
 | Tree Shaking | ESM + Vite dead code elimination | Default Vite behaviour |
 | Minification | esbuild minifier | `minify: 'esbuild'` in vite.config.ts |
 | CDN Caching | GitHub Pages global CDN | Automatic |
-| WASM | Rust Voronoi tessellation | wasm-voronoi/ compiled at build time |
+| WASM | Rust Voronoi tessellation + rvf-wasm search | wasm-voronoi/ (build time) + rvf_wasm_bg.wasm (42KB, search-api) |
 
 ### Bundle Sizes (approximate, gzipped)
 
@@ -294,7 +298,7 @@ main.css     - Tailwind styles (10 KB)
 
 ## Infrastructure Topology
 
-### Current Production (February 2026)
+### Current Production (March 2026)
 
 ```mermaid
 graph TB
@@ -337,16 +341,17 @@ graph TB
     ImageSvc --> GCS
 ```
 
-### Planned Cloudflare Migration (ADR-010)
+### Cloudflare Migration (ADR-010 -- Code Complete, Deployment Pending)
 
-| Service | Current | Target | Storage |
-|---------|---------|--------|---------|
-| auth-api | Cloud Run (Express) | Cloudflare Workers | D1 + KV |
-| jss (pod-api) | Cloud Run (CSS 7.x) | Cloudflare Workers | R2 + KV |
-| image-api | Cloud Run (Node.js) | Cloudflare Workers | R2 |
-| link-preview-api | Cloud Run | Cloudflare Workers | Stateless |
-| nostr-relay | Cloud Run | **Retained on Cloud Run** | Cloud SQL |
-| embedding-api | Cloud Run | **Retained on Cloud Run** | Cloud Build |
+| Service | Current | Target | Storage | Code Status |
+|---------|---------|--------|---------|-------------|
+| auth-api | Cloud Run (Express) | Cloudflare Workers | D1 + KV | Code complete |
+| jss (pod-api) | Cloud Run (CSS 7.x) | Cloudflare Workers | R2 + KV | Code complete |
+| search-api | New | Cloudflare Workers | R2 + KV + WASM | Code complete |
+| image-api | Cloud Run (Node.js) | Cloudflare Workers | R2 | Planned |
+| link-preview-api | Cloud Run | Cloudflare Workers | Stateless | Planned |
+| nostr-relay | Cloud Run | **Retained on Cloud Run** | Cloud SQL | N/A |
+| embedding-api | Cloud Run | **Retained on Cloud Run** | Cloud Build | N/A |
 
 ---
 
@@ -375,4 +380,4 @@ graph TB
 
 **Document Owner**: Architecture Team
 **Review Cycle**: Quarterly
-**Last Review**: 2026-02-28
+**Last Review**: 2026-03-01
