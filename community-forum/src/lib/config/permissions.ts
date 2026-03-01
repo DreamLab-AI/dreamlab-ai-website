@@ -113,6 +113,10 @@ export function canModerateSection(permissions: UserPermissions, sectionId: Sect
 
 /**
  * Check if user can create forums/channels in a section
+ *
+ * Sections with allowForumCreation: true grant creation rights to members (level 1+),
+ * not just moderators with the forum.create capability. This enables cohort members
+ * to create threads in their sections without needing elevated roles.
  */
 export function canCreateChannel(permissions: UserPermissions, sectionId: SectionId): boolean {
 	const section = getSection(sectionId);
@@ -120,8 +124,19 @@ export function canCreateChannel(permissions: UserPermissions, sectionId: Sectio
 		return false;
 	}
 
-	// Need at least moderator role or forum.create capability
-	return hasCapability(permissions, 'forum.create', sectionId);
+	// Users with forum.create capability (moderator+) can always create
+	if (hasCapability(permissions, 'forum.create', sectionId)) {
+		return true;
+	}
+
+	// In sections with allowForumCreation, any member who can access the section can create
+	if (canAccessSection(permissions, sectionId)) {
+		const effectiveRole = getEffectiveRole(permissions, sectionId);
+		const role = getRole(effectiveRole);
+		return role ? role.level >= 1 : false; // member level or higher
+	}
+
+	return false;
 }
 
 /**

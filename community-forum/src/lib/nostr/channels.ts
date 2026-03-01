@@ -8,6 +8,7 @@ import { browser } from '$app/environment';
 import type { ChannelSection, ChannelAccessType } from '$lib/types/channel';
 import { validateContent, validateChannelName } from '$lib/utils/validation';
 import { checkRateLimit, RateLimitError } from '$lib/utils/rateLimit';
+import { getSectionWithCategory } from '$lib/config';
 
 /** Timeout for fetchEvents calls (ms). Prevents indefinite hangs when relay is unresponsive. */
 const FETCH_EVENTS_TIMEOUT = 8000;
@@ -376,6 +377,44 @@ export async function sendChannelMessage(
 }
 
 /**
+ * Check if user can access the zone (category) that contains a channel's section.
+ * Enforces category-level visibleToCohorts and hiddenFromCohorts even on the flat /chat view.
+ */
+function canAccessChannelZone(
+	channel: CreatedChannel,
+	userCohorts: string[],
+	isAdmin: boolean
+): boolean {
+	if (isAdmin) return true;
+
+	const sectionInfo = getSectionWithCategory(channel.section);
+	if (!sectionInfo) return true; // Unknown section — don't filter
+
+	const { category } = sectionInfo;
+	if (!category.access) return true; // No access config = visible to all
+
+	// cross-access cohort can access all categories
+	if (userCohorts.includes('cross-access')) return true;
+
+	// Check hiddenFromCohorts — deny if user has any hidden cohort
+	if (category.access.hiddenFromCohorts?.length) {
+		const isHidden = category.access.hiddenFromCohorts.some((cohort: string) =>
+			userCohorts.includes(cohort)
+		);
+		if (isHidden) return false;
+	}
+
+	// Check visibleToCohorts — user must have at least one matching cohort
+	if (category.access.visibleToCohorts?.length) {
+		return category.access.visibleToCohorts.some((cohort: string) =>
+			userCohorts.includes(cohort)
+		);
+	}
+
+	return true;
+}
+
+/**
  * Check if user can access a channel based on cohorts
  * @param channel - Channel to check
  * @param userCohorts - User's cohorts from whitelist
@@ -476,8 +515,9 @@ export async function fetchChannels(options: FetchChannelOptions = {}): Promise<
 				creatorPubkey: event.pubkey,
 			};
 
-			// SECURITY: Filter channels based on user cohorts
-			if (canAccessChannel(channel, userCohorts, userPubkey, isAdmin)) {
+			// SECURITY: Filter channels based on user cohorts AND zone visibility
+			if (canAccessChannel(channel, userCohorts, userPubkey, isAdmin) &&
+				canAccessChannelZone(channel, userCohorts, isAdmin)) {
 				channels.push(channel);
 			}
 		} catch (e) {

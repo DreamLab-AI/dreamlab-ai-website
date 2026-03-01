@@ -5,9 +5,11 @@
   import { page } from '$app/stores';
   import { authStore } from '$lib/stores/auth';
   import { userStore } from '$lib/stores/user';
+  import { userPermissionsStore } from '$lib/stores/userPermissions';
   import { ndk, connectRelay, isConnected } from '$lib/nostr/relay';
   import { RELAY_URL } from '$lib/config';
   import { getSectionWithCategory, getBreadcrumbs } from '$lib/config';
+  import { canCreateChannel } from '$lib/config/permissions';
   import Breadcrumb from '$lib/components/navigation/Breadcrumb.svelte';
   import ChannelCard from '$lib/components/forum/ChannelCard.svelte';
   import ZoneHero from '$lib/components/zones/ZoneHero.svelte';
@@ -45,6 +47,11 @@
     const userCohortStrings = userCohorts as string[];
     return required.some((c: string) => userCohortStrings.includes(c));
   })();
+
+  // Check if current user can create forums in this section
+  $: canCreate = $userPermissionsStore
+    ? canCreateChannel($userPermissionsStore, sectionId)
+    : false;
 
   async function loadForums() {
     const ndkInstance = ndk();
@@ -163,7 +170,7 @@
               Calendar
             </a>
           {/if}
-          {#if section.allowForumCreation}
+          {#if canCreate}
             <button class="btn btn-primary">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -180,7 +187,7 @@
         <div class="card bg-base-200">
           <div class="card-body text-center">
             <p class="text-base-content/70">No forums in this section yet.</p>
-            {#if section.allowForumCreation}
+            {#if canCreate}
               <p class="text-sm text-base-content/50 mt-2">Be the first to create one!</p>
             {/if}
           </div>

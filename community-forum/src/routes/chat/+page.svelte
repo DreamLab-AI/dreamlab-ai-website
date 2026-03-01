@@ -10,7 +10,8 @@
   import { connectRelay, isConnected, connectionState, ConnectionState } from '$lib/nostr/relay';
   import { RELAY_URL } from '$lib/config';
   import { fetchChannels, type CreatedChannel } from '$lib/nostr/channels';
-  import { getSection } from '$lib/config';
+  import { getSection, getSections } from '$lib/config';
+  import { canCreateChannel } from '$lib/config/permissions';
 
   // Forum components
   import BoardStats from '$lib/components/forum/BoardStats.svelte';
@@ -54,6 +55,13 @@
   $: pageDescription = sectionConfig
     ? sectionConfig.description
     : 'Join conversations in public channels';
+
+  // Check if user can create channels in any section
+  $: canCreateInAnySection = (() => {
+    const perms = $userPermissionsStore;
+    if (!perms) return false;
+    return getSections().some(s => canCreateChannel(perms, s.id));
+  })();
 
   // Connection status for UI feedback
   $: connState = $connectionState;
@@ -287,7 +295,7 @@
             {#if activeSection}
               <a href="{base}/chat" class="btn btn-primary btn-sm">View All Channels</a>
             {/if}
-            {#if $isAdminVerified}
+            {#if canCreateInAnySection}
               <a href="{base}/admin" class="btn btn-primary btn-sm gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
