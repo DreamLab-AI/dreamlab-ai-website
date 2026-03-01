@@ -123,7 +123,7 @@ The Fairfield DreamLab application is a Nostr-based decentralized communication 
 
 ### Console Errors Captured
 \`\`\`
-Failed to fetch profile for 11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c:
+Failed to fetch profile for a5f2a38c44c654b7d7d7c99744e061e02c4402fbc2444d4d5813b7c00eda4beb:
 Error: NDK not initialized
 \`\`\`
 

@@ -65,7 +65,7 @@ The login flow was tested with screenshots:
 | Profile fetch failures | 4 | MEDIUM |
 | Other | 2 | LOW |
 
-**Profile Fetch Error:** `Failed to fetch profile for 11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c`
+**Profile Fetch Error:** `Failed to fetch profile for a5f2a38c44c654b7d7d7c99744e061e02c4402fbc2444d4d5813b7c00eda4beb`
 - This is the admin pubkey
 - Occurs when loading pages without authentication
 - Expected behavior for private relay

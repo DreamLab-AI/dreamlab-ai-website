@@ -384,7 +384,7 @@ describe('Config Loader', () => {
 			const superuser = getSuperuser();
 			// Default config has superuser with pubkey
 			expect(superuser).toBeDefined();
-			expect(superuser?.pubkey).toBe('11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c');
+			expect(superuser?.pubkey).toBe('a5f2a38c44c654b7d7d7c99744e061e02c4402fbc2444d4d5813b7c00eda4beb');
 		});
 
 		it('should identify superuser by pubkey', () => {
@@ -418,7 +418,7 @@ describe('Config Loader', () => {
 			// Empty string should not match configured superuser
 			expect(isSuperuser('')).toBe(false);
 			// Real superuser pubkey should match
-			expect(isSuperuser('11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c')).toBe(true);
+			expect(isSuperuser('a5f2a38c44c654b7d7d7c99744e061e02c4402fbc2444d4d5813b7c00eda4beb')).toBe(true);
 		});
 	});
 

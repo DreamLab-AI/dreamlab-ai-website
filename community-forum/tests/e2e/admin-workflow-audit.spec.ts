@@ -20,7 +20,7 @@ const LIVE_SITE_URL = 'https://dreamlab-ai.github.io/fairfield';
 const SCREENSHOT_DIR = 'tests/screenshots/qe-audit/admin';
 
 // Admin credentials from environment
-const ADMIN_PUBKEY = process.env.VITE_ADMIN_PUBKEY || '11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c';
+const ADMIN_PUBKEY = process.env.VITE_ADMIN_PUBKEY || 'a5f2a38c44c654b7d7d7c99744e061e02c4402fbc2444d4d5813b7c00eda4beb';
 const ADMIN_NSEC = process.env.ADMIN_KEY || '';
 
 // Test nsec for non-admin testing (well-known test key)
