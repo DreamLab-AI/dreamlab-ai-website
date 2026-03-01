@@ -1,5 +1,5 @@
 config:
-  target: "wss://nostr-relay-617806532906.us-central1.run.app"
+  target: "wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev"
   phases:
     # Connection establishment test
     - name: "Connection Test"

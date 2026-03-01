@@ -96,7 +96,7 @@ echo ""
 ###############################################################################
 
 echo -e "${YELLOW}[3/3] Running Nostr Relay WebSocket Tests...${NC}"
-echo -e "Target: wss://nostr-relay-617806532906.us-central1.run.app"
+echo -e "Target: wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev"
 echo ""
 
 artillery run \

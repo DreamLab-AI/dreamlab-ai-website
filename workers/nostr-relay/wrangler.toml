@@ -1,0 +1,22 @@
+name = "dreamlab-nostr-relay"
+compatibility_date = "2024-12-01"
+main = "index.ts"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "dreamlab-relay"
+database_id = "97c77d23-0e24-4325-ada7-1747eab4095b"
+
+[vars]
+ADMIN_PUBKEYS = "11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c"
+RELAY_NAME = "DreamLab Nostr Relay"
+ALLOWED_ORIGIN = "https://dreamlab-ai.com"
+
+[durable_objects]
+bindings = [
+  { name = "RELAY", class_name = "NostrRelayDO" }
+]
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["NostrRelayDO"]

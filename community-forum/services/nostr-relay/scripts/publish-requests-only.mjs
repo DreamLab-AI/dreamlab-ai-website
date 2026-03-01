@@ -9,7 +9,7 @@ import crypto from 'crypto';
 
 const { getPublicKey, finalizeEvent } = nostrTools;
 
-const RELAY_URL = process.env.RELAY_URL || 'wss://nostr-relay-617806532906.us-central1.run.app';
+const RELAY_URL = process.env.RELAY_URL || 'wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev';
 
 // Admin pubkey from environment (required)
 const ADMIN_PUBKEY = process.env.ADMIN_PUBKEY;

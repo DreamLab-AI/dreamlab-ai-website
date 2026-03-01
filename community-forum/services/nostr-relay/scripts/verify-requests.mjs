@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import WebSocket from 'ws';
 
-const RELAY_URL = process.env.RELAY_URL || 'wss://nostr-relay-617806532906.us-central1.run.app';
+const RELAY_URL = process.env.RELAY_URL || 'wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev';
 const ADMIN_PUBKEY = process.env.ADMIN_PUBKEY;
 if (!ADMIN_PUBKEY) {
   console.error('ERROR: ADMIN_PUBKEY environment variable is required');

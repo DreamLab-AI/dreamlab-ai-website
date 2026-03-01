@@ -125,7 +125,7 @@
   },
 
   "nostrRelay": {
-    "url": "wss://nostr-relay-617806532906.us-central1.run.app",
+    "url": "wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev",
     "status": "PENDING",
     "note": "WebSocket test execution pending completion"
   },

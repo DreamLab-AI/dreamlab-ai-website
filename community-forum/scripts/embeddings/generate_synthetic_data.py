@@ -14,7 +14,7 @@ from pathlib import Path
 
 # Configuration
 EMBEDDING_API_URL = "https://embedding-api-617806532906.us-central1.run.app"
-RELAY_URL = "wss://nostr-relay-617806532906.us-central1.run.app"
+RELAY_URL = "wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev"
 OUTPUT_DIR = Path(__file__).parent / "output"
 
 # Synthetic content themes for Nostr-BBS community

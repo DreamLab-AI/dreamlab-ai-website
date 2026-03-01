@@ -24,10 +24,10 @@ function getEnv(key: string, fallback?: string): string {
 
 /**
  * Nostr relay URL
- * Default: production relay (wss://nostr-relay-617806532906.us-central1.run.app)
+ * Default: production relay (Cloudflare Workers)
  * Override with VITE_RELAY_URL for local development
  */
-export const RELAY_URL = getEnv('VITE_RELAY_URL', 'wss://nostr-relay-617806532906.us-central1.run.app');
+export const RELAY_URL = getEnv('VITE_RELAY_URL', 'wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev');
 
 /**
  * Admin public key (hex format)

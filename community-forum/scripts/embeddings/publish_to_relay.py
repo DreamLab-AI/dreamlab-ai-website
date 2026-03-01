@@ -25,7 +25,7 @@ except ImportError:
     subprocess.check_call(['pip', 'install', 'secp256k1'])
     from secp256k1 import PrivateKey
 
-RELAY_URL = "wss://nostr-relay-617806532906.us-central1.run.app"
+RELAY_URL = "wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev"
 OUTPUT_DIR = Path(__file__).parent / "output"
 
 # Sample admin pubkey (from config) - events will be tagged to this admin

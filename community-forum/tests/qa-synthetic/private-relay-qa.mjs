@@ -2,7 +2,7 @@
 /**
  * Enhanced QA Test Suite for Private Relay
  * Tests: Nicknames, Avatars, Reactions, Image Messages
- * Target: wss://nostr-relay-617806532906.us-central1.run.app
+ * Target: wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev
  */
 
 import { generateSecretKey, getPublicKey, finalizeEvent } from 'nostr-tools/pure';
@@ -15,7 +15,7 @@ import 'websocket-polyfill';
 const WebSocket = globalThis.WebSocket;
 
 // Private relay URL from .env
-const RELAY_URL = 'wss://nostr-relay-617806532906.us-central1.run.app';
+const RELAY_URL = 'wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev';
 
 // Test users with proper profiles
 const TEST_USERS = {

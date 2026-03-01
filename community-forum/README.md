@@ -153,7 +153,7 @@ community-forum/
 
 ```bash
 # Required - Nostr Relay
-VITE_RELAY_URL=wss://nostr-relay-617806532906.us-central1.run.app
+VITE_RELAY_URL=wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev
 VITE_ADMIN_PUBKEY=<64-character-hex-pubkey>
 
 # Cloud Run APIs (optional - for full features)
@@ -308,7 +308,7 @@ The core message transport. Stores and broadcasts Nostr events.
 
 **Health Check:**
 ```bash
-curl wss://nostr-relay-617806532906.us-central1.run.app/health
+curl wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev/health
 ```
 
 ### Embedding API Service

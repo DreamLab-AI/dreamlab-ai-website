@@ -14,7 +14,7 @@ import crypto from 'crypto';
 const { getPublicKey, finalizeEvent } = nostrTools;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const RELAY_URL = process.env.RELAY_URL || 'wss://nostr-relay-617806532906.us-central1.run.app';
+const RELAY_URL = process.env.RELAY_URL || 'wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev';
 const SYNTHETIC_EVENTS_PATH = path.resolve(__dirname, '../../../scripts/embeddings/output/synthetic_events.json');
 
 // Admin pubkey from environment (required)

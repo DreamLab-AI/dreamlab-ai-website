@@ -10,8 +10,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "test:live": "RELAY_WS_URL=wss://nostr-relay-617806532906.us-central1.run.app jest --testTimeout=60000",
-    "test:integration": "RELAY_WS_URL=wss://nostr-relay-617806532906.us-central1.run.app jest --testPathPattern='(nip01-protocol|websocket-connection)' --testTimeout=60000"
+    "test:live": "RELAY_WS_URL=wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev jest --testTimeout=60000",
+    "test:integration": "RELAY_WS_URL=wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev jest --testPathPattern='(nip01-protocol|websocket-connection)' --testTimeout=60000"
   },
   "dependencies": {
     "@noble/curves": "^1.4.0",

@@ -11,7 +11,7 @@ const { schnorr } = require('@noble/curves/secp256k1');
 const { bytesToHex, hexToBytes } = require('@noble/hashes/utils');
 const { sha256 } = require('@noble/hashes/sha256');
 
-const RELAY_URL = 'wss://nostr-relay-617806532906.us-central1.run.app';
+const RELAY_URL = 'wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev';
 const OUTPUT_DIR = path.join(import.meta.dirname || __dirname, 'output');
 
 // Sample admin pubkey - events will be tagged to this admin

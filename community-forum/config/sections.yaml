@@ -12,11 +12,11 @@ app:
 superuser:
   pubkey: '11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c'
   name: 'Instance Owner'
-  relayUrl: 'wss://nostr-relay-617806532906.us-central1.run.app'
+  relayUrl: 'wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev'
 
 # Deployment URLs
 deployment:
-  relayUrl: 'wss://nostr-relay-617806532906.us-central1.run.app'
+  relayUrl: 'wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev'
   embeddingApiUrl: 'https://embedding-api-617806532906.us-central1.run.app'
   gcsEmbeddingsUrl: 'https://storage.googleapis.com/minimoonoir-vectors'
   frontendUrl: 'https://dreamlab-ai.github.io/fairfield'

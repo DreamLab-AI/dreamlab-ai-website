@@ -153,7 +153,7 @@ Observed latency increases with input text length, as expected for transformer-b
 ## Test 3: Nostr Relay WebSocket Performance
 
 ### Target
-- **URL:** wss://nostr-relay-617806532906.us-central1.run.app
+- **URL:** wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev
 - **Protocol:** WebSocket (Nostr NIP-01)
 
 ### Test Results
@@ -330,10 +330,9 @@ Observed latency increases with input text length, as expected for transformer-b
 - **CDN:** Google Cloud CDN (global edge caching)
 
 **Nostr Relay:**
-- **Platform:** Google Cloud Run
-- **Region:** us-central1
-- **Service:** nostr-relay-617806532906
-- **URL:** wss://nostr-relay-617806532906.us-central1.run.app
+- **Platform:** Cloudflare Workers + D1
+- **Service:** dreamlab-nostr-relay
+- **URL:** wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev
 - **Protocol:** WebSocket (Nostr NIP-01)
 
 ---

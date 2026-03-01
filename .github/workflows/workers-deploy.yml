@@ -1,6 +1,6 @@
 name: Deploy Cloudflare Workers
 
-# Deploys all 3 Workers using per-worker wrangler.toml configs.
+# Deploys all 4 Workers using per-worker wrangler.toml configs.
 # Triggers on pushes to main that touch workers/ or workflow config,
 # or manually via workflow_dispatch.
 
@@ -67,12 +67,23 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
+      - name: Deploy nostr-relay
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: '3'
+          command: deploy -c workers/nostr-relay/wrangler.toml
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
       - name: Health checks
         run: |
           echo "Waiting 10s for Workers to propagate..."
           sleep 10
 
-          for worker in dreamlab-auth-api dreamlab-pod-api dreamlab-search-api; do
+          for worker in dreamlab-auth-api dreamlab-pod-api dreamlab-search-api dreamlab-nostr-relay; do
             URL="https://${worker}.${{ env.CF_SUBDOMAIN }}.workers.dev/health"
             if [ "$worker" = "dreamlab-search-api" ]; then
               URL="https://${worker}.${{ env.CF_SUBDOMAIN }}.workers.dev/status"
@@ -96,6 +107,7 @@ jobs:
           | auth-api | \`dreamlab-auth-api.${{ env.CF_SUBDOMAIN }}.workers.dev\` |
           | pod-api | \`dreamlab-pod-api.${{ env.CF_SUBDOMAIN }}.workers.dev\` |
           | search-api | \`dreamlab-search-api.${{ env.CF_SUBDOMAIN }}.workers.dev\` |
+          | nostr-relay | \`dreamlab-nostr-relay.${{ env.CF_SUBDOMAIN }}.workers.dev\` |
 
           - **Branch**: \`${{ github.ref_name }}\`
           - **Commit**: \`${{ github.sha }}\`

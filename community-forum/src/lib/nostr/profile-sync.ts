@@ -7,8 +7,8 @@
 
 import { browser } from '$app/environment';
 
-// Get relay URL from environment (GCP Cloud Run relay)
-const RELAY_URL = import.meta.env.VITE_RELAY_URL || 'wss://nostr-relay-617806532906.us-central1.run.app';
+// Get relay URL from environment (Cloudflare Workers relay)
+const RELAY_URL = import.meta.env.VITE_RELAY_URL || 'wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev';
 
 /**
  * Convert WebSocket URL to HTTP URL for API calls

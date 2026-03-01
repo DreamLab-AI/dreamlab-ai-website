@@ -12,7 +12,7 @@ import { test, expect, Page } from '@playwright/test';
 const ADMIN_HEX_KEY = '60da252772e5a26c0be0a04db70c01b9117f5bc27ea46c16cb59e356c986dac6';
 
 // Relay API for whitelist checks
-const RELAY_API = 'https://nostr-relay-617806532906.us-central1.run.app';
+const RELAY_API = 'https://dreamlab-nostr-relay.solitary-paper-764d.workers.dev';
 
 /**
  * Dismiss the tutorial modal if present

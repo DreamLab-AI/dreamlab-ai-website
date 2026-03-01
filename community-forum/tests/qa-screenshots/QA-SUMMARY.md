@@ -2,7 +2,7 @@
 
 **Date:** 2025-12-23
 **Live URL:** https://jjohare.github.io/nostr-BBS/
-**Relay:** wss://nostr-relay-617806532906.us-central1.run.app
+**Relay:** wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev
 
 ## Executive Summary
 

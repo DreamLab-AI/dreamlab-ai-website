@@ -131,7 +131,7 @@ jobs:
             --set-secrets VISIONFLOW_API_TOKEN=visionflow-api-token:latest \
             --set-secrets ANTHROPIC_API_KEY=anthropic-api-key:latest \
             --set-env-vars NODE_ENV=production \
-            --set-env-vars RELAY_URL=wss://nostr-relay-617806532906.us-central1.run.app \
+            --set-env-vars RELAY_URL=wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev \
             --set-env-vars AGENT_TIER1_NAME=VisionFlow\ General \
             --set-env-vars AGENT_TIER1_ABOUT=General\ AI\ assistant\ -\ quick\ answers\ no\ memory \
             --set-env-vars AGENT_TIER2_NAME=VisionFlow\ Claude \

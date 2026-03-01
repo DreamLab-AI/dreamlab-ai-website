@@ -19,7 +19,7 @@ import 'websocket-polyfill';
 const WebSocket = globalThis.WebSocket;
 
 // Relay configuration
-const RELAY_URL = 'wss://nostr-relay-617806532906.us-central1.run.app';
+const RELAY_URL = 'wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev';
 
 // Test user mnemonics (deterministic for reproducibility)
 const TEST_USERS = {
