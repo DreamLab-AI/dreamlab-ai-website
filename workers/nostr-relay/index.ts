@@ -22,19 +22,34 @@ export interface Env {
   ALLOWED_ORIGIN: string;
 }
 
-function corsHeaders(env: Env): Record<string, string> {
+const ALLOWED_ORIGINS = [
+  'https://dreamlab-ai.com',
+  'https://thedreamlab.uk',
+  'https://dreamlab-ai.github.io',
+  'http://localhost:5173',
+  'http://localhost:5174',
+];
+
+function getCorsOrigin(request: Request): string {
+  const origin = request.headers.get('Origin') || '';
+  if (ALLOWED_ORIGINS.includes(origin)) return origin;
+  return ALLOWED_ORIGINS[0];
+}
+
+function corsHeaders(request: Request): Record<string, string> {
   return {
-    'Access-Control-Allow-Origin': env.ALLOWED_ORIGIN || '*',
+    'Access-Control-Allow-Origin': getCorsOrigin(request),
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization, Accept',
     'Access-Control-Max-Age': '86400',
+    'Vary': 'Origin',
   };
 }
 
-function json(data: unknown, status: number, env: Env): Response {
+function json(data: unknown, status: number, request: Request): Response {
   return new Response(JSON.stringify(data), {
     status,
-    headers: { 'Content-Type': 'application/json', ...corsHeaders(env) },
+    headers: { 'Content-Type': 'application/json', ...corsHeaders(request) },
   });
 }
 
@@ -48,7 +63,7 @@ function isAdmin(pubkey: string, env: Env): boolean {
 
 async function requireNip98Admin(request: Request, env: Env): Promise<string | Response> {
   const auth = request.headers.get('Authorization');
-  if (!auth) return json({ error: 'NIP-98 authentication required' }, 401, env);
+  if (!auth) return json({ error: 'NIP-98 authentication required' }, 401, request);
 
   const url = new URL(request.url);
   const rawBody = request.body ? await request.clone().arrayBuffer() : undefined;
@@ -58,8 +73,8 @@ async function requireNip98Admin(request: Request, env: Env): Promise<string | R
     rawBody,
   });
 
-  if (!result) return json({ error: 'Invalid NIP-98 token' }, 401, env);
-  if (!isAdmin(result.pubkey, env)) return json({ error: 'Not authorized' }, 403, env);
+  if (!result) return json({ error: 'Invalid NIP-98 token' }, 401, request);
+  if (!isAdmin(result.pubkey, env)) return json({ error: 'Not authorized' }, 403, request);
   return result.pubkey;
 }
 
@@ -67,7 +82,7 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
     const path = url.pathname;
-    const cors = corsHeaders(env);
+    const cors = corsHeaders(request);
 
     if (request.method === 'OPTIONS') {
       return new Response(null, { status: 204, headers: cors });
@@ -82,23 +97,23 @@ export default {
 
     // NIP-11 relay info
     if (path === '/' && request.headers.get('Accept')?.includes('application/nostr+json')) {
-      return handleNip11(env);
+      return handleNip11(request, env);
     }
 
     try {
       // Health check
       if (path === '/health' || path === '/') {
-        return await handleHealth(env);
+        return await handleHealth(request, env);
       }
 
       // Whitelist check (public — used by community forum client)
       if (path === '/api/check-whitelist' && request.method === 'GET') {
-        return await handleCheckWhitelist(url, env);
+        return await handleCheckWhitelist(request, url, env);
       }
 
       // Whitelist list (public read, admin for full data)
       if (path === '/api/whitelist/list' && request.method === 'GET') {
-        return await handleWhitelistList(url, env);
+        return await handleWhitelistList(request, url, env);
       }
 
       // Whitelist add (NIP-98 admin only)
@@ -111,17 +126,17 @@ export default {
         return await handleWhitelistUpdateCohorts(request, env);
       }
 
-      return json({ error: 'Not found' }, 404, env);
+      return json({ error: 'Not found' }, 404, request);
     } catch (err) {
-      if (err instanceof SyntaxError) return json({ error: 'Invalid JSON' }, 400, env);
-      return json({ error: 'Internal error' }, 500, env);
+      if (err instanceof SyntaxError) return json({ error: 'Invalid JSON' }, 400, request);
+      return json({ error: 'Internal error' }, 500, request);
     }
   },
 };
 
 // ── Handlers ──────────────────────────────────────────────────────────
 
-function handleNip11(env: Env): Response {
+function handleNip11(request: Request, env: Env): Response {
   const adminPubkey = (env.ADMIN_PUBKEYS || '').split(',')[0]?.trim() || '';
   return new Response(JSON.stringify({
     name: env.RELAY_NAME || 'DreamLab Nostr Relay',
@@ -156,12 +171,13 @@ function handleNip11(env: Env): Response {
   }), {
     headers: {
       'Content-Type': 'application/nostr+json',
-      'Access-Control-Allow-Origin': env.ALLOWED_ORIGIN || '*',
+      'Access-Control-Allow-Origin': getCorsOrigin(request),
+      'Vary': 'Origin',
     },
   });
 }
 
-async function handleHealth(env: Env): Promise<Response> {
+async function handleHealth(request: Request, env: Env): Promise<Response> {
   const stats = await env.DB.prepare(
     'SELECT (SELECT COUNT(*) FROM events) as events, (SELECT COUNT(*) FROM whitelist) as whitelisted'
   ).first<{ events: number; whitelisted: number }>();
@@ -174,13 +190,13 @@ async function handleHealth(env: Env): Promise<Response> {
     events: stats?.events ?? 0,
     whitelisted: stats?.whitelisted ?? 0,
     nips: [1, 11, 16, 33, 98],
-  }, 200, env);
+  }, 200, request);
 }
 
-async function handleCheckWhitelist(url: URL, env: Env): Promise<Response> {
+async function handleCheckWhitelist(request: Request, url: URL, env: Env): Promise<Response> {
   const pubkey = url.searchParams.get('pubkey');
   if (!pubkey || !/^[0-9a-f]{64}$/i.test(pubkey)) {
-    return json({ error: 'Invalid pubkey format' }, 400, env);
+    return json({ error: 'Invalid pubkey format' }, 400, request);
   }
 
   const entry = await env.DB.prepare(
@@ -199,10 +215,10 @@ async function handleCheckWhitelist(url: URL, env: Env): Promise<Response> {
     cohorts,
     verifiedAt: Date.now(),
     source: 'relay',
-  }, 200, env);
+  }, 200, request);
 }
 
-async function handleWhitelistList(url: URL, env: Env): Promise<Response> {
+async function handleWhitelistList(request: Request, url: URL, env: Env): Promise<Response> {
   const limit = Math.min(parseInt(url.searchParams.get('limit') || '20'), 100);
   const offset = parseInt(url.searchParams.get('offset') || '0');
   const cohort = url.searchParams.get('cohort');
@@ -243,7 +259,7 @@ async function handleWhitelistList(url: URL, env: Env): Promise<Response> {
     };
   });
 
-  return json({ users, total: countResult?.count ?? 0, limit, offset }, 200, env);
+  return json({ users, total: countResult?.count ?? 0, limit, offset }, 200, request);
 }
 
 async function handleWhitelistAdd(request: Request, env: Env): Promise<Response> {
@@ -252,7 +268,7 @@ async function handleWhitelistAdd(request: Request, env: Env): Promise<Response>
 
   const body = await request.json() as { pubkey?: string; cohorts?: string[] };
   if (!body.pubkey || !/^[0-9a-f]{64}$/i.test(body.pubkey)) {
-    return json({ error: 'Invalid or missing pubkey' }, 400, env);
+    return json({ error: 'Invalid or missing pubkey' }, 400, request);
   }
 
   const cohorts = body.cohorts || ['approved'];
@@ -264,7 +280,7 @@ async function handleWhitelistAdd(request: Request, env: Env): Promise<Response>
      ON CONFLICT (pubkey) DO UPDATE SET cohorts = excluded.cohorts, added_by = excluded.added_by`
   ).bind(body.pubkey, JSON.stringify(cohorts), now, adminResult).run();
 
-  return json({ success: true }, 200, env);
+  return json({ success: true }, 200, request);
 }
 
 async function handleWhitelistUpdateCohorts(request: Request, env: Env): Promise<Response> {
@@ -273,7 +289,7 @@ async function handleWhitelistUpdateCohorts(request: Request, env: Env): Promise
 
   const body = await request.json() as { pubkey?: string; cohorts?: string[] };
   if (!body.pubkey || !body.cohorts) {
-    return json({ error: 'Missing pubkey or cohorts' }, 400, env);
+    return json({ error: 'Missing pubkey or cohorts' }, 400, request);
   }
 
   const now = Math.floor(Date.now() / 1000);
@@ -284,5 +300,5 @@ async function handleWhitelistUpdateCohorts(request: Request, env: Env): Promise
      ON CONFLICT (pubkey) DO UPDATE SET cohorts = excluded.cohorts, added_by = excluded.added_by`
   ).bind(body.pubkey, JSON.stringify(body.cohorts), now, adminResult).run();
 
-  return json({ success: true }, 200, env);
+  return json({ success: true }, 200, request);
 }
