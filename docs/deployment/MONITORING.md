@@ -1,7 +1,7 @@
 ---
 title: Monitoring & Health Checks
 description: Health monitoring, alerting, and metrics for deployed services
-last_updated: 2026-01-25
+last_updated: 2026-03-01
 ---
 
 # Monitoring & Health Checks
