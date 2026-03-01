@@ -156,6 +156,12 @@ For the full breakdown, see [features/STATUS_MATRIX.md](features/STATUS_MATRIX.m
 | [Community overview](community/README.md) | Forum architecture |
 | [UI components](community/UI_COMPONENTS.md) | Forum component library |
 
+### Archive
+
+| Document | Description |
+|----------|-------------|
+| [Archive index](archive/README.md) | Historical documents moved from repo root |
+
 ---
 
 ## Build Commands
