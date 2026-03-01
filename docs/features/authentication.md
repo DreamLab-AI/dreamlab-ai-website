@@ -20,7 +20,7 @@ The authentication system provides:
 - **NIP-98 HTTP auth** -- every state-mutating API call is Schnorr-signed with kind:27235 events
 - **In-memory key security** -- private key held only in a closure (`_privkeyMem`), zero-filled on `pagehide`
 - **Multiple login methods** -- passkey (primary), NIP-07 browser extension, manual nsec/hex key entry
-- **Solid pod provisioning** -- server-side pod creation via JSS on successful registration (Cloudflare Workers pod-api is code complete, deployment pending)
+- **Solid pod provisioning** -- server-side pod creation via JSS on successful registration (Cloudflare Workers pod-api deployed at `dreamlab-pod-api.solitary-paper-764d.workers.dev`)
 
 ## Identity Model
 

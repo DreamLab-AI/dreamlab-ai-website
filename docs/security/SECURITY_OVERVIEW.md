@@ -2,7 +2,7 @@
 
 **Last Updated:** 2026-03-01
 
-Comprehensive security architecture for the DreamLab AI platform (dreamlab-ai.com): a React SPA with SvelteKit community forum, backend services on GCP Cloud Run (migration to Cloudflare Workers in progress), and WebAuthn PRF-based authentication.
+Comprehensive security architecture for the DreamLab AI platform (dreamlab-ai.com): a React SPA with SvelteKit community forum, backend services on GCP Cloud Run (auth-api, pod-api, search-api migrated to Cloudflare Workers), and WebAuthn PRF-based authentication.
 
 ---
 
@@ -307,7 +307,7 @@ JSS pod access is controlled via Web Access Control (WAC):
 - **Authenticated agents**: Read-only access
 - **Public (unauthenticated)**: No access
 
-ACL documents are stored as JSON-LD within the pod. A custom WAC evaluator (planned for Cloudflare Workers migration) will enforce these ACLs with zero RDF dependencies.
+ACL documents are stored as JSON-LD within the pod. A custom WAC evaluator is deployed in the pod-api Cloudflare Worker, enforcing these ACLs with zero RDF dependencies.
 
 ---
 
@@ -319,7 +319,7 @@ ACL documents are stored as JSON-LD within the pod. A custom WAC evaluator (plan
 | **Windows Hello blocked** | Windows Hello does not support the PRF extension | Users on Windows must use a FIDO2 security key (e.g., YubiKey) or fall back to NIP-07/nsec. An error message is shown when PRF is not available. |
 | **No key rotation** | Nostr protocol does not support key rotation natively | The identity is bound to the secp256k1 keypair. Changing keys requires social migration. |
 | **PRF support varies** | PRF extension requires Chrome 116+, Safari 17.4+, or equivalent | Older browsers will fail at registration with a descriptive error message. |
-| **Pod storage is Cloud Run ephemeral** | JSS pod data is stored on a Cloud Storage volume mount, but CSS in-memory state is lost on restart | Cloud Storage volume provides persistence; CSS state rebuild on startup. R2-backed pod-api Worker is code complete (deployment pending). |
+| **Pod storage is Cloud Run ephemeral** | JSS pod data is stored on a Cloud Storage volume mount, but CSS in-memory state is lost on restart | Cloud Storage volume provides persistence; CSS state rebuild on startup. R2-backed pod-api Worker deployed at `dreamlab-pod-api.solitary-paper-764d.workers.dev`. |
 
 ---
 
@@ -409,7 +409,7 @@ ACL documents are stored as JSON-LD within the pod. A custom WAC evaluator (plan
 - **2026-01-16**: Full internal audit. 2 high-severity issues resolved, 1 medium resolved.
 - **2026-01-25**: GCP Cloud Run migration. SSRF and WebSocket security hardening.
 - **2026-02-28**: Documentation rewrite to reflect current WebAuthn PRF + NIP-98 architecture.
-- **2026-03-01**: Updated to reflect Cloudflare Workers migration status (in progress).
+- **2026-03-01**: Updated to reflect Cloudflare Workers deployment (auth-api, pod-api, search-api deployed).
 
 ---
 

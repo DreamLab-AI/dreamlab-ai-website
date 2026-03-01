@@ -13,7 +13,7 @@ last-updated: 2026-01-16
 **RESOLVED** - Root cause identified and fixed
 
 ## Context
-The Fairfield Nostr application requires a user registration and approval flow where:
+The DreamLab application requires a user registration and approval flow where:
 1. New users create an account with a nickname
 2. Admin must approve users before they can access zones
 3. Users can be assigned to multiple zone cohorts (family, dreamlab, minimoonoir, admin)

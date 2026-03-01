@@ -13,7 +13,7 @@ Complete authentication system specification for Nostr-based signup and login.
 
 ## Overview
 
-Fairfield uses a **Nostr-native authentication system** based on nsec private keys with:
+DreamLab uses a **Nostr-native authentication system** based on nsec private keys with:
 - Direct Nostr private key authentication (nsec/hex format)
 - Session-based AES-256-GCM key encryption
 - Account status differentiation (complete/incomplete)

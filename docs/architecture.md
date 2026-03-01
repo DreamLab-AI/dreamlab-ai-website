@@ -8,7 +8,7 @@ This document describes the high-level architecture of the DreamLab AI platform.
 
 ## System Context
 
-DreamLab AI consists of three deployment targets: a static frontend on GitHub Pages (migrating to Cloudflare Pages), backend services on GCP Cloud Run (migration to Cloudflare Workers in progress), and Cloudflare Workers services (code complete, deployment pending).
+DreamLab AI consists of three deployment targets: a static frontend on GitHub Pages (migrating to Cloudflare Pages), backend services on GCP Cloud Run (completed migration of auth-api, pod-api, search-api to Cloudflare Workers), and Cloudflare Workers services (deployed).
 
 ```mermaid
 graph TB
@@ -30,7 +30,7 @@ graph TB
         LinkPreviewAPI["link-preview-api<br/>URL Metadata"]
     end
 
-    subgraph CloudflareWorkers["Cloudflare Workers (code complete, deployment pending)"]
+    subgraph CloudflareWorkers["Cloudflare Workers (deployed)"]
         CFAuth["auth-api Worker<br/>D1 + KV"]
         CFPod["pod-api Worker<br/>R2 + KV"]
     end
@@ -53,12 +53,9 @@ graph TB
     CFAuth -.->|"replaces"| AuthAPI
     CFPod -.->|"replaces"| JSS
 
-    style CloudflareWorkers stroke-dasharray: 5 5
-    style CFAuth stroke-dasharray: 5 5
-    style CFPod stroke-dasharray: 5 5
 ```
 
-*Dashed boxes indicate Cloudflare Workers services that are code complete but not yet deployed.*
+*Cloudflare Workers services are deployed at `*.solitary-paper-764d.workers.dev`. Custom domain DNS pending.*
 
 ---
 
@@ -128,9 +125,9 @@ Six services deployed on Cloud Run in `us-central1`, project `cumbriadreamlab`.
 | **image-api** | Node.js | Stateless | Image resizing and serving |
 | **link-preview-api** | Node.js | Stateless | URL metadata extraction |
 
-### Cloudflare Workers (Code Complete, Deployment Pending)
+### Cloudflare Workers (Deployed)
 
-Two Workers have been written in the `workers/` directory and are code complete but not yet deployed. See [ADR-010](adr/010-return-to-cloudflare.md) for the migration decision.
+Three Workers are deployed at `*.solitary-paper-764d.workers.dev`. See [ADR-010](adr/010-return-to-cloudflare.md) for the migration decision.
 
 | Service | Storage | Replaces |
 |---------|---------|----------|
@@ -400,7 +397,7 @@ community-forum/              # SvelteKit forum (separate package.json)
     image-api/                # Image serving
     link-preview-api/         # URL metadata
 
-workers/                      # Cloudflare Workers (code complete, deployment pending)
+workers/                      # Cloudflare Workers (deployed)
   auth-api/                   # WebAuthn Worker (D1 + KV)
   pod-api/                    # Pod storage Worker (R2 + KV)
   shared/                     # Shared NIP-98 utilities

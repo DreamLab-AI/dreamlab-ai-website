@@ -108,7 +108,7 @@ gh run list --workflow=deploy.yml --limit=10
 **Community App 404**:
 - Verify build output: `dist/community/index.html`
 - Check BASE_PATH configuration in workflow
-- Confirm Fairfield build succeeded in logs
+- Confirm DreamLab build succeeded in logs
 
 **Stale Content**:
 - Force refresh: Ctrl+Shift+R (Windows) or Cmd+Shift+R (Mac)
@@ -123,7 +123,7 @@ gh run list --workflow=deploy.yml --limit=10
 
 ```bash
 # Create monitoring workspace
-gcloud monitoring workspaces create --display-name="Fairfield Services"
+gcloud monitoring workspaces create --display-name="DreamLab Services"
 
 # List available services
 gcloud run services list --region=us-central1

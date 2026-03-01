@@ -2,7 +2,7 @@
 
 **Last Updated:** 2026-03-01
 
-> **Migration Notice (2026-03-01):** The following services are being migrated to Cloudflare Workers per [ADR-010](../adr/010-return-to-cloudflare.md): **auth-api**, **jss** (replaced by pod-api Worker), and **image-api**. Worker code is complete in `workers/` and deployment is pending Cloudflare account setup. See [CLOUDFLARE_WORKERS.md](./CLOUDFLARE_WORKERS.md) for details.
+> **Migration Notice (2026-03-01):** Three services have been migrated to Cloudflare Workers per [ADR-010](../adr/010-return-to-cloudflare.md): **auth-api** (deployed at `dreamlab-auth-api.solitary-paper-764d.workers.dev`), **pod-api** (replaces jss, deployed at `dreamlab-pod-api.solitary-paper-764d.workers.dev`), and **search-api** (deployed at `dreamlab-search-api.solitary-paper-764d.workers.dev`). **image-api** migration is planned. See [CLOUDFLARE_WORKERS.md](./CLOUDFLARE_WORKERS.md) for details.
 >
 > Services **retained** on Cloud Run: **nostr-relay** (WebSocket, always-on), **embedding-api** (Python ML runtime).
 
@@ -39,7 +39,7 @@ All Docker images are pushed to **Artifact Registry**: `us-central1-docker.pkg.d
 
 ## Service: auth-api
 
-> **Migration target: Cloudflare Workers.** Worker code complete in `workers/auth-api/`. Deployment pending Cloudflare account setup. This Cloud Run service will be decommissioned after Workers deployment is verified.
+> **Migration target: Cloudflare Workers.** Worker deployed at `https://dreamlab-auth-api.solitary-paper-764d.workers.dev`. This Cloud Run service will be decommissioned after DNS cutover to Workers.
 
 WebAuthn registration and authentication server with NIP-98 verification and Solid pod provisioning.
 
@@ -92,7 +92,7 @@ See [Auth API Reference](../api/AUTH_API.md) for full endpoint documentation.
 
 ## Service: jss
 
-> **Migration target: Cloudflare Workers.** Replaced by pod-api Worker in `workers/pod-api/` (R2 + WAC evaluator). Worker code complete. Deployment pending Cloudflare account setup. This Cloud Run service will be decommissioned after Workers deployment is verified.
+> **Migration target: Cloudflare Workers.** Replaced by pod-api Worker deployed at `https://dreamlab-pod-api.solitary-paper-764d.workers.dev` (R2 + WAC evaluator). This Cloud Run service will be decommissioned after DNS cutover to Workers.
 
 JavaScript Solid Server (Community Solid Server 7.x) providing per-user pod storage.
 

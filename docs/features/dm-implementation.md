@@ -16,7 +16,7 @@ related-docs:
 
 ## Overview
 
-Complete implementation of privacy-preserving direct messages for Nostr-BBS using:
+Complete implementation of privacy-preserving direct messages for DreamLab Community Forum using:
 
 - **NIP-17**: Private Direct Messages (sealed rumors)
 - **NIP-59**: Gift Wraps (metadata protection)

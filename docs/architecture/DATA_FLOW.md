@@ -41,7 +41,7 @@ flowchart TB
         CloudSQL["Cloud SQL<br/>PostgreSQL"]
         GCS["Cloud Storage"]
         SupabaseDB["Supabase DB"]
-        R2["R2 Bucket<br/>(planned)"]
+        R2["R2 Bucket<br/>(deployed)"]
     end
 
     Browser -->|HTTP GET| React

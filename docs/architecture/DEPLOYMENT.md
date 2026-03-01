@@ -2,11 +2,11 @@
 
 **Last Updated**: 2026-03-01
 **CI/CD Platform**: GitHub Actions
-**Hosting**: GitHub Pages + GCP Cloud Run + Cloudflare Pages (opt-in) + Cloudflare Workers (code complete)
+**Hosting**: GitHub Pages + GCP Cloud Run + Cloudflare Pages (opt-in) + Cloudflare Workers (deployed)
 
 ## Overview
 
-DreamLab AI uses a fully automated CI/CD pipeline with 10 GitHub Actions workflows deploying to multiple targets: GitHub Pages (static site), GCP Cloud Run (6 backend services), optionally Cloudflare Pages (frontend), and Cloudflare Workers (3 Workers with code complete, deployment pending account setup).
+DreamLab AI uses a fully automated CI/CD pipeline with 10 GitHub Actions workflows deploying to multiple targets: GitHub Pages (static site), GCP Cloud Run (6 backend services), optionally Cloudflare Pages (frontend), and Cloudflare Workers (3 Workers deployed at `*.solitary-paper-764d.workers.dev`).
 
 ---
 
@@ -49,7 +49,7 @@ graph TB
             LinkSvc["link-preview-api"]
         end
 
-        subgraph CF["Cloudflare Workers (code complete)"]
+        subgraph CF["Cloudflare Workers (deployed)"]
             CFAuth["auth-api Worker"]
             CFPod["pod-api Worker"]
             CFSearch["search-api Worker"]
@@ -271,7 +271,7 @@ flowchart TB
 
 ---
 
-## 7. Cloudflare Workers Deployment (Code Complete)
+## 7. Cloudflare Workers Deployment (Deployed)
 
 ### Wrangler Configuration (`wrangler.toml`)
 
@@ -337,7 +337,7 @@ The `workers-deploy.yml` workflow automates Workers deployment:
 4. Run D1 migrations
 5. Verify health endpoints
 
-**Status**: Workflow file exists. Deployment is pending Cloudflare account setup (API token, resource creation).
+**Status**: Workflow file exists. All three Workers (auth-api, pod-api, search-api) deployed to `*.solitary-paper-764d.workers.dev`. Custom domain DNS pending.
 
 ---
 
@@ -413,9 +413,9 @@ flowchart LR
 | Record | Value | Purpose |
 |--------|-------|---------|
 | `dreamlab-ai.com` | CNAME to GitHub Pages | Main site |
-| `api.dreamlab-ai.com` | Cloudflare Workers route (code complete, DNS pending) | Auth API |
-| `pods.dreamlab-ai.com` | Cloudflare Workers route (code complete, DNS pending) | Pod API |
-| `search.dreamlab-ai.com` | Cloudflare Workers route (code complete, DNS pending) | Search API (WASM vector search) |
+| `api.dreamlab-ai.com` | Cloudflare Workers route (deployed, DNS pending) | Auth API |
+| `pods.dreamlab-ai.com` | Cloudflare Workers route (deployed, DNS pending) | Pod API |
+| `search.dreamlab-ai.com` | Cloudflare Workers route (deployed, DNS pending) | Search API (WASM vector search) |
 | `relay.dreamlab-ai.com` | Cloud Run service URL | Nostr relay |
 
 ---
@@ -499,7 +499,7 @@ gcloud run services update auth-api \
 
 **Recovery time**: ~30 seconds (traffic switch) or ~2 minutes (new revision)
 
-### Cloudflare Workers Rollback (Planned)
+### Cloudflare Workers Rollback
 
 ```bash
 npx wrangler rollback --env production
@@ -520,7 +520,7 @@ npx wrangler rollback --env production
 | Cloud SQL | Daily (automated) | 30 days | Multi-region GCP |
 | Supabase DB | Daily (managed) | 30 days | Managed |
 | Cloud Storage | Versioning enabled | 90 days | us-central1 |
-| R2 (planned) | 99.999999999% durability | Indefinite | Cloudflare global |
+| R2 (deployed) | 99.999999999% durability | Indefinite | Cloudflare global |
 
 ### Complete Site Rebuild
 

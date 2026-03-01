@@ -1,6 +1,6 @@
 ---
 title: "Admin Security Hardening"
-description: "This document describes the security hardening measures implemented for admin workflows in Fairfield."
+description: "This document describes the security hardening measures implemented for admin workflows in DreamLab."
 category: tutorial
 tags: ['admin', 'developer', 'messaging', 'security', 'user']
 difficulty: beginner
@@ -9,7 +9,7 @@ last-updated: 2026-01-16
 
 # Admin Security Hardening
 
-This document describes the security hardening measures implemented for admin workflows in Fairfield.
+This document describes the security hardening measures implemented for admin workflows in DreamLab.
 
 ## Overview
 

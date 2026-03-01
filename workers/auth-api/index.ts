@@ -16,24 +16,27 @@ export interface Env {
   EXPECTED_ORIGIN: string;
 }
 
-// CORS headers for cross-origin requests from the SPA
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-};
+// CORS headers — restricted to expected origin (not wildcard)
+function corsHeaders(env: Env): Record<string, string> {
+  return {
+    'Access-Control-Allow-Origin': env.EXPECTED_ORIGIN || 'https://dreamlab-ai.com',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Max-Age': '86400',
+  };
+}
 
-function jsonResponse(data: unknown, status = 200): Response {
+function jsonResponse(data: unknown, status: number, env: Env): Response {
   return new Response(JSON.stringify(data), {
     status,
-    headers: { 'Content-Type': 'application/json', ...corsHeaders },
+    headers: { 'Content-Type': 'application/json', ...corsHeaders(env) },
   });
 }
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     if (request.method === 'OPTIONS') {
-      return new Response(null, { status: 204, headers: corsHeaders });
+      return new Response(null, { status: 204, headers: corsHeaders(env) });
     }
 
     const url = new URL(request.url);
@@ -42,7 +45,7 @@ export default {
     try {
       // Health check
       if (path === '/health') {
-        return jsonResponse({ status: 'ok', service: 'auth-api', runtime: 'workers' });
+        return jsonResponse({ status: 'ok', service: 'auth-api', runtime: 'workers' }, 200, env);
       }
 
       // WebAuthn Registration - Generate options
@@ -68,7 +71,7 @@ export default {
       // NIP-98 protected endpoints
       if (path.startsWith('/api/')) {
         const auth = request.headers.get('Authorization');
-        if (!auth) return jsonResponse({ error: 'Authorization required' }, 401);
+        if (!auth) return jsonResponse({ error: 'Authorization required' }, 401, env);
 
         const requestUrl = `${env.EXPECTED_ORIGIN}${path}`;
         const result = await verifyNip98(auth, {
@@ -77,7 +80,7 @@ export default {
           rawBody: request.body ? await request.arrayBuffer() : undefined,
         });
 
-        if (!result) return jsonResponse({ error: 'Invalid NIP-98 token' }, 401);
+        if (!result) return jsonResponse({ error: 'Invalid NIP-98 token' }, 401, env);
 
         // Route authenticated requests
         if (path === '/api/profile' && request.method === 'GET') {
@@ -85,13 +88,13 @@ export default {
         }
       }
 
-      return jsonResponse({ error: 'Not found' }, 404);
+      return jsonResponse({ error: 'Not found' }, 404, env);
     } catch (err) {
       if (err instanceof SyntaxError) {
-        return jsonResponse({ error: 'Invalid JSON body' }, 400);
+        return jsonResponse({ error: 'Invalid JSON body' }, 400, env);
       }
       console.error('Worker error:', err);
-      return jsonResponse({ error: 'Internal server error' }, 500);
+      return jsonResponse({ error: 'Internal server error' }, 500, env);
     }
   },
 };
@@ -99,7 +102,7 @@ export default {
 async function handleRegisterOptions(request: Request, env: Env): Promise<Response> {
   const body = await request.json() as { pubkey?: string };
   if (!body.pubkey || body.pubkey.length !== 64) {
-    return jsonResponse({ error: 'Invalid pubkey' }, 400);
+    return jsonResponse({ error: 'Invalid pubkey' }, 400, env);
   }
 
   // Generate challenge
@@ -128,7 +131,7 @@ async function handleRegisterOptions(request: Request, env: Env): Promise<Respon
       userVerification: 'required',
     },
     extensions: { prf: {} },
-  });
+  }, 200, env);
 }
 
 async function handleRegisterVerify(request: Request, env: Env): Promise<Response> {
@@ -136,7 +139,7 @@ async function handleRegisterVerify(request: Request, env: Env): Promise<Respons
   const pubkey = body.pubkey as string;
 
   if (!pubkey || typeof pubkey !== 'string') {
-    return jsonResponse({ error: 'Missing pubkey' }, 400);
+    return jsonResponse({ error: 'Missing pubkey' }, 400, env);
   }
 
   // Verify challenge exists
@@ -145,14 +148,14 @@ async function handleRegisterVerify(request: Request, env: Env): Promise<Respons
   ).bind(pubkey).first();
 
   if (!challengeRow) {
-    return jsonResponse({ error: 'No pending challenge' }, 400);
+    return jsonResponse({ error: 'No pending challenge' }, 400, env);
   }
 
   // Validate required fields
   const credentialId = typeof body.credentialId === 'string' ? body.credentialId : null;
   const publicKey = typeof body.publicKey === 'string' ? body.publicKey : null;
   if (!credentialId || !publicKey) {
-    return jsonResponse({ error: 'Missing credentialId or publicKey' }, 400);
+    return jsonResponse({ error: 'Missing credentialId or publicKey' }, 400, env);
   }
 
   const prfSalt = typeof body.prfSalt === 'string' ? body.prfSalt : null;
@@ -180,7 +183,7 @@ async function handleRegisterVerify(request: Request, env: Env): Promise<Respons
     verified: true,
     pubkey,
     ...podInfo,
-  });
+  }, 200, env);
 }
 
 async function handleLoginOptions(request: Request, env: Env): Promise<Response> {
@@ -214,20 +217,20 @@ async function handleLoginOptions(request: Request, env: Env): Promise<Response>
     timeout: 60000,
     userVerification: 'required',
     extensions: prfSalt ? { prf: { eval: { first: prfSalt } } } : { prf: {} },
-  });
+  }, 200, env);
 }
 
 async function handleLoginVerify(request: Request, env: Env): Promise<Response> {
   const body = await request.json() as Record<string, unknown>;
   const pubkey = body.pubkey as string;
 
-  if (!pubkey) return jsonResponse({ error: 'Missing pubkey' }, 400);
+  if (!pubkey) return jsonResponse({ error: 'Missing pubkey' }, 400, env);
 
   const cred = await env.DB.prepare(
     'SELECT credential_id, public_key, counter FROM webauthn_credentials WHERE pubkey = ? LIMIT 1'
   ).bind(pubkey).first();
 
-  if (!cred) return jsonResponse({ error: 'No registered credential' }, 400);
+  if (!cred) return jsonResponse({ error: 'No registered credential' }, 400, env);
 
   // Update counter
   const newCounter = (cred.counter as number) + 1;
@@ -239,16 +242,16 @@ async function handleLoginVerify(request: Request, env: Env): Promise<Response> 
     verified: true,
     pubkey,
     didNostr: `did:nostr:${pubkey}`,
-  });
+  }, 200, env);
 }
 
 async function handleProfile(pubkey: string, env: Env): Promise<Response> {
   const profile = await env.PODS.get(`pods/${pubkey}/profile/card`);
-  if (!profile) return jsonResponse({ error: 'Profile not found' }, 404);
+  if (!profile) return jsonResponse({ error: 'Profile not found' }, 404, env);
 
   const body = await profile.text();
   return new Response(body, {
-    headers: { 'Content-Type': 'application/ld+json', ...corsHeaders },
+    headers: { 'Content-Type': 'application/ld+json', ...corsHeaders(env) },
   });
 }
 

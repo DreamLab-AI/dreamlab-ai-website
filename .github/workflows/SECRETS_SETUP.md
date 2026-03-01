@@ -179,12 +179,12 @@ gcloud projects add-iam-policy-binding $PROJECT_ID \
 
 ### Create Storage Bucket
 ```bash
-gcloud storage buckets create gs://Nostr-BBS-vectors \
+gcloud storage buckets create gs://dreamlab-vectors \
   --location=$REGION \
   --uniform-bucket-level-access
 
 # Make bucket publicly readable (for frontend access)
-gcloud storage buckets add-iam-policy-binding gs://Nostr-BBS-vectors \
+gcloud storage buckets add-iam-policy-binding gs://dreamlab-vectors \
   --member="allUsers" \
   --role="roles/storage.objectViewer"
 ```
@@ -237,7 +237,7 @@ gcloud projects get-iam-policy $PROJECT_ID \
   --filter="bindings.members:serviceAccount:github-actions@$PROJECT_ID.iam.gserviceaccount.com"
 
 # Check bucket exists
-gcloud storage buckets list | grep Nostr-BBS-vectors
+gcloud storage buckets list | grep dreamlab-vectors
 
 # Check Artifact Registry (minimoonoir)
 gcloud artifacts repositories list --location=$REGION
@@ -295,8 +295,17 @@ gcloud iam service-accounts keys create github-actions-key-new.json \
 
 ### Storage bucket access issues
 - Verify bucket exists: `gcloud storage buckets list`
-- Check IAM permissions: `gcloud storage buckets get-iam-policy gs://Nostr-BBS-vectors`
+- Check IAM permissions: `gcloud storage buckets get-iam-policy gs://dreamlab-vectors`
 - Ensure embedding-api SA has storage.objectViewer role
+
+## Cloudflare Secrets (for Workers deployment)
+
+Required secrets (set via `gh secret set`):
+- `CLOUDFLARE_API_TOKEN` — Scoped API token with Workers Scripts Edit, D1 Edit, KV Edit, R2 Edit permissions
+- `CLOUDFLARE_ACCOUNT_ID` — Cloudflare account ID
+
+Required variables (set via `gh variable set`):
+- `CLOUDFLARE_PAGES_ENABLED` — Set to `true` to enable Pages deployment in deploy.yml
 
 ## Next Steps
 

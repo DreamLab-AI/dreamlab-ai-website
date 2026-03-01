@@ -2,18 +2,18 @@
 
 **Last Updated**: 2026-03-01
 **Version**: 2.1.0
-**Status**: Production (GCP + GitHub Pages) + Workers Code Complete (Cloudflare)
+**Status**: Production (GCP + GitHub Pages) + Workers Deployed (Cloudflare)
 
 ## Executive Summary
 
-DreamLab AI is a premium AI training and consulting platform comprising two frontend applications (React SPA and SvelteKit community forum) deployed on GitHub Pages, six backend services on GCP Cloud Run, and a planned migration of four of those services to Cloudflare Workers (ADR-010). The platform serves operations leaders, founders, and technical teams through residential masterclasses, corporate workshops, and bespoke consulting services.
+DreamLab AI is a premium AI training and consulting platform comprising two frontend applications (React SPA and SvelteKit community forum) deployed on GitHub Pages, six backend services on GCP Cloud Run, and three Cloudflare Workers (auth-api, pod-api, search-api) deployed per ADR-010. The platform serves operations leaders, founders, and technical teams through residential masterclasses, corporate workshops, and bespoke consulting services.
 
 **Key Metrics**:
 - 44+ team member profiles
 - 14 route pages (main site) + 21 route pages (community forum)
 - 50+ shadcn/ui primitives
 - 6 GCP Cloud Run backend services (current)
-- 3 Cloudflare Workers (auth-api, pod-api, search-api) with code complete in `workers/`
+- 3 Cloudflare Workers (auth-api, pod-api, search-api) deployed at `*.solitary-paper-764d.workers.dev`
 - Consolidated NIP-98 module shared across 4 consumers
 
 ---
@@ -46,7 +46,7 @@ graph TB
         SupabaseAuth["Authentication"]
     end
 
-    subgraph CF["Cloudflare Workers (code complete)"]
+    subgraph CF["Cloudflare Workers (deployed)"]
         CFAuth["auth-api Worker<br/>D1 + KV"]
         CFPod["pod-api Worker<br/>R2 + KV + WAC"]
         CFSearch["search-api Worker<br/>WASM + R2 + KV"]
@@ -83,7 +83,7 @@ graph TB
 | Principle | Implementation | Rationale |
 |-----------|----------------|-----------|
 | **Serverless-First** | GitHub Pages + Cloud Run + Workers | Zero infrastructure management, automatic scaling |
-| **Edge-Optimised** | Cloudflare Workers (planned) at 300+ PoPs | Sub-5ms cold starts, global low latency |
+| **Edge-Optimised** | Cloudflare Workers (deployed) at 300+ PoPs | Sub-5ms cold starts, global low latency |
 | **Security by Design** | WebAuthn PRF + NIP-98 + WAC | Passwordless auth, cryptographic HTTP auth, access control |
 | **Decentralised Identity** | Nostr pubkey + did:nostr + WebID | User-owned keys, no centralised identity provider |
 | **Performance-Oriented** | Code splitting, lazy loading, CDN delivery | Sub-3s page loads |
@@ -127,7 +127,7 @@ graph TB
         Actions["GitHub Actions<br/>(9 workflows)"]
         Pages["GitHub Pages<br/>+ Cloudflare Pages (opt-in)"]
         CloudRun["GCP Cloud Run<br/>(6 services)"]
-        Workers["Cloudflare Workers<br/>(code complete)"]
+        Workers["Cloudflare Workers<br/>(deployed)"]
     end
 
     React --> UI
@@ -165,7 +165,7 @@ graph TB
 | **Type Safety** | TypeScript | 5.5.3 | Static typing |
 | **Backend (Main)** | Supabase | 2.49.4 | Database, auth |
 | **Backend (Forum)** | GCP Cloud Run | - | 6 containerised services |
-| **Backend (Code Complete)** | Cloudflare Workers | - | Edge compute (D1/KV/R2), WASM search |
+| **Backend (Deployed)** | Cloudflare Workers | - | Edge compute (D1/KV/R2), WASM search |
 | **Deployment** | GitHub Pages | - | Static hosting |
 | **CI/CD** | GitHub Actions | - | Automated deployment |
 
@@ -211,13 +211,13 @@ graph TB
 | **link-preview-api** | Cloud Run | Node.js | URL metadata extraction | HTTPS |
 | **Supabase** | Managed | PostgreSQL + Auth | Main site database | Managed |
 
-### 4. Cloudflare Workers (Code Complete, ADR-010)
+### 4. Cloudflare Workers (Deployed, ADR-010)
 
 | Worker | Storage | Replaces | Status |
 |--------|---------|----------|--------|
-| **auth-api** | D1 + KV (SESSIONS) | Cloud Run auth-api | Code complete in `workers/auth-api/` |
-| **pod-api** | R2 (PODS) + KV (POD_META) | Cloud Run JSS | Code complete in `workers/pod-api/` |
-| **search-api** | R2 (dreamlab-vectors) + KV (SEARCH_CONFIG) | New service (WASM vector search) | Code complete in `workers/search-api/` |
+| **auth-api** | D1 + KV (SESSIONS) | Cloud Run auth-api | Deployed at `dreamlab-auth-api.solitary-paper-764d.workers.dev` |
+| **pod-api** | R2 (PODS) + KV (POD_META) | Cloud Run JSS | Deployed at `dreamlab-pod-api.solitary-paper-764d.workers.dev` |
+| **search-api** | R2 (dreamlab-vectors) + KV (SEARCH_CONFIG) | New service (WASM vector search) | Deployed at `dreamlab-search-api.solitary-paper-764d.workers.dev` |
 
 ---
 
@@ -341,13 +341,13 @@ graph TB
     ImageSvc --> GCS
 ```
 
-### Cloudflare Migration (ADR-010 -- Code Complete, Deployment Pending)
+### Cloudflare Migration (ADR-010 -- Deployed)
 
-| Service | Current | Target | Storage | Code Status |
-|---------|---------|--------|---------|-------------|
-| auth-api | Cloud Run (Express) | Cloudflare Workers | D1 + KV | Code complete |
-| jss (pod-api) | Cloud Run (CSS 7.x) | Cloudflare Workers | R2 + KV | Code complete |
-| search-api | New | Cloudflare Workers | R2 + KV + WASM | Code complete |
+| Service | Current | Target | Storage | Status |
+|---------|---------|--------|---------|--------|
+| auth-api | Cloud Run (Express) | Cloudflare Workers | D1 + KV | Deployed |
+| jss (pod-api) | Cloud Run (CSS 7.x) | Cloudflare Workers | R2 + KV | Deployed |
+| search-api | New | Cloudflare Workers | R2 + KV + WASM | Deployed |
 | image-api | Cloud Run (Node.js) | Cloudflare Workers | R2 | Planned |
 | link-preview-api | Cloud Run | Cloudflare Workers | Stateless | Planned |
 | nostr-relay | Cloud Run | **Retained on Cloud Run** | Cloud SQL | N/A |

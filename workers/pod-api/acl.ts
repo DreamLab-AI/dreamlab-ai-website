@@ -44,7 +44,10 @@ function getIds(val: { '@id': string } | Array<{ '@id': string }> | undefined): 
 }
 
 function normalizePath(path: string): string {
-  return path.replace(/\/+$/, '') || '/';
+  // Handle relative paths (e.g., "./" or "./profile/") by converting to absolute
+  let normalized = path.replace(/^\.\//, '/').replace(/^\./, '/');
+  normalized = normalized.replace(/\/+$/, '') || '/';
+  return normalized;
 }
 
 function pathMatches(rulePath: string, resourcePath: string, isDefault: boolean): boolean {

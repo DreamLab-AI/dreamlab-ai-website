@@ -1,7 +1,7 @@
 # Cloudflare Workers Migration
 
 **Last Updated:** 2026-03-01
-**Status:** Code Complete -- Deployment Pending Cloudflare Account Setup
+**Status:** Deployed -- auth-api, pod-api, search-api live at `*.solitary-paper-764d.workers.dev`
 
 This document describes the migration from GCP Cloud Run to the Cloudflare platform (Workers, Pages, D1, KV, R2). See [docs/prd-cloudflare-workers-migration.md](../prd-cloudflare-workers-migration.md) for the full PRD and [ADR-010](../adr/010-return-to-cloudflare.md) for the architectural decision record.
 
@@ -58,9 +58,9 @@ Retained on GCP Cloud Run (us-central1):
 
 | Worker | Source | Bindings | Status |
 |--------|--------|----------|--------|
-| auth-api | `workers/auth-api/` | D1, KV | Code complete |
-| pod-api | `workers/pod-api/` | R2, KV | Code complete |
-| search-api | `workers/search-api/` | WASM (42KB), R2, KV | Code complete |
+| auth-api | `workers/auth-api/` | D1, KV | Deployed |
+| pod-api | `workers/pod-api/` | R2, KV | Deployed |
+| search-api | `workers/search-api/` | WASM (42KB), R2, KV | Deployed |
 
 **Shared modules:**
 
@@ -94,9 +94,9 @@ To enable Pages: set `CLOUDFLARE_PAGES_ENABLED=true` in GitHub repository variab
 | Component | GCP Equivalent | Cloudflare Target | Status |
 |-----------|---------------|-------------------|--------|
 | Static site deploy | GitHub Pages | Cloudflare Pages | Gated, ready to enable |
-| auth-api | Cloud Run (Express) | Worker + D1 | Code complete |
-| pod-api | Cloud Run (CSS 7.x) | Worker + R2 + WAC evaluator | Code complete |
-| search-api | N/A (new service) | Worker + WASM + R2 + KV | Code complete |
+| auth-api | Cloud Run (Express) | Worker + D1 | Deployed |
+| pod-api | Cloud Run (CSS 7.x) | Worker + R2 + WAC evaluator | Deployed |
+| search-api | N/A (new service) | Worker + WASM + R2 + KV | Deployed |
 | image-api | Cloud Run (Node.js) | Worker + R2 | Not started |
 | nostr-relay | Cloud Run (Node.js) | Worker + Durable Objects + D1 | Not started (retained on Cloud Run) |
 | embedding-api | Cloud Run (Python) | N/A (requires Python runtime) | Retained on Cloud Run |
@@ -311,7 +311,7 @@ wrangler d1 execute dreamlab-auth --file=workers/auth-api/schema.sql
 4. Test Cloudflare Pages build
 5. Optionally: migrate DNS to Cloudflare for full CDN benefits
 
-### Phase 2: Workers Deployment (Code Complete, Pending Account Setup)
+### Phase 2: Workers Deployment (Deployed)
 
 1. Create Cloudflare account and API credentials
 2. Create D1 databases, R2 buckets, and KV namespaces

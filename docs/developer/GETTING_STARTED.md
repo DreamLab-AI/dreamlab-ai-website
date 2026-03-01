@@ -166,7 +166,7 @@ The repository is a monorepo containing:
 |-----------|-------------|
 | `src/` | React SPA source (Vite + TypeScript + Tailwind) |
 | `community-forum/` | SvelteKit community forum (separate package.json) |
-| `workers/` | Cloudflare Workers (planned migration from Cloud Run) |
+| `workers/` | Cloudflare Workers (deployed, migrated from Cloud Run) |
 | `wasm-voronoi/` | Rust WASM module for Voronoi tessellation |
 | `public/` | Static assets served as-is (team profiles, workshop content) |
 | `scripts/` | Build-time scripts (workshop list generator, image tools) |

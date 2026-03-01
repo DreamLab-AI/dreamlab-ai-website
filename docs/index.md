@@ -20,7 +20,7 @@ This page provides quick access to the main documentation sections. For the full
 - [Architecture overview](architecture.md) -- system design, data flow, auth model
 - [Feature status matrix](features/STATUS_MATRIX.md) -- what is running, planned, or broken
 - [ADR index](adr/README.md) -- 10 Architecture Decision Records
-- [Cloudflare migration PRD](prd-cloudflare-workers-migration.md) -- platform migration (in progress)
+- [Cloudflare migration PRD](prd-cloudflare-workers-migration.md) -- platform migration (Phase 1 deployed)
 - [Security overview](security/SECURITY_OVERVIEW.md) -- security posture and audit findings
 
 ## Build and Run

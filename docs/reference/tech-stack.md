@@ -196,7 +196,7 @@ All Radix UI primitives are used through shadcn/ui wrappers in `src/components/u
 
 ### auth-api
 
-Express application deployed to Cloud Run. A Cloudflare Workers version exists at `workers/auth-api/` (code complete, deployment pending).
+Express application deployed to Cloud Run. A Cloudflare Workers version is deployed at `https://dreamlab-auth-api.solitary-paper-764d.workers.dev`.
 
 | Dependency | Purpose |
 |-----------|---------|
@@ -231,13 +231,13 @@ URL metadata extraction for link previews.
 
 ---
 
-## Cloudflare Workers (code complete, deployment pending)
+## Cloudflare Workers (deployed)
 
-auth-api and pod-api Workers are code complete. image-api and link-preview-api Workers are planned. See ADR-010 for migration details.
+auth-api, pod-api, and search-api Workers are deployed at `*.solitary-paper-764d.workers.dev`. image-api and link-preview-api Workers are planned. See ADR-010 for migration details.
 
 | Technology | Purpose |
 |-----------|---------|
-| Cloudflare Workers | Serverless compute (auth-api, pod-api code complete) |
+| Cloudflare Workers | Serverless compute (auth-api, pod-api, search-api deployed) |
 | D1 | SQLite database (WebAuthn credentials, challenges) |
 | KV | Key-value storage (sessions, pod metadata, config) |
 | R2 | Object storage (pod data, images) |
@@ -300,8 +300,8 @@ Configuration is in `wrangler.toml`.
 |-----------|----------|-------|
 | Main site | GitHub Pages | Static build via `deploy.yml` |
 | Community forum | GitHub Pages | Static SvelteKit adapter, served at `/community/` |
-| auth-api | Google Cloud Run (migration target: Cloudflare Workers) | `us-central1`, GCP project `cumbriadreamlab`. Workers version code complete. |
-| jss | Google Cloud Run (migration target: Cloudflare Workers pod-api) | Solid pod server. Workers pod-api code complete. |
+| auth-api | Google Cloud Run (migration target: Cloudflare Workers) | `us-central1`, GCP project `cumbriadreamlab`. Workers version deployed at `dreamlab-auth-api.solitary-paper-764d.workers.dev`. |
+| jss | Google Cloud Run (migration target: Cloudflare Workers pod-api) | Solid pod server. Workers pod-api deployed at `dreamlab-pod-api.solitary-paper-764d.workers.dev`. |
 | nostr-relay | Google Cloud Run (retained) | WebSocket-capable. Remains on Cloud Run per ADR-010. |
 | embedding-api | Google Cloud Run (retained) | Vector embeddings. Remains on Cloud Run per ADR-010. |
 | image-api | Google Cloud Run (migration target: Cloudflare Workers) | Image processing. Workers version planned. |

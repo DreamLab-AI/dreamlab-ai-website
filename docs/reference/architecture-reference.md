@@ -365,7 +365,7 @@ interface NostrBBSDB {
 | Component | Technology | Rationale |
 |-----------|------------|-----------|
 | PWA Hosting | GitHub Pages | Free, fast CDN, simple deployment |
-| Relay Hosting | GCP Cloud Run (retained) | Container-based, persistent WebSockets. Migration to Cloudflare Workers in progress for other services. |
+| Relay Hosting | GCP Cloud Run (retained) | Container-based, persistent WebSockets. auth-api, pod-api, search-api migrated to Cloudflare Workers. |
 | Database | Cloud SQL PostgreSQL | Managed DB, automatic backups, pgvector |
 | File Storage | Google Cloud Storage / Cloudflare R2 (target) | Media files, vector indices. R2 for pod and image storage in Workers migration. |
 | Monitoring | Cloud Logging + Monitoring | Built-in GCP observability (retained services) |

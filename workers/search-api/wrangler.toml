@@ -13,6 +13,7 @@ id = "440b1f07ff224fb8ad644e094c6766c0"
 [[rules]]
 type = "CompiledWasm"
 globs = ["**/*.wasm"]
+fallthrough = false
 
 [vars]
 ALLOWED_ORIGIN = "https://dreamlab-ai.com"

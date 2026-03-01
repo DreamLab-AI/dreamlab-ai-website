@@ -12,7 +12,7 @@ This document tracks the status of every major feature and service in the DreamL
 |--------|---------|
 | **Running** | Deployed and functioning in production |
 | **Deployed** | Deployed to production infrastructure but may have known issues |
-| **Code only** | Source code written but not yet deployed |
+| **Code only** | Source code written but not yet deployed to production |
 | **Built** | Package/module built and tested locally, not deployed as a service |
 | **Not running** | Expected to be available but currently offline or inaccessible |
 | **Planned** | Documented in PRD or ADR but no code written |
@@ -81,7 +81,7 @@ This document tracks the status of every major feature and service in the DreamL
 | Module | Status | Location | Detail |
 |--------|--------|----------|--------|
 | NIP-98 shared package | **Built** | `community-forum/packages/nip98/` | Consolidated sign.ts, verify.ts, types.ts. Replaces 4 independent NIP-98 implementations (~330 lines removable). Uses `nostr-tools/nip98` (v2.19.3). |
-| NIP-98 Workers shared | **Code complete** | `workers/shared/nip98.ts` | NIP-98 utilities for Cloudflare Workers runtime. |
+| NIP-98 Workers shared | **Deployed** | `workers/shared/nip98.ts` | NIP-98 utilities for Cloudflare Workers runtime. |
 | WASM Voronoi | **Built** | `wasm-voronoi/` | Rust WASM module for Voronoi tessellation. Compiled and used by VoronoiGoldenHero component. |
 
 ## Authentication

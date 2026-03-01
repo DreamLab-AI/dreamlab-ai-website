@@ -8,7 +8,7 @@ Complete API documentation for the DreamLab AI backend services.
 
 ## Overview
 
-The platform runs six backend services, currently deployed on Google Cloud Run (region `us-central1`, GCP project `cumbriadreamlab`). A migration to Cloudflare Workers is planned.
+The platform runs six backend services, currently deployed on Google Cloud Run (region `us-central1`, GCP project `cumbriadreamlab`). A completed migration of auth-api, pod-api, and search-api to Cloudflare Workers is deployed at `*.solitary-paper-764d.workers.dev`.
 
 | Service | Base URL | Auth required |
 |---------|----------|---------------|

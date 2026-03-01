@@ -1,7 +1,7 @@
 name: Deploy Cloudflare Workers
 
 # Deploys all 3 Workers using per-worker wrangler.toml configs.
-# Triggers on pushes to main that touch workers/ or wrangler configs,
+# Triggers on pushes to main that touch workers/ or workflow config,
 # or manually via workflow_dispatch.
 
 on:
@@ -9,7 +9,7 @@ on:
     branches: [main]
     paths:
       - 'workers/**'
-      - 'wrangler.toml'
+      - '.github/workflows/workers-deploy.yml'
   workflow_dispatch:
 
 permissions:
@@ -17,6 +17,7 @@ permissions:
 
 env:
   NODE_VERSION: '20'
+  CF_SUBDOMAIN: 'solitary-paper-764d'
 
 jobs:
   deploy:
@@ -32,10 +33,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
 
       - name: Deploy auth-api
         uses: cloudflare/wrangler-action@v3
@@ -76,9 +73,9 @@ jobs:
           sleep 10
 
           for worker in dreamlab-auth-api dreamlab-pod-api dreamlab-search-api; do
-            URL="https://${worker}.solitary-paper-764d.workers.dev/health"
+            URL="https://${worker}.${{ env.CF_SUBDOMAIN }}.workers.dev/health"
             if [ "$worker" = "dreamlab-search-api" ]; then
-              URL="https://${worker}.solitary-paper-764d.workers.dev/status"
+              URL="https://${worker}.${{ env.CF_SUBDOMAIN }}.workers.dev/status"
             fi
             STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 "$URL" || true)
             echo "${worker}: HTTP ${STATUS}"
@@ -91,16 +88,16 @@ jobs:
 
       - name: Deployment summary
         run: |
-          cat >> $GITHUB_STEP_SUMMARY <<'EOF'
+          cat >> $GITHUB_STEP_SUMMARY <<EOF
           ## Cloudflare Workers Deployment
 
           | Worker | URL |
           |--------|-----|
-          | auth-api | `dreamlab-auth-api.solitary-paper-764d.workers.dev` |
-          | pod-api | `dreamlab-pod-api.solitary-paper-764d.workers.dev` |
-          | search-api | `dreamlab-search-api.solitary-paper-764d.workers.dev` |
+          | auth-api | \`dreamlab-auth-api.${{ env.CF_SUBDOMAIN }}.workers.dev\` |
+          | pod-api | \`dreamlab-pod-api.${{ env.CF_SUBDOMAIN }}.workers.dev\` |
+          | search-api | \`dreamlab-search-api.${{ env.CF_SUBDOMAIN }}.workers.dev\` |
 
-          - **Branch**: `${{ github.ref_name }}`
-          - **Commit**: `${{ github.sha }}`
+          - **Branch**: \`${{ github.ref_name }}\`
+          - **Commit**: \`${{ github.sha }}\`
           - **Actor**: @${{ github.actor }}
           EOF

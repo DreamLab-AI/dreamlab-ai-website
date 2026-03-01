@@ -43,9 +43,9 @@ Return to the Cloudflare platform. Migrate the majority of services to Cloudflar
 
 | Service | Storage Backend | Rationale | Code Status |
 |---------|----------------|-----------|-------------|
-| **auth-api** | D1 (credentials, challenges) + KV (sessions) | WebAuthn + NIP-98 proven on Workers (paa.pub). PostgreSQL schema maps cleanly to D1 SQLite. | Code complete |
-| **pod-api** (replaces JSS) | R2 (pod files) + KV (ACLs, metadata) | Replace CSS 7.x with custom Workers-native pod storage. Eliminates ephemeral storage and permissive ACL problems. | Code complete |
-| **search-api** | R2 (dreamlab-vectors, .rvf files) + KV (SEARCH_CONFIG, id-to-label) | WASM-powered vector similarity search. 42KB rvf-wasm microkernel. 490K vec/sec ingest, 0.47ms p50 query. | Code complete |
+| **auth-api** | D1 (credentials, challenges) + KV (sessions) | WebAuthn + NIP-98 proven on Workers (paa.pub). PostgreSQL schema maps cleanly to D1 SQLite. | Deployed |
+| **pod-api** (replaces JSS) | R2 (pod files) + KV (ACLs, metadata) | Replace CSS 7.x with custom Workers-native pod storage. Eliminates ephemeral storage and permissive ACL problems. | Deployed |
+| **search-api** | R2 (dreamlab-vectors, .rvf files) + KV (SEARCH_CONFIG, id-to-label) | WASM-powered vector similarity search. 42KB rvf-wasm microkernel. 490K vec/sec ingest, 0.47ms p50 query. | Deployed |
 | **image-api** | R2 (uploads) | Image storage on R2. Transforms via Workers paid tier (30s CPU). | Planned |
 | **link-preview-api** | Stateless | Lightweight HTTP fetch + parse. Natural Workers fit. | Planned |
 
@@ -138,14 +138,18 @@ Deploy the existing Vite SPA to Cloudflare Pages with zero code changes. The `di
 - **wrangler.toml**: Complete configuration with all D1, KV, R2, and route bindings for auth-api, pod-api, and search-api
 - **workers-deploy.yml**: GitHub Actions workflow for automated Workers deployment
 
+### Deployed (2026-03-01)
+
+- **auth-api Worker**: deployed at `https://dreamlab-auth-api.solitary-paper-764d.workers.dev`
+- **pod-api Worker**: deployed at `https://dreamlab-pod-api.solitary-paper-764d.workers.dev`
+- **search-api Worker**: deployed at `https://dreamlab-search-api.solitary-paper-764d.workers.dev`
+- **D1 database**: `dreamlab-auth` created with schema migrated
+- **KV namespaces**: SESSIONS, POD_META, CONFIG, SEARCH_CONFIG provisioned
+- **R2 buckets**: `dreamlab-pods` and `dreamlab-vectors` provisioned
+
 ### Pending
 
-- **Cloudflare account setup**: API token creation, account ID configuration in GitHub Secrets
-- **D1 database creation**: `wrangler d1 create dreamlab-auth` + schema migration
-- **KV namespace creation**: SESSIONS, POD_META, CONFIG, SEARCH_CONFIG namespaces
-- **R2 bucket creation**: `dreamlab-pods` and `dreamlab-vectors` buckets
 - **DNS configuration**: CNAME/route records for `api.dreamlab-ai.com`, `pods.dreamlab-ai.com`, `search.dreamlab-ai.com`
-- **Production deployment and testing**: Deploy Workers, run health checks, verify end-to-end auth flow
 - **image-api and link-preview-api Workers**: Code not yet written
 
 ## References

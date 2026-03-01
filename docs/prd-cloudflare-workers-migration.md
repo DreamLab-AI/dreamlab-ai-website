@@ -1,6 +1,6 @@
 # PRD: Return to Cloudflare Platform + Consolidated NIP-98 + Per-User Solid Storage
 
-**Status:** Draft v4 -- Implementation In Progress
+**Status:** v5 -- Phase 1 Deployed
 **Author:** Claude Code (research synthesis from 7 parallel research agents)
 **Date:** 2026-03-01
 **Stakeholders:** DreamLab AI Engineering
@@ -236,7 +236,7 @@ export async function verifyNip98(authHeader: string, opts: VerifyOptions): Prom
 |---|---|---|---|
 | **auth-api** | **Yes → Workers** | D1 + KV | WebAuthn + NIP-98 proven on Workers (paa.pub). PostgreSQL schema maps cleanly to D1 (SQLite). |
 | **jss → pod-api** | **Yes → Workers** | R2 + KV | Replace CSS 7.x with custom Workers-native pod storage. paa.pub proves the pattern. No UI needed — DreamLab has its own frontend. |
-| **search-api** | **Yes → Workers** | R2 + KV + WASM | WASM-powered vector similarity search. 42KB rvf-wasm microkernel. 490K vec/sec ingest, 0.47ms query. **Code complete.** |
+| **search-api** | **Yes → Workers** | R2 + KV + WASM | WASM-powered vector similarity search. 42KB rvf-wasm microkernel. 490K vec/sec ingest, 0.47ms query. **Deployed.** |
 | **image-api** | **Yes → Workers** | R2 | Image storage on R2. Transforms via Workers paid tier (30s CPU). |
 | **link-preview-api** | **Yes → Workers** | (stateless) | Lightweight HTTP fetch + parse. Natural Workers fit. |
 | **nostr-relay** | **No → Keep Cloud Run** | Cloud SQL | Persistent WebSockets. Durable Objects possible but adds complexity. Evaluate separately. |
@@ -478,11 +478,11 @@ For production vector search requirements (e.g., embedding-api), the existing GC
 - [ ] E2E test: passkey register → login → NIP-98 protected endpoints
 
 ### Phase 2: Cloudflare Infrastructure Setup (Weeks 2-3)
-- [ ] Reactivate or create Cloudflare account (check if Nosflare-era account accessible)
+- [x] Reactivate or create Cloudflare account (check if Nosflare-era account accessible)
 - [x] Create Wrangler project (`wrangler.toml`) -- complete with all bindings for auth-api, pod-api, search-api
-- [ ] Create D1 database: migrate `webauthn_credentials` + `challenges` schema (needs `wrangler d1 create`)
-- [ ] Create KV namespaces: `SESSIONS`, `POD_META`, `CONFIG`, `SEARCH_CONFIG` (needs `wrangler kv namespace create`)
-- [ ] Create R2 buckets: `dreamlab-pods`, `dreamlab-vectors` (needs `wrangler r2 bucket create`)
+- [x] Create D1 database: migrate `webauthn_credentials` + `challenges` schema
+- [x] Create KV namespaces: `SESSIONS`, `POD_META`, `CONFIG`, `SEARCH_CONFIG`
+- [x] Create R2 buckets: `dreamlab-pods`, `dreamlab-vectors`
 - [ ] Set up Cloudflare Pages project for the SPA
 - [ ] Configure custom domains (`api.dreamlab-ai.com`, `pods.dreamlab-ai.com`, `search.dreamlab-ai.com`)
 - [x] Set up GitHub Actions with `cloudflare/wrangler-action@v3` (`workers-deploy.yml` exists)
@@ -496,20 +496,20 @@ For production vector search requirements (e.g., embedding-api), the existing GC
 
 ### Phase 4: auth-api to Workers (Weeks 3-5)
 - [x] Port Express routes to Workers fetch handler (`workers/auth-api/index.ts`)
-- [x] Migrate PostgreSQL → D1 (`webauthn_credentials`, `challenges` tables) -- code written, D1 database needs creation
+- [x] Migrate PostgreSQL → D1 (`webauthn_credentials`, `challenges` tables) -- D1 database created and schema migrated
 - [x] Replace Express sessions with KV-backed sessions (paa.pub pattern)
 - [x] Port WebAuthn registration/authentication (Web Crypto API compatible)
 - [x] Port NIP-98 verification (use consolidated `packages/nip98` + `workers/shared/nip98.ts`)
 - [x] Replace JSS pod provisioning with direct R2 + KV writes
-- [ ] Deploy to Workers staging domain, test (pending Cloudflare account setup)
+- [x] Deploy to Workers staging domain, test -- deployed to `*.solitary-paper-764d.workers.dev`
 - [ ] Cut over, decommission Cloud Run auth-api + JSS
 
 ### Phase 5: Pod Storage on Workers + R2 (Weeks 5-7)
-- [ ] Implement pod-api Worker: CRUD for pod resources on R2
-- [ ] Implement JSON-LD WAC evaluator (~200 lines)
-- [ ] Implement NIP-98 → `did:nostr:{pubkey}` → ACL check pipeline
-- [ ] Per-pod ACL provisioning during registration
-- [ ] Default ACL: owner full control, public read on profile only
+- [x] Implement pod-api Worker: CRUD for pod resources on R2
+- [x] Implement JSON-LD WAC evaluator (~200 lines)
+- [x] Implement NIP-98 → `did:nostr:{pubkey}` → ACL check pipeline
+- [x] Per-pod ACL provisioning during registration
+- [x] Default ACL: owner full control, public read on profile only
 - [ ] Build frontend pod I/O (profile data, user content)
 - [ ] Migrate any existing pod data from CSS/GCS to R2
 - [ ] Decommission Cloud Run JSS service

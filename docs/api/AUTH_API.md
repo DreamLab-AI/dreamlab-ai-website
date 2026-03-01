@@ -4,7 +4,7 @@
 
 REST API for the DreamLab AI authentication service. Handles WebAuthn PRF-based registration and authentication, with NIP-98 HTTP auth and Solid pod provisioning.
 
-> **Migration note:** A Cloudflare Workers version of this service exists at `workers/auth-api/` (code complete, deployment pending). The Workers version uses D1 + KV instead of PostgreSQL. This reference documents the Cloud Run version currently in production.
+> **Migration note:** A Cloudflare Workers version of this service is deployed at `https://dreamlab-auth-api.solitary-paper-764d.workers.dev`. The Workers version uses D1 + KV instead of PostgreSQL. This reference documents the Cloud Run version; cutover to Workers pending DNS configuration.
 
 **Base URL**: Cloud Run service URL (set as `VITE_AUTH_API_URL`)
 **Protocol**: HTTPS

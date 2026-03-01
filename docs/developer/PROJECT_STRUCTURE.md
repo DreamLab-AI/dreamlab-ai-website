@@ -13,7 +13,7 @@ dreamlab-ai-website/
 |-- src/                          # React SPA source
 |-- public/                       # Static assets (served as-is by Vite)
 |-- community-forum/              # SvelteKit community forum (separate package)
-|-- workers/                      # Cloudflare Workers (planned)
+|-- workers/                      # Cloudflare Workers (deployed)
 |-- wasm-voronoi/                 # Rust WASM module
 |-- scripts/                      # Build and utility scripts
 |-- docs/                         # Project documentation
@@ -56,7 +56,7 @@ A SvelteKit application for the community platform. Uses Nostr (NDK) for decentr
 
 ### 3. Cloudflare Workers (`workers/`)
 
-Planned replacement for Cloud Run backend services. Not yet deployed.
+Deployed replacement for Cloud Run backend services. Live at `*.solitary-paper-764d.workers.dev`.
 
 - **Configuration**: `wrangler.toml` (at project root)
 - **Entry points**: `workers/auth-api/index.ts`, `workers/pod-api/index.ts`
@@ -243,7 +243,7 @@ community-forum/
 
 ## Cloudflare Workers (`workers/`)
 
-Planned migration target for Cloud Run services. Not yet deployed in production.
+Deployed migration target for Cloud Run services. Live at `*.solitary-paper-764d.workers.dev` (custom domain DNS pending).
 
 ```
 workers/

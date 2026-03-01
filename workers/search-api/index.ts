@@ -269,6 +269,24 @@ async function handleSearch(request: Request, env: Env): Promise<Response> {
 }
 
 async function handleIngest(request: Request, env: Env): Promise<Response> {
+  // NIP-98 auth required for ingest
+  const auth = request.headers.get('Authorization');
+  if (!auth) {
+    return json({ error: 'Authorization required' }, 401, env);
+  }
+
+  const { verifyNip98 } = await import('../shared/nip98');
+  const requestUrl = new URL(request.url);
+  const rawBody = await request.clone().arrayBuffer();
+  const result = await verifyNip98(auth, {
+    url: requestUrl.origin + requestUrl.pathname,
+    method: request.method,
+    rawBody,
+  });
+  if (!result) {
+    return json({ error: 'Invalid NIP-98 token' }, 401, env);
+  }
+
   const body = await request.json() as IngestRequest;
 
   if (!body.entries?.length) {

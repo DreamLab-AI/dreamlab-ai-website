@@ -13,11 +13,15 @@ export interface Env {
   EXPECTED_ORIGIN: string;
 }
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, PUT, POST, DELETE, HEAD, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-};
+// CORS headers — restricted to expected origin (not wildcard)
+function corsHeaders(env: Env): Record<string, string> {
+  return {
+    'Access-Control-Allow-Origin': env.EXPECTED_ORIGIN || 'https://dreamlab-ai.com',
+    'Access-Control-Allow-Methods': 'GET, PUT, POST, DELETE, HEAD, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Max-Age': '86400',
+  };
+}
 
 function methodToMode(method: string): AccessMode {
   switch (method.toUpperCase()) {
@@ -36,8 +40,10 @@ function methodToMode(method: string): AccessMode {
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
+    const cors = corsHeaders(env);
+
     if (request.method === 'OPTIONS') {
-      return new Response(null, { status: 204, headers: corsHeaders });
+      return new Response(null, { status: 204, headers: cors });
     }
 
     const url = new URL(request.url);
@@ -45,13 +51,13 @@ export default {
 
     // Health check
     if (path === '/health') {
-      return Response.json({ status: 'ok', service: 'pod-api' }, { headers: corsHeaders });
+      return Response.json({ status: 'ok', service: 'pod-api' }, { headers: cors });
     }
 
     // Route: /pods/{pubkey}/...
     const podMatch = path.match(/^\/pods\/([a-f0-9]{64})(\/.*)?$/);
     if (!podMatch) {
-      return Response.json({ error: 'Not found' }, { status: 404, headers: corsHeaders });
+      return Response.json({ error: 'Not found' }, { status: 404, headers: cors });
     }
 
     const ownerPubkey = podMatch[1];
@@ -84,7 +90,7 @@ export default {
       const status = requesterPubkey ? 403 : 401;
       return Response.json(
         { error: requesterPubkey ? 'Forbidden' : 'Authentication required' },
-        { status, headers: corsHeaders },
+        { status, headers: cors },
       );
     }
 
@@ -95,9 +101,9 @@ export default {
       case 'HEAD': {
         const object = await env.PODS.get(r2Key);
         if (!object) {
-          return Response.json({ error: 'Not found' }, { status: 404, headers: corsHeaders });
+          return Response.json({ error: 'Not found' }, { status: 404, headers: cors });
         }
-        const headers = new Headers(corsHeaders);
+        const headers = new Headers(cors);
         headers.set('Content-Type', object.httpMetadata?.contentType || 'application/octet-stream');
         headers.set('ETag', object.etag);
         if (request.method === 'HEAD') {
@@ -111,22 +117,22 @@ export default {
         const contentLength = parseInt(request.headers.get('Content-Length') || '0', 10);
         const MAX_BODY_SIZE = 50 * 1024 * 1024; // 50MB
         if (contentLength > MAX_BODY_SIZE) {
-          return Response.json({ error: `Body exceeds ${MAX_BODY_SIZE} byte limit` }, { status: 413, headers: corsHeaders });
+          return Response.json({ error: `Body exceeds ${MAX_BODY_SIZE} byte limit` }, { status: 413, headers: cors });
         }
         const contentType = request.headers.get('Content-Type') || 'application/octet-stream';
         await env.PODS.put(r2Key, request.body, {
           httpMetadata: { contentType },
         });
-        return Response.json({ status: 'ok', key: r2Key }, { status: 201, headers: corsHeaders });
+        return Response.json({ status: 'ok' }, { status: 201, headers: cors });
       }
 
       case 'DELETE': {
         await env.PODS.delete(r2Key);
-        return Response.json({ status: 'deleted' }, { headers: corsHeaders });
+        return Response.json({ status: 'deleted' }, { headers: cors });
       }
 
       default:
-        return Response.json({ error: 'Method not allowed' }, { status: 405, headers: corsHeaders });
+        return Response.json({ error: 'Method not allowed' }, { status: 405, headers: cors });
     }
   },
 };

@@ -164,9 +164,9 @@ ACL rules are stored as JSON-LD documents within the pod:
 }
 ```
 
-### WAC Evaluator (Planned for Cloudflare Workers)
+### WAC Evaluator (Deployed in pod-api Worker)
 
-The planned Cloudflare Workers migration includes a custom WAC evaluator:
+The deployed pod-api Cloudflare Worker includes a custom WAC evaluator:
 
 - **JSON-LD ACL parsing**: No RDF library dependencies
 - **NIP-98 identity resolution**: Maps `Authorization: Nostr <token>` to `did:nostr:<pubkey>`

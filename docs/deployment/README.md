@@ -2,7 +2,7 @@
 
 **Last Updated:** 2026-03-01
 
-Comprehensive guide to deploying and maintaining the DreamLab AI platform: a React SPA on GitHub Pages, SvelteKit community forum, GCP Cloud Run backend services (being migrated), and Cloudflare Workers (code complete, deployment pending).
+Comprehensive guide to deploying and maintaining the DreamLab AI platform: a React SPA on GitHub Pages, SvelteKit community forum, GCP Cloud Run backend services (being migrated), and Cloudflare Workers (deployed).
 
 ---
 
@@ -21,8 +21,8 @@ Comprehensive guide to deploying and maintaining the DreamLab AI platform: a Rea
            v                  v                    v
 +------------------+  +-------------------+  +------------------+
 | GitHub Pages      |  | Cloudflare Workers |  | GCP Cloud Run    |
-|                   |  | (code complete,    |  | (retained svcs)  |
-| - React SPA       |  |  deploy pending)   |  |                  |
+|                   |  | (deployed to       |  | (retained svcs)  |
+| - React SPA       |  |  *.workers.dev)    |  |                  |
 |   -> dist/        |  |                    |  | - nostr-relay    |
 | - SvelteKit forum |  | - auth-api Worker  |  | - embedding-api  |
 |   -> dist/community|  |   +-- D1, KV      |  |                  |
@@ -50,9 +50,9 @@ Comprehensive guide to deploying and maintaining the DreamLab AI platform: a Rea
 |--------|-----------|---------|--------|
 | **Main site** | React SPA (Vite) | `deploy.yml` | Live (https://dreamlab-ai.com) |
 | **Community forum** | SvelteKit (static adapter) | `deploy.yml` (bundled) | Live (https://dreamlab-ai.com/community) |
-| **auth-api** | Cloudflare Worker + D1 | `workers-deploy.yml` | Workers (code complete, deployment pending) |
-| **pod-api** | Cloudflare Worker + R2 | `workers-deploy.yml` | Workers (code complete, deployment pending) |
-| **search-api** | Cloudflare Worker + WASM | `workers-deploy.yml` | Workers (code complete, deployment pending) |
+| **auth-api** | Cloudflare Worker + D1 | `workers-deploy.yml` | Deployed at `dreamlab-auth-api.solitary-paper-764d.workers.dev` |
+| **pod-api** | Cloudflare Worker + R2 | `workers-deploy.yml` | Deployed at `dreamlab-pod-api.solitary-paper-764d.workers.dev` |
+| **search-api** | Cloudflare Worker + WASM | `workers-deploy.yml` | Deployed at `dreamlab-search-api.solitary-paper-764d.workers.dev` |
 | **nostr-relay** | Node.js WebSocket relay | `fairfield-relay.yml` | Cloud Run (us-central1) -- retained |
 | **embedding-api** | Python (FastAPI) | `fairfield-embedding-api.yml` | Cloud Run (us-central1) -- retained |
 | **image-api** | Node.js | `fairfield-image-api.yml` | Cloud Run (us-central1) -- migration target |
@@ -65,7 +65,7 @@ Comprehensive guide to deploying and maintaining the DreamLab AI platform: a Rea
 |----------|---------|----------|
 | [GITHUB_PAGES.md](./GITHUB_PAGES.md) | Static site build and deployment | All developers |
 | [CLOUD_SERVICES.md](./CLOUD_SERVICES.md) | GCP Cloud Run backend services | DevOps, infrastructure |
-| [CLOUDFLARE_WORKERS.md](./CLOUDFLARE_WORKERS.md) | Cloudflare Workers migration (code complete) | Architecture, DevOps |
+| [CLOUDFLARE_WORKERS.md](./CLOUDFLARE_WORKERS.md) | Cloudflare Workers deployment | Architecture, DevOps |
 | [ENVIRONMENTS.md](./ENVIRONMENTS.md) | Dev, staging, production configuration | All developers |
 | [MONITORING.md](./MONITORING.md) | Health checks and observability | DevOps, SRE |
 | [ROLLBACK.md](./ROLLBACK.md) | Emergency recovery procedures | DevOps, on-call |

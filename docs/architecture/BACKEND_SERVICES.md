@@ -10,7 +10,7 @@ DreamLab AI operates a hybrid backend architecture:
 
 - **Main marketing site**: Supabase (managed PostgreSQL + Auth) for form submissions and email signups.
 - **Community forum**: Six GCP Cloud Run services providing WebAuthn authentication, Solid pod storage, Nostr relay messaging, vector embeddings, image processing, and link previews.
-- **Workers migration**: Three Cloudflare Workers have code complete (auth-api, pod-api, search-api) with deployment pending Cloudflare account setup. Two additional Workers (image-api, link-preview-api) are planned. Code exists in `workers/`.
+- **Workers migration**: Three Cloudflare Workers are deployed (auth-api, pod-api, search-api) at `*.solitary-paper-764d.workers.dev`. Two additional Workers (image-api, link-preview-api) are planned. Code exists in `workers/`.
 
 ---
 
@@ -58,7 +58,7 @@ graph TB
     Relay --> SM
 ```
 
-### Cloudflare Workers (Code Complete)
+### Cloudflare Workers (Deployed)
 
 ```mermaid
 graph TB
@@ -102,13 +102,13 @@ graph TB
 | **image-api** | `fairfield-image-api.yml` | Node.js 20, Express, Sharp | 512Mi, 1 CPU | 0--10 |
 | **link-preview-api** | (manual) | Node.js | 256Mi, 0.5 CPU | 0--5 |
 
-### Cloudflare Workers (Code Complete)
+### Cloudflare Workers (Deployed)
 
 | Worker | File | Replaces | Storage | Routes | Status |
 |--------|------|----------|---------|--------|--------|
-| **auth-api** | `workers/auth-api/index.ts` | Cloud Run auth-api | D1 + KV (SESSIONS) | `api.dreamlab-ai.com/*` | Code complete |
-| **pod-api** | `workers/pod-api/index.ts` | Cloud Run JSS | R2 (PODS) + KV (POD_META) | `pods.dreamlab-ai.com/*` | Code complete |
-| **search-api** | `workers/search-api/index.ts` | New service | R2 (dreamlab-vectors) + KV (SEARCH_CONFIG) | `search.dreamlab-ai.com/*` | Code complete |
+| **auth-api** | `workers/auth-api/index.ts` | Cloud Run auth-api | D1 + KV (SESSIONS) | `api.dreamlab-ai.com/*` | Deployed |
+| **pod-api** | `workers/pod-api/index.ts` | Cloud Run JSS | R2 (PODS) + KV (POD_META) | `pods.dreamlab-ai.com/*` | Deployed |
+| **search-api** | `workers/search-api/index.ts` | New service | R2 (dreamlab-vectors) + KV (SEARCH_CONFIG) | `search.dreamlab-ai.com/*` | Deployed |
 
 ---
 
@@ -175,7 +175,7 @@ CREATE INDEX idx_challenges_pubkey ON challenges(pubkey);
 
 ---
 
-## 2. auth-api Worker (Cloudflare -- Code Complete)
+## 2. auth-api Worker (Cloudflare -- Deployed)
 
 ### Purpose
 
@@ -226,7 +226,7 @@ When a user registers, the Worker provisions a Solid pod directly in R2:
 
 ---
 
-## 3. pod-api Worker (Cloudflare -- Code Complete)
+## 3. pod-api Worker (Cloudflare -- Deployed)
 
 ### Purpose
 
@@ -289,7 +289,7 @@ Supported agent classes:
 
 ---
 
-## 10. search-api Worker (Cloudflare -- Code Complete)
+## 10. search-api Worker (Cloudflare -- Deployed)
 
 ### Purpose
 

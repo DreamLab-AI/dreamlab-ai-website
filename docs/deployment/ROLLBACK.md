@@ -397,7 +397,7 @@ gcloud sql connect nostr-db --user=nostr-app
 
 ## Coordinated Multi-Service Rollback
 
-### Scenario: Fairfield App Broken
+### Scenario: App Broken
 
 **Situation**: Changes to multiple services cause failures
 
