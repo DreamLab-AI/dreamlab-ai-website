@@ -151,6 +151,7 @@
             class:locked-zone={isLocked}
             class:cursor-not-allowed={isLocked}
             style={isActive && hasAccess ? `border-left: 3px solid ${color};` : ''}
+            aria-label={isLocked ? `Locked zone: ${displayName}` : undefined}
           >
             <!-- Icon: show lock for locked zones -->
             {#if isLocked}
@@ -162,10 +163,10 @@
             {#if !collapsed}
               {#if isLocked}
                 <!-- Scrambled cypherpunk text for locked zones -->
-                <span class="flex-1 truncate font-mono text-sm scrambled-text">
+                <span class="flex-1 truncate font-mono text-sm scrambled-text" aria-hidden="true">
                   {scrambleText(displayName.length, catIndex * 13)}
                 </span>
-                <span class="text-xs opacity-40 font-mono">▓▒░</span>
+                <span class="text-xs opacity-40 font-mono" aria-hidden="true">▓▒░</span>
               {:else}
                 <span class="flex-1 truncate font-medium">
                   {displayName}

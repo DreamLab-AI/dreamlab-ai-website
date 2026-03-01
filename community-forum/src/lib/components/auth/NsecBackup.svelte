@@ -12,6 +12,11 @@
   $: npub = publicKey ? nip19.npubEncode(publicKey) : '';
   $: npubShort = npub ? npub.slice(0, 8) + '...' + npub.slice(-6) : '';
 
+  let hasDownloaded = false;
+  let confirmChecked = false;
+
+  $: canContinue = hasDownloaded && confirmChecked;
+
   function downloadBackup() {
     if (!browser) return;
     const privkeyBytes = authStore.getPrivkey();
@@ -37,9 +42,12 @@ KEEP THIS FILE SECURE. Never share the private key.
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+
+    hasDownloaded = true;
   }
 
   function handleContinue() {
+    if (!canContinue) return;
     authStore.confirmNsecBackup();
     dispatch('continue');
   }
@@ -76,12 +84,25 @@ KEEP THIS FILE SECURE. Never share the private key.
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
           </svg>
-          Download backup key
+          {hasDownloaded ? 'Download again' : 'Download backup key'}
         </button>
+
+        {#if hasDownloaded}
+          <label class="flex items-center gap-3 cursor-pointer px-1">
+            <input
+              type="checkbox"
+              class="checkbox checkbox-primary"
+              bind:checked={confirmChecked}
+            />
+            <span class="text-sm">I have downloaded and securely saved my backup key</span>
+          </label>
+        {/if}
 
         <button
           class="btn btn-primary w-full"
           on:click={handleContinue}
+          disabled={!canContinue}
+          title={!hasDownloaded ? 'Download your backup key first' : !confirmChecked ? 'Confirm you have saved your backup' : ''}
         >
           I've saved my backup, continue →
         </button>

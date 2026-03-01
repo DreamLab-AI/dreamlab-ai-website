@@ -150,6 +150,7 @@
 <button
   class="card bg-base-200 hover:bg-base-300 transition-all cursor-pointer text-left w-full border border-transparent hover:border-primary/30"
   on:click={navigate}
+  aria-label="Open channel: {channel.name}"
 >
   <div class="card-body p-4">
     <div class="flex gap-4">
@@ -217,7 +218,7 @@
             </div>
           </div>
         {:else if !loading}
-          <div class="mt-2 pt-2 border-t border-base-300 text-xs text-base-content/40 italic">
+          <div class="mt-2 pt-2 border-t border-base-300 text-xs text-base-content/60 italic">
             No messages yet - be the first to post!
           </div>
         {/if}

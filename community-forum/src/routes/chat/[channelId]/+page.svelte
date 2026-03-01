@@ -20,6 +20,9 @@
   import PinnedMessages from '$lib/components/chat/PinnedMessages.svelte';
   import ChannelStats from '$lib/components/forum/ChannelStats.svelte';
   import MessageItem from '$lib/components/chat/MessageItem.svelte';
+  import Breadcrumb from '$lib/components/navigation/Breadcrumb.svelte';
+  import { getSectionWithCategory, getBreadcrumbs } from '$lib/config';
+  import type { BreadcrumbItem } from '$lib/config/types';
   import type { Message } from '$lib/types/channel';
   import { getActiveRelays } from '$lib/stores/settings';
   import { getAppConfig } from '$lib/config/loader';
@@ -87,12 +90,19 @@
         return;
       }
 
-      // Fetch existing messages
-      messages = await fetchChannelMessages(channelId);
+      // Build auth context for channel access checks
+      const authContext = {
+        userCohorts,
+        userPubkey: $authStore.publicKey ?? '',
+        isAdmin
+      };
+
+      // Fetch existing messages (SECURITY: passes authContext for access verification)
+      messages = await fetchChannelMessages(channelId, 50, authContext);
       messageCount = messages.length;
 
-      // Subscribe to new messages
-      const sub = subscribeToChannel(channelId, (newMessage) => {
+      // Subscribe to new messages (SECURITY: passes authContext for access verification)
+      const sub = await subscribeToChannel(channelId, (newMessage) => {
         // Avoid duplicates
         if (!messages.find(m => m.id === newMessage.id)) {
           messages = [...messages, newMessage];
@@ -104,7 +114,7 @@
             scheduleMarkAsRead();
           }
         }
-      });
+      }, authContext);
       unsubscribe = sub.unsubscribe;
 
       // Mark as read after brief delay
@@ -283,6 +293,23 @@
     decryptedContent: undefined,
     replyTo: msg.replyTo
   } as Message));
+
+  // Build breadcrumbs from channel's section tag: Home > Zone > Section > Channel Name
+  $: breadcrumbItems = (() => {
+    if (!channel) return [];
+    const sectionInfo = getSectionWithCategory(channel.section);
+    if (sectionInfo) {
+      const { section, category } = sectionInfo;
+      const crumbs: BreadcrumbItem[] = getBreadcrumbs(category.id, section.id);
+      crumbs.push({ label: channel.name, path: `/chat/${channel.id}` });
+      return crumbs;
+    }
+    // Fallback: just Channels > Channel Name
+    return [
+      { label: 'Channels', path: '/chat' },
+      { label: channel.name, path: `/chat/${channel.id}` }
+    ] as BreadcrumbItem[];
+  })();
 </script>
 
 <svelte:head>
@@ -306,9 +333,9 @@
   <div class="flex flex-col h-[calc(100vh-64px)]">
     <div class="bg-base-200 border-b border-base-300 p-4">
       <div class="container mx-auto max-w-4xl">
-        <button class="btn btn-ghost btn-sm mb-2" on:click={() => goto(`${base}/chat`)}>
-          ← Back to Channels
-        </button>
+        <div class="mb-2">
+          <Breadcrumb items={breadcrumbItems} />
+        </div>
         <h1 class="text-2xl font-bold">{channel.name}</h1>
         {#if channel.description}
           <p class="text-base-content/70 text-sm">{channel.description}</p>

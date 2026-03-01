@@ -10,6 +10,9 @@
     type RuVectorStats
   } from './ruvector-search';
   import { shouldSync } from './embeddings-sync';
+  import { db } from '$lib/db';
+  import { sectionStore } from '$lib/stores/sections';
+  import type { ChannelSection } from '$lib/types/channel';
 
   // Props
   export let onSelect: (noteId: string) => void = () => {};
@@ -24,8 +27,62 @@
   let indexLoaded = false;
   let searchMode: 'server' | 'cached' | 'hybrid' = 'hybrid';
 
+  // Channel-to-section cache for authorization filtering
+  let channelSectionCache = new Map<string, ChannelSection>();
+
   // Debounce search
   let searchTimeout: ReturnType<typeof setTimeout>;
+
+  /**
+   * Get the section for a channel, with caching
+   */
+  async function getChannelSection(channelId: string): Promise<ChannelSection | null> {
+    if (channelSectionCache.has(channelId)) {
+      return channelSectionCache.get(channelId)!;
+    }
+
+    try {
+      const channel = await db.channels.get(channelId);
+      if (channel) {
+        const sectionTag = channel.tags?.find((t: string[]) => t[0] === 'section')?.[1];
+        const section = (sectionTag || 'public-lobby') as ChannelSection;
+        channelSectionCache.set(channelId, section);
+        return section;
+      }
+    } catch (e) {
+      console.warn('Failed to get channel section:', e);
+    }
+    return null;
+  }
+
+  /**
+   * Filter search results to only include messages from sections the user can access.
+   * Prevents privacy leakage through semantic search.
+   */
+  async function filterResultsByAuthorization(
+    rawResults: SearchResult[]
+  ): Promise<SearchResult[]> {
+    const authorizedResults: SearchResult[] = [];
+
+    for (const result of rawResults) {
+      try {
+        const message = await db.messages.get(result.noteId);
+        if (!message) continue;
+
+        const section = await getChannelSection(message.channelId);
+        if (!section) continue;
+
+        if (sectionStore.canAccessSection(section)) {
+          authorizedResults.push(result);
+        }
+      } catch (e) {
+        // Skip results we can't verify access for
+        console.warn('Failed to check authorization for result:', result.noteId);
+      }
+    }
+
+    return authorizedResults;
+  }
 
   onMount(async () => {
     // Try to load RuVector index (from server or local cache)
@@ -55,7 +112,14 @@
     error = null;
 
     try {
-      results = await searchSimilar(query, 10, 0.3);
+      // Fetch more results than needed to account for authorization filtering
+      const rawResults = await searchSimilar(query, 30, 0.3);
+
+      // SECURITY: Filter results to only show messages from authorized sections
+      const authorizedResults = await filterResultsByAuthorization(rawResults);
+
+      // Limit to requested count after filtering
+      results = authorizedResults.slice(0, 10);
     } catch (e) {
       error = e instanceof Error ? e.message : 'Search failed';
       results = [];

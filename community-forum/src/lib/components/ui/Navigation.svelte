@@ -1,9 +1,11 @@
 <script lang="ts">
+	import { onMount, onDestroy } from 'svelte';
 	import { page } from '$app/stores';
 	import { base } from '$app/paths';
 	import { authStore } from '$lib/stores/auth';
 	import { isAdminVerified, userStore } from '$lib/stores/user';
 	import { getAppConfig } from '$lib/config/loader';
+	import GlobalSearch from '$lib/components/chat/GlobalSearch.svelte';
 
 	const appConfig = getAppConfig();
 
@@ -19,6 +21,7 @@
 	$: pathname = $page?.url?.pathname ?? '';
 
 	let mobileMenuOpen = false;
+	let searchOpen = false;
 
 	function toggleMobileMenu() {
 		mobileMenuOpen = !mobileMenuOpen;
@@ -41,6 +44,31 @@
 		authStore.logout();
 		closeMobileMenu();
 	}
+
+	function openSearch() {
+		searchOpen = true;
+	}
+
+	function closeSearch() {
+		searchOpen = false;
+	}
+
+	function handleGlobalKeydown(event: KeyboardEvent) {
+		if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
+			event.preventDefault();
+			searchOpen = !searchOpen;
+		}
+	}
+
+	onMount(() => {
+		window.addEventListener('keydown', handleGlobalKeydown);
+	});
+
+	onDestroy(() => {
+		if (typeof window !== 'undefined') {
+			window.removeEventListener('keydown', handleGlobalKeydown);
+		}
+	});
 </script>
 
 <!-- Desktop/Mobile Navigation Bar -->
@@ -87,6 +115,16 @@
 
 	<!-- Actions (desktop and mobile) -->
 	<div class="navbar-end gap-2">
+		<button
+			class="btn btn-ghost btn-circle min-h-11 min-w-11"
+			on:click={openSearch}
+			aria-label="Search (Ctrl+K)"
+			title="Search (Ctrl+K)"
+		>
+			<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-5 h-5" aria-hidden="true">
+				<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+			</svg>
+		</button>
 		<button
 			class="btn btn-ghost btn-circle min-h-11 min-w-11"
 			on:click={onThemeToggle}
@@ -241,6 +279,8 @@
 		</div>
 	</div>
 {/if}
+
+<GlobalSearch isOpen={searchOpen} onClose={closeSearch} />
 
 <style>
 	@keyframes slide-in {

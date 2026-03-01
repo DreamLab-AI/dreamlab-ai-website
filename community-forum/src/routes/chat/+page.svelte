@@ -273,12 +273,12 @@
                   {/if}
                 </button>
               {:else}
-                <p class="text-sm text-base-content/50">Max retries reached. Please refresh the page.</p>
+                <p class="text-sm text-base-content/65">Max retries reached. Please refresh the page.</p>
               {/if}
               <a href="{base}/" class="btn btn-ghost btn-sm">Back to Home</a>
             </div>
             {#if retryCount > 0}
-              <p class="text-xs text-base-content/40 mt-2">Retry attempt {retryCount} of {MAX_RETRIES}</p>
+              <p class="text-xs text-base-content/60 mt-2">Retry attempt {retryCount} of {MAX_RETRIES}</p>
             {/if}
           </div>
         </div>

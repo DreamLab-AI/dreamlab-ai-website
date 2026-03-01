@@ -119,14 +119,15 @@ export function canModerateSection(permissions: UserPermissions, sectionId: Sect
  * to create threads in their sections without needing elevated roles.
  */
 export function canCreateChannel(permissions: UserPermissions, sectionId: SectionId): boolean {
+	// Users with forum.create capability (moderator+) can always create,
+	// regardless of whether the section has allowForumCreation enabled.
+	if (hasCapability(permissions, 'forum.create', sectionId)) {
+		return true;
+	}
+
 	const section = getSection(sectionId);
 	if (!section?.allowForumCreation) {
 		return false;
-	}
-
-	// Users with forum.create capability (moderator+) can always create
-	if (hasCapability(permissions, 'forum.create', sectionId)) {
-		return true;
 	}
 
 	// In sections with allowForumCreation, any member who can access the section can create

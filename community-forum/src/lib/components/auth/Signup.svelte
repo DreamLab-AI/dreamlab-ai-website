@@ -114,9 +114,9 @@ KEEP THIS FILE SECURE. Never share the private key.
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
             <div class="text-sm">
-              <p class="font-bold">Passkey PRF not supported</p>
+              <p class="font-bold">Passkey not fully supported</p>
               <p>
-                Your browser or authenticator does not support the PRF extension required for passkey-based accounts.
+                Your browser or authenticator does not support the secure key feature required for passkey-based accounts.
                 Try <strong>Create account with local key</strong> below, or use an existing account on the login page.
               </p>
             </div>
@@ -189,7 +189,7 @@ KEEP THIS FILE SECURE. Never share the private key.
       {:else if step === 'registering'}
         <div class="flex flex-col items-center gap-4 py-6">
           <span class="loading loading-spinner loading-lg text-primary"></span>
-          <p class="text-center text-base-content/70">Creating your cryptographic identity...</p>
+          <p class="text-center text-base-content/70">Creating your secure account...</p>
         </div>
 
       {:else if step === 'download'}

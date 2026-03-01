@@ -68,6 +68,7 @@
       class="mb-6 opacity-80"
       style="transform: translateY({$floatY}px)"
       in:scale={{ duration: 400, delay: 100, start: 0.8 }}
+      aria-hidden="true"
     >
       {@html illustrations[illustration]}
     </div>

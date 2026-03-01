@@ -48,10 +48,52 @@
 		onClose();
 	}
 
+	let drawerEl: HTMLDivElement;
+
+	function getFocusableElements(): HTMLElement[] {
+		if (!drawerEl) return [];
+		return Array.from(
+			drawerEl.querySelectorAll<HTMLElement>(
+				'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
+			)
+		);
+	}
+
 	function handleKeydown(e: KeyboardEvent) {
 		if (e.key === 'Escape') {
 			onClose();
+			return;
 		}
+
+		if (e.key === 'Tab' && isOpen && drawerEl) {
+			const focusable = getFocusableElements();
+			if (focusable.length === 0) return;
+
+			const first = focusable[0];
+			const last = focusable[focusable.length - 1];
+
+			if (e.shiftKey) {
+				if (document.activeElement === first) {
+					e.preventDefault();
+					last.focus();
+				}
+			} else {
+				if (document.activeElement === last) {
+					e.preventDefault();
+					first.focus();
+				}
+			}
+		}
+	}
+
+	// Focus the first focusable element when drawer opens
+	$: if (isOpen && drawerEl) {
+		requestAnimationFrame(() => {
+			const focusable = getFocusableElements();
+			if (focusable.length > 0) {
+				focusable[0].focus();
+			}
+		});
 	}
 </script>
 
@@ -71,6 +113,7 @@
 
 	<!-- Bottom Sheet Drawer -->
 	<div
+		bind:this={drawerEl}
 		class="fixed inset-x-0 bottom-0 z-50 bg-base-100 rounded-t-2xl shadow-2xl md:hidden max-h-[80vh] flex flex-col"
 		transition:fly={{ y: 300, duration: 300 }}
 		role="dialog"

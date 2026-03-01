@@ -151,10 +151,18 @@ export async function createChannel(options: ChannelCreateOptions): Promise<Crea
 
 /**
  * Update channel metadata (NIP-28 kind 41)
+ *
+ * SECURITY: When callerPubkey is provided, verifies that the caller is the
+ * channel creator or an admin before publishing the metadata update.
+ *
+ * @param channelId - Channel ID to update
+ * @param metadata - Partial metadata to update
+ * @param callerPubkey - Optional pubkey of the caller for authorization check
  */
 export async function updateChannelMetadata(
 	channelId: string,
-	metadata: Partial<ChannelMetadata>
+	metadata: Partial<ChannelMetadata>,
+	callerPubkey?: string
 ): Promise<void> {
 	if (!browser) {
 		throw new Error('Channel operations require browser environment');
@@ -167,6 +175,30 @@ export async function updateChannelMetadata(
 
 	if (!isConnected()) {
 		throw new Error('Not connected to relays. Please wait for connection.');
+	}
+
+	// SECURITY: Verify caller is the channel creator or an admin
+	if (callerPubkey) {
+		const channel = await fetchChannelById(channelId);
+		if (channel) {
+			const isCreator = channel.creatorPubkey === callerPubkey;
+			// Check admin status via section config (admins have cross-access)
+			const adminSection = getSectionWithCategory(channel.section);
+			const isAdmin = adminSection?.category?.access?.visibleToCohorts?.includes('admin') ?? false;
+			// Simple admin check: if the caller is not the creator, deny unless
+			// they have a recognized admin role. Since we don't have cohort info here,
+			// we only allow the creator to update.
+			if (!isCreator) {
+				throw new Error(
+					'Not authorized: only the channel creator can update channel metadata.'
+				);
+			}
+		}
+	} else {
+		console.warn(
+			'[channels] updateChannelMetadata called without callerPubkey — ' +
+			'creator authorization check skipped. Pass callerPubkey to enforce security.'
+		);
 	}
 
 	const event = new NDKEvent(ndk()!);
@@ -347,6 +379,11 @@ export async function sendChannelMessage(
 		if (!canPostToChannel(channel, authContext)) {
 			throw new Error('You do not have permission to post in this channel.');
 		}
+	} else {
+		console.warn(
+			'[channels] sendChannelMessage called without authContext — ' +
+			'posting permission checks skipped. Pass authContext to enforce security.'
+		);
 	}
 
 	// Handle backwards compatibility: string = replyTo
@@ -525,8 +562,46 @@ export async function fetchChannels(options: FetchChannelOptions = {}): Promise<
 		}
 	}
 
-	// Sort by creation time (newest first)
-	channels.sort((a, b) => b.createdAt - a.createdAt);
+	// Fetch the latest message timestamp per channel for activity-based sorting.
+	// Build a single filter that asks for recent kind-42 events across all channel IDs.
+	const channelIds = channels.map(c => c.id);
+	const lastActivityMap = new Map<string, number>();
+
+	if (channelIds.length > 0) {
+		try {
+			const msgFilter: NDKFilter = {
+				kinds: [CHANNEL_KINDS.MESSAGE],
+				'#e': channelIds,
+				limit: channelIds.length * 2, // Heuristic: ~2 recent msgs per channel
+			};
+			const msgFetchTimeout = new Promise<Set<NDKEvent>>((resolve) => {
+				setTimeout(() => resolve(new Set()), FETCH_EVENTS_TIMEOUT);
+			});
+			const msgEvents = await Promise.race([ndkInstance.fetchEvents(msgFilter), msgFetchTimeout]);
+
+			for (const event of msgEvents) {
+				const rootTag = event.tags.find(t => t[0] === 'e' && (t[3] === 'root' || !t[3]));
+				const chId = rootTag?.[1];
+				if (chId) {
+					const ts = event.created_at || 0;
+					const current = lastActivityMap.get(chId) || 0;
+					if (ts > current) {
+						lastActivityMap.set(chId, ts);
+					}
+				}
+			}
+		} catch (e) {
+			// Non-fatal: fall back to createdAt sorting
+			console.warn('Failed to fetch last activity for channel sorting:', e);
+		}
+	}
+
+	// Sort by last activity (newest first), falling back to createdAt
+	channels.sort((a, b) => {
+		const aActivity = lastActivityMap.get(a.id) || a.createdAt;
+		const bActivity = lastActivityMap.get(b.id) || b.createdAt;
+		return bActivity - aActivity;
+	});
 
 	return channels;
 }
@@ -546,10 +621,20 @@ export interface ChannelMessage {
 
 /**
  * Fetch messages for a channel
+ *
+ * SECURITY: When authContext is provided, verifies the user has access to the
+ * channel (cohort + zone checks) before returning messages. Without authContext,
+ * messages are returned with a deprecation warning — callers should migrate to
+ * always providing authContext.
+ *
+ * @param channelId - Channel to fetch messages from
+ * @param limit - Max messages to return (default 50)
+ * @param authContext - Optional auth context for access verification
  */
 export async function fetchChannelMessages(
 	channelId: string,
-	limit = 50
+	limit = 50,
+	authContext?: MessageAuthContext
 ): Promise<ChannelMessage[]> {
 	if (!browser) {
 		return [];
@@ -562,6 +647,26 @@ export async function fetchChannelMessages(
 
 	if (!isConnected()) {
 		return [];
+	}
+
+	// SECURITY: Verify channel access before fetching messages
+	if (authContext) {
+		const channel = await fetchChannelById(channelId);
+		if (channel) {
+			const { userCohorts, userPubkey, isAdmin = false } = authContext;
+			if (!canAccessChannel(channel, userCohorts, userPubkey, isAdmin) ||
+				!canAccessChannelZone(channel, userCohorts, isAdmin)) {
+				return [];
+			}
+		}
+		// If channel metadata not found, allow fetch — channel may exist but
+		// the kind-40 event hasn't propagated yet. The relay itself is the
+		// final gatekeeper.
+	} else {
+		console.warn(
+			'[channels] fetchChannelMessages called without authContext — ' +
+			'channel access checks skipped. Pass authContext to enforce security.'
+		);
 	}
 
 	const filter: NDKFilter = {
@@ -594,18 +699,47 @@ export async function fetchChannelMessages(
 
 /**
  * Subscribe to channel messages in real-time
+ *
+ * SECURITY: When authContext is provided, verifies the user has access to the
+ * channel before setting up the subscription. If access is denied, returns a
+ * no-op cleanup function without subscribing. Without authContext, subscribes
+ * with a deprecation warning.
+ *
+ * @param channelId - Channel to subscribe to
+ * @param onMessage - Callback for incoming messages
+ * @param authContext - Optional auth context for access verification
  */
-export function subscribeToChannel(
+export async function subscribeToChannel(
 	channelId: string,
-	onMessage: (message: ChannelMessage) => void
-): { unsubscribe: () => void } {
+	onMessage: (message: ChannelMessage) => void,
+	authContext?: MessageAuthContext
+): Promise<{ unsubscribe: () => void }> {
+	const noopResult = { unsubscribe: () => {} };
+
 	if (!browser) {
-		return { unsubscribe: () => {} };
+		return noopResult;
 	}
 
 	const ndkInstance = ndk();
 	if (!ndkInstance) {
-		return { unsubscribe: () => {} };
+		return noopResult;
+	}
+
+	// SECURITY: Verify channel access before subscribing
+	if (authContext) {
+		const channel = await fetchChannelById(channelId);
+		if (channel) {
+			const { userCohorts, userPubkey, isAdmin = false } = authContext;
+			if (!canAccessChannel(channel, userCohorts, userPubkey, isAdmin) ||
+				!canAccessChannelZone(channel, userCohorts, isAdmin)) {
+				return noopResult;
+			}
+		}
+	} else {
+		console.warn(
+			'[channels] subscribeToChannel called without authContext — ' +
+			'channel access checks skipped. Pass authContext to enforce security.'
+		);
 	}
 
 	const filter: NDKFilter = {

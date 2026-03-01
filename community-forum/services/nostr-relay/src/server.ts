@@ -77,6 +77,8 @@ class NostrRelay {
     }
 
     // Whitelist check endpoint
+    // TODO: Add rate limiting to prevent user directory enumeration via brute-force pubkey probing.
+    // Consider IP-based throttling (e.g., 10 req/min per IP) or require NIP-98 auth.
     if (url.pathname === '/api/check-whitelist') {
       const pubkey = url.searchParams.get('pubkey');
 
@@ -189,9 +191,35 @@ class NostrRelay {
       });
     };
 
-    // List whitelisted users (paginated)
+    // List whitelisted users (paginated) — admin-only
     if (url.pathname === '/api/whitelist/list' && req.method === 'GET') {
       try {
+        // Require NIP-98 signature — prevents unauthenticated user directory leakage
+        const headers: Record<string, string | string[] | undefined> = {};
+        for (const [key, value] of Object.entries(req.headers)) { headers[key] = value; }
+        if (!hasNostrAuth(headers)) {
+          res.writeHead(401, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'NIP-98 authentication required' }));
+          return;
+        }
+        const authResult = await verifyNostrAuth({
+          method: req.method || 'GET',
+          url: req.url || '/',
+          headers,
+          protocol: 'http',
+          hostname: req.headers.host
+        });
+        if (authResult.error) {
+          res.writeHead(401, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: authResult.error }));
+          return;
+        }
+        if (!isAdminPubkey(authResult.pubkey!)) {
+          res.writeHead(403, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Not authorized' }));
+          return;
+        }
+
         const limit = parseInt(url.searchParams.get('limit') || '20');
         const offset = parseInt(url.searchParams.get('offset') || '0');
         const cohort = url.searchParams.get('cohort') || undefined;
