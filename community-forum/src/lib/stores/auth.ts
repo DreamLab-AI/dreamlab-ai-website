@@ -7,12 +7,15 @@ import { hasNip07Extension, getPublicKeyFromExtension, getExtensionName, waitFor
 import { setNip07Signer, clearSigner } from '$lib/nostr/ndk';
 import { registerPasskey, authenticatePasskey } from '$lib/auth/passkey';
 import type { PasskeyRegistrationResult, PasskeyAuthResult } from '$lib/auth/passkey';
+import { bytesToHex } from '@noble/hashes/utils';
 
 export interface AuthState {
   state: 'unauthenticated' | 'authenticating' | 'authenticated';
   pubkey: string | null;
   isAuthenticated: boolean;
   publicKey: string | null;
+  /** Hex-encoded private key for relay connections and signing. In-memory only — never persisted. */
+  privateKey: string | null;
   nickname: string | null;
   avatar: string | null;
   isPending: boolean;
@@ -35,6 +38,7 @@ const initialState: AuthState = {
   pubkey: null,
   isAuthenticated: false,
   publicKey: null,
+  privateKey: null,
   nickname: null,
   avatar: null,
   isPending: false,
@@ -112,6 +116,7 @@ function createAuthStore() {
         _privkeyMem.fill(0);
         _privkeyMem = null;
       }
+      update((s) => ({ ...s, privateKey: null }));
     }, { once: true });
   }
 
@@ -222,6 +227,7 @@ function createAuthStore() {
             ...s,
             ...syncStateFields({
               publicKey: parsed.publicKey ?? null,
+              privateKey: privkeyHex,
               nickname: parsed.nickname ?? null,
               avatar: parsed.avatar ?? null,
               isAuthenticated: true,
@@ -320,6 +326,7 @@ function createAuthStore() {
         ...s,
         ...syncStateFields({
           publicKey: pubkey,
+          privateKey: bytesToHex(privkey),
           nickname: meta.nickname ?? s.nickname,
           avatar: meta.avatar ?? s.avatar,
           isAuthenticated: true,
@@ -376,6 +383,7 @@ function createAuthStore() {
           ...s,
           ...syncStateFields({
             publicKey: result.pubkey,
+            privateKey: bytesToHex(result.privkey),
             nickname: existingNickname,
             avatar: existingAvatar,
             isAuthenticated: true,
@@ -439,6 +447,7 @@ function createAuthStore() {
           ...s,
           ...syncStateFields({
             publicKey: result.pubkey,
+            privateKey: bytesToHex(result.privkey),
             nickname: storageData.nickname,
             avatar: storageData.avatar,
             isAuthenticated: true,
@@ -507,6 +516,7 @@ function createAuthStore() {
           ...s,
           ...syncStateFields({
             publicKey,
+            privateKey: privateKey,
             nickname: storageData.nickname,
             avatar: storageData.avatar,
             isAuthenticated: true,
@@ -565,6 +575,7 @@ function createAuthStore() {
           ...s,
           ...syncStateFields({
             publicKey,
+            privateKey: privateKey,
             nickname: displayName,
             avatar: null,
             isAuthenticated: true,
