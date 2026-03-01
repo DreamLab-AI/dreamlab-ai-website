@@ -51,9 +51,32 @@ vite.config.ts.timestamp-*
 .aqe/
 .agentic-qe/
 
+# Backup directories
+.agentdb-global-backup-*/
+.agentic-qe-backup-*/
+
+# MCP configuration (local dev tooling)
+.mcp.json
+
+# Wrangler (Cloudflare dev artifacts)
+.wrangler/
+**/.wrangler/
+
+# Python virtual environments
+**/.venv/
+**/venv/
+
+# Disabled workflow files
+*.disabled
+
 # Test outputs
 test-results/
 mobile-audit/
+tests/*.png
+tests/*.jpg
+
+# OS artifacts
+Thumbs.db
 
 # Rust build artifacts
 wasm-voronoi/target/
