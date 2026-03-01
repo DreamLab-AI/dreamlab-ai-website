@@ -384,7 +384,7 @@
       <div class="flex-1">
         <input
           type="text"
-          placeholder="Search by name or pubkey..."
+          placeholder="Search by name or public ID..."
           class="input input-bordered w-full"
           bind:value={searchQuery}
           on:input={handleSearch}

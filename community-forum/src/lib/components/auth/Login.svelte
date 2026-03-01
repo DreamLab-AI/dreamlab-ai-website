@@ -187,7 +187,7 @@
               <span class="label-text font-medium flex items-center gap-2">
                 Private Key
                 <InfoTooltip
-                  text="Your private key is the secret credential that proves you own your account. It starts with 'nsec1' or can be 64 hex characters. NEVER share this with anyone."
+                  text="Your secret key is the credential that proves you own your account. It is a 64-character hex string. NEVER share this with anyone."
                   position="top"
                   maxWidth="350px"
                   inline={true}
@@ -198,7 +198,7 @@
               id="private-key-input"
               type="password"
               class="input input-bordered font-mono"
-              placeholder="nsec1... or 64-character hex"
+              placeholder="Your secret key (64 hex characters)"
               bind:value={privateKeyInput}
               disabled={isBusy}
               autocomplete="off"
@@ -207,7 +207,7 @@
             />
             <label class="label">
               <span id="private-key-hint" class="label-text-alt text-base-content/50">
-                Accepts nsec1... format or 64-character hex
+                Enter your secret key in hex format
               </span>
             </label>
           </div>

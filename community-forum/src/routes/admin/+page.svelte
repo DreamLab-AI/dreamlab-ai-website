@@ -14,7 +14,7 @@
   import { sectionStore } from '$lib/stores/sections';
   import { subscribeAccessRequests, approveSectionAccess } from '$lib/nostr/sections';
   import { KIND_JOIN_REQUEST, KIND_ADD_USER, KIND_DELETION, KIND_USER_REGISTRATION, type JoinRequest, type UserRegistrationRequest } from '$lib/nostr/groups';
-  import { approveUserRegistration } from '$lib/nostr/whitelist';
+  import { approveUserRegistration, fetchWhitelistUsers } from '$lib/nostr/whitelist';
   import { NDKEvent, type NDKSubscription, type NDKFilter } from '@nostr-dev-kit/ndk';
   import { channelStore } from '$lib/stores/channelStore';
   import { getAppConfig } from '$lib/config/loader';
@@ -140,6 +140,29 @@
         withTimeout(loadUserRegistrations(), LOAD_TIMEOUT_MS)
           .catch((e) => console.error('Failed to load registrations:', e))
           .finally(() => { registrationsLoading = false; }),
+
+        // Fetch total user count from the whitelist API
+        withTimeout(fetchWhitelistUsers({ limit: 1, offset: 0 }), LOAD_TIMEOUT_MS)
+          .then((result) => {
+            if (result) {
+              stats.totalUsers = result.total;
+            }
+          })
+          .catch((e) => console.error('Failed to load user count:', e)),
+
+        // Fetch total message count from the relay (kind 42 channel messages + kind 1 posts)
+        withTimeout((async () => {
+          const ndkInstance = ndk();
+          if (!ndkInstance) return 0;
+          const msgEvents = await ndkInstance.fetchEvents({ kinds: [42, 1], limit: 5000 });
+          return msgEvents.size;
+        })(), LOAD_TIMEOUT_MS)
+          .then((count) => {
+            if (typeof count === 'number') {
+              stats.totalMessages = count;
+            }
+          })
+          .catch((e) => console.error('Failed to load message count:', e)),
       ]);
 
       requestSubscription = subscribeAccessRequests((request) => {

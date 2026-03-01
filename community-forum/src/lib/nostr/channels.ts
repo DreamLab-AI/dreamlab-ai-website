@@ -275,9 +275,10 @@ function canPostToChannel(
 }
 
 /**
- * Fetch a single channel by ID (internal helper)
+ * Fetch a single channel by ID.
+ * Uses the Nostr `ids` filter to fetch the specific kind-40 event directly.
  */
-async function fetchChannelById(channelId: string): Promise<CreatedChannel | null> {
+export async function fetchChannelById(channelId: string): Promise<CreatedChannel | null> {
 	if (!browser) {
 		return null;
 	}
@@ -293,7 +294,11 @@ async function fetchChannelById(channelId: string): Promise<CreatedChannel | nul
 		limit: 1,
 	};
 
-	const events = await ndkInstance.fetchEvents(filter);
+	// Race fetchEvents against a timeout so loading never hangs indefinitely
+	const fetchTimeout = new Promise<Set<NDKEvent>>((resolve) => {
+		setTimeout(() => resolve(new Set()), FETCH_EVENTS_TIMEOUT);
+	});
+	const events = await Promise.race([ndkInstance.fetchEvents(filter), fetchTimeout]);
 
 	for (const event of events) {
 		try {

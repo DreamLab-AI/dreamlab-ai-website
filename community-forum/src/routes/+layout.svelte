@@ -7,6 +7,8 @@
 	import { goto } from '$app/navigation';
 	import { fade } from 'svelte/transition';
 	import { authStore, isAuthenticated } from '$lib/stores/auth';
+	import { connectRelay, isConnected } from '$lib/nostr/relay';
+	import { RELAY_URL } from '$lib/config';
 	import { sessionStore } from '$lib/stores/session';
 	import { calendarStore, sidebarVisible, sidebarExpanded } from '$lib/stores/calendar';
 	import { initializePWA } from '$lib/utils/pwa-init';
@@ -49,6 +51,21 @@
 	let zoneNavCollapsed = false;
 	let calendarCollapsed = true;
 	let mobileZoneDrawerOpen = false;
+	let relayConnecting = false;
+
+	// Connect to Nostr relay when authenticated with a private key.
+	// Runs at the layout level so every page has NDK available without
+	// needing its own connectRelay() call in onMount.
+	$: if (browser && $authStore.isAuthenticated && $authStore.privateKey && !isConnected() && !relayConnecting) {
+		relayConnecting = true;
+		connectRelay(RELAY_URL, $authStore.privateKey)
+			.catch((err: unknown) => {
+				console.error('[Layout] Relay connection failed:', err);
+			})
+			.finally(() => {
+				relayConnecting = false;
+			});
+	}
 
 	// Safe pathname access with fallbacks
 	$: pathname = $page?.url?.pathname ?? '';

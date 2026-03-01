@@ -312,7 +312,7 @@
 					class="input input-bordered input-sm"
 				/>
 				<label class="label py-1" for="profile-birthday-input">
-					<span class="label-text-alt text-base-content/60">Visible to tribe members on the calendar</span>
+					<span class="label-text-alt text-base-content/60">Visible to community members on the calendar</span>
 				</label>
 			</div>
 
@@ -387,7 +387,7 @@
 			<!-- npub (always visible) -->
 			<div class="form-control mb-4">
 				<label class="label" for="profile-npub-input">
-					<span class="label-text font-semibold">Public Key (npub)</span>
+					<span class="label-text font-semibold">Your Public ID</span>
 					<div
 						class="tooltip tooltip-left"
 						data-tip="Your public key is safe to share with anyone. It's how others find and message you."
@@ -419,7 +419,7 @@
 					<button
 						class="btn btn-square btn-outline"
 						on:click={() => copyToClipboard(npub, 'npub')}
-						title="Copy full npub"
+						title="Copy Public ID"
 					>
 						{#if copiedNpub}
 							<svg
@@ -461,7 +461,7 @@
 			<!-- nsec (hidden by default) -->
 			<div class="form-control">
 				<label class="label" for="profile-nsec-input">
-					<span class="label-text font-semibold">Private Key (nsec)</span>
+					<span class="label-text font-semibold">Secret Key</span>
 					<div
 						class="tooltip tooltip-left"
 						data-tip="Your private key controls your identity. NEVER share it with anyone. Anyone with it can impersonate you permanently."
@@ -519,7 +519,7 @@
 						}}
 						disabled={!confirmReveal}
 					>
-						Reveal Private Key
+						Export Account Key
 					</button>
 				{:else}
 					<!-- Key is revealed -->
@@ -553,7 +553,7 @@
 						<button
 							class="btn btn-square btn-outline btn-warning"
 							on:click={() => copyToClipboard(nsec, 'nsec')}
-							title="Copy full nsec"
+							title="Copy Secret Key"
 						>
 							{#if copiedNsec}
 								<svg

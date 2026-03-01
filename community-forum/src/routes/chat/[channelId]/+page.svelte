@@ -9,7 +9,7 @@
   import { connectRelay, isConnected } from '$lib/nostr/relay';
   import { RELAY_URL } from '$lib/config';
   import {
-    fetchChannels,
+    fetchChannelById,
     fetchChannelMessages,
     sendChannelMessage,
     subscribeToChannel,
@@ -56,6 +56,39 @@
   let wasAtBottom = true;
   let showStats = false;
 
+  /**
+   * Wait for the relay to be connected, with a timeout.
+   * The root layout initiates the connection reactively, so this just
+   * polls until isConnected() returns true or the deadline expires.
+   */
+  async function waitForRelayConnection(timeoutMs: number = 10000): Promise<boolean> {
+    if (isConnected()) return true;
+
+    // If layout hasn't triggered connection yet, connect directly as fallback
+    if ($authStore.privateKey && !isConnected()) {
+      try {
+        await connectRelay(RELAY_URL, $authStore.privateKey);
+        return true;
+      } catch {
+        // Fall through to polling
+      }
+    }
+
+    const start = Date.now();
+    return new Promise<boolean>((resolve) => {
+      const check = () => {
+        if (isConnected()) {
+          resolve(true);
+        } else if (Date.now() - start >= timeoutMs) {
+          resolve(false);
+        } else {
+          setTimeout(check, 200);
+        }
+      };
+      check();
+    });
+  }
+
   onMount(async () => {
     // Wait for auth store to be ready before checking authentication
     await authStore.waitForReady();
@@ -66,9 +99,12 @@
     }
 
     try {
-      // Connect to relay if we have a private key
-      if ($authStore.privateKey && !isConnected()) {
-        await connectRelay(RELAY_URL, $authStore.privateKey);
+      // Wait for relay connection (initiated by root layout or fallback here)
+      const connected = await waitForRelayConnection();
+      if (!connected) {
+        error = 'Could not connect to relay. Please try again.';
+        loading = false;
+        return;
       }
 
       // Get user's cohorts from whitelist for channel filtering
@@ -76,19 +112,14 @@
       const userCohorts = whitelistStatus?.cohorts ?? [];
       const isAdmin = whitelistStatus?.isAdmin ?? false;
 
-      // Fetch channels with cohort filtering (SECURITY: user can only see channels they have access to)
-      const channels = await fetchChannels({
-        userCohorts,
-        userPubkey: $authStore.publicKey ?? undefined,
-        isAdmin
-      });
-      channel = channels.find(c => c.id === channelId) || null;
-
-      if (!channel) {
+      // Fetch the specific channel by ID directly (more reliable than fetching all)
+      const fetchedChannel = await fetchChannelById(channelId);
+      if (!fetchedChannel) {
         error = 'Channel not found';
         loading = false;
         return;
       }
+      channel = fetchedChannel;
 
       // Build auth context for channel access checks
       const authContext = {

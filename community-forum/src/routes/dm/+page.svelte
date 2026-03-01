@@ -140,7 +140,7 @@
         </svg>
         <h3 class="text-lg font-semibold text-base-content mb-2">No conversations yet</h3>
         <p class="text-base-content/60 mb-6 max-w-sm">
-          Start a private, encrypted conversation by sending a message to someone using their public key.
+          Start a private, encrypted conversation by sending a message to someone using their public ID.
         </p>
         <button
           class="btn btn-primary gap-2"
