@@ -9,7 +9,7 @@
 	const appConfig = getAppConfig();
 	const appNameParts = appConfig.name.split(' - ');
 	const primaryName = appNameParts[0];
-	const subtitle = appNameParts.slice(1).join(' - ') || 'Nostr Community';
+	const subtitle = appNameParts.slice(1).join(' - ') || 'Private Community';
 
 	// Dev mode credentials - MUST be set via environment variables, no hardcoded fallbacks
 	const ADMIN_NSEC = import.meta.env.VITE_DEV_ADMIN_NSEC || '';
@@ -146,7 +146,7 @@
 					</div>
 					<h3 class="card-title text-lg">Encrypted messaging</h3>
 					<p class="text-sm text-base-content/70">
-						End-to-end encrypted DMs built on the Nostr protocol.
+						End-to-end encrypted DMs for private conversations.
 					</p>
 				</div>
 			</div>

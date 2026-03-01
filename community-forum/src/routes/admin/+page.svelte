@@ -51,6 +51,22 @@
   let successMessage: string | null = null;
   let relayStatus = 'disconnected';
 
+  // Per-section loading states to avoid infinite spinners
+  let channelsLoading = true;
+  let registrationsLoading = true;
+  let requestsLoading = true;
+  let joinRequestsLoading = true;
+
+  const LOAD_TIMEOUT_MS = 5000;
+
+  /** Race a promise against a timeout; resolves to the promise result or undefined on timeout. */
+  function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T | undefined> {
+    return Promise.race([
+      promise,
+      new Promise<undefined>((resolve) => setTimeout(() => resolve(undefined), ms))
+    ]);
+  }
+
   // Relay settings
   let isPrivateMode = $settingsStore.relayMode === 'private';
   let isSwitchingMode = false;
@@ -83,19 +99,38 @@
     try {
       isLoading = true;
       error = null;
+      channelsLoading = true;
+      registrationsLoading = true;
+      requestsLoading = true;
+      joinRequestsLoading = true;
 
       if (!isConnected()) {
         await connectRelay(RELAY_URL, $authStore.privateKey);
       }
       relayStatus = 'connected';
 
-      // Admin page: fetch ALL channels (admin bypass)
-      channels = await fetchChannels({ isAdmin: true });
-      stats.totalChannels = channels.length;
+      // Load all sections in parallel with timeouts so no section hangs forever
+      await Promise.all([
+        withTimeout(fetchChannels({ isAdmin: true }), LOAD_TIMEOUT_MS)
+          .then((result) => {
+            channels = result || [];
+            stats.totalChannels = channels.length;
+          })
+          .catch((e) => console.error('Failed to load channels:', e))
+          .finally(() => { channelsLoading = false; }),
 
-      await loadPendingRequests();
-      await loadChannelJoinRequests();
-      await loadUserRegistrations();
+        withTimeout(loadPendingRequests(), LOAD_TIMEOUT_MS)
+          .catch((e) => console.error('Failed to load pending requests:', e))
+          .finally(() => { requestsLoading = false; }),
+
+        withTimeout(loadChannelJoinRequests(), LOAD_TIMEOUT_MS)
+          .catch((e) => console.error('Failed to load join requests:', e))
+          .finally(() => { joinRequestsLoading = false; }),
+
+        withTimeout(loadUserRegistrations(), LOAD_TIMEOUT_MS)
+          .catch((e) => console.error('Failed to load registrations:', e))
+          .finally(() => { registrationsLoading = false; }),
+      ]);
 
       requestSubscription = subscribeAccessRequests((request) => {
         if (!pendingRequests.find(r => r.id === request.id)) {
@@ -111,19 +146,34 @@
       relayStatus = 'error';
     } finally {
       isLoading = false;
+      // Ensure all section loading states are cleared even on error
+      channelsLoading = false;
+      registrationsLoading = false;
+      requestsLoading = false;
+      joinRequestsLoading = false;
     }
   }
 
   async function loadPendingRequests() {
+    requestsLoading = true;
+    // Safety timeout: force loading state off even if relay never responds
+    const safetyTimer = setTimeout(() => { requestsLoading = false; }, LOAD_TIMEOUT_MS);
     try {
       const { fetchPendingRequests } = await import('$lib/nostr/sections');
-      pendingRequests = await fetchPendingRequests();
+      const result = await withTimeout(fetchPendingRequests(), LOAD_TIMEOUT_MS);
+      pendingRequests = result || [];
     } catch (e) {
       console.error('Failed to load pending requests:', e);
+    } finally {
+      clearTimeout(safetyTimer);
+      requestsLoading = false;
     }
   }
 
   async function loadChannelJoinRequests() {
+    joinRequestsLoading = true;
+    // Safety timeout: force loading state off even if relay never responds
+    const safetyTimer = setTimeout(() => { joinRequestsLoading = false; }, LOAD_TIMEOUT_MS);
     try {
       const ndkInstance = ndk();
       if (!ndkInstance) return;
@@ -176,6 +226,9 @@
       }
     } catch (e) {
       console.error('Failed to load channel join requests:', e);
+    } finally {
+      clearTimeout(safetyTimer);
+      joinRequestsLoading = false;
     }
   }
 
@@ -216,6 +269,9 @@
   }
 
   async function loadUserRegistrations() {
+    registrationsLoading = true;
+    // Safety timeout: force loading state off even if relay never responds
+    const safetyTimer = setTimeout(() => { registrationsLoading = false; }, LOAD_TIMEOUT_MS);
     try {
       const ndkInstance = ndk();
       if (!ndkInstance) return;
@@ -259,6 +315,9 @@
       }
     } catch (e) {
       console.error('Failed to load user registrations:', e);
+    } finally {
+      clearTimeout(safetyTimer);
+      registrationsLoading = false;
     }
   }
 
@@ -575,11 +634,12 @@
 
   <RelaySettings bind:isPrivateMode {isSwitchingMode} on:modeChange={handleRelayModeChange} />
 
-  <ChannelManagement {channels} {isLoading} on:create={handleCreateChannel} />
+  <ChannelManagement {channels} {isLoading} isSectionLoading={channelsLoading} on:create={handleCreateChannel} />
 
   <UserRegistrations
     {pendingUserRegistrations}
     {isLoading}
+    isSectionLoading={registrationsLoading}
     on:approve={(e) => handleApproveUserRegistration(e.detail)}
     on:reject={(e) => handleRejectUserRegistration(e.detail)}
     on:refresh={loadUserRegistrations}
@@ -590,6 +650,7 @@
   <SectionRequests
     {pendingRequests}
     {isLoading}
+    isSectionLoading={requestsLoading}
     on:approve={(e) => handleApproveRequest(e.detail)}
     on:deny={(e) => handleDenyRequest(e.detail)}
     on:refresh={loadPendingRequests}
@@ -598,6 +659,7 @@
   <ChannelJoinRequests
     {pendingChannelJoinRequests}
     {isLoading}
+    isSectionLoading={joinRequestsLoading}
     {getChannelName}
     on:approve={(e) => handleApproveChannelJoin(e.detail)}
     on:reject={(e) => handleRejectChannelJoin(e.detail)}

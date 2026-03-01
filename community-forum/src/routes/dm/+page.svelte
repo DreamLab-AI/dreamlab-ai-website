@@ -6,14 +6,20 @@
   import { dmStore, sortedConversations } from '$lib/stores/dm';
   import { hexToBytes } from '@noble/hashes/utils.js';
   import { getAppConfig } from '$lib/config/loader';
+  import NewDMDialog from '$lib/components/dm/NewDMDialog.svelte';
 
   const appConfig = getAppConfig();
+
+  /** Timeout (ms) before we stop showing the spinner and show empty state */
+  const LOAD_TIMEOUT_MS = 8000;
 
   $: conversations = $sortedConversations;
   $: loading = $dmStore.isLoading;
   $: error = $dmStore.error;
 
   let unsubscribe: (() => void) | null = null;
+  let loadTimer: ReturnType<typeof setTimeout> | null = null;
+  let showNewDMDialog = false;
 
   onMount(async () => {
     // Wait for auth store to be ready before checking authentication
@@ -23,6 +29,15 @@
       goto(`${base}/`);
       return;
     }
+
+    // Safety timeout: if fetchConversations hangs, force loading to false
+    loadTimer = setTimeout(() => {
+      if ($dmStore.isLoading) {
+        dmStore.clearError();
+        // Force the store out of loading state
+        dmStore.forceLoadingComplete();
+      }
+    }, LOAD_TIMEOUT_MS);
 
     // Load DM conversations from relay
     try {
@@ -39,15 +54,26 @@
       unsubscribe = await dmStore.subscribeToIncoming(privkeyBytes);
     } catch (err) {
       console.error('Failed to load conversations:', err);
+    } finally {
+      if (loadTimer) {
+        clearTimeout(loadTimer);
+        loadTimer = null;
+      }
     }
   });
 
   onDestroy(() => {
-    // Unsubscribe when leaving the page
     if (unsubscribe) {
       unsubscribe();
     }
+    if (loadTimer) {
+      clearTimeout(loadTimer);
+    }
   });
+
+  function handleNewDMStart(event: CustomEvent<{ pubkey: string }>) {
+    goto(`${base}/dm/${event.detail.pubkey}`);
+  }
 
   function formatPubkey(pubkey: string): string {
     return pubkey.slice(0, 12) + '...' + pubkey.slice(-8);
@@ -78,9 +104,20 @@
 </svelte:head>
 
 <div class="container mx-auto p-4 max-w-2xl">
-  <div class="mb-6">
-    <h1 class="text-4xl font-bold gradient-text mb-2">Direct Messages</h1>
-    <p class="text-base-content/70">Private encrypted conversations</p>
+  <div class="flex items-start justify-between mb-6">
+    <div>
+      <h1 class="text-4xl font-bold gradient-text mb-2">Direct Messages</h1>
+      <p class="text-base-content/70">Private encrypted conversations</p>
+    </div>
+    <button
+      class="btn btn-primary gap-2"
+      on:click={() => (showNewDMDialog = true)}
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+      </svg>
+      New Message
+    </button>
   </div>
 
   {#if error}
@@ -91,16 +128,29 @@
   {/if}
 
   {#if loading}
-    <div class="flex justify-center items-center min-h-[400px]">
+    <div class="flex flex-col justify-center items-center min-h-[400px] gap-3">
       <div class="loading loading-spinner loading-lg text-primary"></div>
+      <p class="text-sm text-base-content/50">Loading conversations...</p>
     </div>
   {:else if conversations.length === 0}
     <div class="card bg-base-200">
-      <div class="card-body items-center text-center">
-        <p class="text-base-content/70">No conversations yet. Start chatting!</p>
-        <p class="text-sm text-base-content/50 mt-2">
-          To start a conversation, you need someone else's public key
+      <div class="card-body items-center text-center py-16">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 text-base-content/20 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+        </svg>
+        <h3 class="text-lg font-semibold text-base-content mb-2">No conversations yet</h3>
+        <p class="text-base-content/60 mb-6 max-w-sm">
+          Start a private, encrypted conversation by sending a message to someone using their public key.
         </p>
+        <button
+          class="btn btn-primary gap-2"
+          on:click={() => (showNewDMDialog = true)}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          Start a Conversation
+        </button>
       </div>
     </div>
   {:else}
@@ -138,3 +188,8 @@
     </div>
   {/if}
 </div>
+
+<NewDMDialog
+  bind:open={showNewDMDialog}
+  on:start={handleNewDMStart}
+/>

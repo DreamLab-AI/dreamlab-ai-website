@@ -5,6 +5,7 @@
 
   export let pendingUserRegistrations: UserRegistrationRequest[];
   export let isLoading: boolean;
+  export let isSectionLoading: boolean = false;
 
   const dispatch = createEventDispatcher<{
     approve: UserRegistrationRequest;
@@ -48,7 +49,7 @@
       </button>
     </div>
 
-    {#if isLoading && pendingUserRegistrations.length === 0}
+    {#if isSectionLoading && pendingUserRegistrations.length === 0}
       <div class="text-center py-8">
         <span class="loading loading-spinner loading-lg"></span>
         <p class="mt-2 text-base-content/70">Loading user registrations...</p>

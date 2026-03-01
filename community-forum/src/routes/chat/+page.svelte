@@ -37,6 +37,8 @@
   let retryCount = 0;
   let retrying = false;
   const MAX_RETRIES = 3;
+  const LOADING_TIMEOUT_MS = 6000;
+  let loadingTimer: ReturnType<typeof setTimeout> | null = null;
 
   // Get active section from URL query params
   $: activeSection = $page.url.searchParams.get('section');
@@ -108,6 +110,27 @@
       } else if (error.includes('Invalid private key')) {
         error = 'Authentication failed. Please try logging out and back in.';
       }
+    } finally {
+      // Always clear loading state so the UI transitions from skeleton to
+      // either channels, empty state, or error — never stuck on shimmer.
+      loading = false;
+      clearLoadingTimer();
+    }
+  }
+
+  function startLoadingTimer() {
+    clearLoadingTimer();
+    loadingTimer = setTimeout(() => {
+      if (loading) {
+        loading = false;
+      }
+    }, LOADING_TIMEOUT_MS);
+  }
+
+  function clearLoadingTimer() {
+    if (loadingTimer) {
+      clearTimeout(loadingTimer);
+      loadingTimer = null;
     }
   }
 
@@ -137,8 +160,16 @@
     // Open registration: no pending approval check needed
     // Users get minimoonoir welcome level access by default
 
+    // Start a safety timer so shimmer never persists indefinitely.
+    // loadChannels() clears loading in its finally block, but if it
+    // hangs (e.g. fetchEvents never resolves), the timer ensures the
+    // UI transitions to empty state after LOADING_TIMEOUT_MS.
+    startLoadingTimer();
     await loadChannels();
-    loading = false;
+  });
+
+  onDestroy(() => {
+    clearLoadingTimer();
   });
 
   function formatDate(timestamp: number): string {

@@ -1,9 +1,10 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
+  import { base } from '$app/paths';
   import AuthFlow from '$lib/components/auth/AuthFlow.svelte';
 
   function handleComplete(event: CustomEvent<{ publicKey: string }>) {
-    goto('/');
+    goto(`${base}/chat`);
   }
 </script>
 

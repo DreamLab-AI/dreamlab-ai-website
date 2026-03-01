@@ -5,6 +5,7 @@
 
   export let pendingChannelJoinRequests: JoinRequest[];
   export let isLoading: boolean;
+  export let isSectionLoading: boolean = false;
   export let getChannelName: (channelId: string) => string;
 
   const dispatch = createEventDispatcher<{
@@ -49,7 +50,7 @@
       </button>
     </div>
 
-    {#if isLoading && pendingChannelJoinRequests.length === 0}
+    {#if isSectionLoading && pendingChannelJoinRequests.length === 0}
       <div class="text-center py-8">
         <span class="loading loading-spinner loading-lg"></span>
         <p class="mt-2 text-base-content/70">Loading channel join requests...</p>

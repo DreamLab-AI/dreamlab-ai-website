@@ -9,6 +9,9 @@ import type { ChannelSection, ChannelAccessType } from '$lib/types/channel';
 import { validateContent, validateChannelName } from '$lib/utils/validation';
 import { checkRateLimit, RateLimitError } from '$lib/utils/rateLimit';
 
+/** Timeout for fetchEvents calls (ms). Prevents indefinite hangs when relay is unresponsive. */
+const FETCH_EVENTS_TIMEOUT = 8000;
+
 // NIP-28 Event Kinds for Public Chat
 export const CHANNEL_KINDS = {
 	CREATE: 40,      // Channel creation
@@ -443,7 +446,12 @@ export async function fetchChannels(options: FetchChannelOptions = {}): Promise<
 		limit,
 	};
 
-	const events = await ndkInstance.fetchEvents(filter);
+	// Race fetchEvents against a timeout so loading never hangs indefinitely
+	// when the relay is slow or never sends EOSE.
+	const fetchTimeout = new Promise<Set<NDKEvent>>((resolve) => {
+		setTimeout(() => resolve(new Set()), FETCH_EVENTS_TIMEOUT);
+	});
+	const events = await Promise.race([ndkInstance.fetchEvents(filter), fetchTimeout]);
 	const channels: CreatedChannel[] = [];
 
 	for (const event of events) {

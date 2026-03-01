@@ -244,7 +244,7 @@
           </div>
           <div class="metric-content">
             <div class="metric-value">
-              {((platformStats.activeChannels / platformStats.totalChannels) * 100).toFixed(0)}%
+              {platformStats.totalChannels === 0 ? '0' : ((platformStats.activeChannels / platformStats.totalChannels) * 100).toFixed(0)}%
             </div>
             <div class="metric-label">Engagement Rate</div>
             <div class="metric-detail">
@@ -364,7 +364,7 @@
 <style>
   .admin-stats-page {
     min-height: 100vh;
-    background: #f9fafb;
+    background: oklch(var(--b1));
     padding: 2rem;
   }
 
@@ -382,12 +382,12 @@
     margin: 0 0 0.25rem 0;
     font-size: 2rem;
     font-weight: 700;
-    color: #111827;
+    color: oklch(var(--bc));
   }
 
   .subtitle {
     margin: 0;
-    color: #6b7280;
+    color: oklch(var(--bc) / 0.6);
     font-size: 1rem;
   }
 
@@ -400,9 +400,9 @@
   .export-button {
     padding: 0.625rem 1.25rem;
     border-radius: 8px;
-    border: 1px solid #e5e7eb;
-    background: white;
-    color: #374151;
+    border: 1px solid oklch(var(--b3));
+    background: oklch(var(--b2));
+    color: oklch(var(--bc));
     font-size: 0.875rem;
     font-weight: 500;
     cursor: pointer;
@@ -414,9 +414,9 @@
 
   .refresh-button:hover,
   .export-button:hover {
-    background: #f9fafb;
-    border-color: #3b82f6;
-    color: #3b82f6;
+    background: oklch(var(--b3));
+    border-color: oklch(var(--p));
+    color: oklch(var(--p));
   }
 
   .refresh-button:disabled,
@@ -434,14 +434,14 @@
     align-items: center;
     justify-content: center;
     padding: 4rem 1rem;
-    color: #6b7280;
+    color: oklch(var(--bc) / 0.6);
   }
 
   .spinner {
     width: 48px;
     height: 48px;
-    border: 4px solid #e5e7eb;
-    border-top-color: #3b82f6;
+    border: 4px solid oklch(var(--b3));
+    border-top-color: oklch(var(--p));
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin-bottom: 1rem;
@@ -453,14 +453,14 @@
 
   .error-message {
     margin-bottom: 1rem;
-    color: #dc2626;
+    color: oklch(var(--er));
     font-size: 1rem;
   }
 
   .retry-button {
     padding: 0.625rem 1.5rem;
-    background: #3b82f6;
-    color: white;
+    background: oklch(var(--p));
+    color: oklch(var(--pc));
     border: none;
     border-radius: 8px;
     cursor: pointer;
@@ -469,7 +469,7 @@
   }
 
   .retry-button:hover {
-    background: #2563eb;
+    background: oklch(var(--p) / 0.85);
   }
 
   .stats-content {
@@ -485,8 +485,8 @@
   }
 
   .metric-card {
-    background: white;
-    border: 1px solid #e5e7eb;
+    background: oklch(var(--b2));
+    border: 1px solid oklch(var(--b3));
     border-radius: 12px;
     padding: 1.5rem;
     display: flex;
@@ -505,23 +505,23 @@
   }
 
   .metric-icon.channels {
-    background: #dbeafe;
-    color: #2563eb;
+    background: oklch(var(--in) / 0.15);
+    color: oklch(var(--in));
   }
 
   .metric-icon.messages {
-    background: #dcfce7;
-    color: #16a34a;
+    background: oklch(var(--su) / 0.15);
+    color: oklch(var(--su));
   }
 
   .metric-icon.users {
-    background: #fef3c7;
-    color: #d97706;
+    background: oklch(var(--wa) / 0.15);
+    color: oklch(var(--wa));
   }
 
   .metric-icon.engagement {
-    background: #f3e8ff;
-    color: #9333ea;
+    background: oklch(var(--s) / 0.15);
+    color: oklch(var(--s));
   }
 
   .metric-content {
@@ -531,26 +531,26 @@
   .metric-value {
     font-size: 2rem;
     font-weight: 700;
-    color: #111827;
+    color: oklch(var(--bc));
     line-height: 1;
     margin-bottom: 0.5rem;
   }
 
   .metric-label {
     font-size: 0.875rem;
-    color: #6b7280;
+    color: oklch(var(--bc) / 0.6);
     font-weight: 600;
     margin-bottom: 0.25rem;
   }
 
   .metric-detail {
     font-size: 0.75rem;
-    color: #9ca3af;
+    color: oklch(var(--bc) / 0.4);
   }
 
   .section {
-    background: white;
-    border: 1px solid #e5e7eb;
+    background: oklch(var(--b2));
+    border: 1px solid oklch(var(--b3));
     border-radius: 12px;
     padding: 1.5rem;
     margin-bottom: 2rem;
@@ -569,7 +569,7 @@
     margin: 0;
     font-size: 1.25rem;
     font-weight: 600;
-    color: #111827;
+    color: oklch(var(--bc));
   }
 
   .sort-controls {
@@ -579,12 +579,12 @@
 
   .sort-button {
     padding: 0.5rem 1rem;
-    background: #f9fafb;
-    border: 1px solid #e5e7eb;
+    background: oklch(var(--b1));
+    border: 1px solid oklch(var(--b3));
     border-radius: 6px;
     cursor: pointer;
     font-size: 0.875rem;
-    color: #6b7280;
+    color: oklch(var(--bc) / 0.6);
     transition: all 0.2s;
     display: flex;
     align-items: center;
@@ -592,15 +592,15 @@
   }
 
   .sort-button:hover {
-    background: white;
-    border-color: #3b82f6;
-    color: #3b82f6;
+    background: oklch(var(--b2));
+    border-color: oklch(var(--p));
+    color: oklch(var(--p));
   }
 
   .sort-button.active {
-    background: #3b82f6;
-    border-color: #3b82f6;
-    color: white;
+    background: oklch(var(--p));
+    border-color: oklch(var(--p));
+    color: oklch(var(--pc));
   }
 
   .sort-arrow {
@@ -617,16 +617,16 @@
     grid-template-columns: 2fr 1fr 1fr 1fr 1fr 2fr;
     gap: 1rem;
     padding: 1rem;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid oklch(var(--b3));
   }
 
   .table-header {
     font-weight: 600;
     font-size: 0.875rem;
-    color: #6b7280;
+    color: oklch(var(--bc) / 0.6);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    background: #f9fafb;
+    background: oklch(var(--b1));
     border-radius: 8px;
   }
 
@@ -644,7 +644,7 @@
   .channel-id {
     font-family: monospace;
     font-size: 0.875rem;
-    color: #111827;
+    color: oklch(var(--bc));
   }
 
   .top-poster {
@@ -662,23 +662,23 @@
   }
 
   .poster-count {
-    color: #9ca3af;
+    color: oklch(var(--bc) / 0.4);
     font-size: 0.75rem;
   }
 
   .text-muted {
-    color: #9ca3af;
+    color: oklch(var(--bc) / 0.4);
   }
 
   .stats-footer {
     text-align: center;
     padding: 1.5rem;
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid oklch(var(--b3));
   }
 
   .last-updated {
     font-size: 0.875rem;
-    color: #9ca3af;
+    color: oklch(var(--bc) / 0.4);
   }
 
   @media (max-width: 1024px) {

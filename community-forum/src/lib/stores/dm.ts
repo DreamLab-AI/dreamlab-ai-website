@@ -519,6 +519,13 @@ function createDMStore() {
     },
 
     /**
+     * Force loading state to complete (used by timeout safety net)
+     */
+    forceLoadingComplete: (): void => {
+      update(state => ({ ...state, isLoading: false }));
+    },
+
+    /**
      * Clear error
      */
     clearError: (): void => {

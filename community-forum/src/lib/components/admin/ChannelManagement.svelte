@@ -6,6 +6,7 @@
 
   export let channels: CreatedChannel[];
   export let isLoading: boolean;
+  export let isSectionLoading: boolean = false;
   export let showCreateForm: boolean = false;
 
   // Form fields
@@ -181,7 +182,7 @@
 
     <!-- Channels List -->
     <div class="mt-4">
-      {#if isLoading && channels.length === 0}
+      {#if isSectionLoading && channels.length === 0}
         <div class="text-center py-8">
           <span class="loading loading-spinner loading-lg"></span>
           <p class="mt-2 text-base-content/70">Loading channels...</p>

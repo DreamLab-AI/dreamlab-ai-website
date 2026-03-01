@@ -230,7 +230,7 @@
 					</div>
 
 					<p class="text-xs text-base-content/50 mt-4">
-						Fairfield uses the Nostr protocol - your identity is portable and you control your data.
+						Your identity is portable and you control your data.
 					</p>
 				</div>
 			</div>

@@ -6,6 +6,7 @@
 
   export let pendingRequests: SectionAccessRequest[];
   export let isLoading: boolean;
+  export let isSectionLoading: boolean = false;
 
   const dispatch = createEventDispatcher<{
     approve: SectionAccessRequest;
@@ -49,7 +50,7 @@
       </button>
     </div>
 
-    {#if isLoading && pendingRequests.length === 0}
+    {#if isSectionLoading && pendingRequests.length === 0}
       <div class="text-center py-8">
         <span class="loading loading-spinner loading-lg"></span>
         <p class="mt-2 text-base-content/70">Loading pending requests...</p>
