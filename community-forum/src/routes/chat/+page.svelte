@@ -5,7 +5,7 @@
   import { page } from '$app/stores';
   import { authStore } from '$lib/stores/auth';
   import { userPermissionsStore } from '$lib/stores/userPermissions';
-  import { whitelistStatusStore } from '$lib/stores/user';
+  import { whitelistStatusStore, isAdminVerified } from '$lib/stores/user';
   import { get } from 'svelte/store';
   import { connectRelay, isConnected, connectionState, ConnectionState } from '$lib/nostr/relay';
   import { RELAY_URL } from '$lib/config';
@@ -280,12 +280,22 @@
             icon="💬"
             title={activeSection ? `No channels in ${pageTitle}` : "No channels yet"}
             description={activeSection
-              ? "This board doesn't have any channels yet. Check back later or browse all channels."
-              : "Create or join a channel to start chatting with the community"}
+              ? "This section doesn't have any channels yet. Check back later or browse all channels."
+              : "Channels are where conversations happen. Browse existing channels or ask an admin to create one."}
           />
-          {#if activeSection}
-            <a href="{base}/chat" class="btn btn-primary btn-sm">View All Channels</a>
-          {/if}
+          <div class="flex flex-wrap gap-2 justify-center mt-2">
+            {#if activeSection}
+              <a href="{base}/chat" class="btn btn-primary btn-sm">View All Channels</a>
+            {/if}
+            {#if $isAdminVerified}
+              <a href="{base}/admin" class="btn btn-primary btn-sm gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Create Channel
+              </a>
+            {/if}
+          </div>
         </div>
       {:else}
         <div class="space-y-3">
@@ -297,7 +307,7 @@
     </div>
 
     <!-- Sidebar -->
-    <div class="lg:w-80 space-y-4">
+    <div class="hidden lg:block lg:w-80 space-y-4">
       <BoardStats />
       <TodaysActivity />
       <TopPosters />

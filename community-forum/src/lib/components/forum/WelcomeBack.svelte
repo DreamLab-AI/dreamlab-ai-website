@@ -38,7 +38,7 @@
     return date.toLocaleDateString();
   }
 
-  $: shortPubkey = $authStore.publicKey?.substring(0, 8) + '...' || '';
+  $: shortPubkey = $authStore.publicKey ? $authStore.publicKey.substring(0, 8) + '...' : '';
 </script>
 
 {#if $authStore.isAuthenticated}

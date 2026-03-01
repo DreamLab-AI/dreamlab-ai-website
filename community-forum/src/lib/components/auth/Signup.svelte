@@ -95,8 +95,8 @@ KEEP THIS FILE SECURE. Never share the private key.
 
 <WelcomeModal />
 
-<div class="flex flex-col items-center justify-center min-h-screen p-4 bg-base-200 gradient-mesh">
-  <div class="card w-full max-w-md bg-base-100 shadow-xl">
+<div class="w-full max-w-md sm:max-w-lg mx-auto">
+  <div class="card w-full bg-base-100 shadow-xl">
     <div class="card-body">
       <h2 class="card-title text-2xl justify-center mb-4">Welcome to {appName}</h2>
 

@@ -166,7 +166,7 @@
       </div>
 
       <!-- Sidebar -->
-      <div class="space-y-4">
+      <div class="order-last xl:order-first space-y-4">
         <!-- Upcoming Events -->
         <div class="card bg-base-200 shadow-lg">
           <div class="card-body p-4">

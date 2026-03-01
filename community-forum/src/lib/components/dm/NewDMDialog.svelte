@@ -16,11 +16,21 @@
   let searchInput = '';
   let selectedPubkey = '';
   let customName = '';
+  let contactFilter = '';
 
   /**
    * Recent contacts from existing conversations
    */
-  $: recentContacts = $sortedConversations.slice(0, 5);
+  $: recentContacts = $sortedConversations.slice(0, 10);
+
+  /**
+   * Filtered contacts based on search input
+   */
+  $: filteredContacts = contactFilter
+    ? recentContacts.filter(c =>
+        c.name.toLowerCase().includes(contactFilter.toLowerCase())
+      )
+    : recentContacts;
 
   /**
    * Validate pubkey format (hex string, 64 characters)
@@ -35,7 +45,7 @@
     if (!pubkey) return;
 
     if (!/^[0-9a-f]{64}$/i.test(pubkey)) {
-      toast.error('Invalid public key format. Must be 64 hex characters.');
+      toast.error('Invalid user ID format. Please check and try again.');
       return;
     }
 
@@ -62,6 +72,7 @@
     searchInput = '';
     selectedPubkey = '';
     customName = '';
+    contactFilter = '';
     dispatch('close');
   }
 
@@ -116,51 +127,24 @@
         </button>
       </div>
 
-      <!-- Search Input -->
-      <div class="form-control mb-4">
-        <label class="label" for="dm-pubkey-input">
-          <span class="label-text">Public Key (hex)</span>
-        </label>
-        <input
-          id="dm-pubkey-input"
-          type="text"
-          bind:value={searchInput}
-          placeholder="Enter 64-character hex public key..."
-          class="input input-bordered w-full font-mono text-sm"
-          class:input-success={isValidPubkey}
-          class:input-error={searchInput.length > 0 && !isValidPubkey}
-        />
-        {#if searchInput.length > 0 && !isValidPubkey}
-          <span class="label" role="alert">
-            <span class="label-text-alt text-error">
-              Invalid format. Public key must be 64 hex characters.
-            </span>
-          </span>
-        {/if}
-      </div>
-
-      <!-- Optional Custom Name -->
-      <div class="form-control mb-6">
-        <label class="label" for="dm-display-name-input">
-          <span class="label-text">Display Name (optional)</span>
-        </label>
-        <input
-          id="dm-display-name-input"
-          type="text"
-          bind:value={customName}
-          placeholder="Give this contact a friendly name..."
-          class="input input-bordered w-full"
-        />
-      </div>
-
       <!-- Recent Contacts -->
-      {#if recentContacts.length > 0 && !searchInput}
+      {#if recentContacts.length > 0}
         <div class="mb-6">
           <h4 class="text-sm font-semibold mb-3 text-base-content/70">Recent Contacts</h4>
-          <div class="space-y-2">
-            {#each recentContacts as contact (contact.pubkey)}
+          {#if recentContacts.length > 3}
+            <div class="form-control mb-3">
+              <input
+                type="text"
+                bind:value={contactFilter}
+                placeholder="Filter contacts by name..."
+                class="input input-bordered input-sm w-full"
+              />
+            </div>
+          {/if}
+          <div class="space-y-1 max-h-48 overflow-y-auto">
+            {#each filteredContacts as contact (contact.pubkey)}
               <button
-                class="w-full p-3 rounded-lg hover:bg-base-200 active:bg-base-300 transition-colors flex items-center gap-3 text-left"
+                class="w-full p-3 rounded-lg hover:bg-base-200 active:bg-base-300 transition-colors flex items-center gap-3 text-left {selectedPubkey === contact.pubkey ? 'bg-primary/10 ring-1 ring-primary' : ''}"
                 on:click={() => handleSelectContact(contact.pubkey, contact.name)}
               >
                 <div class="avatar placeholder">
@@ -195,10 +179,51 @@
                   />
                 </svg>
               </button>
+            {:else}
+              <p class="text-sm text-base-content/50 text-center py-2">No matching contacts</p>
             {/each}
           </div>
         </div>
+
+        <div class="divider text-xs text-base-content/40 my-2">or enter a user ID manually</div>
       {/if}
+
+      <!-- Manual User ID Input -->
+      <div class="form-control mb-4">
+        <label class="label" for="dm-pubkey-input">
+          <span class="label-text">User ID</span>
+        </label>
+        <input
+          id="dm-pubkey-input"
+          type="text"
+          bind:value={searchInput}
+          placeholder="Paste a user ID to start a conversation..."
+          class="input input-bordered w-full font-mono text-sm"
+          class:input-success={isValidPubkey}
+          class:input-error={searchInput.length > 0 && !isValidPubkey}
+        />
+        {#if searchInput.length > 0 && !isValidPubkey}
+          <span class="label" role="alert">
+            <span class="label-text-alt text-error">
+              Invalid format. User ID must be 64 hex characters.
+            </span>
+          </span>
+        {/if}
+      </div>
+
+      <!-- Optional Custom Name -->
+      <div class="form-control mb-6">
+        <label class="label" for="dm-display-name-input">
+          <span class="label-text">Display Name (optional)</span>
+        </label>
+        <input
+          id="dm-display-name-input"
+          type="text"
+          bind:value={customName}
+          placeholder="Give this contact a friendly name..."
+          class="input input-bordered w-full"
+        />
+      </div>
 
       <!-- Help Text -->
       {#if !searchInput && recentContacts.length === 0}
@@ -218,9 +243,9 @@
             />
           </svg>
           <div class="text-sm">
-            <p>Enter a Nostr public key to start a private conversation.</p>
+            <p>Start a private conversation with another community member.</p>
             <p class="mt-1">
-              Public keys are 64-character hexadecimal strings starting with npub or in raw hex format.
+              You can select from your recent contacts above or paste a user ID to message someone new.
             </p>
           </div>
         </div>

@@ -3,6 +3,7 @@
   import type { CreatedChannel } from '$lib/nostr/channels';
   import type { ChannelSection } from '$lib/types/channel';
   import { SECTION_CONFIG } from '$lib/types/channel';
+  import { SkeletonLoader } from '$lib/components/ui';
 
   export let channels: CreatedChannel[];
   export let isLoading: boolean;
@@ -183,9 +184,8 @@
     <!-- Channels List -->
     <div class="mt-4">
       {#if isSectionLoading && channels.length === 0}
-        <div class="text-center py-8">
-          <span class="loading loading-spinner loading-lg"></span>
-          <p class="mt-2 text-base-content/70">Loading channels...</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <SkeletonLoader variant="channel" count={3} />
         </div>
       {:else if channels.length === 0}
         <div class="text-center py-8 text-base-content/50">

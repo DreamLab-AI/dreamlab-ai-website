@@ -97,7 +97,7 @@
 
 <div class="card bg-base-200 shadow-lg">
   <div class="card-body p-4">
-    <h3 class="card-title text-lg text-primary mb-3">Board Statistics</h3>
+    <h3 class="card-title text-lg text-primary mb-3">Community Statistics</h3>
 
     {#if loading}
       <div class="flex justify-center py-4">

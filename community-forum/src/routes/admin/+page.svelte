@@ -17,6 +17,16 @@
   import { approveUserRegistration } from '$lib/nostr/whitelist';
   import { NDKEvent, type NDKSubscription, type NDKFilter } from '@nostr-dev-kit/ndk';
   import { channelStore } from '$lib/stores/channelStore';
+  import { getAppConfig } from '$lib/config/loader';
+
+  const appConfig = getAppConfig();
+
+  // Tab navigation
+  type AdminTab = 'overview' | 'channels' | 'users' | 'access';
+  let activeTab: AdminTab = 'overview';
+
+  $: pendingUsersCount = pendingUserRegistrations.length;
+  $: pendingAccessCount = pendingRequests.length + pendingChannelJoinRequests.length;
 
   // Component imports
   import AdminStats from '$lib/components/admin/AdminStats.svelte';
@@ -562,7 +572,18 @@
 
     try {
       isLoading = true;
-      const status = await verifyWhitelistStatus($authStore.publicKey);
+      const statusPromise = verifyWhitelistStatus($authStore.publicKey);
+      const status = await Promise.race([
+        statusPromise,
+        new Promise<undefined>((resolve) => setTimeout(() => resolve(undefined), 8000))
+      ]);
+
+      if (!status) {
+        error = 'Could not verify admin status — relay may be unavailable. Please try again.';
+        isLoading = false;
+        return;
+      }
+
       whitelistStatusStore.set(status);
 
       if (!status.isAdmin) {
@@ -573,8 +594,8 @@
 
       initializeAdmin();
     } catch (e) {
-      error = 'Failed to verify admin status';
-      setTimeout(() => goto(`${base}/chat`), 2000);
+      error = 'Failed to verify admin status. The relay may be temporarily unavailable.';
+      isLoading = false;
     }
   });
 
@@ -595,7 +616,7 @@
 </script>
 
 <svelte:head>
-  <title>Admin Dashboard - Nostr-BBS</title>
+  <title>Admin Dashboard - {appConfig.name}</title>
 </svelte:head>
 
 <div class="container mx-auto p-4 max-w-6xl">
@@ -630,41 +651,90 @@
     </div>
   {/if}
 
-  <AdminStats {stats} />
+  <!-- Tabbed Navigation -->
+  <div class="tabs tabs-boxed bg-base-200 mb-6 p-1">
+    <button
+      class="tab tab-lg gap-2"
+      class:tab-active={activeTab === 'overview'}
+      on:click={() => activeTab = 'overview'}
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+      </svg>
+      Overview
+    </button>
+    <button
+      class="tab tab-lg gap-2"
+      class:tab-active={activeTab === 'channels'}
+      on:click={() => activeTab = 'channels'}
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+      </svg>
+      Channels
+    </button>
+    <button
+      class="tab tab-lg gap-2"
+      class:tab-active={activeTab === 'users'}
+      on:click={() => activeTab = 'users'}
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+      </svg>
+      Users
+      {#if pendingUsersCount > 0}
+        <span class="badge badge-warning badge-sm">{pendingUsersCount}</span>
+      {/if}
+    </button>
+    <button
+      class="tab tab-lg gap-2"
+      class:tab-active={activeTab === 'access'}
+      on:click={() => activeTab = 'access'}
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+      </svg>
+      Access
+      {#if pendingAccessCount > 0}
+        <span class="badge badge-warning badge-sm">{pendingAccessCount}</span>
+      {/if}
+    </button>
+  </div>
 
-  <RelaySettings bind:isPrivateMode {isSwitchingMode} on:modeChange={handleRelayModeChange} />
-
-  <ChannelManagement {channels} {isLoading} isSectionLoading={channelsLoading} on:create={handleCreateChannel} />
-
-  <UserRegistrations
-    {pendingUserRegistrations}
-    {isLoading}
-    isSectionLoading={registrationsLoading}
-    on:approve={(e) => handleApproveUserRegistration(e.detail)}
-    on:reject={(e) => handleRejectUserRegistration(e.detail)}
-    on:refresh={loadUserRegistrations}
-  />
-
-  <UserManagement />
-
-  <SectionRequests
-    {pendingRequests}
-    {isLoading}
-    isSectionLoading={requestsLoading}
-    on:approve={(e) => handleApproveRequest(e.detail)}
-    on:deny={(e) => handleDenyRequest(e.detail)}
-    on:refresh={loadPendingRequests}
-  />
-
-  <ChannelJoinRequests
-    {pendingChannelJoinRequests}
-    {isLoading}
-    isSectionLoading={joinRequestsLoading}
-    {getChannelName}
-    on:approve={(e) => handleApproveChannelJoin(e.detail)}
-    on:reject={(e) => handleRejectChannelJoin(e.detail)}
-    on:refresh={loadChannelJoinRequests}
-  />
-
-  <QuickActions />
+  <!-- Tab Content -->
+  {#if activeTab === 'overview'}
+    <AdminStats {stats} />
+    <RelaySettings bind:isPrivateMode {isSwitchingMode} on:modeChange={handleRelayModeChange} />
+    <QuickActions />
+  {:else if activeTab === 'channels'}
+    <ChannelManagement {channels} {isLoading} isSectionLoading={channelsLoading} on:create={handleCreateChannel} />
+  {:else if activeTab === 'users'}
+    <UserRegistrations
+      {pendingUserRegistrations}
+      {isLoading}
+      isSectionLoading={registrationsLoading}
+      on:approve={(e) => handleApproveUserRegistration(e.detail)}
+      on:reject={(e) => handleRejectUserRegistration(e.detail)}
+      on:refresh={loadUserRegistrations}
+    />
+    <UserManagement />
+  {:else if activeTab === 'access'}
+    <SectionRequests
+      {pendingRequests}
+      {isLoading}
+      isSectionLoading={requestsLoading}
+      on:approve={(e) => handleApproveRequest(e.detail)}
+      on:deny={(e) => handleDenyRequest(e.detail)}
+      on:refresh={loadPendingRequests}
+    />
+    <ChannelJoinRequests
+      {pendingChannelJoinRequests}
+      {isLoading}
+      isSectionLoading={joinRequestsLoading}
+      {getChannelName}
+      on:approve={(e) => handleApproveChannelJoin(e.detail)}
+      on:reject={(e) => handleRejectChannelJoin(e.detail)}
+      on:refresh={loadChannelJoinRequests}
+    />
+  {/if}
 </div>

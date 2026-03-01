@@ -13,5 +13,7 @@
 </svelte:head>
 
 <div class="min-h-screen flex items-center justify-center bg-gradient-mesh p-4">
-  <AuthFlow on:complete={handleComplete} />
+  <div class="w-full max-w-lg">
+    <AuthFlow on:complete={handleComplete} />
+  </div>
 </div>

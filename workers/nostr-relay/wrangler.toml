@@ -8,7 +8,7 @@ database_name = "dreamlab-relay"
 database_id = "97c77d23-0e24-4325-ada7-1747eab4095b"
 
 [vars]
-ADMIN_PUBKEYS = "11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c"
+ADMIN_PUBKEYS = "11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c,37f922fd632060ee9905505b687f8803090e943ffe92105428b3859a1c4ee7ff"
 RELAY_NAME = "DreamLab Nostr Relay"
 ALLOWED_ORIGIN = "https://dreamlab-ai.com"
 

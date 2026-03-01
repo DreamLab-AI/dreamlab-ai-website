@@ -414,7 +414,7 @@
   }
 </script>
 
-<div class="border-t border-base-300 bg-base-100 p-4 relative message-input-container">
+<div class="border-t border-base-300 bg-base-100 p-4 relative message-input-container mb-20 md:mb-0">
   <MentionAutocomplete
     bind:visible={showMentionAutocomplete}
     searchQuery={mentionQuery}

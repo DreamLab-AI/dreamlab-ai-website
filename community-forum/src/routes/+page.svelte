@@ -101,8 +101,25 @@
 				{primaryName}
 			</h1>
 			<p class="text-xl text-base-content/70">
-				{subtitle}
+				Where ideas come alive together
 			</p>
+		</div>
+
+		<!-- Activity pulse -->
+		<div class="flex items-center justify-center gap-6 text-sm text-base-content/60">
+			<span class="flex items-center gap-2">
+				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-4 h-4">
+					<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+				</svg>
+				120+ members
+			</span>
+			<span class="flex items-center gap-2">
+				<span class="relative flex h-2.5 w-2.5">
+					<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
+					<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-success"></span>
+				</span>
+				Active now
+			</span>
 		</div>
 
 		<div class="card bg-base-200/80 backdrop-blur border border-base-300/50 shadow-xl">
@@ -111,13 +128,14 @@
 				<p class="text-base-content/70">
 					A private, encrypted space for DreamLab trainees and the wider collective to connect, share knowledge, and collaborate.
 				</p>
-				<div class="card-actions justify-center mt-4 flex-wrap gap-3">
-					<a href="{base}/signup" class="btn btn-primary btn-lg">
-						Join the community
+				<div class="card-actions flex-col items-center mt-4 gap-2">
+					<a href="{base}/signup" class="btn btn-primary btn-lg btn-wide">
+						Join the Community
 					</a>
-					<a href="{base}/login" class="btn btn-outline btn-lg">
-						Sign in
-					</a>
+					<p class="text-sm text-base-content/50">
+						Already have an account?
+						<a href="{base}/login" class="link link-hover text-primary">Sign in</a>
+					</p>
 				</div>
 			</div>
 		</div>
@@ -125,7 +143,7 @@
 		<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
 			<div class="card bg-base-200/80 backdrop-blur border border-base-300/30">
 				<div class="card-body items-center text-center">
-					<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-2">
+					<div class="w-10 h-10 rounded-full bg-primary/20 ring-2 ring-primary/10 flex items-center justify-center mb-2">
 						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-5 h-5 text-primary">
 							<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
 						</svg>
@@ -139,7 +157,7 @@
 
 			<div class="card bg-base-200/80 backdrop-blur border border-base-300/30">
 				<div class="card-body items-center text-center">
-					<div class="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center mb-2">
+					<div class="w-10 h-10 rounded-full bg-secondary/20 ring-2 ring-secondary/10 flex items-center justify-center mb-2">
 						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-5 h-5 text-secondary">
 							<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
 						</svg>
@@ -153,7 +171,7 @@
 
 			<div class="card bg-base-200/80 backdrop-blur border border-base-300/30">
 				<div class="card-body items-center text-center">
-					<div class="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center mb-2">
+					<div class="w-10 h-10 rounded-full bg-accent/20 ring-2 ring-accent/10 flex items-center justify-center mb-2">
 						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-5 h-5 text-accent">
 							<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
 						</svg>
