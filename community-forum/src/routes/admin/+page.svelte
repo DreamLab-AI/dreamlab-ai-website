@@ -392,14 +392,15 @@
     }
   }
 
-  async function handleApproveUserRegistration(registration: UserRegistrationRequest) {
+  async function handleApproveUserRegistration(registration: UserRegistrationRequest & { selectedCohorts?: string[] }) {
     try {
       isLoading = true;
       error = null;
       successMessage = null;
 
       const privkey = authStore.getPrivkey() ?? undefined;
-      const result = await approveUserRegistration(registration.pubkey, $authStore.publicKey || '', privkey);
+      const cohorts = registration.selectedCohorts?.length ? registration.selectedCohorts : ['approved'];
+      const result = await approveUserRegistration(registration.pubkey, $authStore.publicKey || '', privkey, cohorts);
 
       if (!result.success) {
         error = result.error || 'Failed to approve via whitelist API';
@@ -420,7 +421,8 @@
 
       pendingUserRegistrations = pendingUserRegistrations.filter(r => r.id !== registration.id);
 
-      successMessage = `Approved user registration. User can now access the system.`;
+      const cohortLabel = cohorts.join(', ');
+      successMessage = `Approved user with groups: ${cohortLabel}`;
       setTimeout(() => { successMessage = null; }, 5000);
 
       if (import.meta.env.DEV) {

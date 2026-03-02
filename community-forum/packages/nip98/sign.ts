@@ -19,5 +19,5 @@ export async function createNip98Token(
   body?: Uint8Array | ArrayBuffer,
 ): Promise<string> {
   const payload = body ? await hashRawBody(body) : undefined;
-  return getToken(url, method, createSigner(privkey), true, payload);
+  return getToken(url, method, createSigner(privkey), false, payload);
 }

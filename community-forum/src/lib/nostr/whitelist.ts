@@ -265,7 +265,8 @@ export async function publishRegistrationRequest(
 export async function approveUserRegistration(
   pubkey: string,
   adminPubkey: string,
-  privkey?: Uint8Array
+  privkey?: Uint8Array,
+  cohorts: string[] = ['approved'],
 ): Promise<{ success: boolean; error?: string }> {
   if (!privkey) {
     return {
@@ -279,7 +280,7 @@ export async function approveUserRegistration(
     const url = `${httpUrl}/api/whitelist/add`;
     const body = JSON.stringify({
       pubkey,
-      cohorts: ['approved'],
+      cohorts,
       adminPubkey,
     });
     const fetchOptions: RequestInit = {

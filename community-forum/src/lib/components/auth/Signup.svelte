@@ -3,15 +3,19 @@
   import { nip19 } from 'nostr-tools';
   import { bytesToHex } from '@noble/hashes/utils';
   import { authStore } from '$lib/stores/auth';
+  import { profileCache } from '$lib/stores/profiles';
+  import { ndk, ensureRelayConnected, isConnected, publishEvent } from '$lib/nostr/relay';
+  import { NDKEvent } from '@nostr-dev-kit/ndk';
+  import { publishRegistrationRequest } from '$lib/nostr/whitelist';
   import { getAppConfig } from '$lib/config/loader';
   import WelcomeModal from '$lib/components/ui/WelcomeModal.svelte';
 
   const appConfig = getAppConfig();
   const appName = appConfig.name.split(' - ')[0];
 
-  const dispatch = createEventDispatcher<{ next: { publicKey: string } }>();
+  const dispatch = createEventDispatcher<{ next: { publicKey: string; displayName: string } }>();
 
-  type Step = 'idle' | 'registering' | 'download' | 'done';
+  type Step = 'idle' | 'registering' | 'download' | 'publishing' | 'done';
 
   let step: Step = 'idle';
   let displayName = '';
@@ -87,9 +91,48 @@ KEEP THIS FILE SECURE. Never share the private key.
     URL.revokeObjectURL(url);
   }
 
-  function handleProceed() {
+  async function handleProceed() {
     authStore.confirmNsecBackup();
-    dispatch('next', { publicKey });
+    step = 'publishing';
+
+    const name = displayName.trim() || 'New User';
+
+    try {
+      // Connect to relay if not already connected
+      if (!isConnected()) {
+        const privkeyBytes = authStore.getPrivkey();
+        const privkeyHex = privkeyBytes ? bytesToHex(privkeyBytes) : null;
+        await ensureRelayConnected({ privateKey: privkeyHex });
+      }
+
+      const ndkInstance = ndk();
+      if (ndkInstance) {
+        // Publish kind-0 metadata with the display name entered during signup
+        const metadataEvent = new NDKEvent(ndkInstance);
+        metadataEvent.kind = 0;
+        metadataEvent.content = JSON.stringify({
+          name,
+          display_name: name,
+        });
+        await publishEvent(metadataEvent);
+
+        // Update local stores
+        authStore.setProfile(name, null);
+        profileCache.updateCurrentUserProfile(publicKey, name, null);
+      }
+
+      // Publish kind-9024 registration request so admin can see the pending user
+      const privkeyBytes = authStore.getPrivkey();
+      const privkeyHex = privkeyBytes ? bytesToHex(privkeyBytes) : null;
+      if (privkeyHex) {
+        await publishRegistrationRequest(privkeyHex, name);
+      }
+    } catch (err) {
+      // Non-fatal: profile publish failure shouldn't block signup flow
+      console.warn('[Signup] Failed to publish profile/registration:', err);
+    }
+
+    dispatch('next', { publicKey, displayName: name });
   }
 </script>
 
@@ -180,7 +223,7 @@ KEEP THIS FILE SECURE. Never share the private key.
         <div class="mt-4 text-center">
           <button
             class="btn btn-ghost btn-sm"
-            on:click={() => dispatch('next', { publicKey: '' })}
+            on:click={() => dispatch('next', { publicKey: '', displayName: '' })}
           >
             Already have an account?
           </button>
@@ -192,7 +235,7 @@ KEEP THIS FILE SECURE. Never share the private key.
           <p class="text-center text-base-content/70">Creating your secure account...</p>
         </div>
 
-      {:else if step === 'download'}
+      {:else if step === 'download' || step === 'publishing'}
         <div class="alert alert-warning mb-4">
           <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -222,8 +265,14 @@ KEEP THIS FILE SECURE. Never share the private key.
           <button
             class="btn btn-primary w-full"
             on:click={handleProceed}
+            disabled={step === 'publishing'}
           >
-            I've saved my key →
+            {#if step === 'publishing'}
+              <span class="loading loading-spinner loading-sm"></span>
+              Setting up profile...
+            {:else}
+              I've saved my key →
+            {/if}
           </button>
         </div>
       {/if}
