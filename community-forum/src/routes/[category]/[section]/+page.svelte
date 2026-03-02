@@ -8,6 +8,7 @@
   import { ndk, ensureRelayConnected, isConnected } from '$lib/nostr/relay';
   import { getSectionWithCategory, getBreadcrumbs } from '$lib/config';
   import { canCreateChannel, canAccessSection } from '$lib/config/permissions';
+  import { createChannel } from '$lib/nostr/channels';
   import Breadcrumb from '$lib/components/navigation/Breadcrumb.svelte';
   import ChannelCard from '$lib/components/forum/ChannelCard.svelte';
   import ZoneHero from '$lib/components/zones/ZoneHero.svelte';
@@ -28,6 +29,14 @@
   let loading = true;
   let error: string | null = null;
   let forums: Forum[] = [];
+  let ready = false;
+  let loadedSectionId: string | null = null;
+
+  // Create forum modal state
+  let showCreateModal = false;
+  let newForumName = '';
+  let newForumDescription = '';
+  let creating = false;
 
   $: categoryId = $page.params.category;
   $: sectionId = $page.params.section;
@@ -43,15 +52,46 @@
     ? canCreateChannel($userPermissionsStore, sectionId)
     : false;
 
-  async function loadForums() {
+  // Reload forums when section changes via client-side navigation
+  $: if (ready && sectionId && sectionId !== loadedSectionId) {
+    reloadSection(sectionId);
+  }
+
+  async function reloadSection(sid: string) {
+    loading = true;
+    error = null;
+    forums = [];
+    const info = getSectionWithCategory(sid);
+    if (!info?.section || !info?.category) {
+      error = `Section "${sid}" not found`;
+      loading = false;
+      return;
+    }
+    if (info.category.id !== categoryId) {
+      error = `Section "${sid}" is not in category "${categoryId}"`;
+      loading = false;
+      return;
+    }
+    try {
+      await loadForums(sid);
+    } catch (e) {
+      error = e instanceof Error ? e.message : 'Failed to load forums';
+    } finally {
+      loadedSectionId = sid;
+      loading = false;
+    }
+  }
+
+  async function loadForums(sid?: string) {
     const ndkInstance = ndk();
     if (!ndkInstance) return;
 
+    const targetSection = sid || sectionId;
+
     try {
-      // Fetch NIP-28 channels (kind 40) tagged with this section
       const filter: NDKFilter = {
         kinds: [40],
-        '#section': [sectionId],
+        '#section': [targetSection],
         limit: 50
       };
 
@@ -80,6 +120,28 @@
     }
   }
 
+  async function handleCreateForum() {
+    if (!newForumName.trim()) return;
+    creating = true;
+    try {
+      const channel = await createChannel({
+        name: newForumName.trim(),
+        description: newForumDescription.trim(),
+        section: sectionId,
+        visibility: 'public'
+      });
+      // Reload forums to show the new one
+      await loadForums();
+      showCreateModal = false;
+      newForumName = '';
+      newForumDescription = '';
+    } catch (e) {
+      error = e instanceof Error ? e.message : 'Failed to create forum';
+    } finally {
+      creating = false;
+    }
+  }
+
   onMount(async () => {
     await authStore.waitForReady();
 
@@ -94,14 +156,12 @@
       return;
     }
 
-    // Verify category matches
     if (category.id !== categoryId) {
       error = `Section "${sectionId}" is not in category "${categoryId}"`;
       loading = false;
       return;
     }
 
-    // Wait for whitelist verification before checking access
     const perms = await waitForPermissions();
     if (perms && !canAccessSection(perms, sectionId)) {
       error = 'You do not have access to this section';
@@ -112,10 +172,12 @@
     try {
       await ensureRelayConnected($authStore);
       await loadForums();
+      loadedSectionId = sectionId;
     } catch (e) {
       console.error('Failed to connect:', e);
       error = e instanceof Error ? e.message : 'Connection failed';
     } finally {
+      ready = true;
       loading = false;
     }
   });
@@ -161,7 +223,7 @@
             </a>
           {/if}
           {#if canCreate}
-            <button class="btn btn-primary">
+            <button class="btn btn-primary" on:click={() => showCreateModal = true}>
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
               </svg>
@@ -218,3 +280,52 @@
     </div>
   {/if}
 </div>
+
+<!-- Create Forum Modal -->
+{#if showCreateModal}
+  <div class="modal modal-open">
+    <div class="modal-box">
+      <h3 class="font-bold text-lg">Create New Forum</h3>
+      <p class="text-sm text-base-content/60 mt-1">in {section?.name ?? sectionId}</p>
+      <div class="form-control mt-4">
+        <label class="label" for="forum-name">
+          <span class="label-text">Forum Name</span>
+        </label>
+        <input
+          id="forum-name"
+          type="text"
+          placeholder="e.g. Weekly Discussion"
+          class="input input-bordered"
+          bind:value={newForumName}
+          disabled={creating}
+        />
+      </div>
+      <div class="form-control mt-2">
+        <label class="label" for="forum-desc">
+          <span class="label-text">Description (optional)</span>
+        </label>
+        <textarea
+          id="forum-desc"
+          placeholder="What is this forum about?"
+          class="textarea textarea-bordered"
+          bind:value={newForumDescription}
+          disabled={creating}
+        ></textarea>
+      </div>
+      <div class="modal-action">
+        <button class="btn btn-ghost" on:click={() => showCreateModal = false} disabled={creating}>Cancel</button>
+        <button
+          class="btn btn-primary"
+          on:click={handleCreateForum}
+          disabled={creating || !newForumName.trim()}
+        >
+          {#if creating}
+            <span class="loading loading-spinner loading-sm"></span>
+          {/if}
+          Create
+        </button>
+      </div>
+    </div>
+    <div class="modal-backdrop" on:click={() => showCreateModal = false} on:keydown></div>
+  </div>
+{/if}

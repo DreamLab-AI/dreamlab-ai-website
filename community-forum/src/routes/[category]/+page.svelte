@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
+  import { afterNavigate } from '$app/navigation';
   import { base } from '$app/paths';
   import { page } from '$app/stores';
   import { authStore } from '$lib/stores/auth';
@@ -17,6 +18,7 @@
 
   let loading = true;
   let error: string | null = null;
+  let ready = false;
 
   $: categoryId = $page.params.category;
   $: category = getCategory(categoryId);
@@ -25,8 +27,17 @@
   $: permissions = $userPermissionsStore;
   $: canViewCategory = ($permissionsReady && permissions) ? canAccessCategory(permissions, categoryId) : true;
 
+  // Re-evaluate on client-side navigation (params change)
+  $: if (ready && categoryId) {
+    error = null;
+    if (!getCategory(categoryId)) {
+      error = `Category "${categoryId}" not found`;
+    }
+    loading = false;
+  }
+
   function getSectionAccessStatus(section: SectionConfig): 'approved' | 'pending' | 'none' {
-    if (!$permissionsReady || !permissions) return 'approved'; // optimistic while loading
+    if (!$permissionsReady || !permissions) return 'approved';
     if (canAccessSection(permissions, section.id)) return 'approved';
     if (!section.access?.requiresApproval) return 'approved';
     return 'none';
@@ -40,13 +51,8 @@
       return;
     }
 
-    if (!category) {
-      error = `Category "${categoryId}" not found`;
-    }
-
-    // Wait for whitelist verification before rendering access decisions
     await waitForPermissions();
-
+    ready = true;
     loading = false;
   });
 </script>
