@@ -2,45 +2,16 @@
   import { createEventDispatcher } from 'svelte';
   import type { UserRegistrationRequest } from '$lib/nostr/groups';
   import UserDisplay from '$lib/components/user/UserDisplay.svelte';
-  import { getCohorts } from '$lib/config/loader';
 
   export let pendingUserRegistrations: UserRegistrationRequest[];
   export let isLoading: boolean;
   export let isSectionLoading: boolean = false;
 
   const dispatch = createEventDispatcher<{
-    approve: UserRegistrationRequest & { selectedCohorts: string[] };
+    approve: UserRegistrationRequest;
     reject: UserRegistrationRequest;
     refresh: void;
   }>();
-
-  // Available cohorts from YAML config
-  const availableCohorts = getCohorts();
-
-  // Per-registration cohort selections (keyed by registration.id)
-  let cohortSelections: Record<string, string[]> = {};
-
-  function getSelectedCohorts(id: string): string[] {
-    return cohortSelections[id] || ['approved'];
-  }
-
-  function toggleCohort(registrationId: string, cohortId: string) {
-    const current = getSelectedCohorts(registrationId);
-    if (current.includes(cohortId)) {
-      cohortSelections[registrationId] = current.filter(c => c !== cohortId);
-    } else {
-      cohortSelections[registrationId] = [...current, cohortId];
-    }
-    // Force reactivity
-    cohortSelections = { ...cohortSelections };
-  }
-
-  function handleApprove(registration: UserRegistrationRequest) {
-    dispatch('approve', {
-      ...registration,
-      selectedCohorts: getSelectedCohorts(registration.id),
-    });
-  }
 
   function formatRelativeTime(timestamp: number): string {
     const now = Date.now();
@@ -97,7 +68,7 @@
           <thead>
             <tr>
               <th>User</th>
-              <th>Groups</th>
+              <th>Message</th>
               <th>Requested</th>
               <th class="text-right">Actions</th>
             </tr>
@@ -123,36 +94,11 @@
                   </div>
                 </td>
                 <td>
-                  <div class="flex flex-wrap gap-1">
-                    {#each availableCohorts.filter(c => c.id !== 'admin') as cohort (cohort.id)}
-                      <button
-                        class="badge badge-sm cursor-pointer select-none transition-colors"
-                        class:badge-primary={getSelectedCohorts(registration.id).includes(cohort.id)}
-                        class:badge-outline={!getSelectedCohorts(registration.id).includes(cohort.id)}
-                        on:click={() => toggleCohort(registration.id, cohort.id)}
-                        title={cohort.description}
-                      >
-                        {cohort.name}
-                      </button>
-                    {/each}
-                    {#if getSelectedCohorts(registration.id).includes('approved')}
-                      <button
-                        class="badge badge-sm badge-primary cursor-pointer select-none"
-                        on:click={() => toggleCohort(registration.id, 'approved')}
-                        title="Basic approved access"
-                      >
-                        approved
-                      </button>
-                    {:else}
-                      <button
-                        class="badge badge-sm badge-outline cursor-pointer select-none"
-                        on:click={() => toggleCohort(registration.id, 'approved')}
-                        title="Basic approved access"
-                      >
-                        approved
-                      </button>
-                    {/if}
-                  </div>
+                  {#if registration.message}
+                    <span class="text-sm text-base-content/70 line-clamp-2">{registration.message}</span>
+                  {:else}
+                    <span class="text-xs text-base-content/50">No message</span>
+                  {/if}
                 </td>
                 <td>
                   <span class="text-sm">{formatRelativeTime(registration.createdAt)}</span>
@@ -161,9 +107,8 @@
                   <div class="flex justify-end gap-2">
                     <button
                       class="btn btn-success btn-sm"
-                      on:click={() => handleApprove(registration)}
-                      disabled={isLoading || getSelectedCohorts(registration.id).length === 0}
-                      title={getSelectedCohorts(registration.id).length === 0 ? 'Select at least one group' : ''}
+                      on:click={() => dispatch('approve', registration)}
+                      disabled={isLoading}
                     >
                       Approve
                     </button>
