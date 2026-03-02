@@ -229,44 +229,64 @@ class RelayManager {
   }
 
   /**
-   * Shared connect logic: wire up relay events and return status
+   * Shared connect logic: wire up relay events and return status.
+   * Retries up to 3 times with backoff — Firefox kills WebSocket connections
+   * during SvelteKit client-side navigation, causing transient failures.
    */
   private async _finishConnect(relayUrl: string): Promise<ConnectionStatus> {
     if (!this._ndk) throw new Error('NDK not initialized');
 
-    const connectTimeout = new Promise<never>((_, reject) => {
-      setTimeout(() => reject(new Error('Connection timeout')), TIMEOUTS.connect);
-    });
+    const MAX_RETRIES = 3;
+    let lastError: Error | null = null;
 
-    await Promise.race([this._ndk.connect(), connectTimeout]);
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+      try {
+        if (attempt > 0) {
+          // Backoff: 500ms, 1500ms before retries
+          await new Promise(r => setTimeout(r, 500 + attempt * 1000));
+          console.log(`[NDK] Retry ${attempt}/${MAX_RETRIES} connecting to ${relayUrl}`);
+        }
 
-    const relay = Array.from(this._ndk.pool.relays.values())[0];
+        const connectTimeout = new Promise<never>((_, reject) => {
+          setTimeout(() => reject(new Error('Connection timeout')), TIMEOUTS.connect);
+        });
 
-    if (!relay) {
-      throw new Error('No relay connected');
+        const connectPromise = this._ndk!.connect();
+        connectPromise.catch(() => {}); // Prevent unhandled rejection if timeout wins
+        await Promise.race([connectPromise, connectTimeout]);
+
+        const relay = Array.from(this._ndk!.pool.relays.values())[0];
+
+        if (!relay || relay.connectivity.status < 5) {
+          throw new Error('Relay not connected after handshake');
+        }
+
+        relay.on('auth', async (challenge: string) => {
+          this.updateState(ConnectionState.AuthRequired, relay.url);
+          try {
+            await this.handleAuthChallenge(relay, challenge);
+          } catch (error) {
+            console.error('[NDK] AUTH failed:', error);
+          }
+        });
+
+        this.updateState(ConnectionState.Connected, relayUrl, undefined, false);
+
+        return {
+          state: ConnectionState.Connected,
+          relay: relayUrl,
+          timestamp: Date.now(),
+          authenticated: false
+        };
+      } catch (err) {
+        lastError = err instanceof Error ? err : new Error(String(err));
+        console.warn(`[NDK] Connect attempt ${attempt + 1} failed: ${lastError.message}`);
+      }
     }
 
-    relay.on('auth', async (challenge: string) => {
-      this.updateState(ConnectionState.AuthRequired, relay.url);
-      try {
-        await this.handleAuthChallenge(relay, challenge);
-      } catch (error) {
-        console.error('[NDK] AUTH failed:', error);
-      }
-    });
-
-    const currentState = relay.connectivity.status >= 5
-      ? ConnectionState.Connected
-      : ConnectionState.Disconnected;
-
-    this.updateState(currentState, relayUrl, undefined, false);
-
-    return {
-      state: currentState,
-      relay: relayUrl,
-      timestamp: Date.now(),
-      authenticated: false
-    };
+    // All retries exhausted
+    this.updateState(ConnectionState.Error, relayUrl, lastError?.message);
+    throw lastError ?? new Error('Connection failed');
   }
 
   /**
@@ -496,12 +516,22 @@ export const isConnected = (): boolean => {
  * Ensure relay is connected, using the appropriate signer.
  * Reads auth state to decide between NIP-07, private key, or throws.
  * Safe to call repeatedly — no-op when already connected.
+ * Waits briefly for SvelteKit hydration to settle before connecting.
  */
 export async function ensureRelayConnected(authState: {
   isNip07?: boolean;
   privateKey?: string | null;
 }): Promise<void> {
   if (relayManagerInstance.isConnected()) return;
+
+  // Wait for DOM to be ready — prevents Firefox from killing the WebSocket
+  // during SvelteKit's hydration/navigation lifecycle
+  if (typeof document !== 'undefined' && document.readyState !== 'complete') {
+    await new Promise<void>(resolve => {
+      window.addEventListener('load', () => resolve(), { once: true });
+      setTimeout(resolve, 2000); // Safety fallback
+    });
+  }
 
   if (authState.isNip07) {
     await relayManagerInstance.connectRelayWithNip07(RELAY_URL);
