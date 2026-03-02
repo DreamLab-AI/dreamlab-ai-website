@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+		<meta name="description" content="Secure Nostr messaging application" />
+		<meta name="theme-color" content="#16213e" />
+		<meta name="mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+		<meta name="apple-mobile-web-app-title" content="Nostr BBS" />
+
+		<link rel="icon" href="/community/favicon.png" />
+		<link rel="apple-touch-icon" href="/community/icon-192.png" />
+		<link rel="manifest" href="/community/manifest.json" />
+
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet" />
+
+		<link href="/community/_app/immutable/entry/start.ow2jpJFG.js" rel="modulepreload">
+		<link href="/community/_app/immutable/chunks/CTVLmyHZ.js" rel="modulepreload">
+		<link href="/community/_app/immutable/chunks/xKPZ-4ZK.js" rel="modulepreload">
+		<link href="/community/_app/immutable/chunks/0ZVSoAEn.js" rel="modulepreload">
+		<link href="/community/_app/immutable/entry/app.CPYvba9V.js" rel="modulepreload">
+		<link href="/community/_app/immutable/chunks/CmsKOCeN.js" rel="modulepreload">
+		<link href="/community/_app/immutable/chunks/DKVmOqaf.js" rel="modulepreload">
+		
+	</head>
+	<body data-sveltekit-preload-data="hover" class="bg-base-100 text-base-content">
+		<div style="display: contents">
+			<script>
+				{
+					__sveltekit_7qrplc = {
+						base: "/community",
+						assets: "/community"
+					};
+
+					const element = document.currentScript.parentElement;
+
+					Promise.all([
+						import("/community/_app/immutable/entry/start.ow2jpJFG.js"),
+						import("/community/_app/immutable/entry/app.CPYvba9V.js")
+					]).then(([kit, app]) => {
+						kit.start(app, element);
+					});
+
+					if ('serviceWorker' in navigator) {
+						addEventListener('load', function () {
+							navigator.serviceWorker.register('/community/service-worker.js');
+						});
+					}
+				}
+			</script>
+		</div>
+	</body>
+</html>

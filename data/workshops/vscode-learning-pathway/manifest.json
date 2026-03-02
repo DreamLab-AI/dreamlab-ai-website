@@ -1,0 +1,57 @@
+{
+  "title": "Vscode Learning Pathway",
+  "pages": [
+    {
+      "slug": "01-introduction.md",
+      "title": "Introduction to VS Code as an AI-Powered IDE"
+    },
+    {
+      "slug": "02-keyboard-shortcuts.md",
+      "title": "Essential Keyboard Shortcuts and Productivity"
+    },
+    {
+      "slug": "03-extension-ecosystem.md",
+      "title": "Extension Ecosystem Mastery"
+    },
+    {
+      "slug": "04-settings-customization.md",
+      "title": "Settings and Customization"
+    },
+    {
+      "slug": "05-git-integration.md",
+      "title": "Git Integration Deep Dive"
+    },
+    {
+      "slug": "06-remote-development.md",
+      "title": "Remote Development (SSH, Containers, WSL)"
+    },
+    {
+      "slug": "07-debugging.md",
+      "title": "Debugging Mastery"
+    },
+    {
+      "slug": "08-task-automation.md",
+      "title": "Task Automation and Build Systems"
+    },
+    {
+      "slug": "09-ai-integration.md",
+      "title": "AI Coding Assistants Integration"
+    },
+    {
+      "slug": "10-profiles-sync.md",
+      "title": "Profile Management and Settings Sync"
+    },
+    {
+      "slug": "11-workspaces.md",
+      "title": "Multi-root Workspaces and Advanced Organization"
+    },
+    {
+      "slug": "12-advanced-editing.md",
+      "title": "Advanced Editing Features"
+    },
+    {
+      "slug": "overview.md",
+      "title": "VS Code Learning Pathway 2025: From Beginner to AI-Powered Master"
+    }
+  ]
+}

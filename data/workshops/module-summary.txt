@@ -1,0 +1,14 @@
+AI-Powered Knowledge Work - Module Structure Summary
+Created: Sun Jun 22 09:52:22 UTC 2025
+
+Modules Created:
+- Module 05: VS Code as AI Command Center (workshop-01-morning-vscode-setup)
+- Module 06: Visual Tools & Version Control (workshop-01-afternoon-visual-version-control)
+- Module 07: Direct AI API Access (workshop-02-morning-ai-api-access)
+- Module 08: Vibe Coding Mastery (workshop-02-afternoon-vibe-coding)
+- Module 09: Local AI Models (workshop-03-morning-local-ai)
+- Module 10: RAG System Implementation (workshop-03-afternoon-rag-system)
+- Module 11: Specialized AI Agents (workshop-04-morning-ai-agents)
+- Module 12: Agent Orchestration & Safety (workshop-04-afternoon-orchestration)
+- Module 13: Quality Assurance & Automation (workshop-05-morning-qa-automation)
+- Module 14: Professional Output Suite (workshop-05-afternoon-publishing)

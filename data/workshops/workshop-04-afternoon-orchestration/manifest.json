@@ -1,0 +1,45 @@
+{
+  "title": "Module 12: Agent Orchestration & Safety",
+  "pages": [
+    {
+      "slug": "README.md",
+      "title": "Module 12: Agent Orchestration & Safety"
+    },
+    {
+      "slug": "00_introduction.md",
+      "title": "00_introduction - Module 12: Agent Orchestration & Safety"
+    },
+    {
+      "slug": "01_concepts.md",
+      "title": "01_concepts - Module 12: Agent Orchestration & Safety"
+    },
+    {
+      "slug": "02_hands_on.md",
+      "title": "02_hands_on - Module 12: Agent Orchestration & Safety"
+    },
+    {
+      "slug": "03_exercises.md",
+      "title": "03_exercises - Module 12: Agent Orchestration & Safety"
+    },
+    {
+      "slug": "04_project.md",
+      "title": "04_project - Module 12: Agent Orchestration & Safety"
+    },
+    {
+      "slug": "05_assessment.md",
+      "title": "05_assessment - Module 12: Agent Orchestration & Safety"
+    },
+    {
+      "slug": "06_resources.md",
+      "title": "06_resources - Module 12: Agent Orchestration & Safety"
+    },
+    {
+      "slug": "objectives.md",
+      "title": "Learning Objectives - Module 12"
+    },
+    {
+      "slug": "prerequisites.md",
+      "title": "Prerequisites - Module 12"
+    }
+  ]
+}

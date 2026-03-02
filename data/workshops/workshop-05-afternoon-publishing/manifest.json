@@ -1,0 +1,45 @@
+{
+  "title": "Module 14: Professional Output Suite",
+  "pages": [
+    {
+      "slug": "README.md",
+      "title": "Module 14: Professional Output Suite"
+    },
+    {
+      "slug": "00_introduction.md",
+      "title": "Introduction to Modern Publishing & Deployment"
+    },
+    {
+      "slug": "01_concepts.md",
+      "title": "Core Concepts: Modern Deployment & Publishing"
+    },
+    {
+      "slug": "02_hands_on.md",
+      "title": "Hands-On: Deploy to Production"
+    },
+    {
+      "slug": "03_exercises.md",
+      "title": "Advanced Deployment Exercises"
+    },
+    {
+      "slug": "04_project.md",
+      "title": "Final Project: Full-Stack Deployment Pipeline"
+    },
+    {
+      "slug": "05_assessment.md",
+      "title": "Assessment: Publishing & Deployment Mastery"
+    },
+    {
+      "slug": "06_resources.md",
+      "title": "Additional Resources: Publishing & Deployment"
+    },
+    {
+      "slug": "objectives.md",
+      "title": "Learning Objectives - Publishing & Deployment"
+    },
+    {
+      "slug": "prerequisites.md",
+      "title": "Prerequisites - Publishing & Deployment"
+    }
+  ]
+}
