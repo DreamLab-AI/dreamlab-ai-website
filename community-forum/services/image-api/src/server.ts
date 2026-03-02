@@ -351,16 +351,22 @@ app.delete('/image/:imageId', async (req, res) => {
     const { imageId } = req.params;
     const pubkey = authResult.pubkey!;
 
-    // Find and delete the file (only files owned by authenticated user)
-    const [files] = await bucket.getFiles({
-      prefix: `message/${pubkey.slice(0, 8)}/${imageId}`
-    });
+    // Search all category prefixes for the file (avatar/, message/, channel/)
+    // Upload routes dynamically choose the category, so deletion must check all.
+    const categories = Object.keys(COMPRESSION_SETTINGS);
+    let matchedFiles: any[] = [];
+    for (const cat of categories) {
+      const [files] = await bucket.getFiles({
+        prefix: `${cat}/${pubkey.slice(0, 8)}/${imageId}`
+      });
+      matchedFiles.push(...files);
+    }
 
-    if (files.length === 0) {
+    if (matchedFiles.length === 0) {
       return res.status(404).json({ error: 'Image not found' });
     }
 
-    await Promise.all(files.map(file => file.delete()));
+    await Promise.all(matchedFiles.map((file: any) => file.delete()));
 
     res.json({ success: true, deleted: files.length });
   } catch (error) {

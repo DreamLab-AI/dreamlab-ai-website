@@ -84,8 +84,10 @@ function isPrivateUrl(url) {
       if (a === 169 && b === 254) return true;
       if (a === 0) return true;
       if (a >= 240) return true;
+      return false; // Public IPv4-mapped address — allow
     }
-    // Any other ::ffff: form (hex groups like ::ffff:7f00:1) — block as unmappable without a full parser
+    // Hex-form mapped addresses (::ffff:7f00:1) that didn't match dotted-decimal above
+    // — block since we can't reliably parse hex octets without a full IPv6 parser
     if (/^::ffff:/i.test(host)) return true;
 
     return false;

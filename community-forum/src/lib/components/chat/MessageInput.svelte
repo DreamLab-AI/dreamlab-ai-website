@@ -14,6 +14,7 @@
   import EventInput from '$lib/components/events/EventInput.svelte';
   import type { Message, EventMetadata } from '$lib/types/channel';
   import type { UserProfile } from '$lib/stores/user';
+  import { profileCache } from '$lib/stores/profiles';
 
   let messageText = '';
   let textareaElement: HTMLTextAreaElement;
@@ -95,31 +96,39 @@
     }
   });
 
-  function loadChannelUsers(channel: typeof $selectedChannel) {
+  async function loadChannelUsers(channel: typeof $selectedChannel) {
     if (!channel) {
       availableUsers = [];
       return;
     }
 
-    // Create user profiles from channel members
-    // In production, fetch full profiles from Nostr
-    availableUsers = channel.members.map(pubkey => ({
-      pubkey,
-      name: null,
-      displayName: null,
-      avatar: null,
-      about: null,
-      cohorts: [],
-      isAdmin: channel.admins.includes(pubkey),
-      isApproved: true,
-      nip05: null,
-      lud16: null,
-      website: null,
-      banner: null,
-      birthday: null,
-      createdAt: null,
-      updatedAt: null
-    }));
+    // Build initial list from channel members, then enrich with cached profiles
+    // so the nickname resolver has real names for @mention matching
+    availableUsers = await Promise.all(
+      channel.members.map(async (pubkey) => {
+        let cached = null;
+        try {
+          cached = await profileCache.getProfile(pubkey);
+        } catch { /* non-fatal */ }
+        return {
+          pubkey,
+          name: cached?.profile?.name ?? null,
+          displayName: cached?.displayName ?? null,
+          avatar: cached?.avatar ?? null,
+          about: cached?.about ?? null,
+          cohorts: [],
+          isAdmin: channel.admins.includes(pubkey),
+          isApproved: true,
+          nip05: cached?.nip05 ?? null,
+          lud16: cached?.profile?.lud16 ?? null,
+          website: cached?.profile?.website ?? null,
+          banner: cached?.profile?.banner ?? null,
+          birthday: null,
+          createdAt: null,
+          updatedAt: null
+        };
+      })
+    );
   }
 
   function loadDraft(channelId: string) {

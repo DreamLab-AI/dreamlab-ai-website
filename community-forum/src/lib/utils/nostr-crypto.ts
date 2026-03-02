@@ -4,6 +4,7 @@
  */
 
 import { sha256 } from '@noble/hashes/sha256.js';
+import { schnorr } from '@noble/curves/secp256k1';
 import { secp256k1 } from '@noble/curves/secp256k1';
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils.js';
 
@@ -40,7 +41,8 @@ export function getEventHash(event: {
 }
 
 /**
- * Sign event
+ * Sign event using BIP340 Schnorr signatures (required by Nostr NIP-01).
+ * Previous implementation incorrectly used ECDSA which is rejected by relays.
  */
 export function signEvent(
   event: {
@@ -53,12 +55,14 @@ export function signEvent(
   },
   privkey: string
 ): string {
-  const signature = secp256k1.sign(event.id, privkey);
-  return bytesToHex(signature.toCompactRawBytes());
+  const sig = schnorr.sign(event.id, privkey);
+  return bytesToHex(sig);
 }
 
 /**
- * Verify event signature
+ * Verify event signature using BIP340 Schnorr (NIP-01 compliant).
+ * Previous implementation used ECDSA verify with compressed pubkey prefix,
+ * which would reject valid Schnorr signatures from conformant clients.
  */
 export function verifySignature(event: {
   id: string;
@@ -66,11 +70,10 @@ export function verifySignature(event: {
   sig: string;
 }): boolean {
   try {
-    const signature = secp256k1.Signature.fromCompact(hexToBytes(event.sig));
-    return secp256k1.verify(
-      signature,
+    return schnorr.verify(
+      hexToBytes(event.sig),
       hexToBytes(event.id),
-      hexToBytes('02' + event.pubkey)
+      hexToBytes(event.pubkey)
     );
   } catch {
     return false;

@@ -161,9 +161,11 @@ export async function sendDM(
   const randomPrivkey = generateSecretKey();
   const randomPubkey = getPublicKey(randomPrivkey);
 
-  // Step 4: Fuzz timestamp by ±2 days
-  const fuzzOffset = Math.floor(Math.random() * (2 * TWO_DAYS_SECONDS)) - TWO_DAYS_SECONDS;
-  const fuzzedTimestamp = currentTimestamp + fuzzOffset;
+  // Step 4: Fuzz timestamp into the PAST only (0 to -2 days).
+  // NIP-22 relays reject events >15min in the future, so we only fuzz backwards.
+  // This still prevents timestamp correlation while remaining relay-compatible.
+  const fuzzOffset = Math.floor(Math.random() * TWO_DAYS_SECONDS);
+  const fuzzedTimestamp = currentTimestamp - fuzzOffset;
 
   // Step 5: Encrypt the seal with the random key for the recipient
   const randomRecipientKey = nip44.v2.utils.getConversationKey(
