@@ -54,6 +54,8 @@ class RelayManager {
     timestamp: Date.now(),
     authenticated: false
   });
+  /** Prevents concurrent connectRelay calls from racing each other */
+  private _connectingPromise: Promise<ConnectionStatus> | null = null;
   private _cacheAdapter: NDKCacheAdapterDexie | null = null;
 
   /**
@@ -192,16 +194,37 @@ class RelayManager {
    * Connect to relay using NIP-07 browser extension signer (no private key needed)
    */
   async connectRelayWithNip07(relayUrl: string): Promise<ConnectionStatus> {
+    if (this._connectingPromise) return this._connectingPromise;
+
+    this._connectingPromise = this._doConnect(relayUrl, async () => {
+      return this.initializeNDKWithNip07(relayUrl);
+    });
+
+    try {
+      return await this._connectingPromise;
+    } finally {
+      this._connectingPromise = null;
+    }
+  }
+
+  /**
+   * Shared connect logic: clean up, create NDK, wait for WebSocket.
+   */
+  private async _doConnect(
+    relayUrl: string,
+    createNdk: () => Promise<NDK>
+  ): Promise<ConnectionStatus> {
     try {
       this.updateState(ConnectionState.Connecting, relayUrl);
 
+      // Clean up old subscriptions
       this._activeSubscriptions.forEach(sub => sub.stop());
       this._activeSubscriptions.clear();
       this._ndk = null;
       this._signer = null;
 
-      this._ndk = await this.initializeNDKWithNip07(relayUrl);
-      return this._finishConnect(relayUrl);
+      this._ndk = await createNdk();
+      return await this._finishConnect(relayUrl);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Connection failed';
       this.updateState(ConnectionState.Error, relayUrl, errorMessage);
@@ -210,96 +233,66 @@ class RelayManager {
   }
 
   /**
-   * Connect to relay with authentication
+   * Connect to relay with authentication.
+   * Returns existing promise if a connection is already in progress.
    */
   async connectRelay(relayUrl: string, privateKey: string): Promise<ConnectionStatus> {
+    // If already connecting, return the existing promise (prevent racing)
+    if (this._connectingPromise) return this._connectingPromise;
+
+    this._connectingPromise = this._doConnect(relayUrl, async () => {
+      return this.initializeNDK(privateKey, relayUrl);
+    });
+
     try {
-      this.updateState(ConnectionState.Connecting, relayUrl);
-
-      // Clean up old subscriptions without closing the WebSocket prematurely
-      this._activeSubscriptions.forEach(sub => sub.stop());
-      this._activeSubscriptions.clear();
-      this._ndk = null;
-      this._signer = null;
-
-      this._ndk = await this.initializeNDK(privateKey, relayUrl);
-      return this._finishConnect(relayUrl);
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Connection failed';
-      this.updateState(ConnectionState.Error, relayUrl, errorMessage);
-      throw error;
+      return await this._connectingPromise;
+    } finally {
+      this._connectingPromise = null;
     }
   }
 
   /**
-   * Shared connect logic: wire up relay events and return status.
-   * Waits for the relay's WebSocket to actually open before returning.
+   * Wait for relay WebSocket to actually connect.
+   * Uses polling — NDK's event-based connect/disconnect race with each other
+   * when connection attempts overlap, making events unreliable.
    */
   private async _finishConnect(relayUrl: string): Promise<ConnectionStatus> {
     if (!this._ndk) throw new Error('NDK not initialized');
 
-    // Start NDK connection (fires off WebSocket but doesn't wait for open)
+    // Start NDK connection (fires off WebSocket asynchronously)
     this._ndk.connect().catch(() => {});
 
-    // Wait for the relay to actually reach CONNECTED status
-    const relay = Array.from(this._ndk.pool.relays.values())[0];
-    if (!relay) throw new Error('No relay in pool');
+    // Poll relay status until connected or timeout
+    const deadline = Date.now() + TIMEOUTS.connect;
+    while (Date.now() < deadline) {
+      if (!this._ndk) throw new Error('Connection cancelled');
 
-    // Wait for the relay to actually reach connected status.
-    // NDK's connect() fires off the WebSocket but resolves immediately.
-    const currentNdk = this._ndk;
-    await new Promise<void>((resolve, reject) => {
-      const timeout = setTimeout(() => {
-        cleanup();
-        reject(new Error('Connection timeout'));
-      }, TIMEOUTS.connect);
+      for (const relay of this._ndk.pool.relays.values()) {
+        if (relay.connectivity.status >= 5) {
+          // Connected — wire up AUTH handler
+          relay.on('auth', async (challenge: string) => {
+            this.updateState(ConnectionState.AuthRequired, relay.url);
+            try {
+              await this.handleAuthChallenge(relay, challenge);
+            } catch (error) {
+              console.error('[NDK] AUTH failed:', error);
+            }
+          });
 
-      const cleanup = () => {
-        clearTimeout(timeout);
-        relay.off('connect', onConnect);
-        relay.off('disconnect', onDisconnect);
-      };
-
-      // Already connected
-      if (relay.connectivity.status >= 5) {
-        cleanup();
-        resolve();
-        return;
+          this.updateState(ConnectionState.Connected, relayUrl, undefined, false);
+          return {
+            state: ConnectionState.Connected,
+            relay: relayUrl,
+            timestamp: Date.now(),
+            authenticated: false
+          };
+        }
       }
 
-      const onConnect = () => {
-        cleanup();
-        resolve();
-      };
-      relay.on('connect', onConnect);
+      await new Promise(r => setTimeout(r, 200));
+    }
 
-      const onDisconnect = () => {
-        // Ignore disconnect if NDK was replaced (stale event from old instance)
-        if (this._ndk !== currentNdk) { cleanup(); return; }
-        cleanup();
-        reject(new Error('Relay disconnected during handshake'));
-      };
-      relay.on('disconnect', onDisconnect);
-    });
-
-    // Wire up AUTH handler
-    relay.on('auth', async (challenge: string) => {
-      this.updateState(ConnectionState.AuthRequired, relay.url);
-      try {
-        await this.handleAuthChallenge(relay, challenge);
-      } catch (error) {
-        console.error('[NDK] AUTH failed:', error);
-      }
-    });
-
-    this.updateState(ConnectionState.Connected, relayUrl, undefined, false);
-
-    return {
-      state: ConnectionState.Connected,
-      relay: relayUrl,
-      timestamp: Date.now(),
-      authenticated: false
-    };
+    throw new Error('Connection timeout');
   }
 
   /**
