@@ -53,6 +53,7 @@ import {
 	createChannel,
 	updateChannelMetadata,
 	sendChannelMessage,
+	clearChannelCache,
 	CHANNEL_KINDS,
 	type CreatedChannel,
 	type ChannelMessage
@@ -110,6 +111,7 @@ describe('Channel Access Control', () => {
 	beforeEach(() => {
 		resetRateLimit('message');
 		resetRateLimit('channelCreate');
+		clearChannelCache();
 
 		mockNdk = {
 			fetchEvents: vi.fn(),
@@ -590,7 +592,8 @@ describe('fetchChannelById', () => {
 				kinds: [40],
 				ids: ['target-id'],
 				limit: 1
-			})
+			}),
+			expect.objectContaining({ groupable: false })
 		);
 	});
 
@@ -755,7 +758,8 @@ describe('fetchChannelMessages', () => {
 				kinds: [42],
 				'#e': ['ch-abc'],
 				limit: 25
-			})
+			}),
+			expect.objectContaining({ groupable: false })
 		);
 	});
 
@@ -764,7 +768,8 @@ describe('fetchChannelMessages', () => {
 		await fetchChannelMessages('ch-abc');
 
 		expect(mockNdk.fetchEvents).toHaveBeenCalledWith(
-			expect.objectContaining({ limit: 50 })
+			expect.objectContaining({ limit: 50 }),
+			expect.objectContaining({ groupable: false })
 		);
 	});
 

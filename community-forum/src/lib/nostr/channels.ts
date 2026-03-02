@@ -13,6 +13,24 @@ import { getSectionWithCategory } from '$lib/config';
 /** Timeout for fetchEvents calls (ms). Prevents indefinite hangs when relay is unresponsive. */
 const FETCH_EVENTS_TIMEOUT = 8000;
 
+/**
+ * Module-level caches that survive SvelteKit client-side navigation.
+ * When {#key pathname} destroys and recreates page components, the
+ * NDK fetchEvents call may time out on re-navigation (relay cold D1
+ * query, subscription grouping). These caches ensure we never clobber
+ * a good result with an empty timeout response.
+ */
+let _channelCache: CreatedChannel[] = [];
+let _messageCache: Map<string, ChannelMessage[]> = new Map();
+
+/**
+ * Clear the module-level channel and message caches (call on logout).
+ */
+export function clearChannelCache(): void {
+	_channelCache = [];
+	_messageCache.clear();
+}
+
 // NIP-28 Event Kinds for Public Chat
 export const CHANNEL_KINDS = {
 	CREATE: 40,      // Channel creation
@@ -292,8 +310,9 @@ export async function fetchChannelById(channelId: string): Promise<CreatedChanne
 		limit: 1,
 	};
 
-	// Race fetchEvents against a timeout so loading never hangs indefinitely
-	const fetchPromise = ndkInstance.fetchEvents(filter);
+	// Race fetchEvents against a timeout so loading never hangs indefinitely.
+	// groupable: false ensures a fresh REQ on re-navigation.
+	const fetchPromise = ndkInstance.fetchEvents(filter, { groupable: false });
 	fetchPromise.catch(() => {}); // Prevent unhandled rejection if timeout wins
 	const fetchTimeout = new Promise<Set<NDKEvent>>((resolve) => {
 		setTimeout(() => resolve(new Set()), FETCH_EVENTS_TIMEOUT);
@@ -528,10 +547,14 @@ export async function fetchChannels(options: FetchChannelOptions = {}): Promise<
 
 	// Race fetchEvents against a timeout so loading never hangs indefinitely
 	// when the relay is slow or never sends EOSE.
-	const fetchChannelsPromise = ndkInstance.fetchEvents(filter);
+	// groupable: false prevents NDK from merging this with a prior subscription
+	// that already received EOSE — which would cause the new sub to resolve
+	// immediately with 0 events on re-navigation.
+	let fetchTimedOut = false;
+	const fetchChannelsPromise = ndkInstance.fetchEvents(filter, { groupable: false });
 	fetchChannelsPromise.catch(() => {}); // Prevent unhandled rejection if timeout wins
 	const fetchTimeout = new Promise<Set<NDKEvent>>((resolve) => {
-		setTimeout(() => resolve(new Set()), FETCH_EVENTS_TIMEOUT);
+		setTimeout(() => { fetchTimedOut = true; resolve(new Set()); }, FETCH_EVENTS_TIMEOUT);
 	});
 	const events = await Promise.race([fetchChannelsPromise, fetchTimeout]);
 	const channels: CreatedChannel[] = [];
@@ -580,7 +603,7 @@ export async function fetchChannels(options: FetchChannelOptions = {}): Promise<
 				'#e': channelIds,
 				limit: channelIds.length * 2, // Heuristic: ~2 recent msgs per channel
 			};
-			const msgFetchPromise = ndkInstance.fetchEvents(msgFilter);
+			const msgFetchPromise = ndkInstance.fetchEvents(msgFilter, { groupable: false });
 			msgFetchPromise.catch(() => {}); // Prevent unhandled rejection if timeout wins
 			const msgFetchTimeout = new Promise<Set<NDKEvent>>((resolve) => {
 				setTimeout(() => resolve(new Set()), FETCH_EVENTS_TIMEOUT);
@@ -610,6 +633,21 @@ export async function fetchChannels(options: FetchChannelOptions = {}): Promise<
 		const bActivity = lastActivityMap.get(b.id) || b.createdAt;
 		return bActivity - aActivity;
 	});
+
+	// Update module-level cache when we got real results.
+	// Only use the cache as fallback when the fetch TIMED OUT (relay unresponsive).
+	// If the relay returned EOSE with 0 events, or all events were filtered out
+	// by access control, that's a genuine empty result — don't use stale cache.
+	if (channels.length > 0) {
+		_channelCache = channels;
+	} else if (fetchTimedOut && _channelCache.length > 0) {
+		console.warn('[channels] fetchChannels timed out — returning cached channels');
+		// Re-filter cache with current user permissions (cohorts may have changed)
+		return _channelCache.filter(ch =>
+			canAccessChannel(ch, userCohorts, userPubkey, isAdmin) &&
+			canAccessChannelZone(ch, userCohorts, isAdmin)
+		);
+	}
 
 	return channels;
 }
@@ -683,11 +721,13 @@ export async function fetchChannelMessages(
 		limit,
 	};
 
-	// Race fetchEvents against a timeout so loading never hangs indefinitely
-	const fetchPromise = ndkInstance.fetchEvents(filter);
+	// Race fetchEvents against a timeout so loading never hangs indefinitely.
+	// groupable: false prevents NDK subscription grouping from returning stale/empty results.
+	let msgFetchTimedOut = false;
+	const fetchPromise = ndkInstance.fetchEvents(filter, { groupable: false });
 	fetchPromise.catch(() => {}); // Prevent unhandled rejection if timeout wins
 	const fetchTimeout = new Promise<Set<NDKEvent>>((resolve) => {
-		setTimeout(() => resolve(new Set()), FETCH_EVENTS_TIMEOUT);
+		setTimeout(() => { msgFetchTimedOut = true; resolve(new Set()); }, FETCH_EVENTS_TIMEOUT);
 	});
 	const events = await Promise.race([fetchPromise, fetchTimeout]);
 	const messages: ChannelMessage[] = [];
@@ -711,6 +751,15 @@ export async function fetchChannelMessages(
 
 	// Sort by creation time (oldest first for messages)
 	messages.sort((a, b) => a.createdAt - b.createdAt);
+
+	// Update module-level message cache.
+	// Only use cache as fallback when the fetch TIMED OUT (relay unresponsive).
+	if (messages.length > 0) {
+		_messageCache.set(channelId, messages);
+	} else if (msgFetchTimedOut && _messageCache.has(channelId)) {
+		console.warn(`[channels] fetchChannelMessages(${channelId}) timed out — returning cached messages`);
+		return _messageCache.get(channelId)!;
+	}
 
 	return messages;
 }
@@ -772,14 +821,23 @@ export async function subscribeToChannel(
 		try {
 			const replyTag = event.tags.find(t => t[0] === 'e' && t[3] === 'reply');
 
-			onMessage({
+			const msg: ChannelMessage = {
 				id: event.id,
 				content: event.content,
 				pubkey: event.pubkey,
 				createdAt: event.created_at || 0,
 				replyTo: replyTag?.[1],
 				tags: event.tags.map(t => [...t]), // Clone tags array
-			});
+			};
+
+			// Also update the module-level message cache so re-navigation
+			// shows the latest messages immediately from cache.
+			const cached = _messageCache.get(channelId);
+			if (cached && !cached.find(m => m.id === msg.id)) {
+				cached.push(msg);
+			}
+
+			onMessage(msg);
 		} catch (e) {
 			console.error('[channels] Error processing subscription event:', e);
 		}

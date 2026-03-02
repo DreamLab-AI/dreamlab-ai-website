@@ -788,6 +788,7 @@ function createAuthStore() {
           { channelStore },
           { adminStore },
           { profileCache },
+          { clearChannelCache },
         ] = await Promise.all([
           import('./user'),
           import('./sections'),
@@ -795,6 +796,7 @@ function createAuthStore() {
           import('./channels'),
           import('./admin'),
           import('./profiles'),
+          import('$lib/nostr/channels'),
         ]);
         whitelistStatusStore.set(null);
         sectionStore.clear();
@@ -802,6 +804,7 @@ function createAuthStore() {
         channelStore.clearChannels();
         adminStore.reset();
         profileCache.clear();
+        clearChannelCache();
 
         const { goto } = await import('$app/navigation');
         goto(`${base}/`);

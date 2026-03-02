@@ -99,6 +99,12 @@
       const userCohorts = whitelistStatus?.cohorts ?? [];
       const isAdmin = whitelistStatus?.isAdmin ?? false;
 
+      // Track whether whitelist data was available during this load.
+      // If not, the reactive block will re-fetch once it arrives.
+      if (whitelistStatus) {
+        initialLoadHadWhitelist = true;
+      }
+
       // Fetch NIP-28 channels (kind 40) with cohort filtering
       allChannels = await fetchChannels({
         userCohorts,
@@ -128,10 +134,17 @@
     }
   }
 
-  // Re-fetch channels when whitelist status arrives after initial mount.
+  // Re-fetch channels when whitelist status arrives AFTER initial mount,
+  // but ONLY if the initial load didn't have whitelist data yet.
   // Fixes race condition where loadChannels() runs before async whitelist
   // verification completes, resulting in isAdmin=false and userCohorts=[].
-  $: if ($whitelistStatusStore && mounted && !channelsLoading) {
+  // Without the initialLoadHadWhitelist guard, this reactive fires on
+  // every re-navigation (since whitelistStatusStore already has a value),
+  // triggering a redundant second fetch that can clobber good results
+  // when the relay is slow to respond.
+  let initialLoadHadWhitelist = false;
+  $: if ($whitelistStatusStore && mounted && !channelsLoading && !initialLoadHadWhitelist) {
+    initialLoadHadWhitelist = true;
     loadChannels();
   }
 
