@@ -3,7 +3,7 @@
 	import { page } from '$app/stores';
 	import { base } from '$app/paths';
 	import { authStore } from '$lib/stores/auth';
-	import { isAdminVerified, userStore } from '$lib/stores/user';
+	import { isAdminVerified } from '$lib/stores/user';
 	import { getAppConfig } from '$lib/config/loader';
 	import GlobalSearch from '$lib/components/chat/GlobalSearch.svelte';
 
@@ -12,10 +12,6 @@
 	export let themePreference: 'dark' | 'light' = 'dark';
 	export let onThemeToggle: () => void;
 	export let onProfileClick: () => void;
-
-	// Subscribe to userStore to trigger whitelist verification
-	// This ensures the derived callback runs and populates whitelistStatusStore
-	$: void $userStore;
 
 	// Safe pathname access with fallback
 	$: pathname = $page?.url?.pathname ?? '';

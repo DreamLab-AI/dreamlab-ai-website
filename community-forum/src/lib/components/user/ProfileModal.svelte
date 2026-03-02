@@ -14,6 +14,7 @@
   const dispatch = createEventDispatcher<{ close: void; startDM: { pubkey: string } }>();
 
   let previousFocusElement: HTMLElement | null = null;
+  let modalElement: HTMLElement;
 
   $: npub = nip19.npubEncode(pubkey);
   $: displayName = name || `${pubkey.slice(0, 8)}...${pubkey.slice(-4)}`;
@@ -22,7 +23,7 @@
   $: if (show && typeof window !== 'undefined') {
     previousFocusElement = document.activeElement as HTMLElement;
     setTimeout(() => {
-      const firstButton = document.querySelector('.modal.modal-open button') as HTMLElement;
+      const firstButton = modalElement?.querySelector('button') as HTMLElement;
       if (firstButton) {
         firstButton.focus();
       }
@@ -53,10 +54,9 @@
     }
 
     if (e.key === 'Tab') {
-      const modal = document.querySelector('.modal.modal-open');
-      if (!modal) return;
+      if (!modalElement) return;
 
-      const focusableElements = modal.querySelectorAll<HTMLElement>(
+      const focusableElements = modalElement.querySelectorAll<HTMLElement>(
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
       );
       const firstElement = focusableElements[0];
@@ -74,7 +74,7 @@
 </script>
 
 {#if show}
-  <div class="modal modal-open" on:keydown={handleKeydown} role="dialog" aria-modal="true" aria-labelledby="user-profile-modal-title">
+  <div class="modal modal-open" bind:this={modalElement} on:keydown={handleKeydown} role="dialog" aria-modal="true" aria-labelledby="user-profile-modal-title">
     <div class="modal-box max-w-2xl">
       <button
         class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"

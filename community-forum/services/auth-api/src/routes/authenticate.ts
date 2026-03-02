@@ -159,20 +159,27 @@ router.post('/verify', async (req: Request, res: Response): Promise<void> => {
     return;
   }
 
-  // Counter validation: reject if counter did not advance (replay attack)
+  // Counter validation: reject if counter did not advance (replay attack).
+  // Counter 0 means the authenticator doesn't track sign counts (e.g., Apple iCloud Keychain).
+  // Only enforce counter advancement when both sides provide non-zero counters.
   const newCounter = verification.authenticationInfo.newCounter;
-  if (newCounter <= Number(credential.counter)) {
-    res.status(401).json({ error: 'Credential counter did not advance' });
+  const storedCounter = Number(credential.counter);
+  if (newCounter > 0 && storedCounter > 0 && newCounter <= storedCounter) {
+    res.status(401).json({ error: 'Credential counter did not advance (possible replay)' });
     return;
   }
 
-  // Update stored counter — propagate errors as 500
-  try {
-    await updateCredentialCounter(credential.credential_id, newCounter);
-  } catch (err) {
-    console.error('[login/verify] Failed to update counter:', err);
-    res.status(500).json({ error: 'Failed to update credential counter' });
-    return;
+  // Only update counter if the new value is meaningful (non-zero).
+  // This avoids overwriting a valid counter with 0 when switching between
+  // authenticators (e.g., registered on hardware key, used via iCloud Keychain).
+  if (newCounter > 0) {
+    try {
+      await updateCredentialCounter(credential.credential_id, newCounter);
+    } catch (err) {
+      console.error('[login/verify] Failed to update counter:', err);
+      res.status(500).json({ error: 'Failed to update credential counter' });
+      return;
+    }
   }
 
   res.json({

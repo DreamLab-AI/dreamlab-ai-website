@@ -7,6 +7,38 @@ import { muteStore } from './mute';
 import { profileCache } from './profiles';
 
 /**
+ * Safely persist DM messages to localStorage with size guard and quota handling.
+ * If the serialized payload exceeds 2 MB, the oldest conversations are evicted.
+ * If a QuotaExceededError is thrown despite trimming, the key is removed entirely.
+ */
+function safePersistDMs(messagesObj: Record<string, DMMessage[]>): void {
+  try {
+    const json = JSON.stringify(messagesObj);
+    // Guard: if over 2 MB, trim oldest conversations
+    if (json.length > 2 * 1024 * 1024) {
+      const entries = Object.entries(messagesObj);
+      // Sort by most-recent last-message timestamp descending, then keep the newer half
+      entries.sort((a, b) => {
+        const aLast = a[1][a[1].length - 1]?.timestamp ?? 0;
+        const bLast = b[1][b[1].length - 1]?.timestamp ?? 0;
+        return bLast - aLast;
+      });
+      const trimmed = Object.fromEntries(entries.slice(0, Math.ceil(entries.length / 2)));
+      localStorage.setItem('dm_messages', JSON.stringify(trimmed));
+      return;
+    }
+    localStorage.setItem('dm_messages', json);
+  } catch (e) {
+    if (e instanceof DOMException && e.name === 'QuotaExceededError') {
+      console.warn('[DM] localStorage quota exceeded, clearing old messages');
+      try {
+        localStorage.removeItem('dm_messages');
+      } catch { /* ignore */ }
+    }
+  }
+}
+
+/**
  * DM Conversation with another user
  */
 export interface DMConversation {
@@ -158,7 +190,7 @@ function createDMStore() {
           allMessages.forEach((msgs, pubkey) => {
             messagesObj[pubkey] = msgs;
           });
-          localStorage.setItem('dm_messages', JSON.stringify(messagesObj));
+          safePersistDMs(messagesObj);
         }
 
         update(state => ({
@@ -285,7 +317,7 @@ function createDMStore() {
                 }
               }
               allMessages[recipientPubkey] = updatedMessages;
-              localStorage.setItem('dm_messages', JSON.stringify(allMessages));
+              safePersistDMs(allMessages);
             }
 
             return {
@@ -405,7 +437,7 @@ function createDMStore() {
                 allMessages[otherPubkey] = [];
               }
               allMessages[otherPubkey].push(newMessage);
-              localStorage.setItem('dm_messages', JSON.stringify(allMessages));
+              safePersistDMs(allMessages);
             }
 
             // Update conversation

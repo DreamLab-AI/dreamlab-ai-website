@@ -29,6 +29,7 @@
 	let profileSaving = false;
 	let profileError: string | null = null;
 	let previousFocusElement: HTMLElement | null = null;
+	let modalElement: HTMLElement;
 	let useImageUpload = false;
 	let pwaInstalling = false;
 
@@ -111,10 +112,9 @@
 		}
 
 		if (e.key === 'Tab' && open) {
-			const modal = document.querySelector('.modal.modal-open');
-			if (!modal) return;
+			if (!modalElement) return;
 
-			const focusableElements = modal.querySelectorAll<HTMLElement>(
+			const focusableElements = modalElement.querySelectorAll<HTMLElement>(
 				'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
 			);
 			const firstElement = focusableElements[0];
@@ -203,6 +203,7 @@
 {#if open}
 	<div
 		class="modal modal-open"
+		bind:this={modalElement}
 		on:keydown={handleKeydown}
 		role="dialog"
 		aria-modal="true"

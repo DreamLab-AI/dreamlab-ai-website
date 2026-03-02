@@ -9,12 +9,13 @@
   const dispatch = createEventDispatcher<{ close: void; navigate: { channelId: string; messageId: string } }>();
 
   let previousFocusElement: HTMLElement | null = null;
+  let modalElement: HTMLElement;
 
   $: bookmarks = bookmarkStore.getBookmarks();
 
   onMount(() => {
     previousFocusElement = document.activeElement as HTMLElement;
-    const firstButton = document.querySelector('.modal.modal-open button') as HTMLElement;
+    const firstButton = modalElement?.querySelector('button') as HTMLElement;
     if (firstButton) {
       firstButton.focus();
     }
@@ -85,10 +86,9 @@
     }
 
     if (e.key === 'Tab') {
-      const modal = document.querySelector('.modal.modal-open');
-      if (!modal) return;
+      if (!modalElement) return;
 
-      const focusableElements = modal.querySelectorAll<HTMLElement>(
+      const focusableElements = modalElement.querySelectorAll<HTMLElement>(
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
       );
       const firstElement = focusableElements[0];
@@ -105,7 +105,7 @@
   }
 </script>
 
-<div class="modal modal-open" on:keydown={handleKeydown} role="dialog" aria-modal="true" aria-labelledby="bookmarks-modal-title">
+<div class="modal modal-open" bind:this={modalElement} on:keydown={handleKeydown} role="dialog" aria-modal="true" aria-labelledby="bookmarks-modal-title">
   <div class="modal-box max-w-3xl max-h-[80vh]">
     <div class="flex items-center justify-between mb-4">
       <h3 id="bookmarks-modal-title" class="font-bold text-lg">Bookmarked Messages</h3>

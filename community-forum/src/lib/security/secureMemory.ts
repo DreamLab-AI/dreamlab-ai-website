@@ -31,8 +31,9 @@ export class SecureString {
     try {
       return fn(value);
     } finally {
-      // Force async boundary to help GC clear temporary string
-      setTimeout(() => {}, 0);
+      // NOTE: The decoded JS string may linger in V8 heap until GC runs.
+      // This is a known JS limitation — strings are immutable and cannot be zeroed.
+      // The use() callback pattern minimizes the string's lifetime/scope.
     }
   }
 

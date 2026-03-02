@@ -234,9 +234,9 @@ export async function encryptKeyForRecipients(
   const errors: Array<{ pubkey: string; error: string }> = [];
 
   for (let i = 0; i < recipientPubkeys.length; i++) {
-    // Yield to the main thread every 5 recipients to prevent UI freeze
-    // during CPU-intensive ECDH scalar multiplication on large channels.
-    if (i > 0 && i % 5 === 0) await new Promise(r => setTimeout(r, 0));
+    // Yield to main thread after each recipient to prevent UI freeze.
+    // TODO: Move NIP-44 key wrapping to crypto.worker.ts for true off-thread processing.
+    if (i > 0) await new Promise(r => setTimeout(r, 0));
     const recipientPubkey = recipientPubkeys[i];
     try {
       // Validate pubkey format

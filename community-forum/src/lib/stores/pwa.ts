@@ -292,8 +292,14 @@ export async function queueMessage(
 
   return new Promise((resolve, reject) => {
     const messageChannel = new MessageChannel();
+    const timeoutId = setTimeout(() => {
+      messageChannel.port1.close();
+      reject(new Error('Service worker IPC timeout'));
+    }, 10_000);
 
     messageChannel.port1.onmessage = (event) => {
+      clearTimeout(timeoutId);
+      messageChannel.port1.close();
       if (event.data.success) {
         queuedMessageCount.update(n => n + 1);
         resolve();
@@ -321,8 +327,14 @@ export async function getQueuedMessages(): Promise<QueuedMessage[]> {
 
   return new Promise((resolve, reject) => {
     const messageChannel = new MessageChannel();
+    const timeoutId = setTimeout(() => {
+      messageChannel.port1.close();
+      reject(new Error('Service worker IPC timeout'));
+    }, 10_000);
 
     messageChannel.port1.onmessage = (event) => {
+      clearTimeout(timeoutId);
+      messageChannel.port1.close();
       if (event.data.messages) {
         queuedMessageCount.set(event.data.messages.length);
         resolve(event.data.messages);
@@ -350,8 +362,14 @@ export async function clearMessageQueue(): Promise<void> {
 
   return new Promise((resolve, reject) => {
     const messageChannel = new MessageChannel();
+    const timeoutId = setTimeout(() => {
+      messageChannel.port1.close();
+      reject(new Error('Service worker IPC timeout'));
+    }, 10_000);
 
     messageChannel.port1.onmessage = (event) => {
+      clearTimeout(timeoutId);
+      messageChannel.port1.close();
       if (event.data.success) {
         queuedMessageCount.set(0);
         resolve();

@@ -48,6 +48,30 @@ const RESTRICTED_COHORTS: string[] = ['admin'];
 // Request signature validity window (prevents replay attacks)
 const SIGNATURE_VALIDITY_WINDOW_SECONDS = 300; // 5 minutes
 
+// Track used nonces to prevent replay attacks within the validity window
+const usedNonces = new Map<string, number>(); // nonce -> timestamp
+const NONCE_CLEANUP_INTERVAL = 60 * 1000; // Clean up every minute
+
+function isNonceUsed(nonce: string): boolean {
+  return usedNonces.has(nonce);
+}
+
+function markNonceUsed(nonce: string, timestamp: number): void {
+  usedNonces.set(nonce, timestamp);
+}
+
+// Periodic cleanup of expired nonces
+if (typeof setInterval !== 'undefined') {
+  setInterval(() => {
+    const now = Math.floor(Date.now() / 1000);
+    for (const [nonce, ts] of usedNonces) {
+      if (now - ts > SIGNATURE_VALIDITY_WINDOW_SECONDS + 60) {
+        usedNonces.delete(nonce);
+      }
+    }
+  }, NONCE_CLEANUP_INTERVAL);
+}
+
 // ============================================================================
 // Types
 // ============================================================================
@@ -492,6 +516,20 @@ export async function verifySignedAdminRequest(
     };
   }
 
+  // Check for nonce reuse (prevent replay attacks)
+  if (isNonceUsed(request.nonce)) {
+    logSuspiciousActivity({
+      pubkey: request.pubkey,
+      action: 'nonce_replay',
+      timestamp: Date.now(),
+      details: `Replayed nonce detected for ${request.action}`,
+    });
+    return {
+      valid: false,
+      error: 'Request nonce already used (possible replay attack)',
+    };
+  }
+
   // Verify admin status
   const adminStatus = await verifyWhitelistStatus(request.pubkey);
   if (!adminStatus.isAdmin) {
@@ -529,6 +567,9 @@ export async function verifySignedAdminRequest(
       error: 'Invalid request signature',
     };
   }
+
+  // Mark nonce as used
+  markNonceUsed(request.nonce, request.timestamp);
 
   return { valid: true };
 }
