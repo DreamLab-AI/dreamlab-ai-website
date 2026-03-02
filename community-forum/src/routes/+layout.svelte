@@ -7,6 +7,7 @@
 	import { goto } from '$app/navigation';
 	import { fade } from 'svelte/transition';
 	import { authStore, isAuthenticated } from '$lib/stores/auth';
+	import { userStore } from '$lib/stores/user';
 	import { connectRelay, connectRelayWithNip07, isConnected } from '$lib/nostr/relay';
 	import { RELAY_URL } from '$lib/config';
 	import { sessionStore } from '$lib/stores/session';
@@ -43,6 +44,12 @@
 	let calendarCollapsed = true;
 	let mobileZoneDrawerOpen = false;
 	let relayConnecting = false;
+
+	// Subscribe to userStore at the layout level so it always runs.
+	// userStore is a lazy derived store — without a subscriber, its loadProfile()
+	// callback never executes, meaning whitelistStatusStore never gets set and
+	// isAdminVerified stays false. This line forces the subscription.
+	$: void $userStore;
 
 	// Connect to Nostr relay when authenticated.
 	// Uses private key signer for passkey/local-key users, NIP-07 signer for extension users.
