@@ -230,63 +230,64 @@ class RelayManager {
 
   /**
    * Shared connect logic: wire up relay events and return status.
-   * Retries up to 3 times with backoff — Firefox kills WebSocket connections
-   * during SvelteKit client-side navigation, causing transient failures.
+   * Waits for the relay's WebSocket to actually open before returning.
    */
   private async _finishConnect(relayUrl: string): Promise<ConnectionStatus> {
     if (!this._ndk) throw new Error('NDK not initialized');
 
-    const MAX_RETRIES = 3;
-    let lastError: Error | null = null;
+    // Start NDK connection (fires off WebSocket but doesn't wait for open)
+    this._ndk.connect().catch(() => {});
 
-    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-      try {
-        if (attempt > 0) {
-          // Backoff: 500ms, 1500ms before retries
-          await new Promise(r => setTimeout(r, 500 + attempt * 1000));
-          console.log(`[NDK] Retry ${attempt}/${MAX_RETRIES} connecting to ${relayUrl}`);
-        }
+    // Wait for the relay to actually reach CONNECTED status
+    const relay = Array.from(this._ndk.pool.relays.values())[0];
+    if (!relay) throw new Error('No relay in pool');
 
-        const connectTimeout = new Promise<never>((_, reject) => {
-          setTimeout(() => reject(new Error('Connection timeout')), TIMEOUTS.connect);
-        });
+    await new Promise<void>((resolve, reject) => {
+      const timeout = setTimeout(() => reject(new Error('Connection timeout')), TIMEOUTS.connect);
 
-        const connectPromise = this._ndk!.connect();
-        connectPromise.catch(() => {}); // Prevent unhandled rejection if timeout wins
-        await Promise.race([connectPromise, connectTimeout]);
-
-        const relay = Array.from(this._ndk!.pool.relays.values())[0];
-
-        if (!relay || relay.connectivity.status < 5) {
-          throw new Error('Relay not connected after handshake');
-        }
-
-        relay.on('auth', async (challenge: string) => {
-          this.updateState(ConnectionState.AuthRequired, relay.url);
-          try {
-            await this.handleAuthChallenge(relay, challenge);
-          } catch (error) {
-            console.error('[NDK] AUTH failed:', error);
-          }
-        });
-
-        this.updateState(ConnectionState.Connected, relayUrl, undefined, false);
-
-        return {
-          state: ConnectionState.Connected,
-          relay: relayUrl,
-          timestamp: Date.now(),
-          authenticated: false
-        };
-      } catch (err) {
-        lastError = err instanceof Error ? err : new Error(String(err));
-        console.warn(`[NDK] Connect attempt ${attempt + 1} failed: ${lastError.message}`);
+      // Already connected (e.g., reconnect scenario)
+      if (relay.connectivity.status >= 5) {
+        clearTimeout(timeout);
+        resolve();
+        return;
       }
-    }
 
-    // All retries exhausted
-    this.updateState(ConnectionState.Error, relayUrl, lastError?.message);
-    throw lastError ?? new Error('Connection failed');
+      // Wait for connect event from the relay
+      const onConnect = () => {
+        clearTimeout(timeout);
+        relay.off('connect', onConnect);
+        resolve();
+      };
+      relay.on('connect', onConnect);
+
+      // Also handle disconnect during connection attempt
+      const onDisconnect = () => {
+        clearTimeout(timeout);
+        relay.off('connect', onConnect);
+        relay.off('disconnect', onDisconnect);
+        reject(new Error('Relay disconnected during handshake'));
+      };
+      relay.on('disconnect', onDisconnect);
+    });
+
+    // Wire up AUTH handler
+    relay.on('auth', async (challenge: string) => {
+      this.updateState(ConnectionState.AuthRequired, relay.url);
+      try {
+        await this.handleAuthChallenge(relay, challenge);
+      } catch (error) {
+        console.error('[NDK] AUTH failed:', error);
+      }
+    });
+
+    this.updateState(ConnectionState.Connected, relayUrl, undefined, false);
+
+    return {
+      state: ConnectionState.Connected,
+      relay: relayUrl,
+      timestamp: Date.now(),
+      authenticated: false
+    };
   }
 
   /**
