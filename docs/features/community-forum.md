@@ -26,12 +26,12 @@ community-forum/
   packages/
     nip98/               -- shared NIP-98 sign/verify module
   services/
-    auth-api/            -- Cloud Run WebAuthn server (Express)
-    jss/                 -- Cloud Run Solid pod server
-    nostr-relay/         -- Cloud Run Nostr relay
-    embedding-api/       -- Cloud Run vector embeddings
-    image-api/           -- Cloud Run image resizing
-    link-preview-api/    -- Cloud Run URL metadata
+    auth-api/            -- Legacy (replaced by workers/auth-api/)
+    jss/                 -- Legacy (replaced by workers/pod-api/)
+    nostr-relay/         -- Legacy (replaced by workers/nostr-relay/)
+    embedding-api/       -- Legacy (replaced by workers/search-api/)
+    image-api/           -- Legacy (deleted)
+    link-preview-api/    -- Legacy (replaced by workers/link-preview-api/)
   tests/
     unit/                -- Vitest unit tests
     e2e/                 -- Playwright end-to-end tests
@@ -131,16 +131,15 @@ cd community-forum && npx playwright test
 
 ## Backend Services
 
-The forum depends on six Cloud Run services. Per ADR-010, auth-api, pod-api, and search-api Workers are deployed to Cloudflare:
+The forum depends on five Cloudflare Workers. All GCP Cloud Run services have been deleted as of 2026-03-02.
 
-| Service | Purpose | Storage | Migration Target |
-|---------|---------|---------|-----------------|
-| **auth-api** | WebAuthn registration/authentication, NIP-98 gating, pod provisioning | PostgreSQL | Cloudflare Workers + D1 (deployed) |
-| **jss** | Solid pod storage (WebID, per-user files, ACLs) | Filesystem | Cloudflare Workers + R2 pod-api (deployed) |
-| **nostr-relay** | Nostr event relay (NIP-01/28/98) | PostgreSQL | Retained on Cloud Run |
-| **embedding-api** | Vector embeddings for semantic search | -- | Retained on Cloud Run |
-| **image-api** | Image upload, resizing, serving | Filesystem | Cloudflare Workers + R2 (planned) |
-| **link-preview-api** | URL metadata extraction | -- | Cloudflare Workers (planned) |
+| Service | Purpose | Storage |
+|---------|---------|---------|
+| **auth-api** | WebAuthn registration/authentication, NIP-98 gating, pod provisioning | D1 + KV |
+| **pod-api** | Solid pod storage (WebID, per-user files, WAC ACLs) | R2 + KV |
+| **search-api** | WASM-powered vector similarity search | R2 + KV |
+| **nostr-relay** | WebSocket Nostr relay (NIP-01/28/42/98) | D1 + Durable Objects |
+| **link-preview** | URL metadata extraction | Cache API |
 
 
 ## Zone and Cohort Access Control

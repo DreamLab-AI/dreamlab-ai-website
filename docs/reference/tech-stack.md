@@ -194,50 +194,38 @@ All Radix UI primitives are used through shadcn/ui wrappers in `src/components/u
 
 ## Backend services
 
-### auth-api
+### auth-api Worker
 
-Express application deployed to Cloud Run. A Cloudflare Workers version is deployed at `https://dreamlab-auth-api.solitary-paper-764d.workers.dev`.
+Cloudflare Workers application at `workers/auth-api/index.ts`.
 
 | Dependency | Purpose |
 |-----------|---------|
-| express | HTTP server |
-| cors | CORS middleware |
 | @simplewebauthn/server | WebAuthn registration/authentication |
-| pg (PostgreSQL) | Database driver |
-| dotenv | Environment variable loading |
+| nostr-tools | NIP-98 verification |
+| D1 binding | SQLite database (credentials, challenges) |
+| KV binding | Session metadata |
 
-### jss (JavaScript Solid Server)
+### nostr-relay Worker
 
-| Technology | Purpose |
-|-----------|---------|
-| @solid/community-server 7.1.8 | Solid pod server |
-| Docker (node:20-slim) | Container runtime |
+Cloudflare Workers + Durable Objects at `workers/nostr-relay/index.ts`. Supports NIP-01, NIP-11, NIP-28, NIP-42, NIP-98.
 
-### nostr-relay
+### search-api Worker
 
-Custom Nostr relay with PostgreSQL storage. Supports NIP-01, NIP-11, NIP-16, NIP-33, NIP-98. Retained on Cloud Run per ADR-010 (persistent WebSocket connections require Cloud SQL).
+WASM-powered vector search at `workers/search-api/index.ts`. Uses 42KB `@ruvector/rvf-wasm` microkernel. Replaces the former GCP embedding-api.
 
-### embedding-api
+### link-preview Worker
 
-Vector embedding generation service. Retained on Cloud Run per ADR-010 (ML inference requires CPU/memory beyond Workers limits). Client-side WASM search (rvf-wasm) provides an alternative for forum search.
-
-### image-api
-
-Image resizing and format conversion service. Includes NIP-98 authentication.
-
-### link-preview-api
-
-URL metadata extraction for link previews.
+URL metadata extraction at `workers/link-preview-api/index.ts`. Uses Cache API for response caching.
 
 ---
 
 ## Cloudflare Workers (deployed)
 
-auth-api, pod-api, and search-api Workers are deployed at `*.solitary-paper-764d.workers.dev`. image-api and link-preview-api Workers are planned. See ADR-010 for migration details.
+All 5 Workers (auth-api, pod-api, search-api, nostr-relay, link-preview) are deployed at `*.solitary-paper-764d.workers.dev`. Zero GCP as of 2026-03-02.
 
 | Technology | Purpose |
 |-----------|---------|
-| Cloudflare Workers | Serverless compute (auth-api, pod-api, search-api deployed) |
+| Cloudflare Workers | Serverless compute (5 Workers: auth-api, pod-api, search-api, nostr-relay, link-preview) |
 | D1 | SQLite database (WebAuthn credentials, challenges) |
 | KV | Key-value storage (sessions, pod metadata, config) |
 | R2 | Object storage (pod data, images) |
@@ -300,11 +288,11 @@ Configuration is in `wrangler.toml`.
 |-----------|----------|-------|
 | Main site | GitHub Pages | Static build via `deploy.yml` |
 | Community forum | GitHub Pages | Static SvelteKit adapter, served at `/community/` |
-| auth-api | Google Cloud Run (migration target: Cloudflare Workers) | `us-central1`, GCP project `cumbriadreamlab`. Workers version deployed at `dreamlab-auth-api.solitary-paper-764d.workers.dev`. |
-| jss | Google Cloud Run (migration target: Cloudflare Workers pod-api) | Solid pod server. Workers pod-api deployed at `dreamlab-pod-api.solitary-paper-764d.workers.dev`. |
-| nostr-relay | Google Cloud Run (retained) | WebSocket-capable. Remains on Cloud Run per ADR-010. |
-| embedding-api | Google Cloud Run (retained) | Vector embeddings. Remains on Cloud Run per ADR-010. |
-| image-api | Google Cloud Run (migration target: Cloudflare Workers) | Image processing. Workers version planned. |
+| auth-api | Cloudflare Workers | `dreamlab-auth-api.solitary-paper-764d.workers.dev` |
+| pod-api | Cloudflare Workers | `dreamlab-pod-api.solitary-paper-764d.workers.dev` |
+| search-api | Cloudflare Workers | `dreamlab-search-api.solitary-paper-764d.workers.dev` |
+| nostr-relay | Cloudflare Workers + Durable Objects | `dreamlab-nostr-relay.solitary-paper-764d.workers.dev` |
+| link-preview | Cloudflare Workers | Workers route |
 | DNS | Cloudflare | Domain: dreamlab-ai.com |
 
 ---

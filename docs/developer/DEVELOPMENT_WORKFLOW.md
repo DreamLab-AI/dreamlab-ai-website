@@ -180,32 +180,29 @@ The `community-forum/packages/nip98/` module provides NIP-98 signing and verific
 
 ## Working with backend services
 
-Backend services live in `community-forum/services/`. Each service is deployed as a separate Cloud Run container.
+Backend services are Cloudflare Workers in `workers/`. For local development, use `wrangler dev`:
 
-### Running a service locally
-
-Example for `auth-api`:
+### Running Workers locally
 
 ```bash
-cd community-forum/services/auth-api
-npm install
-cp .env.example .env   # create and configure .env
-npm run dev
+# Run the auth-api Worker locally
+npx wrangler dev workers/auth-api/index.ts --local
+
+# Run with local D1/KV/R2 persistence
+npx wrangler dev workers/auth-api/index.ts --local --persist-to .wrangler/state
 ```
 
-The auth-api requires a PostgreSQL database (see `DATABASE_URL` in the env file).
+Wrangler creates local D1, KV, and R2 instances automatically. No external database required.
 
 ### Service overview
 
-| Service | Port | Purpose |
-|---------|------|---------|
-| auth-api | 8080 | WebAuthn registration/authentication, NIP-98 gating |
-| jss | 8080 | Solid pod server (WebID + storage per pubkey) |
-| nostr-relay | 8080 | Nostr relay (NIP-01, NIP-98 verified) |
-| embedding-api | 8080 | Vector embeddings |
-| image-api | 8080 | Image resizing and serving |
-| link-preview-api | 8080 | URL metadata extraction |
-| visionflow-bridge | 8080 | VisionFlow integration |
+| Worker | Port | Purpose |
+|--------|------|---------|
+| auth-api | 8787 | WebAuthn registration/authentication, NIP-98 gating |
+| pod-api | 8787 | Solid pod storage with WAC enforcement |
+| search-api | 8787 | WASM-powered vector similarity search |
+| nostr-relay | 8787 | Nostr relay (NIP-01, NIP-28, NIP-42, NIP-98) |
+| link-preview-api | 8787 | URL metadata extraction |
 
 ---
 

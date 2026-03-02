@@ -22,9 +22,10 @@ This directory contains Architecture Decision Records for the DreamLab AI platfo
 | [ADR-005](005-nip-44-encryption-mandate.md) | NIP-44 Encryption Mandate | Accepted | 2024-03 |
 | [ADR-006](006-client-side-wasm-search.md) | Client-Side WASM Search | Accepted | 2024-03 |
 | [ADR-007](007-sveltekit-ndk-frontend.md) | SvelteKit + NDK Frontend | Accepted | 2024-01 |
-| [ADR-008](008-postgresql-relay-storage.md) | PostgreSQL Relay Storage | Accepted | 2024-02 |
+| [ADR-008](008-postgresql-relay-storage.md) | PostgreSQL Relay Storage | Superseded by ADR-010 | 2024-02 |
 | [ADR-009](009-user-registration-flow.md) | User Registration Flow | Accepted | 2026-01 |
-| [ADR-010](010-return-to-cloudflare.md) | Return to Cloudflare Platform | Accepted (supersedes ADR-003) | 2026-02 |
+| [ADR-010](010-return-to-cloudflare.md) | Return to Cloudflare Platform | Accepted -- Complete | 2026-02 |
+| [ADR-011](011-zero-gcp-completion.md) | Zero-GCP Migration Complete | Accepted | 2026-03 |
 
 ## ADR Template
 
@@ -42,6 +43,6 @@ Use [000-template.md](000-template.md) when creating new ADRs.
 - **Protocol**: Nostr (NIPs 01, 17, 25, 28, 42, 44, 52, 59, 98)
 - **Frontend**: React 18.3 (main site) + SvelteKit 2.49 (community forum)
 - **Auth**: WebAuthn PRF + NIP-98 HTTP auth
-- **Backend**: GCP Cloud Run (relay, embedding-api) + Cloudflare Workers (auth-api, pod-api, image-api, link-preview-api)
-- **Database**: PostgreSQL (relay), D1/SQLite (auth), R2 (pod/image storage), KV (sessions, ACLs)
-- **Hosting**: Cloudflare Pages (static site + forum)
+- **Backend**: 5 Cloudflare Workers (auth-api, pod-api, search-api, nostr-relay, link-preview) -- zero GCP
+- **Database**: D1 (structured data), KV (sessions, ACLs, config), R2 (pods, images, vectors), Durable Objects (WebSocket relay), Cache API (link previews)
+- **Hosting**: GitHub Pages (static site + forum), Cloudflare Pages (opt-in)

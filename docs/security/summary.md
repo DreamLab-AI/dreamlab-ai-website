@@ -34,7 +34,7 @@ KEY FINDINGS
    Status: ✅ COMPLIANT
    Finding: .env and .env.* properly listed in .gitignore
    Admin pubkey exposure: LOW (public key only, not private key)
-   Private keys: Stored in GCP Secret Manager (production)
+   Private keys: Stored in Cloudflare Workers secrets (production)
    Verification: No secrets found in git history
 
 2. CRYPTOGRAPHY IMPLEMENTATION

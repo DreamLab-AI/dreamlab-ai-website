@@ -1,15 +1,16 @@
 # Nostr Relay WebSocket API
 
-**Last Updated:** 2026-03-01
+**Last Updated:** 2026-03-02
 
 WebSocket API for the DreamLab AI Nostr relay. Implements NIP-01 (basic protocol), NIP-16 (event treatment), NIP-28 (public channels), NIP-33 (parameterised replaceable events), NIP-42 (authentication), and NIP-98 (HTTP auth).
 
-> **Migration note:** This service is retained on GCP Cloud Run per ADR-010. Persistent WebSocket connections with Cloud SQL make it unsuitable for Cloudflare Workers at this time. Durable Objects migration is evaluated separately.
+> **Current implementation:** Cloudflare Workers + Durable Objects + D1, deployed at `https://dreamlab-nostr-relay.solitary-paper-764d.workers.dev`. The legacy GCP Cloud Run relay has been deleted as of 2026-03-02.
 
 **Protocol**: WebSocket (RFC 6455)
 **Transport**: WSS (TLS-encrypted)
-**Database**: PostgreSQL 15 with JSONB indexing
-**Deployment**: GCP Cloud Run (always-on, 1 instance, 3600s timeout) -- retained on Cloud Run
+**Database**: Cloudflare D1 (SQLite)
+**State**: Durable Objects (WebSocket connection management)
+**Deployment**: Cloudflare Workers at `workers/nostr-relay/index.ts`
 
 ---
 
@@ -225,11 +226,11 @@ All events must carry a valid 64-byte Schnorr signature (BIP-340) over the event
 | Events per second per IP | 10 |
 | Max connections per IP | 10 |
 | Max events per query | 5000 |
-| Database connection pool | 20 max, 30s idle timeout |
+| Durable Object connections | Managed by Cloudflare runtime |
 
 ---
 
-## Database Schema
+## Database Schema (D1)
 
 ### events Table
 
@@ -237,19 +238,18 @@ All events must carry a valid 64-byte Schnorr signature (BIP-340) over the event
 CREATE TABLE events (
   id TEXT PRIMARY KEY,
   pubkey TEXT NOT NULL,
-  created_at BIGINT NOT NULL,
+  created_at INTEGER NOT NULL,
   kind INTEGER NOT NULL,
-  tags JSONB NOT NULL DEFAULT '[]'::jsonb,
+  tags TEXT NOT NULL,  -- JSON string
   content TEXT NOT NULL,
   sig TEXT NOT NULL,
-  received_at BIGINT DEFAULT EXTRACT(EPOCH FROM NOW())::BIGINT
+  received_at INTEGER
 );
 
 CREATE INDEX idx_pubkey ON events(pubkey);
 CREATE INDEX idx_kind ON events(kind);
 CREATE INDEX idx_created_at ON events(created_at DESC);
 CREATE INDEX idx_kind_created ON events(kind, created_at DESC);
-CREATE INDEX idx_tags ON events USING GIN(tags);
 ```
 
 ### whitelist Table
@@ -257,14 +257,12 @@ CREATE INDEX idx_tags ON events USING GIN(tags);
 ```sql
 CREATE TABLE whitelist (
   pubkey TEXT PRIMARY KEY,
-  cohorts JSONB NOT NULL DEFAULT '[]'::jsonb,
-  added_at BIGINT DEFAULT EXTRACT(EPOCH FROM NOW())::BIGINT,
+  cohorts TEXT NOT NULL DEFAULT '[]',  -- JSON string
+  added_at INTEGER,
   added_by TEXT,
-  expires_at BIGINT,
+  expires_at INTEGER,
   notes TEXT
 );
-
-CREATE INDEX idx_whitelist_cohorts ON whitelist USING GIN(cohorts);
 ```
 
 ---

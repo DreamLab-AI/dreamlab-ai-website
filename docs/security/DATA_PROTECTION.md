@@ -175,7 +175,7 @@ The deployed pod-api Cloudflare Worker includes a custom WAC evaluator:
 
 ### Cloud Storage Persistence
 
-Pod data is stored on a Google Cloud Storage volume mount (`dreamlab-pods` bucket) attached to the JSS Cloud Run service:
+Pod data is stored in Cloudflare R2 (`dreamlab-pods` bucket), managed by the pod-api Worker:
 
 ```
 --add-volume name=dreamlab-pods,type=cloud-storage,bucket=dreamlab-pods,mount-path=/data/pods
@@ -276,7 +276,7 @@ if (rawClientWebId.includes('..') || /%2e%2e/i.test(rawClientWebId)) {
 |-------|-----------|---------|-----------|
 | **Critical** | Private key (Uint8Array) | Memory closure only | N/A (never stored) |
 | **High** | DM content | Relay database (encrypted) | NIP-44 v2 + NIP-59 gift wrap |
-| **Medium** | PRF salt, WebAuthn credentials | PostgreSQL | At rest (Cloud SQL) |
+| **Medium** | PRF salt, WebAuthn credentials | D1 | At rest (Cloudflare D1 encryption) |
 | **Low** | Public channel messages, reactions | Relay database | None (public by design) |
 | **Public** | Pubkeys, profiles, metadata | Relay database, pods | None |
 
@@ -284,7 +284,7 @@ if (rawClientWebId.includes('..') || /%2e%2e/i.test(rawClientWebId)) {
 
 1. **Critical data** (private key): Never logged, never transmitted, never stored. Zeroed on pagehide.
 2. **High sensitivity** (DM content): End-to-end encrypted. Relay stores only ciphertext. TLS in transit.
-3. **Medium sensitivity** (credentials): Protected by Cloud SQL encryption at rest and TLS in transit. Access restricted via IAM.
+3. **Medium sensitivity** (credentials): Protected by D1 encryption at rest and TLS in transit. Access restricted via Workers bindings.
 4. **Low/Public**: Standard security practices. Users control deletion via NIP-09 events.
 
 ---

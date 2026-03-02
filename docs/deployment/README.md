@@ -2,7 +2,7 @@
 
 **Last Updated:** 2026-03-01
 
-Comprehensive guide to deploying and maintaining the DreamLab AI platform: a React SPA on GitHub Pages, SvelteKit community forum, GCP Cloud Run backend services (being migrated), and Cloudflare Workers (deployed).
+Comprehensive guide to deploying and maintaining the DreamLab AI platform: a React SPA on GitHub Pages, SvelteKit community forum, and 5 Cloudflare Workers backend services. All GCP infrastructure has been deleted as of 2026-03-02.
 
 ---
 
@@ -14,28 +14,25 @@ Comprehensive guide to deploying and maintaining the DreamLab AI platform: a Rea
 | - React 18.3 SPA (Vite + TypeScript + Tailwind CSS)           |
 | - SvelteKit community forum (static adapter)                  |
 | - Workers code in workers/ (auth-api, pod-api, search-api)    |
-| - GCP service directories (retained: embedding, image, jss)   |
+| - Legacy services dir (auth-api reference code only)          |
 | - GitHub Actions CI/CD workflows                               |
 +----------+------------------+--------------------+------------+
            |                  |                    |
            v                  v                    v
-+------------------+  +-------------------+  +------------------+
-| GitHub Pages      |  | Cloudflare Workers |  | GCP Cloud Run    |
-|                   |  | (deployed to       |  | (retained svcs)  |
-| - React SPA       |  |  *.workers.dev)    |  |                  |
-|   -> dist/        |  |                    |  | - nostr-relay    |
-| - SvelteKit forum |  | - auth-api Worker  |  | - embedding-api  |
-|   -> dist/community|  |   +-- D1, KV      |  |                  |
-| - Static assets   |  | - pod-api Worker   |  +--------+---------+
-|                   |  |   +-- R2, KV       |           |
-| dreamlab-ai.com   |  | - search-api Worker|  +--------v---------+
-| thedreamlab.uk    |  |   +-- WASM (42KB)  |  | Cloud SQL (PG)   |
-+------------------+  |   +-- R2, KV       |  | Artifact Registry |
-                      |                    |  +------------------+
-                      | - D1: credentials  |
-                      | - R2: pods, images |
-                      | - KV: sessions,ACL |
-                      +--------------------+
++------------------+  +------------------------+
+| GitHub Pages      |  | Cloudflare Workers     |
+|                   |  | (*.workers.dev)        |
+| - React SPA       |  |                        |
+|   -> dist/        |  | - auth-api    (D1+KV)  |
+| - SvelteKit forum |  | - pod-api     (R2+KV)  |
+|   -> dist/community|  | - search-api  (WASM+R2)|
+| - Static assets   |  | - nostr-relay (D1+DO)  |
+|                   |  | - link-preview (Cache) |
+| dreamlab-ai.com   |  |                        |
+| thedreamlab.uk    |  | D1: credentials, relay |
++------------------+  | R2: pods, vectors      |
+                      | KV: sessions, ACLs     |
+                      +------------------------+
 
 +---------------------------------------------------+
 | Cloudflare Pages (gated, ready to enable)         |
@@ -54,9 +51,7 @@ Comprehensive guide to deploying and maintaining the DreamLab AI platform: a Rea
 | **pod-api** | Cloudflare Worker + R2 | `workers-deploy.yml` | Deployed at `dreamlab-pod-api.solitary-paper-764d.workers.dev` |
 | **search-api** | Cloudflare Worker + WASM | `workers-deploy.yml` | Deployed at `dreamlab-search-api.solitary-paper-764d.workers.dev` |
 | **nostr-relay** | Cloudflare Worker + D1 + DO | `workers-deploy.yml` | Deployed at `dreamlab-nostr-relay.solitary-paper-764d.workers.dev` |
-| **embedding-api** | Python (FastAPI) | `fairfield-embedding-api.yml` | Cloud Run (us-central1) -- manual deploy only |
-| **image-api** | Node.js | `fairfield-image-api.yml` | Cloud Run (us-central1) -- manual deploy only |
-| **link-preview-api** | Node.js | (existing) | Cloud Run (us-central1) |
+| **link-preview** | Cloudflare Worker + Cache API | `workers-deploy.yml` | Deployed at `dreamlab-link-preview.solitary-paper-764d.workers.dev` |
 | **Cloudflare Pages** | Static SPA | `deploy.yml` (gated) | Ready to enable |
 
 ## Documentation Index
@@ -79,21 +74,9 @@ Comprehensive guide to deploying and maintaining the DreamLab AI platform: a Rea
 | `deploy.yml` | Any push to main | 5-10 min |
 | `workers-deploy.yml` | `workers/**` | 3-5 min |
 
-### Manual Only (GCP Cloud Run -- requires GCP_SA_KEY)
+### Removed Workflows (GCP — deleted 2026-03-02)
 
-| Workflow | Service | Duration |
-|----------|---------|----------|
-| `visionflow-bridge.yml` | VisionFlow Bridge | 3-5 min |
-| `fairfield-embedding-api.yml` | Embedding API | 10-15 min |
-| `fairfield-image-api.yml` | Image API | 3-5 min |
-| `jss.yml` | JSS (Solid pods) | 3-5 min |
-
-### Removed Workflows
-
-| Workflow | Reason |
-|----------|--------|
-| `auth-api.yml` | Replaced by Cloudflare Worker in `workers-deploy.yml` |
-| `fairfield-relay.yml` | Replaced by Cloudflare Worker in `workers-deploy.yml` |
+All GCP Cloud Run workflows have been deleted. Services now deploy via `workers-deploy.yml`.
 
 ### Manual Trigger
 
@@ -110,31 +93,15 @@ gh run watch
 ```
 VITE_SUPABASE_URL              # Supabase project URL
 VITE_SUPABASE_ANON_KEY         # Supabase anonymous key
-VITE_AUTH_API_URL               # auth-api URL (will point to Workers after migration)
-GCP_PROJECT_ID                 # cumbriadreamlab (for retained Cloud Run services)
-GCP_SA_KEY                     # Service account JSON key (for retained Cloud Run services)
-CLOUDFLARE_API_TOKEN            # Cloudflare API token (REQUIRED for Workers + Pages deploy)
-CLOUDFLARE_ACCOUNT_ID           # Cloudflare account ID (REQUIRED for Workers + Pages deploy)
+CLOUDFLARE_API_TOKEN            # Cloudflare API token (Workers + Pages deploy)
+CLOUDFLARE_ACCOUNT_ID           # Cloudflare account ID (Workers + Pages deploy)
 ```
 
 ### GitHub Repository Variables
 
 ```
-FAIRFIELD_RELAY_URL             # wss://... Nostr relay
-FAIRFIELD_EMBEDDING_API_URL     # https://... embedding service
-FAIRFIELD_LINK_PREVIEW_API_URL  # https://... link preview service
-FAIRFIELD_IMAGE_API_URL         # https://... image service
-FAIRFIELD_IMAGE_BUCKET          # GCS bucket name
 FAIRFIELD_ADMIN_PUBKEY          # Nostr admin pubkey (hex)
 CLOUDFLARE_PAGES_ENABLED        # 'true' to enable Cloudflare Pages deploy
-```
-
-### GCP Secret Manager
-
-```
-nostr-db-url                    # PostgreSQL connection string
-jss-base-url                    # JSS Cloud Run URL (chicken-and-egg)
-admin-pubkey                    # Admin Nostr pubkeys (comma-separated)
 ```
 
 ## Quick Rollback
@@ -143,10 +110,8 @@ admin-pubkey                    # Admin Nostr pubkeys (comma-separated)
 # GitHub Pages: revert commit and re-deploy
 git revert <sha> --no-edit && git push origin main
 
-# Cloud Run: route traffic to previous revision
-gcloud run services update-traffic <service> \
-  --to-revisions=<previous-revision>=100 \
-  --region=us-central1
+# Cloudflare Workers: rollback to previous deployment
+npx wrangler rollback --name <worker-name>
 ```
 
 See [ROLLBACK.md](./ROLLBACK.md) for detailed procedures.

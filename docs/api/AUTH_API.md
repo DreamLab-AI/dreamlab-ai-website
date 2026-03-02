@@ -1,12 +1,12 @@
 # Auth API Reference
 
-**Last Updated:** 2026-03-01
+**Last Updated:** 2026-03-02
 
 REST API for the DreamLab AI authentication service. Handles WebAuthn PRF-based registration and authentication, with NIP-98 HTTP auth and Solid pod provisioning.
 
-> **Migration note:** A Cloudflare Workers version of this service is deployed at `https://dreamlab-auth-api.solitary-paper-764d.workers.dev`. The Workers version uses D1 + KV instead of PostgreSQL. This reference documents the Cloud Run version; cutover to Workers pending DNS configuration.
+> **Current implementation:** Cloudflare Workers at `workers/auth-api/index.ts`, deployed at `https://dreamlab-auth-api.solitary-paper-764d.workers.dev`. Uses D1 for structured data and KV for sessions. The legacy GCP Cloud Run auth-api has been deleted as of 2026-03-02.
 
-**Base URL**: Cloud Run service URL (set as `VITE_AUTH_API_URL`)
+**Base URL**: `https://dreamlab-auth-api.solitary-paper-764d.workers.dev` (or custom domain `api.dreamlab-ai.com`)
 **Protocol**: HTTPS
 **Authentication**: NIP-98 on `/auth/login/verify`
 
@@ -142,8 +142,8 @@ Verify the WebAuthn registration response, provision a Solid pod, and store the 
   "ok": true,
   "pubkey": "a1b2c3d4e5f6...",
   "didNostr": "did:nostr:a1b2c3d4e5f6...",
-  "webId": "https://jss-xxx.run.app/a1b2c3d4e5f6.../profile/card#me",
-  "podUrl": "https://jss-xxx.run.app/a1b2c3d4e5f6.../"
+  "webId": "https://dreamlab-pod-api.solitary-paper-764d.workers.dev/a1b2c3d4e5f6.../profile/card#me",
+  "podUrl": "https://dreamlab-pod-api.solitary-paper-764d.workers.dev/a1b2c3d4e5f6.../"
 }
 ```
 
@@ -282,8 +282,8 @@ The NIP-98 event must:
   "ok": true,
   "pubkey": "a1b2c3d4e5f6...",
   "didNostr": "did:nostr:a1b2c3d4e5f6...",
-  "webId": "https://jss-xxx.run.app/a1b2c3d4e5f6.../profile/card#me",
-  "podUrl": "https://jss-xxx.run.app/a1b2c3d4e5f6.../"
+  "webId": "https://dreamlab-pod-api.solitary-paper-764d.workers.dev/a1b2c3d4e5f6.../profile/card#me",
+  "podUrl": "https://dreamlab-pod-api.solitary-paper-764d.workers.dev/a1b2c3d4e5f6.../"
 }
 ```
 
@@ -322,7 +322,7 @@ The signed event:
   "pubkey": "<64-char-hex-pubkey>",
   "created_at": 1740700000,
   "tags": [
-    ["u", "https://auth-api-xxx.run.app/auth/login/verify"],
+    ["u", "https://dreamlab-auth-api.solitary-paper-764d.workers.dev/auth/login/verify"],
     ["method", "POST"],
     ["payload", "<sha256-hex-of-raw-request-body>"]
   ],

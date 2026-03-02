@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-03-01 | **Version:** 2.0.0 | **Repository:** [DreamLab-AI/dreamlab-ai-website](https://github.com/DreamLab-AI/dreamlab-ai-website)
 
-DreamLab AI is a premium AI training and consulting platform at [dreamlab-ai.com](https://dreamlab-ai.com) (also [thedreamlab.uk](https://thedreamlab.uk)). The platform comprises a React single-page application with 3D visualisations, a SvelteKit community forum with passkey authentication, and backend services on GCP Cloud Run with completed migration of auth-api, pod-api, and search-api to Cloudflare Workers (deployed at `*.solitary-paper-764d.workers.dev`).
+DreamLab AI is a premium AI training and consulting platform at [dreamlab-ai.com](https://dreamlab-ai.com) (also [thedreamlab.uk](https://thedreamlab.uk)). The platform comprises a React single-page application with 3D visualisations, a SvelteKit community forum with passkey authentication, and 5 Cloudflare Workers backend services (deployed at `*.solitary-paper-764d.workers.dev`). All GCP infrastructure was deleted as of 2026-03-02.
 
 ---
 
@@ -20,7 +20,7 @@ DreamLab AI is a premium AI training and consulting platform at [dreamlab-ai.com
 | Forum | SvelteKit 2.49 (`community-forum/`) |
 | Protocol | Nostr (NDK 2.13) for community features |
 | Auth | WebAuthn PRF + HKDF + NIP-98 (nostr-tools 2.19.3) |
-| Database | Supabase (main site), PostgreSQL (auth-api) |
+| Database | Supabase (main site), D1 + KV + R2 (Cloudflare) |
 
 ---
 
@@ -46,7 +46,7 @@ DreamLab AI is a premium AI training and consulting platform at [dreamlab-ai.com
 
 - [Deployment overview](deployment/README.md) -- deployment strategies
 - [GitHub Pages deployment](deployment/GITHUB_PAGES.md) -- static site hosting
-- [Cloud services](deployment/CLOUD_SERVICES.md) -- GCP Cloud Run configuration
+- [Cloud services](deployment/CLOUD_SERVICES.md) -- Legacy GCP reference (deprecated)
 - [Environments](deployment/ENVIRONMENTS.md) -- environment configuration
 - [Monitoring](deployment/MONITORING.md) -- observability and alerting
 - [Rollback procedures](deployment/ROLLBACK.md) -- incident recovery
@@ -70,14 +70,12 @@ DreamLab AI is a premium AI training and consulting platform at [dreamlab-ai.com
 | Workshop content system (15 workshops) | Running |
 | Team profiles (44 experts) | Running |
 | Community forum (SvelteKit) | Builds and deploys to `/community` |
-| Auth API (WebAuthn + NIP-98) | Deployed on GCP Cloud Run |
-| JSS (Solid pod storage) | Deployed on GCP Cloud Run |
-| Nostr relay | Deployed on GCP Cloud Run |
-| Embedding API | Deployed on GCP Cloud Run |
-| Image API | Deployed on GCP Cloud Run |
-| Link preview API | Deployed on GCP Cloud Run |
+| Auth API (WebAuthn + NIP-98) | Cloudflare Workers |
+| Pod API (Solid pod storage) | Cloudflare Workers |
+| Search API (WASM vector search) | Cloudflare Workers |
+| Nostr relay | Cloudflare Workers + Durable Objects |
+| Link preview API | Cloudflare Workers |
 | NIP-98 shared module | Built (consolidated from 4 implementations) |
-| Cloudflare Workers (auth-api, pod-api, search-api) | Deployed at `*.solitary-paper-764d.workers.dev` |
 
 For the full breakdown, see [features/STATUS_MATRIX.md](features/STATUS_MATRIX.md).
 
@@ -106,7 +104,7 @@ For the full breakdown, see [features/STATUS_MATRIX.md](features/STATUS_MATRIX.m
 | [ADR-005](adr/005-nip-44-encryption-mandate.md) | NIP-44 Encryption Mandate | Accepted |
 | [ADR-006](adr/006-client-side-wasm-search.md) | Client-Side WASM Search | Accepted |
 | [ADR-007](adr/007-sveltekit-ndk-frontend.md) | SvelteKit + NDK Frontend | Accepted |
-| [ADR-008](adr/008-postgresql-relay-storage.md) | PostgreSQL Relay Storage | Accepted |
+| [ADR-008](adr/008-postgresql-relay-storage.md) | PostgreSQL Relay Storage | Superseded by ADR-010 |
 | [ADR-009](adr/009-user-registration-flow.md) | User Registration Flow | Resolved |
 | [ADR-010](adr/010-return-to-cloudflare.md) | Return to Cloudflare Platform | Accepted |
 

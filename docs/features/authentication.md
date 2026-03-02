@@ -64,8 +64,8 @@ The PRF salt is generated at registration time and stored server-side in the `we
 sequenceDiagram
     participant User
     participant Client as SvelteKit Forum
-    participant AuthAPI as auth-api (Cloud Run / Workers)
-    participant JSS as JSS Pod Server (Cloud Run / pod-api Worker)
+    participant AuthAPI as auth-api (Cloudflare Workers)
+    participant JSS as pod-api (Cloudflare Workers + R2)
 
     User->>Client: 1. Click "Register with Passkey"
     Client->>AuthAPI: 2. POST /auth/register/options { displayName }
@@ -104,7 +104,7 @@ sequenceDiagram
 sequenceDiagram
     participant User
     participant Client as SvelteKit Forum
-    participant AuthAPI as auth-api (Cloud Run / Workers)
+    participant AuthAPI as auth-api (Cloudflare Workers)
 
     User->>Client: 1. Click "Log in with Passkey"
     Client->>AuthAPI: 2. POST /auth/login/options { pubkey? }

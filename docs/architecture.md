@@ -8,7 +8,7 @@ This document describes the high-level architecture of the DreamLab AI platform.
 
 ## System Context
 
-DreamLab AI consists of three deployment targets: a static frontend on GitHub Pages (migrating to Cloudflare Pages), backend services on GCP Cloud Run (completed migration of auth-api, pod-api, search-api to Cloudflare Workers), and Cloudflare Workers services (deployed).
+DreamLab AI consists of two deployment targets: a static frontend on GitHub Pages (with Cloudflare Pages opt-in) and five Cloudflare Workers backend services. All GCP infrastructure has been deleted as of 2026-03-02.
 
 ```mermaid
 graph TB
@@ -21,18 +21,12 @@ graph TB
         Forum["SvelteKit Forum<br/>at /community"]
     end
 
-    subgraph CloudRun["GCP Cloud Run (us-central1)"]
-        AuthAPI["auth-api<br/>WebAuthn + NIP-98"]
-        JSS["JSS<br/>Solid Pod Storage"]
-        Relay["nostr-relay<br/>WebSocket + PostgreSQL"]
-        EmbeddingAPI["embedding-api<br/>Vector Embeddings"]
-        ImageAPI["image-api<br/>Image Resize/Serve"]
-        LinkPreviewAPI["link-preview-api<br/>URL Metadata"]
-    end
-
-    subgraph CloudflareWorkers["Cloudflare Workers (deployed)"]
+    subgraph CloudflareWorkers["Cloudflare Workers (5 services)"]
         CFAuth["auth-api Worker<br/>D1 + KV"]
         CFPod["pod-api Worker<br/>R2 + KV"]
+        CFSearch["search-api Worker<br/>WASM + R2"]
+        CFRelay["nostr-relay Worker<br/>D1 + Durable Objects"]
+        CFLink["link-preview Worker<br/>Cache API"]
     end
 
     subgraph External["External Services"]
@@ -42,20 +36,14 @@ graph TB
     Browser --> SPA
     Browser --> Forum
     SPA --> Supabase
-    Forum --> AuthAPI
-    Forum --> Relay
-    Forum --> ImageAPI
-    Forum --> EmbeddingAPI
-    Forum --> LinkPreviewAPI
-    AuthAPI --> JSS
-    AuthAPI --> Relay
-
-    CFAuth -.->|"replaces"| AuthAPI
-    CFPod -.->|"replaces"| JSS
+    Forum --> CFAuth
+    Forum --> CFRelay
+    Forum --> CFSearch
+    Forum --> CFLink
 
 ```
 
-*Cloudflare Workers services are deployed at `*.solitary-paper-764d.workers.dev`. Custom domain DNS pending.*
+*All Workers deployed at `*.solitary-paper-764d.workers.dev`. Custom domain routes configured.*
 
 ---
 
@@ -112,36 +100,19 @@ The community forum at `dreamlab-ai.com/community` is a SvelteKit 2.49 applicati
 
 ## Backend Services
 
-### GCP Cloud Run (Current)
+### Cloudflare Workers (Production)
 
-Six services deployed on Cloud Run in `us-central1`, project `cumbriadreamlab`.
+Five Workers deployed at `*.solitary-paper-764d.workers.dev`. All GCP Cloud Run services deleted as of 2026-03-02.
 
-| Service | Runtime | Storage | Purpose |
-|---------|---------|---------|---------|
-| **auth-api** | Express + @simplewebauthn/server | PostgreSQL (Cloud SQL) | WebAuthn registration/authentication, NIP-98 gating, JSS pod provisioning |
-| **jss** | @solid/community-server 7.1.8 | Ephemeral filesystem | Solid pod storage per pubkey (WebID + Linked Data) |
-| **nostr-relay** | Custom Node.js | PostgreSQL (Cloud SQL) | Nostr relay (NIP-01, NIP-98 verified) |
-| **embedding-api** | Node.js | Stateless | Vector embeddings for semantic search |
-| **image-api** | Node.js | Stateless | Image resizing and serving |
-| **link-preview-api** | Node.js | Stateless | URL metadata extraction |
-
-### Cloudflare Workers (Deployed)
-
-Three Workers are deployed at `*.solitary-paper-764d.workers.dev`. See [ADR-010](adr/010-return-to-cloudflare.md) for the migration decision.
-
-| Service | Storage | Replaces |
-|---------|---------|----------|
-| **auth-api** (`workers/auth-api/`) | D1 + KV | Cloud Run auth-api |
-| **pod-api** (`workers/pod-api/`) | R2 + KV | Cloud Run JSS |
+| Service | Storage | Purpose |
+|---------|---------|---------|
+| **auth-api** (`workers/auth-api/`) | D1 + KV | WebAuthn registration/authentication, NIP-98 gating, pod provisioning |
+| **pod-api** (`workers/pod-api/`) | R2 + KV | Solid pod storage per pubkey with WAC enforcement |
+| **search-api** (`workers/search-api/`) | R2 + KV + WASM | Vector similarity search (42KB rvf-wasm microkernel) |
+| **nostr-relay** (`workers/nostr-relay/`) | D1 + Durable Objects | WebSocket Nostr relay (NIP-01, NIP-28, NIP-42, NIP-98) |
+| **link-preview** (`workers/link-preview-api/`) | Cache API | URL metadata extraction |
 
 Shared NIP-98 utilities live in `workers/shared/nip98.ts`.
-
-### Planned Retention on Cloud Run
-
-Per ADR-010, two services remain on Cloud Run due to Cloudflare Workers limitations:
-
-- **nostr-relay** -- persistent WebSocket connections with Cloud SQL (Durable Objects migration evaluated separately)
-- **embedding-api** -- ML inference requires CPU/memory beyond Workers limits
 
 ---
 
@@ -250,11 +221,8 @@ flowchart LR
     GHP --> Forum["SvelteKit Forum"]
     Forum -->|"WebAuthn + NIP-98"| AuthAPI["auth-api"]
     Forum -->|"WSS"| Relay["nostr-relay"]
-    Forum -->|"NIP-98 auth"| ImageAPI["image-api"]
-    Forum -->|"NIP-98 auth"| EmbedAPI["embedding-api"]
-    AuthAPI --> JSS["JSS (Solid pods)"]
-    AuthAPI --> CloudSQL["Cloud SQL<br/>(PostgreSQL)"]
-    Relay --> CloudSQL
+    Forum -->|"HTTPS"| CFSearch["search-api"]
+    Forum -->|"HTTPS"| CFLink["link-preview"]
 ```
 
 ---
@@ -272,7 +240,7 @@ All major technology decisions are documented as Architecture Decision Records:
 | [ADR-005](adr/005-nip-44-encryption-mandate.md) | NIP-44 mandatory for new encryption | Accepted |
 | [ADR-006](adr/006-client-side-wasm-search.md) | Client-side WASM semantic search | Accepted |
 | [ADR-007](adr/007-sveltekit-ndk-frontend.md) | SvelteKit + NDK for forum frontend | Accepted |
-| [ADR-008](adr/008-postgresql-relay-storage.md) | PostgreSQL for relay event storage | Accepted |
+| [ADR-008](adr/008-postgresql-relay-storage.md) | PostgreSQL for relay event storage | **Superseded by ADR-010** |
 | [ADR-009](adr/009-user-registration-flow.md) | User registration and approval flow | Resolved |
 | [ADR-010](adr/010-return-to-cloudflare.md) | Return to Cloudflare platform (Workers, D1, KV, R2) | Accepted |
 
@@ -280,7 +248,7 @@ All major technology decisions are documented as Architecture Decision Records:
 
 ## Deployment Architecture
 
-### Current State
+### Current State (as of 2026-03-02)
 
 ```mermaid
 graph TB
@@ -289,75 +257,36 @@ graph TB
         ForumStatic["SvelteKit Forum (dist/community/)"]
     end
 
-    subgraph GCP["GCP Cloud Run (us-central1)"]
-        Auth["auth-api"]
-        JSS["jss"]
-        NRelay["nostr-relay"]
-        Embed["embedding-api"]
-        Img["image-api"]
-        Link["link-preview-api"]
-    end
-
-    subgraph GCPDB["GCP Cloud SQL"]
-        PG["PostgreSQL (nostr-db)"]
-    end
-
-    Auth --> PG
-    NRelay --> PG
-    Auth --> JSS
-```
-
-### Target State (ADR-010)
-
-```mermaid
-graph TB
-    subgraph CFPages["Cloudflare Pages"]
-        ReactSPA["React SPA"]
-        ForumStatic["SvelteKit Forum"]
-    end
-
     subgraph CFWorkers["Cloudflare Workers"]
         CFAuth["auth-api"]
         CFPod["pod-api"]
-        CFImg["image-api"]
-        CFLink["link-preview-api"]
+        CFSearch["search-api"]
+        CFRelay["nostr-relay"]
+        CFLink["link-preview"]
     end
 
     subgraph CFStorage["Cloudflare Storage"]
-        D1["D1 (credentials, challenges)"]
-        KV["KV (sessions, ACLs, metadata)"]
-        R2["R2 (pod files, images)"]
-    end
-
-    subgraph GCP["GCP Cloud Run (retained)"]
-        NRelay["nostr-relay"]
-        Embed["embedding-api"]
-    end
-
-    subgraph GCPDB["GCP Cloud SQL"]
-        PG["PostgreSQL"]
+        D1["D1 (credentials, events)"]
+        KV["KV (sessions, ACLs, config)"]
+        R2["R2 (pods, images, vectors)"]
+        DO["Durable Objects (relay)"]
     end
 
     CFAuth --> D1
     CFAuth --> KV
     CFPod --> R2
     CFPod --> KV
-    CFImg --> R2
-    NRelay --> PG
+    CFSearch --> R2
+    CFRelay --> D1
+    CFRelay --> DO
 ```
 
 ### CI/CD Workflows
 
 | Workflow | Trigger | Deploys To |
 |----------|---------|------------|
-| `deploy.yml` | Push to main | GitHub Pages (SPA + forum) |
-| `auth-api.yml` | Push to main (services/auth-api/) | Cloud Run: auth-api |
-| `jss.yml` | Push to main (services/jss/) | Cloud Run: JSS |
-| `relay.yml` | Push to main | Cloud Run: nostr-relay |
-| `embedding-api.yml` | Push to main | Cloud Run: embedding-api |
-| `image-api.yml` | Push to main | Cloud Run: image-api |
-
-For first-time GCP bootstrap, see `.github/workflows/SECRETS_SETUP.md`.
+| `deploy.yml` | Push to main | GitHub Pages (SPA + forum) + Cloudflare Pages (opt-in) |
+| `workers-deploy.yml` | Push to main (workers/) | Cloudflare Workers (all 5 services) |
 
 ---
 

@@ -214,26 +214,13 @@ community-forum/
 |       |-- verify.ts             # NIP-98 event verification
 |       `-- types.ts              # Shared type definitions
 |
-|-- services/                     # Backend service source code
-|   |-- auth-api/                 # Express WebAuthn server (Cloud Run)
-|   |   `-- src/
-|   |       |-- server.ts         # Express app, CORS, env validation
-|   |       |-- db.ts             # PostgreSQL pool, schema migrations
-|   |       |-- webauthn.ts       # Registration/authentication option generators
-|   |       |-- nip98.ts          # NIP-98 server-side verification
-|   |       |-- jss-client.ts     # JSS pod provisioning client
-|   |       `-- routes/
-|   |           |-- register.ts   # POST /auth/register/options + /verify
-|   |           `-- authenticate.ts   # POST /auth/login/options + /verify
-|   |
-|   |-- jss/                      # JavaScript Solid Server (pod storage)
-|   |   |-- Dockerfile            # node:20-slim, @solid/community-server@7.1.8
-|   |   `-- entrypoint.sh         # Startup script
-|   |
-|   |-- nostr-relay/              # Nostr relay (NIP-01, NIP-98 verified)
-|   |-- embedding-api/            # Vector embeddings service
-|   |-- image-api/                # Image processing and resizing
-|   |-- link-preview-api/         # URL metadata extraction
+|-- services/                     # Legacy backend service source (GCP, deleted 2026-03-02)
+|   |-- auth-api/                 # Legacy Express WebAuthn server (replaced by workers/auth-api/)
+|   |-- jss/                      # Legacy Solid pod server (replaced by workers/pod-api/)
+|   |-- nostr-relay/              # Legacy Nostr relay (replaced by workers/nostr-relay/)
+|   |-- embedding-api/            # Legacy embedding service (replaced by workers/search-api/)
+|   |-- image-api/                # Legacy image service (deleted)
+|   |-- link-preview-api/         # Legacy link preview (replaced by workers/link-preview-api/)
 |   `-- visionflow-bridge/        # VisionFlow integration bridge
 |
 `-- tests/                        # Vitest unit + Playwright e2e tests
@@ -243,15 +230,21 @@ community-forum/
 
 ## Cloudflare Workers (`workers/`)
 
-Deployed migration target for Cloud Run services. Live at `*.solitary-paper-764d.workers.dev` (custom domain DNS pending).
+All backend services. Live at `*.solitary-paper-764d.workers.dev`.
 
 ```
 workers/
 |-- auth-api/
-|   `-- index.ts                  # WebAuthn auth worker
+|   `-- index.ts                  # WebAuthn auth worker (D1 + KV)
 |-- pod-api/
-|   |-- index.ts                  # Pod storage worker (R2-backed)
-|   `-- acl.ts                    # Access control logic
+|   |-- index.ts                  # Pod storage worker (R2 + KV)
+|   `-- acl.ts                    # WAC access control evaluator
+|-- search-api/
+|   `-- index.ts                  # WASM vector search worker (R2 + KV)
+|-- nostr-relay/
+|   `-- index.ts                  # Nostr relay worker (D1 + Durable Objects)
+|-- link-preview-api/
+|   `-- index.ts                  # Link preview worker (Cache API)
 `-- shared/
     `-- nip98.ts                  # Shared NIP-98 verification
 ```
@@ -291,14 +284,8 @@ wasm-voronoi/
 | Workflow | File | Purpose |
 |----------|------|---------|
 | Main deployment | `deploy.yml` | Build main site + forum, deploy to GitHub Pages |
-| Auth API | `auth-api.yml` | Deploy auth-api to Cloud Run |
-| JSS | `jss.yml` | Deploy Solid pod server to Cloud Run |
-| Nostr relay | `fairfield-relay.yml` | Deploy Nostr relay to Cloud Run |
-| Embedding API | `fairfield-embedding-api.yml` | Deploy embedding service to Cloud Run |
-| Image API | `fairfield-image-api.yml` | Deploy image service to Cloud Run |
-| VisionFlow bridge | `visionflow-bridge.yml` | Deploy VisionFlow bridge |
+| Workers deploy | `workers-deploy.yml` | Deploy all 5 Cloudflare Workers |
 | Documentation | `docs-update.yml` | Documentation validation |
-| Embeddings generation | `generate-embeddings.yml` | Batch embedding generation |
 
 ---
 

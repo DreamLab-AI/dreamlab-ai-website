@@ -1,7 +1,7 @@
 # Cloudflare Workers Migration
 
-**Last Updated:** 2026-03-01
-**Status:** Deployed -- auth-api, pod-api, search-api live at `*.solitary-paper-764d.workers.dev`
+**Last Updated:** 2026-03-02
+**Status:** Production -- all 5 Workers live at `*.solitary-paper-764d.workers.dev` (auth-api, pod-api, search-api, nostr-relay, link-preview). Zero GCP.
 
 This document describes the migration from GCP Cloud Run to the Cloudflare platform (Workers, Pages, D1, KV, R2). See [docs/prd-cloudflare-workers-migration.md](../prd-cloudflare-workers-migration.md) for the full PRD and [ADR-010](../adr/010-return-to-cloudflare.md) for the architectural decision record.
 
@@ -43,9 +43,7 @@ Cloudflare Edge (300+ PoPs)
 |                     +-- Durable Objects (WebSocket state)     |
 +---------------------------------------------------------------+
 
-Retained on GCP Cloud Run (us-central1):
-  - nostr-relay (WebSocket, always-on)
-  - embedding-api (Python, ML model)
+No services retained on GCP -- all deleted as of 2026-03-02.
 ```
 
 ---
@@ -97,9 +95,8 @@ To enable Pages: set `CLOUDFLARE_PAGES_ENABLED=true` in GitHub repository variab
 | auth-api | Cloud Run (Express) | Worker + D1 | Deployed |
 | pod-api | Cloud Run (CSS 7.x) | Worker + R2 + WAC evaluator | Deployed |
 | search-api | N/A (new service) | Worker + WASM + R2 + KV | Deployed |
-| image-api | Cloud Run (Node.js) | Worker + R2 | Not started |
-| nostr-relay | Cloud Run (Node.js) | Worker + Durable Objects + D1 | Not started (retained on Cloud Run) |
-| embedding-api | Cloud Run (Python) | N/A (requires Python runtime) | Retained on Cloud Run |
+| nostr-relay | Cloud Run (Node.js) | Worker + Durable Objects + D1 | Deployed |
+| link-preview | Cloud Run (Node.js) | Worker + Cache API | Deployed |
 
 ---
 

@@ -278,7 +278,7 @@ npm run validate
 
 The `deploy.yml` workflow runs `npm run build` for the main site on every push to `main`. The community forum build is included in the same workflow.
 
-Individual service workflows (`auth-api.yml`, `jss.yml`, etc.) build and deploy their respective Cloud Run containers on push.
+The `workers-deploy.yml` workflow deploys all Cloudflare Workers on push to `workers/`.
 
 ---
 

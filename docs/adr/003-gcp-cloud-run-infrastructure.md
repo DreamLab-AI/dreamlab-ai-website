@@ -13,7 +13,7 @@ last-updated: 2026-03-01
 
 ## Status
 
-Superseded by ADR-010
+Superseded by ADR-010 (Return to Cloudflare). All GCP services have been deleted as of 2026-03-02. The platform now runs entirely on Cloudflare Workers (auth-api, pod-api, search-api, nostr-relay, link-preview) with D1, KV, R2, and Durable Objects for storage.
 
 ## Date
 

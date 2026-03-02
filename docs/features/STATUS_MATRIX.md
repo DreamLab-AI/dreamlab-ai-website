@@ -34,25 +34,9 @@ This document tracks the status of every major feature and service in the DreamL
 | Supabase integration | **Running** | Main site data via Supabase PostgreSQL + Auth. |
 | Community forum (SvelteKit) | **Running** | Builds and deploys to `/community` path on GitHub Pages via static adapter. |
 
-## Backend Services -- GCP Cloud Run
+## Backend Services -- GCP Cloud Run (DELETED 2026-03-02)
 
-| Service | Status | Config | Detail |
-|---------|--------|--------|--------|
-| auth-api | **Deployed** | 512Mi, scale-to-zero | WebAuthn registration/authentication + NIP-98 gating + JSS pod provisioning. Express + @simplewebauthn/server. PostgreSQL via Cloud SQL. |
-| JSS (Solid pod storage) | **Deployed** | 1Gi, scale-to-zero | @solid/community-server 7.1.8. **Known issue:** ephemeral filesystem -- pod data at `/data/pods` lost on every container restart or scale-down. Root `.acl` is world-writable. CSS password not persisted. |
-| nostr-relay | **Deployed** | 512Mi, always-on (min=1) | Custom Nostr relay with NIP-01 event handling and NIP-98 verification. PostgreSQL via Cloud SQL. |
-| embedding-api | **Deployed** | Via Cloud Build | Vector embeddings for semantic search. |
-| image-api | **Deployed** | 512Mi, scale-to-zero, max 10 | Image resizing and serving with NIP-98 auth. |
-| link-preview-api | **Deployed** | 512Mi, scale-to-zero | URL metadata extraction (title, description, image). |
-
-### Cloud Run Supporting Infrastructure
-
-| Resource | Status | Detail |
-|----------|--------|--------|
-| Cloud SQL (nostr-db) | **Running** | Always-on PostgreSQL instance. Used by auth-api and nostr-relay. |
-| Artifact Registry | **Running** | Docker image storage for Cloud Run deployments. |
-| Secret Manager | **Running** | Stores DATABASE_URL, RELAY_URL, RP_ID, EXPECTED_ORIGIN, JSS_BASE_URL. |
-| IAM service accounts | **Configured** | Per-service accounts for Cloud Run. |
+All GCP Cloud Run services, Cloud SQL, Artifact Registry, and Secret Manager have been deleted. See "Backend Services -- Cloudflare Workers" below.
 
 ## Backend Services -- Cloudflare Workers (Deployed)
 
@@ -61,8 +45,8 @@ This document tracks the status of every major feature and service in the DreamL
 | auth-api Worker | **Deployed** | `dreamlab-auth-api.solitary-paper-764d.workers.dev` | Cloud Run auth-api | WebAuthn + NIP-98 on D1 + KV. D1 tables migrated. Per ADR-010. |
 | pod-api Worker | **Deployed** | `dreamlab-pod-api.solitary-paper-764d.workers.dev` | Cloud Run JSS | Pod storage on R2 + KV with JSON-LD ACL evaluator. Fixes ephemeral pod storage. Per ADR-010. |
 | search-api Worker | **Deployed** | `dreamlab-search-api.solitary-paper-764d.workers.dev` | -- | WASM-powered vector search (42KB rvf-wasm, 384-dim cosine, 490K vec/sec ingest, 0.47ms p50 query). R2 + KV. |
-| image-api Worker | **Planned** | -- | Cloud Run image-api | Image storage on R2 with Workers transforms. No code written. |
-| link-preview-api Worker | **Planned** | -- | Cloud Run link-preview-api | Stateless HTTP fetch + parse. No code written. |
+| nostr-relay Worker | **Deployed** | `dreamlab-nostr-relay.solitary-paper-764d.workers.dev` | Cloud Run nostr-relay | WebSocket relay on D1 + Durable Objects. Per ADR-010. |
+| link-preview Worker | **Deployed** | Workers route | Cloud Run link-preview-api | URL metadata extraction with Cache API. |
 
 ### Cloudflare Resources (Provisioned 2026-03-01)
 
@@ -111,7 +95,7 @@ This document tracks the status of every major feature and service in the DreamL
 | Feature | Status | Detail |
 |---------|--------|--------|
 | GitHub Pages deployment | **Running** | `deploy.yml` workflow. Builds SPA + forum, deploys to gh-pages branch. |
-| Cloud Run CI/CD | **Running** | 5 workflows (auth-api, jss, relay, embedding-api, image-api). Docker builds via Artifact Registry. |
+| Workers CI/CD | **Running** | `workers-deploy.yml` deploys all 5 Cloudflare Workers. |
 | RuVector memory | **Not running** | `ruvector-postgres` container expected on `docker_ragflow` network. Env vars configured (`RUVECTOR_PG_CONNINFO`) but container does not exist. Vector search and cross-session memory are offline. |
 | MCP claude-flow | **Not running** | `autoStart: false` in config. npm cache issues prevent startup. Memory tools non-functional. |
 
@@ -151,10 +135,10 @@ This document tracks the status of every major feature and service in the DreamL
 
 | Phase | Services | Target Platform | Status |
 |-------|----------|----------------|--------|
-| Phase 1 | auth-api, pod-api, search-api | Cloudflare Workers + D1 + KV + R2 | **Deployed** to workers.dev (custom domain DNS pending) |
-| Phase 2 | image-api, link-preview-api | Cloudflare Workers + R2 | Planned |
-| Phase 3 | Static site (SPA + forum) | Cloudflare Pages | Planned |
-| Retained | nostr-relay, embedding-api | GCP Cloud Run | No change |
+| Phase 1 | auth-api, pod-api, search-api | Cloudflare Workers + D1 + KV + R2 | **Complete** |
+| Phase 2 | nostr-relay, link-preview | Cloudflare Workers + D1 + DO + Cache API | **Complete** |
+| Phase 3 | Static site (SPA + forum) | Cloudflare Pages | Ready to enable |
+| GCP Decommission | All GCP services | Deleted | **Complete** (2026-03-02) |
 
 See [ADR-010](../adr/010-return-to-cloudflare.md) and the [migration PRD](../prd-cloudflare-workers-migration.md) for full details.
 

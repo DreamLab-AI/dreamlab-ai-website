@@ -1,12 +1,12 @@
 # Cloud Services Deployment
 
-**Last Updated:** 2026-03-01
+**Last Updated:** 2026-03-02
 
-> **Migration Notice (2026-03-01):** Three services have been migrated to Cloudflare Workers per [ADR-010](../adr/010-return-to-cloudflare.md): **auth-api** (deployed at `dreamlab-auth-api.solitary-paper-764d.workers.dev`), **pod-api** (replaces jss, deployed at `dreamlab-pod-api.solitary-paper-764d.workers.dev`), and **search-api** (deployed at `dreamlab-search-api.solitary-paper-764d.workers.dev`). **image-api** migration is planned. See [CLOUDFLARE_WORKERS.md](./CLOUDFLARE_WORKERS.md) for details.
+> **DEPRECATED (2026-03-02):** All GCP Cloud Run services have been deleted. The platform now runs entirely on Cloudflare Workers. See [CLOUDFLARE_WORKERS.md](./CLOUDFLARE_WORKERS.md) for the current backend architecture.
 >
-> Services **retained** on Cloud Run: **nostr-relay** (WebSocket, always-on), **embedding-api** (Python ML runtime).
+> This document is retained for historical reference only. The 5 Cloudflare Workers (auth-api, pod-api, search-api, nostr-relay, link-preview) replace all former GCP services.
 
-GCP Cloud Run backend services for the DreamLab AI platform. GCP project: `cumbriadreamlab`, region: `us-central1`.
+**Legacy reference:** GCP Cloud Run backend services that previously ran on GCP project `cumbriadreamlab`, region `us-central1`. All deleted as of 2026-03-02.
 
 ---
 

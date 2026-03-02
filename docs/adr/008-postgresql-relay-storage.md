@@ -11,7 +11,7 @@ last-updated: 2026-01-16
 
 ## Status
 
-Accepted
+Superseded -- relay storage migrated to Cloudflare D1 + Durable Objects as of 2026-03-02. See ADR-010.
 
 ## Date
 

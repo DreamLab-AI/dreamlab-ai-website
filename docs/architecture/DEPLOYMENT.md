@@ -1,12 +1,12 @@
 # Deployment Architecture -- DreamLab AI
 
-**Last Updated**: 2026-03-01
+**Last Updated**: 2026-03-02
 **CI/CD Platform**: GitHub Actions
-**Hosting**: GitHub Pages + GCP Cloud Run + Cloudflare Pages (opt-in) + Cloudflare Workers (deployed)
+**Hosting**: GitHub Pages + Cloudflare Workers + Cloudflare Pages (opt-in)
 
 ## Overview
 
-DreamLab AI uses a fully automated CI/CD pipeline with 10 GitHub Actions workflows deploying to multiple targets: GitHub Pages (static site), GCP Cloud Run (6 backend services), optionally Cloudflare Pages (frontend), and Cloudflare Workers (3 Workers deployed at `*.solitary-paper-764d.workers.dev`).
+DreamLab AI uses a fully automated CI/CD pipeline with GitHub Actions workflows deploying to: GitHub Pages (static site), Cloudflare Workers (5 backend services at `*.solitary-paper-764d.workers.dev`), and optionally Cloudflare Pages (frontend). All GCP Cloud Run services have been deleted as of 2026-03-02.
 
 ---
 
@@ -377,24 +377,21 @@ flowchart LR
 
 ## Environment Configuration
 
-### GCP Infrastructure
+### Cloudflare Resources
 
-| Resource | Value |
-|----------|-------|
-| Project ID | `cumbriadreamlab` |
-| Region | `us-central1` |
-| Artifact Registry | `minimoonoir` |
-| Cloud SQL Instance | `nostr-db` (PostgreSQL) |
-| Service Account | `fairfield-applications@cumbriadreamlab.iam.gserviceaccount.com` |
-| Cloud Storage Bucket | `dreamlab-pods` (JSS), `minimoonoir-images` (image-api) |
+All backend services run on Cloudflare Workers. GCP infrastructure has been deleted as of 2026-03-02.
 
-### GCP Secret Manager
-
-| Secret | Used By | Purpose |
-|--------|---------|---------|
-| `nostr-db-url` | auth-api, nostr-relay | PostgreSQL connection URL |
-| `admin-pubkey` | nostr-relay | Admin Nostr public key |
-| `jss-base-url` | auth-api, jss | JSS service URL |
+| Resource | Type | Purpose |
+|----------|------|---------|
+| `dreamlab-auth` | D1 Database | WebAuthn credentials, challenges |
+| `dreamlab-relay` | D1 Database | Nostr events, whitelist |
+| `SESSIONS` | KV Namespace | Session metadata |
+| `POD_META` | KV Namespace | Pod ACL metadata |
+| `CONFIG` | KV Namespace | Application config |
+| `SEARCH_CONFIG` | KV Namespace | Search index config |
+| `dreamlab-pods` | R2 Bucket | Pod file storage |
+| `dreamlab-vectors` | R2 Bucket | Vector index persistence |
+| `NostrRelayDO` | Durable Object | WebSocket connection state |
 
 ### GitHub Repository Secrets
 
@@ -402,21 +399,20 @@ flowchart LR
 |--------|---------|
 | `VITE_SUPABASE_URL` | Supabase API endpoint |
 | `VITE_SUPABASE_ANON_KEY` | Supabase anonymous key |
-| `VITE_AUTH_API_URL` | Auth API Cloud Run URL |
-| `GCP_PROJECT_ID` | GCP project identifier |
-| `GCP_SA_KEY` | GCP service account JSON key |
-| `CLOUDFLARE_API_TOKEN` | Cloudflare API token (optional) |
-| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare account (optional) |
+| `VITE_AUTH_API_URL` | Auth API Cloudflare Workers URL |
+| `CLOUDFLARE_API_TOKEN` | Cloudflare API token (required) |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare account ID (required) |
 
 ### DNS Configuration
 
 | Record | Value | Purpose |
 |--------|-------|---------|
 | `dreamlab-ai.com` | CNAME to GitHub Pages | Main site |
-| `api.dreamlab-ai.com` | Cloudflare Workers route (deployed, DNS pending) | Auth API |
-| `pods.dreamlab-ai.com` | Cloudflare Workers route (deployed, DNS pending) | Pod API |
-| `search.dreamlab-ai.com` | Cloudflare Workers route (deployed, DNS pending) | Search API (WASM vector search) |
-| `relay.dreamlab-ai.com` | Cloud Run service URL | Nostr relay |
+| `api.dreamlab-ai.com` | Cloudflare Workers route | Auth API |
+| `pods.dreamlab-ai.com` | Cloudflare Workers route | Pod API |
+| `search.dreamlab-ai.com` | Cloudflare Workers route | Search API (WASM vector search) |
+| `relay.dreamlab-ai.com` | Cloudflare Workers route | Nostr relay (Durable Objects) |
+| `preview.dreamlab-ai.com` | Cloudflare Workers route | Link preview API |
 
 ---
 
@@ -564,4 +560,4 @@ npm run build
 
 **Document Owner**: DevOps Team
 **Review Cycle**: Quarterly
-**Last Review**: 2026-03-01
+**Last Review**: 2026-03-02

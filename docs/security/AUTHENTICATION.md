@@ -270,7 +270,7 @@ The resulting token is a base64-encoded Nostr event:
   "pubkey": "<64-char hex>",
   "created_at": 1740700000,
   "tags": [
-    ["u", "https://auth-api-xxx.run.app/auth/login/verify"],
+    ["u", "https://dreamlab-auth-api.solitary-paper-764d.workers.dev/auth/login/verify"],
     ["method", "POST"],
     ["payload", "<sha256-hex-of-raw-body>"]
   ],

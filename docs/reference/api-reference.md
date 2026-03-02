@@ -8,16 +8,15 @@ Complete API documentation for the DreamLab AI backend services.
 
 ## Overview
 
-The platform runs six backend services, currently deployed on Google Cloud Run (region `us-central1`, GCP project `cumbriadreamlab`). A completed migration of auth-api, pod-api, and search-api to Cloudflare Workers is deployed at `*.solitary-paper-764d.workers.dev`.
+The platform runs five Cloudflare Workers backend services, deployed at `*.solitary-paper-764d.workers.dev`. All GCP Cloud Run services have been deleted as of 2026-03-02.
 
 | Service | Base URL | Auth required |
 |---------|----------|---------------|
-| auth-api | `https://auth-api-xxx-uc.a.run.app` | No (public endpoints) |
-| jss | `https://jss-xxx-uc.a.run.app` | NIP-98 |
-| nostr-relay | `wss://relay.dreamlab-ai.com` | Whitelist (writes only) |
-| embedding-api | `https://embedding-api-xxx-uc.a.run.app` | NIP-98 |
-| image-api | `https://image-api-xxx-uc.a.run.app` | NIP-98 |
-| link-preview-api | `https://link-preview-xxx-uc.a.run.app` | None |
+| auth-api | `https://dreamlab-auth-api.solitary-paper-764d.workers.dev` | No (public endpoints) |
+| pod-api | `https://dreamlab-pod-api.solitary-paper-764d.workers.dev` | NIP-98 |
+| search-api | `https://dreamlab-search-api.solitary-paper-764d.workers.dev` | None |
+| nostr-relay | `wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev` | Whitelist (writes only) |
+| link-preview | Workers route | None |
 
 ---
 
@@ -120,8 +119,8 @@ Verify a WebAuthn registration response. On success, provisions a Solid pod via 
 {
   "verified": true,
   "didNostr": "did:nostr:<pubkey>",
-  "webId": "https://jss-xxx-uc.a.run.app/<pubkey>/profile/card#me",
-  "podUrl": "https://jss-xxx-uc.a.run.app/<pubkey>/"
+  "webId": "https://dreamlab-pod-api.solitary-paper-764d.workers.dev/<pubkey>/profile/card#me",
+  "podUrl": "https://dreamlab-pod-api.solitary-paper-764d.workers.dev/<pubkey>/"
 }
 ```
 
@@ -206,13 +205,13 @@ Provides WebID and pod storage per Nostr public key. Runs `@solid/community-serv
 ### Pod URL format
 
 ```
-https://jss-xxx-uc.a.run.app/<pubkey>/
+https://dreamlab-pod-api.solitary-paper-764d.workers.dev/<pubkey>/
 ```
 
 ### WebID
 
 ```
-https://jss-xxx-uc.a.run.app/<pubkey>/profile/card#me
+https://dreamlab-pod-api.solitary-paper-764d.workers.dev/<pubkey>/profile/card#me
 ```
 
 Pods are provisioned automatically during user registration via the auth-api.

@@ -55,7 +55,7 @@ graph TB
 | **Client** | User interface, local state, event creation | SvelteKit, NDK, IndexedDB |
 | **Transport** | Secure WebSocket communication | WSS, NIP-42 AUTH |
 | **Relay** | Event routing, storage, access control | Custom Nostr relay, PostgreSQL |
-| **Infrastructure** | Hosting, CDN, monitoring | GitHub Pages, Cloud Run |
+| **Infrastructure** | Hosting, CDN, monitoring | GitHub Pages, Cloudflare Workers |
 
 ---
 

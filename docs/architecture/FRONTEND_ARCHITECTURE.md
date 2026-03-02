@@ -219,12 +219,12 @@ community-forum/
 |       +-- types.ts              # VerifyOptions, VerifyResult, Nip98Event
 |       +-- index.ts              # Barrel re-exports
 +-- services/
-|   +-- auth-api/                 # Express WebAuthn server (Cloud Run)
-|   +-- jss/                      # Solid pod server (Cloud Run)
-|   +-- nostr-relay/              # Nostr relay (Cloud Run)
-|   +-- embedding-api/            # Embedding service (Cloud Run)
-|   +-- image-api/                # Image service (Cloud Run)
-|   +-- link-preview-api/         # Link preview (Cloud Run)
+|   +-- auth-api/                 # Legacy Express WebAuthn server (replaced by workers/auth-api/)
+|   +-- jss/                      # Legacy Solid pod server (replaced by workers/pod-api/)
+|   +-- nostr-relay/              # Legacy Nostr relay (replaced by workers/nostr-relay/)
+|   +-- embedding-api/            # Legacy embedding service (replaced by workers/search-api/)
+|   +-- image-api/                # Legacy image service (deleted)
+|   +-- link-preview-api/         # Legacy link preview (replaced by workers/link-preview-api/)
 +-- tests/                        # Vitest unit + Playwright e2e
 ```
 
@@ -235,7 +235,7 @@ sequenceDiagram
     participant U as User Browser
     participant S as Signup/Login UI
     participant P as passkey.ts
-    participant A as auth-api (Cloud Run)
+    participant A as auth-api (Cloudflare Workers)
     participant DB as PostgreSQL
 
     Note over U,DB: Registration Flow

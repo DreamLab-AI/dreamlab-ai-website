@@ -5,7 +5,7 @@
 DreamLab AI is a premium AI training and consulting platform. This is a React SPA (Vite + TypeScript + Tailwind CSS) with a SvelteKit community forum, 3D WebGL visualizations (Three.js + Rust WASM), Supabase backend, and Nostr-based decentralized social features.
 
 - **Domain:** dreamlab-ai.com
-- **Hosting:** GitHub Pages (static site) + Google Cloud Run (backend services)
+- **Hosting:** GitHub Pages (static site) + Cloudflare Workers (backend services)
 - **Repository:** https://github.com/DreamLab-AI/dreamlab-ai-website
 
 ## Tech Stack
@@ -120,23 +120,21 @@ community-forum/        # SvelteKit app (separate package.json)
     NicknameSetup.svelte # Profile setup after registration
     NsecBackup.svelte   # One-time privkey download (gets key from auth store)
   services/
-    auth-api/           # Cloud Run: WebAuthn server (Express + @simplewebauthn/server)
-      src/db.ts         # PostgreSQL pool, webauthn_credentials/challenges schema
-      src/nip98.ts      # NIP-98 event verification (server-side)
-      src/webauthn.ts   # Registration/authentication option generators
-      src/server.ts     # Express app, CORS, raw body capture, env validation
-      src/jss-client.ts # JSS pod provisioning client
-      src/routes/
-        register.ts     # POST /auth/register/options + /verify
-        authenticate.ts # POST /auth/login/options + /verify
-    jss/                # Cloud Run: JavaScript Solid Server (pod storage)
-      Dockerfile        # node:20-slim, @solid/community-server@7.1.8, USER node
-      entrypoint.sh     # css --port 8080 --baseUrl $JSS_BASE_URL
-    nostr-relay/        # Cloud Run: Nostr relay (existing)
-    embedding-api/      # Cloud Run: Embedding API (existing)
-    image-api/          # Cloud Run: Image API (existing)
-    link-preview-api/   # Cloud Run: Link preview (existing)
+    auth-api/           # Reference code (migrated to workers/auth-api/)
   tests/                # Vitest unit + Playwright e2e
+
+workers/                # Cloudflare Workers (backend services)
+  auth-api/             # WebAuthn + NIP-98 + pod provisioning (D1 + KV + R2)
+    index.ts            # Worker entry point
+  pod-api/              # Solid pods, images/media, WAC ACL (R2 + KV)
+    index.ts            # Worker entry point
+  search-api/           # RuVector WASM, .rvf, /embed (R2 + KV)
+    index.ts            # Worker entry point
+  nostr-relay-api/      # WebSocket relay, NIP-01/42/98 (D1 + DO)
+    index.ts            # Worker entry point
+  link-preview-api/     # OG metadata, Twitter oEmbed (Cache API)
+    index.ts            # Worker entry point
+  shared/               # Shared modules (nip98.ts, types)
 
 wasm-voronoi/           # Rust WASM (Cargo.toml, src/lib.rs)
 
@@ -146,13 +144,9 @@ scripts/
   optimize-images.sh          # Image compression
 
 .github/workflows/
-  deploy.yml                  # Main CI/CD → GitHub Pages + forum build
-  auth-api.yml                # Cloud Run: auth-api (WebAuthn server)
-  jss.yml                     # Cloud Run: JSS (Solid pod server)
-  fairfield-relay.yml         # Cloud Run: Nostr relay
-  fairfield-embedding-api.yml # Cloud Run: Embedding API
-  fairfield-image-api.yml     # Cloud Run: Image API
-  SECRETS_SETUP.md            # 8-step GCP bootstrap guide
+  deploy.yml                  # GitHub Pages + CF Pages
+  workers-deploy.yml          # 5 Cloudflare Workers
+  docs-update.yml             # Documentation
 ```
 
 ## Routing
@@ -203,50 +197,34 @@ All routes are lazy-loaded via `React.lazy()` in `src/App.tsx`:
 ```
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key-here
-VITE_AUTH_API_URL=https://auth-api-xxx-uc.a.run.app
+VITE_AUTH_API_URL=https://dreamlab-auth-api.*.workers.dev
 ```
 
 ### community-forum `.env` (never commit)
 ```
-VITE_AUTH_API_URL=https://auth-api-xxx-uc.a.run.app
-```
-
-### auth-api `.env` (Cloud Run secrets in production)
-```
-DATABASE_URL=postgresql://user:pass@host/db?sslmode=require
-RELAY_URL=wss://relay.dreamlab-ai.com
-RP_ID=dreamlab-ai.com
-RP_NAME=DreamLab Community
-EXPECTED_ORIGIN=https://dreamlab-ai.com
-JSS_BASE_URL=https://jss-xxx-uc.a.run.app
-```
-
-### jss `.env` (Cloud Run env var)
-```
-JSS_BASE_URL=https://jss-xxx-uc.a.run.app/
+VITE_AUTH_API_URL=https://dreamlab-auth-api.*.workers.dev
+VITE_POD_API_URL=https://dreamlab-pod-api.*.workers.dev
+VITE_SEARCH_API_URL=https://dreamlab-search-api.*.workers.dev
+VITE_RELAY_URL=wss://dreamlab-nostr-relay.*.workers.dev
+VITE_LINK_PREVIEW_URL=https://dreamlab-link-preview.*.workers.dev
 ```
 
 ## Deployment
 
 - **Static site:** `npm run build` → `dist/` → GitHub Pages (gh-pages branch)
 - **Community forum:** SvelteKit static adapter → `dist/community/`
-- **Backend:** Cloud Run containers — see GCP project `cumbriadreamlab`, region `us-central1`
+- **Backend:** Cloudflare Workers (deployed via `workers-deploy.yml`)
 - **Custom domain:** dreamlab-ai.com (CNAME file in public/)
 
-### Cloud Run Services
+### Cloudflare Workers
 
-| Service | Workflow | Purpose |
-|---------|----------|---------|
-| auth-api | auth-api.yml | WebAuthn registration/authentication, NIP-98 gating, JSS provisioning |
-| jss | jss.yml | JavaScript Solid Server — WebID + pod storage per pubkey |
-| nostr-relay | fairfield-relay.yml | Nostr relay (NIP-01, NIP-98 verified) |
-| embedding-api | fairfield-embedding-api.yml | Vector embeddings |
-| image-api | fairfield-image-api.yml | Image resizing/serving |
-
-### First-time GCP Bootstrap
-See `.github/workflows/SECRETS_SETUP.md` for the full 8-step sequence.
-Key chicken-and-egg: auth-api and JSS each need their own Cloud Run URL as a secret
-before CI can wire them together. Use `--no-traffic` on first deploy.
+| Worker | URL | Storage | Purpose |
+|--------|-----|---------|---------|
+| auth-api | dreamlab-auth-api.*.workers.dev | D1 + KV + R2 | WebAuthn, NIP-98, pod provisioning |
+| pod-api | dreamlab-pod-api.*.workers.dev | R2 + KV | Solid pods, images/media, WAC ACL |
+| search-api | dreamlab-search-api.*.workers.dev | R2 + KV | RuVector WASM, .rvf, /embed |
+| nostr-relay | dreamlab-nostr-relay.*.workers.dev | D1 + DO | WebSocket relay, NIP-01/42/98 |
+| link-preview | dreamlab-link-preview.*.workers.dev | Cache API | OG metadata, Twitter oEmbed |
 
 ## Behavioral Rules
 
@@ -311,18 +289,22 @@ Registration:
   1. Client: navigator.credentials.create() with PRF extension
   2. Client: check extensions.prf.enabled (abort if false)
   3. Client: HKDF(PRF output) → privkey → pubkey
-  4. Server: store credential + prf_salt in Postgres
-  5. Server: provision Solid pod via JSS POST /idp/register/
+  4. Server: store credential + prf_salt in D1
+  5. Server: provision Solid pod in R2 with WAC ACL
   6. Server: return { didNostr, webId, podUrl }
   7. Client: store pubkey in auth state, privkey in closure
 
 Authentication:
   1. Client: fetch /auth/login/options (returns stored prf_salt in extensions)
   2. Client: navigator.credentials.get() with same prf_salt
-  3. Client: check authenticatorAttachment !== 'cross-platform'
+  3. Client: block hybrid transport (QR) but allow USB security keys
   4. Client: HKDF(PRF output) → privkey (same result as registration)
   5. Server: verify assertion, verify counter advanced, update counter
   6. Client: privkey in closure, ready to sign NIP-98 tokens
+
+Note: Discoverable credentials allow new-device login — the authenticator stores
+the credential ID, so the user can authenticate on any device with the same passkey
+provider without needing to remember which credential was used.
 ```
 
 ### NIP-98 HTTP Auth
@@ -331,13 +313,13 @@ Every state-mutating API call uses NIP-98 `Authorization: Nostr <base64(event)>`
 - `kind: 27235`, tags: `u` (URL), `method`, optional `payload` (SHA-256 of body)
 - Schnorr-signed with privkey from auth store closure
 - Server recomputes event ID from NIP-01 canonical form and verifies independently
-- Payload hash uses raw body bytes (server captures via `express.raw` before JSON parsing)
+- Payload hash uses raw body bytes (server captures raw body for payload hash verification)
 
 ### Identity
 
 - Nostr pubkey (hex) is the primary identity
 - `did:nostr:<pubkey>` for DID-based interop
-- WebID at `{jss-url}/{pubkey}/profile/card#me` (Solid/Linked Data)
+- WebID at `https://pods.dreamlab-ai.com/{pubkey}/profile/card#me` (Solid/Linked Data)
 
 ### Key files
 
@@ -346,8 +328,10 @@ Every state-mutating API call uses NIP-98 `Authorization: Nostr <base64(event)>`
 | `community-forum/src/lib/auth/passkey.ts` | WebAuthn PRF ceremony, HKDF derivation |
 | `community-forum/src/lib/auth/nip98-client.ts` | NIP-98 token creation + fetch wrapper |
 | `community-forum/src/lib/stores/auth.ts` | Auth state, privkey closure, passkey hooks |
-| `community-forum/services/auth-api/src/` | Cloud Run WebAuthn server |
-| `community-forum/services/jss/` | Cloud Run Solid pod server |
+| `workers/auth-api/index.ts` | CF Worker: WebAuthn + NIP-98 + pod provisioning |
+| `workers/pod-api/index.ts` | CF Worker: Solid pod storage on R2 |
+| `workers/search-api/index.ts` | CF Worker: RuVector WASM vector search |
+| `workers/link-preview-api/index.ts` | CF Worker: OG metadata proxy |
 
 ## Claude Flow V3 Integration
 

@@ -68,7 +68,7 @@ VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key-here
 
 # Auth API URL (optional -- needed for forum auth integration)
-VITE_AUTH_API_URL=https://auth-api-xxx-uc.a.run.app
+VITE_AUTH_API_URL=https://dreamlab-auth-api.solitary-paper-764d.workers.dev
 ```
 
 ### Community forum `.env`
@@ -76,21 +76,12 @@ VITE_AUTH_API_URL=https://auth-api-xxx-uc.a.run.app
 Create `community-forum/.env`:
 
 ```bash
-VITE_AUTH_API_URL=https://auth-api-xxx-uc.a.run.app
+VITE_AUTH_API_URL=https://dreamlab-auth-api.solitary-paper-764d.workers.dev
 ```
 
 ### auth-api `.env`
 
-Only needed if running the auth-api service locally. Create `community-forum/services/auth-api/.env`:
-
-```bash
-DATABASE_URL=postgresql://user:pass@host/db?sslmode=require
-RELAY_URL=wss://relay.dreamlab-ai.com
-RP_ID=localhost
-RP_NAME=DreamLab Community
-RP_ORIGIN=http://localhost:5173
-JSS_BASE_URL=https://jss-xxx-uc.a.run.app
-```
+Only needed if running Workers locally via `wrangler dev`. The `wrangler.toml` at the project root contains all bindings. For local development, wrangler creates local D1, KV, and R2 instances automatically.
 
 **Security**: Never commit `.env` files. They are listed in `.gitignore`.
 

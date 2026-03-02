@@ -68,6 +68,7 @@ graph TB
 **Integrations**:
 - **Outbound**: publishes pubkey and DID to Community and Storage contexts
 - **Technology**: WebAuthn API, Web Crypto (HKDF), nostr-tools, @noble/hashes
+- **Infrastructure**: Cloudflare Workers (auth-api) + D1 + KV
 
 ```typescript
 // Identity Context Public API

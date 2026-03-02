@@ -220,18 +220,16 @@ GitHub Pages provides managed TLS certificates for custom domains. HTTPS is enfo
 |--------|---------|
 | `VITE_SUPABASE_URL` | Supabase project URL (written to `.env` during build) |
 | `VITE_SUPABASE_ANON_KEY` | Supabase anonymous key (written to `.env` during build) |
-| `VITE_AUTH_API_URL` | Auth API URL -- currently Cloud Run, will point to Cloudflare Worker after migration |
+| `VITE_AUTH_API_URL` | Auth API URL (Cloudflare Workers) |
 | `GITHUB_TOKEN` | Auto-provided by Actions (for gh-pages push) |
 
 ## Required Variables
 
 | Variable | Purpose |
 |----------|---------|
-| `FAIRFIELD_RELAY_URL` | Nostr relay endpoint (forum build) -- retained on Cloud Run |
-| `FAIRFIELD_EMBEDDING_API_URL` | Embedding service (forum build) -- retained on Cloud Run |
-| `FAIRFIELD_LINK_PREVIEW_API_URL` | Link preview service (forum build) |
-| `FAIRFIELD_IMAGE_API_URL` | Image service (forum build) -- will point to Cloudflare Worker after migration |
-| `FAIRFIELD_IMAGE_BUCKET` | GCS bucket name (forum build) -- will become R2 bucket after migration |
+| `FAIRFIELD_RELAY_URL` | Nostr relay endpoint (forum build) -- Cloudflare Workers |
+| `FAIRFIELD_SEARCH_API_URL` | Search service (forum build) -- Cloudflare Workers |
+| `FAIRFIELD_LINK_PREVIEW_API_URL` | Link preview service (forum build) -- Cloudflare Workers |
 | `FAIRFIELD_ADMIN_PUBKEY` | Admin Nostr pubkey (forum build) |
 | `CLOUDFLARE_PAGES_ENABLED` | Set to `true` to enable Cloudflare Pages deploy (ready to enable) |
 

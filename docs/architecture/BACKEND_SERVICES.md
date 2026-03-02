@@ -1,22 +1,22 @@
 # Backend Services Architecture -- DreamLab AI
 
-**Last Updated**: 2026-03-01
-**Current Platform**: GCP Cloud Run (cumbriadreamlab project, us-central1)
-**Target Platform**: Hybrid -- Cloudflare Workers + GCP Cloud Run (ADR-010)
+**Last Updated**: 2026-03-02
+**Platform**: Cloudflare Workers (zero GCP)
 
 ## Overview
 
-DreamLab AI operates a hybrid backend architecture:
+DreamLab AI operates a fully edge-native backend architecture:
 
 - **Main marketing site**: Supabase (managed PostgreSQL + Auth) for form submissions and email signups.
-- **Community forum**: Six GCP Cloud Run services providing WebAuthn authentication, Solid pod storage, Nostr relay messaging, vector embeddings, image processing, and link previews.
-- **Workers migration**: Three Cloudflare Workers are deployed (auth-api, pod-api, search-api) at `*.solitary-paper-764d.workers.dev`. Two additional Workers (image-api, link-preview-api) are planned. Code exists in `workers/`.
+- **Community forum**: Five Cloudflare Workers providing WebAuthn authentication, pod storage, vector search, Nostr relay messaging, and link previews. All deployed at `*.solitary-paper-764d.workers.dev`.
+- **Storage**: D1 (structured data), KV (sessions, ACLs, config), R2 (pods, images, vectors), Durable Objects (WebSocket relay state), Cache API (link preview caching).
+- **GCP**: All GCP Cloud Run services, Cloud SQL, Artifact Registry, and Secret Manager resources have been deleted as of 2026-03-02.
 
 ---
 
 ## Service Topology
 
-### Current Production
+### Production Architecture (as of 2026-03-02)
 
 ```mermaid
 graph TB
@@ -24,19 +24,20 @@ graph TB
         Supabase["Supabase<br/>(PostgreSQL + Auth)"]
     end
 
-    subgraph Community["Community Forum Backend (GCP Cloud Run)"]
-        AuthAPI["auth-api<br/>Express 4.19<br/>WebAuthn + NIP-98"]
-        JSS["jss<br/>@solid/community-server 7.1.8<br/>Solid Pod Storage"]
-        Relay["nostr-relay<br/>Node.js + ws<br/>NIP-01/28/98"]
-        EmbedAPI["embedding-api<br/>Python 3.11 + FastAPI<br/>sentence-transformers"]
-        ImageAPI["image-api<br/>Node.js + Sharp<br/>NIP-98 auth"]
-        LinkAPI["link-preview-api<br/>Node.js<br/>URL metadata"]
+    subgraph CF["Cloudflare Workers (5 services)"]
+        CFAuth["auth-api Worker<br/>WebAuthn + NIP-98"]
+        CFPod["pod-api Worker<br/>R2 pod storage + WAC"]
+        CFSearch["search-api Worker<br/>WASM vector search"]
+        CFRelay["nostr-relay Worker<br/>Durable Objects + D1"]
+        CFLink["link-preview Worker<br/>Cache API"]
     end
 
-    subgraph Storage["Storage"]
-        CSQL["Cloud SQL PostgreSQL<br/>(nostr-db)"]
-        GCS["Cloud Storage<br/>(minimoonoir-images)"]
-        SM["Secret Manager"]
+    subgraph CFStorage["Cloudflare Storage"]
+        D1["D1 Databases<br/>(dreamlab-auth, dreamlab-relay)"]
+        KV["KV Namespaces<br/>(SESSIONS, POD_META, CONFIG, SEARCH_CONFIG)"]
+        R2["R2 Buckets<br/>(dreamlab-pods, dreamlab-vectors)"]
+        DO["Durable Objects<br/>(NostrRelayDO)"]
+        Cache["Cache API<br/>(link preview responses)"]
     end
 
     subgraph Clients["Client Applications"]
@@ -45,78 +46,42 @@ graph TB
     end
 
     MainSite -->|HTTPS| Supabase
-    ForumApp -->|HTTPS| AuthAPI
-    ForumApp -->|WSS| Relay
-    ForumApp -->|HTTPS| EmbedAPI
-    ForumApp -->|HTTPS| ImageAPI
-    ForumApp -->|HTTPS| LinkAPI
-    AuthAPI --> CSQL
-    AuthAPI --> JSS
-    Relay --> CSQL
-    ImageAPI --> GCS
-    AuthAPI --> SM
-    Relay --> SM
-```
-
-### Cloudflare Workers (Deployed)
-
-```mermaid
-graph TB
-    subgraph CF["Cloudflare Workers"]
-        CFAuth["auth-api Worker<br/>WebAuthn + NIP-98"]
-        CFPod["pod-api Worker<br/>R2 pod storage + WAC"]
-        CFSearch["search-api Worker<br/>WASM vector search"]
-    end
-
-    subgraph CFStorage["Cloudflare Storage"]
-        D1["D1 Database<br/>(dreamlab-auth)"]
-        KV1["KV: SESSIONS"]
-        KV2["KV: POD_META"]
-        KV3["KV: CONFIG"]
-        KV4["KV: SEARCH_CONFIG"]
-        R2Pods["R2: dreamlab-pods"]
-        R2Vectors["R2: dreamlab-vectors"]
-    end
-
+    ForumApp -->|HTTPS| CFAuth
+    ForumApp -->|WSS| CFRelay
+    ForumApp -->|HTTPS| CFSearch
+    ForumApp -->|HTTPS| CFLink
     CFAuth --> D1
-    CFAuth --> KV1
-    CFAuth --> R2Pods
-    CFPod --> R2Pods
-    CFPod --> KV2
-    CFSearch --> R2Vectors
-    CFSearch --> KV4
+    CFAuth --> KV
+    CFPod --> R2
+    CFPod --> KV
+    CFSearch --> R2
+    CFSearch --> KV
+    CFRelay --> D1
+    CFRelay --> DO
+    CFLink --> Cache
 ```
 
 ---
 
 ## Service Catalogue
 
-### Current GCP Cloud Run Services
+### Cloudflare Workers (Production)
 
-| Service | Workflow | Technology | Resources | Instances |
-|---------|----------|-----------|-----------|-----------|
-| **auth-api** | `auth-api.yml` | Express 4.19, @simplewebauthn/server 10.0, nostr-tools 2.19.3, pg 8.12 | 512Mi, 1 CPU | 0--3 |
-| **jss** | `jss.yml` | @solid/community-server 7.1.8, node:20-slim | 1Gi, 1 CPU | 0--2 |
-| **nostr-relay** | `fairfield-relay.yml` | Node.js 20, ws, pg, nostr-tools | 512Mi, 1 CPU, no-cpu-throttling | 1--1 |
-| **embedding-api** | `fairfield-embedding-api.yml` | Python 3.11, FastAPI, sentence-transformers (all-MiniLM-L6-v2) | 2Gi, 2 CPU | 0--5 |
-| **image-api** | `fairfield-image-api.yml` | Node.js 20, Express, Sharp | 512Mi, 1 CPU | 0--10 |
-| **link-preview-api** | (manual) | Node.js | 256Mi, 0.5 CPU | 0--5 |
-
-### Cloudflare Workers (Deployed)
-
-| Worker | File | Replaces | Storage | Routes | Status |
-|--------|------|----------|---------|--------|--------|
-| **auth-api** | `workers/auth-api/index.ts` | Cloud Run auth-api | D1 + KV (SESSIONS) | `api.dreamlab-ai.com/*` | Deployed |
-| **pod-api** | `workers/pod-api/index.ts` | Cloud Run JSS | R2 (PODS) + KV (POD_META) | `pods.dreamlab-ai.com/*` | Deployed |
-| **search-api** | `workers/search-api/index.ts` | New service | R2 (dreamlab-vectors) + KV (SEARCH_CONFIG) | `search.dreamlab-ai.com/*` | Deployed |
+| Worker | File | Storage | Routes | Purpose |
+|--------|------|---------|--------|---------|
+| **auth-api** | `workers/auth-api/index.ts` | D1 (dreamlab-auth) + KV (SESSIONS) | `api.dreamlab-ai.com/*` | WebAuthn registration/authentication, NIP-98 gating, pod provisioning |
+| **pod-api** | `workers/pod-api/index.ts` | R2 (dreamlab-pods) + KV (POD_META) | `pods.dreamlab-ai.com/*` | Per-user Solid pod storage with WAC enforcement |
+| **search-api** | `workers/search-api/index.ts` | R2 (dreamlab-vectors) + KV (SEARCH_CONFIG) + WASM (42KB) | `search.dreamlab-ai.com/*` | WASM-powered vector similarity search (490K vec/sec, 0.47ms p50) |
+| **nostr-relay** | `workers/nostr-relay/index.ts` | D1 (dreamlab-relay) + Durable Objects (NostrRelayDO) | `relay.dreamlab-ai.com/*` | WebSocket Nostr relay (NIP-01, NIP-28, NIP-42, NIP-98) |
+| **link-preview** | `workers/link-preview-api/index.ts` | Cache API | `preview.dreamlab-ai.com/*` | URL metadata extraction with edge caching |
 
 ---
 
-## 1. auth-api (Cloud Run -- Current)
+## 1. auth-api Worker
 
 ### Purpose
 
-WebAuthn registration and authentication with PRF extension support, NIP-98 HTTP auth gating, and Solid pod provisioning via JSS.
+WebAuthn registration and authentication with PRF extension support, NIP-98 HTTP auth gating, and pod provisioning via R2.
 
 ### Endpoints
 
@@ -132,67 +97,18 @@ WebAuthn registration and authentication with PRF extension support, NIP-98 HTTP
 
 | File | Role |
 |------|------|
-| `community-forum/services/auth-api/src/server.ts` | Express app, CORS, raw body capture |
-| `community-forum/services/auth-api/src/webauthn.ts` | Registration/authentication option generators |
-| `community-forum/services/auth-api/src/nip98.ts` | NIP-98 server-side verification |
-| `community-forum/services/auth-api/src/db.ts` | PostgreSQL pool, schema |
-| `community-forum/services/auth-api/src/jss-client.ts` | JSS pod provisioning client |
-| `community-forum/services/auth-api/src/routes/register.ts` | Registration route handlers |
-| `community-forum/services/auth-api/src/routes/authenticate.ts` | Authentication route handlers |
-
-### Database Schema (Cloud SQL -- nostr-db)
-
-```sql
--- WebAuthn credentials
-CREATE TABLE webauthn_credentials (
-  pubkey TEXT PRIMARY KEY,
-  credential_id TEXT NOT NULL,
-  public_key TEXT NOT NULL,
-  counter INTEGER DEFAULT 0,
-  prf_salt TEXT,                    -- Base64url PRF salt (stored at registration)
-  created_at BIGINT NOT NULL
-);
-
--- WebAuthn challenges (short-lived)
-CREATE TABLE challenges (
-  pubkey TEXT NOT NULL,
-  challenge TEXT NOT NULL,
-  created_at BIGINT NOT NULL
-);
-
-CREATE INDEX idx_challenges_pubkey ON challenges(pubkey);
-```
-
-### Configuration
-
-| Env Var | Source | Purpose |
-|---------|--------|---------|
-| `DATABASE_URL` | Secret Manager (`nostr-db-url`) | PostgreSQL connection string |
-| `JSS_BASE_URL` | Secret Manager (`jss-base-url`) | JSS pod server URL |
-| `RP_ID` | Env var | `dreamlab-ai.com` |
-| `RP_NAME` | Env var | `DreamLab Community` |
-| `RP_ORIGIN` | Env var | `https://dreamlab-ai.com` (anti-SSRF) |
-
----
-
-## 2. auth-api Worker (Cloudflare -- Deployed)
-
-### Purpose
-
-Edge-native replacement for the Cloud Run auth-api. Uses D1 for structured data and KV for sessions.
+| `workers/auth-api/index.ts` | Worker entry point, routing, CORS |
 
 ### Implementation (`workers/auth-api/index.ts`)
 
-The Worker handles the same four WebAuthn endpoints plus NIP-98-protected API routes. Key differences from the Cloud Run version:
-
-| Aspect | Cloud Run | Cloudflare Worker |
-|--------|-----------|-------------------|
-| Runtime | Node.js 20 + Express | Cloudflare Workers V8 isolate |
-| Database | PostgreSQL (Cloud SQL) | D1 (SQLite) |
-| Sessions | In-memory / database | KV namespace |
-| Pod provisioning | HTTP call to JSS | Direct R2 write + KV metadata |
-| Cold start | 1--10s | <5ms |
-| Secrets | GCP Secret Manager | Workers secrets (wrangler) |
+| Aspect | Value |
+|--------|-------|
+| Runtime | Cloudflare Workers V8 isolate |
+| Database | D1 (SQLite) |
+| Sessions | KV namespace |
+| Pod provisioning | Direct R2 write + KV metadata |
+| Cold start | <5ms |
+| Secrets | Workers secrets (wrangler) |
 
 ### Bindings (from `wrangler.toml`)
 
@@ -358,162 +274,68 @@ binding = "SEARCH_CONFIG"
 
 ---
 
-## 4. jss -- JavaScript Solid Server (Cloud Run -- Current)
+## 4. nostr-relay Worker
 
 ### Purpose
 
-Solid Community Server providing per-user WebID and pod storage. Each registered user gets a pod at `{jss-url}/{pubkey}/` with a WebID at `{jss-url}/{pubkey}/profile/card#me`.
-
-### Technology
-
-- `@solid/community-server` 7.1.8
-- `node:20-slim` Docker image
-- `entrypoint.sh`: `css --port 8080 --baseUrl $JSS_BASE_URL`
-- Cloud Storage volume mount at `/data/pods` (GCS bucket: `dreamlab-pods`)
-
-### Bootstrap Issue
-
-JSS requires its own URL as `JSS_BASE_URL` before it can start, but that URL only exists after the first deployment. The `jss.yml` workflow includes a bootstrap guard that checks for the `jss-base-url` secret in Secret Manager and fails with instructions if missing.
-
----
-
-## 5. nostr-relay (Cloud Run -- Retained)
-
-### Purpose
-
-WebSocket Nostr relay for real-time messaging in the community forum. Implements NIP-01 (basic protocol), NIP-28 (public channels), and NIP-98 (HTTP auth verification).
+WebSocket Nostr relay for real-time messaging in the community forum. Implements NIP-01 (basic protocol), NIP-28 (public channels), NIP-42 (authentication), and NIP-98 (HTTP auth verification).
 
 ### Architecture
 
 ```mermaid
 graph TB
-    subgraph CloudRun["Cloud Run Container"]
-        WSServer["WebSocket Server<br/>(ws library)"]
-        NIP98MW["NIP-98 Middleware<br/>Verify signed events"]
-        EventHandler["Event Handler<br/>Publish/subscribe"]
+    subgraph CFWorker["Cloudflare Worker"]
+        Router["Request Router"]
+        NIP98MW["NIP-98 Middleware"]
+        EventHandler["Event Handler"]
     end
 
-    subgraph Database["Cloud SQL PostgreSQL"]
-        Events["events table"]
-        Groups["groups table"]
-        Members["group_members"]
+    subgraph DO["Durable Object (NostrRelayDO)"]
+        WSServer["WebSocket Manager<br/>Connection lifecycle"]
+        PubSub["Pub/Sub<br/>Event broadcasting"]
     end
 
-    Client["Community Forum"] -->|WSS| WSServer
+    subgraph Storage["Cloudflare Storage"]
+        D1DB["D1: dreamlab-relay<br/>events, whitelist"]
+    end
+
+    Client["Community Forum"] -->|WSS| Router
+    Router --> DO
+    DO --> WSServer
     WSServer --> NIP98MW
     NIP98MW --> EventHandler
-    EventHandler --> Events
-    EventHandler --> Groups
-    EventHandler --> Members
+    EventHandler --> D1DB
+    EventHandler --> PubSub
+    PubSub --> Client
 ```
 
-### Configuration
+### Key Files
 
-| Setting | Value | Purpose |
-|---------|-------|---------|
-| Memory | 512Mi | Moderate for WebSocket connections |
-| CPU | 1 | Single vCPU |
-| Min instances | 1 | Always-on for reliability |
-| Max instances | 1 | Single instance for consistency |
-| Timeout | 3600s | 1 hour for long-lived WebSocket |
-| CPU throttling | Disabled | Consistent performance for real-time messaging |
-
-### Database Schema
-
-```sql
--- Nostr events
-CREATE TABLE events (
-  id TEXT PRIMARY KEY,          -- Nostr event ID (hex)
-  pubkey TEXT NOT NULL,
-  created_at INTEGER NOT NULL,
-  kind INTEGER NOT NULL,
-  tags JSONB NOT NULL,
-  content TEXT NOT NULL,
-  sig TEXT NOT NULL,
-  deleted BOOLEAN DEFAULT FALSE
-);
-
-CREATE INDEX idx_events_pubkey ON events(pubkey);
-CREATE INDEX idx_events_created_at ON events(created_at DESC);
-CREATE INDEX idx_events_kind ON events(kind);
-CREATE INDEX idx_events_tags ON events USING GIN(tags);
-```
-
-### Retention on Cloud Run (ADR-010)
-
-The relay remains on Cloud Run because persistent WebSocket connections benefit from Cloud Run's 3600s timeout and always-on instance. A future migration to Cloudflare Durable Objects with Hibernation API is under evaluation.
-
----
-
-## 6. embedding-api (Cloud Run -- Retained)
-
-### Purpose
-
-Generate 384-dimensional vector embeddings for semantic search using the `all-MiniLM-L6-v2` model.
-
-### Technology
-
-| Component | Technology |
-|-----------|-----------|
-| Runtime | Python 3.11 |
-| Framework | FastAPI |
-| ML Library | sentence-transformers |
-| WSGI Server | Uvicorn |
-| Build | Cloud Build (`cloudbuild.yaml`) |
-
-### Endpoints
-
-| Endpoint | Method | Request | Response |
-|----------|--------|---------|----------|
-| `/embed` | POST | `{ "texts": ["..."] }` | `{ "embeddings": [[...]], "model": "...", "dimension": 384 }` |
-| `/health` | GET | - | `{ "status": "healthy", "model_loaded": true }` |
+| File | Role |
+|------|------|
+| `workers/nostr-relay/index.ts` | Worker entry point, Durable Object binding |
 
 ### Performance
 
 | Metric | Value |
 |--------|-------|
-| Single text latency | ~50ms |
-| Batch of 32 | ~200ms |
-| Memory usage | ~500MB |
-| Cold start | ~5s (model loading) |
-
-### Retention on Cloud Run (ADR-010)
-
-ML inference requires more CPU and memory than Cloudflare Workers provide (30s CPU limit, no GPU).
+| Cold start | <5ms (Worker) |
+| WebSocket state | Durable Objects with Hibernation API |
+| Event storage | D1 (SQLite) |
 
 ---
 
-## 7. image-api (Cloud Run -- Current)
+## 5. link-preview Worker
 
 ### Purpose
 
-Image upload, resizing, and serving with NIP-98 authentication for the community forum.
+URL metadata extraction (title, description, Open Graph tags, favicon) for link previews in forum messages. Responses cached via Cloudflare Cache API.
 
-### Technology
+### Key Files
 
-| Component | Technology |
-|-----------|-----------|
-| Runtime | Node.js 20 |
-| Framework | Express |
-| Image Processing | Sharp |
-| Storage | Google Cloud Storage (minimoonoir-images) |
-
-### Endpoints
-
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/upload` | POST | Upload image (multipart, NIP-98 auth) |
-| `/image/:id` | GET | Retrieve processed image |
-| `/image/:id/thumb` | GET | Retrieve thumbnail |
-| `/health` | GET | Health check |
-
----
-
-## 8. link-preview-api (Cloud Run -- Current)
-
-### Purpose
-
-URL metadata extraction (title, description, Open Graph tags, favicon) for link previews in forum messages.
+| File | Role |
+|------|------|
+| `workers/link-preview-api/index.ts` | Worker entry point, fetch + parse + cache |
 
 ---
 
@@ -622,58 +444,43 @@ A separate, lighter implementation for Cloudflare Workers that:
 
 ---
 
-## Cloud Run Shared Configuration
+## Cloudflare Configuration
 
-### GCP Project
+### Account Resources
 
-| Setting | Value |
-|---------|-------|
-| Project ID | `cumbriadreamlab` |
-| Region | `us-central1` |
-| Artifact Registry | `minimoonoir` repository |
-| Cloud SQL Instance | `nostr-db` |
-| Service Account | `fairfield-applications@cumbriadreamlab.iam.gserviceaccount.com` |
+| Resource | Type | Purpose |
+|----------|------|---------|
+| `dreamlab-auth` | D1 Database | WebAuthn credentials and challenges |
+| `dreamlab-relay` | D1 Database | Nostr events and whitelist |
+| `SESSIONS` | KV Namespace | Session metadata |
+| `POD_META` | KV Namespace | Pod ACL metadata cache |
+| `CONFIG` | KV Namespace | Application configuration |
+| `SEARCH_CONFIG` | KV Namespace | Search index configuration |
+| `dreamlab-pods` | R2 Bucket | Pod file storage |
+| `dreamlab-vectors` | R2 Bucket | Vector index persistence |
+| `NostrRelayDO` | Durable Object | WebSocket connection state |
 
-### Secret Manager Secrets
+### Worker Secrets (via `wrangler secret put`)
 
 | Secret | Used By |
 |--------|---------|
-| `nostr-db-url` | auth-api, nostr-relay |
-| `admin-pubkey` | nostr-relay |
-| `jss-base-url` | auth-api, jss |
+| `ADMIN_PUBKEYS` | nostr-relay |
 
 ---
 
 ## Cost Profile
 
-### Current Monthly Costs (Approximate)
+### Monthly Costs (Approximate)
 
 | Service | Cost |
 |---------|------|
 | Supabase (free tier) | $0 |
-| Cloud Run (auth-api, 0--3 instances) | ~$3 |
-| Cloud Run (jss, 0--2 instances) | ~$5 |
-| Cloud Run (nostr-relay, 1 always-on) | ~$15 |
-| Cloud Run (embedding-api, scale-to-zero) | ~$3 |
-| Cloud Run (image-api, scale-to-zero) | ~$2 |
-| Cloud Run (link-preview-api) | ~$1 |
-| Cloud SQL (nostr-db) | ~$10 |
-| Cloud Storage | ~$1 |
-| Artifact Registry | ~$1 |
-| **Total** | **~$41/month** |
-
-### Projected Cloudflare Costs (Post-Migration)
-
-| Service | Cost |
-|---------|------|
 | Cloudflare Workers paid plan | $5/month |
-| D1 (included in paid plan) | $0 |
+| D1 (included in paid plan, 5GB) | $0 |
 | KV (included in paid plan) | $0 |
 | R2 (10GB free, then $0.015/GB) | ~$1 |
-| Cloud Run (relay, 1 always-on) | ~$15 |
-| Cloud Run (embedding-api) | ~$3 |
-| Cloud SQL | ~$10 |
-| **Projected Total** | **~$34/month** |
+| Durable Objects (included in paid plan) | $0 |
+| **Total** | **~$6/month** |
 
 ---
 
@@ -689,4 +496,4 @@ A separate, lighter implementation for Cloudflare Workers that:
 
 **Document Owner**: Backend Team
 **Review Cycle**: Quarterly
-**Last Review**: 2026-03-01
+**Last Review**: 2026-03-02

@@ -1,10 +1,10 @@
 # Embedding Service API
 
-**Last Updated:** 2026-03-01
+**Last Updated:** 2026-03-02
 
-The embedding service provides vector embeddings for semantic search capabilities in the DreamLab AI community forum. Embeddings are pre-computed and stored in Google Cloud Storage, then synced to client devices for local similarity search.
+> **DEPRECATED:** The GCP Cloud Run embedding-api has been deleted as of 2026-03-02. Embeddings are now served by the search-api Cloudflare Worker at `workers/search-api/index.ts` via the `/embed` endpoint (deployed at `https://dreamlab-search-api.solitary-paper-764d.workers.dev`). Client-side WASM search via `rvf-wasm` (`community-forum/packages/rvf-wasm/`) provides complementary local TF-IDF search.
 
-> **Migration note:** This service is retained on GCP Cloud Run per ADR-010 (ML inference requires CPU/memory beyond Cloudflare Workers limits). Client-side WASM search via `rvf-wasm` (`community-forum/packages/rvf-wasm/`) provides a complementary local TF-IDF search capability that does not depend on this service.
+The embedding service previously provided vector embeddings for semantic search capabilities in the DreamLab AI community forum. This functionality is now handled by the search-api Worker using a 42KB WASM microkernel (`@ruvector/rvf-wasm`) with HNSW indexing, R2-backed persistence, and sub-millisecond query latency.
 
 ---
 

@@ -1,6 +1,6 @@
 # Data Flow Architecture -- DreamLab AI
 
-**Last Updated**: 2026-02-28
+**Last Updated**: 2026-03-02
 **Status**: Production
 
 ## Overview
@@ -38,10 +38,10 @@ flowchart TB
     end
 
     subgraph Storage["Storage Layer"]
-        CloudSQL["Cloud SQL<br/>PostgreSQL"]
-        GCS["Cloud Storage"]
+        D1DB["Cloudflare D1"]
+        R2["R2 Buckets"]
         SupabaseDB["Supabase DB"]
-        R2["R2 Bucket<br/>(deployed)"]
+        KV["KV Namespaces"]
     end
 
     Browser -->|HTTP GET| React
@@ -57,9 +57,8 @@ flowchart TB
     Svelte -->|HTTPS| LinkAPI
 
     Supabase --> SupabaseDB
-    AuthAPI --> CloudSQL
-    Relay --> CloudSQL
-    ImageAPI --> GCS
+    AuthAPI --> D1DB
+    Relay --> D1DB
 ```
 
 ---
@@ -427,10 +426,10 @@ flowchart TB
     end
 
     subgraph Forum["Forum Data"]
-        Events["Cloud SQL PostgreSQL<br/>(Nostr events, groups, members)"]
-        Credentials["Cloud SQL / D1<br/>(webauthn_credentials, challenges)"]
-        Pods["JSS / R2<br/>(Solid pods per user)"]
-        Images["Cloud Storage / R2<br/>(uploaded images)"]
+        Events["D1: dreamlab-relay<br/>(Nostr events, whitelist)"]
+        Credentials["D1: dreamlab-auth<br/>(webauthn_credentials, challenges)"]
+        Pods["R2: dreamlab-pods<br/>(Solid pods per user)"]
+        Images["R2: dreamlab-pods<br/>(uploaded images)"]
     end
 
     subgraph Derived["Derived/Cached"]
@@ -455,36 +454,25 @@ flowchart TB
 | Workshop content | Markdown in `public/data/workshops/` | CDN via workshop-list.json | Build-time | Read-only, route-based |
 | Email signups | Contact form | Supabase | Indefinite | Insert (public), read (admin) |
 | Contact forms | Contact page | Supabase | Indefinite | Insert (public), read (admin) |
-| WebAuthn credentials | Registration | Cloud SQL / D1 | Indefinite | Write once, read on login |
-| Challenges | Auth flow | Cloud SQL / D1 | Short-lived | Write, read once, delete |
-| Nostr events | Forum messages | Cloud SQL | Indefinite | Write (publish), read (subscribe) |
-| Solid pods | Registration | JSS / R2 | Indefinite | CRUD (owner), read (public profile) |
-| Uploaded images | Forum posts | Cloud Storage / R2 | Indefinite | Write (upload), read (display) |
+| WebAuthn credentials | Registration | D1 (dreamlab-auth) | Indefinite | Write once, read on login |
+| Challenges | Auth flow | D1 (dreamlab-auth) | Short-lived | Write, read once, delete |
+| Nostr events | Forum messages | D1 (dreamlab-relay) | Indefinite | Write (publish), read (subscribe) |
+| Solid pods | Registration | R2 (dreamlab-pods) | Indefinite | CRUD (owner), read (public profile) |
+| Uploaded images | Forum posts | R2 (dreamlab-pods) | Indefinite | Write (upload), read (display) |
 | Embeddings | Nostr events | In-memory / cached | Session | Compute on demand |
 
-### Pod Storage Flow (Current JSS vs Planned R2)
+### Pod Storage Flow (Cloudflare Workers + R2)
 
 ```mermaid
 flowchart LR
-    subgraph Current["Current (JSS on Cloud Run)"]
-        JSSClient["auth-api jss-client.ts"]
-        CSS["@solid/community-server"]
-        GCSMount["GCS volume mount<br/>/data/pods"]
+    AuthWorker["auth-api Worker"]
+    R2Bucket["R2 bucket<br/>dreamlab-pods"]
+    KVACL["KV: acl:{pubkey}"]
+    KVMeta["KV: meta:{pubkey}"]
 
-        JSSClient -->|POST /idp/register/| CSS
-        CSS --> GCSMount
-    end
-
-    subgraph Planned["Planned (Workers + R2)"]
-        AuthWorker["auth-api Worker"]
-        R2Bucket["R2 bucket<br/>dreamlab-pods"]
-        KVACL["KV: acl:{pubkey}"]
-        KVMeta["KV: meta:{pubkey}"]
-
-        AuthWorker -->|R2 PUT| R2Bucket
-        AuthWorker -->|KV PUT| KVACL
-        AuthWorker -->|KV PUT| KVMeta
-    end
+    AuthWorker -->|R2 PUT| R2Bucket
+    AuthWorker -->|KV PUT| KVACL
+    AuthWorker -->|KV PUT| KVMeta
 ```
 
 ---
@@ -631,4 +619,4 @@ flowchart TB
 
 **Document Owner**: Architecture Team
 **Review Cycle**: Quarterly
-**Last Review**: 2026-02-28
+**Last Review**: 2026-03-02

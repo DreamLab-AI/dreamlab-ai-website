@@ -1,19 +1,19 @@
 # DreamLab AI System Architecture Overview
 
-**Last Updated**: 2026-03-01
-**Version**: 2.1.0
-**Status**: Production (GCP + GitHub Pages) + Workers Deployed (Cloudflare)
+**Last Updated**: 2026-03-02
+**Version**: 3.0.0
+**Status**: Production (Cloudflare Workers + GitHub Pages) -- Zero GCP
 
 ## Executive Summary
 
-DreamLab AI is a premium AI training and consulting platform comprising two frontend applications (React SPA and SvelteKit community forum) deployed on GitHub Pages, six backend services on GCP Cloud Run, and three Cloudflare Workers (auth-api, pod-api, search-api) deployed per ADR-010. The platform serves operations leaders, founders, and technical teams through residential masterclasses, corporate workshops, and bespoke consulting services.
+DreamLab AI is a premium AI training and consulting platform comprising two frontend applications (React SPA and SvelteKit community forum) deployed on GitHub Pages, and five Cloudflare Workers (auth-api, pod-api, search-api, nostr-relay, link-preview) providing all backend services. All GCP infrastructure has been deleted as of 2026-03-02.
 
 **Key Metrics**:
 - 44+ team member profiles
 - 14 route pages (main site) + 21 route pages (community forum)
 - 50+ shadcn/ui primitives
-- 6 GCP Cloud Run backend services (current)
-- 3 Cloudflare Workers (auth-api, pod-api, search-api) deployed at `*.solitary-paper-764d.workers.dev`
+- 5 Cloudflare Workers at `*.solitary-paper-764d.workers.dev`
+- Storage: D1, KV, R2, Durable Objects, Cache API
 - Consolidated NIP-98 module shared across 4 consumers
 
 ---
@@ -31,14 +31,19 @@ graph TB
         CommunityApp["Community Forum<br/>dreamlab-ai.com/community"]
     end
 
-    subgraph GCP["GCP Cloud Run (us-central1)"]
-        AuthAPI["auth-api<br/>Express + WebAuthn"]
-        JSS["JSS<br/>Solid Pod Server"]
-        Relay["nostr-relay<br/>WebSocket + NIP-01/28/98"]
-        EmbedAPI["embedding-api<br/>Python + sentence-transformers"]
-        ImageAPI["image-api<br/>Node.js + Sharp"]
-        LinkPreview["link-preview-api<br/>URL metadata"]
-        CloudSQL["Cloud SQL<br/>PostgreSQL (nostr-db)"]
+    subgraph CF["Cloudflare Workers (5 services)"]
+        CFAuth["auth-api Worker<br/>D1 + KV"]
+        CFPod["pod-api Worker<br/>R2 + KV + WAC"]
+        CFSearch["search-api Worker<br/>WASM + R2 + KV"]
+        CFRelay["nostr-relay Worker<br/>D1 + Durable Objects"]
+        CFLink["link-preview Worker<br/>Cache API"]
+    end
+
+    subgraph CFStorage["Cloudflare Storage"]
+        D1["D1 Databases<br/>(dreamlab-auth, dreamlab-relay)"]
+        KV["KV Namespaces<br/>(SESSIONS, POD_META, CONFIG, SEARCH_CONFIG)"]
+        R2["R2 Buckets<br/>(dreamlab-pods, dreamlab-vectors)"]
+        DO["Durable Objects<br/>(NostrRelayDO)"]
     end
 
     subgraph Supabase["Supabase Cloud"]
@@ -46,25 +51,12 @@ graph TB
         SupabaseAuth["Authentication"]
     end
 
-    subgraph CF["Cloudflare Workers (deployed)"]
-        CFAuth["auth-api Worker<br/>D1 + KV"]
-        CFPod["pod-api Worker<br/>R2 + KV + WAC"]
-        CFSearch["search-api Worker<br/>WASM + R2 + KV"]
-        D1["D1 Database<br/>(dreamlab-auth)"]
-        KV["KV Namespaces<br/>(SESSIONS, POD_META, CONFIG, SEARCH_CONFIG)"]
-        R2["R2 Buckets<br/>(dreamlab-pods, dreamlab-vectors)"]
-    end
-
     Browser --> MainSite
     Browser --> CommunityApp
-    CommunityApp -->|WSS| Relay
-    CommunityApp -->|HTTPS| AuthAPI
-    CommunityApp -->|HTTPS| ImageAPI
-    CommunityApp -->|HTTPS| EmbedAPI
-    CommunityApp -->|HTTPS| LinkPreview
-    AuthAPI --> JSS
-    AuthAPI --> CloudSQL
-    Relay --> CloudSQL
+    CommunityApp -->|WSS| CFRelay
+    CommunityApp -->|HTTPS| CFAuth
+    CommunityApp -->|HTTPS| CFSearch
+    CommunityApp -->|HTTPS| CFLink
     MainSite -->|HTTPS| SupabaseDB
     MainSite -->|HTTPS| SupabaseAuth
 
@@ -74,6 +66,8 @@ graph TB
     CFPod --> KV
     CFSearch --> R2
     CFSearch --> KV
+    CFRelay --> D1
+    CFRelay --> DO
 ```
 
 ---
@@ -82,7 +76,7 @@ graph TB
 
 | Principle | Implementation | Rationale |
 |-----------|----------------|-----------|
-| **Serverless-First** | GitHub Pages + Cloud Run + Workers | Zero infrastructure management, automatic scaling |
+| **Serverless-First** | GitHub Pages + Cloudflare Workers | Zero infrastructure management, automatic scaling |
 | **Edge-Optimised** | Cloudflare Workers (deployed) at 300+ PoPs | Sub-5ms cold starts, global low latency |
 | **Security by Design** | WebAuthn PRF + NIP-98 + WAC | Passwordless auth, cryptographic HTTP auth, access control |
 | **Decentralised Identity** | Nostr pubkey + did:nostr + WebID | User-owned keys, no centralised identity provider |
@@ -164,8 +158,7 @@ graph TB
 | **Nostr Crypto** | nostr-tools | 2.19.3 | Event signing/verification |
 | **Type Safety** | TypeScript | 5.5.3 | Static typing |
 | **Backend (Main)** | Supabase | 2.49.4 | Database, auth |
-| **Backend (Forum)** | GCP Cloud Run | - | 6 containerised services |
-| **Backend (Deployed)** | Cloudflare Workers | - | Edge compute (D1/KV/R2), WASM search |
+| **Backend (Forum)** | Cloudflare Workers | - | 5 edge-native services (D1/KV/R2/DO) |
 | **Deployment** | GitHub Pages | - | Static hosting |
 | **CI/CD** | GitHub Actions | - | Automated deployment |
 
@@ -199,25 +192,16 @@ graph TB
 - Solid pod storage per user (WebID + Linked Data)
 - Admin approval flow for new registrations
 
-### 3. Backend Services
+### 3. Backend Services (Cloudflare Workers)
 
-| Service | Platform | Technology | Purpose | Endpoint |
-|---------|----------|-----------|---------|----------|
-| **auth-api** | Cloud Run | Express 4.19 + @simplewebauthn/server 10.0 | WebAuthn + NIP-98 + pod provisioning | HTTPS |
-| **jss** | Cloud Run | @solid/community-server 7.1.8 | Solid pod storage (WebID) | HTTPS |
-| **nostr-relay** | Cloud Run | Node.js + ws + pg 8.12 | WebSocket Nostr relay | WSS |
-| **embedding-api** | Cloud Run | Python 3.11 + FastAPI + sentence-transformers | Vector embeddings (384-dim) | HTTPS |
-| **image-api** | Cloud Run | Node.js + Sharp | Image upload/resize with NIP-98 | HTTPS |
-| **link-preview-api** | Cloud Run | Node.js | URL metadata extraction | HTTPS |
-| **Supabase** | Managed | PostgreSQL + Auth | Main site database | Managed |
-
-### 4. Cloudflare Workers (Deployed, ADR-010)
-
-| Worker | Storage | Replaces | Status |
-|--------|---------|----------|--------|
-| **auth-api** | D1 + KV (SESSIONS) | Cloud Run auth-api | Deployed at `dreamlab-auth-api.solitary-paper-764d.workers.dev` |
-| **pod-api** | R2 (PODS) + KV (POD_META) | Cloud Run JSS | Deployed at `dreamlab-pod-api.solitary-paper-764d.workers.dev` |
-| **search-api** | R2 (dreamlab-vectors) + KV (SEARCH_CONFIG) | New service (WASM vector search) | Deployed at `dreamlab-search-api.solitary-paper-764d.workers.dev` |
+| Service | Storage | Purpose | URL |
+|---------|---------|---------|-----|
+| **auth-api** | D1 + KV | WebAuthn + NIP-98 + pod provisioning | `dreamlab-auth-api.solitary-paper-764d.workers.dev` |
+| **pod-api** | R2 + KV | Solid pod storage with WAC | `dreamlab-pod-api.solitary-paper-764d.workers.dev` |
+| **search-api** | R2 + KV + WASM | Vector similarity search (42KB rvf-wasm) | `dreamlab-search-api.solitary-paper-764d.workers.dev` |
+| **nostr-relay** | D1 + Durable Objects | WebSocket Nostr relay (NIP-01/28/42/98) | `dreamlab-nostr-relay.solitary-paper-764d.workers.dev` |
+| **link-preview** | Cache API | URL metadata extraction | Workers route |
+| **Supabase** | Managed PostgreSQL + Auth | Main site database | Managed |
 
 ---
 
@@ -245,7 +229,7 @@ WebAuthn PRF output (32 bytes, HMAC-SHA-256 from authenticator)
 | **Encryption** | NIP-44 | End-to-end encrypted DMs |
 | **Input Validation** | Zod schemas | Form + API boundary validation |
 | **Sanitisation** | DOMPurify 3.3 | HTML/markdown rendering |
-| **Secrets Management** | GitHub Secrets + GCP Secret Manager | No secrets in client code |
+| **Secrets Management** | GitHub Secrets + Wrangler secrets | No secrets in client code |
 
 ### Threat Model
 
@@ -341,17 +325,17 @@ graph TB
     ImageSvc --> GCS
 ```
 
-### Cloudflare Migration (ADR-010 -- Deployed)
+### Zero-GCP Migration (ADR-010 -- Complete)
 
-| Service | Current | Target | Storage | Status |
-|---------|---------|--------|---------|--------|
-| auth-api | Cloud Run (Express) | Cloudflare Workers | D1 + KV | Deployed |
-| jss (pod-api) | Cloud Run (CSS 7.x) | Cloudflare Workers | R2 + KV | Deployed |
-| search-api | New | Cloudflare Workers | R2 + KV + WASM | Deployed |
-| image-api | Cloud Run (Node.js) | Cloudflare Workers | R2 | Planned |
-| link-preview-api | Cloud Run | Cloudflare Workers | Stateless | Planned |
-| nostr-relay | Cloud Run | **Retained on Cloud Run** | Cloud SQL | N/A |
-| embedding-api | Cloud Run | **Retained on Cloud Run** | Cloud Build | N/A |
+All services migrated to Cloudflare as of 2026-03-02. GCP infrastructure deleted.
+
+| Service | Previous | Current | Storage |
+|---------|----------|---------|---------|
+| auth-api | Cloud Run (Express) | Cloudflare Workers | D1 + KV |
+| pod-api (was jss) | Cloud Run (CSS 7.x) | Cloudflare Workers | R2 + KV |
+| search-api | New | Cloudflare Workers | R2 + KV + WASM |
+| nostr-relay | Cloud Run | Cloudflare Workers + Durable Objects | D1 + DO |
+| link-preview | Cloud Run | Cloudflare Workers | Cache API |
 
 ---
 
@@ -361,7 +345,7 @@ graph TB
 |-------------|------|----------------|
 | Frontend Performance | Web Vitals API | FCP, LCP, CLS, FID |
 | Error Tracking | Browser console | JS errors, network failures |
-| Backend Performance | Cloud Run metrics | Request latency, error rates, CPU, memory |
+| Backend Performance | Cloudflare Workers Analytics | Request latency, error rates, CPU time |
 | Database Performance | Supabase dashboard | Query performance, connections |
 | Deployment Status | GitHub Actions | Workflow success/failure, build times |
 
@@ -380,4 +364,4 @@ graph TB
 
 **Document Owner**: Architecture Team
 **Review Cycle**: Quarterly
-**Last Review**: 2026-03-01
+**Last Review**: 2026-03-02

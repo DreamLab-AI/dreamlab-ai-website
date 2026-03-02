@@ -30,7 +30,7 @@ This architecture implements a decentralized chat system built on Nostr protocol
 | Decision | Rationale |
 |----------|-----------|
 | **SvelteKit Framework** | Smallest runtime (~15KB), compile-time reactivity, NDK integration |
-| **GCP Cloud Run Relay** (retained) | Container-based, persistent WebSocket connections, Cloud SQL storage |
+| **Cloudflare Workers Relay** | Edge-native, Durable Objects for WebSocket state, D1 for event storage |
 | **No Federation** | Enables true message deletion, full privacy control |
 | **Direct Key Generation** | crypto.getRandomValues for instant nsec creation |
 | **Hierarchical Topology** | Zone → Section → Forum provides clear structure |
@@ -355,20 +355,20 @@ interface NostrBBSDB {
 
 | Component | Technology | Rationale |
 |-----------|------------|-----------|
-| Core Relay | Node.js + Express + WS | WebSocket support, npm ecosystem |
-| Storage | PostgreSQL (Cloud SQL) | ACID compliance, pgvector for semantic search |
+| Core Relay | Cloudflare Workers + Durable Objects | WebSocket support, edge-native |
+| Storage | D1 (SQLite) | Event storage, whitelist |
 | Group Logic | Custom NIP-29 impl | Full control over group features |
-| Hosting | Google Cloud Run | Auto-scaling containers, managed infrastructure |
+| Hosting | Cloudflare Workers | Global edge deployment, <5ms cold start |
 
 ### Infrastructure
 
 | Component | Technology | Rationale |
 |-----------|------------|-----------|
 | PWA Hosting | GitHub Pages | Free, fast CDN, simple deployment |
-| Relay Hosting | GCP Cloud Run (retained) | Container-based, persistent WebSockets. auth-api, pod-api, search-api migrated to Cloudflare Workers. |
-| Database | Cloud SQL PostgreSQL | Managed DB, automatic backups, pgvector |
-| File Storage | Google Cloud Storage / Cloudflare R2 (target) | Media files, vector indices. R2 for pod and image storage in Workers migration. |
-| Monitoring | Cloud Logging + Monitoring | Built-in GCP observability (retained services) |
+| Relay Hosting | Cloudflare Workers + Durable Objects | Edge-native WebSocket relay |
+| Database | Cloudflare D1 (SQLite) | Managed, replicated, zero-ops |
+| File Storage | Cloudflare R2 | Media files, vector indices, pod storage |
+| Monitoring | Cloudflare Workers Analytics + Logpush | Built-in edge observability |
 
 ---
 

@@ -2,7 +2,7 @@
 
 **Last Updated:** 2026-03-01
 
-Comprehensive security architecture for the DreamLab AI platform (dreamlab-ai.com): a React SPA with SvelteKit community forum, backend services on GCP Cloud Run (auth-api, pod-api, search-api migrated to Cloudflare Workers), and WebAuthn PRF-based authentication.
+Comprehensive security architecture for the DreamLab AI platform (dreamlab-ai.com): a React SPA with SvelteKit community forum, 5 Cloudflare Workers backend services (zero GCP as of 2026-03-02), and WebAuthn PRF-based authentication.
 
 ---
 
@@ -60,7 +60,7 @@ Comprehensive security architecture for the DreamLab AI platform (dreamlab-ai.co
                             |
 +---------------------------------------------------------------+
 | Layer 5: Transport and Network                                |
-| - HTTPS for all web traffic (GitHub Pages + Cloud Run)        |
+| - HTTPS for all web traffic (GitHub Pages + Cloudflare Workers)|
 | - WebSocket Secure (WSS) for relay connections                |
 | - Content Security Policy headers                             |
 | - Strict CORS configuration per service                       |
@@ -227,7 +227,7 @@ Content-Security-Policy:
   script-src 'self' 'wasm-unsafe-eval';
   style-src 'self' 'unsafe-inline';
   img-src 'self' data: https:;
-  connect-src 'self' wss://*.dreamlab-ai.com https://*.run.app;
+  connect-src 'self' wss://*.dreamlab-ai.com https://*.workers.dev;
   frame-ancestors 'none';
   base-uri 'self';
   form-action 'self';

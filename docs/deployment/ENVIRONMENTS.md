@@ -1,6 +1,6 @@
 # Environment Configuration
 
-**Last Updated:** 2026-02-28
+**Last Updated:** 2026-03-02
 
 Development, staging, and production environment setup for the DreamLab AI platform.
 
@@ -10,13 +10,13 @@ Development, staging, and production environment setup for the DreamLab AI platf
 
 | Aspect | Development | Staging | Production |
 |--------|-------------|---------|-----------|
-| **Location** | Local machine | Not configured | GitHub Pages + Cloudflare Workers + GCP Cloud Run |
+| **Location** | Local machine | Not configured | GitHub Pages + Cloudflare Workers |
 | **Main site** | `npm run dev` (localhost:5173) | -- | https://dreamlab-ai.com |
 | **Forum** | `npm run dev` (localhost:5174) | -- | https://dreamlab-ai.com/community |
-| **Backend** | Local services (optional) | -- | Cloud Run (us-central1) |
-| **Database** | Local PostgreSQL (optional) | -- | Cloud SQL |
+| **Backend** | Local services (optional) | -- | Cloudflare Workers |
+| **Database** | Local SQLite (optional) | -- | D1 + KV + R2 |
 | **Build time** | ~1 min | -- | 5-10 min |
-| **Cost** | Free | -- | ~$50-100/month |
+| **Cost** | Free | -- | ~$6/month |
 
 ---
 
@@ -53,18 +53,15 @@ Create `.env` in the project root:
 ```env
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key-here
-VITE_AUTH_API_URL=https://auth-api-xxx-uc.a.run.app
+VITE_AUTH_API_URL=https://dreamlab-auth-api.solitary-paper-764d.workers.dev
 ```
 
 Create `.env` in `community-forum/`:
 
 ```env
-VITE_AUTH_API_URL=https://auth-api-xxx-uc.a.run.app
-VITE_RELAY_URL=wss://nostr-relay-xxx.run.app
-VITE_EMBEDDING_API_URL=https://embedding-api-xxx.run.app
-VITE_LINK_PREVIEW_API_URL=https://link-preview-xxx.run.app
-VITE_IMAGE_API_URL=https://image-api-xxx.run.app
-VITE_IMAGE_BUCKET=minimoonoir-images
+VITE_AUTH_API_URL=https://dreamlab-auth-api.solitary-paper-764d.workers.dev
+VITE_RELAY_URL=wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev
+VITE_SEARCH_API_URL=https://dreamlab-search-api.solitary-paper-764d.workers.dev
 VITE_ADMIN_PUBKEY=<admin-pubkey-hex>
 ```
 
@@ -83,27 +80,23 @@ npm run dev
 
 The main site dev server automatically runs `scripts/generate-workshop-list.mjs` before starting.
 
-### Running Backend Services Locally (Optional)
+### Running Backend Workers Locally (Optional)
 
 ```bash
-# auth-api
-cd community-forum/services/auth-api
-npm install
-# Create .env with DATABASE_URL, RP_ID, RP_NAME, RP_ORIGIN, RELAY_URL
-npm run dev
-# Serves at http://localhost:8080
+# auth-api Worker
+cd workers/auth-api
+npx wrangler dev
+# Serves at http://localhost:8787
 
-# nostr-relay
-cd community-forum/services/nostr-relay
-npm install
-npm run dev
-# Serves at ws://localhost:8080
+# pod-api Worker
+cd workers/pod-api
+npx wrangler dev
+# Serves at http://localhost:8788
 
-# embedding-api
-cd community-forum/services/embedding-api
-pip install -r requirements.txt
-python -m uvicorn main:app --reload --port 8081
-# Serves at http://localhost:8081
+# search-api Worker
+cd workers/search-api
+npx wrangler dev
+# Serves at http://localhost:8789
 ```
 
 ### Building and Previewing
@@ -128,7 +121,7 @@ A staging environment is not currently configured. To add one:
 1. Create a GitHub environment named `staging` in repository settings
 2. Add environment-specific secrets and variables
 3. Modify `deploy.yml` to include a staging deployment job with environment protection rules
-4. Deploy backend services as separate Cloud Run revisions with staging-specific configuration
+4. Deploy backend Workers with staging-specific wrangler configuration
 
 ---
 
@@ -144,19 +137,16 @@ A staging environment is not currently configured. To add one:
 | pod-api | Cloudflare Worker | `dreamlab-pod-api.solitary-paper-764d.workers.dev` |
 | search-api | Cloudflare Worker | `dreamlab-search-api.solitary-paper-764d.workers.dev` |
 | nostr-relay | Cloudflare Worker + D1 + DO | `dreamlab-nostr-relay.solitary-paper-764d.workers.dev` |
-| jss | Cloud Run | `https://jss-<hash>-uc.a.run.app` |
-| embedding-api | Cloud Run | `https://embedding-api-<hash>-uc.a.run.app` |
-| image-api | Cloud Run | `https://image-api-<hash>-uc.a.run.app` |
-| Database | D1 (relay), Cloud SQL (legacy) | `dreamlab-relay`, `cumbriadreamlab:us-central1:nostr-db` |
-| Images | Cloud Storage | `gs://minimoonoir-images` |
-| Pods | Cloud Storage | `gs://dreamlab-pods` |
+| Database | D1 | `dreamlab-auth`, `dreamlab-relay` |
+| Pod storage | R2 | `dreamlab-pods` |
+| Vector storage | R2 | `dreamlab-vectors` |
 
 ### Deployment Process
 
 1. Push to `main` branch (or merge PR)
 2. GitHub Actions workflows trigger automatically
 3. Static site builds and deploys to `gh-pages` branch (5-10 min)
-4. Backend services build, push Docker images, and deploy to Cloud Run (3-5 min each, triggered only by path changes)
+4. Workers deploy via `workers-deploy.yml` (2-3 min, triggered by changes in `workers/`)
 
 ### Production Secrets
 
@@ -166,17 +156,15 @@ A staging environment is not currently configured. To add one:
 |--------|---------|
 | `VITE_SUPABASE_URL` | Supabase project URL |
 | `VITE_SUPABASE_ANON_KEY` | Supabase anonymous key |
-| `VITE_AUTH_API_URL` | Auth API Cloud Run URL |
-| `GCP_PROJECT_ID` | `cumbriadreamlab` |
-| `GCP_SA_KEY` | Service account JSON key |
+| `VITE_AUTH_API_URL` | Auth API Cloudflare Workers URL |
+| `CLOUDFLARE_API_TOKEN` | Cloudflare API token |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare account ID |
 
-**GCP Secret Manager**:
+**Cloudflare Workers Secrets** (via `wrangler secret put`):
 
 | Secret | Purpose |
 |--------|---------|
-| `nostr-db-url` | PostgreSQL connection string |
-| `jss-base-url` | JSS Cloud Run URL |
-| `admin-pubkey` | Admin Nostr pubkeys |
+| `ADMIN_PUBKEYS` | Admin Nostr pubkeys |
 
 ### Environment Variables Reference
 
@@ -188,25 +176,15 @@ A staging environment is not currently configured. To add one:
 | `VITE_SUPABASE_ANON_KEY` | Yes | Supabase anonymous API key |
 | `VITE_AUTH_API_URL` | Yes | Auth API base URL |
 
-#### auth-api (runtime)
+#### auth-api Worker (wrangler.toml vars)
 
 | Variable | Required | Source | Description |
 |----------|---------|--------|-------------|
-| `DATABASE_URL` | Yes | Secret Manager | PostgreSQL connection string |
-| `RELAY_URL` | Yes | Env var | Nostr relay WebSocket URL |
-| `RP_ID` | Yes | Env var | WebAuthn relying party ID (`dreamlab-ai.com`) |
-| `RP_NAME` | Yes | Env var | WebAuthn relying party name |
-| `RP_ORIGIN` | Yes | Env var | Expected origin (`https://dreamlab-ai.com`) |
-| `JSS_BASE_URL` | No | Secret Manager | JSS URL for pod provisioning |
-| `NODE_ENV` | No | Env var | `production` |
-| `PORT` | No | Env var | Default `8080` |
-
-#### jss (runtime)
-
-| Variable | Required | Source | Description |
-|----------|---------|--------|-------------|
-| `JSS_BASE_URL` | Yes | Secret Manager | Own Cloud Run URL |
-| `NODE_ENV` | No | Env var | `production` |
+| `RP_ID` | Yes | wrangler.toml `[vars]` | WebAuthn relying party ID (`dreamlab-ai.com`) |
+| `RP_NAME` | Yes | wrangler.toml `[vars]` | WebAuthn relying party name |
+| `EXPECTED_ORIGIN` | Yes | wrangler.toml `[vars]` | Expected origin (`https://dreamlab-ai.com`) |
+| `DB` | Yes | D1 binding | `dreamlab-auth` D1 database |
+| `SESSIONS` | Yes | KV binding | Session KV namespace |
 
 #### nostr-relay (Cloudflare Worker — wrangler.toml vars)
 
@@ -224,10 +202,9 @@ A staging environment is not currently configured. To add one:
 |----------|---------|-------------|
 | `BASE_PATH` | Yes | `/community` |
 | `VITE_RELAY_URL` | Yes | Nostr relay WebSocket URL |
-| `VITE_EMBEDDING_API_URL` | Yes | Embedding service URL |
-| `VITE_LINK_PREVIEW_API_URL` | Yes | Link preview service URL |
-| `VITE_IMAGE_API_URL` | Yes | Image service URL |
-| `VITE_IMAGE_BUCKET` | Yes | GCS bucket name |
+| `VITE_POD_API_URL` | Yes | Pod-api Worker URL |
+| `VITE_SEARCH_API_URL` | Yes | Search-api Worker URL |
+| `VITE_LINK_PREVIEW_API_URL` | Yes | Link-preview Worker URL |
 | `VITE_IMAGE_ENCRYPTION_ENABLED` | No | `true` to enable |
 | `VITE_ADMIN_PUBKEY` | Yes | Admin Nostr pubkey (hex) |
 | `VITE_APP_NAME` | No | `DreamLab Community` |
@@ -244,8 +221,8 @@ curl -s -o /dev/null -w "%{http_code}" https://dreamlab-ai.com
 # auth-api
 curl -s https://<auth-api-url>/health | jq .
 
-# Cloud Run services
-gcloud run services list --region=us-central1 --format="table(metadata.name,status.url)"
+# Cloudflare Workers
+npx wrangler deployments list
 
 # Recent deployments
 gh run list --workflow=deploy.yml --limit=5
