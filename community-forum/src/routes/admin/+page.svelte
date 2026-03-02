@@ -405,7 +405,8 @@
       error = null;
       successMessage = null;
 
-      const result = await approveUserRegistration(registration.pubkey, $authStore.publicKey || '');
+      const privkey = authStore.getPrivkey() ?? undefined;
+      const result = await approveUserRegistration(registration.pubkey, $authStore.publicKey || '', privkey);
 
       if (!result.success) {
         console.warn('[Admin] Whitelist API failed:', result.error);

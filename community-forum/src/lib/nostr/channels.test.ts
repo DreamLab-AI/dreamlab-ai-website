@@ -9,6 +9,17 @@ import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import type { NDKEvent, NDKFilter } from '@nostr-dev-kit/ndk';
 import { resetRateLimit } from '$lib/utils/rateLimit';
 
+// Mock $app/environment to enable browser-only code paths
+vi.mock('$app/environment', () => ({
+	browser: true,
+	dev: true
+}));
+
+// Mock config module to avoid YAML loading issues in zone filtering
+vi.mock('$lib/config', () => ({
+	getSectionWithCategory: vi.fn(() => null)
+}));
+
 // Mock NDK and relay modules
 vi.mock('./relay', () => ({
 	ndk: vi.fn(),
@@ -92,6 +103,9 @@ describe('Channel Access Control', () => {
 			}
 		};
 
+		// Default: first call returns channels, second call (messages) returns empty set
+		mockNdk.fetchEvents.mockResolvedValue(new Set());
+
 		vi.mocked(ndk).mockReturnValue(mockNdk as any);
 		vi.mocked(isConnected).mockReturnValue(true);
 	});
@@ -132,7 +146,7 @@ describe('Channel Access Control', () => {
 				})
 			];
 
-			mockNdk.fetchEvents.mockResolvedValue(new Set(allChannels));
+			mockNdk.fetchEvents.mockResolvedValueOnce(new Set(allChannels)).mockResolvedValueOnce(new Set());
 
 			// Act: Fetch channels without cohort filtering (no userCohorts passed)
 			const result = await fetchChannels();
@@ -165,7 +179,7 @@ describe('Channel Access Control', () => {
 				})
 			];
 
-			mockNdk.fetchEvents.mockResolvedValue(new Set(channelsFromRelay));
+			mockNdk.fetchEvents.mockResolvedValueOnce(new Set(channelsFromRelay)).mockResolvedValueOnce(new Set());
 
 			// User with 'family' cohort only
 			const result = await fetchChannels({
@@ -191,7 +205,7 @@ describe('Channel Access Control', () => {
 				accessType: 'gated'
 			});
 
-			mockNdk.fetchEvents.mockResolvedValue(new Set([channelWithCohorts]));
+			mockNdk.fetchEvents.mockResolvedValueOnce(new Set([channelWithCohorts])).mockResolvedValueOnce(new Set());
 
 			// Admin bypass
 			const result = await fetchChannels({ isAdmin: true });
@@ -209,7 +223,7 @@ describe('Channel Access Control', () => {
 				pubkey: 'my-pubkey'
 			});
 
-			mockNdk.fetchEvents.mockResolvedValue(new Set([myChannel]));
+			mockNdk.fetchEvents.mockResolvedValueOnce(new Set([myChannel])).mockResolvedValueOnce(new Set());
 
 			// User without matching cohort but IS the creator
 			const result = await fetchChannels({
@@ -246,7 +260,7 @@ describe('Channel Access Control', () => {
 				{ ...createMockChannelEvent({ id: 'mid', name: 'Middle Channel' }), created_at: now - 500 }
 			];
 
-			mockNdk.fetchEvents.mockResolvedValue(new Set(channels));
+			mockNdk.fetchEvents.mockResolvedValueOnce(new Set(channels)).mockResolvedValueOnce(new Set());
 
 			const result = await fetchChannels();
 
@@ -270,7 +284,7 @@ describe('Channel Access Control', () => {
 				created_at: Math.floor(Date.now() / 1000)
 			} as unknown as NDKEvent;
 
-			mockNdk.fetchEvents.mockResolvedValue(new Set([validChannel, malformedChannel]));
+			mockNdk.fetchEvents.mockResolvedValueOnce(new Set([validChannel, malformedChannel])).mockResolvedValueOnce(new Set());
 
 			const result = await fetchChannels();
 
@@ -329,10 +343,10 @@ describe('Channel Access Control', () => {
 				visibility: 'public'
 			});
 
-			mockNdk.fetchEvents.mockResolvedValue(new Set([
+			mockNdk.fetchEvents.mockResolvedValueOnce(new Set([
 				cohortChannel,
 				publicChannel
-			]));
+			])).mockResolvedValueOnce(new Set());
 
 			// Fetch with matching cohort
 			const result = await fetchChannels({ userCohorts: ['test'] });
@@ -353,7 +367,7 @@ describe('Channel Access Control', () => {
 				created_at: Math.floor(Date.now() / 1000)
 			} as unknown as NDKEvent;
 
-			mockNdk.fetchEvents.mockResolvedValue(new Set([channelWithoutVisibility]));
+			mockNdk.fetchEvents.mockResolvedValueOnce(new Set([channelWithoutVisibility])).mockResolvedValueOnce(new Set());
 
 			const result = await fetchChannels();
 
@@ -373,7 +387,7 @@ describe('Channel Access Control', () => {
 				accessType: 'gated'
 			});
 
-			mockNdk.fetchEvents.mockResolvedValue(new Set([openChannel, gatedChannel]));
+			mockNdk.fetchEvents.mockResolvedValueOnce(new Set([openChannel, gatedChannel])).mockResolvedValueOnce(new Set());
 
 			const result = await fetchChannels();
 
@@ -393,7 +407,7 @@ describe('Channel Access Control', () => {
 				created_at: Math.floor(Date.now() / 1000)
 			} as unknown as NDKEvent;
 
-			mockNdk.fetchEvents.mockResolvedValue(new Set([channelWithoutAccessType]));
+			mockNdk.fetchEvents.mockResolvedValueOnce(new Set([channelWithoutAccessType])).mockResolvedValueOnce(new Set());
 
 			const result = await fetchChannels();
 
@@ -411,7 +425,7 @@ describe('Channel Access Control', () => {
 				visibility: 'cohort'
 			});
 
-			mockNdk.fetchEvents.mockResolvedValue(new Set([restrictedChannel]));
+			mockNdk.fetchEvents.mockResolvedValueOnce(new Set([restrictedChannel])).mockResolvedValueOnce(new Set());
 
 			// User without matching cohort
 			const result = await fetchChannels({
@@ -431,7 +445,7 @@ describe('Channel Access Control', () => {
 				visibility: 'cohort'
 			});
 
-			mockNdk.fetchEvents.mockResolvedValue(new Set([restrictedChannel]));
+			mockNdk.fetchEvents.mockResolvedValueOnce(new Set([restrictedChannel])).mockResolvedValueOnce(new Set());
 
 			// User with matching cohort
 			const result = await fetchChannels({

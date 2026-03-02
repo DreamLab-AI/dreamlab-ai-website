@@ -51,8 +51,8 @@ export async function requestSectionAccess(
     return { success: false, error: 'Not in browser' };
   }
 
-  // Don't allow requests for public-lobby (auto-approved)
-  if (section === 'public-lobby') {
+  // Don't allow requests for dreamlab-lobby (auto-approved)
+  if (section === 'dreamlab-lobby') {
     return { success: false, error: 'This section does not require approval' };
   }
 
@@ -324,8 +324,8 @@ export async function fetchUserAccess(
     const events = await ndkInstance.fetchEvents(filter);
     const access: UserSectionAccess[] = [];
 
-    // public-lobby is always approved
-    access.push({ section: 'public-lobby', status: 'approved' });
+    // dreamlab-lobby is always approved
+    access.push({ section: 'dreamlab-lobby', status: 'approved' });
 
     for (const event of events) {
       const sectionTag = event.tags.find(t => t[0] === 'section')?.[1];

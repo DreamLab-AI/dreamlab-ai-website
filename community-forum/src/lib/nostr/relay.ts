@@ -548,6 +548,27 @@ export const reconnectRelay = async (): Promise<void> => {
 export const relayManager = relayManagerInstance;
 
 /**
+ * Set a NIP-07 browser extension signer on the current NDK instance.
+ * Creates the NDK instance if it doesn't exist yet.
+ */
+export function setNip07Signer(): void {
+  const ndkInstance = relayManagerInstance.ndk;
+  if (ndkInstance) {
+    ndkInstance.signer = new NDKNip07Signer() as any;
+  }
+}
+
+/**
+ * Clear the current signer from the NDK instance (logout).
+ */
+export function clearSigner(): void {
+  const ndkInstance = relayManagerInstance.ndk;
+  if (ndkInstance) {
+    ndkInstance.signer = undefined;
+  }
+}
+
+/**
  * Default export
  */
 export default relayManagerInstance;

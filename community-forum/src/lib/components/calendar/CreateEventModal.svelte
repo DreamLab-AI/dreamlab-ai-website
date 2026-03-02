@@ -2,6 +2,7 @@
   import { createEventDispatcher } from 'svelte';
   import Modal from '../ui/Modal.svelte';
   import { createCalendarEvent } from '$lib/nostr/calendar';
+  import { getSections, getCohorts } from '$lib/config';
   import type { FairfieldEvent, EventCategory, EventVenueType } from '$lib/types/calendar';
   import type { SectionId, CohortId } from '$lib/config/types';
 
@@ -70,20 +71,11 @@
     { id: 'meditation-space', name: 'Meditation Space' }
   ];
 
-  // Section options (from sections.yaml)
-  const sections: Array<{ id: SectionId; name: string }> = [
-    { id: 'public-lobby', name: 'Public Lobby' },
-    { id: 'community-rooms', name: 'Community Rooms' },
-    { id: 'dreamlab', name: 'DreamLab' }
-  ];
+  // Section options (loaded dynamically from config)
+  const sections: Array<{ id: SectionId; name: string }> = getSections().map(s => ({ id: s.id as SectionId, name: s.name }));
 
-  // Cohort options
-  const cohorts: Array<{ id: CohortId; name: string }> = [
-    { id: 'admin', name: 'Administrators' },
-    { id: 'approved', name: 'Approved Users' },
-    { id: 'business', name: 'Business Partners' },
-    { id: 'moomaa-tribe', name: 'Moomaa Tribe' }
-  ];
+  // Cohort options (loaded dynamically from config)
+  const cohorts: Array<{ id: CohortId; name: string }> = getCohorts().map(c => ({ id: c.id as CohortId, name: c.name }));
 
   function validateStep(step: number): boolean {
     validationErrors = {};

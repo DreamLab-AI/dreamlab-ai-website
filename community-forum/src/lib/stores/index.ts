@@ -17,7 +17,7 @@ export {
   currentCohorts,
   currentDisplayName
 } from './user';
-export type { UserProfile, UserState, CohortType } from './user';
+export type { UserProfile, UserState } from './user';
 
 export {
   saveKeys,

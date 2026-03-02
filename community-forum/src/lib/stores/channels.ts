@@ -9,7 +9,7 @@ export interface Channel {
   name: string;                                  // From kind 39000 metadata
   description: string;
   picture?: string;                              // Avatar URL
-  cohorts: ('business' | 'moomaa-tribe')[];
+  cohorts: string[];
   section: ChannelSection;                       // Section category
   visibility: ChannelVisibility;                 // Visibility within section
   accessType: ChannelAccessType;                 // open = anyone can post, gated = members only
@@ -57,7 +57,7 @@ const { subscribe, set, update } = writable<ChannelStore>(initialState);
 export async function fetchChannels(
   ndk: NDK,
   userPubkey: string,
-  userCohorts: ('business' | 'moomaa-tribe')[]
+  userCohorts: string[]
 ): Promise<Channel[]> {
   update(state => ({ ...state, loading: true, error: null }));
 
@@ -142,7 +142,7 @@ function buildChannelFromEvents(
   memberEvents: NDKEvent[],
   requestEvents: NDKEvent[],
   userPubkey: string,
-  userCohorts: ('business' | 'moomaa-tribe')[]
+  userCohorts: string[]
 ): Channel | null {
   // Extract group ID from 'd' tag
   const groupId = metaEvent.tags.find(t => t[0] === 'd')?.[1];
@@ -151,7 +151,7 @@ function buildChannelFromEvents(
   // Extract cohort tags
   const channelCohorts = metaEvent.tags
     .filter(t => t[0] === 'cohort')
-    .map(t => t[1] as 'business' | 'moomaa-tribe');
+    .map(t => t[1]);
 
   // Apply cohort filtering logic as per SPARC:
   // - business cohort sees business channels
@@ -200,9 +200,9 @@ function buildChannelFromEvents(
     return requestChannelId === groupId;
   });
 
-  // Extract section tag (default to public-lobby)
+  // Extract section tag (default to dreamlab-lobby)
   const sectionTag = metaEvent.tags.find(t => t[0] === 'section')?.[1];
-  const section = (sectionTag as ChannelSection) || 'public-lobby';
+  const section = (sectionTag as ChannelSection) || 'dreamlab-lobby';
 
   // Extract visibility setting (default to public)
   const visibilityTag = metaEvent.tags.find(t => t[0] === 'visibility')?.[1];
@@ -290,7 +290,7 @@ export const availableChannels = {
 /**
  * Filter channels by cohort
  */
-export function getChannelsByCohort(cohort: 'business' | 'moomaa-tribe'): Channel[] {
+export function getChannelsByCohort(cohort: string): Channel[] {
   const state = get(channelStore);
   return state.channels.filter(c => c.cohorts.includes(cohort));
 }
@@ -302,60 +302,6 @@ export function getChannelsBySection(section: ChannelSection): Channel[] {
   const state = get(channelStore);
   return state.channels.filter(c => c.section === section);
 }
-
-// Lazy-initialized derived stores for section filtering
-let _publicLobbyChannels: ReturnType<typeof derived<typeof channelStore, Channel[]>> | null = null;
-let _communityRoomsChannels: ReturnType<typeof derived<typeof channelStore, Channel[]>> | null = null;
-let _dreamlabChannels: ReturnType<typeof derived<typeof channelStore, Channel[]>> | null = null;
-
-/**
- * Get channels for public-lobby section (lazy initialization)
- */
-export function getPublicLobbyChannels() {
-  if (!_publicLobbyChannels) {
-    _publicLobbyChannels = derived(channelStore, $store =>
-      $store.channels.filter(c => c.section === 'public-lobby')
-    );
-  }
-  return _publicLobbyChannels;
-}
-
-/**
- * Get channels for community-rooms section (lazy initialization)
- */
-export function getCommunityRoomsChannels() {
-  if (!_communityRoomsChannels) {
-    _communityRoomsChannels = derived(channelStore, $store =>
-      $store.channels.filter(c => c.section === 'community-rooms')
-    );
-  }
-  return _communityRoomsChannels;
-}
-
-/**
- * Get channels for dreamlab section (lazy initialization)
- */
-export function getDreamlabChannels() {
-  if (!_dreamlabChannels) {
-    _dreamlabChannels = derived(channelStore, $store =>
-      $store.channels.filter(c => c.section === 'dreamlab')
-    );
-  }
-  return _dreamlabChannels;
-}
-
-// Backwards-compatible exports for section filtering
-export const publicLobbyChannels = {
-  subscribe: (fn: (value: Channel[]) => void) => getPublicLobbyChannels().subscribe(fn)
-};
-
-export const communityRoomsChannels = {
-  subscribe: (fn: (value: Channel[]) => void) => getCommunityRoomsChannels().subscribe(fn)
-};
-
-export const dreamlabChannels = {
-  subscribe: (fn: (value: Channel[]) => void) => getDreamlabChannels().subscribe(fn)
-};
 
 /**
  * Clear all channels (e.g., on logout)

@@ -65,7 +65,7 @@ describe('Config Loader', () => {
 			const config = loadConfig();
 
 			expect(config).toBeDefined();
-			expect(config.app.name).toBe('Fairfield');
+			expect(config.app.name).toBe('DreamLab Community');
 			expect(config.categories.length).toBeGreaterThan(0);
 			expect(config.roles.length).toBeGreaterThan(0);
 		});
@@ -131,7 +131,7 @@ describe('Config Loader', () => {
 			clearConfigCache();
 
 			const config = loadConfig();
-			expect(config.app.name).toBe('Fairfield');
+			expect(config.app.name).toBe('DreamLab Community');
 		});
 
 		it('should cache config after first load', () => {
@@ -216,7 +216,7 @@ describe('Config Loader', () => {
 	describe('accessor functions', () => {
 		it('should get app config', () => {
 			const appConfig = getAppConfig();
-			expect(appConfig.name).toBe('Fairfield');
+			expect(appConfig.name).toBe('DreamLab Community');
 			expect(appConfig.version).toBeDefined();
 		});
 

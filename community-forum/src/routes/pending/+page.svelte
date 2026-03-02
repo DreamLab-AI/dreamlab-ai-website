@@ -13,7 +13,9 @@
   let checkInterval: ReturnType<typeof setInterval>;
 
   // Periodically check if user has been approved
-  onMount(() => {
+  onMount(async () => {
+    await authStore.waitForReady();
+
     if (browser) {
       // Check every 30 seconds if user has been approved
       checkInterval = setInterval(() => {

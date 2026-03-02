@@ -25,8 +25,8 @@ import type {
   UserSectionAccess,
   SectionStats,
   SectionAccessRequest,
-  SECTION_CONFIG
 } from '$lib/types/channel';
+import { getSections } from '$lib/config';
 import { currentPubkey, isAdminVerified } from './user';
 import { notificationStore } from './notifications';
 import {
@@ -58,11 +58,16 @@ interface SectionAccessState {
   error: string | null;
 }
 
+// Auto-approve sections from config that have autoApprove: true
+const autoApprovedSections: UserSectionAccess[] = getSections()
+  .filter(s => s.access.autoApprove)
+  .map(s => ({
+    section: s.id as ChannelSection,
+    status: 'approved' as const
+  }));
+
 const initialState: SectionAccessState = {
-  access: [
-    // public-lobby is auto-approved for all authenticated users
-    { section: 'public-lobby', status: 'approved' }
-  ],
+  access: autoApprovedSections,
   pendingRequests: [],
   stats: [],
   loading: false,
@@ -79,15 +84,14 @@ function loadFromStorage(): SectionAccessState {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
       const parsed = JSON.parse(stored);
-      // Ensure public-lobby is always approved
-      const hasGuestsAccess = parsed.access?.some(
-        (a: UserSectionAccess) => a.section === 'public-lobby'
+      // Ensure all autoApprove sections are always approved
+      const existingAccess: UserSectionAccess[] = parsed.access || [];
+      const existingSections = new Set(existingAccess.map((a: UserSectionAccess) => a.section));
+      const missingAutoApproved = autoApprovedSections.filter(
+        a => !existingSections.has(a.section)
       );
-      if (!hasGuestsAccess) {
-        parsed.access = [
-          { section: 'public-lobby', status: 'approved' },
-          ...(parsed.access || [])
-        ];
+      if (missingAutoApproved.length > 0) {
+        parsed.access = [...missingAutoApproved, ...existingAccess];
       }
       return { ...initialState, ...parsed };
     }
@@ -177,8 +181,8 @@ function createSectionStore() {
         return { success: false, error: 'Request already pending' };
       }
 
-      // For public-lobby, auto-approve
-      if (section === 'public-lobby') {
+      // For autoApprove sections, auto-approve immediately
+      if (autoApprovedSections.some(a => a.section === section)) {
         update(state => ({
           ...state,
           access: [

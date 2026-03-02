@@ -13,8 +13,7 @@ import {
   getUserCohorts,
   checkWhitelistStatus,
   clearWhitelistCache,
-  type WhitelistStatus,
-  type CohortName
+  type WhitelistStatus
 } from './whitelist';
 
 // Mock fetch globally
@@ -301,7 +300,7 @@ describe('Whitelist Verification Service', () => {
 
   describe('getUserCohorts', () => {
     it('should return all user cohorts', async () => {
-      const expectedCohorts: CohortName[] = ['approved', 'business'];
+      const expectedCohorts: string[] = ['approved', 'business'];
 
       mockFetch.mockResolvedValueOnce({
         ok: true,

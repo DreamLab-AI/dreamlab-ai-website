@@ -7,7 +7,7 @@
 import { ndk, isConnected } from './relay';
 import type { NDKFilter } from '@nostr-dev-kit/ndk';
 import type { CalendarEvent } from './calendar';
-import { verifyCohortMembership, type CohortName } from './whitelist';
+import { verifyCohortMembership } from './whitelist';
 
 export interface BirthdayEntry {
   pubkey: string;
@@ -20,7 +20,7 @@ export interface BirthdayEntry {
 /**
  * Fetch birthdays for all members of a specific cohort
  */
-export async function fetchCohortBirthdays(cohort: CohortName): Promise<BirthdayEntry[]> {
+export async function fetchCohortBirthdays(cohort: string): Promise<BirthdayEntry[]> {
   const ndkInstance = ndk();
   if (!ndkInstance) {
     console.error('NDK not initialized');
@@ -97,12 +97,12 @@ export function birthdaysToCalendarEvents(
 
 /**
  * Fetch birthday calendar events for current user's tribe
- * Returns empty array if user is not in moomaa-tribe
+ * Returns empty array if user is not in minimoonoir cohort
  */
 export async function fetchTribeBirthdayEvents(
   userPubkey: string
 ): Promise<CalendarEvent[]> {
-  const tribeCohort: CohortName = 'moomaa-tribe';
+  const tribeCohort = 'minimoonoir';
 
   // Check if current user is a tribe member
   const isTribeMember = await verifyCohortMembership(userPubkey, tribeCohort);
@@ -146,7 +146,7 @@ export async function getUpcomingBirthdays(
   userPubkey: string,
   days: number = 30
 ): Promise<BirthdayEntry[]> {
-  const tribeCohort: CohortName = 'moomaa-tribe';
+  const tribeCohort = 'minimoonoir';
 
   // Check if current user is a tribe member
   const isTribeMember = await verifyCohortMembership(userPubkey, tribeCohort);

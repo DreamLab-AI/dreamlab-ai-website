@@ -39,6 +39,8 @@
     : [];
 
   onMount(async () => {
+    await authStore.waitForReady();
+
     // Check if user is authenticated
     if (!$authStore.publicKey) {
       goto(`${base}/`);
@@ -47,8 +49,11 @@
 
     // Verify admin status via relay (server-side source of truth)
     try {
-      const status = await verifyWhitelistStatus($authStore.publicKey);
-      isAdmin = status.isAdmin;
+      const status = await Promise.race([
+        verifyWhitelistStatus($authStore.publicKey),
+        new Promise<undefined>((resolve) => setTimeout(() => resolve(undefined), 8000))
+      ]);
+      isAdmin = status?.isAdmin ?? false;
 
       if (!isAdmin) {
         error = 'Access denied: Admin privileges required';

@@ -6,9 +6,7 @@
  */
 
 import { browser } from '$app/environment';
-
-// Get relay URL from environment (Cloudflare Workers relay)
-const RELAY_URL = import.meta.env.VITE_RELAY_URL || 'wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev';
+import { RELAY_URL } from '$lib/config';
 
 /**
  * Convert WebSocket URL to HTTP URL for API calls

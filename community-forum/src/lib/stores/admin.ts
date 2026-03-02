@@ -2,7 +2,7 @@ import { writable, derived } from 'svelte/store';
 import type { Event as NostrEvent } from 'nostr-tools';
 import type { NDKRelay, NDKFilter } from '@nostr-dev-kit/ndk';
 import type { ChannelSection } from '$lib/types/channel';
-import { ndk, isConnected } from '$lib/nostr/relay';
+import { ndk } from '$lib/nostr/relay';
 
 export interface PendingRequest {
   id: string;
@@ -328,7 +328,11 @@ export async function fetchAllChannels(_relay: NDKRelay): Promise<void> {
     creationEvents.forEach((event) => {
       try {
         const metadata = JSON.parse(event.content);
-        const cohortTag = event.tags.find((t: string[]) => t[0] === 'cohort');
+        // Support both comma-separated single tag and multiple separate tags
+        const cohortTags = event.tags.filter((t: string[]) => t[0] === 'cohort');
+        const cohorts = cohortTags.length > 1
+          ? cohortTags.map((t: string[]) => t[1])
+          : (cohortTags[0]?.[1]?.split(',') || []);
         const visibilityTag = event.tags.find((t: string[]) => t[0] === 'visibility');
         const encryptedTag = event.tags.find((t: string[]) => t[0] === 'encrypted');
         const sectionTag = event.tags.find((t: string[]) => t[0] === 'section');
@@ -341,10 +345,10 @@ export async function fetchAllChannels(_relay: NDKRelay): Promise<void> {
           id: event.id,
           name: metadata.name || 'Unnamed Channel',
           description: metadata.about || metadata.description,
-          cohorts: cohortTag?.[1]?.split(',') || [],
+          cohorts,
           visibility,
           encrypted: encryptedTag?.[1] === 'true',
-          section: (sectionTag?.[1] as ChannelSection) || 'public-lobby',
+          section: (sectionTag?.[1] as ChannelSection) || 'dreamlab-lobby',
           createdAt: event.created_at!,
           memberCount: 0,
           creatorPubkey: event.pubkey,

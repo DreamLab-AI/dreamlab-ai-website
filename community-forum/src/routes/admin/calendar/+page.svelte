@@ -44,6 +44,8 @@
     .slice(0, 10);
 
   onMount(async () => {
+    await authStore.waitForReady();
+
     if (!$authStore.isAuthenticated || !$authStore.publicKey) {
       goto(`${base}/`);
       return;

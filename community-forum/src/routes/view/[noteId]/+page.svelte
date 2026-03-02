@@ -4,13 +4,18 @@
 	import { base } from '$app/paths';
 	import { page } from '$app/stores';
 	import { nip19 } from 'nostr-tools';
-	import { connectNDK, getNDK } from '$lib/nostr/ndk';
+	import NDK from '@nostr-dev-kit/ndk';
+	import { ndk as getNDKInstance, isConnected } from '$lib/nostr/relay';
+	import { RELAY_URL } from '$lib/config';
 	import { formatRelativeTime } from '$lib/nostr/events';
 	import UserDisplay from '$lib/components/user/UserDisplay.svelte';
 	import Avatar from '$lib/components/ui/Avatar.svelte';
 	import { profileCache } from '$lib/stores/profiles';
 	import { getAvatarUrl } from '$lib/utils/identicon';
+	import { getAppConfig } from '$lib/config/loader';
 	import type { NDKEvent } from '@nostr-dev-kit/ndk';
+
+	const appConfig = getAppConfig();
 
 	$: noteId = $page.params.noteId;
 
@@ -57,9 +62,14 @@
 				throw new Error('Invalid note ID format. Expected note1..., nevent1..., or hex event ID');
 			}
 
-			// Connect to NDK
-			await connectNDK();
-			const ndk = getNDK();
+			// Use existing RelayManager connection if available, otherwise create
+			// a lightweight read-only NDK instance for this public page.
+			let ndkInstance = getNDKInstance();
+			if (!ndkInstance || !isConnected()) {
+				ndkInstance = new NDK({ explicitRelayUrls: [RELAY_URL] });
+				await ndkInstance.connect();
+			}
+			const ndk = ndkInstance;
 
 			// Fetch the event
 			const events = await ndk.fetchEvents({
@@ -112,8 +122,8 @@
 </script>
 
 <svelte:head>
-	<title>{event ? `Note by ${displayName}` : 'View Note'} - Fairfield</title>
-	<meta name="description" content={event?.content?.slice(0, 160) || 'View this post on Fairfield'} />
+	<title>{event ? `Note by ${displayName}` : 'View Note'} - {appConfig.name}</title>
+	<meta name="description" content={event?.content?.slice(0, 160) || `View this post on ${appConfig.name}`} />
 </svelte:head>
 
 <div class="min-h-screen bg-base-200 gradient-mesh flex flex-col">
@@ -121,7 +131,7 @@
 	<header class="bg-base-100 border-b border-base-300 py-4">
 		<div class="container mx-auto px-4 max-w-2xl">
 			<a href="{base}/" class="text-xl font-bold text-primary hover:opacity-80 transition-opacity">
-				Fairfield
+				{appConfig.name}
 			</a>
 		</div>
 	</header>
@@ -204,7 +214,7 @@
 				<div class="card-body text-center">
 					<h3 class="text-xl font-bold mb-2">Join the conversation</h3>
 					<p class="text-base-content/70 mb-6">
-						Connect with the community on Fairfield. Reply to posts, share your thoughts, and discover more content.
+						Connect with the community on {appConfig.name}. Reply to posts, share your thoughts, and discover more content.
 					</p>
 
 					<div class="flex flex-col sm:flex-row gap-3 justify-center">

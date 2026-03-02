@@ -36,6 +36,8 @@
   let showSearch = false;
   let retryCount = 0;
   let retrying = false;
+  let mounted = false;
+  let channelsLoading = false;
   const MAX_RETRIES = 3;
   const LOADING_TIMEOUT_MS = 6000;
   let loadingTimer: ReturnType<typeof setTimeout> | null = null;
@@ -86,6 +88,8 @@
   }
 
   async function loadChannels() {
+    if (channelsLoading) return;
+    channelsLoading = true;
     try {
       // Connect to relay with authentication (NIP-07 or private key)
       await ensureRelayConnected($authStore);
@@ -119,8 +123,16 @@
       // Always clear loading state so the UI transitions from skeleton to
       // either channels, empty state, or error — never stuck on shimmer.
       loading = false;
+      channelsLoading = false;
       clearLoadingTimer();
     }
+  }
+
+  // Re-fetch channels when whitelist status arrives after initial mount.
+  // Fixes race condition where loadChannels() runs before async whitelist
+  // verification completes, resulting in isAdmin=false and userCohorts=[].
+  $: if ($whitelistStatusStore && mounted && !channelsLoading) {
+    loadChannels();
   }
 
   function startLoadingTimer() {
@@ -171,6 +183,7 @@
     // UI transitions to empty state after LOADING_TIMEOUT_MS.
     startLoadingTimer();
     await loadChannels();
+    mounted = true;
   });
 
   onDestroy(() => {

@@ -125,7 +125,8 @@
     const uniqueCohorts = [...new Set(newCohorts)];
 
     try {
-      const result = await updateUserCohorts(user.pubkey, uniqueCohorts, adminPubkey);
+      const privkey = authStore.getPrivkey() ?? undefined;
+      const result = await updateUserCohorts(user.pubkey, uniqueCohorts, adminPubkey, privkey);
 
       if (result.success) {
         const userIndex = users.findIndex(u => u.pubkey === user.pubkey);
@@ -252,7 +253,8 @@
         : [...new Set([...nonZoneCohorts, 'approved'])];
 
       try {
-        const result = await updateUserCohorts(pubkey, newCohorts, adminPubkey);
+        const privkey = authStore.getPrivkey() ?? undefined;
+        const result = await updateUserCohorts(pubkey, newCohorts, adminPubkey, privkey);
         if (result.success) {
           successCount++;
           // Update local state
@@ -303,7 +305,8 @@
       const newCohorts = user.cohorts.filter(c => c !== zoneId);
 
       try {
-        const result = await updateUserCohorts(pubkey, newCohorts, adminPubkey);
+        const privkey = authStore.getPrivkey() ?? undefined;
+        const result = await updateUserCohorts(pubkey, newCohorts, adminPubkey, privkey);
         if (result.success) {
           successCount++;
           const idx = users.findIndex(u => u.pubkey === pubkey);

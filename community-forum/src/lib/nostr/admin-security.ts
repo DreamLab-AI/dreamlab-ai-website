@@ -10,7 +10,7 @@
 
 import { browser } from '$app/environment';
 import { verifyEventSignature, nowSeconds } from './events';
-import { verifyWhitelistStatus, type CohortName } from './whitelist';
+import { verifyWhitelistStatus } from './whitelist';
 import type { NostrEvent } from '../../types/nostr';
 
 // ============================================================================
@@ -43,7 +43,7 @@ const RATE_LIMIT_CONFIG = {
 };
 
 // Restricted cohorts that users cannot self-assign
-const RESTRICTED_COHORTS: CohortName[] = ['admin'];
+const RESTRICTED_COHORTS: string[] = ['admin'];
 
 // Request signature validity window (prevents replay attacks)
 const SIGNATURE_VALIDITY_WINDOW_SECONDS = 300; // 5 minutes
@@ -353,7 +353,7 @@ export function clearRateLimit(actionKey: string): void {
 export async function validateCohortAssignment(
   requestingPubkey: string,
   targetPubkey: string,
-  newCohorts: CohortName[]
+  newCohorts: string[]
 ): Promise<{ valid: boolean; error?: string }> {
   // Verify requester's admin status via relay
   const requesterStatus = await verifyWhitelistStatus(requestingPubkey);
@@ -406,7 +406,7 @@ export async function validateCohortAssignment(
 /**
  * Get current user's cohorts from relay (verified)
  */
-export async function getVerifiedCohorts(pubkey: string): Promise<CohortName[]> {
+export async function getVerifiedCohorts(pubkey: string): Promise<string[]> {
   const status = await verifyWhitelistStatus(pubkey);
   return status.cohorts;
 }

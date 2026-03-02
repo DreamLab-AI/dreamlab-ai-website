@@ -4,11 +4,10 @@
   import { base } from '$app/paths';
   import { page } from '$app/stores';
   import { authStore } from '$lib/stores/auth';
-  import { userStore } from '$lib/stores/user';
-  import { userPermissionsStore } from '$lib/stores/userPermissions';
+  import { userPermissionsStore, permissionsReady, waitForPermissions } from '$lib/stores/userPermissions';
   import { ndk, ensureRelayConnected, isConnected } from '$lib/nostr/relay';
   import { getSectionWithCategory, getBreadcrumbs } from '$lib/config';
-  import { canCreateChannel } from '$lib/config/permissions';
+  import { canCreateChannel, canAccessSection } from '$lib/config/permissions';
   import Breadcrumb from '$lib/components/navigation/Breadcrumb.svelte';
   import ChannelCard from '$lib/components/forum/ChannelCard.svelte';
   import ZoneHero from '$lib/components/zones/ZoneHero.svelte';
@@ -36,19 +35,11 @@
   $: section = sectionInfo?.section;
   $: category = sectionInfo?.category;
   $: breadcrumbs = section && category ? getBreadcrumbs(categoryId, sectionId) : [];
-  $: userCohorts = $userStore.profile?.cohorts || [];
-
-  $: hasAccess = (() => {
-    if (!section?.access?.requiresApproval) return true;
-    const required = section.access.requiredCohorts || [];
-    if (required.length === 0) return true;
-    // Cast to string[] for comparison since config uses string cohort IDs
-    const userCohortStrings = userCohorts as string[];
-    return required.some((c: string) => userCohortStrings.includes(c));
-  })();
+  $: permissions = $userPermissionsStore;
+  $: hasAccess = ($permissionsReady && permissions) ? canAccessSection(permissions, sectionId) : true;
 
   // Check if current user can create forums in this section
-  $: canCreate = $userPermissionsStore
+  $: canCreate = ($permissionsReady && $userPermissionsStore)
     ? canCreateChannel($userPermissionsStore, sectionId)
     : false;
 
@@ -110,7 +101,9 @@
       return;
     }
 
-    if (!hasAccess) {
+    // Wait for whitelist verification before checking access
+    const perms = await waitForPermissions();
+    if (perms && !canAccessSection(perms, sectionId)) {
       error = 'You do not have access to this section';
       loading = false;
       return;

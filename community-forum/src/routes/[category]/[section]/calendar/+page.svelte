@@ -4,8 +4,7 @@
   import { base } from '$app/paths';
   import { page } from '$app/stores';
   import { authStore } from '$lib/stores/auth';
-  import { userStore } from '$lib/stores/user';
-  import { userPermissionsStore } from '$lib/stores/userPermissions';
+  import { userPermissionsStore, waitForPermissions } from '$lib/stores/userPermissions';
   import { ndk, ensureRelayConnected, isConnected } from '$lib/nostr/relay';
   import { getSectionWithCategory, getBreadcrumbs, getCategories } from '$lib/config';
   import {
@@ -37,11 +36,12 @@
   $: section = sectionInfo?.section;
   $: category = sectionInfo?.category;
   $: breadcrumbs = section && category ? [...getBreadcrumbs(categoryId, sectionId), { label: 'Calendar', path: `/${categoryId}/${sectionId}/calendar` }] : [];
-  $: userCohorts = $userStore.profile?.cohorts || [];
+  $: userCohorts = $userPermissionsStore?.cohorts || [];
   $: categories = getCategories();
 
   onMount(async () => {
     await authStore.waitForReady();
+    await waitForPermissions();
 
     if (!$authStore.isAuthenticated || !$authStore.publicKey) {
       goto(`${base}/`);
@@ -71,7 +71,7 @@
 
       // Also fetch tribe birthdays for community sections
       let birthdayEvents: CalendarEvent[] = [];
-      if ((sectionId === 'minimoonoir-rooms' || sectionId === 'community-rooms') && $authStore.publicKey) {
+      if ((sectionId === 'minimoonoir-events' || sectionId === 'community-rooms') && $authStore.publicKey) {
         birthdayEvents = await fetchTribeBirthdayEvents($authStore.publicKey);
       }
 

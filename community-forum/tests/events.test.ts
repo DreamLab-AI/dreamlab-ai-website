@@ -23,7 +23,6 @@ import {
   nsecDecode,
   channelMessagesFilter,
   userMetadataFilter,
-  dmFilter,
   nowSeconds,
   formatRelativeTime,
   isValidEventStructure,
@@ -259,16 +258,7 @@ describe('Nostr Events Module', () => {
       expect(filter.authors).toEqual(pubkeys);
     });
 
-    it('should create DM filter', () => {
-      const userPubkey = pubkey;
-      const since = nowSeconds() - 3600;
-      const filter = dmFilter(userPubkey, since, 25);
-
-      expect(filter.kinds).toEqual([EventKind.ENCRYPTED_DM]);
-      expect(filter['#p']).toEqual([userPubkey]);
-      expect(filter.since).toBe(since);
-      expect(filter.limit).toBe(25);
-    });
+    // dmFilter was removed (NIP-04 deprecated)
   });
 
   describe('Timestamp Utilities', () => {

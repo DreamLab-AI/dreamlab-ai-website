@@ -240,24 +240,23 @@ describe('Migration Configuration', () => {
     });
   });
 
-  describe('isNip04DecryptionAllowed - REMOVED', () => {
-    it('should always return false (NIP-04 removed as of 2025-12-01)', () => {
-      // NIP-04 is permanently removed - no date-based logic
-      expect(isNip04DecryptionAllowed()).toBe(false);
+  describe('isNip04DecryptionAllowed - READ-ONLY', () => {
+    it('should return true (read-only decryption of historical NIP-04 messages)', () => {
+      // NIP-04 decryption is allowed read-only for historical messages
+      expect(isNip04DecryptionAllowed()).toBe(true);
     });
 
-    it('should return false regardless of system time', () => {
+    it('should return true regardless of system time (historical read-only)', () => {
       vi.useFakeTimers();
 
-      // Even if we pretend it's before the removal date, function returns false
       vi.setSystemTime(new Date('2024-01-01'));
-      expect(isNip04DecryptionAllowed()).toBe(false);
+      expect(isNip04DecryptionAllowed()).toBe(true);
 
       vi.setSystemTime(new Date('2025-03-01'));
-      expect(isNip04DecryptionAllowed()).toBe(false);
+      expect(isNip04DecryptionAllowed()).toBe(true);
 
       vi.setSystemTime(new Date('2026-01-01'));
-      expect(isNip04DecryptionAllowed()).toBe(false);
+      expect(isNip04DecryptionAllowed()).toBe(true);
 
       vi.useRealTimers();
     });
@@ -483,13 +482,12 @@ describe('Migration Configuration', () => {
   describe('Removed Feature Documentation', () => {
     it('NIP-04 helper functions should document removal reason', () => {
       // These tests verify that the functions exist and behave as documented
-      // The implementation no longer checks dates because the feature is permanently removed
 
       // Encryption is never allowed (security: malleable ciphertext, IV reuse, metadata leakage)
       expect(isNip04EncryptionAllowed()).toBe(false);
 
-      // Decryption is never allowed (migration period ended 2025-12-01)
-      expect(isNip04DecryptionAllowed()).toBe(false);
+      // Decryption is allowed read-only for historical messages (prevents data loss)
+      expect(isNip04DecryptionAllowed()).toBe(true);
     });
 
     it('Plaintext key helper functions should document removal reason', () => {

@@ -4,8 +4,9 @@
   import { base } from '$app/paths';
   import { page } from '$app/stores';
   import { authStore } from '$lib/stores/auth';
-  import { userStore } from '$lib/stores/user';
+  import { userPermissionsStore, permissionsReady, waitForPermissions } from '$lib/stores/userPermissions';
   import { getCategory, getBreadcrumbs } from '$lib/config';
+  import { canAccessSection, canAccessCategory } from '$lib/config/permissions';
   import Breadcrumb from '$lib/components/navigation/Breadcrumb.svelte';
   import SectionListCard from '$lib/components/navigation/SectionListCard.svelte';
   import ZoneHero from '$lib/components/zones/ZoneHero.svelte';
@@ -21,15 +22,13 @@
   $: category = getCategory(categoryId);
   $: breadcrumbs = category ? getBreadcrumbs(categoryId) : [];
   $: sections = category?.sections ?? [];
-  $: userCohorts = $userStore.profile?.cohorts || [];
+  $: permissions = $userPermissionsStore;
+  $: canViewCategory = ($permissionsReady && permissions) ? canAccessCategory(permissions, categoryId) : true;
 
   function getSectionAccessStatus(section: SectionConfig): 'approved' | 'pending' | 'none' {
+    if (!$permissionsReady || !permissions) return 'approved'; // optimistic while loading
+    if (canAccessSection(permissions, section.id)) return 'approved';
     if (!section.access?.requiresApproval) return 'approved';
-    const requiredCohorts = section.access.requiredCohorts || [];
-    if (requiredCohorts.length === 0) return 'approved';
-    // Cast to string[] for comparison since config uses string cohort IDs
-    const userCohortStrings = userCohorts as string[];
-    if (requiredCohorts.some((c: string) => userCohortStrings.includes(c))) return 'approved';
     return 'none';
   }
 
@@ -44,6 +43,9 @@
     if (!category) {
       error = `Category "${categoryId}" not found`;
     }
+
+    // Wait for whitelist verification before rendering access decisions
+    await waitForPermissions();
 
     loading = false;
   });
@@ -62,6 +64,11 @@
     <div class="alert alert-error">
       <span>{error}</span>
       <a href="{base}/chat" class="btn btn-sm btn-ghost">Go to Channels</a>
+    </div>
+  {:else if !canViewCategory}
+    <div class="alert alert-warning">
+      <span>You do not have access to this category.</span>
+      <a href="{base}/forums" class="btn btn-sm btn-ghost">Back to Forums</a>
     </div>
   {:else if category}
     <Breadcrumb items={breadcrumbs} />

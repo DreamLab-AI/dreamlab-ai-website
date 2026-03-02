@@ -123,8 +123,8 @@ export async function createChannel(options: ChannelCreateOptions): Promise<Crea
 		event.tags.push(['encrypted', 'true']);
 	}
 
-	// Add section tag (default to public-lobby)
-	const section = options.section || 'public-lobby';
+	// Add section tag (default to dreamlab-lobby)
+	const section = options.section || 'dreamlab-lobby';
 	event.tags.push(['section', section]);
 
 	// Add access type tag (default to gated for safety)
@@ -317,7 +317,7 @@ export async function fetchChannelById(channelId: string): Promise<CreatedChanne
 				accessType: (accessTypeTag?.[1] as ChannelAccessType) || 'gated',
 				cohorts: cohortTag?.[1]?.split(',').filter(Boolean) || [],
 				encrypted: encryptedTag?.[1] === 'true',
-				section: (sectionTag?.[1] as ChannelSection) || 'public-lobby',
+				section: (sectionTag?.[1] as ChannelSection) || 'dreamlab-lobby',
 				createdAt: event.created_at || 0,
 				creatorPubkey: event.pubkey,
 			};
@@ -552,7 +552,7 @@ export async function fetchChannels(options: FetchChannelOptions = {}): Promise<
 				accessType: (accessTypeTag?.[1] as ChannelAccessType) || 'gated',
 				cohorts: cohortTag?.[1]?.split(',').filter(Boolean) || [],
 				encrypted: encryptedTag?.[1] === 'true',
-				section: (sectionTag?.[1] as ChannelSection) || 'public-lobby',
+				section: (sectionTag?.[1] as ChannelSection) || 'dreamlab-lobby',
 				createdAt: event.created_at || 0,
 				creatorPubkey: event.pubkey,
 			};

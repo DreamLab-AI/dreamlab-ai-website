@@ -9,12 +9,18 @@
  */
 
 import { browser } from '$app/environment';
+import { fetchWithNip98 } from '$lib/auth/nip98-client';
 
-export type CohortName = 'admin' | 'approved' | 'business' | 'moomaa-tribe';
+/**
+ * Cohort IDs are plain strings — the relay is the source of truth.
+ * New cohorts can be added on the relay without client-side changes.
+ * @deprecated Import CohortId from '$lib/config/types' instead.
+ */
+export type CohortName = string;
 
 export interface WhitelistEntry {
   pubkey: string;
-  cohorts: CohortName[];
+  cohorts: string[];
   addedAt: number;
   addedBy: string;
   expiresAt: number | null;
@@ -24,7 +30,7 @@ export interface WhitelistEntry {
 export interface WhitelistStatus {
   isWhitelisted: boolean;
   isAdmin: boolean;
-  cohorts: CohortName[];
+  cohorts: string[];
   verifiedAt: number;
   source: 'relay' | 'cache' | 'fallback';
 }
@@ -33,8 +39,7 @@ export interface WhitelistStatus {
 const statusCache = new Map<string, { status: WhitelistStatus; expiresAt: number }>();
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
-// Get relay URL from environment (Cloudflare Workers relay)
-const RELAY_URL = import.meta.env.VITE_RELAY_URL || 'wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev';
+import { RELAY_URL } from '$lib/config';
 
 /**
  * Convert WebSocket URL to HTTP URL for API calls
@@ -107,7 +112,7 @@ export async function verifyWhitelistStatus(pubkey: string): Promise<WhitelistSt
 /**
  * Create fallback status using client-side admin check
  */
-function createFallbackStatus(pubkey: string): WhitelistStatus {
+export function createFallbackStatus(pubkey: string): WhitelistStatus {
   const envAdminPubkeys = (import.meta.env.VITE_ADMIN_PUBKEY || '')
     .split(',')
     .map((k: string) => k.trim())
@@ -158,7 +163,7 @@ export async function verifyAdminStatus(pubkey: string): Promise<boolean> {
 /**
  * Check if current user belongs to a specific cohort
  */
-export async function verifyCohortMembership(pubkey: string, cohort: CohortName): Promise<boolean> {
+export async function verifyCohortMembership(pubkey: string, cohort: string): Promise<boolean> {
   const status = await verifyWhitelistStatus(pubkey);
   return status.cohorts.includes(cohort);
 }
@@ -166,7 +171,7 @@ export async function verifyCohortMembership(pubkey: string, cohort: CohortName)
 /**
  * Get all cohorts for a user
  */
-export async function getUserCohorts(pubkey: string): Promise<CohortName[]> {
+export async function getUserCohorts(pubkey: string): Promise<string[]> {
   const status = await verifyWhitelistStatus(pubkey);
   return status.cohorts;
 }
@@ -255,25 +260,32 @@ export async function publishRegistrationRequest(
  *
  * @param pubkey - User's public key to approve
  * @param adminPubkey - Admin's public key (for authorization)
+ * @param privkey - Admin's private key (Uint8Array) for NIP-98 auth header
  * @returns Promise resolving to success status
  */
 export async function approveUserRegistration(
   pubkey: string,
-  adminPubkey: string
+  adminPubkey: string,
+  privkey?: Uint8Array
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const httpUrl = getRelayHttpUrl();
-    const response = await fetch(`${httpUrl}/api/whitelist/add`, {
+    const url = `${httpUrl}/api/whitelist/add`;
+    const body = JSON.stringify({
+      pubkey,
+      cohorts: ['approved'],
+      adminPubkey,
+    });
+    const fetchOptions: RequestInit = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        pubkey,
-        cohorts: ['approved'],
-        adminPubkey,
-      }),
-    });
+      body,
+    };
+    const response = privkey
+      ? await fetchWithNip98(url, fetchOptions, privkey)
+      : await fetch(url, fetchOptions);
 
     if (response.ok) {
       // Clear cache to force re-check
@@ -365,26 +377,33 @@ export async function fetchWhitelistUsers(options?: {
  * @param pubkey - User's public key
  * @param cohorts - New cohort list
  * @param adminPubkey - Admin's public key for audit trail
+ * @param privkey - Admin's private key (Uint8Array) for NIP-98 auth header
  * @returns Success status
  */
 export async function updateUserCohorts(
   pubkey: string,
   cohorts: string[],
-  adminPubkey: string
+  adminPubkey: string,
+  privkey?: Uint8Array
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const httpUrl = getRelayHttpUrl();
-    const response = await fetch(`${httpUrl}/api/whitelist/update-cohorts`, {
+    const url = `${httpUrl}/api/whitelist/update-cohorts`;
+    const body = JSON.stringify({
+      pubkey,
+      cohorts,
+      adminPubkey,
+    });
+    const fetchOptions: RequestInit = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        pubkey,
-        cohorts,
-        adminPubkey,
-      }),
-    });
+      body,
+    };
+    const response = privkey
+      ? await fetchWithNip98(url, fetchOptions, privkey)
+      : await fetch(url, fetchOptions);
 
     if (response.ok) {
       clearWhitelistCache(pubkey);

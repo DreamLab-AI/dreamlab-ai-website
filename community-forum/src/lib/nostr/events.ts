@@ -450,26 +450,6 @@ export function userMetadataFilter(pubkeys: string[]): Filter {
 }
 
 /**
- * Create a filter for direct messages
- * @param userPubkey - User's public key
- * @param since - Optional timestamp to filter from
- * @param limit - Maximum number of events
- * @returns Nostr filter
- */
-export function dmFilter(
-  userPubkey: string,
-  since?: number,
-  limit: number = 50
-): Filter {
-  return {
-    kinds: [EventKind.ENCRYPTED_DM],
-    '#p': [userPubkey],
-    since,
-    limit,
-  };
-}
-
-/**
  * Create a filter for text notes from specific authors
  * @param authors - Array of author pubkeys
  * @param since - Optional timestamp to filter from

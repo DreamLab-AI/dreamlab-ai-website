@@ -7,7 +7,7 @@
   import { page } from '$app/stores';
   import { base } from '$app/paths';
   import { getCategories, getSections } from '$lib/config';
-  import { userStore, whitelistStatusStore } from '$lib/stores/user';
+  import { userPermissionsStore, permissionsReady } from '$lib/stores/userPermissions';
   import type { CategoryConfig, SectionConfig } from '$lib/config/types';
 
   export let currentCategoryId: string | null = null;
@@ -36,10 +36,10 @@
 
   $: categories = getCategories();
 
-  // Use whitelistStatusStore for authoritative admin/approval check
-  $: userCohorts = $whitelistStatusStore?.cohorts ?? $userStore.profile?.cohorts ?? [];
-  $: isAdmin = $whitelistStatusStore?.isAdmin ?? $userStore.profile?.isAdmin ?? false;
-  $: isApproved = $whitelistStatusStore?.isWhitelisted ?? $userStore.profile?.isApproved ?? false;
+  // Use userPermissionsStore for authoritative admin/approval check
+  $: userCohorts = $userPermissionsStore?.cohorts ?? [];
+  $: isAdmin = $userPermissionsStore?.globalRole === 'admin';
+  $: isApproved = isAdmin || userCohorts.length > 0;
 
   // Check if user has access to a zone
   function hasZoneAccess(cat: CategoryConfig): boolean {

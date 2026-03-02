@@ -4,8 +4,9 @@
   import { base } from '$app/paths';
   import { page } from '$app/stores';
   import { authStore } from '$lib/stores/auth';
-  import { userStore } from '$lib/stores/user';
+  import { waitForPermissions } from '$lib/stores/userPermissions';
   import { getSectionWithCategory, getBreadcrumbs } from '$lib/config';
+  import { canAccessSection } from '$lib/config/permissions';
   import Breadcrumb from '$lib/components/navigation/Breadcrumb.svelte';
   import { getAppConfig } from '$lib/config/loader';
 
@@ -20,16 +21,6 @@
   $: sectionInfo = getSectionWithCategory(sectionId);
   $: section = sectionInfo?.section;
   $: category = sectionInfo?.category;
-  $: userCohorts = $userStore.profile?.cohorts || [];
-
-  $: hasAccess = (() => {
-    if (!section?.access?.requiresApproval) return true;
-    const required = section.access.requiredCohorts || [];
-    if (required.length === 0) return true;
-    // Cast to string[] for comparison since config uses string cohort IDs
-    const userCohortStrings = userCohorts as string[];
-    return required.some((c: string) => userCohortStrings.includes(c));
-  })();
 
   onMount(async () => {
     await authStore.waitForReady();
@@ -45,7 +36,9 @@
       return;
     }
 
-    if (!hasAccess) {
+    // Wait for whitelist verification before checking access
+    const perms = await waitForPermissions();
+    if (perms && !canAccessSection(perms, sectionId)) {
       error = 'You do not have access to this section';
       loading = false;
       return;

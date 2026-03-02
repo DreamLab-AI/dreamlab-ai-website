@@ -314,13 +314,14 @@ describe('Permissions', () => {
 			}
 		});
 
-		it('should deny channel creation when section disallows it', () => {
+		it('should allow admin to create channels even when section disallows it', () => {
 			const sections = getSections();
 			const noChannelSection = sections.find((s) => !s.allowForumCreation);
 
 			if (noChannelSection) {
+				// Admin has forum.create capability which bypasses allowForumCreation check
 				const permissions = createAdminPermissions('test');
-				expect(canCreateChannel(permissions, noChannelSection.id)).toBe(false);
+				expect(canCreateChannel(permissions, noChannelSection.id)).toBe(true);
 			}
 		});
 

@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import { base } from '$app/paths';
 	import { getCategories } from '$lib/config';
-	import { userStore, whitelistStatusStore } from '$lib/stores/user';
+	import { userPermissionsStore } from '$lib/stores/userPermissions';
 	import { fade, fly } from 'svelte/transition';
 	import type { CategoryConfig } from '$lib/config/types';
 
@@ -10,9 +10,9 @@
 	export let onClose: () => void;
 
 	$: categories = getCategories();
-	$: userCohorts = $whitelistStatusStore?.cohorts ?? $userStore.profile?.cohorts ?? [];
-	$: isAdmin = $whitelistStatusStore?.isAdmin ?? $userStore.profile?.isAdmin ?? false;
-	$: isApproved = $whitelistStatusStore?.isWhitelisted ?? $userStore.profile?.isApproved ?? false;
+	$: userCohorts = $userPermissionsStore?.cohorts ?? [];
+	$: isAdmin = $userPermissionsStore?.globalRole === 'admin';
+	$: isApproved = isAdmin || userCohorts.length > 0;
 
 	// Extract current category/section from URL (with null safety)
 	$: pathname = $page?.url?.pathname ?? '';

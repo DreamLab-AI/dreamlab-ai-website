@@ -1,13 +1,8 @@
 import { derived, writable, type Readable, type Writable } from 'svelte/store';
 import { authStore } from './auth';
-import { verifyWhitelistStatus, type CohortName, type WhitelistStatus } from '$lib/nostr/whitelist';
+import { verifyWhitelistStatus, createFallbackStatus, type WhitelistStatus } from '$lib/nostr/whitelist';
 import { browser } from '$app/environment';
 import { profileCache } from './profiles';
-
-/**
- * User cohort types
- */
-export type CohortType = 'freshman' | 'sophomore' | 'junior' | 'senior' | 'graduate' | 'faculty' | 'staff' | 'alumni';
 
 /**
  * Relay-verified whitelist status store
@@ -24,7 +19,7 @@ export interface UserProfile {
   displayName: string | null;
   avatar: string | null;
   about: string | null;
-  cohorts: CohortType[];
+  cohorts: string[];
   isAdmin: boolean;
   isApproved: boolean;
   nip05: string | null;
@@ -118,31 +113,12 @@ export const userStore: Readable<UserState> = derived(
         });
       } catch (whitelistError) {
         console.warn('[User] Whitelist verification failed:', whitelistError);
-        // Create fallback status directly
-        whitelistStatus = {
-          isWhitelisted: false,
-          isAdmin: false,
-          cohorts: [],
-          verifiedAt: Date.now(),
-          source: 'fallback'
-        };
+        whitelistStatus = createFallbackStatus($auth.pubkey);
         whitelistStatusStore.set(whitelistStatus);
       }
 
-      // Map cohorts from whitelist status
-      const cohorts: CohortType[] = whitelistStatus.cohorts.map((cohortName): CohortType => {
-        const mapping: Record<string, CohortType> = {
-          freshman: 'freshman',
-          sophomore: 'sophomore',
-          junior: 'junior',
-          senior: 'senior',
-          graduate: 'graduate',
-          faculty: 'faculty',
-          staff: 'staff',
-          alumni: 'alumni'
-        };
-        return mapping[cohortName] || 'freshman';
-      });
+      // Pass through relay cohorts directly (no mapping - relay is source of truth)
+      const cohorts: string[] = [...whitelistStatus.cohorts];
 
       // Now try to fetch profile data - this can fail without affecting admin status
       let cachedProfile = null;
@@ -251,7 +227,7 @@ export const currentPubkey: Readable<string | null> = derived(
 /**
  * Derived store for current user's cohorts
  */
-export const currentCohorts: Readable<CohortType[]> = derived(
+export const currentCohorts: Readable<string[]> = derived(
   userStore,
   $user => $user.profile?.cohorts ?? []
 );

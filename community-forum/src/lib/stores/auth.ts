@@ -4,7 +4,7 @@ import { browser } from '$app/environment';
 import { base } from '$app/paths';
 import { isPWAInstalled, checkIfPWA } from '$lib/stores/pwa';
 import { hasNip07Extension, getPublicKeyFromExtension, getExtensionName, waitForNip07 } from '$lib/nostr/nip07';
-import { setNip07Signer, clearSigner } from '$lib/nostr/ndk';
+import { setNip07Signer, clearSigner } from '$lib/nostr/relay';
 import { registerPasskey, authenticatePasskey } from '$lib/auth/passkey';
 import type { PasskeyRegistrationResult, PasskeyAuthResult } from '$lib/auth/passkey';
 import { bytesToHex } from '@noble/hashes/utils';
@@ -91,6 +91,7 @@ function createAuthStore() {
   let _privkeyMem: Uint8Array | null = null;
 
   let readyPromise: Promise<void> | null = null;
+  let _pagehideListenerRegistered = false;
 
   function syncStateFields(updates: Partial<AuthState>): Partial<AuthState> {
     const result = { ...updates };
@@ -110,14 +111,16 @@ function createAuthStore() {
    * the user is still actively using the page.
    */
   function clearPrivkeyOnPageHide(): void {
-    if (!browser) return;
+    if (!browser || _pagehideListenerRegistered) return;
+    _pagehideListenerRegistered = true;
+
     window.addEventListener('pagehide', () => {
       if (_privkeyMem) {
         _privkeyMem.fill(0);
         _privkeyMem = null;
       }
       update((s) => ({ ...s, privateKey: null }));
-    }, { once: true });
+    });
   }
 
   /**
@@ -300,6 +303,7 @@ function createAuthStore() {
       } = {},
     ): void => {
       _privkeyMem = privkey;
+      clearPrivkeyOnPageHide();
 
       if (browser) {
         const existing = localStorage.getItem(STORAGE_KEY);
@@ -416,6 +420,7 @@ function createAuthStore() {
       try {
         const result = await authenticatePasskey(pubkey);
         _privkeyMem = result.privkey;
+        clearPrivkeyOnPageHide();
 
         const existing = localStorage.getItem(STORAGE_KEY);
         let existingData: {
@@ -772,6 +777,32 @@ function createAuthStore() {
         localStorage.removeItem('nostr_bbs_local_privkey');
         sessionStorage.removeItem('nostr_bbs_session_privkey');
         deleteCookie(COOKIE_KEY);
+
+        // Clear dependent stores to prevent stale admin/cohort data leaking
+        // to the next user session. Dynamic imports avoid circular dependencies
+        // since user.ts and sections.ts both import from auth.ts.
+        const [
+          { whitelistStatusStore },
+          { sectionStore },
+          { clearWhitelistCache },
+          { channelStore },
+          { adminStore },
+          { profileCache },
+        ] = await Promise.all([
+          import('./user'),
+          import('./sections'),
+          import('$lib/nostr/whitelist'),
+          import('./channels'),
+          import('./admin'),
+          import('./profiles'),
+        ]);
+        whitelistStatusStore.set(null);
+        sectionStore.clear();
+        clearWhitelistCache();
+        channelStore.clearChannels();
+        adminStore.reset();
+        profileCache.clear();
+
         const { goto } = await import('$app/navigation');
         goto(`${base}/`);
       }

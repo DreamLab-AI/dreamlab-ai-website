@@ -135,7 +135,9 @@ describe('Signup Flow Integration', () => {
 
       const state = get(authStore);
       expect(state.publicKey).toBe(TEST_PUBLIC_KEY);
-      expect(state.privateKey).toBe(TEST_PRIVATE_KEY);
+      // setKeys is a legacy method that ignores the privateKey parameter
+      // (passkey mode stores privkey only in memory via setKeysFromPasskey)
+      expect(state.privateKey).toBeNull();
       expect(state.isAuthenticated).toBe(true);
       expect(state.accountStatus).toBe('incomplete');
     });

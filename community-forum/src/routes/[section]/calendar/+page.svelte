@@ -4,7 +4,7 @@
   import { base } from '$app/paths';
   import { page } from '$app/stores';
   import { authStore } from '$lib/stores/auth';
-  import { userStore } from '$lib/stores/user';
+  import { userPermissionsStore, waitForPermissions } from '$lib/stores/userPermissions';
   import { ndk, ensureRelayConnected, isConnected } from '$lib/nostr/relay';
   import { getSection, getSections } from '$lib/config';
   import {
@@ -19,6 +19,9 @@
   import EventCalendar from '$lib/components/events/EventCalendar.svelte';
   import EventCard from '$lib/components/events/EventCard.svelte';
   import CreateEventModal from '$lib/components/calendar/CreateEventModal.svelte';
+  import { getAppConfig } from '$lib/config/loader';
+
+  const appConfig = getAppConfig();
 
   let events: (SectionEvent | CalendarEvent)[] = [];
   let loading = true;
@@ -34,10 +37,11 @@
   $: sectionId = $page.params.section as ChannelSection;
   $: section = getSection(sectionId);
   $: sections = getSections();
-  $: userCohorts = $userStore.profile?.cohorts || [];
+  $: userCohorts = $userPermissionsStore?.cohorts || [];
 
   onMount(async () => {
     await authStore.waitForReady();
+    await waitForPermissions();
 
     if (!$authStore.isAuthenticated || !$authStore.publicKey) {
       goto(`${base}/`);
@@ -68,7 +72,7 @@
 
       // Also fetch tribe birthdays if this is the moomaa-tribe section
       let birthdayEvents: CalendarEvent[] = [];
-      if (sectionId === 'community-rooms' && $authStore.publicKey) {
+      if (sectionId === 'minimoonoir-events' && $authStore.publicKey) {
         birthdayEvents = await fetchTribeBirthdayEvents($authStore.publicKey);
       }
 
@@ -136,7 +140,7 @@
 </script>
 
 <svelte:head>
-  <title>{section?.name || 'Section'} Calendar - Nostr BBS</title>
+  <title>{section?.name || 'Section'} Calendar - {appConfig.name}</title>
 </svelte:head>
 
 <div class="container mx-auto p-4 max-w-6xl">

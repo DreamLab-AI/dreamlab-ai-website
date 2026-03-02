@@ -8,6 +8,7 @@
 		workingConfig,
 		type SetupStep
 	} from '$lib/stores/setup';
+	import { base } from '$app/paths';
 	import { stringify as stringifyYaml } from 'yaml';
 
 	let yamlInput = '';
@@ -88,12 +89,12 @@
 
 	function completeSetup() {
 		setupStore.completeSetup();
-		goto('/');
+		goto(`${base}/`);
 	}
 
 	function skipSetup() {
 		setupStore.skipSetup();
-		goto('/');
+		goto(`${base}/`);
 	}
 
 	function downloadTemplate() {
@@ -197,7 +198,7 @@ sections:
 
 	onMount(() => {
 		if (setupStore.isSetupComplete) {
-			goto('/');
+			goto(`${base}/`);
 		}
 	});
 </script>

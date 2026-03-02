@@ -3,10 +3,22 @@
  * Derives user permissions from auth state and whitelist status (SOURCE OF TRUTH)
  */
 
-import { derived } from 'svelte/store';
+import { derived, get } from 'svelte/store';
 import { authStore } from './auth';
 import { whitelistStatusStore } from './user';
 import type { UserPermissions } from '$lib/config/types';
+
+/**
+ * Whether the whitelist verification has completed (or failed with fallback).
+ * Use this to distinguish "loading" from "loaded with empty cohorts".
+ */
+export const permissionsReady = derived(
+	[authStore, whitelistStatusStore],
+	([$auth, $whitelistStatus]) => {
+		if (!$auth.isAuthenticated || !$auth.pubkey) return true; // not logged in = nothing to wait for
+		return $whitelistStatus !== null;
+	}
+);
 
 /**
  * Derived store that provides user permissions based on auth state AND whitelist status
@@ -38,6 +50,24 @@ export const userPermissionsStore = derived<
 		};
 	}
 );
+
+/**
+ * Wait for permissions to be fully loaded (whitelist verified).
+ * Resolves immediately if not authenticated or if whitelist is already loaded.
+ */
+export function waitForPermissions(): Promise<UserPermissions | null> {
+	return new Promise((resolve) => {
+		const unsub = permissionsReady.subscribe((ready) => {
+			if (ready) {
+				// Use queueMicrotask to allow the subscription to be set before unsubscribing
+				queueMicrotask(() => {
+					unsub();
+					resolve(get(userPermissionsStore));
+				});
+			}
+		});
+	});
+}
 
 /**
  * Check if user has admin permissions
