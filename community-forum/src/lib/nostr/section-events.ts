@@ -72,8 +72,8 @@ async function getChannelSection(channelId: string): Promise<ChannelSection | nu
       }
     }
 
-    // Default to public-lobby if no section found
-    return 'public-lobby';
+    // Default to dreamlab-lobby if no section found
+    return 'dreamlab-lobby';
   } catch (error) {
     console.error('Failed to get channel section:', error);
     return null;

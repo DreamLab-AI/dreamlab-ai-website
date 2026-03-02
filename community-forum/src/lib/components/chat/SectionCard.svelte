@@ -1,16 +1,18 @@
 <script lang="ts">
   import { SECTION_CONFIG } from '$lib/stores';
   import type { ChannelSection, SectionStats, SectionAccessStatus } from '$lib/stores';
+  import { getSection } from '$lib/config';
 
   export let section: ChannelSection;
   export let stats: SectionStats | undefined = undefined;
   export let accessStatus: SectionAccessStatus;
 
   $: config = SECTION_CONFIG[section];
+  $: sectionConfig = getSection(section);
   $: isApproved = accessStatus === 'approved';
   $: isPending = accessStatus === 'pending';
   $: needsApproval = config?.access?.requiresApproval && !isApproved && !isPending;
-  $: hasCalendarAccess = section === 'public-lobby' || (isApproved && config?.calendar?.access !== 'none');
+  $: hasCalendarAccess = sectionConfig?.access?.autoApprove || (isApproved && config?.calendar?.access !== 'none');
 
   function formatLastActivity(timestamp: number): string {
     const now = Date.now();

@@ -15,6 +15,7 @@
     type VisibilityLayer,
     type CalendarDisplayEvent
   } from '$lib/utils/calendar-visibility';
+  import { getSections } from '$lib/config';
 
   export let isExpanded: boolean = true;
   export let isVisible: boolean = true;
@@ -27,7 +28,7 @@
 
   // Venue types for filter UI
   const venueTypeOptions: EventVenueType[] = ['fairfield', 'offsite', 'online', 'external'];
-  const sectionOptions = ['public_lobby', 'community', 'dreamlab'];
+  const sectionOptions = getSections().map(s => s.id);
 
   // Subscribe to stores
   $: selectedDate = $calendarStore.selectedDate || new Date();

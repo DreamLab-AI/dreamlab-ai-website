@@ -4,9 +4,9 @@
  * Manages user access to channel sections (areas).
  *
  * Access Model:
- * - public-lobby: Auto-approved for all authenticated users
- * - community-rooms: Requires admin approval
- * - dreamlab: Requires admin approval
+ * - Sections with autoApprove (e.g. dreamlab-lobby, family-home, minimoonoir-welcome, ai-general):
+ *   Auto-approved for all authenticated users
+ * - Other sections (e.g. dreamlab-community, fairfield-residents): Requires admin approval
  *
  * Flow:
  * 1. User sees section stats/preview

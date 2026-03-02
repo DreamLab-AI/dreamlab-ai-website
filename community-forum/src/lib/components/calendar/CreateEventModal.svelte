@@ -30,8 +30,8 @@
     room: 'main-room',
     address: '',
     virtualLink: '',
-    visibleToSections: [defaultSection || 'public-lobby'] as SectionId[],
-    detailsSections: [defaultSection || 'public-lobby'] as SectionId[],
+    visibleToSections: [defaultSection || 'dreamlab-lobby'] as SectionId[],
+    detailsSections: [defaultSection || 'dreamlab-lobby'] as SectionId[],
     rsvpCohorts: [] as CohortId[],
     maxAttendees: undefined as number | undefined,
     createChatRoom: true
@@ -190,7 +190,7 @@
         category: {
           primary: formData.category,
           tags: event.tags || [],
-          isPublicListing: formData.visibleToSections.includes('public-lobby')
+          isPublicListing: formData.visibleToSections.includes('dreamlab-lobby')
         },
         visibility: {
           visibleToSections: formData.visibleToSections,
@@ -198,7 +198,7 @@
           visibleToRoles: [],
           detailsVisibleToSections: formData.detailsSections,
           detailsVisibleToCohorts: formData.rsvpCohorts,
-          isPublicListing: formData.visibleToSections.includes('public-lobby')
+          isPublicListing: formData.visibleToSections.includes('dreamlab-lobby')
         },
         attendance: {
           maxCapacity: formData.maxAttendees,
@@ -259,8 +259,8 @@
       room: 'main-room',
       address: '',
       virtualLink: '',
-      visibleToSections: [defaultSection || 'public-lobby'],
-      detailsSections: [defaultSection || 'public-lobby'],
+      visibleToSections: [defaultSection || 'dreamlab-lobby'],
+      detailsSections: [defaultSection || 'dreamlab-lobby'],
       rsvpCohorts: [],
       maxAttendees: undefined,
       createChatRoom: true

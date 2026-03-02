@@ -38,7 +38,7 @@ const KIND_GIFT_WRAP = 1059;  // NIP-17/NIP-59 gift-wrapped DM (required since 2
  *   kind: 9022,
  *   content: optional message,
  *   tags: [
- *     ['section', 'community-rooms'],
+ *     ['section', 'dreamlab-lobby'],
  *     ['p', adminPubkey]  // Notify admin(s)
  *   ]
  * }

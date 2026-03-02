@@ -54,9 +54,9 @@
     try {
       const channel = await db.channels.get(channelId);
       if (channel) {
-        // Extract section from tags or default to public-lobby
+        // Extract section from tags or default to dreamlab-lobby
         const sectionTag = channel.tags?.find((t: string[]) => t[0] === 'section')?.[1];
-        const section = (sectionTag || 'public-lobby') as ChannelSection;
+        const section = (sectionTag || 'dreamlab-lobby') as ChannelSection;
         channelSectionCache.set(channelId, section);
         return section;
       }
