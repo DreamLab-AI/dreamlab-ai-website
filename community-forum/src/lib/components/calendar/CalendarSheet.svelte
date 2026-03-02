@@ -44,9 +44,9 @@
       const dayStart = Math.floor(selectedDay.getTime() / 1000);
       const dayEnd = dayStart + 86400;
 
-      return $filteredEvents.filter(e => e.start >= dayStart && e.start < dayEnd);
+      return ($filteredEvents || []).filter(e => e.start >= dayStart && e.start < dayEnd);
     }
-    return upcomingEvents.slice(0, 10);
+    return (upcomingEvents || []).slice(0, 10);
   }
 
   function snapToHeight(target: number) {
