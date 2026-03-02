@@ -1,8 +1,7 @@
 name: Deploy Cloudflare Workers
 
 # Deploys all 5 Workers using per-worker wrangler.toml configs.
-# Triggers on pushes to main that touch workers/ or workflow config,
-# or manually via workflow_dispatch.
+# Runs on DreamLab-AI/dreamlab-ai-website fork only.
 
 on:
   push:
@@ -22,6 +21,7 @@ env:
 jobs:
   deploy:
     name: Deploy Workers
+    if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
     runs-on: ubuntu-latest
     timeout-minutes: 15
 

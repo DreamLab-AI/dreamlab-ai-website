@@ -1,5 +1,8 @@
 name: Deploy to GitHub Pages
 
+# Runs on DreamLab-AI/dreamlab-ai-website fork only.
+# Does NOT run on upstream (TheDreamLabUK/website).
+
 on:
   push:
     branches:
@@ -8,6 +11,8 @@ on:
 
 jobs:
   build-and-deploy:
+    # Only run on the DreamLab-AI fork, skip if triggered on upstream
+    if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -42,7 +47,7 @@ jobs:
       - name: Build main site
         run: npm run build
 
-      - name: Build Fairfield community app
+      - name: Build community forum
         working-directory: community-forum
         env:
           BASE_PATH: '/community'
@@ -56,7 +61,7 @@ jobs:
           VITE_APP_NAME: 'DreamLab Community'
           VITE_NDK_DEBUG: 'false'
         run: |
-          npm ci
+          npm install
           npm run build
 
       - name: Copy Fairfield build to community path

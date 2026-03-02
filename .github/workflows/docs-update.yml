@@ -13,6 +13,7 @@ permissions:
 jobs:
   update-timestamps:
     name: Update Last Modified Timestamps
+    if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
     runs-on: ubuntu-latest
 
     steps:
@@ -69,6 +70,7 @@ jobs:
 
   check-outdated:
     name: Check for Outdated Documentation
+    if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
     runs-on: ubuntu-latest
 
     steps:
