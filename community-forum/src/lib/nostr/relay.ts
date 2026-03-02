@@ -195,9 +195,10 @@ class RelayManager {
     try {
       this.updateState(ConnectionState.Connecting, relayUrl);
 
-      if (this._ndk) {
-        await this.disconnectRelay();
-      }
+      this._activeSubscriptions.forEach(sub => sub.stop());
+      this._activeSubscriptions.clear();
+      this._ndk = null;
+      this._signer = null;
 
       this._ndk = await this.initializeNDKWithNip07(relayUrl);
       return this._finishConnect(relayUrl);
@@ -215,9 +216,11 @@ class RelayManager {
     try {
       this.updateState(ConnectionState.Connecting, relayUrl);
 
-      if (this._ndk) {
-        await this.disconnectRelay();
-      }
+      // Clean up old subscriptions without closing the WebSocket prematurely
+      this._activeSubscriptions.forEach(sub => sub.stop());
+      this._activeSubscriptions.clear();
+      this._ndk = null;
+      this._signer = null;
 
       this._ndk = await this.initializeNDK(privateKey, relayUrl);
       return this._finishConnect(relayUrl);
@@ -242,29 +245,38 @@ class RelayManager {
     const relay = Array.from(this._ndk.pool.relays.values())[0];
     if (!relay) throw new Error('No relay in pool');
 
+    // Wait for the relay to actually reach connected status.
+    // NDK's connect() fires off the WebSocket but resolves immediately.
+    const currentNdk = this._ndk;
     await new Promise<void>((resolve, reject) => {
-      const timeout = setTimeout(() => reject(new Error('Connection timeout')), TIMEOUTS.connect);
+      const timeout = setTimeout(() => {
+        cleanup();
+        reject(new Error('Connection timeout'));
+      }, TIMEOUTS.connect);
 
-      // Already connected (e.g., reconnect scenario)
-      if (relay.connectivity.status >= 5) {
+      const cleanup = () => {
         clearTimeout(timeout);
+        relay.off('connect', onConnect);
+        relay.off('disconnect', onDisconnect);
+      };
+
+      // Already connected
+      if (relay.connectivity.status >= 5) {
+        cleanup();
         resolve();
         return;
       }
 
-      // Wait for connect event from the relay
       const onConnect = () => {
-        clearTimeout(timeout);
-        relay.off('connect', onConnect);
+        cleanup();
         resolve();
       };
       relay.on('connect', onConnect);
 
-      // Also handle disconnect during connection attempt
       const onDisconnect = () => {
-        clearTimeout(timeout);
-        relay.off('connect', onConnect);
-        relay.off('disconnect', onDisconnect);
+        // Ignore disconnect if NDK was replaced (stale event from old instance)
+        if (this._ndk !== currentNdk) { cleanup(); return; }
+        cleanup();
         reject(new Error('Relay disconnected during handshake'));
       };
       relay.on('disconnect', onDisconnect);
