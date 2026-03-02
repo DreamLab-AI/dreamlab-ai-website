@@ -63,11 +63,15 @@
   async function waitForRelayConnection(timeoutMs: number = 10000): Promise<boolean> {
     if (isConnected()) return true;
 
-    // If layout hasn't triggered connection yet, connect directly as fallback
+    // If layout hasn't triggered connection yet, connect directly as fallback.
+    // Wrap in a race so a stuck connectRelay promise can't block the timeout.
     if (!isConnected()) {
       try {
-        await ensureRelayConnected($authStore);
-        return true;
+        const connectTimeout = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('connect timeout')), timeoutMs)
+        );
+        await Promise.race([ensureRelayConnected($authStore), connectTimeout]);
+        if (isConnected()) return true;
       } catch {
         // Fall through to polling
       }

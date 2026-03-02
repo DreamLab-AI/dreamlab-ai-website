@@ -123,13 +123,22 @@ class RelayManager {
       enableOutboxModel: false
     });
 
+    // Always track disconnect events in connection state so the layout
+    // reactive can detect drops and trigger reconnection.
+    ndk.pool.on('relay:disconnect', (relay: NDKRelay) => {
+      if (NDK_CONFIG.enableDebug) {
+        console.log(`[NDK] Disconnected from relay: ${relay.url}`);
+      }
+      // Only update state to Disconnected if this NDK instance is still current
+      // (avoids stale events from a replaced instance updating state).
+      if (this._ndk === ndk) {
+        this.updateState(ConnectionState.Disconnected, relay.url);
+      }
+    });
+
     if (NDK_CONFIG.enableDebug) {
       ndk.pool.on('relay:connect', (relay: NDKRelay) => {
         console.log(`[NDK] Connected to relay: ${relay.url}`);
-      });
-
-      ndk.pool.on('relay:disconnect', (relay: NDKRelay) => {
-        console.log(`[NDK] Disconnected from relay: ${relay.url}`);
       });
 
       ndk.pool.on('relay:auth', (relay: NDKRelay, challenge: string) => {

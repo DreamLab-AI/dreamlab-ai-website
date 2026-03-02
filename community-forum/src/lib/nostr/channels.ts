@@ -686,7 +686,13 @@ export async function fetchChannelMessages(
 		limit,
 	};
 
-	const events = await ndkInstance.fetchEvents(filter);
+	// Race fetchEvents against a timeout so loading never hangs indefinitely
+	const fetchPromise = ndkInstance.fetchEvents(filter);
+	fetchPromise.catch(() => {}); // Prevent unhandled rejection if timeout wins
+	const fetchTimeout = new Promise<Set<NDKEvent>>((resolve) => {
+		setTimeout(() => resolve(new Set()), FETCH_EVENTS_TIMEOUT);
+	});
+	const events = await Promise.race([fetchPromise, fetchTimeout]);
 	const messages: ChannelMessage[] = [];
 
 	for (const event of events) {

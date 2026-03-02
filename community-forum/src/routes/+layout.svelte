@@ -8,7 +8,7 @@
 	import { fade } from 'svelte/transition';
 	import { authStore, isAuthenticated } from '$lib/stores/auth';
 	import { userStore } from '$lib/stores/user';
-	import { connectRelay, connectRelayWithNip07, isConnected } from '$lib/nostr/relay';
+	import { connectRelay, connectRelayWithNip07, isConnected, connectionState, ConnectionState } from '$lib/nostr/relay';
 	import { RELAY_URL } from '$lib/config';
 	import { sessionStore } from '$lib/stores/session';
 	import { calendarStore, sidebarVisible, sidebarExpanded } from '$lib/stores/calendar';
@@ -55,7 +55,11 @@
 	// Uses private key signer for passkey/local-key users, NIP-07 signer for extension users.
 	// Runs at the layout level so every page has NDK available without
 	// needing its own connectRelay() call in onMount.
-	$: if (browser && $authStore.isAuthenticated && !isConnected() && !relayConnecting) {
+	// Subscribe to connectionState store so Svelte re-evaluates when the relay
+	// disconnects (isConnected() alone is a plain function call, not tracked).
+	$: connStatus = $connectionState;
+	$: if (browser && $authStore.isAuthenticated && !isConnected() && !relayConnecting &&
+		(connStatus.state === ConnectionState.Disconnected || connStatus.state === ConnectionState.Error)) {
 		relayConnecting = true;
 		const connectPromise = $authStore.isNip07
 			? connectRelayWithNip07(RELAY_URL)
