@@ -316,26 +316,41 @@ class RelayManager {
       throw new Error('No signer available. Call connectRelay first.');
     }
 
-    try {
-      event.ndk = this._ndk;
+    event.ndk = this._ndk;
 
-      if (!event.sig) {
-        await event.sign(this._signer);
-      }
-
-      const publishTimeout = new Promise<never>((_, reject) => {
-        setTimeout(() => reject(new Error('Publish timeout')), TIMEOUTS.publish);
-      });
-
-      const publishPromise = event.publish();
-
-      const relaySet = await Promise.race([publishPromise, publishTimeout]);
-
-      return relaySet.size > 0;
-    } catch (error) {
-      console.error('[NDK] Publish failed:', error);
-      throw error;
+    if (!event.sig) {
+      await event.sign(this._signer);
     }
+
+    // Try publishing with retry — CF Workers relay may respond slowly on
+    // cold start (D1 queries for replaceable events), causing NDK to time
+    // out even though the event was stored. One retry handles this.
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const publishTimeout = new Promise<never>((_, reject) => {
+          setTimeout(() => reject(new Error('Publish timeout')), TIMEOUTS.publish);
+        });
+
+        const publishPromise = event.publish();
+
+        const relaySet = await Promise.race([publishPromise, publishTimeout]);
+
+        return relaySet.size > 0;
+      } catch (error) {
+        if (attempt === 0) {
+          if (NDK_CONFIG.enableDebug) {
+            console.warn('[NDK] Publish attempt 1 failed, retrying:', error);
+          }
+          // Brief pause before retry
+          await new Promise(r => setTimeout(r, 1000));
+          continue;
+        }
+        console.error('[NDK] Publish failed after retry:', error);
+        throw error;
+      }
+    }
+
+    return false;
   }
 
   /**

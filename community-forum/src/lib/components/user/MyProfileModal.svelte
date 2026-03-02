@@ -2,7 +2,7 @@
 	import { authStore } from '$lib/stores/auth';
 	import { profileCache } from '$lib/stores/profiles';
 	import { encodePubkey, encodePrivkey } from '$lib/nostr/keys';
-	import { ndk, isConnected } from '$lib/nostr/relay';
+	import { ndk, isConnected, ensureRelayConnected, publishEvent } from '$lib/nostr/relay';
 	import { NDKEvent } from '@nostr-dev-kit/ndk';
 	import { browser } from '$app/environment';
 	import ImageUpload from '$lib/components/ui/ImageUpload.svelte';
@@ -140,6 +140,11 @@
 		profileError = null;
 
 		try {
+			// Ensure relay is connected before publishing
+			if (!isConnected()) {
+				await ensureRelayConnected($authStore);
+			}
+
 			const ndkInstance = ndk();
 			if (!ndkInstance) {
 				throw new Error('NDK not connected');
@@ -155,9 +160,8 @@
 				birthday: editBirthday || undefined,
 			});
 
-			// Sign and publish to relay
-			await metadataEvent.sign();
-			await metadataEvent.publish();
+			// Sign and publish via relay manager (has proper timeout handling)
+			await publishEvent(metadataEvent);
 
 			// Update local auth store
 			authStore.setProfile(editNickname || null, editAvatar || null);

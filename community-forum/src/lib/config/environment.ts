@@ -79,7 +79,7 @@ export const NDK_CONFIG = {
 export const TIMEOUTS = {
 	connect: 10000,
 	auth: 5000,
-	publish: 5000,
+	publish: 10000,
 	subscribe: 30000
 } as const;
 
