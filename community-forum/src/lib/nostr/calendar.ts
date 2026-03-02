@@ -3,7 +3,7 @@
  * Provides utilities for creating and managing calendar events on Nostr
  */
 
-import { ndk, isConnected } from './relay';
+import { ndk, isConnected, publishEvent } from './relay';
 import { NDKEvent, type NDKFilter } from '@nostr-dev-kit/ndk';
 import { createChannel } from './channels';
 
@@ -124,8 +124,7 @@ export async function createCalendarEvent(
       event.tags.forEach((tag) => ndkEvent.tags.push(['t', tag]));
     }
 
-    await ndkEvent.sign();
-    await ndkEvent.publish();
+    await publishEvent(ndkEvent);
 
     return {
       id: ndkEvent.id,
@@ -254,8 +253,7 @@ export async function rsvpToEvent(
       ['d', eventId], // For replaceable event
     ];
 
-    await ndkEvent.sign();
-    await ndkEvent.publish();
+    await publishEvent(ndkEvent);
     return true;
   } catch (error) {
     console.error('Failed to RSVP to event:', error);
@@ -317,8 +315,7 @@ export async function deleteCalendarEvent(eventId: string): Promise<boolean> {
     ndkEvent.content = 'Event deleted';
     ndkEvent.tags = [['e', eventId]];
 
-    await ndkEvent.sign();
-    await ndkEvent.publish();
+    await publishEvent(ndkEvent);
     return true;
   } catch (error) {
     console.error('Failed to delete event:', error);

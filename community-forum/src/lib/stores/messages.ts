@@ -525,31 +525,35 @@ function createMessageStore() {
         });
 
         subscription2.on('event', async (ndkEvent: NDKEvent) => {
-          const event = ndkEventToEvent(ndkEvent);
-          // Handle deletion
-          const deletedId = event.tags.find(t => t[0] === 'e')?.[1];
+          try {
+            const event = ndkEventToEvent(ndkEvent);
+            // Handle deletion
+            const deletedId = event.tags.find(t => t[0] === 'e')?.[1];
 
-          if (deletedId) {
-            await db.addDeletion({
-              id: event.id,
-              deletedEventId: deletedId,
-              channelId,
-              deleterPubkey: event.pubkey,
-              created_at: event.created_at,
-              kind: event.kind
-            });
+            if (deletedId) {
+              await db.addDeletion({
+                id: event.id,
+                deletedEventId: deletedId,
+                channelId,
+                deleterPubkey: event.pubkey,
+                created_at: event.created_at,
+                kind: event.kind
+              });
 
-            // Remove from search index (async, don't block)
-            removeDeletedMessage(deletedId).catch(err =>
-              console.error('Failed to remove deleted message from search:', err)
-            );
+              // Remove from search index (async, don't block)
+              removeDeletedMessage(deletedId).catch(err =>
+                console.error('Failed to remove deleted message from search:', err)
+              );
 
-            update(state => ({
-              ...state,
-              messages: state.messages.map(m =>
-                m.id === deletedId ? { ...m, deleted: true } : m
-              )
-            }));
+              update(state => ({
+                ...state,
+                messages: state.messages.map(m =>
+                  m.id === deletedId ? { ...m, deleted: true } : m
+                )
+              }));
+            }
+          } catch (e) {
+            console.error('[messages] Error processing deletion event:', e);
           }
         });
 

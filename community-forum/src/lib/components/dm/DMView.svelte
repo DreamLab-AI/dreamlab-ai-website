@@ -102,10 +102,10 @@
     isSending = true;
 
     try {
-      // Get user's private key
+      // Get user's private key (NIP-07 users won't have this — DMs require privkey for NIP-44)
       const privateKey = $authStore.privateKey;
       if (!privateKey) {
-        throw new Error('No private key available');
+        throw new Error('Direct messages require a private key (NIP-07 extension signing is not supported for encrypted DMs)');
       }
 
       // Convert hex private key to Uint8Array
@@ -115,11 +115,11 @@
       const relayAdapter = relay ? {
         publish: async (event: import('nostr-tools').Event) => {
           const { NDKEvent } = await import('@nostr-dev-kit/ndk');
-          const { ndk } = await import('$lib/nostr/relay');
+          const { ndk, publishEvent } = await import('$lib/nostr/relay');
           const ndkInstance = ndk();
           if (!ndkInstance) throw new Error('NDK not initialized');
           const ndkEvent = new NDKEvent(ndkInstance, event);
-          await ndkEvent.publish();
+          await publishEvent(ndkEvent);
         }
       } : { publish: async () => {} };
 

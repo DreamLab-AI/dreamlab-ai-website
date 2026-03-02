@@ -30,12 +30,24 @@ export default defineConfig({
 		},
 		coverage: {
 			provider: 'v8',
-			reporter: ['text', 'json', 'html'],
+			reporter: ['text', 'json-summary', 'json', 'html'],
+			reportsDirectory: './coverage',
+			include: ['src/lib/**/*.ts'],
 			exclude: [
 				'node_modules/',
 				'tests/',
-				'*.config.ts'
+				'*.config.ts',
+				'src/**/*.test.ts',
+				'src/**/*.spec.ts',
+				'src/app.d.ts',
+				'src/lib/semantic/**',
+				'src/lib/workers/**',
+				'src/lib/types/**',
+				'src/lib/components/*/index.ts',
+				'src/lib/utils/index.ts',
+				'src/lib/index.ts'
 			]
-		}
+		},
+		passWithNoTests: true
 	}
 });

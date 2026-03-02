@@ -1,6 +1,6 @@
 import { writable, derived, get } from 'svelte/store';
 import { isAdmin } from './user';
-import { ndk as getNdk, isConnected } from '$lib/nostr/relay';
+import { ndk as getNdk, isConnected, publishEvent } from '$lib/nostr/relay';
 import { NDKEvent, type NDKFilter } from '@nostr-dev-kit/ndk';
 import { browser } from '$app/environment';
 
@@ -205,7 +205,7 @@ async function publishPinList(channelId: string, messageIds: string[]): Promise<
             ...messageIds.map(id => ['e', id])
         ];
 
-        await event.publish();
+        await publishEvent(event);
         return true;
     } catch (e) {
         console.error('Failed to publish pinned messages list:', e);

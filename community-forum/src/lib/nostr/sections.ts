@@ -11,7 +11,7 @@
  * 2. Sends encrypted DM (NIP-17) to user notifying them
  */
 
-import { ndk, isConnected } from './relay';
+import { ndk, isConnected, publishEvent } from './relay';
 import { NDKEvent, type NDKFilter, type NDKSubscription } from '@nostr-dev-kit/ndk';
 import { browser } from '$app/environment';
 import type {
@@ -91,8 +91,7 @@ export async function requestSectionAccess(
       ...adminPubkeys.map((pk: string) => ['p', pk])
     ];
 
-    await event.sign(signer);
-    await event.publish();
+    await publishEvent(event);
 
     if (import.meta.env.DEV) {
       console.log('[Sections] Access request published:', {
@@ -153,8 +152,7 @@ export async function approveSectionAccess(
       ['e', request.id]  // Reference to original request
     ];
 
-    await approvalEvent.sign(signer);
-    await approvalEvent.publish();
+    await publishEvent(approvalEvent);
 
     // Send DM to user notifying them
     const sectionConfig = SECTION_CONFIG[request.section];
@@ -226,8 +224,7 @@ async function sendAccessApprovalDM(
         JSON.stringify(sealedEvent.rawEvent())
       );
       giftWrapEvent.created_at = Math.floor(Date.now() / 1000);
-      await giftWrapEvent.sign(signer);
-      await giftWrapEvent.publish();
+      await publishEvent(giftWrapEvent);
 
       if (import.meta.env.DEV) {
         console.log('[Sections] Approval DM (NIP-59 gift wrap) sent to:', recipientPubkey.slice(0, 8) + '...');

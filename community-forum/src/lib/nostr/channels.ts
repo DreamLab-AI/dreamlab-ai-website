@@ -3,7 +3,7 @@
  * Implements NIP-28 (Public Chat) event kinds
  */
 import { NDKEvent, type NDKFilter } from '@nostr-dev-kit/ndk';
-import { ndk, isConnected } from './relay';
+import { ndk, isConnected, publishEvent } from './relay';
 import { browser } from '$app/environment';
 import type { ChannelSection, ChannelAccessType } from '$lib/types/channel';
 import { validateContent, validateChannelName } from '$lib/utils/validation';
@@ -131,9 +131,8 @@ export async function createChannel(options: ChannelCreateOptions): Promise<Crea
 	const accessType = options.accessType || 'gated';
 	event.tags.push(['access-type', accessType]);
 
-	// Sign and publish
-	await event.sign();
-	await event.publish();
+	// Sign and publish via relay manager
+	await publishEvent(event);
 
 	return {
 		id: event.id,
@@ -206,8 +205,7 @@ export async function updateChannelMetadata(
 	event.content = JSON.stringify(metadata);
 	event.tags.push(['e', channelId, '', 'root']);
 
-	await event.sign();
-	await event.publish();
+	await publishEvent(event);
 }
 
 /**
@@ -414,8 +412,7 @@ export async function sendChannelMessage(
 		}
 	}
 
-	await event.sign();
-	await event.publish();
+	await publishEvent(event);
 
 	return event.id;
 }
@@ -696,16 +693,20 @@ export async function fetchChannelMessages(
 	const messages: ChannelMessage[] = [];
 
 	for (const event of events) {
-		const replyTag = event.tags.find(t => t[0] === 'e' && t[3] === 'reply');
+		try {
+			const replyTag = event.tags.find(t => t[0] === 'e' && t[3] === 'reply');
 
-		messages.push({
-			id: event.id,
-			content: event.content,
-			pubkey: event.pubkey,
-			createdAt: event.created_at || 0,
-			replyTo: replyTag?.[1],
-			tags: event.tags.map(t => [...t]), // Clone tags array
-		});
+			messages.push({
+				id: event.id,
+				content: event.content,
+				pubkey: event.pubkey,
+				createdAt: event.created_at || 0,
+				replyTo: replyTag?.[1],
+				tags: event.tags.map(t => [...t]), // Clone tags array
+			});
+		} catch (e) {
+			console.error('[channels] Error parsing channel message:', e);
+		}
 	}
 
 	// Sort by creation time (oldest first for messages)
@@ -768,16 +769,20 @@ export async function subscribeToChannel(
 	const sub = ndkInstance.subscribe(filter, { closeOnEose: false });
 
 	sub.on('event', (event: NDKEvent) => {
-		const replyTag = event.tags.find(t => t[0] === 'e' && t[3] === 'reply');
+		try {
+			const replyTag = event.tags.find(t => t[0] === 'e' && t[3] === 'reply');
 
-		onMessage({
-			id: event.id,
-			content: event.content,
-			pubkey: event.pubkey,
-			createdAt: event.created_at || 0,
-			replyTo: replyTag?.[1],
-			tags: event.tags.map(t => [...t]), // Clone tags array
-		});
+			onMessage({
+				id: event.id,
+				content: event.content,
+				pubkey: event.pubkey,
+				createdAt: event.created_at || 0,
+				replyTo: replyTag?.[1],
+				tags: event.tags.map(t => [...t]), // Clone tags array
+			});
+		} catch (e) {
+			console.error('[channels] Error processing subscription event:', e);
+		}
 	});
 
 	return {

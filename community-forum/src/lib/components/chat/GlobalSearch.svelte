@@ -12,7 +12,7 @@
     getSearchStats,
     loadIndex,
     type SearchResult as SemanticResult
-  } from '$lib/semantic/hnsw-search';
+  } from '$lib/semantic/ruvector-search';
   import { getLocalSyncState, syncEmbeddings, shouldSync } from '$lib/semantic/embeddings-sync';
   import { sectionStore, accessibleSections } from '$lib/stores/sections';
   import type { ChannelSection } from '$lib/types/channel';

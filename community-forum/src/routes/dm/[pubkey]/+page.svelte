@@ -8,6 +8,7 @@
   import { toast } from '$lib/stores/toast';
   import { hexToBytes } from '@noble/hashes/utils.js';
   import { getAppConfig } from '$lib/config/loader';
+  import { ensureRelayConnected, isConnected } from '$lib/nostr/relay';
   import { profileCache } from '$lib/stores/profiles';
 
   const appConfig = getAppConfig();
@@ -37,6 +38,15 @@
     if (!$authStore.isAuthenticated || !$authStore.privateKey) {
       goto(`${base}/`);
       return;
+    }
+
+    // Ensure relay is connected before any Nostr operations
+    try {
+      if (!isConnected()) {
+        await ensureRelayConnected($authStore);
+      }
+    } catch (err) {
+      console.error('Failed to connect to relay:', err);
     }
 
     // Load or start conversation

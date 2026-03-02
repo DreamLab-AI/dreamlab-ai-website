@@ -208,7 +208,7 @@ export async function publishRegistrationRequest(
 
   try {
     // Dynamic import to avoid SSR issues
-    const { ndk, connectRelay, isConnected } = await import('./relay');
+    const { ndk, connectRelay, isConnected, publishEvent } = await import('./relay');
     const { RELAY_URL } = await import('$lib/config');
     const { NDKEvent } = await import('@nostr-dev-kit/ndk');
     const { KIND_USER_REGISTRATION } = await import('./groups');
@@ -235,9 +235,8 @@ export async function publishRegistrationRequest(
       event.tags.push(['name', displayName]);
     }
 
-    // Sign and publish
-    await event.sign();
-    await event.publish();
+    // Sign and publish via relay manager
+    await publishEvent(event);
 
     if (import.meta.env.DEV) {
       console.log('[Registration] Published registration request:', event.id);
@@ -268,6 +267,13 @@ export async function approveUserRegistration(
   adminPubkey: string,
   privkey?: Uint8Array
 ): Promise<{ success: boolean; error?: string }> {
+  if (!privkey) {
+    return {
+      success: false,
+      error: 'Admin whitelist operations require passkey login. NIP-07 browser extensions cannot sign NIP-98 HTTP auth tokens. Please log in with your passkey to perform admin actions.',
+    };
+  }
+
   try {
     const httpUrl = getRelayHttpUrl();
     const url = `${httpUrl}/api/whitelist/add`;
@@ -283,9 +289,7 @@ export async function approveUserRegistration(
       },
       body,
     };
-    const response = privkey
-      ? await fetchWithNip98(url, fetchOptions, privkey)
-      : await fetch(url, fetchOptions);
+    const response = await fetchWithNip98(url, fetchOptions, privkey);
 
     if (response.ok) {
       // Clear cache to force re-check
@@ -386,6 +390,13 @@ export async function updateUserCohorts(
   adminPubkey: string,
   privkey?: Uint8Array
 ): Promise<{ success: boolean; error?: string }> {
+  if (!privkey) {
+    return {
+      success: false,
+      error: 'Admin whitelist operations require passkey login. NIP-07 browser extensions cannot sign NIP-98 HTTP auth tokens. Please log in with your passkey to perform admin actions.',
+    };
+  }
+
   try {
     const httpUrl = getRelayHttpUrl();
     const url = `${httpUrl}/api/whitelist/update-cohorts`;
@@ -401,9 +412,7 @@ export async function updateUserCohorts(
       },
       body,
     };
-    const response = privkey
-      ? await fetchWithNip98(url, fetchOptions, privkey)
-      : await fetch(url, fetchOptions);
+    const response = await fetchWithNip98(url, fetchOptions, privkey);
 
     if (response.ok) {
       clearWhitelistCache(pubkey);

@@ -25,7 +25,18 @@ import {
 	getHighestRole,
 	getSuperuser,
 	isSuperuser,
-	getSectionConfigMap
+	getSectionConfigMap,
+	getCategories,
+	getCategory,
+	getDefaultCategory,
+	getTiers,
+	getDefaultPath,
+	getSectionsByCategory,
+	getSectionWithCategory,
+	getBreadcrumbs,
+	getCategoryPath,
+	getSectionPath,
+	getForumPath
 } from '$lib/config/loader';
 
 describe('Config Loader', () => {
@@ -432,6 +443,147 @@ describe('Config Loader', () => {
 				expect(map[section.id]).toBeDefined();
 				expect(map[section.id].name).toBe(section.name);
 			});
+		});
+	});
+
+	describe('getCategories', () => {
+		it('should return categories sorted by order', () => {
+			const categories = getCategories();
+			expect(categories.length).toBeGreaterThan(0);
+			for (let i = 1; i < categories.length; i++) {
+				expect(categories[i].order).toBeGreaterThanOrEqual(categories[i - 1].order);
+			}
+		});
+	});
+
+	describe('getCategory', () => {
+		it('should return category by id', () => {
+			const categories = getCategories();
+			const cat = getCategory(categories[0].id);
+			expect(cat).toBeDefined();
+			expect(cat?.id).toBe(categories[0].id);
+			expect(cat?.name).toBe(categories[0].name);
+		});
+
+		it('should return undefined for nonexistent category', () => {
+			expect(getCategory('nonexistent')).toBeUndefined();
+		});
+	});
+
+	describe('getDefaultCategory', () => {
+		it('should return a valid category', () => {
+			const cat = getDefaultCategory();
+			expect(cat).toBeDefined();
+			expect(cat.id).toBeDefined();
+			expect(cat.sections.length).toBeGreaterThan(0);
+		});
+	});
+
+	describe('getTiers', () => {
+		it('should return tier configuration', () => {
+			const tiers = getTiers();
+			expect(tiers.length).toBeGreaterThanOrEqual(3);
+			expect(tiers[0]).toHaveProperty('level');
+			expect(tiers[0]).toHaveProperty('name');
+			expect(tiers[0]).toHaveProperty('plural');
+		});
+	});
+
+	describe('getDefaultPath', () => {
+		it('should return a string starting with /', () => {
+			const path = getDefaultPath();
+			expect(path).toBeDefined();
+			expect(path.startsWith('/')).toBe(true);
+		});
+	});
+
+	describe('getSectionsByCategory', () => {
+		it('should return sections for a valid category', () => {
+			const categories = getCategories();
+			const sections = getSectionsByCategory(categories[0].id);
+			expect(sections.length).toBeGreaterThan(0);
+			for (let i = 1; i < sections.length; i++) {
+				expect(sections[i].order).toBeGreaterThanOrEqual(sections[i - 1].order);
+			}
+		});
+
+		it('should return empty array for nonexistent category', () => {
+			const sections = getSectionsByCategory('nonexistent');
+			expect(sections).toEqual([]);
+		});
+	});
+
+	describe('getSectionWithCategory', () => {
+		it('should return section and its parent category', () => {
+			const sections = getSections();
+			const result = getSectionWithCategory(sections[0].id);
+			expect(result).toBeDefined();
+			expect(result?.section.id).toBe(sections[0].id);
+			expect(result?.category).toBeDefined();
+			expect(result?.category.sections.some(s => s.id === sections[0].id)).toBe(true);
+		});
+
+		it('should return undefined for nonexistent section', () => {
+			expect(getSectionWithCategory('nonexistent')).toBeUndefined();
+		});
+	});
+
+	describe('getBreadcrumbs', () => {
+		it('should return only Home for no arguments', () => {
+			const crumbs = getBreadcrumbs();
+			expect(crumbs).toHaveLength(1);
+			expect(crumbs[0].label).toBe('Home');
+			expect(crumbs[0].path).toBe('/');
+		});
+
+		it('should add category breadcrumb', () => {
+			const categories = getCategories();
+			const crumbs = getBreadcrumbs(categories[0].id);
+			expect(crumbs).toHaveLength(2);
+			expect(crumbs[1].label).toBe(categories[0].name);
+			expect(crumbs[1].path).toBe(`/${categories[0].id}`);
+		});
+
+		it('should add section breadcrumb', () => {
+			const categories = getCategories();
+			const section = categories[0].sections[0];
+			const crumbs = getBreadcrumbs(categories[0].id, section.id);
+			expect(crumbs).toHaveLength(3);
+			expect(crumbs[2].label).toBe(section.name);
+		});
+
+		it('should add forum breadcrumb', () => {
+			const categories = getCategories();
+			const section = categories[0].sections[0];
+			const crumbs = getBreadcrumbs(categories[0].id, section.id, 'Test Forum');
+			expect(crumbs).toHaveLength(4);
+			expect(crumbs[3].label).toBe('Test Forum');
+			expect(crumbs[3].path).toBe('#');
+		});
+
+		it('should skip category crumb for invalid category id', () => {
+			const crumbs = getBreadcrumbs('nonexistent');
+			expect(crumbs).toHaveLength(1);
+		});
+
+		it('should skip section crumb for invalid section id', () => {
+			const categories = getCategories();
+			const crumbs = getBreadcrumbs(categories[0].id, 'nonexistent');
+			expect(crumbs).toHaveLength(2);
+		});
+	});
+
+	describe('path helpers', () => {
+		it('getCategoryPath should return /<categoryId>', () => {
+			expect(getCategoryPath('general')).toBe('/general');
+		});
+
+		it('getSectionPath should return /<categoryId>/<sectionId>', () => {
+			expect(getSectionPath('general', 'welcome')).toBe('/general/welcome');
+		});
+
+		it('getForumPath should return /<categoryId>/<sectionId>/<forumId>', () => {
+			expect(getForumPath('general', 'welcome', 'forum1')).toBe('/general/welcome/forum1');
 		});
 	});
 });

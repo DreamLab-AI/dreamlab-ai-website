@@ -289,8 +289,9 @@ function createDMStore() {
         const ndkRelay = {
           publish: async (event: Event) => {
             const NDKEvent = (await import('@nostr-dev-kit/ndk')).NDKEvent;
+            const { publishEvent } = await import('$lib/nostr/relay');
             const ndkEvent = new NDKEvent(ndkInstance, event);
-            await ndkEvent.publish();
+            await publishEvent(ndkEvent);
           }
         };
 
@@ -407,85 +408,89 @@ function createDMStore() {
       const subscription = ndkInstance.subscribe(filter, { closeOnEose: false });
 
       subscription.on('event', (ndkEvent: import('@nostr-dev-kit/ndk').NDKEvent) => {
-        const event: Event = {
-          id: ndkEvent.id,
-          kind: ndkEvent.kind!,
-          pubkey: ndkEvent.pubkey,
-          created_at: ndkEvent.created_at!,
-          tags: ndkEvent.tags,
-          content: ndkEvent.content,
-          sig: ndkEvent.sig!
-        };
+        try {
+          const event: Event = {
+            id: ndkEvent.id,
+            kind: ndkEvent.kind!,
+            pubkey: ndkEvent.pubkey,
+            created_at: ndkEvent.created_at!,
+            tags: ndkEvent.tags,
+            content: ndkEvent.content,
+            sig: ndkEvent.sig!
+          };
 
-        // Handle the incoming DM
-        const dm = receiveDM(event, userPrivkey);
-        if (dm) {
-          const otherPubkey = dm.senderPubkey;
+          // Handle the incoming DM
+          const dm = receiveDM(event, userPrivkey);
+          if (dm) {
+            const otherPubkey = dm.senderPubkey;
 
-          update(state => {
-            const newMessage: DMMessage = {
-              id: event.id,
-              senderPubkey: dm.senderPubkey,
-              recipientPubkey: userPubkey,
-              content: dm.content,
-              timestamp: dm.timestamp,
-              isSent: false,
-              isRead: state.currentConversation === otherPubkey
-            };
+            update(state => {
+              const newMessage: DMMessage = {
+                id: event.id,
+                senderPubkey: dm.senderPubkey,
+                recipientPubkey: userPubkey,
+                content: dm.content,
+                timestamp: dm.timestamp,
+                isSent: false,
+                isRead: state.currentConversation === otherPubkey
+              };
 
-            // Update messages if this conversation is open
-            const updatedMessages = state.currentConversation === otherPubkey
-              ? [...state.messages, newMessage]
-              : state.messages;
+              // Update messages if this conversation is open
+              const updatedMessages = state.currentConversation === otherPubkey
+                ? [...state.messages, newMessage]
+                : state.messages;
 
-            // Update localStorage
-            if (typeof window !== 'undefined') {
-              const stored = localStorage.getItem('dm_messages');
-              let allMessages: Record<string, DMMessage[]> = {};
-              if (stored) {
-                try {
-                  allMessages = JSON.parse(stored);
-                } catch (e) {
-                  console.error('Failed to parse stored messages:', e);
+              // Update localStorage
+              if (typeof window !== 'undefined') {
+                const stored = localStorage.getItem('dm_messages');
+                let allMessages: Record<string, DMMessage[]> = {};
+                if (stored) {
+                  try {
+                    allMessages = JSON.parse(stored);
+                  } catch (e) {
+                    console.error('Failed to parse stored messages:', e);
+                  }
                 }
-              }
-              if (!allMessages[otherPubkey]) {
-                allMessages[otherPubkey] = [];
-              }
-              allMessages[otherPubkey].push(newMessage);
-              safePersistDMs(allMessages);
-            }
-
-            // Update conversation
-            const conversation = state.conversations.get(otherPubkey);
-            const updatedConversation: DMConversation = conversation
-              ? {
-                  ...conversation,
-                  lastMessage: dm.content.substring(0, 50) + (dm.content.length > 50 ? '...' : ''),
-                  lastMessageTimestamp: dm.timestamp,
-                  unreadCount: state.currentConversation === otherPubkey
-                    ? conversation.unreadCount
-                    : conversation.unreadCount + 1
+                if (!allMessages[otherPubkey]) {
+                  allMessages[otherPubkey] = [];
                 }
-              : {
-                  pubkey: otherPubkey,
-                  name: getDisplayName(otherPubkey),
-                  lastMessage: dm.content.substring(0, 50) + (dm.content.length > 50 ? '...' : ''),
-                  lastMessageTimestamp: dm.timestamp,
-                  unreadCount: 1,
-                  isPinned: false
-                };
+                allMessages[otherPubkey].push(newMessage);
+                safePersistDMs(allMessages);
+              }
 
-            const updatedConversations = new Map(state.conversations);
-            updatedConversations.set(otherPubkey, updatedConversation);
+              // Update conversation
+              const conversation = state.conversations.get(otherPubkey);
+              const updatedConversation: DMConversation = conversation
+                ? {
+                    ...conversation,
+                    lastMessage: dm.content.substring(0, 50) + (dm.content.length > 50 ? '...' : ''),
+                    lastMessageTimestamp: dm.timestamp,
+                    unreadCount: state.currentConversation === otherPubkey
+                      ? conversation.unreadCount
+                      : conversation.unreadCount + 1
+                  }
+                : {
+                    pubkey: otherPubkey,
+                    name: getDisplayName(otherPubkey),
+                    lastMessage: dm.content.substring(0, 50) + (dm.content.length > 50 ? '...' : ''),
+                    lastMessageTimestamp: dm.timestamp,
+                    unreadCount: 1,
+                    isPinned: false
+                  };
 
-            return {
-              ...state,
-              conversations: updatedConversations,
-              messages: updatedMessages,
-              isSubscribed: true
-            };
-          });
+              const updatedConversations = new Map(state.conversations);
+              updatedConversations.set(otherPubkey, updatedConversation);
+
+              return {
+                ...state,
+                conversations: updatedConversations,
+                messages: updatedMessages,
+                isSubscribed: true
+              };
+            });
+          }
+        } catch (e) {
+          console.error('[DM] Error processing incoming DM event:', e);
         }
       });
 

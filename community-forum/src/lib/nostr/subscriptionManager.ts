@@ -241,11 +241,15 @@ class ManagedSubscription {
     if (!this.ndkSub) return;
 
     this.ndkSub.on('event', (event: NDKEvent) => {
-      this.updateMeta({
-        lastEventAt: Date.now(),
-        eventCount: this.meta.eventCount + 1
-      });
-      this.handlers.onEvent(event);
+      try {
+        this.updateMeta({
+          lastEventAt: Date.now(),
+          eventCount: this.meta.eventCount + 1
+        });
+        this.handlers.onEvent(event);
+      } catch (e) {
+        console.error(`[SubManager] Error processing event in subscription ${this.id}:`, e);
+      }
     });
 
     this.ndkSub.on('eose', () => {

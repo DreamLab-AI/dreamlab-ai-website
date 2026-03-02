@@ -8,7 +8,6 @@ import { authStore } from './auth';
 import type { NostrEvent } from '../../types/nostr';
 import { EventKind } from '../../types/nostr';
 import {
-  createReactionEvent,
   parseReactionEvent,
   groupReactionsByContent,
   hasUserReacted,
@@ -143,26 +142,30 @@ function createReactionStore() {
         const subscription = ndkSubscribe(filter, { closeOnEose: false });
 
         subscription.on('event', (ndkEvent: NDKEvent) => {
-          const event = ndkEventToNostr(ndkEvent);
-          const reactionData = parseReactionEvent(event);
-          if (!reactionData) return;
+          try {
+            const event = ndkEventToNostr(ndkEvent);
+            const reactionData = parseReactionEvent(event);
+            if (!reactionData) return;
 
-          update(state => {
-            const existing = state.reactionsByMessage.get(reactionData.eventId) || [];
+            update(state => {
+              const existing = state.reactionsByMessage.get(reactionData.eventId) || [];
 
-            const isDuplicate = existing.some(
-              r => r.reactionEventId === reactionData.reactionEventId
-            );
+              const isDuplicate = existing.some(
+                r => r.reactionEventId === reactionData.reactionEventId
+              );
 
-            if (!isDuplicate) {
-              const updated = [...existing, reactionData];
-              const reactionsByMessage = new Map(state.reactionsByMessage);
-              reactionsByMessage.set(reactionData.eventId, updated);
-              return { ...state, reactionsByMessage, loading: false };
-            }
+              if (!isDuplicate) {
+                const updated = [...existing, reactionData];
+                const reactionsByMessage = new Map(state.reactionsByMessage);
+                reactionsByMessage.set(reactionData.eventId, updated);
+                return { ...state, reactionsByMessage, loading: false };
+              }
 
-            return { ...state, loading: false };
-          });
+              return { ...state, loading: false };
+            });
+          } catch (e) {
+            console.error('[reactions] Error processing reaction event:', e);
+          }
         });
 
       } catch (error) {
@@ -181,8 +184,8 @@ function createReactionStore() {
       authorPubkey?: string
     ): Promise<void> {
       const auth = get(authStore);
-      if (!auth.privateKey) {
-        throw new Error('No private key available');
+      if (!auth.privateKey && !auth.isNip07) {
+        throw new Error('No signing method available');
       }
 
       const normalized = normalizeReactionContent(emoji);
@@ -216,24 +219,27 @@ function createReactionStore() {
       });
 
       try {
-        // Create and publish reaction event
-        const event = createReactionEvent(
-          messageId,
-          normalized,
-          auth.privateKey,
-          authorPubkey
-        );
-
-        const ndkEvent = nostrEventToNDK(event);
-        if (!ndkEvent) {
+        // Create NDK event and publish via relay manager (handles both privkey and NIP-07 signing)
+        const ndkInstance = ndk();
+        if (!ndkInstance) {
           throw new Error('NDK not connected');
         }
+
+        const ndkEvent = new NDKEvent(ndkInstance);
+        ndkEvent.kind = EventKind.REACTION;
+        ndkEvent.created_at = Math.floor(Date.now() / 1000);
+        ndkEvent.tags = [['e', messageId]];
+        if (authorPubkey) {
+          ndkEvent.tags.push(['p', authorPubkey]);
+        }
+        ndkEvent.content = normalized;
+
         await publishEvent(ndkEvent);
 
         // Replace optimistic with real reaction
         const realReaction: ReactionData = {
           ...optimisticReaction,
-          reactionEventId: event.id || optimisticId,
+          reactionEventId: ndkEvent.id || optimisticId,
         };
 
         update(state => {
@@ -321,26 +327,30 @@ function createReactionStore() {
       });
 
       subscription.on('event', (ndkEvent: NDKEvent) => {
-        const event = ndkEventToNostr(ndkEvent);
-        const reactionData = parseReactionEvent(event);
-        if (!reactionData) return;
+        try {
+          const event = ndkEventToNostr(ndkEvent);
+          const reactionData = parseReactionEvent(event);
+          if (!reactionData) return;
 
-        update(state => {
-          const existing = state.reactionsByMessage.get(reactionData.eventId) || [];
+          update(state => {
+            const existing = state.reactionsByMessage.get(reactionData.eventId) || [];
 
-          const isDuplicate = existing.some(
-            r => r.reactionEventId === reactionData.reactionEventId
-          );
+            const isDuplicate = existing.some(
+              r => r.reactionEventId === reactionData.reactionEventId
+            );
 
-          if (!isDuplicate) {
-            const updated = [...existing, reactionData];
-            const reactionsByMessage = new Map(state.reactionsByMessage);
-            reactionsByMessage.set(reactionData.eventId, updated);
-            return { ...state, reactionsByMessage };
-          }
+            if (!isDuplicate) {
+              const updated = [...existing, reactionData];
+              const reactionsByMessage = new Map(state.reactionsByMessage);
+              reactionsByMessage.set(reactionData.eventId, updated);
+              return { ...state, reactionsByMessage };
+            }
 
-          return { ...state };
-        });
+            return { ...state };
+          });
+        } catch (e) {
+          console.error('[reactions] Error processing real-time reaction event:', e);
+        }
       });
 
       // Track subscription

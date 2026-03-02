@@ -6,6 +6,7 @@
   import { dmStore, sortedConversations } from '$lib/stores/dm';
   import { hexToBytes } from '@noble/hashes/utils.js';
   import { getAppConfig } from '$lib/config/loader';
+  import { ensureRelayConnected, isConnected } from '$lib/nostr/relay';
   import NewDMDialog from '$lib/components/dm/NewDMDialog.svelte';
 
   const appConfig = getAppConfig();
@@ -38,6 +39,15 @@
         dmStore.forceLoadingComplete();
       }
     }, LOAD_TIMEOUT_MS);
+
+    // Ensure relay is connected before any Nostr operations
+    try {
+      if (!isConnected()) {
+        await ensureRelayConnected($authStore);
+      }
+    } catch (err) {
+      console.error('Failed to connect to relay:', err);
+    }
 
     // Load DM conversations from relay
     try {

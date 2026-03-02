@@ -136,34 +136,29 @@ describe('Embeddings Sync Service', () => {
   });
 
   describe('fetchManifest', () => {
-    const mockManifest: EmbeddingManifest = {
-      version: 1,
-      updated_at: '2025-12-14T00:00:00Z',
-      total_vectors: 1000,
+    // The source now fetches /status and synthesizes a manifest from the response
+    const mockStatusResponse = {
+      totalVectors: 1000,
       dimensions: 384,
-      model: 'all-minilm-l6-v2',
-      quantize_type: 'int8',
-      index_size_bytes: 1024000,
-      embeddings_size_bytes: 2048000,
-      latest: {
-        index: 'latest/index.bin',
-        index_mapping: 'latest/mapping.npz',
-        embeddings: 'latest/embeddings.npz',
-        manifest: 'latest/manifest.json'
-      }
+      model: 'all-MiniLM-L6-v2'
     };
 
-    it('fetches manifest successfully', async () => {
+    it('fetches manifest successfully from /status endpoint', async () => {
       (global.fetch as any).mockResolvedValueOnce({
         ok: true,
-        json: async () => mockManifest
+        json: async () => mockStatusResponse
       });
 
       const result = await fetchManifest();
 
-      expect(result).toEqual(mockManifest);
+      expect(result).not.toBeNull();
+      expect(result!.total_vectors).toBe(1000);
+      expect(result!.dimensions).toBe(384);
+      expect(result!.model).toBe('all-MiniLM-L6-v2');
+      // version is synthesized from totalVectors
+      expect(result!.version).toBe(1000);
       expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('/latest/manifest.json'),
+        expect.stringContaining('/status'),
         { cache: 'no-cache' }
       );
     });
@@ -174,16 +169,9 @@ describe('Embeddings Sync Service', () => {
         status: 404
       });
 
-      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
       const result = await fetchManifest();
 
       expect(result).toBeNull();
-      expect(consoleWarnSpy).toHaveBeenCalledWith(
-        'Failed to fetch embedding manifest:',
-        404
-      );
-
-      consoleWarnSpy.mockRestore();
     });
 
     it('returns null when fetch throws error', async () => {
@@ -194,7 +182,7 @@ describe('Embeddings Sync Service', () => {
 
       expect(result).toBeNull();
       expect(consoleWarnSpy).toHaveBeenCalledWith(
-        'Error fetching embedding manifest:',
+        'Error fetching search status:',
         expect.any(Error)
       );
 
@@ -260,21 +248,12 @@ describe('Embeddings Sync Service', () => {
   });
 
   describe('syncEmbeddings', () => {
-    const mockManifest: EmbeddingManifest = {
-      version: 2,
-      updated_at: '2025-12-14T00:00:00Z',
-      total_vectors: 1000,
+    // The source now synthesizes manifest from /status, and downloadIndex is a no-op
+    // (server-side search, no client-side index download)
+    const mockStatusResponse = {
+      totalVectors: 2000,
       dimensions: 384,
-      model: 'all-minilm-l6-v2',
-      quantize_type: 'int8',
-      index_size_bytes: 1024000,
-      embeddings_size_bytes: 2048000,
-      latest: {
-        index: 'latest/index.bin',
-        index_mapping: 'latest/mapping.npz',
-        embeddings: 'latest/embeddings.npz',
-        manifest: 'latest/manifest.json'
-      }
+      model: 'all-MiniLM-L6-v2'
     };
 
     beforeEach(() => {
@@ -316,24 +295,21 @@ describe('Embeddings Sync Service', () => {
       const mockTable = vi.fn().mockReturnValue({ get: mockGet, put: mockPut });
       (db.table as any) = mockTable;
 
-      (global.fetch as any)
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => mockManifest
-        })
-        .mockResolvedValueOnce({
-          ok: true,
-          arrayBuffer: async () => new ArrayBuffer(100)
-        })
-        .mockResolvedValueOnce({
-          ok: true,
-          arrayBuffer: async () => new ArrayBuffer(50)
-        });
+      // fetchManifest calls /status
+      (global.fetch as any).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockStatusResponse
+      });
 
+      const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
       const result = await syncEmbeddings(true);
 
+      // downloadIndex is now a no-op that always returns true
       expect(result.synced).toBe(true);
-      expect(result.version).toBe(2);
+      // version comes from synthesized manifest (totalVectors)
+      expect(result.version).toBe(2000);
+
+      consoleLogSpy.mockRestore();
     });
 
     it('returns false when manifest fetch fails', async () => {
@@ -346,29 +322,27 @@ describe('Embeddings Sync Service', () => {
       const mockTable = vi.fn().mockReturnValue({ get: mockGet });
       (db.table as any) = mockTable;
 
-      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
       const result = await syncEmbeddings();
 
       expect(result).toEqual({ synced: false, version: 1 });
-
-      consoleWarnSpy.mockRestore();
     });
 
     it('skips sync when local version is up to date', async () => {
-      const mockGet = vi.fn().mockResolvedValue({ value: { version: 2 } });
+      // Local version matches remote (totalVectors)
+      const mockGet = vi.fn().mockResolvedValue({ value: { version: 2000 } });
       const mockTable = vi.fn().mockReturnValue({ get: mockGet });
       (db.table as any) = mockTable;
 
       (global.fetch as any).mockResolvedValueOnce({
         ok: true,
-        json: async () => mockManifest
+        json: async () => mockStatusResponse
       });
 
       const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
       const result = await syncEmbeddings();
 
-      expect(result).toEqual({ synced: false, version: 2 });
-      expect(consoleLogSpy).toHaveBeenCalledWith('Embeddings up to date (v2)');
+      expect(result).toEqual({ synced: false, version: 2000 });
+      expect(consoleLogSpy).toHaveBeenCalledWith('Embeddings up to date (v2000)');
 
       consoleLogSpy.mockRestore();
     });
@@ -379,48 +353,24 @@ describe('Embeddings Sync Service', () => {
       const mockTable = vi.fn().mockReturnValue({ get: mockGet, put: mockPut });
       (db.table as any) = mockTable;
 
-      const indexBuffer = new ArrayBuffer(100);
-      const mappingBuffer = new ArrayBuffer(50);
-
-      (global.fetch as any)
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => mockManifest
-        })
-        .mockResolvedValueOnce({
-          ok: true,
-          arrayBuffer: async () => indexBuffer
-        })
-        .mockResolvedValueOnce({
-          ok: true,
-          arrayBuffer: async () => mappingBuffer
-        });
+      // fetchManifest calls /status
+      (global.fetch as any).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockStatusResponse
+      });
 
       const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
       const result = await syncEmbeddings();
 
+      // downloadIndex is a no-op (server-side search), always returns true
       expect(result.synced).toBe(true);
-      expect(result.version).toBe(2);
-
-      // Verify index was stored
-      expect(mockPut).toHaveBeenCalledWith({
-        key: 'hnsw_index',
-        data: indexBuffer,
-        version: 2
-      });
-
-      // Verify mapping was stored
-      expect(mockPut).toHaveBeenCalledWith({
-        key: 'index_mapping',
-        data: mappingBuffer,
-        version: 2
-      });
+      expect(result.version).toBe(2000);
 
       // Verify sync state was updated
       expect(mockPut).toHaveBeenCalledWith({
         key: 'embedding_sync_state',
         value: expect.objectContaining({
-          version: 2,
+          version: 2000,
           indexLoaded: false
         })
       });
@@ -428,60 +378,34 @@ describe('Embeddings Sync Service', () => {
       consoleLogSpy.mockRestore();
     });
 
-    it('handles index download failure', async () => {
+    it('handles manifest fetch failure gracefully', async () => {
       const mockGet = vi.fn().mockResolvedValue({ value: { version: 1 } });
       const mockTable = vi.fn().mockReturnValue({ get: mockGet });
       (db.table as any) = mockTable;
 
-      (global.fetch as any)
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => mockManifest
-        })
-        .mockResolvedValueOnce({
-          ok: false,
-          status: 500
-        });
+      (global.fetch as any).mockResolvedValueOnce({
+        ok: false,
+        status: 500
+      });
 
-      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
       const result = await syncEmbeddings();
 
       expect(result).toEqual({ synced: false, version: 1 });
-      expect(consoleErrorSpy).toHaveBeenCalled();
-
-      consoleErrorSpy.mockRestore();
-      consoleLogSpy.mockRestore();
     });
 
-    it('handles mapping download failure', async () => {
+    it('handles network error during manifest fetch', async () => {
       const mockGet = vi.fn().mockResolvedValue({ value: { version: 1 } });
       const mockTable = vi.fn().mockReturnValue({ get: mockGet });
       (db.table as any) = mockTable;
 
-      (global.fetch as any)
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => mockManifest
-        })
-        .mockResolvedValueOnce({
-          ok: true,
-          arrayBuffer: async () => new ArrayBuffer(100)
-        })
-        .mockResolvedValueOnce({
-          ok: false,
-          status: 500
-        });
+      (global.fetch as any).mockRejectedValueOnce(new Error('Network error'));
 
-      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
       const result = await syncEmbeddings();
 
       expect(result).toEqual({ synced: false, version: 1 });
-      expect(consoleErrorSpy).toHaveBeenCalled();
 
-      consoleErrorSpy.mockRestore();
-      consoleLogSpy.mockRestore();
+      consoleWarnSpy.mockRestore();
     });
 
     it('handles zero local version', async () => {
@@ -490,24 +414,18 @@ describe('Embeddings Sync Service', () => {
       const mockTable = vi.fn().mockReturnValue({ get: mockGet, put: mockPut });
       (db.table as any) = mockTable;
 
-      (global.fetch as any)
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => mockManifest
-        })
-        .mockResolvedValueOnce({
-          ok: true,
-          arrayBuffer: async () => new ArrayBuffer(100)
-        })
-        .mockResolvedValueOnce({
-          ok: true,
-          arrayBuffer: async () => new ArrayBuffer(50)
-        });
+      (global.fetch as any).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockStatusResponse
+      });
 
+      const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
       const result = await syncEmbeddings();
 
       expect(result.synced).toBe(true);
-      expect(result.version).toBe(2);
+      expect(result.version).toBe(2000);
+
+      consoleLogSpy.mockRestore();
     });
   });
 
@@ -525,26 +443,15 @@ describe('Embeddings Sync Service', () => {
         configurable: true
       });
 
-      const mockManifest: EmbeddingManifest = {
-        version: 1,
-        updated_at: '2025-12-14T00:00:00Z',
-        total_vectors: 1000,
+      const mockStatusResponse = {
+        totalVectors: 1000,
         dimensions: 384,
-        model: 'all-minilm-l6-v2',
-        quantize_type: 'int8',
-        index_size_bytes: 1024000,
-        embeddings_size_bytes: 2048000,
-        latest: {
-          index: 'latest/index.bin',
-          index_mapping: 'latest/mapping.npz',
-          embeddings: 'latest/embeddings.npz',
-          manifest: 'latest/manifest.json'
-        }
+        model: 'all-MiniLM-L6-v2'
       };
 
       (global.fetch as any).mockResolvedValue({
         ok: true,
-        json: async () => mockManifest
+        json: async () => mockStatusResponse
       });
 
       const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
@@ -572,8 +479,7 @@ describe('Embeddings Sync Service', () => {
       const mockTable = vi.fn().mockReturnValue({ get: mockGet });
       (db.table as any) = mockTable;
 
-      // Mock fetch to throw - this simulates a network error during manifest fetch
-      // getLocalSyncState catches DB errors, so we need fetchManifest to fail
+      // Mock fetch to throw - this simulates a network error during status fetch
       (global.fetch as any).mockRejectedValue(new Error('Network error'));
 
       const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
@@ -581,9 +487,9 @@ describe('Embeddings Sync Service', () => {
       await initEmbeddingSync();
       await vi.advanceTimersByTimeAsync(5000);
 
-      // The error is caught and logged by fetchManifest
+      // The error is caught and logged by fetchManifest with updated message
       expect(consoleWarnSpy).toHaveBeenCalledWith(
-        'Error fetching embedding manifest:',
+        'Error fetching search status:',
         expect.any(Error)
       );
 

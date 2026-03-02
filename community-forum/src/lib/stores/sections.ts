@@ -279,7 +279,7 @@ function createSectionStore() {
       // Send DM explaining denial if reason provided (using NIP-59 gift wrap)
       if (reason) {
         try {
-          const { ndk } = await import('$lib/nostr/relay');
+          const { ndk, publishEvent } = await import('$lib/nostr/relay');
           const { NDKEvent } = await import('@nostr-dev-kit/ndk');
           const ndkInstance = ndk();
           if (!ndkInstance) {
@@ -309,8 +309,7 @@ function createSectionStore() {
               JSON.stringify(sealedEvent.rawEvent())
             );
             giftWrapEvent.created_at = Math.floor(Date.now() / 1000);
-            await giftWrapEvent.sign(signer);
-            await giftWrapEvent.publish();
+            await publishEvent(giftWrapEvent);
           }
         } catch (error) {
           console.error('[Sections] Failed to send denial DM:', error);

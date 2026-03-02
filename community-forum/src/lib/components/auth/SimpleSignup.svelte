@@ -3,7 +3,7 @@
   import { generateNewIdentity } from '$lib/nostr/keys';
   import { authStore } from '$lib/stores/auth';
   import { profileCache } from '$lib/stores/profiles';
-  import { ndk, ensureRelayConnected, isConnected } from '$lib/nostr/relay';
+  import { ndk, ensureRelayConnected, isConnected, publishEvent } from '$lib/nostr/relay';
   import { NDKEvent } from '@nostr-dev-kit/ndk';
 
   const dispatch = createEventDispatcher<{
@@ -92,9 +92,8 @@
         display_name: nickname.trim(),
       });
 
-      // Sign and publish to relay
-      await metadataEvent.sign();
-      await metadataEvent.publish();
+      // Sign and publish via relay manager
+      await publishEvent(metadataEvent);
 
       // Update local auth store with nickname
       authStore.setProfile(nickname.trim(), null);

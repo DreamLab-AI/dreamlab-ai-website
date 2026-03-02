@@ -131,7 +131,7 @@
 	}
 
 	async function saveProfile() {
-		if (!$authStore.publicKey || !$authStore.privateKey) {
+		if (!$authStore.publicKey || (!$authStore.privateKey && !$authStore.isNip07)) {
 			profileError = 'Not authenticated';
 			return;
 		}
