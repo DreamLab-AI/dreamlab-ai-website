@@ -281,6 +281,13 @@ async function provisionPod(pubkey: string, env: Env): Promise<{ webId: string; 
         'acl:accessTo': { '@id': './profile/' },
         'acl:mode': [{ '@id': 'acl:Read' }],
       },
+      {
+        '@id': '#media-public',
+        '@type': 'acl:Authorization',
+        'acl:agentClass': { '@id': 'foaf:Agent' },
+        'acl:accessTo': { '@id': './media/public/' },
+        'acl:mode': [{ '@id': 'acl:Read' }],
+      },
     ],
   };
 

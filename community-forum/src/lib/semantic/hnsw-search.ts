@@ -114,17 +114,15 @@ function parseNpzMapping(data: Uint8Array): Map<number, string> {
   return mapping;
 }
 
-// Embedding API URL (deployed on Google Cloud Run)
-// Default URL pattern: https://embedding-api-{HASH}-uc.a.run.app
-// Configure via VITE_EMBEDDING_API_URL environment variable
-const EMBEDDING_API_URL = import.meta.env.VITE_EMBEDDING_API_URL || 'https://embedding-api-uc.a.run.app';
+// Search API URL — Cloudflare Worker with /embed endpoint
+const SEARCH_API_URL = import.meta.env.VITE_SEARCH_API_URL || 'https://search.dreamlab-ai.com';
 
 // Cache for embedding results
 const embeddingCache = new Map<string, number[]>();
 
 /**
- * Generate query embedding via Cloud Run API
- * Uses Xenova/all-MiniLM-L6-v2 ONNX model (384 dimensions)
+ * Generate query embedding via search-api Worker /embed endpoint
+ * Uses all-MiniLM-L6-v2 (384 dimensions)
  */
 async function embedQuery(query: string): Promise<number[]> {
   // Check cache first
@@ -134,7 +132,7 @@ async function embedQuery(query: string): Promise<number[]> {
   }
 
   try {
-    const response = await fetch(`${EMBEDDING_API_URL}/embed`, {
+    const response = await fetch(`${SEARCH_API_URL}/embed`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text: query })

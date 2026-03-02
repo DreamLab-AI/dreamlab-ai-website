@@ -1,0 +1,6 @@
+name = "dreamlab-link-preview"
+compatibility_date = "2024-12-01"
+main = "index.ts"
+
+[vars]
+ALLOWED_ORIGIN = "https://dreamlab-ai.com"

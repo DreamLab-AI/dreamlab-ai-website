@@ -15,15 +15,9 @@
 
 import { db } from '$lib/db';
 
-// Search API endpoint — Cloudflare Worker or Cloud Run fallback
+// Search API endpoint — Cloudflare Worker (RuVector WASM + R2)
 const SEARCH_API_URL = import.meta.env.VITE_SEARCH_API_URL ||
-  import.meta.env.VITE_RUVECTOR_API_URL ||
-  import.meta.env.VITE_EMBEDDING_API_URL ||
   'https://search.dreamlab-ai.com';
-
-// Embedding API for text → vector conversion
-const EMBEDDING_API_URL = import.meta.env.VITE_EMBEDDING_API_URL ||
-  'https://embedding-api-uc.a.run.app';
 
 const DIMENSIONS = 384;
 
@@ -79,14 +73,14 @@ async function embedQuery(query: string): Promise<number[]> {
   if (cached) return cached;
 
   try {
-    const response = await fetch(`${EMBEDDING_API_URL}/embed`, {
+    const response = await fetch(`${SEARCH_API_URL}/embed`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text: query }),
     });
 
     if (!response.ok) {
-      throw new Error(`Embedding API error: ${response.status}`);
+      throw new Error(`Embed API error: ${response.status}`);
     }
 
     const data = await response.json() as { embeddings: number[][]; dimensions: number };
@@ -96,7 +90,6 @@ async function embedQuery(query: string): Promise<number[]> {
 
     const embedding = data.embeddings[0];
 
-    // LRU eviction
     if (embeddingCache.size >= EMBEDDING_CACHE_MAX) {
       const firstKey = embeddingCache.keys().next().value;
       if (firstKey) embeddingCache.delete(firstKey);
@@ -105,7 +98,7 @@ async function embedQuery(query: string): Promise<number[]> {
 
     return embedding;
   } catch (error) {
-    console.error('Embedding API failed:', error);
+    console.error('Embed API failed:', error);
     return generateFallbackEmbedding(query);
   }
 }

@@ -11,7 +11,7 @@ last-updated: 2026-03-01
 
 ## Status
 
-Accepted (supersedes ADR-003)
+Accepted -- Migration Complete (supersedes ADR-003)
 
 ## Date
 
@@ -51,10 +51,7 @@ Return to the Cloudflare platform. Migrate the majority of services to Cloudflar
 
 ### Services retained on GCP Cloud Run
 
-| Service | Rationale |
-|---------|-----------|
-| **nostr-relay** | Persistent WebSocket connections with Cloud SQL. Durable Objects migration possible but adds complexity -- evaluate separately. |
-| **embedding-api** | ML inference needs CPU/memory beyond Workers limits. |
+*None.* As of 2026-03-02, all services run on Cloudflare Workers. The nostr-relay was migrated to Workers + Durable Objects + D1 on 2026-03-01. The embedding-api was replaced by the search-api Worker's hash-based fallback embeddings (to be upgraded to ONNX WASM). The image-api was replaced by pod-api R2 storage (ADR-011).
 
 ### Frontend deployment
 
@@ -72,10 +69,12 @@ Deploy the existing Vite SPA to Cloudflare Pages with zero code changes. The `di
 
 | Context | Runtime | Storage |
 |---------|---------|---------|
-| **AuthContext** | Cloudflare Workers | D1 + KV |
-| **PodContext** | Cloudflare Workers | R2 + KV |
-| **MediaContext** | Cloudflare Workers | R2 |
-| **RelayContext** | GCP Cloud Run | Cloud SQL (PostgreSQL) |
+| **AuthContext** | Cloudflare Workers (auth-api) | D1 + KV |
+| **PodContext** | Cloudflare Workers (pod-api) | R2 + KV |
+| **MediaContext** | Cloudflare Workers (pod-api) | R2 (ADR-011) |
+| **SearchContext** | Cloudflare Workers (search-api) | R2 (.rvf) + KV |
+| **RelayContext** | Cloudflare Workers (nostr-relay) | D1 + Durable Objects |
+| **PreviewContext** | Cloudflare Workers (link-preview) | Cache API |
 | **IdentityContext** | Cross-cutting | did:nostr:{pubkey} + WebID at pod URL |
 
 ## Consequences
@@ -150,12 +149,22 @@ Deploy the existing Vite SPA to Cloudflare Pages with zero code changes. The `di
 ### Pending
 
 - **DNS configuration**: CNAME/route records for `api.dreamlab-ai.com`, `pods.dreamlab-ai.com`, `search.dreamlab-ai.com`
-- **image-api and link-preview-api Workers**: Code not yet written
+
+### Completed (2026-03-02) -- Zero-GCP Migration
+
+- **link-preview-api Worker**: Created and deployed (`workers/link-preview-api/index.ts`). Ports GCP Fastify service with CF Cache API, SSRF protection, Twitter oEmbed.
+- **Image uploads → pod-api**: Images stored in user Solid pods on R2 (`/pods/{pubkey}/media/public/`). Client-side compression via Canvas. NIP-98 authenticated uploads. See ADR-011.
+- **Search/embedding consolidation**: search-api Worker now serves `/embed` endpoint. Frontend semantic search (`ruvector-search.ts`, `embeddings-sync.ts`, `hnsw-search.ts`) updated to use search-api exclusively.
+- **Agent relay routing**: VisionFlow agent DMs routed via public relay (`wss://relay.damus.io`). No bridge service needed.
+- **GCP services deleted**: `services/jss/`, `services/embedding-api/`, `services/link-preview-api/`, `services/nostr-relay/`, `services/visionflow-bridge/`, `services/image-api/`
+- **GCP workflows deleted**: `fairfield-embedding-api.yml`, `fairfield-image-api.yml`, `jss.yml`, `visionflow-bridge.yml`, `generate-embeddings.yml`, `SECRETS_SETUP.md`
+- **Frontend environment purged**: `.env.example`, `env.d.ts`, `deploy.yml` updated to CF Worker URLs only. Zero `run.app` or `googleapis.com` references in source.
 
 ## References
 
 - Supersedes: ADR-003 (GCP Cloud Run Infrastructure)
-- Related: ADR-008 (PostgreSQL Relay Storage -- retained for relay on Cloud Run)
+- Extended by: ADR-011 (Images and Media Storage in Solid Pods)
+- Related: ADR-008 (PostgreSQL Relay Storage -- superseded by D1 + Durable Objects)
 - PRD: `docs/prd-cloudflare-workers-migration.md`
 - GCP migration history: `.github/workflows/GCP_MIGRATION_SUMMARY.md`
 - paa.pub reference implementation: Cloudflare Workers + KV + R2 for WebAuthn + Solid Pod

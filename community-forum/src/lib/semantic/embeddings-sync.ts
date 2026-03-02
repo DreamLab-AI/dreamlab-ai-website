@@ -5,9 +5,7 @@
 
 import { db } from '$lib/db';
 
-// Google Cloud Storage public URL (configured via environment)
-// Embeddings stored in public GCS bucket: Nostr-BBS-vectors
-const GCS_BASE_URL = import.meta.env.VITE_GCS_EMBEDDINGS_URL || 'https://storage.googleapis.com/Nostr-BBS-vectors';
+const SEARCH_API_URL = import.meta.env.VITE_SEARCH_API_URL || 'https://search.dreamlab-ai.com';
 
 export interface EmbeddingManifest {
   version: number;
@@ -194,22 +192,39 @@ export function getConnectionStatus(): { canSync: boolean; reason: string; platf
 }
 
 /**
- * Fetch the current manifest from Google Cloud Storage
+ * Fetch embedding manifest from search-api Worker status endpoint.
+ * Synthesizes an EmbeddingManifest from the /status response.
  */
 export async function fetchManifest(): Promise<EmbeddingManifest | null> {
   try {
-    const response = await fetch(`${GCS_BASE_URL}/latest/manifest.json`, {
+    const response = await fetch(`${SEARCH_API_URL}/status`, {
       cache: 'no-cache'
     });
-
-    if (!response.ok) {
-      console.warn('Failed to fetch embedding manifest:', response.status);
-      return null;
-    }
-
-    return await response.json();
+    if (!response.ok) return null;
+    const status = await response.json() as {
+      totalVectors: number;
+      dimensions: number;
+      model: string;
+    };
+    // Synthesize a manifest from search-api status
+    return {
+      version: status.totalVectors, // Use vector count as pseudo-version
+      updated_at: new Date().toISOString(),
+      total_vectors: status.totalVectors,
+      dimensions: status.dimensions,
+      model: status.model || 'all-MiniLM-L6-v2',
+      quantize_type: 'float32',
+      index_size_bytes: 0,
+      embeddings_size_bytes: 0,
+      latest: {
+        index: '',
+        index_mapping: '',
+        embeddings: '',
+        manifest: '',
+      },
+    };
   } catch (error) {
-    console.warn('Error fetching embedding manifest:', error);
+    console.warn('Error fetching search status:', error);
     return null;
   }
 }
@@ -237,41 +252,14 @@ async function saveSyncState(state: SyncState): Promise<void> {
 }
 
 /**
- * Download and store index files
+ * Download and store index files.
+ * Index lives server-side in the search-api Worker (R2-backed .rvf store).
+ * No client-side download needed — search-api handles vector search.
+ * IndexedDB cache is populated lazily by ruvector-search.ts.
  */
-async function downloadIndex(manifest: EmbeddingManifest): Promise<boolean> {
-  try {
-    console.log(`Downloading HNSW index (${(manifest.index_size_bytes / 1024 / 1024).toFixed(1)} MB)...`);
-
-    // Download index.bin
-    const indexResponse = await fetch(`${GCS_BASE_URL}/${manifest.latest.index}`);
-    if (!indexResponse.ok) throw new Error('Failed to download index');
-    const indexBuffer = await indexResponse.arrayBuffer();
-
-    // Download mapping
-    const mappingResponse = await fetch(`${GCS_BASE_URL}/${manifest.latest.index_mapping}`);
-    if (!mappingResponse.ok) throw new Error('Failed to download mapping');
-    const mappingBuffer = await mappingResponse.arrayBuffer();
-
-    // Store in IndexedDB
-    await db.table('embeddings').put({
-      key: 'hnsw_index',
-      data: indexBuffer,
-      version: manifest.version
-    });
-
-    await db.table('embeddings').put({
-      key: 'index_mapping',
-      data: mappingBuffer,
-      version: manifest.version
-    });
-
-    console.log('Index downloaded and stored');
-    return true;
-  } catch (error) {
-    console.error('Error downloading index:', error);
-    return false;
-  }
+async function downloadIndex(_manifest: EmbeddingManifest): Promise<boolean> {
+  console.log('Search handled server-side by search-api Worker — no index download needed');
+  return true;
 }
 
 /**

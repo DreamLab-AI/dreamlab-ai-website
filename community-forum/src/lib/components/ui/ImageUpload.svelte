@@ -59,7 +59,8 @@
 
     try {
       const pubkey = $authStore.publicKey || 'anonymous';
-      const result = await uploadImage(file, pubkey, category);
+      const privkey = authStore.getPrivkey();
+      const result = await uploadImage(file, pubkey, category, undefined, privkey);
 
       if (result.success) {
         dispatch('upload', result);

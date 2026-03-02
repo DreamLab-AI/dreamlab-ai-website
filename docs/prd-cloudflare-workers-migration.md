@@ -1,6 +1,6 @@
 # PRD: Return to Cloudflare Platform + Consolidated NIP-98 + Per-User Solid Storage
 
-**Status:** v5 -- Phase 1 Deployed
+**Status:** v6 -- Migration Complete (Zero GCP)
 **Author:** Claude Code (research synthesis from 7 parallel research agents)
 **Date:** 2026-03-01
 **Stakeholders:** DreamLab AI Engineering

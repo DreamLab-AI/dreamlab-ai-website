@@ -46,16 +46,15 @@ jobs:
         working-directory: community-forum
         env:
           BASE_PATH: '/community'
-          VITE_RELAY_URL: ${{ vars.FAIRFIELD_RELAY_URL }}
-          VITE_EMBEDDING_API_URL: ${{ vars.FAIRFIELD_EMBEDDING_API_URL }}
-          VITE_LINK_PREVIEW_API_URL: ${{ vars.FAIRFIELD_LINK_PREVIEW_API_URL }}
-          VITE_IMAGE_API_URL: ${{ vars.FAIRFIELD_IMAGE_API_URL }}
-          VITE_IMAGE_BUCKET: ${{ vars.FAIRFIELD_IMAGE_BUCKET }}
+          VITE_RELAY_URL: 'wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev'
+          VITE_AUTH_API_URL: 'https://dreamlab-auth-api.solitary-paper-764d.workers.dev'
+          VITE_POD_API_URL: 'https://dreamlab-pod-api.solitary-paper-764d.workers.dev'
+          VITE_SEARCH_API_URL: 'https://dreamlab-search-api.solitary-paper-764d.workers.dev'
+          VITE_LINK_PREVIEW_API_URL: 'https://dreamlab-link-preview.solitary-paper-764d.workers.dev'
           VITE_IMAGE_ENCRYPTION_ENABLED: 'true'
           VITE_ADMIN_PUBKEY: ${{ vars.FAIRFIELD_ADMIN_PUBKEY }}
           VITE_APP_NAME: 'DreamLab Community'
           VITE_NDK_DEBUG: 'false'
-          VITE_AUTH_API_URL: ${{ secrets.VITE_AUTH_API_URL }}
         run: |
           npm ci
           npm run build

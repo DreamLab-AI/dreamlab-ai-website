@@ -6,9 +6,9 @@
 import { writable, get } from 'svelte/store';
 import { browser } from '$app/environment';
 
-// Link preview API URL - use Cloud Run service in production, local proxy in dev
+// Link preview API URL - use CF Worker in production, local proxy in dev
 const LINK_PREVIEW_API = browser
-	? (import.meta.env.VITE_LINK_PREVIEW_API_URL || '/api/proxy')
+	? (import.meta.env.VITE_LINK_PREVIEW_API_URL || 'https://dreamlab-link-preview.solitary-paper-764d.workers.dev')
 	: '/api/proxy';
 
 export interface LinkPreviewData {

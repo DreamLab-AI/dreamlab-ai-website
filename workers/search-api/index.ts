@@ -211,6 +211,50 @@ function json(data: unknown, status: number, env: Env): Response {
 
 // ── Handlers ──────────────────────────────────────────────────────────
 
+async function handleEmbed(request: Request, env: Env): Promise<Response> {
+  const body = await request.json() as { text: string; texts?: string[] };
+
+  const texts = body.texts || (body.text ? [body.text] : []);
+  if (texts.length === 0) {
+    return json({ error: 'Missing text or texts field' }, 400, env);
+  }
+  if (texts.length > 100) {
+    return json({ error: 'Maximum 100 texts per request' }, 400, env);
+  }
+
+  const embeddings = texts.map(text => generateEmbedding(text));
+
+  return json({
+    embeddings,
+    dimensions: DIM,
+    model: 'hash-fallback-v1',
+    note: 'Hash-based fallback embedding. Replace with ONNX WASM model for semantic quality.',
+  }, 200, env);
+}
+
+/**
+ * Deterministic hash-based embedding for offline/fallback use.
+ * NOT semantic — provides stable vectors for testing and graceful degradation.
+ * Will be replaced by quantized MiniLM ONNX model running in WASM.
+ */
+function generateEmbedding(text: string): number[] {
+  const vector = new Array(DIM).fill(0);
+  const normalized = text.toLowerCase().trim();
+
+  // Multi-pass hash for better distribution
+  for (let pass = 0; pass < 3; pass++) {
+    for (let i = 0; i < normalized.length; i++) {
+      const code = normalized.charCodeAt(i);
+      const idx = (code * (i + 1) * (pass + 1) + pass * 127) % DIM;
+      vector[idx] += code / (255 * (pass + 1));
+    }
+  }
+
+  // L2 normalize
+  const norm = Math.sqrt(vector.reduce((s, v) => s + v * v, 0)) || 1;
+  return vector.map(v => v / norm);
+}
+
 async function handleSearch(request: Request, env: Env): Promise<Response> {
   const body = await request.json() as SearchRequest;
 
@@ -362,6 +406,7 @@ export default {
 
     try {
       if (path === '/search' && request.method === 'POST') return await handleSearch(request, env);
+      if (path === '/embed' && request.method === 'POST') return await handleEmbed(request, env);
       if (path === '/ingest' && request.method === 'POST') return await handleIngest(request, env);
       if (path === '/status' && request.method === 'GET') return await handleStatus(env);
       return json({ error: 'Not found' }, 404, env);

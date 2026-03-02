@@ -1,6 +1,6 @@
 /**
  * Image Upload Utility
- * Client-side image compression and upload to GCS via Cloud Run API
+ * Client-side image compression and upload to pod-api (Cloudflare Worker + R2)
  * Supports optional client-side encryption for private channels/DMs
  */
 
@@ -9,13 +9,13 @@ import {
   arrayBufferToBase64,
   type RecipientKey,
 } from './imageEncryption';
+import { createNip98Token } from '$lib/auth/nip98-client';
 
 // Re-export RecipientKey for use by encryptedImageTags.ts
 export type { RecipientKey } from './imageEncryption';
 
 // Configuration from environment
-const IMAGE_API_URL = import.meta.env.VITE_IMAGE_API_URL || '';
-const IMAGE_BUCKET = import.meta.env.VITE_IMAGE_BUCKET || '';
+const POD_API_URL = import.meta.env.VITE_POD_API_URL || 'https://dreamlab-pod-api.solitary-paper-764d.workers.dev';
 const IMAGE_ENCRYPTION_ENABLED = import.meta.env.VITE_IMAGE_ENCRYPTION_ENABLED === 'true';
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB original limit
 const MAX_DIMENSION = 1920; // Max width/height
@@ -189,80 +189,68 @@ export interface EncryptionOptions {
 }
 
 /**
- * Upload compressed image to GCS via Cloud Run API
+ * Upload compressed image to pod-api (Cloudflare Worker + R2)
  * Optionally encrypts before upload for private channels/DMs
+ *
+ * @param file - Image file to upload
+ * @param userPubkey - Nostr hex pubkey of the uploader
+ * @param category - Image category (avatar, message, channel)
+ * @param encryptionOptions - Optional encryption for private images
+ * @param privkey - Nostr private key (Uint8Array) for NIP-98 auth; required for upload
  */
 export async function uploadImage(
   file: File,
   userPubkey: string,
   category: 'avatar' | 'message' | 'channel' = 'message',
-  encryptionOptions?: EncryptionOptions
+  encryptionOptions?: EncryptionOptions,
+  privkey?: Uint8Array | null
 ): Promise<ImageUploadResult> {
-  // Check if image API URL is configured
-  if (!IMAGE_API_URL) {
-    return {
-      success: false,
-      error: 'Image upload not configured. Please set VITE_IMAGE_API_URL environment variable.'
-    };
+  if (!POD_API_URL) {
+    return { success: false, error: 'Pod API not configured. Please set VITE_POD_API_URL.' };
   }
 
-  // Validate file size
+  if (!privkey) {
+    return { success: false, error: 'Authentication required. Please log in to upload images.' };
+  }
+
   if (file.size > MAX_FILE_SIZE) {
-    return {
-      success: false,
-      error: `File too large. Maximum size is ${MAX_FILE_SIZE / 1024 / 1024}MB`
-    };
+    return { success: false, error: `File too large. Maximum size is ${MAX_FILE_SIZE / 1024 / 1024}MB` };
   }
 
-  // Validate file type
   if (!file.type.startsWith('image/')) {
-    return {
-      success: false,
-      error: 'File must be an image'
-    };
+    return { success: false, error: 'File must be an image' };
   }
 
-  // Validate encryption options if provided
   const shouldEncrypt = encryptionOptions?.encrypt === true;
   if (shouldEncrypt) {
     if (!encryptionOptions.recipientPubkeys || encryptionOptions.recipientPubkeys.length === 0) {
-      return {
-        success: false,
-        error: 'Encryption requires at least one recipient public key'
-      };
+      return { success: false, error: 'Encryption requires at least one recipient public key' };
     }
     if (!encryptionOptions.senderPrivkey) {
-      return {
-        success: false,
-        error: 'Encryption requires sender private key'
-      };
+      return { success: false, error: 'Encryption requires sender private key' };
     }
   }
 
   try {
-    // Compress image
     const { blob, thumbnail, width, height } = await compressImage(file, {
       maxWidth: category === 'avatar' ? 400 : MAX_DIMENSION,
       maxHeight: category === 'avatar' ? 400 : MAX_DIMENSION,
       quality: category === 'avatar' ? 0.9 : JPEG_QUALITY,
       format: 'jpeg',
-      generateThumbnail: category !== 'avatar' && !shouldEncrypt // No thumbnails for encrypted images
+      generateThumbnail: category !== 'avatar' && !shouldEncrypt
     });
 
+    const imageId = crypto.randomUUID();
     let uploadBlob: Blob = blob;
     let encryptionData: EncryptedImageMetadata | undefined;
 
-    // Encrypt if requested
     if (shouldEncrypt && encryptionOptions?.recipientPubkeys && encryptionOptions?.senderPrivkey) {
       const encrypted = await encryptImageForRecipients(
         blob,
         encryptionOptions.recipientPubkeys,
         encryptionOptions.senderPrivkey
       );
-
-      // Convert encrypted ArrayBuffer to Blob for upload
       uploadBlob = new Blob([encrypted.encryptedBlob], { type: 'application/octet-stream' });
-
       encryptionData = {
         iv: encrypted.iv,
         salt: encrypted.salt,
@@ -270,41 +258,52 @@ export async function uploadImage(
       };
     }
 
-    // Create form data
-    const formData = new FormData();
-    const fileName = shouldEncrypt ? 'image.enc' : 'image.jpg';
+    const mediaPath = shouldEncrypt
+      ? `media/private/${imageId}.enc`
+      : `media/public/${imageId}.jpg`;
     const contentType = shouldEncrypt ? 'application/octet-stream' : 'image/jpeg';
-    formData.append('image', uploadBlob, fileName);
-    formData.append('pubkey', userPubkey);
-    formData.append('category', category);
-    if (shouldEncrypt) {
-      formData.append('encrypted', 'true');
-    }
+    const putUrl = `${POD_API_URL}/pods/${userPubkey}/${mediaPath}`;
 
-    if (thumbnail && !shouldEncrypt) {
-      formData.append('thumbnail', thumbnail, 'thumbnail.jpg');
-    }
+    // NIP-98 auth header
+    const token = await createNip98Token(privkey, putUrl, 'PUT');
+    const authHeader = `Nostr ${token}`;
 
-    // Upload to API
-    const response = await fetch(`${IMAGE_API_URL}/upload`, {
-      method: 'POST',
-      body: formData
+    const response = await fetch(putUrl, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': contentType,
+        'Authorization': authHeader,
+      },
+      body: uploadBlob,
     });
 
     if (!response.ok) {
       const error = await response.text();
-      return {
-        success: false,
-        error: `Upload failed: ${error}`
-      };
+      return { success: false, error: `Upload failed: ${error}` };
     }
 
-    const result = await response.json();
+    // Upload thumbnail if available
+    let thumbnailUrl: string | undefined;
+    if (thumbnail && !shouldEncrypt) {
+      const thumbPath = `media/public/${imageId}_thumb.jpg`;
+      const thumbUrl = `${POD_API_URL}/pods/${userPubkey}/${thumbPath}`;
+      const thumbToken = await createNip98Token(privkey, thumbUrl, 'PUT');
+
+      await fetch(thumbUrl, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'image/jpeg',
+          'Authorization': `Nostr ${thumbToken}`,
+        },
+        body: thumbnail,
+      });
+      thumbnailUrl = thumbUrl;
+    }
 
     return {
       success: true,
-      url: result.url,
-      thumbnailUrl: shouldEncrypt ? undefined : result.thumbnailUrl,
+      url: putUrl,
+      thumbnailUrl,
       encrypted: shouldEncrypt,
       encryptionData,
       metadata: {
@@ -329,7 +328,8 @@ export async function uploadImage(
 export async function uploadBase64Image(
   base64Data: string,
   userPubkey: string,
-  category: 'avatar' | 'message' | 'channel' = 'message'
+  category: 'avatar' | 'message' | 'channel' = 'message',
+  privkey?: Uint8Array | null
 ): Promise<ImageUploadResult> {
   try {
     // Convert base64 to blob
@@ -337,7 +337,7 @@ export async function uploadBase64Image(
     const blob = await response.blob();
     const file = new File([blob], 'image.jpg', { type: blob.type });
 
-    return uploadImage(file, userPubkey, category);
+    return uploadImage(file, userPubkey, category, undefined, privkey);
   } catch (error) {
     return {
       success: false,
@@ -348,14 +348,13 @@ export async function uploadBase64Image(
 
 /**
  * Get image URL for a stored image
+ * imageId format: {pubkey}/media/public/{uuid}.jpg or a full URL
  */
 export function getImageUrl(imageId: string, size: 'full' | 'thumb' = 'full'): string {
-  if (!IMAGE_BUCKET) {
-    console.warn('VITE_IMAGE_BUCKET not configured');
-    return '';
-  }
+  // Pod-api serves images directly — if already a full URL, return it
+  if (imageId.startsWith('http')) return imageId;
   const suffix = size === 'thumb' ? '_thumb' : '';
-  return `https://storage.googleapis.com/${IMAGE_BUCKET}/${imageId}${suffix}.jpg`;
+  return `${POD_API_URL}/pods/${imageId}${suffix}.jpg`;
 }
 
 /**
@@ -385,11 +384,10 @@ export function parseKeybaseImageId(id: string): {
 }
 
 /**
- * Check if a URL is a local image upload URL
+ * Check if a URL is a local image upload URL (pod-api hosted)
  */
 export function isLocalImageUrl(url: string): boolean {
-  if (!IMAGE_BUCKET) return false;
-  return url.includes(IMAGE_BUCKET) || url.includes(`storage.googleapis.com/${IMAGE_BUCKET}`);
+  return url.includes('/pods/') && url.includes('/media/');
 }
 
 /**

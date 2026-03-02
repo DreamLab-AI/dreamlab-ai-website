@@ -125,3 +125,18 @@ export function getAgentByPubkey(pubkey: string): AgentTier | undefined {
 export function isAgentPubkey(pubkey: string): boolean {
   return AGENT_REGISTRY.some((a) => a.pubkey === pubkey && a.pubkey !== '');
 }
+
+/**
+ * Public relay for agent DM routing.
+ * Agent processes subscribe to this relay for their pubkey.
+ * DMs are published to both the DreamLab relay and this relay.
+ */
+export const AGENT_RELAY_URL = import.meta.env.VITE_AGENT_RELAY_URL || 'wss://relay.damus.io';
+
+/**
+ * Send a DM to an agent. Publishes to both DreamLab relay and the agent relay
+ * so the agent process can receive it regardless of which relay it monitors.
+ */
+export function getAgentRelayUrls(): string[] {
+  return [AGENT_RELAY_URL];
+}
