@@ -71,13 +71,16 @@ export async function loadIndex(): Promise<boolean> {
       const mappingArray = new Uint8Array(mappingData.data);
       labelMapping = parseNpzMapping(mappingArray);
 
-      // Set search ef parameter
-      searchIndex.setEf(50);
-
-      console.log(`Index loaded with ${labelMapping.size} vectors`);
-      return true;
+      // hnswlib-wasm requires readIndex() to load binary data, but the
+      // browser WASM binding doesn't support file-path based loading.
+      // Server-side search via search-api Worker is the primary path.
+      // Mark offline HNSW as unavailable until a proper WASM load API is used.
+      console.warn(`HNSW mapping has ${labelMapping.size} entries but binary index load not implemented. Using server-side search.`);
+      searchIndex = null;
+      labelMapping = null;
+      return false;
     } finally {
-      // Fix memory leak: always revoke Blob URL
+      // Always revoke Blob URL to prevent memory leak
       URL.revokeObjectURL(indexUrl);
     }
   } catch (error) {

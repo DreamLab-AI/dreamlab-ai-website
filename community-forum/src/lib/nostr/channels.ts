@@ -295,10 +295,12 @@ export async function fetchChannelById(channelId: string): Promise<CreatedChanne
 	};
 
 	// Race fetchEvents against a timeout so loading never hangs indefinitely
+	const fetchPromise = ndkInstance.fetchEvents(filter);
+	fetchPromise.catch(() => {}); // Prevent unhandled rejection if timeout wins
 	const fetchTimeout = new Promise<Set<NDKEvent>>((resolve) => {
 		setTimeout(() => resolve(new Set()), FETCH_EVENTS_TIMEOUT);
 	});
-	const events = await Promise.race([ndkInstance.fetchEvents(filter), fetchTimeout]);
+	const events = await Promise.race([fetchPromise, fetchTimeout]);
 
 	for (const event of events) {
 		try {
@@ -529,10 +531,12 @@ export async function fetchChannels(options: FetchChannelOptions = {}): Promise<
 
 	// Race fetchEvents against a timeout so loading never hangs indefinitely
 	// when the relay is slow or never sends EOSE.
+	const fetchChannelsPromise = ndkInstance.fetchEvents(filter);
+	fetchChannelsPromise.catch(() => {}); // Prevent unhandled rejection if timeout wins
 	const fetchTimeout = new Promise<Set<NDKEvent>>((resolve) => {
 		setTimeout(() => resolve(new Set()), FETCH_EVENTS_TIMEOUT);
 	});
-	const events = await Promise.race([ndkInstance.fetchEvents(filter), fetchTimeout]);
+	const events = await Promise.race([fetchChannelsPromise, fetchTimeout]);
 	const channels: CreatedChannel[] = [];
 
 	for (const event of events) {
@@ -579,10 +583,12 @@ export async function fetchChannels(options: FetchChannelOptions = {}): Promise<
 				'#e': channelIds,
 				limit: channelIds.length * 2, // Heuristic: ~2 recent msgs per channel
 			};
+			const msgFetchPromise = ndkInstance.fetchEvents(msgFilter);
+			msgFetchPromise.catch(() => {}); // Prevent unhandled rejection if timeout wins
 			const msgFetchTimeout = new Promise<Set<NDKEvent>>((resolve) => {
 				setTimeout(() => resolve(new Set()), FETCH_EVENTS_TIMEOUT);
 			});
-			const msgEvents = await Promise.race([ndkInstance.fetchEvents(msgFilter), msgFetchTimeout]);
+			const msgEvents = await Promise.race([msgFetchPromise, msgFetchTimeout]);
 
 			for (const event of msgEvents) {
 				const rootTag = event.tags.find(t => t[0] === 'e' && (t[3] === 'root' || !t[3]));

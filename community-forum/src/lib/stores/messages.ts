@@ -211,7 +211,9 @@ function createMessageStore() {
           kinds: [9], // NIP-29 channel message
           '#e': [channelId],
           since,
-          limit
+          // When catching up from cache, use a higher limit to avoid silent gaps.
+          // Initial load (since=0) uses the caller's limit.
+          limit: since > 0 ? 500 : limit,
         };
 
         const subscription = ndkSubscribe(filter, { closeOnEose: false });
@@ -438,6 +440,13 @@ function createMessageStore() {
       userPrivkey: string | null
     ): Promise<void> {
       try {
+        // Stop any existing subscriptions for this channel to prevent leaks
+        const existingSubs = channelSubscriptions.get(channelId);
+        if (existingSubs) {
+          existingSubs.forEach(({ subscription }) => subscription.stop());
+          channelSubscriptions.delete(channelId);
+        }
+
         // Get channel info
         const channel = await db.getChannel(channelId);
         const isEncrypted = channel?.isEncrypted || false;

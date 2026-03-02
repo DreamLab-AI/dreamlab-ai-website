@@ -30,9 +30,22 @@ function safePersistDMs(messagesObj: Record<string, DMMessage[]>): void {
     localStorage.setItem('dm_messages', json);
   } catch (e) {
     if (e instanceof DOMException && e.name === 'QuotaExceededError') {
-      console.warn('[DM] localStorage quota exceeded, clearing old messages');
+      console.warn('[DM] localStorage quota exceeded, trimming aggressively');
       try {
-        localStorage.removeItem('dm_messages');
+        // Progressive trim: keep only the 10 most recent conversations
+        const entries = Object.entries(messagesObj);
+        entries.sort((a, b) => {
+          const aLast = a[1][a[1].length - 1]?.timestamp ?? 0;
+          const bLast = b[1][b[1].length - 1]?.timestamp ?? 0;
+          return bLast - aLast;
+        });
+        const minimal = Object.fromEntries(entries.slice(0, 10));
+        try {
+          localStorage.setItem('dm_messages', JSON.stringify(minimal));
+        } catch {
+          // Still too large — silently skip persistence rather than deleting
+          console.warn('[DM] localStorage still full after aggressive trim, skipping persistence');
+        }
       } catch { /* ignore */ }
     }
   }

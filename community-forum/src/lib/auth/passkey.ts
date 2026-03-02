@@ -154,19 +154,31 @@ export async function registerPasskey(displayName: string): Promise<PasskeyRegis
 
 /**
  * Authenticate with an existing passkey, re-deriving the Nostr privkey from PRF.
+ *
+ * Supports two flows:
+ * 1. Known pubkey: single assertion with PRF (fast path)
+ * 2. Unknown pubkey (new device): discoverable credential assertion to identify
+ *    the user, then a second assertion with PRF to derive the key
  */
 export async function authenticatePasskey(pubkey?: string): Promise<PasskeyAuthResult> {
   if (!browser) throw new Error('Browser environment required');
 
-  // Get authentication options (includes stored per-user prfSalt as base64url)
+  let resolvedPubkey = pubkey;
+
+  // If no pubkey, use discoverable credential flow to identify the user first
+  if (!resolvedPubkey) {
+    resolvedPubkey = await discoverPubkeyFromPasskey();
+  }
+
+  // Get authentication options with PRF salt for the resolved pubkey
   const optRes = await fetch(`${AUTH_API_BASE}/auth/login/options`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ pubkey: pubkey ?? '' }),
+    body: JSON.stringify({ pubkey: resolvedPubkey }),
   });
   if (!optRes.ok) throw new Error(`Login options failed: ${optRes.statusText}`);
   const { options: optionsJSON, prfSalt: prfSaltB64 } = await optRes.json() as { options: any; prfSalt: string };
-  if (!prfSaltB64) throw new Error('Server did not return prfSalt in login options');
+  if (!prfSaltB64) throw new Error('Your passkey credential does not have PRF data. Please re-register.');
 
   // Authenticate with the same PRF salt used during registration
   const publicKeyOptions: PublicKeyCredentialRequestOptions = {
@@ -181,8 +193,11 @@ export async function authenticatePasskey(pubkey?: string): Promise<PasskeyAuthR
   })) as PublicKeyCredential | null;
   if (!assertion) throw new Error('Passkey authentication cancelled');
 
-  if ((assertion as any).authenticatorAttachment === 'cross-platform') {
-    throw new Error('Cross-device QR authentication will produce a different PRF output and cannot derive your Nostr key. Use the same device/authenticator used during registration.');
+  // Block cross-device QR (hybrid transport) which produces different PRF outputs.
+  // USB security keys are allowed — they produce consistent PRF outputs.
+  const transport = ((assertion.response as AuthenticatorAssertionResponse).getTransports?.() ?? []) as string[];
+  if ((assertion as any).authenticatorAttachment === 'cross-platform' && transport.includes('hybrid')) {
+    throw new Error('Cross-device QR authentication produces a different key and cannot derive your Nostr identity. Use the same device or authenticator used during registration.');
   }
 
   // Extract PRF output → privkey → pubkey
@@ -221,6 +236,50 @@ export async function authenticatePasskey(pubkey?: string): Promise<PasskeyAuthR
   };
 
   return { pubkey: derivedPubkey, privkey, didNostr, webId: webId ?? null };
+}
+
+/**
+ * Discoverable credential flow: identify the user by their passkey when pubkey
+ * is unknown (e.g., logging in on a new device via iCloud Keychain sync).
+ *
+ * Flow:
+ * 1. Request challenge from server (no pubkey)
+ * 2. Browser shows credential picker for discoverable credentials
+ * 3. Extract pubkey from userHandle (set as user.id during registration)
+ */
+async function discoverPubkeyFromPasskey(): Promise<string> {
+  const optRes = await fetch(`${AUTH_API_BASE}/auth/login/options`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ pubkey: '' }),
+  });
+  if (!optRes.ok) throw new Error(`Login options failed: ${optRes.statusText}`);
+  const { options: optionsJSON } = await optRes.json() as { options: any };
+
+  // Discoverable assertion — no allowCredentials, no PRF on this pass
+  const publicKeyOptions: PublicKeyCredentialRequestOptions = {
+    ...decodeRequestOptions(optionsJSON),
+  };
+
+  const assertion = await navigator.credentials.get({
+    publicKey: publicKeyOptions,
+  }) as PublicKeyCredential | null;
+  if (!assertion) throw new Error('Passkey selection cancelled');
+
+  const response = assertion.response as AuthenticatorAssertionResponse;
+  if (!response.userHandle) {
+    throw new Error('Passkey did not return a user identity. Please log in from the device where you registered.');
+  }
+
+  // userHandle is the user.id set during registration (the pubkey hex string,
+  // base64url-encoded by the WebAuthn protocol). Round-trip it back.
+  const pubkey = bufferToBase64url(response.userHandle);
+
+  if (!/^[0-9a-f]{64}$/i.test(pubkey)) {
+    throw new Error('Could not identify your account from the passkey. Please try logging in from the original device.');
+  }
+
+  return pubkey;
 }
 
 // ── Codec helpers ────────────────────────────────────────────────────────────
