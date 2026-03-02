@@ -211,9 +211,12 @@ export async function fetchUpcomingEvents(days: number = 7): Promise<CalendarEve
   const futureLimit = now + days * 24 * 60 * 60;
 
   try {
+    // Do NOT use a `since` filter here. `since` filters by `created_at` (event
+    // creation time), not by the calendar event's start date. A calendar event
+    // created weeks ago for a date next week would be excluded by a 24h lookback.
+    // Instead, fetch liberally and filter by the event's start/end tags in JS.
     const filter: NDKFilter = {
       kinds: [CALENDAR_EVENT_KIND as number],
-      since: now - 86400, // Include events from yesterday (might still be ongoing)
       limit: 100,
     };
 

@@ -88,6 +88,13 @@ export async function verifyNip98(
 
   // Payload hash check against raw body bytes
   const payloadTag = getTag(event, 'payload');
+  const methodUpper = opts.method.toUpperCase();
+  const methodHasBody = methodUpper === 'POST' || methodUpper === 'PUT' || methodUpper === 'PATCH';
+
+  // For methods that carry a body: if rawBody is provided but the payload tag is
+  // missing from the signed event, reject the request to prevent hash bypass.
+  if (methodHasBody && opts.rawBody && !payloadTag) return null;
+
   if (payloadTag && opts.rawBody) {
     const bytes = opts.rawBody instanceof ArrayBuffer
       ? new Uint8Array(opts.rawBody)

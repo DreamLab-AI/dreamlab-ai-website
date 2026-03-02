@@ -21,6 +21,9 @@
   let startY = 0;
   let currentY = 0;
   let viewportHeight = 0;
+  // Track raw (non-animated) height during drag to avoid reading from the spring
+  // store on every touchmove, which creates recursive animation feedback and lag.
+  let rawHeight = 0;
 
   // Calculate snap heights in pixels
   $: snapHeights = snapPoints.map(p => viewportHeight * p);
@@ -61,6 +64,9 @@
     isDragging = true;
     startY = e.touches[0].clientY;
     currentY = startY;
+    // Snapshot the current animated value once at drag start so subsequent
+    // touchmove handlers use the raw value instead of the spring store.
+    rawHeight = $targetHeight || 0;
   }
 
   function handleTouchMove(e: TouchEvent) {
@@ -68,20 +74,23 @@
     e.preventDefault();
     currentY = e.touches[0].clientY;
     const deltaY = startY - currentY;
-    const newHeight = ($targetHeight || 0) + deltaY;
+    const newHeight = rawHeight + deltaY;
 
     // Clamp to valid range with rubber band effect
     const maxHeight = viewportHeight * 0.95;
     const minHeight = dismissible ? -50 : snapHeights[0] || 100;
 
+    let clampedHeight: number;
     if (newHeight > maxHeight) {
-      targetHeight.set(maxHeight + (newHeight - maxHeight) * 0.2);
+      clampedHeight = maxHeight + (newHeight - maxHeight) * 0.2;
     } else if (newHeight < minHeight) {
-      targetHeight.set(minHeight + (newHeight - minHeight) * 0.2);
+      clampedHeight = minHeight + (newHeight - minHeight) * 0.2;
     } else {
-      targetHeight.set(newHeight);
+      clampedHeight = newHeight;
     }
 
+    targetHeight.set(clampedHeight);
+    rawHeight = clampedHeight;
     startY = currentY;
   }
 

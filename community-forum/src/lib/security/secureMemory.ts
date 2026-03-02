@@ -102,9 +102,18 @@ export class SecureClipboard {
       }, warningDelay);
     }
 
-    // Set clear timeout
+    // Set clear timeout — only clear if clipboard still holds the sensitive value,
+    // to avoid destroying content the user copied after the sensitive data.
     const timeoutId = setTimeout(async () => {
-      await SecureClipboard.clearClipboard();
+      try {
+        const current = await navigator.clipboard.readText();
+        if (current === data) {
+          await SecureClipboard.clearClipboard();
+        }
+      } catch {
+        // Clipboard read may fail if page lost focus — clear anyway as safety measure
+        await SecureClipboard.clearClipboard();
+      }
       SecureClipboard.clearTimeouts.delete(id);
       onCleared?.();
     }, clearDelay);

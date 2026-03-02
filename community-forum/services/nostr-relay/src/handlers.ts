@@ -104,6 +104,11 @@ export class NostrHandlers {
       return;
     }
 
+    // TODO: NIP-29 group management — Kind 9000 (add-user), 9001 (remove-user), etc.
+    // are saved to the database but never processed into Kind 39002 group member lists.
+    // A dedicated NIP-29 engine should watch for 9000-9005 events and maintain
+    // corresponding 39000 (group metadata) and 39002 (group members) replaceable events.
+
     // NIP-16: Handle event based on its treatment type
     const treatment = getEventTreatment(event.kind);
 

@@ -164,13 +164,16 @@ export function verifyPinListSignature(
     };
   }
 
-  // Check timestamp is recent (prevent old events from being replayed)
+  // Check timestamp is recent. Kind 30001 is a replaceable event (NIP-51 pin list)
+  // that represents persistent state — it should remain valid for much longer than
+  // ephemeral requests. Use a 30-day window instead of 24 hours to avoid rejecting
+  // legitimate pin lists that were signed days or weeks ago.
   const eventAge = nowSeconds() - event.created_at;
-  if (eventAge > 86400) {
-    // 24 hours
+  if (eventAge > 30 * 86400) {
+    // 30 days
     return {
       valid: false,
-      error: 'Pin list event is too old (>24 hours)',
+      error: 'Pin list event is too old (>30 days)',
     };
   }
 

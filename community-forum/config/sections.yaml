@@ -144,7 +144,7 @@ categories:
 
     # Zone-level access control
     access:
-      visibleToCohorts: ['family', 'cross-access']
+      visibleToCohorts: ['family', 'family-only', 'cross-access']
       hiddenFromCohorts: ['business-only']
       strictIsolation: true
 

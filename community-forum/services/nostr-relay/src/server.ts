@@ -498,7 +498,9 @@ class NostrRelay {
     const forwardedFor = req.headers['x-forwarded-for'];
     if (forwardedFor) {
       const ips = Array.isArray(forwardedFor) ? forwardedFor[0] : forwardedFor;
-      return ips.split(',')[0].trim();
+      // GCP/Cloud Run appends the true client IP as the LAST entry in X-Forwarded-For.
+      // Reading the first entry allows spoofing via a crafted X-Forwarded-For header.
+      return ips.split(',').pop()!.trim();
     }
 
     const realIP = req.headers['x-real-ip'];

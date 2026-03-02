@@ -148,8 +148,11 @@ function createDMStore() {
         const conversationsMap = new Map<string, DMConversation>();
         const allMessages: Map<string, DMMessage[]> = new Map();
 
-        // Process each gift-wrapped DM
-        for (const event of events) {
+        // Process each gift-wrapped DM, yielding to the event loop periodically
+        // to avoid freezing the main thread on large inboxes.
+        for (let i = 0; i < events.length; i++) {
+          if (i > 0 && i % 10 === 0) await new Promise(r => setTimeout(r, 0));
+          const event = events[i];
           const dm = receiveDM(event, userPrivkey);
           if (!dm) continue;
 
