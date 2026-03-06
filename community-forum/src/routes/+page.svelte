@@ -100,9 +100,6 @@
 			<h1 class="text-5xl md:text-6xl font-bold gradient-text">
 				{primaryName}
 			</h1>
-			<p class="text-xl text-base-content/70">
-				Where ideas come alive together
-			</p>
 		</div>
 
 		<!-- Activity pulse -->
@@ -124,9 +121,9 @@
 
 		<div class="card bg-base-200/80 backdrop-blur border border-base-300/50 shadow-xl">
 			<div class="card-body">
-				<h2 class="card-title text-2xl justify-center">Community Forum</h2>
+				<h2 class="card-title text-2xl justify-center">MiniMooNoir</h2>
 				<p class="text-base-content/70">
-					A private, encrypted space for DreamLab trainees and the wider collective to connect, share knowledge, and collaborate.
+					A private, encrypted space based on old school forums.
 				</p>
 				<div class="card-actions flex-col items-center mt-4 gap-2">
 					<a href="{base}/signup" class="btn btn-primary btn-lg btn-wide">
@@ -148,9 +145,9 @@
 							<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
 						</svg>
 					</div>
-					<h3 class="card-title text-lg">Cohort channels</h3>
+					<h3 class="card-title text-lg">Multi Cohort</h3>
 					<p class="text-sm text-base-content/70">
-						Private spaces organised by training programme and interest.
+						Private spaces, forums, and threads.
 					</p>
 				</div>
 			</div>
@@ -164,7 +161,7 @@
 					</div>
 					<h3 class="card-title text-lg">Encrypted messaging</h3>
 					<p class="text-sm text-base-content/70">
-						End-to-end encrypted DMs for private conversations.
+						End-to-end encrypted private conversations.
 					</p>
 				</div>
 			</div>
@@ -178,7 +175,7 @@
 					</div>
 					<h3 class="card-title text-lg">Events and calendar</h3>
 					<p class="text-sm text-base-content/70">
-						Training sessions, meetups, and community events.
+						Multiple shared calendars.
 					</p>
 				</div>
 			</div>
