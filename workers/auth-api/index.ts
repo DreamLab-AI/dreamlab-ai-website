@@ -33,6 +33,14 @@ function jsonResponse(data: unknown, status: number, env: Env): Response {
   });
 }
 
+function arrayToBase64url(arr: Uint8Array): string {
+  let binary = '';
+  for (let i = 0; i < arr.length; i++) {
+    binary += String.fromCharCode(arr[i]);
+  }
+  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     if (request.method === 'OPTIONS') {
@@ -68,6 +76,11 @@ export default {
         return await handleLoginVerify(request, env);
       }
 
+      // Credential lookup (for discoverable login when userHandle isn't the pubkey)
+      if (path === '/auth/lookup' && request.method === 'POST') {
+        return await handleCredentialLookup(request, env);
+      }
+
       // NIP-98 protected endpoints
       if (path.startsWith('/api/')) {
         const auth = request.headers.get('Authorization');
@@ -100,37 +113,49 @@ export default {
 };
 
 async function handleRegisterOptions(request: Request, env: Env): Promise<Response> {
-  const body = await request.json() as { pubkey?: string };
-  if (!body.pubkey || body.pubkey.length !== 64) {
-    return jsonResponse({ error: 'Invalid pubkey' }, 400, env);
-  }
+  const body = await request.json() as { displayName?: string };
+  const displayName = (typeof body.displayName === 'string' && body.displayName.trim())
+    ? body.displayName.trim() : 'Nostr User';
 
   // Generate challenge
   const challenge = crypto.getRandomValues(new Uint8Array(32));
-  const challengeB64 = btoa(String.fromCharCode.apply(null, Array.from(challenge)));
+  const challengeB64 = arrayToBase64url(challenge);
 
-  // Clean expired challenges (>5 min old) and store new one
+  // Server-controlled PRF salt — stored with credential during verify
+  const prfSalt = crypto.getRandomValues(new Uint8Array(32));
+  const prfSaltB64 = arrayToBase64url(prfSalt);
+
+  // Temporary user ID for the WebAuthn ceremony. The real pubkey is derived
+  // from the PRF output AFTER credential creation, so it can't be user.id.
+  const tempUserId = crypto.getRandomValues(new Uint8Array(16));
+  const tempUserIdB64 = arrayToBase64url(tempUserId);
+
+  // Clean expired challenges and store new one keyed by challenge value
   const fiveMinAgo = Date.now() - 5 * 60 * 1000;
   await env.DB.batch([
     env.DB.prepare('DELETE FROM challenges WHERE created_at < ?').bind(fiveMinAgo),
-    env.DB.prepare('INSERT INTO challenges (pubkey, challenge, created_at) VALUES (?, ?, ?)').bind(body.pubkey, challengeB64, Date.now()),
+    env.DB.prepare('INSERT INTO challenges (pubkey, challenge, created_at) VALUES (?, ?, ?)')
+      .bind(challengeB64, challengeB64, Date.now()),
   ]);
 
   return jsonResponse({
-    rp: { name: env.RP_NAME, id: env.RP_ID },
-    user: { id: body.pubkey, name: `nostr:${body.pubkey.slice(0, 8)}`, displayName: `Nostr User` },
-    challenge: challengeB64,
-    pubKeyCredParams: [
-      { alg: -7, type: 'public-key' },
-      { alg: -257, type: 'public-key' },
-    ],
-    timeout: 60000,
-    authenticatorSelection: {
-      authenticatorAttachment: 'platform',
-      residentKey: 'required',
-      userVerification: 'required',
+    options: {
+      rp: { name: env.RP_NAME || 'DreamLab AI', id: env.RP_ID || 'dreamlab-ai.com' },
+      user: { id: tempUserIdB64, name: displayName, displayName },
+      challenge: challengeB64,
+      pubKeyCredParams: [
+        { alg: -7, type: 'public-key' },
+        { alg: -257, type: 'public-key' },
+      ],
+      timeout: 60000,
+      authenticatorSelection: {
+        authenticatorAttachment: 'platform',
+        residentKey: 'required',
+        userVerification: 'required',
+      },
+      excludeCredentials: [],
     },
-    extensions: { prf: {} },
+    prfSalt: prfSaltB64,
   }, 200, env);
 }
 
@@ -138,26 +163,31 @@ async function handleRegisterVerify(request: Request, env: Env): Promise<Respons
   const body = await request.json() as Record<string, unknown>;
   const pubkey = body.pubkey as string;
 
-  if (!pubkey || typeof pubkey !== 'string') {
-    return jsonResponse({ error: 'Missing pubkey' }, 400, env);
+  if (!pubkey || typeof pubkey !== 'string' || !/^[0-9a-f]{64}$/i.test(pubkey)) {
+    return jsonResponse({ error: 'Invalid pubkey' }, 400, env);
   }
 
-  // Verify challenge exists
+  // Verify a non-expired challenge exists
+  const fiveMinAgo = Date.now() - 5 * 60 * 1000;
   const challengeRow = await env.DB.prepare(
-    'SELECT challenge FROM challenges WHERE pubkey = ? ORDER BY created_at DESC LIMIT 1'
-  ).bind(pubkey).first();
+    'SELECT challenge FROM challenges WHERE created_at > ? LIMIT 1'
+  ).bind(fiveMinAgo).first();
 
   if (!challengeRow) {
-    return jsonResponse({ error: 'No pending challenge' }, 400, env);
+    return jsonResponse({ error: 'No pending challenge or challenge expired' }, 400, env);
   }
 
-  // Validate required fields
-  const credentialId = typeof body.credentialId === 'string' ? body.credentialId : null;
-  const publicKey = typeof body.publicKey === 'string' ? body.publicKey : null;
-  if (!credentialId || !publicKey) {
-    return jsonResponse({ error: 'Missing credentialId or publicKey' }, 400, env);
+  // Extract credential data — accept both nested (response.id) and flat (credentialId) formats
+  const credential = body.response as Record<string, unknown> | undefined;
+  const credentialId = (credential?.id as string) ?? (body.credentialId as string);
+  const credentialResponse = credential?.response as Record<string, unknown> | undefined;
+  const attestation = (credentialResponse?.attestationObject as string) ?? (body.publicKey as string);
+
+  if (!credentialId) {
+    return jsonResponse({ error: 'Missing credential data' }, 400, env);
   }
 
+  // PRF salt generated by server during options, sent back by client
   const prfSalt = typeof body.prfSalt === 'string' ? body.prfSalt : null;
 
   // Store credential
@@ -167,7 +197,7 @@ async function handleRegisterVerify(request: Request, env: Env): Promise<Respons
   ).bind(
     pubkey,
     credentialId,
-    publicKey,
+    attestation || credentialId,
     0,
     prfSalt,
     Date.now(),
@@ -176,12 +206,14 @@ async function handleRegisterVerify(request: Request, env: Env): Promise<Respons
   // Provision pod
   const podInfo = await provisionPod(pubkey, env);
 
-  // Clean up challenge
-  await env.DB.prepare('DELETE FROM challenges WHERE pubkey = ?').bind(pubkey).run();
+  // Clean up used challenge
+  await env.DB.prepare('DELETE FROM challenges WHERE challenge = ?')
+    .bind(challengeRow.challenge as string).run();
 
   return jsonResponse({
     verified: true,
     pubkey,
+    didNostr: `did:nostr:${pubkey}`,
     ...podInfo,
   }, 200, env);
 }
@@ -191,16 +223,20 @@ async function handleLoginOptions(request: Request, env: Env): Promise<Response>
 
   // Generate challenge
   const challenge = crypto.getRandomValues(new Uint8Array(32));
-  const challengeB64 = btoa(String.fromCharCode.apply(null, Array.from(challenge)));
+  const challengeB64 = arrayToBase64url(challenge);
 
   const pubkey = body.pubkey;
   let prfSalt: string | null = null;
+  let allowCredentials: { id: string; type: string }[] = [];
 
   if (pubkey) {
     const cred = await env.DB.prepare(
-      'SELECT prf_salt FROM webauthn_credentials WHERE pubkey = ? LIMIT 1'
+      'SELECT credential_id, prf_salt FROM webauthn_credentials WHERE pubkey = ? LIMIT 1'
     ).bind(pubkey).first();
-    prfSalt = cred?.prf_salt as string | null;
+    prfSalt = (cred?.prf_salt as string) ?? null;
+    if (cred?.credential_id) {
+      allowCredentials = [{ id: cred.credential_id as string, type: 'public-key' }];
+    }
   }
 
   // Always store challenge (supports discoverable credential flows without pubkey)
@@ -208,15 +244,19 @@ async function handleLoginOptions(request: Request, env: Env): Promise<Response>
   const fiveMinAgo = Date.now() - 5 * 60 * 1000;
   await env.DB.batch([
     env.DB.prepare('DELETE FROM challenges WHERE created_at < ?').bind(fiveMinAgo),
-    env.DB.prepare('INSERT INTO challenges (pubkey, challenge, created_at) VALUES (?, ?, ?)').bind(challengePubkey, challengeB64, Date.now()),
+    env.DB.prepare('INSERT INTO challenges (pubkey, challenge, created_at) VALUES (?, ?, ?)')
+      .bind(challengePubkey, challengeB64, Date.now()),
   ]);
 
   return jsonResponse({
-    challenge: challengeB64,
-    rpId: env.RP_ID,
-    timeout: 60000,
-    userVerification: 'required',
-    extensions: prfSalt ? { prf: { eval: { first: prfSalt } } } : { prf: {} },
+    options: {
+      challenge: challengeB64,
+      rpId: env.RP_ID || 'dreamlab-ai.com',
+      timeout: 60000,
+      userVerification: 'required',
+      allowCredentials,
+    },
+    prfSalt,
   }, 200, env);
 }
 
@@ -243,6 +283,23 @@ async function handleLoginVerify(request: Request, env: Env): Promise<Response> 
     pubkey,
     didNostr: `did:nostr:${pubkey}`,
   }, 200, env);
+}
+
+async function handleCredentialLookup(request: Request, env: Env): Promise<Response> {
+  const body = await request.json() as { credentialId?: string };
+  if (!body.credentialId || typeof body.credentialId !== 'string') {
+    return jsonResponse({ error: 'Missing credentialId' }, 400, env);
+  }
+
+  const cred = await env.DB.prepare(
+    'SELECT pubkey FROM webauthn_credentials WHERE credential_id = ? LIMIT 1'
+  ).bind(body.credentialId).first();
+
+  if (!cred) {
+    return jsonResponse({ error: 'Credential not found' }, 404, env);
+  }
+
+  return jsonResponse({ pubkey: cred.pubkey }, 200, env);
 }
 
 async function handleProfile(pubkey: string, env: Env): Promise<Response> {

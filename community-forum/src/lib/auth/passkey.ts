@@ -129,6 +129,7 @@ export async function registerPasskey(displayName: string): Promise<PasskeyRegis
     body: JSON.stringify({
       response: encodeCredentialResponse(credential),
       pubkey,
+      prfSalt: prfSaltB64,
     }),
   });
   if (!verifyRes.ok) {
@@ -267,19 +268,31 @@ async function discoverPubkeyFromPasskey(): Promise<string> {
   if (!assertion) throw new Error('Passkey selection cancelled');
 
   const response = assertion.response as AuthenticatorAssertionResponse;
-  if (!response.userHandle) {
-    throw new Error('Passkey did not return a user identity. Please log in from the device where you registered.');
+
+  // Try extracting pubkey from userHandle (works for legacy credentials
+  // created with pubkey as user.id)
+  if (response.userHandle) {
+    const maybeHex = bufferToBase64url(response.userHandle);
+    if (/^[0-9a-f]{64}$/i.test(maybeHex)) {
+      return maybeHex;
+    }
   }
 
-  // userHandle is the user.id set during registration (the pubkey hex string,
-  // base64url-encoded by the WebAuthn protocol). Round-trip it back.
-  const pubkey = bufferToBase64url(response.userHandle);
-
-  if (!/^[0-9a-f]{64}$/i.test(pubkey)) {
-    throw new Error('Could not identify your account from the passkey. Please try logging in from the original device.');
+  // Fallback: look up pubkey by credential ID (for credentials where user.id
+  // was a random temp value because the pubkey wasn't derived yet at creation time)
+  const lookupRes = await fetch(`${AUTH_API_BASE}/auth/lookup`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ credentialId: assertion.id }),
+  });
+  if (lookupRes.ok) {
+    const { pubkey } = await lookupRes.json() as { pubkey?: string };
+    if (pubkey && /^[0-9a-f]{64}$/i.test(pubkey)) {
+      return pubkey;
+    }
   }
 
-  return pubkey;
+  throw new Error('Could not identify your account from the passkey. Please try logging in from the original device.');
 }
 
 // ── Codec helpers ────────────────────────────────────────────────────────────
