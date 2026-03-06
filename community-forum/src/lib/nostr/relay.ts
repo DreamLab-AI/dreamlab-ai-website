@@ -305,6 +305,27 @@ class RelayManager {
   }
 
   /**
+   * Reconnect the existing NDK instance when the relay WebSocket has dropped.
+   * Re-uses the current signer and pool configuration.
+   */
+  private async _reconnect(): Promise<void> {
+    if (!this._ndk) return;
+
+    // Kick off WebSocket reconnection
+    this._ndk.connect().catch(() => {});
+
+    // Poll until at least one relay is connected or timeout
+    const deadline = Date.now() + TIMEOUTS.connect;
+    while (Date.now() < deadline) {
+      for (const relay of this._ndk.pool.relays.values()) {
+        if (relay.connectivity.status >= 5) return;
+      }
+      await new Promise(r => setTimeout(r, 200));
+    }
+    throw new Error('Failed to reconnect to relay');
+  }
+
+  /**
    * Publish event to relay
    */
   async publishEvent(event: NDKEvent): Promise<boolean> {
@@ -327,6 +348,15 @@ class RelayManager {
     // out even though the event was stored. One retry handles this.
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
+        // If the relay WebSocket dropped, reconnect before publishing.
+        // This handles the common case where the CF Worker went idle.
+        if (!this.isConnected()) {
+          if (NDK_CONFIG.enableDebug) {
+            console.log('[NDK] Relay disconnected, reconnecting before publish...');
+          }
+          await this._reconnect();
+        }
+
         const publishTimeout = new Promise<never>((_, reject) => {
           setTimeout(() => reject(new Error('Publish timeout')), TIMEOUTS.publish);
         });
@@ -341,7 +371,7 @@ class RelayManager {
           if (NDK_CONFIG.enableDebug) {
             console.warn('[NDK] Publish attempt 1 failed, retrying:', error);
           }
-          // Brief pause before retry
+          // Brief pause then retry with reconnection
           await new Promise(r => setTimeout(r, 1000));
           continue;
         }

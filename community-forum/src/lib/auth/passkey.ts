@@ -177,7 +177,13 @@ export async function authenticatePasskey(pubkey?: string): Promise<PasskeyAuthR
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ pubkey: resolvedPubkey }),
   });
-  if (!optRes.ok) throw new Error(`Login options failed: ${optRes.statusText}`);
+  if (!optRes.ok) {
+    const errBody = await optRes.json().catch(() => ({})) as { error?: string; code?: string };
+    if (errBody.code === 'NO_CREDENTIAL') {
+      throw new Error('No passkey registered for this account. Use private key login or create a new account with passkey.');
+    }
+    throw new Error(errBody.error ?? `Login options failed: ${optRes.statusText}`);
+  }
   const { options: optionsJSON, prfSalt: prfSaltB64 } = await optRes.json() as { options: any; prfSalt: string };
   if (!prfSaltB64) throw new Error('Your passkey credential does not have PRF data. Please re-register.');
 

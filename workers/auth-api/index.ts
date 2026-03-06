@@ -233,8 +233,17 @@ async function handleLoginOptions(request: Request, env: Env): Promise<Response>
     const cred = await env.DB.prepare(
       'SELECT credential_id, prf_salt FROM webauthn_credentials WHERE pubkey = ? LIMIT 1'
     ).bind(pubkey).first();
-    prfSalt = (cred?.prf_salt as string) ?? null;
-    if (cred?.credential_id) {
+
+    if (!cred) {
+      // No passkey credential registered — user must use private key login or register a passkey
+      return jsonResponse({
+        error: 'No passkey registered for this account. Use private key login or create a new passkey.',
+        code: 'NO_CREDENTIAL',
+      }, 404, env);
+    }
+
+    prfSalt = (cred.prf_salt as string) ?? null;
+    if (cred.credential_id) {
       allowCredentials = [{ id: cred.credential_id as string, type: 'public-key' }];
     }
   }
