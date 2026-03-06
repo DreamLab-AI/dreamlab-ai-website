@@ -4,7 +4,6 @@
 	import { base } from '$app/paths';
 	import { page } from '$app/stores';
 	import { nip19 } from 'nostr-tools';
-	import NDK from '@nostr-dev-kit/ndk';
 	import { ndk as getNDKInstance, isConnected } from '$lib/nostr/relay';
 	import { RELAY_URL } from '$lib/config';
 	import { formatRelativeTime } from '$lib/nostr/events';
@@ -63,9 +62,10 @@
 			}
 
 			// Use existing RelayManager connection if available, otherwise create
-			// a lightweight read-only NDK instance for this public page.
+			// a lightweight read-only NDK instance for unauthenticated viewers.
 			let ndkInstance = getNDKInstance();
 			if (!ndkInstance || !isConnected()) {
+				const NDK = (await import('@nostr-dev-kit/ndk')).default;
 				ndkInstance = new NDK({ explicitRelayUrls: [RELAY_URL] });
 				await ndkInstance.connect();
 			}

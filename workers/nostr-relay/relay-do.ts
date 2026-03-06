@@ -157,8 +157,8 @@ export class NostrRelayDO implements DurableObject {
       }
     }
 
-    // Verify event ID (NIP-01 canonical serialization)
-    if (!this.verifyEventId(event)) {
+    // Verify event ID (NIP-01 canonical serialization → SHA-256)
+    if (!(await this.verifyEventId(event))) {
       this.sendOK(ws, event.id, false, 'invalid: event id verification failed');
       return;
     }
@@ -250,16 +250,11 @@ export class NostrRelayDO implements DurableObject {
     return true;
   }
 
-  private verifyEventId(event: NostrEvent): boolean {
+  private async verifyEventId(event: NostrEvent): Promise<boolean> {
     const serialized = JSON.stringify([0, event.pubkey, event.created_at, event.kind, event.tags, event.content]);
-    // Use Web Crypto API for SHA-256
-    const encoder = new TextEncoder();
-    const data = encoder.encode(serialized);
-    // Sync hash using subtle crypto isn't available, use a manual approach
-    // Actually in Workers we need to use crypto.subtle which is async
-    // But we need this to be sync for validation flow — use a simple check
-    // We'll verify the ID in the signature verification step instead
-    return /^[0-9a-f]{64}$/.test(event.id);
+    const data = new TextEncoder().encode(serialized);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    return bytesToHex(new Uint8Array(hashBuffer)) === event.id;
   }
 
   private verifySignature(event: NostrEvent): boolean {
@@ -494,4 +489,12 @@ function hexToBytes(hex: string): Uint8Array {
     bytes[i / 2] = parseInt(hex.substring(i, i + 2), 16);
   }
   return bytes;
+}
+
+function bytesToHex(bytes: Uint8Array): string {
+  let hex = '';
+  for (let i = 0; i < bytes.length; i++) {
+    hex += bytes[i].toString(16).padStart(2, '0');
+  }
+  return hex;
 }

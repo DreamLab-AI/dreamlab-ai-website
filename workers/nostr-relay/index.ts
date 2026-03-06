@@ -184,17 +184,11 @@ function handleNip11(request: Request, env: Env): Response {
 }
 
 async function handleHealth(request: Request, env: Env): Promise<Response> {
-  const stats = await env.DB.prepare(
-    'SELECT (SELECT COUNT(*) FROM events) as events, (SELECT COUNT(*) FROM whitelist) as whitelisted'
-  ).first<{ events: number; whitelisted: number }>();
-
+  // Minimal health check — no internal counts exposed to unauthenticated callers
   return json({
     status: 'healthy',
     version: '3.0.0',
     runtime: 'workers',
-    database: 'd1',
-    events: stats?.events ?? 0,
-    whitelisted: stats?.whitelisted ?? 0,
     nips: [1, 11, 16, 33, 98],
   }, 200, request);
 }
