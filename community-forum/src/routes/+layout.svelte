@@ -203,7 +203,7 @@
 					class="flex-shrink-0 flex flex-col border-r border-base-300 bg-base-100 overflow-y-auto"
 					class:w-72={!zoneNavCollapsed || !calendarCollapsed}
 					class:w-16={zoneNavCollapsed && calendarCollapsed}
-					style="max-height: calc(100vh - 64px); transition: width 0.3s ease-in-out;"
+					style="max-height: calc(100vh - 64px - env(safe-area-inset-top, 0px)); transition: width 0.3s ease-in-out;"
 					aria-label="Navigation sidebar"
 				>
 					<!-- Zones Section -->

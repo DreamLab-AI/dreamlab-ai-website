@@ -135,4 +135,9 @@ export default {
         return Response.json({ error: 'Method not allowed' }, { status: 405, headers: cors });
     }
   },
+
+  // Cron keep-warm: prevents cold starts by running every 5 minutes
+  async scheduled(_event: ScheduledEvent, _env: Env, _ctx: ExecutionContext): Promise<void> {
+    // No D1 to ping — the cron trigger itself keeps the isolate warm
+  },
 };

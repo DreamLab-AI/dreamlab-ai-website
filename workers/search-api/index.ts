@@ -417,4 +417,13 @@ export default {
       return json({ error: err instanceof Error ? err.message : 'Internal error' }, 500, env);
     }
   },
+
+  // Cron keep-warm: prevents cold starts and keeps WASM store in memory
+  async scheduled(_event: ScheduledEvent, env: Env, _ctx: ExecutionContext): Promise<void> {
+    try {
+      await ensureStore(env);
+    } catch (err) {
+      console.error('Scheduled keep-warm failed:', err);
+    }
+  },
 };

@@ -10,10 +10,10 @@ export interface AppSettings {
 const STORAGE_KEY = 'Nostr-BBS-settings';
 
 /**
- * Private relay URL from environment variable
- * Set via VITE_RELAY_URL in .env file
+ * Private relay URL — use the canonical RELAY_URL from environment config
  */
-const PRIVATE_RELAY_URL = import.meta.env.VITE_RELAY_URL || 'wss://localhost:7777';
+import { RELAY_URL } from '$lib/config';
+const PRIVATE_RELAY_URL = RELAY_URL;
 
 /**
  * Get the private relay URL

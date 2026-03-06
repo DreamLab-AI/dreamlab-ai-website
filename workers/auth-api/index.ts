@@ -110,6 +110,11 @@ export default {
       return jsonResponse({ error: 'Internal server error' }, 500, env);
     }
   },
+
+  // Cron keep-warm: prevents cold starts by running every 5 minutes
+  async scheduled(_event: ScheduledEvent, env: Env, _ctx: ExecutionContext): Promise<void> {
+    await env.DB.prepare('SELECT 1').first();
+  },
 };
 
 async function handleRegisterOptions(request: Request, env: Env): Promise<Response> {

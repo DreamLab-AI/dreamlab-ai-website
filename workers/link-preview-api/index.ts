@@ -369,4 +369,9 @@ export default {
       return json({ error: err instanceof Error ? err.message : 'Internal error' }, 500, env);
     }
   },
+
+  // Cron keep-warm: prevents cold starts by running every 5 minutes
+  async scheduled(_event: ScheduledEvent, _env: Env, _ctx: ExecutionContext): Promise<void> {
+    // No persistent storage to touch — the cron itself keeps the isolate warm
+  },
 };

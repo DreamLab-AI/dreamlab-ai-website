@@ -18,3 +18,7 @@ fallthrough = false
 [vars]
 ALLOWED_ORIGIN = "https://dreamlab-ai.com"
 RVF_STORE_KEY = "dreamlab.rvf"
+
+# Keep worker warm — ping every 5 minutes to avoid cold starts
+[triggers]
+crons = ["*/5 * * * *"]

@@ -68,7 +68,7 @@
 </script>
 
 <!-- Desktop/Mobile Navigation Bar -->
-<nav class="navbar bg-base-200/80 backdrop-blur-md border-b border-base-300/50 sticky top-0 z-40" role="navigation" aria-label="Main navigation">
+<nav class="navbar bg-base-200/80 backdrop-blur-md border-b border-base-300/50 sticky top-0 z-40 safe-top" role="navigation" aria-label="Main navigation">
 	<div class="navbar-start">
 		<!-- Mobile hamburger menu -->
 		<button
@@ -87,7 +87,7 @@
 			</svg>
 			DreamLab
 		</a>
-		<a href="{base}/chat" class="btn btn-ghost text-xl">{appConfig.name.split(' - ')[0]}</a>
+		<a href="{base}/chat" class="btn btn-ghost text-lg sm:text-xl truncate max-w-[140px] sm:max-w-none">{appConfig.name.split(' - ')[0]}</a>
 	</div>
 
 	<!-- Desktop Navigation (hidden on mobile) -->

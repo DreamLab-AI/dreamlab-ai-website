@@ -268,8 +268,14 @@ class RelayManager {
   private async _finishConnect(relayUrl: string): Promise<ConnectionStatus> {
     if (!this._ndk) throw new Error('NDK not initialized');
 
-    // Start NDK connection (fires off WebSocket asynchronously)
-    this._ndk.connect().catch(() => {});
+    // Await NDK connect to ensure the relay pool is populated before polling.
+    // Without await, pool.relays may be empty when we start checking status.
+    try {
+      await this._ndk.connect();
+    } catch {
+      // connect() may reject if the WebSocket fails — fall through to polling
+      // which gives the relay time to come up on retry.
+    }
 
     // Poll relay status until connected or timeout
     const deadline = Date.now() + TIMEOUTS.connect;
@@ -311,8 +317,12 @@ class RelayManager {
   private async _reconnect(): Promise<void> {
     if (!this._ndk) return;
 
-    // Kick off WebSocket reconnection
-    this._ndk.connect().catch(() => {});
+    // Await WebSocket reconnection so pool.relays is populated before polling.
+    try {
+      await this._ndk.connect();
+    } catch {
+      // connect() may reject if the WebSocket fails — fall through to polling
+    }
 
     // Poll until at least one relay is connected or timeout
     const deadline = Date.now() + TIMEOUTS.connect;

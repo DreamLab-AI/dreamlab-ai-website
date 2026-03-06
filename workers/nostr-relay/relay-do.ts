@@ -293,21 +293,8 @@ export class NostrRelayDO implements DurableObject {
 
   private async saveEvent(event: NostrEvent, treatment: string): Promise<boolean> {
     try {
-      if (treatment === 'replaceable') {
-        await this.env.DB.prepare(
-          'DELETE FROM events WHERE pubkey = ? AND kind = ? AND created_at < ?'
-        ).bind(event.pubkey, event.kind, event.created_at).run();
-      }
-
-      if (treatment === 'parameterized_replaceable') {
-        const dTag = this.getDTagValue(event);
-        // D1 doesn't have JSONB, use a d_tag column
-        await this.env.DB.prepare(
-          'DELETE FROM events WHERE pubkey = ? AND kind = ? AND d_tag = ? AND created_at < ?'
-        ).bind(event.pubkey, event.kind, dTag, event.created_at).run();
-      }
-
-      await this.env.DB.prepare(
+      const dTag = this.getDTagValue(event);
+      const insertStmt = this.env.DB.prepare(
         `INSERT INTO events (id, pubkey, created_at, kind, tags, content, sig, d_tag, received_at)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
          ON CONFLICT (id) DO NOTHING`
@@ -319,9 +306,24 @@ export class NostrRelayDO implements DurableObject {
         JSON.stringify(event.tags),
         event.content,
         event.sig,
-        this.getDTagValue(event),
+        dTag,
         Math.floor(Date.now() / 1000),
-      ).run();
+      );
+
+      // Batch DELETE + INSERT into a single D1 round trip for replaceable events
+      if (treatment === 'replaceable') {
+        const deleteStmt = this.env.DB.prepare(
+          'DELETE FROM events WHERE pubkey = ? AND kind = ? AND created_at < ?'
+        ).bind(event.pubkey, event.kind, event.created_at);
+        await this.env.DB.batch([deleteStmt, insertStmt]);
+      } else if (treatment === 'parameterized_replaceable') {
+        const deleteStmt = this.env.DB.prepare(
+          'DELETE FROM events WHERE pubkey = ? AND kind = ? AND d_tag = ? AND created_at < ?'
+        ).bind(event.pubkey, event.kind, dTag, event.created_at);
+        await this.env.DB.batch([deleteStmt, insertStmt]);
+      } else {
+        await insertStmt.run();
+      }
 
       return true;
     } catch {
@@ -376,8 +378,10 @@ export class NostrRelayDO implements DurableObject {
           const realConditions: string[] = [];
           for (const v of values) {
             if (typeof v === 'string' && v.length > 0) {
-              realConditions.push('tags LIKE ?');
-              params.push(`%"${tagName}","${v}"%`);
+              // Escape LIKE wildcards and quotes in tag values to prevent pattern injection
+              const escaped = v.replace(/%/g, '\\%').replace(/_/g, '\\_').replace(/"/g, '');
+              realConditions.push("tags LIKE ? ESCAPE '\\'");
+              params.push(`%"${tagName}","${escaped}"%`);
             }
           }
           if (realConditions.length > 0) {

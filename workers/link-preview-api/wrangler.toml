@@ -4,3 +4,7 @@ main = "index.ts"
 
 [vars]
 ALLOWED_ORIGIN = "https://dreamlab-ai.com"
+
+# Keep worker warm — ping every 5 minutes to avoid cold starts
+[triggers]
+crons = ["*/5 * * * *"]

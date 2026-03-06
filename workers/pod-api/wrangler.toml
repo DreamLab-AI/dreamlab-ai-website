@@ -12,3 +12,7 @@ id = "8ec8759ab40d4709a831bf6b0e5241eb"
 
 [vars]
 EXPECTED_ORIGIN = "https://dreamlab-ai.com"
+
+# Keep worker warm — ping every 5 minutes to avoid cold starts
+[triggers]
+crons = ["*/5 * * * *"]

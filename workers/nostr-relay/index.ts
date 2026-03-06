@@ -132,6 +132,12 @@ export default {
       return json({ error: 'Internal error' }, 500, request);
     }
   },
+
+  // Cron keep-warm: prevents cold starts by running every 5 minutes
+  async scheduled(_event: ScheduledEvent, env: Env, _ctx: ExecutionContext): Promise<void> {
+    // Touch D1 to keep the connection pool warm
+    await env.DB.prepare('SELECT 1').first();
+  },
 };
 
 // ── Handlers ──────────────────────────────────────────────────────────
@@ -231,10 +237,12 @@ async function handleWhitelistList(request: Request, url: URL, env: Env): Promis
   const params: unknown[] = [now];
 
   if (cohort) {
-    const cohortFilter = ` AND cohorts LIKE ?`;
+    // Escape LIKE wildcards and strip quotes to prevent pattern injection
+    const escaped = cohort.replace(/%/g, '\\%').replace(/_/g, '\\_').replace(/"/g, '');
+    const cohortFilter = ` AND cohorts LIKE ? ESCAPE '\\'`;
     countQuery += cohortFilter;
     listQuery += cohortFilter;
-    params.push(`%"${cohort}"%`);
+    params.push(`%"${escaped}"%`);
   }
 
   listQuery += ' ORDER BY w.added_at DESC LIMIT ? OFFSET ?';
