@@ -12,8 +12,6 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 const mockCreateNip98Token = vi.fn().mockResolvedValue('mock-base64-token');
 vi.mock('../../../packages/nip98/sign.js', () => ({
   createNip98Token: (...args: any[]) => mockCreateNip98Token(...args),
-  createSigner: vi.fn(),
-  hashRawBody: vi.fn()
 }));
 
 // Mock $app/environment
