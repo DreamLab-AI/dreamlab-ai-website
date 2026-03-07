@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>DreamLab AI Consulting Ltd. - Redirecting...</title>
+    <script>
+      // SPA routing for GitHub Pages
+      // Handle both main site (/) and community app (/community/)
+      var path = location.pathname + location.search + location.hash;
+
+      if (path.startsWith('/community')) {
+        // Community SvelteKit app - store path and redirect to community root
+        sessionStorage.setItem('redirect', path);
+        location.replace('/community/');
+      } else {
+        // Main React app - redirect to root
+        sessionStorage.setItem('redirect', path);
+        location.replace('/');
+      }
+    </script>
+  </head>
+  <body>
+    <div style="font-family: system-ui; text-align: center; padding: 2rem;">
+      <h1>Redirecting...</h1>
+      <p>If you are not redirected automatically, <a href="/">click here</a>.</p>
+    </div>
+  </body>
+</html>
