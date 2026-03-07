@@ -1,4 +1,31 @@
 <script lang="ts">
+  /**
+   * ========================================================================
+   * TRUST BOUNDARY DOCUMENTATION (E3.2 / FIND-010)
+   * ========================================================================
+   *
+   * This page performs client-side channel access checks (authContext with
+   * cohort/admin/pubkey fields) before fetching messages and subscribing.
+   * These checks are UX OPTIMIZATION ONLY -- they prevent the UI from
+   * rendering channels the user should not see, but they do not constitute
+   * a security boundary.
+   *
+   * A malicious client can bypass these checks entirely by:
+   *   1. Connecting to the relay WebSocket directly
+   *   2. Sending raw NIP-01 REQ messages for any channel's events
+   *   3. Ignoring client-side cohort/visibility filtering
+   *
+   * SECURITY ENFORCEMENT:
+   *   The Cloudflare Worker relay (workers/nostr-relay-api/) enforces
+   *   channel ACLs via NIP-42 AUTH at the WebSocket level. The relay
+   *   determines which events to return based on the authenticated user's
+   *   pubkey and cohort membership. This page's authContext checks are
+   *   defense-in-depth and must not be treated as the security perimeter.
+   *
+   * See: community-forum/src/lib/nostr/channels.ts for detailed trust
+   *      boundary documentation.
+   * ========================================================================
+   */
   import { onMount, onDestroy } from 'svelte';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';

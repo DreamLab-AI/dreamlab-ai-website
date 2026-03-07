@@ -304,6 +304,43 @@ function isTwitterUrl(url: string): boolean {
 }
 
 // =============================================================================
+// DNS Resolution for SSRF Protection
+// =============================================================================
+
+/**
+ * Resolve hostname via DNS-over-HTTPS and validate resolved IPs against SSRF blocklist.
+ * Prevents DNS rebinding attacks where a hostname resolves to a private IP.
+ * Throws if any resolved IP is in a blocked range.
+ */
+async function resolveAndValidateHost(hostname: string): Promise<void> {
+	try {
+		const dohUrl = `https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(hostname)}&type=A`;
+		const response = await fetch(dohUrl, {
+			headers: { 'Accept': 'application/dns-json' },
+			signal: AbortSignal.timeout(3000),
+		});
+
+		if (!response.ok) return; // DNS resolution failure — let fetch handle it
+
+		const data = await response.json() as { Answer?: Array<{ type: number; data: string }> };
+		const answers = data.Answer || [];
+
+		for (const record of answers) {
+			if (record.type === 1 || record.type === 28) { // A or AAAA
+				if (isPrivateHost(record.data)) {
+					throw new Error(`DNS resolved to private IP: ${record.data}`);
+				}
+			}
+		}
+	} catch (error) {
+		if (error instanceof Error && error.message.includes('private IP')) {
+			throw error;
+		}
+		// DNS resolution failures are non-fatal — the fetch will fail naturally
+	}
+}
+
+// =============================================================================
 // Data Fetching Functions
 // =============================================================================
 
@@ -348,17 +385,36 @@ async function fetchTwitterEmbed(url: string): Promise<Response> {
 }
 
 /**
- * Fetch generic OpenGraph metadata
+ * Fetch generic OpenGraph metadata.
+ * Uses manual redirect following with DNS re-validation at each hop to prevent
+ * SSRF via redirect chains that land on private IPs.
  */
-async function fetchOpenGraphData(url: string): Promise<Response> {
+async function fetchOpenGraphData(url: string, redirectCount = 0): Promise<Response> {
+	if (redirectCount > 3) {
+		throw new Error('Too many redirects');
+	}
+
 	const response = await fetch(url, {
 		headers: {
 			'Accept': 'text/html,application/xhtml+xml',
 			'User-Agent': 'Nostr-BBS/1.0 (Link Preview Bot)',
 		},
 		signal: AbortSignal.timeout(TIMEOUT_MS),
-		redirect: 'follow',
+		redirect: 'manual',
 	});
+
+	// Handle redirects with DNS re-validation
+	if (response.status >= 300 && response.status < 400) {
+		const location = response.headers.get('Location');
+		if (!location) throw new Error('Redirect without Location header');
+
+		const redirectUrl = new URL(location, url).href;
+		const securityError = validateUrlSecurity(redirectUrl);
+		if (securityError) throw new Error(`Redirect blocked: ${securityError}`);
+
+		await resolveAndValidateHost(new URL(redirectUrl).hostname);
+		return fetchOpenGraphData(redirectUrl, redirectCount + 1);
+	}
 
 	if (!response.ok) {
 		throw new Error(`Failed to fetch URL: ${response.status}`);
@@ -531,6 +587,11 @@ export const GET: RequestHandler = async ({ url, getClientAddress }) => {
 	//     },
 	//   });
 	// }
+
+	// DNS resolution check for SSRF protection — validates resolved IPs
+	// are not in private/internal ranges before allowing the fetch.
+	const targetHostname = new URL(targetUrl).hostname;
+	await resolveAndValidateHost(targetHostname);
 
 	const isTwitter = isTwitterUrl(targetUrl);
 

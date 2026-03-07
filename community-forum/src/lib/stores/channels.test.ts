@@ -1,8 +1,11 @@
 /**
  * Channel Store Access Control Tests
  *
- * Tests for cohort-based filtering logic in the channel store.
+ * Tests for cohort-based filtering logic in the NIP-29 channel store.
  * The store's fetchChannels() function should filter channels based on user cohorts.
+ *
+ * Note: This file imports from './channels' which re-exports NIP-29 functions
+ * from './channelStore' for backward compatibility.
  */
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
@@ -11,7 +14,7 @@ import type NDK from '@nostr-dev-kit/ndk';
 import type { NDKEvent, NDKFilter } from '@nostr-dev-kit/ndk';
 import type { ChannelSection, ChannelVisibility, ChannelAccessType } from '$lib/types/channel';
 
-// Import store functions and types
+// Import NIP-29 store functions and types from the re-export shim
 import {
 	channelStore,
 	fetchChannels,
@@ -336,16 +339,16 @@ describe('Channel Store - Cohort Filtering', () => {
 
 	describe('Channel Filtering Helpers', () => {
 		beforeEach(async () => {
-			// Populate store with test channels
+			// Populate store with test NIP-29 channels via channelStore.update
 			const testChannels: Channel[] = [
 				{
 					id: 'business-1',
 					name: 'Business Room 1',
 					description: 'Business discussion',
 					cohorts: ['business'],
-					section: 'community-rooms',
-					visibility: 'cohort',
-					accessType: 'gated',
+					section: 'community-rooms' as ChannelSection,
+					visibility: 'cohort' as ChannelVisibility,
+					accessType: 'gated' as ChannelAccessType,
 					isEncrypted: false,
 					memberCount: 10,
 					createdAt: Date.now(),
@@ -357,9 +360,9 @@ describe('Channel Store - Cohort Filtering', () => {
 					name: 'Tribe Room 1',
 					description: 'Tribe discussion',
 					cohorts: ['moomaa-tribe'],
-					section: 'dreamlab',
-					visibility: 'cohort',
-					accessType: 'gated',
+					section: 'dreamlab' as ChannelSection,
+					visibility: 'cohort' as ChannelVisibility,
+					accessType: 'gated' as ChannelAccessType,
 					isEncrypted: false,
 					memberCount: 5,
 					createdAt: Date.now(),
@@ -371,9 +374,9 @@ describe('Channel Store - Cohort Filtering', () => {
 					name: 'Public Lobby',
 					description: 'Public discussion',
 					cohorts: [],
-					section: 'public-lobby',
-					visibility: 'public',
-					accessType: 'open',
+					section: 'public-lobby' as ChannelSection,
+					visibility: 'public' as ChannelVisibility,
+					accessType: 'open' as ChannelAccessType,
 					isEncrypted: false,
 					memberCount: 100,
 					createdAt: Date.now(),
@@ -384,7 +387,7 @@ describe('Channel Store - Cohort Filtering', () => {
 
 			channelStore.update(state => ({
 				...state,
-				channels: testChannels
+				nip29Channels: testChannels
 			}));
 		});
 
@@ -422,9 +425,9 @@ describe('Channel Store - Cohort Filtering', () => {
 				name: 'Test Channel',
 				description: 'Test',
 				cohorts: ['business'],
-				section: 'public-lobby',
-				visibility: 'public',
-				accessType: 'open',
+				section: 'public-lobby' as ChannelSection,
+				visibility: 'public' as ChannelVisibility,
+				accessType: 'open' as ChannelAccessType,
 				isEncrypted: false,
 				memberCount: 1,
 				createdAt: Date.now(),
@@ -444,9 +447,9 @@ describe('Channel Store - Cohort Filtering', () => {
 				name: 'Test',
 				description: '',
 				cohorts: [],
-				section: 'public-lobby',
-				visibility: 'public',
-				accessType: 'open',
+				section: 'public-lobby' as ChannelSection,
+				visibility: 'public' as ChannelVisibility,
+				accessType: 'open' as ChannelAccessType,
 				isEncrypted: false,
 				memberCount: 0,
 				createdAt: Date.now(),
@@ -467,9 +470,9 @@ describe('Channel Store - Cohort Filtering', () => {
 				name: 'Original Name',
 				description: 'Original',
 				cohorts: [],
-				section: 'public-lobby',
-				visibility: 'public',
-				accessType: 'open',
+				section: 'public-lobby' as ChannelSection,
+				visibility: 'public' as ChannelVisibility,
+				accessType: 'open' as ChannelAccessType,
 				isEncrypted: false,
 				memberCount: 5,
 				createdAt: Date.now(),
@@ -479,14 +482,14 @@ describe('Channel Store - Cohort Filtering', () => {
 
 			channelStore.update(state => ({
 				...state,
-				channels: [channel]
+				nip29Channels: [channel]
 			}));
 
 			updateChannel('update-test', { name: 'Updated Name', memberCount: 10 });
 
 			const state = get(channelStore);
-			expect(state.channels[0].name).toBe('Updated Name');
-			expect(state.channels[0].memberCount).toBe(10);
+			expect(state.nip29Channels[0].name).toBe('Updated Name');
+			expect(state.nip29Channels[0].memberCount).toBe(10);
 		});
 
 		it('should remove channel from store', () => {
@@ -496,9 +499,9 @@ describe('Channel Store - Cohort Filtering', () => {
 					name: 'Keep',
 					description: '',
 					cohorts: [],
-					section: 'public-lobby',
-					visibility: 'public',
-					accessType: 'open',
+					section: 'public-lobby' as ChannelSection,
+					visibility: 'public' as ChannelVisibility,
+					accessType: 'open' as ChannelAccessType,
 					isEncrypted: false,
 					memberCount: 0,
 					createdAt: Date.now(),
@@ -510,9 +513,9 @@ describe('Channel Store - Cohort Filtering', () => {
 					name: 'Remove',
 					description: '',
 					cohorts: [],
-					section: 'public-lobby',
-					visibility: 'public',
-					accessType: 'open',
+					section: 'public-lobby' as ChannelSection,
+					visibility: 'public' as ChannelVisibility,
+					accessType: 'open' as ChannelAccessType,
 					isEncrypted: false,
 					memberCount: 0,
 					createdAt: Date.now(),
@@ -523,14 +526,14 @@ describe('Channel Store - Cohort Filtering', () => {
 
 			channelStore.update(state => ({
 				...state,
-				channels
+				nip29Channels: channels
 			}));
 
 			removeChannel('remove-this');
 
 			const state = get(channelStore);
-			expect(state.channels).toHaveLength(1);
-			expect(state.channels[0].id).toBe('keep-this');
+			expect(state.nip29Channels).toHaveLength(1);
+			expect(state.nip29Channels[0].id).toBe('keep-this');
 		});
 
 		it('should clear current channel when removed channel was current', () => {
@@ -539,9 +542,9 @@ describe('Channel Store - Cohort Filtering', () => {
 				name: 'Current',
 				description: '',
 				cohorts: [],
-				section: 'public-lobby',
-				visibility: 'public',
-				accessType: 'open',
+				section: 'public-lobby' as ChannelSection,
+				visibility: 'public' as ChannelVisibility,
+				accessType: 'open' as ChannelAccessType,
 				isEncrypted: false,
 				memberCount: 0,
 				createdAt: Date.now(),
@@ -551,8 +554,8 @@ describe('Channel Store - Cohort Filtering', () => {
 
 			channelStore.update(state => ({
 				...state,
-				channels: [channel],
-				currentChannel: channel
+				nip29Channels: [channel],
+				nip29CurrentChannel: channel
 			}));
 
 			expect(getCurrentChannel()).not.toBeNull();
@@ -568,9 +571,9 @@ describe('Channel Store - Cohort Filtering', () => {
 				name: 'Test',
 				description: '',
 				cohorts: [],
-				section: 'public-lobby',
-				visibility: 'public',
-				accessType: 'open',
+				section: 'public-lobby' as ChannelSection,
+				visibility: 'public' as ChannelVisibility,
+				accessType: 'open' as ChannelAccessType,
 				isEncrypted: false,
 				memberCount: 0,
 				createdAt: Date.now(),
@@ -580,17 +583,17 @@ describe('Channel Store - Cohort Filtering', () => {
 
 			channelStore.update(state => ({
 				...state,
-				channels: [channel],
-				currentChannel: channel
+				nip29Channels: [channel],
+				nip29CurrentChannel: channel
 			}));
 
 			clearChannels();
 
 			const state = get(channelStore);
-			expect(state.channels).toHaveLength(0);
-			expect(state.currentChannel).toBeNull();
-			expect(state.loading).toBe(false);
-			expect(state.error).toBeNull();
+			expect(state.nip29Channels).toHaveLength(0);
+			expect(state.nip29CurrentChannel).toBeNull();
+			expect(state.nip29Loading).toBe(false);
+			expect(state.nip29Error).toBeNull();
 		});
 	});
 
@@ -607,8 +610,8 @@ describe('Channel Store - Cohort Filtering', () => {
 			).rejects.toThrow('Network error');
 
 			const state = get(channelStore);
-			expect(state.loading).toBe(false);
-			expect(state.error).toBe('Network error');
+			expect(state.nip29Loading).toBe(false);
+			expect(state.nip29Error).toBe('Network error');
 		});
 
 		it('should handle malformed metadata gracefully', async () => {

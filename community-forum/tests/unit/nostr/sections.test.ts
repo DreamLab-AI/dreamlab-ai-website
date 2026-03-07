@@ -67,13 +67,17 @@ vi.mock('$lib/stores/sections', () => ({
   sectionStore: { update: vi.fn() },
 }));
 
-vi.mock('$lib/types/channel', () => ({
-  SECTION_CONFIG: {
+vi.mock('$lib/types/channel', async () => {
+  const { readable } = await import('svelte/store');
+  const sectionConfigData = {
     'dreamlab-lobby': { name: 'DreamLab Lobby' },
     'business-hub': { name: 'Business Hub' },
     'community-rooms': { name: 'Community Rooms' },
-  },
-}));
+  };
+  return {
+    SECTION_CONFIG: readable(sectionConfigData),
+  };
+});
 
 // Set import.meta.env values for admin pubkey (Vitest makes import.meta.env mutable)
 const TEST_ADMIN_PUBKEY = 'admin'.repeat(8) + '00000000000000000000000000000000';

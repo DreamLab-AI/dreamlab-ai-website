@@ -4,6 +4,7 @@ Update manifest.json with embedding generation metadata.
 """
 
 import json
+import os
 import argparse
 from pathlib import Path
 from datetime import datetime, timezone
@@ -52,9 +53,9 @@ def update_manifest(
         manifest["last_event_id"] = notes[0]["id"]
         manifest["last_event_timestamp"] = notes[0]["created_at"]
 
-    # File URLs (will be set relative to GCS bucket)
+    # File URLs (relative to R2 bucket)
     version = manifest["version"]
-    bucket_name = os.environ.get('GCS_BUCKET_NAME', 'Nostr-BBS-vectors')
+    bucket_name = os.environ.get('R2_BUCKET_NAME', 'dreamlab-vectors')
 
     manifest["files"] = {
         "index": f"v{version}/index.bin",
@@ -71,13 +72,13 @@ def update_manifest(
         "manifest": "latest/manifest.json"
     }
 
-    # GCS public URLs
-    manifest["gcs_bucket"] = bucket_name
+    # R2 public URLs
+    manifest["r2_bucket"] = bucket_name
     manifest["public_urls"] = {
-        "index": f"https://storage.googleapis.com/{bucket_name}/latest/index.bin",
-        "index_mapping": f"https://storage.googleapis.com/{bucket_name}/latest/index_mapping.npz",
-        "embeddings": f"https://storage.googleapis.com/{bucket_name}/latest/embeddings.npz",
-        "manifest": f"https://storage.googleapis.com/{bucket_name}/latest/manifest.json"
+        "index": f"https://{bucket_name}.r2.dev/latest/index.bin",
+        "index_mapping": f"https://{bucket_name}.r2.dev/latest/index_mapping.npz",
+        "embeddings": f"https://{bucket_name}.r2.dev/latest/embeddings.npz",
+        "manifest": f"https://{bucket_name}.r2.dev/latest/manifest.json"
     }
 
     # Compute file sizes

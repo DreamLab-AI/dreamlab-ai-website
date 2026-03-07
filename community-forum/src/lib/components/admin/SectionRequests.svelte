@@ -89,7 +89,7 @@
                 </td>
                 <td>
                   <span class="badge badge-primary">
-                    {SECTION_CONFIG[request.section]?.icon || ''} {SECTION_CONFIG[request.section]?.name || request.section}
+                    {$SECTION_CONFIG[request.section]?.icon || ''} {$SECTION_CONFIG[request.section]?.name || request.section}
                   </span>
                 </td>
                 <td>

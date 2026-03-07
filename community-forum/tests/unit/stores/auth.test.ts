@@ -292,11 +292,12 @@ describe('authStore', () => {
       expect(localStorage.getItem('nostr_bbs_local_privkey')).toBeNull();
     });
 
-    it('should store key in localStorage when rememberMe=true', async () => {
+    it('should use sessionStorage even when rememberMe=true (localStorage privkey storage removed)', async () => {
       await authStore.loginWithLocalKey('f'.repeat(64), true);
 
-      expect(localStorage.getItem('nostr_bbs_local_privkey')).toBe('f'.repeat(64));
-      expect(sessionStorage.getItem('nostr_bbs_session_privkey')).toBeNull();
+      // Private key should never be stored in localStorage — only sessionStorage
+      expect(localStorage.getItem('nostr_bbs_local_privkey')).toBeNull();
+      expect(sessionStorage.getItem('nostr_bbs_session_privkey')).toBe('f'.repeat(64));
     });
 
     it('should set error on failure', async () => {
@@ -532,7 +533,6 @@ describe('authStore', () => {
 
       // Storage cleared
       expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
-      expect(localStorage.getItem('nostr_bbs_local_privkey')).toBeNull();
       expect(sessionStorage.getItem('nostr_bbs_session_privkey')).toBeNull();
 
       // Relay signer cleared

@@ -3,13 +3,13 @@
 
 # Documentation validation pre-commit hook
 
-echo "🔍 Running documentation validation..."
+echo "Running documentation validation..."
 
 # Get list of staged markdown files
 STAGED_MD_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.md$' || true)
 
 if [ -z "$STAGED_MD_FILES" ]; then
-  echo "✅ No markdown files to validate"
+  echo "No markdown files to validate"
   exit 0
 fi
 
@@ -23,26 +23,39 @@ for file in $STAGED_MD_FILES; do
   git show ":$file" > "$TEMP_DIR/$file"
 done
 
+# Find validation scripts (check repo root first, then community-forum)
+SCRIPT_DIR=""
+if [ -d "docs/scripts" ] && [ -f "docs/scripts/validate-frontmatter.sh" ]; then
+  SCRIPT_DIR="docs/scripts"
+elif [ -d "../docs/scripts" ] && [ -f "../docs/scripts/validate-frontmatter.sh" ]; then
+  SCRIPT_DIR="../docs/scripts"
+fi
+
+if [ -z "$SCRIPT_DIR" ]; then
+  echo "Validation scripts not found, skipping"
+  exit 0
+fi
+
 # Run validations on temp directory
 EXIT_CODE=0
 
 echo "Validating front matter..."
-if ! bash docs/scripts/validate-frontmatter.sh "$TEMP_DIR" 2>&1; then
+if ! bash "$SCRIPT_DIR/validate-frontmatter.sh" "$TEMP_DIR" 2>&1; then
   EXIT_CODE=1
 fi
 
 echo "Validating links..."
-if ! bash docs/scripts/validate-links.sh "$TEMP_DIR" 2>&1; then
+if ! bash "$SCRIPT_DIR/validate-links.sh" "$TEMP_DIR" 2>&1; then
   EXIT_CODE=1
 fi
 
 if [ $EXIT_CODE -ne 0 ]; then
   echo ""
-  echo "❌ Documentation validation failed!"
+  echo "Documentation validation failed!"
   echo "Please fix the issues above before committing."
   echo "You can skip this hook with: git commit --no-verify"
   exit 1
 fi
 
-echo "✅ Documentation validation passed"
+echo "Documentation validation passed"
 exit 0

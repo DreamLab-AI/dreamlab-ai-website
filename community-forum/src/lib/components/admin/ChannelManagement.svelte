@@ -117,12 +117,12 @@
             <span class="label-text">Section (Area)</span>
           </label>
           <select id="mgmt-channel-section" class="select select-bordered" bind:value={formSection}>
-            {#each Object.entries(SECTION_CONFIG) as [key, config]}
+            {#each Object.entries($SECTION_CONFIG) as [key, config]}
               <option value={key}>{config.icon} {config.name}</option>
             {/each}
           </select>
           <span class="label-text-alt text-base-content/60 mt-1">
-            {SECTION_CONFIG[formSection]?.description || ''}
+            {$SECTION_CONFIG[formSection]?.description || ''}
           </span>
         </div>
 
@@ -202,7 +202,7 @@
                 {/if}
                 <div class="flex flex-wrap gap-1 mt-2">
                   <span class="badge badge-neutral badge-sm" title="Section">
-                    {SECTION_CONFIG[channel.section]?.icon || '👋'} {SECTION_CONFIG[channel.section]?.name || 'Guest Area'}
+                    {$SECTION_CONFIG[channel.section]?.icon || '👋'} {$SECTION_CONFIG[channel.section]?.name || 'Guest Area'}
                   </span>
                   <span class="badge {getVisibilityBadge(channel.visibility)} badge-sm">
                     {channel.visibility}

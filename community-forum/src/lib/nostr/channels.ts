@@ -1,6 +1,42 @@
 /**
  * Channel Service - Nostr channel operations using NDK
  * Implements NIP-28 (Public Chat) event kinds
+ *
+ * ============================================================================
+ * TRUST BOUNDARY DOCUMENTATION (E3.2 / FIND-010)
+ * ============================================================================
+ *
+ * All channel access filtering in this module (canAccessChannel,
+ * canAccessChannelZone, canPostToChannel, cohort checks, visibility checks)
+ * is UX OPTIMIZATION ONLY. These checks exist to provide a good user
+ * experience by hiding channels and messages the user should not see, but
+ * they are NOT a security boundary.
+ *
+ * SECURITY ENFORCEMENT POINT:
+ *   The Cloudflare Worker relay at workers/nostr-relay-api/ is the sole
+ *   security enforcement point. The relay implements NIP-42 AUTH and
+ *   enforces channel ACLs at the WebSocket protocol level. It controls
+ *   which events are stored, which events are returned per-user, and
+ *   which publish operations are accepted based on authenticated identity
+ *   and cohort membership.
+ *
+ * THREAT MODEL:
+ *   A malicious client can bypass every check in this file by connecting
+ *   to the relay directly via WebSocket and issuing raw REQ/EVENT messages.
+ *   Client-side filtering MUST NOT be relied upon for confidentiality or
+ *   integrity of channel data.
+ *
+ * INVARIANTS:
+ *   - Client-side checks = UX convenience (hide inaccessible UI elements)
+ *   - Relay-side NIP-42 AUTH = security enforcement (controls event delivery)
+ *   - If client-side and relay-side disagree, relay-side wins
+ *   - All authContext/cohort checks here are defense-in-depth, not primary
+ *
+ * See also:
+ *   - workers/nostr-relay-api/ for relay-side enforcement
+ *   - community-forum/src/routes/chat/[channelId]/+page.svelte for UI usage
+ *   - docs/adr/ for architecture decision records
+ * ============================================================================
  */
 import { NDKEvent, type NDKFilter } from '@nostr-dev-kit/ndk';
 import { ndk, isConnected, publishEvent } from './relay';

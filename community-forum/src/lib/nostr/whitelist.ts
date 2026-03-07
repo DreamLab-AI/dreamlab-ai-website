@@ -268,10 +268,11 @@ export async function approveUserRegistration(
   privkey?: Uint8Array,
   cohorts: string[] = ['approved'],
 ): Promise<{ success: boolean; error?: string }> {
-  if (!privkey) {
+  // Require either a raw private key or a NIP-07 extension for signing
+  if (!privkey && !(typeof window !== 'undefined' && window.nostr?.signEvent)) {
     return {
       success: false,
-      error: 'Admin whitelist operations require passkey login. NIP-07 browser extensions cannot sign NIP-98 HTTP auth tokens. Please log in with your passkey to perform admin actions.',
+      error: 'No signing method available. Log in with a passkey or enable a NIP-07 browser extension.',
     };
   }
 
@@ -391,10 +392,11 @@ export async function updateUserCohorts(
   adminPubkey: string,
   privkey?: Uint8Array
 ): Promise<{ success: boolean; error?: string }> {
-  if (!privkey) {
+  // Require either a raw private key or a NIP-07 extension for signing
+  if (!privkey && !(typeof window !== 'undefined' && window.nostr?.signEvent)) {
     return {
       success: false,
-      error: 'Admin whitelist operations require passkey login. NIP-07 browser extensions cannot sign NIP-98 HTTP auth tokens. Please log in with your passkey to perform admin actions.',
+      error: 'No signing method available. Log in with a passkey or enable a NIP-07 browser extension.',
     };
   }
 

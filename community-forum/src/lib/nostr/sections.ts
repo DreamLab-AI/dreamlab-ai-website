@@ -22,6 +22,7 @@ import type {
 } from '$lib/types/channel';
 import { sectionStore } from '$lib/stores/sections';
 import { SECTION_CONFIG } from '$lib/types/channel';
+import { get } from 'svelte/store';
 
 // NIP event kinds
 const KIND_SECTION_REQUEST = 9022;
@@ -155,7 +156,7 @@ export async function approveSectionAccess(
     await publishEvent(approvalEvent);
 
     // Send DM to user notifying them
-    const sectionConfig = SECTION_CONFIG[request.section];
+    const sectionConfig = get(SECTION_CONFIG)[request.section];
     const dmContent = `Welcome to ${sectionConfig.name}! Your access request has been approved. You can now join public channels in this area.`;
 
     await sendAccessApprovalDM(request.requesterPubkey, dmContent);

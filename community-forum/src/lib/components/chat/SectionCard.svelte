@@ -7,7 +7,7 @@
   export let stats: SectionStats | undefined = undefined;
   export let accessStatus: SectionAccessStatus;
 
-  $: config = SECTION_CONFIG[section];
+  $: config = $SECTION_CONFIG[section];
   $: sectionConfig = getSection(section);
   $: isApproved = accessStatus === 'approved';
   $: isPending = accessStatus === 'pending';

@@ -1,6 +1,29 @@
 /**
  * Section Events Module
  * Fetches and manages events by section with access control
+ *
+ * ============================================================================
+ * TRUST BOUNDARY DOCUMENTATION (E3.2 / FIND-010)
+ * ============================================================================
+ *
+ * The access checks in this module (canViewSectionEvents,
+ * getSectionCalendarAccess, cohort-based section filtering) are UX
+ * OPTIMIZATION ONLY. They filter events on the client side so the UI
+ * does not display sections or calendar events the user should not see.
+ *
+ * These checks are NOT a security boundary. A malicious client can bypass
+ * them by connecting to the relay WebSocket directly and issuing raw REQ
+ * filters for kind-9 events across any section.
+ *
+ * SECURITY ENFORCEMENT:
+ *   The Cloudflare Worker relay (workers/nostr-relay-api/) is the sole
+ *   enforcement point. It uses NIP-42 AUTH to authenticate users and
+ *   enforces section/channel ACLs at the protocol level, controlling
+ *   which events are returned per authenticated session.
+ *
+ * See: community-forum/src/lib/nostr/channels.ts for the full trust
+ *      boundary documentation.
+ * ============================================================================
  */
 
 import { ndk, isConnected } from './relay';

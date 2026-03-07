@@ -27,7 +27,7 @@ export interface AuthState {
   isNip07: boolean;
   /** Whether authenticated via PRF passkey (privkey lives in memory only) */
   isPasskey: boolean;
-  /** Whether authenticated via local key (privkey in sessionStorage or localStorage) */
+  /** Whether authenticated via local key (privkey in sessionStorage only, never localStorage) */
   isLocalKey: boolean;
   /** Name of the NIP-07 extension if available */
   extensionName: string | null;
@@ -106,20 +106,47 @@ function createAuthStore() {
 
   /**
    * Wire up pagehide to zero-fill the in-memory private key when the page is
-   * being unloaded (navigation away, tab/window close). Uses pagehide rather
-   * than visibilitychange to avoid clearing the key on every tab switch while
-   * the user is still actively using the page.
+   * being discarded (navigation away, tab/window close).
+   *
+   * Uses pagehide with event.persisted check:
+   *   - persisted=true  → page entering bfcache (mobile app-switch, back/forward) — keep key
+   *   - persisted=false → page actually unloading (close tab, navigate away)     — clear key
+   *
+   * A complementary pageshow handler re-derives the key when the page is
+   * restored from bfcache with a missing key by setting isAuthenticated=false,
+   * which forces the login gate to prompt for passkey re-auth.
    */
   function clearPrivkeyOnPageHide(): void {
     if (!browser || _pagehideListenerRegistered) return;
     _pagehideListenerRegistered = true;
 
-    window.addEventListener('pagehide', () => {
+    window.addEventListener('pagehide', (e) => {
+      if (e.persisted) {
+        // Page is entering bfcache — will come back via pageshow.
+        // Keep the key so the user doesn't have to re-auth on return.
+        return;
+      }
+      // Page is actually being discarded — zero the key.
       if (_privkeyMem) {
         _privkeyMem.fill(0);
         _privkeyMem = null;
       }
       update((s) => ({ ...s, privateKey: null }));
+    });
+
+    // When restored from bfcache, check if we still have the key.
+    // If the key was lost (shouldn't happen with the persisted guard above,
+    // but defensive), mark as unauthenticated so the login gate re-triggers.
+    window.addEventListener('pageshow', (e) => {
+      if (e.persisted) {
+        update((s) => {
+          if (s.isPasskey && !_privkeyMem) {
+            // Key was lost while in bfcache — force re-auth
+            return { ...s, ...syncStateFields({ isAuthenticated: false, privateKey: null }) };
+          }
+          return s;
+        });
+      }
     });
   }
 
@@ -142,6 +169,7 @@ function createAuthStore() {
 
     try {
       const parsed = JSON.parse(stored) as {
+        _v?: number;
         publicKey?: string;
         isNip07?: boolean;
         isPasskey?: boolean;
@@ -152,6 +180,22 @@ function createAuthStore() {
         accountStatus?: 'incomplete' | 'complete';
         nsecBackedUp?: boolean;
       };
+
+      // Normalize stored session to v2 schema
+      if (!parsed._v || parsed._v < 2) {
+        // Migrate from v1 (unversioned): ensure all fields present
+        parsed._v = 2;
+        parsed.isNip07 = parsed.isNip07 ?? false;
+        parsed.isPasskey = parsed.isPasskey ?? false;
+        parsed.isLocalKey = parsed.isLocalKey ?? false;
+        parsed.nickname = parsed.nickname ?? null;
+        parsed.avatar = parsed.avatar ?? null;
+        parsed.accountStatus = parsed.accountStatus ?? 'incomplete';
+        parsed.nsecBackedUp = parsed.nsecBackedUp ?? false;
+        parsed.extensionName = parsed.extensionName ?? null;
+        // Re-save with normalized schema
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+      }
 
       // NIP-07 extension path — re-verify extension is still reachable
       if (parsed.isNip07 && parsed.publicKey) {
@@ -220,9 +264,9 @@ function createAuthStore() {
         return;
       }
 
-      // Local Key path — restore privkey from session/localStorage
+      // Local Key path — restore privkey from sessionStorage only (never localStorage)
       if (parsed.isLocalKey && parsed.publicKey) {
-        const privkeyHex = sessionStorage.getItem('nostr_bbs_session_privkey') || localStorage.getItem('nostr_bbs_local_privkey');
+        const privkeyHex = sessionStorage.getItem('nostr_bbs_session_privkey');
         if (privkeyHex) {
           const { hexToBytes } = await import('@noble/hashes/utils');
           _privkeyMem = hexToBytes(privkeyHex);
@@ -312,6 +356,7 @@ function createAuthStore() {
           try { existingData = JSON.parse(existing); } catch { /* ignore */ }
         }
         const storageData = {
+          _v: 2,
           publicKey: pubkey,
           isPasskey: true,
           isNip07: false,
@@ -369,6 +414,7 @@ function createAuthStore() {
         }
 
         const storageData = {
+          _v: 2,
           publicKey: result.pubkey,
           isPasskey: true,
           isNip07: false,
@@ -434,6 +480,7 @@ function createAuthStore() {
         }
 
         const storageData = {
+          _v: 2,
           publicKey: result.pubkey,
           isPasskey: true,
           isNip07: false,
@@ -494,6 +541,7 @@ function createAuthStore() {
         }
 
         const storageData = {
+          _v: 2,
           publicKey,
           isPasskey: false,
           isNip07: false,
@@ -505,13 +553,9 @@ function createAuthStore() {
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(storageData));
 
-        if (rememberMe) {
-          localStorage.setItem('nostr_bbs_local_privkey', privateKey);
-          sessionStorage.removeItem('nostr_bbs_session_privkey');
-        } else {
-          sessionStorage.setItem('nostr_bbs_session_privkey', privateKey);
-          localStorage.removeItem('nostr_bbs_local_privkey');
-        }
+        // Always use sessionStorage only — never persist raw privkeys to localStorage.
+        // rememberMe is ignored for local-key mode; persistent auth requires passkey.
+        sessionStorage.setItem('nostr_bbs_session_privkey', privateKey);
 
         if (shouldKeepSignedIn()) {
           setCookie(COOKIE_KEY, publicKey, 30);
@@ -558,6 +602,7 @@ function createAuthStore() {
         _privkeyMem = hexToBytes(privateKey);
 
         const storageData = {
+          _v: 2,
           publicKey,
           isPasskey: false,
           isNip07: false,
@@ -568,9 +613,8 @@ function createAuthStore() {
           nsecBackedUp: false,
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(storageData));
-        // Default to session storage until user explicitly chooses "remember me" on login
+        // Session storage only — privkey never persisted to localStorage
         sessionStorage.setItem('nostr_bbs_session_privkey', privateKey);
-        localStorage.removeItem('nostr_bbs_local_privkey');
 
         if (shouldKeepSignedIn()) {
           setCookie(COOKIE_KEY, publicKey, 30);
@@ -616,6 +660,7 @@ function createAuthStore() {
         const extensionName = getExtensionName();
 
         const storageData = {
+          _v: 2,
           publicKey,
           isNip07: true,
           isPasskey: false,
@@ -676,6 +721,7 @@ function createAuthStore() {
           try { existingData = JSON.parse(existing); } catch { /* ignore */ }
         }
         const storageData = {
+          _v: 2,
           publicKey,
           isNip07: false,
           isPasskey: false,
@@ -774,7 +820,6 @@ function createAuthStore() {
       if (browser) {
         clearSigner();
         localStorage.removeItem(STORAGE_KEY);
-        localStorage.removeItem('nostr_bbs_local_privkey');
         sessionStorage.removeItem('nostr_bbs_session_privkey');
         deleteCookie(COOKIE_KEY);
 

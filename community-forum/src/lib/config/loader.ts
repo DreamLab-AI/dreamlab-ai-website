@@ -1,7 +1,11 @@
 /**
  * Configuration Loader
  * Loads and parses YAML configuration for 3-tier BBS hierarchy
- * Category → Section → Forum (NIP-28 Channel)
+ * Category -> Section -> Forum (NIP-28 Channel)
+ *
+ * Uses a Svelte writable store for reactivity. Runtime mutations
+ * via saveConfig() propagate to all derived constants and getter
+ * functions automatically.
  */
 
 import type {
@@ -20,6 +24,7 @@ import type {
 	TierConfig
 } from './types';
 
+import { writable, derived, get } from 'svelte/store';
 import { parse as parseYaml } from 'yaml';
 import { browser } from '$app/environment';
 
@@ -30,42 +35,65 @@ const STORAGE_KEY = 'nostr_bbs_custom_config';
 
 let cachedConfig: BBSConfig | null = null;
 
-/**
- * Load and parse the BBS configuration
- */
-export function loadConfig(): BBSConfig {
-	if (cachedConfig) {
-		return cachedConfig;
-	}
+/** Whether configStore has been initialized (prevents circular ref during module init) */
+let storeInitialized = false;
 
-	// Check for custom config in localStorage
+/**
+ * Read config from localStorage / YAML without caching.
+ * Used internally by clearConfigCache() to refresh the store
+ * without polluting the cache.
+ */
+function readConfigFresh(): BBSConfig {
 	if (browser) {
 		try {
 			const stored = localStorage.getItem(STORAGE_KEY);
 			if (stored) {
 				const customConfig = JSON.parse(stored) as BBSConfig;
 				validateConfig(customConfig);
-				cachedConfig = customConfig;
-				return cachedConfig;
+				return customConfig;
 			}
-		} catch (error) {
-			console.warn('[Config] Invalid stored config, using default:', error);
+		} catch {
+			// fall through to default
 		}
 	}
-
-	// Fall back to default config
 	try {
-		cachedConfig = parseYaml(defaultConfigYaml) as BBSConfig;
-		validateConfig(cachedConfig);
-		return cachedConfig;
-	} catch (error) {
-		console.error('[Config] Failed to parse default config:', error);
+		const parsed = parseYaml(defaultConfigYaml) as BBSConfig;
+		validateConfig(parsed);
+		return parsed;
+	} catch {
 		return getDefaultConfig();
 	}
 }
 
 /**
- * Save custom configuration to localStorage
+ * Load and parse the BBS configuration.
+ * Caches the result so subsequent calls return the same reference
+ * until clearConfigCache() is called.
+ * Also updates the reactive configStore so that Svelte-derived values
+ * stay in sync whenever a fresh config is loaded.
+ */
+export function loadConfig(): BBSConfig {
+	if (cachedConfig) {
+		return cachedConfig;
+	}
+
+	cachedConfig = readConfigFresh();
+	if (storeInitialized) {
+		configStore.set(cachedConfig);
+	}
+	return cachedConfig;
+}
+
+// ============================================================================
+// REACTIVE CONFIG STORE
+// ============================================================================
+
+/** Reactive config store - all getter functions read from this */
+export const configStore = writable<BBSConfig>(loadConfig());
+storeInitialized = true;
+
+/**
+ * Save custom configuration to localStorage and update the reactive store
  */
 export function saveConfig(config: BBSConfig): void {
 	if (!browser) return;
@@ -74,6 +102,7 @@ export function saveConfig(config: BBSConfig): void {
 		validateConfig(config);
 		localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
 		cachedConfig = config;
+		configStore.set(config);
 	} catch (error) {
 		console.error('[Config] Failed to save configuration:', error);
 		throw error;
@@ -81,10 +110,17 @@ export function saveConfig(config: BBSConfig): void {
 }
 
 /**
- * Clear cached config (forces reload)
+ * Clear cached config and refresh the reactive store.
+ * The store is updated immediately with a fresh read from
+ * localStorage / YAML, but the result is NOT cached so that
+ * subsequent calls to loadConfig() will read fresh again
+ * (useful when localStorage changes between clear and load).
  */
 export function clearConfigCache(): void {
 	cachedConfig = null;
+	if (storeInitialized) {
+		configStore.set(readConfigFresh());
+	}
 }
 
 /**
@@ -165,14 +201,14 @@ function getDefaultConfig(): BBSConfig {
 				id: 'general',
 				name: 'General',
 				description: 'Public discussion areas',
-				icon: '💬',
+				icon: '\u{1F4AC}',
 				order: 1,
 				sections: [
 					{
 						id: 'welcome',
 						name: 'Welcome',
 						description: 'Welcome area for new visitors',
-						icon: '👋',
+						icon: '\u{1F44B}',
 						order: 1,
 						access: { requiresApproval: false, defaultRole: 'guest', autoApprove: true },
 						calendar: { access: 'full', canCreate: false },
@@ -184,7 +220,7 @@ function getDefaultConfig(): BBSConfig {
 						id: 'announcements',
 						name: 'Announcements',
 						description: 'Official news and updates',
-						icon: '📢',
+						icon: '\u{1F4E2}',
 						order: 2,
 						access: { requiresApproval: false, defaultRole: 'guest', autoApprove: true },
 						calendar: { access: 'full', canCreate: false },
@@ -196,7 +232,7 @@ function getDefaultConfig(): BBSConfig {
 						id: 'help',
 						name: 'Help & Support',
 						description: 'Get help with using the platform',
-						icon: '❓',
+						icon: '\u{2753}',
 						order: 3,
 						access: { requiresApproval: false, defaultRole: 'guest', autoApprove: true },
 						calendar: { access: 'none', canCreate: false },
@@ -210,14 +246,14 @@ function getDefaultConfig(): BBSConfig {
 				id: 'community',
 				name: 'Community',
 				description: 'Members-only discussion spaces',
-				icon: '🌟',
+				icon: '\u{1F31F}',
 				order: 2,
 				sections: [
 					{
 						id: 'discussions',
 						name: 'Discussions',
 						description: 'General member discussions',
-						icon: '💭',
+						icon: '\u{1F4AD}',
 						order: 1,
 						access: { requiresApproval: true, defaultRole: 'member', autoApprove: false },
 						calendar: { access: 'full', canCreate: true },
@@ -229,7 +265,7 @@ function getDefaultConfig(): BBSConfig {
 						id: 'introductions',
 						name: 'Introductions',
 						description: 'Introduce yourself',
-						icon: '🙋',
+						icon: '\u{1F64B}',
 						order: 2,
 						access: { requiresApproval: true, defaultRole: 'member', autoApprove: false },
 						calendar: { access: 'none', canCreate: false },
@@ -241,7 +277,7 @@ function getDefaultConfig(): BBSConfig {
 						id: 'events',
 						name: 'Events',
 						description: 'Community events and meetups',
-						icon: '📅',
+						icon: '\u{1F4C5}',
 						order: 3,
 						access: { requiresApproval: true, defaultRole: 'member', autoApprove: false },
 						calendar: { access: 'full', canCreate: true },
@@ -255,14 +291,14 @@ function getDefaultConfig(): BBSConfig {
 				id: 'projects',
 				name: 'Projects',
 				description: 'Collaborative project spaces',
-				icon: '🚀',
+				icon: '\u{1F680}',
 				order: 3,
 				sections: [
 					{
 						id: 'active-projects',
 						name: 'Active Projects',
 						description: 'Currently active project discussions',
-						icon: '💡',
+						icon: '\u{1F4A1}',
 						order: 1,
 						access: { requiresApproval: true, defaultRole: 'member', autoApprove: false },
 						calendar: { access: 'availability', canCreate: true, cohortRestricted: true },
@@ -274,7 +310,7 @@ function getDefaultConfig(): BBSConfig {
 						id: 'resources',
 						name: 'Resources',
 						description: 'Shared files and documentation',
-						icon: '📚',
+						icon: '\u{1F4DA}',
 						order: 2,
 						access: { requiresApproval: true, defaultRole: 'member', autoApprove: false },
 						calendar: { access: 'none', canCreate: false },
@@ -299,19 +335,17 @@ function getDefaultConfig(): BBSConfig {
 	};
 }
 
-// Load config once at module level
-const config = loadConfig();
-
 // ============================================================================
 // APP CONFIG
 // ============================================================================
 
 export function getAppConfig() {
-	return config.app;
+	return get(configStore).app;
 }
 
 export function getTiers(): TierConfig[] {
-	return config.app.tiers || [
+	const cfg = get(configStore);
+	return cfg.app.tiers || [
 		{ level: 1, name: 'Category', plural: 'Categories' },
 		{ level: 2, name: 'Section', plural: 'Sections' },
 		{ level: 3, name: 'Forum', plural: 'Forums' }
@@ -319,7 +353,7 @@ export function getTiers(): TierConfig[] {
 }
 
 export function getDefaultPath(): string {
-	return config.app.defaultPath || '/general/welcome';
+	return get(configStore).app.defaultPath || '/general/welcome';
 }
 
 // ============================================================================
@@ -327,17 +361,18 @@ export function getDefaultPath(): string {
 // ============================================================================
 
 export function getCategories(): CategoryConfig[] {
-	return config.categories.sort((a, b) => a.order - b.order);
+	return get(configStore).categories.sort((a, b) => a.order - b.order);
 }
 
 export function getCategory(categoryId: CategoryId): CategoryConfig | undefined {
-	return config.categories.find((c) => c.id === categoryId);
+	return get(configStore).categories.find((c) => c.id === categoryId);
 }
 
 export function getDefaultCategory(): CategoryConfig {
-	const defaultPath = config.app.defaultPath || '/general/welcome';
+	const cfg = get(configStore);
+	const defaultPath = cfg.app.defaultPath || '/general/welcome';
 	const categoryId = defaultPath.split('/')[1];
-	return getCategory(categoryId) || config.categories[0];
+	return getCategory(categoryId) || cfg.categories[0];
 }
 
 // ============================================================================
@@ -345,8 +380,8 @@ export function getDefaultCategory(): CategoryConfig {
 // ============================================================================
 
 export function getSections(): SectionConfig[] {
-	// Flatten all sections from all categories
-	return config.categories
+	const cfg = get(configStore);
+	return cfg.categories
 		.flatMap((cat) => cat.sections.map((sec) => ({ ...sec, _categoryId: cat.id })))
 		.sort((a, b) => a.order - b.order);
 }
@@ -358,7 +393,8 @@ export function getSectionsByCategory(categoryId: CategoryId): SectionConfig[] {
 }
 
 export function getSection(sectionId: SectionId): SectionConfig | undefined {
-	for (const category of config.categories) {
+	const cfg = get(configStore);
+	for (const category of cfg.categories) {
 		const section = category.sections.find((s) => s.id === sectionId);
 		if (section) return section;
 	}
@@ -366,7 +402,8 @@ export function getSection(sectionId: SectionId): SectionConfig | undefined {
 }
 
 export function getSectionWithCategory(sectionId: SectionId): { section: SectionConfig; category: CategoryConfig } | undefined {
-	for (const category of config.categories) {
+	const cfg = get(configStore);
+	for (const category of cfg.categories) {
 		const section = category.sections.find((s) => s.id === sectionId);
 		if (section) return { section, category };
 	}
@@ -374,13 +411,14 @@ export function getSectionWithCategory(sectionId: SectionId): { section: Section
 }
 
 export function getDefaultSection(): SectionConfig {
-	const defaultPath = config.app.defaultPath || '/general/welcome';
+	const cfg = get(configStore);
+	const defaultPath = cfg.app.defaultPath || '/general/welcome';
 	const parts = defaultPath.split('/').filter(Boolean);
 	if (parts.length >= 2) {
 		const section = getSection(parts[1]);
 		if (section) return section;
 	}
-	return config.categories[0]?.sections[0];
+	return cfg.categories[0]?.sections[0];
 }
 
 export function getSectionsByAccess(requiresApproval: boolean): SectionConfig[] {
@@ -392,11 +430,11 @@ export function getSectionsByAccess(requiresApproval: boolean): SectionConfig[] 
 // ============================================================================
 
 export function getRoles(): RoleConfig[] {
-	return config.roles;
+	return get(configStore).roles;
 }
 
 export function getRole(roleId: RoleId): RoleConfig | undefined {
-	return config.roles.find((r) => r.id === roleId);
+	return get(configStore).roles.find((r) => r.id === roleId);
 }
 
 export function roleHasCapability(roleId: RoleId, capability: string): boolean {
@@ -425,11 +463,11 @@ export function getHighestRole(roles: RoleId[]): RoleId {
 // ============================================================================
 
 export function getCohorts(): CohortConfig[] {
-	return config.cohorts;
+	return get(configStore).cohorts;
 }
 
 export function getCohort(cohortId: CohortId): CohortConfig | undefined {
-	return config.cohorts.find((c) => c.id === cohortId);
+	return get(configStore).cohorts.find((c) => c.id === cohortId);
 }
 
 // ============================================================================
@@ -437,7 +475,7 @@ export function getCohort(cohortId: CohortId): CohortConfig | undefined {
 // ============================================================================
 
 export function getCalendarAccessLevel(level: CalendarAccessLevel) {
-	return config.calendarAccessLevels?.find((l) => l.id === level);
+	return get(configStore).calendarAccessLevels?.find((l) => l.id === level);
 }
 
 // ============================================================================
@@ -445,11 +483,11 @@ export function getCalendarAccessLevel(level: CalendarAccessLevel) {
 // ============================================================================
 
 export function getSuperuser(): SuperuserConfig | undefined {
-	return config.superuser;
+	return get(configStore).superuser;
 }
 
 export function isSuperuser(pubkey: string): boolean {
-	return config.superuser?.pubkey === pubkey;
+	return get(configStore).superuser?.pubkey === pubkey;
 }
 
 // ============================================================================
@@ -460,7 +498,7 @@ import type { BreadcrumbItem } from './types';
 
 export function getBreadcrumbs(categoryId?: CategoryId, sectionId?: SectionId, forumName?: string): BreadcrumbItem[] {
 	const crumbs: BreadcrumbItem[] = [
-		{ label: 'Home', path: '/', icon: '🏠' }
+		{ label: 'Home', path: '/', icon: '\u{1F3E0}' }
 	];
 
 	if (categoryId) {
@@ -489,7 +527,7 @@ export function getBreadcrumbs(categoryId?: CategoryId, sectionId?: SectionId, f
 		crumbs.push({
 			label: forumName,
 			path: '#',
-			icon: '💬'
+			icon: '\u{1F4AC}'
 		});
 	}
 
@@ -521,7 +559,23 @@ export function getSectionConfigMap(): Record<string, SectionConfig> {
 	return map;
 }
 
-export const SECTION_CONFIG = getSectionConfigMap();
+/**
+ * SECTION_CONFIG as a derived store: automatically recalculates when
+ * configStore changes (e.g. after saveConfig()).
+ *
+ * Components that use `$SECTION_CONFIG[sectionId]` in Svelte templates
+ * will reactively update. Imperative code that needs the current value
+ * synchronously can use `get(SECTION_CONFIG)` or call `getSectionConfigMap()`.
+ */
+export const SECTION_CONFIG = derived(configStore, ($config) => {
+	const map: Record<string, SectionConfig> = {};
+	for (const category of $config.categories) {
+		for (const section of category.sections) {
+			map[section.id] = section;
+		}
+	}
+	return map;
+});
 
 // Export type aliases
 export type { SectionId as ChannelSection } from './types';

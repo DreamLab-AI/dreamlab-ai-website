@@ -45,6 +45,9 @@ export type {
 	UserPermissions
 } from './types';
 
+// Reactive config store
+export { configStore } from './loader';
+
 // Loader functions
 export {
 	loadConfig,
