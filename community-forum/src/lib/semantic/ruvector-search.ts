@@ -4,16 +4,21 @@
  * Primary semantic search for DreamLab AI community forum.
  * Uses a Cloudflare Worker (search-api) backed by R2-stored vector index.
  *
- * Architecture:
- *   Client → search-api Worker → R2 (JSON index, future: .rvf HNSW)
- *   Client ← k-NN cosine results with scores
+ * Embedding pipeline (priority order):
+ *   1. Local ONNX WASM (all-MiniLM-L6-v2, 384d) — real semantic embeddings
+ *   2. Server /embed endpoint — hash-based fallback (deterministic, not semantic)
+ *   3. Client-side hash fallback — offline graceful degradation
  *
- * Offline fallback: IndexedDB-cached embeddings with brute-force cosine.
+ * Search pipeline:
+ *   Client embedding → POST /search (CF Worker) → WASM k-NN → R2 .rvf index
+ *   Offline fallback: brute-force cosine on IndexedDB-cached embeddings
  *
  * Embedding model: all-MiniLM-L6-v2 (384 dimensions, L2-normalised)
  */
 
 import { db } from '$lib/db';
+import { fetchWithNip98 } from '$lib/auth/nip98-client';
+import { onnxEmbed, isOnnxReady, preWarmOnnx } from './onnx-local';
 
 // Search API endpoint — Cloudflare Worker (RuVector WASM + R2)
 const SEARCH_API_URL = import.meta.env.VITE_SEARCH_API_URL ||
@@ -66,12 +71,23 @@ function cosineSimilarity(a: number[], b: number[]): number {
 }
 
 /**
- * Generate query embedding via embedding API.
+ * Generate query embedding. Priority:
+ *   1. Local ONNX WASM (semantic, ~10ms after model loaded)
+ *   2. Server /embed endpoint (hash-based, ~100ms network)
+ *   3. Client-side hash fallback (offline, instant, non-semantic)
  */
 async function embedQuery(query: string): Promise<number[]> {
   const cached = embeddingCache.get(query);
   if (cached) return cached;
 
+  // Priority 1: Local ONNX (real semantic embedding)
+  const onnxResult = await onnxEmbed(query);
+  if (onnxResult) {
+    cacheEmbedding(query, onnxResult);
+    return onnxResult;
+  }
+
+  // Priority 2: Server /embed endpoint (hash-based fallback)
   try {
     const response = await fetch(`${SEARCH_API_URL}/embed`, {
       method: 'POST',
@@ -89,18 +105,21 @@ async function embedQuery(query: string): Promise<number[]> {
     }
 
     const embedding = data.embeddings[0];
-
-    if (embeddingCache.size >= EMBEDDING_CACHE_MAX) {
-      const firstKey = embeddingCache.keys().next().value;
-      if (firstKey) embeddingCache.delete(firstKey);
-    }
-    embeddingCache.set(query, embedding);
-
+    cacheEmbedding(query, embedding);
     return embedding;
   } catch (error) {
     console.error('Embed API failed:', error);
     return generateFallbackEmbedding(query);
   }
+}
+
+/** LRU cache insertion for embeddings */
+function cacheEmbedding(query: string, embedding: number[]): void {
+  if (embeddingCache.size >= EMBEDDING_CACHE_MAX) {
+    const firstKey = embeddingCache.keys().next().value;
+    if (firstKey) embeddingCache.delete(firstKey);
+  }
+  embeddingCache.set(query, embedding);
 }
 
 /**
@@ -275,18 +294,22 @@ async function saveToIndexedDB(): Promise<void> {
 export async function storeEmbedding(noteId: string, content: string, channel?: string): Promise<boolean> {
   try {
     const embedding = await embedQuery(content);
+    const url = `${SEARCH_API_URL}/ingest`;
+    const body = JSON.stringify({
+      entries: [{
+        id: noteId,
+        embedding,
+        channel,
+        timestamp: Math.floor(Date.now() / 1000),
+      }],
+    });
 
-    const response = await fetch(`${SEARCH_API_URL}/ingest`, {
+    // Ingest requires NIP-98 auth — use fetchWithNip98 which handles
+    // both raw privkey (passkey/local-key) and NIP-07 extension signing
+    const response = await fetchWithNip98(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        entries: [{
-          id: noteId,
-          embedding,
-          channel,
-          timestamp: Math.floor(Date.now() / 1000),
-        }],
-      }),
+      body,
     });
 
     if (response.ok) {
@@ -332,7 +355,11 @@ export async function initRuVectorSearch(): Promise<void> {
   setTimeout(async () => {
     try {
       await loadFromIndexedDB();
-      if (navigator.onLine) await loadFromRuVector();
+      if (navigator.onLine) {
+        await loadFromRuVector();
+        // Pre-warm ONNX embedder in background (downloads model on first run)
+        preWarmOnnx();
+      }
     } catch {
       console.warn('Background search init failed');
     }

@@ -33,6 +33,11 @@ export default defineConfig({
 		globals: true,
 		environment: 'jsdom'
 	},
+	// Allow WASM files to be imported as assets (ruvector ONNX embedder)
+	assetsInclude: ['**/*.wasm'],
+	optimizeDeps: {
+		exclude: ['ruvector']
+	},
 	build: {
 		target: 'esnext',
 		// Disable sourcemaps in production to prevent source code exposure

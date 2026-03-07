@@ -31,6 +31,17 @@ export {
 // Re-export SearchResult from ruvector (same interface)
 export type { SearchResult as RuVectorSearchResult } from './ruvector-search';
 
+// Local ONNX embedder (client-side semantic embeddings)
+export {
+  ensureOnnx,
+  onnxEmbed,
+  onnxEmbedBatch,
+  isOnnxReady,
+  getOnnxDimension,
+  preWarmOnnx,
+  destroyOnnx
+} from './onnx-local';
+
 // Initialize semantic search via RuVector
 export async function initSemanticSearch(): Promise<void> {
   const { initRuVectorSearch } = await import('./ruvector-search');

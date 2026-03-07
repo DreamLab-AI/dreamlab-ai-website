@@ -284,10 +284,20 @@ export async function getSearchSuggestions(limit: number = 5): Promise<string[]>
 }
 
 /**
- * Index a new message (called when message is received)
+ * Index a new message (called when message is received).
+ * Indexes locally in IndexedDB AND pushes to server-side search API.
  */
 export async function indexNewMessage(message: DBMessage): Promise<void> {
   await db.indexMessage(message);
+
+  // Also push to server-side RuVector search (fire-and-forget)
+  if (message.content && message.content.length > 5) {
+    import('$lib/semantic/ruvector-search').then(({ storeEmbedding }) => {
+      storeEmbedding(message.id, message.content, message.channelId).catch(() => {
+        // Silent fail — local index is the fallback
+      });
+    }).catch(() => {});
+  }
 }
 
 /**
