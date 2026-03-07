@@ -53,12 +53,26 @@ function json(data: unknown, status: number, request: Request): Response {
   });
 }
 
-function isAdmin(pubkey: string, env: Env): boolean {
+function isAdminByEnv(pubkey: string, env: Env): boolean {
   return (env.ADMIN_PUBKEYS || '')
     .split(',')
     .map(k => k.trim())
     .filter(Boolean)
     .includes(pubkey);
+}
+
+async function isAdmin(pubkey: string, env: Env): Promise<boolean> {
+  // Check env var first (fast path)
+  if (isAdminByEnv(pubkey, env)) return true;
+  // Check D1 whitelist for 'admin' cohort
+  const entry = await env.DB.prepare(
+    'SELECT cohorts FROM whitelist WHERE pubkey = ? AND (expires_at IS NULL OR expires_at > ?)'
+  ).bind(pubkey, Math.floor(Date.now() / 1000)).first<{ cohorts: string }>();
+  if (entry) {
+    const cohorts: string[] = JSON.parse(entry.cohorts);
+    if (cohorts.includes('admin')) return true;
+  }
+  return false;
 }
 
 async function requireNip98Admin(request: Request, env: Env): Promise<string | Response> {
@@ -74,7 +88,7 @@ async function requireNip98Admin(request: Request, env: Env): Promise<string | R
   });
 
   if (!result) return json({ error: 'Invalid NIP-98 token' }, 401, request);
-  if (!isAdmin(result.pubkey, env)) return json({ error: 'Not authorized' }, 403, request);
+  if (!(await isAdmin(result.pubkey, env))) return json({ error: 'Not authorized' }, 403, request);
   return result.pubkey;
 }
 
@@ -209,9 +223,12 @@ async function handleCheckWhitelist(request: Request, url: URL, env: Env): Promi
   const cohorts: string[] = entry ? JSON.parse(entry.cohorts) : [];
   if (isAdminKey && !cohorts.includes('admin')) cohorts.push('admin');
 
+  // Admin if in ADMIN_PUBKEYS env var OR has 'admin' cohort in D1 whitelist
+  const hasAdminCohort = cohorts.includes('admin');
+
   return json({
     isWhitelisted: !!entry || isAdminKey,
-    isAdmin: isAdminKey,
+    isAdmin: isAdminKey || hasAdminCohort,
     cohorts,
     verifiedAt: Date.now(),
     source: 'relay',
