@@ -597,10 +597,8 @@ graph TD
 
 - [API Reference](./api-reference.md) - Complete API documentation
 - [Authentication Reference](./authentication.md) - Auth system specification
-- [Configuration Reference](./configuration.md) - Configuration options
-- [NIP Protocol Reference](../developer/reference/nip-protocol-reference.md) - Nostr protocol implementations
-- [PRD](../PRD.md) - Product requirements document
-- [Deployment Guide](../deployment/deployment-guide.md) - Deployment procedures
+- [PRD](../prd-cloudflare-workers-migration.md) - Product requirements document
+- [Deployment Guide](../deployment/README.md) - Deployment procedures
 
 ---
 
@@ -616,4 +614,4 @@ This document consolidates content from the following legacy SPARC methodology f
 
 **Note**: The SPARC files remain for historical reference but should not be used for current implementation. This consolidated reference is the authoritative source for architectural documentation.
 
-For current requirements and features, see [PRD](../PRD.md) v2.1.0.
+For current requirements and features, see [PRD](../prd-cloudflare-workers-migration.md) v6.

@@ -163,8 +163,8 @@ Files Checked:
 Environment Variables:
   VITE_RELAY_URL - ✅ Public URL, safe in .env
   VITE_ADMIN_PUBKEY - ✅ Public key, safe in .env
-  ADMIN_PROVKEY - ⚠️ SHOULD BE in GCP Secret Manager
-  ADMIN_KEY - ⚠️ SHOULD BE in GCP Secret Manager
+  ADMIN_PROVKEY - ⚠️ SHOULD BE in Cloudflare Workers secrets (wrangler secret)
+  ADMIN_KEY - ⚠️ SHOULD BE in Cloudflare Workers secrets (wrangler secret)
 
 Secret Storage Status:
   ✅ No plaintext private keys in repository
@@ -256,8 +256,8 @@ RECOMMENDATIONS FOR DEVELOPERS
 Before Deploying:
   1. Set VITE_RELAY_URL to production relay (wss://...)
   2. Set VITE_ADMIN_PUBKEY to actual admin key
-  3. Store ADMIN_PROVKEY in GCP Secret Manager
-  4. Store ADMIN_KEY in GCP Secret Manager
+  3. Store ADMIN_PROVKEY in Cloudflare Workers secrets (wrangler secret)
+  4. Store ADMIN_KEY in Cloudflare Workers secrets (wrangler secret)
   5. Run npm audit and fix high/critical issues
   6. Test encryption with various passwords
 

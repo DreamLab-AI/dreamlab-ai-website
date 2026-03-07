@@ -370,8 +370,7 @@ try {
 
 - [API Reference](../api/NOSTR_RELAY.md) - WebSocket and HTTP API
 - [Architecture](../architecture/BACKEND_SERVICES.md) - System design
-- [Deployment](../deployment/CLOUD_SERVICES.md) - Production deployment
-- [Main README](../../community-forum/services/nostr-relay/README.md) - Service overview
+- [Deployment](../deployment/CLOUDFLARE_WORKERS.md) - Production deployment
 
 ---
 

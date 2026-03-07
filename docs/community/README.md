@@ -9,7 +9,7 @@ For the full architectural overview, see [features/community-forum.md](../featur
 ## Quick Links
 
 - [UI Components](./UI_COMPONENTS.md) -- toast notification system, architecture, API, and usage
-- [Forum Architecture](./ARCHITECTURE.md) -- system design and data flow
+- [Forum Architecture](../features/community-forum.md) -- system design and data flow
 
 ## Key Features
 

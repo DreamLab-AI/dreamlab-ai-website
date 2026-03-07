@@ -396,7 +396,7 @@ Expired challenges are purged every 60 seconds by a background interval.
 
 - [Authentication](../security/AUTHENTICATION.md) -- Full auth flow specification
 - [Security Overview](../security/SECURITY_OVERVIEW.md) -- Security architecture
-- [Cloud Services](../deployment/CLOUD_SERVICES.md) -- Deployment details
+- [Cloudflare Workers](../deployment/CLOUDFLARE_WORKERS.md) -- Deployment details
 
 ---
 

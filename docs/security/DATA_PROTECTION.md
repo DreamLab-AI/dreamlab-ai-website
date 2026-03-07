@@ -315,7 +315,7 @@ if (rawClientWebId.includes('..') || /%2e%2e/i.test(rawClientWebId)) {
 - [Security Overview](./SECURITY_OVERVIEW.md)
 - [Authentication](./AUTHENTICATION.md)
 - [Auth API Reference](../api/AUTH_API.md)
-- [Deployment: Cloud Services](../deployment/CLOUD_SERVICES.md)
+- [Deployment: Cloudflare Workers](../deployment/CLOUDFLARE_WORKERS.md)
 
 ---
 

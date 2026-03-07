@@ -1,6 +1,6 @@
 # DreamLab AI -- Documentation Quick Navigation
 
-**Last updated:** 2026-03-01
+**Last updated:** 2026-03-07
 
 This page provides quick access to the main documentation sections. For the full hub with document index, feature status, and tech stack details, see [README.md](README.md).
 
@@ -19,8 +19,8 @@ This page provides quick access to the main documentation sections. For the full
 
 - [Architecture overview](architecture.md) -- system design, data flow, auth model
 - [Feature status matrix](features/STATUS_MATRIX.md) -- what is running, planned, or broken
-- [ADR index](adr/README.md) -- 10 Architecture Decision Records
-- [Cloudflare migration PRD](prd-cloudflare-workers-migration.md) -- platform migration (Phase 1 deployed)
+- [ADR index](adr/README.md) -- 12 Architecture Decision Records
+- [Cloudflare migration PRD](prd-cloudflare-workers-migration.md) -- platform migration (complete)
 - [Security overview](security/SECURITY_OVERVIEW.md) -- security posture and audit findings
 
 ## Build and Run

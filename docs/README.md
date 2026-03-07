@@ -1,6 +1,6 @@
 # DreamLab AI Documentation
 
-**Last updated:** 2026-03-01 | **Version:** 2.0.0 | **Repository:** [DreamLab-AI/dreamlab-ai-website](https://github.com/DreamLab-AI/dreamlab-ai-website)
+**Last updated:** 2026-03-07 | **Version:** 2.1.0 | **Repository:** [DreamLab-AI/dreamlab-ai-website](https://github.com/DreamLab-AI/dreamlab-ai-website)
 
 DreamLab AI is a premium AI training and consulting platform at [dreamlab-ai.com](https://dreamlab-ai.com) (also [thedreamlab.uk](https://thedreamlab.uk)). The platform comprises a React single-page application with 3D visualisations, a SvelteKit community forum with passkey authentication, and 5 Cloudflare Workers backend services (deployed at `*.solitary-paper-764d.workers.dev`). All GCP infrastructure was deleted as of 2026-03-02.
 
@@ -46,7 +46,7 @@ DreamLab AI is a premium AI training and consulting platform at [dreamlab-ai.com
 
 - [Deployment overview](deployment/README.md) -- deployment strategies
 - [GitHub Pages deployment](deployment/GITHUB_PAGES.md) -- static site hosting
-- [Cloud services](deployment/CLOUD_SERVICES.md) -- Legacy GCP reference (deprecated)
+- [Cloudflare Workers](deployment/CLOUDFLARE_WORKERS.md) -- backend services deployment
 - [Environments](deployment/ENVIRONMENTS.md) -- environment configuration
 - [Monitoring](deployment/MONITORING.md) -- observability and alerting
 - [Rollback procedures](deployment/ROLLBACK.md) -- incident recovery
@@ -54,10 +54,10 @@ DreamLab AI is a premium AI training and consulting platform at [dreamlab-ai.com
 ### For Architects
 
 - [Architecture overview](architecture.md) -- high-level system design
-- [Architecture Decision Records](adr/README.md) -- 10 ADRs covering all major decisions
+- [Architecture Decision Records](adr/README.md) -- 12 ADRs covering all major decisions
 - [Domain model](ddd/01-domain-model.md) -- Domain-Driven Design documentation
 - [Feature status matrix](features/STATUS_MATRIX.md) -- what is running, planned, or broken
-- [Cloudflare migration PRD](prd-cloudflare-workers-migration.md) -- return to Cloudflare platform (Phase 1 deployed)
+- [Cloudflare migration PRD](prd-cloudflare-workers-migration.md) -- return to Cloudflare platform (complete)
 
 ---
 
@@ -107,6 +107,8 @@ For the full breakdown, see [features/STATUS_MATRIX.md](features/STATUS_MATRIX.m
 | [ADR-008](adr/008-postgresql-relay-storage.md) | PostgreSQL Relay Storage | Superseded by ADR-010 |
 | [ADR-009](adr/009-user-registration-flow.md) | User Registration Flow | Resolved |
 | [ADR-010](adr/010-return-to-cloudflare.md) | Return to Cloudflare Platform | Accepted |
+| [ADR-011](adr/011-images-to-solid-pods.md) | Images to Solid Pods | Accepted |
+| [ADR-012](adr/012-hardening-sprint.md) | Hardening Sprint | Accepted |
 
 ### Domain-Driven Design
 
@@ -134,9 +136,10 @@ For the full breakdown, see [features/STATUS_MATRIX.md](features/STATUS_MATRIX.m
 
 | Document | Description |
 |----------|-------------|
-| [Embedding service](api/EMBEDDING_SERVICE.md) | Vector embedding API |
-| [Supabase schema](api/SUPABASE_SCHEMA.md) | Database schema reference |
+| [Auth API](api/AUTH_API.md) | WebAuthn + NIP-98 endpoints |
+| [Search API](api/SEARCH_API.md) | RuVector WASM search |
 | [Nostr relay](api/NOSTR_RELAY.md) | Relay protocol reference |
+| [Supabase schema](api/SUPABASE_SCHEMA.md) | Database schema reference |
 
 ### Features
 
@@ -159,6 +162,8 @@ For the full breakdown, see [features/STATUS_MATRIX.md](features/STATUS_MATRIX.m
 | Document | Description |
 |----------|-------------|
 | [Archive index](archive/README.md) | Historical documents moved from repo root |
+| [Embedding Service (deprecated)](archive/EMBEDDING_SERVICE_DEPRECATED.md) | GCP embedding API (deleted 2026-03-02) |
+| [Cloud Services (deprecated)](archive/CLOUD_SERVICES_DEPRECATED.md) | GCP Cloud Run services (deleted 2026-03-02) |
 
 ---
 
@@ -192,5 +197,5 @@ npm run preview
 
 ---
 
-**Last updated:** 2026-03-01
+**Last updated:** 2026-03-07
 **Maintained by:** DreamLab AI Engineering

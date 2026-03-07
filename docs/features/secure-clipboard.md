@@ -291,7 +291,7 @@ The random overwrite ensures the original data is not simply dereferenced but ac
 
 - [Authentication](./authentication.md)
 - [Admin Security Hardening](../security/admin-security.md)
-- [User Guide - Understanding Your Keys](../user-guide.md#understanding-your-keys)
+- [User Guide](../user/README.md) - Getting started guides
 
 ---
 

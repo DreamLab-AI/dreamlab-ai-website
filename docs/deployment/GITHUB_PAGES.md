@@ -271,9 +271,9 @@ git push origin gh-pages
 ## Related Documentation
 
 - [Deployment Overview](./README.md)
-- [Cloud Services](./CLOUD_SERVICES.md)
-- [Environments](./ENVIRONMENTS.md)
 - [Cloudflare Workers](./CLOUDFLARE_WORKERS.md)
+- [Environments](./ENVIRONMENTS.md)
+- [Cloud Services (deprecated)](./CLOUD_SERVICES.md)
 
 ---
 

@@ -45,6 +45,38 @@ graph TB
 
 *All Workers deployed at `*.solitary-paper-764d.workers.dev`. Custom domain routes configured.*
 
+### Detailed System Architecture
+
+```mermaid
+flowchart TB
+    subgraph "Static Hosting (GitHub Pages)"
+        REACT["React SPA<br/>Main Website"]
+        SVELTE["SvelteKit Forum<br/>Community"]
+    end
+
+    subgraph "Cloudflare Workers"
+        AUTH["auth-api<br/>WebAuthn + NIP-98"]
+        POD["pod-api<br/>Solid Pods"]
+        SEARCH["search-api<br/>RuVector WASM"]
+        RELAY["nostr-relay<br/>WebSocket NIP-01/42"]
+        PREVIEW["link-preview<br/>OG Metadata"]
+    end
+
+    subgraph "Cloudflare Storage"
+        D1["D1 (SQLite)<br/>Auth + Relay"]
+        KV["KV Namespaces<br/>Sessions, Config"]
+        R2["R2 Buckets<br/>Pods, Vectors"]
+        DO["Durable Objects<br/>WebSocket State"]
+    end
+
+    SVELTE --> AUTH & SEARCH & RELAY & POD & PREVIEW
+    AUTH --> D1 & KV & R2
+    POD --> R2 & KV
+    SEARCH --> R2 & KV
+    RELAY --> D1 & DO
+    PREVIEW -.-> |Cache API| PREVIEW
+```
+
 ---
 
 ## Frontend Architecture
@@ -135,8 +167,8 @@ WebAuthn PRF output (32 bytes, HMAC-SHA-256 from authenticator)
 sequenceDiagram
     participant User
     participant Browser
-    participant AuthAPI as auth-api (Cloud Run)
-    participant JSS as JSS (Cloud Run)
+    participant AuthAPI as auth-api (Cloudflare Worker)
+    participant PodAPI as pod-api (Cloudflare Worker)
 
     User->>Browser: Tap "Register" (passkey)
     Browser->>AuthAPI: POST /auth/register/options
@@ -147,9 +179,9 @@ sequenceDiagram
     Browser->>Browser: HKDF(PRF output) --> privkey --> pubkey
 
     Browser->>AuthAPI: POST /auth/register/verify<br/>(attestation + pubkey)
-    AuthAPI->>AuthAPI: Store credential + prf_salt<br/>in PostgreSQL
-    AuthAPI->>JSS: POST /idp/register/<br/>(provision Solid pod)
-    JSS-->>AuthAPI: { webId, podUrl }
+    AuthAPI->>AuthAPI: Store credential + prf_salt<br/>in D1
+    AuthAPI->>PodAPI: Provision Solid pod in R2
+    PodAPI-->>AuthAPI: { webId, podUrl }
     AuthAPI-->>Browser: { didNostr, webId, podUrl }
 
     Browser->>Browser: Store pubkey in auth state<br/>privkey in closure only
@@ -161,7 +193,7 @@ sequenceDiagram
 sequenceDiagram
     participant User
     participant Browser
-    participant AuthAPI as auth-api (Cloud Run)
+    participant AuthAPI as auth-api (Cloudflare Worker)
 
     User->>Browser: Tap "Login" (passkey)
     Browser->>AuthAPI: POST /auth/login/options
@@ -196,7 +228,7 @@ A consolidated shared NIP-98 module exists at `community-forum/packages/nip98/` 
 |-------|--------|---------|
 | Nostr pubkey | Hex (32 bytes) | `a1b2c3...` |
 | DID | `did:nostr:{pubkey}` | `did:nostr:a1b2c3...` |
-| WebID | `{jss-url}/{pubkey}/profile/card#me` | `https://jss.../a1b2c3.../profile/card#me` |
+| WebID | `{pod-url}/{pubkey}/profile/card#me` | `https://pods.dreamlab-ai.com/a1b2c3.../profile/card#me` |
 
 ---
 
@@ -318,17 +350,15 @@ community-forum/              # SvelteKit forum (separate package.json)
   src/lib/auth/               # WebAuthn PRF + NIP-98
   src/lib/stores/             # Auth state, privkey closure
   packages/nip98/             # Consolidated NIP-98 shared module
-  services/                   # Backend service source
-    auth-api/                 # WebAuthn server (Express)
-    jss/                      # Solid pod server (CSS 7.1.8)
-    nostr-relay/              # Nostr relay
-    embedding-api/            # Vector embeddings
-    image-api/                # Image serving
-    link-preview-api/         # URL metadata
+  services/
+    auth-api/                 # Legacy reference code (migrated to workers/)
 
 workers/                      # Cloudflare Workers (deployed)
   auth-api/                   # WebAuthn Worker (D1 + KV)
   pod-api/                    # Pod storage Worker (R2 + KV)
+  search-api/                 # RuVector WASM search Worker (R2 + KV)
+  nostr-relay-api/            # WebSocket relay Worker (D1 + Durable Objects)
+  link-preview-api/           # OG metadata Worker (Cache API)
   shared/                     # Shared NIP-98 utilities
 
 wasm-voronoi/                 # Rust WASM (Cargo.toml, src/lib.rs)

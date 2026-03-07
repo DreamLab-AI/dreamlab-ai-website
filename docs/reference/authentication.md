@@ -421,4 +421,4 @@ npm run test:e2e -- --ui
 - [Admin Security](../security/admin-security.md) - Admin workflow hardening
 - [Security Audit Report](../security/security-audit-report.md) - Full security findings
 - [DM Implementation](../features/dm-implementation.md) - Private messaging
-- [API Reference](./api.md) - Full API documentation
+- [API Reference](./api-reference.md) - Full API documentation

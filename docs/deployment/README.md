@@ -41,6 +41,27 @@ Comprehensive guide to deploying and maintaining the DreamLab AI platform: a Rea
 +---------------------------------------------------+
 ```
 
+```mermaid
+flowchart LR
+    GIT["git push<br/>main"] --> GHA["GitHub Actions"]
+
+    GHA --> BUILD["build-and-deploy.yml"]
+    GHA --> WORKERS["workers-deploy.yml"]
+
+    BUILD --> REACT["Build React SPA"]
+    BUILD --> FORUM["Build SvelteKit Forum"]
+    REACT --> GHP["GitHub Pages<br/>dreamlab-ai.com"]
+    FORUM --> GHP
+
+    WORKERS --> W1["auth-api"]
+    WORKERS --> W2["pod-api"]
+    WORKERS --> W3["search-api"]
+    WORKERS --> W4["nostr-relay"]
+    WORKERS --> W5["link-preview"]
+
+    W1 & W2 & W3 & W4 & W5 --> CF["Cloudflare Edge<br/>Global CDN"]
+```
+
 ## Quick Reference
 
 | Target | Technology | Workflow | Status |
@@ -59,7 +80,7 @@ Comprehensive guide to deploying and maintaining the DreamLab AI platform: a Rea
 | Document | Purpose | Audience |
 |----------|---------|----------|
 | [GITHUB_PAGES.md](./GITHUB_PAGES.md) | Static site build and deployment | All developers |
-| [CLOUD_SERVICES.md](./CLOUD_SERVICES.md) | GCP Cloud Run backend services | DevOps, infrastructure |
+| [CLOUD_SERVICES.md](./CLOUD_SERVICES.md) | GCP Cloud Run (DEPRECATED -- see CLOUDFLARE_WORKERS.md) | Historical reference |
 | [CLOUDFLARE_WORKERS.md](./CLOUDFLARE_WORKERS.md) | Cloudflare Workers deployment | Architecture, DevOps |
 | [ENVIRONMENTS.md](./ENVIRONMENTS.md) | Dev, staging, production configuration | All developers |
 | [MONITORING.md](./MONITORING.md) | Health checks and observability | DevOps, SRE |

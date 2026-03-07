@@ -43,6 +43,26 @@ A .rvf file can be:
 - A **runtime**: WASM_SEG + data segments = runs anywhere
 - A **cognitive engine**: all of the above in one file
 
+```mermaid
+sequenceDiagram
+    participant B as Browser
+    participant ONNX as ONNX WASM<br/>(7.4MB)
+    participant W as search-api<br/>Worker
+    participant RVF as rvf_wasm<br/>(42KB)
+    participant R2 as R2 Storage
+
+    Note over B: User searches forum
+    B->>ONNX: embedOne(query)
+    ONNX-->>B: Float32Array(384)
+    B->>W: POST /search {embedding, k}
+    W->>R2: GET dreamlab-vectors.rvf
+    R2-->>W: .rvf binary
+    W->>RVF: rvf_store_open(buf)
+    W->>RVF: rvf_store_query(vec, k)
+    RVF-->>W: [{id, score, distance}]
+    W-->>B: JSON results
+```
+
 ### Comparison to Existing Formats
 
 | Format | Contains | Executable | Self-Describing | Attestable |
@@ -314,6 +334,26 @@ Browser ─── indexNewMessage() ──→ Local IndexedDB (text search)
                                           ├── Cosine k-NN on WASM linear memory
                                           ├── Map labels → string IDs
                                           └── Return JSON results
+```
+
+```mermaid
+flowchart LR
+    subgraph "Embedding Priority"
+        P1["1. Local ONNX WASM<br/>all-MiniLM-L6-v2<br/>384d semantic"]
+        P2["2. Server /embed<br/>Hash-based<br/>384d deterministic"]
+        P3["3. Client Hash<br/>Offline fallback<br/>384d non-semantic"]
+    end
+
+    P1 -->|fail| P2
+    P2 -->|fail| P3
+
+    subgraph "Search Path"
+        EMB["384d Vector"] --> SERVER["POST /search<br/>CF Worker"]
+        SERVER --> WASM["rvf_store_query()<br/>WASM k-NN"]
+        WASM --> RES["Ranked Results"]
+    end
+
+    P1 & P2 & P3 --> EMB
 ```
 
 ### Key Components

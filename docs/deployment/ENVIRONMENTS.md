@@ -234,8 +234,8 @@ gh run list --workflow=deploy.yml --limit=5
 
 - [Deployment Overview](./README.md)
 - [GitHub Pages](./GITHUB_PAGES.md)
-- [Cloud Services](./CLOUD_SERVICES.md)
 - [Cloudflare Workers](./CLOUDFLARE_WORKERS.md)
+- [Cloud Services (deprecated)](./CLOUD_SERVICES.md)
 
 ---
 

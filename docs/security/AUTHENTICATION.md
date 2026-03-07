@@ -485,7 +485,7 @@ The `payload` tag in NIP-98 events contains a SHA-256 hash of the raw request bo
 - [Security Overview](./SECURITY_OVERVIEW.md)
 - [Data Protection](./DATA_PROTECTION.md)
 - [Auth API Reference](../api/AUTH_API.md)
-- [Deployment: Cloud Services](../deployment/CLOUD_SERVICES.md)
+- [Deployment: Cloudflare Workers](../deployment/CLOUDFLARE_WORKERS.md)
 
 ---
 

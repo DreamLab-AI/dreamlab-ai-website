@@ -22,6 +22,44 @@ The authentication system provides:
 - **Multiple login methods** -- passkey (primary), NIP-07 browser extension, manual nsec/hex key entry
 - **Solid pod provisioning** -- server-side pod creation via JSS on successful registration (Cloudflare Workers pod-api deployed at `dreamlab-pod-api.solitary-paper-764d.workers.dev`)
 
+## Combined Auth Flow Overview
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant B as Browser
+    participant A as Authenticator<br/>(Passkey)
+    participant W as auth-api<br/>Worker
+    participant D1 as D1 Database
+
+    rect rgb(230, 245, 255)
+    Note over U,D1: Registration
+    U->>B: Click "Create Account"
+    B->>W: POST /auth/register/options
+    W-->>B: {challenge, rp, user}
+    B->>A: navigator.credentials.create({prf})
+    A-->>B: {attestation, prf_output}
+    B->>B: HKDF(prf_output) → privkey → pubkey
+    B->>W: POST /auth/register/verify {attestation, pubkey}
+    W->>D1: Store credential + prf_salt
+    W-->>B: {didNostr, webId, podUrl}
+    end
+
+    rect rgb(255, 245, 230)
+    Note over U,D1: Authentication
+    U->>B: Click "Login"
+    B->>W: POST /auth/login/options
+    W->>D1: Fetch credential + prf_salt
+    W-->>B: {challenge, allowCredentials, prf_salt}
+    B->>A: navigator.credentials.get({prf})
+    A-->>B: {assertion, prf_output}
+    B->>B: HKDF(prf_output) → same privkey
+    B->>W: POST /auth/login/verify {assertion}
+    W->>D1: Verify + update counter
+    W-->>B: {session}
+    end
+```
+
 ## Identity Model
 
 Each user's identity spans three layers:

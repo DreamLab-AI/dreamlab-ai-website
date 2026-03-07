@@ -359,7 +359,7 @@ wrangler d1 execute dreamlab-auth --file=workers/auth-api/schema.sql
 ## Related Documentation
 
 - [Deployment Overview](./README.md)
-- [Cloud Services (current)](./CLOUD_SERVICES.md)
+- [Cloud Services (deprecated)](./CLOUD_SERVICES.md)
 - [PRD: Cloudflare Workers Migration](../prd-cloudflare-workers-migration.md)
 - [ADR-003: GCP Cloud Run Infrastructure](../adr/003-gcp-cloud-run-infrastructure.md)
 - [ADR-010: Return to Cloudflare](../adr/010-return-to-cloudflare.md)

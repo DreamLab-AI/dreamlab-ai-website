@@ -553,7 +553,6 @@ npm run build
 - [Frontend Architecture](FRONTEND_ARCHITECTURE.md) -- React and SvelteKit patterns
 - [Backend Services](BACKEND_SERVICES.md) -- API and database architecture
 - [Data Flow](DATA_FLOW.md) -- Auth, request, event, and storage flows
-- [GCP Bootstrap Guide](../../.github/workflows/SECRETS_SETUP.md) -- 8-step GCP setup
 - [ADR-010](../adr/010-return-to-cloudflare.md) -- Return to Cloudflare decision
 
 ---

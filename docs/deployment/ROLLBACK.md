@@ -321,7 +321,7 @@ Severity?
 ## Related Documentation
 
 - [GitHub Pages Deployment](./GITHUB_PAGES.md) - Site deployment details
-- [Cloud Services Deployment](./CLOUD_SERVICES.md) - Service architecture
+- [Cloudflare Workers](./CLOUDFLARE_WORKERS.md) - Service architecture
 - [Monitoring & Health Checks](./MONITORING.md) - Incident detection
 - [Environment Setup](./ENVIRONMENTS.md) - Configuration reference
 

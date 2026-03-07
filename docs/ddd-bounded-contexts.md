@@ -31,6 +31,33 @@ last-updated: 2026-03-07
                         ──── Source of Truth ────           │
 ```
 
+```mermaid
+flowchart TB
+    subgraph "Core Domain"
+        IDENTITY["BC-1: Identity<br/>Nostr keypairs, DIDs<br/>WebAuthn PRF"]
+        COMMUNITY["BC-2: Community<br/>Channels, messages<br/>Cohort access"]
+    end
+
+    subgraph "Supporting Domain"
+        AUTH["BC-3: Authentication<br/>NIP-98, sessions<br/>Role hierarchy"]
+        STORAGE["BC-4: Storage<br/>Solid pods, R2<br/>WAC ACL"]
+        MESSAGING["BC-5: Messaging<br/>NIP-17/59 DMs<br/>Encrypted"]
+    end
+
+    subgraph "Generic Domain"
+        SEARCH["BC-6: Search<br/>RuVector, ONNX<br/>Semantic + text"]
+        PREVIEW["BC-7: Link Preview<br/>OG metadata<br/>oEmbed"]
+    end
+
+    IDENTITY --> AUTH
+    IDENTITY --> COMMUNITY
+    AUTH --> COMMUNITY
+    COMMUNITY --> MESSAGING
+    COMMUNITY --> SEARCH
+    STORAGE --> COMMUNITY
+    PREVIEW --> COMMUNITY
+```
+
 ## BC-1: Auth & Identity
 
 **Aggregate Root**: `UserSession`

@@ -99,15 +99,15 @@ Comprehensive security architecture for the DreamLab AI platform (dreamlab-ai.co
 +-----------------------------+---------------------------------+
                               | HTTPS / WSS (TLS 1.3)
 +-----------------------------v---------------------------------+
-|  AUTH-API (Cloud Run, partially trusted)                      |
-|  - Stores WebAuthn credentials + PRF salts in PostgreSQL      |
+|  auth-api (Cloudflare Worker, partially trusted)              |
+|  - Stores WebAuthn credentials + PRF salts in D1              |
 |  - Verifies WebAuthn assertions and NIP-98 tokens             |
-|  - Provisions Solid pods via JSS                               |
+|  - Provisions Solid pods via pod-api                           |
 |  - Cannot derive private keys (no PRF output)                 |
 +-----------------------------+---------------------------------+
                               |
 +-----------------------------v---------------------------------+
-|  NOSTR RELAY (Cloud Run, semi-trusted)                        |
+|  nostr-relay (Cloudflare Worker + Durable Objects, semi-trusted)|
 |  - Can read public channel messages                            |
 |  - Cannot decrypt DMs (NIP-44 encrypted)                       |
 |  - Enforces event signature verification                       |
@@ -115,10 +115,10 @@ Comprehensive security architecture for the DreamLab AI platform (dreamlab-ai.co
 +-----------------------------+---------------------------------+
                               |
 +-----------------------------v---------------------------------+
-|  JSS POD STORAGE (Cloud Run + Cloud Storage, controlled)      |
+|  pod-api (Cloudflare Worker + R2, controlled)                 |
 |  - Per-user pods with WAC-based ACLs                           |
 |  - Owner gets full Control; authenticated agents get read-only|
-|  - Cloud Storage volume mount for persistence                  |
+|  - R2 object storage for persistence                           |
 +---------------------------------------------------------------+
 ```
 
@@ -203,7 +203,7 @@ The Vite dev server includes middleware to validate file paths and prevent direc
 ### HTTPS
 
 - **GitHub Pages**: HTTPS enforced via GitHub's infrastructure. Custom domain `dreamlab-ai.com` configured with CNAME.
-- **Cloud Run**: All services require HTTPS. Cloud Run provides managed TLS certificates.
+- **Cloudflare Workers**: All services use HTTPS. Cloudflare provides managed TLS certificates.
 - **WebSocket**: WSS (TLS-encrypted WebSocket) for all relay connections.
 
 ### CORS Configuration
@@ -319,7 +319,7 @@ ACL documents are stored as JSON-LD within the pod. A custom WAC evaluator is de
 | **Windows Hello blocked** | Windows Hello does not support the PRF extension | Users on Windows must use a FIDO2 security key (e.g., YubiKey) or fall back to NIP-07/nsec. An error message is shown when PRF is not available. |
 | **No key rotation** | Nostr protocol does not support key rotation natively | The identity is bound to the secp256k1 keypair. Changing keys requires social migration. |
 | **PRF support varies** | PRF extension requires Chrome 116+, Safari 17.4+, or equivalent | Older browsers will fail at registration with a descriptive error message. |
-| **Pod storage is Cloud Run ephemeral** | JSS pod data is stored on a Cloud Storage volume mount, but CSS in-memory state is lost on restart | Cloud Storage volume provides persistence; CSS state rebuild on startup. R2-backed pod-api Worker deployed at `dreamlab-pod-api.solitary-paper-764d.workers.dev`. |
+| **Pod storage** | Pod data is stored in R2 via the pod-api Cloudflare Worker | R2 provides durable object storage; pod-api Worker deployed at `dreamlab-pod-api.solitary-paper-764d.workers.dev`. |
 
 ---
 

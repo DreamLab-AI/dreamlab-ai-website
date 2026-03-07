@@ -305,8 +305,8 @@ NDK handles NIP-42 authentication automatically when configured with a signer.
 ## Related Documentation
 
 - [Auth API Reference](./AUTH_API.md) -- WebAuthn and NIP-98 endpoints
-- [Embedding Service](./EMBEDDING_SERVICE.md) -- Semantic search API
-- [Cloud Services Deployment](../deployment/CLOUD_SERVICES.md) -- Relay deployment details
+- [Search API](./SEARCH_API.md) -- Semantic search API
+- [Cloudflare Workers Deployment](../deployment/CLOUDFLARE_WORKERS.md) -- Relay deployment details
 - [Security Overview](../security/SECURITY_OVERVIEW.md) -- Security architecture
 
 ---

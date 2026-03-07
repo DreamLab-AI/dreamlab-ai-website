@@ -65,6 +65,31 @@ Deploy the existing Vite SPA to Cloudflare Pages with zero code changes. The `di
 | **KV** | Sessions, ACL documents, pod metadata, configuration |
 | **R2** | Pod file storage (per-user Solid pods), uploaded media/images |
 
+### Infrastructure Migration
+
+```mermaid
+flowchart LR
+    subgraph "Before (GCP — DELETED)"
+        direction TB
+        GCR["Cloud Run<br/>6 services"]
+        GCS["Cloud SQL<br/>PostgreSQL"]
+        GAR["Artifact Registry<br/>Docker images"]
+        GCR --> GCS
+    end
+
+    subgraph "After (Cloudflare — CURRENT)"
+        direction TB
+        CFW["Workers<br/>5 services"]
+        CFD["D1 (SQLite)"]
+        CFKV["KV Namespaces"]
+        CFR2["R2 Buckets"]
+        CFDO["Durable Objects"]
+        CFW --> CFD & CFKV & CFR2 & CFDO
+    end
+
+    GCR -.->|"Migration<br/>2026-03-02"| CFW
+```
+
 ### DDD bounded contexts
 
 | Context | Runtime | Storage |

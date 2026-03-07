@@ -4,7 +4,7 @@ description: "Index of architecture decision records documenting key technical d
 category: reference
 tags: [architecture, adr, reference, developer, decisions]
 difficulty: intermediate
-last-updated: 2026-02-28
+last-updated: 2026-03-07
 ---
 
 # Architecture Decision Records (ADR)
@@ -25,7 +25,8 @@ This directory contains Architecture Decision Records for the DreamLab AI platfo
 | [ADR-008](008-postgresql-relay-storage.md) | PostgreSQL Relay Storage | Superseded by ADR-010 | 2024-02 |
 | [ADR-009](009-user-registration-flow.md) | User Registration Flow | Accepted | 2026-01 |
 | [ADR-010](010-return-to-cloudflare.md) | Return to Cloudflare Platform | Accepted -- Complete | 2026-02 |
-| [ADR-011](011-zero-gcp-completion.md) | Zero-GCP Migration Complete | Accepted | 2026-03 |
+| [ADR-011](011-images-to-solid-pods.md) | Images and Media Storage in Solid Pods | Accepted | 2026-03 |
+| [ADR-012](012-hardening-sprint.md) | Community Forum Hardening Sprint | Accepted | 2026-03 |
 
 ## ADR Template
 
