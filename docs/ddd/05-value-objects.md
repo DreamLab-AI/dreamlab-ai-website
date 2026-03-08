@@ -1,523 +1,285 @@
----
-title: "Value Objects"
-description: "## Overview"
-category: explanation
-tags: ['ddd', 'developer', 'user']
-difficulty: beginner
-last-updated: 2026-01-16
----
-
 # Value Objects
 
-## Overview
+Value objects are immutable, compared by value (not identity), and have no
+lifecycle. They are the building blocks of entities and aggregates.
 
-Value Objects are immutable domain primitives identified by their attributes rather than identity.
+## Core Nostr Value Objects
+
+```rust
+use serde::{Serialize, Deserialize};
+use std::fmt;
+
+/// SHA-256 hash of the canonical JSON serialization of a Nostr event.
+/// Computed as: SHA-256([0, pubkey, created_at, kind, tags, content]).
+/// 32 bytes, displayed as 64-char lowercase hex.
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct EventId([u8; 32]);
+
+impl EventId {
+    pub fn from_canonical(
+        pubkey: &PublicKey,
+        created_at: Timestamp,
+        kind: u32,
+        tags: &[Vec<String>],
+        content: &str,
+    ) -> Self {
+        use sha2::{Sha256, Digest};
+        let canonical = serde_json::to_string(
+            &(0u8, pubkey.as_hex(), created_at.0, kind, tags, content)
+        ).expect("canonical serialization");
+        let hash = Sha256::digest(canonical.as_bytes());
+        Self(hash.into())
+    }
+
+    pub fn as_hex(&self) -> String {
+        hex::encode(self.0)
+    }
+}
+
+/// 32-byte x-only secp256k1 public key (BIP-340).
+/// Displayed as 64-char lowercase hex. This is the primary user identifier
+/// across the entire Nostr protocol.
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct PublicKey([u8; 32]);
+
+impl PublicKey {
+    pub fn from_hex(hex: &str) -> Result<Self, KeyError> {
+        if hex.len() != 64 {
+            return Err(KeyError::InvalidLength);
+        }
+        let mut bytes = [0u8; 32];
+        hex::decode_to_slice(hex, &mut bytes)
+            .map_err(|_| KeyError::InvalidHex)?;
+        Ok(Self(bytes))
+    }
+
+    pub fn as_hex(&self) -> String {
+        hex::encode(self.0)
+    }
+
+    pub fn as_bytes(&self) -> &[u8; 32] {
+        &self.0
+    }
+}
+
+/// Schnorr signature (BIP-340). 64 bytes, displayed as 128-char lowercase hex.
+/// Produced by signing the EventId with the sender's private key.
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub struct Signature([u8; 64]);
+
+impl Signature {
+    pub fn from_hex(hex: &str) -> Result<Self, KeyError> {
+        if hex.len() != 128 {
+            return Err(KeyError::InvalidLength);
+        }
+        let mut bytes = [0u8; 64];
+        hex::decode_to_slice(hex, &mut bytes)
+            .map_err(|_| KeyError::InvalidHex)?;
+        Ok(Self(bytes))
+    }
+
+    pub fn as_hex(&self) -> String {
+        hex::encode(self.0)
+    }
+}
+
+/// Unix timestamp in seconds. All Nostr events use second-precision timestamps.
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+pub struct Timestamp(pub u64);
+
+impl Timestamp {
+    pub fn now() -> Self {
+        // In WASM: js_sys::Date::now() / 1000.0
+        // In native: std::time::SystemTime
+        Self(0) // placeholder -- actual impl uses target-specific code
+    }
+
+    pub fn as_secs(&self) -> u64 {
+        self.0
+    }
+}
+```
+
+## Access Control Value Objects
+
+```rust
+/// Role within the BBS hierarchy. Ordered by privilege level.
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum RoleId {
+    Guest,        // level 0 -- unauthenticated or unverified
+    Member,       // level 1 -- whitelisted user
+    Moderator,    // level 2 -- can moderate channels
+    SectionAdmin, // level 3 -- can manage a section
+    Admin,        // level 4 -- global admin
+}
+
+impl RoleId {
+    pub fn level(&self) -> u8 {
+        match self {
+            Self::Guest => 0,
+            Self::Member => 1,
+            Self::Moderator => 2,
+            Self::SectionAdmin => 3,
+            Self::Admin => 4,
+        }
+    }
+
+    pub fn is_at_least(&self, other: &Self) -> bool {
+        self.level() >= other.level()
+    }
+}
+
+/// Channel visibility determines who can see the channel in listings.
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum ChannelVisibility {
+    /// Visible to all authenticated users.
+    Public,
+    /// Visible only to users in matching cohorts.
+    Cohort,
+    /// Visible only to explicitly invited users.
+    Invite,
+}
+
+/// Channel access type determines who can post.
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum ChannelAccessType {
+    /// Any user who can see the channel can post.
+    Open,
+    /// Only members (approved via join request) can post.
+    Gated,
+}
+
+/// Calendar access level for a section.
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum CalendarAccessLevel {
+    /// Full access to event details.
+    Full,
+    /// Can see busy/free blocks but not event details.
+    Availability,
+    /// Can see details only for events in matching cohorts.
+    Cohort,
+    /// No calendar access.
+    None,
+}
+```
 
 ## Cryptographic Value Objects
 
-### Pubkey
+```rust
+/// NIP-44 ciphertext: the encrypted payload of a direct message.
+/// Produced by ChaCha20-Poly1305 with a key derived from ECDH shared secret.
+#[derive(Clone, PartialEq, Eq)]
+pub struct Nip44Ciphertext {
+    pub version: u8,           // always 2 for NIP-44
+    pub nonce: [u8; 24],       // random nonce
+    pub ciphertext: Vec<u8>,   // encrypted content + 16-byte Poly1305 tag
+}
 
-Represents a Nostr public key.
+/// NIP-59 gift wrap: an outer event (kind 1059) that hides the real sender.
+/// The outer event is signed by a random throwaway key.
+#[derive(Clone)]
+pub struct GiftWrap {
+    pub outer_event: NostrEventWire,  // kind 1059, random pubkey
+    pub recipient: PublicKey,         // p-tag on outer event
+}
 
-```typescript
-class Pubkey {
-  private readonly hex: string;
+/// A relay URL. Always a WebSocket URL (wss:// or ws://).
+#[derive(Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct RelayUrl(String);
 
-  private constructor(hex: string) {
-    if (!/^[0-9a-f]{64}$/i.test(hex)) {
-      throw new Error('Invalid pubkey: must be 64-char hex');
+impl RelayUrl {
+    pub fn new(url: &str) -> Result<Self, RelayUrlError> {
+        if !url.starts_with("wss://") && !url.starts_with("ws://") {
+            return Err(RelayUrlError::InvalidScheme);
+        }
+        Ok(Self(url.to_string()))
     }
-    this.hex = hex.toLowerCase();
-  }
 
-  // Factories
-  static fromHex(hex: string): Pubkey {
-    return new Pubkey(hex);
-  }
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
 
-  static fromNpub(npub: string): Pubkey {
-    const { type, data } = nip19.decode(npub);
-    if (type !== 'npub') throw new Error('Not an npub');
-    return new Pubkey(bytesToHex(data));
-  }
-
-  static fromPrivkey(privkey: string): Pubkey {
-    const pubkey = getPublicKey(privkey);
-    return new Pubkey(pubkey);
-  }
-
-  // Conversions
-  toHex(): string {
-    return this.hex;
-  }
-
-  toNpub(): string {
-    return nip19.npubEncode(this.hex);
-  }
-
-  toBytes(): Uint8Array {
-    return hexToBytes(this.hex);
-  }
-
-  // Display
-  toShort(): string {
-    return `${this.hex.slice(0, 8)}...${this.hex.slice(-8)}`;
-  }
-
-  // Equality
-  equals(other: Pubkey): boolean {
-    return this.hex === other.hex;
-  }
-
-  toString(): string {
-    return this.toNpub();
-  }
+    /// Convert to HTTP URL for API calls (wss:// -> https://).
+    pub fn to_http(&self) -> String {
+        self.0
+            .replace("wss://", "https://")
+            .replace("ws://", "http://")
+    }
 }
 ```
 
-### EventId
+## Identity Value Objects
 
-Represents a Nostr event identifier (SHA256 hash).
+```rust
+/// Nostr event tag: a string array where the first element is the tag name.
+/// Common tags: "e" (event ref), "p" (pubkey ref), "t" (hashtag),
+/// "u" (URL, NIP-98), "method" (NIP-98), "payload" (NIP-98).
+#[derive(Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Tag(pub Vec<String>);
 
-```typescript
-class EventId {
-  private readonly hex: string;
-
-  private constructor(hex: string) {
-    if (!/^[0-9a-f]{64}$/i.test(hex)) {
-      throw new Error('Invalid event ID: must be 64-char hex');
+impl Tag {
+    pub fn name(&self) -> &str {
+        self.0.first().map(|s| s.as_str()).unwrap_or("")
     }
-    this.hex = hex.toLowerCase();
-  }
 
-  // Factories
-  static fromHex(hex: string): EventId {
-    return new EventId(hex);
-  }
+    pub fn value(&self) -> Option<&str> {
+        self.0.get(1).map(|s| s.as_str())
+    }
 
-  static fromNevent(nevent: string): EventId {
-    const { type, data } = nip19.decode(nevent);
-    if (type !== 'nevent') throw new Error('Not an nevent');
-    return new EventId(data.id);
-  }
+    pub fn event_ref(id: &EventId) -> Self {
+        Self(vec!["e".to_string(), id.as_hex()])
+    }
 
-  static fromEvent(event: NostrEvent): EventId {
-    return new EventId(event.id);
-  }
+    pub fn pubkey_ref(pk: &PublicKey) -> Self {
+        Self(vec!["p".to_string(), pk.as_hex()])
+    }
 
-  static compute(event: UnsignedEvent): EventId {
-    const serialized = JSON.stringify([
-      0,
-      event.pubkey,
-      event.created_at,
-      event.kind,
-      event.tags,
-      event.content
-    ]);
-    const hash = sha256(new TextEncoder().encode(serialized));
-    return new EventId(bytesToHex(hash));
-  }
+    pub fn url(url: &str) -> Self {
+        Self(vec!["u".to_string(), url.to_string()])
+    }
 
-  // Conversions
-  toHex(): string {
-    return this.hex;
-  }
+    pub fn method(method: &str) -> Self {
+        Self(vec!["method".to_string(), method.to_string()])
+    }
+}
 
-  toNevent(relays?: string[]): string {
-    return nip19.neventEncode({ id: this.hex, relays });
-  }
+/// Section identifier (string, config-driven).
+#[derive(Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct SectionId(pub String);
 
-  // Equality
-  equals(other: EventId): boolean {
-    return this.hex === other.hex;
-  }
+/// Category identifier (string, config-driven).
+#[derive(Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct CategoryId(pub String);
 
-  toString(): string {
-    return this.hex;
-  }
+/// Forum identifier (NIP-28 channel ID or NIP-29 group ID).
+#[derive(Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct ForumId(pub String);
+```
+
+## Error Types
+
+```rust
+#[derive(Debug)]
+pub enum KeyError {
+    InvalidLength,
+    InvalidHex,
+    InvalidScalar,
+}
+
+#[derive(Debug)]
+pub enum RelayUrlError {
+    InvalidScheme,
 }
 ```
 
-### Signature
-
-Represents a Schnorr signature.
-
-```typescript
-class Signature {
-  private readonly sig: string;
-
-  private constructor(sig: string) {
-    if (!/^[0-9a-f]{128}$/i.test(sig)) {
-      throw new Error('Invalid signature: must be 128-char hex');
-    }
-    this.sig = sig.toLowerCase();
-  }
-
-  // Factories
-  static fromHex(hex: string): Signature {
-    return new Signature(hex);
-  }
-
-  static sign(event: UnsignedEvent, privkey: string): Signature {
-    const eventId = EventId.compute(event);
-    const sig = schnorr.sign(eventId.toHex(), privkey);
-    return new Signature(bytesToHex(sig));
-  }
-
-  // Verification
-  verify(event: NostrEvent): boolean {
-    try {
-      return schnorr.verify(
-        this.sig,
-        event.id,
-        event.pubkey
-      );
-    } catch {
-      return false;
-    }
-  }
-
-  // Conversions
-  toHex(): string {
-    return this.sig;
-  }
-
-  toString(): string {
-    return this.sig;
-  }
-}
-```
-
-## Identifier Value Objects
-
-### CohortId
-
-```typescript
-class CohortId {
-  private readonly value: string;
-
-  private constructor(value: string) {
-    if (!/^[a-z][a-z0-9-]*$/.test(value)) {
-      throw new Error('Invalid cohort ID: lowercase alphanumeric with dashes');
-    }
-    if (value.length > 32) {
-      throw new Error('Cohort ID too long: max 32 chars');
-    }
-    this.value = value;
-  }
-
-  static fromString(value: string): CohortId {
-    return new CohortId(value);
-  }
-
-  // Predefined cohorts
-  static readonly ADMIN = new CohortId('admin');
-  static readonly MEMBERS = new CohortId('members');
-  static readonly GUESTS = new CohortId('guests');
-
-  toString(): string {
-    return this.value;
-  }
-
-  equals(other: CohortId): boolean {
-    return this.value === other.value;
-  }
-}
-```
-
-### SectionId
-
-```typescript
-class SectionId {
-  private readonly value: string;
-
-  private constructor(value: string) {
-    if (!/^[a-z][a-z0-9-]*$/.test(value)) {
-      throw new Error('Invalid section ID');
-    }
-    this.value = value;
-  }
-
-  static fromString(value: string): SectionId {
-    return new SectionId(value);
-  }
-
-  toString(): string {
-    return this.value;
-  }
-
-  equals(other: SectionId): boolean {
-    return this.value === other.value;
-  }
-}
-```
-
-### RoleId
-
-```typescript
-class RoleId {
-  private readonly value: string;
-  private readonly priority: number;
-
-  private constructor(value: string, priority: number) {
-    this.value = value;
-    this.priority = priority;
-  }
-
-  // Predefined roles (ordered by priority)
-  static readonly ADMIN = new RoleId('admin', 100);
-  static readonly MODERATOR = new RoleId('moderator', 75);
-  static readonly MEMBER = new RoleId('member', 50);
-  static readonly VIEWER = new RoleId('viewer', 25);
-
-  static fromString(value: string): RoleId {
-    const roles: Record<string, RoleId> = {
-      admin: RoleId.ADMIN,
-      moderator: RoleId.MODERATOR,
-      member: RoleId.MEMBER,
-      viewer: RoleId.VIEWER
-    };
-    if (!roles[value]) throw new Error(`Unknown role: ${value}`);
-    return roles[value];
-  }
-
-  isHigherThan(other: RoleId): boolean {
-    return this.priority > other.priority;
-  }
-
-  isAtLeast(other: RoleId): boolean {
-    return this.priority >= other.priority;
-  }
-
-  toString(): string {
-    return this.value;
-  }
-
-  equals(other: RoleId): boolean {
-    return this.value === other.value;
-  }
-}
-```
-
-## Content Value Objects
-
-### MessageContent
-
-```typescript
-class MessageContent {
-  private readonly value: string;
-  private readonly mentions: Pubkey[];
-  private readonly tags: EventId[];
-
-  private constructor(value: string) {
-    if (value.length > 64000) {
-      throw new Error('Content too long: max 64KB');
-    }
-    this.value = value;
-    this.mentions = this.extractMentions();
-    this.tags = this.extractTags();
-  }
-
-  static fromString(value: string): MessageContent {
-    return new MessageContent(value);
-  }
-
-  private extractMentions(): Pubkey[] {
-    const npubPattern = /nostr:npub1[a-z0-9]{58}/g;
-    const matches = this.value.match(npubPattern) || [];
-    return matches.map(m => Pubkey.fromNpub(m.replace('nostr:', '')));
-  }
-
-  private extractTags(): EventId[] {
-    const neventPattern = /nostr:nevent1[a-z0-9]+/g;
-    const matches = this.value.match(neventPattern) || [];
-    return matches.map(m => EventId.fromNevent(m.replace('nostr:', '')));
-  }
-
-  getText(): string {
-    return this.value;
-  }
-
-  getMentions(): Pubkey[] {
-    return [...this.mentions];
-  }
-
-  getEventTags(): EventId[] {
-    return [...this.tags];
-  }
-
-  getPreview(maxLength: number = 100): string {
-    if (this.value.length <= maxLength) return this.value;
-    return this.value.slice(0, maxLength - 3) + '...';
-  }
-
-  toString(): string {
-    return this.value;
-  }
-}
-```
-
-### Timestamp
-
-```typescript
-class Timestamp {
-  private readonly unixSeconds: number;
-
-  private constructor(unixSeconds: number) {
-    if (unixSeconds < 0) {
-      throw new Error('Timestamp cannot be negative');
-    }
-    this.unixSeconds = Math.floor(unixSeconds);
-  }
-
-  // Factories
-  static now(): Timestamp {
-    return new Timestamp(Math.floor(Date.now() / 1000));
-  }
-
-  static fromUnix(seconds: number): Timestamp {
-    return new Timestamp(seconds);
-  }
-
-  static fromDate(date: Date): Timestamp {
-    return new Timestamp(Math.floor(date.getTime() / 1000));
-  }
-
-  // Conversions
-  toUnix(): number {
-    return this.unixSeconds;
-  }
-
-  toDate(): Date {
-    return new Date(this.unixSeconds * 1000);
-  }
-
-  toISO(): string {
-    return this.toDate().toISOString();
-  }
-
-  // Comparisons
-  isBefore(other: Timestamp): boolean {
-    return this.unixSeconds < other.unixSeconds;
-  }
-
-  isAfter(other: Timestamp): boolean {
-    return this.unixSeconds > other.unixSeconds;
-  }
-
-  // Display
-  toRelative(): string {
-    const now = Timestamp.now().unixSeconds;
-    const diff = now - this.unixSeconds;
-
-    if (diff < 60) return 'just now';
-    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-    if (diff < 604800) return `${Math.floor(diff / 86400)}d ago`;
-    return this.toDate().toLocaleDateString();
-  }
-
-  equals(other: Timestamp): boolean {
-    return this.unixSeconds === other.unixSeconds;
-  }
-}
-```
-
-## Encryption Value Objects
-
-### EncryptedPayload
-
-```typescript
-class EncryptedPayload {
-  private readonly ciphertext: string;
-  private readonly version: 'nip04' | 'nip44';
-
-  private constructor(ciphertext: string, version: 'nip04' | 'nip44') {
-    this.ciphertext = ciphertext;
-    this.version = version;
-  }
-
-  static fromNip04(ciphertext: string): EncryptedPayload {
-    // NIP-04 format: base64?iv=base64
-    if (!ciphertext.includes('?iv=')) {
-      throw new Error('Invalid NIP-04 ciphertext');
-    }
-    return new EncryptedPayload(ciphertext, 'nip04');
-  }
-
-  static fromNip44(ciphertext: string): EncryptedPayload {
-    // NIP-44 format: version byte + nonce + ciphertext
-    return new EncryptedPayload(ciphertext, 'nip44');
-  }
-
-  static detect(ciphertext: string): EncryptedPayload {
-    if (ciphertext.includes('?iv=')) {
-      return EncryptedPayload.fromNip04(ciphertext);
-    }
-    return EncryptedPayload.fromNip44(ciphertext);
-  }
-
-  isLegacy(): boolean {
-    return this.version === 'nip04';
-  }
-
-  getCiphertext(): string {
-    return this.ciphertext;
-  }
-
-  getVersion(): 'nip04' | 'nip44' {
-    return this.version;
-  }
-}
-```
-
-## Search Value Objects
-
-### Embedding
-
-```typescript
-class Embedding {
-  private readonly vector: Float32Array;
-  private readonly dimensions: number;
-
-  private constructor(vector: Float32Array) {
-    this.vector = vector;
-    this.dimensions = vector.length;
-  }
-
-  static fromArray(values: number[]): Embedding {
-    return new Embedding(new Float32Array(values));
-  }
-
-  static fromFloat32Array(array: Float32Array): Embedding {
-    return new Embedding(array);
-  }
-
-  getVector(): Float32Array {
-    return this.vector;
-  }
-
-  getDimensions(): number {
-    return this.dimensions;
-  }
-
-  // Cosine similarity
-  similarity(other: Embedding): number {
-    if (this.dimensions !== other.dimensions) {
-      throw new Error('Dimension mismatch');
-    }
-
-    let dotProduct = 0;
-    let normA = 0;
-    let normB = 0;
-
-    for (let i = 0; i < this.dimensions; i++) {
-      dotProduct += this.vector[i] * other.vector[i];
-      normA += this.vector[i] * this.vector[i];
-      normB += other.vector[i] * other.vector[i];
-    }
-
-    return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
-  }
-}
-```
+## Properties
+
+All value objects in this module satisfy:
+
+1. **Immutability**: No `&mut self` methods. New values are created via
+   constructors or `From`/`Into` conversions.
+2. **Structural equality**: `PartialEq` and `Eq` are derived from field values.
+3. **Self-validation**: Constructors reject invalid inputs (wrong hex length,
+   invalid URL scheme, etc.).
+4. **Serialization**: All types implement `Serialize`/`Deserialize` for JSON
+   wire format and IndexedDB persistence.

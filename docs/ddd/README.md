@@ -1,122 +1,58 @@
----
-title: "Domain-Driven Design Documentation"
-description: "Domain-driven design artifacts including domain model, bounded contexts, aggregates, and ubiquitous language"
-category: reference
-tags: [ddd, architecture, developer, domain, design]
-difficulty: advanced
-related-docs:
-  - ./01-domain-model.md
-  - ./02-bounded-contexts.md
-  - ../adr/README.md
-last-updated: 2026-01-16
----
+# DreamLab Community Forum -- Domain-Driven Design
 
-# Domain-Driven Design Documentation
+Domain-Driven Design documentation for the Rust port of the DreamLab community
+forum. These documents define the domain model, bounded contexts, aggregates,
+events, value objects, and shared vocabulary used across the 5-crate Rust
+workspace (`nostr-core`, `forum-client`, `auth-worker`, `pod-worker`,
+`preview-worker`).
 
-This directory contains Domain-Driven Design artifacts for the Nostr BBS project.
+For the accepted architecture baseline, see the
+[Rust Port PRD v2.0.0](../prd-rust-port.md).
 
-## Document Index
+> Alignment note: The current DDD set reflects the accepted v2.0.0 plan. The
+> proposed planning refinement in [PRD v2.1.0](../prd-rust-port-v2.1.md) and
+> [ADR-019](../adr/019-plan-governance-and-delivery-structure.md) is focused on
+> delivery structure and documentation governance. These domain documents should
+> only be updated after the revised plan is accepted and any architecture
+> changes are formalized through ADRs.
+
+## Documents
 
 | Document | Description |
 |----------|-------------|
-| [Domain Model](01-domain-model.md) | Core domain entities and relationships |
-| [Bounded Contexts](02-bounded-contexts.md) | Context boundaries and integration |
-| [Aggregates](03-aggregates.md) | Aggregate roots and invariants |
-| [Domain Events](04-domain-events.md) | Event catalog and flows |
-| [Value Objects](05-value-objects.md) | Immutable domain primitives |
-| [Ubiquitous Language](06-ubiquitous-language.md) | Domain terminology glossary |
+| [01 - Domain Model](01-domain-model.md) | Core entities: identity (keypairs, DIDs), authentication (passkeys, NIP-98), community (channels, sections, cohorts), messaging (events, DMs, reactions), content (posts, profiles, calendar), and storage (pods, media, ACL). Includes Rust type definitions for each entity. |
+| [02 - Bounded Contexts](02-bounded-contexts.md) | Maps each bounded context to a Rust crate or TypeScript Worker. Defines responsibilities, public module structure, dependencies, and the anti-corruption layer between `nostr-sdk` alpha APIs and stable DreamLab types. |
+| [03 - Aggregates](03-aggregates.md) | Five aggregate roots: UserIdentity (keypair + credentials + permissions), Channel (messages + members + join requests), Conversation (encrypted DMs), ForumThread (posts + replies + reactions), and Pod (media + ACL). Documents invariants and commands for each. |
+| [04 - Domain Events](04-domain-events.md) | Distinguishes Nostr protocol events (kind-typed signed data) from application-level domain events (state transitions). Includes the event kind registry, event flow diagrams for publishing, receiving, NIP-98 auth, and NIP-44 encryption. |
+| [05 - Value Objects](05-value-objects.md) | Immutable types: EventId (SHA-256), PublicKey (32-byte hex), Signature (Schnorr BIP-340), Timestamp (Unix seconds), RoleId enum, ChannelVisibility enum, Nip44Ciphertext, GiftWrap, RelayUrl, Tag, SectionId, CategoryId. Full Rust implementations with constructors and validation. |
+| [06 - Ubiquitous Language](06-ubiquitous-language.md) | Glossary of all terms used in the project: Nostr protocol (event, kind, NIP, relay), DreamLab forum (cohort, zone, section, pod, whitelist), authentication (passkey, PRF, HKDF, NIP-98), and Rust/Leptos (signal, resource, memo, component, trunk). |
 
-## Domain Overview
-
-```
-┌─────────────────────────────────────────────────────────┐
-│                    Nostr BBS Domain                      │
-├─────────────────────────────────────────────────────────┤
-│                                                         │
-│  Identity Context          Messaging Context            │
-│  ├── Member                ├── Message                  │
-│  ├── Keypair               ├── Thread                   │
-│  ├── Profile               ├── Reaction                 │
-│  └── Session               └── DirectMessage            │
-│                                                         │
-│  Organisation Context      Access Context               │
-│  ├── Category              ├── Cohort                   │
-│  ├── Section               ├── Role                     │
-│  ├── Forum                 ├── Permission               │
-│  └── Channel               └── Whitelist                │
-│                                                         │
-│  Search Context            Calendar Context             │
-│  ├── Index                 ├── Event                    │
-│  ├── Query                 ├── RSVP                     │
-│  └── Result                └── Reminder                 │
-│                                                         │
-└─────────────────────────────────────────────────────────┘
-```
-
-## Strategic Design
-
-### Core Domain
-- **Messaging**: The primary value - community communication
-- **Organisation**: BBS structure (Category → Section → Forum)
-
-### Supporting Domains
-- **Identity**: Nostr keypair management
-- **Access Control**: Zone-based permissions
-
-### Generic Domains
-- **Search**: Semantic search capability
-- **Calendar**: Event scheduling (NIP-52)
-
-## Tactical Patterns Used
-
-| Pattern | Usage |
-|---------|-------|
-| Aggregate | Message thread, Forum channel |
-| Entity | Member, Message, Section |
-| Value Object | Pubkey, EventId, Signature |
-| Domain Event | MessagePosted, MemberJoined |
-| Repository | EventRepository, MemberRepository |
-| Domain Service | EncryptionService, SearchService |
-
-## Context Map
+## Architecture Overview
 
 ```
-┌────────────┐     ┌────────────┐     ┌──────────────┐
-│  Identity  │────>│  Access    │────>│Organisation  │
-│  Context   │ ACL │  Context   │ OHS │  Context     │
-└────────────┘     └────────────┘     └──────────────┘
-      │                  │                  │
-      │                  │                  │
-      ▼                  ▼                  ▼
-┌────────────────────────────────────────────────┐
-│              Messaging Context                  │
-│            (Core Domain)                       │
-└────────────────────────────────────────────────┘
-      │                  │
-      ▼                  ▼
-┌────────────┐     ┌────────────┐
-│   Search   │     │  Calendar  │
-│  Context   │     │  Context   │
-└────────────┘     └────────────┘
-
-Legend:
-  ───> ACL: Anticorruption Layer
-  ───> OHS: Open Host Service
+nostr-core (shared library)
+    |
+    +-- forum-client (Leptos WASM, browser)
+    |       |
+    |       +-- WebSocket --> nostr-relay (TypeScript, unchanged)
+    |       +-- HTTP ------> auth-worker (Rust CF Worker)
+    |       +-- HTTP ------> pod-worker (Rust CF Worker)
+    |       +-- HTTP ------> preview-worker (Rust CF Worker)
+    |       +-- HTTP ------> search-api (TypeScript, unchanged)
+    |
+    +-- auth-worker
+    +-- pod-worker
+    +-- preview-worker
 ```
 
-## Quick Reference
+## Crate-to-Context Mapping
 
-### Key Aggregates
-- `MessageThread` - Root for threaded conversations
-- `Forum` - NIP-28 channel with messages
-- `Member` - User with profile and permissions
-
-### Key Domain Events
-- `MessagePosted` - New message in forum
-- `MemberWhitelisted` - User granted access
-- `ThreadCreated` - New discussion started
-
-### Key Services
-- `EncryptionService` - NIP-44/04 handling
-- `RelayService` - Event publishing/subscription
-- `PermissionService` - Access control checks
+| Crate | Bounded Context | Target |
+|-------|----------------|--------|
+| `nostr-core` | Nostr Core | wasm32 + native |
+| `forum-client` | Forum Client | wasm32 only |
+| `auth-worker` | Identity and Auth | CF Worker (wasm32) |
+| `pod-worker` | Storage | CF Worker (wasm32) |
+| `preview-worker` | Preview | CF Worker (wasm32) |
+| `workers/nostr-relay/` (TS) | Relay | CF Worker (JS) |
+| `workers/search-api/` (TS) | Search | CF Worker (JS) |

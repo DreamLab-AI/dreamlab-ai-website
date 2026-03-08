@@ -1,201 +1,83 @@
-# DreamLab AI Documentation
+# DreamLab AI — Rust Port Documentation
 
-**Last updated:** 2026-03-07 | **Version:** 2.1.0 | **Repository:** [DreamLab-AI/dreamlab-ai-website](https://github.com/DreamLab-AI/dreamlab-ai-website)
+**Documentation Set:** 2026-03-08 | **Branch:** `rust-version`
 
-DreamLab AI is a premium AI training and consulting platform at [dreamlab-ai.com](https://dreamlab-ai.com) (also [thedreamlab.uk](https://thedreamlab.uk)). The platform comprises a React single-page application with 3D visualisations, a SvelteKit community forum with passkey authentication, and 5 Cloudflare Workers backend services (deployed at `*.solitary-paper-764d.workers.dev`). All GCP infrastructure was deleted as of 2026-03-02.
+Documentation for the DreamLab community forum Rust port. The React main site (`src/`) is excluded from this port.
 
----
+## Planning and Governance
 
-## Technology Stack
+| Document | Status | Description |
+|----------|--------|-------------|
+| [PRD: Rust Port v2.0.0](prd-rust-port.md) | Accepted baseline | Current accepted architecture and execution baseline |
+| [PRD: Rust Port v2.1.0](prd-rust-port-v2.1.md) | Proposed refinement | Refactored delivery model with tranche-based execution, stronger governance, and clearer stop/go gates |
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend | React 18.3 + TypeScript 5.5 + Vite 5.4 (SWC) |
-| Styling | Tailwind CSS 3.4 + shadcn/ui (Radix UI) |
-| Routing | React Router DOM 6.26 (lazy-loaded, 13 routes) |
-| State | TanStack React Query 5.56 |
-| Forms | React Hook Form 7.53 + Zod 3.23 |
-| 3D | Three.js 0.156 + @react-three/fiber + @react-three/drei |
-| WASM | Rust (Voronoi tessellation in `wasm-voronoi/`) |
-| Forum | SvelteKit 2.49 (`community-forum/`) |
-| Protocol | Nostr (NDK 2.13) for community features |
-| Auth | WebAuthn PRF + HKDF + NIP-98 (nostr-tools 2.19.3) |
-| Database | Supabase (main site), D1 + KV + R2 (Cloudflare) |
-
----
-
-## Quick Navigation
-
-### For Users
-
-- [Website guide](user/WEBSITE_GUIDE.md) -- navigating the main site
-- [Workshop booking](user/WORKSHOP_BOOKING.md) -- booking AI training workshops
-- [FAQ](user/FAQ.md) -- frequently asked questions
-
-### For Developers
-
-- [Getting started](developer/GETTING_STARTED.md) -- local development environment
-- [Architecture overview](architecture.md) -- system design and components
-- [Development workflow](developer/DEVELOPMENT_WORKFLOW.md) -- day-to-day development
-- [Component development](developer/COMPONENT_DEVELOPMENT.md) -- building UI components
-- [Code style](developer/CODE_STYLE.md) -- coding standards
-- [Testing guide](developer/TESTING_GUIDE.md) -- writing and running tests
-- [Service development](developer/SERVICE_DEVELOPMENT.md) -- backend service development
-
-### For Operators
-
-- [Deployment overview](deployment/README.md) -- deployment strategies
-- [GitHub Pages deployment](deployment/GITHUB_PAGES.md) -- static site hosting
-- [Cloudflare Workers](deployment/CLOUDFLARE_WORKERS.md) -- backend services deployment
-- [Environments](deployment/ENVIRONMENTS.md) -- environment configuration
-- [Monitoring](deployment/MONITORING.md) -- observability and alerting
-- [Rollback procedures](deployment/ROLLBACK.md) -- incident recovery
-
-### For Architects
-
-- [Architecture overview](architecture.md) -- high-level system design
-- [Architecture Decision Records](adr/README.md) -- 12 ADRs covering all major decisions
-- [Domain model](ddd/01-domain-model.md) -- Domain-Driven Design documentation
-- [Feature status matrix](features/STATUS_MATRIX.md) -- what is running, planned, or broken
-- [Cloudflare migration PRD](prd-cloudflare-workers-migration.md) -- return to Cloudflare platform (complete)
-
----
-
-## Feature Status
-
-| Feature | Status |
-|---------|--------|
-| Main React SPA (13 routes) | Running on GitHub Pages |
-| 3D visualisations (VoronoiGoldenHero, TesseractProjection) | Running |
-| Workshop content system (15 workshops) | Running |
-| Team profiles (44 experts) | Running |
-| Community forum (SvelteKit) | Builds and deploys to `/community` |
-| Auth API (WebAuthn + NIP-98) | Cloudflare Workers |
-| Pod API (Solid pod storage) | Cloudflare Workers |
-| Search API (WASM vector search) | Cloudflare Workers |
-| Nostr relay | Cloudflare Workers + Durable Objects |
-| Link preview API | Cloudflare Workers |
-| NIP-98 shared module | Built (consolidated from 4 implementations) |
-
-For the full breakdown, see [features/STATUS_MATRIX.md](features/STATUS_MATRIX.md).
-
----
-
-## Document Index
-
-### Core
-
-| Document | Description |
-|----------|-------------|
-| [README.md](README.md) | This file -- master documentation hub |
-| [index.md](index.md) | Quick-navigation page |
-| [architecture.md](architecture.md) | High-level architecture overview |
-| [features/STATUS_MATRIX.md](features/STATUS_MATRIX.md) | Comprehensive feature status matrix |
-| [prd-cloudflare-workers-migration.md](prd-cloudflare-workers-migration.md) | Cloudflare migration PRD |
-
-### Architecture Decision Records
+## Architecture Decision Records (19 tracked)
 
 | ADR | Title | Status |
 |-----|-------|--------|
-| [ADR-001](adr/001-nostr-protocol-foundation.md) | Nostr Protocol as Foundation | Accepted |
-| [ADR-002](adr/002-three-tier-hierarchy.md) | Three-Tier BBS Hierarchy | Accepted |
-| [ADR-003](adr/003-gcp-cloud-run-infrastructure.md) | GCP Cloud Run Infrastructure | Superseded by ADR-010 |
-| [ADR-004](adr/004-zone-based-access-control.md) | Zone-Based Access Control | Accepted |
-| [ADR-005](adr/005-nip-44-encryption-mandate.md) | NIP-44 Encryption Mandate | Accepted |
-| [ADR-006](adr/006-client-side-wasm-search.md) | Client-Side WASM Search | Accepted |
-| [ADR-007](adr/007-sveltekit-ndk-frontend.md) | SvelteKit + NDK Frontend | Accepted |
-| [ADR-008](adr/008-postgresql-relay-storage.md) | PostgreSQL Relay Storage | Superseded by ADR-010 |
-| [ADR-009](adr/009-user-registration-flow.md) | User Registration Flow | Resolved |
-| [ADR-010](adr/010-return-to-cloudflare.md) | Return to Cloudflare Platform | Accepted |
-| [ADR-011](adr/011-images-to-solid-pods.md) | Images to Solid Pods | Accepted |
-| [ADR-012](adr/012-hardening-sprint.md) | Hardening Sprint | Accepted |
+| [001](adr/README.md) | Nostr Protocol as Foundation | Accepted |
+| [002](adr/README.md) | Three-Tier BBS Hierarchy | Accepted |
+| [003](adr/README.md) | GCP Cloud Run Infrastructure | Superseded by 010 |
+| [004](adr/README.md) | Zone-Based Access Control | Accepted |
+| [005](adr/README.md) | NIP-44 Encryption Mandate | Accepted |
+| [006](adr/README.md) | Client-Side WASM Search | Accepted |
+| [007](adr/README.md) | SvelteKit + NDK Frontend | Superseded by 013 |
+| [008](adr/README.md) | PostgreSQL Relay Storage | Superseded by 010 |
+| [009](adr/README.md) | User Registration Flow | Resolved |
+| [010](adr/README.md) | Return to Cloudflare Platform | Accepted |
+| [011](adr/README.md) | Images to Solid Pods | Accepted |
+| [012](adr/README.md) | Hardening Sprint | Accepted |
+| [013](adr/013-rust-leptos-forum-framework.md) | Rust/Leptos as Forum Framework | Accepted |
+| [014](adr/014-hybrid-validation-phase.md) | Hybrid Validation Phase | Accepted |
+| [015](adr/015-workers-port-strategy.md) | Workers Port Strategy (3 Rust, 2 TS) | Accepted |
+| [016](adr/016-nostr-sdk-protocol-layer.md) | nostr-sdk 0.44 Protocol Layer | Accepted |
+| [017](adr/017-passkey-rs-webauthn-prf.md) | passkey-rs for WebAuthn PRF | Accepted |
+| [018](adr/018-testing-strategy-rust-port.md) | Testing Strategy | Accepted |
+| [019](adr/019-plan-governance-and-delivery-structure.md) | Versioned Planning Governance and Tranche-Based Delivery | Accepted |
 
-### Domain-Driven Design
+## Domain-Driven Design
 
-| Document | Description |
-|----------|-------------|
-| [Domain model](ddd/01-domain-model.md) | Core domain entities |
-| [Bounded contexts](ddd/02-bounded-contexts.md) | System boundaries |
-| [Aggregates](ddd/03-aggregates.md) | Data aggregates |
-| [Domain events](ddd/04-domain-events.md) | Event model |
-| [Value objects](ddd/05-value-objects.md) | Value types |
-| [Ubiquitous language](ddd/06-ubiquitous-language.md) | Terminology |
-
-### Security
+The current DDD set remains aligned to the accepted baseline in [PRD v2.0.0](prd-rust-port.md). The proposed refinement in [PRD v2.1.0](prd-rust-port-v2.1.md) and [ADR-019](adr/019-plan-governance-and-delivery-structure.md) is planning/governance focused and should only drive DDD updates after acceptance.
 
 | Document | Description |
 |----------|-------------|
-| [Security overview](security/SECURITY_OVERVIEW.md) | Security posture summary |
-| [Authentication](security/AUTHENTICATION.md) | Auth system details |
-| [Data protection](security/DATA_PROTECTION.md) | Data handling policies |
-| [Vulnerability management](security/VULNERABILITY_MANAGEMENT.md) | Vulnerability response |
-| [Security audit report](security/security-audit-report.md) | Audit findings |
-| [Admin security](security/admin-security.md) | Administrator guidelines |
+| [Domain Model](ddd/01-domain-model.md) | Core entities with Rust type definitions |
+| [Bounded Contexts](ddd/02-bounded-contexts.md) | Crate-to-context mapping (7 contexts) |
+| [Aggregates](ddd/03-aggregates.md) | 5 aggregate roots with invariants |
+| [Domain Events](ddd/04-domain-events.md) | Nostr event kinds + application events |
+| [Value Objects](ddd/05-value-objects.md) | Immutable types with validation |
+| [Ubiquitous Language](ddd/06-ubiquitous-language.md) | Terminology glossary (50+ terms) |
 
-### API
-
-| Document | Description |
-|----------|-------------|
-| [Auth API](api/AUTH_API.md) | WebAuthn + NIP-98 endpoints |
-| [Search API](api/SEARCH_API.md) | RuVector WASM search |
-| [Nostr relay](api/NOSTR_RELAY.md) | Relay protocol reference |
-| [Supabase schema](api/SUPABASE_SCHEMA.md) | Database schema reference |
-
-### Features
+## API Reference
 
 | Document | Description |
 |----------|-------------|
-| [Authentication](features/authentication.md) | Auth system implementation |
-| [DM implementation](features/dm-implementation.md) | NIP-17/59 encrypted messaging |
-| [Mobile UI components](features/mobile-ui-components.md) | Touch-optimised components |
-| [Secure clipboard](features/secure-clipboard.md) | Memory-safe data handling |
+| [Auth API](api/AUTH_API.md) | WebAuthn + NIP-98 endpoints (Rust Worker) |
+| [Pod API](api/POD_API.md) | Solid pod storage + WAC ACL (Rust Worker) |
+| [Nostr Relay](api/NOSTR_RELAY.md) | WebSocket NIP-01 relay (TypeScript Worker) |
+| [Search API](api/SEARCH_API.md) | RVF WASM vector search (TypeScript Worker) |
 
-### Community Forum
-
-| Document | Description |
-|----------|-------------|
-| [Community overview](community/README.md) | Forum architecture |
-| [UI components](community/UI_COMPONENTS.md) | Forum component library |
-
-### Archive
+## Security
 
 | Document | Description |
 |----------|-------------|
-| [Archive index](archive/README.md) | Historical documents moved from repo root |
-| [Embedding Service (deprecated)](archive/EMBEDDING_SERVICE_DEPRECATED.md) | GCP embedding API (deleted 2026-03-02) |
-| [Cloud Services (deprecated)](archive/CLOUD_SERVICES_DEPRECATED.md) | GCP Cloud Run services (deleted 2026-03-02) |
+| [Security Overview](security/SECURITY_OVERVIEW.md) | Compile-time safety, crypto stack, access control |
+| [Authentication](security/AUTHENTICATION.md) | Passkey PRF flow, NIP-98, session management |
+
+## Deployment
+
+| Document | Description |
+|----------|-------------|
+| [Deployment Overview](deployment/README.md) | CI/CD, environments, DNS |
+| [Cloudflare Workers](deployment/CLOUDFLARE_WORKERS.md) | Rust + TS Worker builds, resources, secrets |
+
+## Developer
+
+| Document | Description |
+|----------|-------------|
+| [Getting Started](developer/GETTING_STARTED.md) | Prerequisites, setup, local development |
+| [Rust Style Guide](developer/RUST_STYLE_GUIDE.md) | Coding standards, error handling, module organization |
 
 ---
 
-## Build Commands
-
-```bash
-# Development server (generates workshop list first)
-npm run dev
-
-# Production build
-npm run build
-
-# Development build
-npm run build:dev
-
-# Lint (ESLint 9 flat config)
-npm run lint
-
-# Preview production build
-npm run preview
-```
-
----
-
-## Repository
-
-- **Source:** [github.com/DreamLab-AI/dreamlab-ai-website](https://github.com/DreamLab-AI/dreamlab-ai-website)
-- **Live site:** [dreamlab-ai.com](https://dreamlab-ai.com) / [thedreamlab.uk](https://thedreamlab.uk)
-- **Issues:** [GitHub Issues](https://github.com/DreamLab-AI/dreamlab-ai-website/issues)
-- **Forked from:** [TheDreamLabUK/website](https://github.com/TheDreamLabUK/website)
-
----
-
-**Last updated:** 2026-03-07
-**Maintained by:** DreamLab AI Engineering
+**Total files in this docs tree:** 28 | **Accepted baseline:** v2.0.0 | **Proposed refinement:** v2.1.0 | **Repository:** [DreamLab-AI/dreamlab-ai-website](https://github.com/DreamLab-AI/dreamlab-ai-website)

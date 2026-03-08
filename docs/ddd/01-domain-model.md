@@ -1,242 +1,242 @@
----
-title: "Domain Model"
-description: "## Overview"
-category: explanation
-tags: ['ddd', 'developer', 'user']
-difficulty: beginner
-last-updated: 2026-01-16
----
-
 # Domain Model
 
-## Overview
+This document defines the core domain entities for the DreamLab community forum
+Rust port. Each entity maps to a Rust struct in the `nostr-core` or
+`forum-client` crate, compiled to both native and `wasm32-unknown-unknown`.
 
-The Nostr BBS domain model maps community forum concepts to Nostr protocol primitives.
+## Identity
 
-## Entity Relationship Diagram
+Identity is anchored on secp256k1 keypairs. A user's Nostr public key is the
+primary identifier across the entire system.
 
+```rust
+use k256::schnorr::SigningKey;
+
+/// A secp256k1 keypair used for Nostr event signing and NIP-44 encryption.
+/// The private key is held in memory only (never persisted) for passkey users.
+pub struct NostrKeypair {
+    signing_key: SigningKey,
+    public_key: PublicKey,
+}
+
+/// 32-byte compressed x-only public key, displayed as 64-char lowercase hex.
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
+pub struct PublicKey([u8; 32]);
+
+/// Decentralized identifier: `did:nostr:{hex_pubkey}`.
+/// Used for WAC ACL agent references and Solid pod ownership.
+pub struct DidNostr(PublicKey);
+
+/// Solid-compatible WebID URL: `https://pods.dreamlab-ai.com/{pubkey}/profile/card#me`.
+pub struct WebId(String);
+
+/// PRF-derived key material from a WebAuthn ceremony.
+/// Input to HKDF-SHA-256 with info="nostr-secp256k1-v1" to produce a secp256k1 scalar.
+pub struct PrfOutput([u8; 32]);
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                      Domain Model                                │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│  ┌──────────┐         ┌──────────┐         ┌──────────┐        │
-│  │ Category │────────<│ Section  │────────<│  Forum   │        │
-│  │          │   1:N   │          │   1:N   │(Channel) │        │
-│  └──────────┘         └────┬─────┘         └────┬─────┘        │
-│                            │                    │               │
-│                            │                    │ 1:N           │
-│                            │                    ▼               │
-│  ┌──────────┐         ┌────┴─────┐         ┌──────────┐        │
-│  │  Cohort  │────────<│  Member  │────────<│ Message  │        │
-│  │          │   N:M   │          │   1:N   │          │        │
-│  └──────────┘         └────┬─────┘         └────┬─────┘        │
-│                            │                    │               │
-│                            │                    │ 1:N           │
-│                            │                    ▼               │
-│  ┌──────────┐              │               ┌──────────┐        │
-│  │   Role   │──────────────┘               │ Reaction │        │
-│  │          │   section_roles              │          │        │
-│  └──────────┘                              └──────────┘        │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
+
+## Authentication
+
+Three auth paths exist: passkey PRF (primary), NIP-07 extension, and local key.
+The passkey path derives the private key deterministically from a WebAuthn PRF
+ceremony, so the key is never stored.
+
+```rust
+/// A registered WebAuthn credential stored server-side in D1.
+pub struct PasskeyCredential {
+    pub pubkey: PublicKey,
+    pub credential_id: String,
+    pub public_key_der: Vec<u8>,
+    pub counter: u32,
+    /// Server-generated PRF salt (base64url). Same salt + same authenticator = same PRF output.
+    pub prf_salt: String,
+    pub created_at: u64,
+}
+
+/// NIP-98 HTTP authentication token (kind 27235).
+/// Schnorr-signed event with `u` (URL), `method`, and optional `payload` (SHA-256 of body) tags.
+pub struct Nip98Token {
+    pub event: NostrEvent,
+}
+
+/// Client-side auth state, equivalent to the Svelte `AuthState` store.
+pub struct Session {
+    pub state: AuthFlowState,
+    pub pubkey: Option<PublicKey>,
+    pub private_key: Option<[u8; 32]>,
+    pub nickname: Option<String>,
+    pub avatar: Option<String>,
+    pub account_status: AccountStatus,
+    pub auth_method: AuthMethod,
+}
+
+pub enum AuthFlowState { Unauthenticated, Authenticating, Authenticated }
+pub enum AccountStatus { Incomplete, Complete }
+pub enum AuthMethod { Passkey, Nip07, LocalKey, None }
 ```
 
-## Core Entities
+## Community
 
-### Member
+The forum is organized as a 3-tier BBS: Category (zone) > Section > Forum
+(NIP-28 channel). Access is governed by cohort membership and role level.
 
-The central identity in the system.
+```rust
+/// NIP-28/NIP-29 channel. Maps to a kind 40 create event + kind 39000 metadata.
+pub struct Channel {
+    pub id: String,
+    pub name: String,
+    pub description: String,
+    pub picture: Option<String>,
+    pub cohorts: Vec<String>,
+    pub section: SectionId,
+    pub visibility: ChannelVisibility,
+    pub access_type: ChannelAccessType,
+    pub is_encrypted: bool,
+    pub member_count: u32,
+    pub created_at: Timestamp,
+}
 
-```typescript
-interface Member {
-  // Identity (from Nostr)
-  pubkey: Pubkey;              // Primary identifier (hex)
-  npub: string;                // Bech32 encoded pubkey
+pub enum ChannelVisibility { Public, Cohort, Invite }
+pub enum ChannelAccessType { Open, Gated }
 
-  // Profile (NIP-01 kind 0)
-  profile: {
-    name?: string;
-    displayName?: string;
-    about?: string;
-    picture?: string;
-    nip05?: string;
-  };
+/// Section (Tier 2) -- a grouping of channels within a category.
+pub struct Section {
+    pub id: SectionId,
+    pub name: String,
+    pub description: String,
+    pub icon: String,
+    pub order: u32,
+    pub access: AccessConfig,
+    pub allow_forum_creation: bool,
+}
 
-  // Access Control
-  cohorts: CohortId[];         // Membership groups
-  sectionRoles: Map<SectionId, RoleId>;
-  isGlobalAdmin: boolean;
+/// Category (Tier 1 / Zone) -- top-level container with cohort-based isolation.
+pub struct Category {
+    pub id: CategoryId,
+    pub name: String,
+    pub description: String,
+    pub icon: String,
+    pub order: u32,
+    pub sections: Vec<Section>,
+    pub access: Option<CategoryAccessConfig>,
+}
 
-  // State
-  status: 'pending' | 'active' | 'suspended';
-  createdAt: Date;
-  lastSeen: Date;
+/// Whitelist entry from the relay, the source of truth for permissions.
+pub struct WhitelistEntry {
+    pub pubkey: PublicKey,
+    pub cohorts: Vec<String>,
+    pub added_at: u64,
+    pub added_by: PublicKey,
+    pub expires_at: Option<u64>,
+    pub notes: Option<String>,
 }
 ```
 
-### Message
+## Messaging
 
-A forum post or direct message.
+All messages are Nostr events. DMs use NIP-17/59 gift wrapping with NIP-44
+encryption.
 
-```typescript
-interface Message {
-  // Nostr Event Core
-  id: EventId;                 // SHA256 hash
-  pubkey: Pubkey;              // Author
-  createdAt: number;           // Unix timestamp
-  kind: number;                // Event kind
-  content: string;             // Message content
-  sig: Signature;              // Schnorr signature
+```rust
+/// A signed Nostr event (NIP-01). Kind determines semantics.
+pub struct NostrEvent {
+    pub id: EventId,
+    pub pubkey: PublicKey,
+    pub created_at: Timestamp,
+    pub kind: EventKind,
+    pub tags: Vec<Tag>,
+    pub content: String,
+    pub sig: Signature,
+}
 
-  // Threading
-  replyTo?: EventId;           // Parent message (e-tag)
-  rootId?: EventId;            // Thread root (e-tag)
-  mentions: Pubkey[];          // Tagged users (p-tags)
+/// NIP-17 gift-wrapped direct message.
+pub struct DirectMessage {
+    pub outer_event: NostrEvent,     // kind 1059 gift wrap
+    pub inner_event: NostrEvent,     // kind 14 sealed message
+    pub plaintext: String,           // decrypted content
+    pub recipient: PublicKey,
+    pub sender: PublicKey,
+}
 
-  // Forum Context
-  forumId?: ChannelId;         // NIP-28 channel
-  sectionId?: SectionId;       // Containing section
+/// Kind 7 reaction to any event.
+pub struct Reaction {
+    pub event: NostrEvent,
+    pub target_event_id: EventId,
+    pub content: String,             // "+", "-", or emoji
+}
 
-  // State
-  deleted: boolean;
-  reactions: Reaction[];
+/// A threaded conversation anchored to a root event.
+pub struct Thread {
+    pub root_event_id: EventId,
+    pub replies: Vec<NostrEvent>,
+    pub reaction_counts: HashMap<String, u32>,
 }
 ```
 
-### Section
+## Content
 
-An access-controlled area containing forums.
+```rust
+/// A forum post within a channel (kind 1 or kind 9024 for threads).
+pub struct ForumPost {
+    pub event: NostrEvent,
+    pub channel_id: String,
+    pub is_pinned: bool,
+    pub reply_count: u32,
+}
 
-```typescript
-interface Section {
-  id: SectionId;               // Unique identifier
-  categoryId: CategoryId;      // Parent category
+/// Nostr profile metadata (kind 0).
+pub struct Profile {
+    pub pubkey: PublicKey,
+    pub name: Option<String>,
+    pub display_name: Option<String>,
+    pub about: Option<String>,
+    pub picture: Option<String>,
+    pub nip05: Option<String>,
+    pub banner: Option<String>,
+}
 
-  // Display
-  name: string;
-  description: string;
-  icon: string;
-  order: number;
-
-  // Access Control
-  cohorts: CohortId[];         // Who can access
-  visibility: 'public' | 'members' | 'restricted';
-
-  // Forums
-  forums: Forum[];
-
-  // Calendar
-  calendarAccess: 'none' | 'view' | 'create';
+/// Calendar event (NIP-52, kind 31922/31923).
+pub struct CalendarEvent {
+    pub event: NostrEvent,
+    pub title: String,
+    pub start: Timestamp,
+    pub end: Option<Timestamp>,
+    pub location: Option<String>,
 }
 ```
 
-### Forum (Channel)
+## Storage
 
-A NIP-28 public channel within a section.
-
-```typescript
-interface Forum {
-  // NIP-28 Channel
-  id: ChannelId;               // Event ID of channel creation
-  name: string;
-  about: string;
-  picture?: string;
-
-  // Hierarchy
-  sectionId: SectionId;
-
-  // State
-  messageCount: number;
-  lastActivity: Date;
-
-  // Moderation
-  pinnedMessages: EventId[];
-  mutedPubkeys: Pubkey[];
+```rust
+/// A per-user Solid pod backed by Cloudflare R2.
+pub struct SolidPod {
+    pub owner: PublicKey,
+    pub pod_url: String,
+    pub web_id: WebId,
+    pub acl: WacAcl,
+    pub storage_used: u64,
 }
-```
 
-## Value Objects
-
-### Pubkey
-
-```typescript
-class Pubkey {
-  private readonly hex: string;  // 64-char hex
-
-  static fromHex(hex: string): Pubkey;
-  static fromNpub(npub: string): Pubkey;
-
-  toHex(): string;
-  toNpub(): string;
-
-  equals(other: Pubkey): boolean;
+/// A media asset stored in a user's pod.
+pub struct MediaAsset {
+    pub r2_key: String,
+    pub content_type: String,
+    pub size: u64,
+    pub etag: String,
 }
-```
 
-### EventId
-
-```typescript
-class EventId {
-  private readonly hex: string;  // 64-char hex (SHA256)
-
-  static fromEvent(event: NostrEvent): EventId;
-  static fromHex(hex: string): EventId;
-
-  toHex(): string;
-  toNevent(): string;
-
-  equals(other: EventId): boolean;
+/// WAC (Web Access Control) ACL document stored in KV.
+pub struct WacAcl {
+    pub owner_agent: DidNostr,
+    pub rules: Vec<AclRule>,
 }
-```
 
-### Signature
-
-```typescript
-class Signature {
-  private readonly sig: string;  // Schnorr signature
-
-  static sign(event: UnsignedEvent, privkey: string): Signature;
-
-  verify(event: NostrEvent): boolean;
-  toString(): string;
+pub struct AclRule {
+    pub agent: Option<DidNostr>,
+    pub agent_class: Option<String>,
+    pub access_to: String,
+    pub modes: Vec<AccessMode>,
 }
+
+pub enum AccessMode { Read, Write, Append, Control }
 ```
-
-## Nostr Event Kind Mapping
-
-| Kind | Domain Entity | Description |
-|------|---------------|-------------|
-| 0 | Member.profile | User metadata |
-| 1 | Message | Text note |
-| 4 | DirectMessage (legacy) | NIP-04 encrypted DM |
-| 5 | Message.deleted | Deletion request |
-| 7 | Reaction | NIP-25 reaction |
-| 40 | Forum | Channel creation |
-| 41 | Forum.metadata | Channel metadata |
-| 42 | Message (channel) | Channel message |
-| 1059 | DirectMessage | NIP-17 gift wrap |
-| 31922 | CalendarEvent | NIP-52 date-based |
-| 31923 | CalendarEvent | NIP-52 time-based |
-
-## Invariants
-
-### Member Invariants
-- Pubkey must be valid 64-char hex
-- At least one cohort required for active status
-- Global admin implies all section access
-
-### Message Invariants
-- Signature must verify against pubkey
-- ReplyTo must exist if set
-- Content must not exceed 64KB
-
-### Section Invariants
-- At least one cohort must be assigned
-- Forums must have unique names within section
-- CategoryId must reference valid category
-
-### Forum Invariants
-- Must belong to exactly one section
-- Channel creation event must exist
-- Name must be 3-50 characters
