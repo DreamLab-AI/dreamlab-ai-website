@@ -151,9 +151,13 @@ version = "0.1.0"
 dependencies = [
  "base64",
  "getrandom 0.2.17",
+ "hex",
+ "js-sys",
  "nostr-core",
  "serde",
  "serde_json",
+ "sha2",
+ "wasm-bindgen",
  "worker",
 ]
 
@@ -2526,6 +2530,20 @@ name = "regex-syntax"
 version = "0.8.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dc897dd8d9e8bd1ed8cdad82b5966c3e0ecae09fb1907d58efaa013543185d0a"
+
+[[package]]
+name = "relay-worker"
+version = "0.1.0"
+dependencies = [
+ "base64",
+ "hex",
+ "js-sys",
+ "nostr-core",
+ "serde",
+ "serde_json",
+ "sha2",
+ "worker",
+]
 
 [[package]]
 name = "rfc6979"

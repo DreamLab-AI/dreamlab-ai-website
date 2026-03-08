@@ -1,0 +1,28 @@
+name = "dreamlab-nostr-relay"
+main = "build/worker/shim.mjs"
+compatibility_date = "2024-11-01"
+
+[build]
+command = "worker-build --release"
+
+[vars]
+RELAY_NAME = "DreamLab Nostr Relay"
+ADMIN_PUBKEYS = "11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c"
+ALLOWED_ORIGIN = "https://dreamlab-ai.com"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "dreamlab-relay"
+database_id = "placeholder-relay-db-id"
+
+[durable_objects]
+bindings = [
+  { name = "RELAY", class_name = "NostrRelayDO" }
+]
+
+[[migrations]]
+tag = "v1"
+new_classes = ["NostrRelayDO"]
+
+[triggers]
+crons = ["*/5 * * * *"]

@@ -6,6 +6,7 @@ members = [
     "crates/auth-worker",
     "crates/pod-worker",
     "crates/preview-worker",
+    "crates/relay-worker",
 ]
 
 [workspace.dependencies]
