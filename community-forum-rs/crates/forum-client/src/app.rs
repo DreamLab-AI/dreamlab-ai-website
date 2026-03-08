@@ -264,10 +264,10 @@ fn Layout(children: Children) -> impl IntoView {
             <header class="border-b border-gray-800/50 bg-gray-900/80 backdrop-blur-md sticky top-0 z-50">
                 <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
                     // Brand
-                    <A href=base_href("/") attr:class="flex items-center gap-2 text-xl sm:text-2xl font-bold text-amber-400 hover:text-amber-300 transition-colors">
+                    <a href="/" class="flex items-center gap-2 text-xl sm:text-2xl font-bold text-amber-400 hover:text-amber-300 transition-colors">
                         {brand_icon()}
-                        "DreamLab Forum"
-                    </A>
+                        "DreamLab AI"
+                    </a>
 
                     // Desktop nav
                     <div class="hidden sm:flex items-center gap-4">
