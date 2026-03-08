@@ -21,8 +21,8 @@ pub mod wasm_bridge;
 // ── Re-exports for ergonomic top-level use ─────────────────────────────────
 
 pub use event::{
-    compute_event_id, sign_event, verify_event, verify_event_strict, verify_events_batch,
-    EventError, NostrEvent, UnsignedEvent,
+    compute_event_id, sign_event, sign_event_deterministic, verify_event, verify_event_strict,
+    verify_events_batch, EventError, NostrEvent, PubkeyMismatch, UnsignedEvent,
 };
 pub use keys::{
     derive_from_prf, generate_keypair, Keypair, PublicKey, SecretKey, Signature,

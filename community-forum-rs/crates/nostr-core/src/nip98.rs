@@ -148,7 +148,9 @@ pub fn create_token_at(
         content: String::new(),
     };
 
-    let signed = sign_event(unsigned, &sk);
+    // Safety: pubkey is derived from sk above, so sign_event cannot fail with PubkeyMismatch
+    let signed = sign_event(unsigned, &sk)
+        .expect("pubkey derived from same signing key — mismatch impossible");
     let json = serde_json::to_string(&signed)?;
     Ok(BASE64.encode(json.as_bytes()))
 }
@@ -470,7 +472,8 @@ mod tests {
             content: String::new(),
         };
 
-        let signed = sign_event(unsigned, &signing_key);
+        let signed = sign_event(unsigned, &signing_key)
+            .expect("pubkey derived from same key");
         let json = serde_json::to_string(&signed).unwrap();
         let b64 = BASE64.encode(json.as_bytes());
         let header = authorization_header(&b64);

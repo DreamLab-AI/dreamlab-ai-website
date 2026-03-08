@@ -89,16 +89,41 @@ pub fn recompute_event_id(event: &NostrEvent) -> [u8; 32] {
     compute_event_id(&unsigned)
 }
 
+/// Error returned when the pubkey in an [`UnsignedEvent`] does not match the signing key.
+#[derive(Debug, Error)]
+#[error("pubkey mismatch: event has {event_pubkey}, signing key derives {derived_pubkey}")]
+pub struct PubkeyMismatch {
+    pub event_pubkey: String,
+    pub derived_pubkey: String,
+}
+
 /// Sign an unsigned event, producing a fully signed [`NostrEvent`].
-pub fn sign_event(event: UnsignedEvent, signing_key: &SigningKey) -> NostrEvent {
+///
+/// **Pubkey safety:** The `pubkey` field in `event` is validated against the
+/// signing key's derived public key. If they don't match, this function returns
+/// an error rather than producing a self-invalid event.
+///
+/// **Aux randomness:** Uses `getrandom` for the BIP-340 auxiliary randomness
+/// nonce, providing side-channel hardening in production. For deterministic
+/// signing (tests, reproducibility), use [`sign_event_deterministic`].
+pub fn sign_event(event: UnsignedEvent, signing_key: &SigningKey) -> Result<NostrEvent, PubkeyMismatch> {
+    let derived_pubkey = hex::encode(signing_key.verifying_key().to_bytes());
+    if event.pubkey != derived_pubkey {
+        return Err(PubkeyMismatch {
+            event_pubkey: event.pubkey,
+            derived_pubkey,
+        });
+    }
+
     let id_bytes = compute_event_id(&event);
     let id_hex = hex::encode(id_bytes);
 
-    let aux_rand = [0u8; 32]; // deterministic aux randomness for reproducibility
+    let mut aux_rand = [0u8; 32];
+    getrandom::getrandom(&mut aux_rand).expect("getrandom for aux_rand");
     let signature = signing_key.sign_raw(&id_bytes, &aux_rand).expect("schnorr sign");
     let sig_hex = hex::encode(signature.to_bytes());
 
-    NostrEvent {
+    Ok(NostrEvent {
         id: id_hex,
         pubkey: event.pubkey,
         created_at: event.created_at,
@@ -106,7 +131,39 @@ pub fn sign_event(event: UnsignedEvent, signing_key: &SigningKey) -> NostrEvent 
         tags: event.tags,
         content: event.content,
         sig: sig_hex,
+    })
+}
+
+/// Sign an unsigned event with deterministic (zero) auxiliary randomness.
+///
+/// Same pubkey validation as [`sign_event`], but uses all-zero aux bytes for
+/// the BIP-340 nonce. Useful for tests and reproducible signatures. **Not
+/// recommended for production** — prefer [`sign_event`] which uses random aux.
+pub fn sign_event_deterministic(event: UnsignedEvent, signing_key: &SigningKey) -> Result<NostrEvent, PubkeyMismatch> {
+    let derived_pubkey = hex::encode(signing_key.verifying_key().to_bytes());
+    if event.pubkey != derived_pubkey {
+        return Err(PubkeyMismatch {
+            event_pubkey: event.pubkey,
+            derived_pubkey,
+        });
     }
+
+    let id_bytes = compute_event_id(&event);
+    let id_hex = hex::encode(id_bytes);
+
+    let aux_rand = [0u8; 32];
+    let signature = signing_key.sign_raw(&id_bytes, &aux_rand).expect("schnorr sign");
+    let sig_hex = hex::encode(signature.to_bytes());
+
+    Ok(NostrEvent {
+        id: id_hex,
+        pubkey: event.pubkey,
+        created_at: event.created_at,
+        kind: event.kind,
+        tags: event.tags,
+        content: event.content,
+        sig: sig_hex,
+    })
 }
 
 /// Verify a signed event: recompute ID from canonical form, then verify Schnorr signature.
@@ -189,7 +246,42 @@ mod tests {
             content: "hello".to_string(),
         };
 
-        let signed = sign_event(unsigned, &sk);
+        let signed = sign_event_deterministic(unsigned, &sk).unwrap();
+        assert!(verify_event(&signed));
+    }
+
+    #[test]
+    fn sign_event_rejects_wrong_pubkey() {
+        let sk = test_signing_key();
+
+        let unsigned = UnsignedEvent {
+            pubkey: "aa".repeat(32), // wrong pubkey
+            created_at: 1700000000,
+            kind: 1,
+            tags: vec![],
+            content: "hello".to_string(),
+        };
+
+        let result = sign_event_deterministic(unsigned, &sk);
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("pubkey mismatch"));
+    }
+
+    #[test]
+    fn sign_event_randomized_produces_valid_event() {
+        let sk = test_signing_key();
+        let pubkey = hex::encode(sk.verifying_key().to_bytes());
+
+        let unsigned = UnsignedEvent {
+            pubkey,
+            created_at: 1700000000,
+            kind: 1,
+            tags: vec![],
+            content: "randomized".to_string(),
+        };
+
+        let signed = sign_event(unsigned, &sk).unwrap();
         assert!(verify_event(&signed));
     }
 
@@ -206,7 +298,7 @@ mod tests {
             content: "hello".to_string(),
         };
 
-        let mut signed = sign_event(unsigned, &sk);
+        let mut signed = sign_event_deterministic(unsigned, &sk).unwrap();
         signed.content = "tampered".to_string();
         assert!(!verify_event(&signed));
     }
@@ -224,7 +316,7 @@ mod tests {
             content: "hello".to_string(),
         };
 
-        let mut signed = sign_event(unsigned, &sk);
+        let mut signed = sign_event_deterministic(unsigned, &sk).unwrap();
         signed.id = "00".repeat(32);
         assert!(!verify_event(&signed));
     }
@@ -242,7 +334,7 @@ mod tests {
             content: "hello".to_string(),
         };
 
-        let mut signed = sign_event(unsigned, &sk);
+        let mut signed = sign_event_deterministic(unsigned, &sk).unwrap();
         signed.id = "00".repeat(32);
         let err = verify_event_strict(&signed).unwrap_err();
         assert!(matches!(err, EventError::IdMismatch { .. }));
@@ -261,8 +353,7 @@ mod tests {
             content: "hello".to_string(),
         };
 
-        let mut signed = sign_event(unsigned, &sk);
-        // Tamper signature but keep the correct id
+        let mut signed = sign_event_deterministic(unsigned, &sk).unwrap();
         let mut sig_bytes = hex::decode(&signed.sig).unwrap();
         sig_bytes[0] ^= 0xFF;
         signed.sig = hex::encode(&sig_bytes);
@@ -275,7 +366,7 @@ mod tests {
         let sk = test_signing_key();
         let pubkey = hex::encode(sk.verifying_key().to_bytes());
 
-        let good = sign_event(
+        let good = sign_event_deterministic(
             UnsignedEvent {
                 pubkey: pubkey.clone(),
                 created_at: 1700000000,
@@ -284,9 +375,9 @@ mod tests {
                 content: "valid".to_string(),
             },
             &sk,
-        );
+        ).unwrap();
 
-        let mut bad = sign_event(
+        let mut bad = sign_event_deterministic(
             UnsignedEvent {
                 pubkey,
                 created_at: 1700000001,
@@ -295,8 +386,8 @@ mod tests {
                 content: "tampered".to_string(),
             },
             &sk,
-        );
-        bad.content = "modified".to_string(); // tamper
+        ).unwrap();
+        bad.content = "modified".to_string();
 
         let results = verify_events_batch(&[good, bad]);
         assert_eq!(results.len(), 2);
@@ -311,7 +402,7 @@ mod tests {
 
         let events: Vec<NostrEvent> = (0..5)
             .map(|i| {
-                sign_event(
+                sign_event_deterministic(
                     UnsignedEvent {
                         pubkey: pubkey.clone(),
                         created_at: 1700000000 + i,
@@ -320,7 +411,7 @@ mod tests {
                         content: format!("msg {i}"),
                     },
                     &sk,
-                )
+                ).unwrap()
             })
             .collect();
 
