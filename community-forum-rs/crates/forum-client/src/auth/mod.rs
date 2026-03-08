@@ -26,14 +26,16 @@ const STORAGE_KEY: &str = "nostr_bbs_keys";
 // -- Auth state ---------------------------------------------------------------
 
 /// Reactive auth state mirroring the SvelteKit `AuthState` interface.
+///
+/// **Security**: Private key bytes are stored separately in `AuthStore::privkey`
+/// (a non-reactive `StoredValue`). They never enter the reactive signal graph,
+/// preventing accidental leaks through Memo clones or debug output.
 #[derive(Clone, Debug, PartialEq)]
 pub struct AuthState {
     pub state: AuthPhase,
     pub pubkey: Option<String>,
     pub is_authenticated: bool,
     pub public_key: Option<String>,
-    /// Hex-encoded private key. In-memory only -- never persisted.
-    pub private_key: Option<String>,
     pub nickname: Option<String>,
     pub avatar: Option<String>,
     pub is_pending: bool,
@@ -68,7 +70,6 @@ impl Default for AuthState {
             pubkey: None,
             is_authenticated: false,
             public_key: None,
-            private_key: None,
             nickname: None,
             avatar: None,
             is_pending: false,
@@ -170,15 +171,15 @@ impl AuthStore {
     ///
     /// **WARNING**: Prefer `sign_event()` for signing. This method exists
     /// only for NIP-44 symmetric key derivation where the raw bytes are
-    /// required by the encryption API. Callers MUST zeroize the returned
-    /// array when done.
-    pub fn get_privkey_bytes(&self) -> Option<[u8; 32]> {
+    /// required by the encryption API. The returned `Zeroizing<[u8; 32]>`
+    /// auto-zeroizes on drop — callers do not need to manually clear it.
+    pub fn get_privkey_bytes(&self) -> Option<zeroize::Zeroizing<[u8; 32]>> {
         self.privkey.with_value(|opt| {
             opt.as_ref().and_then(|v| {
                 if v.len() == 32 {
                     let mut arr = [0u8; 32];
                     arr.copy_from_slice(v);
-                    Some(arr)
+                    Some(zeroize::Zeroizing::new(arr))
                 } else {
                     None
                 }
@@ -298,8 +299,6 @@ impl AuthStore {
         let sk = nostr_core::SecretKey::from_bytes(key_bytes)
             .map_err(|e| format!("Invalid secp256k1 key: {e}"))?;
         let pubkey = sk.public_key().to_hex();
-        let privkey_hex_owned = hex::encode(key_bytes);
-
         self.privkey.set_value(Some(key_bytes.to_vec()));
 
         let (nickname, avatar, account_status, _nsec_backed_up) = self.read_existing_metadata();
@@ -323,7 +322,6 @@ impl AuthStore {
             pubkey: Some(pubkey.clone()),
             is_authenticated: true,
             public_key: Some(pubkey),
-            private_key: Some(privkey_hex_owned),
             nickname,
             avatar,
             is_pending: false,
@@ -390,14 +388,11 @@ impl AuthStore {
         };
         self.save_session(&stored);
 
-        let privkey_hex = hex::encode(result.privkey_bytes);
-
         self.state.set(AuthState {
             state: AuthPhase::Authenticated,
             pubkey: Some(result.pubkey.clone()),
             is_authenticated: true,
             public_key: Some(result.pubkey.clone()),
-            private_key: Some(privkey_hex),
             nickname,
             avatar,
             is_pending: false,
@@ -431,14 +426,11 @@ impl AuthStore {
         };
         self.save_session(&stored);
 
-        let privkey_hex = hex::encode(result.privkey_bytes);
-
         self.state.set(AuthState {
             state: AuthPhase::Authenticated,
             pubkey: Some(result.pubkey.clone()),
             is_authenticated: true,
             public_key: Some(result.pubkey.clone()),
-            private_key: Some(privkey_hex),
             nickname,
             avatar,
             is_pending: false,

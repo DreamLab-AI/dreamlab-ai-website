@@ -148,7 +148,6 @@ impl AuthStore {
                     pubkey: Some(pubkey.clone()),
                     is_authenticated: false,
                     public_key: Some(pubkey.clone()),
-                    private_key: None,
                     nickname: stored.nickname,
                     avatar: stored.avatar,
                     is_pending: false,
@@ -172,7 +171,6 @@ impl AuthStore {
                     pubkey: Some(pubkey.clone()),
                     is_authenticated: false,
                     public_key: Some(pubkey.clone()),
-                    private_key: None,
                     nickname: stored.nickname,
                     avatar: stored.avatar,
                     is_pending: false,
@@ -196,7 +194,6 @@ impl AuthStore {
                     pubkey: Some(pubkey.clone()),
                     is_authenticated: false,
                     public_key: Some(pubkey.clone()),
-                    private_key: None,
                     nickname: stored.nickname,
                     avatar: stored.avatar,
                     is_pending: false,
@@ -242,9 +239,8 @@ pub(super) fn register_pagehide_listener(store: AuthStore) {
                 }
                 *opt = None;
             });
-            store_clone
-                .state
-                .update(|s| s.private_key = None);
+            // AuthState no longer carries private_key — privkey bytes
+            // are already zeroed in the StoredValue above.
         },
     );
 
@@ -267,7 +263,6 @@ pub(super) fn register_pagehide_listener(store: AuthStore) {
                 store_clone2.state.update(|s| {
                     if s.is_passkey {
                         s.is_authenticated = false;
-                        s.private_key = None;
                         s.state = AuthPhase::Unauthenticated;
                     }
                 });

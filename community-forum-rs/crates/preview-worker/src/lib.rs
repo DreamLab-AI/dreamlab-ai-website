@@ -11,7 +11,41 @@
 
 use regex::Regex;
 use serde::{Deserialize, Serialize};
+use std::sync::OnceLock;
 use worker::*;
+
+// ── Compiled regex cache (compiled once per isolate, not per request) ────────
+
+struct OgRegexes {
+    og_title_1: Regex,
+    og_title_2: Regex,
+    html_title: Regex,
+    og_desc_1: Regex,
+    og_desc_2: Regex,
+    meta_desc: Regex,
+    og_image_1: Regex,
+    og_image_2: Regex,
+    og_site_name: Regex,
+    decimal_entity: Regex,
+    hex_entity: Regex,
+}
+
+fn og_regexes() -> &'static OgRegexes {
+    static INSTANCE: OnceLock<OgRegexes> = OnceLock::new();
+    INSTANCE.get_or_init(|| OgRegexes {
+        og_title_1: Regex::new(r#"(?i)<meta\s+property=["']og:title["']\s+content=["']([^"']+)["']"#).unwrap(),
+        og_title_2: Regex::new(r#"(?i)<meta\s+content=["']([^"']+)["']\s+property=["']og:title["']"#).unwrap(),
+        html_title: Regex::new(r"(?i)<title>([^<]+)</title>").unwrap(),
+        og_desc_1: Regex::new(r#"(?i)<meta\s+property=["']og:description["']\s+content=["']([^"']+)["']"#).unwrap(),
+        og_desc_2: Regex::new(r#"(?i)<meta\s+content=["']([^"']+)["']\s+property=["']og:description["']"#).unwrap(),
+        meta_desc: Regex::new(r#"(?i)<meta\s+name=["']description["']\s+content=["']([^"']+)["']"#).unwrap(),
+        og_image_1: Regex::new(r#"(?i)<meta\s+property=["']og:image["']\s+content=["']([^"']+)["']"#).unwrap(),
+        og_image_2: Regex::new(r#"(?i)<meta\s+content=["']([^"']+)["']\s+property=["']og:image["']"#).unwrap(),
+        og_site_name: Regex::new(r#"(?i)<meta\s+property=["']og:site_name["']\s+content=["']([^"']+)["']"#).unwrap(),
+        decimal_entity: Regex::new(r"&#(\d+);").unwrap(),
+        hex_entity: Regex::new(r"&#x([0-9a-fA-F]+);").unwrap(),
+    })
+}
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -300,7 +334,7 @@ fn is_twitter_url(raw_url: &str) -> bool {
 fn decode_html_entities(text: &str) -> String {
     let mut decoded = text.to_string();
 
-    // Named entities (case-insensitive)
+    // Named entities — simple str replacements (no regex needed)
     let named: &[(&str, &str)] = &[
         ("&amp;", "&"),
         ("&lt;", "<"),
@@ -311,13 +345,15 @@ fn decode_html_entities(text: &str) -> String {
         ("&nbsp;", " "),
     ];
     for (entity, replacement) in named {
-        let re = Regex::new(&format!("(?i){}", regex::escape(entity))).unwrap();
-        decoded = re.replace_all(&decoded, *replacement).to_string();
+        // Case-insensitive replace via the pre-compiled approach is overkill
+        // for fixed named entities — but we keep it simple with str::replace
+        decoded = decoded.replace(entity, replacement);
     }
 
+    let re = og_regexes();
+
     // Numeric decimal entities: &#123;
-    let decimal_re = Regex::new(r"&#(\d+);").unwrap();
-    decoded = decimal_re
+    decoded = re.decimal_entity
         .replace_all(&decoded, |caps: &regex::Captures| {
             let num: u32 = caps[1].parse().unwrap_or(0);
             if num > 0 && num < 0x10FFFF {
@@ -331,8 +367,7 @@ fn decode_html_entities(text: &str) -> String {
         .to_string();
 
     // Hex entities: &#x7B;
-    let hex_re = Regex::new(r"&#x([0-9a-fA-F]+);").unwrap();
-    decoded = hex_re
+    decoded = re.hex_entity
         .replace_all(&decoded, |caps: &regex::Captures| {
             let num = u32::from_str_radix(&caps[1], 16).unwrap_or(0);
             if num > 0 && num < 0x10FFFF {
@@ -386,52 +421,20 @@ fn parse_open_graph_tags(html: &str, target_url: &str) -> OgPreview {
         domain
     );
 
-    // og:title patterns (property-first and content-first attribute order)
-    let og_title_1 =
-        Regex::new(r#"(?i)<meta\s+property=["']og:title["']\s+content=["']([^"']+)["']"#)
-            .unwrap();
-    let og_title_2 =
-        Regex::new(r#"(?i)<meta\s+content=["']([^"']+)["']\s+property=["']og:title["']"#)
-            .unwrap();
-    let html_title = Regex::new(r"(?i)<title>([^<]+)</title>").unwrap();
+    let re = og_regexes();
 
-    let title = extract_meta(html, &og_title_1)
-        .or_else(|| extract_meta(html, &og_title_2))
-        .or_else(|| extract_meta(html, &html_title));
+    let title = extract_meta(html, &re.og_title_1)
+        .or_else(|| extract_meta(html, &re.og_title_2))
+        .or_else(|| extract_meta(html, &re.html_title));
 
-    // og:description patterns
-    let og_desc_1 = Regex::new(
-        r#"(?i)<meta\s+property=["']og:description["']\s+content=["']([^"']+)["']"#,
-    )
-    .unwrap();
-    let og_desc_2 = Regex::new(
-        r#"(?i)<meta\s+content=["']([^"']+)["']\s+property=["']og:description["']"#,
-    )
-    .unwrap();
-    let meta_desc =
-        Regex::new(r#"(?i)<meta\s+name=["']description["']\s+content=["']([^"']+)["']"#).unwrap();
+    let description = extract_meta(html, &re.og_desc_1)
+        .or_else(|| extract_meta(html, &re.og_desc_2))
+        .or_else(|| extract_meta(html, &re.meta_desc));
 
-    let description = extract_meta(html, &og_desc_1)
-        .or_else(|| extract_meta(html, &og_desc_2))
-        .or_else(|| extract_meta(html, &meta_desc));
-
-    // og:image patterns
-    let og_image_1 =
-        Regex::new(r#"(?i)<meta\s+property=["']og:image["']\s+content=["']([^"']+)["']"#)
-            .unwrap();
-    let og_image_2 =
-        Regex::new(r#"(?i)<meta\s+content=["']([^"']+)["']\s+property=["']og:image["']"#)
-            .unwrap();
-
-    let image_url = extract_meta(html, &og_image_1).or_else(|| extract_meta(html, &og_image_2));
+    let image_url = extract_meta(html, &re.og_image_1).or_else(|| extract_meta(html, &re.og_image_2));
     let image = image_url.map(|u| resolve_url(&u, target_url));
 
-    // og:site_name
-    let og_site_name = Regex::new(
-        r#"(?i)<meta\s+property=["']og:site_name["']\s+content=["']([^"']+)["']"#,
-    )
-    .unwrap();
-    let site_name = extract_meta(html, &og_site_name);
+    let site_name = extract_meta(html, &re.og_site_name);
 
     OgPreview {
         url: target_url.to_string(),

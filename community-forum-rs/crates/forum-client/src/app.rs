@@ -2,8 +2,9 @@
 
 use leptos::prelude::*;
 use leptos_router::components::{FlatRoutes, Route, Router, A};
-use leptos_router::hooks::use_location;
+use leptos_router::hooks::{use_location, use_navigate};
 use leptos_router::path;
+use leptos_router::NavigateOptions;
 
 use crate::admin::AdminStore;
 use crate::auth::{provide_auth, use_auth};
@@ -408,60 +409,46 @@ fn LogoutButton() -> impl IntoView {
 
 // -- Auth-gated chat pages ----------------------------------------------------
 
-/// Channel list with auth gate -- redirects to login if not authenticated.
+/// Channel list with auth gate -- SPA-navigates to login if not authenticated.
 #[component]
 fn AuthGatedChat() -> impl IntoView {
     let auth = use_auth();
     let is_authed = auth.is_authenticated();
     let is_ready = auth.is_ready();
+    let navigate = StoredValue::new(use_navigate());
 
     Effect::new(move |_| {
         if is_ready.get() && !is_authed.get() {
-            if let Some(window) = web_sys::window() {
-                let _ = window.location().set_href(&base_href("/login"));
-            }
+            navigate.with_value(|nav| nav(&base_href("/login"), NavigateOptions::default()));
         }
     });
 
     view! {
-        <Show
-            when=move || is_ready.get()
-            fallback=|| { loading_spinner() }
-        >
-            <Show
-                when=move || is_authed.get()
-                fallback=|| { redirect_spinner() }
-            >
+        <Show when=move || is_ready.get() fallback=|| { loading_spinner() }>
+            <Show when=move || is_authed.get() fallback=|| { redirect_spinner() }>
                 <ChatPage />
             </Show>
         </Show>
     }
 }
 
-/// Single channel view with auth gate -- redirects to login if not authenticated.
+/// Single channel view with auth gate.
 #[component]
 fn AuthGatedChannel() -> impl IntoView {
     let auth = use_auth();
     let is_authed = auth.is_authenticated();
     let is_ready = auth.is_ready();
+    let navigate = StoredValue::new(use_navigate());
 
     Effect::new(move |_| {
         if is_ready.get() && !is_authed.get() {
-            if let Some(window) = web_sys::window() {
-                let _ = window.location().set_href(&base_href("/login"));
-            }
+            navigate.with_value(|nav| nav(&base_href("/login"), NavigateOptions::default()));
         }
     });
 
     view! {
-        <Show
-            when=move || is_ready.get()
-            fallback=|| { loading_spinner() }
-        >
-            <Show
-                when=move || is_authed.get()
-                fallback=|| { redirect_spinner() }
-            >
+        <Show when=move || is_ready.get() fallback=|| { loading_spinner() }>
+            <Show when=move || is_authed.get() fallback=|| { redirect_spinner() }>
                 <ChannelPage />
             </Show>
         </Show>
@@ -474,24 +461,17 @@ fn AuthGatedDmList() -> impl IntoView {
     let auth = use_auth();
     let is_authed = auth.is_authenticated();
     let is_ready = auth.is_ready();
+    let navigate = StoredValue::new(use_navigate());
 
     Effect::new(move |_| {
         if is_ready.get() && !is_authed.get() {
-            if let Some(window) = web_sys::window() {
-                let _ = window.location().set_href(&base_href("/login"));
-            }
+            navigate.with_value(|nav| nav(&base_href("/login"), NavigateOptions::default()));
         }
     });
 
     view! {
-        <Show
-            when=move || is_ready.get()
-            fallback=|| { loading_spinner() }
-        >
-            <Show
-                when=move || is_authed.get()
-                fallback=|| { redirect_spinner() }
-            >
+        <Show when=move || is_ready.get() fallback=|| { loading_spinner() }>
+            <Show when=move || is_authed.get() fallback=|| { redirect_spinner() }>
                 <DmListPage />
             </Show>
         </Show>
@@ -504,24 +484,17 @@ fn AuthGatedDmChat() -> impl IntoView {
     let auth = use_auth();
     let is_authed = auth.is_authenticated();
     let is_ready = auth.is_ready();
+    let navigate = StoredValue::new(use_navigate());
 
     Effect::new(move |_| {
         if is_ready.get() && !is_authed.get() {
-            if let Some(window) = web_sys::window() {
-                let _ = window.location().set_href(&base_href("/login"));
-            }
+            navigate.with_value(|nav| nav(&base_href("/login"), NavigateOptions::default()));
         }
     });
 
     view! {
-        <Show
-            when=move || is_ready.get()
-            fallback=|| { loading_spinner() }
-        >
-            <Show
-                when=move || is_authed.get()
-                fallback=|| { redirect_spinner() }
-            >
+        <Show when=move || is_ready.get() fallback=|| { loading_spinner() }>
+            <Show when=move || is_authed.get() fallback=|| { redirect_spinner() }>
                 <DmChatPage />
             </Show>
         </Show>

@@ -4,7 +4,7 @@
 //! backward-compatible NIP-44 kind-4 decryption for incoming events. Subscribes
 //! to both kind 4 and kind 1059 events for real-time DM delivery via the relay.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::rc::Rc;
 
 use leptos::prelude::*;
@@ -42,6 +42,8 @@ struct DMStateInner {
     conversations: HashMap<String, DMConversation>,
     current_conversation: Option<String>,
     messages: Vec<DMMessage>,
+    /// O(1) dedup index for message IDs (avoids O(n) linear scan).
+    seen_ids: HashSet<String>,
     is_loading: bool,
     error: Option<String>,
 }
@@ -209,7 +211,12 @@ impl DMStore {
         state.update(|s| {
             s.messages.retain(|m| {
                 let cp = if m.is_sent { &m.recipient_pubkey } else { &m.sender_pubkey };
-                cp != &partner_pk
+                if cp == &partner_pk {
+                    s.seen_ids.remove(&m.id);
+                    false
+                } else {
+                    true
+                }
             });
             s.is_loading = true;
         });
@@ -284,7 +291,7 @@ impl DMStore {
 
         self.state.update(|s| {
             if s.current_conversation.as_deref() == Some(recipient_pk_hex)
-                && !s.messages.iter().any(|m| m.id == msg.id)
+                && s.seen_ids.insert(msg.id.clone())
             {
                 s.messages.push(msg.clone());
             }
@@ -447,7 +454,7 @@ fn insert_dm_message(
     state: RwSignal<DMStateInner>,
 ) {
     state.update(|s| {
-        if !s.messages.iter().any(|m| m.id == msg.id) { s.messages.push(msg.clone()); }
+        if s.seen_ids.insert(msg.id.clone()) { s.messages.push(msg.clone()); }
 
         let convo = s.conversations.entry(counterparty_pk.to_string()).or_insert_with(|| {
             DMConversation {
@@ -468,9 +475,14 @@ fn insert_dm_message(
 
 // -- Helpers ------------------------------------------------------------------
 
-fn truncate_message(content: &str, max_len: usize) -> String {
+fn truncate_message(content: &str, max_chars: usize) -> String {
     let t = content.trim();
-    if t.len() <= max_len { t.to_string() } else { format!("{}...", &t[..max_len]) }
+    if t.chars().count() <= max_chars {
+        t.to_string()
+    } else {
+        let truncated: String = t.chars().take(max_chars).collect();
+        format!("{truncated}...")
+    }
 }
 
 // -- Context providers --------------------------------------------------------
