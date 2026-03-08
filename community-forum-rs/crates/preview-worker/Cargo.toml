@@ -2,7 +2,7 @@
 name = "preview-worker"
 version = "0.1.0"
 edition = "2021"
-description = "DreamLab link preview Worker: OG metadata + SSRF protection"
+description = "DreamLab link preview Worker: OG metadata + Twitter oEmbed + SSRF protection"
 
 [lib]
 crate-type = ["cdylib"]
@@ -11,3 +11,4 @@ crate-type = ["cdylib"]
 worker = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
+regex = "1"

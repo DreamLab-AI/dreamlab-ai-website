@@ -2160,9 +2160,13 @@ dependencies = [
 name = "pod-worker"
 version = "0.1.0"
 dependencies = [
+ "base64",
+ "hex",
+ "js-sys",
  "nostr-core",
  "serde",
  "serde_json",
+ "sha2",
  "worker",
 ]
 
@@ -2209,6 +2213,7 @@ dependencies = [
 name = "preview-worker"
 version = "0.1.0"
 dependencies = [
+ "regex",
  "serde",
  "serde_json",
  "worker",
