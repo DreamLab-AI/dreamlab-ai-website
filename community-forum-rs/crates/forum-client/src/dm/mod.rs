@@ -1,13 +1,15 @@
-//! Direct Message state store with NIP-44 encryption.
+//! Direct Message state store with NIP-59 Gift Wrap + NIP-44 encryption.
 //!
-//! Manages DM conversations, encrypts outgoing messages with NIP-44, decrypts
-//! incoming kind-4 events, and subscribes to real-time DM delivery via the relay.
+//! Manages DM conversations using NIP-59 (Gift Wrap) for outgoing messages and
+//! backward-compatible NIP-44 kind-4 decryption for incoming events. Subscribes
+//! to both kind 4 and kind 1059 events for real-time DM delivery via the relay.
 
 use std::collections::HashMap;
 use std::rc::Rc;
 
 use leptos::prelude::*;
-use nostr_core::{nip44_decrypt, nip44_encrypt, NostrEvent, UnsignedEvent};
+use nostr_core::gift_wrap::{gift_wrap, unwrap_gift};
+use nostr_core::{nip44_decrypt, NostrEvent};
 
 use crate::relay::{Filter, RelayConnection};
 use crate::utils::shorten_pubkey;
@@ -109,8 +111,9 @@ impl DMStore {
         self.state.update(|s| s.error = None);
     }
 
-    /// Fetch existing DM conversations by subscribing to kind 4 events where
-    /// the user is either sender (author) or recipient (#p tag).
+    /// Fetch existing DM conversations by subscribing to kind 4 (legacy) and
+    /// kind 1059 (NIP-59 Gift Wrap) events where the user is either sender
+    /// (author) or recipient (#p tag).
     pub fn fetch_conversations(
         &self,
         relay: &RelayConnection,
@@ -124,19 +127,19 @@ impl DMStore {
         let state = self.state;
 
         let sent_filter = Filter {
-            kinds: Some(vec![4]),
+            kinds: Some(vec![4, 1059]),
             authors: Some(vec![my_pk.clone()]),
             ..Default::default()
         };
         let recv_filter = Filter {
-            kinds: Some(vec![4]),
+            kinds: Some(vec![4, 1059]),
             p_tags: Some(vec![my_pk.clone()]),
             ..Default::default()
         };
 
         let my_pk_cb = my_pk.clone();
         let on_event = Rc::new(move |event: NostrEvent| {
-            if event.kind == 4 { process_dm_event(&event, &sk, &my_pk_cb, state); }
+            process_dm_event(&event, &sk, &my_pk_cb, state);
         });
         let on_eose = Rc::new(move || { state.update(|s| s.is_loading = false); });
 
@@ -150,6 +153,7 @@ impl DMStore {
     }
 
     /// Subscribe to incoming DMs in real-time (new events only, since=now).
+    /// Listens for both kind 4 (legacy) and kind 1059 (NIP-59 Gift Wrap).
     pub fn subscribe_incoming(
         &self,
         relay: &RelayConnection,
@@ -162,13 +166,13 @@ impl DMStore {
         let now = (js_sys::Date::now() / 1000.0) as u64;
 
         let filter = Filter {
-            kinds: Some(vec![4]),
+            kinds: Some(vec![4, 1059]),
             p_tags: Some(vec![my_pk.clone()]),
             since: Some(now),
             ..Default::default()
         };
         let on_event = Rc::new(move |event: NostrEvent| {
-            if event.kind == 4 { process_dm_event(&event, &sk, &my_pk, state); }
+            process_dm_event(&event, &sk, &my_pk, state);
         });
 
         let id = relay.subscribe(vec![filter], on_event, None);
@@ -189,6 +193,7 @@ impl DMStore {
     }
 
     /// Subscribe to historical + live messages for a specific conversation partner.
+    /// Subscribes to both kind 4 (legacy) and kind 1059 (NIP-59 Gift Wrap).
     pub fn load_conversation_messages(
         &self,
         relay: &RelayConnection,
@@ -210,13 +215,13 @@ impl DMStore {
         });
 
         let sent_filter = Filter {
-            kinds: Some(vec![4]),
+            kinds: Some(vec![4, 1059]),
             authors: Some(vec![my_pk.clone()]),
             p_tags: Some(vec![partner_pk.clone()]),
             ..Default::default()
         };
         let recv_filter = Filter {
-            kinds: Some(vec![4]),
+            kinds: Some(vec![4, 1059]),
             authors: Some(vec![partner_pk]),
             p_tags: Some(vec![my_pk.clone()]),
             ..Default::default()
@@ -224,7 +229,7 @@ impl DMStore {
 
         let my_pk_cb = my_pk.clone();
         let on_event = Rc::new(move |event: NostrEvent| {
-            if event.kind == 4 { process_dm_event(&event, &sk, &my_pk_cb, state); }
+            process_dm_event(&event, &sk, &my_pk_cb, state);
         });
         let on_eose = Rc::new(move || { state.update(|s| s.is_loading = false); });
 
@@ -232,11 +237,15 @@ impl DMStore {
         self.sub_ids.update(|ids| ids.push(id));
     }
 
-    /// Encrypt and send a DM to the given recipient.
+    /// Encrypt and send a DM using NIP-59 Gift Wrap (kind 1059).
     ///
-    /// The privkey bytes are used only for NIP-44 encryption (symmetric key
-    /// derivation). Signing is delegated to `AuthStore::sign_event()` so the
-    /// raw key bytes are confined to the auth module.
+    /// The gift_wrap function handles all three layers internally:
+    ///   1. Rumor (unsigned kind 14 with plaintext)
+    ///   2. Seal (kind 13, sender signs + NIP-44 encrypts the rumor)
+    ///   3. Wrap (kind 1059, throwaway key signs + NIP-44 encrypts the seal)
+    ///
+    /// The privkey bytes are passed directly to `gift_wrap()` which creates the
+    /// Seal signature internally. No separate `auth.sign_event()` call is needed.
     pub fn send_message(
         &self,
         relay: &RelayConnection,
@@ -247,30 +256,24 @@ impl DMStore {
     ) -> Result<(), String> {
         if content.trim().is_empty() { return Err("Message cannot be empty".into()); }
 
-        let rpk_bytes: [u8; 32] = hex::decode(recipient_pk_hex)
-            .map_err(|_| "Invalid recipient pubkey hex".to_string())?
-            .try_into()
-            .map_err(|_| "Recipient pubkey must be 32 bytes".to_string())?;
+        // Validate recipient pubkey before calling gift_wrap
+        if hex::decode(recipient_pk_hex)
+            .ok()
+            .filter(|b| b.len() == 32)
+            .is_none()
+        {
+            return Err("Invalid recipient pubkey hex".into());
+        }
 
-        let encrypted = nip44_encrypt(privkey_bytes, &rpk_bytes, content)
-            .map_err(|e| format!("Encryption failed: {e}"))?;
+        let wrapped = gift_wrap(privkey_bytes, my_pubkey, recipient_pk_hex, content)
+            .map_err(|e| format!("Gift wrap failed: {e}"))?;
 
         let now = (js_sys::Date::now() / 1000.0) as u64;
-        let unsigned = UnsignedEvent {
-            pubkey: my_pubkey.to_string(),
-            created_at: now,
-            kind: 4,
-            tags: vec![vec!["p".to_string(), recipient_pk_hex.to_string()]],
-            content: encrypted,
-        };
 
-        // Sign via AuthStore — privkey bytes stay inside the auth module
-        let auth = crate::auth::use_auth();
-        let signed = auth.sign_event(unsigned)?;
-
-        // Optimistic local update
+        // Optimistic local update — use the outer wrap event ID for dedup.
+        // The UI does not need to know about the wire format.
         let msg = DMMessage {
-            id: signed.id.clone(),
+            id: wrapped.id.clone(),
             sender_pubkey: my_pubkey.to_string(),
             recipient_pubkey: recipient_pk_hex.to_string(),
             content: content.to_string(),
@@ -293,7 +296,8 @@ impl DMStore {
             convo.last_timestamp = now;
         });
 
-        relay.publish(&signed);
+        // gift_wrap returns a fully signed kind 1059 event — publish directly
+        relay.publish(&wrapped);
         Ok(())
     }
 
@@ -306,8 +310,85 @@ impl DMStore {
 
 // -- Event processing ---------------------------------------------------------
 
-/// Decrypt a kind 4 DM event, deduplicate, and update reactive state.
+/// Process an incoming DM event — either kind 1059 (NIP-59 Gift Wrap) or
+/// kind 4 (legacy NIP-44). Deduplicates and updates reactive state.
 fn process_dm_event(
+    event: &NostrEvent,
+    my_sk: &[u8; 32],
+    my_pubkey: &str,
+    state: RwSignal<DMStateInner>,
+) {
+    if event.kind == 1059 {
+        process_gift_wrap_event(event, my_sk, my_pubkey, state);
+    } else if event.kind == 4 {
+        process_kind4_event(event, my_sk, my_pubkey, state);
+    }
+    // Ignore other kinds silently
+}
+
+/// Unwrap a NIP-59 Gift Wrap (kind 1059) event and insert into state.
+///
+/// The unwrap_gift function peels the three layers:
+///   Wrap (kind 1059) -> Seal (kind 13) -> Rumor (kind 14)
+/// and returns the sender's real pubkey, the plaintext rumor, and the seal.
+fn process_gift_wrap_event(
+    event: &NostrEvent,
+    my_sk: &[u8; 32],
+    my_pubkey: &str,
+    state: RwSignal<DMStateInner>,
+) {
+    let unwrapped = match unwrap_gift(event, my_sk) {
+        Ok(u) => u,
+        Err(e) => {
+            web_sys::console::warn_1(
+                &format!("[DM] Gift unwrap failed for {}: {}", &event.id, e).into(),
+            );
+            return;
+        }
+    };
+
+    let sender_pubkey = unwrapped.sender_pubkey.clone();
+    let is_sent = sender_pubkey == my_pubkey;
+
+    // The rumor's "p" tag identifies the recipient
+    let recipient_pubkey = unwrapped.rumor.tags
+        .iter()
+        .find(|t| t.len() >= 2 && t[0] == "p")
+        .map(|t| t[1].clone())
+        .unwrap_or_else(|| {
+            if is_sent { String::new() } else { my_pubkey.to_string() }
+        });
+
+    let counterparty_pk = if is_sent {
+        recipient_pubkey.clone()
+    } else {
+        sender_pubkey.clone()
+    };
+
+    if counterparty_pk.len() != 64 {
+        return;
+    }
+
+    let plaintext = unwrapped.rumor.content.clone();
+    // Use the rumor's created_at as the real timestamp (wrap timestamp is randomized)
+    let timestamp = unwrapped.rumor.created_at;
+
+    // Use the outer wrap event ID for deduplication
+    let msg = DMMessage {
+        id: event.id.clone(),
+        sender_pubkey,
+        recipient_pubkey,
+        content: plaintext.clone(),
+        timestamp,
+        is_sent,
+        is_read: is_sent,
+    };
+
+    insert_dm_message(msg, &counterparty_pk, &plaintext, timestamp, is_sent, state);
+}
+
+/// Decrypt a legacy kind 4 DM event (NIP-44) and insert into state.
+fn process_kind4_event(
     event: &NostrEvent,
     my_sk: &[u8; 32],
     my_pubkey: &str,
@@ -350,21 +431,34 @@ fn process_dm_event(
         is_read: is_sent,
     };
 
+    insert_dm_message(msg, &counterparty_pk, &plaintext, event.created_at, is_sent, state);
+}
+
+/// Shared helper: deduplicate and insert a DM message into the reactive state,
+/// updating the conversation summary.
+fn insert_dm_message(
+    msg: DMMessage,
+    counterparty_pk: &str,
+    plaintext: &str,
+    timestamp: u64,
+    is_sent: bool,
+    state: RwSignal<DMStateInner>,
+) {
     state.update(|s| {
         if !s.messages.iter().any(|m| m.id == msg.id) { s.messages.push(msg.clone()); }
 
-        let convo = s.conversations.entry(counterparty_pk.clone()).or_insert_with(|| {
+        let convo = s.conversations.entry(counterparty_pk.to_string()).or_insert_with(|| {
             DMConversation {
-                pubkey: counterparty_pk.clone(),
-                name: shorten_pubkey(&counterparty_pk),
+                pubkey: counterparty_pk.to_string(),
+                name: shorten_pubkey(counterparty_pk),
                 last_message: String::new(), last_timestamp: 0, unread_count: 0,
             }
         });
-        if event.created_at >= convo.last_timestamp {
-            convo.last_message = truncate_message(&plaintext, 80);
-            convo.last_timestamp = event.created_at;
+        if timestamp >= convo.last_timestamp {
+            convo.last_message = truncate_message(plaintext, 80);
+            convo.last_timestamp = timestamp;
         }
-        if !is_sent && s.current_conversation.as_deref() != Some(&counterparty_pk) {
+        if !is_sent && s.current_conversation.as_deref() != Some(counterparty_pk) {
             convo.unread_count += 1;
         }
     });

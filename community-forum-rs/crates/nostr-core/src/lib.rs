@@ -10,6 +10,7 @@
 //! - **Value types** (`EventId`, `Timestamp`, `Tag`, etc.)
 
 pub mod event;
+pub mod gift_wrap;
 pub mod keys;
 pub mod nip44;
 pub mod nip98;
@@ -32,4 +33,5 @@ pub use nip98::{
     create_token as create_nip98_token, verify_token as verify_nip98_token,
     verify_token_at as verify_nip98_token_at, Nip98Token as VerifiedToken,
 };
+pub use gift_wrap::{gift_wrap, unwrap_gift, GiftWrapError, UnwrappedGift};
 pub use types::{EventId, Tag, Timestamp};

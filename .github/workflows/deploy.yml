@@ -59,7 +59,7 @@ jobs:
           trunk --version
 
       - name: Build Rust/WASM forum with Trunk
-        working-directory: community-forum-rs
+        working-directory: community-forum-rs/crates/forum-client
         run: trunk build --release
 
       - name: Inject runtime env config

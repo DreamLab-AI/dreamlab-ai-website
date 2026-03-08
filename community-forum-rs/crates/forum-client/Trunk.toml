@@ -1,9 +1,9 @@
 [build]
 target = "index.html"
-dist = "dist"
+dist = "../../dist"
 
 [watch]
-watch = ["crates/forum-client/src", "crates/nostr-core/src"]
+watch = ["src", "../nostr-core/src"]
 
 [serve]
 address = "127.0.0.1"
