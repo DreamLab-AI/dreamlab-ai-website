@@ -1,6 +1,6 @@
 [target.wasm32-unknown-unknown]
 rustflags = ["-C", "link-arg=--max-memory=268435456"]
 
-[build]
-# Default target for cargo check/build (native)
-# Use --target wasm32-unknown-unknown for WASM builds
+# Note: default target removed to allow native `cargo test` for non-WASM crates.
+# Trunk automatically targets wasm32-unknown-unknown for the forum-client binary.
+# Use `cargo build -p forum-client --target wasm32-unknown-unknown` for manual WASM builds.

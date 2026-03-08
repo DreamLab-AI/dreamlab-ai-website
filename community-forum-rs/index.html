@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DreamLab Forum</title>
+    <meta name="description" content="DreamLab AI Community Forum — Decentralized, private, Nostr-powered" />
+
+    <!-- Tailwind Play CDN (development only — production uses Tailwind CLI tree-shaking) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        amber: {
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Base styles processed by Trunk -->
+    <link rel="stylesheet" data-trunk href="style.css" />
+
+    <!-- Trunk WASM bundle injection -->
+    <link data-trunk rel="rust" data-wasm-opt="z" data-bin="forum-client" />
+</head>
+<body>
+    <!-- Leptos mounts here via mount_to_body -->
+    <noscript>This application requires JavaScript and WebAssembly.</noscript>
+</body>
+</html>

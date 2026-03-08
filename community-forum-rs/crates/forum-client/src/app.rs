@@ -4,8 +4,11 @@ use leptos::prelude::*;
 use leptos_router::components::{Route, Router, Routes, A};
 use leptos_router::path;
 
+use crate::admin::AdminStore;
 use crate::auth::{provide_auth, use_auth};
-use crate::pages::{ChannelPage, ChatPage, HomePage, LoginPage, SignupPage};
+use crate::pages::{
+    AdminPage, ChannelPage, ChatPage, DmChatPage, DmListPage, HomePage, LoginPage, SignupPage,
+};
 use crate::relay::RelayConnection;
 
 // -- App root -----------------------------------------------------------------
@@ -50,6 +53,9 @@ pub fn App() -> impl IntoView {
                     <Route path=path!("/signup") view=SignupPage />
                     <Route path=path!("/chat") view=AuthGatedChat />
                     <Route path=path!("/chat/:channel_id") view=AuthGatedChannel />
+                    <Route path=path!("/dm") view=AuthGatedDmList />
+                    <Route path=path!("/dm/:pubkey") view=AuthGatedDmChat />
+                    <Route path=path!("/admin") view=AdminPage />
                 </Routes>
             </Layout>
         </Router>
@@ -72,6 +78,13 @@ fn Layout(children: Children) -> impl IntoView {
                 .map(|pk| format!("{}...", &pk[..8]))
                 .unwrap_or_else(|| "Anonymous".to_string())
         })
+    });
+
+    let is_admin = Memo::new(move |_| {
+        pubkey
+            .get()
+            .map(|pk| AdminStore::is_admin(&pk))
+            .unwrap_or(false)
     });
 
     view! {
@@ -97,6 +110,14 @@ fn Layout(children: Children) -> impl IntoView {
                             <A href="/chat" attr:class="text-gray-300 hover:text-white transition-colors px-3 py-2 rounded-lg hover:bg-gray-800">
                                 "Chat"
                             </A>
+                            <A href="/dm" attr:class="text-gray-300 hover:text-white transition-colors px-3 py-2 rounded-lg hover:bg-gray-800">
+                                "DMs"
+                            </A>
+                            {move || is_admin.get().then(|| view! {
+                                <A href="/admin" attr:class="text-amber-400 hover:text-amber-300 transition-colors px-3 py-2 rounded-lg hover:bg-gray-800 text-sm font-medium">
+                                    "Admin"
+                                </A>
+                            })}
                             <span class="text-gray-400 text-sm">{move || display_name.get()}</span>
                             <LogoutButton />
                         </Show>
@@ -208,6 +229,82 @@ fn AuthGatedChannel() -> impl IntoView {
                 }
             >
                 <ChannelPage />
+            </Show>
+        </Show>
+    }
+}
+
+/// DM conversation list with auth gate.
+#[component]
+fn AuthGatedDmList() -> impl IntoView {
+    let auth = use_auth();
+    let is_authed = auth.is_authenticated();
+    let is_ready = auth.is_ready();
+
+    Effect::new(move |_| {
+        if is_ready.get() && !is_authed.get() {
+            if let Some(window) = web_sys::window() {
+                let _ = window.location().set_href("/login");
+            }
+        }
+    });
+
+    view! {
+        <Show
+            when=move || is_ready.get()
+            fallback=|| view! {
+                <div class="flex items-center justify-center min-h-[60vh]">
+                    <div class="animate-pulse text-gray-400">"Loading..."</div>
+                </div>
+            }
+        >
+            <Show
+                when=move || is_authed.get()
+                fallback=|| view! {
+                    <div class="flex items-center justify-center min-h-[60vh]">
+                        <p class="text-gray-400">"Redirecting to login..."</p>
+                    </div>
+                }
+            >
+                <DmListPage />
+            </Show>
+        </Show>
+    }
+}
+
+/// Single DM conversation with auth gate.
+#[component]
+fn AuthGatedDmChat() -> impl IntoView {
+    let auth = use_auth();
+    let is_authed = auth.is_authenticated();
+    let is_ready = auth.is_ready();
+
+    Effect::new(move |_| {
+        if is_ready.get() && !is_authed.get() {
+            if let Some(window) = web_sys::window() {
+                let _ = window.location().set_href("/login");
+            }
+        }
+    });
+
+    view! {
+        <Show
+            when=move || is_ready.get()
+            fallback=|| view! {
+                <div class="flex items-center justify-center min-h-[60vh]">
+                    <div class="animate-pulse text-gray-400">"Loading..."</div>
+                </div>
+            }
+        >
+            <Show
+                when=move || is_authed.get()
+                fallback=|| view! {
+                    <div class="flex items-center justify-center min-h-[60vh]">
+                        <p class="text-gray-400">"Redirecting to login..."</p>
+                    </div>
+                }
+            >
+                <DmChatPage />
             </Show>
         </Show>
     }
