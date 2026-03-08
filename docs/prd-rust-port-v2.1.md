@@ -10,6 +10,8 @@ baseline: "v2.1.0 is the accepted delivery baseline (supersedes v2.0.0 execution
 
 # PRD: DreamLab Community Forum — Refined Rust Port Delivery Plan
 
+[Back to Documentation Index](README.md)
+
 ## 1. Document Status and Intent
 
 This document is a **proposed refactor** of the accepted Rust-port plan in

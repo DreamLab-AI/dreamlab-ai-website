@@ -12,6 +12,25 @@ use crate::pages::{
 };
 use crate::relay::RelayConnection;
 
+// -- Base path for sub-directory deployment -----------------------------------
+
+/// Base URL prefix. Set `FORUM_BASE=/community` at compile time for production.
+/// Empty/unset for local development (routes mount at root).
+const FORUM_BASE: &str = match option_env!("FORUM_BASE") {
+    Some(b) => b,
+    None => "",
+};
+
+/// Build a full href by prepending the base path. Used for programmatic
+/// navigation that bypasses the router (e.g. `window.location.set_href`).
+pub(crate) fn base_href(path: &str) -> String {
+    if FORUM_BASE.is_empty() {
+        path.to_string()
+    } else {
+        format!("{}{}", FORUM_BASE, path)
+    }
+}
+
 // -- SVG icon helpers ---------------------------------------------------------
 
 fn brand_icon() -> impl IntoView {
@@ -134,7 +153,7 @@ pub fn App() -> impl IntoView {
     });
 
     view! {
-        <Router>
+        <Router base=FORUM_BASE>
             <Layout>
                 <Routes fallback=|| view! {
                     <div class="min-h-screen bg-gray-900 text-white flex items-center justify-center">
@@ -387,7 +406,7 @@ fn AuthGatedChat() -> impl IntoView {
     Effect::new(move |_| {
         if is_ready.get() && !is_authed.get() {
             if let Some(window) = web_sys::window() {
-                let _ = window.location().set_href("/login");
+                let _ = window.location().set_href(&base_href("/login"));
             }
         }
     });
@@ -417,7 +436,7 @@ fn AuthGatedChannel() -> impl IntoView {
     Effect::new(move |_| {
         if is_ready.get() && !is_authed.get() {
             if let Some(window) = web_sys::window() {
-                let _ = window.location().set_href("/login");
+                let _ = window.location().set_href(&base_href("/login"));
             }
         }
     });
@@ -447,7 +466,7 @@ fn AuthGatedDmList() -> impl IntoView {
     Effect::new(move |_| {
         if is_ready.get() && !is_authed.get() {
             if let Some(window) = web_sys::window() {
-                let _ = window.location().set_href("/login");
+                let _ = window.location().set_href(&base_href("/login"));
             }
         }
     });
@@ -477,7 +496,7 @@ fn AuthGatedDmChat() -> impl IntoView {
     Effect::new(move |_| {
         if is_ready.get() && !is_authed.get() {
             if let Some(window) = web_sys::window() {
-                let _ = window.location().set_href("/login");
+                let _ = window.location().set_href(&base_href("/login"));
             }
         }
     });

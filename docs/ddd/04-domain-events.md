@@ -1,66 +1,67 @@
 # Domain Events
 
-This document distinguishes between **Nostr protocol events** (signed data
-structures transmitted via relays) and **application-level domain events**
-(state transitions within the DreamLab forum).
+**Last updated:** 2026-03-08 | [Back to DDD Index](README.md) | [Back to Documentation Index](../README.md)
+
+This document distinguishes between **Nostr protocol events** (signed data structures transmitted via relays) and **application-level domain events** (state transitions within the DreamLab forum).
 
 ## Nostr Protocol Events (NIP-01)
 
-Every Nostr event has a `kind` that determines its semantics. The DreamLab
-forum uses the following kinds.
+Every Nostr event has a `kind` that determines its semantics. The DreamLab forum uses the following kinds.
 
 ### Event Kind Registry
+
+| Kind | Name | NIP | Description |
+|------|------|-----|-------------|
+| 0 | ProfileMetadata | NIP-01 | User profile metadata |
+| 1 | TextNote | NIP-01 | Short text note / forum post |
+| 7 | Reaction | NIP-25 | Reaction to another event (`+`, `-`, emoji) |
+| 13 | Seal | NIP-17 | Encrypted direct message seal |
+| 14 | DirectMessage | NIP-17 | Encrypted direct message content |
+| 1059 | GiftWrap | NIP-59 | Gift wrap envelope, hides sender metadata |
+| 9021 | JoinRequest | Custom | Join request for a gated channel |
+| 9024 | Thread | Custom | Thread / long-form post |
+| 40 | ChannelCreation | NIP-28 | Channel creation |
+| 41 | ChannelMetadata | NIP-28 | Channel metadata update |
+| 42 | ChannelMessage | NIP-28 | Channel message |
+| 43 | ChannelHideMessage | NIP-28 | Channel hide message |
+| 44 | ChannelMuteUser | NIP-28 | Channel mute user |
+| 10002 | RelayList | NIP-65 | Relay list metadata |
+| 27235 | HttpAuth | NIP-98 | HTTP authentication token |
+| 31922 | CalendarEvent | NIP-52 | Time-based calendar event |
+| 31923 | CalendarDateEvent | NIP-52 | Date-based calendar event |
+| 39000 | GroupMetadata | NIP-29 | Group metadata |
+| 39002 | GroupMembers | NIP-29 | Group member list |
 
 ```rust
 /// All Nostr event kinds used by the DreamLab forum.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[repr(u32)]
 pub enum EventKind {
-    /// User profile metadata (NIP-01).
     ProfileMetadata       = 0,
-    /// Short text note / forum post (NIP-01).
     TextNote              = 1,
-    /// Relay list metadata (NIP-65).
-    RelayList             = 10002,
-    /// Reaction to another event (NIP-25). Content: "+", "-", or emoji.
     Reaction              = 7,
-    /// Encrypted direct message seal (NIP-17).
     Seal                  = 13,
-    /// Encrypted direct message content (NIP-17).
     DirectMessage         = 14,
-    /// Gift wrap envelope (NIP-59). Hides sender metadata.
     GiftWrap              = 1059,
-    /// Thread / long-form post (DreamLab custom).
-    Thread                = 9024,
-    /// Join request for a gated channel (DreamLab custom).
     JoinRequest           = 9021,
-    /// Channel creation (NIP-28).
+    Thread                = 9024,
     ChannelCreation       = 40,
-    /// Channel metadata update (NIP-28).
     ChannelMetadata       = 41,
-    /// Channel message (NIP-28).
     ChannelMessage        = 42,
-    /// Channel hide message (NIP-28).
     ChannelHideMessage    = 43,
-    /// Channel mute user (NIP-28).
     ChannelMuteUser       = 44,
-    /// NIP-98 HTTP authentication token.
+    RelayList             = 10002,
     HttpAuth              = 27235,
-    /// Time-based calendar event (NIP-52).
     CalendarEvent         = 31922,
-    /// Date-based calendar event (NIP-52).
     CalendarDateEvent     = 31923,
-    /// NIP-29 group metadata.
     GroupMetadata         = 39000,
-    /// NIP-29 group member list.
     GroupMembers          = 39002,
 }
 ```
 
 ### Event Structure
 
-Every Nostr event follows the NIP-01 canonical form. The `id` field is the
-SHA-256 hash of the serialized array `[0, pubkey, created_at, kind, tags, content]`.
+Every Nostr event follows the NIP-01 canonical form. The `id` field is the SHA-256 hash of the serialized array `[0, pubkey, created_at, kind, tags, content]`.
 
 ```rust
 /// Wire format of a Nostr event (NIP-01 canonical).
@@ -78,9 +79,7 @@ pub struct NostrEventWire {
 
 ## Application-Level Domain Events
 
-These are state transitions within the DreamLab application, triggered by
-receiving or sending Nostr events. They drive reactive updates in the Leptos
-signal graph.
+These are state transitions within the DreamLab application, triggered by receiving or sending Nostr events. They drive reactive updates in the Leptos signal graph.
 
 ### Identity Domain Events
 
@@ -120,57 +119,104 @@ signal graph.
 | `MediaDeleted` | DELETE to pod-worker | Removes MediaAsset from Pod |
 | `AclUpdated` | Admin modifies ACL | Updates WacAcl rules |
 
-## Event Flow
+## Event Flow Diagrams
 
 ### Publishing (Outbound)
 
-```
-User action
-  -> forum-client creates unsigned event
-  -> nostr-core signs with private key (Schnorr BIP-340)
-  -> nostr-core computes event ID (SHA-256 of canonical JSON)
-  -> nostr-sdk publishes to relay pool
-  -> relay validates (NIP-01 + whitelist check)
-  -> relay broadcasts to subscribers
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant FC as forum-client
+    participant NC as nostr-core
+    participant RW as relay-worker
+
+    U->>FC: User action (post, react, etc.)
+    FC->>NC: Create unsigned event
+    NC->>NC: Sign with private key (Schnorr BIP-340)
+    NC->>NC: Compute event ID (SHA-256 of canonical JSON)
+    NC-->>FC: Signed NostrEvent
+    FC->>RW: Publish via WebSocket (EVENT message)
+    RW->>RW: Validate NIP-01 + whitelist check
+    RW-->>FC: OK / NOTICE
+    RW->>RW: Broadcast to subscribers
 ```
 
 ### Receiving (Inbound)
 
-```
-Relay sends EVENT message
-  -> nostr-sdk receives via WebSocket
-  -> nostr-core validates signature + ID
-  -> forum-client event pipeline routes by kind
-  -> Appropriate store updates (Leptos signals)
-  -> UI reactively re-renders
+```mermaid
+sequenceDiagram
+    participant RW as relay-worker
+    participant FC as forum-client
+    participant NC as nostr-core
+    participant UI as Leptos UI
+
+    RW->>FC: EVENT message via WebSocket
+    FC->>NC: Validate signature + ID
+    NC-->>FC: Valid event
+    FC->>FC: Route by event kind
+    FC->>FC: Update appropriate store (Leptos signals)
+    FC-->>UI: Reactive re-render
 ```
 
 ### NIP-98 Auth Flow (HTTP)
 
-```
-forum-client needs authenticated HTTP call
-  -> nostr-core creates kind 27235 event with URL, method, payload hash
-  -> Signs with private key
-  -> Base64-encodes signed event
-  -> Sends as Authorization: Nostr <base64>
-  -> Worker extracts event, verifies signature + timestamp + URL + method + payload
-  -> Worker processes request if valid
+```mermaid
+sequenceDiagram
+    participant FC as forum-client
+    participant NC as nostr-core
+    participant W as Worker (auth/pod)
+
+    FC->>NC: Create kind 27235 event<br/>(URL, method, payload hash)
+    NC->>NC: Sign with private key
+    NC-->>FC: Base64-encoded signed event
+    FC->>W: HTTP request<br/>Authorization: Nostr [base64]
+    W->>W: Extract event from header
+    W->>W: Verify signature + timestamp
+    W->>W: Verify URL + method + payload hash
+    W-->>FC: Response (200 / 401)
 ```
 
-### NIP-44 Encryption Flow (DMs)
+### NIP-59 Gift Wrap Flow (DMs)
 
+```mermaid
+sequenceDiagram
+    participant S as Sender
+    participant NC as nostr-core
+    participant RW as relay-worker
+    participant R as Recipient
+
+    Note over S,R: Sending a DM
+
+    S->>NC: Compose plaintext message
+    NC->>NC: ECDH shared secret<br/>(sender privkey + recipient pubkey)
+    NC->>NC: NIP-44 encrypt plaintext<br/>(ChaCha20-Poly1305)
+    NC->>NC: Create kind 14 Rumor<br/>(unsigned, contains ciphertext)
+    NC->>NC: Create kind 13 Seal<br/>(signed by sender, encrypts Rumor)
+    NC->>NC: Create kind 1059 Gift Wrap<br/>(random throwaway key,<br/>addressed to recipient via p-tag)
+    NC-->>S: Gift wrap event
+    S->>RW: Publish kind 1059
+
+    Note over S,R: Receiving a DM
+
+    RW->>R: Deliver kind 1059 to recipient
+    R->>NC: Decrypt gift wrap<br/>(recipient privkey)
+    NC->>NC: Extract kind 13 Seal
+    NC->>NC: Verify Seal signature<br/>(confirms sender identity)
+    NC->>NC: Decrypt kind 14 Rumor<br/>(ECDH shared secret)
+    NC-->>R: Plaintext in memory only
 ```
-Sender composes DM
-  -> nostr-core derives shared secret (ECDH: sender privkey + recipient pubkey)
-  -> nostr-core encrypts plaintext (ChaCha20-Poly1305)
-  -> Creates kind 14 event with ciphertext
-  -> Wraps in kind 13 seal (signed by sender)
-  -> Wraps in kind 1059 gift wrap (random throwaway key, addressed to recipient)
-  -> Publishes gift wrap to relay
 
-Recipient receives kind 1059
-  -> Unwraps gift wrap (decrypt with recipient privkey)
-  -> Verifies kind 13 seal signature (confirms sender)
-  -> Decrypts kind 14 content (ECDH shared secret)
-  -> Plaintext available in memory only
+### NIP-44 Encryption Detail
+
+```mermaid
+graph LR
+    SK["Sender Private Key"] --> ECDH["ECDH<br/>(secp256k1)"]
+    RPK["Recipient Public Key"] --> ECDH
+    ECDH --> SS["Shared Secret"]
+    SS --> HKDF2["HKDF-SHA-256"]
+    HKDF2 --> CK["Conversation Key"]
+    CK --> ENC["ChaCha20-Poly1305<br/>Encrypt"]
+    PT["Plaintext"] --> PAD["Pad to power-of-2"]
+    PAD --> ENC
+    ENC --> CT["Nip44Ciphertext<br/>(version=2, nonce, ciphertext+tag)"]
 ```

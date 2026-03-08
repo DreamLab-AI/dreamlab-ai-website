@@ -1,5 +1,7 @@
 # Route Parity Matrix -- DreamLab Rust Port (T1.4)
 
+[Back to Documentation Index](../README.md)
+
 Generated: 2026-03-08
 
 ## Overview

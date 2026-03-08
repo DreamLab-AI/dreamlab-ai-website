@@ -1,5 +1,7 @@
 # ADR-019: Versioned Planning Governance and Tranche-Based Delivery
 
+[Back to ADR Index](README.md) | [Back to Documentation Index](../README.md)
+
 | Field     | Value                          |
 |-----------|--------------------------------|
 | Status    | Accepted                       |

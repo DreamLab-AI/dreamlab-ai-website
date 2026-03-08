@@ -1,107 +1,259 @@
-# Deployment Overview — DreamLab AI
+# Deployment Overview -- DreamLab AI
+
+**Last updated:** 2026-03-08 | [Back to Documentation Index](../README.md)
+
+---
+
+## Table of Contents
+
+- [Architecture](#architecture)
+- [CI/CD Pipeline](#cicd-pipeline)
+- [Static Sites](#static-sites)
+- [Cloudflare Workers](#cloudflare-workers)
+- [Environments](#environments)
+- [Required Secrets](#required-secrets)
+- [DNS Records](#dns-records)
+- [Related Documents](#related-documents)
+
+---
 
 ## Architecture
 
-```
-dreamlab-ai.com
-  ├── /              React main site (GitHub Pages)
-  ├── /community/    Leptos forum client (GitHub Pages, WASM)
-  └── Workers:
-      ├── api.       auth-worker      (Rust WASM)
-      ├── pods.      pod-worker       (Rust WASM)
-      ├── preview.   preview-worker   (Rust WASM)
-      ├── relay.     nostr-relay      (TypeScript)
-      └── search.    search-api       (TypeScript)
+```mermaid
+graph TB
+    subgraph "Client Browser"
+        BROWSER[Browser]
+    end
+
+    subgraph "CDN: GitHub Pages"
+        REACT[React Main Site<br/>dreamlab-ai.com /]
+        LEPTOS[Leptos Forum Client<br/>dreamlab-ai.com /community/]
+    end
+
+    subgraph "Cloudflare Edge"
+        CF_EDGE[TLS Termination + Routing]
+    end
+
+    subgraph "Rust Workers (WASM)"
+        AUTH_W[auth-worker<br/>api.dreamlab-ai.com]
+        POD_W[pod-worker<br/>pods.dreamlab-ai.com]
+        PREVIEW_W[preview-worker<br/>preview.dreamlab-ai.com]
+    end
+
+    subgraph "TypeScript Workers"
+        RELAY_W[nostr-relay<br/>relay.dreamlab-ai.com]
+        SEARCH_W[search-api<br/>search.dreamlab-ai.com]
+    end
+
+    subgraph "Cloudflare Storage"
+        D1_AUTH[(D1: dreamlab-auth)]
+        D1_RELAY[(D1: dreamlab-relay)]
+        KV_SESSIONS[(KV: SESSIONS)]
+        KV_POD_META[(KV: POD_META)]
+        KV_SEARCH[(KV: SEARCH_CONFIG)]
+        R2_PODS[(R2: dreamlab-pods)]
+        R2_VECTORS[(R2: dreamlab-vectors)]
+        DO[DO: NostrRelayDO]
+    end
+
+    BROWSER --> REACT
+    BROWSER --> LEPTOS
+    BROWSER --> CF_EDGE
+
+    CF_EDGE --> AUTH_W
+    CF_EDGE --> POD_W
+    CF_EDGE --> PREVIEW_W
+    CF_EDGE -- "WSS" --> RELAY_W
+    CF_EDGE --> SEARCH_W
+
+    AUTH_W --> D1_AUTH
+    AUTH_W --> KV_SESSIONS
+    AUTH_W --> KV_POD_META
+    AUTH_W --> R2_PODS
+
+    POD_W --> R2_PODS
+    POD_W --> KV_POD_META
+
+    PREVIEW_W -- "Outbound fetch" --> EXTERNAL[External URLs]
+
+    RELAY_W --> D1_RELAY
+    RELAY_W --> DO
+
+    SEARCH_W --> R2_VECTORS
+    SEARCH_W --> KV_SEARCH
 ```
 
-## Static Sites (GitHub Pages)
+---
+
+## CI/CD Pipeline
+
+### deploy.yml -- Static Sites
+
+Triggers on push to `main`. Guard: `if: github.repository == 'DreamLab-AI/dreamlab-ai-website'`
+
+```mermaid
+flowchart LR
+    PUSH[Push to main] --> CHECKOUT[Checkout code]
+    CHECKOUT --> PARALLEL
+
+    subgraph PARALLEL [Parallel Build]
+        direction TB
+        REACT_BUILD[npm ci<br/>npm run build<br/>React main site -> dist/]
+        LEPTOS_BUILD[Install Rust + Trunk<br/>trunk build --release<br/>Leptos forum -> WASM]
+        LEPTOS_BUILD --> WASM_OPT[wasm-opt -Oz<br/>Optimize WASM binary]
+    end
+
+    PARALLEL --> COPY[Copy forum output<br/>to dist/community/]
+    COPY --> DEPLOY_PAGES[Push dist/ to<br/>gh-pages branch]
+    DEPLOY_PAGES --> LIVE[Live on<br/>dreamlab-ai.com]
+```
+
+### workers-deploy.yml -- Cloudflare Workers
+
+Triggers on push to `main` when files in `workers/` or `community-forum-rs/crates/` change. Guard: `if: github.repository == 'DreamLab-AI/dreamlab-ai-website'`
+
+```mermaid
+flowchart LR
+    PUSH[Push to main<br/>workers/ or crates/ changed] --> SETUP[Install Rust toolchain<br/>+ wasm32-unknown-unknown<br/>+ worker-build]
+
+    SETUP --> RUST_BUILD
+
+    subgraph RUST_BUILD [Parallel Rust Builds]
+        direction TB
+        AUTH_BUILD[worker-build --release<br/>auth-worker]
+        POD_BUILD[worker-build --release<br/>pod-worker]
+        PREVIEW_BUILD[worker-build --release<br/>preview-worker]
+    end
+
+    RUST_BUILD --> DEPLOY_ALL
+
+    subgraph DEPLOY_ALL [Deploy All Workers]
+        direction TB
+        DEPLOY_AUTH[wrangler deploy<br/>dreamlab-auth-api]
+        DEPLOY_POD[wrangler deploy<br/>dreamlab-pod-api]
+        DEPLOY_PREVIEW[wrangler deploy<br/>dreamlab-link-preview]
+        DEPLOY_RELAY[wrangler deploy<br/>dreamlab-nostr-relay]
+        DEPLOY_SEARCH[wrangler deploy<br/>dreamlab-search-api]
+    end
+```
+
+---
+
+## Static Sites
 
 ### React Main Site
 
-- **Source**: `src/` (React 18 + Vite + TypeScript)
-- **Build**: `npm run build` -> `dist/`
-- **Deploy**: GitHub Actions pushes `dist/` to `gh-pages` branch
-- **Domain**: `dreamlab-ai.com` (CNAME in `public/CNAME`)
+| Property | Value |
+|----------|-------|
+| Source | `src/` (React 18 + Vite + TypeScript) |
+| Build command | `npm run build` |
+| Output | `dist/` |
+| Deploy target | `gh-pages` branch |
+| Domain | `dreamlab-ai.com` |
+| CNAME | `public/CNAME` |
 
 ### Leptos Forum Client
 
-- **Source**: `community-forum-rs/crates/forum-client/`
-- **Build**: `trunk build --release` -> produces WASM + HTML + JS loader
-- **Optimization**: `wasm-opt -Oz` reduces binary size (target: <2MB gzipped)
-- **Deploy**: Output copied to `dist/community/` before GitHub Pages push
-- **Route**: All `/community/*` paths serve the Leptos SPA
+| Property | Value |
+|----------|-------|
+| Source | `community-forum-rs/crates/forum-client/` |
+| Build command | `trunk build --release` |
+| Optimization | `wasm-opt -Oz` (target: <2 MB gzipped) |
+| Output | Copied to `dist/community/` |
+| Route | All `/community/*` paths serve the Leptos SPA |
+
+---
 
 ## Cloudflare Workers
 
 ### Rust Workers (3 services)
 
-Built with `worker-build --release` which compiles Rust to `wasm32-unknown-unknown`
-and packages it as a Workers-compatible module.
+Built with `worker-build --release` which compiles Rust to `wasm32-unknown-unknown` and packages it as a Workers-compatible module.
 
-| Worker | Crate | Storage | Build Command |
-|--------|-------|---------|---------------|
-| auth-worker | `crates/auth-worker` | D1 + KV + R2 | `cd crates/auth-worker && worker-build --release` |
-| pod-worker | `crates/pod-worker` | R2 + KV | `cd crates/pod-worker && worker-build --release` |
-| preview-worker | `crates/preview-worker` | Cache API | `cd crates/preview-worker && worker-build --release` |
+| Worker | Crate | Storage | Subdomain |
+|--------|-------|---------|-----------|
+| auth-worker | `crates/auth-worker` | D1 + KV + R2 | `api.dreamlab-ai.com` |
+| pod-worker | `crates/pod-worker` | R2 + KV | `pods.dreamlab-ai.com` |
+| preview-worker | `crates/preview-worker` | Cache API | `preview.dreamlab-ai.com` |
 
 ### TypeScript Workers (2 services)
 
 Built and deployed directly with `wrangler`.
 
-| Worker | Source | Storage | Build Command |
-|--------|--------|---------|---------------|
-| nostr-relay | `workers/nostr-relay/` | D1 + Durable Objects | `wrangler deploy` |
-| search-api | `workers/search-api/` | R2 + KV + WASM | `wrangler deploy` |
+| Worker | Source | Storage | Subdomain |
+|--------|--------|---------|-----------|
+| nostr-relay | `workers/nostr-relay/` | D1 + Durable Objects | `relay.dreamlab-ai.com` |
+| search-api | `workers/search-api/` | R2 + KV + WASM | `search.dreamlab-ai.com` |
 
-## CI/CD: GitHub Actions
-
-### deploy.yml — Static Sites
-
-Triggers on push to `main`. Steps:
-1. `npm ci && npm run build` (React main site)
-2. `trunk build --release` (Leptos forum client)
-3. `wasm-opt -Oz` on forum WASM binary
-4. Copy forum output to `dist/community/`
-5. Push `dist/` to `gh-pages` branch
-
-Guard: `if: github.repository == 'DreamLab-AI/dreamlab-ai-website'`
-
-### workers-deploy.yml — Cloudflare Workers
-
-Triggers on push to `main` when files in `workers/` or `crates/` change. Steps:
-1. Install Rust toolchain + `wasm32-unknown-unknown` target + `worker-build`
-2. Build 3 Rust Workers in parallel
-3. Deploy all 5 Workers via `wrangler`
-
-Guard: `if: github.repository == 'DreamLab-AI/dreamlab-ai-website'`
+---
 
 ## Environments
 
 ### Production
 
-- **Domain**: `dreamlab-ai.com`
-- **Workers subdomains**: `api.`, `pods.`, `search.`, `preview.` + relay WebSocket
-- **GitHub Pages branch**: `gh-pages`
+| Property | Value |
+|----------|-------|
+| Domain | `dreamlab-ai.com` |
+| Workers subdomains | `api.`, `pods.`, `search.`, `preview.`, `relay.` |
+| GitHub Pages branch | `gh-pages` |
+| TLS | Cloudflare-managed (edge + origin) |
 
 ### Development
 
-- **React dev**: `npm run dev` -> `http://localhost:5173`
-- **Leptos dev**: `trunk serve` -> `http://localhost:8080`
-- **Workers local**: `wrangler dev` per worker (uses local D1/KV/R2 simulators)
-- **Relay local**: `wrangler dev --local` with `--persist` for D1 state
+| Service | Command | URL |
+|---------|---------|-----|
+| React main site | `npm run dev` | `http://localhost:5173` |
+| Leptos forum | `trunk serve` | `http://localhost:8080` |
+| Any Worker (local) | `wrangler dev` | `http://localhost:8787` (default) |
+| Relay (local) | `wrangler dev --local --persist` | Local with persisted D1 state |
 
-## Required Secrets (GitHub)
+Local Workers use `wrangler dev` which simulates D1, KV, R2, and Durable Objects locally.
+
+---
+
+## Required Secrets
+
+### GitHub Actions Secrets
 
 | Secret | Purpose |
 |--------|---------|
 | `CLOUDFLARE_API_TOKEN` | Workers deploy (Scripts:Edit, D1:Edit, KV:Edit, R2:Edit) |
 | `CLOUDFLARE_ACCOUNT_ID` | Cloudflare account identifier |
 
+### Worker Secrets (set via `wrangler secret put`)
+
+| Secret | Workers | Value |
+|--------|---------|-------|
+| `RP_ID` | auth-worker | `dreamlab-ai.com` |
+| `RP_NAME` | auth-worker | `DreamLab AI` |
+| `EXPECTED_ORIGIN` | auth-worker, pod-worker | `https://dreamlab-ai.com` |
+| `ADMIN_PUBKEYS` | auth-worker, nostr-relay | Comma-separated admin hex pubkeys |
+| `ALLOWED_ORIGIN` | nostr-relay, search-api | `https://dreamlab-ai.com` |
+
+---
+
 ## DNS Records
 
-| Subdomain | Type | Target |
-|-----------|------|--------|
-| `api.dreamlab-ai.com` | CNAME | auth-worker route |
-| `pods.dreamlab-ai.com` | CNAME | pod-worker route |
-| `search.dreamlab-ai.com` | CNAME | search-api route |
-| `preview.dreamlab-ai.com` | CNAME | preview-worker route |
+All DNS records are managed in the Cloudflare `dreamlab-ai.com` zone.
+
+| Subdomain | Type | Target | Proxied |
+|-----------|------|--------|---------|
+| `dreamlab-ai.com` | CNAME | `dreamlab-ai.github.io` | No (GitHub Pages) |
+| `api.dreamlab-ai.com` | CNAME | auth-worker route | Yes |
+| `pods.dreamlab-ai.com` | CNAME | pod-worker route | Yes |
+| `search.dreamlab-ai.com` | CNAME | search-api route | Yes |
+| `preview.dreamlab-ai.com` | CNAME | preview-worker route | Yes |
+| `relay.dreamlab-ai.com` | CNAME | nostr-relay route | Yes |
+
+---
+
+## Related Documents
+
+| Document | Description |
+|----------|-------------|
+| [Cloudflare Workers](CLOUDFLARE_WORKERS.md) | Build pipeline, resource bindings, secrets |
+| [Auth API](../api/AUTH_API.md) | WebAuthn + NIP-98 endpoints |
+| [Pod API](../api/POD_API.md) | Solid pod storage |
+| [Nostr Relay](../api/NOSTR_RELAY.md) | WebSocket relay |
+| [Search API](../api/SEARCH_API.md) | RVF WASM vector search |
+| [Security Overview](../security/SECURITY_OVERVIEW.md) | Threat model, CORS, input validation |

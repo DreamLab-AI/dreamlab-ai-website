@@ -1,7 +1,110 @@
 # Value Objects
 
-Value objects are immutable, compared by value (not identity), and have no
-lifecycle. They are the building blocks of entities and aggregates.
+**Last updated:** 2026-03-08 | [Back to DDD Index](README.md) | [Back to Documentation Index](../README.md)
+
+Value objects are immutable, compared by value (not identity), and have no lifecycle. They are the building blocks of entities and aggregates.
+
+## Value Object Hierarchy
+
+```mermaid
+classDiagram
+    class EventId {
+        -[u8; 32] bytes
+        +from_canonical() EventId
+        +as_hex() String
+    }
+
+    class PublicKey {
+        -[u8; 32] bytes
+        +from_hex(str) Result~PublicKey~
+        +as_hex() String
+        +as_bytes() [u8; 32]
+    }
+
+    class Signature {
+        -[u8; 64] bytes
+        +from_hex(str) Result~Signature~
+        +as_hex() String
+    }
+
+    class Timestamp {
+        +u64 secs
+        +now() Timestamp
+        +as_secs() u64
+    }
+
+    class Tag {
+        +Vec~String~ parts
+        +name() str
+        +value() Option~str~
+        +event_ref(EventId) Tag
+        +pubkey_ref(PublicKey) Tag
+        +url(str) Tag
+        +method(str) Tag
+    }
+
+    class RoleId {
+        <<enumeration>>
+        Guest
+        Member
+        Moderator
+        SectionAdmin
+        Admin
+        +level() u8
+        +is_at_least(RoleId) bool
+    }
+
+    class ChannelVisibility {
+        <<enumeration>>
+        Public
+        Cohort
+        Invite
+    }
+
+    class ChannelAccessType {
+        <<enumeration>>
+        Open
+        Gated
+    }
+
+    class CalendarAccessLevel {
+        <<enumeration>>
+        Full
+        Availability
+        Cohort
+        None
+    }
+
+    class Nip44Ciphertext {
+        +u8 version
+        +[u8; 24] nonce
+        +Vec~u8~ ciphertext
+    }
+
+    class GiftWrap {
+        +NostrEventWire outer_event
+        +PublicKey recipient
+    }
+
+    class RelayUrl {
+        -String url
+        +new(str) Result~RelayUrl~
+        +as_str() str
+        +to_http() String
+    }
+
+    class SectionId {
+        +String id
+    }
+
+    class CategoryId {
+        +String id
+    }
+
+    class ForumId {
+        +String id
+    }
+```
 
 ## Core Nostr Value Objects
 
@@ -91,7 +194,7 @@ impl Timestamp {
     pub fn now() -> Self {
         // In WASM: js_sys::Date::now() / 1000.0
         // In native: std::time::SystemTime
-        Self(0) // placeholder -- actual impl uses target-specific code
+        Self(0) // actual impl uses target-specific code
     }
 
     pub fn as_secs(&self) -> u64 {
@@ -276,10 +379,7 @@ pub enum RelayUrlError {
 
 All value objects in this module satisfy:
 
-1. **Immutability**: No `&mut self` methods. New values are created via
-   constructors or `From`/`Into` conversions.
+1. **Immutability**: No `&mut self` methods. New values are created via constructors or `From`/`Into` conversions.
 2. **Structural equality**: `PartialEq` and `Eq` are derived from field values.
-3. **Self-validation**: Constructors reject invalid inputs (wrong hex length,
-   invalid URL scheme, etc.).
-4. **Serialization**: All types implement `Serialize`/`Deserialize` for JSON
-   wire format and IndexedDB persistence.
+3. **Self-validation**: Constructors reject invalid inputs (wrong hex length, invalid URL scheme, etc.).
+4. **Serialization**: All types implement `Serialize`/`Deserialize` for JSON wire format and IndexedDB persistence.
