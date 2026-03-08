@@ -22,7 +22,24 @@ base64 = { workspace = true }
 zeroize = { workspace = true }
 thiserror = { workspace = true }
 
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = { workspace = true }
+js-sys = { workspace = true }
+serde-wasm-bindgen = "0.6"
+
 [dev-dependencies]
 proptest = { workspace = true }
 wasm-bindgen-test = { workspace = true }
 criterion = { workspace = true }
+
+[[bench]]
+name = "bench_nip44"
+harness = false
+
+[[bench]]
+name = "bench_keys"
+harness = false
+
+[[bench]]
+name = "bench_events"
+harness = false
