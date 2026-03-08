@@ -1,6 +1,6 @@
 name: Deploy Cloudflare Workers
 
-# Deploys all 5 Workers using per-worker wrangler.toml configs.
+# Deploys TypeScript Workers from workers/ and Rust Workers from community-forum-rs/crates/.
 # Runs on DreamLab-AI/dreamlab-ai-website fork only.
 
 on:
@@ -8,6 +8,9 @@ on:
     branches: [main]
     paths:
       - 'workers/**'
+      - 'community-forum-rs/crates/preview-worker/**'
+      - 'community-forum-rs/crates/pod-worker/**'
+      - 'community-forum-rs/crates/auth-worker/**'
       - '.github/workflows/workers-deploy.yml'
   workflow_dispatch:
 
@@ -19,8 +22,9 @@ env:
   CF_SUBDOMAIN: 'solitary-paper-764d'
 
 jobs:
-  deploy:
-    name: Deploy Workers
+  # ─── TypeScript Workers ────────────────────────────────────────────
+  deploy-ts:
+    name: Deploy TS Workers
     if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -89,11 +93,86 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
-      - name: Health checks
-        run: |
-          echo "Waiting 10s for Workers to propagate..."
-          sleep 10
+  # ─── Rust Workers (worker-build + wasm) ────────────────────────────
+  deploy-rust:
+    name: Deploy Rust Workers
+    if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
 
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - crate: preview-worker
+            worker_name: dreamlab-link-preview
+          - crate: pod-worker
+            worker_name: dreamlab-pod-api
+          # auth-worker: uncomment when Tranche 3 is ready
+          # - crate: auth-worker
+          #   worker_name: dreamlab-auth-api
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Cache Cargo registry + build
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ~/.cargo/bin/worker-build
+            community-forum-rs/target
+          key: rust-deploy-${{ matrix.crate }}-${{ hashFiles('community-forum-rs/Cargo.lock') }}
+          restore-keys: |
+            rust-deploy-${{ matrix.crate }}-
+            rust-deploy-
+
+      - name: Install worker-build
+        run: |
+          if ! command -v worker-build &>/dev/null; then
+            cargo install worker-build --locked
+          fi
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Build and deploy ${{ matrix.crate }}
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: '3'
+          command: deploy
+          workingDirectory: community-forum-rs/crates/${{ matrix.crate }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+  # ─── Health checks (runs after both deploy jobs) ───────────────────
+  health-check:
+    name: Health Checks
+    if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
+    needs: [deploy-ts, deploy-rust]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Wait for propagation
+        run: sleep 10
+
+      - name: Check all workers
+        run: |
+          PASS=0
+          FAIL=0
           for worker in dreamlab-auth-api dreamlab-pod-api dreamlab-search-api dreamlab-nostr-relay dreamlab-link-preview; do
             URL="https://${worker}.${{ env.CF_SUBDOMAIN }}.workers.dev/health"
             if [ "$worker" = "dreamlab-search-api" ]; then
@@ -103,16 +182,21 @@ jobs:
             echo "${worker}: HTTP ${STATUS}"
             if [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 500 ]; then
               echo "  PASS"
+              PASS=$((PASS + 1))
             else
               echo "::warning::${worker} health check returned HTTP ${STATUS}"
+              FAIL=$((FAIL + 1))
             fi
           done
+          echo ""
+          echo "Results: ${PASS} passed, ${FAIL} warnings"
 
       - name: Deployment summary
         run: |
           cat >> $GITHUB_STEP_SUMMARY <<EOF
           ## Cloudflare Workers Deployment
 
+          ### TypeScript Workers
           | Worker | URL |
           |--------|-----|
           | auth-api | \`dreamlab-auth-api.${{ env.CF_SUBDOMAIN }}.workers.dev\` |
@@ -120,6 +204,13 @@ jobs:
           | search-api | \`dreamlab-search-api.${{ env.CF_SUBDOMAIN }}.workers.dev\` |
           | nostr-relay | \`dreamlab-nostr-relay.${{ env.CF_SUBDOMAIN }}.workers.dev\` |
           | link-preview | \`dreamlab-link-preview.${{ env.CF_SUBDOMAIN }}.workers.dev\` |
+
+          ### Rust Workers (Tranche 2)
+          | Worker | Crate | Status |
+          |--------|-------|--------|
+          | dreamlab-link-preview | preview-worker | Deployed |
+          | dreamlab-pod-api | pod-worker | Deployed |
+          | dreamlab-auth-api | auth-worker | Pending (Tranche 3) |
 
           - **Branch**: \`${{ github.ref_name }}\`
           - **Commit**: \`${{ github.sha }}\`

@@ -25,7 +25,10 @@ const MAX_EVENT_SIZE: usize = 64 * 1024;
 const NOSTR_PREFIX: &str = "Nostr ";
 
 /// A verified NIP-98 token with extracted fields.
-#[derive(Debug, Clone)]
+///
+/// Returned by [`verify_token`] and [`verify_token_at`] after successful
+/// verification of an `Authorization: Nostr <base64(event)>` header.
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Nip98Token {
     /// Hex-encoded x-only public key of the signer.
     pub pubkey: String,
@@ -150,11 +153,11 @@ pub fn create_token_at(
     Ok(BASE64.encode(json.as_bytes()))
 }
 
-/// Verify a NIP-98 `Authorization` header value.
+/// Verify a NIP-98 `Authorization` header value using the system clock.
 ///
-/// Decodes the base64 token, recomputes the event ID from canonical form
-/// (never trusts the provided id), verifies the Schnorr signature, and
-/// checks URL, method, timestamp, and optional payload hash.
+/// Delegates to [`verify_token_at`] with the current Unix timestamp from
+/// `SystemTime::now()`. Prefer [`verify_token_at`] in tests or environments
+/// where you want deterministic timestamp control.
 ///
 /// # Arguments
 /// * `auth_header` - The full `Authorization` header value (e.g. `"Nostr base64..."`)
@@ -166,6 +169,35 @@ pub fn verify_token(
     expected_url: &str,
     expected_method: &str,
     body: Option<&[u8]>,
+) -> Result<Nip98Token, Nip98Error> {
+    let now = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .expect("system clock before epoch")
+        .as_secs();
+    verify_token_at(auth_header, expected_url, expected_method, body, now)
+}
+
+/// Verify a NIP-98 `Authorization` header value against an explicit timestamp.
+///
+/// Decodes the base64 token, recomputes the event ID from canonical form
+/// (never trusts the provided id), verifies the Schnorr signature, and
+/// checks URL, method, timestamp tolerance, and optional payload hash.
+///
+/// Use this variant in tests or worker environments where you want
+/// deterministic timestamp validation instead of relying on `SystemTime::now()`.
+///
+/// # Arguments
+/// * `auth_header` - The full `Authorization` header value (e.g. `"Nostr base64..."`)
+/// * `expected_url` - The URL that should appear in the `u` tag
+/// * `expected_method` - The HTTP method that should appear in the `method` tag
+/// * `body` - Optional request body bytes to verify against the `payload` tag
+/// * `now` - The current Unix timestamp (seconds) used for tolerance checking
+pub fn verify_token_at(
+    auth_header: &str,
+    expected_url: &str,
+    expected_method: &str,
+    body: Option<&[u8]>,
+    now: u64,
 ) -> Result<Nip98Token, Nip98Error> {
     // 1. Strip "Nostr " prefix
     let token = auth_header
@@ -196,16 +228,7 @@ pub fn verify_token(
     }
 
     // 6. Timestamp within tolerance
-    let now = std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .expect("system clock before epoch")
-        .as_secs();
-    let diff = if now > event.created_at {
-        now - event.created_at
-    } else {
-        event.created_at - now
-    };
-    if diff > TIMESTAMP_TOLERANCE {
+    if now.abs_diff(event.created_at) > TIMESTAMP_TOLERANCE {
         return Err(Nip98Error::TimestampExpired {
             event_ts: event.created_at,
             now,
@@ -453,6 +476,64 @@ mod tests {
         let header = authorization_header(&b64);
 
         let err = verify_token(&header, url, "GET", None).unwrap_err();
+        assert!(matches!(err, Nip98Error::TimestampExpired { .. }));
+    }
+
+    // ── verify_token_at tests ─────────────────────────────────────────
+
+    #[test]
+    fn nip98_verify_token_at_accepts_matching_timestamp() {
+        let sk = test_secret_key();
+        let url = "https://api.example.com/at";
+        let created_at = 1_700_000_000u64;
+
+        let token = create_token_at(&sk, url, "GET", None, created_at).unwrap();
+        let header = authorization_header(&token);
+
+        // Verify at the same timestamp
+        let result = verify_token_at(&header, url, "GET", None, created_at).unwrap();
+        assert_eq!(result.created_at, created_at);
+    }
+
+    #[test]
+    fn nip98_verify_token_at_accepts_within_tolerance() {
+        let sk = test_secret_key();
+        let url = "https://api.example.com/at";
+        let created_at = 1_700_000_000u64;
+
+        let token = create_token_at(&sk, url, "POST", Some(b"body"), created_at).unwrap();
+        let header = authorization_header(&token);
+
+        // 30 seconds later -- within the 60s tolerance
+        let result = verify_token_at(&header, url, "POST", Some(b"body"), created_at + 30).unwrap();
+        assert_eq!(result.created_at, created_at);
+    }
+
+    #[test]
+    fn nip98_verify_token_at_rejects_beyond_tolerance() {
+        let sk = test_secret_key();
+        let url = "https://api.example.com/at";
+        let created_at = 1_700_000_000u64;
+
+        let token = create_token_at(&sk, url, "GET", None, created_at).unwrap();
+        let header = authorization_header(&token);
+
+        // 120 seconds later -- beyond the 60s tolerance
+        let err = verify_token_at(&header, url, "GET", None, created_at + 120).unwrap_err();
+        assert!(matches!(err, Nip98Error::TimestampExpired { .. }));
+    }
+
+    #[test]
+    fn nip98_verify_token_at_rejects_future_beyond_tolerance() {
+        let sk = test_secret_key();
+        let url = "https://api.example.com/at";
+        let created_at = 1_700_000_100u64;
+
+        let token = create_token_at(&sk, url, "GET", None, created_at).unwrap();
+        let header = authorization_header(&token);
+
+        // Verify at a time 120s BEFORE the event -- future event beyond tolerance
+        let err = verify_token_at(&header, url, "GET", None, created_at - 120).unwrap_err();
         assert!(matches!(err, Nip98Error::TimestampExpired { .. }));
     }
 

@@ -6,6 +6,36 @@
 use k256::schnorr::{SigningKey, VerifyingKey};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
+use thiserror::Error;
+
+/// Errors returned by event verification.
+#[derive(Debug, Error)]
+pub enum EventError {
+    /// The recomputed event ID does not match the `id` field.
+    #[error("event ID mismatch: expected {expected}, got {actual}")]
+    IdMismatch {
+        /// The event's declared ID.
+        actual: String,
+        /// The ID recomputed from canonical serialization.
+        expected: String,
+    },
+
+    /// The pubkey field is not a valid 32-byte hex string.
+    #[error("invalid pubkey: expected 64 hex chars")]
+    InvalidPubkey,
+
+    /// The pubkey bytes are not a valid secp256k1 x-coordinate.
+    #[error("pubkey is not a valid secp256k1 point")]
+    InvalidPubkeyPoint,
+
+    /// The signature field is not a valid 64-byte hex string.
+    #[error("invalid signature: expected 128 hex chars")]
+    InvalidSignature,
+
+    /// The Schnorr signature does not verify against the pubkey and event ID.
+    #[error("signature verification failed")]
+    SignatureInvalid,
+}
 
 /// A fully signed Nostr event.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -20,7 +50,7 @@ pub struct NostrEvent {
 }
 
 /// An unsigned event template, ready for ID computation and signing.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UnsignedEvent {
     pub pubkey: String,
     pub created_at: u64,
@@ -82,38 +112,59 @@ pub fn sign_event(event: UnsignedEvent, signing_key: &SigningKey) -> NostrEvent 
 /// Verify a signed event: recompute ID from canonical form, then verify Schnorr signature.
 ///
 /// Returns `true` if the event ID matches the canonical serialization AND the
-/// signature is valid against the pubkey.
+/// signature is valid against the pubkey. For richer error information, use
+/// [`verify_event_strict`] instead.
 pub fn verify_event(event: &NostrEvent) -> bool {
+    verify_event_strict(event).is_ok()
+}
+
+/// Verify a signed event with detailed error reporting.
+///
+/// Same checks as [`verify_event`] but returns a typed [`EventError`] on failure
+/// instead of a bare `false`, making it easier to log or propagate the reason.
+pub fn verify_event_strict(event: &NostrEvent) -> Result<(), EventError> {
     // Recompute ID — never trust the provided id field
     let expected_id = recompute_event_id(event);
     let expected_id_hex = hex::encode(expected_id);
 
     if event.id != expected_id_hex {
-        return false;
+        return Err(EventError::IdMismatch {
+            actual: event.id.clone(),
+            expected: expected_id_hex,
+        });
     }
 
     // Decode pubkey
-    let pubkey_bytes = match hex::decode(&event.pubkey) {
-        Ok(b) if b.len() == 32 => b,
-        _ => return false,
-    };
-    let verifying_key = match VerifyingKey::from_bytes(&pubkey_bytes) {
-        Ok(k) => k,
-        Err(_) => return false,
-    };
+    let pubkey_bytes = hex::decode(&event.pubkey)
+        .ok()
+        .filter(|b| b.len() == 32)
+        .ok_or(EventError::InvalidPubkey)?;
+
+    let verifying_key =
+        VerifyingKey::from_bytes(&pubkey_bytes).map_err(|_| EventError::InvalidPubkeyPoint)?;
 
     // Decode signature
-    let sig_bytes = match hex::decode(&event.sig) {
-        Ok(b) if b.len() == 64 => b,
-        _ => return false,
-    };
-    let signature = match k256::schnorr::Signature::try_from(sig_bytes.as_slice()) {
-        Ok(s) => s,
-        Err(_) => return false,
-    };
+    let sig_bytes = hex::decode(&event.sig)
+        .ok()
+        .filter(|b| b.len() == 64)
+        .ok_or(EventError::InvalidSignature)?;
+
+    let signature = k256::schnorr::Signature::try_from(sig_bytes.as_slice())
+        .map_err(|_| EventError::InvalidSignature)?;
 
     // Verify Schnorr signature over the event ID bytes
-    verifying_key.verify_raw(&expected_id, &signature).is_ok()
+    verifying_key
+        .verify_raw(&expected_id, &signature)
+        .map_err(|_| EventError::SignatureInvalid)
+}
+
+/// Verify multiple events, returning a result for each.
+///
+/// Useful in relay and worker contexts that receive batches of events
+/// (e.g. `EVENT` messages on a WebSocket connection). Each event is
+/// verified independently; a failure in one does not affect the others.
+pub fn verify_events_batch(events: &[NostrEvent]) -> Vec<Result<(), EventError>> {
+    events.iter().map(verify_event_strict).collect()
 }
 
 #[cfg(test)]
@@ -176,5 +227,110 @@ mod tests {
         let mut signed = sign_event(unsigned, &sk);
         signed.id = "00".repeat(32);
         assert!(!verify_event(&signed));
+    }
+
+    #[test]
+    fn verify_event_strict_returns_id_mismatch() {
+        let sk = test_signing_key();
+        let pubkey = hex::encode(sk.verifying_key().to_bytes());
+
+        let unsigned = UnsignedEvent {
+            pubkey,
+            created_at: 1700000000,
+            kind: 1,
+            tags: vec![],
+            content: "hello".to_string(),
+        };
+
+        let mut signed = sign_event(unsigned, &sk);
+        signed.id = "00".repeat(32);
+        let err = verify_event_strict(&signed).unwrap_err();
+        assert!(matches!(err, EventError::IdMismatch { .. }));
+    }
+
+    #[test]
+    fn verify_event_strict_returns_signature_invalid() {
+        let sk = test_signing_key();
+        let pubkey = hex::encode(sk.verifying_key().to_bytes());
+
+        let unsigned = UnsignedEvent {
+            pubkey,
+            created_at: 1700000000,
+            kind: 1,
+            tags: vec![],
+            content: "hello".to_string(),
+        };
+
+        let mut signed = sign_event(unsigned, &sk);
+        // Tamper signature but keep the correct id
+        let mut sig_bytes = hex::decode(&signed.sig).unwrap();
+        sig_bytes[0] ^= 0xFF;
+        signed.sig = hex::encode(&sig_bytes);
+        let err = verify_event_strict(&signed).unwrap_err();
+        assert!(matches!(err, EventError::SignatureInvalid));
+    }
+
+    #[test]
+    fn verify_events_batch_mixed_results() {
+        let sk = test_signing_key();
+        let pubkey = hex::encode(sk.verifying_key().to_bytes());
+
+        let good = sign_event(
+            UnsignedEvent {
+                pubkey: pubkey.clone(),
+                created_at: 1700000000,
+                kind: 1,
+                tags: vec![],
+                content: "valid".to_string(),
+            },
+            &sk,
+        );
+
+        let mut bad = sign_event(
+            UnsignedEvent {
+                pubkey,
+                created_at: 1700000001,
+                kind: 1,
+                tags: vec![],
+                content: "tampered".to_string(),
+            },
+            &sk,
+        );
+        bad.content = "modified".to_string(); // tamper
+
+        let results = verify_events_batch(&[good, bad]);
+        assert_eq!(results.len(), 2);
+        assert!(results[0].is_ok());
+        assert!(results[1].is_err());
+    }
+
+    #[test]
+    fn verify_events_batch_all_valid() {
+        let sk = test_signing_key();
+        let pubkey = hex::encode(sk.verifying_key().to_bytes());
+
+        let events: Vec<NostrEvent> = (0..5)
+            .map(|i| {
+                sign_event(
+                    UnsignedEvent {
+                        pubkey: pubkey.clone(),
+                        created_at: 1700000000 + i,
+                        kind: 1,
+                        tags: vec![],
+                        content: format!("msg {i}"),
+                    },
+                    &sk,
+                )
+            })
+            .collect();
+
+        let results = verify_events_batch(&events);
+        assert!(results.iter().all(|r| r.is_ok()));
+    }
+
+    #[test]
+    fn verify_events_batch_empty() {
+        let results = verify_events_batch(&[]);
+        assert!(results.is_empty());
     }
 }

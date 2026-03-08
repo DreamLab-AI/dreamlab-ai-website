@@ -144,7 +144,7 @@ pub fn calc_padded_len(unpadded_len: usize) -> usize {
     }
     let next_power = unpadded_len.next_power_of_two();
     let chunk = if next_power <= 256 { 32 } else { next_power / 8 };
-    chunk * ((unpadded_len + chunk - 1) / chunk)
+    chunk * unpadded_len.div_ceil(chunk)
 }
 
 /// Internal encryption: pads, encrypts, MACs, and base64-encodes.
@@ -228,11 +228,14 @@ fn decrypt_inner(conv_key: &[u8; 32], payload: &str) -> Result<String, Nip44Erro
         .map_err(|_| Nip44Error::InvalidPayload("invalid UTF-8 in plaintext"))
 }
 
+/// Derived message keys: (chacha_key[32], chacha_nonce[12], hmac_key[32]).
+type MessageKeys = ([u8; 32], [u8; 12], [u8; 32]);
+
 /// Derive (chacha_key[32], chacha_nonce[12], hmac_key[32]) from conversation key + nonce.
 fn derive_message_keys(
     conv_key: &[u8; 32],
     nonce: &[u8; 32],
-) -> Result<([u8; 32], [u8; 12], [u8; 32]), Nip44Error> {
+) -> Result<MessageKeys, Nip44Error> {
     let hk = Hkdf::<Sha256>::new(Some(conv_key), nonce);
     let mut okm = [0u8; 76];
     hk.expand(b"nip44-v2", &mut okm)
@@ -277,7 +280,7 @@ fn unpad(padded: &[u8]) -> Result<&[u8], Nip44Error> {
     }
 
     let unpadded_len = ((padded[0] as usize) << 8) | (padded[1] as usize);
-    if unpadded_len < MIN_PLAINTEXT_LEN || unpadded_len > MAX_PLAINTEXT_LEN {
+    if !(MIN_PLAINTEXT_LEN..=MAX_PLAINTEXT_LEN).contains(&unpadded_len) {
         return Err(Nip44Error::InvalidPayload("invalid unpadded length"));
     }
 

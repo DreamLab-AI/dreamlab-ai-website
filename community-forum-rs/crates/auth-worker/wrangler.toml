@@ -1,6 +1,28 @@
-name = "dreamlab-auth-worker"
+name = "dreamlab-auth-api"
 main = "build/worker/shim.mjs"
-compatibility_date = "2026-03-01"
+compatibility_date = "2024-09-02"
 
 [build]
-command = "cargo install worker-build && worker-build --release"
+command = "worker-build --release"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "dreamlab-auth"
+database_id = ""  # Set via wrangler or GitHub secret
+
+[[kv_namespaces]]
+binding = "SESSIONS"
+id = ""  # Set via wrangler or GitHub secret
+
+[[kv_namespaces]]
+binding = "POD_META"
+id = ""  # Set via wrangler or GitHub secret
+
+[[r2_buckets]]
+binding = "PODS"
+bucket_name = "dreamlab-pods"
+
+[vars]
+RP_ID = "dreamlab-ai.com"
+RP_NAME = "DreamLab Community"
+EXPECTED_ORIGIN = "https://dreamlab-ai.com"

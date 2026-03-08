@@ -103,16 +103,40 @@ pub fn verify_nip98_token(
 ) -> Result<JsValue, JsValue> {
     let token = nip98::verify_token(auth_header, url, method, body.as_deref())
         .map_err(|e| JsValue::from_str(&e.to_string()))?;
+    nip98_token_to_js(&token)
+}
 
+/// Verify a NIP-98 `Authorization` header value against an explicit Unix timestamp.
+///
+/// Use this variant in environments where you need deterministic timestamp
+/// control (e.g. tests, replayed requests). `now` is Unix seconds.
+///
+/// Returns a JS object `{ pubkey, url, method, payloadHash, createdAt }`.
+#[wasm_bindgen]
+pub fn verify_nip98_token_at(
+    auth_header: &str,
+    url: &str,
+    method: &str,
+    body: Option<Vec<u8>>,
+    now: u32,
+) -> Result<JsValue, JsValue> {
+    let token =
+        nip98::verify_token_at(auth_header, url, method, body.as_deref(), now as u64)
+            .map_err(|e| JsValue::from_str(&e.to_string()))?;
+    nip98_token_to_js(&token)
+}
+
+/// Convert a verified NIP-98 token to a JS object.
+fn nip98_token_to_js(token: &nip98::Nip98Token) -> Result<JsValue, JsValue> {
     let obj = js_sys::Object::new();
-    js_sys::Reflect::set(&obj, &"pubkey".into(), &token.pubkey.into())?;
-    js_sys::Reflect::set(&obj, &"url".into(), &token.url.into())?;
-    js_sys::Reflect::set(&obj, &"method".into(), &token.method.into())?;
+    js_sys::Reflect::set(&obj, &"pubkey".into(), &token.pubkey.clone().into())?;
+    js_sys::Reflect::set(&obj, &"url".into(), &token.url.clone().into())?;
+    js_sys::Reflect::set(&obj, &"method".into(), &token.method.clone().into())?;
     js_sys::Reflect::set(
         &obj,
         &"payloadHash".into(),
-        &match token.payload_hash {
-            Some(h) => JsValue::from_str(&h),
+        &match &token.payload_hash {
+            Some(h) => JsValue::from_str(h),
             None => JsValue::NULL,
         },
     )?;
