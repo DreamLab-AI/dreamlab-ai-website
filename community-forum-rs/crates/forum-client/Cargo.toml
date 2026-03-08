@@ -27,6 +27,8 @@ web-sys = { workspace = true, features = [
     "Document",
     "HtmlElement",
     "HtmlInputElement",
+    "HtmlCanvasElement",
+    "CanvasRenderingContext2d",
     "Element",
     "ScrollBehavior",
     "ScrollIntoViewOptions",
@@ -51,6 +53,8 @@ web-sys = { workspace = true, features = [
     "Request",
     "Response",
     "PageTransitionEvent",
+    "DomRect",
+    "MediaQueryList",
 ] }
 gloo = { workspace = true }
 comrak = { workspace = true }

@@ -5,3 +5,4 @@
 
 pub mod channel_card;
 pub mod message_bubble;
+pub mod particle_canvas;
