@@ -8,6 +8,8 @@
 use leptos::prelude::*;
 use leptos_router::components::A;
 use leptos_router::hooks::use_params_map;
+
+use crate::app::base_href;
 use wasm_bindgen::JsCast;
 
 use crate::auth::use_auth;
@@ -153,7 +155,7 @@ pub fn DmChatPage() -> impl IntoView {
             <div class="bg-gray-800 border-b border-gray-700 p-4">
                 <div class="max-w-2xl mx-auto">
                     <div class="flex items-center gap-3">
-                        <A href="/dm" attr:class="text-gray-400 hover:text-white transition-colors p-1 rounded hover:bg-gray-700">
+                        <A href=base_href("/dm") attr:class="text-gray-400 hover:text-white transition-colors p-1 rounded hover:bg-gray-700">
                             {arrow_left_svg()}
                         </A>
 

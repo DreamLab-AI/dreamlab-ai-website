@@ -3,6 +3,7 @@
 use leptos::prelude::*;
 use leptos_router::components::A;
 
+use crate::app::base_href;
 use crate::utils::format_relative_time;
 
 /// Props for the ChannelCard component.
@@ -19,7 +20,7 @@ pub struct ChannelInfo {
 /// Display a single channel as a card in the channel list.
 #[component]
 pub fn ChannelCard(channel: ChannelInfo) -> impl IntoView {
-    let href = format!("/chat/{}", channel.id);
+    let href = base_href(&format!("/chat/{}", channel.id));
     let last_active_display = format_relative_time(channel.last_active);
     let has_messages = channel.last_active > 0;
     let msg_count_label = if channel.message_count == 1 {

@@ -7,6 +7,7 @@ use std::collections::HashMap;
 use std::rc::Rc;
 use wasm_bindgen::JsCast;
 
+use crate::app::base_href;
 use crate::components::channel_card::{ChannelCard, ChannelInfo};
 use crate::relay::{ConnectionState, Filter, RelayConnection};
 
@@ -263,9 +264,9 @@ pub fn ChatPage() -> impl IntoView {
                         current == value
                     };
                     let href = if value.is_empty() {
-                        "/chat".to_string()
+                        base_href("/chat")
                     } else {
-                        format!("/chat?section={}", value)
+                        base_href(&format!("/chat?section={}", value))
                     };
                     let class = if is_active {
                         "inline-block px-3 py-1.5 rounded-full text-sm font-semibold bg-amber-500 text-gray-900 whitespace-nowrap transition-colors"
@@ -356,7 +357,7 @@ pub fn ChatPage() -> impl IntoView {
                                     let section = section_filter();
                                     if !section.is_empty() {
                                         Some(view! {
-                                            <A href="/chat" attr:class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-gray-900 font-semibold px-5 py-2.5 rounded-lg transition-colors">
+                                            <A href=base_href("/chat") attr:class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-gray-900 font-semibold px-5 py-2.5 rounded-lg transition-colors">
                                                 <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
                                                 </svg>

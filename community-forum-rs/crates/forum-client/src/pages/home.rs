@@ -33,20 +33,20 @@ pub fn HomePage() -> impl IntoView {
                     <div class="absolute -z-10 w-96 h-96 rounded-full bg-amber-500/10 blur-3xl animate-ambient-breathe"></div>
 
                     <p class="text-amber-400/60 uppercase tracking-widest text-xs font-medium mb-4">
-                        "Decentralized Community"
+                        "a dreamlab ai ltd partnership"
                     </p>
 
                     <h1 class="text-5xl sm:text-6xl font-bold bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent drop-shadow-lg">
-                        "DreamLab Forum"
+                        "MiniMooNoir Forums"
                     </h1>
                 </div>
 
                 <div class="space-y-2">
                     <p class="text-xl text-gray-300 leading-relaxed">
-                        "A decentralized community forum built on Nostr."
+                        "Private, secure, multi cohort BBS done the right way"
                     </p>
                     <p class="text-lg text-gray-400 leading-relaxed">
-                        "Your keys, your identity, your data \u{2014} no platform lock-in, ever."
+                        "Secure, end to end encrypted with private file stores and distributed identity."
                     </p>
                 </div>
 
@@ -81,7 +81,7 @@ pub fn HomePage() -> impl IntoView {
                     <FeatureCard
                         icon="\u{1F511}"
                         title="Passkey Auth"
-                        description="Sign in with biometrics. Your Nostr key is derived from your passkey -- no seed phrases."
+                        description="Sign in with biometrics. Your key is derived from your passkey -- no seed phrases."
                     />
                     <FeatureCard
                         icon="\u{1F6E1}"
@@ -91,7 +91,7 @@ pub fn HomePage() -> impl IntoView {
                     <FeatureCard
                         icon="\u{1F5DD}"
                         title="Self-Sovereign"
-                        description="Your identity is a Nostr keypair. Take it anywhere. No platform lock-in."
+                        description="Your identity allows you to generate AI agents."
                     />
                 </div>
 

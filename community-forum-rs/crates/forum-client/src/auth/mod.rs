@@ -16,6 +16,7 @@ use zeroize::Zeroize;
 
 use self::passkey::{PasskeyAuthResult, PasskeyRegistrationResult};
 use self::session::StoredSession;
+use crate::app::base_href;
 use nostr_core::{NostrEvent, UnsignedEvent};
 
 // -- Constants ----------------------------------------------------------------
@@ -354,8 +355,9 @@ impl AuthStore {
 
         if let Some(window) = web_sys::window() {
             if let Ok(location) = window.location().pathname() {
-                if location != "/" {
-                    let _ = window.location().set_href("/");
+                let home = base_href("/");
+                if location != home {
+                    let _ = window.location().set_href(&home);
                 }
             }
         }

@@ -9,6 +9,8 @@ use leptos::prelude::*;
 use leptos_router::components::A;
 use wasm_bindgen::JsCast;
 
+use crate::app::base_href;
+
 use crate::auth::use_auth;
 use crate::dm::{provide_dm_store, use_dm_store, DMConversation};
 use crate::relay::{ConnectionState, RelayConnection};
@@ -89,7 +91,7 @@ pub fn DmListPage() -> impl IntoView {
 
         // Navigate to the DM chat page
         if let Some(window) = web_sys::window() {
-            let _ = window.location().set_href(&format!("/dm/{}", pk));
+            let _ = window.location().set_href(&base_href(&format!("/dm/{}", pk)));
         }
     };
 
@@ -253,7 +255,7 @@ pub fn DmListPage() -> impl IntoView {
 /// A single conversation row in the DM list.
 #[component]
 fn ConversationRow(convo: DMConversation) -> impl IntoView {
-    let href = format!("/dm/{}", convo.pubkey);
+    let href = base_href(&format!("/dm/{}", convo.pubkey));
     let has_unread = convo.unread_count > 0;
     let unread_count = convo.unread_count;
     let time_display = format_relative_time(convo.last_timestamp);

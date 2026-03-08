@@ -7,6 +7,7 @@ use leptos::prelude::*;
 use wasm_bindgen::JsCast;
 use wasm_bindgen_futures::spawn_local;
 
+use crate::app::base_href;
 use crate::admin::channel_form::{ChannelForm, ChannelFormData};
 use crate::admin::overview::{ConnectionStatusBar, OverviewTab};
 use crate::admin::user_table::{UpdateCohortsCb, UserTable};
@@ -30,7 +31,7 @@ pub fn AdminPage() -> impl IntoView {
     Effect::new(move |_| {
         if is_ready.get() && !is_authed.get() {
             if let Some(window) = web_sys::window() {
-                let _ = window.location().set_href("/login");
+                let _ = window.location().set_href(&base_href("/login"));
             }
         }
     });
@@ -39,7 +40,7 @@ pub fn AdminPage() -> impl IntoView {
     Effect::new(move |_| {
         if is_ready.get() && is_authed.get() && !is_admin.get() {
             if let Some(window) = web_sys::window() {
-                let _ = window.location().set_href("/chat");
+                let _ = window.location().set_href(&base_href("/chat"));
             }
         }
     });

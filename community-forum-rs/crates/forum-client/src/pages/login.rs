@@ -4,6 +4,7 @@ use leptos::prelude::*;
 use leptos_router::components::A;
 use wasm_bindgen_futures::spawn_local;
 
+use crate::app::base_href;
 use crate::auth::use_auth;
 
 #[component]
@@ -21,7 +22,7 @@ pub fn LoginPage() -> impl IntoView {
     Effect::new(move |_| {
         if is_authed.get() {
             if let Some(window) = web_sys::window() {
-                let _ = window.location().set_href("/chat");
+                let _ = window.location().set_href(&base_href("/chat"));
             }
         }
     });
@@ -39,7 +40,7 @@ pub fn LoginPage() -> impl IntoView {
             is_pending.set(false);
             if result.is_ok() {
                 if let Some(window) = web_sys::window() {
-                    let _ = window.location().set_href("/chat");
+                    let _ = window.location().set_href(&base_href("/chat"));
                 }
             }
         });
@@ -57,7 +58,7 @@ pub fn LoginPage() -> impl IntoView {
         match auth.login_with_local_key(&trimmed) {
             Ok(()) => {
                 if let Some(window) = web_sys::window() {
-                    let _ = window.location().set_href("/chat");
+                    let _ = window.location().set_href(&base_href("/chat"));
                 }
             }
             Err(e) => {
@@ -163,7 +164,7 @@ pub fn LoginPage() -> impl IntoView {
 
                 <p class="text-center text-gray-500 text-sm mt-6">
                     "Don\u{2019}t have an account? "
-                    <A href="/signup" attr:class="text-amber-400 hover:text-amber-300 underline">
+                    <A href=base_href("/signup") attr:class="text-amber-400 hover:text-amber-300 underline">
                         "Create one"
                     </A>
                 </p>

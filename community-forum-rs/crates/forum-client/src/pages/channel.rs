@@ -7,6 +7,7 @@ use nostr_core::NostrEvent;
 use std::rc::Rc;
 use wasm_bindgen::JsCast;
 
+use crate::app::base_href;
 use crate::auth::use_auth;
 use crate::components::message_bubble::{MessageBubble, MessageData};
 use crate::relay::{ConnectionState, Filter, RelayConnection};
@@ -244,7 +245,7 @@ pub fn ChannelPage() -> impl IntoView {
                 <div class="p-4">
                     <div class="max-w-4xl mx-auto">
                         <div class="flex items-center gap-3 mb-1">
-                            <A href="/chat" attr:class="text-gray-400 hover:text-white transition-colors p-1 rounded hover:bg-gray-700">
+                            <A href=base_href("/chat") attr:class="text-gray-400 hover:text-white transition-colors p-1 rounded hover:bg-gray-700">
                                 {arrow_left_svg()}
                             </A>
                             // Channel avatar

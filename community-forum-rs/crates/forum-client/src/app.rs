@@ -160,7 +160,7 @@ pub fn App() -> impl IntoView {
                         <div class="text-center">
                             <h1 class="text-6xl font-bold mb-4">"404"</h1>
                             <p class="text-gray-400 mb-8">"Page not found"</p>
-                            <A href="/" attr:class="text-amber-400 hover:text-amber-300 underline">
+                            <A href=base_href("/") attr:class="text-amber-400 hover:text-amber-300 underline">
                                 "Go home"
                             </A>
                         </div>
@@ -264,7 +264,7 @@ fn Layout(children: Children) -> impl IntoView {
             <header class="border-b border-gray-800/50 bg-gray-900/80 backdrop-blur-md sticky top-0 z-50">
                 <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
                     // Brand
-                    <A href="/" attr:class="flex items-center gap-2 text-xl sm:text-2xl font-bold text-amber-400 hover:text-amber-300 transition-colors">
+                    <A href=base_href("/") attr:class="flex items-center gap-2 text-xl sm:text-2xl font-bold text-amber-400 hover:text-amber-300 transition-colors">
                         {brand_icon()}
                         "DreamLab Forum"
                     </A>
@@ -274,24 +274,24 @@ fn Layout(children: Children) -> impl IntoView {
                         <Show
                             when=move || is_authed.get()
                             fallback=move || view! {
-                                <A href="/login" attr:class="text-gray-300 hover:text-white transition-colors px-3 py-2 rounded-lg hover:bg-gray-800">
+                                <A href=base_href("/login") attr:class="text-gray-300 hover:text-white transition-colors px-3 py-2 rounded-lg hover:bg-gray-800">
                                     "Log In"
                                 </A>
-                                <A href="/signup" attr:class="bg-amber-500 hover:bg-amber-400 text-gray-900 font-semibold px-4 py-2 rounded-lg transition-colors">
+                                <A href=base_href("/signup") attr:class="bg-amber-500 hover:bg-amber-400 text-gray-900 font-semibold px-4 py-2 rounded-lg transition-colors">
                                     "Sign Up"
                                 </A>
                             }
                         >
-                            <A href="/chat" attr:class=nav_link_class("/chat")>
+                            <A href=base_href("/chat") attr:class=nav_link_class("/chat")>
                                 {chat_icon()}
                                 "Chat"
                             </A>
-                            <A href="/dm" attr:class=nav_link_class("/dm")>
+                            <A href=base_href("/dm") attr:class=nav_link_class("/dm")>
                                 {dm_icon()}
                                 "DMs"
                             </A>
                             {move || is_admin.get().then(|| view! {
-                                <A href="/admin" attr:class=nav_link_class("/admin")>
+                                <A href=base_href("/admin") attr:class=nav_link_class("/admin")>
                                     {admin_icon()}
                                     <span class="text-sm">"Admin"</span>
                                 </A>
@@ -324,24 +324,24 @@ fn Layout(children: Children) -> impl IntoView {
                         <Show
                             when=move || is_authed.get()
                             fallback=move || view! {
-                                <A href="/login" attr:class="block text-gray-300 hover:text-white px-4 py-3 rounded-lg hover:bg-gray-800 transition-colors" on:click=close_mobile>
+                                <A href=base_href("/login") attr:class="block text-gray-300 hover:text-white px-4 py-3 rounded-lg hover:bg-gray-800 transition-colors" on:click=close_mobile>
                                     "Log In"
                                 </A>
-                                <A href="/signup" attr:class="block bg-amber-500 hover:bg-amber-400 text-gray-900 font-semibold px-4 py-3 rounded-lg transition-colors text-center" on:click=close_mobile>
+                                <A href=base_href("/signup") attr:class="block bg-amber-500 hover:bg-amber-400 text-gray-900 font-semibold px-4 py-3 rounded-lg transition-colors text-center" on:click=close_mobile>
                                     "Sign Up"
                                 </A>
                             }
                         >
-                            <A href="/chat" attr:class=mobile_link_class("/chat") on:click=close_mobile>
+                            <A href=base_href("/chat") attr:class=mobile_link_class("/chat") on:click=close_mobile>
                                 {chat_icon()}
                                 "Chat"
                             </A>
-                            <A href="/dm" attr:class=mobile_link_class("/dm") on:click=close_mobile>
+                            <A href=base_href("/dm") attr:class=mobile_link_class("/dm") on:click=close_mobile>
                                 {dm_icon()}
                                 "DMs"
                             </A>
                             {move || is_admin.get().then(|| view! {
-                                <A href="/admin" attr:class=mobile_link_class("/admin") on:click=close_mobile>
+                                <A href=base_href("/admin") attr:class=mobile_link_class("/admin") on:click=close_mobile>
                                     {admin_icon()}
                                     "Admin"
                                 </A>
