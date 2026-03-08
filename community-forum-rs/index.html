@@ -48,8 +48,8 @@
     <!-- Base styles processed by Trunk -->
     <link data-trunk rel="css" href="style.css" />
 
-    <!-- Trunk WASM bundle injection -->
-    <link data-trunk rel="rust" data-wasm-opt="z" data-bin="forum-client" />
+    <!-- Trunk WASM bundle injection (workspace: specify package + binary) -->
+    <link data-trunk rel="rust" data-wasm-opt="z" data-cargo-package="forum-client" data-bin="forum-client" />
 </head>
 <body>
     <!-- Loading screen — replaced by Leptos mount_to_body() -->
