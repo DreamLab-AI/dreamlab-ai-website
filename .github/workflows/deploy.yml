@@ -1,12 +1,13 @@
 name: Deploy to GitHub Pages
 
-# Runs on DreamLab-AI/dreamlab-ai-website fork only.
-# Does NOT run on upstream (TheDreamLabUK/website).
+# Builds the React main site + Rust/WASM Leptos forum client and deploys
+# both to GitHub Pages (dreamlab-ai.com).
 #
-# Builds the Rust/WASM Leptos forum client via Trunk and deploys to
-# GitHub Pages (dreamlab-ai.com) and optionally Cloudflare Pages.
+# Layout:
+#   /              → React marketing site
+#   /community/    → Leptos forum (Rust WASM)
 #
-# Rollback: revert the merge commit or reset main to the `pre-rust-deploy` tag.
+# Rollback: revert the merge commit or reset main to `pre-rust-deploy` tag.
 
 on:
   push:
@@ -22,10 +23,11 @@ env:
   VITE_POD_API_URL: 'https://dreamlab-pod-api.solitary-paper-764d.workers.dev'
   VITE_SEARCH_API_URL: 'https://dreamlab-search-api.solitary-paper-764d.workers.dev'
   VITE_LINK_PREVIEW_API_URL: 'https://dreamlab-link-preview.solitary-paper-764d.workers.dev'
+  # Forum base path for leptos_router (sub-directory deployment)
+  FORUM_BASE: '/community'
 
 jobs:
   build-and-deploy:
-    # Only run on the DreamLab-AI fork, skip if triggered on upstream
     if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
     runs-on: ubuntu-latest
     permissions:
@@ -35,6 +37,20 @@ jobs:
       - name: Check out the code
         uses: actions/checkout@v4
 
+      # ── React main site ────────────────────────────────────────────────
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Build React main site
+        run: npm run build
+
+      # ── Rust/WASM forum client ─────────────────────────────────────────
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -58,45 +74,85 @@ jobs:
             | tar xz -C /usr/local/bin
           trunk --version
 
-      - name: Build Rust/WASM forum with Trunk
+      - name: Build Leptos forum with Trunk
         working-directory: community-forum-rs/crates/forum-client
-        run: trunk build --release
+        run: trunk build --release --public-url /community/
 
-      - name: Inject runtime env config
+      # ── Combine outputs ────────────────────────────────────────────────
+      - name: Merge React + Forum into dist/
         run: |
-          # Inject window.__ENV__ into the built index.html so runtime overrides
-          # work without recompiling. Inserted right before </head>.
+          # React build already in dist/
+          # Copy forum output into dist/community/
+          mkdir -p dist/community
+          cp -r community-forum-rs/dist/* dist/community/
+
+          echo "=== React site ==="
+          ls dist/index.html dist/assets/ | head -5
+
+          echo "=== Forum (community/) ==="
+          ls dist/community/
+
+      - name: Inject runtime env config into forum
+        run: |
           ENV_SCRIPT='<script>window.__ENV__={VITE_RELAY_URL:"'"$VITE_RELAY_URL"'",VITE_AUTH_API_URL:"'"$VITE_AUTH_API_URL"'",VITE_POD_API_URL:"'"$VITE_POD_API_URL"'",VITE_SEARCH_API_URL:"'"$VITE_SEARCH_API_URL"'",VITE_LINK_PREVIEW_API_URL:"'"$VITE_LINK_PREVIEW_API_URL"'"};</script>'
-          sed -i "s|</head>|${ENV_SCRIPT}</head>|" community-forum-rs/dist/index.html
-          echo "Injected window.__ENV__ into index.html"
+          sed -i "s|</head>|${ENV_SCRIPT}</head>|" dist/community/index.html
+          echo "Injected window.__ENV__ into forum index.html"
 
-      - name: Prepare deploy artifacts
+      - name: Create GitHub Pages SPA routing files
         run: |
-          DIST="community-forum-rs/dist"
+          # Smart 404.html: routes /community/* to the forum SPA,
+          # all other paths to the React SPA.
+          cat > dist/404.html << 'REDIRECT_EOF'
+          <!DOCTYPE html>
+          <html><head><meta charset="utf-8"><title>Redirecting...</title>
+          <script>
+            (function(){
+              var loc = window.location;
+              var path = loc.pathname;
+              if (path.startsWith('/community')) {
+                // Route to forum SPA — encode sub-path as query param
+                var sub = path.slice('/community'.length) || '/';
+                loc.replace(
+                  loc.protocol + '//' + loc.host +
+                  '/community/?__p=' + encodeURIComponent(sub + loc.search + loc.hash)
+                );
+              } else {
+                // Route to React SPA — standard SPA redirect
+                loc.replace(
+                  loc.protocol + '//' + loc.host +
+                  '/?__p=' + encodeURIComponent(path + loc.search + loc.hash)
+                );
+              }
+            })();
+          </script>
+          </head><body></body></html>
+          REDIRECT_EOF
 
-          # SPA routing: copy index.html as 404.html so GitHub Pages
-          # serves the app for all routes (client-side router handles them).
-          cp "$DIST/index.html" "$DIST/404.html"
+          # Forum also needs its own 404.html for direct community/ sub-paths
+          cp dist/community/index.html dist/community/404.html
 
           # Prevent Jekyll processing
-          touch "$DIST/.nojekyll"
+          touch dist/.nojekyll
 
-          echo "Build artifacts:"
-          ls -la "$DIST/"
-          echo ""
-          echo "WASM files:"
-          ls -lh "$DIST/"*.wasm 2>/dev/null || echo "(none — may be in subfolder)"
-          ls -lh "$DIST/"*.js 2>/dev/null || echo "(no JS files)"
+          echo "SPA routing files created"
 
+      - name: Inject React SPA redirect pickup
+        run: |
+          # Add redirect pickup script to React index.html (before </head>)
+          PICKUP='<script>(function(){var q=new URLSearchParams(window.location.search);var r=q.get("__p");if(r){q.delete("__p");var s=q.toString();history.replaceState(null,"",r+(s?"?"+s:""));}})();</script>'
+          sed -i "s|</head>|${PICKUP}</head>|" dist/index.html
+          echo "Injected SPA redirect pickup into React index.html"
+
+      # ── Deploy ─────────────────────────────────────────────────────────
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./community-forum-rs/dist
+          publish_dir: ./dist
           publish_branch: gh-pages
           force_orphan: true
           cname: dreamlab-ai.com
-          commit_message: "Deploy Rust/WASM forum from ${{ github.sha }}"
+          commit_message: "Deploy React + Leptos forum from ${{ github.sha }}"
 
       - name: Deploy to Cloudflare Pages
         if: vars.CLOUDFLARE_PAGES_ENABLED == 'true'
@@ -104,4 +160,4 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy community-forum-rs/dist/ --project-name=dreamlab-ai --commit-dirty=true
+          command: pages deploy dist/ --project-name=dreamlab-ai --commit-dirty=true

@@ -39,7 +39,7 @@ pub enum ConnectionState {
 }
 
 /// A NIP-01 subscription filter.
-#[derive(Debug, Clone, serde::Serialize)]
+#[derive(Debug, Clone, Default, serde::Serialize)]
 pub struct Filter {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ids: Option<Vec<String>>,
@@ -59,20 +59,6 @@ pub struct Filter {
     pub limit: Option<u64>,
 }
 
-impl Default for Filter {
-    fn default() -> Self {
-        Self {
-            ids: None,
-            authors: None,
-            kinds: None,
-            e_tags: None,
-            p_tags: None,
-            since: None,
-            until: None,
-            limit: None,
-        }
-    }
-}
 
 /// Callback type for received events on a subscription.
 pub type EventCallback = Rc<dyn Fn(NostrEvent)>;
@@ -151,7 +137,7 @@ impl RelayConnection {
     where
         F: FnOnce(&Rc<RefCell<RelayInner>>) -> R,
     {
-        f(&*self.inner)
+        f(&self.inner)
     }
 
     /// Connect to the relay WebSocket.

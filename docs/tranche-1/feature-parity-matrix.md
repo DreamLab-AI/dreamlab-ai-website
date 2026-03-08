@@ -1,5 +1,7 @@
 # Feature Parity Matrix: SvelteKit Forum -> Rust/WASM Port
 
+[Back to Documentation Index](../README.md)
+
 **Task:** T1.5 -- Feature Audit
 **Date:** 2026-03-08
 **Scope:** All user-facing capabilities in `community-forum/src/`

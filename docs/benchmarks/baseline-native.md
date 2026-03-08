@@ -1,5 +1,7 @@
 # nostr-core Native Benchmark Baseline
 
+[Back to Documentation Index](../README.md)
+
 **Date**: 2026-03-08
 **Platform**: Linux 6.18.6-2-cachyos (x86_64)
 **Profile**: release (optimized)

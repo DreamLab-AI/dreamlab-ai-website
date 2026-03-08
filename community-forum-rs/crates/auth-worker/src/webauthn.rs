@@ -273,7 +273,7 @@ pub async fn register_options(mut req: Request, env: &Env) -> Result<Response> {
         "prfSalt": prf_salt_b64
     });
 
-    Ok(Response::from_json(&response_body)?)
+    Response::from_json(&response_body)
 }
 
 /// POST /auth/register/verify
@@ -364,7 +364,7 @@ pub async fn register_verify(mut req: Request, env: &Env) -> Result<Response> {
         "podUrl": pod_info.pod_url
     });
 
-    Ok(Response::from_json(&response_body)?)
+    Response::from_json(&response_body)
 }
 
 /// POST /auth/login/options
@@ -449,7 +449,7 @@ pub async fn login_options(mut req: Request, env: &Env) -> Result<Response> {
         "prfSalt": prf_salt
     });
 
-    Ok(Response::from_json(&response_body)?)
+    Response::from_json(&response_body)
 }
 
 /// POST /auth/login/verify
@@ -623,7 +623,7 @@ pub async fn login_verify(mut req: Request, env: &Env) -> Result<Response> {
         "didNostr": format!("did:nostr:{pubkey}")
     });
 
-    Ok(Response::from_json(&response_body)?)
+    Response::from_json(&response_body)
 }
 
 /// POST /auth/lookup

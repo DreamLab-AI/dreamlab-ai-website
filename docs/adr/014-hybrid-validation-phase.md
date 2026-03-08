@@ -1,5 +1,7 @@
 # ADR-014: Hybrid Validation Phase Before Full Leptos Rewrite
 
+[Back to ADR Index](README.md) | [Back to Documentation Index](../README.md)
+
 | Field     | Value                          |
 |-----------|--------------------------------|
 | Status    | Accepted                       |

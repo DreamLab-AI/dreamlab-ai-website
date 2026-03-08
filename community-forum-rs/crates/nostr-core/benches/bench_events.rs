@@ -22,7 +22,7 @@ fn generate_event_jsons(n: usize) -> Vec<String> {
                 ],
                 content: format!("Benchmark event #{i} with some content to make it realistic"),
             };
-            let signed = sign_event(unsigned, &sk);
+            let signed = sign_event(unsigned, &sk).unwrap();
             serde_json::to_string(&signed).unwrap()
         })
         .collect()
@@ -88,7 +88,7 @@ fn bench_event_verify(c: &mut Criterion) {
         tags: vec![],
         content: "bench".to_string(),
     };
-    let signed = sign_event(unsigned, &sk);
+    let signed = sign_event(unsigned, &sk).unwrap();
 
     c.bench_function("event_verify", |b| {
         b.iter(|| nostr_core::event::verify_event(&signed));

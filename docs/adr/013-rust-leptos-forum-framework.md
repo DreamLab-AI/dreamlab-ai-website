@@ -1,5 +1,7 @@
 # ADR-013: Rust/Leptos 0.7 as Forum UI Framework
 
+[Back to ADR Index](README.md) | [Back to Documentation Index](../README.md)
+
 | Field     | Value                          |
 |-----------|--------------------------------|
 | Status    | Accepted                       |

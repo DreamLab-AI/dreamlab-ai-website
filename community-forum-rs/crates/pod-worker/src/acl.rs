@@ -112,7 +112,7 @@ fn normalize_path_owned(path: &str) -> String {
         .or_else(|| path.strip_prefix('.'));
 
     let base = match stripped {
-        Some(s) if s.is_empty() => "/".to_string(),
+        Some("") => "/".to_string(),
         Some(s) if !s.starts_with('/') => format!("/{s}"),
         Some(s) => s.to_string(),
         None => path.to_string(),

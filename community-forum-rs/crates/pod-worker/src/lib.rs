@@ -115,7 +115,7 @@ async fn fetch(mut req: Request, env: Env, _ctx: Context) -> Result<Response> {
     }
 
     // Route: /pods/{pubkey}/...
-    let (owner_pubkey, resource_path) = match parse_pod_route(&path) {
+    let (owner_pubkey, resource_path) = match parse_pod_route(path) {
         Some(parsed) => parsed,
         None => return json_error(&env, "Not found", 404),
     };

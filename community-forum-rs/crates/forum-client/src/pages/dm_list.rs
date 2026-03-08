@@ -100,7 +100,7 @@ pub fn DmListPage() -> impl IntoView {
     };
 
     let on_new_pubkey_keydown = {
-        let on_start = on_start_conversation.clone();
+        let on_start = on_start_conversation;
         move |ev: leptos::ev::KeyboardEvent| {
             if ev.key() == "Enter" {
                 ev.prevent_default();

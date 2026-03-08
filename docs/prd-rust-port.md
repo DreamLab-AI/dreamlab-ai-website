@@ -10,6 +10,8 @@ research: "4-agent parallel crate survey, 2026-03-08"
 
 # PRD: DreamLab Community Forum — Production Rust Port
 
+[Back to Documentation Index](README.md)
+
 ## 1. Executive Summary
 
 Port the DreamLab community forum from TypeScript/SvelteKit to Rust/Leptos with
@@ -621,5 +623,9 @@ gantt
 - [Leptos component libraries](https://github.com/RustForWeb/shadcn-ui) (222 stars)
 - [lemmy-ui-leptos](https://github.com/LemmyNet/lemmy-ui-leptos) (134 stars, forum proof)
 - [nostr-indexeddb](https://github.com/rust-nostr/nostr/tree/master/crates/nostr-indexeddb) (fallback storage)
-- [ADR-010: Return to Cloudflare](docs/adr/010-return-to-cloudflare.md)
-- [ADR-012: Hardening Sprint](docs/adr/012-hardening-sprint.md)
+- ADR-010: Return to Cloudflare (historical, not present in this tree)
+- ADR-012: Hardening Sprint (historical, not present in this tree)
+
+---
+
+[Back to Documentation Index](README.md)

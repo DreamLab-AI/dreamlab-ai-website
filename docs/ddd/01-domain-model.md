@@ -1,13 +1,54 @@
 # Domain Model
 
-This document defines the core domain entities for the DreamLab community forum
-Rust port. Each entity maps to a Rust struct in the `nostr-core` or
-`forum-client` crate, compiled to both native and `wasm32-unknown-unknown`.
+**Last updated:** 2026-03-08 | [Back to DDD Index](README.md) | [Back to Documentation Index](../README.md)
+
+This document defines the core domain entities for the DreamLab community forum Rust port. Each entity maps to a Rust struct in the `nostr-core` or `forum-client` crate, compiled to both native and `wasm32-unknown-unknown`.
+
+## Entity Relationship Diagram
+
+```mermaid
+erDiagram
+    NostrKeypair ||--|| PublicKey : "derives"
+    NostrKeypair ||--o| PrfOutput : "derived from"
+    NostrKeypair ||--|| DidNostr : "maps to"
+    DidNostr ||--|| WebId : "resolves to"
+
+    PasskeyCredential }o--|| PublicKey : "belongs to"
+    Session ||--o| PublicKey : "authenticated as"
+    Session ||--|| AuthMethod : "via"
+
+    Category ||--|{ Section : "contains"
+    Section ||--|{ Channel : "contains"
+    Channel }o--|| SectionId : "belongs to"
+    Channel ||--|{ NostrEvent : "has messages"
+    Channel ||--|{ JoinRequest : "has pending"
+
+    WhitelistEntry ||--|| PublicKey : "authorizes"
+
+    NostrEvent ||--|| EventId : "identified by"
+    NostrEvent ||--|| PublicKey : "authored by"
+    NostrEvent ||--|| Signature : "signed with"
+    NostrEvent ||--|{ Tag : "has"
+
+    DirectMessage ||--|| NostrEvent : "outer (kind 1059)"
+    DirectMessage ||--|| NostrEvent : "inner (kind 14)"
+
+    ForumPost ||--|| NostrEvent : "wraps"
+    Reaction ||--|| NostrEvent : "wraps"
+    Thread ||--|{ NostrEvent : "contains"
+
+    SolidPod ||--|| PublicKey : "owned by"
+    SolidPod ||--|| WacAcl : "governed by"
+    SolidPod ||--|{ MediaAsset : "stores"
+    WacAcl ||--|{ AclRule : "has"
+
+    Profile ||--|| PublicKey : "for"
+    CalendarEvent ||--|| NostrEvent : "wraps"
+```
 
 ## Identity
 
-Identity is anchored on secp256k1 keypairs. A user's Nostr public key is the
-primary identifier across the entire system.
+Identity is anchored on secp256k1 keypairs. A user's Nostr public key is the primary identifier across the entire system.
 
 ```rust
 use k256::schnorr::SigningKey;
@@ -37,9 +78,28 @@ pub struct PrfOutput([u8; 32]);
 
 ## Authentication
 
-Three auth paths exist: passkey PRF (primary), NIP-07 extension, and local key.
-The passkey path derives the private key deterministically from a WebAuthn PRF
-ceremony, so the key is never stored.
+Three auth paths exist: passkey PRF (primary), NIP-07 extension, and local key. The passkey path derives the private key deterministically from a WebAuthn PRF ceremony, so the key is never stored.
+
+```mermaid
+graph TD
+    U["User"] --> P{"Auth Method?"}
+    P -->|Passkey| PRF["WebAuthn PRF"]
+    P -->|Extension| NIP07["NIP-07 (Alby, nos2x)"]
+    P -->|Local Key| LK["Raw nsec"]
+
+    PRF --> HKDF["HKDF-SHA-256<br/>info='nostr-secp256k1-v1'"]
+    HKDF --> SK["secp256k1 Private Key<br/>(in-memory only)"]
+    SK --> PK["Public Key<br/>(Nostr identity)"]
+
+    NIP07 --> EXT["Extension signs events"]
+    EXT --> PK
+
+    LK --> SK
+
+    style PRF fill:#2ecc71,color:#fff
+    style NIP07 fill:#f39c12,color:#fff
+    style LK fill:#e74c3c,color:#fff
+```
 
 ```rust
 /// A registered WebAuthn credential stored server-side in D1.
@@ -77,8 +137,26 @@ pub enum AuthMethod { Passkey, Nip07, LocalKey, None }
 
 ## Community
 
-The forum is organized as a 3-tier BBS: Category (zone) > Section > Forum
-(NIP-28 channel). Access is governed by cohort membership and role level.
+The forum is organized as a 3-tier BBS: Category (zone) > Section > Forum (NIP-28 channel). Access is governed by cohort membership and role level.
+
+```mermaid
+graph TD
+    subgraph "BBS Hierarchy"
+        CAT["Category (Zone)<br/>Tier 1"]
+        SEC["Section<br/>Tier 2"]
+        CH["Channel / Forum<br/>Tier 3"]
+    end
+
+    CAT --> SEC
+    SEC --> CH
+
+    WL["Whitelist Entry"] -->|"cohort match"| CAT
+    WL -->|"role check"| SEC
+
+    style CAT fill:#8e44ad,color:#fff
+    style SEC fill:#2980b9,color:#fff
+    style CH fill:#27ae60,color:#fff
+```
 
 ```rust
 /// NIP-28/NIP-29 channel. Maps to a kind 40 create event + kind 39000 metadata.
@@ -134,8 +212,7 @@ pub struct WhitelistEntry {
 
 ## Messaging
 
-All messages are Nostr events. DMs use NIP-17/59 gift wrapping with NIP-44
-encryption.
+All messages are Nostr events. DMs use NIP-17/59 gift wrapping with NIP-44 encryption.
 
 ```rust
 /// A signed Nostr event (NIP-01). Kind determines semantics.
