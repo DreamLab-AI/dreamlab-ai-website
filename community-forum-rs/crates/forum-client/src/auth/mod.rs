@@ -107,6 +107,7 @@ impl AuthStore {
     // -- Getters --------------------------------------------------------------
 
     /// Read the current auth state (reactive).
+    #[allow(dead_code)]
     pub fn get(&self) -> AuthState {
         self.state.get()
     }
@@ -167,10 +168,12 @@ impl AuthStore {
         self.state.update(|s| s.error = Some(msg.to_string()));
     }
 
+    #[allow(dead_code)]
     pub fn set_pending(&self, pending: bool) {
         self.state.update(|s| s.is_pending = pending);
     }
 
+    #[allow(dead_code)]
     pub fn set_profile(&self, nickname: Option<String>, avatar: Option<String>) {
         self.state.update(|s| {
             s.nickname = nickname.clone();
@@ -187,6 +190,7 @@ impl AuthStore {
         }
     }
 
+    #[allow(dead_code)]
     pub fn complete_signup(&self) {
         self.state.update(|s| s.account_status = AccountStatus::Complete);
         self.update_storage_field(|stored| {
@@ -194,6 +198,7 @@ impl AuthStore {
         });
     }
 
+    #[allow(dead_code)]
     pub fn confirm_nsec_backup(&self) {
         self.state.update(|s| s.nsec_backed_up = true);
         self.update_storage_field(|stored| {

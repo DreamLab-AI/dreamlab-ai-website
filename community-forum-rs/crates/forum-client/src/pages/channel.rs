@@ -10,6 +10,7 @@ use wasm_bindgen::JsCast;
 use crate::auth::use_auth;
 use crate::components::message_bubble::{MessageBubble, MessageData};
 use crate::relay::{ConnectionState, Filter, RelayConnection};
+use crate::utils::arrow_left_svg;
 
 /// Parsed channel metadata from the kind 40 event.
 #[derive(Clone, Debug)]
@@ -254,66 +255,89 @@ pub fn ChannelPage() -> impl IntoView {
         message_input.set(input.value());
     };
 
+    // Derive avatar letter from channel name
+    let avatar_letter = move || {
+        channel_info
+            .get()
+            .map(|c| {
+                c.name
+                    .chars()
+                    .next()
+                    .unwrap_or('#')
+                    .to_uppercase()
+                    .to_string()
+            })
+            .unwrap_or_else(|| "#".to_string())
+    };
+
     view! {
         <div class="flex flex-col h-[calc(100vh-64px)]">
             // Channel header
-            <div class="bg-gray-800 border-b border-gray-700 p-4">
-                <div class="max-w-4xl mx-auto">
-                    <div class="flex items-center gap-2 mb-1">
-                        <A href="/chat" attr:class="text-gray-400 hover:text-white transition-colors p-1 rounded hover:bg-gray-700">
-                            {arrow_left_svg()}
-                        </A>
-                        <h1 class="text-xl font-bold">
-                            {move || {
-                                channel_info.get()
-                                    .map(|c| c.name)
-                                    .unwrap_or_else(|| "Loading...".to_string())
-                            }}
-                        </h1>
-                    </div>
-                    {move || {
-                        channel_info.get().and_then(|c| {
-                            if c.description.is_empty() {
-                                None
-                            } else {
-                                Some(view! {
-                                    <p class="text-sm text-gray-400 ml-9">
-                                        {c.description}
-                                    </p>
-                                })
-                            }
-                        })
-                    }}
-                    <div class="flex items-center gap-2 mt-1 ml-9">
-                        <span class="text-xs text-gray-500 border border-gray-600 rounded px-1.5 py-0.5">
-                            {move || format!("{} messages", messages.get().len())}
-                        </span>
-                        // Connection indicator
+            <div class="bg-gray-800 border-b border-gray-700 relative">
+                <div class="p-4">
+                    <div class="max-w-4xl mx-auto">
+                        <div class="flex items-center gap-3 mb-1">
+                            <A href="/chat" attr:class="text-gray-400 hover:text-white transition-colors p-1 rounded hover:bg-gray-700">
+                                {arrow_left_svg()}
+                            </A>
+                            // Channel avatar
+                            <div class="w-8 h-8 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center text-sm font-bold flex-shrink-0">
+                                {avatar_letter}
+                            </div>
+                            <h1 class="text-2xl font-bold text-white">
+                                {move || {
+                                    channel_info.get()
+                                        .map(|c| c.name)
+                                        .unwrap_or_else(|| "Loading...".to_string())
+                                }}
+                            </h1>
+                        </div>
                         {move || {
-                            let state = conn_state.get();
-                            match state {
-                                ConnectionState::Connected => view! {
-                                    <span class="text-xs text-green-400 flex items-center gap-1">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span>
-                                        "Connected"
-                                    </span>
-                                }.into_any(),
-                                ConnectionState::Reconnecting => view! {
-                                    <span class="text-xs text-yellow-400 flex items-center gap-1">
-                                        <span class="animate-pulse w-1.5 h-1.5 rounded-full bg-yellow-400"></span>
-                                        "Reconnecting"
-                                    </span>
-                                }.into_any(),
-                                _ => view! {
-                                    <span class="text-xs text-red-400 flex items-center gap-1">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-red-400"></span>
-                                        "Disconnected"
-                                    </span>
-                                }.into_any(),
-                            }
+                            channel_info.get().and_then(|c| {
+                                if c.description.is_empty() {
+                                    None
+                                } else {
+                                    Some(view! {
+                                        <p class="text-sm text-gray-400 ml-14">
+                                            {c.description}
+                                        </p>
+                                    })
+                                }
+                            })
                         }}
+                        <div class="flex items-center gap-2 mt-1 ml-14">
+                            <span class="text-xs text-gray-500 border border-gray-600 rounded px-1.5 py-0.5">
+                                {move || format!("{} messages", messages.get().len())}
+                            </span>
+                            // Connection indicator
+                            {move || {
+                                let state = conn_state.get();
+                                match state {
+                                    ConnectionState::Connected => view! {
+                                        <span class="text-xs text-green-400 flex items-center gap-1">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span>
+                                            "Connected"
+                                        </span>
+                                    }.into_any(),
+                                    ConnectionState::Reconnecting => view! {
+                                        <span class="text-xs text-yellow-400 flex items-center gap-1">
+                                            <span class="animate-pulse w-1.5 h-1.5 rounded-full bg-yellow-400"></span>
+                                            "Reconnecting"
+                                        </span>
+                                    }.into_any(),
+                                    _ => view! {
+                                        <span class="text-xs text-red-400 flex items-center gap-1">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-red-400"></span>
+                                            "Disconnected"
+                                        </span>
+                                    }.into_any(),
+                                }
+                            }}
+                        </div>
                     </div>
                 </div>
+                // Subtle bottom gradient line
+                <div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-amber-500/20 to-transparent"></div>
             </div>
 
             // Error banner
@@ -334,23 +358,36 @@ pub fn ChannelPage() -> impl IntoView {
 
             // Messages area
             <div
-                class="flex-1 overflow-y-auto p-4 bg-gray-900"
+                class="flex-1 overflow-y-auto bg-gray-900 relative"
                 node_ref=messages_container
             >
-                <div class="max-w-4xl mx-auto">
+                // Top fade gradient to indicate scrollability
+                <div class="sticky top-0 left-0 right-0 h-6 bg-gradient-to-b from-gray-900 to-transparent z-10 pointer-events-none"></div>
+
+                <div class="max-w-4xl mx-auto px-4 pb-4">
                     {move || {
                         if loading.get() {
                             view! {
-                                <div class="flex items-center justify-center py-20">
-                                    <div class="animate-pulse text-gray-400">"Loading messages..."</div>
+                                <div class="flex flex-col items-center justify-center py-20 gap-3">
+                                    <svg class="w-6 h-6 text-amber-500 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    <span class="text-gray-400 text-sm">"Loading messages..."</span>
                                 </div>
                             }.into_any()
                         } else {
                             let msgs = messages.get();
                             if msgs.is_empty() {
                                 view! {
-                                    <div class="flex items-center justify-center py-20 text-gray-500">
-                                        <p>"No messages yet. Start the conversation!"</p>
+                                    <div class="flex flex-col items-center justify-center py-20 text-center">
+                                        <div class="w-14 h-14 rounded-full bg-gray-800 flex items-center justify-center mb-4">
+                                            <svg class="w-7 h-7 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z"/>
+                                            </svg>
+                                        </div>
+                                        <h3 class="text-white font-semibold mb-1">"No messages yet"</h3>
+                                        <p class="text-gray-500 text-sm">"Be the first to start this conversation."</p>
                                     </div>
                                 }.into_any()
                             } else {
@@ -370,10 +407,10 @@ pub fn ChannelPage() -> impl IntoView {
             // Compose area
             <div class="bg-gray-800 border-t border-gray-700 p-4">
                 <div class="max-w-4xl mx-auto">
-                    <div class="flex gap-2">
+                    <div class="flex gap-2 items-end">
                         <input
                             type="text"
-                            class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-amber-500 transition-colors"
+                            class="flex-1 bg-gray-700 border border-gray-600 rounded-xl px-4 py-2.5 text-white placeholder-gray-400 focus:outline-none focus:border-amber-500 focus:shadow-[0_0_0_1px_rgba(245,158,11,0.5)] transition-all"
                             placeholder="Type a message..."
                             prop:value=move || message_input.get()
                             on:input=on_input
@@ -381,15 +418,24 @@ pub fn ChannelPage() -> impl IntoView {
                             prop:disabled=move || sending.get()
                         />
                         <button
-                            class="bg-amber-500 hover:bg-amber-400 disabled:bg-gray-600 disabled:text-gray-400 text-gray-900 font-semibold px-6 py-2 rounded-lg transition-colors"
+                            class="w-10 h-10 flex items-center justify-center rounded-full bg-amber-500 hover:bg-amber-400 disabled:bg-gray-600 text-gray-900 disabled:text-gray-400 transition-colors flex-shrink-0"
                             on:click=move |_| on_send(())
                             disabled=move || sending.get() || message_input.get().trim().is_empty()
                         >
                             {move || {
                                 if sending.get() {
-                                    "Sending..."
+                                    view! {
+                                        <svg class="w-5 h-5 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                    }.into_any()
                                 } else {
-                                    "Send"
+                                    view! {
+                                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M10 17a.75.75 0 01-.75-.75V5.612L5.29 9.77a.75.75 0 01-1.08-1.04l5.25-5.5a.75.75 0 011.08 0l5.25 5.5a.75.75 0 11-1.08 1.04l-3.96-4.158V16.25A.75.75 0 0110 17z" clip-rule="evenodd"/>
+                                        </svg>
+                                    }.into_any()
                                 }
                             }}
                         </button>
@@ -422,11 +468,3 @@ fn parse_channel_metadata(content: &str) -> ChannelHeader {
     }
 }
 
-/// Simple left arrow SVG for the back button.
-fn arrow_left_svg() -> impl IntoView {
-    view! {
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/>
-        </svg>
-    }
-}

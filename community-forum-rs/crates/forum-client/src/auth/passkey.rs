@@ -42,9 +42,13 @@ fn auth_api_base() -> String {
 pub struct PasskeyRegistrationResult {
     pub pubkey: String,
     pub privkey_bytes: [u8; 32],
+    #[allow(dead_code)]
     pub credential_id: String,
+    #[allow(dead_code)]
     pub web_id: Option<String>,
+    #[allow(dead_code)]
     pub pod_url: Option<String>,
+    #[allow(dead_code)]
     pub did_nostr: String,
 }
 
@@ -58,7 +62,9 @@ impl Drop for PasskeyRegistrationResult {
 pub struct PasskeyAuthResult {
     pub pubkey: String,
     pub privkey_bytes: [u8; 32],
+    #[allow(dead_code)]
     pub did_nostr: String,
+    #[allow(dead_code)]
     pub web_id: Option<String>,
 }
 

@@ -5,6 +5,3 @@
 
 pub mod channel_card;
 pub mod message_bubble;
-
-pub use channel_card::ChannelCard;
-pub use message_bubble::MessageBubble;

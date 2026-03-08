@@ -53,7 +53,9 @@ pub struct AdminChannel {
     pub name: String,
     pub description: String,
     pub section: String,
+    #[allow(dead_code)]
     pub created_at: u64,
+    #[allow(dead_code)]
     pub creator: String,
 }
 

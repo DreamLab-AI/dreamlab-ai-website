@@ -4,13 +4,13 @@
 //! Route: `/admin`
 
 use leptos::prelude::*;
+use wasm_bindgen::JsCast;
 use wasm_bindgen_futures::spawn_local;
 
 use crate::admin::channel_form::{ChannelForm, ChannelFormData};
+use crate::admin::overview::{ConnectionStatusBar, OverviewTab};
 use crate::admin::user_table::{UpdateCohortsCb, UserTable};
-use crate::admin::{
-    provide_admin, use_admin, AdminStore, AdminTab, ADMIN_PUBKEY,
-};
+use crate::admin::{provide_admin, use_admin, AdminStore, AdminTab};
 use crate::auth::use_auth;
 use crate::relay::{ConnectionState, RelayConnection};
 
@@ -106,25 +106,43 @@ fn AdminPanelInner() -> impl IntoView {
     let admin_for_dismiss_err = admin.clone();
     let admin_for_dismiss_success = admin.clone();
 
+    // Auto-dismiss toasts after 5 seconds
+    Effect::new(move |_| {
+        if error.get().is_some() {
+            let admin_clone = admin_for_dismiss_err.clone();
+            auto_dismiss(move || admin_clone.clear_error());
+        }
+    });
+    Effect::new(move |_| {
+        if success.get().is_some() {
+            let admin_clone = admin_for_dismiss_success.clone();
+            auto_dismiss(move || admin_clone.clear_success());
+        }
+    });
+
+    let admin_for_err_btn = admin.clone();
+    let admin_for_suc_btn = admin.clone();
+
     view! {
         <div class="max-w-6xl mx-auto p-4 sm:p-6">
-            // Header
             <div class="mb-6">
-                <h1 class="text-3xl font-bold text-white">"Admin Panel"</h1>
+                <h1 class="text-3xl font-bold text-white flex items-center gap-2">
+                    {admin_shield_icon()}
+                    "Admin Panel"
+                </h1>
                 <p class="text-gray-400 mt-1">
                     "Manage whitelist, channels, and view forum statistics."
                 </p>
             </div>
 
-            // Connection status bar
             <ConnectionStatusBar />
 
-            // Toast messages
+            // Error toast
             {move || {
                 error.get().map(|msg| {
-                    let admin_err = admin_for_dismiss_err.clone();
+                    let admin_err = admin_for_err_btn.clone();
                     view! {
-                        <div class="mb-4 bg-red-900/50 border border-red-700 rounded-lg px-4 py-3 flex items-center justify-between">
+                        <div class="mb-4 bg-red-900/50 border border-red-700 rounded-lg px-4 py-3 flex items-center justify-between animate-slide-in-down">
                             <span class="text-red-200 text-sm">{msg}</span>
                             <button
                                 on:click=move |_| admin_err.clear_error()
@@ -136,11 +154,12 @@ fn AdminPanelInner() -> impl IntoView {
                     }
                 })
             }}
+            // Success toast
             {move || {
                 success.get().map(|msg| {
-                    let admin_suc = admin_for_dismiss_success.clone();
+                    let admin_suc = admin_for_suc_btn.clone();
                     view! {
-                        <div class="mb-4 bg-green-900/50 border border-green-700 rounded-lg px-4 py-3 flex items-center justify-between">
+                        <div class="mb-4 bg-green-900/50 border border-green-700 rounded-lg px-4 py-3 flex items-center justify-between animate-slide-in-down">
                             <span class="text-green-200 text-sm">{msg}</span>
                             <button
                                 on:click=move |_| admin_suc.clear_success()
@@ -154,7 +173,7 @@ fn AdminPanelInner() -> impl IntoView {
             }}
 
             // Tab navigation
-            <div class="flex gap-1 mb-6 bg-gray-800 rounded-lg p-1 border border-gray-700">
+            <div class="flex gap-6 border-b border-gray-700 mb-6">
                 <TabButton tab=AdminTab::Overview active=active_tab label="Overview" />
                 <TabButton tab=AdminTab::Channels active=active_tab label="Channels" />
                 <TabButton tab=AdminTab::Users active=active_tab label="Users" />
@@ -184,9 +203,9 @@ fn TabButton(
 
     let class = move || {
         if is_active() {
-            "flex-1 text-center py-2 px-4 rounded-md text-sm font-medium transition-colors bg-amber-500 text-gray-900"
+            "py-2 px-1 text-sm font-medium transition-colors text-amber-400 border-b-2 border-amber-400 -mb-px"
         } else {
-            "flex-1 text-center py-2 px-4 rounded-md text-sm font-medium transition-colors text-gray-400 hover:text-white hover:bg-gray-700"
+            "py-2 px-1 text-sm font-medium transition-colors text-gray-400 hover:text-gray-200 border-b-2 border-transparent -mb-px"
         }
     };
 
@@ -194,168 +213,6 @@ fn TabButton(
         <button on:click=move |_| active.set(tab) class=class>
             {label}
         </button>
-    }
-}
-
-// -- Connection status bar ----------------------------------------------------
-
-#[component]
-fn ConnectionStatusBar() -> impl IntoView {
-    let relay = expect_context::<RelayConnection>();
-    let conn_state = relay.connection_state();
-
-    view! {
-        {move || {
-            match conn_state.get() {
-                ConnectionState::Connected => view! {
-                    <div class="mb-4 bg-green-900/30 border border-green-700/50 rounded-lg px-4 py-2 flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-green-400"></span>
-                        <span class="text-green-300 text-sm">"Relay connected"</span>
-                    </div>
-                }.into_any(),
-                ConnectionState::Connecting | ConnectionState::Reconnecting => view! {
-                    <div class="mb-4 bg-yellow-900/30 border border-yellow-700/50 rounded-lg px-4 py-2 flex items-center gap-2">
-                        <span class="animate-pulse w-2 h-2 rounded-full bg-yellow-400"></span>
-                        <span class="text-yellow-300 text-sm">"Connecting to relay..."</span>
-                    </div>
-                }.into_any(),
-                ConnectionState::Error => view! {
-                    <div class="mb-4 bg-red-900/30 border border-red-700/50 rounded-lg px-4 py-2 flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-red-400"></span>
-                        <span class="text-red-300 text-sm">"Relay connection error"</span>
-                    </div>
-                }.into_any(),
-                ConnectionState::Disconnected => view! {
-                    <div class="mb-4 bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-gray-500"></span>
-                        <span class="text-gray-400 text-sm">"Relay disconnected"</span>
-                    </div>
-                }.into_any(),
-            }
-        }}
-    }
-}
-
-// -- Overview tab -------------------------------------------------------------
-
-#[component]
-fn OverviewTab() -> impl IntoView {
-    let admin = use_admin();
-    let stats = admin.state.stats;
-    let is_loading = admin.state.is_loading;
-
-    view! {
-        <Show
-            when=move || !is_loading.get()
-            fallback=|| view! {
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <StatCardSkeleton />
-                    <StatCardSkeleton />
-                    <StatCardSkeleton />
-                    <StatCardSkeleton />
-                </div>
-            }
-        >
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <StatCard
-                    label="Total Users"
-                    value=Signal::derive(move || stats.get().total_users.to_string())
-                    icon="U"
-                    color="amber"
-                />
-                <StatCard
-                    label="Channels"
-                    value=Signal::derive(move || stats.get().total_channels.to_string())
-                    icon="#"
-                    color="blue"
-                />
-                <StatCard
-                    label="Messages"
-                    value=Signal::derive(move || stats.get().total_messages.to_string())
-                    icon="M"
-                    color="green"
-                />
-                <StatCard
-                    label="Pending"
-                    value=Signal::derive(move || stats.get().pending_approvals.to_string())
-                    icon="!"
-                    color="orange"
-                />
-            </div>
-        </Show>
-
-        // Admin pubkey info
-        <div class="mt-6 bg-gray-800 border border-gray-700 rounded-lg p-4">
-            <h3 class="text-sm font-medium text-gray-400 mb-2">"Admin Public Key"</h3>
-            <code class="text-xs text-amber-300 font-mono break-all">{ADMIN_PUBKEY}</code>
-        </div>
-    }
-}
-
-#[component]
-fn StatCard(
-    label: &'static str,
-    value: Signal<String>,
-    icon: &'static str,
-    color: &'static str,
-) -> impl IntoView {
-    let (bg, text, icon_bg) = match color {
-        "amber" => (
-            "bg-amber-500/10 border-amber-500/20",
-            "text-amber-400",
-            "bg-amber-500/20",
-        ),
-        "blue" => (
-            "bg-blue-500/10 border-blue-500/20",
-            "text-blue-400",
-            "bg-blue-500/20",
-        ),
-        "green" => (
-            "bg-green-500/10 border-green-500/20",
-            "text-green-400",
-            "bg-green-500/20",
-        ),
-        "orange" => (
-            "bg-orange-500/10 border-orange-500/20",
-            "text-orange-400",
-            "bg-orange-500/20",
-        ),
-        _ => (
-            "bg-gray-500/10 border-gray-500/20",
-            "text-gray-400",
-            "bg-gray-500/20",
-        ),
-    };
-
-    let card_class = format!("border rounded-lg p-4 {bg}");
-    let icon_class = format!("w-10 h-10 rounded-lg {icon_bg} {text} flex items-center justify-center text-lg font-bold");
-    let value_class = format!("text-2xl font-bold {text}");
-
-    view! {
-        <div class=card_class>
-            <div class="flex items-start justify-between">
-                <div>
-                    <p class="text-sm text-gray-400 mb-1">{label}</p>
-                    <p class=value_class>{move || value.get()}</p>
-                </div>
-                <div class=icon_class>{icon}</div>
-            </div>
-        </div>
-    }
-}
-
-#[component]
-fn StatCardSkeleton() -> impl IntoView {
-    view! {
-        <div class="border border-gray-700 rounded-lg p-4 bg-gray-800 animate-pulse">
-            <div class="flex items-start justify-between">
-                <div class="space-y-2">
-                    <div class="h-3 bg-gray-700 rounded w-16"></div>
-                    <div class="h-7 bg-gray-700 rounded w-12"></div>
-                </div>
-                <div class="w-10 h-10 rounded-lg bg-gray-700"></div>
-            </div>
-        </div>
     }
 }
 
@@ -370,16 +227,13 @@ fn ChannelsTab() -> impl IntoView {
     let admin_for_create = admin.clone();
     let on_create_channel = move |data: ChannelFormData| {
         if let Some(privkey) = auth.get_privkey_bytes() {
-            match admin_for_create.create_channel(
+            if let Err(e) = admin_for_create.create_channel(
                 &data.name,
                 &data.description,
                 &data.section,
                 &privkey,
             ) {
-                Ok(()) => {}
-                Err(e) => {
-                    admin_for_create.state.error.set(Some(e));
-                }
+                admin_for_create.state.error.set(Some(e));
             }
         } else {
             admin_for_create
@@ -391,12 +245,9 @@ fn ChannelsTab() -> impl IntoView {
 
     view! {
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            // Channel creation form (sidebar)
             <div class="lg:col-span-1">
                 <ChannelForm on_submit=on_create_channel />
             </div>
-
-            // Existing channels list
             <div class="lg:col-span-2">
                 <h3 class="text-lg font-semibold text-white mb-3">"Existing Channels"</h3>
                 {move || {
@@ -411,28 +262,21 @@ fn ChannelsTab() -> impl IntoView {
                         view! {
                             <div class="space-y-2">
                                 {chan_list.into_iter().map(|ch| {
-                                    let section_display = if ch.section.is_empty() {
-                                        "none".to_string()
-                                    } else {
-                                        ch.section.clone()
-                                    };
+                                    let section = if ch.section.is_empty() { "none".to_string() } else { ch.section.clone() };
+                                    let section_dot_class = section_color_dot(&section);
+                                    let id_short = format!("ID: {}...{}", &ch.id[..8], &ch.id[ch.id.len().saturating_sub(4)..]);
                                     view! {
                                         <div class="bg-gray-800 border border-gray-700 rounded-lg p-4 hover:border-gray-600 transition-colors">
-                                            <div class="flex items-start justify-between">
-                                                <div class="min-w-0 flex-1">
-                                                    <h4 class="font-semibold text-white truncate">{ch.name.clone()}</h4>
-                                                    {(!ch.description.is_empty()).then(|| view! {
-                                                        <p class="text-sm text-gray-400 mt-0.5 truncate">{ch.description.clone()}</p>
-                                                    })}
-                                                    <div class="flex items-center gap-2 mt-2">
-                                                        <span class="text-xs text-gray-500 border border-gray-600 rounded px-1.5 py-0.5">
-                                                            {section_display}
-                                                        </span>
-                                                        <span class="text-xs text-gray-600">
-                                                            {format!("ID: {}...{}", &ch.id[..8], &ch.id[ch.id.len().saturating_sub(4)..])}
-                                                        </span>
-                                                    </div>
-                                                </div>
+                                            <h4 class="font-semibold text-white truncate">{ch.name.clone()}</h4>
+                                            {(!ch.description.is_empty()).then(|| view! {
+                                                <p class="text-sm text-gray-400 mt-0.5 truncate">{ch.description.clone()}</p>
+                                            })}
+                                            <div class="flex items-center gap-2 mt-2">
+                                                <span class="flex items-center gap-1.5 text-xs text-gray-500 border border-gray-600 rounded px-1.5 py-0.5">
+                                                    <span class=section_dot_class></span>
+                                                    {section}
+                                                </span>
+                                                <span class="text-xs text-gray-600">{id_short}</span>
                                             </div>
                                         </div>
                                     }
@@ -455,7 +299,6 @@ fn UsersTab() -> impl IntoView {
     let users = admin.state.users;
     let is_loading = admin.state.is_loading;
 
-    // Add user form state
     let new_pubkey = RwSignal::new(String::new());
     let new_cohorts = RwSignal::new(vec!["general".to_string()]);
     let add_error = RwSignal::new(Option::<String>::None);
@@ -468,32 +311,25 @@ fn UsersTab() -> impl IntoView {
     let admin_for_add = admin.clone();
     let on_add_user = move |ev: leptos::ev::SubmitEvent| {
         ev.prevent_default();
-
         let pk = new_pubkey.get_untracked();
         let pk_trimmed = pk.trim();
 
-        // Validate pubkey format (64 hex chars)
         if pk_trimmed.len() != 64 || !pk_trimmed.chars().all(|c| c.is_ascii_hexdigit()) {
             add_error.set(Some("Pubkey must be 64 hex characters".into()));
             return;
         }
-
         let cohorts = new_cohorts.get_untracked();
         if cohorts.is_empty() {
             add_error.set(Some("Select at least one cohort".into()));
             return;
         }
-
         if let Some(privkey) = auth.get_privkey_bytes() {
             let admin_clone = admin_for_add.clone();
             let pk_owned = pk_trimmed.to_string();
             spawn_local(async move {
-                match admin_clone.add_to_whitelist(&pk_owned, &cohorts, &privkey).await {
-                    Ok(()) => {
-                        new_pubkey.set(String::new());
-                        new_cohorts.set(vec!["general".to_string()]);
-                    }
-                    Err(_) => {} // Error is already set in admin state
+                if (admin_clone.add_to_whitelist(&pk_owned, &cohorts, &privkey).await).is_ok() {
+                    new_pubkey.set(String::new());
+                    new_cohorts.set(vec!["general".to_string()]);
                 }
             });
         } else {
@@ -501,7 +337,6 @@ fn UsersTab() -> impl IntoView {
         }
     };
 
-    // Cohort update handler for the user table
     let admin_for_update = admin.clone();
     let on_update_cohorts = move |pubkey: String, cohorts: Vec<String>| {
         if let Some(privkey) = auth.get_privkey_bytes() {
@@ -512,7 +347,6 @@ fn UsersTab() -> impl IntoView {
         }
     };
 
-    // Refresh handler
     let admin_for_refresh = admin.clone();
     let on_refresh = move |_| {
         if let Some(privkey) = auth.get_privkey_bytes() {
@@ -529,69 +363,51 @@ fn UsersTab() -> impl IntoView {
         <div class="space-y-6">
             // Add user form
             <div class="bg-gray-800 border border-gray-700 rounded-lg p-6">
-                <h3 class="text-lg font-semibold text-white mb-4">"Add User to Whitelist"</h3>
+                <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                    {user_plus_icon()}
+                    "Add User to Whitelist"
+                </h3>
                 <form on:submit=on_add_user class="space-y-4">
-                    // Pubkey input
-                    <div class="space-y-1">
-                        <label for="add-pubkey" class="block text-sm font-medium text-gray-300">
-                            "Public Key (hex)"
-                        </label>
-                        <input
-                            id="add-pubkey"
-                            type="text"
-                            prop:value=move || new_pubkey.get()
-                            on:input=on_pubkey_input
-                            placeholder="64-character hex public key"
-                            class="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-white font-mono text-sm placeholder-gray-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
-                        />
-                        {move || {
-                            add_error.get().map(|msg| view! {
-                                <p class="text-red-400 text-sm">{msg}</p>
-                            })
-                        }}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-1 md:col-span-2">
+                            <label for="add-pubkey" class="block text-sm font-medium text-gray-300">"Public Key (hex)"</label>
+                            <input
+                                id="add-pubkey"
+                                type="text"
+                                prop:value=move || new_pubkey.get()
+                                on:input=on_pubkey_input
+                                placeholder="64-character hex public key"
+                                class="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-white font-mono text-sm placeholder-gray-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
+                            />
+                            {move || add_error.get().map(|msg| view! { <p class="text-red-400 text-sm">{msg}</p> })}
+                        </div>
                     </div>
-
-                    // Cohort checkboxes
                     <div class="space-y-1">
                         <label class="block text-sm font-medium text-gray-300">"Cohorts"</label>
                         <div class="flex flex-wrap gap-3">
                             {["general", "music", "events", "tech", "moderator", "vip"].iter().map(|cohort| {
-                                let cohort_str = cohort.to_string();
-                                let cohort_check = cohort_str.clone();
-                                let cohort_toggle = cohort_str.clone();
+                                let cs = cohort.to_string();
+                                let cc = cs.clone();
+                                let ct = cs.clone();
                                 let label = capitalize_str(cohort);
-
-                                let is_checked = move || new_cohorts.get().contains(&cohort_check);
+                                let is_checked = move || new_cohorts.get().contains(&cc);
                                 let on_toggle = move |_| {
                                     new_cohorts.update(|list| {
-                                        if list.contains(&cohort_toggle) {
-                                            list.retain(|c| c != &cohort_toggle);
-                                        } else {
-                                            list.push(cohort_toggle.clone());
-                                        }
+                                        if list.contains(&ct) { list.retain(|c| c != &ct); } else { list.push(ct.clone()); }
                                     });
                                 };
-
                                 view! {
                                     <label class="flex items-center gap-1.5 cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            prop:checked=is_checked
-                                            on:change=on_toggle
-                                            class="rounded border-gray-600 bg-gray-900 text-amber-500 focus:ring-amber-500"
-                                        />
+                                        <input type="checkbox" prop:checked=is_checked on:change=on_toggle
+                                            class="rounded border-gray-600 bg-gray-900 text-amber-500 focus:ring-amber-500" />
                                         <span class="text-sm text-gray-300">{label}</span>
                                     </label>
                                 }
                             }).collect_view()}
                         </div>
                     </div>
-
-                    <button
-                        type="submit"
-                        disabled=move || is_loading.get()
-                        class="bg-amber-500 hover:bg-amber-400 disabled:bg-gray-600 disabled:cursor-not-allowed text-gray-900 font-semibold px-4 py-2 rounded-lg transition-colors"
-                    >
+                    <button type="submit" disabled=move || is_loading.get()
+                        class="bg-amber-500 hover:bg-amber-400 disabled:bg-gray-600 disabled:cursor-not-allowed text-gray-900 font-semibold px-4 py-2 rounded-lg transition-colors flex items-center gap-1.5">
                         {move || if is_loading.get() { "Adding..." } else { "Add User" }}
                     </button>
                 </form>
@@ -601,15 +417,11 @@ fn UsersTab() -> impl IntoView {
             <div>
                 <div class="flex items-center justify-between mb-3">
                     <h3 class="text-lg font-semibold text-white">"Whitelisted Users"</h3>
-                    <button
-                        on:click=on_refresh
-                        disabled=move || is_loading.get()
-                        class="text-sm text-amber-400 hover:text-amber-300 border border-amber-500/30 hover:border-amber-400 rounded px-3 py-1 transition-colors disabled:opacity-50"
-                    >
+                    <button on:click=on_refresh disabled=move || is_loading.get()
+                        class="text-sm text-amber-400 hover:text-amber-300 border border-amber-500/30 hover:border-amber-400 rounded px-3 py-1 transition-colors disabled:opacity-50">
                         {move || if is_loading.get() { "Refreshing..." } else { "Refresh" }}
                     </button>
                 </div>
-
                 <Show
                     when=move || !is_loading.get()
                     fallback=|| view! {
@@ -625,11 +437,57 @@ fn UsersTab() -> impl IntoView {
     }
 }
 
-/// Capitalize the first letter of a string.
+// -- Helpers ------------------------------------------------------------------
+
 fn capitalize_str(s: &str) -> String {
-    let mut chars = s.chars();
-    match chars.next() {
-        None => String::new(),
-        Some(c) => c.to_uppercase().collect::<String>() + chars.as_str(),
+    crate::utils::capitalize(s)
+}
+
+/// Set a 5-second timer that calls the given closure.
+fn auto_dismiss(f: impl Fn() + 'static) {
+    let cb = wasm_bindgen::closure::Closure::once(Box::new(f) as Box<dyn FnOnce()>);
+    if let Some(w) = web_sys::window() {
+        let _ = w.set_timeout_with_callback_and_timeout_and_arguments_0(
+            cb.as_ref().unchecked_ref(),
+            5000,
+        );
+    }
+    cb.forget();
+}
+
+/// Return a Tailwind class for a small colored dot representing the section.
+fn section_color_dot(section: &str) -> &'static str {
+    match section {
+        "general" => "w-2 h-2 rounded-full bg-gray-400 inline-block",
+        "announcements" => "w-2 h-2 rounded-full bg-amber-400 inline-block",
+        "introductions" => "w-2 h-2 rounded-full bg-cyan-400 inline-block",
+        "music" => "w-2 h-2 rounded-full bg-pink-400 inline-block",
+        "events" => "w-2 h-2 rounded-full bg-green-400 inline-block",
+        "tech" => "w-2 h-2 rounded-full bg-blue-400 inline-block",
+        "random" => "w-2 h-2 rounded-full bg-purple-400 inline-block",
+        "support" => "w-2 h-2 rounded-full bg-red-400 inline-block",
+        _ => "w-2 h-2 rounded-full bg-gray-500 inline-block",
+    }
+}
+
+// -- SVG icon helpers ---------------------------------------------------------
+
+fn admin_shield_icon() -> impl IntoView {
+    view! {
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="M9 12l2 2 4-4"/>
+        </svg>
+    }
+}
+
+fn user_plus_icon() -> impl IntoView {
+    view! {
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+            <circle cx="8.5" cy="7" r="4"/>
+            <line x1="20" y1="8" x2="20" y2="14"/>
+            <line x1="23" y1="11" x2="17" y2="11"/>
+        </svg>
     }
 }

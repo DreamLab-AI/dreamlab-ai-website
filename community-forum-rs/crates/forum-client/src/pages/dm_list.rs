@@ -12,6 +12,7 @@ use wasm_bindgen::JsCast;
 use crate::auth::use_auth;
 use crate::dm::{provide_dm_store, use_dm_store, DMConversation};
 use crate::relay::{ConnectionState, RelayConnection};
+use crate::utils::{format_relative_time, pubkey_color};
 
 /// DM conversation list page component.
 #[component]
@@ -117,17 +118,28 @@ pub fn DmListPage() -> impl IntoView {
             // Header
             <div class="flex items-center justify-between mb-6">
                 <div>
-                    <h1 class="text-3xl font-bold text-white mb-1">"Direct Messages"</h1>
+                    <h1 class="text-3xl font-bold text-white mb-1 flex items-center gap-2">
+                        {shield_icon()}
+                        "Direct Messages"
+                    </h1>
                     <p class="text-gray-400 text-sm">"Private encrypted conversations"</p>
+                    <div class="text-xs text-green-400/60 flex items-center gap-1 mt-1">
+                        {lock_icon_small()}
+                        "NIP-44 Encrypted"
+                    </div>
                 </div>
                 <button
-                    class="bg-amber-500 hover:bg-amber-400 text-gray-900 font-semibold px-4 py-2 rounded-lg transition-colors text-sm"
+                    class="bg-amber-500 hover:bg-amber-400 text-gray-900 font-semibold px-4 py-2 rounded-lg transition-colors text-sm flex items-center gap-1.5"
                     on:click=move |_| {
                         show_new_dm.update(|v| *v = !*v);
                         new_dm_error.set(None);
                     }
                 >
-                    {move || if show_new_dm.get() { "Cancel" } else { "New Message" }}
+                    {move || if show_new_dm.get() {
+                        view! { <>{x_icon_small()}" Cancel"</> }.into_any()
+                    } else {
+                        view! { <>{plus_icon()}" New Message"</> }.into_any()
+                    }}
                 </button>
             </div>
 
@@ -213,8 +225,10 @@ pub fn DmListPage() -> impl IntoView {
                     let convos = conversations.get();
                     if convos.is_empty() {
                         view! {
-                            <div class="bg-gray-800 border border-gray-700 rounded-lg p-12 text-center">
-                                <div class="text-5xl mb-4 opacity-30">"@"</div>
+                            <div class="bg-gray-800/50 border border-gray-700 rounded-lg p-12 text-center">
+                                <div class="animate-gentle-float mb-4 inline-block">
+                                    {mail_icon_large()}
+                                </div>
                                 <h3 class="text-lg font-semibold text-white mb-2">"No conversations yet"</h3>
                                 <p class="text-gray-400 text-sm mb-4">
                                     "Start a new conversation by clicking \"New Message\" above."
@@ -250,7 +264,7 @@ fn ConversationRow(convo: DMConversation) -> impl IntoView {
     let has_message = !last_message.is_empty();
 
     view! {
-        <A href=href attr:class="block bg-gray-800 hover:bg-gray-750 border border-gray-700 hover:border-amber-500/30 rounded-lg transition-all no-underline text-inherit">
+        <A href=href attr:class="block bg-gray-800 hover:bg-gray-750 border border-gray-700 hover:border-amber-500/30 rounded-lg hover:-translate-y-px hover:shadow-md transition-all duration-200 no-underline text-inherit">
             <div class="p-4">
                 <div class="flex gap-3 items-center">
                     // Avatar
@@ -320,54 +334,48 @@ fn ConversationSkeleton() -> impl IntoView {
     }
 }
 
-/// Format a UNIX timestamp as a relative time string.
-fn format_relative_time(timestamp: u64) -> String {
-    if timestamp == 0 {
-        return String::new();
-    }
+// -- SVG icon helpers ---------------------------------------------------------
 
-    let now = (js_sys::Date::now() / 1000.0) as u64;
-    if now < timestamp {
-        return "now".to_string();
+fn shield_icon() -> impl IntoView {
+    view! {
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-amber-400/80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
     }
-    let diff = now - timestamp;
-
-    if diff < 60 {
-        return "now".to_string();
-    }
-    if diff < 3600 {
-        let mins = diff / 60;
-        return format!("{}m", mins);
-    }
-    if diff < 86400 {
-        let hours = diff / 3600;
-        return format!("{}h", hours);
-    }
-    if diff < 604800 {
-        let days = diff / 86400;
-        return format!("{}d", days);
-    }
-
-    let date = js_sys::Date::new_0();
-    date.set_time((timestamp as f64) * 1000.0);
-    let month = date.get_month();
-    let day = date.get_date();
-    let months = [
-        "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
-    ];
-    let month_name = months.get(month as usize).unwrap_or(&"???");
-    format!("{} {}", month_name, day)
 }
 
-/// Generate a deterministic color from a pubkey for the avatar background.
-fn pubkey_color(pubkey: &str) -> String {
-    let hue = pubkey
-        .chars()
-        .take(6)
-        .enumerate()
-        .fold(0u32, |acc, (i, c)| {
-            acc.wrapping_add((c as u32).wrapping_mul((i as u32) + 1))
-        })
-        % 360;
-    format!("hsl({}, 55%, 45%)", hue)
+fn lock_icon_small() -> impl IntoView {
+    view! {
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0110 0v4"/>
+        </svg>
+    }
+}
+
+fn plus_icon() -> impl IntoView {
+    view! {
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+    }
+}
+
+fn x_icon_small() -> impl IntoView {
+    view! {
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+    }
+}
+
+fn mail_icon_large() -> impl IntoView {
+    view! {
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 text-amber-400/20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <polyline points="22,6 12,13 2,6"/>
+        </svg>
+    }
 }

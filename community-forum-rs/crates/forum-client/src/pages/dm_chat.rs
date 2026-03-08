@@ -13,6 +13,7 @@ use wasm_bindgen::JsCast;
 use crate::auth::use_auth;
 use crate::dm::{provide_dm_store, use_dm_store, DMMessage};
 use crate::relay::{ConnectionState, RelayConnection};
+use crate::utils::{arrow_left_svg, format_relative_time, pubkey_color, shorten_pubkey};
 
 /// DM chat view component for a single conversation.
 #[component]
@@ -150,12 +151,7 @@ pub fn DmChatPage() -> impl IntoView {
 
     // Short display name for recipient
     let recipient_display = move || {
-        let rpk = recipient_pubkey();
-        if rpk.len() >= 12 {
-            format!("{}...{}", &rpk[..6], &rpk[rpk.len() - 4..])
-        } else {
-            rpk
-        }
+        shorten_pubkey(&recipient_pubkey())
     };
 
     view! {
@@ -213,7 +209,10 @@ pub fn DmChatPage() -> impl IntoView {
                                 }}
 
                                 <span class="text-xs text-gray-600">"|"</span>
-                                <span class="text-xs text-gray-500">"NIP-44 encrypted"</span>
+                                <span class="text-xs text-green-400/50 flex items-center gap-1">
+                                    {lock_icon_tiny()}
+                                    "End-to-end encrypted"
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -253,20 +252,22 @@ pub fn DmChatPage() -> impl IntoView {
                             let msgs = messages.get();
                             if msgs.is_empty() {
                                 view! {
-                                    <div class="flex flex-col items-center justify-center py-20 text-gray-500">
-                                        <div class="text-4xl mb-4 opacity-30">"@"</div>
-                                        <p class="text-center">"No messages yet. Send the first one!"</p>
-                                        <p class="text-xs text-gray-600 mt-2">"Messages are encrypted with NIP-44"</p>
+                                    <div class="flex flex-col items-center justify-center py-20">
+                                        <div class="animate-gentle-float mb-4">
+                                            {chat_bubble_icon_large()}
+                                        </div>
+                                        <p class="text-center text-gray-400">"No messages yet. Send the first one!"</p>
+                                        <p class="text-xs text-green-400/40 mt-2 flex items-center gap-1">
+                                            {lock_icon_tiny()}
+                                            "Messages are encrypted with NIP-44"
+                                        </p>
                                     </div>
                                 }.into_any()
                             } else {
                                 let my_pk = my_pubkey.get().unwrap_or_default();
                                 view! {
                                     <div class="space-y-1">
-                                        {msgs.into_iter().map(|msg| {
-                                            let is_mine = msg.sender_pubkey == my_pk;
-                                            view! { <DmBubble message=msg is_mine=is_mine/> }
-                                        }).collect_view()}
+                                        <MessageListWithDateSeparators msgs=msgs my_pk=my_pk />
                                     </div>
                                 }.into_any()
                             }
@@ -278,10 +279,10 @@ pub fn DmChatPage() -> impl IntoView {
             // Compose area
             <div class="bg-gray-800 border-t border-gray-700 p-4">
                 <div class="max-w-2xl mx-auto">
-                    <div class="flex gap-2">
+                    <div class="flex gap-2 items-end">
                         <input
                             type="text"
-                            class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-amber-500 transition-colors"
+                            class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-400 focus:outline-none focus:border-amber-500 transition-colors"
                             placeholder="Type a message..."
                             prop:value=move || message_input.get()
                             on:input=on_input
@@ -289,23 +290,53 @@ pub fn DmChatPage() -> impl IntoView {
                             prop:disabled=move || sending.get()
                         />
                         <button
-                            class="bg-amber-500 hover:bg-amber-400 disabled:bg-gray-600 disabled:text-gray-400 text-gray-900 font-semibold px-6 py-2 rounded-lg transition-colors"
+                            class=move || {
+                                if sending.get() || message_input.get().trim().is_empty() {
+                                    "w-10 h-10 rounded-full flex items-center justify-center bg-gray-600 text-gray-400 transition-colors flex-shrink-0"
+                                } else {
+                                    "w-10 h-10 rounded-full flex items-center justify-center bg-amber-500 hover:bg-amber-400 text-white transition-colors flex-shrink-0"
+                                }
+                            }
                             on:click=move |_| on_send(())
                             disabled=move || sending.get() || message_input.get().trim().is_empty()
                         >
-                            {move || {
-                                if sending.get() {
-                                    "Sending..."
-                                } else {
-                                    "Send"
-                                }
-                            }}
+                            {send_arrow_icon()}
                         </button>
                     </div>
                 </div>
             </div>
         </div>
     }
+}
+
+/// Render messages with date separators between days.
+#[component]
+fn MessageListWithDateSeparators(
+    msgs: Vec<DMMessage>,
+    my_pk: String,
+) -> impl IntoView {
+    let mut fragments: Vec<leptos::tachys::view::any_view::AnyView> = Vec::new();
+    let mut prev_timestamp: u64 = 0;
+
+    for msg in msgs.into_iter() {
+        // Insert date separator if day changed
+        if prev_timestamp > 0 && should_show_date_separator(prev_timestamp, msg.timestamp) {
+            let label = format_date_label(msg.timestamp);
+            fragments.push(view! {
+                <div class="flex items-center gap-3 my-4">
+                    <div class="flex-1 border-t border-gray-800"></div>
+                    <span class="text-xs text-gray-600">{label}</span>
+                    <div class="flex-1 border-t border-gray-800"></div>
+                </div>
+            }.into_any());
+        }
+        prev_timestamp = msg.timestamp;
+
+        let is_mine = msg.sender_pubkey == my_pk;
+        fragments.push(view! { <DmBubble message=msg is_mine=is_mine/> }.into_any());
+    }
+
+    fragments.collect_view()
 }
 
 /// A single DM message bubble with alignment based on sender.
@@ -317,16 +348,16 @@ fn DmBubble(message: DMMessage, is_mine: bool) -> impl IntoView {
     view! {
         <div class=move || {
             if is_mine {
-                "flex justify-end py-1"
+                "flex justify-end py-1 animate-fadeIn"
             } else {
-                "flex justify-start py-1"
+                "flex justify-start py-1 animate-fadeIn"
             }
         }>
             <div class=move || {
                 if is_mine {
-                    "max-w-[75%] bg-amber-500/20 border border-amber-500/30 rounded-2xl rounded-br-sm px-4 py-2"
+                    "max-w-[75%] bg-amber-500/20 border border-amber-500/30 rounded-2xl rounded-br-md px-4 py-2"
                 } else {
-                    "max-w-[75%] bg-gray-800 border border-gray-700 rounded-2xl rounded-bl-sm px-4 py-2"
+                    "max-w-[75%] bg-gray-800 border border-gray-700 rounded-2xl rounded-bl-md px-4 py-2"
                 }
             }>
                 <p class="text-sm text-gray-200 break-words whitespace-pre-wrap">
@@ -346,61 +377,62 @@ fn DmBubble(message: DMMessage, is_mine: bool) -> impl IntoView {
     }
 }
 
-/// Format a UNIX timestamp as a relative time string.
-fn format_relative_time(timestamp: u64) -> String {
-    if timestamp == 0 {
-        return "unknown".to_string();
-    }
+/// Check if a date separator should be shown between two timestamps.
+fn should_show_date_separator(prev: u64, current: u64) -> bool {
+    // Compare day boundaries rather than raw diff
+    let prev_day = prev / 86400;
+    let current_day = current / 86400;
+    prev_day != current_day
+}
 
+/// Format a timestamp into a human-readable date label.
+fn format_date_label(timestamp: u64) -> String {
     let now = (js_sys::Date::now() / 1000.0) as u64;
-    if now < timestamp {
-        return "now".to_string();
-    }
-    let diff = now - timestamp;
+    let today_start = now - (now % 86400);
+    let yesterday_start = today_start - 86400;
 
-    if diff < 60 {
-        return "now".to_string();
+    if timestamp >= today_start {
+        "Today".to_string()
+    } else if timestamp >= yesterday_start {
+        "Yesterday".to_string()
+    } else {
+        let date = js_sys::Date::new_0();
+        date.set_time((timestamp as f64) * 1000.0);
+        let month = date.get_month();
+        let day = date.get_date();
+        let months = [
+            "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+        ];
+        let month_name = months.get(month as usize).unwrap_or(&"???");
+        format!("{} {}", month_name, day)
     }
-    if diff < 3600 {
-        let mins = diff / 60;
-        return format!("{}m ago", mins);
-    }
-    if diff < 86400 {
-        let hours = diff / 3600;
-        return format!("{}h ago", hours);
-    }
-
-    let date = js_sys::Date::new_0();
-    date.set_time((timestamp as f64) * 1000.0);
-    let month = date.get_month();
-    let day = date.get_date();
-    let hours = date.get_hours();
-    let minutes = date.get_minutes();
-    let months = [
-        "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
-    ];
-    let month_name = months.get(month as usize).unwrap_or(&"???");
-    format!("{} {} {:02}:{:02}", month_name, day, hours, minutes)
 }
 
-/// Generate a deterministic color from a pubkey for the avatar background.
-fn pubkey_color(pubkey: &str) -> String {
-    let hue = pubkey
-        .chars()
-        .take(6)
-        .enumerate()
-        .fold(0u32, |acc, (i, c)| {
-            acc.wrapping_add((c as u32).wrapping_mul((i as u32) + 1))
-        })
-        % 360;
-    format!("hsl({}, 55%, 45%)", hue)
-}
+// -- SVG icon helpers ---------------------------------------------------------
 
-/// Simple left arrow SVG for the back button.
-fn arrow_left_svg() -> impl IntoView {
+fn lock_icon_tiny() -> impl IntoView {
     view! {
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/>
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0110 0v4"/>
+        </svg>
+    }
+}
+
+fn send_arrow_icon() -> impl IntoView {
+    view! {
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="19" x2="12" y2="5"/>
+            <polyline points="5 12 12 5 19 12"/>
+        </svg>
+    }
+}
+
+fn chat_bubble_icon_large() -> impl IntoView {
+    view! {
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 text-amber-400/20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
         </svg>
     }
 }

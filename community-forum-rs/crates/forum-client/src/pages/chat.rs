@@ -1,6 +1,7 @@
 //! Channel list page -- displays NIP-28 channels (kind 40) from the relay.
 
 use leptos::prelude::*;
+use leptos_router::components::A;
 use leptos_router::hooks::use_query_map;
 use std::collections::HashMap;
 use std::rc::Rc;
@@ -16,8 +17,19 @@ struct ChannelMeta {
     name: String,
     description: String,
     section: String,
+    #[allow(dead_code)]
     created_at: u64,
 }
+
+/// Section filter pill definitions.
+const SECTION_FILTERS: &[(&str, &str)] = &[
+    ("All", ""),
+    ("General", "general"),
+    ("Music", "music"),
+    ("Events", "events"),
+    ("Tech", "tech"),
+    ("Random", "random"),
+];
 
 /// Channel list page. Subscribes to kind 40 (channel creation) events,
 /// displays them as cards, and supports filtering by section query param.
@@ -218,11 +230,54 @@ pub fn ChatPage() -> impl IntoView {
         }
     };
 
+    let channel_count = move || channels.get().len();
+
     view! {
         <div class="max-w-4xl mx-auto p-4 sm:p-6">
             <div class="mb-6">
-                <h1 class="text-3xl font-bold text-white mb-1">{page_title}</h1>
+                <div class="flex items-center gap-3 mb-1">
+                    <h1 class="text-3xl font-bold text-white">{page_title}</h1>
+                    {move || {
+                        let count = channel_count();
+                        if !loading.get() && count > 0 {
+                            Some(view! {
+                                <span class="text-xs font-medium text-gray-400 bg-gray-800 border border-gray-700 rounded-full px-2.5 py-0.5">
+                                    {count}
+                                </span>
+                            })
+                        } else {
+                            None
+                        }
+                    }}
+                </div>
                 <p class="text-gray-400">"Join conversations in public channels"</p>
+            </div>
+
+            // Section filter pills
+            <div class="flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-none" style="-webkit-overflow-scrolling: touch">
+                {SECTION_FILTERS.iter().map(|&(label, value)| {
+                    let current = section_filter();
+                    let is_active = if value.is_empty() {
+                        current.is_empty()
+                    } else {
+                        current == value
+                    };
+                    let href = if value.is_empty() {
+                        "/chat".to_string()
+                    } else {
+                        format!("/chat?section={}", value)
+                    };
+                    let class = if is_active {
+                        "inline-block px-3 py-1.5 rounded-full text-sm font-semibold bg-amber-500 text-gray-900 whitespace-nowrap transition-colors"
+                    } else {
+                        "inline-block px-3 py-1.5 rounded-full text-sm bg-gray-800 text-gray-400 border border-gray-700 hover:bg-gray-700 hover:text-gray-200 whitespace-nowrap transition-colors"
+                    };
+                    view! {
+                        <A href=href attr:class=class>
+                            {label}
+                        </A>
+                    }
+                }).collect_view()}
             </div>
 
             // Connection banner
@@ -275,8 +330,15 @@ pub fn ChatPage() -> impl IntoView {
                     let chans = filtered_channels();
                     if chans.is_empty() {
                         view! {
-                            <div class="bg-gray-800 border border-gray-700 rounded-lg p-12 text-center">
-                                <div class="text-5xl mb-4 opacity-40">"#"</div>
+                            <div class="bg-gray-800/50 border border-gray-700 rounded-xl p-12 text-center">
+                                // Chat bubble SVG icon
+                                <div class="flex justify-center mb-5">
+                                    <div class="w-16 h-16 rounded-full bg-gray-700/50 flex items-center justify-center">
+                                        <svg class="w-8 h-8 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z"/>
+                                        </svg>
+                                    </div>
+                                </div>
                                 <h3 class="text-lg font-semibold text-white mb-2">
                                     {move || {
                                         let section = section_filter();
@@ -287,16 +349,19 @@ pub fn ChatPage() -> impl IntoView {
                                         }
                                     }}
                                 </h3>
-                                <p class="text-gray-400">
-                                    "Channels are where conversations happen. Check back later."
+                                <p class="text-gray-400 mb-6 max-w-sm mx-auto">
+                                    "Channels are where conversations happen. New channels will appear here as they are created."
                                 </p>
                                 {move || {
                                     let section = section_filter();
                                     if !section.is_empty() {
                                         Some(view! {
-                                            <a href="/chat" class="inline-block mt-4 bg-amber-500 hover:bg-amber-400 text-gray-900 font-semibold px-4 py-2 rounded-lg transition-colors">
+                                            <A href="/chat" attr:class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-gray-900 font-semibold px-5 py-2.5 rounded-lg transition-colors">
+                                                <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
+                                                </svg>
                                                 "View All Channels"
-                                            </a>
+                                            </A>
                                         })
                                     } else {
                                         None
@@ -323,13 +388,13 @@ pub fn ChatPage() -> impl IntoView {
 #[component]
 fn ChannelSkeleton() -> impl IntoView {
     view! {
-        <div class="bg-gray-800 border border-gray-700 rounded-lg p-4 animate-pulse">
+        <div class="bg-gray-800 border border-gray-700 rounded-lg p-4">
             <div class="flex gap-4">
-                <div class="w-12 h-12 rounded-lg bg-gray-700"></div>
+                <div class="w-12 h-12 rounded-lg skeleton"></div>
                 <div class="flex-1 space-y-2">
-                    <div class="h-4 bg-gray-700 rounded w-1/3"></div>
-                    <div class="h-3 bg-gray-700 rounded w-2/3"></div>
-                    <div class="h-3 bg-gray-700 rounded w-1/4 mt-3"></div>
+                    <div class="h-4 skeleton rounded w-1/3"></div>
+                    <div class="h-3 skeleton rounded w-2/3"></div>
+                    <div class="h-3 skeleton rounded w-1/4 mt-3"></div>
                 </div>
             </div>
         </div>

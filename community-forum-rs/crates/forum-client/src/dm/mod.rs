@@ -12,6 +12,7 @@ use nostr_core::{nip44_decrypt, nip44_encrypt, sign_event, NostrEvent, UnsignedE
 use wasm_bindgen::JsCast;
 
 use crate::relay::{Filter, RelayConnection};
+use crate::utils::shorten_pubkey;
 
 /// A single decrypted direct message.
 #[derive(Clone, Debug, PartialEq)]
@@ -84,6 +85,7 @@ impl DMStore {
         })
     }
 
+    #[allow(dead_code)]
     pub fn current_conversation(&self) -> Memo<Option<String>> {
         let state = self.state;
         Memo::new(move |_| state.get().current_conversation)
@@ -99,6 +101,7 @@ impl DMStore {
         Memo::new(move |_| state.get().error.clone())
     }
 
+    #[allow(dead_code)]
     pub fn total_unread(&self) -> Memo<u32> {
         let state = self.state;
         Memo::new(move |_| state.get().conversations.values().map(|c| c.unread_count).sum())
@@ -373,11 +376,6 @@ fn process_dm_event(
 }
 
 // -- Helpers ------------------------------------------------------------------
-
-fn shorten_pubkey(pubkey: &str) -> String {
-    if pubkey.len() < 12 { return pubkey.to_string(); }
-    format!("{}...{}", &pubkey[..6], &pubkey[pubkey.len() - 4..])
-}
 
 fn truncate_message(content: &str, max_len: usize) -> String {
     let t = content.trim();

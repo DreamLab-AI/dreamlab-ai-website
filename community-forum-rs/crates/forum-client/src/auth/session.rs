@@ -59,10 +59,12 @@ impl Default for StoredSession {
 /// Wrapper that zeroizes private key bytes on drop.
 #[derive(Zeroize)]
 #[zeroize(drop)]
+#[allow(dead_code)]
 pub(super) struct PrivkeyMem {
     pub bytes: [u8; 32],
 }
 
+#[allow(dead_code)]
 impl PrivkeyMem {
     pub fn new(bytes: [u8; 32]) -> Self {
         Self { bytes }
@@ -102,6 +104,7 @@ impl AuthStore {
     }
 
     /// Update a single field in the stored session.
+    #[allow(dead_code)]
     pub(super) fn update_storage_field<F: FnOnce(&mut StoredSession)>(&self, f: F) {
         let json_str: Result<String, _> = LocalStorage::get(STORAGE_KEY);
         if let Ok(ref s) = json_str {

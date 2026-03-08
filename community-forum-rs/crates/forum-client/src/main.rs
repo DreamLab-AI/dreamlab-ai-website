@@ -7,6 +7,7 @@ mod components;
 mod dm;
 mod pages;
 mod relay;
+pub(crate) mod utils;
 
 use app::App;
 

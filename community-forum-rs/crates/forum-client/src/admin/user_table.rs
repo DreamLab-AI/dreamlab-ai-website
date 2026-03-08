@@ -8,6 +8,7 @@ use send_wrapper::SendWrapper;
 use std::rc::Rc;
 
 use super::WhitelistUser;
+use crate::utils::capitalize;
 
 /// Available cohorts for the cohort editor.
 const AVAILABLE_COHORTS: &[&str] = &[
@@ -36,7 +37,7 @@ pub fn UserTable(
     view! {
         <div class="bg-gray-800 border border-gray-700 rounded-lg overflow-hidden">
             // Table header
-            <div class="grid grid-cols-12 gap-2 px-4 py-3 bg-gray-750 border-b border-gray-700 text-sm font-medium text-gray-400">
+            <div class="grid grid-cols-12 gap-2 px-4 py-3 bg-gray-750 border-b border-gray-700 text-xs font-semibold text-gray-400 uppercase tracking-wider">
                 <div class="col-span-5">"Pubkey"</div>
                 <div class="col-span-5">"Cohorts"</div>
                 <div class="col-span-2 text-right">"Actions"</div>
@@ -138,7 +139,7 @@ fn UserRow(
     let cohorts_for_display = cohorts.clone();
 
     view! {
-        <div class="grid grid-cols-12 gap-2 px-4 py-3 items-center text-sm hover:bg-gray-750 transition-colors">
+        <div class="grid grid-cols-12 gap-2 px-4 py-3 items-center text-sm hover:bg-gray-750 hover:border-l-2 hover:border-l-amber-500/50 border-l-2 border-l-transparent transition-all">
             // Pubkey column
             <div class="col-span-5">
                 <span
@@ -183,22 +184,25 @@ fn UserRow(
                     fallback=move || view! {
                         <button
                             on:click=on_edit_click.clone()
-                            class="text-xs text-amber-400 hover:text-amber-300 border border-amber-500/30 hover:border-amber-400 rounded px-2 py-1 transition-colors"
+                            class="text-xs text-amber-400 hover:text-amber-300 border border-amber-500/30 hover:border-amber-400 rounded px-2 py-1 transition-colors flex items-center gap-1"
                         >
+                            {pencil_icon()}
                             "Edit"
                         </button>
                     }
                 >
                     <button
                         on:click=on_save_click.clone()
-                        class="text-xs text-green-400 hover:text-green-300 border border-green-500/30 hover:border-green-400 rounded px-2 py-1 transition-colors"
+                        class="text-xs text-green-400 hover:text-green-300 border border-green-500/30 hover:border-green-400 rounded px-2 py-1 transition-colors flex items-center gap-1"
                     >
+                        {check_icon()}
                         "Save"
                     </button>
                     <button
                         on:click=on_cancel_click.clone()
-                        class="text-xs text-gray-400 hover:text-gray-300 border border-gray-600 hover:border-gray-500 rounded px-2 py-1 transition-colors"
+                        class="text-xs text-gray-400 hover:text-gray-300 border border-gray-600 hover:border-gray-500 rounded px-2 py-1 transition-colors flex items-center gap-1"
                     >
+                        {x_icon()}
                         "Cancel"
                     </button>
                 </Show>
@@ -260,20 +264,38 @@ fn truncate_pubkey(pk: &str) -> String {
 /// Return a Tailwind CSS class string for a cohort badge based on the cohort name.
 fn cohort_badge_class(cohort: &str) -> &'static str {
     match cohort {
-        "moderator" => "inline-block text-xs rounded px-1.5 py-0.5 bg-purple-500/20 text-purple-300 border border-purple-500/30",
-        "vip" => "inline-block text-xs rounded px-1.5 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-500/30",
-        "tech" => "inline-block text-xs rounded px-1.5 py-0.5 bg-blue-500/20 text-blue-300 border border-blue-500/30",
-        "music" => "inline-block text-xs rounded px-1.5 py-0.5 bg-pink-500/20 text-pink-300 border border-pink-500/30",
-        "events" => "inline-block text-xs rounded px-1.5 py-0.5 bg-green-500/20 text-green-300 border border-green-500/30",
-        _ => "inline-block text-xs rounded px-1.5 py-0.5 bg-gray-500/20 text-gray-300 border border-gray-500/30",
+        "moderator" => "inline-block text-xs rounded px-1.5 py-0.5 bg-purple-500/20 text-purple-300 border border-purple-500/30 hover:shadow-[0_0_6px_rgba(168,85,247,0.3)] transition-shadow",
+        "vip" => "inline-block text-xs rounded px-1.5 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:shadow-[0_0_6px_rgba(245,158,11,0.3)] transition-shadow",
+        "tech" => "inline-block text-xs rounded px-1.5 py-0.5 bg-blue-500/20 text-blue-300 border border-blue-500/30 hover:shadow-[0_0_6px_rgba(59,130,246,0.3)] transition-shadow",
+        "music" => "inline-block text-xs rounded px-1.5 py-0.5 bg-pink-500/20 text-pink-300 border border-pink-500/30 hover:shadow-[0_0_6px_rgba(236,72,153,0.3)] transition-shadow",
+        "events" => "inline-block text-xs rounded px-1.5 py-0.5 bg-green-500/20 text-green-300 border border-green-500/30 hover:shadow-[0_0_6px_rgba(34,197,94,0.3)] transition-shadow",
+        _ => "inline-block text-xs rounded px-1.5 py-0.5 bg-gray-500/20 text-gray-300 border border-gray-500/30 hover:shadow-[0_0_6px_rgba(107,114,128,0.3)] transition-shadow",
     }
 }
 
-/// Capitalize the first letter of a string.
-fn capitalize(s: &str) -> String {
-    let mut chars = s.chars();
-    match chars.next() {
-        None => String::new(),
-        Some(c) => c.to_uppercase().collect::<String>() + chars.as_str(),
+// -- SVG icon helpers ---------------------------------------------------------
+
+fn pencil_icon() -> impl IntoView {
+    view! {
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
+        </svg>
+    }
+}
+
+fn check_icon() -> impl IntoView {
+    view! {
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+        </svg>
+    }
+}
+
+fn x_icon() -> impl IntoView {
+    view! {
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
     }
 }
