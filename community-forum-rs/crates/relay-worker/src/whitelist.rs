@@ -145,15 +145,13 @@ pub async fn handle_whitelist_list(req: &Request, env: &Env) -> Result<Response>
             .replace('"', "");
         let like_pattern = format!("%\"{escaped}\"%");
 
-        let count = format!(
-            "SELECT COUNT(*) as count FROM whitelist WHERE (expires_at IS NULL OR expires_at > ?1) AND cohorts LIKE ?2 ESCAPE '\\'"
-        );
-        let list = format!(
+        let count =
+            "SELECT COUNT(*) as count FROM whitelist WHERE (expires_at IS NULL OR expires_at > ?1) AND cohorts LIKE ?2 ESCAPE '\\'".to_string();
+        let list =
             "SELECT w.pubkey, w.cohorts, w.added_at, w.added_by, \
              (SELECT e.content FROM events e WHERE e.pubkey = w.pubkey AND e.kind = 0 ORDER BY e.created_at DESC LIMIT 1) as profile_content \
              FROM whitelist w WHERE (w.expires_at IS NULL OR w.expires_at > ?1) AND w.cohorts LIKE ?2 ESCAPE '\\' \
-             ORDER BY w.added_at DESC LIMIT ?3 OFFSET ?4"
-        );
+             ORDER BY w.added_at DESC LIMIT ?3 OFFSET ?4".to_string();
         (count, list, vec![
             js_f64(now as f64),
             js_str(&like_pattern),
@@ -162,12 +160,10 @@ pub async fn handle_whitelist_list(req: &Request, env: &Env) -> Result<Response>
         ])
     } else {
         let count = "SELECT COUNT(*) as count FROM whitelist WHERE (expires_at IS NULL OR expires_at > ?1)".to_string();
-        let list = format!(
-            "SELECT w.pubkey, w.cohorts, w.added_at, w.added_by, \
+        let list = "SELECT w.pubkey, w.cohorts, w.added_at, w.added_by, \
              (SELECT e.content FROM events e WHERE e.pubkey = w.pubkey AND e.kind = 0 ORDER BY e.created_at DESC LIMIT 1) as profile_content \
              FROM whitelist w WHERE (w.expires_at IS NULL OR w.expires_at > ?1) \
-             ORDER BY w.added_at DESC LIMIT ?2 OFFSET ?3"
-        );
+             ORDER BY w.added_at DESC LIMIT ?2 OFFSET ?3".to_string();
         (count, list, vec![
             js_f64(now as f64),
             js_f64(limit as f64),

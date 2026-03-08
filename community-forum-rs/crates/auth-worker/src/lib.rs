@@ -47,8 +47,7 @@ fn json_response(env: &Env, body: &serde_json::Value, status: u16) -> Result<Res
 /// Attach CORS headers to an existing response.
 fn with_cors(resp: Response, env: &Env) -> Response {
     let cors = cors_headers(env);
-    let result = resp.with_headers(cors);
-    result
+    resp.with_headers(cors)
 }
 
 #[event(fetch)]
@@ -62,7 +61,7 @@ async fn fetch(req: Request, env: Env, _ctx: Context) -> Result<Response> {
     let path = url.path();
     let method = req.method();
 
-    let result = route(req, &env, &path, &method).await;
+    let result = route(req, &env, path, &method).await;
 
     match result {
         Ok(resp) => Ok(with_cors(resp, &env)),

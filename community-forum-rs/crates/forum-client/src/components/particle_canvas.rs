@@ -24,6 +24,9 @@ use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
 use web_sys::CanvasRenderingContext2d;
 
+/// Slot type for a self-dropping rAF animation closure.
+type AnimSlot = Rc<RefCell<Option<Closure<dyn FnMut(f64)>>>>;
+
 // -- Constants ----------------------------------------------------------------
 
 /// Golden angle in radians: 360 * (1 - 1/phi) where phi = (1+sqrt5)/2.
@@ -275,7 +278,7 @@ pub fn ParticleCanvas() -> impl IntoView {
         };
         started.set(true);
 
-        let canvas: web_sys::HtmlCanvasElement = el.into();
+        let canvas: web_sys::HtmlCanvasElement = el;
         let rect = canvas.get_bounding_client_rect();
         let w = rect.width();
         let h = rect.height();
@@ -336,8 +339,7 @@ pub fn ParticleCanvas() -> impl IntoView {
         // will resume it when the tab is re-foregrounded.
         let ctx = Rc::new(ctx);
         let running_loop = running.clone();
-        let anim_slot: Rc<RefCell<Option<Closure<dyn FnMut(f64)>>>> =
-            Rc::new(RefCell::new(None));
+        let anim_slot: AnimSlot = Rc::new(RefCell::new(None));
         let slot = anim_slot.clone();
         let last_t = Rc::new(Cell::new(0.0f64));
 

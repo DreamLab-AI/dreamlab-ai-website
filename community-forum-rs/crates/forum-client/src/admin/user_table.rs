@@ -199,7 +199,7 @@ fn UserRow(
                         "Save"
                     </button>
                     <button
-                        on:click=on_cancel_click.clone()
+                        on:click=on_cancel_click
                         class="text-xs text-gray-400 hover:text-gray-300 border border-gray-600 hover:border-gray-500 rounded px-2 py-1 transition-colors flex items-center gap-1"
                     >
                         {x_icon()}

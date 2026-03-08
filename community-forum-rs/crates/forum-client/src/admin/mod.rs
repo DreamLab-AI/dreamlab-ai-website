@@ -315,9 +315,9 @@ impl AdminStore {
             return;
         }
 
-        let channels_sig = self.state.channels.clone();
-        let stats_sig = self.state.stats.clone();
-        let loading_sig = self.state.is_loading.clone();
+        let channels_sig = self.state.channels;
+        let stats_sig = self.state.stats;
+        let loading_sig = self.state.is_loading;
 
         loading_sig.set(true);
 
@@ -349,7 +349,7 @@ impl AdminStore {
             });
         });
 
-        let stats_for_eose = stats_sig.clone();
+        let stats_for_eose = stats_sig;
         let channels_for_eose = channels_sig;
         let loading_for_eose = loading_sig;
         let on_channel_eose = Rc::new(move || {

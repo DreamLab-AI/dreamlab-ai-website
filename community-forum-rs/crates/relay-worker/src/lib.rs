@@ -165,7 +165,7 @@ async fn fetch(req: Request, env: Env, _ctx: Context) -> Result<Response> {
     }
 
     // Route to handlers with error wrapping
-    let result = route(req, &env, &path).await;
+    let result = route(req, &env, path).await;
     match result {
         Ok(resp) => Ok(resp),
         Err(e) => {

@@ -85,11 +85,11 @@ enum EventTreatment {
 }
 
 fn event_treatment(kind: u64) -> EventTreatment {
-    if kind >= 20000 && kind < 30000 {
+    if (20000..30000).contains(&kind) {
         EventTreatment::Ephemeral
-    } else if (kind >= 10000 && kind < 20000) || kind == 0 || kind == 3 {
+    } else if (10000..20000).contains(&kind) || kind == 0 || kind == 3 {
         EventTreatment::Replaceable
-    } else if kind >= 30000 && kind < 40000 {
+    } else if (30000..40000).contains(&kind) {
         EventTreatment::ParameterizedReplaceable
     } else {
         EventTreatment::Regular
@@ -370,6 +370,9 @@ impl NostrRelayDO {
     }
 
     /// Schedule an alarm to evict the DO if still idle after `IDLE_TIMEOUT_MS`.
+    /// The `set_alarm` JS binding fires synchronously in the Workers runtime;
+    /// we intentionally drop the resulting promise/future.
+    #[allow(clippy::let_underscore_future)]
     fn schedule_idle_alarm(&self) {
         let now = js_sys::Date::now() as i64;
         let _ = self.state.storage().set_alarm(now + IDLE_TIMEOUT_MS);
@@ -457,11 +460,7 @@ impl NostrRelayDO {
         }
 
         let now = auth::js_now_secs();
-        let drift = if now > event.created_at {
-            now - event.created_at
-        } else {
-            event.created_at - now
-        };
+        let drift = now.abs_diff(event.created_at);
         if drift > MAX_TIMESTAMP_DRIFT {
             return false;
         }

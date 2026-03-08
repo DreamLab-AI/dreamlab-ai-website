@@ -6,6 +6,9 @@ use std::rc::Rc;
 use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
 
+/// Slot type for a one-shot WASM timer closure (used by `set_timeout_once`).
+type TimerSlot = Rc<Cell<Option<Closure<dyn FnMut()>>>>;
+
 /// Format a UNIX timestamp as a human-readable relative time string.
 ///
 /// Returns strings like "just now", "5m ago", "2h ago", "3d ago", or a
@@ -105,7 +108,7 @@ pub fn capitalize(s: &str) -> String {
 /// from inside the callback itself, so the memory is reclaimed after execution.
 pub fn set_timeout_once<F: FnOnce() + 'static>(f: F, delay_ms: i32) {
     // Shared slot: the closure is stored here so it can drop itself.
-    let slot: Rc<Cell<Option<Closure<dyn FnMut()>>>> = Rc::new(Cell::new(None));
+    let slot: TimerSlot = Rc::new(Cell::new(None));
     let slot_clone = slot.clone();
 
     // Wrap f in Option so we can .take() it from inside an FnMut closure.

@@ -283,8 +283,10 @@ impl DMStore {
         };
 
         self.state.update(|s| {
-            if s.current_conversation.as_deref() == Some(recipient_pk_hex) {
-                if !s.messages.iter().any(|m| m.id == msg.id) { s.messages.push(msg.clone()); }
+            if s.current_conversation.as_deref() == Some(recipient_pk_hex)
+                && !s.messages.iter().any(|m| m.id == msg.id)
+            {
+                s.messages.push(msg.clone());
             }
             let convo = s.conversations.entry(recipient_pk_hex.to_string())
                 .or_insert_with(|| DMConversation {
