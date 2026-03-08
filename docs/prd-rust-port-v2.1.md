@@ -1,7 +1,7 @@
 ---
 title: "PRD: DreamLab Community Forum — Rust Port (Refined Delivery Plan)"
 version: "2.1.0"
-status: accepted
+status: in-progress
 date: 2026-03-08
 branch: rust-version
 scope: community-forum + selected workers only
@@ -251,7 +251,28 @@ and low-risk workers have proven out.
 - accepted docs updated,
 - superseded implementation archived cleanly.
 
-## 7. Work Packages and Ownership Model
+## 7. Progress Tracker
+
+| Tranche | Status | Summary |
+|---------|--------|---------|
+| 0 — Planning Hardening | COMPLETE | Benchmarks baselined, parity matrix built, WASM bridge validated |
+| 1 — Hybrid Validation | COMPLETE | JS vs WASM benchmarks confirm >3x speedup on crypto hot paths |
+| 2 — Core + Low-Risk Workers | COMPLETE | nostr-core finalized (73 tests), preview-worker (35 tests), pod-worker (22 tests), mixed deploy pipeline operational |
+| 3 — Auth Boundary | COMPLETE | auth-worker (WebAuthn register/login, NIP-98, pod provisioning, cron keep-warm), relay-worker (NIP-01 WebSocket DO relay, NIP-11/16/33, whitelist API) |
+| 4 — Client by Vertical Slice | IN PROGRESS | Slice A (auth shell) and Slice B (channel browse) under active development in forum-client crate |
+| 5 — Cutover + Decommission | NOT STARTED | Blocked on Tranche 4 completion |
+
+**Total**: 130 workspace tests, ~7,800 lines of Rust across 6 crates.
+
+**Scope note**: The relay-worker was listed as "Explicitly Out of Scope" in section 4
+but was ported during Tranche 3 because the Durable Object relay implementation was
+straightforward and shared significant NIP-01/NIP-98 validation code with nostr-core.
+This scope expansion was a pragmatic decision — the relay-worker was low-risk given the
+existing shared crate infrastructure, and porting it alongside auth-worker avoided
+duplicating NIP verification logic in TypeScript. The "Explicitly Out of Scope" listing
+in section 4 is retained for historical accuracy; this tracker reflects actual delivery.
+
+## 8. Work Packages and Ownership Model
 
 | Workstream | Primary ownership | Core output |
 |-----------|-------------------|-------------|
@@ -270,7 +291,7 @@ Each workstream must expose:
 - rollback instructions,
 - and architecture delta notes.
 
-## 8. Go / No-Go and Kill Criteria
+## 9. Go / No-Go and Kill Criteria
 
 | Condition | Continue | Stop / Re-scope |
 |----------|----------|-----------------|
@@ -281,7 +302,7 @@ Each workstream must expose:
 | Bundle size | initial forum payload `<2MB gzipped` | `>3MB gzipped` without mitigation path |
 | Route parity | critical routes green per slice | critical user journeys blocked |
 
-## 9. Success Metrics
+## 10. Success Metrics
 
 ### Technical Metrics
 
@@ -309,7 +330,7 @@ Each workstream must expose:
 | Canary regression window | stable for 48h before expansion |
 | Documentation drift | zero known PRD/ADR/DDD contradictions at cutover |
 
-## 10. Documentation Governance
+## 11. Documentation Governance
 
 The documentation set should follow these rules:
 
@@ -331,7 +352,7 @@ The documentation set should follow these rules:
    - and domain-model synchronization
    should be reviewable as distinct activities even if they land near each other.
 
-## 11. Immediate Recommendations
+## 12. Immediate Recommendations
 
 1. Treat `v2.0.0` as the accepted delivery baseline until `v2.1.0` is approved.
 2. Accept a planning-governance ADR before making deeper architectural edits.
@@ -341,7 +362,7 @@ The documentation set should follow these rules:
 6. Require a rollback note and cutover note for every production-affecting tranche.
 7. Update DDD only after any new architecture ADRs are accepted.
 
-## 12. Approval and Supersession
+## 13. Approval and Supersession
 
 This PRD supersedes [`prd-rust-port.md`](./prd-rust-port.md) **only if it is
 accepted**.
@@ -353,7 +374,7 @@ Recommended approval path:
 3. decide whether any architecture ADRs need supersession,
 4. then synchronize the DDD set.
 
-## 13. References
+## 14. References
 
 - [Accepted baseline: PRD v2.0.0](./prd-rust-port.md)
 - [ADR-013: Rust/Leptos 0.7 as Forum UI Framework](./adr/013-rust-leptos-forum-framework.md)
