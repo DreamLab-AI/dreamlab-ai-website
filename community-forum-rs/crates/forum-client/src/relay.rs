@@ -20,7 +20,7 @@ use wasm_bindgen::JsCast;
 use web_sys::WebSocket;
 
 /// Default relay URL when VITE_RELAY_URL is not set.
-const DEFAULT_RELAY_URL: &str = "wss://dreamlab-nostr-relay.workers.dev";
+const DEFAULT_RELAY_URL: &str = "wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev";
 
 /// Maximum reconnect delay in milliseconds.
 const MAX_RECONNECT_DELAY_MS: u32 = 30_000;
