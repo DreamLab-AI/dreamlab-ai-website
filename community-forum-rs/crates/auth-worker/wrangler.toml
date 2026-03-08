@@ -8,15 +8,15 @@ command = "worker-build --release"
 [[d1_databases]]
 binding = "DB"
 database_name = "dreamlab-auth"
-database_id = ""  # Set via wrangler or GitHub secret
+database_id = "e3981999-e8f0-4c07-9e4b-2e50859b8524"
 
 [[kv_namespaces]]
 binding = "SESSIONS"
-id = ""  # Set via wrangler or GitHub secret
+id = "901345296c2848788066686aa67d5909"
 
 [[kv_namespaces]]
 binding = "POD_META"
-id = ""  # Set via wrangler or GitHub secret
+id = "8ec8759ab40d4709a831bf6b0e5241eb"
 
 [[r2_buckets]]
 binding = "PODS"

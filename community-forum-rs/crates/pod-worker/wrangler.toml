@@ -11,7 +11,7 @@ bucket_name = "dreamlab-pods"
 
 [[kv_namespaces]]
 binding = "POD_META"
-id = ""  # Set via wrangler or GitHub secret
+id = "8ec8759ab40d4709a831bf6b0e5241eb"
 
 [vars]
 EXPECTED_ORIGIN = "https://dreamlab-ai.com"
