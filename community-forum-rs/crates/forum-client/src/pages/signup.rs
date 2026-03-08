@@ -2,6 +2,8 @@
 
 use leptos::prelude::*;
 use leptos_router::components::A;
+use leptos_router::hooks::use_navigate;
+use leptos_router::NavigateOptions;
 use wasm_bindgen_futures::spawn_local;
 
 use crate::app::base_href;
@@ -12,16 +14,16 @@ pub fn SignupPage() -> impl IntoView {
     let auth = use_auth();
     let is_authed = auth.is_authenticated();
     let error = auth.error();
+    // StoredValue is Copy — safe to capture in multiple closures
+    let navigate = StoredValue::new(use_navigate());
 
     let display_name = RwSignal::new(String::new());
     let is_pending = RwSignal::new(false);
 
-    // Redirect if already authenticated
+    // Redirect if already authenticated (SPA navigation — preserves WASM state)
     Effect::new(move |_| {
         if is_authed.get() {
-            if let Some(window) = web_sys::window() {
-                let _ = window.location().set_href(&base_href("/chat"));
-            }
+            navigate.with_value(|nav| nav(&base_href("/chat"), NavigateOptions::default()));
         }
     });
 
@@ -49,9 +51,7 @@ pub fn SignupPage() -> impl IntoView {
             let result = auth.register_with_passkey(&trimmed).await;
             is_pending.set(false);
             if result.is_ok() {
-                if let Some(window) = web_sys::window() {
-                    let _ = window.location().set_href(&base_href("/chat"));
-                }
+                navigate.with_value(|nav| nav(&base_href("/chat"), NavigateOptions::default()));
             }
         });
     };
@@ -73,9 +73,7 @@ pub fn SignupPage() -> impl IntoView {
                 let result = auth.register_with_passkey(&trimmed).await;
                 is_pending.set(false);
                 if result.is_ok() {
-                    if let Some(window) = web_sys::window() {
-                        let _ = window.location().set_href(&base_href("/chat"));
-                    }
+                    navigate.with_value(|nav| nav(&base_href("/chat"), NavigateOptions::default()));
                 }
             });
         }

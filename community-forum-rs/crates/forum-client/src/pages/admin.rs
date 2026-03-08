@@ -4,6 +4,8 @@
 //! Route: `/admin`
 
 use leptos::prelude::*;
+use leptos_router::hooks::use_navigate;
+use leptos_router::NavigateOptions;
 use wasm_bindgen::JsCast;
 use wasm_bindgen_futures::spawn_local;
 
@@ -22,26 +24,24 @@ pub fn AdminPage() -> impl IntoView {
     let is_authed = auth.is_authenticated();
     let is_ready = auth.is_ready();
     let pubkey = auth.pubkey();
+    // StoredValue is Copy — safe to capture in multiple Effect closures
+    let navigate = StoredValue::new(use_navigate());
 
     let is_admin = Memo::new(move |_| {
         pubkey.get().map(|pk| AdminStore::is_admin(&pk)).unwrap_or(false)
     });
 
-    // Redirect non-authenticated users
+    // Redirect non-authenticated users (SPA navigation — preserves WASM state)
     Effect::new(move |_| {
         if is_ready.get() && !is_authed.get() {
-            if let Some(window) = web_sys::window() {
-                let _ = window.location().set_href(&base_href("/login"));
-            }
+            navigate.with_value(|nav| nav(&base_href("/login"), NavigateOptions::default()));
         }
     });
 
     // Redirect non-admin users
     Effect::new(move |_| {
         if is_ready.get() && is_authed.get() && !is_admin.get() {
-            if let Some(window) = web_sys::window() {
-                let _ = window.location().set_href(&base_href("/chat"));
-            }
+            navigate.with_value(|nav| nav(&base_href("/chat"), NavigateOptions::default()));
         }
     });
 

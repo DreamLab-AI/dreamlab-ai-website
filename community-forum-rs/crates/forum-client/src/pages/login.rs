@@ -2,6 +2,8 @@
 
 use leptos::prelude::*;
 use leptos_router::components::A;
+use leptos_router::hooks::use_navigate;
+use leptos_router::NavigateOptions;
 use wasm_bindgen_futures::spawn_local;
 
 use crate::app::base_href;
@@ -12,18 +14,18 @@ pub fn LoginPage() -> impl IntoView {
     let auth = use_auth();
     let is_authed = auth.is_authenticated();
     let error = auth.error();
+    // StoredValue is Copy — safe to capture in multiple closures including <Show> children
+    let navigate = StoredValue::new(use_navigate());
 
     // Local state for the nsec input fallback
     let nsec_input = RwSignal::new(String::new());
     let show_nsec = RwSignal::new(false);
     let is_pending = RwSignal::new(false);
 
-    // Redirect if already authenticated
+    // Redirect if already authenticated (SPA navigation — preserves WASM state)
     Effect::new(move |_| {
         if is_authed.get() {
-            if let Some(window) = web_sys::window() {
-                let _ = window.location().set_href(&base_href("/chat"));
-            }
+            navigate.with_value(|nav| nav(&base_href("/chat"), NavigateOptions::default()));
         }
     });
 
@@ -39,32 +41,9 @@ pub fn LoginPage() -> impl IntoView {
                 .await;
             is_pending.set(false);
             if result.is_ok() {
-                if let Some(window) = web_sys::window() {
-                    let _ = window.location().set_href(&base_href("/chat"));
-                }
+                navigate.with_value(|nav| nav(&base_href("/chat"), NavigateOptions::default()));
             }
         });
-    };
-
-    // Nsec login handler
-    let on_nsec_login = move |_| {
-        let input = nsec_input.get_untracked();
-        let trimmed = input.trim().to_string();
-        if trimmed.is_empty() {
-            auth.set_error("Please enter your private key");
-            return;
-        }
-        auth.clear_error();
-        match auth.login_with_local_key(&trimmed) {
-            Ok(()) => {
-                if let Some(window) = web_sys::window() {
-                    let _ = window.location().set_href(&base_href("/chat"));
-                }
-            }
-            Err(e) => {
-                auth.set_error(&e);
-            }
-        }
     };
 
     view! {
@@ -141,7 +120,23 @@ pub fn LoginPage() -> impl IntoView {
                                     class="w-full bg-gray-900 border border-gray-600 focus:border-amber-500 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-amber-500 text-sm font-mono"
                                 />
                                 <button
-                                    on:click=on_nsec_login
+                                    on:click=move |_| {
+                                        let input = nsec_input.get_untracked();
+                                        let trimmed = input.trim().to_string();
+                                        if trimmed.is_empty() {
+                                            auth.set_error("Please enter your private key");
+                                            return;
+                                        }
+                                        auth.clear_error();
+                                        match auth.login_with_local_key(&trimmed) {
+                                            Ok(()) => {
+                                                navigate.with_value(|nav| nav(&base_href("/chat"), NavigateOptions::default()));
+                                            }
+                                            Err(e) => {
+                                                auth.set_error(&e);
+                                            }
+                                        }
+                                    }
                                     class="w-full bg-gray-700 hover:bg-gray-600 text-white py-2.5 rounded-lg transition-colors text-sm font-semibold"
                                 >
                                     "Sign In with Key"
