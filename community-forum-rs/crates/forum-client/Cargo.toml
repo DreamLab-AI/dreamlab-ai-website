@@ -1,0 +1,69 @@
+[package]
+name = "forum-client"
+version = "0.1.0"
+edition = "2021"
+description = "DreamLab community forum Leptos CSR application"
+
+[[bin]]
+name = "forum-client"
+path = "src/main.rs"
+
+[dependencies]
+nostr-core = { workspace = true }
+nostr-sdk = { workspace = true }
+leptos = { workspace = true }
+leptos_router = { workspace = true }
+leptos_meta = { workspace = true }
+wasm-bindgen = { workspace = true }
+wasm-bindgen-futures = { workspace = true }
+js-sys = { workspace = true }
+web-sys = { workspace = true, features = [
+    "WebSocket",
+    "MessageEvent",
+    "CloseEvent",
+    "ErrorEvent",
+    "BinaryType",
+    "Window",
+    "Document",
+    "HtmlElement",
+    "HtmlInputElement",
+    "HtmlCanvasElement",
+    "CanvasRenderingContext2d",
+    "Element",
+    "ScrollBehavior",
+    "ScrollIntoViewOptions",
+    "EventTarget",
+    "Location",
+    "Navigator",
+    "CredentialsContainer",
+    "PublicKeyCredential",
+    "PublicKeyCredentialCreationOptions",
+    "PublicKeyCredentialRequestOptions",
+    "AuthenticatorResponse",
+    "AuthenticatorAttestationResponse",
+    "AuthenticatorAssertionResponse",
+    "CredentialCreationOptions",
+    "CredentialRequestOptions",
+    "AuthenticationExtensionsClientInputs",
+    "AuthenticationExtensionsClientOutputs",
+    "Storage",
+    "HtmlDocument",
+    "Headers",
+    "RequestInit",
+    "Request",
+    "Response",
+    "PageTransitionEvent",
+    "DomRect",
+    "MediaQueryList",
+] }
+gloo = { workspace = true }
+comrak = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+hex = { workspace = true }
+base64 = { workspace = true }
+zeroize = { workspace = true }
+thiserror = { workspace = true }
+k256 = { workspace = true }
+send_wrapper = "0.6"
+serde-wasm-bindgen = "0.6"

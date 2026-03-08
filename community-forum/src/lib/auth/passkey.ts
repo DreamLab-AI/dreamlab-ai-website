@@ -6,6 +6,7 @@ import { getPublicKey } from 'nostr-tools';
 import { secp256k1 } from '@noble/curves/secp256k1';
 import { browser } from '$app/environment';
 import { fetchWithNip98 } from '$lib/auth/nip98-client';
+import { deriveKeypairFromPrf } from '$lib/crypto';
 
 const PRF_LABEL = new TextEncoder().encode('dreamlab-nostr-key-v1');
 const AUTH_API_BASE = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_AUTH_API_URL) ?? '';
@@ -119,8 +120,9 @@ export async function registerPasskey(displayName: string): Promise<PasskeyRegis
     );
   }
 
-  const privkey = await derivePrivkeyFromPrf(prfOutput);
-  const pubkey = getPublicKey(privkey);
+  const keypair = await deriveKeypairFromPrf(new Uint8Array(prfOutput));
+  const privkey = keypair.secretKey;
+  const pubkey = keypair.publicKey;
 
   // Step 4: Send verify to server
   const verifyRes = await fetch(`${AUTH_API_BASE}/auth/register/verify`, {
@@ -215,8 +217,9 @@ export async function authenticatePasskey(pubkey?: string): Promise<PasskeyAuthR
   const prfOutput = extensions.prf?.results?.first;
   if (!prfOutput) throw new Error('PRF extension not available on this credential');
 
-  const privkey = await derivePrivkeyFromPrf(prfOutput);
-  const derivedPubkey = getPublicKey(privkey);
+  const keypair = await deriveKeypairFromPrf(new Uint8Array(prfOutput));
+  const privkey = keypair.secretKey;
+  const derivedPubkey = keypair.publicKey;
 
   // Verify with server — include NIP-98 auth; the endpoint requires it to confirm
   // the caller controls the derived Nostr privkey.

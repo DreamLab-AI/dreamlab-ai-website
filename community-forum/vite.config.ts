@@ -36,7 +36,7 @@ export default defineConfig({
 	// Allow WASM files to be imported as assets (ruvector ONNX embedder)
 	assetsInclude: ['**/*.wasm'],
 	optimizeDeps: {
-		exclude: ['ruvector']
+		exclude: ['ruvector', '@dreamlab/nostr-core-wasm']
 	},
 	build: {
 		target: 'esnext',
@@ -65,6 +65,8 @@ export default defineConfig({
 			'@scure/bip39',
 			'@nostr-dev-kit/ndk',
 			'@nostr-dev-kit/ndk-svelte'
-		]
+		],
+		// WASM binary cannot load in Node SSR -- gated by browser check in init.ts
+		external: ['@dreamlab/nostr-core-wasm']
 	}
 });

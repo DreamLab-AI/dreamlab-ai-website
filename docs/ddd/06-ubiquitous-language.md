@@ -1,168 +1,77 @@
----
-title: "Ubiquitous Language"
-description: "## Glossary"
-category: explanation
-tags: ['ddd', 'developer', 'user']
-difficulty: beginner
-last-updated: 2026-01-16
----
-
 # Ubiquitous Language
 
-## Glossary
+A shared vocabulary for the DreamLab community forum Rust port. Every term here
+has a precise meaning used consistently across code, documentation, and
+conversation.
 
-This glossary defines the shared vocabulary used across the Nostr BBS domain.
+## Nostr Protocol Terms
 
-### Identity Terms
+| Term | Definition |
+|------|-----------|
+| **Event** | A signed JSON object with `id`, `pubkey`, `created_at`, `kind`, `tags`, `content`, and `sig`. The atomic unit of the Nostr protocol (NIP-01). |
+| **Kind** | An integer classifying an event's purpose. Kind 0 = profile metadata, kind 1 = text note, kind 7 = reaction, kind 27235 = NIP-98 HTTP auth, etc. |
+| **Tag** | A string array attached to an event. First element is the tag name (`e`, `p`, `t`, `u`, `method`, `payload`). Used for referencing other events, pubkeys, URLs. |
+| **Relay** | A WebSocket server that stores and forwards Nostr events. Clients connect to relays to publish and subscribe to events. |
+| **Subscription** | A client-initiated filter (REQ message) that tells a relay which events to send. Closed with a CLOSE message. |
+| **REQ** | Protocol message from client to relay requesting events matching a filter (kinds, authors, tags, time range). |
+| **CLOSE** | Protocol message from client to relay cancelling a subscription. |
+| **NIP** | Nostr Implementation Possibility. A numbered specification for protocol features (NIP-01 = core, NIP-44 = encryption, NIP-98 = HTTP auth, etc.). |
+| **NIP-01** | Core protocol: event structure, canonical JSON serialization, REQ/CLOSE/EVENT messages, signature verification. |
+| **NIP-10** | Event threading: `e` tags with markers (`root`, `reply`, `mention`) for building conversation threads. |
+| **NIP-17** | Private direct messages using gift wrapping (kind 14 sealed message inside kind 1059 gift wrap). |
+| **NIP-25** | Reactions: kind 7 events referencing another event, with content like `+`, `-`, or an emoji. |
+| **NIP-28** | Public channels: kind 40 (create), 41 (metadata), 42 (message), 43 (hide), 44 (mute). |
+| **NIP-29** | Relay-enforced groups: kind 39000 (group metadata), 39002 (member list). Server-side access control. |
+| **NIP-42** | Client authentication to a relay via a signed event, enabling relay-level access control. |
+| **NIP-44** | Versioned encryption: ECDH key agreement + HKDF + ChaCha20-Poly1305. Version 2 is current. |
+| **NIP-52** | Calendar events: kind 31922 (time-based) and 31923 (date-based). |
+| **NIP-59** | Gift wrap: kind 1059 outer event with a random throwaway key to hide the real sender from relay operators. |
+| **NIP-65** | Relay list metadata: kind 10002 events specifying a user's preferred relays. |
+| **NIP-98** | HTTP authentication: kind 27235 event with `u` (URL), `method`, and optional `payload` (SHA-256 of body) tags. Sent as `Authorization: Nostr <base64>`. |
 
-| Term | Definition | Example |
-|------|------------|---------|
-| **Pubkey** | A 64-character hexadecimal string representing a user's public key on the secp256k1 curve. The primary identifier for all users. | `a1b2c3d4...` |
-| **Npub** | Bech32-encoded public key with `npub1` prefix. Human-readable format for sharing. | `npub1abc123...` |
-| **Nsec** | Bech32-encoded private key with `nsec1` prefix. Must never be shared or stored insecurely. | `nsec1xyz789...` |
-| **Keypair** | A matched public/private key pair used for signing and encryption. Generated from entropy or BIP-39 mnemonic. | - |
-| **Mnemonic** | 12 or 24 word BIP-39 seed phrase that can deterministically generate a keypair. The recovery mechanism. | "abandon ability able..." |
-| **Profile** | NIP-01 kind 0 metadata including name, display name, about, picture, and NIP-05 identifier. | - |
-| **NIP-05** | Domain-verified identifier in format `name@domain.com`. Provides human-readable identity. | `alice@example.com` |
+## DreamLab Forum Terms
 
-### Access Terms
+| Term | Definition |
+|------|-----------|
+| **Category** | Tier 1 of the BBS hierarchy. A top-level organizational container (also called a "zone"). Categories can be restricted to specific cohorts for zone isolation. |
+| **Section** | Tier 2 of the BBS hierarchy. A grouping of forums/channels within a category. Has its own access config, calendar settings, and role assignments. |
+| **Forum** | Tier 3 of the BBS hierarchy. Maps to a NIP-28 channel or NIP-29 group. The space where users post messages and create threads. |
+| **Channel** | Synonym for forum in the NIP-28/NIP-29 context. A channel has messages, members, and metadata. |
+| **Zone** | Synonym for category. Used when emphasizing access isolation (e.g., "zone-level visibility"). |
+| **Cohort** | A named group membership tag assigned to users via the relay whitelist. Determines which zones, sections, and channels a user can access. Examples: `admin`, `mentor`, `business`, `moomaa-tribe`. |
+| **Whitelist** | The relay-maintained list of authorized users with their cohort assignments. The whitelist API is the source of truth for permissions. |
+| **Pod** | A per-user Solid-compatible storage container backed by Cloudflare R2. Stores profile cards, media, and private files. Accessible at `https://pods.dreamlab-ai.com/{pubkey}/`. |
+| **WAC** | Web Access Control. The ACL system used on pods, with rules for agent identity, access modes (Read/Write/Control), and path scoping. |
+| **Whitelist Status** | A verified snapshot of a user's permissions, including whether they are whitelisted, their admin status, and their cohort list. Cached for 5 minutes. |
 
-| Term | Definition | Example |
-|------|------------|---------|
-| **Whitelist** | PostgreSQL table of pubkeys allowed to connect to the relay. Enforced via NIP-42 AUTH. | - |
-| **Cohort** | Named group of members sharing access permissions. Members can belong to multiple cohorts. | `admin`, `members`, `guests` |
-| **Role** | Permission level within a specific section. Hierarchical: admin > moderator > member > viewer. | `moderator` |
-| **Section Role** | A (section, role) pair granting specific permissions in one section. | `(general, admin)` |
-| **Permission** | A capability to perform an action. Derived from cohort membership and section roles. | `can_post`, `can_moderate` |
-| **Global Admin** | A member with admin cohort membership. Has access to all sections and admin functions. | - |
-| **Superuser** | The ADMIN_PUBKEY from environment. Has absolute authority, cannot be removed. | - |
+## Authentication Terms
 
-### Organisation Terms
+| Term | Definition |
+|------|-----------|
+| **Passkey** | A FIDO2/WebAuthn credential stored in the user's platform authenticator (e.g., iCloud Keychain, Android Biometric). The primary authentication method. |
+| **PRF** | Pseudo-Random Function extension for WebAuthn. Returns deterministic bytes from the authenticator, used as input to key derivation. Same credential + same salt = same output. |
+| **HKDF** | HMAC-based Key Derivation Function. Derives the secp256k1 private key from PRF output using `HKDF(SHA-256, salt=[], info="nostr-secp256k1-v1")`. |
+| **PRF Salt** | A 32-byte random value generated server-side during registration, stored with the credential. Passed back to the authenticator during login to produce the same PRF output. |
+| **Discoverable Credential** | A passkey that the authenticator can present without the server knowing the credential ID. Enables login on new devices via iCloud/Google sync. |
+| **Hybrid Transport** | Cross-device QR-code WebAuthn flow. Blocked in DreamLab because it produces different PRF outputs than the original device. |
+| **NIP-07** | Browser extension signing interface (window.nostr). Used by extensions like Alby and nos2x. No private key access; the extension signs events on behalf of the user. |
+| **Credential** | A WebAuthn credential record (credential ID, public key, counter, PRF salt) stored in D1. |
+| **Session** | The client-side auth state. For passkey users, the private key lives in a closure (`_privkeyMem`) and is zeroed on page discard. |
 
-| Term | Definition | Example |
-|------|------------|---------|
-| **Category** | Top-level UI grouping for sections. Has no Nostr representation. Defined in sections.yaml. | "Community", "Projects" |
-| **Section** | Access-controlled container for forums. Maps to NIP-29 relay group concept. | "General Discussion" |
-| **Forum** | A NIP-28 public channel within a section. Contains message threads. | "Introductions" |
-| **Channel** | Synonym for Forum. NIP-28 terminology. | - |
-| **Thread** | A root message and all its replies. Implicit structure via e-tags. | - |
-| **Zone** | Informal term for a section's access boundary. "Users in the general zone." | - |
+## Rust / Leptos Terms
 
-### Messaging Terms
-
-| Term | Definition | Example |
-|------|------------|---------|
-| **Event** | The fundamental Nostr data unit. Contains id, pubkey, created_at, kind, tags, content, sig. | - |
-| **Message** | A text post in a forum (kind 42) or general note (kind 1). | "Hello everyone!" |
-| **DM** | Direct Message. Private encrypted communication between two parties. | - |
-| **Gift Wrap** | NIP-59 privacy envelope. Hides sender/recipient metadata. Contains sealed rumor. | kind 1059 |
-| **Seal** | NIP-59 encrypted container inside gift wrap. Decrypted by recipient. | kind 13 |
-| **Rumor** | The actual message content inside a seal. Unsigned to prevent forwarding proof. | kind 1 (unsigned) |
-| **Reaction** | NIP-25 emoji response to a message. | kind 7, content: "👍" |
-| **Reply** | A message referencing another via e-tag. Forms thread structure. | - |
-| **Mention** | Reference to a pubkey via p-tag or nostr:npub in content. | "@alice" |
-| **Tag** | Event metadata array. Common: e (event ref), p (pubkey ref), t (hashtag). | `["e", "abc123"]` |
-
-### Encryption Terms
-
-| Term | Definition | Example |
-|------|------------|---------|
-| **NIP-04** | Legacy encryption using AES-256-CBC. Deprecated. Only used for decryption. | - |
-| **NIP-44** | Modern encryption using XChaCha20-Poly1305. Required for all new encryption. | - |
-| **Conversation Key** | Derived shared secret between two pubkeys. Used for DM encryption. | - |
-| **ECDH** | Elliptic Curve Diffie-Hellman. Key agreement protocol for deriving shared secrets. | - |
-
-### Calendar Terms
-
-| Term | Definition | Example |
-|------|------------|---------|
-| **Calendar Event** | NIP-52 scheduled happening. Can be date-based (kind 31922) or time-based (kind 31923). | "Team Meeting" |
-| **RSVP** | Response to calendar event. Status: accepted, declined, tentative. | kind 31925 |
-| **Date Event** | All-day calendar event without specific time. | "Holiday" |
-| **Time Event** | Calendar event with specific start/end times. | "3pm-4pm Meeting" |
-
-### Search Terms
-
-| Term | Definition | Example |
-|------|------------|---------|
-| **Index** | HNSW vector index stored in IndexedDB. Enables semantic search. | - |
-| **Embedding** | 384-dimensional vector representation of text. Generated by all-MiniLM-L6-v2. | Float32Array |
-| **HNSW** | Hierarchical Navigable Small World. Graph-based ANN algorithm. | - |
-| **Semantic Search** | Finding messages by meaning rather than exact keywords. | "authentication issues" finds "login problems" |
-| **Sync** | Process of downloading updated search index. WiFi-only to preserve data. | - |
-
-### Technical Terms
-
-| Term | Definition | Example |
-|------|------------|---------|
-| **Relay** | Nostr server that stores and forwards events. Our private relay runs strfry. | `wss://relay.example.com` |
-| **NDK** | Nostr Development Kit. TypeScript library for Nostr client development. | @nostr-dev-kit/ndk |
-| **Subscription** | REQ message to relay specifying event filters. Returns matching events. | - |
-| **Filter** | Criteria for event subscription: kinds, authors, since, until, #e, #p, etc. | `{kinds: [1], limit: 100}` |
-| **EOSE** | End Of Stored Events. Signal that relay has sent all stored matches. | - |
-| **AUTH** | NIP-42 authentication challenge/response. Required for whitelist enforcement. | kind 22242 |
-
-### State Terms
-
-| Term | Definition | Example |
-|------|------------|---------|
-| **Pending** | Member status before whitelist approval. Can view but not post. | - |
-| **Active** | Member status after approval. Full access per cohort/roles. | - |
-| **Suspended** | Member status when access revoked. Cannot connect. | - |
-| **Deleted** | Event marked for deletion via NIP-09. May still exist on some relays. | kind 5 |
-| **Pinned** | Message highlighted by moderator in forum. Appears at top. | - |
-| **Muted** | User whose messages are hidden. Per-forum or global. | - |
-
-## Usage Guidelines
-
-### Prefer Domain Terms
-
-```typescript
-// ✓ Good: Uses domain language
-const member = await memberRepository.findByPubkey(pubkey);
-if (member.canAccessSection(sectionId)) {
-  await forum.postMessage(content);
-}
-
-// ✗ Avoid: Generic programming terms
-const user = await userDao.getById(id);
-if (checkPermissions(user, areaId)) {
-  await channel.send(text);
-}
-```
-
-### Consistent Naming
-
-```typescript
-// ✓ Consistent: Same term everywhere
-interface Forum { ... }
-class ForumRepository { ... }
-function createForum() { ... }
-const forumId = ...;
-
-// ✗ Inconsistent: Mixed terminology
-interface Channel { ... }
-class ForumRepository { ... }
-function createRoom() { ... }
-const channelId = ...;
-```
-
-### Documentation Standards
-
-When writing documentation:
-- Use **bold** for term definitions
-- Use `code` for identifiers and values
-- Always use the canonical term from this glossary
-- Add new terms here when introducing concepts
-
-## Cross-Reference
-
-| Code Entity | Domain Term | Nostr Concept |
-|-------------|-------------|---------------|
-| `Member` | Member | Profile (kind 0) |
-| `Message` | Message | Event (kind 1, 42) |
-| `Forum` | Forum/Channel | Channel (kind 40) |
-| `Section` | Section | Group (NIP-29) |
-| `DirectMessage` | DM | Gift Wrap (kind 1059) |
-| `Reaction` | Reaction | Reaction (kind 7) |
-| `CalendarEvent` | Calendar Event | Calendar (kind 31922/31923) |
+| Term | Definition |
+|------|-----------|
+| **Crate** | A Rust compilation unit (library or binary). The workspace has 5 crates: `nostr-core`, `forum-client`, `auth-worker`, `pod-worker`, `preview-worker`. |
+| **Signal** | A Leptos reactive primitive. `Signal<T>` holds a value that triggers re-renders when updated. Replaces Svelte's `writable`/`derived` stores. |
+| **Resource** | A Leptos async data primitive. `Resource<T>` loads data asynchronously and integrates with `Suspense` for loading states. |
+| **Memo** | A Leptos derived computation. `Memo<T>` caches a derived value and only recomputes when its dependencies change. |
+| **Effect** | A Leptos side-effect. `Effect` runs a closure whenever its tracked signals change. Used for subscriptions, logging, DOM manipulation. |
+| **Component** | A Leptos function that returns a `View`. Annotated with `#[component]`. The building block of the UI. |
+| **View** | The return type of a Leptos component. Describes the DOM tree declaratively using the `view!` macro. |
+| **trunk** | The build tool for Leptos CSR apps. Compiles Rust to WASM, bundles assets, serves during development. Replaces the archived `wasm-pack`. |
+| **worker-build** | The build tool for Cloudflare Workers written in Rust. Compiles to WASM and generates the Worker entry point. |
+| **wasm-bindgen** | The FFI layer between Rust/WASM and JavaScript. Generates JS glue code for calling browser APIs from Rust. |
+| **web-sys** | Rust bindings to Web APIs (DOM, WebAuthn, Crypto, IndexedDB). Generated from WebIDL specifications. |
+| **gloo** | High-level Rust wrappers around browser APIs (timers, events, storage, fetch). Built on top of `web-sys`. |
+| **proptest** | Property-based testing framework. Generates random inputs and checks that properties hold. Used for crypto roundtrip testing. |

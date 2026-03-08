@@ -1,243 +1,194 @@
----
-title: "Bounded Contexts"
-description: "Domain-driven design bounded contexts for the DreamLab AI platform"
-category: explanation
-tags: ['ddd', 'developer']
-difficulty: beginner
-last-updated: 2026-02-28
----
-
 # Bounded Contexts
+
+This document maps each bounded context to a Rust crate (or existing TypeScript
+Worker) and defines the responsibilities, public interfaces, and dependencies
+between contexts.
 
 ## Context Map
 
-```mermaid
-graph TB
-    subgraph Upstream["UPSTREAM CONTEXTS"]
-        Identity["Identity Context<br/>----------<br/>Passkey<br/>Pubkey / DID / WebID<br/>Profile"]
-    end
-
-    subgraph Core["CORE DOMAIN"]
-        Community["Community Context<br/>----------<br/>Channel<br/>Message / DM<br/>Thread / Reaction<br/>Calendar Event"]
-    end
-
-    subgraph Supporting["SUPPORTING CONTEXTS"]
-        Content["Content Context<br/>----------<br/>Workshop<br/>Team Profile<br/>Case Study"]
-        Storage["Storage Context<br/>----------<br/>Pod / File<br/>ACL<br/>Image"]
-    end
-
-    Identity -->|Published<br/>Language| Community
-    Identity -->|ACL| Storage
-    Community -->|Events| Storage
-    Content -.->|Independent| Community
-
-    style Identity fill:#e1f5fe
-    style Community fill:#c8e6c9
-    style Content fill:#fff9c4
-    style Storage fill:#f8bbd0
+```
+                          +-----------------+
+                          |   nostr-core    |  (shared library crate)
+                          |  events, crypto |
+                          |  NIP-44, NIP-98 |
+                          +--------+--------+
+                                   |
+                  +----------------+----------------+
+                  |                |                 |
+          +-------v------+  +-----v-------+  +------v-------+
+          | forum-client  |  | auth-worker |  | pod-worker   |
+          | (Leptos WASM) |  | (CF Worker) |  | (CF Worker)  |
+          +---------+-----+  +------+------+  +------+-------+
+                    |               |                |
+                    |        +------v------+         |
+                    |        | preview-    |         |
+                    |        | worker      |         |
+                    |        +-------------+         |
+                    |                                 |
+          +---------v---------------------------------v------+
+          |       TypeScript Workers (unchanged)             |
+          |  nostr-relay (D1+DO+WS)  |  search-api (RVF)    |
+          +--------------------------------------------------+
 ```
 
-*Domain-driven design context map showing upstream identity, core community domain, and supporting contexts.*
+## 1. Nostr Core Context -- `nostr-core` crate
 
-## Context Definitions
+**Responsibility**: Protocol primitives shared between client and Workers. Zero
+browser or Worker runtime dependencies.
 
-### 1. Identity Context
+**Compilation targets**: `wasm32-unknown-unknown` + native (for tests/CI).
 
-**Purpose**: Manage cryptographic identity, authentication, and user profiles.
-
-**Responsibilities**:
-- WebAuthn PRF passkey registration and authentication
-- HKDF key derivation (PRF output to secp256k1 private key)
-- In-memory private key lifecycle (closure-held, zero-filled on page hide)
-- NIP-98 HTTP auth token creation and verification
-- Profile metadata (kind:0 events)
-- DID and WebID identity resolution
-- NIP-07 browser extension integration
-
-**Language**:
-
-| Term | Definition |
-|------|------------|
-| Passkey | WebAuthn credential with PRF extension support |
-| Pubkey | 64-char hex secp256k1 public key (primary identity) |
-| DID | `did:nostr:{pubkey}` -- W3C decentralised identifier |
-| WebID | `{pod-url}/profile/card#me` -- Solid Linked Data profile |
-| PRF | Pseudo-Random Function extension for deterministic key derivation |
-| NIP-98 Token | Schnorr-signed kind:27235 event for HTTP authentication |
-
-**Integrations**:
-- **Outbound**: publishes pubkey and DID to Community and Storage contexts
-- **Technology**: WebAuthn API, Web Crypto (HKDF), nostr-tools, @noble/hashes
-- **Infrastructure**: Cloudflare Workers (auth-api) + D1 + KV
-
-```typescript
-// Identity Context Public API
-interface IdentityService {
-  registerPasskey(displayName: string): Promise<PasskeyRegistrationResult>;
-  authenticatePasskey(pubkey?: string): Promise<PasskeyAuthResult>;
-  loginWithExtension(): Promise<{ publicKey: string }>;
-  loginWithLocalKey(privkeyHex: string, rememberMe: boolean): Promise<{ publicKey: string }>;
-  getPrivkey(): Uint8Array | null;
-  createNip98Token(privkey: Uint8Array, url: string, method: string, body?: Uint8Array): Promise<string>;
-  verifyNip98(authHeader: string, opts: VerifyOptions): Promise<VerifyResult | null>;
-}
+```rust
+// Public modules
+pub mod event;      // NostrEvent, EventId, Tag, canonical JSON serialization
+pub mod keys;       // NostrKeypair, PublicKey, derive_from_prf(), HKDF
+pub mod nip01;      // REQ/CLOSE/EVENT message framing
+pub mod nip44;      // ChaCha20-Poly1305 encrypt/decrypt, key derivation
+pub mod nip98;      // Token creation and verification (kind 27235)
+pub mod kinds;      // EventKind enum with all 12+ forum event kinds
+pub mod validation; // Event ID recomputation, signature verification, tag checks
+pub mod types;      // Timestamp, Signature, CohortType, ZoneType, value objects
 ```
 
----
+**Key dependencies**: `k256`, `chacha20poly1305`, `hkdf`, `sha2`, `serde`,
+`serde_json`, `getrandom` (with `js` feature).
 
-### 2. Community Context
+**Anti-corruption layer**: Wraps `nostr-sdk` types where the 0.44.x alpha API is
+unstable, exposing stable DreamLab-specific types to downstream crates.
 
-**Purpose**: Handle all community interactions -- messaging, channels, events, and moderation.
+## 2. Forum Client Context -- `forum-client` crate
 
-**Responsibilities**:
-- Channel (NIP-28) message posting and retrieval
-- Thread management (replies)
-- Direct messages (NIP-17, encrypted with NIP-44)
-- Reactions (NIP-25)
-- Calendar events (NIP-52) and RSVPs
-- Zone/section/forum hierarchy navigation
-- Cohort-based access control (whitelist membership)
-- Admin approval workflows (kind:9024 registration, kind:9023 approval)
+**Responsibility**: The browser-side Leptos CSR application. Owns UI components,
+reactive stores, routing, relay connections, and IndexedDB persistence.
 
-**Language**:
+**Compilation target**: `wasm32-unknown-unknown` only (via `trunk`).
 
-| Term | Definition |
-|------|------------|
-| Zone (Category) | Top-level context boundary (e.g., DreamLab) |
-| Section | Topical grouping within a zone, access-controlled by cohort |
-| Forum (Channel) | NIP-28 channel for discussions within a section |
-| Message | Nostr event posted to a forum channel |
-| Thread | Chain of reply messages |
-| DM | Encrypted direct message (NIP-17 + NIP-44 + NIP-59 gift wrap) |
-| Reaction | Emoji response to a message (NIP-25) |
-| Cohort | Named group of members controlling section access |
-| Calendar Event | Scheduled happening (NIP-52 kind:31922 or kind:31923) |
-
-**Integrations**:
-- **Inbound**: receives pubkey and auth tokens from Identity Context
-- **Outbound**: sends message content to Storage Context (images, attachments)
-- **Technology**: NDK, SvelteKit, NIP-01/17/25/28/42/44/52/59
-
-```typescript
-// Community Context Public API
-interface CommunityService {
-  postMessage(content: string, channelId: string): Promise<Message>;
-  replyTo(content: string, parentId: string): Promise<Message>;
-  sendDM(content: string, recipient: string): Promise<DirectMessage>;
-  react(messageId: string, emoji: string): Promise<Reaction>;
-  getChannels(sectionId: string): Promise<Channel[]>;
-  createCalendarEvent(event: CalendarEventInput): Promise<CalendarEvent>;
-  rsvp(eventId: string, status: RSVPStatus): Promise<void>;
-}
+```rust
+// Public modules
+pub mod app;        // Root Leptos component + router (14 routes)
+pub mod pages;      // Route page components
+pub mod components; // 102 UI components (Tailwind + DaisyUI)
+pub mod stores;     // 32 reactive signal groups (auth, channels, messages, DMs, etc.)
+pub mod nostr;      // Relay pool management, subscription lifecycle, event pipeline
+pub mod auth;       // Passkey ceremony (web-sys), NIP-98, session management
+pub mod search;     // ONNX embedder bridge, IndexedDB cache, RuVector client
+pub mod config;     // Environment, zone definitions, BBS config types
 ```
 
----
+**Key dependencies**: `nostr-core`, `leptos`, `leptos_router`, `nostr-sdk`
+(WASM), `indexed-db`, `comrak`, `web-sys`, `gloo`.
 
-### 3. Content Context
+**Upstream communication**: Connects to the nostr-relay (TypeScript) via
+WebSocket. Calls auth-worker, pod-worker, preview-worker, and search-api via
+HTTP with NIP-98 auth.
 
-**Purpose**: Manage marketing site content -- workshops, team profiles, and case studies.
+## 3. Identity and Auth Context -- `auth-worker` crate
 
-**Responsibilities**:
-- Workshop content loading and rendering (Markdown from `public/data/workshops/`)
-- Workshop list generation (`scripts/generate-workshop-list.mjs`)
-- Team profile management (44 expert profiles in `public/data/team/`)
-- Case study / portfolio content (`src/data/work/`)
-- Residential training and masterclass page content
+**Responsibility**: WebAuthn registration/authentication with PRF extension,
+NIP-98 token verification, Solid pod provisioning, credential storage.
 
-**Language**:
+**Runtime**: Cloudflare Worker (compiled via `worker-build`).
 
-| Term | Definition |
-|------|------------|
-| Workshop | Multi-page training programme with Markdown content |
-| Workshop Manifest | Auto-generated JSON listing pages within a workshop |
-| Team Profile | Expert biography loaded from Markdown at runtime |
-| Case Study | Portfolio project with description and outcomes |
-
-**Integrations**:
-- **Independent**: does not depend on Identity or Community contexts
-- **Technology**: React, Vite, Markdown processing, workshop generation script
-
-```typescript
-// Content Context Public API
-interface ContentService {
-  getWorkshopList(): WorkshopSummary[];
-  getWorkshopManifest(workshopId: string): Promise<WorkshopManifest>;
-  getWorkshopPage(workshopId: string, pageSlug: string): Promise<string>;
-  getTeamProfiles(): Promise<TeamProfile[]>;
-  getCaseStudies(): Promise<CaseStudy[]>;
-}
+```rust
+// Public modules
+pub mod routes;       // HTTP handler: /auth/register/*, /auth/login/*, /auth/lookup
+pub mod webauthn;     // passkey-rs ceremony handling, PRF salt management
+pub mod nip98;        // Server-side NIP-98 verification (reuses nostr-core)
+pub mod pod;          // Pod provisioning: R2 profile card + KV ACL + KV metadata
+pub mod challenge;    // Challenge generation, D1 storage, expiry cleanup
+pub mod credential;   // D1 CRUD for webauthn_credentials table
 ```
 
----
+**Storage**: D1 (challenges, webauthn_credentials), KV (SESSIONS, POD_META), R2
+(PODS -- profile card seed).
 
-### 4. Storage Context
+**Key dependencies**: `nostr-core`, `worker`, `passkey`, `serde`.
 
-**Purpose**: Manage per-user pod storage, file uploads, and access control.
+**Invariants**:
+- PRF salt is generated server-side and stored with the credential.
+- The Nostr pubkey is derived client-side from the PRF output; the server never
+  sees the private key.
+- Login verification requires both a valid WebAuthn assertion AND a valid NIP-98
+  token proving private key control.
 
-**Responsibilities**:
-- Solid pod provisioning per pubkey (via JSS / pod-api)
-- File storage and retrieval (R2 on Cloudflare, filesystem on Cloud Run)
-- Web Access Control (WAC) document evaluation
-- Image upload, resizing, and serving
-- ACL management (owner-restricted by default)
-- Link preview metadata extraction
+## 4. Storage Context -- `pod-worker` crate
 
-**Language**:
+**Responsibility**: Per-user Solid pod CRUD backed by R2, with WAC
+(Web Access Control) ACL enforcement. Media upload/download, content-type
+handling.
 
-| Term | Definition |
-|------|------------|
-| Pod | Per-user Solid storage container identified by pubkey |
-| ACL | Access Control List document (WAC / JSON-LD) |
-| WebID | Solid profile URI used for ACL agent matching |
-| Resource | File or directory within a pod |
-| Container | Directory within a pod |
+**Runtime**: Cloudflare Worker.
 
-**Integrations**:
-- **Inbound**: receives pubkey and auth tokens from Identity Context; receives file uploads from Community Context
-- **Technology**: Cloudflare R2 + KV (target), JSS/CSS (current), NIP-98 gating
-
-```typescript
-// Storage Context Public API
-interface StorageService {
-  provisionPod(pubkey: string): Promise<{ podUrl: string; webId: string }>;
-  putResource(podUrl: string, path: string, body: Blob, contentType: string): Promise<void>;
-  getResource(podUrl: string, path: string): Promise<Response>;
-  evaluateACL(aclDoc: ACLDocument, agent: string, mode: AccessMode): boolean;
-  uploadImage(file: File, privkey: Uint8Array): Promise<string>;
-}
+```rust
+// Public modules
+pub mod routes;  // HTTP handler: /pods/{pubkey}/**, /health
+pub mod acl;     // WAC ACL evaluation: agent matching, mode checking, path scoping
+pub mod r2;      // R2 get/put/delete/head operations, content-type mapping
+pub mod nip98;   // NIP-98 verification for authenticated requests (reuses nostr-core)
 ```
 
-## Integration Patterns
+**Storage**: R2 (PODS), KV (POD_META for ACL documents and metadata).
 
-### Anticorruption Layer (ACL)
+**Access rules**:
+- Owner (`did:nostr:{pubkey}`) has Read + Write + Control on `./`.
+- Public agents (`foaf:Agent`) have Read on `./profile/` and `./media/public/`.
+- All write operations require NIP-98 auth with matching pubkey.
 
-Used between Identity and Community contexts to translate NIP-98 auth tokens into community permissions.
+## 5. Preview Context -- `preview-worker` crate
 
-```typescript
-// ACL: Translate NIP-98 verification result to community permissions
-class CommunityPermissionAdapter {
-  constructor(private identityService: IdentityService) {}
+**Responsibility**: Fetch OpenGraph metadata and Twitter oEmbed data for link
+previews, with SSRF protection and CF Cache API caching.
 
-  async canPost(authHeader: string, channelId: string): Promise<boolean> {
-    const result = await this.identityService.verifyNip98(authHeader, { url, method: 'POST' });
-    if (!result) return false;
-    return this.checkWhitelist(result.pubkey, channelId);
-  }
-}
+**Runtime**: Cloudflare Worker.
+
+```rust
+// Public modules
+pub mod routes;    // HTTP handler: /preview?url=..., /health, /stats
+pub mod og;        // HTML parsing for og:title, og:description, og:image (scraper crate)
+pub mod twitter;   // Twitter/X oEmbed API client
+pub mod ssrf;      // Private IP/hostname blocking (IPv4, IPv6, cloud metadata)
+pub mod cache;     // CF Cache API read/write with TTL (10d OG, 1d Twitter)
 ```
 
-### Published Language
+**Storage**: CF Cache API only (no D1/KV/R2).
 
-Identity Context publishes standard types consumed by all other contexts.
+**Key dependencies**: `worker`, `scraper`, `serde`.
 
-```typescript
-// Published Language: Standard identity types
-export type Pubkey = string;          // 64-char hex
-export type DidNostr = string;        // did:nostr:{pubkey}
-export type WebId = string;           // {pod-url}/profile/card#me
-export type Nip98Token = string;      // base64-encoded signed event
-```
+## 6. Relay Context -- stays TypeScript
 
-### Context Independence
+**Location**: `workers/nostr-relay/` (unchanged).
 
-The Content Context is deliberately independent of Identity and Community. Workshop content, team profiles, and case studies are publicly accessible and do not require authentication. This separation allows the marketing site to function without backend services.
+**Why not ported**: The `worker` crate (0.7.5) does not expose WebSocket
+Hibernation handler methods (`webSocketMessage`, `webSocketClose`,
+`webSocketError`). Without hibernation, each idle WebSocket connection pins a
+Durable Object in memory, making the cost prohibitive at scale.
+
+**Interfaces consumed by other contexts**:
+- WebSocket: NIP-01 REQ/CLOSE/EVENT, NIP-42 AUTH
+- HTTP: `/api/check-whitelist?pubkey=`, admin endpoints
+
+## 7. Search Context -- stays TypeScript
+
+**Location**: `workers/search-api/` (unchanged).
+
+**Why not ported**: The RVF (RuVector Format) core is already Rust compiled to
+WASM. The TypeScript wrapper is 430 lines of R2/KV orchestration with 0.47ms p50
+latency. Porting the thin wrapper gains nothing; eliminating WASM-in-WASM would
+require restructuring `rvf_wasm` as a library crate -- disproportionate effort.
+
+**Interfaces consumed by other contexts**:
+- HTTP: `/search?q=`, `/embed` (vector embedding endpoint)
+
+## Context Dependencies
+
+| Consumer | Provider | Mechanism |
+|----------|----------|-----------|
+| forum-client | nostr-core | Cargo dependency (same WASM binary) |
+| auth-worker | nostr-core | Cargo dependency (compiled into Worker) |
+| pod-worker | nostr-core | Cargo dependency (NIP-98 verification) |
+| forum-client | auth-worker | HTTP + NIP-98 |
+| forum-client | pod-worker | HTTP + NIP-98 |
+| forum-client | preview-worker | HTTP (no auth) |
+| forum-client | nostr-relay (TS) | WebSocket (NIP-01/42) |
+| forum-client | search-api (TS) | HTTP |
+| auth-worker | pod-worker | Internal (pod provisioning at registration) |

@@ -1,0 +1,451 @@
+//! Admin state management and API interactions for whitelist/channel management.
+//!
+//! Provides `AdminStore` with reactive signals for admin panel state, plus
+//! methods for calling the relay-worker admin endpoints with NIP-98 auth and
+//! creating kind-40 channel events.
+
+pub mod channel_form;
+pub mod overview;
+pub mod user_table;
+
+use leptos::prelude::*;
+use serde::{Deserialize, Serialize};
+use std::rc::Rc;
+
+use crate::auth::nip98::{fetch_with_nip98_get, fetch_with_nip98_post};
+use crate::relay::{ConnectionState, Filter, RelayConnection};
+
+// -- Constants ----------------------------------------------------------------
+
+/// The sole admin pubkey for the DreamLab forum.
+pub const ADMIN_PUBKEY: &str =
+    "11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c";
+
+/// Default auth API base URL (overridable via `window.__ENV__.VITE_AUTH_API_URL`).
+const DEFAULT_AUTH_API_URL: &str = "https://dreamlab-auth-api.solitary-paper-764d.workers.dev";
+
+// -- Types --------------------------------------------------------------------
+
+/// Tabs in the admin panel.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum AdminTab {
+    Overview,
+    Channels,
+    Users,
+}
+
+/// A whitelisted user returned from the relay API.
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct WhitelistUser {
+    pub pubkey: String,
+    #[serde(default)]
+    pub cohorts: Vec<String>,
+    #[serde(default)]
+    pub nickname: Option<String>,
+    #[serde(default)]
+    pub created_at: Option<u64>,
+}
+
+/// A channel parsed from a kind-40 event on the relay.
+#[derive(Clone, Debug)]
+pub struct AdminChannel {
+    pub id: String,
+    pub name: String,
+    pub description: String,
+    pub section: String,
+    #[allow(dead_code)]
+    pub created_at: u64,
+    #[allow(dead_code)]
+    pub creator: String,
+}
+
+/// Aggregate statistics for the admin overview.
+#[derive(Clone, Debug, Default)]
+pub struct AdminStats {
+    pub total_users: u32,
+    pub total_channels: u32,
+    pub total_messages: u32,
+    pub pending_approvals: u32,
+}
+
+/// Reactive admin state held in signals.
+#[derive(Clone)]
+pub struct AdminState {
+    pub users: RwSignal<Vec<WhitelistUser>>,
+    pub channels: RwSignal<Vec<AdminChannel>>,
+    pub stats: RwSignal<AdminStats>,
+    pub is_loading: RwSignal<bool>,
+    pub error: RwSignal<Option<String>>,
+    pub success: RwSignal<Option<String>>,
+    pub active_tab: RwSignal<AdminTab>,
+}
+
+// -- AdminStore ---------------------------------------------------------------
+
+/// Admin store provided via Leptos context. Holds reactive state and provides
+/// methods for admin API calls (whitelist management, channel creation).
+#[derive(Clone)]
+pub struct AdminStore {
+    pub state: AdminState,
+}
+
+impl AdminStore {
+    /// Create a new admin store with default empty state.
+    fn new() -> Self {
+        Self {
+            state: AdminState {
+                users: RwSignal::new(Vec::new()),
+                channels: RwSignal::new(Vec::new()),
+                stats: RwSignal::new(AdminStats::default()),
+                is_loading: RwSignal::new(false),
+                error: RwSignal::new(None),
+                success: RwSignal::new(None),
+                active_tab: RwSignal::new(AdminTab::Overview),
+            },
+        }
+    }
+
+    /// Check whether the given hex pubkey is the admin pubkey.
+    pub fn is_admin(pubkey: &str) -> bool {
+        pubkey == ADMIN_PUBKEY
+    }
+
+    /// Resolve the auth API base URL from the runtime environment or compile-time default.
+    fn api_base() -> String {
+        if let Some(window) = web_sys::window() {
+            if let Ok(val) = js_sys::Reflect::get(&window, &"__ENV__".into()) {
+                if !val.is_undefined() && !val.is_null() {
+                    // First try VITE_AUTH_API_URL directly
+                    if let Ok(url) =
+                        js_sys::Reflect::get(&val, &"VITE_AUTH_API_URL".into())
+                    {
+                        if let Some(s) = url.as_string() {
+                            if !s.is_empty() {
+                                return s;
+                            }
+                        }
+                    }
+                    // Fallback: derive from relay URL (relay worker also hosts /api/ routes)
+                    if let Ok(url) =
+                        js_sys::Reflect::get(&val, &"VITE_RELAY_URL".into())
+                    {
+                        if let Some(s) = url.as_string() {
+                            if !s.is_empty() {
+                                return relay_url_to_http(&s);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        option_env!("VITE_AUTH_API_URL")
+            .unwrap_or(DEFAULT_AUTH_API_URL)
+            .to_string()
+    }
+
+    // -- Whitelist API --------------------------------------------------------
+
+    /// Fetch the full whitelist from the relay-worker admin API.
+    pub async fn fetch_whitelist(&self, privkey: &[u8; 32]) -> Result<(), String> {
+        self.state.is_loading.set(true);
+        self.state.error.set(None);
+
+        let url = format!("{}/api/whitelist/list", Self::api_base());
+        match fetch_with_nip98_get(&url, privkey).await {
+            Ok(body) => {
+                let parsed: WhitelistResponse = serde_json::from_str(&body)
+                    .map_err(|e| format!("Failed to parse whitelist: {e}"))?;
+                self.state.users.set(parsed.users);
+                self.state.stats.update(|s| {
+                    s.total_users = self.state.users.get_untracked().len() as u32;
+                });
+                self.state.is_loading.set(false);
+                Ok(())
+            }
+            Err(e) => {
+                let msg = e.to_string();
+                self.state.error.set(Some(msg.clone()));
+                self.state.is_loading.set(false);
+                Err(msg)
+            }
+        }
+    }
+
+    /// Add a pubkey to the whitelist with the given cohorts.
+    pub async fn add_to_whitelist(
+        &self,
+        pubkey: &str,
+        cohorts: &[String],
+        privkey: &[u8; 32],
+    ) -> Result<(), String> {
+        self.state.is_loading.set(true);
+        self.state.error.set(None);
+        self.state.success.set(None);
+
+        let body = serde_json::json!({
+            "pubkey": pubkey,
+            "cohorts": cohorts,
+        });
+        let url = format!("{}/api/whitelist/add", Self::api_base());
+        match fetch_with_nip98_post(&url, &serde_json::to_string(&body).unwrap(), privkey).await {
+            Ok(_) => {
+                self.state.success.set(Some(format!(
+                    "Added {}...{} to whitelist",
+                    &pubkey[..8],
+                    &pubkey[pubkey.len().saturating_sub(4)..]
+                )));
+                self.state.is_loading.set(false);
+                // Refresh the whitelist
+                let _ = self.fetch_whitelist(privkey).await;
+                Ok(())
+            }
+            Err(e) => {
+                let msg = e.to_string();
+                self.state.error.set(Some(msg.clone()));
+                self.state.is_loading.set(false);
+                Err(msg)
+            }
+        }
+    }
+
+    /// Update cohorts for an existing whitelisted pubkey.
+    pub async fn update_cohorts(
+        &self,
+        pubkey: &str,
+        cohorts: &[String],
+        privkey: &[u8; 32],
+    ) -> Result<(), String> {
+        self.state.is_loading.set(true);
+        self.state.error.set(None);
+        self.state.success.set(None);
+
+        let body = serde_json::json!({
+            "pubkey": pubkey,
+            "cohorts": cohorts,
+        });
+        let url = format!("{}/api/whitelist/update-cohorts", Self::api_base());
+        match fetch_with_nip98_post(&url, &serde_json::to_string(&body).unwrap(), privkey).await {
+            Ok(_) => {
+                self.state.success.set(Some(format!(
+                    "Updated cohorts for {}...{}",
+                    &pubkey[..8],
+                    &pubkey[pubkey.len().saturating_sub(4)..]
+                )));
+                self.state.is_loading.set(false);
+                // Refresh the whitelist
+                let _ = self.fetch_whitelist(privkey).await;
+                Ok(())
+            }
+            Err(e) => {
+                let msg = e.to_string();
+                self.state.error.set(Some(msg.clone()));
+                self.state.is_loading.set(false);
+                Err(msg)
+            }
+        }
+    }
+
+    // -- Channel management ---------------------------------------------------
+
+    /// Create a kind-40 channel creation event and publish it to the relay.
+    pub fn create_channel(
+        &self,
+        name: &str,
+        description: &str,
+        section: &str,
+        privkey: &[u8; 32],
+    ) -> Result<(), String> {
+        let relay = expect_context::<RelayConnection>();
+        let conn = relay.connection_state();
+        if conn.get_untracked() != ConnectionState::Connected {
+            return Err("Relay not connected".to_string());
+        }
+
+        let sk = k256::schnorr::SigningKey::from_bytes(privkey)
+            .map_err(|e| format!("Invalid signing key: {e}"))?;
+        let pubkey_hex = hex::encode(sk.verifying_key().to_bytes());
+
+        let content = serde_json::json!({
+            "name": name,
+            "about": description,
+            "picture": ""
+        });
+
+        let now = (js_sys::Date::now() / 1000.0) as u64;
+
+        let unsigned = nostr_core::UnsignedEvent {
+            pubkey: pubkey_hex,
+            created_at: now,
+            kind: 40,
+            tags: vec![vec!["section".into(), section.into()]],
+            content: serde_json::to_string(&content).unwrap(),
+        };
+
+        let signed = nostr_core::sign_event(unsigned, &sk)
+            .map_err(|e| format!("Signing failed: {e}"))?;
+
+        relay.publish(&signed);
+
+        self.state.success.set(Some(format!("Channel '{}' created", name)));
+
+        // Add to local state immediately
+        self.state.channels.update(|list| {
+            list.push(AdminChannel {
+                id: signed.id.clone(),
+                name: name.to_string(),
+                description: description.to_string(),
+                section: section.to_string(),
+                created_at: signed.created_at,
+                creator: signed.pubkey.clone(),
+            });
+        });
+        self.state.stats.update(|s| {
+            s.total_channels = self.state.channels.get_untracked().len() as u32;
+        });
+
+        Ok(())
+    }
+
+    /// Fetch stats by subscribing to the relay for kind 40 (channels) and kind 42
+    /// (messages). Updates the stats signal reactively.
+    pub fn fetch_stats(&self) {
+        let relay = expect_context::<RelayConnection>();
+        let conn = relay.connection_state();
+        if conn.get_untracked() != ConnectionState::Connected {
+            return;
+        }
+
+        let channels_sig = self.state.channels.clone();
+        let stats_sig = self.state.stats.clone();
+        let loading_sig = self.state.is_loading.clone();
+
+        loading_sig.set(true);
+
+        // Subscribe for kind 40 (channel creation) events
+        let channels_for_event = channels_sig;
+        let on_channel_event = Rc::new(move |event: nostr_core::NostrEvent| {
+            if event.kind != 40 {
+                return;
+            }
+            let (name, description) = parse_channel_content(&event.content);
+            let section = event
+                .tags
+                .iter()
+                .find(|t| t.len() >= 2 && t[0] == "section")
+                .map(|t| t[1].clone())
+                .unwrap_or_default();
+
+            channels_for_event.update(|list| {
+                if !list.iter().any(|c| c.id == event.id) {
+                    list.push(AdminChannel {
+                        id: event.id.clone(),
+                        name,
+                        description,
+                        section,
+                        created_at: event.created_at,
+                        creator: event.pubkey.clone(),
+                    });
+                }
+            });
+        });
+
+        let stats_for_eose = stats_sig.clone();
+        let channels_for_eose = channels_sig;
+        let loading_for_eose = loading_sig;
+        let on_channel_eose = Rc::new(move || {
+            stats_for_eose.update(|s| {
+                s.total_channels = channels_for_eose.get_untracked().len() as u32;
+            });
+            loading_for_eose.set(false);
+        });
+
+        let relay_for_channels = relay.clone();
+        relay_for_channels.subscribe(
+            vec![Filter {
+                kinds: Some(vec![40]),
+                ..Default::default()
+            }],
+            on_channel_event,
+            Some(on_channel_eose),
+        );
+
+        // Subscribe for kind 42 (messages) to count them
+        let stats_for_msgs = stats_sig;
+        let msg_counter = RwSignal::new(0u32);
+        let on_msg_event = Rc::new(move |_event: nostr_core::NostrEvent| {
+            msg_counter.update(|c| *c += 1);
+            stats_for_msgs.update(|s| {
+                s.total_messages = msg_counter.get_untracked();
+            });
+        });
+
+        relay.subscribe(
+            vec![Filter {
+                kinds: Some(vec![42]),
+                ..Default::default()
+            }],
+            on_msg_event,
+            None,
+        );
+    }
+
+    /// Clear the current error.
+    pub fn clear_error(&self) {
+        self.state.error.set(None);
+    }
+
+    /// Clear the current success message.
+    pub fn clear_success(&self) {
+        self.state.success.set(None);
+    }
+}
+
+// -- Context providers --------------------------------------------------------
+
+/// Create and provide the admin store context. Call once in the admin page component.
+pub fn provide_admin() {
+    let store = AdminStore::new();
+    provide_context(store);
+}
+
+/// Get the admin store from context. Panics if `provide_admin()` was not called.
+pub fn use_admin() -> AdminStore {
+    expect_context::<AdminStore>()
+}
+
+// -- Internal helpers ---------------------------------------------------------
+
+/// API response shape for GET /api/whitelist/list.
+#[derive(Deserialize)]
+struct WhitelistResponse {
+    users: Vec<WhitelistUser>,
+}
+
+/// Parse kind-40 channel content JSON into (name, description).
+fn parse_channel_content(content: &str) -> (String, String) {
+    match serde_json::from_str::<serde_json::Value>(content) {
+        Ok(val) => {
+            let name = val
+                .get("name")
+                .and_then(|v| v.as_str())
+                .unwrap_or("Unnamed Channel")
+                .to_string();
+            let description = val
+                .get("about")
+                .and_then(|v| v.as_str())
+                .unwrap_or("")
+                .to_string();
+            (name, description)
+        }
+        Err(_) => ("Unnamed Channel".to_string(), String::new()),
+    }
+}
+
+/// Convert a WebSocket relay URL (wss://...) to an HTTPS URL for HTTP API calls.
+fn relay_url_to_http(relay_url: &str) -> String {
+    relay_url
+        .replace("wss://", "https://")
+        .replace("ws://", "http://")
+        .trim_end_matches('/')
+        .to_string()
+}

@@ -1,233 +1,113 @@
-# Getting Started
-
-Last updated: 2026-02-28
-
-Complete guide to setting up your development environment for the DreamLab AI website.
-
----
+# Getting Started — DreamLab Community Forum (Rust Port)
 
 ## Prerequisites
 
-| Tool | Minimum version | Check command |
-|------|-----------------|---------------|
-| Node.js | 20.x | `node --version` |
-| npm | 10.x | `npm --version` |
-| Git | 2.x | `git --version` |
+```bash
+# Rust toolchain
+rustup target add wasm32-unknown-unknown
+cargo install trunk wasm-bindgen-cli worker-build cargo-criterion
+cargo install wasm-opt --locked
 
-A code editor with TypeScript support is recommended. VS Code with the ESLint and Tailwind CSS IntelliSense extensions works well.
+# Node.js 20+ (Tailwind, Playwright, TS Workers)
+npm install -g wrangler
+```
 
-Optional (for specific subsystems):
-
-- **Rust toolchain** -- required only for building the WASM Voronoi module (`wasm-voronoi/`).
-- **Wrangler CLI** -- required only for Cloudflare Workers development (`workers/`).
-- **Docker** -- required only for running backend services locally.
-
----
-
-## Clone and install
-
-### 1. Clone the repository
+## Clone and Setup
 
 ```bash
 git clone https://github.com/DreamLab-AI/dreamlab-ai-website.git
-cd dreamlab-ai-website
-```
-
-The repository has two remotes configured:
-
-| Remote | Repository | Purpose |
-|--------|-----------|---------|
-| `origin` | `DreamLab-AI/dreamlab-ai-website` | Primary development |
-| `upstream` | `TheDreamLabUK/website` | Upstream fork source |
-
-### 2. Install dependencies
-
-```bash
+cd dreamlab-ai-website && git checkout rust-version
 npm install
+cargo check --workspace
+cargo check --workspace --target wasm32-unknown-unknown
 ```
 
-This installs all dependencies for the main React site. The community forum has its own `package.json` and must be installed separately:
+## Running the Leptos Dev Server
 
 ```bash
-cd community-forum
-npm install
-cd ..
+# From community-forum-rs/ workspace root
+trunk serve
+# Opens at http://localhost:8080, hot-reloads on .rs changes
 ```
 
----
+`Trunk.toml` configures the build. `tailwind.config.js` scans `crates/**/*.rs`.
 
-## Environment setup
-
-### Main site `.env`
-
-Create a `.env` file in the project root. The site runs without these variables, but backend-connected features (Supabase data, auth redirects) require them.
+## Running Workers Locally
 
 ```bash
-# Supabase (optional -- site works without these)
+# Rust Workers (build first)
+cd crates/auth-worker && worker-build --dev && wrangler dev
+cd crates/pod-worker && worker-build --dev && wrangler dev
+cd crates/preview-worker && worker-build --dev && wrangler dev
+
+# TypeScript Workers
+cd workers/nostr-relay && wrangler dev --local --persist
+cd workers/search-api && wrangler dev
+```
+
+Add `--persist` to keep D1/KV data between restarts.
+
+## Running Tests
+
+```bash
+# All native tests
+cargo test --workspace
+
+# WASM tests
+cargo test --workspace --target wasm32-unknown-unknown
+
+# Property-based (increase cases for CI)
+PROPTEST_CASES=10000 cargo test -p nostr-core
+
+# Benchmarks
+cargo criterion -p nostr-core
+
+# Playwright E2E
+npx playwright install chromium && npx playwright test
+
+# Linting
+cargo clippy --workspace -- -D warnings
+cargo fmt --workspace --check
+```
+
+## Environment Variables
+
+Main site `.env` (never commit):
+```
 VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key-here
-
-# Auth API URL (optional -- needed for forum auth integration)
-VITE_AUTH_API_URL=https://dreamlab-auth-api.solitary-paper-764d.workers.dev
+VITE_SUPABASE_ANON_KEY=your-anon-key
+VITE_AUTH_API_URL=http://localhost:8787
 ```
 
-### Community forum `.env`
-
-Create `community-forum/.env`:
-
-```bash
-VITE_AUTH_API_URL=https://dreamlab-auth-api.solitary-paper-764d.workers.dev
+Workers use `wrangler.toml` vars for local dev:
+```toml
+[vars]
+RP_ID = "localhost"
+EXPECTED_ORIGIN = "http://localhost:8080"
+ADMIN_PUBKEYS = "<your-test-pubkey>"
 ```
 
-### auth-api `.env`
+## Project Structure
 
-Only needed if running Workers locally via `wrangler dev`. The `wrangler.toml` at the project root contains all bindings. For local development, wrangler creates local D1, KV, and R2 instances automatically.
-
-**Security**: Never commit `.env` files. They are listed in `.gitignore`.
-
----
-
-## Running the development server
-
-```bash
-npm run dev
+```
+community-forum-rs/
+  Cargo.toml              # Workspace root
+  Trunk.toml              # trunk build config
+  index.html              # Entry point for Leptos SPA
+  crates/
+    nostr-core/            # Shared: events, NIP-44, NIP-98, keys
+    forum-client/          # Leptos CSR app
+    auth-worker/           # CF Worker (Rust)
+    pod-worker/            # CF Worker (Rust)
+    preview-worker/        # CF Worker (Rust)
+  tests/
+    unit/                  # cargo test
+    integration/           # Cross-crate tests
+    e2e/                   # Playwright (JS)
 ```
 
-This runs two pre-steps automatically before starting Vite:
+## Common Tasks
 
-1. `node scripts/generate-workshop-list.mjs` -- scans `public/data/workshops/` and writes `src/data/workshop-list.json`.
-2. `node scripts/generate-testimonials.mjs` -- generates `src/data/testimonials.json`.
-
-The site is then available at `http://localhost:5173`.
-
-### Community forum (separate server)
-
-```bash
-cd community-forum
-npm run dev
-```
-
-The forum runs on a separate port (typically `http://localhost:5174`).
-
----
-
-## Building for production
-
-```bash
-npm run build
-```
-
-Output is written to `dist/`. The build uses Vite with SWC for fast transpilation and produces three manual chunks:
-
-- `vendor` -- React, ReactDOM, React Router
-- `three` -- Three.js, @react-three/fiber, @react-three/drei
-- `ui` -- Radix UI component primitives
-
-Preview the production build locally:
-
-```bash
-npm run preview
-```
-
-### Development build
-
-```bash
-npm run build:dev
-```
-
-Produces an unminified build useful for debugging production-only issues.
-
----
-
-## Linting
-
-```bash
-npm run lint
-```
-
-ESLint 9 with flat config. It checks all `*.ts` and `*.tsx` files, excluding `dist/`, `community-forum/`, `workers/`, and `scripts/`.
-
----
-
-## Project structure overview
-
-The repository is a monorepo containing:
-
-| Directory | Description |
-|-----------|-------------|
-| `src/` | React SPA source (Vite + TypeScript + Tailwind) |
-| `community-forum/` | SvelteKit community forum (separate package.json) |
-| `workers/` | Cloudflare Workers (deployed, migrated from Cloud Run) |
-| `wasm-voronoi/` | Rust WASM module for Voronoi tessellation |
-| `public/` | Static assets served as-is (team profiles, workshop content) |
-| `scripts/` | Build-time scripts (workshop list generator, image tools) |
-| `docs/` | Project documentation |
-| `.github/workflows/` | CI/CD pipelines |
-
-For a detailed breakdown, see [PROJECT_STRUCTURE.md](./PROJECT_STRUCTURE.md).
-
----
-
-## First run checklist
-
-- [ ] Node.js 20+ installed
-- [ ] `npm install` completes without errors
-- [ ] `npm run dev` starts the server
-- [ ] Browser loads `http://localhost:5173`
-- [ ] Home page renders (including 3D hero section)
-- [ ] Navigation links work
-- [ ] No errors in the browser console
-- [ ] `npm run build` succeeds
-- [ ] `npm run lint` passes
-
----
-
-## Common first-time issues
-
-### Port already in use
-
-```bash
-npm run dev -- --port 3000
-```
-
-### Node.js version too old
-
-```bash
-node --version
-# Must be 20.x or higher
-```
-
-If using nvm:
-
-```bash
-nvm install 20
-nvm use 20
-```
-
-### Installation errors
-
-Clear the cache and reinstall:
-
-```bash
-rm -rf node_modules package-lock.json
-npm install
-```
-
-### Build errors after pulling new changes
-
-The workshop list generator may fail if workshop content has changed. Regenerate:
-
-```bash
-node scripts/generate-workshop-list.mjs
-npm run build
-```
-
----
-
-## Next steps
-
-- [PROJECT_STRUCTURE.md](./PROJECT_STRUCTURE.md) -- full directory tree with explanations
-- [DEVELOPMENT_WORKFLOW.md](./DEVELOPMENT_WORKFLOW.md) -- daily development practices
-- [CODE_STYLE.md](./CODE_STYLE.md) -- coding standards and conventions
-- [TESTING_GUIDE.md](./TESTING_GUIDE.md) -- testing strategies
-- [../reference/tech-stack.md](../reference/tech-stack.md) -- complete technology reference
+**Add a page**: Create `crates/forum-client/src/pages/my_page.rs`, add route in `app.rs`.
+**Add event kind**: Add variant to `nostr_core::event::EventKind`, add tests, run `cargo test -p nostr-core`.
+**Test crypto**: `PROPTEST_CASES=10000 cargo test -p nostr-core nip44 && cargo criterion -p nostr-core --bench crypto`.

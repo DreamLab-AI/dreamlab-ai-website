@@ -1,150 +1,107 @@
-# Deployment Documentation
+# Deployment Overview — DreamLab AI
 
-**Last Updated:** 2026-03-01
-
-Comprehensive guide to deploying and maintaining the DreamLab AI platform: a React SPA on GitHub Pages, SvelteKit community forum, and 5 Cloudflare Workers backend services. All GCP infrastructure has been deleted as of 2026-03-02.
-
----
-
-## Architecture Overview
+## Architecture
 
 ```
-+---------------------------------------------------------------+
-| GitHub Repository (main branch)                               |
-| - React 18.3 SPA (Vite + TypeScript + Tailwind CSS)           |
-| - SvelteKit community forum (static adapter)                  |
-| - Workers code in workers/ (auth-api, pod-api, search-api)    |
-| - Legacy services dir (auth-api reference code only)          |
-| - GitHub Actions CI/CD workflows                               |
-+----------+------------------+--------------------+------------+
-           |                  |                    |
-           v                  v                    v
-+------------------+  +------------------------+
-| GitHub Pages      |  | Cloudflare Workers     |
-|                   |  | (*.workers.dev)        |
-| - React SPA       |  |                        |
-|   -> dist/        |  | - auth-api    (D1+KV)  |
-| - SvelteKit forum |  | - pod-api     (R2+KV)  |
-|   -> dist/community|  | - search-api  (WASM+R2)|
-| - Static assets   |  | - nostr-relay (D1+DO)  |
-|                   |  | - link-preview (Cache) |
-| dreamlab-ai.com   |  |                        |
-| thedreamlab.uk    |  | D1: credentials, relay |
-+------------------+  | R2: pods, vectors      |
-                      | KV: sessions, ACLs     |
-                      +------------------------+
-
-+---------------------------------------------------+
-| Cloudflare Pages (gated, ready to enable)         |
-| - Static SPA deployment                           |
-| - Set CLOUDFLARE_PAGES_ENABLED='true' to activate |
-+---------------------------------------------------+
+dreamlab-ai.com
+  ├── /              React main site (GitHub Pages)
+  ├── /community/    Leptos forum client (GitHub Pages, WASM)
+  └── Workers:
+      ├── api.       auth-worker      (Rust WASM)
+      ├── pods.      pod-worker       (Rust WASM)
+      ├── preview.   preview-worker   (Rust WASM)
+      ├── relay.     nostr-relay      (TypeScript)
+      └── search.    search-api       (TypeScript)
 ```
 
-```mermaid
-flowchart LR
-    GIT["git push<br/>main"] --> GHA["GitHub Actions"]
+## Static Sites (GitHub Pages)
 
-    GHA --> BUILD["build-and-deploy.yml"]
-    GHA --> WORKERS["workers-deploy.yml"]
+### React Main Site
 
-    BUILD --> REACT["Build React SPA"]
-    BUILD --> FORUM["Build SvelteKit Forum"]
-    REACT --> GHP["GitHub Pages<br/>dreamlab-ai.com"]
-    FORUM --> GHP
+- **Source**: `src/` (React 18 + Vite + TypeScript)
+- **Build**: `npm run build` -> `dist/`
+- **Deploy**: GitHub Actions pushes `dist/` to `gh-pages` branch
+- **Domain**: `dreamlab-ai.com` (CNAME in `public/CNAME`)
 
-    WORKERS --> W1["auth-api"]
-    WORKERS --> W2["pod-api"]
-    WORKERS --> W3["search-api"]
-    WORKERS --> W4["nostr-relay"]
-    WORKERS --> W5["link-preview"]
+### Leptos Forum Client
 
-    W1 & W2 & W3 & W4 & W5 --> CF["Cloudflare Edge<br/>Global CDN"]
-```
+- **Source**: `community-forum-rs/crates/forum-client/`
+- **Build**: `trunk build --release` -> produces WASM + HTML + JS loader
+- **Optimization**: `wasm-opt -Oz` reduces binary size (target: <2MB gzipped)
+- **Deploy**: Output copied to `dist/community/` before GitHub Pages push
+- **Route**: All `/community/*` paths serve the Leptos SPA
 
-## Quick Reference
+## Cloudflare Workers
 
-| Target | Technology | Workflow | Status |
-|--------|-----------|---------|--------|
-| **Main site** | React SPA (Vite) | `deploy.yml` | Live (https://dreamlab-ai.com) |
-| **Community forum** | SvelteKit (static adapter) | `deploy.yml` (bundled) | Live (https://dreamlab-ai.com/community) |
-| **auth-api** | Cloudflare Worker + D1 | `workers-deploy.yml` | Deployed at `dreamlab-auth-api.solitary-paper-764d.workers.dev` |
-| **pod-api** | Cloudflare Worker + R2 | `workers-deploy.yml` | Deployed at `dreamlab-pod-api.solitary-paper-764d.workers.dev` |
-| **search-api** | Cloudflare Worker + WASM | `workers-deploy.yml` | Deployed at `dreamlab-search-api.solitary-paper-764d.workers.dev` |
-| **nostr-relay** | Cloudflare Worker + D1 + DO | `workers-deploy.yml` | Deployed at `dreamlab-nostr-relay.solitary-paper-764d.workers.dev` |
-| **link-preview** | Cloudflare Worker + Cache API | `workers-deploy.yml` | Deployed at `dreamlab-link-preview.solitary-paper-764d.workers.dev` |
-| **Cloudflare Pages** | Static SPA | `deploy.yml` (gated) | Ready to enable |
+### Rust Workers (3 services)
 
-## Documentation Index
+Built with `worker-build --release` which compiles Rust to `wasm32-unknown-unknown`
+and packages it as a Workers-compatible module.
 
-| Document | Purpose | Audience |
-|----------|---------|----------|
-| [GITHUB_PAGES.md](./GITHUB_PAGES.md) | Static site build and deployment | All developers |
-| [CLOUD_SERVICES.md](./CLOUD_SERVICES.md) | GCP Cloud Run (DEPRECATED -- see CLOUDFLARE_WORKERS.md) | Historical reference |
-| [CLOUDFLARE_WORKERS.md](./CLOUDFLARE_WORKERS.md) | Cloudflare Workers deployment | Architecture, DevOps |
-| [ENVIRONMENTS.md](./ENVIRONMENTS.md) | Dev, staging, production configuration | All developers |
-| [MONITORING.md](./MONITORING.md) | Health checks and observability | DevOps, SRE |
-| [ROLLBACK.md](./ROLLBACK.md) | Emergency recovery procedures | DevOps, on-call |
+| Worker | Crate | Storage | Build Command |
+|--------|-------|---------|---------------|
+| auth-worker | `crates/auth-worker` | D1 + KV + R2 | `cd crates/auth-worker && worker-build --release` |
+| pod-worker | `crates/pod-worker` | R2 + KV | `cd crates/pod-worker && worker-build --release` |
+| preview-worker | `crates/preview-worker` | Cache API | `cd crates/preview-worker && worker-build --release` |
 
-## Deployment Workflows
+### TypeScript Workers (2 services)
 
-### Automatic (on push to main)
+Built and deployed directly with `wrangler`.
 
-| Workflow | Trigger Path | Duration |
-|----------|-------------|----------|
-| `deploy.yml` | Any push to main | 5-10 min |
-| `workers-deploy.yml` | `workers/**` | 3-5 min |
+| Worker | Source | Storage | Build Command |
+|--------|--------|---------|---------------|
+| nostr-relay | `workers/nostr-relay/` | D1 + Durable Objects | `wrangler deploy` |
+| search-api | `workers/search-api/` | R2 + KV + WASM | `wrangler deploy` |
 
-### Removed Workflows (GCP — deleted 2026-03-02)
+## CI/CD: GitHub Actions
 
-All GCP Cloud Run workflows have been deleted. Services now deploy via `workers-deploy.yml`.
+### deploy.yml — Static Sites
 
-### Manual Trigger
+Triggers on push to `main`. Steps:
+1. `npm ci && npm run build` (React main site)
+2. `trunk build --release` (Leptos forum client)
+3. `wasm-opt -Oz` on forum WASM binary
+4. Copy forum output to `dist/community/`
+5. Push `dist/` to `gh-pages` branch
 
-```bash
-gh workflow run deploy.yml --ref main
-gh workflow run workers-deploy.yml --ref main
-gh run watch
-```
+Guard: `if: github.repository == 'DreamLab-AI/dreamlab-ai-website'`
 
-## Required Secrets and Variables
+### workers-deploy.yml — Cloudflare Workers
 
-### GitHub Repository Secrets
+Triggers on push to `main` when files in `workers/` or `crates/` change. Steps:
+1. Install Rust toolchain + `wasm32-unknown-unknown` target + `worker-build`
+2. Build 3 Rust Workers in parallel
+3. Deploy all 5 Workers via `wrangler`
 
-```
-VITE_SUPABASE_URL              # Supabase project URL
-VITE_SUPABASE_ANON_KEY         # Supabase anonymous key
-CLOUDFLARE_API_TOKEN            # Cloudflare API token (Workers + Pages deploy)
-CLOUDFLARE_ACCOUNT_ID           # Cloudflare account ID (Workers + Pages deploy)
-```
+Guard: `if: github.repository == 'DreamLab-AI/dreamlab-ai-website'`
 
-### GitHub Repository Variables
+## Environments
 
-```
-FAIRFIELD_ADMIN_PUBKEY          # Nostr admin pubkey (hex)
-CLOUDFLARE_PAGES_ENABLED        # 'true' to enable Cloudflare Pages deploy
-```
+### Production
 
-## Quick Rollback
+- **Domain**: `dreamlab-ai.com`
+- **Workers subdomains**: `api.`, `pods.`, `search.`, `preview.` + relay WebSocket
+- **GitHub Pages branch**: `gh-pages`
 
-```bash
-# GitHub Pages: revert commit and re-deploy
-git revert <sha> --no-edit && git push origin main
+### Development
 
-# Cloudflare Workers: rollback to previous deployment
-npx wrangler rollback --name <worker-name>
-```
+- **React dev**: `npm run dev` -> `http://localhost:5173`
+- **Leptos dev**: `trunk serve` -> `http://localhost:8080`
+- **Workers local**: `wrangler dev` per worker (uses local D1/KV/R2 simulators)
+- **Relay local**: `wrangler dev --local` with `--persist` for D1 state
 
-See [ROLLBACK.md](./ROLLBACK.md) for detailed procedures.
+## Required Secrets (GitHub)
 
----
+| Secret | Purpose |
+|--------|---------|
+| `CLOUDFLARE_API_TOKEN` | Workers deploy (Scripts:Edit, D1:Edit, KV:Edit, R2:Edit) |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare account identifier |
 
-## Related Documentation
+## DNS Records
 
-- [Security Overview](../security/SECURITY_OVERVIEW.md)
-- [Auth API Reference](../api/AUTH_API.md)
-- [Nostr Relay API](../api/NOSTR_RELAY.md)
-
----
-
-*Last major revision: 2026-03-01.*
+| Subdomain | Type | Target |
+|-----------|------|--------|
+| `api.dreamlab-ai.com` | CNAME | auth-worker route |
+| `pods.dreamlab-ai.com` | CNAME | pod-worker route |
+| `search.dreamlab-ai.com` | CNAME | search-api route |
+| `preview.dreamlab-ai.com` | CNAME | preview-worker route |

@@ -1,363 +1,215 @@
----
-title: "Aggregates"
-description: "## Overview"
-category: explanation
-tags: ['ddd', 'developer', 'user']
-difficulty: beginner
-last-updated: 2026-01-16
----
-
 # Aggregates
 
-## Overview
+Each aggregate root enforces consistency boundaries. External references use
+only the aggregate root's identity (a value object). Modifications go through
+the aggregate root's methods.
 
-Aggregates are clusters of domain objects treated as a single unit for data changes.
+## 1. UserIdentity Aggregate
 
-## Aggregate Catalog
+**Root**: `UserIdentity`
+**Crate**: `nostr-core` (types), `forum-client` (store), `auth-worker` (persistence)
 
-### 1. Member Aggregate
+The UserIdentity aggregate owns everything about a user's identity, credentials,
+and access rights. It is the single source of truth for "who is this user and
+what can they do."
 
-**Root**: `Member`
+```rust
+/// Aggregate root: a user's complete identity and access state.
+pub struct UserIdentity {
+    /// Primary identifier -- the Nostr public key.
+    pub pubkey: PublicKey,
+    /// DID representation for Solid/WAC interop.
+    pub did: DidNostr,
+    /// Nostr profile metadata (kind 0).
+    pub profile: Profile,
+    /// Registered WebAuthn credentials (may have multiple per user).
+    pub credentials: Vec<PasskeyCredential>,
+    /// Cohort memberships from the relay whitelist.
+    pub cohorts: Vec<String>,
+    /// Whitelist status (relay-verified, cached client-side for 5 minutes).
+    pub whitelist: Option<WhitelistEntry>,
+    /// Effective permissions computed from cohorts + roles.
+    pub permissions: UserPermissions,
+}
 
-**Boundary**:
-```
-┌─────────────────────────────────────┐
-│          Member Aggregate           │
-├─────────────────────────────────────┤
-│                                     │
-│  ┌─────────┐                        │
-│  │ Member  │ ◄── Aggregate Root     │
-│  │ (Root)  │                        │
-│  └────┬────┘                        │
-│       │                             │
-│       ├──────┬──────┬──────┐        │
-│       ▼      ▼      ▼      ▼        │
-│  ┌───────┐┌─────┐┌─────┐┌──────┐   │
-│  │Profile││Keys ││Roles││Status│   │
-│  └───────┘└─────┘└─────┘└──────┘   │
-│                                     │
-└─────────────────────────────────────┘
-```
-
-**Invariants**:
-- Pubkey is immutable after creation
-- Profile updates must be signed by member's private key
-- At least one cohort required for active status
-- Section roles must reference valid sections
-
-**Commands**:
-```typescript
-class Member {
-  // Factory
-  static create(keypair: Keypair): Member;
-  static restore(mnemonic: string): Member;
-
-  // Commands
-  updateProfile(profile: Partial<Profile>): void;
-  addToCohort(cohort: CohortId): void;
-  removeFromCohort(cohort: CohortId): void;
-  assignSectionRole(section: SectionId, role: RoleId): void;
-  suspend(reason: string): void;
-  activate(): void;
-
-  // Queries
-  canAccessSection(section: SectionId): boolean;
-  hasCapability(capability: string): boolean;
+/// Computed permission state. Derived from whitelist + config, not stored directly.
+pub struct UserPermissions {
+    pub pubkey: PublicKey,
+    pub cohorts: Vec<String>,
+    pub global_role: RoleId,
+    pub section_roles: Vec<UserSectionRole>,
+    pub category_roles: Vec<UserCategoryRole>,
+    pub primary_zone: Option<CategoryId>,
 }
 ```
 
-**Events Emitted**:
-- `MemberCreated`
-- `ProfileUpdated`
-- `CohortAssigned`
-- `RoleAssigned`
-- `MemberSuspended`
-- `MemberActivated`
+**Invariants**:
+- A user has exactly one pubkey for their lifetime.
+- Cohort membership is authoritative only from the relay whitelist API; the
+  client caches it but must re-verify within 5 minutes.
+- Credentials are append-only (a user may register additional passkeys but
+  cannot delete old ones without admin intervention).
+- `permissions` is always recomputed from `cohorts` + BBS config; it is never
+  stored as a persistent field.
 
----
+**Commands**: RegisterPasskey, AuthenticatePasskey, LoginWithExtension,
+LoginWithLocalKey, UpdateProfile, Logout.
 
-### 2. Forum Aggregate
+## 2. Channel Aggregate
 
-**Root**: `Forum`
+**Root**: `Channel`
+**Crate**: `nostr-core` (types), `forum-client` (store)
 
-**Boundary**:
-```
-┌─────────────────────────────────────┐
-│          Forum Aggregate            │
-├─────────────────────────────────────┤
-│                                     │
-│  ┌─────────┐                        │
-│  │  Forum  │ ◄── Aggregate Root     │
-│  │ (Root)  │                        │
-│  └────┬────┘                        │
-│       │                             │
-│       ├──────┬──────┬──────┐        │
-│       ▼      ▼      ▼      ▼        │
-│  ┌──────┐┌──────┐┌─────┐┌──────┐   │
-│  │Metadata│Pins ││Mutes││Settings│  │
-│  └──────┘└──────┘└─────┘└──────┘   │
-│                                     │
-│  Note: Messages are NOT part of     │
-│  this aggregate (separate lifecycle)│
-│                                     │
-└─────────────────────────────────────┘
+A Channel represents a NIP-28/NIP-29 group with its messages, participants,
+and structural position in the BBS hierarchy.
+
+```rust
+/// Aggregate root: a forum channel with its messages and membership.
+pub struct ChannelAggregate {
+    /// The channel metadata (kind 40 create + kind 39000 NIP-29 metadata).
+    pub channel: Channel,
+    /// Ordered messages within this channel (kind 42 / kind 1).
+    pub messages: Vec<NostrEvent>,
+    /// Set of member pubkeys (from kind 39002 member list).
+    pub members: HashSet<PublicKey>,
+    /// Pending join requests (kind 9021).
+    pub join_requests: Vec<JoinRequest>,
+    /// Parent section in the BBS hierarchy.
+    pub section_id: SectionId,
+    /// Parent category (zone).
+    pub category_id: CategoryId,
+}
+
+pub struct JoinRequest {
+    pub pubkey: PublicKey,
+    pub channel_id: String,
+    pub requested_at: Timestamp,
+    pub status: JoinRequestStatus,
+}
+
+pub enum JoinRequestStatus { Pending, Approved, Rejected }
 ```
 
 **Invariants**:
-- Must belong to exactly one section
-- Name must be unique within section
-- Name must be 3-50 characters
-- Only moderators+ can pin/mute
+- A channel belongs to exactly one section and one category.
+- Messages are ordered by `created_at` timestamp.
+- A user can only post to a channel if their cohorts grant access to the
+  channel's section (enforced by the relay, checked client-side for UX).
+- Gated channels require membership; open channels allow any whitelisted user.
 
-**Commands**:
-```typescript
-class Forum {
-  // Factory
-  static create(section: SectionId, name: string, creator: Pubkey): Forum;
+**Commands**: CreateChannel, PostMessage, EditMessage, DeleteMessage,
+RequestJoin, ApproveJoin, RejectJoin, PinMessage.
 
-  // Commands
-  updateMetadata(metadata: ForumMetadata): void;
-  pinMessage(messageId: EventId, moderator: Pubkey): void;
-  unpinMessage(messageId: EventId): void;
-  muteUser(pubkey: Pubkey, moderator: Pubkey): void;
-  unmuteUser(pubkey: Pubkey): void;
-  archive(): void;
-
-  // Queries
-  isUserMuted(pubkey: Pubkey): boolean;
-  getPinnedMessages(): EventId[];
-}
-```
-
-**Events Emitted**:
-- `ForumCreated`
-- `ForumMetadataUpdated`
-- `MessagePinned`
-- `MessageUnpinned`
-- `UserMuted`
-- `UserUnmuted`
-- `ForumArchived`
-
----
-
-### 3. MessageThread Aggregate
-
-**Root**: `Thread`
-
-**Boundary**:
-```
-┌─────────────────────────────────────┐
-│       MessageThread Aggregate       │
-├─────────────────────────────────────┤
-│                                     │
-│  ┌─────────┐                        │
-│  │ Thread  │ ◄── Aggregate Root     │
-│  │ (Root)  │                        │
-│  └────┬────┘                        │
-│       │                             │
-│       ├──────────────┐              │
-│       ▼              ▼              │
-│  ┌──────────┐  ┌──────────┐        │
-│  │  Root    │  │ Replies  │        │
-│  │ Message  │  │  List    │        │
-│  └──────────┘  └────┬─────┘        │
-│                     │               │
-│                     ▼               │
-│               ┌──────────┐         │
-│               │ Reactions│         │
-│               └──────────┘         │
-│                                     │
-└─────────────────────────────────────┘
-```
-
-**Invariants**:
-- Root message cannot be deleted if replies exist
-- Replies must reference valid parent
-- Reactions must reference valid message in thread
-- Maximum thread depth: 10 levels
-
-**Commands**:
-```typescript
-class Thread {
-  // Factory
-  static fromRootMessage(message: Message): Thread;
-
-  // Commands
-  addReply(content: string, author: Pubkey, parentId?: EventId): Message;
-  addReaction(messageId: EventId, emoji: string, author: Pubkey): Reaction;
-  removeReaction(reactionId: EventId): void;
-  deleteMessage(messageId: EventId, author: Pubkey): void;
-
-  // Queries
-  getReplies(messageId: EventId): Message[];
-  getReactions(messageId: EventId): Reaction[];
-  getParticipants(): Pubkey[];
-  getDepth(): number;
-}
-```
-
-**Events Emitted**:
-- `ThreadCreated`
-- `ReplyAdded`
-- `ReactionAdded`
-- `ReactionRemoved`
-- `MessageDeleted`
-
----
-
-### 4. DirectConversation Aggregate
+## 3. Conversation Aggregate
 
 **Root**: `Conversation`
+**Crate**: `forum-client` (store), `nostr-core` (NIP-44/NIP-17)
 
-**Boundary**:
-```
-┌─────────────────────────────────────┐
-│    DirectConversation Aggregate     │
-├─────────────────────────────────────┤
-│                                     │
-│  ┌────────────┐                     │
-│  │Conversation│ ◄── Aggregate Root  │
-│  │  (Root)    │                     │
-│  └─────┬──────┘                     │
-│        │                            │
-│        ├──────────┐                 │
-│        ▼          ▼                 │
-│  ┌───────────┐ ┌────────┐          │
-│  │Participants│ │Messages│          │
-│  │  (2 only)  │ │(sealed)│          │
-│  └───────────┘ └────────┘          │
-│                                     │
-└─────────────────────────────────────┘
+A Conversation is a private DM thread between two users, using NIP-17 gift
+wrapping and NIP-44 encryption.
+
+```rust
+/// Aggregate root: a private conversation between two parties.
+pub struct Conversation {
+    /// The other participant's pubkey (self is implicit from auth state).
+    pub peer: PublicKey,
+    /// Gift-wrapped messages in chronological order.
+    pub messages: Vec<DirectMessage>,
+    /// Timestamp of the last read message (for unread indicators).
+    pub last_read: Option<Timestamp>,
+    /// Whether any unread messages exist.
+    pub has_unread: bool,
+}
 ```
 
 **Invariants**:
-- Exactly 2 participants
-- All messages encrypted with NIP-44
-- Messages wrapped in NIP-59 gift wrap
-- Only participants can read messages
+- All message content is NIP-44 encrypted; plaintext never leaves the
+  `forum-client` WASM boundary.
+- Gift wrapping (kind 1059) hides sender metadata from relays; the relay sees
+  only the outer wrapper addressed to the recipient.
+- Decryption requires the private key in memory; NIP-07 users cannot decrypt
+  DMs (known blind spot from the TypeScript version).
 
-**Commands**:
-```typescript
-class Conversation {
-  // Factory
-  static start(initiator: Pubkey, recipient: Pubkey): Conversation;
-  static fromExisting(participant1: Pubkey, participant2: Pubkey): Conversation;
+**Commands**: SendDirectMessage, DecryptMessage, MarkAsRead.
 
-  // Commands
-  sendMessage(content: string, sender: Pubkey): DirectMessage;
-  markAsRead(messageId: EventId): void;
+## 4. ForumThread Aggregate
 
-  // Queries
-  getMessages(limit?: number): DirectMessage[];
-  getUnreadCount(forPubkey: Pubkey): number;
-  getLastActivity(): Date;
+**Root**: `ForumThread`
+**Crate**: `forum-client` (store)
+
+A ForumThread is a top-level post with its reply chain and reactions, displayed
+in the forum view.
+
+```rust
+/// Aggregate root: a forum thread with replies and reactions.
+pub struct ForumThread {
+    /// The root post (kind 1 or kind 9024).
+    pub root_post: ForumPost,
+    /// Replies sorted by created_at (kind 1 with `e` tag referencing root).
+    pub replies: Vec<ForumPost>,
+    /// Aggregated reactions keyed by content ("+", emoji, etc.).
+    pub reactions: HashMap<String, Vec<Reaction>>,
+    /// Whether the thread is pinned in its channel.
+    pub is_pinned: bool,
+    /// Whether the thread is locked (no new replies).
+    pub is_locked: bool,
 }
-```
-
-**Events Emitted**:
-- `ConversationStarted`
-- `DirectMessageSent`
-- `MessageRead`
-
----
-
-### 5. Section Aggregate
-
-**Root**: `Section`
-
-**Boundary**:
-```
-┌─────────────────────────────────────┐
-│         Section Aggregate           │
-├─────────────────────────────────────┤
-│                                     │
-│  ┌─────────┐                        │
-│  │ Section │ ◄── Aggregate Root     │
-│  │ (Root)  │                        │
-│  └────┬────┘                        │
-│       │                             │
-│       ├──────┬──────┬──────┐        │
-│       ▼      ▼      ▼      ▼        │
-│  ┌──────┐┌──────┐┌─────┐┌──────┐   │
-│  │Config││Cohorts││Forums││Calendar│ │
-│  │      ││Access ││ Refs ││Settings│ │
-│  └──────┘└──────┘└─────┘└──────┘   │
-│                                     │
-│  Note: Forums have their own        │
-│  aggregate (reference only here)    │
-│                                     │
-└─────────────────────────────────────┘
 ```
 
 **Invariants**:
-- At least one cohort must have access
-- Category must exist
-- Forum names unique within section
-- Calendar access level valid for section type
+- A thread has exactly one root post.
+- Replies reference the root via an `e` tag (NIP-10 threading).
+- Reactions reference a specific event (root or reply) via an `e` tag.
+- Only moderators or the thread author can pin/lock.
 
-**Commands**:
-```typescript
-class Section {
-  // Factory (typically from config)
-  static fromConfig(config: SectionConfig): Section;
+**Commands**: CreateThread, Reply, React, PinThread, LockThread.
 
-  // Commands
-  addCohortAccess(cohort: CohortId): void;
-  removeCohortAccess(cohort: CohortId): void;
-  updateCalendarAccess(level: CalendarAccessLevel): void;
-  createForum(name: string, creator: Pubkey): Forum;
-  archiveForum(forumId: ChannelId): void;
+## 5. Pod Aggregate
 
-  // Queries
-  getForums(): Forum[];
-  canAccess(member: Member): boolean;
-  getCalendarAccess(): CalendarAccessLevel;
+**Root**: `Pod`
+**Crate**: `pod-worker`
+
+A Pod is a user's personal storage space in R2, governed by WAC ACL rules.
+
+```rust
+/// Aggregate root: a user's Solid pod with its assets and access rules.
+pub struct PodAggregate {
+    /// Pod owner's pubkey.
+    pub owner: PublicKey,
+    /// Base URL: https://pods.dreamlab-ai.com/{pubkey}/
+    pub pod_url: String,
+    /// WebID: {pod_url}profile/card#me
+    pub web_id: WebId,
+    /// WAC ACL document (stored in KV).
+    pub acl: WacAcl,
+    /// Media assets stored in this pod.
+    pub assets: Vec<MediaAsset>,
+    /// Storage usage metadata.
+    pub storage_used: u64,
 }
 ```
 
-**Events Emitted**:
-- `SectionCreated`
-- `CohortAccessGranted`
-- `CohortAccessRevoked`
-- `CalendarAccessUpdated`
+**Invariants**:
+- Every pod is created at registration time with a default ACL granting owner
+  full access and public read on `/profile/` and `/media/public/`.
+- Write operations require NIP-98 auth where the token's pubkey matches the pod
+  owner (or the ACL grants write to the requester's DID).
+- Maximum upload size is 50MB per request.
+- The ACL is the sole authority for access decisions; the pod-worker never
+  hardcodes access rules beyond the default provisioning.
 
-## Aggregate Design Principles
+**Commands**: UploadMedia, DeleteMedia, GetMedia, UpdateAcl.
 
-### Consistency Boundaries
+## Aggregate Relationships
 
-Each aggregate guarantees:
-1. All invariants hold after any command
-2. Transactions are scoped to single aggregate
-3. References to other aggregates by ID only
-
-### Event Sourcing Consideration
-
-While not fully event-sourced, aggregates:
-- Emit domain events for cross-aggregate coordination
-- Can be reconstructed from Nostr events
-- Maintain compatibility with relay event storage
-
-### Repository Pattern
-
-```typescript
-interface Repository<T> {
-  findById(id: string): Promise<T | null>;
-  save(aggregate: T): Promise<void>;
-  delete(id: string): Promise<void>;
-}
-
-// Example implementation
-class ForumRepository implements Repository<Forum> {
-  constructor(private ndk: NDK) {}
-
-  async findById(channelId: string): Promise<Forum | null> {
-    const event = await this.ndk.fetchEvent({ ids: [channelId] });
-    return event ? Forum.fromEvent(event) : null;
-  }
-
-  async save(forum: Forum): Promise<void> {
-    const event = forum.toEvent();
-    await this.ndk.publish(event);
-  }
-}
+```
+UserIdentity ----< PasskeyCredential   (1:N, same user may have multiple passkeys)
+UserIdentity ----< WhitelistEntry      (1:0..1, relay-verified)
+Channel      ----< NostrEvent          (1:N, messages in channel)
+Channel      ----< JoinRequest         (1:N, pending requests)
+Conversation ----< DirectMessage       (1:N, messages in thread)
+ForumThread  ----< ForumPost           (1:N, root + replies)
+ForumThread  ----< Reaction            (1:N, reactions on any post)
+Pod          ----< MediaAsset          (1:N, files in pod)
+Pod          ---- WacAcl               (1:1, access control)
 ```

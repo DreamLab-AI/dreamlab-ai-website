@@ -1,0 +1,98 @@
+name: Rust CI
+
+on:
+  push:
+    branches: [rust-version]
+  pull_request:
+    branches: [rust-version, main]
+
+env:
+  CARGO_TERM_COLOR: always
+  MANIFEST: community-forum-rs/Cargo.toml
+
+jobs:
+  fmt:
+    name: Format
+    runs-on: ubuntu-latest
+    if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+      - run: cargo fmt --manifest-path ${{ env.MANIFEST }} --all -- --check
+
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            community-forum-rs/target
+          key: rust-${{ hashFiles('community-forum-rs/Cargo.lock') }}
+          restore-keys: rust-
+      - run: cargo clippy --manifest-path ${{ env.MANIFEST }} --all-targets -- -D warnings
+
+  test-native:
+    name: Test (native)
+    runs-on: ubuntu-latest
+    if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            community-forum-rs/target
+          key: rust-${{ hashFiles('community-forum-rs/Cargo.lock') }}
+          restore-keys: rust-
+      - run: cargo test --manifest-path ${{ env.MANIFEST }} --all
+
+  test-wasm:
+    name: Test (wasm)
+    runs-on: ubuntu-latest
+    if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            community-forum-rs/target
+          key: rust-${{ hashFiles('community-forum-rs/Cargo.lock') }}
+          restore-keys: rust-
+      - run: cargo install wasm-bindgen-cli --locked || true
+      - run: cargo test --manifest-path ${{ env.MANIFEST }} --target wasm32-unknown-unknown -p nostr-core
+
+  check-wasm-client:
+    name: Check (wasm client)
+    runs-on: ubuntu-latest
+    if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            community-forum-rs/target
+          key: rust-${{ hashFiles('community-forum-rs/Cargo.lock') }}
+          restore-keys: rust-
+      - run: cargo check --manifest-path ${{ env.MANIFEST }} --target wasm32-unknown-unknown -p forum-client

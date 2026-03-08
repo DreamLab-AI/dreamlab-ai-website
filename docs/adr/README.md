@@ -1,49 +1,53 @@
----
-title: "Architecture Decision Records"
-description: "Index of architecture decision records documenting key technical decisions for DreamLab AI"
-category: reference
-tags: [architecture, adr, reference, developer, decisions]
-difficulty: intermediate
-last-updated: 2026-03-07
----
+# Architecture Decision Records
 
-# Architecture Decision Records (ADR)
+This directory contains the Architecture Decision Records (ADRs) for the DreamLab
+AI community forum project.
 
-This directory contains Architecture Decision Records for the DreamLab AI platform.
+> Note: this repository snapshot currently includes ADR files 013-019. Earlier
+> ADR numbers are retained in the sequence as historical references, but their
+> source files are not present in this docs tree.
 
-## ADR Index
+## Index
 
-| ID | Title | Status | Date |
-|----|-------|--------|------|
-| [ADR-001](001-nostr-protocol-foundation.md) | Nostr Protocol as Foundation | Accepted | 2024-01 |
-| [ADR-002](002-three-tier-hierarchy.md) | Three-Tier Hierarchy | Accepted | 2024-01 |
-| [ADR-003](003-gcp-cloud-run-infrastructure.md) | GCP Cloud Run Infrastructure | Superseded by ADR-010 | 2024-02 |
-| [ADR-004](004-zone-based-access-control.md) | Zone-Based Access Control | Accepted | 2024-02 |
-| [ADR-005](005-nip-44-encryption-mandate.md) | NIP-44 Encryption Mandate | Accepted | 2024-03 |
-| [ADR-006](006-client-side-wasm-search.md) | Client-Side WASM Search | Accepted | 2024-03 |
-| [ADR-007](007-sveltekit-ndk-frontend.md) | SvelteKit + NDK Frontend | Accepted | 2024-01 |
-| [ADR-008](008-postgresql-relay-storage.md) | PostgreSQL Relay Storage | Superseded by ADR-010 | 2024-02 |
-| [ADR-009](009-user-registration-flow.md) | User Registration Flow | Accepted | 2026-01 |
-| [ADR-010](010-return-to-cloudflare.md) | Return to Cloudflare Platform | Accepted -- Complete | 2026-02 |
-| [ADR-011](011-images-to-solid-pods.md) | Images and Media Storage in Solid Pods | Accepted | 2026-03 |
-| [ADR-012](012-hardening-sprint.md) | Community Forum Hardening Sprint | Accepted | 2026-03 |
+| ADR | Title | Status |
+|-----|-------|--------|
+| 001 | Nostr Protocol as Foundation | Accepted |
+| 002 | Three-Tier BBS Hierarchy | Accepted |
+| 003 | GCP Cloud Run Infrastructure | Superseded by 010 |
+| 004 | Zone-Based Access Control | Accepted |
+| 005 | NIP-44 Encryption Mandate | Accepted |
+| 006 | Client-Side WASM Search | Accepted |
+| 007 | SvelteKit + NDK Frontend | Superseded by 013 |
+| 008 | PostgreSQL Relay Storage | Superseded by 010 |
+| 009 | User Registration Flow | Accepted |
+| 010 | Return to Cloudflare Platform | Accepted |
+| 011 | Images to Solid Pods | Accepted |
+| 012 | Hardening Sprint | Accepted |
+| [013](013-rust-leptos-forum-framework.md) | Rust/Leptos 0.7 as Forum UI Framework | Accepted |
+| [014](014-hybrid-validation-phase.md) | Hybrid Validation Phase Before Full Rewrite | Accepted |
+| [015](015-workers-port-strategy.md) | Selective Workers Port Strategy (3 Rust, 2 TypeScript) | Accepted |
+| [016](016-nostr-sdk-protocol-layer.md) | nostr-sdk 0.44.x as Nostr Protocol Layer | Accepted |
+| [017](017-passkey-rs-webauthn-prf.md) | passkey-rs for WebAuthn/FIDO2 with PRF Extension | Accepted |
+| [018](018-testing-strategy-rust-port.md) | Testing Strategy for Rust Port | Accepted |
+| [019](019-plan-governance-and-delivery-structure.md) | Versioned Planning Governance and Tranche-Based Delivery | Proposed |
 
-## ADR Template
+## Supersession Chain
 
-Use [000-template.md](000-template.md) when creating new ADRs.
+- ADR-003 (GCP Cloud Run) -> ADR-010 (Cloudflare Platform)
+- ADR-007 (SvelteKit + NDK) -> ADR-013 (Rust/Leptos 0.7)
+- ADR-008 (PostgreSQL Relay Storage) -> ADR-010 (Cloudflare D1)
 
-## Status Definitions
+## Conventions
 
-- **Proposed** -- under discussion
-- **Accepted** -- decision made and implemented
-- **Superseded** -- replaced by a newer ADR (see superseding ADR for rationale)
-- **Rejected** -- considered but not adopted
+- ADRs use sequential numbering (zero-padded to 3 digits)
+- Status values: `Proposed`, `Accepted`, `Superseded`, `Deprecated`
+- Each ADR follows the format: Title, Status, Context, Decision, Consequences
+- Consequences are categorized as Positive, Negative, and Neutral
+- ADRs are immutable once accepted; new ADRs supersede old ones rather than editing
 
-## Core Stack
+## Related Documents
 
-- **Protocol**: Nostr (NIPs 01, 17, 25, 28, 42, 44, 52, 59, 98)
-- **Frontend**: React 18.3 (main site) + SvelteKit 2.49 (community forum)
-- **Auth**: WebAuthn PRF + NIP-98 HTTP auth
-- **Backend**: 5 Cloudflare Workers (auth-api, pod-api, search-api, nostr-relay, link-preview) -- zero GCP
-- **Database**: D1 (structured data), KV (sessions, ACLs, config), R2 (pods, images, vectors), Durable Objects (WebSocket relay), Cache API (link previews)
-- **Hosting**: GitHub Pages (static site + forum), Cloudflare Pages (opt-in)
+- [PRD: Rust Port v2.0.0](../prd-rust-port.md)
+- [PRD: Rust Port v2.1.0](../prd-rust-port-v2.1.md)
+- [DDD Overview](../ddd/README.md)
+- [Deployment Overview](../deployment/README.md)

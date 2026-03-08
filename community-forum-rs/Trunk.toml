@@ -1,0 +1,10 @@
+[build]
+target = "index.html"
+dist = "dist"
+
+[watch]
+watch = ["crates/forum-client/src", "crates/nostr-core/src"]
+
+[serve]
+address = "127.0.0.1"
+port = 8080

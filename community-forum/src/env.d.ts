@@ -19,6 +19,8 @@ interface ImportMetaEnv {
   readonly VITE_AGENT_RELAY_URL?: string;
   /** Enable client-side encryption for private channel/DM images */
   readonly VITE_IMAGE_ENCRYPTION_ENABLED?: string;
+  /** Enable Rust WASM crypto (nostr-core-wasm) instead of JS fallback */
+  readonly VITE_USE_WASM_CRYPTO?: string;
   readonly PUBLIC_DEFAULT_RELAYS?: string;
   readonly PUBLIC_AI_ENABLED?: string;
   readonly PUBLIC_APP_NAME?: string;
