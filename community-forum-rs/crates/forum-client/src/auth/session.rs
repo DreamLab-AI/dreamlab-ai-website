@@ -176,10 +176,7 @@ impl AuthStore {
                     nickname: stored.nickname,
                     avatar: stored.avatar,
                     is_pending: false,
-                    error: Some(
-                        "NIP-07 session restored. Please sign in again with your extension."
-                            .to_string(),
-                    ),
+                    error: None,
                     account_status: stored.account_status,
                     nsec_backed_up: stored.nsec_backed_up,
                     is_ready: true,
@@ -203,7 +200,7 @@ impl AuthStore {
                     nickname: stored.nickname,
                     avatar: stored.avatar,
                     is_pending: false,
-                    error: Some("Local session expired. Please log in again.".to_string()),
+                    error: None,
                     account_status: stored.account_status,
                     nsec_backed_up: stored.nsec_backed_up,
                     is_ready: true,
