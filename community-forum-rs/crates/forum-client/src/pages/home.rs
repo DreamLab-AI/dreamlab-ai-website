@@ -8,6 +8,7 @@
 use leptos::prelude::*;
 use leptos_router::components::A;
 
+use crate::app::base_href;
 use crate::auth::use_auth;
 use crate::components::particle_canvas::ParticleCanvas;
 
@@ -55,13 +56,13 @@ pub fn HomePage() -> impl IntoView {
                         when=move || is_authed.get()
                         fallback=move || view! {
                             <A
-                                href="/signup"
+                                href=base_href("/signup")
                                 attr:class="bg-amber-500 hover:bg-amber-400 text-gray-900 font-semibold px-8 py-3 rounded-xl text-lg transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/20"
                             >
                                 "Create Account"
                             </A>
                             <A
-                                href="/login"
+                                href=base_href("/login")
                                 attr:class="border border-gray-600 hover:border-amber-500/50 text-gray-200 hover:text-white px-8 py-3 rounded-xl text-lg transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/10"
                             >
                                 "Sign In"
@@ -69,7 +70,7 @@ pub fn HomePage() -> impl IntoView {
                         }
                     >
                         <A
-                            href="/chat"
+                            href=base_href("/chat")
                             attr:class="bg-amber-500 hover:bg-amber-400 text-gray-900 font-semibold px-8 py-3 rounded-xl text-lg transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/20"
                         >
                             "Enter Chat"
