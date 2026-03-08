@@ -1,0 +1,14 @@
+[package]
+name = "pod-worker"
+version = "0.1.0"
+edition = "2021"
+description = "DreamLab pod Worker: Solid pods + R2 storage + WAC ACL"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+nostr-core = { workspace = true }
+worker = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }

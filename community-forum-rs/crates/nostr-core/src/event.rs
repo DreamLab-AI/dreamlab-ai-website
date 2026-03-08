@@ -1,0 +1,180 @@
+//! Nostr event types and NIP-01 canonical serialization.
+//!
+//! Implements the event structure, ID computation (SHA-256 of canonical JSON),
+//! and Schnorr signing/verification per BIP-340.
+
+use k256::schnorr::{SigningKey, VerifyingKey};
+use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha256};
+
+/// A fully signed Nostr event.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct NostrEvent {
+    pub id: String,
+    pub pubkey: String,
+    pub created_at: u64,
+    pub kind: u64,
+    pub tags: Vec<Vec<String>>,
+    pub content: String,
+    pub sig: String,
+}
+
+/// An unsigned event template, ready for ID computation and signing.
+#[derive(Debug, Clone)]
+pub struct UnsignedEvent {
+    pub pubkey: String,
+    pub created_at: u64,
+    pub kind: u64,
+    pub tags: Vec<Vec<String>>,
+    pub content: String,
+}
+
+/// Compute the NIP-01 event ID: SHA-256 of the canonical JSON serialization.
+///
+/// Canonical form: `[0, <pubkey>, <created_at>, <kind>, <tags>, <content>]`
+pub fn compute_event_id(event: &UnsignedEvent) -> [u8; 32] {
+    let canonical = serde_json::json!([
+        0,
+        event.pubkey,
+        event.created_at,
+        event.kind,
+        event.tags,
+        event.content,
+    ]);
+    let serialized = serde_json::to_string(&canonical).expect("canonical JSON serialization");
+    let mut hasher = Sha256::new();
+    hasher.update(serialized.as_bytes());
+    hasher.finalize().into()
+}
+
+/// Compute the event ID from a raw [`NostrEvent`] (for verification — recomputes from scratch).
+pub fn recompute_event_id(event: &NostrEvent) -> [u8; 32] {
+    let unsigned = UnsignedEvent {
+        pubkey: event.pubkey.clone(),
+        created_at: event.created_at,
+        kind: event.kind,
+        tags: event.tags.clone(),
+        content: event.content.clone(),
+    };
+    compute_event_id(&unsigned)
+}
+
+/// Sign an unsigned event, producing a fully signed [`NostrEvent`].
+pub fn sign_event(event: UnsignedEvent, signing_key: &SigningKey) -> NostrEvent {
+    let id_bytes = compute_event_id(&event);
+    let id_hex = hex::encode(id_bytes);
+
+    let aux_rand = [0u8; 32]; // deterministic aux randomness for reproducibility
+    let signature = signing_key.sign_raw(&id_bytes, &aux_rand).expect("schnorr sign");
+    let sig_hex = hex::encode(signature.to_bytes());
+
+    NostrEvent {
+        id: id_hex,
+        pubkey: event.pubkey,
+        created_at: event.created_at,
+        kind: event.kind,
+        tags: event.tags,
+        content: event.content,
+        sig: sig_hex,
+    }
+}
+
+/// Verify a signed event: recompute ID from canonical form, then verify Schnorr signature.
+///
+/// Returns `true` if the event ID matches the canonical serialization AND the
+/// signature is valid against the pubkey.
+pub fn verify_event(event: &NostrEvent) -> bool {
+    // Recompute ID — never trust the provided id field
+    let expected_id = recompute_event_id(event);
+    let expected_id_hex = hex::encode(expected_id);
+
+    if event.id != expected_id_hex {
+        return false;
+    }
+
+    // Decode pubkey
+    let pubkey_bytes = match hex::decode(&event.pubkey) {
+        Ok(b) if b.len() == 32 => b,
+        _ => return false,
+    };
+    let verifying_key = match VerifyingKey::from_bytes(&pubkey_bytes) {
+        Ok(k) => k,
+        Err(_) => return false,
+    };
+
+    // Decode signature
+    let sig_bytes = match hex::decode(&event.sig) {
+        Ok(b) if b.len() == 64 => b,
+        _ => return false,
+    };
+    let signature = match k256::schnorr::Signature::try_from(sig_bytes.as_slice()) {
+        Ok(s) => s,
+        Err(_) => return false,
+    };
+
+    // Verify Schnorr signature over the event ID bytes
+    verifying_key.verify_raw(&expected_id, &signature).is_ok()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn test_signing_key() -> SigningKey {
+        let secret = [0x01u8; 32];
+        SigningKey::from_bytes(&secret).unwrap()
+    }
+
+    #[test]
+    fn sign_and_verify_roundtrip() {
+        let sk = test_signing_key();
+        let pubkey = hex::encode(sk.verifying_key().to_bytes());
+
+        let unsigned = UnsignedEvent {
+            pubkey,
+            created_at: 1700000000,
+            kind: 1,
+            tags: vec![],
+            content: "hello".to_string(),
+        };
+
+        let signed = sign_event(unsigned, &sk);
+        assert!(verify_event(&signed));
+    }
+
+    #[test]
+    fn tampered_content_fails_verification() {
+        let sk = test_signing_key();
+        let pubkey = hex::encode(sk.verifying_key().to_bytes());
+
+        let unsigned = UnsignedEvent {
+            pubkey,
+            created_at: 1700000000,
+            kind: 1,
+            tags: vec![],
+            content: "hello".to_string(),
+        };
+
+        let mut signed = sign_event(unsigned, &sk);
+        signed.content = "tampered".to_string();
+        assert!(!verify_event(&signed));
+    }
+
+    #[test]
+    fn tampered_id_fails_verification() {
+        let sk = test_signing_key();
+        let pubkey = hex::encode(sk.verifying_key().to_bytes());
+
+        let unsigned = UnsignedEvent {
+            pubkey,
+            created_at: 1700000000,
+            kind: 1,
+            tags: vec![],
+            content: "hello".to_string(),
+        };
+
+        let mut signed = sign_event(unsigned, &sk);
+        signed.id = "00".repeat(32);
+        assert!(!verify_event(&signed));
+    }
+}

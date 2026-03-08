@@ -1,0 +1,6 @@
+name = "dreamlab-pod-worker"
+main = "build/worker/shim.mjs"
+compatibility_date = "2026-03-01"
+
+[build]
+command = "cargo install worker-build && worker-build --release"

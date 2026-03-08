@@ -1,0 +1,13 @@
+[package]
+name = "preview-worker"
+version = "0.1.0"
+edition = "2021"
+description = "DreamLab link preview Worker: OG metadata + SSRF protection"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+worker = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
