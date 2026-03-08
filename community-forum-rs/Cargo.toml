@@ -15,7 +15,7 @@ nostr = "0.44"
 nostr-sdk = "0.44"
 
 # UI framework (0.7.x — stay on 0.7 track, 0.8 is breaking)
-leptos = "0.7"
+leptos = { version = "0.7", features = ["csr"] }
 leptos_router = "0.7"
 leptos_meta = "0.7"
 
