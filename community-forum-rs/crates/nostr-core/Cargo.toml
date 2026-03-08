@@ -5,7 +5,7 @@ edition = "2021"
 description = "Shared Nostr protocol primitives for DreamLab forum (client + workers)"
 
 [lib]
-crate-type = ["lib"]
+crate-type = ["lib", "cdylib"]
 
 [dependencies]
 nostr = { workspace = true }

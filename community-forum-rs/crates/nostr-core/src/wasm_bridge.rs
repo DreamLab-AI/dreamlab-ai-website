@@ -71,6 +71,7 @@ pub fn derive_keypair_from_prf(prf_output: &[u8]) -> Result<JsValue, JsValue> {
 
 /// Create a NIP-98 authorization token for an HTTP request.
 ///
+/// `created_at` is a Unix timestamp (seconds). In browser, pass `Math.floor(Date.now() / 1000)`.
 /// Returns a base64-encoded JSON string for `Authorization: Nostr <token>`.
 #[wasm_bindgen]
 pub fn create_nip98_token(
@@ -78,11 +79,15 @@ pub fn create_nip98_token(
     url: &str,
     method: &str,
     body: Option<Vec<u8>>,
+    created_at: Option<u32>,
 ) -> Result<String, JsValue> {
     let sk: [u8; 32] = secret_key
         .try_into()
         .map_err(|_| JsValue::from_str("secret_key must be 32 bytes"))?;
-    nip98::create_token(&sk, url, method, body.as_deref())
+    let ts = created_at.map(|t| t as u64).unwrap_or_else(|| {
+        (js_sys::Date::now() / 1000.0) as u64
+    });
+    nip98::create_token_at(&sk, url, method, body.as_deref(), ts)
         .map_err(|e| JsValue::from_str(&e.to_string()))
 }
 
@@ -162,4 +167,46 @@ pub fn schnorr_sign(secret_key: &[u8], message: &[u8]) -> Result<Vec<u8>, JsValu
         .map_err(|e| JsValue::from_str(&e.to_string()))?;
     let sig = sk.sign(&msg).map_err(|e| JsValue::from_str(&e.to_string()))?;
     Ok(sig.as_bytes().to_vec())
+}
+
+/// Verify a BIP-340 Schnorr signature.
+///
+/// `public_key` must be 32 bytes (x-only), `message` must be 32 bytes,
+/// `signature` must be 64 bytes. Returns `true` if valid.
+#[wasm_bindgen]
+pub fn schnorr_verify(
+    public_key: &[u8],
+    message: &[u8],
+    signature: &[u8],
+) -> Result<bool, JsValue> {
+    let pk_bytes: [u8; 32] = public_key
+        .try_into()
+        .map_err(|_| JsValue::from_str("public_key must be 32 bytes"))?;
+    let msg: [u8; 32] = message
+        .try_into()
+        .map_err(|_| JsValue::from_str("message must be 32 bytes"))?;
+    let sig_bytes: [u8; 64] = signature
+        .try_into()
+        .map_err(|_| JsValue::from_str("signature must be 64 bytes"))?;
+
+    let pk = keys::PublicKey::from_bytes(pk_bytes)
+        .map_err(|e| JsValue::from_str(&e.to_string()))?;
+    let sig = keys::Signature::from_bytes(sig_bytes);
+    match pk.verify(&msg, &sig) {
+        Ok(()) => Ok(true),
+        Err(_) => Ok(false),
+    }
+}
+
+/// Generate a new random Nostr keypair.
+///
+/// Returns `{ secretKey: Uint8Array(32), publicKey: string }`.
+#[wasm_bindgen]
+pub fn generate_keypair() -> Result<JsValue, JsValue> {
+    let kp = keys::generate_keypair().map_err(|e| JsValue::from_str(&e.to_string()))?;
+    let obj = js_sys::Object::new();
+    let sk_array = js_sys::Uint8Array::from(kp.secret.as_bytes().as_slice());
+    js_sys::Reflect::set(&obj, &"secretKey".into(), &sk_array)?;
+    js_sys::Reflect::set(&obj, &"publicKey".into(), &kp.public.to_hex().into())?;
+    Ok(obj.into())
 }

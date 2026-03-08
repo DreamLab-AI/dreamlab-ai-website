@@ -36,6 +36,7 @@
     "validate:docs:spelling": "[ -f ../docs/scripts/validate-spelling.sh ] && bash ../docs/scripts/validate-spelling.sh docs || echo 'Skipping'"
   },
   "dependencies": {
+    "@dreamlab/nostr-core-wasm": "file:../community-forum-rs/crates/nostr-core/pkg",
     "@nostr-dev-kit/ndk": "^2.8.2",
     "@nostr-dev-kit/ndk-cache-dexie": "^2.2.11",
     "@nostr-dev-kit/ndk-svelte": "^2.2.15",

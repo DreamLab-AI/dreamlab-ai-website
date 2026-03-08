@@ -9,11 +9,11 @@
  * When privkey is omitted, auto-falls back to NIP-07 if available.
  */
 
-import { createNip98Token } from '../../../packages/nip98/sign.js';
+import { createNip98Token } from '$lib/crypto';
 import { sha256 } from '@noble/hashes/sha256';
 import { bytesToHex } from '@noble/hashes/utils';
 
-export { createNip98Token } from '../../../packages/nip98/sign.js';
+export { createNip98Token } from '$lib/crypto';
 
 /**
  * Create a NIP-98 token using the NIP-07 browser extension signer.

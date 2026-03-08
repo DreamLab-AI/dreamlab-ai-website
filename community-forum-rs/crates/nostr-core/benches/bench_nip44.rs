@@ -24,7 +24,7 @@ fn bench_encrypt(c: &mut Criterion) {
     let (sender_sk, _sender_pk) = random_keypair();
     let (_recipient_sk, recipient_pk) = random_keypair();
 
-    for size in [1_024, 10_240, 100_000] {
+    for size in [1_024, 10_240, 60_000] {
         let plaintext = "A".repeat(size);
         group.throughput(Throughput::Bytes(size as u64));
         group.bench_with_input(
@@ -43,7 +43,7 @@ fn bench_decrypt(c: &mut Criterion) {
     let (sender_sk, sender_pk) = random_keypair();
     let (recipient_sk, recipient_pk) = random_keypair();
 
-    for size in [1_024, 10_240, 100_000] {
+    for size in [1_024, 10_240, 60_000] {
         let plaintext = "A".repeat(size);
         let ciphertext = nip44::encrypt(&sender_sk, &recipient_pk, &plaintext).unwrap();
         group.throughput(Throughput::Bytes(size as u64));

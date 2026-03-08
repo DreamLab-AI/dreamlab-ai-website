@@ -106,6 +106,24 @@ pub fn create_token(
     method: &str,
     body: Option<&[u8]>,
 ) -> Result<String, Nip98Error> {
+    let now = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .expect("system clock before epoch")
+        .as_secs();
+    create_token_at(secret_key, url, method, body, now)
+}
+
+/// Like [`create_token`] but accepts an explicit Unix timestamp.
+///
+/// Use this variant in WASM environments where `SystemTime::now()` is unavailable.
+/// The caller is responsible for providing a current timestamp (e.g., from `Date.now() / 1000`).
+pub fn create_token_at(
+    secret_key: &[u8; 32],
+    url: &str,
+    method: &str,
+    body: Option<&[u8]>,
+    created_at: u64,
+) -> Result<String, Nip98Error> {
     let sk = SigningKey::from_bytes(secret_key)?;
     let pubkey = hex::encode(sk.verifying_key().to_bytes());
 
@@ -119,14 +137,9 @@ pub fn create_token(
         tags.push(vec!["payload".to_string(), hex::encode(hash)]);
     }
 
-    let now = std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .expect("system clock before epoch")
-        .as_secs();
-
     let unsigned = UnsignedEvent {
         pubkey,
-        created_at: now,
+        created_at,
         kind: HTTP_AUTH_KIND,
         tags,
         content: String::new(),

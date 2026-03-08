@@ -84,6 +84,12 @@ pub struct PublicKey {
 }
 
 impl PublicKey {
+    /// Construct from raw 32-byte x-only public key.
+    pub fn from_bytes(bytes: [u8; 32]) -> Result<Self, KeyError> {
+        VerifyingKey::from_bytes(&bytes).map_err(|_| KeyError::InvalidPublicKey)?;
+        Ok(Self { bytes })
+    }
+
     /// Parse from a 64-character lowercase hex string.
     pub fn from_hex(hex_str: &str) -> Result<Self, KeyError> {
         let decoded = hex::decode(hex_str)
