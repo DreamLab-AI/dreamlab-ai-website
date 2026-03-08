@@ -1,7 +1,7 @@
 //! Root application component with router, layout, and auth gate.
 
 use leptos::prelude::*;
-use leptos_router::components::{Route, Router, Routes, A};
+use leptos_router::components::{FlatRoutes, Route, Router, A};
 use leptos_router::hooks::use_location;
 use leptos_router::path;
 
@@ -155,7 +155,7 @@ pub fn App() -> impl IntoView {
     view! {
         <Router base=FORUM_BASE>
             <Layout>
-                <Routes fallback=|| view! {
+                <FlatRoutes fallback=|| view! {
                     <div class="min-h-screen bg-gray-900 text-white flex items-center justify-center">
                         <div class="text-center">
                             <h1 class="text-6xl font-bold mb-4">"404"</h1>
@@ -174,7 +174,7 @@ pub fn App() -> impl IntoView {
                     <Route path=path!("/dm") view=AuthGatedDmList />
                     <Route path=path!("/dm/:pubkey") view=AuthGatedDmChat />
                     <Route path=path!("/admin") view=AdminPage />
-                </Routes>
+                </FlatRoutes>
             </Layout>
         </Router>
     }
@@ -191,7 +191,19 @@ fn Layout(children: Children) -> impl IntoView {
     let mobile_open = RwSignal::new(false);
 
     let location = use_location();
-    let pathname = move || location.pathname.get();
+    // Strip FORUM_BASE prefix so nav comparisons work regardless of sub-directory.
+    let pathname = move || {
+        let p = location.pathname.get();
+        if FORUM_BASE.is_empty() {
+            return p;
+        }
+        let stripped = p.strip_prefix(FORUM_BASE).unwrap_or(&p);
+        if stripped.is_empty() {
+            "/".to_string()
+        } else {
+            stripped.to_string()
+        }
+    };
 
     let display_name = Memo::new(move |_| {
         nickname.get().unwrap_or_else(|| {
