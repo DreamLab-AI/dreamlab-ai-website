@@ -16,6 +16,7 @@ use zeroize::Zeroize;
 
 use self::passkey::{PasskeyAuthResult, PasskeyRegistrationResult};
 use self::session::StoredSession;
+use nostr_core::{NostrEvent, UnsignedEvent};
 
 // -- Constants ----------------------------------------------------------------
 
@@ -142,8 +143,34 @@ impl AuthStore {
         Memo::new(move |_| state.get().nickname)
     }
 
-    /// Get the raw privkey bytes (for NIP-98 signing). Returns None if not
-    /// authenticated via passkey/local-key.
+    /// Sign an unsigned event using the in-memory private key.
+    ///
+    /// The raw key bytes never leave this module — the `SigningKey` is
+    /// constructed inside the closure and dropped (+ zeroized) before
+    /// returning. This prevents the 32-byte secret from being copied
+    /// onto arbitrary WASM stack frames in calling code.
+    pub fn sign_event(&self, event: UnsignedEvent) -> Result<NostrEvent, String> {
+        self.privkey.with_value(|opt| {
+            let v = opt.as_ref().ok_or("No signing key available")?;
+            if v.len() != 32 {
+                return Err("Invalid key length".to_string());
+            }
+            let mut key_bytes = [0u8; 32];
+            key_bytes.copy_from_slice(v);
+            let signing_key = k256::schnorr::SigningKey::from_bytes(&key_bytes)
+                .map_err(|e| format!("Invalid signing key: {e}"))?;
+            key_bytes.zeroize();
+            nostr_core::sign_event(event, &signing_key)
+                .map_err(|e| format!("Signing failed: {e}"))
+        })
+    }
+
+    /// Get the raw privkey bytes for NIP-44 encryption/decryption.
+    ///
+    /// **WARNING**: Prefer `sign_event()` for signing. This method exists
+    /// only for NIP-44 symmetric key derivation where the raw bytes are
+    /// required by the encryption API. Callers MUST zeroize the returned
+    /// array when done.
     pub fn get_privkey_bytes(&self) -> Option<[u8; 32]> {
         self.privkey.with_value(|opt| {
             opt.as_ref().and_then(|v| {

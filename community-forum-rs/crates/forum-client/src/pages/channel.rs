@@ -10,7 +10,7 @@ use wasm_bindgen::JsCast;
 use crate::auth::use_auth;
 use crate::components::message_bubble::{MessageBubble, MessageData};
 use crate::relay::{ConnectionState, Filter, RelayConnection};
-use crate::utils::arrow_left_svg;
+use crate::utils::{arrow_left_svg, set_timeout_once};
 
 /// Parsed channel metadata from the kind 40 event.
 #[derive(Clone, Debug)]
@@ -120,18 +120,12 @@ pub fn ChannelPage() -> impl IntoView {
         let id2 = relay_for_sub.subscribe(vec![msg_filter], on_msg_event, Some(on_eose));
         messages_sub_id.set(Some(id2));
 
-        // Loading timeout
-        let cb = wasm_bindgen::closure::Closure::once(move || {
+        // Loading timeout (auto-drops closure after execution)
+        set_timeout_once(move || {
             if loading_sig.get_untracked() {
                 loading_sig.set(false);
             }
-        });
-        let window = web_sys::window().expect("no global window");
-        let _ = window.set_timeout_with_callback_and_timeout_and_arguments_0(
-            cb.as_ref().unchecked_ref(),
-            8000,
-        );
-        cb.forget();
+        }, 8000);
     });
 
     // Auto-scroll to bottom when new messages arrive
@@ -139,15 +133,9 @@ pub fn ChannelPage() -> impl IntoView {
         let _count = messages.get().len();
         if let Some(container) = messages_container.get() {
             let el: web_sys::HtmlElement = container.into();
-            let cb = wasm_bindgen::closure::Closure::once(move || {
+            set_timeout_once(move || {
                 el.set_scroll_top(el.scroll_height());
-            });
-            let window = web_sys::window().expect("no global window");
-            let _ = window.set_timeout_with_callback_and_timeout_and_arguments_0(
-                cb.as_ref().unchecked_ref(),
-                50,
-            );
-            cb.forget();
+            }, 50);
         }
     });
 
@@ -178,18 +166,10 @@ pub fn ChannelPage() -> impl IntoView {
         sending.set(true);
         message_input.set(String::new());
 
-        // Get pubkey and privkey from auth store
+        // Get pubkey from auth store
         let pubkey = auth.pubkey().get_untracked().unwrap_or_default();
         if pubkey.is_empty() {
             error_msg.set(Some("Not authenticated".to_string()));
-            sending.set(false);
-            message_input.set(content);
-            return;
-        }
-
-        let privkey_bytes = auth.get_privkey_bytes();
-        if privkey_bytes.is_none() {
-            error_msg.set(Some("Signing key not available. Please re-authenticate.".to_string()));
             sending.set(false);
             message_input.set(content);
             return;
@@ -210,30 +190,17 @@ pub fn ChannelPage() -> impl IntoView {
             content: content.clone(),
         };
 
-        // Sign using k256 via nostr-core
-        let key_bytes = privkey_bytes.unwrap();
-        match k256::schnorr::SigningKey::from_bytes(&key_bytes) {
-            Ok(signing_key) => {
-                match nostr_core::sign_event(unsigned, &signing_key) {
-                    Ok(signed_event) => {
-                        relay_for_send.publish(&signed_event);
-                        sending.set(false);
-                    }
-                    Err(e) => {
-                        web_sys::console::error_1(
-                            &format!("[Channel] Failed to sign event: {}", e).into(),
-                        );
-                        error_msg.set(Some("Failed to sign message".to_string()));
-                        sending.set(false);
-                        message_input.set(content);
-                    }
-                }
+        // Sign via AuthStore — privkey bytes never leave the auth module
+        match auth.sign_event(unsigned) {
+            Ok(signed_event) => {
+                relay_for_send.publish(&signed_event);
+                sending.set(false);
             }
             Err(e) => {
                 web_sys::console::error_1(
-                    &format!("[Channel] Invalid signing key: {}", e).into(),
+                    &format!("[Channel] Signing failed: {}", e).into(),
                 );
-                error_msg.set(Some("Invalid signing key".to_string()));
+                error_msg.set(Some(e));
                 sending.set(false);
                 message_input.set(content);
             }

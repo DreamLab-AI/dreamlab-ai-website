@@ -62,15 +62,20 @@ pub struct UnsignedEvent {
 /// Compute the NIP-01 event ID: SHA-256 of the canonical JSON serialization.
 ///
 /// Canonical form: `[0, <pubkey>, <created_at>, <kind>, <tags>, <content>]`
+///
+/// Uses a tuple-of-references to serialize directly into the hasher, avoiding
+/// the intermediate `serde_json::Value` DOM tree that the `json!()` macro
+/// would create. This matters when verifying batches of 1K+ events: no
+/// intermediate heap allocations per event, no GC stutter in WASM.
 pub fn compute_event_id(event: &UnsignedEvent) -> [u8; 32] {
-    let canonical = serde_json::json!([
-        0,
-        event.pubkey,
+    let canonical = (
+        0u8,
+        &event.pubkey,
         event.created_at,
         event.kind,
-        event.tags,
-        event.content,
-    ]);
+        &event.tags,
+        &event.content,
+    );
     let serialized = serde_json::to_string(&canonical).expect("canonical JSON serialization");
     let mut hasher = Sha256::new();
     hasher.update(serialized.as_bytes());

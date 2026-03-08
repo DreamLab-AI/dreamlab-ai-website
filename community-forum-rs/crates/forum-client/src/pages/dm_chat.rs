@@ -13,7 +13,7 @@ use wasm_bindgen::JsCast;
 use crate::auth::use_auth;
 use crate::dm::{provide_dm_store, use_dm_store, DMMessage};
 use crate::relay::{ConnectionState, RelayConnection};
-use crate::utils::{arrow_left_svg, format_relative_time, pubkey_color, shorten_pubkey};
+use crate::utils::{arrow_left_svg, format_relative_time, pubkey_color, set_timeout_once, shorten_pubkey};
 
 /// DM chat view component for a single conversation.
 #[component]
@@ -67,16 +67,9 @@ pub fn DmChatPage() -> impl IntoView {
         let _count = messages.get().len();
         if let Some(container) = messages_container.get() {
             let el: web_sys::HtmlElement = container.into();
-            let cb = wasm_bindgen::closure::Closure::once(move || {
+            set_timeout_once(move || {
                 el.set_scroll_top(el.scroll_height());
-            });
-            if let Some(window) = web_sys::window() {
-                let _ = window.set_timeout_with_callback_and_timeout_and_arguments_0(
-                    cb.as_ref().unchecked_ref(),
-                    50,
-                );
-            }
-            cb.forget();
+            }, 50);
         }
     });
 

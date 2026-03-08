@@ -7,9 +7,7 @@ use std::collections::HashMap;
 use std::rc::Rc;
 
 use leptos::prelude::*;
-use nostr_core::{nip44_decrypt, nip44_encrypt, sign_event, NostrEvent, UnsignedEvent};
-
-use wasm_bindgen::JsCast;
+use nostr_core::{nip44_decrypt, nip44_encrypt, NostrEvent, UnsignedEvent};
 
 use crate::relay::{Filter, RelayConnection};
 use crate::utils::shorten_pubkey;
@@ -145,16 +143,10 @@ impl DMStore {
         let id = relay.subscribe(vec![sent_filter, recv_filter], on_event, Some(on_eose));
         self.sub_ids.update(|ids| ids.push(id));
 
-        // Timeout guard so the UI never gets stuck
-        let cb = wasm_bindgen::closure::Closure::once(move || {
+        // Timeout guard so the UI never gets stuck (auto-drops closure)
+        crate::utils::set_timeout_once(move || {
             if state.get_untracked().is_loading { state.update(|s| s.is_loading = false); }
-        });
-        if let Some(w) = web_sys::window() {
-            let _ = w.set_timeout_with_callback_and_timeout_and_arguments_0(
-                cb.as_ref().unchecked_ref(), 8000,
-            );
-        }
-        cb.forget();
+        }, 8000);
     }
 
     /// Subscribe to incoming DMs in real-time (new events only, since=now).
@@ -241,6 +233,10 @@ impl DMStore {
     }
 
     /// Encrypt and send a DM to the given recipient.
+    ///
+    /// The privkey bytes are used only for NIP-44 encryption (symmetric key
+    /// derivation). Signing is delegated to `AuthStore::sign_event()` so the
+    /// raw key bytes are confined to the auth module.
     pub fn send_message(
         &self,
         relay: &RelayConnection,
@@ -268,10 +264,9 @@ impl DMStore {
             content: encrypted,
         };
 
-        let signing_key = k256::schnorr::SigningKey::from_bytes(privkey_bytes)
-            .map_err(|e| format!("Invalid signing key: {e}"))?;
-        let signed = sign_event(unsigned, &signing_key)
-            .map_err(|e| format!("Signing failed: {e}"))?;
+        // Sign via AuthStore — privkey bytes stay inside the auth module
+        let auth = crate::auth::use_auth();
+        let signed = auth.sign_event(unsigned)?;
 
         // Optimistic local update
         let msg = DMMessage {

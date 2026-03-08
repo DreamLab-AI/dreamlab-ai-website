@@ -34,6 +34,10 @@ const MAX_EVENTS_PER_SECOND: usize = 10;
 const MAX_CONNECTIONS_PER_IP: u32 = 20;
 const MAX_SUBSCRIPTIONS: usize = 20;
 const MAX_QUERY_LIMIT: u32 = 1000;
+/// Idle timeout: evict DO from memory if no sessions for 60 seconds.
+/// Cloudflare bills per-wall-clock-second, so keeping an empty DO alive
+/// burns money for zero utility.
+const IDLE_TIMEOUT_MS: i64 = 60_000;
 
 // ---------------------------------------------------------------------------
 // NIP-01 filter type
@@ -309,6 +313,18 @@ impl DurableObject for NostrRelayDO {
         self.remove_session(&ws);
         Ok(())
     }
+
+    /// Alarm handler: if no sessions remain, clear in-memory state so the DO
+    /// can be evicted. If sessions exist (a new connection arrived during the
+    /// timeout window), the alarm is a no-op.
+    async fn alarm(&self) -> Result<Response> {
+        if self.sessions.borrow().is_empty() {
+            self.rate_limits.borrow_mut().clear();
+            self.connection_counts.borrow_mut().clear();
+            console_log!("[RelayDO] Idle timeout — cleared in-memory state for eviction");
+        }
+        Response::ok("ok")
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -344,7 +360,19 @@ impl NostrRelayDO {
                     counts.insert(ip, count - 1);
                 }
             }
+
+            // If no sessions remain, schedule an idle timeout alarm so the
+            // DO evicts itself and stops billing.
+            if self.sessions.borrow().is_empty() {
+                self.schedule_idle_alarm();
+            }
         }
+    }
+
+    /// Schedule an alarm to evict the DO if still idle after `IDLE_TIMEOUT_MS`.
+    fn schedule_idle_alarm(&self) {
+        let now = js_sys::Date::now() as i64;
+        let _ = self.state.storage().set_alarm(now + IDLE_TIMEOUT_MS);
     }
 }
 

@@ -1,6 +1,10 @@
 //! Shared utility functions used across forum-client components.
 
 use leptos::prelude::*;
+use std::cell::Cell;
+use std::rc::Rc;
+use wasm_bindgen::closure::Closure;
+use wasm_bindgen::JsCast;
 
 /// Format a UNIX timestamp as a human-readable relative time string.
 ///
@@ -87,4 +91,41 @@ pub fn capitalize(s: &str) -> String {
         None => String::new(),
         Some(c) => c.to_uppercase().collect::<String>() + chars.as_str(),
     }
+}
+
+/// Schedule a one-shot callback via `setTimeout` that properly drops the
+/// `Closure` after execution instead of leaking it with `.forget()`.
+///
+/// The standard pattern of `Closure::once` + `cb.forget()` intentionally leaks
+/// the closure into WASM linear memory so the JS runtime can invoke it. On a
+/// spotty mobile connection triggering reconnect loops, this accumulates leaked
+/// closures until the tab crashes.
+///
+/// This helper stores the `Closure` in an `Rc<Cell<Option<...>>>` and drops it
+/// from inside the callback itself, so the memory is reclaimed after execution.
+pub fn set_timeout_once<F: FnOnce() + 'static>(f: F, delay_ms: i32) {
+    // Shared slot: the closure is stored here so it can drop itself.
+    let slot: Rc<Cell<Option<Closure<dyn FnMut()>>>> = Rc::new(Cell::new(None));
+    let slot_clone = slot.clone();
+
+    // Wrap f in Option so we can .take() it from inside an FnMut closure.
+    let f_cell: Rc<Cell<Option<F>>> = Rc::new(Cell::new(Some(f)));
+
+    let closure = Closure::wrap(Box::new(move || {
+        if let Some(func) = f_cell.take() {
+            func();
+        }
+        // Drop the closure, reclaiming the WASM memory.
+        slot_clone.set(None);
+    }) as Box<dyn FnMut()>);
+
+    if let Some(window) = web_sys::window() {
+        let _ = window.set_timeout_with_callback_and_timeout_and_arguments_0(
+            closure.as_ref().unchecked_ref(),
+            delay_ms,
+        );
+    }
+
+    // Park the closure in the slot so it lives until the callback fires.
+    slot.set(Some(closure));
 }
