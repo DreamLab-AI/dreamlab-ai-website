@@ -4,6 +4,7 @@ use leptos::prelude::*;
 use leptos_router::components::A;
 
 use crate::app::base_href;
+use crate::stores::read_position::use_read_positions;
 use crate::utils::format_relative_time;
 
 /// Props for the ChannelCard component.
@@ -41,6 +42,10 @@ pub fn ChannelCard(channel: ChannelInfo) -> impl IntoView {
     let has_description = !description.is_empty();
     let section_badge_class = get_section_badge_class(&section);
 
+    // Unread badge from read-position store
+    let read_store = use_read_positions();
+    let unread = read_store.unread_count_signal(channel.id.clone());
+
     view! {
         <A href=href attr:class="block bg-gray-800 hover:bg-gray-750 border border-gray-700 hover:border-amber-500/30 rounded-lg transition-all duration-200 no-underline text-inherit hover:-translate-y-0.5 hover:shadow-lg hover:shadow-amber-500/5">
             <div class="p-4">
@@ -73,8 +78,16 @@ pub fn ChannelCard(channel: ChannelInfo) -> impl IntoView {
                                 })}
                             </div>
 
-                            // Stats
+                            // Stats + unread badge
                             <div class="flex flex-col items-end gap-1 flex-shrink-0">
+                                {move || {
+                                    let count = unread.get();
+                                    (count > 0).then(|| view! {
+                                        <span class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs font-bold text-gray-900 bg-amber-400 rounded-full">
+                                            {if count > 99 { "99+".to_string() } else { count.to_string() }}
+                                        </span>
+                                    })
+                                }}
                                 <span class="text-xs text-amber-400 bg-amber-500/10 rounded px-2 py-0.5 font-medium">
                                     {msg_count_label}
                                 </span>

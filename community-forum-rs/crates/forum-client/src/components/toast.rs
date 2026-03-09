@@ -152,7 +152,7 @@ pub(crate) fn ToastContainer() -> impl IntoView {
     let toasts = store.toasts;
 
     view! {
-        <div class="toast-container">
+        <div class="toast-container" role="alert" aria-live="polite" aria-atomic="false">
             <For
                 each=move || toasts.get()
                 key=|t| t.id
@@ -185,6 +185,7 @@ pub(crate) fn ToastContainer() -> impl IntoView {
                             <button
                                 class="text-gray-500 hover:text-gray-300 transition-colors flex-shrink-0"
                                 on:click=move |_| store.dismiss(id)
+                                aria-label="Dismiss notification"
                             >
                                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <line x1="18" y1="6" x2="6" y2="18" stroke-linecap="round"/>

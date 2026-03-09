@@ -17,7 +17,13 @@ use crate::components::notification_bell::{provide_notifications, NotificationBe
 use crate::components::profile_modal::ProfileModal;
 use crate::components::session_timeout::SessionTimeout;
 use crate::components::toast::{provide_toasts, ToastContainer};
+use crate::components::fx::provide_render_tier;
 use crate::components::user_display::provide_name_cache;
+use crate::components::screen_reader::{provide_announcer, ScreenReaderAnnouncer};
+use crate::stores::mute::provide_mute_store;
+use crate::stores::preferences::provide_preferences;
+use crate::stores::read_position::provide_read_positions;
+use crate::stores::zone_access::provide_zone_access;
 use crate::pages::{
     AdminPage, CategoryPage, ChannelPage, ChatPage, DmChatPage, DmListPage, EventsPage, ForumsPage,
     HomePage, LoginPage, NoteViewPage, PendingPage, SectionPage, SettingsPage, SetupPage,
@@ -181,14 +187,21 @@ fn redirect_spinner() -> impl IntoView {
 #[component]
 pub fn App() -> impl IntoView {
     provide_auth();
+    provide_zone_access();
+    provide_render_tier();
 
     // Provide global context stores
     provide_toasts();
     provide_notifications();
+    crate::stores::notifications::provide_notification_store();
     provide_bookmarks();
     provide_unread_dm_count();
     provide_name_cache();
     provide_profile_modal_target();
+    provide_read_positions();
+    provide_mute_store();
+    provide_preferences();
+    provide_announcer();
 
     // Provide relay connection as context — connect/disconnect reactively with auth state
     let relay = RelayConnection::new();
@@ -339,6 +352,17 @@ fn Layout(children: Children) -> impl IntoView {
 
     view! {
         <div class="min-h-screen bg-gray-900 text-white flex flex-col">
+            // Skip navigation link
+            <a
+                href="#main-content"
+                class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:bg-amber-500 focus:text-gray-900 focus:rounded-lg focus:font-semibold focus:text-sm"
+            >
+                "Skip to main content"
+            </a>
+
+            // Screen reader announcer
+            <ScreenReaderAnnouncer />
+
             // Header
             <header class="border-b border-gray-800/50 bg-gray-900/80 backdrop-blur-md sticky top-0 z-50">
                 <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -470,7 +494,7 @@ fn Layout(children: Children) -> impl IntoView {
                 </Show>
             </header>
 
-            <main class="flex-1">
+            <main id="main-content" class="flex-1" role="main">
                 {children()}
             </main>
 

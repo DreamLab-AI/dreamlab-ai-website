@@ -14,6 +14,7 @@ use crate::app::base_href;
 use crate::components::breadcrumb::{Breadcrumb, BreadcrumbItem};
 use crate::components::empty_state::EmptyState;
 use crate::components::section_card::SectionCard;
+use crate::components::zone_hero::ZoneHero;
 use crate::relay::{ConnectionState, Filter, RelayConnection};
 use crate::utils::{capitalize, set_timeout_once};
 
@@ -185,41 +186,43 @@ pub fn CategoryPage() -> impl IntoView {
 
     let display_name = move || capitalize(&category_slug());
 
-    // Accent color derived from category name
-    let accent_class = move || {
+    // Map category slug to zone level for ZoneHero
+    let zone_level = move || -> u8 {
         let slug = category_slug().to_lowercase();
-        if slug.contains("lobby") || slug.contains("general") {
-            "from-amber-500/20 to-orange-500/10"
-        } else if slug.contains("common") || slug.contains("community") {
-            "from-blue-500/20 to-cyan-500/10"
-        } else if slug.contains("deep") || slug.contains("tech") {
-            "from-purple-500/20 to-indigo-500/10"
-        } else if slug.contains("inner") || slug.contains("sanctum") {
-            "from-emerald-500/20 to-teal-500/10"
+        if slug.contains("lobby") || slug.contains("public") || slug.contains("general") {
+            0
+        } else if slug.contains("common") || slug.contains("community") || slug.contains("registered") {
+            1
+        } else if slug.contains("deep") || slug.contains("tech") || slug.contains("cohort") {
+            2
+        } else if slug.contains("inner") || slug.contains("sanctum") || slug.contains("private") {
+            3
         } else {
-            "from-amber-500/20 to-orange-500/10"
+            0
+        }
+    };
+
+    // Icon path data per zone
+    let zone_icon = move || -> &'static str {
+        match zone_level() {
+            0 => "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6",
+            1 => "M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z",
+            2 => "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4",
+            _ => "M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z",
         }
     };
 
     view! {
         <div class="max-w-5xl mx-auto p-4 sm:p-6">
-            // Hero section
-            <div class=move || format!(
-                "relative mb-8 py-12 px-6 rounded-2xl overflow-hidden bg-gradient-to-br {} aurora-shimmer",
-                accent_class()
-            )>
-                <div class="ambient-orb ambient-orb-1" aria-hidden="true"></div>
-                <div class="ambient-orb ambient-orb-3" aria-hidden="true"></div>
-                <div class="absolute inset-0 mesh-bg opacity-30"></div>
-                <div class="relative z-10">
-                    <h1 class="text-3xl sm:text-4xl font-bold text-white mb-2">
-                        {display_name}
-                    </h1>
-                    <p class="text-gray-300 text-lg">
-                        "Browse sections and start a discussion"
-                    </p>
-                </div>
-            </div>
+            // Zone hero banner
+            {move || view! {
+                <ZoneHero
+                    title=display_name()
+                    description="Browse sections and start a discussion".to_string()
+                    zone=zone_level()
+                    icon=zone_icon()
+                />
+            }}
 
             <Breadcrumb items=vec![
                 BreadcrumbItem::link("Home", "/"),

@@ -8,6 +8,9 @@ pub mod channel_card;
 pub mod message_bubble;
 pub mod particle_canvas;
 
+// -- Visual effects (WebGPU / Canvas2D / CSS fallback) -----------------------
+pub mod fx;
+
 // -- Core UI (Stream 1) ------------------------------------------------------
 pub mod avatar;
 pub mod badge;
@@ -40,11 +43,45 @@ pub mod category_card;
 pub mod section_card;
 
 // -- Calendar/Events (Stream 6) ----------------------------------------------
+pub mod create_event_modal;
 pub mod event_card;
 pub mod mini_calendar;
+pub mod notification_center;
+pub mod rsvp_buttons;
 
 // -- Search + DM Enhancement (Stream 8) --------------------------------------
 pub mod bookmarks_modal;
 pub mod global_search;
 pub mod image_upload;
 pub mod virtual_list;
+
+// -- Social Features (Stream 9) ----------------------------------------------
+pub mod draft_indicator;
+pub mod export_modal;
+pub mod join_request;
+pub mod pinned_messages;
+
+// -- Zone Access (Stream 10) -------------------------------------------------
+pub mod access_denied;
+pub mod section_request;
+
+// -- Board Stats (Stream 13) ------------------------------------------------
+pub mod board_stats;
+pub mod top_posters;
+pub mod activity_graph;
+pub mod welcome_modal;
+pub mod moderator_team;
+pub mod todays_activity;
+
+// -- PWA / Offline (Stream 12) -----------------------------------------------
+pub mod offline_banner;
+
+// -- Accessibility & Polish (Stream 11) --------------------------------------
+pub mod nsec_backup;
+pub mod screen_reader;
+pub mod swipeable_message;
+
+// -- Integration (Stream 14) ------------------------------------------------
+pub mod mark_all_read;
+pub mod zone_hero;
+pub mod channel_stats;

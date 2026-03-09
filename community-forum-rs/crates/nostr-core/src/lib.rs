@@ -9,8 +9,11 @@
 //! - **Key management** including HKDF derivation from WebAuthn PRF output
 //! - **Value types** (`EventId`, `Timestamp`, `Tag`, etc.)
 
+pub mod calendar;
+pub mod deletion;
 pub mod event;
 pub mod gift_wrap;
+pub mod groups;
 pub mod keys;
 pub mod nip44;
 pub mod nip98;
@@ -33,3 +36,7 @@ pub use nip98::{
     verify_token_at as verify_nip98_token_at, Nip98Token as VerifiedToken,
 };
 pub use types::{EventId, Tag, Timestamp};
+
+pub use calendar::{
+    create_calendar_event, create_rsvp, CalendarError, RsvpStatus,
+};

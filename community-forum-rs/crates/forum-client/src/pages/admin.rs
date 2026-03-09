@@ -9,8 +9,10 @@ use leptos_router::NavigateOptions;
 use wasm_bindgen::JsCast;
 use wasm_bindgen_futures::spawn_local;
 
+use crate::admin::calendar::AdminCalendar;
 use crate::admin::channel_form::{ChannelForm, ChannelFormData};
 use crate::admin::overview::{ConnectionStatusBar, OverviewTab};
+use crate::admin::section_requests::SectionRequests;
 use crate::admin::user_table::{UpdateCohortsCb, UserTable};
 use crate::admin::{provide_admin, use_admin, AdminStore, AdminTab};
 use crate::auth::use_auth;
@@ -180,6 +182,8 @@ fn AdminPanelInner() -> impl IntoView {
                 <TabButton tab=AdminTab::Overview active=active_tab label="Overview" />
                 <TabButton tab=AdminTab::Channels active=active_tab label="Channels" />
                 <TabButton tab=AdminTab::Users active=active_tab label="Users" />
+                <TabButton tab=AdminTab::Sections active=active_tab label="Sections" />
+                <TabButton tab=AdminTab::Calendar active=active_tab label="Calendar" />
             </div>
 
             // Tab content
@@ -188,6 +192,8 @@ fn AdminPanelInner() -> impl IntoView {
                     AdminTab::Overview => view! { <OverviewTab /> }.into_any(),
                     AdminTab::Channels => view! { <ChannelsTab /> }.into_any(),
                     AdminTab::Users => view! { <UsersTab /> }.into_any(),
+                    AdminTab::Sections => view! { <SectionRequests /> }.into_any(),
+                    AdminTab::Calendar => view! { <AdminCalendar /> }.into_any(),
                 }
             }}
         </div>
@@ -226,10 +232,12 @@ fn ChannelsTab() -> impl IntoView {
     let admin_for_create = admin.clone();
     let on_create_channel = move |data: ChannelFormData| {
         if let Some(privkey) = auth.get_privkey_bytes() {
-            if let Err(e) = admin_for_create.create_channel(
+            if let Err(e) = admin_for_create.create_channel_with_zone(
                 &data.name,
                 &data.description,
                 &data.section,
+                data.zone,
+                data.cohort.as_deref(),
                 &privkey,
             ) {
                 admin_for_create.state.error.set(Some(e));

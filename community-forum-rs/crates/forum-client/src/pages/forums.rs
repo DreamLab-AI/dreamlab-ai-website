@@ -23,6 +23,8 @@ struct Zone {
     description: &'static str,
     icon: &'static str,
     accent: &'static str,
+    /// Access level: 0=Public, 1=Registered, 2=Cohort, 3=Private
+    access_level: u8,
 }
 
 const ZONES: &[Zone] = &[
@@ -32,6 +34,7 @@ const ZONES: &[Zone] = &[
         description: "Open discussions visible to all",
         icon: "globe",
         accent: "amber",
+        access_level: 0,
     },
     Zone {
         id: "common-room",
@@ -39,6 +42,7 @@ const ZONES: &[Zone] = &[
         description: "Community conversations and networking",
         icon: "users",
         accent: "blue",
+        access_level: 1,
     },
     Zone {
         id: "deep-dives",
@@ -46,6 +50,7 @@ const ZONES: &[Zone] = &[
         description: "Technical deep-dives and learning",
         icon: "code",
         accent: "purple",
+        access_level: 2,
     },
     Zone {
         id: "inner-sanctum",
@@ -53,6 +58,7 @@ const ZONES: &[Zone] = &[
         description: "Exclusive members-only discussions",
         icon: "shield",
         accent: "emerald",
+        access_level: 3,
     },
 ];
 
@@ -184,6 +190,7 @@ pub fn ForumsPage() -> impl IntoView {
                         let zone_desc = zone.description;
                         let accent = zone.accent;
                         let icon = zone.icon;
+                        let al = zone.access_level;
                         let has_cats = !cats.is_empty();
 
                         view! {
@@ -191,7 +198,24 @@ pub fn ForumsPage() -> impl IntoView {
                                 <div class="flex items-center gap-3 mb-4">
                                     <ZoneIcon icon=icon accent=accent/>
                                     <div>
-                                        <h2 class="text-xl font-bold text-white">{zone_name}</h2>
+                                        <div class="flex items-center gap-2">
+                                            <h2 class="text-xl font-bold text-white">{zone_name}</h2>
+                                            {(al > 0).then(|| {
+                                                let badge = crate::stores::zone_access::Zone::from_tag(&al.to_string());
+                                                view! {
+                                                    <span class=format!(
+                                                        "inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider border rounded-full px-2 py-0.5 {}",
+                                                        badge.badge_class()
+                                                    )>
+                                                        <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                            <rect x="3" y="11" width="18" height="11" rx="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                            <path d="M7 11V7a5 5 0 0110 0v4" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        </svg>
+                                                        {badge.label()}
+                                                    </span>
+                                                }
+                                            })}
+                                        </div>
                                         <p class="text-sm text-gray-500">{zone_desc}</p>
                                     </div>
                                 </div>

@@ -9,10 +9,13 @@ use std::rc::Rc;
 use crate::app::base_href;
 use crate::auth::use_auth;
 use crate::components::badge::{Badge, BadgeVariant};
+use crate::components::channel_stats::ChannelStats;
 use crate::components::message_bubble::{MessageBubble, MessageData};
 use crate::components::message_input::MessageInput;
+use crate::components::pinned_messages::{PinnedMessage, PinnedMessages};
 use crate::components::typing_indicator::TypingIndicator;
 use crate::relay::{ConnectionState, Filter, RelayConnection};
+use crate::stores::read_position::use_read_positions;
 use crate::utils::{arrow_left_svg, set_timeout_once};
 
 /// Parsed channel metadata from the kind 40 event.
@@ -32,11 +35,27 @@ pub fn ChannelPage() -> impl IntoView {
     let params = use_params_map();
     let channel_id = move || params.read().get("channel_id").unwrap_or_default();
 
+    // Read-position store for mark-as-read
+    let read_store = use_read_positions();
+
     // State
     let messages = RwSignal::new(Vec::<MessageData>::new());
     let channel_info: RwSignal<Option<ChannelHeader>> = RwSignal::new(None);
+    let pinned = RwSignal::new(Vec::<PinnedMessage>::new());
     let loading = RwSignal::new(true);
+    let last_read_event_id = read_store.last_read_event_id(&channel_id());
     let error_msg: RwSignal<Option<String>> = RwSignal::new(None);
+
+    // Derived signals for ChannelStats
+    let message_count = Signal::derive(move || messages.get().len() as u32);
+    let member_count = Signal::derive(move || {
+        let msgs = messages.get();
+        let mut unique = std::collections::HashSet::new();
+        for m in &msgs {
+            unique.insert(m.pubkey.as_str());
+        }
+        unique.len() as u32
+    });
     let typing_pubkeys = RwSignal::new(Vec::<String>::new());
     let messages_container = NodeRef::<leptos::html::Div>::new();
 
@@ -146,9 +165,10 @@ pub fn ChannelPage() -> impl IntoView {
         );
     });
 
-    // Auto-scroll to bottom when new messages arrive
+    // Auto-scroll to bottom when new messages arrive + mark as read
     Effect::new(move |_| {
-        let _count = messages.get().len();
+        let msgs = messages.get();
+        let count = msgs.len();
         if let Some(container) = messages_container.get() {
             let el: web_sys::HtmlElement = container.into();
             set_timeout_once(
@@ -157,6 +177,13 @@ pub fn ChannelPage() -> impl IntoView {
                 },
                 50,
             );
+        }
+        // Mark channel as read when messages load or new ones arrive
+        if count > 0 {
+            if let Some(last) = msgs.last() {
+                let cid = channel_id();
+                read_store.mark_read(&cid, &last.id, last.created_at);
+            }
         }
     });
 
@@ -184,13 +211,14 @@ pub fn ChannelPage() -> impl IntoView {
         }
 
         let now = (js_sys::Date::now() / 1000.0) as u64;
+        let content_for_index = content.clone();
         let unsigned = nostr_core::UnsignedEvent {
             pubkey: pubkey.clone(),
             created_at: now,
             kind: 42,
             tags: vec![vec![
                 "e".to_string(),
-                cid,
+                cid.clone(),
                 String::new(),
                 "root".to_string(),
             ]],
@@ -200,7 +228,23 @@ pub fn ChannelPage() -> impl IntoView {
         let relay = expect_context::<RelayConnection>();
         match auth.sign_event(unsigned) {
             Ok(signed) => {
+                let event_id = signed.id.clone();
                 relay.publish(&signed);
+
+                // Auto-index for semantic search in background
+                let channel_for_index = cid;
+                let privkey_bytes = auth.get_privkey_bytes();
+                wasm_bindgen_futures::spawn_local(async move {
+                    if let Some(key) = privkey_bytes {
+                        let _ = crate::utils::search_client::ingest_message(
+                            &event_id,
+                            &content_for_index,
+                            Some(&channel_for_index),
+                            &key,
+                        )
+                        .await;
+                    }
+                });
             }
             Err(e) => {
                 error_msg.set(Some(e));
@@ -261,9 +305,10 @@ pub fn ChannelPage() -> impl IntoView {
                             })
                         }}
                         <div class="flex items-center gap-2 mt-1 ml-14">
-                            {move || view! {
-                                <Badge text=format!("{} messages", messages.get().len()) variant=BadgeVariant::Ghost />
-                            }}
+                            <ChannelStats
+                                message_count=message_count
+                                member_count=member_count
+                            />
                             // Connection indicator
                             {move || {
                                 let state = conn_state.get();
@@ -311,6 +356,12 @@ pub fn ChannelPage() -> impl IntoView {
                 <div class="sticky top-0 left-0 right-0 h-6 bg-gradient-to-b from-gray-900 to-transparent z-10 pointer-events-none"></div>
 
                 <div class="max-w-4xl mx-auto px-4 pb-4">
+                    // Pinned messages banner
+                    {
+                        let cid = channel_id();
+                        view! { <PinnedMessages channel_id=cid pinned=pinned /> }
+                    }
+
                     {move || {
                         if loading.get() {
                             view! {
@@ -337,10 +388,32 @@ pub fn ChannelPage() -> impl IntoView {
                                     </div>
                                 }.into_any()
                             } else {
+                                let last_read = last_read_event_id.clone();
+                                let mut found_divider = false;
                                 view! {
                                     <div class="space-y-1">
                                         {msgs.into_iter().map(|msg| {
-                                            view! { <MessageBubble message=msg/> }
+                                            let show_divider = if !found_divider && !last_read.is_empty() && msg.id == last_read {
+                                                found_divider = true;
+                                                false
+                                            } else if found_divider {
+                                                found_divider = false;
+                                                true
+                                            } else {
+                                                false
+                                            };
+                                            view! {
+                                                <>
+                                                    {show_divider.then(|| view! {
+                                                        <div class="flex items-center gap-3 py-2">
+                                                            <div class="flex-1 h-px bg-amber-500/30"></div>
+                                                            <span class="text-xs font-medium text-amber-400">"New messages"</span>
+                                                            <div class="flex-1 h-px bg-amber-500/30"></div>
+                                                        </div>
+                                                    })}
+                                                    <MessageBubble message=msg/>
+                                                </>
+                                            }
                                         }).collect_view()}
                                     </div>
                                 }.into_any()
@@ -355,7 +428,7 @@ pub fn ChannelPage() -> impl IntoView {
                 <div class="bg-gray-800 border-t border-gray-700 p-3">
                     <div class="max-w-4xl mx-auto">
                         <TypingIndicator typing_pubkeys=typing_pubkeys />
-                        <MessageInput on_send=Callback::new(do_send_text) />
+                        <MessageInput on_send=Callback::new(do_send_text) channel_id=channel_id() />
                     </div>
                 </div>
             </Show>

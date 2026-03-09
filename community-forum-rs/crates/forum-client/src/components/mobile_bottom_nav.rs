@@ -80,7 +80,7 @@ pub(crate) fn MobileBottomNav() -> impl IntoView {
 
     view! {
         <Show when=move || is_authed.get()>
-            <nav class="mobile-bottom-nav">
+            <nav class="mobile-bottom-nav" role="navigation" aria-label="Mobile navigation">
                 // Home
                 <A href=base_href("/") attr:class=item_class("/")>
                     <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">

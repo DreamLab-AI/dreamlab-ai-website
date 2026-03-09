@@ -70,6 +70,34 @@ web-sys = { workspace = true, features = [
     "ScrollToOptions",
     "Event",
     "Clipboard",
+    # IndexedDB (offline-first persistence)
+    "IdbFactory",
+    "IdbDatabase",
+    "IdbObjectStore",
+    "IdbObjectStoreParameters",
+    "IdbOpenDbRequest",
+    "IdbRequest",
+    "IdbTransaction",
+    "IdbTransactionMode",
+    "IdbIndex",
+    "IdbKeyRange",
+    "IdbCursorDirection",
+    "DomStringList",
+    # Storage quota
+    "StorageManager",
+    # Service worker registration
+    "ServiceWorkerContainer",
+    # Pointer events (swipe gestures)
+    "PointerEvent",
+    # NodeList (focus trap)
+    "NodeList",
+    # Image compression + encrypted media
+    "ImageBitmap",
+    "BlobPropertyBag",
+    "Crypto",
+    "SubtleCrypto",
+    "CryptoKey",
+    "Url",
 ] }
 gloo = { workspace = true }
 comrak = { workspace = true }

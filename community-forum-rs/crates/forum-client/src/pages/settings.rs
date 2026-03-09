@@ -12,6 +12,9 @@ use crate::auth::use_auth;
 use crate::components::confirm_dialog::{ConfirmDialog, ConfirmVariant};
 use crate::components::toast::{use_toasts, ToastVariant};
 use crate::relay::RelayConnection;
+use crate::stores::preferences::{
+    save_preferences, use_preferences, NotificationLevel, Theme,
+};
 use crate::utils::shorten_pubkey;
 
 /// Key used to persist muted pubkeys in localStorage.
@@ -65,6 +68,7 @@ pub fn SettingsPage() -> impl IntoView {
     let nickname = RwSignal::new(auth.nickname().get_untracked().unwrap_or_default());
     let about = RwSignal::new(String::new());
     let avatar_url = RwSignal::new(String::new());
+    let birthday = RwSignal::new(String::new()); // "MM-DD" format
     let profile_saving = RwSignal::new(false);
 
     // Muted users
@@ -116,6 +120,10 @@ pub fn SettingsPage() -> impl IntoView {
         let pic = avatar_url.get_untracked().trim().to_string();
         if !pic.is_empty() {
             metadata.insert("picture".into(), serde_json::Value::String(pic));
+        }
+        let bday = birthday.get_untracked().trim().to_string();
+        if !bday.is_empty() {
+            metadata.insert("birthday".into(), serde_json::Value::String(bday));
         }
 
         let content =
@@ -236,6 +244,18 @@ pub fn SettingsPage() -> impl IntoView {
                                 class="w-full bg-gray-800 border border-gray-600 focus:border-amber-500 rounded-lg px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-amber-500 transition-colors"
                             />
                         </div>
+                        <div class="space-y-1">
+                            <label class="block text-sm font-medium text-gray-300">"Birthday"</label>
+                            <input
+                                type="text"
+                                prop:value=move || birthday.get()
+                                on:input=move |ev| birthday.set(event_target_value(&ev))
+                                placeholder="MM-DD (e.g. 03-15)"
+                                maxlength="5"
+                                class="w-full bg-gray-800 border border-gray-600 focus:border-amber-500 rounded-lg px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-amber-500 transition-colors"
+                            />
+                            <p class="text-xs text-gray-500">"Shown on the Events birthday calendar"</p>
+                        </div>
                     </div>
 
                     <button
@@ -324,14 +344,148 @@ pub fn SettingsPage() -> impl IntoView {
                     </button>
                 </div>
 
-                // -- Section 4: Appearance (placeholder) --
-                <div class="glass-card p-6 space-y-4 opacity-60">
+                // -- Section 4: Appearance --
+                <div class="glass-card p-6 space-y-4">
                     <h2 class="text-lg font-semibold text-white flex items-center gap-2">
                         {palette_icon()}
                         "Appearance"
                     </h2>
                     <div class="border-t border-gray-700/50"></div>
-                    <p class="text-gray-500 text-sm">"Theme and appearance settings coming soon."</p>
+
+                    // Theme selector
+                    <div class="space-y-2">
+                        <span class="text-sm font-medium text-gray-300">"Theme"</span>
+                        <div class="flex gap-2" role="radiogroup" aria-label="Theme selection">
+                            {[Theme::Dark, Theme::Light, Theme::System].into_iter().map(|t| {
+                                let label = t.label();
+                                let theme_for_class = t.clone();
+                                let theme_for_aria = t.clone();
+                                let theme_for_click = t.clone();
+                                view! {
+                                    <button
+                                        class=move || {
+                                            let prefs = use_preferences();
+                                            if prefs.get().theme == theme_for_class {
+                                                "px-4 py-2 rounded-full text-sm font-medium bg-amber-500/20 text-amber-400 border border-amber-500/30 transition-colors"
+                                            } else {
+                                                "px-4 py-2 rounded-full text-sm font-medium text-gray-400 hover:text-white bg-gray-800/50 border border-gray-700 hover:border-gray-600 transition-colors"
+                                            }
+                                        }
+                                        on:click={
+                                            let t = theme_for_click.clone();
+                                            move |_| {
+                                                let prefs = use_preferences();
+                                                prefs.update(|p| p.theme = t.clone());
+                                                save_preferences(&prefs.get_untracked());
+                                            }
+                                        }
+                                        role="radio"
+                                        aria-checked=move || {
+                                            let prefs = use_preferences();
+                                            (prefs.get().theme == theme_for_aria).to_string()
+                                        }
+                                    >
+                                        {label}
+                                    </button>
+                                }
+                            }).collect_view()}
+                        </div>
+                    </div>
+
+                    // Reduced motion toggle
+                    <label class="flex items-center justify-between cursor-pointer">
+                        <span class="text-sm text-gray-300">"Reduced motion"</span>
+                        <input
+                            type="checkbox"
+                            prop:checked=move || use_preferences().get().reduced_motion
+                            on:change=move |_| {
+                                let prefs = use_preferences();
+                                prefs.update(|p| p.reduced_motion = !p.reduced_motion);
+                                save_preferences(&prefs.get_untracked());
+                            }
+                            class="rounded border-gray-600 bg-gray-900 text-amber-500 focus:ring-amber-500"
+                        />
+                    </label>
+                </div>
+
+                // -- Section 4b: Notifications --
+                <div class="glass-card p-6 space-y-4">
+                    <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+                        {bell_icon()}
+                        "Notifications"
+                    </h2>
+                    <div class="border-t border-gray-700/50"></div>
+
+                    <div class="space-y-2">
+                        <span class="text-sm font-medium text-gray-300">"Notification level"</span>
+                        <select
+                            class="w-full bg-gray-800 border border-gray-600 focus:border-amber-500 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-1 focus:ring-amber-500 transition-colors text-sm"
+                            on:change=move |ev| {
+                                let val = event_target_value(&ev);
+                                let level = match val.as_str() {
+                                    "MentionsOnly" => NotificationLevel::MentionsOnly,
+                                    "None" => NotificationLevel::None,
+                                    _ => NotificationLevel::All,
+                                };
+                                let prefs = use_preferences();
+                                prefs.update(|p| p.notification_level = level);
+                                save_preferences(&prefs.get_untracked());
+                            }
+                            aria-label="Notification level"
+                        >
+                            {NotificationLevel::all_variants().iter().map(|level| {
+                                let val = format!("{:?}", level);
+                                let label = level.label();
+                                let level_cmp = level.clone();
+                                view! {
+                                    <option
+                                        value=val.clone()
+                                        selected=move || use_preferences().get().notification_level == level_cmp
+                                    >
+                                        {label}
+                                    </option>
+                                }
+                            }).collect_view()}
+                        </select>
+                    </div>
+                </div>
+
+                // -- Section 4c: Content --
+                <div class="glass-card p-6 space-y-4">
+                    <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+                        {content_icon()}
+                        "Content"
+                    </h2>
+                    <div class="border-t border-gray-700/50"></div>
+
+                    <div class="space-y-3">
+                        <label class="flex items-center justify-between cursor-pointer">
+                            <span class="text-sm text-gray-300">"Show link previews"</span>
+                            <input
+                                type="checkbox"
+                                prop:checked=move || use_preferences().get().show_link_previews
+                                on:change=move |_| {
+                                    let prefs = use_preferences();
+                                    prefs.update(|p| p.show_link_previews = !p.show_link_previews);
+                                    save_preferences(&prefs.get_untracked());
+                                }
+                                class="rounded border-gray-600 bg-gray-900 text-amber-500 focus:ring-amber-500"
+                            />
+                        </label>
+                        <label class="flex items-center justify-between cursor-pointer">
+                            <span class="text-sm text-gray-300">"Compact messages"</span>
+                            <input
+                                type="checkbox"
+                                prop:checked=move || use_preferences().get().compact_messages
+                                on:change=move |_| {
+                                    let prefs = use_preferences();
+                                    prefs.update(|p| p.compact_messages = !p.compact_messages);
+                                    save_preferences(&prefs.get_untracked());
+                                }
+                                class="rounded border-gray-600 bg-gray-900 text-amber-500 focus:ring-amber-500"
+                            />
+                        </label>
+                    </div>
                 </div>
 
                 // -- Section 5: Account --
@@ -410,4 +564,10 @@ fn palette_icon() -> impl IntoView {
 }
 fn key_icon() -> impl IntoView {
     section_icon("M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4")
+}
+fn bell_icon() -> impl IntoView {
+    section_icon("M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0")
+}
+fn content_icon() -> impl IntoView {
+    section_icon("M4 6h16M4 12h16M4 18h7")
 }

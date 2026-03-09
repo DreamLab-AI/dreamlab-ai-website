@@ -2,6 +2,8 @@
 //! to the pod-api. Glass card with dashed amber border.
 
 use crate::auth::use_auth;
+use crate::utils::image_compress::{compress_image_default, generate_thumbnail};
+use crate::utils::pod_client::upload_image_with_thumbnail;
 use leptos::prelude::*;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
@@ -17,6 +19,7 @@ const MAX_SIZE: u64 = 5 * 1024 * 1024;
 enum State {
     Idle,
     Preview { data_url: String, name: String },
+    Compressing,
     Uploading,
     Ok(String),
     Err(String),
@@ -123,63 +126,46 @@ pub(crate) fn ImageUpload(
                 return;
             }
         };
-        state.set(State::Uploading);
-        let url = format!("{}/pods/{}/media/public/{}", POD_API, pk, file.name());
-        let reader = match web_sys::FileReader::new() {
-            Ok(r) => r,
-            Err(_) => {
-                state.set(State::Err("FileReader unavailable".into()));
+        let privkey = match auth.get_privkey_bytes() {
+            Some(k) => k,
+            None => {
+                state.set(State::Err("No signing key".into()));
                 return;
             }
         };
-        let s = state;
-        let auth_s = auth;
-        let u = url.clone();
+        state.set(State::Compressing);
+        let fname = file.name();
         let cb = on_upload;
-        let onload = Closure::wrap(Box::new(move |ev: web_sys::Event| {
-            let r: web_sys::FileReader = ev.target().unwrap().unchecked_into();
-            let buf = match r.result() {
+        wasm_bindgen_futures::spawn_local(async move {
+            // Compress image
+            let compressed = match compress_image_default(&file).await {
                 Ok(b) => b,
-                Err(_) => {
-                    s.set(State::Err("Read failed".into()));
+                Err(e) => {
+                    state.set(State::Err(format!("Compression failed: {e}")));
                     return;
                 }
             };
-            let bytes: Vec<u8> = js_sys::Uint8Array::new(&buf).to_vec();
-            let privkey = match auth_s.get_privkey_bytes() {
-                Some(k) => k,
-                None => {
-                    s.set(State::Err("No signing key".into()));
+            // Generate thumbnail
+            let thumbnail = match generate_thumbnail(&file).await {
+                Ok(b) => b,
+                Err(e) => {
+                    state.set(State::Err(format!("Thumbnail failed: {e}")));
                     return;
                 }
             };
-            let token =
-                match crate::auth::nip98::create_nip98_token(&privkey, &u, "POST", Some(&bytes)) {
-                    Ok(t) => t,
-                    Err(e) => {
-                        s.set(State::Err(format!("Auth error: {}", e)));
-                        return;
-                    }
-                };
-            let auth_hdr = format!("Nostr {}", token);
-            let url_c = u.clone();
-            let ss = s;
-            let cbc = cb;
-            wasm_bindgen_futures::spawn_local(async move {
-                match upload_bytes(&url_c, &bytes, &auth_hdr).await {
-                    Ok(ru) => {
-                        ss.set(State::Ok(ru.clone()));
-                        cbc.run(ru);
-                    }
-                    Err(e) => {
-                        ss.set(State::Err(e));
-                    }
+            state.set(State::Uploading);
+            // Upload both to pod
+            match upload_image_with_thumbnail(&compressed, &thumbnail, &fname, &pk, &privkey).await
+            {
+                Ok((image_url, _thumb_url)) => {
+                    state.set(State::Ok(image_url.clone()));
+                    cb.run(image_url);
                 }
-            });
-        }) as Box<dyn FnMut(web_sys::Event)>);
-        reader.set_onload(Some(onload.as_ref().unchecked_ref()));
-        let _ = reader.read_as_array_buffer(&file);
-        onload.forget();
+                Err(e) => {
+                    state.set(State::Err(e));
+                }
+            }
+        });
     };
 
     let on_clear = move |_| {
@@ -226,10 +212,18 @@ pub(crate) fn ImageUpload(
                         </div>
                     </div>
                 }.into_any() },
+                State::Compressing => view! {
+                    <div class="flex flex-col items-center justify-center py-8 gap-3">
+                        <div class="w-full max-w-xs h-2 bg-gray-700/50 rounded-full overflow-hidden mx-auto">
+                            <div class="h-full w-full bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 rounded-full animate-pulse"></div>
+                        </div>
+                        <p class="text-sm text-gray-400">"Compressing..."</p>
+                    </div>
+                }.into_any(),
                 State::Uploading => view! {
                     <div class="flex flex-col items-center justify-center py-8 gap-3">
-                        <div class="animate-pulse w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center">
-                            <div class="animate-spin w-6 h-6 border-2 border-amber-400 border-t-transparent rounded-full"></div>
+                        <div class="w-full max-w-xs h-2 bg-gray-700/50 rounded-full overflow-hidden mx-auto">
+                            <div class="h-full w-full bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 rounded-full animate-pulse"></div>
                         </div>
                         <p class="text-sm text-gray-400">"Uploading..."</p>
                     </div>

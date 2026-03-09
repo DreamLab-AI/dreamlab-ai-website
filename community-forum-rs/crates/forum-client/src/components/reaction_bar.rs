@@ -3,6 +3,7 @@
 use leptos::prelude::*;
 
 use crate::auth::use_auth;
+use crate::components::fx::reaction_burst::ReactionBurst;
 use crate::relay::RelayConnection;
 
 /// Common reaction emojis offered in the picker.
@@ -146,27 +147,47 @@ pub(crate) fn ReactionBar(
                 {
                     let emoji = reaction.emoji.clone();
                     let emoji_for_click = emoji.clone();
+                    let emoji_for_burst = emoji.clone();
                     let toggle = toggle_reaction;
+                    let burst_trigger = RwSignal::new(false);
                     view! {
-                        <button
-                            class=move || {
-                                let r = reactions.get().iter().find(|r| r.emoji == emoji).cloned();
-                                let is_mine = r.as_ref().map(|r| r.reacted_by_me).unwrap_or(false);
-                                if is_mine {
-                                    "reaction-burst is-active inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-amber-500/15 border border-amber-500/30 hover:bg-amber-500/25 transition-colors cursor-pointer"
-                                } else {
-                                    "reaction-burst inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-gray-700/50 border border-gray-600/50 hover:bg-gray-600/50 transition-colors cursor-pointer"
+                        <div class="relative inline-flex">
+                            <button
+                                class=move || {
+                                    let r = reactions.get().iter().find(|r| r.emoji == emoji).cloned();
+                                    let is_mine = r.as_ref().map(|r| r.reacted_by_me).unwrap_or(false);
+                                    if is_mine {
+                                        "reaction-burst is-active inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-amber-500/15 border border-amber-500/30 hover:bg-amber-500/25 transition-colors cursor-pointer"
+                                    } else {
+                                        "reaction-burst inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-gray-700/50 border border-gray-600/50 hover:bg-gray-600/50 transition-colors cursor-pointer"
+                                    }
                                 }
-                            }
-                            on:click={
-                                let emoji_c = emoji_for_click.clone();
-                                let toggle_c = toggle;
-                                move |_| toggle_c(emoji_c.clone())
-                            }
-                        >
-                            <span>{reaction.emoji.clone()}</span>
-                            <span class="text-gray-300 font-medium">{reaction.count}</span>
-                        </button>
+                                on:click={
+                                    let emoji_c = emoji_for_click.clone();
+                                    let toggle_c = toggle;
+                                    move |_| {
+                                        let adding = !reactions.get_untracked()
+                                            .iter()
+                                            .find(|r| r.emoji == emoji_c)
+                                            .map(|r| r.reacted_by_me)
+                                            .unwrap_or(false);
+                                        toggle_c(emoji_c.clone());
+                                        if adding {
+                                            burst_trigger.set(false);
+                                            burst_trigger.set(true);
+                                        }
+                                    }
+                                }
+                            >
+                                <span>{reaction.emoji.clone()}</span>
+                                <span class="text-gray-300 font-medium">{reaction.count}</span>
+                            </button>
+                            <ReactionBurst
+                                trigger=Signal::from(burst_trigger)
+                                particle_count=12
+                                emoji=emoji_for_burst
+                            />
+                        </div>
                     }
                 }
             </For>

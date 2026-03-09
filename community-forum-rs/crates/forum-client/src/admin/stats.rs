@@ -10,7 +10,7 @@ use std::rc::Rc;
 use super::{use_admin, AdminStore};
 use crate::auth::use_auth;
 use crate::relay::{ConnectionState, Filter, RelayConnection};
-use crate::utils::{format_relative_time, shorten_pubkey};
+use crate::utils::{format_relative_time, search_client, shorten_pubkey};
 
 /// A single recent activity entry.
 #[derive(Clone, Debug)]
@@ -191,6 +191,9 @@ fn StatsDashboardInner() -> impl IntoView {
                 </div>
             </Show>
 
+            // Search index status
+            <SearchIndexPanel />
+
             // Recent activity feed
             <div class="glass-card p-6">
                 <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
@@ -284,6 +287,80 @@ fn CardSkeleton() -> impl IntoView {
     }
 }
 
+// -- Search index panel -------------------------------------------------------
+
+#[component]
+fn SearchIndexPanel() -> impl IntoView {
+    let search_stats: RwSignal<Option<search_client::SearchStats>> = RwSignal::new(None);
+    let search_error: RwSignal<Option<String>> = RwSignal::new(None);
+    let search_loading = RwSignal::new(true);
+
+    // Fetch search status on mount
+    wasm_bindgen_futures::spawn_local(async move {
+        match search_client::get_search_status().await {
+            Ok(stats) => {
+                search_stats.set(Some(stats));
+                search_loading.set(false);
+            }
+            Err(e) => {
+                search_error.set(Some(e));
+                search_loading.set(false);
+            }
+        }
+    });
+
+    view! {
+        <div class="glass-card p-6">
+            <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                {search_icon()}
+                "Search Index"
+            </h3>
+
+            {move || {
+                if search_loading.get() {
+                    view! {
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <CardSkeleton /><CardSkeleton /><CardSkeleton />
+                        </div>
+                    }.into_any()
+                } else if let Some(err) = search_error.get() {
+                    view! {
+                        <div class="flex items-center gap-2 text-yellow-400 text-sm">
+                            <span class="w-2 h-2 rounded-full bg-yellow-500"></span>
+                            {format!("Search API offline: {}", err)}
+                        </div>
+                    }.into_any()
+                } else if let Some(stats) = search_stats.get() {
+                    view! {
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div class="border border-amber-500/20 bg-amber-500/10 rounded-lg p-4">
+                                <p class="text-sm text-gray-400 mb-1">"Vectors"</p>
+                                <p class="text-3xl font-bold text-amber-400">{stats.total_vectors.to_string()}</p>
+                            </div>
+                            <div class="border border-blue-500/20 bg-blue-500/10 rounded-lg p-4">
+                                <p class="text-sm text-gray-400 mb-1">"Engine"</p>
+                                <p class="text-xl font-bold text-blue-400">{stats.engine.clone()}</p>
+                            </div>
+                            <div class="border border-green-500/20 bg-green-500/10 rounded-lg p-4">
+                                <p class="text-sm text-gray-400 mb-1">"Dimensions"</p>
+                                <p class="text-3xl font-bold text-green-400">{stats.dimensions.to_string()}</p>
+                                <div class="flex items-center gap-1 mt-1">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                                    <span class="text-xs text-green-600">"Healthy"</span>
+                                </div>
+                            </div>
+                        </div>
+                    }.into_any()
+                } else {
+                    view! {
+                        <p class="text-gray-500 text-sm">"No data available."</p>
+                    }.into_any()
+                }
+            }}
+        </div>
+    }
+}
+
 // -- SVG icon helpers ---------------------------------------------------------
 
 fn chart_icon() -> impl IntoView {
@@ -300,6 +377,15 @@ fn activity_icon() -> impl IntoView {
     view! {
         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+    }
+}
+
+fn search_icon() -> impl IntoView {
+    view! {
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
     }
 }

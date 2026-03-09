@@ -1,5 +1,9 @@
 //! Shared utility functions used across forum-client components.
 
+pub mod image_compress;
+pub mod pod_client;
+pub mod search_client;
+
 use leptos::prelude::*;
 use std::cell::Cell;
 use std::rc::Rc;
@@ -131,4 +135,46 @@ pub fn set_timeout_once<F: FnOnce() + 'static>(f: F, delay_ms: i32) {
 
     // Park the closure in the slot so it lives until the callback fires.
     slot.set(Some(closure));
+}
+
+/// Board statistics computed from a slice of kind-42 message events.
+///
+/// Returns `(total_messages, unique_authors, unique_channels)`.
+pub fn compute_board_stats(messages: &[nostr_core::NostrEvent]) -> (u32, u32, u32) {
+    use std::collections::HashSet;
+
+    let total = messages.len() as u32;
+    let authors: HashSet<&str> = messages.iter().map(|e| e.pubkey.as_str()).collect();
+    let channels: HashSet<&str> = messages
+        .iter()
+        .filter_map(|e| {
+            e.tags
+                .iter()
+                .find(|t| t.len() >= 4 && t[0] == "e" && t[3] == "root")
+                .or_else(|| e.tags.iter().find(|t| t.len() >= 2 && t[0] == "e"))
+                .map(|t| t[1].as_str())
+        })
+        .collect();
+
+    (total, authors.len() as u32, channels.len() as u32)
+}
+
+/// Check browser storage quota via `navigator.storage.estimate()`.
+/// Returns `(usage_bytes, quota_bytes)` or `None` if the API is unavailable.
+pub async fn check_storage_quota() -> Option<(f64, f64)> {
+    let window = web_sys::window()?;
+    let navigator = window.navigator();
+    let storage = navigator.storage();
+    let promise = storage.estimate().ok()?;
+    let result = wasm_bindgen_futures::JsFuture::from(promise).await.ok()?;
+    // StorageEstimate is a plain JS object with `usage` and `quota` properties.
+    let usage = js_sys::Reflect::get(&result, &"usage".into())
+        .ok()
+        .and_then(|v| v.as_f64())
+        .unwrap_or(0.0);
+    let quota = js_sys::Reflect::get(&result, &"quota".into())
+        .ok()
+        .and_then(|v| v.as_f64())
+        .unwrap_or(0.0);
+    Some((usage, quota))
 }

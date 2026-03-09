@@ -4,10 +4,12 @@
 //! methods for calling the relay-worker admin endpoints with NIP-98 auth and
 //! creating kind-40 channel events.
 
+pub mod calendar;
 pub mod channel_form;
 pub mod overview;
 pub mod registrations;
 pub mod relay_settings;
+pub mod section_requests;
 pub mod stats;
 pub mod user_table;
 
@@ -34,6 +36,8 @@ pub enum AdminTab {
     Overview,
     Channels,
     Users,
+    Sections,
+    Calendar,
 }
 
 /// A whitelisted user returned from the relay API.
@@ -253,6 +257,19 @@ impl AdminStore {
         section: &str,
         privkey: &[u8; 32],
     ) -> Result<(), String> {
+        self.create_channel_with_zone(name, description, section, 0, None, privkey)
+    }
+
+    /// Create a kind-40 channel with explicit zone and optional cohort tags.
+    pub fn create_channel_with_zone(
+        &self,
+        name: &str,
+        description: &str,
+        section: &str,
+        zone: u8,
+        cohort: Option<&str>,
+        privkey: &[u8; 32],
+    ) -> Result<(), String> {
         let relay = expect_context::<RelayConnection>();
         let conn = relay.connection_state();
         if conn.get_untracked() != ConnectionState::Connected {
@@ -271,11 +288,19 @@ impl AdminStore {
 
         let now = (js_sys::Date::now() / 1000.0) as u64;
 
+        let mut tags = vec![
+            vec!["section".into(), section.into()],
+            vec!["zone".into(), zone.to_string()],
+        ];
+        if let Some(c) = cohort {
+            tags.push(vec!["cohort".into(), c.into()]);
+        }
+
         let unsigned = nostr_core::UnsignedEvent {
             pubkey: pubkey_hex,
             created_at: now,
             kind: 40,
-            tags: vec![vec!["section".into(), section.into()]],
+            tags,
             content: serde_json::to_string(&content).unwrap(),
         };
 

@@ -9,7 +9,10 @@ use wasm_bindgen::JsCast;
 
 use crate::app::base_href;
 use crate::components::channel_card::{ChannelCard, ChannelInfo};
+use crate::components::mark_all_read::MarkAllRead;
 use crate::relay::{ConnectionState, Filter, RelayConnection};
+use crate::stores::mute::use_mute_store;
+use crate::stores::read_position::use_read_positions;
 
 /// Parsed channel creation event metadata.
 #[derive(Clone, Debug)]
@@ -198,7 +201,19 @@ pub fn ChatPage() -> impl IntoView {
         }
     });
 
-    // Filtered and sorted channel list
+    let mute_store = use_mute_store();
+    let read_store = use_read_positions();
+
+    // Mark all channels as read callback
+    let on_mark_all_read = Callback::new(move |_: ()| {
+        let chans = channels.get_untracked();
+        let now = (js_sys::Date::now() / 1000.0) as u64;
+        for ch in &chans {
+            read_store.mark_read(&ch.id, "", now);
+        }
+    });
+
+    // Filtered and sorted channel list (unmuted)
     let filtered_channels = move || {
         let section = section_filter();
         let chans = channels.get();
@@ -208,6 +223,7 @@ pub fn ChatPage() -> impl IntoView {
         let mut result: Vec<ChannelInfo> = chans
             .iter()
             .filter(|c| section.is_empty() || c.section == section)
+            .filter(|c| !mute_store.is_channel_muted(&c.id))
             .map(|c| ChannelInfo {
                 id: c.id.clone(),
                 name: c.name.clone(),
@@ -219,6 +235,31 @@ pub fn ChatPage() -> impl IntoView {
             .collect();
 
         // Sort by last active descending (most recent first)
+        result.sort_by(|a, b| b.last_active.cmp(&a.last_active));
+        result
+    };
+
+    // Muted channels (shown collapsed at bottom)
+    let muted_channels = move || {
+        let section = section_filter();
+        let chans = channels.get();
+        let counts = message_counts.get();
+        let active = last_active_map.get();
+
+        let mut result: Vec<ChannelInfo> = chans
+            .iter()
+            .filter(|c| section.is_empty() || c.section == section)
+            .filter(|c| mute_store.is_channel_muted(&c.id))
+            .map(|c| ChannelInfo {
+                id: c.id.clone(),
+                name: c.name.clone(),
+                description: c.description.clone(),
+                section: c.section.clone(),
+                message_count: counts.get(&c.id).copied().unwrap_or(0),
+                last_active: active.get(&c.id).copied().unwrap_or(0),
+            })
+            .collect();
+
         result.sort_by(|a, b| b.last_active.cmp(&a.last_active));
         result
     };
@@ -253,6 +294,11 @@ pub fn ChatPage() -> impl IntoView {
                     }}
                 </div>
                 <p class="text-gray-400">"Join conversations in public channels"</p>
+            </div>
+
+            // Mark all read button
+            <div class="flex justify-end mb-2">
+                <MarkAllRead on_click=on_mark_all_read />
             </div>
 
             // Section filter pills
@@ -380,6 +426,45 @@ pub fn ChatPage() -> impl IntoView {
                             </div>
                         }.into_any()
                     }
+                }
+            }}
+
+            // Muted channels section (collapsed at bottom)
+            {move || {
+                let muted = muted_channels();
+                if muted.is_empty() {
+                    None
+                } else {
+                    Some(view! {
+                        <div class="mt-6">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="text-xs font-medium text-gray-500 uppercase tracking-wider">"Muted"</span>
+                                <span class="text-xs text-gray-600 bg-gray-800 rounded-full px-2 py-0.5">
+                                    {muted.len()}
+                                </span>
+                            </div>
+                            <div class="space-y-2 opacity-50">
+                                {muted.into_iter().map(|ch| {
+                                    let cid = ch.id.clone();
+                                    view! {
+                                        <div class="relative">
+                                            <ChannelCard channel=ch/>
+                                            <button
+                                                class="absolute top-2 right-2 text-xs text-gray-500 hover:text-amber-400 bg-gray-800/90 rounded px-2 py-1 transition-colors z-10"
+                                                on:click=move |e| {
+                                                    e.prevent_default();
+                                                    e.stop_propagation();
+                                                    mute_store.toggle_mute_channel(&cid);
+                                                }
+                                            >
+                                                "Unmute"
+                                            </button>
+                                        </div>
+                                    }
+                                }).collect_view()}
+                            </div>
+                        </div>
+                    })
                 }
             }}
         </div>

@@ -5,6 +5,7 @@
 
 use leptos::prelude::*;
 use wasm_bindgen::JsCast;
+use std::sync::atomic::{AtomicU32, Ordering};
 
 /// Reusable glass modal overlay.
 ///
@@ -63,6 +64,11 @@ pub(crate) fn Modal(
     // Render children once (outside any conditional)
     let body = children();
 
+    // Generate unique ID for aria-labelledby
+    static MODAL_COUNTER: AtomicU32 = AtomicU32::new(0);
+    let title_id = format!("modal-title-{}", MODAL_COUNTER.fetch_add(1, Ordering::Relaxed));
+    let title_id_attr = title_id.clone();
+
     view! {
         <div
             class=move || if is_open.get() { "modal-backdrop" } else { "hidden" }
@@ -72,12 +78,16 @@ pub(crate) fn Modal(
                 class="modal-panel p-6"
                 style=panel_style
                 on:click=|e| e.stop_propagation()
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby=title_id_attr
             >
                 // Header
                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-lg font-bold text-white">{title.clone()}</h2>
+                    <h2 id=title_id class="text-lg font-bold text-white">{title.clone()}</h2>
                     <button
                         class="text-gray-400 hover:text-white transition-colors p-1 rounded-lg hover:bg-gray-800"
+                        aria-label="Close dialog"
                         on:click=move |_| {
                             is_open.set(false);
                             if let Some(cb) = on_close {

@@ -10,7 +10,7 @@ use leptos_router::components::A;
 
 use crate::app::base_href;
 use crate::auth::use_auth;
-use crate::components::particle_canvas::ParticleCanvas;
+use crate::components::fx::webgpu_hero::WebGPUHero;
 
 #[component]
 pub fn HomePage() -> impl IntoView {
@@ -24,8 +24,8 @@ pub fn HomePage() -> impl IntoView {
             <div class="ambient-orb ambient-orb-2" aria-hidden="true"></div>
             <div class="ambient-orb ambient-orb-3" aria-hidden="true"></div>
 
-            // Canvas2D constellation particle field (tier 1)
-            <ParticleCanvas />
+            // Tiered hero background: WebGPU > Canvas2D > CSS-only
+            <WebGPUHero />
 
             // Content layer — above the canvas
             <div class="max-w-2xl text-center space-y-8 relative z-10">

@@ -5,6 +5,7 @@
 
 use leptos::prelude::*;
 
+use crate::stores::zone_access::Zone;
 use crate::utils::capitalize;
 
 /// Predefined channel sections matching the forum's zone/section model.
@@ -25,6 +26,8 @@ pub struct ChannelFormData {
     pub name: String,
     pub description: String,
     pub section: String,
+    pub zone: u8,
+    pub cohort: Option<String>,
 }
 
 /// Channel creation form. Calls `on_submit` with the validated form data.
@@ -36,6 +39,8 @@ where
     let name = RwSignal::new(String::new());
     let description = RwSignal::new(String::new());
     let section = RwSignal::new(SECTIONS[0].to_string());
+    let zone = RwSignal::new(0u8);
+    let cohort = RwSignal::new(String::new());
     let validation_error = RwSignal::new(Option::<String>::None);
     let is_submitting = RwSignal::new(false);
 
@@ -60,6 +65,20 @@ where
         section.set(target);
     };
 
+    let on_zone_change = move |ev: leptos::ev::Event| {
+        let val = event_target_value(&ev);
+        zone.set(val.parse::<u8>().unwrap_or(0));
+        // Clear cohort when switching to Public or Registered
+        if zone.get_untracked() < 2 {
+            cohort.set(String::new());
+        }
+    };
+
+    let on_cohort_input = move |ev: leptos::ev::Event| {
+        let target = event_target_value(&ev);
+        cohort.set(target);
+    };
+
     let on_form_submit = move |ev: leptos::ev::SubmitEvent| {
         ev.prevent_default();
 
@@ -70,10 +89,14 @@ where
         }
 
         is_submitting.set(true);
+        let z = zone.get_untracked();
+        let c = cohort.get_untracked();
         on_submit(ChannelFormData {
             name: n.trim().to_string(),
             description: description.get_untracked().trim().to_string(),
             section: section.get_untracked(),
+            zone: z,
+            cohort: if z >= 2 && !c.trim().is_empty() { Some(c.trim().to_string()) } else { None },
         });
         is_submitting.set(false);
 
@@ -81,6 +104,8 @@ where
         name.set(String::new());
         description.set(String::new());
         section.set(SECTIONS[0].to_string());
+        zone.set(0);
+        cohort.set(String::new());
     };
 
     view! {
@@ -163,6 +188,48 @@ where
                 </div>
             </div>
 
+            // Zone dropdown
+            <div class="space-y-1">
+                <label for="channel-zone" class="block text-sm font-medium text-gray-300">
+                    "Access Zone"
+                </label>
+                <select
+                    id="channel-zone"
+                    on:change=on_zone_change
+                    class="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
+                >
+                    <option value="0" selected=move || zone.get() == 0>"Public"</option>
+                    <option value="1" selected=move || zone.get() == 1>"Registered"</option>
+                    <option value="2" selected=move || zone.get() == 2>"Cohort"</option>
+                    <option value="3" selected=move || zone.get() == 3>"Private"</option>
+                </select>
+                <div class="flex items-center gap-1.5 mt-1">
+                    <span class=move || zone_color_dot_class(zone.get())></span>
+                    <span class="text-xs text-gray-500">
+                        {move || Zone::from_tag(&zone.get().to_string()).label()}
+                    </span>
+                </div>
+            </div>
+
+            // Cohort input (shown only for zone >= 2)
+            <Show when=move || { zone.get() >= 2 }>
+                <div class="space-y-1">
+                    <label for="channel-cohort" class="block text-sm font-medium text-gray-300">
+                        "Required Cohort"
+                    </label>
+                    <input
+                        id="channel-cohort"
+                        type="text"
+                        maxlength="64"
+                        prop:value=move || cohort.get()
+                        on:input=on_cohort_input
+                        placeholder="e.g. music, vip, moderator"
+                        class="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
+                    />
+                    <p class="text-xs text-gray-500">"Users must belong to this cohort to access the channel."</p>
+                </div>
+            </Show>
+
             // Submit button
             <button
                 type="submit"
@@ -188,6 +255,17 @@ fn section_color_dot_class(section: &str) -> &'static str {
         "tech" => "w-2 h-2 rounded-full bg-blue-400 inline-block",
         "random" => "w-2 h-2 rounded-full bg-purple-400 inline-block",
         "support" => "w-2 h-2 rounded-full bg-red-400 inline-block",
+        _ => "w-2 h-2 rounded-full bg-gray-500 inline-block",
+    }
+}
+
+/// Return a Tailwind class for a small colored dot representing the zone.
+fn zone_color_dot_class(zone: u8) -> &'static str {
+    match zone {
+        0 => "w-2 h-2 rounded-full bg-amber-400 inline-block",
+        1 => "w-2 h-2 rounded-full bg-blue-400 inline-block",
+        2 => "w-2 h-2 rounded-full bg-purple-400 inline-block",
+        3 => "w-2 h-2 rounded-full bg-emerald-400 inline-block",
         _ => "w-2 h-2 rounded-full bg-gray-500 inline-block",
     }
 }
