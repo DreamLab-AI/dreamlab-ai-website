@@ -8,7 +8,6 @@ use leptos_router::hooks::use_navigate;
 use leptos_router::NavigateOptions;
 use nostr_core::UnsignedEvent;
 
-use crate::app::base_href;
 use crate::auth::use_auth;
 use crate::relay::RelayConnection;
 use crate::utils::shorten_pubkey;
@@ -130,7 +129,7 @@ pub fn SetupPage() -> impl IntoView {
                 auth.complete_signup();
 
                 navigate.with_value(|nav| {
-                    nav(&base_href("/chat"), NavigateOptions::default());
+                    nav("/chat", NavigateOptions::default());
                 });
             }
             Err(e) => {

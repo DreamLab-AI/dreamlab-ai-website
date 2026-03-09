@@ -34,8 +34,10 @@ const FORUM_BASE: &str = match option_env!("FORUM_BASE") {
     None => "",
 };
 
-/// Build a full href by prepending the base path. Used for programmatic
-/// navigation that bypasses the router (e.g. `window.location.set_href`).
+/// Build a full href by prepending the base path.
+///
+/// Use for `<A href=...>` and `window.location.set_href()`.
+/// Do **NOT** use with `use_navigate()` — the router prepends `base` automatically.
 pub(crate) fn base_href(path: &str) -> String {
     if FORUM_BASE.is_empty() {
         path.to_string()
@@ -541,7 +543,7 @@ fn AuthGatedChat() -> impl IntoView {
 
     Effect::new(move |_| {
         if is_ready.get() && !is_authed.get() {
-            navigate.with_value(|nav| nav(&base_href("/login"), NavigateOptions::default()));
+            navigate.with_value(|nav| nav("/login", NavigateOptions::default()));
         }
     });
 
@@ -564,7 +566,7 @@ fn AuthGatedChannel() -> impl IntoView {
 
     Effect::new(move |_| {
         if is_ready.get() && !is_authed.get() {
-            navigate.with_value(|nav| nav(&base_href("/login"), NavigateOptions::default()));
+            navigate.with_value(|nav| nav("/login", NavigateOptions::default()));
         }
     });
 
@@ -587,7 +589,7 @@ fn AuthGatedDmList() -> impl IntoView {
 
     Effect::new(move |_| {
         if is_ready.get() && !is_authed.get() {
-            navigate.with_value(|nav| nav(&base_href("/login"), NavigateOptions::default()));
+            navigate.with_value(|nav| nav("/login", NavigateOptions::default()));
         }
     });
 
@@ -610,7 +612,7 @@ fn AuthGatedDmChat() -> impl IntoView {
 
     Effect::new(move |_| {
         if is_ready.get() && !is_authed.get() {
-            navigate.with_value(|nav| nav(&base_href("/login"), NavigateOptions::default()));
+            navigate.with_value(|nav| nav("/login", NavigateOptions::default()));
         }
     });
 
@@ -637,8 +639,7 @@ macro_rules! auth_gated {
 
             Effect::new(move |_| {
                 if is_ready.get() && !is_authed.get() {
-                    navigate
-                        .with_value(|nav| nav(&base_href("/login"), NavigateOptions::default()));
+                    navigate.with_value(|nav| nav("/login", NavigateOptions::default()));
                 }
             });
 

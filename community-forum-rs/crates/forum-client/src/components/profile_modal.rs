@@ -11,7 +11,6 @@ use leptos_router::hooks::use_navigate;
 use leptos_router::NavigateOptions;
 use wasm_bindgen::JsCast;
 
-use crate::app::base_href;
 use crate::components::avatar::{Avatar, AvatarSize};
 use crate::relay::{Filter, RelayConnection};
 use crate::utils::shorten_pubkey;
@@ -97,7 +96,7 @@ pub(crate) fn ProfileModal(
     let on_dm = move |_| {
         is_open.set(false);
         let pk = pk_stored.get_value();
-        let href = base_href(&format!("/dm/{}", pk));
+        let href = format!("/dm/{}", pk);
         navigate.with_value(|nav| nav(&href, NavigateOptions::default()));
     };
 

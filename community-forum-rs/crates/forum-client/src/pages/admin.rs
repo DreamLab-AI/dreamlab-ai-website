@@ -13,7 +13,6 @@ use crate::admin::channel_form::{ChannelForm, ChannelFormData};
 use crate::admin::overview::{ConnectionStatusBar, OverviewTab};
 use crate::admin::user_table::{UpdateCohortsCb, UserTable};
 use crate::admin::{provide_admin, use_admin, AdminStore, AdminTab};
-use crate::app::base_href;
 use crate::auth::use_auth;
 use crate::relay::{ConnectionState, RelayConnection};
 
@@ -37,14 +36,14 @@ pub fn AdminPage() -> impl IntoView {
     // Redirect non-authenticated users (SPA navigation — preserves WASM state)
     Effect::new(move |_| {
         if is_ready.get() && !is_authed.get() {
-            navigate.with_value(|nav| nav(&base_href("/login"), NavigateOptions::default()));
+            navigate.with_value(|nav| nav("/login", NavigateOptions::default()));
         }
     });
 
     // Redirect non-admin users
     Effect::new(move |_| {
         if is_ready.get() && is_authed.get() && !is_admin.get() {
-            navigate.with_value(|nav| nav(&base_href("/chat"), NavigateOptions::default()));
+            navigate.with_value(|nav| nav("/chat", NavigateOptions::default()));
         }
     });
 

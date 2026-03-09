@@ -65,7 +65,7 @@ pub fn PendingPage() -> impl IntoView {
                         auth.set_profile(nickname, avatar);
                         auth.complete_signup();
                         navigate.with_value(|nav| {
-                            nav(&base_href("/chat"), NavigateOptions::default());
+                            nav("/chat", NavigateOptions::default());
                         });
                     }
                 }

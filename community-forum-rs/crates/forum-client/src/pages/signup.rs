@@ -23,7 +23,7 @@ pub fn SignupPage() -> impl IntoView {
     // Redirect if already authenticated (SPA navigation — preserves WASM state)
     Effect::new(move |_| {
         if is_authed.get() {
-            navigate.with_value(|nav| nav(&base_href("/chat"), NavigateOptions::default()));
+            navigate.with_value(|nav| nav("/chat", NavigateOptions::default()));
         }
     });
 
@@ -51,7 +51,7 @@ pub fn SignupPage() -> impl IntoView {
             let result = auth.register_with_passkey(&trimmed).await;
             is_pending.set(false);
             if result.is_ok() {
-                navigate.with_value(|nav| nav(&base_href("/chat"), NavigateOptions::default()));
+                navigate.with_value(|nav| nav("/chat", NavigateOptions::default()));
             }
         });
     };
@@ -73,7 +73,7 @@ pub fn SignupPage() -> impl IntoView {
                 let result = auth.register_with_passkey(&trimmed).await;
                 is_pending.set(false);
                 if result.is_ok() {
-                    navigate.with_value(|nav| nav(&base_href("/chat"), NavigateOptions::default()));
+                    navigate.with_value(|nav| nav("/chat", NavigateOptions::default()));
                 }
             });
         }
