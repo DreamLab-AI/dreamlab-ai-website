@@ -9,11 +9,7 @@ watch = ["src", "../nostr-core/src"]
 address = "127.0.0.1"
 port = 8080
 
-# Optimize WASM binary size (30-50% reduction)
+# Optimize WASM binary size (30-50% reduction).
+# Trunk downloads wasm-opt automatically via [tools]; no separate hook needed.
 [tools]
 wasm_opt = "version_122"
-
-[[hooks]]
-stage = "post_build"
-command = "wasm-opt"
-command_arguments = ["-Os", "--enable-bulk-memory", "--enable-simd", "{wasm_file}", "-o", "{wasm_file}"]
