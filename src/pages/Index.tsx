@@ -151,11 +151,11 @@ const Index = () => {
             className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-6 animate-slide-up max-w-5xl leading-tight"
             style={{ textShadow: '0 0 40px rgba(212, 165, 116, 0.4), 0 0 80px rgba(205, 127, 50, 0.2)' }}
           >
-            <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 text-transparent bg-clip-text">Applied Innovation Lab</span>
+            <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 text-transparent bg-clip-text">DREAMLAB APPLIED INNOVATION</span>
           </h1>
 
           <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-foreground/85 max-w-3xl mb-8 animate-slide-up font-light tracking-wide leading-relaxed" style={{ animationDelay: '0.1s' }}>
-            Where enterprises and SMEs co-create with deep tech. Embed in our Lake District lab to solve real problems using AI, XR, cyber, and creative technology.
+            Co-create deep tech in our Lake District lab. Solve real problems using AI, XR, and Cyber Secure Distributed Systems.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 animate-scale-in mb-8 w-full sm:w-auto" style={{ animationDelay: '0.2s' }}>
@@ -177,7 +177,7 @@ const Index = () => {
           <div className="animate-slide-up flex flex-col sm:flex-row gap-6 text-sm md:text-base text-muted-foreground" style={{ animationDelay: '0.25s' }}>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 bg-cyan-400 rounded-full" />
-              <span>Enterprise residencies | SME sprints | KTP partnerships</span>
+              <span>Enterprise | SME sprints | Knowledge Partnerships</span>
             </div>
           </div>
         </div>
@@ -199,8 +199,8 @@ const Index = () => {
           <div className="flex flex-wrap justify-center gap-6 md:gap-12 lg:gap-16">
             {[
               { stat: "£8M+", label: "Research Heritage" },
-              { stat: "16 Years", label: "Deep Tech R&D" },
-              { stat: "44+", label: "Specialists" },
+              { stat: "30 Years", label: "Deep Tech R&D" },
+              { stat: "40+", label: "Specialists" },
               { stat: "Lake District", label: "Residential Facility" },
             ].map((item) => (
               <div key={item.label} className="text-center px-4 py-2">
