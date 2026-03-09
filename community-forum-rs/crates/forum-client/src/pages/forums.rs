@@ -226,30 +226,42 @@ pub fn ForumsPage() -> impl IntoView {
                         let al = zone.access_level;
                         let has_cats = !cats.is_empty();
 
+                        let gradient = zone_gradient(accent);
+                        let border = zone_border(accent);
+
                         view! {
                             <section class="mb-10">
-                                <div class="flex items-center gap-3 mb-4">
-                                    <ZoneIcon icon=icon accent=accent/>
-                                    <div>
-                                        <div class="flex items-center gap-2">
-                                            <h2 class="text-xl font-bold text-white">{zone_name}</h2>
-                                            {(al > 0).then(|| {
-                                                let badge = crate::stores::zone_access::Zone::from_tag(&al.to_string());
-                                                view! {
-                                                    <span class=format!(
-                                                        "inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider border rounded-full px-2 py-0.5 {}",
-                                                        badge.badge_class()
-                                                    )>
-                                                        <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                            <rect x="3" y="11" width="18" height="11" rx="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                                            <path d="M7 11V7a5 5 0 0110 0v4" stroke-linecap="round" stroke-linejoin="round"/>
-                                                        </svg>
-                                                        {badge.label()}
-                                                    </span>
-                                                }
-                                            })}
+                                // Zone hero card with gradient
+                                <div class=format!(
+                                    "relative mb-4 py-6 px-6 rounded-2xl overflow-hidden bg-gradient-to-br {} border {} backdrop-blur-sm",
+                                    gradient, border
+                                )>
+                                    <div class="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/5 blur-3xl" aria-hidden="true"></div>
+                                    <div class="absolute -bottom-8 -left-8 w-32 h-32 rounded-full bg-white/3 blur-2xl" aria-hidden="true"></div>
+
+                                    <div class="relative z-10 flex items-start gap-4">
+                                        <ZoneIcon icon=icon accent=accent/>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="flex items-center gap-2 mb-1">
+                                                <h2 class="text-xl sm:text-2xl font-bold text-white">{zone_name}</h2>
+                                                {(al > 0).then(|| {
+                                                    let badge = crate::stores::zone_access::Zone::from_tag(&al.to_string());
+                                                    view! {
+                                                        <span class=format!(
+                                                            "inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider border rounded-full px-2 py-0.5 {}",
+                                                            badge.badge_class()
+                                                        )>
+                                                            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                                <rect x="3" y="11" width="18" height="11" rx="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                                <path d="M7 11V7a5 5 0 0110 0v4" stroke-linecap="round" stroke-linejoin="round"/>
+                                                            </svg>
+                                                            {badge.label()}
+                                                        </span>
+                                                    }
+                                                })}
+                                            </div>
+                                            <p class="text-gray-300 text-sm">{zone_desc}</p>
                                         </div>
-                                        <p class="text-sm text-gray-500">{zone_desc}</p>
                                     </div>
                                 </div>
 
@@ -295,6 +307,28 @@ pub fn ForumsPage() -> impl IntoView {
                 }}
             </Show>
         </div>
+    }
+}
+
+/// Gradient class for zone hero cards.
+fn zone_gradient(accent: &str) -> &'static str {
+    match accent {
+        "green" => "from-green-500/20 via-emerald-500/10 to-teal-500/5",
+        "purple" => "from-purple-500/20 via-indigo-500/10 to-violet-500/5",
+        "pink" => "from-pink-500/20 via-rose-500/10 to-fuchsia-500/5",
+        "sky" => "from-sky-500/20 via-blue-500/10 to-cyan-500/5",
+        _ => "from-gray-500/20 via-gray-500/10 to-gray-500/5",
+    }
+}
+
+/// Border class for zone hero cards.
+fn zone_border(accent: &str) -> &'static str {
+    match accent {
+        "green" => "border-green-500/20",
+        "purple" => "border-purple-500/20",
+        "pink" => "border-pink-500/20",
+        "sky" => "border-sky-500/20",
+        _ => "border-gray-500/20",
     }
 }
 

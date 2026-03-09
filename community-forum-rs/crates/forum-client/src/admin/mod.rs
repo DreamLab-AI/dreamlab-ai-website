@@ -22,8 +22,15 @@ use crate::relay::{ConnectionState, Filter, RelayConnection};
 
 // -- Constants ----------------------------------------------------------------
 
-/// The sole admin pubkey for the DreamLab forum.
-pub const ADMIN_PUBKEY: &str = "11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c";
+/// Admin pubkeys for the DreamLab forum (matches relay-worker ADMIN_PUBKEYS).
+pub const ADMIN_PUBKEYS: &[&str] = &[
+    "a617d2109bdd3f1a607d5a837e885178f6367af296885d7f058c26b2bd03221a",
+    "11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c",
+    "37f922fd632060ee9905505b687f8803090e943ffe92105428b3859a1c4ee7ff",
+];
+
+/// First admin pubkey (used for display in overview panel).
+pub const ADMIN_PUBKEY: &str = ADMIN_PUBKEYS[0];
 
 /// Default auth API base URL (overridable via `window.__ENV__.VITE_AUTH_API_URL`).
 const DEFAULT_AUTH_API_URL: &str = "https://dreamlab-auth-api.solitary-paper-764d.workers.dev";
@@ -111,9 +118,9 @@ impl AdminStore {
         }
     }
 
-    /// Check whether the given hex pubkey is the admin pubkey.
+    /// Check whether the given hex pubkey is in the admin pubkey list.
     pub fn is_admin(pubkey: &str) -> bool {
-        pubkey == ADMIN_PUBKEY
+        ADMIN_PUBKEYS.contains(&pubkey)
     }
 
     /// Resolve the auth API base URL from the runtime environment or compile-time default.
