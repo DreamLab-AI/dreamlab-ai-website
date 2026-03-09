@@ -76,7 +76,10 @@ jobs:
           key: rust-${{ hashFiles('community-forum-rs/Cargo.lock') }}
           restore-keys: rust-
       - run: cargo install wasm-bindgen-cli --locked || true
-      - run: cargo test --manifest-path ${{ env.MANIFEST }} --target wasm32-unknown-unknown -p nostr-core
+      # --no-run: compile tests for wasm32 but don't execute (no wasm_bindgen_test runner configured).
+      # Standard #[test] functions can't run on wasm32 without a WASM runtime. The check-wasm-client
+      # job verifies compilation for the forum-client; this job validates nostr-core test compilation.
+      - run: cargo test --manifest-path ${{ env.MANIFEST }} --target wasm32-unknown-unknown -p nostr-core --no-run
 
   check-wasm-client:
     name: Check (wasm client)
