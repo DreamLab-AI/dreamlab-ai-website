@@ -25,15 +25,34 @@ struct ChannelMeta {
     created_at: u64,
 }
 
-/// Section filter pill definitions.
+/// Zone-based filter pill definitions matching production sections.yaml.
+/// Values are zone IDs; channels are matched by resolving their section tag
+/// to a parent zone via ZONE_SECTIONS below.
 const SECTION_FILTERS: &[(&str, &str)] = &[
     ("All", ""),
-    ("General", "general"),
-    ("Music", "music"),
-    ("Events", "events"),
-    ("Tech", "tech"),
-    ("Random", "random"),
+    ("Fairfield Family", "fairfield-family"),
+    ("Minimoonoir", "minimoonoir"),
+    ("DreamLab", "dreamlab"),
+    ("AI Agents", "ai-agents"),
 ];
+
+/// Maps zone IDs to their child section IDs (from config/sections.yaml).
+const ZONE_SECTIONS: &[(&str, &[&str])] = &[
+    ("fairfield-family", &["family-home", "family-events", "family-photos"]),
+    ("minimoonoir", &["minimoonoir-welcome", "minimoonoir-events", "minimoonoir-booking"]),
+    ("dreamlab", &["dreamlab-lobby", "dreamlab-training", "dreamlab-projects", "dreamlab-bookings"]),
+    ("ai-agents", &["ai-general", "ai-claude-flow", "ai-visionflow"]),
+];
+
+/// Resolve a channel's section tag to its parent zone ID.
+fn section_to_zone_id(section: &str) -> Option<&'static str> {
+    for &(zone_id, sections) in ZONE_SECTIONS {
+        if sections.contains(&section) {
+            return Some(zone_id);
+        }
+    }
+    None
+}
 
 /// Channel list page. Subscribes to kind 40 (channel creation) events,
 /// displays them as cards, and supports filtering by section query param.
@@ -222,7 +241,14 @@ pub fn ChatPage() -> impl IntoView {
 
         let mut result: Vec<ChannelInfo> = chans
             .iter()
-            .filter(|c| section.is_empty() || c.section == section)
+            .filter(|c| {
+                if section.is_empty() {
+                    return true;
+                }
+                // Filter matches if section tag equals the zone filter, OR
+                // if the section tag resolves to the selected zone
+                c.section == section || section_to_zone_id(&c.section) == Some(section.as_str())
+            })
             .filter(|c| !mute_store.is_channel_muted(&c.id))
             .map(|c| ChannelInfo {
                 id: c.id.clone(),
@@ -248,7 +274,12 @@ pub fn ChatPage() -> impl IntoView {
 
         let mut result: Vec<ChannelInfo> = chans
             .iter()
-            .filter(|c| section.is_empty() || c.section == section)
+            .filter(|c| {
+                if section.is_empty() {
+                    return true;
+                }
+                c.section == section || section_to_zone_id(&c.section) == Some(section.as_str())
+            })
             .filter(|c| mute_store.is_channel_muted(&c.id))
             .map(|c| ChannelInfo {
                 id: c.id.clone(),

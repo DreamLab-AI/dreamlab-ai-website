@@ -80,9 +80,8 @@ pub fn CategoryPage() -> impl IntoView {
                 .map(|t| t[1].clone())
                 .unwrap_or_default();
 
-            // Match: the tag must contain the category slug
-            // e.g. "public-lobby/General" contains "General" for category "General"
-            // or slug matches the full path
+            // Match: the section tag must contain the category slug
+            // e.g. section "family-home" matches slug "family-home"
             let matches = section_tag.contains(&slug)
                 || section_tag.to_lowercase().contains(&slug.to_lowercase());
 

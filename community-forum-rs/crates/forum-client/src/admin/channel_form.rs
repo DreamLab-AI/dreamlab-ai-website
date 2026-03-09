@@ -6,18 +6,27 @@
 use leptos::prelude::*;
 
 use crate::stores::zone_access::Zone;
-use crate::utils::capitalize;
 
-/// Predefined channel sections matching the forum's zone/section model.
-const SECTIONS: &[&str] = &[
-    "general",
-    "announcements",
-    "introductions",
-    "music",
-    "events",
-    "tech",
-    "random",
-    "support",
+/// Predefined channel sections matching `community-forum/config/sections.yaml`.
+/// Format: (section_id, display_label).
+const SECTIONS: &[(&str, &str)] = &[
+    // Fairfield Family
+    ("family-home", "Family Home"),
+    ("family-events", "Family Events"),
+    ("family-photos", "Family Photos"),
+    // Minimoonoir
+    ("minimoonoir-welcome", "Minimoonoir Welcome"),
+    ("minimoonoir-events", "Minimoonoir Events"),
+    ("minimoonoir-booking", "Minimoonoir Booking"),
+    // DreamLab
+    ("dreamlab-lobby", "DreamLab Lobby"),
+    ("dreamlab-training", "DreamLab Training"),
+    ("dreamlab-projects", "DreamLab Projects"),
+    ("dreamlab-bookings", "DreamLab Bookings"),
+    // AI Agents
+    ("ai-general", "AI General"),
+    ("ai-claude-flow", "AI Claude Flow"),
+    ("ai-visionflow", "AI VisionFlow"),
 ];
 
 /// Data submitted from the channel creation form.
@@ -38,7 +47,7 @@ where
 {
     let name = RwSignal::new(String::new());
     let description = RwSignal::new(String::new());
-    let section = RwSignal::new(SECTIONS[0].to_string());
+    let section = RwSignal::new(SECTIONS[0].0.to_string());
     let zone = RwSignal::new(0u8);
     let cohort = RwSignal::new(String::new());
     let validation_error = RwSignal::new(Option::<String>::None);
@@ -103,7 +112,7 @@ where
         // Reset form
         name.set(String::new());
         description.set(String::new());
-        section.set(SECTIONS[0].to_string());
+        section.set(SECTIONS[0].0.to_string());
         zone.set(0);
         cohort.set(String::new());
     };
@@ -169,12 +178,12 @@ where
                     on:change=on_section_change
                     class="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
                 >
-                    {SECTIONS.iter().map(|s| {
-                        let value = s.to_string();
-                        let label = capitalize(s);
+                    {SECTIONS.iter().map(|&(id, label)| {
+                        let value = id.to_string();
+                        let display = label.to_string();
                         view! {
                             <option value=value.clone() selected=move || section.get() == value>
-                                {label}
+                                {display}
                             </option>
                         }
                     }).collect_view()}
@@ -183,7 +192,14 @@ where
                 <div class="flex items-center gap-1.5 mt-1">
                     <span class=move || section_color_dot_class(&section.get())></span>
                     <span class="text-xs text-gray-500">
-                        {move || format!("Section: {}", capitalize(&section.get()))}
+                        {move || {
+                            let s = section.get();
+                            let label = SECTIONS.iter()
+                                .find(|&&(id, _)| id == s)
+                                .map(|&(_, l)| l)
+                                .unwrap_or(&s);
+                            format!("Section: {}", label)
+                        }}
                     </span>
                 </div>
             </div>
@@ -245,16 +261,17 @@ where
 }
 
 /// Return a Tailwind class for a small colored dot representing the section.
+/// Color is derived from the parent zone.
 fn section_color_dot_class(section: &str) -> &'static str {
     match section {
-        "general" => "w-2 h-2 rounded-full bg-gray-400 inline-block",
-        "announcements" => "w-2 h-2 rounded-full bg-amber-400 inline-block",
-        "introductions" => "w-2 h-2 rounded-full bg-cyan-400 inline-block",
-        "music" => "w-2 h-2 rounded-full bg-pink-400 inline-block",
-        "events" => "w-2 h-2 rounded-full bg-green-400 inline-block",
-        "tech" => "w-2 h-2 rounded-full bg-blue-400 inline-block",
-        "random" => "w-2 h-2 rounded-full bg-purple-400 inline-block",
-        "support" => "w-2 h-2 rounded-full bg-red-400 inline-block",
+        // Fairfield Family (green)
+        s if s.starts_with("family-") => "w-2 h-2 rounded-full bg-green-400 inline-block",
+        // Minimoonoir (purple)
+        s if s.starts_with("minimoonoir-") => "w-2 h-2 rounded-full bg-purple-400 inline-block",
+        // DreamLab (pink)
+        s if s.starts_with("dreamlab-") => "w-2 h-2 rounded-full bg-pink-400 inline-block",
+        // AI Agents (sky)
+        s if s.starts_with("ai-") => "w-2 h-2 rounded-full bg-sky-400 inline-block",
         _ => "w-2 h-2 rounded-full bg-gray-500 inline-block",
     }
 }

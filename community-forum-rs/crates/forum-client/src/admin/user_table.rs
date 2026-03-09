@@ -10,8 +10,22 @@ use std::rc::Rc;
 use super::WhitelistUser;
 use crate::utils::capitalize;
 
-/// Available cohorts for the cohort editor.
-const AVAILABLE_COHORTS: &[&str] = &["general", "music", "events", "tech", "moderator", "vip"];
+/// Available cohorts matching `community-forum/config/sections.yaml`.
+const AVAILABLE_COHORTS: &[&str] = &[
+    "admin",
+    "cross-access",
+    "family",
+    "family-only",
+    "minimoonoir",
+    "minimoonoir-only",
+    "minimoonoir-business",
+    "business",
+    "business-only",
+    "trainers",
+    "trainees",
+    "agent",
+    "visionflow-full",
+];
 
 /// Callback type for cohort updates: (pubkey, new_cohorts).
 type UpdateCallback = Rc<dyn Fn(String, Vec<String>)>;
@@ -253,11 +267,13 @@ fn truncate_pubkey(pk: &str) -> String {
 /// Return a Tailwind CSS class string for a cohort badge based on the cohort name.
 fn cohort_badge_class(cohort: &str) -> &'static str {
     match cohort {
-        "moderator" => "inline-block text-xs rounded px-1.5 py-0.5 bg-purple-500/20 text-purple-300 border border-purple-500/30 hover:shadow-[0_0_6px_rgba(168,85,247,0.3)] transition-shadow",
-        "vip" => "inline-block text-xs rounded px-1.5 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:shadow-[0_0_6px_rgba(245,158,11,0.3)] transition-shadow",
-        "tech" => "inline-block text-xs rounded px-1.5 py-0.5 bg-blue-500/20 text-blue-300 border border-blue-500/30 hover:shadow-[0_0_6px_rgba(59,130,246,0.3)] transition-shadow",
-        "music" => "inline-block text-xs rounded px-1.5 py-0.5 bg-pink-500/20 text-pink-300 border border-pink-500/30 hover:shadow-[0_0_6px_rgba(236,72,153,0.3)] transition-shadow",
-        "events" => "inline-block text-xs rounded px-1.5 py-0.5 bg-green-500/20 text-green-300 border border-green-500/30 hover:shadow-[0_0_6px_rgba(34,197,94,0.3)] transition-shadow",
+        "admin" => "inline-block text-xs rounded px-1.5 py-0.5 bg-red-500/20 text-red-300 border border-red-500/30 hover:shadow-[0_0_6px_rgba(239,68,68,0.3)] transition-shadow",
+        "cross-access" => "inline-block text-xs rounded px-1.5 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:shadow-[0_0_6px_rgba(245,158,11,0.3)] transition-shadow",
+        "family" | "family-only" => "inline-block text-xs rounded px-1.5 py-0.5 bg-green-500/20 text-green-300 border border-green-500/30 hover:shadow-[0_0_6px_rgba(34,197,94,0.3)] transition-shadow",
+        "minimoonoir" | "minimoonoir-only" | "minimoonoir-business" => "inline-block text-xs rounded px-1.5 py-0.5 bg-purple-500/20 text-purple-300 border border-purple-500/30 hover:shadow-[0_0_6px_rgba(168,85,247,0.3)] transition-shadow",
+        "business" | "business-only" => "inline-block text-xs rounded px-1.5 py-0.5 bg-pink-500/20 text-pink-300 border border-pink-500/30 hover:shadow-[0_0_6px_rgba(236,72,153,0.3)] transition-shadow",
+        "trainers" | "trainees" => "inline-block text-xs rounded px-1.5 py-0.5 bg-blue-500/20 text-blue-300 border border-blue-500/30 hover:shadow-[0_0_6px_rgba(59,130,246,0.3)] transition-shadow",
+        "agent" | "visionflow-full" => "inline-block text-xs rounded px-1.5 py-0.5 bg-sky-500/20 text-sky-300 border border-sky-500/30 hover:shadow-[0_0_6px_rgba(14,165,233,0.3)] transition-shadow",
         _ => "inline-block text-xs rounded px-1.5 py-0.5 bg-gray-500/20 text-gray-300 border border-gray-500/30 hover:shadow-[0_0_6px_rgba(107,114,128,0.3)] transition-shadow",
     }
 }

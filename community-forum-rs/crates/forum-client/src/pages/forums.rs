@@ -15,7 +15,7 @@ use crate::components::empty_state::EmptyState;
 use crate::relay::{ConnectionState, Filter, RelayConnection};
 use crate::utils::set_timeout_once;
 
-// -- Zone definitions ---------------------------------------------------------
+// -- Zone definitions (matching config/sections.yaml) -------------------------
 
 struct Zone {
     id: &'static str,
@@ -23,44 +23,67 @@ struct Zone {
     description: &'static str,
     icon: &'static str,
     accent: &'static str,
-    /// Access level: 0=Public, 1=Registered, 2=Cohort, 3=Private
+    /// Access level: 0=Public, 1=Registered, 2=Cohort, 3=Private.
     access_level: u8,
+    /// Sections belonging to this zone (section IDs from the YAML config).
+    /// Channels tagged with these section IDs will appear under this zone.
+    sections: &'static [&'static str],
 }
 
+/// Production zone definitions matching `community-forum/config/sections.yaml`.
+/// Each zone owns a set of section IDs; channels carry a `section` tag with the
+/// section ID, and we resolve zone membership by looking up which zone contains
+/// that section ID.
 const ZONES: &[Zone] = &[
     Zone {
-        id: "public-lobby",
-        name: "Public Lobby",
-        description: "Open discussions visible to all",
-        icon: "globe",
-        accent: "amber",
-        access_level: 0,
+        id: "fairfield-family",
+        name: "Fairfield Family",
+        description: "Private family zone",
+        icon: "home",
+        accent: "green",
+        access_level: 3,
+        sections: &["family-home", "family-events", "family-photos"],
     },
     Zone {
-        id: "common-room",
-        name: "Common Room",
-        description: "Community conversations and networking",
-        icon: "users",
-        accent: "blue",
-        access_level: 1,
-    },
-    Zone {
-        id: "deep-dives",
-        name: "Deep Dives",
-        description: "Technical deep-dives and learning",
-        icon: "code",
+        id: "minimoonoir",
+        name: "Minimoonoir",
+        description: "For friends and visitors staying with us",
+        icon: "moon",
         accent: "purple",
         access_level: 2,
+        sections: &["minimoonoir-welcome", "minimoonoir-events", "minimoonoir-booking"],
     },
     Zone {
-        id: "inner-sanctum",
-        name: "Inner Sanctum",
-        description: "Exclusive members-only discussions",
-        icon: "shield",
-        accent: "emerald",
-        access_level: 3,
+        id: "dreamlab",
+        name: "DreamLab",
+        description: "Business training and collaboration space",
+        icon: "sparkle",
+        accent: "pink",
+        access_level: 2,
+        sections: &["dreamlab-lobby", "dreamlab-training", "dreamlab-projects", "dreamlab-bookings"],
+    },
+    Zone {
+        id: "ai-agents",
+        name: "AI Agents",
+        description: "VisionFlow AI agents — tiered intelligence via Nostr DM",
+        icon: "bot",
+        accent: "sky",
+        access_level: 1,
+        sections: &["ai-general", "ai-claude-flow", "ai-visionflow"],
     },
 ];
+
+/// Resolve a section tag to its parent zone ID.
+/// Channels store the section ID directly (e.g. "minimoonoir-welcome"),
+/// not in "zone/category" format.
+fn section_to_zone(section: &str) -> Option<&'static str> {
+    for zone in ZONES {
+        if zone.sections.contains(&section) {
+            return Some(zone.id);
+        }
+    }
+    None
+}
 
 /// Main forum index page showing all zones and their categories.
 #[component]
@@ -99,7 +122,7 @@ pub fn ForumsPage() -> impl IntoView {
                 return;
             }
 
-            // Extract section tag: ["section", "zone-id/category-name"]
+            // Extract section tag: ["section", "section-id"]
             let section_tag = event
                 .tags
                 .iter()
@@ -107,19 +130,29 @@ pub fn ForumsPage() -> impl IntoView {
                 .map(|t| t[1].clone())
                 .unwrap_or_default();
 
-            let (zone, category) = if let Some(idx) = section_tag.find('/') {
-                (
-                    section_tag[..idx].to_string(),
-                    section_tag[idx + 1..].to_string(),
-                )
-            } else if !section_tag.is_empty() {
-                (section_tag.clone(), "General".to_string())
-            } else {
-                ("public-lobby".to_string(), "General".to_string())
-            };
+            if section_tag.is_empty() {
+                return;
+            }
+
+            // Resolve section ID to its parent zone
+            let zone_id = section_to_zone(&section_tag)
+                .unwrap_or_else(|| {
+                    // Fallback: if section_tag contains '/', use the prefix as zone
+                    // Otherwise skip unrecognised sections
+                    if section_tag.contains('/') {
+                        return "unknown";
+                    }
+                    "unknown"
+                });
+            if zone_id == "unknown" {
+                return;
+            }
+
+            // Use the section ID as the category within this zone
+            let category = section_tag;
 
             zc.update(|map| {
-                let cats = map.entry(zone).or_default();
+                let cats = map.entry(zone_id.to_string()).or_default();
                 *cats.entry(category).or_insert(0) += 1;
             });
         });
@@ -269,36 +302,41 @@ pub fn ForumsPage() -> impl IntoView {
 #[component]
 fn ZoneIcon(icon: &'static str, accent: &'static str) -> impl IntoView {
     let bg_class = match accent {
-        "amber" => "w-10 h-10 rounded-lg flex items-center justify-center bg-amber-500/10",
-        "blue" => "w-10 h-10 rounded-lg flex items-center justify-center bg-blue-500/10",
+        "green" => "w-10 h-10 rounded-lg flex items-center justify-center bg-green-500/10",
         "purple" => "w-10 h-10 rounded-lg flex items-center justify-center bg-purple-500/10",
-        "emerald" => "w-10 h-10 rounded-lg flex items-center justify-center bg-emerald-500/10",
+        "pink" => "w-10 h-10 rounded-lg flex items-center justify-center bg-pink-500/10",
+        "sky" => "w-10 h-10 rounded-lg flex items-center justify-center bg-sky-500/10",
         _ => "w-10 h-10 rounded-lg flex items-center justify-center bg-gray-500/10",
     };
 
     let svg = match icon {
-        "globe" => view! {
-            <svg class="w-5 h-5 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <circle cx="12" cy="12" r="10" stroke-linecap="round"/>
-                <path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10A15.3 15.3 0 0112 2z" stroke-linecap="round"/>
+        // Home icon for Fairfield Family
+        "home" => view! {
+            <svg class="w-5 h-5 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round"/>
+                <polyline points="9 22 9 12 15 12 15 22" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
         }.into_any(),
-        "users" => view! {
-            <svg class="w-5 h-5 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke-linecap="round" stroke-linejoin="round"/>
-                <circle cx="9" cy="7" r="4" stroke-linecap="round"/>
-                <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-        }.into_any(),
-        "code" => view! {
+        // Moon icon for Minimoonoir
+        "moon" => view! {
             <svg class="w-5 h-5 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <polyline points="16 18 22 12 16 6" stroke-linecap="round" stroke-linejoin="round"/>
-                <polyline points="8 6 2 12 8 18" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
         }.into_any(),
-        "shield" => view! {
-            <svg class="w-5 h-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke-linecap="round" stroke-linejoin="round"/>
+        // Sparkle icon for DreamLab
+        "sparkle" => view! {
+            <svg class="w-5 h-5 text-pink-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8L12 2z" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        }.into_any(),
+        // Bot icon for AI Agents
+        "bot" => view! {
+            <svg class="w-5 h-5 text-sky-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="3" y="11" width="18" height="10" rx="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="12" cy="5" r="2" stroke-linecap="round"/>
+                <path d="M12 7v4" stroke-linecap="round"/>
+                <line x1="8" y1="16" x2="8" y2="16" stroke-linecap="round" stroke-width="2"/>
+                <line x1="16" y1="16" x2="16" y2="16" stroke-linecap="round" stroke-width="2"/>
             </svg>
         }.into_any(),
         _ => view! { <span class="text-gray-400">"?"</span> }.into_any(),

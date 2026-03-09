@@ -85,7 +85,7 @@ fn RegistrationsInner() -> impl IntoView {
             action_msg.set(None);
             let pending_sig = pending;
             spawn_local(async move {
-                let cohorts = vec!["general".to_string()];
+                let cohorts = vec!["cross-access".to_string()];
                 match admin_ctx
                     .add_to_whitelist(&pubkey, &cohorts, &privkey)
                     .await
@@ -137,7 +137,7 @@ fn RegistrationsInner() -> impl IntoView {
             let pending_sig = pending;
             let count = selected.len();
             spawn_local(async move {
-                let cohorts = vec!["general".to_string()];
+                let cohorts = vec!["cross-access".to_string()];
                 let mut ok_count = 0usize;
                 for pk in &selected {
                     if admin_ctx
