@@ -20,6 +20,7 @@ use crate::components::toast::{provide_toasts, ToastContainer};
 use crate::components::fx::provide_render_tier;
 use crate::components::user_display::provide_name_cache;
 use crate::components::screen_reader::{provide_announcer, ScreenReaderAnnouncer};
+use crate::stores::channels::{provide_channel_store, use_channel_store};
 use crate::stores::mute::provide_mute_store;
 use crate::stores::preferences::provide_preferences;
 use crate::stores::read_position::provide_read_positions;
@@ -29,7 +30,7 @@ use crate::pages::{
     HomePage, LoginPage, NoteViewPage, PendingPage, SectionPage, SettingsPage, SetupPage,
     SignupPage,
 };
-use crate::relay::RelayConnection;
+use crate::relay::{ConnectionState, RelayConnection};
 
 // -- Base path for sub-directory deployment -----------------------------------
 
@@ -206,6 +207,7 @@ pub fn App() -> impl IntoView {
     // Provide relay connection as context — connect/disconnect reactively with auth state
     let relay = RelayConnection::new();
     provide_context(relay.clone());
+    provide_channel_store();
 
     let auth = use_auth();
     let is_authed = auth.is_authenticated();
@@ -219,6 +221,36 @@ pub fn App() -> impl IntoView {
             r.disconnect();
         }
     });
+
+    // Start channel sync once relay connects (single subscription for all pages)
+    let relay_conn = relay.connection_state();
+    Effect::new(move |_| {
+        if relay_conn.get() != ConnectionState::Connected {
+            return;
+        }
+        let store = use_channel_store();
+        let r = expect_context::<RelayConnection>();
+        store.start_sync(&r);
+    });
+
+    // Start message count sync after channel EOSE
+    Effect::new(move |_| {
+        let store = use_channel_store();
+        if !store.eose_received.get() {
+            return;
+        }
+        let r = expect_context::<RelayConnection>();
+        store.start_msg_sync(&r);
+    });
+
+    // Cleanup on unmount
+    {
+        let relay_cleanup = relay;
+        on_cleanup(move || {
+            let store = use_channel_store();
+            store.cleanup(&relay_cleanup);
+        });
+    }
 
     view! {
         <Router base=FORUM_BASE>

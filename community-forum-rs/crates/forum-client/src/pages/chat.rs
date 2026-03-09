@@ -1,33 +1,17 @@
-//! Channel list page -- displays NIP-28 channels (kind 40) from the relay.
+//! Channel list page -- reads from shared ChannelStore (no per-page subscription).
 
 use leptos::prelude::*;
 use leptos_router::components::A;
 use leptos_router::hooks::use_query_map;
-use std::collections::HashMap;
-use std::rc::Rc;
-use wasm_bindgen::JsCast;
 
 use crate::app::base_href;
 use crate::components::channel_card::{ChannelCard, ChannelInfo};
 use crate::components::mark_all_read::MarkAllRead;
-use crate::relay::{ConnectionState, Filter, RelayConnection};
+use crate::stores::channels::use_channel_store;
 use crate::stores::mute::use_mute_store;
 use crate::stores::read_position::use_read_positions;
 
-/// Parsed channel creation event metadata.
-#[derive(Clone, Debug)]
-struct ChannelMeta {
-    id: String,
-    name: String,
-    description: String,
-    section: String,
-    #[allow(dead_code)]
-    created_at: u64,
-}
-
 /// Zone-based filter pill definitions matching production sections.yaml.
-/// Values are zone IDs; channels are matched by resolving their section tag
-/// to a parent zone via ZONE_SECTIONS below.
 const SECTION_FILTERS: &[(&str, &str)] = &[
     ("All", ""),
     ("Fairfield Family", "fairfield-family"),
@@ -54,178 +38,22 @@ fn section_to_zone_id(section: &str) -> Option<&'static str> {
     None
 }
 
-/// Channel list page. Subscribes to kind 40 (channel creation) events,
-/// displays them as cards, and supports filtering by section query param.
+/// Channel list page. Reads from shared ChannelStore and supports zone filtering.
 #[component]
 pub fn ChatPage() -> impl IntoView {
-    let relay = expect_context::<RelayConnection>();
-    let conn_state = relay.connection_state();
+    let store = use_channel_store();
+    let conn_state = expect_context::<crate::relay::RelayConnection>().connection_state();
 
     let query = use_query_map();
     let section_filter = move || query.read().get("section").unwrap_or_default();
-
-    // Reactive state
-    let channels = RwSignal::new(Vec::<ChannelMeta>::new());
-    let message_counts = RwSignal::new(HashMap::<String, u32>::new());
-    let last_active_map = RwSignal::new(HashMap::<String, u64>::new());
-    let loading = RwSignal::new(true);
-    let error_msg: RwSignal<Option<String>> = RwSignal::new(None);
-    let eose_received = RwSignal::new(false);
-
-    // Track the active subscription ID for cleanup
-    let sub_id: RwSignal<Option<String>> = RwSignal::new(None);
-    let msg_sub_id: RwSignal<Option<String>> = RwSignal::new(None);
-
-    // Clone relay for each closure that needs it
-    let relay_for_channels = relay.clone();
-    let relay_for_msgs = relay.clone();
-    let relay_for_cleanup = relay;
-
-    // Subscribe to kind 40 events when connected
-    Effect::new(move |_| {
-        let state = conn_state.get();
-        if state != ConnectionState::Connected {
-            return;
-        }
-
-        // Already subscribed
-        if sub_id.get_untracked().is_some() {
-            return;
-        }
-
-        loading.set(true);
-        error_msg.set(None);
-
-        let filter = Filter {
-            kinds: Some(vec![40]),
-            ..Default::default()
-        };
-
-        let channels_sig = channels;
-        let on_event = Rc::new(move |event: nostr_core::NostrEvent| {
-            if event.kind != 40 {
-                return;
-            }
-
-            // Parse channel metadata from content JSON
-            let (name, description) = parse_channel_content(&event.content);
-
-            // Extract section from tags
-            let section = event
-                .tags
-                .iter()
-                .find(|t| t.len() >= 2 && t[0] == "section")
-                .map(|t| t[1].clone())
-                .unwrap_or_default();
-
-            let meta = ChannelMeta {
-                id: event.id.clone(),
-                name,
-                description,
-                section,
-                created_at: event.created_at,
-            };
-
-            // Add or update channel (deduplicate by id)
-            channels_sig.update(|list| {
-                if !list.iter().any(|c| c.id == meta.id) {
-                    list.push(meta);
-                }
-            });
-        });
-
-        let on_eose = Rc::new(move || {
-            loading.set(false);
-            eose_received.set(true);
-        });
-
-        let id = relay_for_channels.subscribe(vec![filter], on_event, Some(on_eose));
-        sub_id.set(Some(id));
-
-        // Set a loading timeout so the UI never gets stuck
-        let loading_sig = loading;
-        let cb = wasm_bindgen::closure::Closure::once(move || {
-            if loading_sig.get_untracked() {
-                loading_sig.set(false);
-            }
-        });
-        let window = web_sys::window().expect("no global window");
-        let _ = window.set_timeout_with_callback_and_timeout_and_arguments_0(
-            cb.as_ref().unchecked_ref(),
-            6000,
-        );
-        cb.forget();
-    });
-
-    // Subscribe to kind 42 (messages) once channel EOSE arrives, for counts
-    Effect::new(move |_| {
-        if !eose_received.get() {
-            return;
-        }
-        if msg_sub_id.get_untracked().is_some() {
-            return;
-        }
-
-        let channel_ids: Vec<String> = channels
-            .get_untracked()
-            .iter()
-            .map(|c| c.id.clone())
-            .collect();
-        if channel_ids.is_empty() {
-            return;
-        }
-
-        let msg_filter = Filter {
-            kinds: Some(vec![42]),
-            e_tags: Some(channel_ids),
-            ..Default::default()
-        };
-
-        let msg_counts = message_counts;
-        let last_active = last_active_map;
-        let on_msg_event = Rc::new(move |event: nostr_core::NostrEvent| {
-            // Find channel ID from the root "e" tag
-            let channel_id = event
-                .tags
-                .iter()
-                .find(|t| t.len() >= 4 && t[0] == "e" && t[3] == "root")
-                .or_else(|| event.tags.iter().find(|t| t.len() >= 2 && t[0] == "e"))
-                .map(|t| t[1].clone());
-
-            if let Some(cid) = channel_id {
-                msg_counts.update(|m| {
-                    let count = m.entry(cid.clone()).or_insert(0);
-                    *count += 1;
-                });
-                last_active.update(|m| {
-                    let ts = m.entry(cid).or_insert(0);
-                    if event.created_at > *ts {
-                        *ts = event.created_at;
-                    }
-                });
-            }
-        });
-
-        let id = relay_for_msgs.subscribe(vec![msg_filter], on_msg_event, None);
-        msg_sub_id.set(Some(id));
-    });
-
-    // Cleanup subscriptions on unmount
-    on_cleanup(move || {
-        if let Some(id) = sub_id.get_untracked() {
-            relay_for_cleanup.unsubscribe(&id);
-        }
-        if let Some(id) = msg_sub_id.get_untracked() {
-            relay_for_cleanup.unsubscribe(&id);
-        }
-    });
 
     let mute_store = use_mute_store();
     let read_store = use_read_positions();
 
     // Mark all channels as read callback
+    let channels_for_mark = store.channels;
     let on_mark_all_read = Callback::new(move |_: ()| {
-        let chans = channels.get_untracked();
+        let chans = channels_for_mark.get_untracked();
         let now = (js_sys::Date::now() / 1000.0) as u64;
         for ch in &chans {
             read_store.mark_read(&ch.id, "", now);
@@ -235,9 +63,9 @@ pub fn ChatPage() -> impl IntoView {
     // Filtered and sorted channel list (unmuted)
     let filtered_channels = move || {
         let section = section_filter();
-        let chans = channels.get();
-        let counts = message_counts.get();
-        let active = last_active_map.get();
+        let chans = store.channels.get();
+        let counts = store.message_counts.get();
+        let active = store.last_active.get();
 
         let mut result: Vec<ChannelInfo> = chans
             .iter()
@@ -245,8 +73,6 @@ pub fn ChatPage() -> impl IntoView {
                 if section.is_empty() {
                     return true;
                 }
-                // Filter matches if section tag equals the zone filter, OR
-                // if the section tag resolves to the selected zone
                 c.section == section || section_to_zone_id(&c.section) == Some(section.as_str())
             })
             .filter(|c| !mute_store.is_channel_muted(&c.id))
@@ -260,7 +86,6 @@ pub fn ChatPage() -> impl IntoView {
             })
             .collect();
 
-        // Sort by last active descending (most recent first)
         result.sort_by(|a, b| b.last_active.cmp(&a.last_active));
         result
     };
@@ -268,9 +93,9 @@ pub fn ChatPage() -> impl IntoView {
     // Muted channels (shown collapsed at bottom)
     let muted_channels = move || {
         let section = section_filter();
-        let chans = channels.get();
-        let counts = message_counts.get();
-        let active = last_active_map.get();
+        let chans = store.channels.get();
+        let counts = store.message_counts.get();
+        let active = store.last_active.get();
 
         let mut result: Vec<ChannelInfo> = chans
             .iter()
@@ -304,7 +129,8 @@ pub fn ChatPage() -> impl IntoView {
         }
     };
 
-    let channel_count = move || channels.get().len();
+    let channel_count = move || store.channels.get().len();
+    let loading = store.loading;
 
     view! {
         <div class="max-w-4xl mx-auto p-4 sm:p-6">
@@ -363,34 +189,24 @@ pub fn ChatPage() -> impl IntoView {
             {move || {
                 let state = conn_state.get();
                 match state {
-                    ConnectionState::Reconnecting => Some(view! {
+                    crate::relay::ConnectionState::Reconnecting => Some(view! {
                         <div class="bg-yellow-900/50 border border-yellow-700 rounded-lg px-4 py-3 mb-4 flex items-center gap-2">
                             <span class="animate-pulse w-2 h-2 rounded-full bg-yellow-400"></span>
                             <span class="text-yellow-200 text-sm">"Reconnecting to relay..."</span>
                         </div>
                     }.into_any()),
-                    ConnectionState::Error => Some(view! {
+                    crate::relay::ConnectionState::Error => Some(view! {
                         <div class="bg-red-900/50 border border-red-700 rounded-lg px-4 py-3 mb-4">
                             <span class="text-red-200 text-sm">"Connection error. Retrying..."</span>
                         </div>
                     }.into_any()),
-                    ConnectionState::Disconnected => Some(view! {
+                    crate::relay::ConnectionState::Disconnected => Some(view! {
                         <div class="bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 mb-4">
                             <span class="text-gray-300 text-sm">"Disconnected from relay."</span>
                         </div>
                     }.into_any()),
                     _ => None,
                 }
-            }}
-
-            // Error message
-            {move || {
-                error_msg.get().map(|msg| view! {
-                    <div class="bg-gray-800 border border-gray-700 rounded-lg p-6 text-center mb-4">
-                        <h3 class="text-lg font-semibold text-red-400 mb-2">"Connection Issue"</h3>
-                        <p class="text-gray-400 mb-4">{msg}</p>
-                    </div>
-                })
             }}
 
             // Content
@@ -410,7 +226,6 @@ pub fn ChatPage() -> impl IntoView {
                     if chans.is_empty() {
                         view! {
                             <div class="bg-gray-800/50 border border-gray-700 rounded-xl p-12 text-center">
-                                // Chat bubble SVG icon
                                 <div class="flex justify-center mb-5">
                                     <div class="w-16 h-16 rounded-full bg-gray-700/50 flex items-center justify-center">
                                         <svg class="w-8 h-8 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -460,7 +275,7 @@ pub fn ChatPage() -> impl IntoView {
                 }
             }}
 
-            // Muted channels section (collapsed at bottom)
+            // Muted channels section
             {move || {
                 let muted = muted_channels();
                 if muted.is_empty() {
@@ -502,7 +317,7 @@ pub fn ChatPage() -> impl IntoView {
     }
 }
 
-/// Skeleton loader for a channel card (loading placeholder).
+/// Skeleton loader for a channel card.
 #[component]
 fn ChannelSkeleton() -> impl IntoView {
     view! {
@@ -516,25 +331,5 @@ fn ChannelSkeleton() -> impl IntoView {
                 </div>
             </div>
         </div>
-    }
-}
-
-/// Parse channel creation event content JSON into (name, description).
-fn parse_channel_content(content: &str) -> (String, String) {
-    match serde_json::from_str::<serde_json::Value>(content) {
-        Ok(val) => {
-            let name = val
-                .get("name")
-                .and_then(|v| v.as_str())
-                .unwrap_or("Unnamed Channel")
-                .to_string();
-            let description = val
-                .get("about")
-                .and_then(|v| v.as_str())
-                .unwrap_or("")
-                .to_string();
-            (name, description)
-        }
-        Err(_) => ("Unnamed Channel".to_string(), String::new()),
     }
 }

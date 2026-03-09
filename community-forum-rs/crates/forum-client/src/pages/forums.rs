@@ -5,15 +5,12 @@
 //! each zone with its categories as visually rich hero cards.
 
 use leptos::prelude::*;
-use nostr_core::NostrEvent;
 use std::collections::HashMap;
-use std::rc::Rc;
 
 use crate::components::breadcrumb::{Breadcrumb, BreadcrumbItem};
 use crate::components::category_card::CategoryCard;
 use crate::components::empty_state::EmptyState;
-use crate::relay::{ConnectionState, Filter, RelayConnection};
-use crate::utils::set_timeout_once;
+use crate::stores::channels::use_channel_store;
 
 // -- Zone definitions (matching config/sections.yaml) -------------------------
 
@@ -86,99 +83,26 @@ fn section_to_zone(section: &str) -> Option<&'static str> {
 }
 
 /// Main forum index page showing all zones and their categories.
+/// Reads from the shared ChannelStore — no per-page relay subscription.
 #[component]
 pub fn ForumsPage() -> impl IntoView {
-    let relay = expect_context::<RelayConnection>();
-    let conn_state = relay.connection_state();
+    let store = use_channel_store();
+    let loading = store.loading;
 
-    // zone_id -> { category_name -> count_of_sections }
-    let zone_categories = RwSignal::new(HashMap::<String, HashMap<String, u32>>::new());
-    let loading = RwSignal::new(true);
-    let sub_id: RwSignal<Option<String>> = RwSignal::new(None);
-
-    let relay_for_sub = relay.clone();
-    let relay_for_cleanup = relay;
-
-    // Subscribe to kind 40 channel-creation events
-    Effect::new(move |_| {
-        let state = conn_state.get();
-        if state != ConnectionState::Connected {
-            return;
-        }
-        if sub_id.get_untracked().is_some() {
-            return;
-        }
-
-        loading.set(true);
-
-        let filter = Filter {
-            kinds: Some(vec![40]),
-            ..Default::default()
-        };
-
-        let zc = zone_categories;
-        let on_event = Rc::new(move |event: NostrEvent| {
-            if event.kind != 40 {
-                return;
+    // Derive zone_id -> { section_id -> channel_count } from the shared store
+    let zone_categories = Memo::new(move |_| {
+        let chans = store.channels.get();
+        let mut map = HashMap::<String, HashMap<String, u32>>::new();
+        for ch in &chans {
+            if ch.section.is_empty() {
+                continue;
             }
-
-            // Extract section tag: ["section", "section-id"]
-            let section_tag = event
-                .tags
-                .iter()
-                .find(|t| t.len() >= 2 && t[0] == "section")
-                .map(|t| t[1].clone())
-                .unwrap_or_default();
-
-            if section_tag.is_empty() {
-                return;
-            }
-
-            // Resolve section ID to its parent zone
-            let zone_id = section_to_zone(&section_tag)
-                .unwrap_or_else(|| {
-                    // Fallback: if section_tag contains '/', use the prefix as zone
-                    // Otherwise skip unrecognised sections
-                    if section_tag.contains('/') {
-                        return "unknown";
-                    }
-                    "unknown"
-                });
-            if zone_id == "unknown" {
-                return;
-            }
-
-            // Use the section ID as the category within this zone
-            let category = section_tag;
-
-            zc.update(|map| {
+            if let Some(zone_id) = section_to_zone(&ch.section) {
                 let cats = map.entry(zone_id.to_string()).or_default();
-                *cats.entry(category).or_insert(0) += 1;
-            });
-        });
-
-        let loading_sig = loading;
-        let on_eose = Rc::new(move || {
-            loading_sig.set(false);
-        });
-
-        let id = relay_for_sub.subscribe(vec![filter], on_event, Some(on_eose));
-        sub_id.set(Some(id));
-
-        set_timeout_once(
-            move || {
-                if loading_sig.get_untracked() {
-                    loading_sig.set(false);
-                }
-            },
-            8000,
-        );
-    });
-
-    on_cleanup(move || {
-        if let Some(id) = sub_id.get_untracked() {
-            relay_for_cleanup.unsubscribe(&id);
+                *cats.entry(ch.section.clone()).or_insert(0) += 1;
+            }
         }
+        map
     });
 
     view! {

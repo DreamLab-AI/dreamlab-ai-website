@@ -4,6 +4,7 @@
 //! on every mutation so state survives page reloads.  IndexedDB is used for
 //! larger data sets (messages, profiles, outbox queue).
 
+pub mod channels;
 pub mod indexed_db;
 pub mod mute;
 pub mod notifications;
