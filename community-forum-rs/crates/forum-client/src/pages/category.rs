@@ -183,31 +183,53 @@ pub fn CategoryPage() -> impl IntoView {
         }
     });
 
-    let display_name = move || capitalize(&category_slug());
+    let display_name = move || {
+        let slug = category_slug();
+        match slug.as_str() {
+            "fairfield-family" => "Fairfield Family".to_string(),
+            "minimoonoir" => "Minimoonoir".to_string(),
+            "dreamlab" => "DreamLab".to_string(),
+            "ai-agents" => "AI Agents".to_string(),
+            other => capitalize(other),
+        }
+    };
 
-    // Map category slug to zone level for ZoneHero
+    // Map category slug to zone access level for ZoneHero
     let zone_level = move || -> u8 {
-        let slug = category_slug().to_lowercase();
-        if slug.contains("lobby") || slug.contains("public") || slug.contains("general") {
-            0
-        } else if slug.contains("common") || slug.contains("community") || slug.contains("registered") {
-            1
-        } else if slug.contains("deep") || slug.contains("tech") || slug.contains("cohort") {
-            2
-        } else if slug.contains("inner") || slug.contains("sanctum") || slug.contains("private") {
-            3
-        } else {
-            0
+        let slug = category_slug();
+        match slug.as_str() {
+            "fairfield-family" => 3,     // Private
+            "minimoonoir" => 2,          // Cohort
+            "dreamlab" => 2,             // Cohort
+            "ai-agents" => 1,            // Registered
+            _ => {
+                // Also match section IDs to their parent zone
+                if slug.starts_with("family-") { 3 }
+                else if slug.starts_with("minimoonoir-") { 2 }
+                else if slug.starts_with("dreamlab-") { 2 }
+                else if slug.starts_with("ai-") { 1 }
+                else { 0 }
+            }
         }
     };
 
     // Icon path data per zone
     let zone_icon = move || -> &'static str {
-        match zone_level() {
-            0 => "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6",
-            1 => "M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z",
-            2 => "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4",
-            _ => "M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z",
+        let slug = category_slug();
+        if slug.starts_with("family") || slug == "fairfield-family" {
+            // Home
+            "M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"
+        } else if slug.starts_with("minimoonoir") {
+            // Moon
+            "M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"
+        } else if slug.starts_with("dreamlab") {
+            // Sparkle
+            "M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8L12 2z"
+        } else if slug.starts_with("ai") {
+            // Bot
+            "M3 11h18v10a2 2 0 01-2 2H5a2 2 0 01-2-2V11zm9-6a2 2 0 100 4 2 2 0 000-4zm0 4v2"
+        } else {
+            "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
         }
     };
 
