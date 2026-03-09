@@ -325,7 +325,7 @@ fn constant_time_eq(a: &[u8; 32], b: &[u8; 32]) -> bool {
 mod tests {
     use super::*;
     use k256::{elliptic_curve::sec1::ToEncodedPoint, SecretKey};
-    use proptest::prelude::*;
+    // proptest import moved to proptests submodule (native-only)
 
     /// Generate a random keypair for testing.
     fn random_keypair() -> ([u8; 32], [u8; 32]) {
@@ -518,26 +518,32 @@ mod tests {
         }
     }
 
-    proptest! {
-        #[test]
-        fn proptest_nip44_roundtrip(
-            plaintext in "[\\x20-\\x7E]{1,500}"
-        ) {
-            let (sender_sk, sender_pk) = random_keypair();
-            let (recipient_sk, recipient_pk) = random_keypair();
+    #[cfg(not(target_arch = "wasm32"))]
+    mod proptests {
+        use super::*;
+        use proptest::prelude::*;
 
-            let encrypted = encrypt(&sender_sk, &recipient_pk, &plaintext).unwrap();
-            let decrypted = decrypt(&recipient_sk, &sender_pk, &encrypted).unwrap();
+        proptest! {
+            #[test]
+            fn proptest_nip44_roundtrip(
+                plaintext in "[\\x20-\\x7E]{1,500}"
+            ) {
+                let (sender_sk, sender_pk) = random_keypair();
+                let (recipient_sk, recipient_pk) = random_keypair();
 
-            prop_assert_eq!(decrypted, plaintext);
-        }
+                let encrypted = encrypt(&sender_sk, &recipient_pk, &plaintext).unwrap();
+                let decrypted = decrypt(&recipient_sk, &sender_pk, &encrypted).unwrap();
 
-        #[test]
-        fn proptest_padding_roundtrip(len in 1usize..=65535) {
-            let data = vec![0xAB; len];
-            let padded = pad(&data).unwrap();
-            let unpadded = unpad(&padded).unwrap();
-            prop_assert_eq!(unpadded, &data[..]);
+                prop_assert_eq!(decrypted, plaintext);
+            }
+
+            #[test]
+            fn proptest_padding_roundtrip(len in 1usize..=65535) {
+                let data = vec![0xAB; len];
+                let padded = pad(&data).unwrap();
+                let unpadded = unpad(&padded).unwrap();
+                prop_assert_eq!(unpadded, &data[..]);
+            }
         }
     }
 }
