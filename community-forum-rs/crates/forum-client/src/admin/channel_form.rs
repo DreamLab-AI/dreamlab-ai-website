@@ -35,6 +35,7 @@ pub struct ChannelFormData {
     pub name: String,
     pub description: String,
     pub section: String,
+    pub picture: String,
     pub zone: u8,
     pub cohort: Option<String>,
 }
@@ -47,6 +48,7 @@ where
 {
     let name = RwSignal::new(String::new());
     let description = RwSignal::new(String::new());
+    let picture = RwSignal::new(String::new());
     let section = RwSignal::new(SECTIONS[0].0.to_string());
     let zone = RwSignal::new(0u8);
     let cohort = RwSignal::new(String::new());
@@ -67,6 +69,11 @@ where
     let on_desc_input = move |ev: leptos::ev::Event| {
         let target = event_target_value(&ev);
         description.set(target);
+    };
+
+    let on_picture_input = move |ev: leptos::ev::Event| {
+        let target = event_target_value(&ev);
+        picture.set(target);
     };
 
     let on_section_change = move |ev: leptos::ev::Event| {
@@ -104,6 +111,7 @@ where
             name: n.trim().to_string(),
             description: description.get_untracked().trim().to_string(),
             section: section.get_untracked(),
+            picture: picture.get_untracked().trim().to_string(),
             zone: z,
             cohort: if z >= 2 && !c.trim().is_empty() { Some(c.trim().to_string()) } else { None },
         });
@@ -112,6 +120,7 @@ where
         // Reset form
         name.set(String::new());
         description.set(String::new());
+        picture.set(String::new());
         section.set(SECTIONS[0].0.to_string());
         zone.set(0);
         cohort.set(String::new());
@@ -166,6 +175,23 @@ where
                     rows="3"
                     class="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors resize-none"
                 />
+            </div>
+
+            // Picture URL input
+            <div class="space-y-1">
+                <label for="channel-picture" class="block text-sm font-medium text-gray-300">
+                    "Picture URL"
+                </label>
+                <input
+                    id="channel-picture"
+                    type="url"
+                    maxlength="512"
+                    prop:value=move || picture.get()
+                    on:input=on_picture_input
+                    placeholder="https://example.com/image.webp"
+                    class="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
+                />
+                <p class="text-xs text-gray-500">"Optional cover image URL for the channel card."</p>
             </div>
 
             // Section dropdown

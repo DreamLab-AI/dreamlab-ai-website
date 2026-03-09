@@ -12,14 +12,12 @@ const Index = lazy(() => import("./pages/Index"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const Team = lazy(() => import("./pages/Team"));
-const Work = lazy(() => import("./pages/Work"));
 const Contact = lazy(() => import("./pages/Contact"));
 const WorkshopPage = lazy(() => import("./pages/WorkshopPage"));
 const WorkshopIndex = lazy(() => import("./pages/WorkshopIndex"));
-const ResidentialTraining = lazy(() => import("./pages/ResidentialTraining"));
-// Masterclass page consolidated into landing page — /masterclass now redirects to /
-const SystemDesign = lazy(() => import("./pages/SystemDesign"));
-const ResearchPaper = lazy(() => import("./pages/ResearchPaper"));
+const Programmes = lazy(() => import("./pages/Programmes"));
+const CoCreate = lazy(() => import("./pages/CoCreate"));
+const Research = lazy(() => import("./pages/Research"));
 const Testimonials = lazy(() => import("./pages/Testimonials"));
 
 // Initialize React Query client
@@ -31,47 +29,38 @@ const queryClient = new QueryClient();
  * and defines the main application routing using React Router.
  */
 const App = () => (
-  // Provide React Query client to the app
   <QueryClientProvider client={queryClient}>
-    {/* Provide tooltip functionality */}
     <TooltipProvider>
-      {/* Toaster components for displaying notifications */}
       <Toaster />
       <Sonner />
-      {/* Set up client-side routing */}
       <BrowserRouter>
         <Suspense fallback={<RouteLoader />}>
           <Routes>
-            {/* Main index route */}
             <Route path="/" element={<Index />} />
-            {/* Team page route */}
+            <Route path="/programmes" element={<Programmes />} />
+            <Route path="/co-create" element={<CoCreate />} />
+            <Route path="/research" element={<Research />} />
             <Route path="/team" element={<Team />} />
-            {/* Previous Work route */}
-            <Route path="/work" element={<Work />} />
 
             {/* Workshop Routes */}
             <Route path="/workshops" element={<WorkshopIndex />} />
             <Route path="/workshops/:workshopId" element={<WorkshopPage />} />
             <Route path="/workshops/:workshopId/:pageSlug" element={<WorkshopPage />} />
 
-            {/* Residential Training route */}
-            <Route path="/residential-training" element={<ResidentialTraining />} />
-
-            {/* Legacy /masterclass redirects to landing page */}
-            <Route path="/masterclass" element={<Navigate to="/#training-options" replace />} />
-
-            {/* Contact form route */}
-            <Route path="/contact" element={<Contact />} />
-            {/* Privacy Policy route */}
-            <Route path="/privacy" element={<Privacy />} />
-            {/* System Design route */}
-            <Route path="/system-design" element={<SystemDesign />} />
-            {/* Research Paper route */}
-            <Route path="/research-paper" element={<ResearchPaper />} />
-            {/* Testimonials route */}
+            {/* Impact Stories (formerly Testimonials) */}
             <Route path="/testimonials" element={<Testimonials />} />
-            {/* --- Add Custom Routes Above This Line --- */}
-            {/* Catch-all route for pages not found */}
+
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/privacy" element={<Privacy />} />
+
+            {/* Legacy redirects — old routes point to new equivalents */}
+            <Route path="/residential-training" element={<Navigate to="/programmes" replace />} />
+            <Route path="/masterclass" element={<Navigate to="/programmes" replace />} />
+            <Route path="/system-design" element={<Navigate to="/research" replace />} />
+            <Route path="/research-paper" element={<Navigate to="/research" replace />} />
+            <Route path="/work" element={<Navigate to="/research" replace />} />
+
+            {/* Catch-all */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

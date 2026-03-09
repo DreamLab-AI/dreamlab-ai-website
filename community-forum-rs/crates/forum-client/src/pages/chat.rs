@@ -81,6 +81,7 @@ pub fn ChatPage() -> impl IntoView {
                 name: c.name.clone(),
                 description: c.description.clone(),
                 section: c.section.clone(),
+                picture: c.picture.clone(),
                 message_count: counts.get(&c.id).copied().unwrap_or(0),
                 last_active: active.get(&c.id).copied().unwrap_or(0),
             })
@@ -111,6 +112,7 @@ pub fn ChatPage() -> impl IntoView {
                 name: c.name.clone(),
                 description: c.description.clone(),
                 section: c.section.clone(),
+                picture: c.picture.clone(),
                 message_count: counts.get(&c.id).copied().unwrap_or(0),
                 last_active: active.get(&c.id).copied().unwrap_or(0),
             })

@@ -236,6 +236,7 @@ fn ChannelsTab() -> impl IntoView {
                 &data.name,
                 &data.description,
                 &data.section,
+                &data.picture,
                 data.zone,
                 data.cohort.as_deref(),
                 &privkey,

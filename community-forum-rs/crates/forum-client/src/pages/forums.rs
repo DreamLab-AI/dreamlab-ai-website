@@ -152,6 +152,8 @@ pub fn ForumsPage() -> impl IntoView {
 
                         let gradient = zone_gradient(accent);
                         let border = zone_border(accent);
+                        let hero_img = zone_default_image(zone_id);
+                        let has_hero = !hero_img.is_empty();
 
                         view! {
                             <section class="mb-10">
@@ -160,6 +162,16 @@ pub fn ForumsPage() -> impl IntoView {
                                     "relative mb-4 py-6 px-6 rounded-2xl overflow-hidden bg-gradient-to-br {} border {} backdrop-blur-sm",
                                     gradient, border
                                 )>
+                                    // Background hero image (subtle, behind gradient)
+                                    {has_hero.then(|| view! {
+                                        <img
+                                            src=hero_img
+                                            alt=""
+                                            class="absolute inset-0 w-full h-full object-cover opacity-15 pointer-events-none"
+                                            loading="lazy"
+                                        />
+                                        <div class="absolute inset-0 bg-gray-900/50 pointer-events-none"></div>
+                                    })}
                                     <div class="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/5 blur-3xl" aria-hidden="true"></div>
                                     <div class="absolute -bottom-8 -left-8 w-32 h-32 rounded-full bg-white/3 blur-2xl" aria-hidden="true"></div>
 
@@ -231,6 +243,17 @@ pub fn ForumsPage() -> impl IntoView {
                 }}
             </Show>
         </div>
+    }
+}
+
+/// Map zone IDs to default hero images from the main marketing site.
+fn zone_default_image(zone_id: &str) -> &'static str {
+    match zone_id {
+        "fairfield-family" => "/images/heroes/dreamlab-hero.webp",
+        "minimoonoir" => "/images/heroes/corporate-immersive.webp",
+        "dreamlab" => "/images/heroes/ai-commander-week.webp",
+        "ai-agents" => "/images/heroes/decentralised-agents.webp",
+        _ => "",
     }
 }
 

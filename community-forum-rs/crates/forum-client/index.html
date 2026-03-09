@@ -60,7 +60,9 @@
         }
     </script>
 
-    <!-- Base styles processed by Trunk -->
+    <!-- Shared design tokens (same source as React marketing site) -->
+    <link data-trunk rel="css" href="design-tokens.css" />
+    <!-- Forum-specific styles (imports design-tokens.css for @import fallback) -->
     <link data-trunk rel="css" href="style.css" />
 
     <!-- Trunk WASM bundle injection (workspace: specify package + binary) -->

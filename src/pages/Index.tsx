@@ -1,145 +1,134 @@
-import { lazy, Suspense, useRef, useState } from "react";
+import { lazy, Suspense, useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { HyperdimensionalHeroBackground } from "@/components/HyperdimensionalHeroBackground";
 import { Header } from "@/components/Header";
 import {
   ChevronDown,
-  Laptop,
-  Play,
-  Wrench,
-  FileText,
-  Calendar,
-  FolderOpen,
-  CheckCircle2,
-  XCircle,
-  Shield,
-  ChevronRight,
   ArrowRight,
-  Mail,
-  MessageSquare,
+  Brain,
+  Glasses,
+  ShieldCheck,
+  Palette,
+  Building2,
   Users,
-  FileSpreadsheet,
-  Search,
-  Bot
+  Beaker,
+  Handshake,
+  GraduationCap,
+  Play,
 } from "lucide-react";
 import { useOGMeta } from "@/hooks/useOGMeta";
 import { PAGE_OG_CONFIGS } from "@/lib/og-meta";
 
-// Lazy-load email signup for performance
 const EmailSignupForm = lazy(() => import("@/components/EmailSignupForm").then(m => ({ default: m.EmailSignupForm })));
 
-// Loading skeleton
-const SectionSkeleton = () => (
-  <div className="w-full py-24 flex items-center justify-center">
-    <div className="w-8 h-8 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin" />
-  </div>
-);
-
-// Example use cases data
-const useCases = [
+// Programme track definitions
+const programmeTracks = [
   {
-    title: "Support triage assistant",
-    icon: MessageSquare,
-    input: "New support tickets (or an export)",
-    output: "Categorised tickets, suggested replies, and a priority queue"
+    id: "ai-autonomous",
+    title: "AI & Autonomous Systems",
+    description: "From agentic orchestration to production-grade multi-model architectures. Build systems that reason, plan, and act.",
+    accent: "sky",
+    trlRange: "3-7",
+    icon: Brain,
+    borderClass: "border-sky-500/30 hover:border-sky-500/50",
+    iconBg: "bg-sky-500/10",
+    iconColor: "text-sky-400",
+    badgeBg: "bg-sky-500/20",
+    badgeText: "text-sky-300",
   },
   {
-    title: "Sales lead follow-up drafter",
-    icon: Users,
-    input: "New leads from a form/CRM export",
-    output: "Draft follow-ups and a tidy next-step list"
+    id: "immersive-xr",
+    title: "Immersive & XR",
+    description: "LED volume workflows, spatial computing on Vision Pro, and industrial XR training systems with Emmy-nominated talent.",
+    accent: "purple",
+    trlRange: "4-7",
+    icon: Glasses,
+    borderClass: "border-purple-500/30 hover:border-purple-500/50",
+    iconBg: "bg-purple-500/10",
+    iconColor: "text-purple-400",
+    badgeBg: "bg-purple-500/20",
+    badgeText: "text-purple-300",
   },
   {
-    title: "Ops reporting helper",
-    icon: FileSpreadsheet,
-    input: "Weekly CSV exports",
-    output: "A clean summary, anomalies to check, and a ready-to-send update"
+    id: "cyber-trust",
+    title: "Cyber & Trust Infrastructure",
+    description: "Zero-trust architectures, decentralised identity, and cryptographic agent infrastructure. SPRITE+ network aligned.",
+    accent: "green",
+    trlRange: "3-6",
+    icon: ShieldCheck,
+    borderClass: "border-green-500/30 hover:border-green-500/50",
+    iconBg: "bg-green-500/10",
+    iconColor: "text-green-400",
+    badgeBg: "bg-green-500/20",
+    badgeText: "text-green-300",
   },
   {
-    title: "Hiring screen helper",
-    icon: FileText,
-    input: "CVs and a role scorecard",
-    output: "Structured summaries and questions for the first call"
+    id: "creative-tech",
+    title: "Creative Technology",
+    description: "Neural rendering, spatial audio production, and engineering visualisation. Where art meets applied research.",
+    accent: "pink",
+    trlRange: "2-5",
+    icon: Palette,
+    borderClass: "border-pink-500/30 hover:border-pink-500/50",
+    iconBg: "bg-pink-500/10",
+    iconColor: "text-pink-400",
+    badgeBg: "bg-pink-500/20",
+    badgeText: "text-pink-300",
   },
   {
-    title: "Internal knowledge finder",
-    icon: Search,
-    input: "A folder of docs",
-    output: "Answers with links back to the source files"
-  }
+    id: "enterprise",
+    title: "Enterprise Innovation",
+    description: "Embedded R&D sprints for senior leadership teams. Strategic AI briefings, hands-on technology immersion, and innovation roadmaps.",
+    accent: "amber",
+    trlRange: "5-8",
+    icon: Building2,
+    borderClass: "border-amber-500/30 hover:border-amber-500/50",
+    iconBg: "bg-amber-500/10",
+    iconColor: "text-amber-400",
+    badgeBg: "bg-amber-500/20",
+    badgeText: "text-amber-300",
+  },
 ];
 
-// FAQ data
-const faqs = [
-  {
-    q: "What is an AI agent, in plain English?",
-    a: "A repeatable workflow that uses AI to do a task, plus a small amount of glue so it can take inputs, use tools, and produce outputs you can check."
-  },
-  {
-    q: "Is this just 'prompting' training?",
-    a: "No. Prompts matter, but the real value is learning how to turn a useful behaviour into a workflow you can run again and improve over time."
-  },
-  {
-    q: "Do I need to be an AI expert?",
-    a: "No. This is aimed at people who are practical and can follow steps. You do not need to know machine learning."
-  },
-  {
-    q: "Do I need to be a software engineer?",
-    a: "No. Being comfortable in a terminal is enough. Git helps, but we will cover what you need."
-  },
-  {
-    q: "What operating systems do you support?",
-    a: "Windows, macOS, and Linux are all fine."
-  },
-  {
-    q: "Will it be fully autonomous?",
-    a: "Sometimes. Often the sensible version is \"agent does the work, a human approves the action\". We will choose the safest approach for your workflow."
-  },
-  {
-    q: "Can we connect it to our tools and data?",
-    a: "Yes, as long as you can access them in a practical way (exports, APIs, shared folders, or similar). On day one I aim to connect to one real data source or tool."
-  },
-  {
-    q: "Is our data safe?",
-    a: "We will be careful about what is used during the day. We will talk through sensible boundaries, and you can choose how much real data to use."
-  },
-  {
-    q: "How many people can join?",
-    a: "Up to 4 people from your team for a single engagement fee. Get in touch for details."
-  },
-  {
-    q: "Is the session recorded?",
-    a: "Yes, you will get a recording afterwards."
-  }
+// Research video demonstrations
+const researchVideos = [
+  { src: "nuclear-robot.mp4", thumb: "nuclear-robot-thumb.jpg", caption: "Nuclear decommissioning planning" },
+  { src: "unity-vr.mp4", thumb: "unity-vr-thumb.jpg", caption: "Multi-viewpoint VR collaboration" },
+  { src: "hand-interact.mp4", thumb: "hand-interact-thumb.jpg", caption: "Natural gesture interfaces" },
+  { src: "bigdata-viz.mp4", thumb: "bigdata-viz-thumb.jpg", caption: "Immersive data visualisation" },
+  { src: "robot-arm.mp4", thumb: "robot-arm-thumb.jpg", caption: "Robotic control systems" },
+  { src: "motorway-sim.mp4", thumb: "motorway-sim-thumb.jpg", caption: "Infrastructure simulation" },
 ];
 
-// FAQ Item component
-const FAQItem = ({ question, answer }: { question: string; answer: string }) => {
-  const [isOpen, setIsOpen] = useState(false);
+// Featured team members
+const featuredTeam = [
+  { name: "Dr John O'Hare", domain: "AI & Immersive Systems", role: "Founder / Chief Hyperreality Officer", image: "/data/team/04.webp" },
+  { name: "Pete Woodbridge", domain: "Agentic Architecture", role: "Co-founder / CTO", image: "/data/team/02.webp" },
+  { name: "Stephen Moyler", domain: "Cyber Infrastructure", role: "Chief Commercial Officer", image: "/data/team/03.webp" },
+  { name: "Dr Arpana Sherpa", domain: "XR & Spatial Computing", role: "Head of XR Research", image: "/data/team/06.webp" },
+];
 
-  return (
-    <div className="border-b border-purple-500/20 last:border-b-0">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full py-4 md:py-5 flex items-center justify-between text-left hover:text-purple-400 transition-colors min-h-[56px]"
-      >
-        <span className="font-medium pr-4 text-base md:text-lg">{question}</span>
-        <ChevronRight
-          className={`w-6 h-6 md:w-5 md:h-5 flex-shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`}
-        />
-      </button>
-      {isOpen && (
-        <div className="pb-5 text-muted-foreground leading-relaxed text-base">
-          {answer}
-        </div>
-      )}
-    </div>
-  );
-};
+// Facility images for carousel
+const facilityImages = [
+  "/data/media/aerial.jpeg",
+  "/data/media/fairfield-front.jpg",
+  "/data/media/fairfield-back.jpeg",
+  "/data/media/view.jpeg",
+  "/data/media/labview2.webp",
+  "/data/media/labview3.webp",
+];
 
 const Index = () => {
   useOGMeta(PAGE_OG_CONFIGS.home);
   const heroRef = useRef<HTMLDivElement>(null);
+  const [facilityIndex, setFacilityIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setFacilityIndex((prev) => (prev + 1) % facilityImages.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-hidden">
@@ -148,7 +137,7 @@ const Index = () => {
       </a>
       <Header />
 
-      {/* Hero Section */}
+      {/* Section 1: Hero */}
       <section
         id="main-content"
         ref={heroRef}
@@ -159,32 +148,36 @@ const Index = () => {
 
         <div className="container relative z-10 mt-16 flex flex-col items-center text-center px-5 md:px-4">
           <h1
-            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-6 animate-slide-up max-w-4xl leading-tight"
-            style={{
-              textShadow: '0 0 40px rgba(212, 165, 116, 0.4), 0 0 80px rgba(205, 127, 50, 0.2)'
-            }}
+            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-6 animate-slide-up max-w-5xl leading-tight"
+            style={{ textShadow: '0 0 40px rgba(212, 165, 116, 0.4), 0 0 80px rgba(205, 127, 50, 0.2)' }}
           >
-            Learn how to build and manage AI agents
+            <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 text-transparent bg-clip-text">Applied Innovation Lab</span>
           </h1>
 
           <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-foreground/85 max-w-3xl mb-8 animate-slide-up font-light tracking-wide leading-relaxed" style={{ animationDelay: '0.1s' }}>
-            Flexible deployment and workloads. Long term advantage for your business.
+            Where enterprises and SMEs co-create with deep tech. Embed in our Lake District lab to solve real problems using AI, XR, cyber, and creative technology.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 animate-scale-in mb-8 w-full sm:w-auto" style={{ animationDelay: '0.2s' }}>
-            <a
-              href="#training-options"
+            <Link
+              to="/co-create"
               className="group relative inline-flex items-center justify-center rounded-lg text-base md:text-lg font-semibold ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-xl hover:shadow-cyan-500/50 hover:scale-105 min-h-[56px] h-14 md:h-16 px-6 md:px-8 py-4 overflow-hidden"
             >
-              <span className="relative z-10">See training options</span>
+              <span className="relative z-10">Partner With Us</span>
               <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            </a>
+            </Link>
+            <Link
+              to="/programmes"
+              className="group relative inline-flex items-center justify-center rounded-lg text-base md:text-lg font-semibold ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-purple-500/40 text-foreground hover:bg-purple-500/10 hover:scale-105 min-h-[56px] h-14 md:h-16 px-6 md:px-8 py-4"
+            >
+              <span>Explore Programmes</span>
+            </Link>
           </div>
 
           <div className="animate-slide-up flex flex-col sm:flex-row gap-6 text-sm md:text-base text-muted-foreground" style={{ animationDelay: '0.25s' }}>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 bg-cyan-400 rounded-full" />
-              <span>1-day workshops · residential programmes · expert retainer</span>
+              <span>Enterprise residencies | SME sprints | KTP partnerships</span>
             </div>
           </div>
         </div>
@@ -200,522 +193,332 @@ const Index = () => {
         </div>
       </section>
 
-      {/* John's Introduction */}
-      <section className="py-16 md:py-20 relative overflow-hidden" aria-label="Introduction">
-        <div className="container max-w-4xl mx-auto px-5 md:px-4">
-          <div className="flex flex-col md:flex-row items-center gap-8 md:gap-10">
-            <div className="flex-shrink-0">
-              <div className="w-28 h-28 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center overflow-hidden shadow-2xl shadow-purple-500/30">
-                <img
-                  src="/data/team/04.webp"
-                  alt="Dr John O'Hare"
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                    e.currentTarget.parentElement!.innerHTML = '<span class="text-4xl font-bold text-white">JJ</span>';
-                  }}
-                />
+      {/* Section 2: Evidence Strip */}
+      <section className="py-8 md:py-10 border-y border-purple-500/15 bg-background/50 backdrop-blur" aria-label="Key statistics">
+        <div className="container px-5 md:px-4">
+          <div className="flex flex-wrap justify-center gap-6 md:gap-12 lg:gap-16">
+            {[
+              { stat: "£8M+", label: "Research Heritage" },
+              { stat: "16 Years", label: "Deep Tech R&D" },
+              { stat: "44+", label: "Specialists" },
+              { stat: "Lake District", label: "Residential Facility" },
+            ].map((item) => (
+              <div key={item.label} className="text-center px-4 py-2">
+                <div className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 text-transparent bg-clip-text">{item.stat}</div>
+                <div className="text-xs sm:text-sm text-muted-foreground mt-1">{item.label}</div>
               </div>
-            </div>
-            <div className="text-center md:text-left">
-              <p className="text-lg sm:text-xl md:text-2xl text-foreground/90 leading-relaxed mb-4">
-                I'm John. I build practical AI systems for a living, and I run a hands-on training day for teams who want to apply AI inside their organisation.
-              </p>
-              <p className="text-base sm:text-lg text-foreground/80 leading-relaxed mb-4">
-                In this masterclass, we'll pick one workflow you can genuinely automate with AI, then build an agent you can run on demand. You'll leave with a working agent, plus templates, prompts, frameworks, and a starter repo so you can build the next one without starting from scratch.
-              </p>
-              <p className="text-muted-foreground text-base">
-                <span className="font-semibold text-foreground">Dr John O'Hare</span> · Founder at DreamLab
-              </p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* What You'll Walk Away With */}
-      <section className="py-16 md:py-20 bg-gradient-to-b from-background to-purple-950/10" aria-label="Outcomes">
-        <div className="container max-w-6xl mx-auto px-5 md:px-4">
+      {/* Section 3: Programme Tracks */}
+      <section className="py-16 md:py-20 mesh-bg relative overflow-hidden" aria-label="Programme tracks">
+        {/* Ambient orbs */}
+        <div className="ambient-orb ambient-orb-1" aria-hidden="true" />
+        <div className="ambient-orb ambient-orb-2" aria-hidden="true" />
+        <div className="ambient-orb ambient-orb-3" aria-hidden="true" />
+
+        <div className="container max-w-6xl mx-auto px-5 md:px-4 relative z-10">
           <div className="text-center mb-12 md:mb-16">
-            <p className="text-purple-400 font-medium mb-3 text-base">Turn AI into a repeatable advantage for your business</p>
+            <p className="text-purple-400 font-medium mb-3 text-base">Five Strategic Tracks Across TRL 2-8</p>
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
-              Here's what you'll walk away with:
-            </h2>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6 md:gap-8">
-            {/* Outcome 1 */}
-            <div className="bg-background/50 backdrop-blur border border-purple-500/20 rounded-xl p-6 md:p-8 hover:border-purple-500/40 transition-colors">
-              <div className="w-12 h-12 md:w-14 md:h-14 bg-purple-500/10 rounded-xl flex items-center justify-center mb-5 md:mb-6">
-                <Laptop className="w-6 h-6 md:w-7 md:h-7 text-purple-400" />
-              </div>
-              <h3 className="text-lg md:text-xl font-semibold mb-3">A working setup on your computer</h3>
-              <p className="text-muted-foreground leading-relaxed text-base">
-                We will have set up a clean project you can keep and reuse and a git repo with a clear structure you can extend.
-              </p>
-            </div>
-
-            {/* Outcome 2 */}
-            <div className="bg-background/50 backdrop-blur border border-purple-500/20 rounded-xl p-6 md:p-8 hover:border-purple-500/40 transition-colors">
-              <div className="w-12 h-12 md:w-14 md:h-14 bg-cyan-500/10 rounded-xl flex items-center justify-center mb-5 md:mb-6">
-                <Play className="w-6 h-6 md:w-7 md:h-7 text-cyan-400" />
-              </div>
-              <h3 className="text-lg md:text-xl font-semibold mb-3">A real agent you can run on demand</h3>
-              <p className="text-muted-foreground leading-relaxed text-base">
-                You will have an agent that takes real inputs and produces useful outputs that you can run repeatedly.
-              </p>
-            </div>
-
-            {/* Outcome 3 */}
-            <div className="bg-background/50 backdrop-blur border border-purple-500/20 rounded-xl p-6 md:p-8 hover:border-purple-500/40 transition-colors">
-              <div className="w-12 h-12 md:w-14 md:h-14 bg-pink-500/10 rounded-xl flex items-center justify-center mb-5 md:mb-6">
-                <Wrench className="w-6 h-6 md:w-7 md:h-7 text-pink-400" />
-              </div>
-              <h3 className="text-lg md:text-xl font-semibold mb-3">The ability to build your own agents</h3>
-              <p className="text-muted-foreground leading-relaxed text-base">
-                You'll leave with the fundamentals to repeat this again. I will include templates, checklists and prompts so you can build the next agent easily.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* What is an AI Agent? */}
-      <section className="py-20" aria-label="What is an AI agent">
-        <div className="container max-w-4xl mx-auto px-4">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              Wait, what even is an 'AI agent'?
-            </h2>
-          </div>
-          <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-2xl p-8 md:p-10">
-            <div className="flex items-start gap-6">
-              <div className="hidden md:flex flex-shrink-0 w-16 h-16 bg-purple-500/20 rounded-full items-center justify-center">
-                <Bot className="w-8 h-8 text-purple-400" />
-              </div>
-              <div>
-                <p className="text-lg md:text-xl text-foreground/90 leading-relaxed mb-4">
-                  In plain English, an AI agent is a small bit of autonomous software that can follow a set of steps you define, use tools (files, APIs, spreadsheets, inboxes), and produce an output you can check.
-                </p>
-                <p className="text-lg text-foreground/80 leading-relaxed">
-                  Think of it like a junior assistant that can do the repetitive parts of your business fast, freeing you and your team to focus on the important stuff.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Example Use Cases */}
-      <section className="py-16 md:py-20 bg-gradient-to-b from-background to-purple-950/10" aria-label="Use cases">
-        <div className="container max-w-6xl mx-auto px-5 md:px-4">
-          <div className="text-center mb-12 md:mb-16">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
-              What you will learn to build
+              Deep Tech Programme Tracks
             </h2>
             <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-              We'll develop one small, safe, high-value automation. Here are some examples that are usually "day-one friendly":
+              Each track maps to Innovate UK Technology Readiness Levels, from applied research through to commercial deployment.
             </p>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
-            {useCases.map((useCase, index) => {
-              const Icon = useCase.icon;
+            {programmeTracks.map((track) => {
+              const Icon = track.icon;
               return (
-                <div
-                  key={index}
-                  className="bg-background/50 backdrop-blur border border-purple-500/20 rounded-xl p-5 md:p-6 hover:border-purple-500/40 transition-all hover:-translate-y-1"
+                <Link
+                  key={track.id}
+                  to={`/programmes#${track.id}`}
+                  className={`glass-card-interactive border ${track.borderClass} !rounded-xl p-5 md:p-6 group`}
                 >
                   <div className="flex items-center gap-3 mb-4">
-                    <Icon className="w-6 h-6 md:w-5 md:h-5 text-purple-400 flex-shrink-0" />
-                    <h3 className="font-semibold text-base md:text-lg">{useCase.title}</h3>
-                  </div>
-                  <div className="space-y-3 text-sm md:text-base">
-                    <div>
-                      <span className="text-muted-foreground">Input:</span>
-                      <span className="ml-2 text-foreground/80">{useCase.input}</span>
+                    <div className={`w-10 h-10 ${track.iconBg} rounded-lg flex items-center justify-center`}>
+                      <Icon className={`w-5 h-5 ${track.iconColor}`} />
                     </div>
-                    <div>
-                      <span className="text-muted-foreground">Output:</span>
-                      <span className="ml-2 text-foreground/80">{useCase.output}</span>
-                    </div>
+                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${track.badgeBg} ${track.badgeText}`}>
+                      TRL {track.trlRange}
+                    </span>
                   </div>
-                </div>
+                  <h3 className="font-semibold text-base md:text-lg mb-2">{track.title}</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed mb-3">{track.description}</p>
+                  <span className={`text-sm ${track.iconColor} group-hover:underline flex items-center gap-1`}>
+                    Explore <ArrowRight className="w-3.5 h-3.5" />
+                  </span>
+                </Link>
               );
             })}
           </div>
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="py-20" aria-label="How it works">
-        <div className="container max-w-5xl mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              How it works
+      {/* Section 4: Co-Creation Model */}
+      <section className="py-16 md:py-20" aria-label="Co-creation model">
+        <div className="container max-w-6xl mx-auto px-5 md:px-4">
+          <div className="text-center mb-12 md:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
+              Embed in Our Lab
             </h2>
+            <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
+              Three pathways for enterprises and SMEs to access deep tech expertise, from intensive sprints to long-term knowledge transfer.
+            </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* Step 1 */}
-            <div className="text-center">
-              <div className="w-16 h-16 mx-auto bg-purple-500/10 rounded-xl flex items-center justify-center mb-6">
-                <FileText className="w-8 h-8 text-purple-400" />
+          <div className="grid md:grid-cols-3 gap-6 md:gap-8">
+            <div className="glass-card-interactive aurora-shimmer !rounded-2xl !border-cyan-500/30 hover:!border-cyan-500/50 p-6 md:p-8">
+              <div className="w-12 h-12 bg-cyan-500/10 rounded-xl flex items-center justify-center mb-5">
+                <Building2 className="w-6 h-6 text-cyan-400" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">Light prep</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                I'll send you a simple checklist in advance. It usually includes: installing a couple of tools and creating an account for API access to an AI model.
+              <h3 className="text-xl font-bold mb-2">Enterprise Residency</h3>
+              <p className="text-muted-foreground text-sm mb-4">1-4 weeks</p>
+              <p className="text-foreground/80 text-sm leading-relaxed mb-4">
+                Your team embeds in the lab alongside our specialists for intensive R&D sprints. Bring a real challenge, leave with a validated prototype and deployment roadmap.
               </p>
+              <p className="text-xs text-muted-foreground">Outcome: Working prototype at TRL 4-6</p>
             </div>
 
-            {/* Step 2 */}
-            <div className="text-center">
-              <div className="w-16 h-16 mx-auto bg-cyan-500/10 rounded-xl flex items-center justify-center mb-6">
-                <Calendar className="w-8 h-8 text-cyan-400" />
+            <div className="glass-card-interactive aurora-shimmer !rounded-2xl !border-purple-500/30 hover:!border-purple-500/50 p-6 md:p-8">
+              <div className="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center mb-5">
+                <Beaker className="w-6 h-6 text-purple-400" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">The live training day</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                Hands-on build with me, with plenty of time for questions and getting it working on your machines.
+              <h3 className="text-xl font-bold mb-2">SME Innovation Sprint</h3>
+              <p className="text-muted-foreground text-sm mb-4">3-5 days</p>
+              <p className="text-foreground/80 text-sm leading-relaxed mb-4">
+                Structured programmes for smaller companies ready to apply deep tech. Hands-on building with expert guidance, designed to deliver immediate capability.
               </p>
+              <p className="text-xs text-muted-foreground">Outcome: Deployable MVP and team upskilling</p>
             </div>
 
-            {/* Step 3 */}
-            <div className="text-center">
-              <div className="w-16 h-16 mx-auto bg-pink-500/10 rounded-xl flex items-center justify-center mb-6">
-                <FolderOpen className="w-8 h-8 text-pink-400" />
+            <div className="glass-card-interactive aurora-shimmer !rounded-2xl !border-green-500/30 hover:!border-green-500/50 p-6 md:p-8">
+              <div className="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center mb-5">
+                <GraduationCap className="w-6 h-6 text-green-400" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">Recording & resources</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                I'll send you a recording of the day and the full resource pack.
+              <h3 className="text-xl font-bold mb-2">KTP Partnership</h3>
+              <p className="text-muted-foreground text-sm mb-4">12-36 months</p>
+              <p className="text-foreground/80 text-sm leading-relaxed mb-4">
+                Innovate UK-funded Knowledge Transfer Partnerships embedding a graduate associate in your organisation, co-supervised by our research team.
               </p>
+              <p className="text-xs text-muted-foreground">Outcome: Long-term capability transfer, grant-funded</p>
             </div>
           </div>
 
-          {/* What happens on the day */}
-          <div className="mt-20">
-            <h3 className="text-2xl font-bold text-center mb-10">What happens on the day:</h3>
-            <div className="max-w-2xl mx-auto space-y-6">
-              {[
-                { num: 1, title: "Kick-off & scoping", desc: "We pick the workflow and define \"success\"" },
-                { num: 2, title: "Setup", desc: "Project, repo, and a working environment on each machine" },
-                { num: 3, title: "Build", desc: "Start simple, then make it real" },
-                { num: 4, title: "Connect", desc: "We hook into one data source/tool you can access" },
-                { num: 5, title: "Make it repeatable", desc: "Run it again, document it, and agree ownership" }
-              ].map((step) => (
-                <div key={step.num} className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center flex-shrink-0 text-white font-bold">
-                    {step.num}
-                  </div>
-                  <div>
-                    <h4 className="font-semibold">{step.title}</h4>
-                    <p className="text-muted-foreground">{step.desc}</p>
+          <div className="text-center mt-10">
+            <Link
+              to="/co-create"
+              className="inline-flex items-center justify-center rounded-lg text-base font-semibold bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transition-all min-h-[48px] px-8 py-3"
+            >
+              Design Your Engagement <ArrowRight className="ml-2 w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Section 5: Research Evidence */}
+      <section className="py-16 md:py-20 bg-gradient-to-b from-background to-purple-950/10" aria-label="Research evidence">
+        <div className="container max-w-6xl mx-auto px-5 md:px-4">
+          <div className="text-center mb-12 md:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
+              Built on 16 Years of Deep Tech Research
+            </h2>
+            <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
+              The Octave laboratory (2007-2023) produced world-first collaborative immersive systems. That research heritage now powers applied innovation for industry.
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
+            {researchVideos.map((video) => (
+              <div key={video.src} className="bg-background/50 backdrop-blur border border-purple-500/20 rounded-xl overflow-hidden hover:border-purple-500/40 transition-all group">
+                <div className="aspect-video relative">
+                  <video
+                    controls
+                    className="w-full h-full object-cover"
+                    poster={`/data/media/${video.thumb}`}
+                    preload="none"
+                  >
+                    <source src={`/data/media/videos/${video.src}`} type="video/mp4" />
+                  </video>
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none group-hover:opacity-0 transition-opacity">
+                    <div className="w-12 h-12 bg-black/50 backdrop-blur rounded-full flex items-center justify-center">
+                      <Play className="w-5 h-5 text-white ml-0.5" />
+                    </div>
                   </div>
                 </div>
+                <div className="p-3">
+                  <p className="text-sm text-foreground/80">{video.caption}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="text-center mt-8">
+            <Link to="/research" className="text-purple-400 hover:text-purple-300 text-sm font-medium hover:underline inline-flex items-center gap-1">
+              View full research lineage <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Section 6: Facility & Tech Stack */}
+      <section className="py-16 md:py-20" aria-label="Facility and technology">
+        <div className="container max-w-6xl mx-auto px-5 md:px-4">
+          <div className="grid lg:grid-cols-2 gap-10 md:gap-12 items-center">
+            <div>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6">
+                The Lab: Lake District Innovation Facility
+              </h2>
+              <p className="text-base md:text-lg text-foreground/80 leading-relaxed mb-6">
+                A residential deep tech facility in the Lake District combining focused R&D environments with the clarity that comes from working away from the office. Solar-powered, enterprise-grade, and purpose-built for intensive co-creation.
+              </p>
+              <div className="grid grid-cols-2 gap-4 mb-8">
+                {[
+                  { label: "Solar-Powered", detail: "6.3kW sustainable infrastructure" },
+                  { label: "10G Network", detail: "Enterprise-grade connectivity" },
+                  { label: "GPU Cluster", detail: "8x RTX for ML workloads" },
+                  { label: "LED Volume", detail: "Virtual production stage" },
+                  { label: "Dolby Atmos", detail: "Spatial audio studio" },
+                  { label: "5 Bedrooms", detail: "Full-board residential" },
+                ].map((item) => (
+                  <div key={item.label} className="p-3 bg-background/50 border border-purple-500/15 rounded-lg">
+                    <div className="font-semibold text-sm text-foreground">{item.label}</div>
+                    <div className="text-xs text-muted-foreground">{item.detail}</div>
+                  </div>
+                ))}
+              </div>
+              <Link
+                to="/contact"
+                className="inline-flex items-center text-cyan-400 hover:text-cyan-300 font-medium text-sm hover:underline gap-1"
+              >
+                Schedule a lab visit <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
+            <div className="relative aspect-video rounded-xl overflow-hidden shadow-2xl shadow-purple-500/10">
+              {facilityImages.map((src, index) => (
+                <img
+                  key={src}
+                  src={src}
+                  alt="DreamLab Innovation Facility, Lake District"
+                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${
+                    index === facilityIndex ? "opacity-100" : "opacity-0"
+                  }`}
+                />
               ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* Who This Is For */}
-      <section className="py-20 bg-gradient-to-b from-background to-purple-950/10" aria-label="Target audience">
-        <div className="container max-w-5xl mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Who is the AI Agent Masterclass for?
-            </h2>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-10">
-            {/* Who it's for */}
-            <div className="bg-background/50 backdrop-blur border border-green-500/30 rounded-2xl p-8">
-              <h3 className="text-xl font-semibold mb-6 text-green-400">Who this is for</h3>
-              <p className="text-muted-foreground mb-6">This is a good fit if you are:</p>
-              <ul className="space-y-4">
-                {[
-                  "An ops lead, RevOps lead, systems person, technical founder, or similar",
-                  "Comfortable following steps in a terminal",
-                  "Keen to move from \"AI experiments\" to \"AI doing work\"",
-                  "Able to bring up to 3 who will actually use the system afterwards"
-                ].map((item, i) => (
-                  <li key={i} className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
-                    <span className="text-foreground/90">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Who it's not for */}
-            <div className="bg-background/50 backdrop-blur border border-red-500/30 rounded-2xl p-8">
-              <h3 className="text-xl font-semibold mb-6 text-red-400">Who it's not for</h3>
-              <p className="text-muted-foreground mb-6">This is not the right session if you:</p>
-              <ul className="space-y-4">
-                {[
-                  "Want general ChatGPT productivity tips",
-                  "Cannot use a terminal at all",
-                  "Want to automate something high-risk on day one (money movement, destructive actions)",
-                  "Want help doing anything illegal or morally dodgy"
-                ].map((item, i) => (
-                  <li key={i} className="flex items-start gap-3">
-                    <XCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-                    <span className="text-foreground/90">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Training Options */}
-      <section id="training-options" className="py-16 md:py-20" aria-label="Training options">
+      {/* Section 7: Team Preview */}
+      <section className="py-16 md:py-20 bg-gradient-to-b from-background to-purple-950/10" aria-label="Team preview">
         <div className="container max-w-6xl mx-auto px-5 md:px-4">
           <div className="text-center mb-12 md:mb-16">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
-              Choose your training format
+              Multi-Disciplinary Expertise
             </h2>
             <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-              Every engagement starts with a conversation. We'll tailor the format and scope to your team's needs.
+              44+ specialists spanning AI, XR, cyber, audio, and creative technology. Every programme draws on complementary expertise for comprehensive knowledge transfer.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6 md:gap-8">
-            {/* 1-Day Workshop */}
-            <div className="bg-background/50 backdrop-blur border border-cyan-500/30 rounded-2xl p-6 md:p-8 hover:border-cyan-500/50 transition-colors relative">
-              <div className="absolute top-4 right-4 px-3 py-1 bg-cyan-500/20 rounded-full text-cyan-400 text-xs font-medium">
-                Most Popular
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
+            {featuredTeam.map((member) => (
+              <div key={member.name} className="bg-background/50 backdrop-blur border border-purple-500/20 rounded-xl p-5 text-center hover:border-purple-500/40 transition-colors">
+                <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center overflow-hidden mb-4 shadow-lg shadow-purple-500/20">
+                  <img
+                    src={member.image}
+                    alt={member.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                      e.currentTarget.parentElement!.innerHTML = `<span class="text-xl font-bold text-white">${member.name.split(' ').map(n => n[0]).join('')}</span>`;
+                    }}
+                  />
+                </div>
+                <h3 className="font-semibold text-sm">{member.name}</h3>
+                <p className="text-xs text-muted-foreground mt-1">{member.role}</p>
+                <p className="text-xs text-purple-400 mt-1">{member.domain}</p>
               </div>
-              <h3 className="text-xl md:text-2xl font-bold mb-2">1-Day Workshop</h3>
-              <p className="text-muted-foreground mb-6 text-sm">At your location, anywhere in the UK</p>
-              <ul className="space-y-3 mb-8 text-sm md:text-base">
-                <li className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-cyan-400 flex-shrink-0 mt-0.5" />
-                  <span>Up to 4 people from your team</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-cyan-400 flex-shrink-0 mt-0.5" />
-                  <span>One working agent, built on your data</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-cyan-400 flex-shrink-0 mt-0.5" />
-                  <span>Starter repo, templates, and recording</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-cyan-400 flex-shrink-0 mt-0.5" />
-                  <span>2 weeks of async follow-up support</span>
-                </li>
-              </ul>
-              <Link
-                to="/contact"
-                className="block w-full py-3 px-6 rounded-lg bg-gradient-to-r from-cyan-600 to-cyan-500 text-white font-semibold text-center hover:shadow-lg hover:shadow-cyan-500/30 transition-all min-h-[48px]"
-              >
-                Get in touch <ArrowRight className="inline w-4 h-4 ml-1" />
-              </Link>
-            </div>
-
-            {/* Residential Programme */}
-            <div className="bg-background/50 backdrop-blur border border-purple-500/30 rounded-2xl p-6 md:p-8 hover:border-purple-500/50 transition-colors relative">
-              <div className="absolute top-4 right-4 px-3 py-1 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full text-purple-400 text-xs font-medium">
-                Deep Immersion
-              </div>
-              <h3 className="text-xl md:text-2xl font-bold mb-2">Residential Programme</h3>
-              <p className="text-muted-foreground mb-6 text-sm">Full-board at our Lake District facility</p>
-              <ul className="space-y-3 mb-8 text-sm md:text-base">
-                <li className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" />
-                  <span>Multi-day immersive training (2-5 days)</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" />
-                  <span>Multi-agent orchestration and advanced platform</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" />
-                  <span>Accommodation and meals included</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" />
-                  <span>Strategic roadmap + 4 weeks support</span>
-                </li>
-              </ul>
-              <Link
-                to="/residential-training"
-                className="block w-full py-3 px-6 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold text-center hover:shadow-lg hover:shadow-purple-500/30 transition-all min-h-[48px]"
-              >
-                View programmes <ArrowRight className="inline w-4 h-4 ml-1" />
-              </Link>
-            </div>
-
-            {/* Expert Retainer */}
-            <div className="bg-background/50 backdrop-blur border border-blue-500/30 rounded-2xl p-6 md:p-8 hover:border-blue-500/50 transition-colors relative">
-              <div className="absolute top-4 right-4 px-3 py-1 bg-blue-500/20 rounded-full text-blue-400 text-xs font-medium">
-                Ongoing
-              </div>
-              <h3 className="text-xl md:text-2xl font-bold mb-2">Expert Retainer</h3>
-              <p className="text-muted-foreground mb-6 text-sm">Flexible monthly or annual support hours</p>
-              <ul className="space-y-3 mb-8 text-sm md:text-base">
-                <li className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
-                  <span>Agreed hours of consulting and development</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
-                  <span>Monthly or annual commitment (30% annual saving)</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
-                  <span>Direct access to our specialist network</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
-                  <span>Strategy, builds, troubleshooting, and training</span>
-                </li>
-              </ul>
-              <Link
-                to="/contact"
-                className="block w-full py-3 px-6 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 text-white font-semibold text-center hover:shadow-lg hover:shadow-blue-500/30 transition-all min-h-[48px]"
-              >
-                Discuss a retainer <ArrowRight className="inline w-4 h-4 ml-1" />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Guarantee */}
-      <section className="py-20 bg-gradient-to-b from-background to-purple-950/10" aria-label="Guarantee">
-        <div className="container max-w-4xl mx-auto px-4">
-          <div className="bg-background/50 backdrop-blur border border-green-500/30 rounded-2xl p-8 md:p-12">
-            <div className="flex items-start gap-6">
-              <div className="hidden md:flex flex-shrink-0 w-16 h-16 bg-green-500/20 rounded-full items-center justify-center">
-                <Shield className="w-8 h-8 text-green-400" />
-              </div>
-              <div>
-                <h2 className="text-2xl md:text-3xl font-bold mb-4">My guarantee</h2>
-                <p className="text-foreground/80 mb-6">I want this to feel like a safe decision for you.</p>
-
-                <h3 className="font-semibold text-lg mb-3 text-green-400">The "working proof" guarantee</h3>
-                <p className="text-foreground/90 mb-4 leading-relaxed">
-                  If you complete the prep checklist and attend the day, and we do not get a working on-demand run of the agent in your environment by the end of the day, I will book an additional 90-minute follow-up session at no cost to get it over the line.
-                </p>
-                <p className="text-foreground/90 mb-6 leading-relaxed">
-                  If we still cannot get a working proof after that follow-up, I will refund the full fee.
-                </p>
-
-                <h4 className="font-semibold mb-2">Fair boundary (so nobody gets surprised):</h4>
-                <ul className="space-y-2 text-muted-foreground">
-                  <li>• The guarantee assumes we can access at least one workable data source/tool during the session.</li>
-                  <li>• If access turns out to be blocked on the day, we will still build the workflow using a realistic example dataset.</li>
-                  <li>• I'll sanity-check access on the fit call so this does not become an issue.</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* About John */}
-      <section className="py-20" aria-label="About the instructor">
-        <div className="container max-w-4xl mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              About me
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              I'm not a "tips and tricks" trainer. I've spent decades building and running real systems.
-            </p>
-          </div>
-
-          <div className="flex flex-col md:flex-row items-center gap-10">
-            <div className="flex-shrink-0">
-              <div className="w-48 h-48 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center overflow-hidden shadow-2xl shadow-purple-500/30">
-                <img
-                  src="/data/team/04.webp"
-                  alt="Dr John O'Hare"
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                    e.currentTarget.parentElement!.innerHTML = '<span class="text-6xl font-bold text-white">JJ</span>';
-                  }}
-                />
-              </div>
-            </div>
-            <div>
-              <h3 className="text-xl font-semibold mb-4">Dr John O'Hare</h3>
-              <p className="text-muted-foreground mb-2">Your instructor</p>
-
-              <h4 className="font-semibold mt-6 mb-3">A few highlights:</h4>
-              <ul className="space-y-2 text-foreground/80">
-                <li>• Postdoctoral research and commercial work at MediaCityUK</li>
-                <li>• AI lead for Future Fleet (machine vision for marine systems, patent pending)</li>
-                <li>• Research Director at Pathway XR (virtual production and immersive systems)</li>
-                <li>• Technical Director of the Octave mixed reality laboratory (17 years)</li>
-                <li>• PhD work in telepresence and light field implementation</li>
-                <li>• CTO (Display Engineering) at Insight Imaging</li>
-              </ul>
-
-              <p className="text-muted-foreground mt-6 italic">
-                What matters for you: I'm good at making complex ideas practical, and keeping the focus on shipping something that works.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ */}
-      <section className="py-16 md:py-20 bg-gradient-to-b from-background to-purple-950/10" aria-label="FAQ">
-        <div className="container max-w-3xl mx-auto px-5 md:px-4">
-          <div className="text-center mb-12 md:mb-16">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
-              Frequently asked questions
-            </h2>
-          </div>
-
-          <div className="bg-background/50 backdrop-blur border border-purple-500/20 rounded-2xl p-5 md:p-8">
-            {faqs.map((faq, index) => (
-              <FAQItem key={index} question={faq.q} answer={faq.a} />
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* Final CTA */}
-      <section className="py-16 md:py-20" aria-label="Book a call">
-        <div className="container max-w-4xl mx-auto px-5 md:px-4 text-center">
-          <div className="bg-gradient-to-br from-purple-500/10 via-cyan-500/10 to-pink-500/10 border border-purple-500/30 rounded-2xl p-6 md:p-12">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
-              Book a 10-minute call
-            </h2>
-            <p className="text-base md:text-lg text-foreground/80 mb-6 max-w-2xl mx-auto">
-              If you want to see if this is right for your team, start here. You'll speak to me directly.
-            </p>
-            <p className="text-muted-foreground mb-8 text-base">
-              10 minutes • no prep • we will check scope, access, and whether this will work for your team
-            </p>
-
-            <Link
-              to="/contact"
-              className="inline-flex items-center justify-center rounded-lg text-base md:text-lg font-semibold bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-xl hover:shadow-cyan-500/50 hover:scale-105 transition-all min-h-[56px] h-14 md:h-16 px-8 md:px-10"
-            >
-              Schedule a conversation
-              <ArrowRight className="ml-2 w-5 h-5" />
+          <div className="text-center mt-8">
+            <Link to="/team" className="text-purple-400 hover:text-purple-300 text-sm font-medium hover:underline inline-flex items-center gap-1">
+              Meet the full team <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
         </div>
       </section>
 
+      {/* Section 8: Dual CTA Footer */}
+      <section className="py-16 md:py-20" aria-label="Get started">
+        <div className="container max-w-5xl mx-auto px-5 md:px-4">
+          <div className="grid md:grid-cols-2 gap-6 md:gap-8">
+            {/* Enterprise CTA */}
+            <div className="bg-gradient-to-br from-cyan-500/10 via-blue-500/10 to-purple-500/10 border border-cyan-500/30 rounded-2xl p-6 md:p-10 text-center">
+              <div className="w-14 h-14 mx-auto bg-cyan-500/10 rounded-xl flex items-center justify-center mb-5">
+                <Handshake className="w-7 h-7 text-cyan-400" />
+              </div>
+              <h3 className="text-xl md:text-2xl font-bold mb-3">Enterprise</h3>
+              <p className="text-foreground/80 mb-6 text-sm leading-relaxed">
+                Bring your team to the lab for intensive co-creation. Schedule a visit to scope your engagement.
+              </p>
+              <Link
+                to="/contact"
+                className="inline-flex items-center justify-center rounded-lg text-base font-semibold bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transition-all min-h-[48px] px-6 py-3 w-full sm:w-auto"
+              >
+                Schedule a Lab Visit <ArrowRight className="ml-2 w-4 h-4" />
+              </Link>
+            </div>
+
+            {/* SME CTA */}
+            <div className="bg-gradient-to-br from-purple-500/10 via-pink-500/10 to-purple-500/10 border border-purple-500/30 rounded-2xl p-6 md:p-10 text-center">
+              <div className="w-14 h-14 mx-auto bg-purple-500/10 rounded-xl flex items-center justify-center mb-5">
+                <Users className="w-7 h-7 text-purple-400" />
+              </div>
+              <h3 className="text-xl md:text-2xl font-bold mb-3">SME</h3>
+              <p className="text-foreground/80 mb-6 text-sm leading-relaxed">
+                Start with our self-guided workshops or enquire about a structured innovation sprint.
+              </p>
+              <Link
+                to="/workshops"
+                className="inline-flex items-center justify-center rounded-lg text-base font-semibold bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:shadow-lg hover:shadow-purple-500/30 hover:scale-105 transition-all min-h-[48px] px-6 py-3 w-full sm:w-auto"
+              >
+                Explore Workshops <ArrowRight className="ml-2 w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+
+          {/* Community link */}
+          <div className="text-center mt-8">
+            <a
+              href="/community/"
+              className="text-muted-foreground hover:text-purple-400 text-sm font-medium hover:underline inline-flex items-center gap-1 transition-colors"
+            >
+              Or join the community conversation <ArrowRight className="w-3.5 h-3.5" />
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* Email Signup */}
-      <section className="relative py-24 overflow-hidden" aria-label="Email signup">
+      <section className="relative py-20 overflow-hidden" aria-label="Email signup">
         <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-pink-900/20 backdrop-blur-xl" />
         <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 animate-gradient-shift bg-400%" />
 
         <div className="container relative z-10 flex flex-col items-center">
-          <div className="bg-background/60 backdrop-blur-xl rounded-2xl border border-purple-500/30 shadow-2xl shadow-purple-500/10 p-12 max-w-3xl w-full">
+          <div className="bg-background/60 backdrop-blur-xl rounded-2xl border border-purple-500/30 shadow-2xl shadow-purple-500/10 p-10 md:p-12 max-w-3xl w-full">
             <h2 className="text-2xl md:text-3xl font-bold mb-4 text-center">
               Stay in the loop
             </h2>
             <p className="text-lg text-foreground/85 text-center mb-10 max-w-2xl mx-auto leading-relaxed">
-              Get updates on upcoming training dates and practical AI insights.
+              Lab updates, programme announcements, and applied innovation insights.
             </p>
             <Suspense fallback={<div className="h-12 w-full bg-muted/20 rounded animate-pulse" />}>
               <EmailSignupForm />
@@ -747,12 +550,12 @@ const Index = () => {
                   </li>
                 </ul>
               </nav>
-              <a href="/privacy" className="text-sm md:text-base text-muted-foreground hover:text-purple-400 transition-all duration-300 hover:scale-105 inline-block py-2 min-h-[44px] flex items-center">
+              <Link to="/privacy" className="text-sm md:text-base text-muted-foreground hover:text-purple-400 transition-all duration-300 hover:scale-105 inline-block py-2 min-h-[44px] flex items-center">
                 Privacy Policy
-              </a>
-              <a href="/testimonials" className="text-sm md:text-base text-muted-foreground hover:text-purple-400 transition-all duration-300 hover:scale-105 inline-block py-2 min-h-[44px] flex items-center">
-                Success Stories
-              </a>
+              </Link>
+              <Link to="/testimonials" className="text-sm md:text-base text-muted-foreground hover:text-purple-400 transition-all duration-300 hover:scale-105 inline-block py-2 min-h-[44px] flex items-center">
+                Impact Stories
+              </Link>
             </div>
           </div>
         </div>

@@ -57,15 +57,19 @@ export const Header = () => {
             <DropdownMenuSeparator />
             <DropdownMenuSub>
               <DropdownMenuSubTrigger>
-                <span>Training</span>
+                <span>Lab</span>
               </DropdownMenuSubTrigger>
               <DropdownMenuSubContent>
                 <DropdownMenuItem asChild>
-                  <a href="/#training-options" className="w-full">Overview</a>
+                  <Link to="/programmes" className="w-full">Programmes</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/residential-training" className="w-full">Residential Programmes</Link>
+                  <Link to="/co-create" className="w-full">Co-Create</Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/research" className="w-full">Research</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link to="/workshops" className="w-full">Self-Guided Workshops</Link>
                 </DropdownMenuItem>
@@ -75,7 +79,7 @@ export const Header = () => {
               <Link to="/team" className="w-full">Team</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link to="/testimonials" className="w-full">Success Stories</Link>
+              <Link to="/testimonials" className="w-full">Impact Stories</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <a href="/community/" className="w-full">
@@ -86,34 +90,6 @@ export const Header = () => {
             <DropdownMenuItem asChild>
               <Link to="/contact" className="w-full">Contact</Link>
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger>
-                <span>Affiliate Partners</span>
-              </DropdownMenuSubTrigger>
-              <DropdownMenuSubContent>
-                <DropdownMenuItem asChild>
-                  <a href="https://dreamlab-ai.com" target="_blank" rel="noopener noreferrer" className="w-full">
-                    DreamLab Creative Tech<span className="sr-only"> (opens in new window)</span>
-                  </a>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <a href="https://agenticalliance.com/" target="_blank" rel="noopener noreferrer" className="w-full">
-                    Agentic Alliance<span className="sr-only"> (opens in new window)</span>
-                  </a>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <a href="https://www.narrativegoldmine.com" target="_blank" rel="noopener noreferrer" className="w-full">
-                    Narrative Goldmine<span className="sr-only"> (opens in new window)</span>
-                  </a>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <a href="https://www.visionflow.com" target="_blank" rel="noopener noreferrer" className="w-full">
-                    Visionflow<span className="sr-only"> (opens in new window)</span>
-                  </a>
-                </DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuSub>
           </DropdownMenuContent>
         </DropdownMenu>
 
@@ -129,7 +105,7 @@ export const Header = () => {
             asChild
             className="bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transition-all duration-300 min-h-[48px] px-4 text-base md:text-sm"
           >
-            <a href="/#training-options">Training</a>
+            <Link to="/co-create">Partner With Us</Link>
           </Button>
         </div>
       </div>

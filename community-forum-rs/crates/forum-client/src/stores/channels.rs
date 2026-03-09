@@ -28,6 +28,7 @@ pub struct ChannelMeta {
     pub name: String,
     pub description: String,
     pub section: String,
+    pub picture: String,
     pub created_at: u64,
 }
 
@@ -110,7 +111,7 @@ impl ChannelStore {
                 return;
             }
 
-            let (name, description) = parse_channel_content(&event.content);
+            let (name, description, picture) = parse_channel_content(&event.content);
             let section = event
                 .tags
                 .iter()
@@ -123,6 +124,7 @@ impl ChannelStore {
                 name,
                 description,
                 section,
+                picture,
                 created_at: event.created_at,
             };
 
@@ -252,8 +254,8 @@ pub fn use_channel_store() -> ChannelStore {
 
 // -- Helpers ------------------------------------------------------------------
 
-/// Parse kind-40 channel content JSON into (name, description).
-pub fn parse_channel_content(content: &str) -> (String, String) {
+/// Parse kind-40 channel content JSON into (name, description, picture).
+pub fn parse_channel_content(content: &str) -> (String, String, String) {
     match serde_json::from_str::<serde_json::Value>(content) {
         Ok(val) => {
             let name = val
@@ -266,8 +268,13 @@ pub fn parse_channel_content(content: &str) -> (String, String) {
                 .and_then(|v| v.as_str())
                 .unwrap_or("")
                 .to_string();
-            (name, description)
+            let picture = val
+                .get("picture")
+                .and_then(|v| v.as_str())
+                .unwrap_or("")
+                .to_string();
+            (name, description, picture)
         }
-        Err(_) => ("Unnamed Channel".to_string(), String::new()),
+        Err(_) => ("Unnamed Channel".to_string(), String::new(), String::new()),
     }
 }

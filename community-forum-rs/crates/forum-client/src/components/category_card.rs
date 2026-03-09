@@ -24,6 +24,9 @@ pub fn CategoryCard(
     accent_color: &'static str,
     /// Parent zone id for building the href.
     zone_id: &'static str,
+    /// Optional picture URL for background image.
+    #[prop(optional, into)]
+    picture: String,
 ) -> impl IntoView {
     let href = base_href(&format!("/forums/{}", slug(&name)));
 
@@ -59,16 +62,35 @@ pub fn CategoryCard(
 
     let name_display = name.clone();
     let desc_display = description.clone();
+    let has_picture = !picture.is_empty();
 
     view! {
         <A href=href attr:class="block category-hero-card glass-card-interactive aurora-shimmer no-underline text-inherit">
+            // Background image (when picture URL is available)
+            {has_picture.then(|| {
+                let pic = picture.clone();
+                view! {
+                    <img
+                        src=pic
+                        alt=""
+                        class="absolute inset-0 w-full h-full object-cover rounded-xl opacity-20 pointer-events-none"
+                        loading="lazy"
+                    />
+                    <div class="absolute inset-0 bg-gray-900/60 rounded-xl pointer-events-none"></div>
+                }
+            })}
+
             // Background gradient overlay
             <div class=format!("absolute inset-0 bg-gradient-to-br {} pointer-events-none", gradient_class)></div>
 
-            // Watermark icon (large, semi-transparent)
-            <div class=format!("absolute -right-4 -bottom-4 {} pointer-events-none", icon_color)>
-                <WatermarkIcon icon=icon/>
-            </div>
+            // Watermark icon (large, semi-transparent) -- only when no image
+            {(!has_picture).then(|| {
+                view! {
+                    <div class=format!("absolute -right-4 -bottom-4 {} pointer-events-none", icon_color)>
+                        <WatermarkIcon icon=icon/>
+                    </div>
+                }
+            })}
 
             // Content
             <div class="relative z-10 p-5 flex flex-col justify-between min-h-[160px]">

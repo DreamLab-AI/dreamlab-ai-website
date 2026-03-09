@@ -264,7 +264,7 @@ impl AdminStore {
         section: &str,
         privkey: &[u8; 32],
     ) -> Result<(), String> {
-        self.create_channel_with_zone(name, description, section, 0, None, privkey)
+        self.create_channel_with_zone(name, description, section, "", 0, None, privkey)
     }
 
     /// Create a kind-40 channel with explicit zone and optional cohort tags.
@@ -273,6 +273,7 @@ impl AdminStore {
         name: &str,
         description: &str,
         section: &str,
+        picture: &str,
         zone: u8,
         cohort: Option<&str>,
         privkey: &[u8; 32],
@@ -290,7 +291,7 @@ impl AdminStore {
         let content = serde_json::json!({
             "name": name,
             "about": description,
-            "picture": ""
+            "picture": picture
         });
 
         let now = (js_sys::Date::now() / 1000.0) as u64;
