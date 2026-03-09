@@ -68,7 +68,7 @@ pub(crate) fn MessageInput(
             let el: web_sys::HtmlElement = el.into();
             el.style().set_property("height", "auto").ok();
             let scroll_h = el.scroll_height();
-            let clamped = scroll_h.min(200).max(44);
+            let clamped = scroll_h.clamp(44, 200);
             el.style()
                 .set_property("height", &format!("{}px", clamped))
                 .ok();

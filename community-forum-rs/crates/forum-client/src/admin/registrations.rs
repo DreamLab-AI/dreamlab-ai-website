@@ -288,7 +288,7 @@ fn RegistrationsInner() -> impl IntoView {
                                         let pk_short = shorten_pubkey(&pk);
                                         let nick = user.nickname.clone().unwrap_or_else(|| "-".to_string());
                                         let time_str = user.registered_at
-                                            .map(|t| crate::utils::format_relative_time(t))
+                                            .map(crate::utils::format_relative_time)
                                             .unwrap_or_else(|| "-".to_string());
                                         let selected = user.selected;
                                         let pk_approve = pk.clone();

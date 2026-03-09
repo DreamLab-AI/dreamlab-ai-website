@@ -146,7 +146,7 @@ pub(crate) fn ReactionBar(
                 {
                     let emoji = reaction.emoji.clone();
                     let emoji_for_click = emoji.clone();
-                    let toggle = toggle_reaction.clone();
+                    let toggle = toggle_reaction;
                     view! {
                         <button
                             class=move || {
@@ -160,7 +160,7 @@ pub(crate) fn ReactionBar(
                             }
                             on:click={
                                 let emoji_c = emoji_for_click.clone();
-                                let toggle_c = toggle.clone();
+                                let toggle_c = toggle;
                                 move |_| toggle_c(emoji_c.clone())
                             }
                         >

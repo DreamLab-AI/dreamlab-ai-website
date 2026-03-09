@@ -100,9 +100,8 @@ fn parse_mentions(input: &str) -> Vec<Segment> {
                     // Use the npub as-is for display (we don't decode bech32 here)
                     segments.push(Segment::Mention(npub.to_string()));
                     remaining = &remaining[pos + 6 + npub_len..];
-                } else if at_this.starts_with('@') {
+                } else if let Some(hex_part) = at_this.strip_prefix('@') {
                     // @<64 hex chars>
-                    let hex_part = &at_this[1..];
                     let hex_len = hex_part
                         .chars()
                         .take(64)

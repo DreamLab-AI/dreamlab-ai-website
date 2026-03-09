@@ -32,6 +32,10 @@ proptest = { workspace = true }
 wasm-bindgen-test = { workspace = true }
 criterion = { workspace = true }
 
+# proptest pulls rand 0.9 → getrandom 0.3 which needs wasm_js for WASM targets
+[target.'cfg(target_arch = "wasm32")'.dev-dependencies]
+getrandom = { version = "0.3", features = ["wasm_js"] }
+
 [[bench]]
 name = "bench_nip44"
 harness = false

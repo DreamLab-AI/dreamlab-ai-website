@@ -165,7 +165,7 @@ pub fn SettingsPage() -> impl IntoView {
     let toasts_for_nsec = toasts.clone();
     let on_confirm_nsec = Callback::new(move |_: ()| {
         if let Some(privkey) = auth.get_privkey_bytes() {
-            let hex_str = hex::encode(&*privkey);
+            let hex_str = hex::encode(*privkey);
             // Copy to clipboard
             if let Some(window) = web_sys::window() {
                 let nav = window.navigator().clipboard();

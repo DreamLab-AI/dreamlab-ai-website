@@ -28,13 +28,13 @@ const MONTHS: [&str; 12] = [
 /// Get the current (year, month_0based) from js_sys::Date.
 fn current_year_month() -> (u32, u32) {
     let d = js_sys::Date::new_0();
-    (d.get_full_year() as u32, d.get_month() as u32)
+    (d.get_full_year(), d.get_month())
 }
 
 /// Get today's day-of-month (1-based).
 fn today_day() -> (u32, u32, u32) {
     let d = js_sys::Date::new_0();
-    (d.get_full_year() as u32, d.get_month() as u32, d.get_date())
+    (d.get_full_year(), d.get_month(), d.get_date())
 }
 
 /// Number of days in a given month (0-indexed month).
@@ -103,7 +103,7 @@ fn build_grid(year: u32, month: u32, event_days: &[u32], today: (u32, u32, u32))
     }
 
     // Trailing cells from next month (fill to 42 or nearest complete row)
-    let rows_needed = ((cells.len() + 6) / 7) * 7;
+    let rows_needed = cells.len().div_ceil(7) * 7;
     let trailing = rows_needed - cells.len();
     for d in 1..=(trailing as u32) {
         cells.push(DayCell {

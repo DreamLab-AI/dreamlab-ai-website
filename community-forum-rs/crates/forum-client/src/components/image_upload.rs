@@ -45,7 +45,7 @@ pub(crate) fn ImageUpload(
         if file.size() as u64 > MAX_SIZE {
             state.set(State::Err(format!(
                 "File too large ({:.1} MB). Max 5 MB.",
-                file.size() as f64 / 1048576.0
+                file.size() / 1048576.0
             )));
             return;
         }
@@ -154,7 +154,7 @@ pub(crate) fn ImageUpload(
                 }
             };
             let token =
-                match crate::auth::nip98::create_nip98_token(&*privkey, &u, "POST", Some(&bytes)) {
+                match crate::auth::nip98::create_nip98_token(&privkey, &u, "POST", Some(&bytes)) {
                     Ok(t) => t,
                     Err(e) => {
                         s.set(State::Err(format!("Auth error: {}", e)));
@@ -186,7 +186,7 @@ pub(crate) fn ImageUpload(
         state.set(State::Idle);
         file_cell.with_value(|c| *c.borrow_mut() = None);
         if let Some(el) = input_ref.get() {
-            let i: web_sys::HtmlInputElement = el.into();
+            let i: web_sys::HtmlInputElement = el;
             i.set_value("");
         }
     };

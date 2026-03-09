@@ -61,8 +61,8 @@ pub(crate) fn VirtualList(
     let end_idx = Memo::new(move |_| {
         let total = total_items.get();
         let start_raw = (scroll_top.get() / item_height).floor() as usize;
-        let end = (start_raw + visible_count + overscan).min(total);
-        end
+
+        (start_raw + visible_count + overscan).min(total)
     });
 
     // Total scrollable height

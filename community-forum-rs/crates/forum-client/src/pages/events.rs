@@ -127,16 +127,16 @@ pub fn EventsPage() -> impl IntoView {
         let evts = events.get();
         let now = now_ts;
         let d = js_sys::Date::new_0();
-        let current_month = d.get_month() as u32;
-        let current_year = d.get_full_year() as u32;
+        let current_month = d.get_month();
+        let current_year = d.get_full_year();
 
         evts.iter()
             .filter(|e| e.end_time >= now) // only upcoming
             .filter_map(|e| {
                 let ed = js_sys::Date::new_0();
                 ed.set_time((e.start_time as f64) * 1000.0);
-                let m = ed.get_month() as u32;
-                let y = ed.get_full_year() as u32;
+                let m = ed.get_month();
+                let y = ed.get_full_year();
                 if y == current_year && m == current_month {
                     Some(ed.get_date())
                 } else {

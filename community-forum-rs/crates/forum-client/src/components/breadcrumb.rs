@@ -81,7 +81,7 @@ pub(crate) fn Breadcrumb(
                 let show_home = is_home;
                 view! {
                     <A href=full_href attr:class="text-gray-400 hover:text-amber-400 transition-colors">
-                        {show_home.then(|| home_icon())}
+                        {show_home.then(home_icon)}
                         {label}
                     </A>
                 }
