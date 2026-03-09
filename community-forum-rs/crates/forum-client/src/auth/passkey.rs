@@ -159,9 +159,7 @@ pub async fn register_passkey(
     let prf_output = extract_prf_output_from_creation(&credential)?;
     let mut prf_bytes = [0u8; 32];
     if prf_output.len() < 32 {
-        return Err(PasskeyError::PrfNotSupported(
-            "PRF output too short".into(),
-        ));
+        return Err(PasskeyError::PrfNotSupported("PRF output too short".into()));
     }
     prf_bytes.copy_from_slice(&prf_output[..32]);
 
@@ -202,9 +200,7 @@ pub async fn register_passkey(
 /// Supports two flows:
 /// 1. Known pubkey: single assertion with PRF (fast path)
 /// 2. Unknown pubkey: discoverable credential -> identify user -> PRF assertion
-pub async fn authenticate_passkey(
-    pubkey: Option<&str>,
-) -> Result<PasskeyAuthResult, PasskeyError> {
+pub async fn authenticate_passkey(pubkey: Option<&str>) -> Result<PasskeyAuthResult, PasskeyError> {
     let base = auth_api_base();
 
     let resolved_pubkey = match pubkey {
@@ -234,9 +230,7 @@ pub async fn authenticate_passkey(
     let prf_output = extract_prf_output_from_assertion(&assertion)?;
     let mut prf_bytes = [0u8; 32];
     if prf_output.len() < 32 {
-        return Err(PasskeyError::PrfNotSupported(
-            "PRF output too short".into(),
-        ));
+        return Err(PasskeyError::PrfNotSupported("PRF output too short".into()));
     }
     prf_bytes.copy_from_slice(&prf_output[..32]);
 
@@ -263,15 +257,12 @@ pub async fn authenticate_passkey(
         "response": encoded_response,
         "pubkey": derived_pubkey,
     });
-    let verify_body_str = serde_json::to_string(&verify_body)
-        .map_err(|e| PasskeyError::Protocol(e.to_string()))?;
+    let verify_body_str =
+        serde_json::to_string(&verify_body).map_err(|e| PasskeyError::Protocol(e.to_string()))?;
 
-    let verify_resp_text = nip98::fetch_with_nip98_post(
-        &verify_url,
-        &verify_body_str,
-        keypair.secret.as_bytes(),
-    )
-    .await?;
+    let verify_resp_text =
+        nip98::fetch_with_nip98_post(&verify_url, &verify_body_str, keypair.secret.as_bytes())
+            .await?;
 
     let verify_resp: LoginVerifyResponse = serde_json::from_str(&verify_resp_text)
         .map_err(|e| PasskeyError::Protocol(e.to_string()))?;
@@ -305,9 +296,7 @@ async fn discover_pubkey_from_passkey(base: &str) -> Result<String, PasskeyError
     // Fallback: look up by credential ID
     let cred_id = get_credential_id(&assertion)?;
     let lookup_body = serde_json::json!({ "credentialId": cred_id });
-    if let Ok(lookup_text) =
-        fetch_json_post(&format!("{base}/auth/lookup"), &lookup_body).await
-    {
+    if let Ok(lookup_text) = fetch_json_post(&format!("{base}/auth/lookup"), &lookup_body).await {
         if let Ok(lookup) = serde_json::from_str::<LookupResponse>(&lookup_text) {
             if let Some(pk) = lookup.pubkey {
                 if pk.len() == 64 && pk.chars().all(|c| c.is_ascii_hexdigit()) {
@@ -392,9 +381,7 @@ async fn get_assertion(
     Ok(result)
 }
 
-async fn get_assertion_no_prf(
-    options_json: &serde_json::Value,
-) -> Result<JsValue, PasskeyError> {
+async fn get_assertion_no_prf(options_json: &serde_json::Value) -> Result<JsValue, PasskeyError> {
     let win = window().ok_or(PasskeyError::NoBrowser)?;
     let navigator = win.navigator();
     let credentials = navigator.credentials();
@@ -434,15 +421,19 @@ pub enum PasskeyError {
     #[error("PRF extension not supported: {0}")]
     PrfNotSupported(String),
 
-    #[error("Cross-device QR authentication produces a different key and cannot derive your \
-             Nostr identity. Use the same device or authenticator used during registration.")]
+    #[error(
+        "Cross-device QR authentication produces a different key and cannot derive your \
+             Nostr identity. Use the same device or authenticator used during registration."
+    )]
     HybridBlocked,
 
     #[error("Passkey operation cancelled: {0}")]
     Cancelled(String),
 
-    #[error("No passkey registered for this account. Use private key login or create a new \
-             account with passkey.")]
+    #[error(
+        "No passkey registered for this account. Use private key login or create a new \
+             account with passkey."
+    )]
     NoCredential,
 
     #[error("Network error: {0}")]

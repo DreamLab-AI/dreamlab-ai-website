@@ -10,7 +10,6 @@ use leptos_router::components::A;
 use wasm_bindgen::JsCast;
 
 use crate::app::base_href;
-
 use crate::auth::use_auth;
 use crate::dm::{provide_dm_store, use_dm_store, DMConversation};
 use crate::relay::{ConnectionState, RelayConnection};
@@ -74,7 +73,9 @@ pub fn DmListPage() -> impl IntoView {
 
         // Validate hex pubkey (64 chars, valid hex)
         if pk.len() != 64 || hex::decode(&pk).is_err() {
-            new_dm_error.set(Some("Invalid pubkey. Must be 64 hex characters.".to_string()));
+            new_dm_error.set(Some(
+                "Invalid pubkey. Must be 64 hex characters.".to_string(),
+            ));
             return;
         }
 
@@ -91,7 +92,9 @@ pub fn DmListPage() -> impl IntoView {
 
         // Navigate to the DM chat page
         if let Some(window) = web_sys::window() {
-            let _ = window.location().set_href(&base_href(&format!("/dm/{}", pk)));
+            let _ = window
+                .location()
+                .set_href(&base_href(&format!("/dm/{}", pk)));
         }
     };
 
@@ -226,16 +229,18 @@ pub fn DmListPage() -> impl IntoView {
                 } else {
                     let convos = conversations.get();
                     if convos.is_empty() {
+                        let empty_icon: Box<dyn FnOnce() -> leptos::prelude::AnyView + Send> = Box::new(|| view! {
+                            <svg class="w-7 h-7 text-amber-400/60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke-linecap="round" stroke-linejoin="round"/>
+                                <polyline points="22,6 12,13 2,6" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        }.into_any());
                         view! {
-                            <div class="bg-gray-800/50 border border-gray-700 rounded-lg p-12 text-center">
-                                <div class="animate-gentle-float mb-4 inline-block">
-                                    {mail_icon_large()}
-                                </div>
-                                <h3 class="text-lg font-semibold text-white mb-2">"No conversations yet"</h3>
-                                <p class="text-gray-400 text-sm mb-4">
-                                    "Start a new conversation by clicking \"New Message\" above."
-                                </p>
-                            </div>
+                            <crate::components::empty_state::EmptyState
+                                icon=empty_icon
+                                title="No conversations yet".to_string()
+                                description="Start a new encrypted conversation by clicking \"New Message\" above.".to_string()
+                            />
                         }.into_any()
                     } else {
                         view! {
@@ -373,6 +378,7 @@ fn x_icon_small() -> impl IntoView {
     }
 }
 
+#[allow(dead_code)]
 fn mail_icon_large() -> impl IntoView {
     view! {
         <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 text-amber-400/20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">

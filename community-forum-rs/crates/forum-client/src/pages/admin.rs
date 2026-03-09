@@ -9,11 +9,11 @@ use leptos_router::NavigateOptions;
 use wasm_bindgen::JsCast;
 use wasm_bindgen_futures::spawn_local;
 
-use crate::app::base_href;
 use crate::admin::channel_form::{ChannelForm, ChannelFormData};
 use crate::admin::overview::{ConnectionStatusBar, OverviewTab};
 use crate::admin::user_table::{UpdateCohortsCb, UserTable};
 use crate::admin::{provide_admin, use_admin, AdminStore, AdminTab};
+use crate::app::base_href;
 use crate::auth::use_auth;
 use crate::relay::{ConnectionState, RelayConnection};
 
@@ -28,7 +28,10 @@ pub fn AdminPage() -> impl IntoView {
     let navigate = StoredValue::new(use_navigate());
 
     let is_admin = Memo::new(move |_| {
-        pubkey.get().map(|pk| AdminStore::is_admin(&pk)).unwrap_or(false)
+        pubkey
+            .get()
+            .map(|pk| AdminStore::is_admin(&pk))
+            .unwrap_or(false)
     });
 
     // Redirect non-authenticated users (SPA navigation — preserves WASM state)
@@ -195,11 +198,7 @@ fn AdminPanelInner() -> impl IntoView {
 // -- Tab button ---------------------------------------------------------------
 
 #[component]
-fn TabButton(
-    tab: AdminTab,
-    active: RwSignal<AdminTab>,
-    label: &'static str,
-) -> impl IntoView {
+fn TabButton(tab: AdminTab, active: RwSignal<AdminTab>, label: &'static str) -> impl IntoView {
     let is_active = move || active.get() == tab;
 
     let class = move || {
@@ -328,7 +327,11 @@ fn UsersTab() -> impl IntoView {
             let admin_clone = admin_for_add.clone();
             let pk_owned = pk_trimmed.to_string();
             spawn_local(async move {
-                if (admin_clone.add_to_whitelist(&pk_owned, &cohorts, &privkey).await).is_ok() {
+                if (admin_clone
+                    .add_to_whitelist(&pk_owned, &cohorts, &privkey)
+                    .await)
+                    .is_ok()
+                {
                     new_pubkey.set(String::new());
                     new_cohorts.set(vec!["general".to_string()]);
                 }
@@ -343,7 +346,9 @@ fn UsersTab() -> impl IntoView {
         if let Some(privkey) = auth.get_privkey_bytes() {
             let admin_clone = admin_for_update.clone();
             spawn_local(async move {
-                let _ = admin_clone.update_cohorts(&pubkey, &cohorts, &privkey).await;
+                let _ = admin_clone
+                    .update_cohorts(&pubkey, &cohorts, &privkey)
+                    .await;
             });
         }
     };

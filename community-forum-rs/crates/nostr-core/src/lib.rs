@@ -25,13 +25,11 @@ pub use event::{
     compute_event_id, sign_event, sign_event_deterministic, verify_event, verify_event_strict,
     verify_events_batch, EventError, NostrEvent, PubkeyMismatch, UnsignedEvent,
 };
-pub use keys::{
-    derive_from_prf, generate_keypair, Keypair, PublicKey, SecretKey, Signature,
-};
+pub use gift_wrap::{gift_wrap, unwrap_gift, GiftWrapError, UnwrappedGift};
+pub use keys::{derive_from_prf, generate_keypair, Keypair, PublicKey, SecretKey, Signature};
 pub use nip44::{decrypt as nip44_decrypt, encrypt as nip44_encrypt};
 pub use nip98::{
     create_token as create_nip98_token, verify_token as verify_nip98_token,
     verify_token_at as verify_nip98_token_at, Nip98Token as VerifiedToken,
 };
-pub use gift_wrap::{gift_wrap, unwrap_gift, GiftWrapError, UnwrappedGift};
 pub use types::{EventId, Tag, Timestamp};

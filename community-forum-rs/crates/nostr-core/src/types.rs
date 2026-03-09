@@ -334,7 +334,10 @@ mod tests {
 
     #[test]
     fn event_id_rejects_short_hex() {
-        assert_eq!(EventId::from_hex("abcd").unwrap_err(), KeyError::InvalidLength);
+        assert_eq!(
+            EventId::from_hex("abcd").unwrap_err(),
+            KeyError::InvalidLength
+        );
     }
 
     #[test]
@@ -367,10 +370,9 @@ mod tests {
 
     #[test]
     fn tag_event_ref() {
-        let id = EventId::from_hex(
-            "4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b",
-        )
-        .unwrap();
+        let id =
+            EventId::from_hex("4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b")
+                .unwrap();
         let tag = Tag::event_ref(&id);
         assert_eq!(tag.name(), "e");
         assert_eq!(
@@ -425,10 +427,9 @@ mod tests {
 
     #[test]
     fn event_id_serde_json_roundtrip() {
-        let id = EventId::from_hex(
-            "4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b",
-        )
-        .unwrap();
+        let id =
+            EventId::from_hex("4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b")
+                .unwrap();
         let json = serde_json::to_string(&id).unwrap();
         let id2: EventId = serde_json::from_str(&json).unwrap();
         assert_eq!(id, id2);

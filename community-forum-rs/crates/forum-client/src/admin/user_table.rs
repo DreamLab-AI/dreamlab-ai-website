@@ -11,14 +11,7 @@ use super::WhitelistUser;
 use crate::utils::capitalize;
 
 /// Available cohorts for the cohort editor.
-const AVAILABLE_COHORTS: &[&str] = &[
-    "general",
-    "music",
-    "events",
-    "tech",
-    "moderator",
-    "vip",
-];
+const AVAILABLE_COHORTS: &[&str] = &["general", "music", "events", "tech", "moderator", "vip"];
 
 /// Callback type for cohort updates: (pubkey, new_cohorts).
 type UpdateCallback = Rc<dyn Fn(String, Vec<String>)>;
@@ -112,12 +105,8 @@ fn UserRow(
     let pk_for_check2 = pk.clone();
     let pk_for_save = pk.clone();
 
-    let is_editing = move || {
-        editing_pubkey.get().as_deref() == Some(&*pk_for_check)
-    };
-    let is_editing2 = move || {
-        editing_pubkey.get().as_deref() == Some(&*pk_for_check2)
-    };
+    let is_editing = move || editing_pubkey.get().as_deref() == Some(&*pk_for_check);
+    let is_editing2 = move || editing_pubkey.get().as_deref() == Some(&*pk_for_check2);
 
     let on_edit_click = move |_| {
         editing_pubkey.set(Some(pk_for_edit.clone()));

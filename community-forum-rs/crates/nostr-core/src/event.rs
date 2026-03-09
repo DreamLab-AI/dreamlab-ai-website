@@ -111,7 +111,10 @@ pub struct PubkeyMismatch {
 /// **Aux randomness:** Uses `getrandom` for the BIP-340 auxiliary randomness
 /// nonce, providing side-channel hardening in production. For deterministic
 /// signing (tests, reproducibility), use [`sign_event_deterministic`].
-pub fn sign_event(event: UnsignedEvent, signing_key: &SigningKey) -> Result<NostrEvent, PubkeyMismatch> {
+pub fn sign_event(
+    event: UnsignedEvent,
+    signing_key: &SigningKey,
+) -> Result<NostrEvent, PubkeyMismatch> {
     let derived_pubkey = hex::encode(signing_key.verifying_key().to_bytes());
     if event.pubkey != derived_pubkey {
         return Err(PubkeyMismatch {
@@ -125,7 +128,9 @@ pub fn sign_event(event: UnsignedEvent, signing_key: &SigningKey) -> Result<Nost
 
     let mut aux_rand = [0u8; 32];
     getrandom::getrandom(&mut aux_rand).expect("getrandom for aux_rand");
-    let signature = signing_key.sign_raw(&id_bytes, &aux_rand).expect("schnorr sign");
+    let signature = signing_key
+        .sign_raw(&id_bytes, &aux_rand)
+        .expect("schnorr sign");
     let sig_hex = hex::encode(signature.to_bytes());
 
     Ok(NostrEvent {
@@ -144,7 +149,10 @@ pub fn sign_event(event: UnsignedEvent, signing_key: &SigningKey) -> Result<Nost
 /// Same pubkey validation as [`sign_event`], but uses all-zero aux bytes for
 /// the BIP-340 nonce. Useful for tests and reproducible signatures. **Not
 /// recommended for production** — prefer [`sign_event`] which uses random aux.
-pub fn sign_event_deterministic(event: UnsignedEvent, signing_key: &SigningKey) -> Result<NostrEvent, PubkeyMismatch> {
+pub fn sign_event_deterministic(
+    event: UnsignedEvent,
+    signing_key: &SigningKey,
+) -> Result<NostrEvent, PubkeyMismatch> {
     let derived_pubkey = hex::encode(signing_key.verifying_key().to_bytes());
     if event.pubkey != derived_pubkey {
         return Err(PubkeyMismatch {
@@ -157,7 +165,9 @@ pub fn sign_event_deterministic(event: UnsignedEvent, signing_key: &SigningKey) 
     let id_hex = hex::encode(id_bytes);
 
     let aux_rand = [0u8; 32];
-    let signature = signing_key.sign_raw(&id_bytes, &aux_rand).expect("schnorr sign");
+    let signature = signing_key
+        .sign_raw(&id_bytes, &aux_rand)
+        .expect("schnorr sign");
     let sig_hex = hex::encode(signature.to_bytes());
 
     Ok(NostrEvent {
@@ -380,7 +390,8 @@ mod tests {
                 content: "valid".to_string(),
             },
             &sk,
-        ).unwrap();
+        )
+        .unwrap();
 
         let mut bad = sign_event_deterministic(
             UnsignedEvent {
@@ -391,7 +402,8 @@ mod tests {
                 content: "tampered".to_string(),
             },
             &sk,
-        ).unwrap();
+        )
+        .unwrap();
         bad.content = "modified".to_string();
 
         let results = verify_events_batch(&[good, bad]);
@@ -416,7 +428,8 @@ mod tests {
                         content: format!("msg {i}"),
                     },
                     &sk,
-                ).unwrap()
+                )
+                .unwrap()
             })
             .collect();
 

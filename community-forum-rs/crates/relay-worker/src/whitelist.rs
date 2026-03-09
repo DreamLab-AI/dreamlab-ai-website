@@ -123,14 +123,20 @@ pub async fn handle_check_whitelist(req: &Request, env: &Env) -> Result<Response
 /// to extract `display_name` from the most recent kind-0 profile event.
 pub async fn handle_whitelist_list(req: &Request, env: &Env) -> Result<Response> {
     let url = req.url()?;
-    let params: std::collections::HashMap<String, String> = url.query_pairs().map(|(k, v)| (k.to_string(), v.to_string())).collect();
+    let params: std::collections::HashMap<String, String> = url
+        .query_pairs()
+        .map(|(k, v)| (k.to_string(), v.to_string()))
+        .collect();
 
     let limit: u32 = params
         .get("limit")
         .and_then(|v| v.parse().ok())
         .unwrap_or(20)
         .min(100);
-    let offset: u32 = params.get("offset").and_then(|v| v.parse().ok()).unwrap_or(0);
+    let offset: u32 = params
+        .get("offset")
+        .and_then(|v| v.parse().ok())
+        .unwrap_or(0);
     let cohort = params.get("cohort").cloned();
 
     let db = env.d1("DB")?;
@@ -152,23 +158,33 @@ pub async fn handle_whitelist_list(req: &Request, env: &Env) -> Result<Response>
              (SELECT e.content FROM events e WHERE e.pubkey = w.pubkey AND e.kind = 0 ORDER BY e.created_at DESC LIMIT 1) as profile_content \
              FROM whitelist w WHERE (w.expires_at IS NULL OR w.expires_at > ?1) AND w.cohorts LIKE ?2 ESCAPE '\\' \
              ORDER BY w.added_at DESC LIMIT ?3 OFFSET ?4".to_string();
-        (count, list, vec![
-            js_f64(now as f64),
-            js_str(&like_pattern),
-            js_f64(limit as f64),
-            js_f64(offset as f64),
-        ])
+        (
+            count,
+            list,
+            vec![
+                js_f64(now as f64),
+                js_str(&like_pattern),
+                js_f64(limit as f64),
+                js_f64(offset as f64),
+            ],
+        )
     } else {
-        let count = "SELECT COUNT(*) as count FROM whitelist WHERE (expires_at IS NULL OR expires_at > ?1)".to_string();
+        let count =
+            "SELECT COUNT(*) as count FROM whitelist WHERE (expires_at IS NULL OR expires_at > ?1)"
+                .to_string();
         let list = "SELECT w.pubkey, w.cohorts, w.added_at, w.added_by, \
              (SELECT e.content FROM events e WHERE e.pubkey = w.pubkey AND e.kind = 0 ORDER BY e.created_at DESC LIMIT 1) as profile_content \
              FROM whitelist w WHERE (w.expires_at IS NULL OR w.expires_at > ?1) \
              ORDER BY w.added_at DESC LIMIT ?2 OFFSET ?3".to_string();
-        (count, list, vec![
-            js_f64(now as f64),
-            js_f64(limit as f64),
-            js_f64(offset as f64),
-        ])
+        (
+            count,
+            list,
+            vec![
+                js_f64(now as f64),
+                js_f64(limit as f64),
+                js_f64(offset as f64),
+            ],
+        )
     };
 
     // Execute count query
@@ -185,11 +201,7 @@ pub async fn handle_whitelist_list(req: &Request, env: &Env) -> Result<Response>
     let total = count_result.map(|r| r.count as u64).unwrap_or(0);
 
     // Execute list query
-    let list_result = db
-        .prepare(&list_sql)
-        .bind(&bind_values)?
-        .all()
-        .await?;
+    let list_result = db.prepare(&list_sql).bind(&bind_values)?.all().await?;
 
     let rows: Vec<WhitelistRow> = list_result.results()?;
     let users: Vec<serde_json::Value> = rows
@@ -207,8 +219,7 @@ pub async fn handle_whitelist_list(req: &Request, env: &Env) -> Result<Response>
                     })
             });
 
-            let cohorts: Vec<String> =
-                serde_json::from_str(&row.cohorts).unwrap_or_default();
+            let cohorts: Vec<String> = serde_json::from_str(&row.cohorts).unwrap_or_default();
 
             json!({
                 "pubkey": row.pubkey,
@@ -234,11 +245,7 @@ pub async fn handle_whitelist_list(req: &Request, env: &Env) -> Result<Response>
 pub async fn handle_whitelist_add(mut req: Request, env: &Env) -> Result<Response> {
     let url = req.url()?;
     let request_url = format!("{}{}", url.origin().ascii_serialization(), url.path());
-    let auth_header = req
-        .headers()
-        .get("Authorization")
-        .ok()
-        .flatten();
+    let auth_header = req.headers().get("Authorization").ok().flatten();
     let body_bytes = req.bytes().await?;
 
     let admin_pubkey = match auth::require_nip98_admin(
@@ -263,8 +270,8 @@ pub async fn handle_whitelist_add(mut req: Request, env: &Env) -> Result<Respons
     };
 
     let cohorts = body.cohorts.unwrap_or_else(|| vec!["approved".to_string()]);
-    let cohorts_json = serde_json::to_string(&cohorts)
-        .map_err(|e| worker::Error::RustError(e.to_string()))?;
+    let cohorts_json =
+        serde_json::to_string(&cohorts).map_err(|e| worker::Error::RustError(e.to_string()))?;
     let now = auth::js_now_secs();
 
     let db = env.d1("DB")?;
@@ -292,11 +299,7 @@ pub async fn handle_whitelist_add(mut req: Request, env: &Env) -> Result<Respons
 pub async fn handle_whitelist_update_cohorts(mut req: Request, env: &Env) -> Result<Response> {
     let url = req.url()?;
     let request_url = format!("{}{}", url.origin().ascii_serialization(), url.path());
-    let auth_header = req
-        .headers()
-        .get("Authorization")
-        .ok()
-        .flatten();
+    let auth_header = req.headers().get("Authorization").ok().flatten();
     let body_bytes = req.bytes().await?;
 
     let admin_pubkey = match auth::require_nip98_admin(
@@ -324,8 +327,8 @@ pub async fn handle_whitelist_update_cohorts(mut req: Request, env: &Env) -> Res
         None => return json_response(env, &json!({ "error": "Missing pubkey or cohorts" }), 400),
     };
 
-    let cohorts_json = serde_json::to_string(&cohorts)
-        .map_err(|e| worker::Error::RustError(e.to_string()))?;
+    let cohorts_json =
+        serde_json::to_string(&cohorts).map_err(|e| worker::Error::RustError(e.to_string()))?;
     let now = auth::js_now_secs();
 
     let db = env.d1("DB")?;

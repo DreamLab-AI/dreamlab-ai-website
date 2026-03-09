@@ -105,16 +105,13 @@ pub fn conversation_key(sk: &[u8; 32], pk: &[u8; 32]) -> Result<[u8; 32], Nip44E
     compressed[0] = 0x02; // assume even y
     compressed[1..].copy_from_slice(pk);
 
-    let public_key = PublicKey::from_sec1_bytes(&compressed)
-        .map_err(|_| Nip44Error::InvalidPublicKey)?;
+    let public_key =
+        PublicKey::from_sec1_bytes(&compressed).map_err(|_| Nip44Error::InvalidPublicKey)?;
 
     // ECDH: multiply sk * pk to get shared point, take x-coordinate
     let shared_point = {
         let pk_affine = public_key.as_affine();
-        let shared = k256::ecdh::diffie_hellman(
-            secret_key.to_nonzero_scalar(),
-            pk_affine,
-        );
+        let shared = k256::ecdh::diffie_hellman(secret_key.to_nonzero_scalar(), pk_affine);
         let shared_bytes = shared.raw_secret_bytes();
         let mut x = [0u8; 32];
         x.copy_from_slice(shared_bytes.as_slice());
@@ -143,7 +140,11 @@ pub fn calc_padded_len(unpadded_len: usize) -> usize {
         return 32;
     }
     let next_power = unpadded_len.next_power_of_two();
-    let chunk = if next_power <= 256 { 32 } else { next_power / 8 };
+    let chunk = if next_power <= 256 {
+        32
+    } else {
+        next_power / 8
+    };
     chunk * unpadded_len.div_ceil(chunk)
 }
 
@@ -232,10 +233,7 @@ fn decrypt_inner(conv_key: &[u8; 32], payload: &str) -> Result<String, Nip44Erro
 type MessageKeys = ([u8; 32], [u8; 12], [u8; 32]);
 
 /// Derive (chacha_key[32], chacha_nonce[12], hmac_key[32]) from conversation key + nonce.
-fn derive_message_keys(
-    conv_key: &[u8; 32],
-    nonce: &[u8; 32],
-) -> Result<MessageKeys, Nip44Error> {
+fn derive_message_keys(conv_key: &[u8; 32], nonce: &[u8; 32]) -> Result<MessageKeys, Nip44Error> {
     let hk = Hkdf::<Sha256>::new(Some(conv_key), nonce);
     let mut okm = [0u8; 76];
     hk.expand(b"nip44-v2", &mut okm)
@@ -508,7 +506,13 @@ mod tests {
         let mut prev = calc_padded_len(1);
         for i in 2..=65535 {
             let curr = calc_padded_len(i);
-            assert!(curr >= prev, "padding decreased at i={}: {} < {}", i, curr, prev);
+            assert!(
+                curr >= prev,
+                "padding decreased at i={}: {} < {}",
+                i,
+                curr,
+                prev
+            );
             assert!(curr >= i, "padding < input at i={}", i);
             prev = curr;
         }

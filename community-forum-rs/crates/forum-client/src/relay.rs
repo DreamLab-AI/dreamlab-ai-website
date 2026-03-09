@@ -59,7 +59,6 @@ pub struct Filter {
     pub limit: Option<u64>,
 }
 
-
 /// Callback type for received events on a subscription.
 pub type EventCallback = Rc<dyn Fn(NostrEvent)>;
 
@@ -263,10 +262,9 @@ impl RelayConnection {
             let mut inner = rc.borrow_mut();
             inner.sub_counter += 1;
             let sub_id = format!("sub_{}", inner.sub_counter);
-            inner.subscriptions.insert(
-                sub_id.clone(),
-                Subscription { on_event, on_eose },
-            );
+            inner
+                .subscriptions
+                .insert(sub_id.clone(), Subscription { on_event, on_eose });
             sub_id
         });
 
@@ -290,9 +288,10 @@ impl RelayConnection {
             rc.borrow_mut().subscriptions.remove(sub_id);
         });
 
-        let close_msg = serde_json::to_string(
-            &vec![Value::String("CLOSE".into()), Value::String(sub_id.into())],
-        )
+        let close_msg = serde_json::to_string(&vec![
+            Value::String("CLOSE".into()),
+            Value::String(sub_id.into()),
+        ])
         .unwrap_or_default();
         self.send_raw(&close_msg);
     }
@@ -335,18 +334,25 @@ impl RelayConnection {
         });
 
         web_sys::console::log_1(
-            &format!("[Relay] Reconnecting in {}ms (attempt {})", delay, attempts + 1).into(),
+            &format!(
+                "[Relay] Reconnecting in {}ms (attempt {})",
+                delay,
+                attempts + 1
+            )
+            .into(),
         );
 
         let self_clone = self.clone();
-        crate::utils::set_timeout_once(move || {
-            let current = self_clone.state.get_untracked();
-            if current != ConnectionState::Disconnected
-                && current != ConnectionState::Connected
-            {
-                self_clone.connect();
-            }
-        }, delay as i32);
+        crate::utils::set_timeout_once(
+            move || {
+                let current = self_clone.state.get_untracked();
+                if current != ConnectionState::Disconnected && current != ConnectionState::Connected
+                {
+                    self_clone.connect();
+                }
+            },
+            delay as i32,
+        );
     }
 }
 
@@ -355,9 +361,7 @@ fn handle_relay_message(inner_rc: &Rc<RefCell<RelayInner>>, text: &str) {
     let parsed: Value = match serde_json::from_str(text) {
         Ok(v) => v,
         Err(e) => {
-            web_sys::console::warn_1(
-                &format!("[Relay] Failed to parse message: {}", e).into(),
-            );
+            web_sys::console::warn_1(&format!("[Relay] Failed to parse message: {}", e).into());
             return;
         }
     };
@@ -397,7 +401,10 @@ fn handle_relay_message(inner_rc: &Rc<RefCell<RelayInner>>, text: &str) {
 
             let callback = {
                 let inner = inner_rc.borrow();
-                inner.subscriptions.get(&sub_id).map(|s| Rc::clone(&s.on_event))
+                inner
+                    .subscriptions
+                    .get(&sub_id)
+                    .map(|s| Rc::clone(&s.on_event))
             };
             if let Some(cb) = callback {
                 cb(event);
@@ -426,9 +433,7 @@ fn handle_relay_message(inner_rc: &Rc<RefCell<RelayInner>>, text: &str) {
         "NOTICE" => {
             if arr.len() >= 2 {
                 if let Some(notice) = arr[1].as_str() {
-                    web_sys::console::warn_1(
-                        &format!("[Relay] NOTICE: {}", notice).into(),
-                    );
+                    web_sys::console::warn_1(&format!("[Relay] NOTICE: {}", notice).into());
                 }
             }
         }

@@ -86,8 +86,7 @@ pub(crate) mod cors {
     /// `&Request`. The origin is resolved from the `ALLOWED_ORIGIN` env var
     /// or defaults to the first allowed origin.
     pub fn json_response(env: &Env, body: &serde_json::Value, status: u16) -> Result<Response> {
-        let json_str =
-            serde_json::to_string(body).map_err(|e| Error::RustError(e.to_string()))?;
+        let json_str = serde_json::to_string(body).map_err(|e| Error::RustError(e.to_string()))?;
         let headers = Headers::new();
         headers.set("Content-Type", "application/json").ok();
 
@@ -151,12 +150,9 @@ async fn fetch(req: Request, env: Env, _ctx: Context) -> Result<Response> {
     // NIP-11 relay info document
     if path == "/" && accepts_nostr_json(&req) {
         let info = nip11::relay_info(&env);
-        let json_str =
-            serde_json::to_string(&info).map_err(|e| Error::RustError(e.to_string()))?;
+        let json_str = serde_json::to_string(&info).map_err(|e| Error::RustError(e.to_string()))?;
         let headers = Headers::new();
-        headers
-            .set("Content-Type", "application/nostr+json")
-            .ok();
+        headers.set("Content-Type", "application/nostr+json").ok();
         headers
             .set("Access-Control-Allow-Origin", &cors_origin(&req))
             .ok();
@@ -179,11 +175,9 @@ async fn fetch(req: Request, env: Env, _ctx: Context) -> Result<Response> {
                     .set("Access-Control-Allow-Origin", ALLOWED_ORIGINS[0])
                     .ok();
                 headers.set("Vary", "Origin").ok();
-                Ok(
-                    Response::ok(r#"{"error":"Invalid JSON"}"#)?
-                        .with_status(400)
-                        .with_headers(headers),
-                )
+                Ok(Response::ok(r#"{"error":"Invalid JSON"}"#)?
+                    .with_status(400)
+                    .with_headers(headers))
             } else {
                 let headers = Headers::new();
                 headers.set("Content-Type", "application/json").ok();
@@ -191,11 +185,9 @@ async fn fetch(req: Request, env: Env, _ctx: Context) -> Result<Response> {
                     .set("Access-Control-Allow-Origin", ALLOWED_ORIGINS[0])
                     .ok();
                 headers.set("Vary", "Origin").ok();
-                Ok(
-                    Response::ok(r#"{"error":"Internal error"}"#)?
-                        .with_status(500)
-                        .with_headers(headers),
-                )
+                Ok(Response::ok(r#"{"error":"Internal error"}"#)?
+                    .with_status(500)
+                    .with_headers(headers))
             }
         }
     }

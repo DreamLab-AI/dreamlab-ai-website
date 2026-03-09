@@ -472,8 +472,7 @@ mod tests {
             content: String::new(),
         };
 
-        let signed = sign_event(unsigned, &signing_key)
-            .expect("pubkey derived from same key");
+        let signed = sign_event(unsigned, &signing_key).expect("pubkey derived from same key");
         let json = serde_json::to_string(&signed).unwrap();
         let b64 = BASE64.encode(json.as_bytes());
         let header = authorization_header(&b64);

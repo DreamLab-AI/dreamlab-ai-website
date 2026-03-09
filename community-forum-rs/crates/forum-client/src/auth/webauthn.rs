@@ -150,11 +150,7 @@ pub(super) fn build_request_options(
 
     // userVerification
     if let Some(uv) = json.get("userVerification").and_then(|v| v.as_str()) {
-        Reflect::set(
-            &options,
-            &"userVerification".into(),
-            &JsValue::from_str(uv),
-        )?;
+        Reflect::set(&options, &"userVerification".into(), &JsValue::from_str(uv))?;
     }
 
     // extensions with PRF (if salt provided)

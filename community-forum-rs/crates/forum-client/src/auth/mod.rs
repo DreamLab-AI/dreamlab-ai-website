@@ -162,8 +162,7 @@ impl AuthStore {
             let signing_key = k256::schnorr::SigningKey::from_bytes(&key_bytes)
                 .map_err(|e| format!("Invalid signing key: {e}"))?;
             key_bytes.zeroize();
-            nostr_core::sign_event(event, &signing_key)
-                .map_err(|e| format!("Signing failed: {e}"))
+            nostr_core::sign_event(event, &signing_key).map_err(|e| format!("Signing failed: {e}"))
         })
     }
 
@@ -221,7 +220,8 @@ impl AuthStore {
 
     #[allow(dead_code)]
     pub fn complete_signup(&self) {
-        self.state.update(|s| s.account_status = AccountStatus::Complete);
+        self.state
+            .update(|s| s.account_status = AccountStatus::Complete);
         self.update_storage_field(|stored| {
             stored.account_status = AccountStatus::Complete;
         });
@@ -369,9 +369,7 @@ impl AuthStore {
         let (existing_nickname, existing_avatar, _existing_status, _existing_nsec) =
             self.read_existing_metadata();
 
-        let nickname = display_name
-            .map(|s| s.to_string())
-            .or(existing_nickname);
+        let nickname = display_name.map(|s| s.to_string()).or(existing_nickname);
         let avatar = existing_avatar;
 
         let stored = StoredSession {

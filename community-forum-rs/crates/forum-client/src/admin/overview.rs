@@ -150,9 +150,8 @@ fn StatCard(
     let card_class = format!(
         "border rounded-lg p-4 {bg} hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200"
     );
-    let icon_class = format!(
-        "w-12 h-12 rounded-lg {icon_bg} {text} flex items-center justify-center"
-    );
+    let icon_class =
+        format!("w-12 h-12 rounded-lg {icon_bg} {text} flex items-center justify-center");
     let value_class = format!("text-2xl font-bold {text}");
 
     view! {

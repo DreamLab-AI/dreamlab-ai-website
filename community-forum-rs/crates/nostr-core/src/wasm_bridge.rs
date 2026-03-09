@@ -84,9 +84,9 @@ pub fn create_nip98_token(
     let sk: [u8; 32] = secret_key
         .try_into()
         .map_err(|_| JsValue::from_str("secret_key must be 32 bytes"))?;
-    let ts = created_at.map(|t| t as u64).unwrap_or_else(|| {
-        (js_sys::Date::now() / 1000.0) as u64
-    });
+    let ts = created_at
+        .map(|t| t as u64)
+        .unwrap_or_else(|| (js_sys::Date::now() / 1000.0) as u64);
     nip98::create_token_at(&sk, url, method, body.as_deref(), ts)
         .map_err(|e| JsValue::from_str(&e.to_string()))
 }
@@ -120,9 +120,8 @@ pub fn verify_nip98_token_at(
     body: Option<Vec<u8>>,
     now: u32,
 ) -> Result<JsValue, JsValue> {
-    let token =
-        nip98::verify_token_at(auth_header, url, method, body.as_deref(), now as u64)
-            .map_err(|e| JsValue::from_str(&e.to_string()))?;
+    let token = nip98::verify_token_at(auth_header, url, method, body.as_deref(), now as u64)
+        .map_err(|e| JsValue::from_str(&e.to_string()))?;
     nip98_token_to_js(&token)
 }
 
@@ -140,7 +139,11 @@ fn nip98_token_to_js(token: &nip98::Nip98Token) -> Result<JsValue, JsValue> {
             None => JsValue::NULL,
         },
     )?;
-    js_sys::Reflect::set(&obj, &"createdAt".into(), &JsValue::from_f64(token.created_at as f64))?;
+    js_sys::Reflect::set(
+        &obj,
+        &"createdAt".into(),
+        &JsValue::from_f64(token.created_at as f64),
+    )?;
     Ok(obj.into())
 }
 
@@ -187,9 +190,11 @@ pub fn schnorr_sign(secret_key: &[u8], message: &[u8]) -> Result<Vec<u8>, JsValu
         .try_into()
         .map_err(|_| JsValue::from_str("message must be 32 bytes"))?;
 
-    let sk = keys::SecretKey::from_bytes(sk_bytes)
+    let sk =
+        keys::SecretKey::from_bytes(sk_bytes).map_err(|e| JsValue::from_str(&e.to_string()))?;
+    let sig = sk
+        .sign(&msg)
         .map_err(|e| JsValue::from_str(&e.to_string()))?;
-    let sig = sk.sign(&msg).map_err(|e| JsValue::from_str(&e.to_string()))?;
     Ok(sig.as_bytes().to_vec())
 }
 
@@ -213,8 +218,8 @@ pub fn schnorr_verify(
         .try_into()
         .map_err(|_| JsValue::from_str("signature must be 64 bytes"))?;
 
-    let pk = keys::PublicKey::from_bytes(pk_bytes)
-        .map_err(|e| JsValue::from_str(&e.to_string()))?;
+    let pk =
+        keys::PublicKey::from_bytes(pk_bytes).map_err(|e| JsValue::from_str(&e.to_string()))?;
     let sig = keys::Signature::from_bytes(sig_bytes);
     match pk.verify(&msg, &sig) {
         Ok(()) => Ok(true),

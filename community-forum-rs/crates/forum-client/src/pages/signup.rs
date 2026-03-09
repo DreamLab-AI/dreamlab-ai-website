@@ -171,7 +171,11 @@ pub fn SignupPage() -> impl IntoView {
 
 #[component]
 fn StepItem(number: &'static str, text: &'static str, last: bool) -> impl IntoView {
-    let connector_class = if last { "hidden" } else { "w-px h-4 bg-gray-700 ml-3.5" };
+    let connector_class = if last {
+        "hidden"
+    } else {
+        "w-px h-4 bg-gray-700 ml-3.5"
+    };
     view! {
         <div>
             <div class="flex items-start gap-3">
