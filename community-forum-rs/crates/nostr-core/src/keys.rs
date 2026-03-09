@@ -92,8 +92,8 @@ impl PublicKey {
 
     /// Parse from a 64-character lowercase hex string.
     pub fn from_hex(hex_str: &str) -> Result<Self, KeyError> {
-        let decoded = hex::decode(hex_str)
-            .map_err(|_| KeyError::InvalidPublicKeyHex(hex_str.to_string()))?;
+        let decoded =
+            hex::decode(hex_str).map_err(|_| KeyError::InvalidPublicKeyHex(hex_str.to_string()))?;
         if decoded.len() != 32 {
             return Err(KeyError::InvalidPublicKeyHex(format!(
                 "expected 32 bytes, got {}",
@@ -114,8 +114,7 @@ impl PublicKey {
 
     /// Verify a BIP-340 Schnorr signature over a 32-byte message hash.
     pub fn verify(&self, message: &[u8; 32], sig: &Signature) -> Result<(), KeyError> {
-        let vk =
-            VerifyingKey::from_bytes(&self.bytes).map_err(|_| KeyError::InvalidPublicKey)?;
+        let vk = VerifyingKey::from_bytes(&self.bytes).map_err(|_| KeyError::InvalidPublicKey)?;
         let k256_sig = k256::schnorr::Signature::try_from(sig.bytes.as_slice())
             .map_err(|_| KeyError::InvalidSignature)?;
         vk.verify_raw(message, &k256_sig)
@@ -167,9 +166,7 @@ pub fn pubkey_hex(secret_key: &[u8; 32]) -> Result<String, KeyError> {
 }
 
 /// Create a [`SigningKey`] from a 32-byte secret.
-pub fn signing_key_from_bytes(
-    secret_key: &[u8; 32],
-) -> Result<SigningKey, KeyError> {
+pub fn signing_key_from_bytes(secret_key: &[u8; 32]) -> Result<SigningKey, KeyError> {
     SigningKey::from_bytes(secret_key).map_err(|_| KeyError::InvalidSecretKey)
 }
 

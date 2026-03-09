@@ -106,7 +106,14 @@ impl DMStore {
     #[allow(dead_code)]
     pub fn total_unread(&self) -> Memo<u32> {
         let state = self.state;
-        Memo::new(move |_| state.get().conversations.values().map(|c| c.unread_count).sum())
+        Memo::new(move |_| {
+            state
+                .get()
+                .conversations
+                .values()
+                .map(|c| c.unread_count)
+                .sum()
+        })
     }
 
     pub fn clear_error(&self) {
@@ -122,7 +129,10 @@ impl DMStore {
         privkey_bytes: &[u8; 32],
         my_pubkey: &str,
     ) {
-        self.state.update(|s| { s.is_loading = true; s.error = None; });
+        self.state.update(|s| {
+            s.is_loading = true;
+            s.error = None;
+        });
 
         let sk = *privkey_bytes;
         let my_pk = my_pubkey.to_string();
@@ -143,15 +153,22 @@ impl DMStore {
         let on_event = Rc::new(move |event: NostrEvent| {
             process_dm_event(&event, &sk, &my_pk_cb, state);
         });
-        let on_eose = Rc::new(move || { state.update(|s| s.is_loading = false); });
+        let on_eose = Rc::new(move || {
+            state.update(|s| s.is_loading = false);
+        });
 
         let id = relay.subscribe(vec![sent_filter, recv_filter], on_event, Some(on_eose));
         self.sub_ids.update(|ids| ids.push(id));
 
         // Timeout guard so the UI never gets stuck (auto-drops closure)
-        crate::utils::set_timeout_once(move || {
-            if state.get_untracked().is_loading { state.update(|s| s.is_loading = false); }
-        }, 8000);
+        crate::utils::set_timeout_once(
+            move || {
+                if state.get_untracked().is_loading {
+                    state.update(|s| s.is_loading = false);
+                }
+            },
+            8000,
+        );
     }
 
     /// Subscribe to incoming DMs in real-time (new events only, since=now).
@@ -186,10 +203,18 @@ impl DMStore {
         let pk = pubkey.to_string();
         self.state.update(|s| {
             s.current_conversation = Some(pk.clone());
-            if let Some(convo) = s.conversations.get_mut(&pk) { convo.unread_count = 0; }
+            if let Some(convo) = s.conversations.get_mut(&pk) {
+                convo.unread_count = 0;
+            }
             for msg in &mut s.messages {
-                let cp = if msg.is_sent { &msg.recipient_pubkey } else { &msg.sender_pubkey };
-                if cp == &pk { msg.is_read = true; }
+                let cp = if msg.is_sent {
+                    &msg.recipient_pubkey
+                } else {
+                    &msg.sender_pubkey
+                };
+                if cp == &pk {
+                    msg.is_read = true;
+                }
             }
         });
     }
@@ -210,7 +235,11 @@ impl DMStore {
 
         state.update(|s| {
             s.messages.retain(|m| {
-                let cp = if m.is_sent { &m.recipient_pubkey } else { &m.sender_pubkey };
+                let cp = if m.is_sent {
+                    &m.recipient_pubkey
+                } else {
+                    &m.sender_pubkey
+                };
                 if cp == &partner_pk {
                     s.seen_ids.remove(&m.id);
                     false
@@ -238,7 +267,9 @@ impl DMStore {
         let on_event = Rc::new(move |event: NostrEvent| {
             process_dm_event(&event, &sk, &my_pk_cb, state);
         });
-        let on_eose = Rc::new(move || { state.update(|s| s.is_loading = false); });
+        let on_eose = Rc::new(move || {
+            state.update(|s| s.is_loading = false);
+        });
 
         let id = relay.subscribe(vec![sent_filter, recv_filter], on_event, Some(on_eose));
         self.sub_ids.update(|ids| ids.push(id));
@@ -261,7 +292,9 @@ impl DMStore {
         privkey_bytes: &[u8; 32],
         my_pubkey: &str,
     ) -> Result<(), String> {
-        if content.trim().is_empty() { return Err("Message cannot be empty".into()); }
+        if content.trim().is_empty() {
+            return Err("Message cannot be empty".into());
+        }
 
         // Validate recipient pubkey before calling gift_wrap
         if hex::decode(recipient_pk_hex)
@@ -295,11 +328,15 @@ impl DMStore {
             {
                 s.messages.push(msg.clone());
             }
-            let convo = s.conversations.entry(recipient_pk_hex.to_string())
+            let convo = s
+                .conversations
+                .entry(recipient_pk_hex.to_string())
                 .or_insert_with(|| DMConversation {
                     pubkey: recipient_pk_hex.to_string(),
                     name: shorten_pubkey(recipient_pk_hex),
-                    last_message: String::new(), last_timestamp: 0, unread_count: 0,
+                    last_message: String::new(),
+                    last_timestamp: 0,
+                    unread_count: 0,
                 });
             convo.last_message = truncate_message(content, 80);
             convo.last_timestamp = now;
@@ -312,7 +349,9 @@ impl DMStore {
 
     /// Unsubscribe from all active DM subscriptions.
     pub fn cleanup(&self, relay: &RelayConnection) {
-        for id in &self.sub_ids.get_untracked() { relay.unsubscribe(id); }
+        for id in &self.sub_ids.get_untracked() {
+            relay.unsubscribe(id);
+        }
         self.sub_ids.set(Vec::new());
     }
 }
@@ -360,12 +399,18 @@ fn process_gift_wrap_event(
     let is_sent = sender_pubkey == my_pubkey;
 
     // The rumor's "p" tag identifies the recipient
-    let recipient_pubkey = unwrapped.rumor.tags
+    let recipient_pubkey = unwrapped
+        .rumor
+        .tags
         .iter()
         .find(|t| t.len() >= 2 && t[0] == "p")
         .map(|t| t[1].clone())
         .unwrap_or_else(|| {
-            if is_sent { String::new() } else { my_pubkey.to_string() }
+            if is_sent {
+                String::new()
+            } else {
+                my_pubkey.to_string()
+            }
         });
 
     let counterparty_pk = if is_sent {
@@ -405,7 +450,11 @@ fn process_kind4_event(
 ) {
     let is_sent = event.pubkey == my_pubkey;
     let counterparty_pk = if is_sent {
-        event.tags.iter().find(|t| t.len() >= 2 && t[0] == "p").map(|t| t[1].clone())
+        event
+            .tags
+            .iter()
+            .find(|t| t.len() >= 2 && t[0] == "p")
+            .map(|t| t[1].clone())
     } else {
         Some(event.pubkey.clone())
     };
@@ -433,14 +482,25 @@ fn process_kind4_event(
     let msg = DMMessage {
         id: event.id.clone(),
         sender_pubkey: event.pubkey.clone(),
-        recipient_pubkey: if is_sent { counterparty_pk.clone() } else { my_pubkey.to_string() },
+        recipient_pubkey: if is_sent {
+            counterparty_pk.clone()
+        } else {
+            my_pubkey.to_string()
+        },
         content: plaintext.clone(),
         timestamp: event.created_at,
         is_sent,
         is_read: is_sent,
     };
 
-    insert_dm_message(msg, &counterparty_pk, &plaintext, event.created_at, is_sent, state);
+    insert_dm_message(
+        msg,
+        &counterparty_pk,
+        &plaintext,
+        event.created_at,
+        is_sent,
+        state,
+    );
 }
 
 /// Shared helper: deduplicate and insert a DM message into the reactive state,
@@ -454,15 +514,20 @@ fn insert_dm_message(
     state: RwSignal<DMStateInner>,
 ) {
     state.update(|s| {
-        if s.seen_ids.insert(msg.id.clone()) { s.messages.push(msg.clone()); }
+        if s.seen_ids.insert(msg.id.clone()) {
+            s.messages.push(msg.clone());
+        }
 
-        let convo = s.conversations.entry(counterparty_pk.to_string()).or_insert_with(|| {
-            DMConversation {
+        let convo = s
+            .conversations
+            .entry(counterparty_pk.to_string())
+            .or_insert_with(|| DMConversation {
                 pubkey: counterparty_pk.to_string(),
                 name: shorten_pubkey(counterparty_pk),
-                last_message: String::new(), last_timestamp: 0, unread_count: 0,
-            }
-        });
+                last_message: String::new(),
+                last_timestamp: 0,
+                unread_count: 0,
+            });
         if timestamp >= convo.last_timestamp {
             convo.last_message = truncate_message(plaintext, 80);
             convo.last_timestamp = timestamp;
@@ -488,7 +553,11 @@ fn truncate_message(content: &str, max_chars: usize) -> String {
 // -- Context providers --------------------------------------------------------
 
 /// Create and provide the DM store context.
-pub fn provide_dm_store() { provide_context(DMStore::new()); }
+pub fn provide_dm_store() {
+    provide_context(DMStore::new());
+}
 
 /// Get the DM store from context. Panics if `provide_dm_store()` was not called.
-pub fn use_dm_store() -> DMStore { expect_context::<DMStore>() }
+pub fn use_dm_store() -> DMStore {
+    expect_context::<DMStore>()
+}

@@ -40,9 +40,7 @@ pub fn ChatPage() -> impl IntoView {
     let conn_state = relay.connection_state();
 
     let query = use_query_map();
-    let section_filter = move || {
-        query.read().get("section").unwrap_or_default()
-    };
+    let section_filter = move || query.read().get("section").unwrap_or_default();
 
     // Reactive state
     let channels = RwSignal::new(Vec::<ChannelMeta>::new());
@@ -146,8 +144,11 @@ pub fn ChatPage() -> impl IntoView {
             return;
         }
 
-        let channel_ids: Vec<String> =
-            channels.get_untracked().iter().map(|c| c.id.clone()).collect();
+        let channel_ids: Vec<String> = channels
+            .get_untracked()
+            .iter()
+            .map(|c| c.id.clone())
+            .collect();
         if channel_ids.is_empty() {
             return;
         }

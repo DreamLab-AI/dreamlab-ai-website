@@ -221,9 +221,7 @@ impl DurableObject for NostrRelayDO {
     ) -> Result<()> {
         let msg = match message {
             WebSocketIncomingMessage::String(s) => s,
-            WebSocketIncomingMessage::Binary(b) => {
-                String::from_utf8(b).unwrap_or_default()
-            }
+            WebSocketIncomingMessage::Binary(b) => String::from_utf8(b).unwrap_or_default(),
         };
 
         let session_id = match self.find_session_id(&ws) {

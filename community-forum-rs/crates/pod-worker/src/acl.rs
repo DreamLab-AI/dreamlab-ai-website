@@ -107,9 +107,7 @@ fn get_ids(val: &Option<IdOrIds>) -> Vec<&str> {
 /// Normalize a path: convert relative (`./`) to absolute, strip trailing slashes.
 /// Allocates only when the input contains a `./` prefix that needs rewriting.
 fn normalize_path_owned(path: &str) -> String {
-    let stripped = path
-        .strip_prefix("./")
-        .or_else(|| path.strip_prefix('.'));
+    let stripped = path.strip_prefix("./").or_else(|| path.strip_prefix('.'));
 
     let base = match stripped {
         Some("") => "/".to_string(),
@@ -503,12 +501,7 @@ mod tests {
         assert!(evaluate_access(Some(&doc), agent, "/", AccessMode::Read));
         assert!(evaluate_access(Some(&doc), agent, "/", AccessMode::Write));
         assert!(evaluate_access(Some(&doc), agent, "/", AccessMode::Append));
-        assert!(evaluate_access(
-            Some(&doc),
-            agent,
-            "/",
-            AccessMode::Control
-        ));
+        assert!(evaluate_access(Some(&doc), agent, "/", AccessMode::Control));
     }
 
     #[test]

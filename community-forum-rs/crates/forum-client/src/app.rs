@@ -8,8 +8,20 @@ use leptos_router::NavigateOptions;
 
 use crate::admin::AdminStore;
 use crate::auth::{provide_auth, use_auth};
+use crate::components::bookmarks_modal::provide_bookmarks;
+use crate::components::bookmarks_modal::BookmarksModal;
+use crate::components::global_search::GlobalSearch;
+use crate::components::message_bubble::{provide_profile_modal_target, ProfileModalTarget};
+use crate::components::mobile_bottom_nav::{provide_unread_dm_count, MobileBottomNav};
+use crate::components::notification_bell::{provide_notifications, NotificationBell};
+use crate::components::profile_modal::ProfileModal;
+use crate::components::session_timeout::SessionTimeout;
+use crate::components::toast::{provide_toasts, ToastContainer};
+use crate::components::user_display::provide_name_cache;
 use crate::pages::{
-    AdminPage, ChannelPage, ChatPage, DmChatPage, DmListPage, HomePage, LoginPage, SignupPage,
+    AdminPage, CategoryPage, ChannelPage, ChatPage, DmChatPage, DmListPage, EventsPage, ForumsPage,
+    HomePage, LoginPage, NoteViewPage, PendingPage, SectionPage, SettingsPage, SetupPage,
+    SignupPage,
 };
 use crate::relay::RelayConnection;
 
@@ -112,6 +124,38 @@ fn admin_icon() -> impl IntoView {
     }
 }
 
+fn forums_icon() -> impl IntoView {
+    view! {
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7" rx="1" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="14" y="3" width="7" height="7" rx="1" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="3" y="14" width="7" height="7" rx="1" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="14" y="14" width="7" height="7" rx="1" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    }
+}
+
+fn events_icon() -> impl IntoView {
+    view! {
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="16" y1="2" x2="16" y2="6" stroke-linecap="round"/>
+            <line x1="8" y1="2" x2="8" y2="6" stroke-linecap="round"/>
+            <line x1="3" y1="10" x2="21" y2="10" stroke-linecap="round"/>
+        </svg>
+    }
+}
+
+fn settings_icon() -> impl IntoView {
+    view! {
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"
+                stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    }
+}
+
 fn loading_spinner() -> impl IntoView {
     view! {
         <div class="flex flex-col items-center justify-center min-h-[60vh] gap-4">
@@ -135,6 +179,14 @@ fn redirect_spinner() -> impl IntoView {
 #[component]
 pub fn App() -> impl IntoView {
     provide_auth();
+
+    // Provide global context stores
+    provide_toasts();
+    provide_notifications();
+    provide_bookmarks();
+    provide_unread_dm_count();
+    provide_name_cache();
+    provide_profile_modal_target();
 
     // Provide relay connection as context — connect/disconnect reactively with auth state
     let relay = RelayConnection::new();
@@ -167,13 +219,23 @@ pub fn App() -> impl IntoView {
                         </div>
                     </div>
                 }>
+                    // Public routes (no auth required)
                     <Route path=path!("/") view=HomePage />
                     <Route path=path!("/login") view=LoginPage />
                     <Route path=path!("/signup") view=SignupPage />
+                    <Route path=path!("/view/:note_id") view=NoteViewPage />
+                    // Auth-gated routes
+                    <Route path=path!("/setup") view=AuthGatedSetup />
+                    <Route path=path!("/pending") view=AuthGatedPending />
                     <Route path=path!("/chat") view=AuthGatedChat />
                     <Route path=path!("/chat/:channel_id") view=AuthGatedChannel />
                     <Route path=path!("/dm") view=AuthGatedDmList />
                     <Route path=path!("/dm/:pubkey") view=AuthGatedDmChat />
+                    <Route path=path!("/forums") view=AuthGatedForums />
+                    <Route path=path!("/forums/:category") view=AuthGatedCategory />
+                    <Route path=path!("/forums/:category/:section") view=AuthGatedSection />
+                    <Route path=path!("/events") view=AuthGatedEvents />
+                    <Route path=path!("/settings") view=AuthGatedSettings />
                     <Route path=path!("/admin") view=AdminPage />
                 </FlatRoutes>
             </Layout>
@@ -190,6 +252,20 @@ fn Layout(children: Children) -> impl IntoView {
     let nickname = auth.nickname();
     let pubkey = auth.pubkey();
     let mobile_open = RwSignal::new(false);
+    let bookmarks_open = RwSignal::new(false);
+    let profile_target_pk = RwSignal::new(String::new());
+    let profile_open = RwSignal::new(false);
+
+    // Watch for profile modal requests from any component
+    Effect::new(move |_| {
+        if let Some(target) = use_context::<ProfileModalTarget>() {
+            if let Some(pk) = target.0.get() {
+                profile_target_pk.set(pk);
+                profile_open.set(true);
+                target.0.set(None);
+            }
+        }
+    });
 
     let location = use_location();
     // Strip FORUM_BASE prefix so nav comparisons work regardless of sub-directory.
@@ -291,12 +367,33 @@ fn Layout(children: Children) -> impl IntoView {
                                 {dm_icon()}
                                 "DMs"
                             </A>
+                            <A href=base_href("/forums") attr:class=nav_link_class("/forums")>
+                                {forums_icon()}
+                                "Forums"
+                            </A>
+                            <A href=base_href("/events") attr:class=nav_link_class("/events")>
+                                {events_icon()}
+                                "Events"
+                            </A>
                             {move || is_admin.get().then(|| view! {
                                 <A href=base_href("/admin") attr:class=nav_link_class("/admin")>
                                     {admin_icon()}
                                     <span class="text-sm">"Admin"</span>
                                 </A>
                             })}
+                            <NotificationBell />
+                            <button
+                                class="text-gray-400 hover:text-amber-400 transition-colors p-2 rounded-lg hover:bg-gray-800"
+                                on:click=move |_| bookmarks_open.set(true)
+                                title="Bookmarks"
+                            >
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M5 2h14a1 1 0 011 1v19.143a.5.5 0 01-.766.424L12 18.03l-7.234 4.536A.5.5 0 014 22.143V3a1 1 0 011-1z"/>
+                                </svg>
+                            </button>
+                            <A href=base_href("/settings") attr:class="text-gray-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-gray-800">
+                                {settings_icon()}
+                            </A>
                             <div class="flex items-center gap-1.5 bg-gray-800 px-3 py-1 rounded-full text-xs text-gray-300">
                                 {user_icon()}
                                 <span>{move || display_name.get()}</span>
@@ -341,6 +438,18 @@ fn Layout(children: Children) -> impl IntoView {
                                 {dm_icon()}
                                 "DMs"
                             </A>
+                            <A href=base_href("/forums") attr:class=mobile_link_class("/forums") on:click=close_mobile>
+                                {forums_icon()}
+                                "Forums"
+                            </A>
+                            <A href=base_href("/events") attr:class=mobile_link_class("/events") on:click=close_mobile>
+                                {events_icon()}
+                                "Events"
+                            </A>
+                            <A href=base_href("/settings") attr:class=mobile_link_class("/settings") on:click=close_mobile>
+                                {settings_icon()}
+                                "Settings"
+                            </A>
                             {move || is_admin.get().then(|| view! {
                                 <A href=base_href("/admin") attr:class=mobile_link_class("/admin") on:click=close_mobile>
                                     {admin_icon()}
@@ -362,6 +471,19 @@ fn Layout(children: Children) -> impl IntoView {
             <main class="flex-1">
                 {children()}
             </main>
+
+            // Global overlays and layout components
+            <ToastContainer />
+            <GlobalSearch />
+            <SessionTimeout />
+            <MobileBottomNav />
+            <BookmarksModal is_open=bookmarks_open />
+            {move || {
+                let pk = profile_target_pk.get();
+                (!pk.is_empty()).then(|| view! {
+                    <ProfileModal pubkey=pk is_open=profile_open />
+                })
+            }}
 
             // Footer
             <footer class="border-t border-gray-800/50 py-8 mt-auto">
@@ -500,3 +622,41 @@ fn AuthGatedDmChat() -> impl IntoView {
         </Show>
     }
 }
+
+// -- Auth-gated v3.0 pages ----------------------------------------------------
+
+/// Macro-like helper: all new auth gates follow identical pattern.
+macro_rules! auth_gated {
+    ($name:ident, $page:ident) => {
+        #[component]
+        fn $name() -> impl IntoView {
+            let auth = use_auth();
+            let is_authed = auth.is_authenticated();
+            let is_ready = auth.is_ready();
+            let navigate = StoredValue::new(use_navigate());
+
+            Effect::new(move |_| {
+                if is_ready.get() && !is_authed.get() {
+                    navigate
+                        .with_value(|nav| nav(&base_href("/login"), NavigateOptions::default()));
+                }
+            });
+
+            view! {
+                <Show when=move || is_ready.get() fallback=|| { loading_spinner() }>
+                    <Show when=move || is_authed.get() fallback=|| { redirect_spinner() }>
+                        <$page />
+                    </Show>
+                </Show>
+            }
+        }
+    };
+}
+
+auth_gated!(AuthGatedSetup, SetupPage);
+auth_gated!(AuthGatedPending, PendingPage);
+auth_gated!(AuthGatedForums, ForumsPage);
+auth_gated!(AuthGatedCategory, CategoryPage);
+auth_gated!(AuthGatedSection, SectionPage);
+auth_gated!(AuthGatedEvents, EventsPage);
+auth_gated!(AuthGatedSettings, SettingsPage);

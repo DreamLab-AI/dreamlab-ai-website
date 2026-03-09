@@ -197,9 +197,10 @@ fn json_err(message: &str, status: u16) -> Result<Response> {
 /// Generate a WebAuthn PublicKeyCredentialCreationOptions with a
 /// server-controlled PRF salt and a random challenge.
 pub async fn register_options(mut req: Request, env: &Env) -> Result<Response> {
-    let body: RegisterOptionsBody = req.json().await.unwrap_or(RegisterOptionsBody {
-        display_name: None,
-    });
+    let body: RegisterOptionsBody = req
+        .json()
+        .await
+        .unwrap_or(RegisterOptionsBody { display_name: None });
     let display_name = body
         .display_name
         .filter(|s| !s.trim().is_empty())
@@ -372,7 +373,10 @@ pub async fn register_verify(mut req: Request, env: &Env) -> Result<Response> {
 /// Generate a WebAuthn PublicKeyCredentialRequestOptions. If a pubkey is
 /// provided, include the stored credential ID and PRF salt in the response.
 pub async fn login_options(mut req: Request, env: &Env) -> Result<Response> {
-    let body: LoginOptionsBody = req.json().await.unwrap_or(LoginOptionsBody { pubkey: None });
+    let body: LoginOptionsBody = req
+        .json()
+        .await
+        .unwrap_or(LoginOptionsBody { pubkey: None });
 
     // Generate 32-byte challenge
     let mut challenge_bytes = [0u8; 32];
@@ -480,11 +484,11 @@ pub async fn login_verify(mut req: Request, env: &Env) -> Result<Response> {
 
     let request_url = req.url().map(|u| u.to_string()).unwrap_or_default();
 
-    let nip98_result =
-        match auth::verify_nip98(&auth_header, &request_url, "POST", Some(&raw_body)) {
-            Ok(token) => token,
-            Err(_) => return json_err("Invalid NIP-98 token", 401),
-        };
+    let nip98_result = match auth::verify_nip98(&auth_header, &request_url, "POST", Some(&raw_body))
+    {
+        Ok(token) => token,
+        Err(_) => return json_err("Invalid NIP-98 token", 401),
+    };
 
     if nip98_result.pubkey != pubkey {
         return json_err("NIP-98 pubkey mismatch", 401);

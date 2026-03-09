@@ -244,8 +244,8 @@ pub(super) fn register_pagehide_listener(store: AuthStore) {
         },
     );
 
-    let _ = window
-        .add_event_listener_with_callback("pagehide", pagehide_cb.as_ref().unchecked_ref());
+    let _ =
+        window.add_event_listener_with_callback("pagehide", pagehide_cb.as_ref().unchecked_ref());
     // Leak the closure so it stays alive for the page lifetime
     pagehide_cb.forget();
 
@@ -256,9 +256,7 @@ pub(super) fn register_pagehide_listener(store: AuthStore) {
             if !event.persisted() {
                 return;
             }
-            let has_key = store_clone2
-                .privkey
-                .with_value(|opt| opt.is_some());
+            let has_key = store_clone2.privkey.with_value(|opt| opt.is_some());
             if !has_key {
                 store_clone2.state.update(|s| {
                     if s.is_passkey {
@@ -270,7 +268,7 @@ pub(super) fn register_pagehide_listener(store: AuthStore) {
         },
     );
 
-    let _ = window
-        .add_event_listener_with_callback("pageshow", pageshow_cb.as_ref().unchecked_ref());
+    let _ =
+        window.add_event_listener_with_callback("pageshow", pageshow_cb.as_ref().unchecked_ref());
     pageshow_cb.forget();
 }

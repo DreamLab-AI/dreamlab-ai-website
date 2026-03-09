@@ -66,5 +66,10 @@ fn bench_conversation_key(c: &mut Criterion) {
     });
 }
 
-criterion_group!(benches, bench_encrypt, bench_decrypt, bench_conversation_key);
+criterion_group!(
+    benches,
+    bench_encrypt,
+    bench_decrypt,
+    bench_conversation_key
+);
 criterion_main!(benches);

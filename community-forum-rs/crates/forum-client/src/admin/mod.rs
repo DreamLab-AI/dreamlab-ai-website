@@ -6,6 +6,9 @@
 
 pub mod channel_form;
 pub mod overview;
+pub mod registrations;
+pub mod relay_settings;
+pub mod stats;
 pub mod user_table;
 
 use leptos::prelude::*;
@@ -18,8 +21,7 @@ use crate::relay::{ConnectionState, Filter, RelayConnection};
 // -- Constants ----------------------------------------------------------------
 
 /// The sole admin pubkey for the DreamLab forum.
-pub const ADMIN_PUBKEY: &str =
-    "11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c";
+pub const ADMIN_PUBKEY: &str = "11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c";
 
 /// Default auth API base URL (overridable via `window.__ENV__.VITE_AUTH_API_URL`).
 const DEFAULT_AUTH_API_URL: &str = "https://dreamlab-auth-api.solitary-paper-764d.workers.dev";
@@ -116,9 +118,7 @@ impl AdminStore {
             if let Ok(val) = js_sys::Reflect::get(&window, &"__ENV__".into()) {
                 if !val.is_undefined() && !val.is_null() {
                     // First try VITE_AUTH_API_URL directly
-                    if let Ok(url) =
-                        js_sys::Reflect::get(&val, &"VITE_AUTH_API_URL".into())
-                    {
+                    if let Ok(url) = js_sys::Reflect::get(&val, &"VITE_AUTH_API_URL".into()) {
                         if let Some(s) = url.as_string() {
                             if !s.is_empty() {
                                 return s;
@@ -126,9 +126,7 @@ impl AdminStore {
                         }
                     }
                     // Fallback: derive from relay URL (relay worker also hosts /api/ routes)
-                    if let Ok(url) =
-                        js_sys::Reflect::get(&val, &"VITE_RELAY_URL".into())
-                    {
+                    if let Ok(url) = js_sys::Reflect::get(&val, &"VITE_RELAY_URL".into()) {
                         if let Some(s) = url.as_string() {
                             if !s.is_empty() {
                                 return relay_url_to_http(&s);
@@ -281,12 +279,14 @@ impl AdminStore {
             content: serde_json::to_string(&content).unwrap(),
         };
 
-        let signed = nostr_core::sign_event(unsigned, &sk)
-            .map_err(|e| format!("Signing failed: {e}"))?;
+        let signed =
+            nostr_core::sign_event(unsigned, &sk).map_err(|e| format!("Signing failed: {e}"))?;
 
         relay.publish(&signed);
 
-        self.state.success.set(Some(format!("Channel '{}' created", name)));
+        self.state
+            .success
+            .set(Some(format!("Channel '{}' created", name)));
 
         // Add to local state immediately
         self.state.channels.update(|list| {

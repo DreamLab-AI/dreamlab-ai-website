@@ -33,15 +33,37 @@ struct OgRegexes {
 fn og_regexes() -> &'static OgRegexes {
     static INSTANCE: OnceLock<OgRegexes> = OnceLock::new();
     INSTANCE.get_or_init(|| OgRegexes {
-        og_title_1: Regex::new(r#"(?i)<meta\s+property=["']og:title["']\s+content=["']([^"']+)["']"#).unwrap(),
-        og_title_2: Regex::new(r#"(?i)<meta\s+content=["']([^"']+)["']\s+property=["']og:title["']"#).unwrap(),
+        og_title_1: Regex::new(
+            r#"(?i)<meta\s+property=["']og:title["']\s+content=["']([^"']+)["']"#,
+        )
+        .unwrap(),
+        og_title_2: Regex::new(
+            r#"(?i)<meta\s+content=["']([^"']+)["']\s+property=["']og:title["']"#,
+        )
+        .unwrap(),
         html_title: Regex::new(r"(?i)<title>([^<]+)</title>").unwrap(),
-        og_desc_1: Regex::new(r#"(?i)<meta\s+property=["']og:description["']\s+content=["']([^"']+)["']"#).unwrap(),
-        og_desc_2: Regex::new(r#"(?i)<meta\s+content=["']([^"']+)["']\s+property=["']og:description["']"#).unwrap(),
-        meta_desc: Regex::new(r#"(?i)<meta\s+name=["']description["']\s+content=["']([^"']+)["']"#).unwrap(),
-        og_image_1: Regex::new(r#"(?i)<meta\s+property=["']og:image["']\s+content=["']([^"']+)["']"#).unwrap(),
-        og_image_2: Regex::new(r#"(?i)<meta\s+content=["']([^"']+)["']\s+property=["']og:image["']"#).unwrap(),
-        og_site_name: Regex::new(r#"(?i)<meta\s+property=["']og:site_name["']\s+content=["']([^"']+)["']"#).unwrap(),
+        og_desc_1: Regex::new(
+            r#"(?i)<meta\s+property=["']og:description["']\s+content=["']([^"']+)["']"#,
+        )
+        .unwrap(),
+        og_desc_2: Regex::new(
+            r#"(?i)<meta\s+content=["']([^"']+)["']\s+property=["']og:description["']"#,
+        )
+        .unwrap(),
+        meta_desc: Regex::new(r#"(?i)<meta\s+name=["']description["']\s+content=["']([^"']+)["']"#)
+            .unwrap(),
+        og_image_1: Regex::new(
+            r#"(?i)<meta\s+property=["']og:image["']\s+content=["']([^"']+)["']"#,
+        )
+        .unwrap(),
+        og_image_2: Regex::new(
+            r#"(?i)<meta\s+content=["']([^"']+)["']\s+property=["']og:image["']"#,
+        )
+        .unwrap(),
+        og_site_name: Regex::new(
+            r#"(?i)<meta\s+property=["']og:site_name["']\s+content=["']([^"']+)["']"#,
+        )
+        .unwrap(),
         decimal_entity: Regex::new(r"&#(\d+);").unwrap(),
         hex_entity: Regex::new(r"&#x([0-9a-fA-F]+);").unwrap(),
     })
@@ -353,7 +375,8 @@ fn decode_html_entities(text: &str) -> String {
     let re = og_regexes();
 
     // Numeric decimal entities: &#123;
-    decoded = re.decimal_entity
+    decoded = re
+        .decimal_entity
         .replace_all(&decoded, |caps: &regex::Captures| {
             let num: u32 = caps[1].parse().unwrap_or(0);
             if num > 0 && num < 0x10FFFF {
@@ -367,7 +390,8 @@ fn decode_html_entities(text: &str) -> String {
         .to_string();
 
     // Hex entities: &#x7B;
-    decoded = re.hex_entity
+    decoded = re
+        .hex_entity
         .replace_all(&decoded, |caps: &regex::Captures| {
             let num = u32::from_str_radix(&caps[1], 16).unwrap_or(0);
             if num > 0 && num < 0x10FFFF {
@@ -416,10 +440,7 @@ fn parse_open_graph_tags(html: &str, target_url: &str) -> OgPreview {
         .trim_start_matches("www.")
         .to_string();
 
-    let favicon = format!(
-        "https://www.google.com/s2/favicons?domain={}&sz=32",
-        domain
-    );
+    let favicon = format!("https://www.google.com/s2/favicons?domain={}&sz=32", domain);
 
     let re = og_regexes();
 
@@ -431,7 +452,8 @@ fn parse_open_graph_tags(html: &str, target_url: &str) -> OgPreview {
         .or_else(|| extract_meta(html, &re.og_desc_2))
         .or_else(|| extract_meta(html, &re.meta_desc));
 
-    let image_url = extract_meta(html, &re.og_image_1).or_else(|| extract_meta(html, &re.og_image_2));
+    let image_url =
+        extract_meta(html, &re.og_image_1).or_else(|| extract_meta(html, &re.og_image_2));
     let image = image_url.map(|u| resolve_url(&u, target_url));
 
     let site_name = extract_meta(html, &re.og_site_name);

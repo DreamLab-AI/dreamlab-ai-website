@@ -54,6 +54,22 @@ web-sys = { workspace = true, features = [
     "PageTransitionEvent",
     "DomRect",
     "MediaQueryList",
+    "KeyboardEvent",
+    "CssStyleDeclaration",
+    "HtmlTextAreaElement",
+    "HtmlIFrameElement",
+    "IntersectionObserver",
+    "IntersectionObserverEntry",
+    "IntersectionObserverInit",
+    "FileReader",
+    "File",
+    "FileList",
+    "DataTransfer",
+    "DragEvent",
+    "Blob",
+    "ScrollToOptions",
+    "Event",
+    "Clipboard",
 ] }
 gloo = { workspace = true }
 comrak = { workspace = true }

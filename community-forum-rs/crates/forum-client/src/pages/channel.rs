@@ -5,11 +5,13 @@ use leptos_router::components::A;
 use leptos_router::hooks::use_params_map;
 use nostr_core::NostrEvent;
 use std::rc::Rc;
-use wasm_bindgen::JsCast;
 
 use crate::app::base_href;
 use crate::auth::use_auth;
+use crate::components::badge::{Badge, BadgeVariant};
 use crate::components::message_bubble::{MessageBubble, MessageData};
+use crate::components::message_input::MessageInput;
+use crate::components::typing_indicator::TypingIndicator;
 use crate::relay::{ConnectionState, Filter, RelayConnection};
 use crate::utils::{arrow_left_svg, set_timeout_once};
 
@@ -28,17 +30,14 @@ pub fn ChannelPage() -> impl IntoView {
     let conn_state = relay.connection_state();
 
     let params = use_params_map();
-    let channel_id = move || {
-        params.read().get("channel_id").unwrap_or_default()
-    };
+    let channel_id = move || params.read().get("channel_id").unwrap_or_default();
 
     // State
     let messages = RwSignal::new(Vec::<MessageData>::new());
     let channel_info: RwSignal<Option<ChannelHeader>> = RwSignal::new(None);
     let loading = RwSignal::new(true);
     let error_msg: RwSignal<Option<String>> = RwSignal::new(None);
-    let message_input = RwSignal::new(String::new());
-    let sending = RwSignal::new(false);
+    let typing_pubkeys = RwSignal::new(Vec::<String>::new());
     let messages_container = NodeRef::<leptos::html::Div>::new();
 
     // Track subscription IDs for cleanup
@@ -96,11 +95,26 @@ pub fn ChannelPage() -> impl IntoView {
                 return;
             }
 
+            let reply_to = event
+                .tags
+                .iter()
+                .find(|t| t.len() >= 4 && t[0] == "e" && t[3] == "reply")
+                .or_else(|| event.tags.iter().find(|t| t.len() >= 2 && t[0] == "e"))
+                .map(|t| t[1].clone());
+            let reply_pk = event
+                .tags
+                .iter()
+                .find(|t| t.len() >= 2 && t[0] == "p")
+                .map(|t| t[1].clone());
             let msg = MessageData {
                 id: event.id.clone(),
                 pubkey: event.pubkey.clone(),
                 content: event.content.clone(),
                 created_at: event.created_at,
+                reply_to_id: reply_to,
+                reply_to_pubkey: reply_pk,
+                reply_to_content: None,
+                reactions: RwSignal::new(Vec::new()),
             };
 
             messages_sig.update(|list| {
@@ -122,11 +136,14 @@ pub fn ChannelPage() -> impl IntoView {
         messages_sub_id.set(Some(id2));
 
         // Loading timeout (auto-drops closure after execution)
-        set_timeout_once(move || {
-            if loading_sig.get_untracked() {
-                loading_sig.set(false);
-            }
-        }, 8000);
+        set_timeout_once(
+            move || {
+                if loading_sig.get_untracked() {
+                    loading_sig.set(false);
+                }
+            },
+            8000,
+        );
     });
 
     // Auto-scroll to bottom when new messages arrive
@@ -134,9 +151,12 @@ pub fn ChannelPage() -> impl IntoView {
         let _count = messages.get().len();
         if let Some(container) = messages_container.get() {
             let el: web_sys::HtmlElement = container.into();
-            set_timeout_once(move || {
-                el.set_scroll_top(el.scroll_height());
-            }, 50);
+            set_timeout_once(
+                move || {
+                    el.set_scroll_top(el.scroll_height());
+                },
+                50,
+            );
         }
     });
 
@@ -151,33 +171,19 @@ pub fn ChannelPage() -> impl IntoView {
     });
 
     // Send message handler
-    let relay_for_send = expect_context::<RelayConnection>();
-    let on_send = move |_: ()| {
-        let content = message_input.get_untracked();
-        let content = content.trim().to_string();
-        if content.is_empty() || sending.get_untracked() {
-            return;
-        }
-
+    let do_send_text = move |content: String| {
         let cid = channel_id();
         if cid.is_empty() {
             return;
         }
 
-        sending.set(true);
-        message_input.set(String::new());
-
-        // Get pubkey from auth store
         let pubkey = auth.pubkey().get_untracked().unwrap_or_default();
         if pubkey.is_empty() {
             error_msg.set(Some("Not authenticated".to_string()));
-            sending.set(false);
-            message_input.set(content);
             return;
         }
 
         let now = (js_sys::Date::now() / 1000.0) as u64;
-
         let unsigned = nostr_core::UnsignedEvent {
             pubkey: pubkey.clone(),
             created_at: now,
@@ -188,40 +194,21 @@ pub fn ChannelPage() -> impl IntoView {
                 String::new(),
                 "root".to_string(),
             ]],
-            content: content.clone(),
+            content,
         };
 
-        // Sign via AuthStore — privkey bytes never leave the auth module
+        let relay = expect_context::<RelayConnection>();
         match auth.sign_event(unsigned) {
-            Ok(signed_event) => {
-                relay_for_send.publish(&signed_event);
-                sending.set(false);
+            Ok(signed) => {
+                relay.publish(&signed);
             }
             Err(e) => {
-                web_sys::console::error_1(
-                    &format!("[Channel] Signing failed: {}", e).into(),
-                );
                 error_msg.set(Some(e));
-                sending.set(false);
-                message_input.set(content);
             }
         }
     };
 
-    // Handle Enter key in input
-    let on_send_clone = on_send.clone();
-    let on_keydown = move |ev: leptos::ev::KeyboardEvent| {
-        if ev.key() == "Enter" && !ev.shift_key() {
-            ev.prevent_default();
-            on_send_clone(());
-        }
-    };
-
-    let on_input = move |ev: leptos::ev::Event| {
-        let target = ev.target().unwrap();
-        let input: web_sys::HtmlInputElement = target.unchecked_into();
-        message_input.set(input.value());
-    };
+    let is_authed = auth.is_authenticated();
 
     // Derive avatar letter from channel name
     let avatar_letter = move || {
@@ -274,30 +261,21 @@ pub fn ChannelPage() -> impl IntoView {
                             })
                         }}
                         <div class="flex items-center gap-2 mt-1 ml-14">
-                            <span class="text-xs text-gray-500 border border-gray-600 rounded px-1.5 py-0.5">
-                                {move || format!("{} messages", messages.get().len())}
-                            </span>
+                            {move || view! {
+                                <Badge text=format!("{} messages", messages.get().len()) variant=BadgeVariant::Ghost />
+                            }}
                             // Connection indicator
                             {move || {
                                 let state = conn_state.get();
                                 match state {
                                     ConnectionState::Connected => view! {
-                                        <span class="text-xs text-green-400 flex items-center gap-1">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span>
-                                            "Connected"
-                                        </span>
+                                        <Badge text="Connected".to_string() variant=BadgeVariant::Success />
                                     }.into_any(),
                                     ConnectionState::Reconnecting => view! {
-                                        <span class="text-xs text-yellow-400 flex items-center gap-1">
-                                            <span class="animate-pulse w-1.5 h-1.5 rounded-full bg-yellow-400"></span>
-                                            "Reconnecting"
-                                        </span>
+                                        <Badge text="Reconnecting".to_string() variant=BadgeVariant::Warning pulse=true />
                                     }.into_any(),
                                     _ => view! {
-                                        <span class="text-xs text-red-400 flex items-center gap-1">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-red-400"></span>
-                                            "Disconnected"
-                                        </span>
+                                        <Badge text="Disconnected".to_string() variant=BadgeVariant::Error />
                                     }.into_any(),
                                 }
                             }}
@@ -372,44 +350,15 @@ pub fn ChannelPage() -> impl IntoView {
                 </div>
             </div>
 
-            // Compose area
-            <div class="bg-gray-800 border-t border-gray-700 p-4">
-                <div class="max-w-4xl mx-auto">
-                    <div class="flex gap-2 items-end">
-                        <input
-                            type="text"
-                            class="flex-1 bg-gray-700 border border-gray-600 rounded-xl px-4 py-2.5 text-white placeholder-gray-400 focus:outline-none focus:border-amber-500 focus:shadow-[0_0_0_1px_rgba(245,158,11,0.5)] transition-all"
-                            placeholder="Type a message..."
-                            prop:value=move || message_input.get()
-                            on:input=on_input
-                            on:keydown=on_keydown
-                            prop:disabled=move || sending.get()
-                        />
-                        <button
-                            class="w-10 h-10 flex items-center justify-center rounded-full bg-amber-500 hover:bg-amber-400 disabled:bg-gray-600 text-gray-900 disabled:text-gray-400 transition-colors flex-shrink-0"
-                            on:click=move |_| on_send(())
-                            disabled=move || sending.get() || message_input.get().trim().is_empty()
-                        >
-                            {move || {
-                                if sending.get() {
-                                    view! {
-                                        <svg class="w-5 h-5 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                                    }.into_any()
-                                } else {
-                                    view! {
-                                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd" d="M10 17a.75.75 0 01-.75-.75V5.612L5.29 9.77a.75.75 0 01-1.08-1.04l5.25-5.5a.75.75 0 011.08 0l5.25 5.5a.75.75 0 11-1.08 1.04l-3.96-4.158V16.25A.75.75 0 0110 17z" clip-rule="evenodd"/>
-                                        </svg>
-                                    }.into_any()
-                                }
-                            }}
-                        </button>
+            // Compose area (only when authenticated)
+            <Show when=move || is_authed.get()>
+                <div class="bg-gray-800 border-t border-gray-700 p-3">
+                    <div class="max-w-4xl mx-auto">
+                        <TypingIndicator typing_pubkeys=typing_pubkeys />
+                        <MessageInput on_send=Callback::new(do_send_text) />
                     </div>
                 </div>
-            </div>
+            </Show>
         </div>
     }
 }
@@ -435,4 +384,3 @@ fn parse_channel_metadata(content: &str) -> ChannelHeader {
         },
     }
 }
-

@@ -36,9 +36,7 @@ pub fn LoginPage() -> impl IntoView {
         spawn_local(async move {
             // Try to use stored pubkey for fast path
             let stored_pubkey = auth.pubkey().get_untracked();
-            let result = auth
-                .login_with_passkey(stored_pubkey.as_deref())
-                .await;
+            let result = auth.login_with_passkey(stored_pubkey.as_deref()).await;
             is_pending.set(false);
             if result.is_ok() {
                 navigate.with_value(|nav| nav(&base_href("/chat"), NavigateOptions::default()));

@@ -28,8 +28,11 @@ js-sys = { workspace = true }
 serde-wasm-bindgen = "0.6"
 
 [dev-dependencies]
-proptest = { workspace = true }
 wasm-bindgen-test = { workspace = true }
+
+# proptest + criterion use native-only deps (rusty-fork → wait-timeout)
+[target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
+proptest = { workspace = true }
 criterion = { workspace = true }
 
 [[bench]]

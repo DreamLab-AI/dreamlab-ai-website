@@ -111,7 +111,8 @@ fn randomized_timestamp() -> u64 {
     let mut rand_bytes = [0u8; 5];
     getrandom::getrandom(&mut rand_bytes).expect("getrandom for timestamp jitter");
 
-    let offset_raw = u32::from_le_bytes([rand_bytes[0], rand_bytes[1], rand_bytes[2], rand_bytes[3]]);
+    let offset_raw =
+        u32::from_le_bytes([rand_bytes[0], rand_bytes[1], rand_bytes[2], rand_bytes[3]]);
     let offset = (offset_raw % TIMESTAMP_JITTER_SECS) as u64;
     let add = rand_bytes[4] & 1 == 0;
 
@@ -180,8 +181,8 @@ pub fn seal_rumor(
     recipient_pk: &[u8; 32],
 ) -> Result<NostrEvent, GiftWrapError> {
     // Serialize the rumor to JSON
-    let rumor_json = serde_json::to_string(rumor)
-        .map_err(|e| GiftWrapError::Serialization(e.to_string()))?;
+    let rumor_json =
+        serde_json::to_string(rumor).map_err(|e| GiftWrapError::Serialization(e.to_string()))?;
 
     // NIP-44 encrypt: sender → recipient
     let encrypted = nip44::encrypt(sender_sk, recipient_pk, &rumor_json)
@@ -221,10 +222,7 @@ pub fn seal_rumor(
 /// # Arguments
 /// * `seal` - The signed seal event (kind 13)
 /// * `recipient_pubkey` - 64-char hex recipient pubkey
-pub fn wrap_seal(
-    seal: &NostrEvent,
-    recipient_pubkey: &str,
-) -> Result<NostrEvent, GiftWrapError> {
+pub fn wrap_seal(seal: &NostrEvent, recipient_pubkey: &str) -> Result<NostrEvent, GiftWrapError> {
     // Generate a throwaway keypair
     let throwaway = generate_keypair()
         .map_err(|e| GiftWrapError::KeyError(format!("throwaway keypair generation: {e}")))?;
@@ -233,8 +231,8 @@ pub fn wrap_seal(
     let throwaway_pubkey = throwaway.public.to_hex();
 
     // Serialize the seal to JSON
-    let seal_json = serde_json::to_string(seal)
-        .map_err(|e| GiftWrapError::Serialization(e.to_string()))?;
+    let seal_json =
+        serde_json::to_string(seal).map_err(|e| GiftWrapError::Serialization(e.to_string()))?;
 
     // Decode recipient pubkey for NIP-44
     let recipient_pk_bytes = hex_to_32(recipient_pubkey)?;
@@ -574,7 +572,12 @@ mod tests {
         let wrapped = gift_wrap(&sender_sk, &sender_pk, &recipient_pk, "p tag test").unwrap();
         let unwrapped = unwrap_gift(&wrapped, &recipient_sk).unwrap();
 
-        let p_tags: Vec<_> = unwrapped.rumor.tags.iter().filter(|t| t[0] == "p").collect();
+        let p_tags: Vec<_> = unwrapped
+            .rumor
+            .tags
+            .iter()
+            .filter(|t| t[0] == "p")
+            .collect();
         assert_eq!(p_tags.len(), 1);
         assert_eq!(p_tags[0][1], recipient_pk);
     }

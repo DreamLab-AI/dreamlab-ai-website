@@ -226,18 +226,12 @@ impl ParticleField {
 
 #[inline]
 fn set_fill(ctx: &CanvasRenderingContext2d, r: f64, g: f64, b: f64, a: f64) {
-    ctx.set_fill_style_str(&format!(
-        "rgba({},{},{},{})",
-        r as u8, g as u8, b as u8, a
-    ));
+    ctx.set_fill_style_str(&format!("rgba({},{},{},{})", r as u8, g as u8, b as u8, a));
 }
 
 #[inline]
 fn set_stroke(ctx: &CanvasRenderingContext2d, r: f64, g: f64, b: f64, a: f64) {
-    ctx.set_stroke_style_str(&format!(
-        "rgba({},{},{},{})",
-        r as u8, g as u8, b as u8, a
-    ));
+    ctx.set_stroke_style_str(&format!("rgba({},{},{},{})", r as u8, g as u8, b as u8, a));
 }
 
 #[inline]

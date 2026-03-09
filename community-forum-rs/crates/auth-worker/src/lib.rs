@@ -29,7 +29,10 @@ fn cors_headers(env: &Env) -> Headers {
         .set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         .ok();
     headers
-        .set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+        .set(
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization",
+        )
         .ok();
     headers.set("Access-Control-Max-Age", "86400").ok();
     headers
@@ -39,7 +42,9 @@ fn cors_headers(env: &Env) -> Headers {
 fn json_response(env: &Env, body: &serde_json::Value, status: u16) -> Result<Response> {
     let json_str = serde_json::to_string(body).map_err(|e| Error::RustError(e.to_string()))?;
     let cors = cors_headers(env);
-    let resp = Response::ok(json_str)?.with_status(status).with_headers(cors);
+    let resp = Response::ok(json_str)?
+        .with_status(status)
+        .with_headers(cors);
     resp.headers().set("Content-Type", "application/json").ok();
     Ok(resp)
 }
@@ -54,7 +59,9 @@ fn with_cors(resp: Response, env: &Env) -> Response {
 async fn fetch(req: Request, env: Env, _ctx: Context) -> Result<Response> {
     // CORS preflight
     if req.method() == Method::Options {
-        return Ok(Response::empty()?.with_status(204).with_headers(cors_headers(&env)));
+        return Ok(Response::empty()?
+            .with_status(204)
+            .with_headers(cors_headers(&env)));
     }
 
     let url = req.url()?;
@@ -70,7 +77,11 @@ async fn fetch(req: Request, env: Env, _ctx: Context) -> Result<Response> {
             // Check if it's a JSON parse error
             let msg = e.to_string();
             if msg.contains("JSON") || msg.contains("json") {
-                json_response(&env, &serde_json::json!({ "error": "Invalid JSON body" }), 400)
+                json_response(
+                    &env,
+                    &serde_json::json!({ "error": "Invalid JSON body" }),
+                    400,
+                )
             } else {
                 json_response(
                     &env,
@@ -200,5 +211,8 @@ async fn scheduled(_event: ScheduledEvent, env: Env, _ctx: ScheduleContext) -> (
         Ok(db) => db,
         Err(_) => return,
     };
-    let _ = db.prepare("SELECT 1").first::<serde_json::Value>(None).await;
+    let _ = db
+        .prepare("SELECT 1")
+        .first::<serde_json::Value>(None)
+        .await;
 }

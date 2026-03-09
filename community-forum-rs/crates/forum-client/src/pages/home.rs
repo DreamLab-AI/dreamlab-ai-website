@@ -109,7 +109,11 @@ pub fn HomePage() -> impl IntoView {
 }
 
 #[component]
-fn FeatureCard(icon: &'static str, title: &'static str, description: &'static str) -> impl IntoView {
+fn FeatureCard(
+    icon: &'static str,
+    title: &'static str,
+    description: &'static str,
+) -> impl IntoView {
     view! {
         <div class="glass-card p-6 space-y-3 hover:border-amber-500/30 hover:shadow-lg hover:shadow-amber-500/5 hover:-translate-y-0.5 transition-all duration-300 group">
             <h3 class="text-xl font-semibold text-amber-400 flex items-center gap-2">

@@ -158,8 +158,8 @@ pub(super) async fn fetch_json_post(
     let init = web_sys::RequestInit::new();
     init.set_method("POST");
 
-    let headers = web_sys::Headers::new()
-        .map_err(|e| PasskeyError::JsError(format!("Headers: {e:?}")))?;
+    let headers =
+        web_sys::Headers::new().map_err(|e| PasskeyError::JsError(format!("Headers: {e:?}")))?;
     headers
         .set("Content-Type", "application/json")
         .map_err(|e| PasskeyError::JsError(format!("Set header: {e:?}")))?;
@@ -216,10 +216,7 @@ async fn extract_server_error(resp: &web_sys::Response) -> PasskeyError {
                         return PasskeyError::ServerError(msg);
                     }
                 }
-                return PasskeyError::ServerError(format!(
-                    "HTTP {}: {text_str}",
-                    resp.status()
-                ));
+                return PasskeyError::ServerError(format!("HTTP {}: {text_str}", resp.status()));
             }
         }
     }

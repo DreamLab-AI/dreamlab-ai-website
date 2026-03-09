@@ -66,7 +66,10 @@ fn cors_headers(env: &Env) -> Headers {
         )
         .ok();
     headers
-        .set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+        .set(
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization",
+        )
         .ok();
     headers.set("Access-Control-Max-Age", "86400").ok();
     headers
@@ -99,7 +102,9 @@ fn json_ok(env: &Env, body: &serde_json::Value, status: u16) -> Result<Response>
 async fn fetch(mut req: Request, env: Env, _ctx: Context) -> Result<Response> {
     // CORS preflight
     if req.method() == Method::Options {
-        return Ok(Response::empty()?.with_status(204).with_headers(cors_headers(&env)));
+        return Ok(Response::empty()?
+            .with_status(204)
+            .with_headers(cors_headers(&env)));
     }
 
     let url = req.url()?;
@@ -213,21 +218,17 @@ async fn fetch(mut req: Request, env: Env, _ctx: Context) -> Result<Response> {
 
             if method == Method::Head {
                 let resp = Response::empty()?.with_headers(cors);
-                resp.headers()
-                    .set("Content-Type", &obj_content_type)
-                    .ok();
+                resp.headers().set("Content-Type", &obj_content_type).ok();
                 resp.headers().set("ETag", &etag).ok();
                 return Ok(resp);
             }
 
-            let body = object.body().ok_or_else(|| {
-                Error::RustError("R2 object has no body".to_string())
-            })?;
+            let body = object
+                .body()
+                .ok_or_else(|| Error::RustError("R2 object has no body".to_string()))?;
             let bytes = body.bytes().await?;
             let resp = Response::from_bytes(bytes)?.with_headers(cors);
-            resp.headers()
-                .set("Content-Type", &obj_content_type)
-                .ok();
+            resp.headers().set("Content-Type", &obj_content_type).ok();
             resp.headers().set("ETag", &etag).ok();
             Ok(resp)
         }
@@ -259,20 +260,12 @@ async fn fetch(mut req: Request, env: Env, _ctx: Context) -> Result<Response> {
                 .execute()
                 .await?;
 
-            json_ok(
-                &env,
-                &serde_json::json!({ "status": "ok" }),
-                201,
-            )
+            json_ok(&env, &serde_json::json!({ "status": "ok" }), 201)
         }
 
         Method::Delete => {
             bucket.delete(&r2_key).await?;
-            json_ok(
-                &env,
-                &serde_json::json!({ "status": "deleted" }),
-                200,
-            )
+            json_ok(&env, &serde_json::json!({ "status": "deleted" }), 200)
         }
 
         _ => json_error(&env, "Method not allowed", 405),

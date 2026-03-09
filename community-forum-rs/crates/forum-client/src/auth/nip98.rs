@@ -41,8 +41,7 @@ pub async fn fetch_with_nip98_post(
     let init = web_sys::RequestInit::new();
     init.set_method("POST");
 
-    let headers = web_sys::Headers::new()
-        .map_err(|e| Nip98ClientError::Fetch(format!("{e:?}")))?;
+    let headers = web_sys::Headers::new().map_err(|e| Nip98ClientError::Fetch(format!("{e:?}")))?;
     headers
         .set("Content-Type", "application/json")
         .map_err(|e| Nip98ClientError::Fetch(format!("{e:?}")))?;
@@ -99,8 +98,7 @@ pub async fn fetch_with_nip98_get(
     let init = web_sys::RequestInit::new();
     init.set_method("GET");
 
-    let headers = web_sys::Headers::new()
-        .map_err(|e| Nip98ClientError::Fetch(format!("{e:?}")))?;
+    let headers = web_sys::Headers::new().map_err(|e| Nip98ClientError::Fetch(format!("{e:?}")))?;
     headers
         .set("Authorization", &auth_header)
         .map_err(|e| Nip98ClientError::Fetch(format!("{e:?}")))?;

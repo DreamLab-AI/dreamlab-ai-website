@@ -15,7 +15,9 @@ use wasm_bindgen::JsCast;
 use crate::auth::use_auth;
 use crate::dm::{provide_dm_store, use_dm_store, DMMessage};
 use crate::relay::{ConnectionState, RelayConnection};
-use crate::utils::{arrow_left_svg, format_relative_time, pubkey_color, set_timeout_once, shorten_pubkey};
+use crate::utils::{
+    arrow_left_svg, format_relative_time, pubkey_color, set_timeout_once, shorten_pubkey,
+};
 
 /// DM chat view component for a single conversation.
 #[component]
@@ -29,9 +31,7 @@ pub fn DmChatPage() -> impl IntoView {
     let dm_store = use_dm_store();
 
     let params = use_params_map();
-    let recipient_pubkey = move || {
-        params.read().get("pubkey").unwrap_or_default()
-    };
+    let recipient_pubkey = move || params.read().get("pubkey").unwrap_or_default();
 
     // State
     let message_input = RwSignal::new(String::new());
@@ -69,9 +69,12 @@ pub fn DmChatPage() -> impl IntoView {
         let _count = messages.get().len();
         if let Some(container) = messages_container.get() {
             let el: web_sys::HtmlElement = container.into();
-            set_timeout_once(move || {
-                el.set_scroll_top(el.scroll_height());
-            }, 50);
+            set_timeout_once(
+                move || {
+                    el.set_scroll_top(el.scroll_height());
+                },
+                50,
+            );
         }
     });
 
@@ -109,9 +112,7 @@ pub fn DmChatPage() -> impl IntoView {
                         sending.set(false);
                     }
                     Err(e) => {
-                        web_sys::console::error_1(
-                            &format!("[DM] Send failed: {}", e).into(),
-                        );
+                        web_sys::console::error_1(&format!("[DM] Send failed: {}", e).into());
                         send_error.set(Some(e));
                         sending.set(false);
                         message_input.set(content);
@@ -145,9 +146,7 @@ pub fn DmChatPage() -> impl IntoView {
     let my_pubkey = auth.pubkey();
 
     // Short display name for recipient
-    let recipient_display = move || {
-        shorten_pubkey(&recipient_pubkey())
-    };
+    let recipient_display = move || shorten_pubkey(&recipient_pubkey());
 
     view! {
         <div class="flex flex-col h-[calc(100vh-64px)]">
@@ -306,10 +305,7 @@ pub fn DmChatPage() -> impl IntoView {
 
 /// Render messages with date separators between days.
 #[component]
-fn MessageListWithDateSeparators(
-    msgs: Vec<DMMessage>,
-    my_pk: String,
-) -> impl IntoView {
+fn MessageListWithDateSeparators(msgs: Vec<DMMessage>, my_pk: String) -> impl IntoView {
     let mut fragments: Vec<leptos::tachys::view::any_view::AnyView> = Vec::new();
     let mut prev_timestamp: u64 = 0;
 
@@ -317,13 +313,16 @@ fn MessageListWithDateSeparators(
         // Insert date separator if day changed
         if prev_timestamp > 0 && should_show_date_separator(prev_timestamp, msg.timestamp) {
             let label = format_date_label(msg.timestamp);
-            fragments.push(view! {
-                <div class="flex items-center gap-3 my-4">
-                    <div class="flex-1 border-t border-gray-800"></div>
-                    <span class="text-xs text-gray-600">{label}</span>
-                    <div class="flex-1 border-t border-gray-800"></div>
-                </div>
-            }.into_any());
+            fragments.push(
+                view! {
+                    <div class="flex items-center gap-3 my-4">
+                        <div class="flex-1 border-t border-gray-800"></div>
+                        <span class="text-xs text-gray-600">{label}</span>
+                        <div class="flex-1 border-t border-gray-800"></div>
+                    </div>
+                }
+                .into_any(),
+            );
         }
         prev_timestamp = msg.timestamp;
 
@@ -396,8 +395,7 @@ fn format_date_label(timestamp: u64) -> String {
         let month = date.get_month();
         let day = date.get_date();
         let months = [
-            "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+            "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
         ];
         let month_name = months.get(month as usize).unwrap_or(&"???");
         format!("{} {}", month_name, day)
