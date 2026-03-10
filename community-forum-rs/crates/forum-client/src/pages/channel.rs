@@ -120,20 +120,11 @@ pub fn ChannelPage() -> impl IntoView {
         let id1 = relay_for_sub.subscribe(vec![channel_filter], on_channel_event, None);
         channel_sub_id.set(Some(id1));
 
-        // Build auxiliary name/section lookup from the channel store for
-        // client-side matching of legacy tag values.
-        let mut alt_names: Vec<String> = Vec::new();
-        if let Some(store) = use_context::<ChannelStore>() {
-            let channels = store.channels.get_untracked();
-            if let Some(found) = channels.iter().find(|c| c.id == cid || c.name == cid) {
-                if !found.name.is_empty() {
-                    alt_names.push(found.name.to_lowercase());
-                }
-                if !found.section.is_empty() {
-                    alt_names.push(found.section.to_lowercase());
-                }
-            }
-        }
+        // Capture channel store's channels signal for client-side matching.
+        // We read it INSIDE the callback (not here) so it picks up channels
+        // that arrive after the subscription starts (the kind-40 EOSE may not
+        // have fired yet when this Effect runs).
+        let channels_sig_for_cb = use_context::<ChannelStore>().map(|s| s.channels);
 
         // Subscribe to messages (kind 42) -- broad filter, client-side matching.
         // Legacy relay data may tag messages with slugs or section names instead
@@ -150,18 +141,36 @@ pub fn ChannelPage() -> impl IntoView {
                 return;
             }
 
-            // Client-side channel matching: check all e-tags against id/name/section
-            let matches_channel = event.tags.iter().any(|t| {
-                if t.len() < 2 || t[0] != "e" {
-                    return false;
+            // Client-side channel matching: extract root e-tag then resolve
+            // against channel id, name, and section — mirrors channels.rs logic.
+            let tag_val = event
+                .tags
+                .iter()
+                .find(|t| t.len() >= 4 && t[0] == "e" && t[3] == "root")
+                .or_else(|| event.tags.iter().find(|t| t.len() >= 2 && t[0] == "e"))
+                .map(|t| t[1].clone());
+
+            let tag_val = match tag_val {
+                Some(v) => v,
+                None => return,
+            };
+
+            // Check exact channel ID match first
+            let matches_channel = if tag_val == cid_for_cb {
+                true
+            } else if let Some(sig) = &channels_sig_for_cb {
+                // Read current channel list (populated after kind-40 EOSE)
+                let channels = sig.get_untracked();
+                if let Some(found) = channels.iter().find(|c| c.id == cid_for_cb || c.name == cid_for_cb) {
+                    let val_lower = tag_val.to_lowercase();
+                    (!found.name.is_empty() && found.name.to_lowercase() == val_lower)
+                        || (!found.section.is_empty() && found.section.to_lowercase() == val_lower)
+                } else {
+                    false
                 }
-                let val = &t[1];
-                if val == &cid_for_cb {
-                    return true;
-                }
-                let val_lower = val.to_lowercase();
-                alt_names.iter().any(|n| n == &val_lower)
-            });
+            } else {
+                false
+            };
             if !matches_channel {
                 return;
             }
