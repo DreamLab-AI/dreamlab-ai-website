@@ -9,7 +9,8 @@ import {
   Glasses,
   ShieldCheck,
   Palette,
-  Building2,
+  Globe,
+  Rocket,
   Users,
   Beaker,
   Handshake,
@@ -21,73 +22,67 @@ import { PAGE_OG_CONFIGS } from "@/lib/og-meta";
 
 const EmailSignupForm = lazy(() => import("@/components/EmailSignupForm").then(m => ({ default: m.EmailSignupForm })));
 
-// Programme track definitions
-const programmeTracks = [
+// Outcome-based programme categories
+const outcomeCards = [
   {
-    id: "enterprise",
-    title: "Enterprise Innovation",
-    description: "In partnership with VisioningLab. Innovation programmes for organisations exploring AI and emerging technologies. Strategic briefings, hands-on immersion, and roadmaps.",
-    partnerLogo: "/images/partners/visioninglab-dark.png",
-    accent: "amber",
-    trlRange: "5-8",
-    icon: Building2,
+    id: "scale-innovation",
+    title: "Scale Innovation",
+    description: "Build internal capability to drive sustained innovation across your organisation.",
+    icon: Rocket,
     borderClass: "border-amber-500/30 hover:border-amber-500/50",
     iconBg: "bg-amber-500/10",
     iconColor: "text-amber-400",
-    badgeBg: "bg-amber-500/20",
-    badgeText: "text-amber-300",
+    count: 4,
   },
   {
-    id: "ai-autonomous",
-    title: "AI & Autonomous Systems",
-    description: "From agentic orchestration to production-grade multi-model architectures. Build systems that reason, plan, and act.",
-    accent: "sky",
-    trlRange: "3-7",
+    id: "operationalise-ai",
+    title: "Operationalise AI",
+    description: "Move beyond pilots — deploy autonomous systems that power real operations.",
     icon: Brain,
     borderClass: "border-sky-500/30 hover:border-sky-500/50",
     iconBg: "bg-sky-500/10",
     iconColor: "text-sky-400",
-    badgeBg: "bg-sky-500/20",
-    badgeText: "text-sky-300",
+    count: 6,
   },
   {
-    id: "immersive-xr",
-    title: "Immersive & XR",
-    description: "LED volume workflows, spatial computing on Vision Pro, and industrial XR training systems.",
-    accent: "purple",
-    trlRange: "4-7",
+    id: "data-decisions",
+    title: "Data-Driven Decisions",
+    description: "Transform spatial, earth observation, and location data into competitive intelligence.",
+    icon: Globe,
+    borderClass: "border-teal-500/30 hover:border-teal-500/50",
+    iconBg: "bg-teal-500/10",
+    iconColor: "text-teal-400",
+    count: 7,
+  },
+  {
+    id: "immersive-experiences",
+    title: "Immersive Experiences",
+    description: "Build XR, virtual production, and digital twin capabilities that captivate.",
     icon: Glasses,
     borderClass: "border-purple-500/30 hover:border-purple-500/50",
     iconBg: "bg-purple-500/10",
     iconColor: "text-purple-400",
-    badgeBg: "bg-purple-500/20",
-    badgeText: "text-purple-300",
+    count: 7,
   },
   {
-    id: "cyber-trust",
-    title: "Cyber & Trust Infrastructure",
-    description: "Zero-trust architectures, decentralised identity, and cryptographic agent infrastructure.",
-    accent: "green",
-    trlRange: "3-6",
+    id: "secure-infrastructure",
+    title: "Secure Infrastructure",
+    description: "Build cyber-resilient, zero-trust foundations that scale with confidence.",
     icon: ShieldCheck,
     borderClass: "border-green-500/30 hover:border-green-500/50",
     iconBg: "bg-green-500/10",
     iconColor: "text-green-400",
-    badgeBg: "bg-green-500/20",
-    badgeText: "text-green-300",
+    count: 3,
   },
   {
-    id: "creative-tech",
-    title: "Creative Technology",
-    description: "Neural rendering, spatial audio production, and engineering visualisation.",
-    accent: "pink",
-    trlRange: "2-5",
+    id: "creative-production",
+    title: "Creative Production",
+    description: "Future-proof creative workflows with spatial audio, neural rendering, and emerging tech.",
     icon: Palette,
     borderClass: "border-pink-500/30 hover:border-pink-500/50",
     iconBg: "bg-pink-500/10",
     iconColor: "text-pink-400",
-    badgeBg: "bg-pink-500/20",
-    badgeText: "text-pink-300",
+    count: 6,
   },
 ];
 
@@ -212,8 +207,8 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Section 3: Programme Tracks */}
-      <section className="py-16 md:py-20 mesh-bg relative overflow-hidden" aria-label="Programme tracks">
+      {/* Section 3: Programme Outcomes */}
+      <section className="py-16 md:py-20 mesh-bg relative overflow-hidden" aria-label="Programme outcomes">
         {/* Ambient orbs */}
         <div className="ambient-orb ambient-orb-1" aria-hidden="true" />
         <div className="ambient-orb ambient-orb-2" aria-hidden="true" />
@@ -221,41 +216,32 @@ const Index = () => {
 
         <div className="container max-w-6xl mx-auto px-5 md:px-4 relative z-10">
           <div className="text-center mb-12 md:mb-16">
-            <p className="text-purple-400 font-medium mb-3 text-base">Five Strategic Tracks Across TRL 2-8</p>
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
-              Deep Tech Programme Tracks
+              Outcomes, Not Courses
             </h2>
             <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-              Intensive residential training and R&D programmes designed for teams ready to build with deep tech.
+              18 residential programmes designed around the results you need. Pick your destination — we handle the journey.
             </p>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
-            {programmeTracks.map((track) => {
-              const Icon = track.icon;
+            {outcomeCards.map((card) => {
+              const Icon = card.icon;
               return (
                 <Link
-                  key={track.id}
-                  to={`/programmes#${track.id}`}
-                  className={`glass-card-interactive border ${track.borderClass} !rounded-xl p-5 md:p-6 group`}
+                  key={card.id}
+                  to={`/programmes#${card.id}`}
+                  className={`glass-card-interactive border ${card.borderClass} !rounded-xl p-5 md:p-6 group`}
                 >
                   <div className="flex items-center gap-3 mb-4">
-                    <div className={`w-10 h-10 ${track.iconBg} rounded-lg flex items-center justify-center`}>
-                      <Icon className={`w-5 h-5 ${track.iconColor}`} />
+                    <div className={`w-10 h-10 ${card.iconBg} rounded-lg flex items-center justify-center`}>
+                      <Icon className={`w-5 h-5 ${card.iconColor}`} />
                     </div>
-                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${track.badgeBg} ${track.badgeText}`}>
-                      TRL {track.trlRange}
-                    </span>
+                    <span className="text-xs text-muted-foreground/60">{card.count} programmes</span>
                   </div>
-                  <h3 className="font-semibold text-base md:text-lg mb-2">{track.title}</h3>
-                  {(track as any).partnerLogo && (
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider">with</span>
-                      <img src={(track as any).partnerLogo} alt="VisioningLab" className="h-4 w-auto" />
-                    </div>
-                  )}
-                  <p className="text-muted-foreground text-sm leading-relaxed mb-3">{track.description}</p>
-                  <span className={`text-sm ${track.iconColor} group-hover:underline flex items-center gap-1`}>
+                  <h3 className="font-semibold text-base md:text-lg mb-2">{card.title}</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed mb-3">{card.description}</p>
+                  <span className={`text-sm ${card.iconColor} group-hover:underline flex items-center gap-1`}>
                     Explore <ArrowRight className="w-3.5 h-3.5" />
                   </span>
                 </Link>

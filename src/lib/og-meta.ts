@@ -49,8 +49,8 @@ export const PAGE_OG_CONFIGS: Record<string, OGMetaConfig> = {
     imageAlt: 'DreamLab Applied Innovation Lab',
   },
   programmes: {
-    title: 'Programme Tracks | DreamLab Applied Innovation Lab',
-    description: 'Five strategic deep tech programme tracks spanning AI, XR, cyber, creative technology, and enterprise innovation. TRL 2-8, residential delivery at our Lake District facility.',
+    title: 'Programmes | DreamLab Applied Innovation Lab',
+    description: 'Outcome-based residential programmes: scale innovation, operationalise AI, unlock geospatial intelligence, create immersive experiences, secure infrastructure, and modernise creative production. TRL 2-8, Lake District.',
     url: `${BASE_URL}/programmes`,
     image: `${BASE_URL}/og/programmes.png`,
     imageAlt: 'DreamLab Programme Tracks',

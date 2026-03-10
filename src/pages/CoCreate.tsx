@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Header } from "@/components/Header";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   ArrowRight,
@@ -62,7 +61,6 @@ const CoCreate = () => {
         <div className="absolute inset-0 bg-gradient-to-br from-cyan-950/20 to-purple-950/20" />
         <div className="container relative z-10 px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <Badge className="mb-4 text-sm" variant="secondary">Applied Innovation Lab</Badge>
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 inline-block text-transparent bg-clip-text px-4">
               Co-Create With Us
             </h1>

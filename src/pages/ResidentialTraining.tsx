@@ -1,6 +1,5 @@
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MapPin, Home, Zap, Users, Award, Calendar, CheckCircle2 } from "lucide-react";
@@ -322,7 +321,6 @@ const ResidentialTraining = () => {
         <div className="absolute inset-0 bg-gradient-to-br from-blue-950/20 to-purple-950/20" />
         <div className="container relative z-10 px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <Badge className="mb-3 sm:mb-4 text-xs sm:text-sm" variant="secondary">Residential Training</Badge>
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-blue-400 via-purple-500 to-blue-500 inline-block text-transparent bg-clip-text px-4">
               Deep learning with no distractions
             </h1>

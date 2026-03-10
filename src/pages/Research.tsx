@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Brain,
@@ -59,7 +58,6 @@ const Research = () => {
       {/* Hero */}
       <div className="container mx-auto px-4 pt-24 sm:pt-28 pb-12">
         <div className="text-center mb-12 sm:mb-16">
-          <Badge className="mb-4 text-sm bg-cyan-500/20 text-cyan-300 border-cyan-500/30">Research Heritage</Badge>
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent px-4">
             16 Years of Deep Tech Research
           </h1>
