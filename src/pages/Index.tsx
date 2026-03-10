@@ -102,10 +102,9 @@ const researchVideos = [
 
 // Featured team members
 const featuredTeam = [
-  { name: "Dr John O'Hare", domain: "AI & Immersive Systems", role: "Founder / Chief Hyperreality Officer", image: "/data/team/04.webp" },
-  { name: "Pete Woodbridge", domain: "Agentic Architecture", role: "Co-founder / CTO", image: "/data/team/02.webp" },
-  { name: "Stephen Moyler", domain: "Cyber Infrastructure", role: "Chief Commercial Officer", image: "/data/team/03.webp" },
-  { name: "Dr Arpana Sherpa", domain: "XR & Spatial Computing", role: "Head of XR Research", image: "/data/team/06.webp" },
+  { name: "Dr John O'Hare", domain: "AI & Immersive Systems", role: "Chief Hallucination Officer", image: "/data/team/04.webp" },
+  { name: "Pete Woodbridge", domain: "Founder, DREAMLAB", role: "CTO", image: "/data/team/02.webp" },
+  { name: "Steve Moyler", domain: "Creative Lead, DREAMLAB", role: "Creative Lead", image: "/data/team/03.webp" },
 ];
 
 // Facility images for carousel
@@ -320,7 +319,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Section 5: Research Evidence */}
+      {/* Section 5: Research Evidence — temporarily disabled
       <section className="py-16 md:py-20 bg-gradient-to-b from-background to-purple-950/10" aria-label="Research evidence">
         <div className="container max-w-6xl mx-auto px-5 md:px-4">
           <div className="text-center mb-12 md:mb-16">
@@ -364,6 +363,7 @@ const Index = () => {
           </div>
         </div>
       </section>
+      */}
 
       {/* Section 6: Facility & Tech Stack */}
       <section className="py-16 md:py-20" aria-label="Facility and technology">
@@ -427,7 +427,7 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
+          <div className="grid sm:grid-cols-3 gap-5 md:gap-6 max-w-3xl mx-auto">
             {featuredTeam.map((member) => (
               <div key={member.name} className="bg-background/50 backdrop-blur border border-purple-500/20 rounded-xl p-5 text-center hover:border-purple-500/40 transition-colors">
                 <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center overflow-hidden mb-4 shadow-lg shadow-purple-500/20">
