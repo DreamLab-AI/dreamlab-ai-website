@@ -42,8 +42,8 @@ const BASE_URL = 'https://dreamlab-ai.com';
  */
 export const PAGE_OG_CONFIGS: Record<string, OGMetaConfig> = {
   home: {
-    title: 'DreamLab | Applied Innovation Lab — AI, XR, Cyber & Creative Technology',
-    description: 'Applied Innovation Lab where enterprises and SMEs co-create with deep tech. Embed in our Lake District facility to solve real problems using AI, XR, cyber, and creative technology.',
+    title: 'DreamLab Applied Innovation — AI, XR, & Cyber Secure Distributed Systems',
+    description: 'AI, XR, & Cyber Secure Distributed Systems in the Heart of the Lake District. Enterprise training, retainers, and SME innovation sprints with 40+ deep tech specialists.',
     url: BASE_URL,
     image: `${BASE_URL}/og/home.png`,
     imageAlt: 'DreamLab Applied Innovation Lab',

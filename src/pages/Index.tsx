@@ -39,7 +39,7 @@ const programmeTracks = [
   {
     id: "immersive-xr",
     title: "Immersive & XR",
-    description: "LED volume workflows, spatial computing on Vision Pro, and industrial XR training systems with Emmy-nominated talent.",
+    description: "LED volume workflows, spatial computing on Vision Pro, and industrial XR training systems.",
     accent: "purple",
     trlRange: "4-7",
     icon: Glasses,
@@ -52,7 +52,7 @@ const programmeTracks = [
   {
     id: "cyber-trust",
     title: "Cyber & Trust Infrastructure",
-    description: "Zero-trust architectures, decentralised identity, and cryptographic agent infrastructure. SPRITE+ network aligned.",
+    description: "Zero-trust architectures, decentralised identity, and cryptographic agent infrastructure.",
     accent: "green",
     trlRange: "3-6",
     icon: ShieldCheck,
@@ -65,7 +65,7 @@ const programmeTracks = [
   {
     id: "creative-tech",
     title: "Creative Technology",
-    description: "Neural rendering, spatial audio production, and engineering visualisation. Where art meets applied research.",
+    description: "Neural rendering, spatial audio production, and engineering visualisation.",
     accent: "pink",
     trlRange: "2-5",
     icon: Palette,
@@ -151,26 +151,26 @@ const Index = () => {
             className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-6 animate-slide-up max-w-5xl leading-tight"
             style={{ textShadow: '0 0 40px rgba(212, 165, 116, 0.4), 0 0 80px rgba(205, 127, 50, 0.2)' }}
           >
-            <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 text-transparent bg-clip-text">DREAMLAB</span>
+            <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 text-transparent bg-clip-text">DREAMLAB APPLIED INNOVATION</span>
           </h1>
 
           <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-foreground/85 max-w-3xl mb-8 animate-slide-up font-light tracking-wide leading-relaxed" style={{ animationDelay: '0.1s' }}>
-             Applied innovation in our Lake District lab. AI, XR, and Cyber Secure Distributed Systems.
+             AI, XR, & Cyber Secure Distributed Systems in the Heart of the Lake District
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 animate-scale-in mb-8 w-full sm:w-auto" style={{ animationDelay: '0.2s' }}>
             <Link
-              to="/co-create"
+              to="/programmes"
               className="group relative inline-flex items-center justify-center rounded-lg text-base md:text-lg font-semibold ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-xl hover:shadow-cyan-500/50 hover:scale-105 min-h-[56px] h-14 md:h-16 px-6 md:px-8 py-4 overflow-hidden"
             >
-              <span className="relative z-10">Partner With Us</span>
+              <span className="relative z-10">Explore Training</span>
               <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </Link>
             <Link
-              to="/programmes"
+              to="/co-create"
               className="group relative inline-flex items-center justify-center rounded-lg text-base md:text-lg font-semibold ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-purple-500/40 text-foreground hover:bg-purple-500/10 hover:scale-105 min-h-[56px] h-14 md:h-16 px-6 md:px-8 py-4"
             >
-              <span>Explore Programmes</span>
+              <span>Partner With Us</span>
             </Link>
           </div>
 
@@ -226,7 +226,7 @@ const Index = () => {
               Deep Tech Programme Tracks
             </h2>
             <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-              Each track maps to Innovate UK Technology Readiness Levels, from applied research through to commercial deployment.
+              Intensive residential training and R&D programmes designed for teams ready to build with deep tech.
             </p>
           </div>
 
@@ -276,8 +276,8 @@ const Index = () => {
               <div className="w-12 h-12 bg-cyan-500/10 rounded-xl flex items-center justify-center mb-5">
                 <Building2 className="w-6 h-6 text-cyan-400" />
               </div>
-              <h3 className="text-xl font-bold mb-2">Enterprise Residency</h3>
-              <p className="text-muted-foreground text-sm mb-4">1-4 weeks</p>
+              <h3 className="text-xl font-bold mb-2">Enterprise Training + Retainer</h3>
+              <p className="text-muted-foreground text-sm mb-4">1-4 days</p>
               <p className="text-foreground/80 text-sm leading-relaxed mb-4">
                 Your team embeds in the lab alongside our specialists for intensive R&D sprints. Bring a real challenge, leave with a validated prototype and deployment roadmap.
               </p>
@@ -289,7 +289,7 @@ const Index = () => {
                 <Beaker className="w-6 h-6 text-purple-400" />
               </div>
               <h3 className="text-xl font-bold mb-2">SME Innovation Sprint</h3>
-              <p className="text-muted-foreground text-sm mb-4">3-5 days</p>
+              <p className="text-muted-foreground text-sm mb-4">1-4 days</p>
               <p className="text-foreground/80 text-sm leading-relaxed mb-4">
                 Structured programmes for smaller companies ready to apply deep tech. Hands-on building with expert guidance, designed to deliver immediate capability.
               </p>
@@ -382,8 +382,8 @@ const Index = () => {
                   { label: "10G Network", detail: "Enterprise-grade connectivity" },
                   { label: "GPU Cluster", detail: "8x RTX for ML workloads" },
                   { label: "LED Volume", detail: "Virtual production stage" },
-                  { label: "Dolby Atmos", detail: "Spatial audio studio" },
-                  { label: "5 Bedrooms", detail: "Full-board residential" },
+                  { label: "Spatial Sound", detail: "24-speaker custom system" },
+                  { label: "2 Bedrooms", detail: "Full-board residential, local rooms for larger groups" },
                 ].map((item) => (
                   <div key={item.label} className="p-3 bg-background/50 border border-purple-500/15 rounded-lg">
                     <div className="font-semibold text-sm text-foreground">{item.label}</div>
