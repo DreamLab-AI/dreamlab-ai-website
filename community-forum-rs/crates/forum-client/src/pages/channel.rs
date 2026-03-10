@@ -283,11 +283,14 @@ pub fn ChannelPage() -> impl IntoView {
             content,
         };
 
-        let relay = expect_context::<RelayConnection>();
+        let Some(relay_ctx) = use_context::<RelayConnection>() else {
+            error_msg.set(Some("Relay not available".to_string()));
+            return;
+        };
         match auth.sign_event(unsigned) {
             Ok(signed) => {
                 let event_id = signed.id.clone();
-                relay.publish(&signed);
+                let _ = relay_ctx.publish(&signed);
 
                 // Auto-index for semantic search in background
                 let channel_for_index = cid;
