@@ -66,6 +66,7 @@ pub fn ChannelPage() -> impl IntoView {
 
     // Clone relay for each closure that needs it
     let relay_for_sub = relay.clone();
+    let relay_for_send = relay.clone();
     let relay_for_cleanup = relay;
 
     // Try channel store for instant header (avoids waiting for kind-40 relay round-trip)
@@ -283,14 +284,10 @@ pub fn ChannelPage() -> impl IntoView {
             content,
         };
 
-        let Some(relay_ctx) = use_context::<RelayConnection>() else {
-            error_msg.set(Some("Relay not available".to_string()));
-            return;
-        };
         match auth.sign_event(unsigned) {
             Ok(signed) => {
                 let event_id = signed.id.clone();
-                let _ = relay_ctx.publish(&signed);
+                let _ = relay_for_send.publish(&signed);
 
                 // Auto-index for semantic search in background
                 let channel_for_index = cid;
@@ -313,6 +310,7 @@ pub fn ChannelPage() -> impl IntoView {
         }
     };
 
+    let send_callback = Callback::new(do_send_text);
     let is_authed = auth.is_authenticated();
 
     // Derive avatar letter from channel name
@@ -489,7 +487,7 @@ pub fn ChannelPage() -> impl IntoView {
                 <div class="bg-gray-800 border-t border-gray-700 p-3">
                     <div class="max-w-4xl mx-auto">
                         <TypingIndicator typing_pubkeys=typing_pubkeys />
-                        <MessageInput on_send=Callback::new(do_send_text) channel_id=channel_id() />
+                        <MessageInput on_send=send_callback channel_id=channel_id() />
                     </div>
                 </div>
             </Show>
