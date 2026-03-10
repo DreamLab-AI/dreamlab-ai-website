@@ -16,6 +16,14 @@
     "featured": true
   },
   {
+    "id": "viv-andrews",
+    "name": "Viv Andrews",
+    "role": "Gorton Monastery",
+    "quote": "Half an hour with DreamLab produced three years of practicable strategy. Previously unfathomable depths of planning achieved in the blink of an eye.",
+    "location_detail": "Gorton Monastery, Manchester",
+    "featured": true
+  },
+  {
     "id": "james-harrison",
     "name": "James Harrison",
     "role": "Operations Director, FinTech",
