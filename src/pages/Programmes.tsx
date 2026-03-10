@@ -540,7 +540,7 @@ const Programmes = () => {
                           <TRLBadge range={prog.trl} />
                         </div>
 
-                        <h3 className="text-lg font-bold mb-1 pr-24">{prog.title}</h3>
+                        <h3 className="text-lg font-bold mb-1 pr-40">{prog.title}</h3>
 
                         {/* Partnership badge */}
                         {prog.partnership && (
