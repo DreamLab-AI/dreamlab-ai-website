@@ -116,14 +116,7 @@ where
             cohort: if z >= 2 && !c.trim().is_empty() { Some(c.trim().to_string()) } else { None },
         });
         is_submitting.set(false);
-
-        // Reset form
-        name.set(String::new());
-        description.set(String::new());
-        picture.set(String::new());
-        section.set(SECTIONS[0].0.to_string());
-        zone.set(0);
-        cohort.set(String::new());
+        // Form reset is handled by the parent when it signals success via callback.
     };
 
     view! {

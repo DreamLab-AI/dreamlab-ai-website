@@ -3,6 +3,8 @@
 //! Route: `/settings`
 //! Sections: Profile, Muted Users, Privacy, Appearance (future), Account.
 
+use std::rc::Rc;
+
 use leptos::prelude::*;
 use leptos_router::components::A;
 use nostr_core::UnsignedEvent;
@@ -11,7 +13,7 @@ use crate::app::base_href;
 use crate::auth::use_auth;
 use crate::components::confirm_dialog::{ConfirmDialog, ConfirmVariant};
 use crate::components::toast::{use_toasts, ToastVariant};
-use crate::relay::RelayConnection;
+use crate::relay::{ConnectionState, Filter, RelayConnection};
 use crate::stores::preferences::{
     save_preferences, use_preferences, NotificationLevel, Theme,
 };
@@ -92,6 +94,70 @@ pub fn SettingsPage() -> impl IntoView {
 
     let pubkey_full = Memo::new(move |_| auth.pubkey().get().unwrap_or_default());
 
+    // -- Fetch kind-0 metadata on mount to populate fields --
+    {
+        let relay = expect_context::<RelayConnection>();
+        let conn_state = relay.connection_state();
+        let nickname_sig = nickname;
+        let about_sig = about;
+        let avatar_sig = avatar_url;
+        let birthday_sig = birthday;
+        let auth_for_fetch = auth.clone();
+
+        Effect::new(move |_| {
+            if conn_state.get() != ConnectionState::Connected {
+                return;
+            }
+            let pk = match auth_for_fetch.pubkey().get() {
+                Some(pk) => pk,
+                None => return,
+            };
+
+            let on_event: Rc<dyn Fn(nostr_core::NostrEvent)> =
+                Rc::new(move |event: nostr_core::NostrEvent| {
+                    if event.kind != 0 {
+                        return;
+                    }
+                    if let Ok(obj) =
+                        serde_json::from_str::<serde_json::Value>(&event.content)
+                    {
+                        if let Some(name) = obj.get("name").and_then(|v| v.as_str()) {
+                            nickname_sig.set(name.to_string());
+                        }
+                        if let Some(bio) = obj.get("about").and_then(|v| v.as_str()) {
+                            about_sig.set(bio.to_string());
+                        }
+                        if let Some(pic) = obj.get("picture").and_then(|v| v.as_str()) {
+                            avatar_sig.set(pic.to_string());
+                        }
+                        if let Some(bday) = obj.get("birthday").and_then(|v| v.as_str()) {
+                            birthday_sig.set(bday.to_string());
+                        }
+                    }
+                });
+
+            let sub_id = relay.subscribe(
+                vec![Filter {
+                    kinds: Some(vec![0]),
+                    authors: Some(vec![pk]),
+                    limit: Some(1),
+                    ..Default::default()
+                }],
+                on_event,
+                None,
+            );
+
+            // Auto-unsubscribe after 5 seconds
+            let relay_unsub = relay.clone();
+            crate::utils::set_timeout_once(
+                move || {
+                    relay_unsub.unsubscribe(&sub_id);
+                },
+                5_000,
+            );
+        });
+    }
+
     // -- Profile save handler --
     let toasts_for_profile = toasts.clone();
     let on_save_profile = move |_| {
@@ -140,10 +206,27 @@ pub fn SettingsPage() -> impl IntoView {
         match auth.sign_event(unsigned) {
             Ok(signed) => {
                 let relay = expect_context::<RelayConnection>();
-                relay.publish(&signed);
-                auth.set_profile(Some(name), None);
-                profile_saving.set(false);
-                toasts_for_profile.show("Profile updated", ToastVariant::Success);
+                let saving_sig = profile_saving;
+                let toast_sig = toasts_for_profile.clone();
+                let auth_for_ack = auth.clone();
+                let name_for_ack = name.clone();
+                let ack = Rc::new(move |accepted: bool, message: String| {
+                    saving_sig.set(false);
+                    if accepted {
+                        auth_for_ack.set_profile(Some(name_for_ack.clone()), None);
+                        toast_sig.show("Profile updated", ToastVariant::Success);
+                    } else {
+                        toast_sig.show(
+                            format!("Profile rejected: {}", message),
+                            ToastVariant::Error,
+                        );
+                    }
+                });
+                if let Err(e) = relay.publish_with_ack(&signed, Some(ack)) {
+                    profile_saving.set(false);
+                    toasts_for_profile
+                        .show(format!("Publish failed: {}", e), ToastVariant::Error);
+                }
             }
             Err(e) => {
                 profile_saving.set(false);

@@ -113,6 +113,17 @@ pub fn SectionRequests() -> impl IntoView {
 
         let id = relay_for_sub.subscribe(vec![filter], on_event, Some(on_eose));
         sub_id.set(Some(id));
+
+        // 8-second timeout: if EOSE never arrives, stop showing the loading state
+        let loading_timeout = loading;
+        crate::utils::set_timeout_once(
+            move || {
+                if loading_timeout.get_untracked() {
+                    loading_timeout.set(false);
+                }
+            },
+            8_000,
+        );
     });
 
     on_cleanup(move || {

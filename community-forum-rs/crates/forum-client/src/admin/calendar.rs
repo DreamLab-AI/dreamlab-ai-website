@@ -84,6 +84,69 @@ pub fn AdminCalendar() -> impl IntoView {
 
         let id = relay_for_sub.subscribe(vec![filter], on_event, Some(on_eose));
         sub_id.set(Some(id));
+
+        // 8-second timeout: if EOSE never arrives, stop showing the loading state
+        let loading_timeout = loading;
+        crate::utils::set_timeout_once(
+            move || {
+                if loading_timeout.get_untracked() {
+                    loading_timeout.set(false);
+                }
+            },
+            8_000,
+        );
+
+        // Subscribe to kind 31925 (RSVP) events and increment counts
+        let evts_for_rsvp = events;
+        let on_rsvp_event = Rc::new(move |event: NostrEvent| {
+            if event.kind != 31925 {
+                return;
+            }
+            // Find the calendar event this RSVP refers to via "a" tag
+            let a_tag = event
+                .tags
+                .iter()
+                .find(|t| t.len() >= 2 && t[0] == "a")
+                .map(|t| t[1].clone());
+            let status = event
+                .tags
+                .iter()
+                .find(|t| t.len() >= 2 && t[0] == "status")
+                .map(|t| t[1].clone())
+                .unwrap_or_default();
+            // Also check "L" / "l" label tags for status (some clients use content)
+            let status = if status.is_empty() {
+                event.content.trim().to_lowercase()
+            } else {
+                status.to_lowercase()
+            };
+
+            if let Some(a_ref) = a_tag {
+                // a_ref format: "31923:<pubkey>:<d-tag>"
+                let d_tag = a_ref.split(':').nth(2).unwrap_or("").to_string();
+                if !d_tag.is_empty() {
+                    evts_for_rsvp.update(|list| {
+                        if let Some(entry) = list.iter_mut().find(|e| e.d_tag == d_tag) {
+                            match status.as_str() {
+                                "accepted" | "yes" => entry.rsvp_accepted += 1,
+                                "declined" | "no" => entry.rsvp_declined += 1,
+                                "tentative" | "maybe" => entry.rsvp_tentative += 1,
+                                _ => {}
+                            }
+                        }
+                    });
+                }
+            }
+        });
+
+        relay_for_sub.subscribe(
+            vec![Filter {
+                kinds: Some(vec![31925]),
+                ..Default::default()
+            }],
+            on_rsvp_event,
+            None,
+        );
     });
 
     on_cleanup(move || {

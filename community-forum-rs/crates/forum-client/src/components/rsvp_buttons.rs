@@ -3,6 +3,8 @@
 //! Shows Accept / Tentative / Decline buttons with the user's current status
 //! highlighted, attendee count, and max-capacity enforcement.
 
+use std::rc::Rc;
+
 use leptos::prelude::*;
 use nostr_core::RsvpStatus;
 
@@ -47,13 +49,26 @@ pub fn RsvpButtons(
         match nostr_core::create_rsvp(&privkey, &eid, status) {
             Ok(event) => {
                 let relay = expect_context::<RelayConnection>();
-                relay.publish(&event);
                 let label = match status {
                     RsvpStatus::Accept => "Accepted",
                     RsvpStatus::Decline => "Declined",
                     RsvpStatus::Tentative => "Tentative",
                 };
-                toasts.show(format!("RSVP: {}", label), ToastVariant::Success);
+                let toasts_ok = toasts.clone();
+                let label_owned = label.to_string();
+                let ack = Rc::new(move |accepted: bool, message: String| {
+                    if accepted {
+                        toasts_ok.show(format!("RSVP: {}", label_owned), ToastVariant::Success);
+                    } else {
+                        toasts_ok.show(
+                            format!("RSVP rejected: {}", message),
+                            ToastVariant::Error,
+                        );
+                    }
+                });
+                if let Err(e) = relay.publish_with_ack(&event, Some(ack)) {
+                    toasts.show(format!("RSVP failed: {}", e), ToastVariant::Error);
+                }
             }
             Err(e) => {
                 toasts.show(format!("RSVP failed: {}", e), ToastVariant::Error);

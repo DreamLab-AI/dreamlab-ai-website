@@ -15,6 +15,7 @@ use crate::components::message_input::MessageInput;
 use crate::components::pinned_messages::{PinnedMessage, PinnedMessages};
 use crate::components::typing_indicator::TypingIndicator;
 use crate::relay::{ConnectionState, Filter, RelayConnection};
+use crate::stores::channels::ChannelStore;
 use crate::stores::read_position::use_read_positions;
 use crate::utils::{arrow_left_svg, set_timeout_once};
 
@@ -67,6 +68,23 @@ pub fn ChannelPage() -> impl IntoView {
     let relay_for_sub = relay.clone();
     let relay_for_cleanup = relay;
 
+    // Try channel store for instant header (avoids waiting for kind-40 relay round-trip)
+    {
+        let cid = channel_id();
+        if let Some(store) = use_context::<ChannelStore>() {
+            let channels = store.channels.get_untracked();
+            if let Some(found) = channels
+                .iter()
+                .find(|c| c.id == cid || c.name == cid)
+            {
+                channel_info.set(Some(ChannelHeader {
+                    name: found.name.clone(),
+                    description: found.description.clone(),
+                }));
+            }
+        }
+    }
+
     // Subscribe to channel metadata (kind 40) and messages (kind 42) when connected
     Effect::new(move |_| {
         let state = conn_state.get();
@@ -101,16 +119,49 @@ pub fn ChannelPage() -> impl IntoView {
         let id1 = relay_for_sub.subscribe(vec![channel_filter], on_channel_event, None);
         channel_sub_id.set(Some(id1));
 
-        // Subscribe to messages (kind 42) referencing this channel
+        // Build auxiliary name/section lookup from the channel store for
+        // client-side matching of legacy tag values.
+        let mut alt_names: Vec<String> = Vec::new();
+        if let Some(store) = use_context::<ChannelStore>() {
+            let channels = store.channels.get_untracked();
+            if let Some(found) = channels.iter().find(|c| c.id == cid || c.name == cid) {
+                if !found.name.is_empty() {
+                    alt_names.push(found.name.to_lowercase());
+                }
+                if !found.section.is_empty() {
+                    alt_names.push(found.section.to_lowercase());
+                }
+            }
+        }
+
+        // Subscribe to messages (kind 42) -- broad filter, client-side matching.
+        // Legacy relay data may tag messages with slugs or section names instead
+        // of the kind-40 event id, so we cannot rely on e_tags filtering.
         let msg_filter = Filter {
             kinds: Some(vec![42]),
-            e_tags: Some(vec![cid.clone()]),
             ..Default::default()
         };
 
+        let cid_for_cb = cid.clone();
         let messages_sig = messages;
         let on_msg_event = Rc::new(move |event: NostrEvent| {
             if event.kind != 42 {
+                return;
+            }
+
+            // Client-side channel matching: check all e-tags against id/name/section
+            let matches_channel = event.tags.iter().any(|t| {
+                if t.len() < 2 || t[0] != "e" {
+                    return false;
+                }
+                let val = &t[1];
+                if val == &cid_for_cb {
+                    return true;
+                }
+                let val_lower = val.to_lowercase();
+                alt_names.iter().any(|n| n == &val_lower)
+            });
+            if !matches_channel {
                 return;
             }
 
@@ -118,7 +169,14 @@ pub fn ChannelPage() -> impl IntoView {
                 .tags
                 .iter()
                 .find(|t| t.len() >= 4 && t[0] == "e" && t[3] == "reply")
-                .or_else(|| event.tags.iter().find(|t| t.len() >= 2 && t[0] == "e"))
+                .or_else(|| {
+                    // Skip the root tag -- pick a secondary e-tag for reply
+                    event
+                        .tags
+                        .iter()
+                        .filter(|t| t.len() >= 2 && t[0] == "e")
+                        .nth(1)
+                })
                 .map(|t| t[1].clone());
             let reply_pk = event
                 .tags

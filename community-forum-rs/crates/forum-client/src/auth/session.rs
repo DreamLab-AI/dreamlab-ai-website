@@ -189,14 +189,14 @@ impl AuthStore {
 
         if stored.is_local_key {
             if let Some(ref pubkey) = stored.public_key {
-                // Local-key users: restore as authenticated so they can browse
-                // the forum without being redirected to login. The privkey is
-                // gone (lost on reload), so signing operations will fail until
-                // the user re-enters their key, but read-only browsing works.
+                // Local-key users: privkey is gone after reload (never persisted).
+                // Restore as Unauthenticated so signing operations are blocked
+                // until the user re-enters their nsec. Keep pubkey populated for
+                // display and is_local_key=true so the UI shows a re-login prompt.
                 self.state.set(AuthState {
-                    state: AuthPhase::Authenticated,
+                    state: AuthPhase::Unauthenticated,
                     pubkey: Some(pubkey.clone()),
-                    is_authenticated: true,
+                    is_authenticated: false,
                     public_key: Some(pubkey.clone()),
                     nickname: stored.nickname,
                     avatar: stored.avatar,

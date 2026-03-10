@@ -65,8 +65,17 @@ pub type EventCallback = Rc<dyn Fn(NostrEvent)>;
 /// Callback type for EOSE (End of Stored Events) on a subscription.
 pub type EoseCallback = Rc<dyn Fn()>;
 
+/// Callback type for publish acknowledgement (accepted: bool, message: String).
+pub type PublishCallback = Rc<dyn Fn(bool, String)>;
+
+/// Tracks a pending publish awaiting relay OK response.
+struct PendingPublish {
+    on_ok: Option<PublishCallback>,
+}
+
 /// Internal subscription tracking.
 struct Subscription {
+    filters: Vec<Filter>,
     on_event: EventCallback,
     on_eose: Option<EoseCallback>,
 }
@@ -75,6 +84,7 @@ struct Subscription {
 struct RelayInner {
     ws: Option<WebSocket>,
     subscriptions: HashMap<String, Subscription>,
+    pending_publishes: HashMap<String, PendingPublish>,
     sub_counter: u32,
     reconnect_attempts: u32,
     pending_messages: Vec<String>,
@@ -111,6 +121,7 @@ impl RelayConnection {
         let inner = Rc::new(RefCell::new(RelayInner {
             ws: None,
             subscriptions: HashMap::new(),
+            pending_publishes: HashMap::new(),
             sub_counter: 0,
             reconnect_attempts: 0,
             pending_messages: Vec::new(),
@@ -189,6 +200,21 @@ impl RelayConnection {
                 for msg in pending {
                     let _ = ws.send_with_str(&msg);
                 }
+                // Replay subscriptions on reconnect
+                for (sub_id, sub) in inner.subscriptions.iter() {
+                    let mut req = vec![
+                        serde_json::Value::String("REQ".into()),
+                        serde_json::Value::String(sub_id.clone()),
+                    ];
+                    for filter in &sub.filters {
+                        if let Ok(v) = serde_json::to_value(filter) {
+                            req.push(v);
+                        }
+                    }
+                    if let Ok(msg) = serde_json::to_string(&req) {
+                        let _ = ws.send_with_str(&msg);
+                    }
+                }
             }
         }) as Box<dyn FnMut()>);
         ws.set_onopen(Some(on_open.as_ref().unchecked_ref()));
@@ -245,7 +271,8 @@ impl RelayConnection {
             inner._on_message = None;
             inner._on_error = None;
             inner._on_close = None;
-            inner.subscriptions.clear();
+            // NOTE: subscriptions are preserved so they can be replayed on reconnect.
+            inner.pending_publishes.clear();
             inner.pending_messages.clear();
         });
     }
@@ -262,9 +289,14 @@ impl RelayConnection {
             let mut inner = rc.borrow_mut();
             inner.sub_counter += 1;
             let sub_id = format!("sub_{}", inner.sub_counter);
-            inner
-                .subscriptions
-                .insert(sub_id.clone(), Subscription { on_event, on_eose });
+            inner.subscriptions.insert(
+                sub_id.clone(),
+                Subscription {
+                    filters: filters.clone(),
+                    on_event,
+                    on_eose,
+                },
+            );
             sub_id
         });
 
@@ -301,6 +333,28 @@ impl RelayConnection {
         let msg = serde_json::json!(["EVENT", event]);
         let serialized = serde_json::to_string(&msg).unwrap_or_default();
         self.send_raw(&serialized);
+    }
+
+    /// Publish a signed event and invoke `on_ok` when the relay responds with OK.
+    ///
+    /// The callback receives `(accepted: bool, message: String)` matching the
+    /// NIP-01 `["OK", event_id, accepted, message]` response.
+    pub fn publish_with_ack(
+        &self,
+        event: &NostrEvent,
+        on_ok: Option<PublishCallback>,
+    ) -> Result<(), String> {
+        let event_id = event.id.clone();
+        self.with_inner(|rc| {
+            rc.borrow_mut()
+                .pending_publishes
+                .insert(event_id, PendingPublish { on_ok });
+        });
+        let msg = serde_json::json!(["EVENT", event]);
+        let serialized =
+            serde_json::to_string(&msg).map_err(|e| format!("serialize error: {}", e))?;
+        self.send_raw(&serialized);
+        Ok(())
     }
 
     /// Send a raw string message to the WebSocket.
@@ -446,6 +500,17 @@ fn handle_relay_message(inner_rc: &Rc<RefCell<RelayInner>>, text: &str) {
                     web_sys::console::warn_1(
                         &format!("[Relay] Event {} rejected: {}", event_id, message).into(),
                     );
+                }
+                // Dispatch to pending publish callback if registered
+                let callback = {
+                    inner_rc
+                        .borrow_mut()
+                        .pending_publishes
+                        .remove(event_id)
+                        .and_then(|p| p.on_ok)
+                };
+                if let Some(cb) = callback {
+                    cb(accepted, message.to_string());
                 }
             }
         }

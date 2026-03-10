@@ -27,8 +27,8 @@ use crate::stores::read_position::provide_read_positions;
 use crate::stores::zone_access::provide_zone_access;
 use crate::pages::{
     AdminPage, CategoryPage, ChannelPage, ChatPage, DmChatPage, DmListPage, EventsPage, ForumsPage,
-    HomePage, LoginPage, NoteViewPage, PendingPage, SectionPage, SettingsPage, SetupPage,
-    SignupPage,
+    HomePage, LoginPage, NoteViewPage, PendingPage, ProfilePage, SearchPage, SectionPage,
+    SettingsPage, SetupPage, SignupPage,
 };
 use crate::relay::{ConnectionState, RelayConnection};
 
@@ -282,6 +282,8 @@ pub fn App() -> impl IntoView {
                     <Route path=path!("/forums/:category") view=AuthGatedCategory />
                     <Route path=path!("/forums/:category/:section") view=AuthGatedSection />
                     <Route path=path!("/events") view=AuthGatedEvents />
+                    <Route path=path!("/profile/:pubkey") view=AuthGatedProfile />
+                    <Route path=path!("/search") view=AuthGatedSearch />
                     <Route path=path!("/settings") view=AuthGatedSettings />
                     <Route path=path!("/admin") view=AdminPage />
                 </FlatRoutes>
@@ -716,4 +718,6 @@ auth_gated!(AuthGatedForums, ForumsPage);
 auth_gated!(AuthGatedCategory, CategoryPage);
 auth_gated!(AuthGatedSection, SectionPage);
 auth_gated!(AuthGatedEvents, EventsPage);
+auth_gated!(AuthGatedProfile, ProfilePage);
+auth_gated!(AuthGatedSearch, SearchPage);
 auth_gated!(AuthGatedSettings, SettingsPage);

@@ -13,7 +13,7 @@ use std::collections::HashMap;
 use std::rc::Rc;
 use wasm_bindgen::JsCast;
 
-use crate::relay::{ConnectionState, Filter, RelayConnection};
+use crate::relay::{Filter, RelayConnection};
 
 // -- Constants ----------------------------------------------------------------
 
@@ -172,19 +172,34 @@ impl ChannelStore {
     }
 
     /// Start message count subscription (called after channel EOSE).
+    ///
+    /// Uses a BROAD kind-42 subscription (no e_tags filter) because legacy
+    /// relay data tags messages with slugs or section names instead of the
+    /// kind-40 event id. Client-side resolution matches each event's root
+    /// `e` tag value against channel id, name, and section.
     pub(crate) fn start_msg_sync(&self, relay: &RelayConnection) {
         if self.msg_sub_id.get_untracked().is_some() {
             return;
         }
 
-        let channel_ids: Vec<String> = self
-            .channels
-            .get_untracked()
-            .iter()
-            .map(|c| c.id.clone())
-            .collect();
-        if channel_ids.is_empty() {
+        let channels = self.channels.get_untracked();
+        if channels.is_empty() {
             return;
+        }
+
+        // Build lookup maps for client-side channel resolution.
+        // Keys are lowercased for case-insensitive matching.
+        let mut by_id: HashMap<String, String> = HashMap::new();
+        let mut by_name: HashMap<String, String> = HashMap::new();
+        let mut by_section: HashMap<String, String> = HashMap::new();
+        for ch in &channels {
+            by_id.insert(ch.id.clone(), ch.id.clone());
+            if !ch.name.is_empty() {
+                by_name.insert(ch.name.to_lowercase(), ch.id.clone());
+            }
+            if !ch.section.is_empty() {
+                by_section.insert(ch.section.to_lowercase(), ch.id.clone());
+            }
         }
 
         let msg_counts = self.message_counts;
@@ -192,14 +207,27 @@ impl ChannelStore {
         let store = self.clone();
 
         let on_msg = Rc::new(move |event: NostrEvent| {
-            let channel_id = event
+            // Extract the root e-tag value (prefer explicit "root" marker)
+            let tag_val = event
                 .tags
                 .iter()
                 .find(|t| t.len() >= 4 && t[0] == "e" && t[3] == "root")
                 .or_else(|| event.tags.iter().find(|t| t.len() >= 2 && t[0] == "e"))
                 .map(|t| t[1].clone());
 
-            if let Some(cid) = channel_id {
+            let tag_val = match tag_val {
+                Some(v) => v,
+                None => return,
+            };
+
+            // Resolve tag value to a known channel id
+            let resolved = by_id
+                .get(&tag_val)
+                .or_else(|| by_name.get(&tag_val.to_lowercase()))
+                .or_else(|| by_section.get(&tag_val.to_lowercase()))
+                .cloned();
+
+            if let Some(cid) = resolved {
                 msg_counts.update(|m| {
                     *m.entry(cid.clone()).or_insert(0) += 1;
                 });
@@ -217,10 +245,10 @@ impl ChannelStore {
             store_for_eose.save_cache();
         });
 
+        // Broad subscription: all kind-42 events, no e_tags restriction
         let id = relay.subscribe(
             vec![Filter {
                 kinds: Some(vec![42]),
-                e_tags: Some(channel_ids),
                 ..Default::default()
             }],
             on_msg,

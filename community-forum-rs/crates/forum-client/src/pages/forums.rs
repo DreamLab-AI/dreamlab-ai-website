@@ -290,29 +290,37 @@ fn ZoneIcon(icon: &'static str, accent: &'static str) -> impl IntoView {
         _ => "w-10 h-10 rounded-lg flex items-center justify-center bg-gray-500/10",
     };
 
+    let icon_color = match accent {
+        "green" => "text-green-400",
+        "purple" => "text-purple-400",
+        "pink" => "text-pink-400",
+        "sky" => "text-sky-400",
+        _ => "text-gray-400",
+    };
+
     let svg = match icon {
         // Home icon for Fairfield Family
         "home" => view! {
-            <svg class="w-5 h-5 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <svg class=format!("w-5 h-5 {}", icon_color) viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                 <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round"/>
                 <polyline points="9 22 9 12 15 12 15 22" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
         }.into_any(),
         // Moon icon for Minimoonoir
         "moon" => view! {
-            <svg class="w-5 h-5 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <svg class=format!("w-5 h-5 {}", icon_color) viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                 <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
         }.into_any(),
         // Sparkle icon for DreamLab
         "sparkle" => view! {
-            <svg class="w-5 h-5 text-pink-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <svg class=format!("w-5 h-5 {}", icon_color) viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                 <path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8L12 2z" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
         }.into_any(),
         // Bot icon for AI Agents
         "bot" => view! {
-            <svg class="w-5 h-5 text-sky-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <svg class=format!("w-5 h-5 {}", icon_color) viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                 <rect x="3" y="11" width="18" height="10" rx="2" stroke-linecap="round" stroke-linejoin="round"/>
                 <circle cx="12" cy="5" r="2" stroke-linecap="round"/>
                 <path d="M12 7v4" stroke-linecap="round"/>
@@ -320,7 +328,7 @@ fn ZoneIcon(icon: &'static str, accent: &'static str) -> impl IntoView {
                 <line x1="16" y1="16" x2="16" y2="16" stroke-linecap="round" stroke-width="2"/>
             </svg>
         }.into_any(),
-        _ => view! { <span class="text-gray-400">"?"</span> }.into_any(),
+        _ => view! { <span class=format!("{}", icon_color)>"?"</span> }.into_any(),
     };
 
     view! {

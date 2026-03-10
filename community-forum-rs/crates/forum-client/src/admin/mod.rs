@@ -164,6 +164,11 @@ impl AdminStore {
             Ok(body) => {
                 let parsed: WhitelistResponse = serde_json::from_str(&body)
                     .map_err(|e| format!("Failed to parse whitelist: {e}"))?;
+                if parsed.users.is_empty() {
+                    self.state.error.set(Some(
+                        "Whitelist is empty. No users have been approved yet.".to_string(),
+                    ));
+                }
                 self.state.users.set(parsed.users);
                 self.state.stats.update(|s| {
                     s.total_users = self.state.users.get_untracked().len() as u32;
@@ -173,9 +178,18 @@ impl AdminStore {
             }
             Err(e) => {
                 let msg = e.to_string();
-                self.state.error.set(Some(msg.clone()));
+                let user_msg = if msg.contains("401") || msg.contains("403") || msg.contains("Unauthorized") {
+                    format!("Auth failure: your admin key was rejected by the API. {}", msg)
+                } else if msg.contains("404") {
+                    format!("Whitelist endpoint not found. Check API URL configuration. {}", msg)
+                } else if msg.contains("NetworkError") || msg.contains("Failed to fetch") {
+                    format!("Network error: cannot reach the auth API. Check your connection. {}", msg)
+                } else {
+                    format!("Failed to fetch whitelist: {}", msg)
+                };
+                self.state.error.set(Some(user_msg.clone()));
                 self.state.is_loading.set(false);
-                Err(msg)
+                Err(user_msg)
             }
         }
     }
@@ -315,26 +329,41 @@ impl AdminStore {
         let signed =
             nostr_core::sign_event(unsigned, &sk).map_err(|e| format!("Signing failed: {e}"))?;
 
-        relay.publish(&signed);
+        // Publish with ack — only update local state on relay acceptance
+        let success_sig = self.state.success;
+        let error_sig = self.state.error;
+        let channels_sig = self.state.channels;
+        let stats_sig = self.state.stats;
+        let channel_name = name.to_string();
+        let channel_desc = description.to_string();
+        let channel_section = section.to_string();
+        let event_id = signed.id.clone();
+        let event_created_at = signed.created_at;
+        let event_pubkey = signed.pubkey.clone();
 
-        self.state
-            .success
-            .set(Some(format!("Channel '{}' created", name)));
-
-        // Add to local state immediately
-        self.state.channels.update(|list| {
-            list.push(AdminChannel {
-                id: signed.id.clone(),
-                name: name.to_string(),
-                description: description.to_string(),
-                section: section.to_string(),
-                created_at: signed.created_at,
-                creator: signed.pubkey.clone(),
-            });
+        let ack = Rc::new(move |accepted: bool, message: String| {
+            if accepted {
+                success_sig.set(Some(format!("Channel '{}' created", channel_name)));
+                channels_sig.update(|list| {
+                    if !list.iter().any(|c| c.id == event_id) {
+                        list.push(AdminChannel {
+                            id: event_id.clone(),
+                            name: channel_name.clone(),
+                            description: channel_desc.clone(),
+                            section: channel_section.clone(),
+                            created_at: event_created_at,
+                            creator: event_pubkey.clone(),
+                        });
+                    }
+                });
+                stats_sig.update(|s| {
+                    s.total_channels = channels_sig.get_untracked().len() as u32;
+                });
+            } else {
+                error_sig.set(Some(format!("Relay rejected: {}", message)));
+            }
         });
-        self.state.stats.update(|s| {
-            s.total_channels = self.state.channels.get_untracked().len() as u32;
-        });
+        let _ = relay.publish_with_ack(&signed, Some(ack));
 
         Ok(())
     }
@@ -366,7 +395,7 @@ impl AdminStore {
                 .iter()
                 .find(|t| t.len() >= 2 && t[0] == "section")
                 .map(|t| t[1].clone())
-                .unwrap_or_default();
+                .unwrap_or_else(|| infer_legacy_section(&name));
 
             channels_for_event.update(|list| {
                 if !list.iter().any(|c| c.id == event.id) {
@@ -452,6 +481,18 @@ pub fn use_admin() -> AdminStore {
 #[derive(Deserialize)]
 struct WhitelistResponse {
     users: Vec<WhitelistUser>,
+}
+
+/// Infer a legacy section ID from a channel name for channels that lack a
+/// section tag. Returns an empty string if no match is found.
+fn infer_legacy_section(name: &str) -> String {
+    match name.to_lowercase().as_str() {
+        "general" => "dreamlab-lobby".into(),
+        "off-topic" => "dreamlab-lobby".into(),
+        "help-desk" => "dreamlab-training".into(),
+        "ai-projects" => "ai-general".into(),
+        _ => String::new(),
+    }
 }
 
 /// Parse kind-40 channel content JSON into (name, description).

@@ -127,8 +127,8 @@ pub(crate) fn MobileBottomNav() -> impl IntoView {
                     <span>"DMs"</span>
                 </A>
 
-                // Forums (placeholder route — links to chat index for now)
-                <A href=base_href("/chat") attr:class=item_class("/forums")>
+                // Forums
+                <A href=base_href("/forums") attr:class=item_class("/forums")>
                     <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
                         <rect x="3" y="3" width="7" height="7" rx="1"
                             stroke-linecap="round" stroke-linejoin="round"/>
@@ -142,8 +142,17 @@ pub(crate) fn MobileBottomNav() -> impl IntoView {
                     <span>"Forums"</span>
                 </A>
 
-                // Profile (links to home for now)
-                <A href=base_href("/") attr:class=item_class("/profile")>
+                // Profile
+                <A href={
+                    let auth = use_auth();
+                    let pk = auth.pubkey();
+                    move || {
+                        match pk.get() {
+                            Some(pk) => base_href(&format!("/profile/{}", pk)),
+                            None => base_href("/settings"),
+                        }
+                    }
+                } attr:class=item_class("/profile")>
                     <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
                         <circle cx="12" cy="8" r="4"
                             stroke-linecap="round" stroke-linejoin="round"/>

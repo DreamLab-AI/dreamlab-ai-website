@@ -127,11 +127,17 @@ pub fn ChatPage() -> impl IntoView {
         if section.is_empty() {
             "Channels".to_string()
         } else {
-            section
+            match section.as_str() {
+                "fairfield-family" => "Fairfield Family".to_string(),
+                "minimoonoir" => "Minimoonoir".to_string(),
+                "dreamlab" => "DreamLab".to_string(),
+                "ai-agents" => "AI Agents".to_string(),
+                _ => "Channels".to_string(),
+            }
         }
     };
 
-    let channel_count = move || store.channels.get().len();
+    let channel_count = move || filtered_channels().len();
     let loading = store.loading;
 
     view! {

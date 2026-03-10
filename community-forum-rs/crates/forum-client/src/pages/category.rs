@@ -18,6 +18,24 @@ use crate::components::zone_hero::ZoneHero;
 use crate::relay::{ConnectionState, Filter, RelayConnection};
 use crate::utils::{capitalize, set_timeout_once};
 
+/// Maps zone IDs to their child section IDs (from config/sections.yaml).
+const ZONE_SECTIONS: &[(&str, &[&str])] = &[
+    ("fairfield-family", &["family-home", "family-events", "family-photos"]),
+    ("minimoonoir", &["minimoonoir-welcome", "minimoonoir-events", "minimoonoir-booking"]),
+    ("dreamlab", &["dreamlab-lobby", "dreamlab-training", "dreamlab-projects", "dreamlab-bookings"]),
+    ("ai-agents", &["ai-general", "ai-claude-flow", "ai-visionflow"]),
+];
+
+/// Resolve a channel's section tag to its parent zone ID.
+fn section_to_zone_id(section: &str) -> Option<&'static str> {
+    for &(zone_id, sections) in ZONE_SECTIONS {
+        if sections.contains(&section) {
+            return Some(zone_id);
+        }
+    }
+    None
+}
+
 /// Parsed section data from kind 40 events.
 #[derive(Clone, Debug)]
 struct SectionMeta {
@@ -80,10 +98,10 @@ pub fn CategoryPage() -> impl IntoView {
                 .map(|t| t[1].clone())
                 .unwrap_or_default();
 
-            // Match: the section tag must contain the category slug
-            // e.g. section "family-home" matches slug "family-home"
-            let matches = section_tag.contains(&slug)
-                || section_tag.to_lowercase().contains(&slug.to_lowercase());
+            // Match: exact match, case-insensitive match, or zone parent match
+            let matches = section_tag == slug
+                || section_tag.eq_ignore_ascii_case(&slug)
+                || section_to_zone_id(&section_tag) == Some(slug.as_str());
 
             if !matches && !slug.is_empty() {
                 return;
