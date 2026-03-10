@@ -20,7 +20,7 @@ const tracks = [
   {
     id: "enterprise",
     title: "Enterprise Innovation",
-    description: "Bespoke embedded R&D experiences for C-suite and senior leadership teams. Strategic AI briefings, hands-on technology demonstrations, innovation workshop facilitation, and roadmap development. Designed for organisations ready to adopt Responsible Innovation practices aligned with the AREA framework.",
+    description: "Bespoke innovation programmes for organisations ready to explore and adopt AI and emerging technologies. Delivered in partnership with VisioningLab, combining strategic vision with hands-on applied research. Designed for C-suite, senior leadership teams, and innovation leads adopting Responsible Innovation practices aligned with the AREA framework.",
     accent: "amber",
     trlRange: "5-8",
     icon: Building2,
@@ -30,13 +30,17 @@ const tracks = [
     accentBg: "bg-amber-500/10",
     trlBarFrom: "from-amber-600",
     trlBarTo: "to-amber-400",
+    partnership: {
+      name: "VisioningLab",
+      logo: "/images/partners/visioninglab-dark.png",
+    },
     programmes: [
       {
         title: "Enterprise Innovation Residency",
         duration: "1-3 Days",
         format: "Residential, bespoke",
         description: "Tailored executive experience combining strategic AI briefings, hands-on technology demonstrations, innovation facilitation, team building, and strategic roadmap development. Every engagement is scoped to your industry and challenge.",
-        instructors: "Dr Jessica Symons, Pete Woodbridge, Dr John O'Hare, Stephen Moyler, plus domain specialists",
+        instructors: "Dr Jessica Symons (VisioningLab), Dr John O'Hare, Dr Andy Bennett, plus domain specialists",
         outcomes: ["Innovation strategy document", "Technology adoption roadmap", "Proof-of-concept prototypes"],
       },
       {
@@ -44,7 +48,7 @@ const tracks = [
         duration: "1 Day",
         format: "Open or private, up to 12",
         description: "Tailored 'hack' day for individuals and teams to explore the potential for using AI in their organisations. Combines AI strategy exploration, hands-on technology demonstrations, innovation facilitation, team building, and roadmap development. Engagement is scoped to your sector, industry and challenge. Come as an individual to learn with others from different organisations or bring your team for a confidential session.",
-        instructors: "Dr Jessica Symons, Dr John O'Hare, plus domain specialists",
+        instructors: "Dr Jessica Symons (VisioningLab), Dr John O'Hare, plus domain specialists",
         outcomes: ["Insight into potential for AI in your organisation", "AI technology adoption roadmap", "Proof-of-concept prototypes using Claude Code and similar AI agentic tools"],
       },
     ],
@@ -295,6 +299,16 @@ const Programmes = () => {
                     <Badge variant="outline" className={track.borderColor}>TRL {track.trlRange}</Badge>
                   </div>
                   <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">{track.title}</h2>
+                  {(track as any).partnership && (
+                    <div className="flex items-center gap-3 mb-4 p-3 bg-background/50 border border-amber-500/20 rounded-lg w-fit">
+                      <span className="text-xs text-muted-foreground uppercase tracking-wider font-medium">In partnership with</span>
+                      <img
+                        src={(track as any).partnership.logo}
+                        alt={(track as any).partnership.name}
+                        className="h-6 w-auto"
+                      />
+                    </div>
+                  )}
                   <p className="text-foreground/80 leading-relaxed mb-6">{track.description}</p>
                   <TRLBar range={track.trlRange} fromClass={track.trlBarFrom} toClass={track.trlBarTo} />
                 </div>

@@ -26,7 +26,8 @@ const programmeTracks = [
   {
     id: "enterprise",
     title: "Enterprise Innovation",
-    description: "Embedded R&D sprints for senior leadership teams. Strategic AI briefings, hands-on technology immersion, and innovation roadmaps.",
+    description: "In partnership with VisioningLab. Innovation programmes for organisations exploring AI and emerging technologies. Strategic briefings, hands-on immersion, and roadmaps.",
+    partnerLogo: "/images/partners/visioninglab-dark.png",
     accent: "amber",
     trlRange: "5-8",
     icon: Building2,
@@ -247,6 +248,12 @@ const Index = () => {
                     </span>
                   </div>
                   <h3 className="font-semibold text-base md:text-lg mb-2">{track.title}</h3>
+                  {(track as any).partnerLogo && (
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider">with</span>
+                      <img src={(track as any).partnerLogo} alt="VisioningLab" className="h-4 w-auto" />
+                    </div>
+                  )}
                   <p className="text-muted-foreground text-sm leading-relaxed mb-3">{track.description}</p>
                   <span className={`text-sm ${track.iconColor} group-hover:underline flex items-center gap-1`}>
                     Explore <ArrowRight className="w-3.5 h-3.5" />
