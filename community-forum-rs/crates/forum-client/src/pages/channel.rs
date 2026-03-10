@@ -15,6 +15,7 @@ use crate::components::message_input::MessageInput;
 use crate::components::pinned_messages::{PinnedMessage, PinnedMessages};
 use crate::components::typing_indicator::TypingIndicator;
 use crate::relay::{ConnectionState, Filter, RelayConnection};
+#[allow(unused_imports)]
 use crate::stores::channels::ChannelStore;
 use crate::stores::read_position::use_read_positions;
 use crate::utils::{arrow_left_svg, set_timeout_once};
@@ -60,9 +61,8 @@ pub fn ChannelPage() -> impl IntoView {
     let typing_pubkeys = RwSignal::new(Vec::<String>::new());
     let messages_container = NodeRef::<leptos::html::Div>::new();
 
-    // Track subscription IDs for cleanup
+    // Track subscription ID for cleanup
     let channel_sub_id: RwSignal<Option<String>> = RwSignal::new(None);
-    let messages_sub_id: RwSignal<Option<String>> = RwSignal::new(None);
 
     // Clone relay for each closure that needs it
     let relay_for_sub = relay.clone();
@@ -86,7 +86,10 @@ pub fn ChannelPage() -> impl IntoView {
         }
     }
 
-    // Subscribe to channel metadata (kind 40) and messages (kind 42) when connected
+    // Subscribe to channel metadata (kind 40) when connected.
+    // Messages come from ChannelStore's shared kind-42 subscription — the
+    // Cloudflare DO relay ignores duplicate REQs on the same WebSocket, so
+    // we cannot create a second kind-42 subscription.
     Effect::new(move |_| {
         let state = conn_state.get();
         let cid = channel_id();
@@ -99,7 +102,6 @@ pub fn ChannelPage() -> impl IntoView {
             return;
         }
 
-        loading.set(true);
         error_msg.set(None);
 
         // Fetch channel metadata (kind 40, by event id)
@@ -119,132 +121,81 @@ pub fn ChannelPage() -> impl IntoView {
 
         let id1 = relay_for_sub.subscribe(vec![channel_filter], on_channel_event, None);
         channel_sub_id.set(Some(id1));
+    });
 
-        // Capture channel store's channels signal for client-side matching.
-        // We read it INSIDE the callback (not here) so it picks up channels
-        // that arrive after the subscription starts (the kind-40 EOSE may not
-        // have fired yet when this Effect runs).
-        let channels_sig_for_cb = use_context::<ChannelStore>().map(|s| s.channels);
+    // Read messages from ChannelStore's shared kind-42 subscription.
+    // The store resolves each event's channel identity and groups them by ID.
+    // This Effect re-runs whenever channel_messages changes (new events arrive).
+    Effect::new(move |_| {
+        let cid = channel_id();
+        if cid.is_empty() {
+            return;
+        }
 
-        // Subscribe to messages (kind 42) -- broad filter, client-side matching.
-        // Legacy relay data may tag messages with slugs or section names instead
-        // of the kind-40 event id, so we cannot rely on e_tags filtering.
-        let msg_filter = Filter {
-            kinds: Some(vec![42]),
-            ..Default::default()
+        let store = match use_context::<ChannelStore>() {
+            Some(s) => s,
+            None => return,
         };
 
-        let cid_for_cb = cid.clone();
-        let messages_sig = messages;
-        let msg_debug_count = RwSignal::new(0u32);
-        web_sys::console::log_1(&format!("[ChannelPage] subscribing kind-42, cid={}", cid_for_cb).into());
-        let on_msg_event = Rc::new(move |event: NostrEvent| {
-            if event.kind != 42 {
+        let all_msgs = store.channel_messages.get();
+        let channel_events = match all_msgs.get(&cid) {
+            Some(events) => events.clone(),
+            None => {
+                // No messages yet — check if EOSE has been received
+                if store.eose_received.get_untracked() {
+                    loading.set(false);
+                }
                 return;
             }
+        };
 
-            msg_debug_count.update(|c| *c += 1);
-            let count = msg_debug_count.get_untracked();
-            if count <= 5 {
-                let e_tags: Vec<_> = event.tags.iter().filter(|t| t.len() >= 2 && t[0] == "e").collect();
-                web_sys::console::log_1(&format!(
-                    "[ChannelPage] kind-42 #{}: id={} e_tags={:?} cid={}",
-                    count, &event.id[..12], e_tags, cid_for_cb
-                ).into());
+        loading.set(false);
+        messages.update(|list| {
+            for event in &channel_events {
+                if list.iter().any(|m| m.id == event.id) {
+                    continue;
+                }
+                let reply_to = event
+                    .tags
+                    .iter()
+                    .find(|t| t.len() >= 4 && t[0] == "e" && t[3] == "reply")
+                    .or_else(|| {
+                        event
+                            .tags
+                            .iter()
+                            .filter(|t| t.len() >= 2 && t[0] == "e")
+                            .nth(1)
+                    })
+                    .map(|t| t[1].clone());
+                let reply_pk = event
+                    .tags
+                    .iter()
+                    .find(|t| t.len() >= 2 && t[0] == "p")
+                    .map(|t| t[1].clone());
+                list.push(MessageData {
+                    id: event.id.clone(),
+                    pubkey: event.pubkey.clone(),
+                    content: event.content.clone(),
+                    created_at: event.created_at,
+                    reply_to_id: reply_to,
+                    reply_to_pubkey: reply_pk,
+                    reply_to_content: None,
+                    reactions: RwSignal::new(Vec::new()),
+                });
             }
-
-            // Client-side channel matching: extract root e-tag then resolve
-            // against channel id, name, and section — mirrors channels.rs logic.
-            let tag_val = event
-                .tags
-                .iter()
-                .find(|t| t.len() >= 4 && t[0] == "e" && t[3] == "root")
-                .or_else(|| event.tags.iter().find(|t| t.len() >= 2 && t[0] == "e"))
-                .map(|t| t[1].clone());
-
-            let tag_val = match tag_val {
-                Some(v) => v,
-                None => return,
-            };
-
-            // Check exact channel ID match first
-            let matches_channel = if tag_val == cid_for_cb {
-                true
-            } else if let Some(sig) = &channels_sig_for_cb {
-                // Read current channel list (populated after kind-40 EOSE)
-                let channels = sig.get_untracked();
-                if let Some(found) = channels.iter().find(|c| c.id == cid_for_cb || c.name == cid_for_cb) {
-                    let val_lower = tag_val.to_lowercase();
-                    (!found.name.is_empty() && found.name.to_lowercase() == val_lower)
-                        || (!found.section.is_empty() && found.section.to_lowercase() == val_lower)
-                } else {
-                    false
-                }
-            } else {
-                false
-            };
-            if !matches_channel {
-                return;
-            }
-
-            let reply_to = event
-                .tags
-                .iter()
-                .find(|t| t.len() >= 4 && t[0] == "e" && t[3] == "reply")
-                .or_else(|| {
-                    // Skip the root tag -- pick a secondary e-tag for reply
-                    event
-                        .tags
-                        .iter()
-                        .filter(|t| t.len() >= 2 && t[0] == "e")
-                        .nth(1)
-                })
-                .map(|t| t[1].clone());
-            let reply_pk = event
-                .tags
-                .iter()
-                .find(|t| t.len() >= 2 && t[0] == "p")
-                .map(|t| t[1].clone());
-            let msg = MessageData {
-                id: event.id.clone(),
-                pubkey: event.pubkey.clone(),
-                content: event.content.clone(),
-                created_at: event.created_at,
-                reply_to_id: reply_to,
-                reply_to_pubkey: reply_pk,
-                reply_to_content: None,
-                reactions: RwSignal::new(Vec::new()),
-            };
-
-            messages_sig.update(|list| {
-                // Deduplicate by event id
-                if !list.iter().any(|m| m.id == msg.id) {
-                    list.push(msg);
-                    // Keep sorted by created_at ascending
-                    list.sort_by_key(|m| m.created_at);
-                }
-            });
+            list.sort_by_key(|m| m.created_at);
         });
-
-        let loading_sig = loading;
-        let on_eose = Rc::new(move || {
-            web_sys::console::log_1(&"[ChannelPage] EOSE received for kind-42".into());
-            loading_sig.set(false);
-        });
-
-        let id2 = relay_for_sub.subscribe(vec![msg_filter], on_msg_event, Some(on_eose));
-        messages_sub_id.set(Some(id2));
-
-        // Loading timeout (auto-drops closure after execution)
-        set_timeout_once(
-            move || {
-                if loading_sig.get_untracked() {
-                    loading_sig.set(false);
-                }
-            },
-            8000,
-        );
     });
+
+    // Loading timeout fallback
+    set_timeout_once(
+        move || {
+            if loading.get_untracked() {
+                loading.set(false);
+            }
+        },
+        8000,
+    );
 
     // Auto-scroll to bottom when new messages arrive + mark as read
     Effect::new(move |_| {
@@ -268,12 +219,9 @@ pub fn ChannelPage() -> impl IntoView {
         }
     });
 
-    // Cleanup subscriptions on unmount
+    // Cleanup kind-40 subscription on unmount
     on_cleanup(move || {
         if let Some(id) = channel_sub_id.get_untracked() {
-            relay_for_cleanup.unsubscribe(&id);
-        }
-        if let Some(id) = messages_sub_id.get_untracked() {
             relay_for_cleanup.unsubscribe(&id);
         }
     });

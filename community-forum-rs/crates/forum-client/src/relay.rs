@@ -221,15 +221,8 @@ impl RelayConnection {
 
         // --- onmessage ---
         let inner_rc_msg = (*self.inner).clone();
-        let msg_counter = std::cell::Cell::new(0u32);
         let on_message = Closure::wrap(Box::new(move |e: web_sys::MessageEvent| {
             if let Some(text) = e.data().as_string() {
-                let c = msg_counter.get();
-                msg_counter.set(c + 1);
-                if c < 3 || (c % 50 == 0) || text.contains("sub_3") || text.contains("sub_4") {
-                    let preview = if text.len() > 150 { &text[..150] } else { &text };
-                    web_sys::console::log_1(&format!("[Relay] onmessage #{}: {}", c, preview).into());
-                }
                 handle_relay_message(&inner_rc_msg, &text);
             }
         }) as Box<dyn FnMut(web_sys::MessageEvent)>);
@@ -370,14 +363,10 @@ impl RelayConnection {
             let mut inner = rc.borrow_mut();
             if let Some(ws) = &inner.ws {
                 if ws.ready_state() == WebSocket::OPEN {
-                    if msg.contains("REQ") {
-                        web_sys::console::log_1(&format!("[Relay] send_raw SENT: {}", &msg[..std::cmp::min(120, msg.len())]).into());
-                    }
                     let _ = ws.send_with_str(msg);
                     return;
                 }
             }
-            web_sys::console::log_1(&format!("[Relay] send_raw QUEUED (ws not open): {}", &msg[..std::cmp::min(80, msg.len())]).into());
             inner.pending_messages.push(msg.to_string());
         });
     }
@@ -464,20 +453,13 @@ fn handle_relay_message(inner_rc: &Rc<RefCell<RelayInner>>, text: &str) {
                 }
             };
 
-            let (callback, sub_count) = {
+            let callback = {
                 let inner = inner_rc.borrow();
-                let cb = inner
+                inner
                     .subscriptions
                     .get(&sub_id)
-                    .map(|s| Rc::clone(&s.on_event));
-                (cb, inner.subscriptions.len())
+                    .map(|s| Rc::clone(&s.on_event))
             };
-            if callback.is_none() {
-                web_sys::console::warn_1(&format!(
-                    "[Relay] EVENT for unknown sub_id={} (active subs: {})",
-                    sub_id, sub_count
-                ).into());
-            }
             if let Some(cb) = callback {
                 cb(event);
             }

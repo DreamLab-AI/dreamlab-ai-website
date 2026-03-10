@@ -51,6 +51,8 @@ pub struct ChannelStore {
     pub channels: RwSignal<Vec<ChannelMeta>>,
     pub message_counts: RwSignal<HashMap<String, u32>>,
     pub last_active: RwSignal<HashMap<String, u64>>,
+    /// Raw kind-42 events stored per resolved channel ID.
+    pub channel_messages: RwSignal<HashMap<String, Vec<NostrEvent>>>,
     pub loading: RwSignal<bool>,
     pub eose_received: RwSignal<bool>,
     sub_id: RwSignal<Option<String>>,
@@ -67,6 +69,7 @@ impl ChannelStore {
             channels: RwSignal::new(cached.channels),
             message_counts: RwSignal::new(cached.message_counts),
             last_active: RwSignal::new(cached.last_active),
+            channel_messages: RwSignal::new(HashMap::new()),
             // If we have cache, don't show loading — render immediately
             loading: RwSignal::new(!has_cache),
             eose_received: RwSignal::new(false),
@@ -204,6 +207,7 @@ impl ChannelStore {
 
         let msg_counts = self.message_counts;
         let last_active = self.last_active;
+        let channel_msgs = self.channel_messages;
         let store = self.clone();
 
         let on_msg = Rc::new(move |event: NostrEvent| {
@@ -232,9 +236,17 @@ impl ChannelStore {
                     *m.entry(cid.clone()).or_insert(0) += 1;
                 });
                 last_active.update(|m| {
-                    let ts = m.entry(cid).or_insert(0);
+                    let ts = m.entry(cid.clone()).or_insert(0);
                     if event.created_at > *ts {
                         *ts = event.created_at;
+                    }
+                });
+                // Store raw event for channel page consumption
+                channel_msgs.update(|m| {
+                    let events = m.entry(cid).or_insert_with(Vec::new);
+                    if !events.iter().any(|e| e.id == event.id) {
+                        events.push(event);
+                        events.sort_by_key(|e| e.created_at);
                     }
                 });
             }
