@@ -363,10 +363,14 @@ impl RelayConnection {
             let mut inner = rc.borrow_mut();
             if let Some(ws) = &inner.ws {
                 if ws.ready_state() == WebSocket::OPEN {
+                    if msg.contains("REQ") {
+                        web_sys::console::log_1(&format!("[Relay] send_raw SENT: {}", &msg[..std::cmp::min(120, msg.len())]).into());
+                    }
                     let _ = ws.send_with_str(msg);
                     return;
                 }
             }
+            web_sys::console::log_1(&format!("[Relay] send_raw QUEUED (ws not open): {}", &msg[..std::cmp::min(80, msg.len())]).into());
             inner.pending_messages.push(msg.to_string());
         });
     }
@@ -453,13 +457,20 @@ fn handle_relay_message(inner_rc: &Rc<RefCell<RelayInner>>, text: &str) {
                 }
             };
 
-            let callback = {
+            let (callback, sub_count) = {
                 let inner = inner_rc.borrow();
-                inner
+                let cb = inner
                     .subscriptions
                     .get(&sub_id)
-                    .map(|s| Rc::clone(&s.on_event))
+                    .map(|s| Rc::clone(&s.on_event));
+                (cb, inner.subscriptions.len())
             };
+            if callback.is_none() {
+                web_sys::console::warn_1(&format!(
+                    "[Relay] EVENT for unknown sub_id={} (active subs: {})",
+                    sub_id, sub_count
+                ).into());
+            }
             if let Some(cb) = callback {
                 cb(event);
             }
