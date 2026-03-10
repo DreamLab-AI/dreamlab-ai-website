@@ -33,7 +33,7 @@ const tracks = [
     programmes: [
       {
         title: "AI Commander Week",
-        duration: "5 Days",
+        duration: "1-3 Days",
         format: "Residential, up to 4",
         description: "Agentic architecture, multi-agent orchestration, LLM integration, production deployment, and human-AI collaboration interfaces.",
         instructors: "Pete Woodbridge (CTO), Dr John O'Hare (CHO), Jing Li, Kriss Dunk",
@@ -41,7 +41,7 @@ const tracks = [
       },
       {
         title: "VisionFlow Power User",
-        duration: "4 Days",
+        duration: "1-3 Days",
         format: "Residential, up to 4",
         description: "Self-sovereign knowledge management with autonomous AI agent teams. GraphRAG construction, 3D data visualisation, and on-premise deployment.",
         instructors: "Pete Woodbridge (CTO), Kriss Dunk, Jing Li",
@@ -49,7 +49,7 @@ const tracks = [
       },
       {
         title: "Neural Content Creation",
-        duration: "3 Days",
+        duration: "1-3 Days",
         format: "Residential, up to 4",
         description: "Gaussian splatting capture, NeRF implementation, photogrammetry pipelines, and real-time neural rendering for production assets.",
         instructors: "Will Sheridan, Zack Lewis, James Berry",
@@ -73,7 +73,7 @@ const tracks = [
     programmes: [
       {
         title: "Virtual Production Master",
-        duration: "5 Days",
+        duration: "1-3 Days",
         format: "Residential, up to 4",
         description: "LED volume operations, Unreal Engine for real-time production, motion control, camera tracking, real-time compositing, and colour science.",
         instructors: "Pete Woodbridge, Roger McKinley, Thadeous Letitia, Bradley Harris (Emmy-nom)",
@@ -81,7 +81,7 @@ const tracks = [
       },
       {
         title: "XR Innovation Intensive",
-        duration: "5 Days",
+        duration: "1-3 Days",
         format: "Residential, up to 4",
         description: "Apple Vision Pro and Meta Quest development, industrial XR training systems, mixed reality interface design, and healthcare/engineering applications.",
         instructors: "Dr Arpana Sherpa (PhD), Christian Frost, Dr David Tully, Lewis Hackett",
@@ -89,7 +89,7 @@ const tracks = [
       },
       {
         title: "Digital Human & MoCap",
-        duration: "3 Days",
+        duration: "1-3 Days",
         format: "Residential, up to 4",
         description: "Motion capture system operation, performance capture and retargeting, MetaHuman creation, and real-time character animation.",
         instructors: "Bradley Harris (Emmy-nom), Garth Williams, Christian Frost",
@@ -113,7 +113,7 @@ const tracks = [
     programmes: [
       {
         title: "Cyber Infrastructure",
-        duration: "3 Days",
+        duration: "1-3 Days",
         format: "Residential, up to 4",
         description: "Enterprise network architecture, zero-trust security implementation, cloud and hybrid infrastructure, industrial control system security.",
         instructors: "Ste Moyler (CCO), David Sherpa, Pete Woodbridge",
@@ -121,7 +121,7 @@ const tracks = [
       },
       {
         title: "Decentralised Agent Infrastructure",
-        duration: "4 Days",
+        duration: "1-3 Days",
         format: "Residential, up to 4",
         description: "Bitcoin and Lightning for agent payments, RGB protocol, Nostr-based decentralised identity, private contract negotiation, and agent-first architecture.",
         instructors: "Pete Woodbridge, Kriss Dunk, Jing Li",
@@ -145,7 +145,7 @@ const tracks = [
     programmes: [
       {
         title: "Creative Technology Fundamentals",
-        duration: "5 Days",
+        duration: "1-3 Days",
         format: "Residential, up to 4",
         description: "Development environment setup, Git workflows, AI-assisted development with Claude and Copilot, project structure, and deployment. Designed for career changers and newcomers.",
         instructors: "Pete Woodbridge, Dr Arpana Sherpa, Marcus Sherpa",
@@ -153,7 +153,7 @@ const tracks = [
       },
       {
         title: "Spatial Audio Production",
-        duration: "5 Days",
+        duration: "1-3 Days",
         format: "Residential, up to 4",
         description: "Dolby Atmos mixing and mastering, binaural audio for VR/AR, spatial audio engine implementation, field recording for immersive media.",
         instructors: "Bernard Steer (Dolby Atmos), Noelle Nurdin, Dr Sean Hill",
@@ -161,7 +161,7 @@ const tracks = [
       },
       {
         title: "Engineering Visualisation",
-        duration: "5 Days",
+        duration: "1-3 Days",
         format: "Residential, up to 4",
         description: "CAE/CFD data import and optimisation, real-time scientific visualisation in Unreal Engine, interactive simulation interfaces.",
         instructors: "Marco Ghilardi (PhD Nuclear), Dr Sean Hill, Daniel Maktabi",
@@ -185,7 +185,7 @@ const tracks = [
     programmes: [
       {
         title: "Enterprise Innovation Residency",
-        duration: "3-5 Days",
+        duration: "1-3 Days",
         format: "Residential, bespoke",
         description: "Tailored executive experience combining strategic AI briefings, hands-on technology demonstrations, innovation facilitation, team building, and strategic roadmap development. Every engagement is scoped to your industry and challenge.",
         instructors: "Pete Woodbridge, Dr John O'Hare, Stephen Moyler, plus domain specialists",

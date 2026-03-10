@@ -94,7 +94,7 @@ const CoCreate = () => {
                 <Building2 className="w-6 h-6 text-cyan-400" />
               </div>
               <h3 className="text-xl font-bold mb-1">Enterprise Residency</h3>
-              <p className="text-muted-foreground text-sm mb-4">1-4 weeks, bespoke</p>
+              <p className="text-muted-foreground text-sm mb-4">1-3 days, bespoke</p>
               <p className="text-foreground/80 text-sm leading-relaxed mb-5">
                 Your team embeds in the lab for intensive R&D sprints. We assign a dedicated multi-disciplinary team from our specialist collective, matched to your domain and challenge.
               </p>
@@ -128,7 +128,7 @@ const CoCreate = () => {
                 <Beaker className="w-6 h-6 text-purple-400" />
               </div>
               <h3 className="text-xl font-bold mb-1">SME Innovation Sprint</h3>
-              <p className="text-muted-foreground text-sm mb-4">3-5 days, structured</p>
+              <p className="text-muted-foreground text-sm mb-4">1-3 days, structured</p>
               <p className="text-foreground/80 text-sm leading-relaxed mb-5">
                 Structured programmes for smaller companies ready to apply deep tech. You arrive with a challenge and leave with a working solution and the skills to maintain it.
               </p>

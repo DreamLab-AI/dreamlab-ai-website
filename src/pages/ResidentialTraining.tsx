@@ -48,7 +48,7 @@ const ResidentialTraining = () => {
     {
       id: "ai-commander-week",
       title: "AI Commander Week",
-      duration: "5 Days",
+      duration: "1-3 Days",
       pricePerPerson: "",
       teamPrice: "",
       teamSaving: "",
@@ -68,7 +68,7 @@ const ResidentialTraining = () => {
     {
       id: "virtual-production-master",
       title: "Virtual Production Master",
-      duration: "5 Days",
+      duration: "1-3 Days",
       pricePerPerson: "",
       teamPrice: "",
       teamSaving: "",
@@ -88,7 +88,7 @@ const ResidentialTraining = () => {
     {
       id: "xr-innovation-intensive",
       title: "XR Innovation Intensive",
-      duration: "5 Days",
+      duration: "1-3 Days",
       pricePerPerson: "",
       teamPrice: "",
       teamSaving: "",
@@ -108,7 +108,7 @@ const ResidentialTraining = () => {
     {
       id: "digital-human-mocap",
       title: "Digital Human & MoCap",
-      duration: "3 Days",
+      duration: "1-3 Days",
       pricePerPerson: "",
       teamPrice: "",
       teamSaving: "",
@@ -127,7 +127,7 @@ const ResidentialTraining = () => {
     {
       id: "spatial-audio-production",
       title: "Spatial Audio Production",
-      duration: "5 Days",
+      duration: "1-3 Days",
       pricePerPerson: "",
       teamPrice: "",
       teamSaving: "",
@@ -146,7 +146,7 @@ const ResidentialTraining = () => {
     {
       id: "engineering-visualisation",
       title: "Engineering Visualisation",
-      duration: "5 Days",
+      duration: "1-3 Days",
       pricePerPerson: "",
       teamPrice: "",
       teamSaving: "",
@@ -165,7 +165,7 @@ const ResidentialTraining = () => {
     {
       id: "neural-content-creation",
       title: "Neural Content Creation",
-      duration: "3 Days",
+      duration: "1-3 Days",
       pricePerPerson: "",
       teamPrice: "",
       teamSaving: "",
@@ -184,7 +184,7 @@ const ResidentialTraining = () => {
     {
       id: "cyber-infrastructure",
       title: "Cyber Infrastructure",
-      duration: "3 Days",
+      duration: "1-3 Days",
       pricePerPerson: "",
       teamPrice: "",
       teamSaving: "",
@@ -203,7 +203,7 @@ const ResidentialTraining = () => {
     {
       id: "decentralised-agents",
       title: "Decentralised Agent Infrastructure",
-      duration: "4 Days",
+      duration: "1-3 Days",
       pricePerPerson: "",
       teamPrice: "",
       teamSaving: "",
@@ -223,7 +223,7 @@ const ResidentialTraining = () => {
     {
       id: "creative-technology-fundamentals",
       title: "Creative Technology Fundamentals",
-      duration: "5 Days",
+      duration: "1-3 Days",
       pricePerPerson: "",
       teamPrice: "",
       teamSaving: "",
@@ -242,7 +242,7 @@ const ResidentialTraining = () => {
     {
       id: "corporate-immersive",
       title: "Corporate Immersive Retreat",
-      duration: "3 Days",
+      duration: "1-3 Days",
       pricePerPerson: "",
       teamPrice: "",
       teamSaving: "",
@@ -262,7 +262,7 @@ const ResidentialTraining = () => {
     {
       id: "visionflow-power-user",
       title: "VisionFlow Power User",
-      duration: "4 Days",
+      duration: "1-3 Days",
       pricePerPerson: "",
       teamPrice: "",
       teamSaving: "",

@@ -277,7 +277,7 @@ const Index = () => {
                 <Building2 className="w-6 h-6 text-cyan-400" />
               </div>
               <h3 className="text-xl font-bold mb-2">Enterprise Training + Retainer</h3>
-              <p className="text-muted-foreground text-sm mb-4">1-4 days</p>
+              <p className="text-muted-foreground text-sm mb-4">1-3 days</p>
               <p className="text-foreground/80 text-sm leading-relaxed mb-4">
                 Your team embeds in the lab alongside our specialists for intensive R&D sprints. Bring a real challenge, leave with a validated prototype and deployment roadmap.
               </p>
@@ -289,7 +289,7 @@ const Index = () => {
                 <Beaker className="w-6 h-6 text-purple-400" />
               </div>
               <h3 className="text-xl font-bold mb-2">SME Innovation Sprint</h3>
-              <p className="text-muted-foreground text-sm mb-4">1-4 days</p>
+              <p className="text-muted-foreground text-sm mb-4">1-3 days</p>
               <p className="text-foreground/80 text-sm leading-relaxed mb-4">
                 Structured programmes for smaller companies ready to apply deep tech. Hands-on building with expert guidance, designed to deliver immediate capability.
               </p>
