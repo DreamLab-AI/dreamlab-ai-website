@@ -136,9 +136,21 @@ pub fn ChannelPage() -> impl IntoView {
 
         let cid_for_cb = cid.clone();
         let messages_sig = messages;
+        let msg_debug_count = RwSignal::new(0u32);
+        web_sys::console::log_1(&format!("[ChannelPage] subscribing kind-42, cid={}", cid_for_cb).into());
         let on_msg_event = Rc::new(move |event: NostrEvent| {
             if event.kind != 42 {
                 return;
+            }
+
+            msg_debug_count.update(|c| *c += 1);
+            let count = msg_debug_count.get_untracked();
+            if count <= 5 {
+                let e_tags: Vec<_> = event.tags.iter().filter(|t| t.len() >= 2 && t[0] == "e").collect();
+                web_sys::console::log_1(&format!(
+                    "[ChannelPage] kind-42 #{}: id={} e_tags={:?} cid={}",
+                    count, &event.id[..12], e_tags, cid_for_cb
+                ).into());
             }
 
             // Client-side channel matching: extract root e-tag then resolve
@@ -216,6 +228,7 @@ pub fn ChannelPage() -> impl IntoView {
 
         let loading_sig = loading;
         let on_eose = Rc::new(move || {
+            web_sys::console::log_1(&"[ChannelPage] EOSE received for kind-42".into());
             loading_sig.set(false);
         });
 
