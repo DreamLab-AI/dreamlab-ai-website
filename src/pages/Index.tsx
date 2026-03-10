@@ -151,7 +151,7 @@ const Index = () => {
           </h1>
 
           <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-foreground/85 max-w-3xl mb-8 animate-slide-up font-light tracking-wide leading-relaxed" style={{ animationDelay: '0.1s' }}>
-             AI, XR, & Cyber Secure Distributed Systems in the Heart of the Lake District
+             AI, XR, & Cyber Secure Distributed Systems<br />in the Heart of the Lake District
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 animate-scale-in mb-8 w-full sm:w-auto" style={{ animationDelay: '0.2s' }}>
