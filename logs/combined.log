@@ -54,3 +54,11 @@
 {"autoConsolidate":true,"consolidationInterval":100,"enabled":true,"level":"info","message":"SONA Lifecycle Manager initialized","ruvLLMAvailable":false,"service":"agentic-qe-fleet","timestamp":"2026-03-08T13:14:55.474Z"}
 {"level":"info","message":"SONA lifecycle integration enabled","service":"agentic-qe-fleet","timestamp":"2026-03-08T13:14:55.474Z"}
 {"level":"info","message":"AgentRegistry memory store initialized successfully","service":"agentic-qe-fleet","timestamp":"2026-03-08T13:14:55.483Z"}
+{"error":"Cannot find module '@ruvector/ruvllm'\nRequire stack:\n- /mnt/mldata/githubs/dreamlab-ai-website/package.json","level":"warn","message":"RuvLLM not available, using fallback mode","service":"agentic-qe-fleet","timestamp":"2026-03-10T07:46:11.750Z"}
+{"error":"Cannot find module '@ruvector/ruvllm'\nRequire stack:\n- /mnt/mldata/githubs/dreamlab-ai-website/package.json","level":"warn","message":"RuvLLM not available, using fallback mode","service":"agentic-qe-fleet","timestamp":"2026-03-10T07:46:11.752Z"}
+{"autoConsolidate":true,"consolidationInterval":100,"enabled":true,"level":"info","message":"SONA Lifecycle Manager initialized","ruvLLMAvailable":false,"service":"agentic-qe-fleet","timestamp":"2026-03-10T07:46:11.752Z"}
+{"level":"info","message":"SONA lifecycle integration enabled","service":"agentic-qe-fleet","timestamp":"2026-03-10T07:46:11.752Z"}
+{"level":"info","message":"AgentRegistry memory store initialized successfully","service":"agentic-qe-fleet","timestamp":"2026-03-10T07:46:11.763Z"}
+{"autoConsolidate":true,"consolidationInterval":100,"enabled":true,"level":"info","message":"SONA Lifecycle Manager initialized","ruvLLMAvailable":false,"service":"agentic-qe-fleet","timestamp":"2026-03-10T07:46:11.754Z"}
+{"level":"info","message":"SONA lifecycle integration enabled","service":"agentic-qe-fleet","timestamp":"2026-03-10T07:46:11.755Z"}
+{"level":"info","message":"AgentRegistry memory store initialized successfully","service":"agentic-qe-fleet","timestamp":"2026-03-10T07:46:11.764Z"}
