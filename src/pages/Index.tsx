@@ -11,6 +11,7 @@ import {
   Palette,
   Globe,
   Rocket,
+  Building2,
   Users,
   Beaker,
   Handshake,
