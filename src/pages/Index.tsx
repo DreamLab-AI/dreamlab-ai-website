@@ -24,6 +24,19 @@ const EmailSignupForm = lazy(() => import("@/components/EmailSignupForm").then(m
 // Programme track definitions
 const programmeTracks = [
   {
+    id: "enterprise",
+    title: "Enterprise Innovation",
+    description: "Embedded R&D sprints for senior leadership teams. Strategic AI briefings, hands-on technology immersion, and innovation roadmaps.",
+    accent: "amber",
+    trlRange: "5-8",
+    icon: Building2,
+    borderClass: "border-amber-500/30 hover:border-amber-500/50",
+    iconBg: "bg-amber-500/10",
+    iconColor: "text-amber-400",
+    badgeBg: "bg-amber-500/20",
+    badgeText: "text-amber-300",
+  },
+  {
     id: "ai-autonomous",
     title: "AI & Autonomous Systems",
     description: "From agentic orchestration to production-grade multi-model architectures. Build systems that reason, plan, and act.",
@@ -74,19 +87,6 @@ const programmeTracks = [
     iconColor: "text-pink-400",
     badgeBg: "bg-pink-500/20",
     badgeText: "text-pink-300",
-  },
-  {
-    id: "enterprise",
-    title: "Enterprise Innovation",
-    description: "Embedded R&D sprints for senior leadership teams. Strategic AI briefings, hands-on technology immersion, and innovation roadmaps.",
-    accent: "amber",
-    trlRange: "5-8",
-    icon: Building2,
-    borderClass: "border-amber-500/30 hover:border-amber-500/50",
-    iconBg: "bg-amber-500/10",
-    iconColor: "text-amber-400",
-    badgeBg: "bg-amber-500/20",
-    badgeText: "text-amber-300",
   },
 ];
 
