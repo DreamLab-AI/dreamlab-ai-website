@@ -221,8 +221,15 @@ impl RelayConnection {
 
         // --- onmessage ---
         let inner_rc_msg = (*self.inner).clone();
+        let msg_counter = std::cell::Cell::new(0u32);
         let on_message = Closure::wrap(Box::new(move |e: web_sys::MessageEvent| {
             if let Some(text) = e.data().as_string() {
+                let c = msg_counter.get();
+                msg_counter.set(c + 1);
+                if c < 3 || (c % 50 == 0) || text.contains("sub_3") || text.contains("sub_4") {
+                    let preview = if text.len() > 150 { &text[..150] } else { &text };
+                    web_sys::console::log_1(&format!("[Relay] onmessage #{}: {}", c, preview).into());
+                }
                 handle_relay_message(&inner_rc_msg, &text);
             }
         }) as Box<dyn FnMut(web_sys::MessageEvent)>);
