@@ -1,0 +1,36 @@
+name: Clear D1 Data
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type CLEAR to confirm'
+        required: true
+        type: string
+
+jobs:
+  clear:
+    if: github.repository == 'DreamLab-AI/dreamlab-ai-website' && inputs.confirm == 'CLEAR'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Clear relay D1
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: d1 execute dreamlab-relay --command "DELETE FROM events; DELETE FROM whitelist; DELETE FROM challenges;"
+
+      - name: Clear auth D1
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: d1 execute dreamlab-auth --command "DELETE FROM webauthn_credentials; DELETE FROM challenges;"
+
+      - name: Verify
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: d1 execute dreamlab-relay --command "SELECT 'events' as tbl, COUNT(*) as cnt FROM events UNION ALL SELECT 'whitelist', COUNT(*) FROM whitelist;"
