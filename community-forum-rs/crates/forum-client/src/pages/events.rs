@@ -571,6 +571,11 @@ fn BirthdayList() -> impl IntoView {
 }
 
 /// Parse a kind 31923 event into a CalendarEvent.
+///
+/// Supports two layouts:
+/// 1. Tags-based: title/location in event tags, description in plain-text content.
+/// 2. JSON content: NIP-52 allows `content` to be a JSON object with `name`,
+///    `description`, `location` fields (common in some clients).
 fn parse_calendar_event(event: &NostrEvent) -> CalendarEvent {
     let tag = |name: &str| -> Option<String> {
         event
@@ -588,14 +593,43 @@ fn parse_calendar_event(event: &NostrEvent) -> CalendarEvent {
         .and_then(|s| s.parse::<u64>().ok())
         .unwrap_or(start + 3600);
 
+    // Try parsing content as JSON for name/description/location fallback
+    let content_json: Option<serde_json::Value> =
+        serde_json::from_str(&event.content).ok();
+
+    let json_str = |field: &str| -> Option<String> {
+        content_json
+            .as_ref()
+            .and_then(|v| v.get(field))
+            .and_then(|v| v.as_str())
+            .map(|s| s.to_string())
+    };
+
+    let title = tag("title")
+        .or_else(|| json_str("name"))
+        .unwrap_or_else(|| "Untitled".into());
+
+    let description = json_str("description").unwrap_or_else(|| {
+        // If content is not JSON, use it as plain text description
+        if content_json.is_none() {
+            event.content.clone()
+        } else {
+            String::new()
+        }
+    });
+
+    let location = tag("location")
+        .or_else(|| json_str("location"))
+        .unwrap_or_default();
+
     CalendarEvent {
         id: event.id.clone(),
         d_tag: tag("d").unwrap_or_default(),
-        title: tag("title").unwrap_or_else(|| "Untitled".into()),
-        description: event.content.clone(),
+        title,
+        description,
         start_time: start,
         end_time: end,
-        location: tag("location").unwrap_or_default(),
+        location,
         host_pubkey: event.pubkey.clone(),
         max_attendees: tag("max_attendees").and_then(|s| s.parse().ok()),
         featured: false,
