@@ -15,7 +15,7 @@ use serde::{Deserialize, Serialize};
 use zeroize::Zeroize;
 
 use self::passkey::{PasskeyAuthResult, PasskeyRegistrationResult};
-use self::session::StoredSession;
+use self::session::{StoredSession, save_privkey_session, clear_privkey_session};
 use crate::app::base_href;
 use nostr_core::{NostrEvent, UnsignedEvent};
 
@@ -302,6 +302,7 @@ impl AuthStore {
         let pubkey = keypair.public.to_hex();
         let privkey_hex = hex::encode(keypair.secret.as_bytes());
         self.privkey.set_value(Some(keypair.secret.as_bytes().to_vec()));
+        save_privkey_session(&privkey_hex);
 
         let nickname = Some(display_name.to_string());
 
@@ -353,6 +354,7 @@ impl AuthStore {
             .map_err(|e| format!("Invalid secp256k1 key: {e}"))?;
         let pubkey = sk.public_key().to_hex();
         self.privkey.set_value(Some(key_bytes.to_vec()));
+        save_privkey_session(privkey_hex);
 
         let (nickname, avatar, account_status, _nsec_backed_up) = self.read_existing_metadata();
 
@@ -403,6 +405,7 @@ impl AuthStore {
 
         self.state.set(AuthState::default());
         LocalStorage::delete(STORAGE_KEY);
+        clear_privkey_session();
 
         if let Some(window) = web_sys::window() {
             if let Ok(location) = window.location().pathname() {

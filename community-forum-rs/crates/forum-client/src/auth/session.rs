@@ -12,6 +12,9 @@ use zeroize::Zeroize;
 
 use super::{AccountStatus, AuthPhase, AuthState, AuthStore, STORAGE_KEY};
 
+/// sessionStorage key for local-key privkey (survives same-tab nav, cleared on tab close).
+const SESSION_PRIVKEY_KEY: &str = "nostr_bbs_sk";
+
 // -- Persisted session data ---------------------------------------------------
 
 /// Schema for the data stored in localStorage. Never contains private keys.
@@ -72,6 +75,31 @@ impl PrivkeyMem {
 
     pub fn to_hex(&self) -> String {
         hex::encode(self.bytes)
+    }
+}
+
+// -- sessionStorage privkey helpers -------------------------------------------
+
+/// Store privkey hex in sessionStorage (survives SPA navigation + refresh, cleared on tab close).
+pub(super) fn save_privkey_session(hex: &str) {
+    if let Some(storage) = web_sys::window().and_then(|w| w.session_storage().ok()).flatten() {
+        let _ = storage.set_item(SESSION_PRIVKEY_KEY, hex);
+    }
+}
+
+/// Read privkey hex from sessionStorage.
+pub(super) fn read_privkey_session() -> Option<String> {
+    web_sys::window()
+        .and_then(|w| w.session_storage().ok())
+        .flatten()
+        .and_then(|s| s.get_item(SESSION_PRIVKEY_KEY).ok())
+        .flatten()
+}
+
+/// Clear privkey from sessionStorage.
+pub(super) fn clear_privkey_session() {
+    if let Some(storage) = web_sys::window().and_then(|w| w.session_storage().ok()).flatten() {
+        let _ = storage.remove_item(SESSION_PRIVKEY_KEY);
     }
 }
 
@@ -189,10 +217,34 @@ impl AuthStore {
 
         if stored.is_local_key {
             if let Some(ref pubkey) = stored.public_key {
-                // Local-key users: privkey is gone after reload (never persisted).
-                // Restore as Unauthenticated so signing operations are blocked
-                // until the user re-enters their nsec. Keep pubkey populated for
-                // display and is_local_key=true so the UI shows a re-login prompt.
+                // Try to restore privkey from sessionStorage (survives refresh).
+                if let Some(hex) = read_privkey_session() {
+                    if let Ok(bytes) = hex::decode(&hex) {
+                        if bytes.len() == 32 {
+                            self.privkey.set_value(Some(bytes));
+                            self.state.set(AuthState {
+                                state: AuthPhase::Authenticated,
+                                pubkey: Some(pubkey.clone()),
+                                is_authenticated: true,
+                                public_key: Some(pubkey.clone()),
+                                nickname: stored.nickname,
+                                avatar: stored.avatar,
+                                is_pending: false,
+                                error: None,
+                                account_status: stored.account_status,
+                                nsec_backed_up: stored.nsec_backed_up,
+                                is_ready: true,
+                                is_nip07: false,
+                                is_passkey: false,
+                                is_local_key: true,
+                                extension_name: None,
+                            });
+                            return;
+                        }
+                    }
+                }
+
+                // sessionStorage empty — privkey lost, need re-login.
                 self.state.set(AuthState {
                     state: AuthPhase::Unauthenticated,
                     pubkey: Some(pubkey.clone()),
