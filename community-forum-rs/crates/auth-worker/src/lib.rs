@@ -74,12 +74,17 @@ async fn fetch(req: Request, env: Env, _ctx: Context) -> Result<Response> {
         Ok(resp) => Ok(with_cors(resp, &env)),
         Err(e) => {
             console_error!("Worker error: {e}");
-            // Check if it's a JSON parse error
             let msg = e.to_string();
-            if msg.contains("JSON") || msg.contains("json") {
+            // Catch JSON parse errors and serde deserialization errors
+            if msg.contains("JSON")
+                || msg.contains("json")
+                || msg.contains("Serialization")
+                || msg.contains("missing field")
+                || msg.contains("parsing")
+            {
                 json_response(
                     &env,
-                    &serde_json::json!({ "error": "Invalid JSON body" }),
+                    &serde_json::json!({ "error": "Invalid request body" }),
                     400,
                 )
             } else {

@@ -1,16 +1,20 @@
 name: Deploy Cloudflare Workers
 
-# Deploys TypeScript Workers from workers/ and Rust Workers from community-forum-rs/crates/.
+# Deploys Rust Workers from community-forum-rs/crates/ and remaining TS Workers.
+# Auth, Pod, and Link-Preview are Rust; Search and Nostr-Relay remain TypeScript.
 # Runs on DreamLab-AI/dreamlab-ai-website fork only.
 
 on:
   push:
     branches: [main]
     paths:
-      - 'workers/**'
+      - 'workers/search-api/**'
+      - 'workers/nostr-relay/**'
       - 'community-forum-rs/crates/preview-worker/**'
       - 'community-forum-rs/crates/pod-worker/**'
       - 'community-forum-rs/crates/auth-worker/**'
+      - 'community-forum-rs/crates/nostr-core/**'
+      - 'community-forum-rs/Cargo.lock'
       - '.github/workflows/workers-deploy.yml'
   workflow_dispatch:
 
@@ -22,7 +26,7 @@ env:
   CF_SUBDOMAIN: 'solitary-paper-764d'
 
 jobs:
-  # ─── TypeScript Workers ────────────────────────────────────────────
+  # ─── TypeScript Workers (search-api + nostr-relay only) ─────────────
   deploy-ts:
     name: Deploy TS Workers
     if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
@@ -37,28 +41,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-
-      - name: Deploy auth-api
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          wranglerVersion: '3'
-          command: deploy -c workers/auth-api/wrangler.toml
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-
-      - name: Deploy pod-api
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          wranglerVersion: '3'
-          command: deploy -c workers/pod-api/wrangler.toml
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
       - name: Deploy search-api
         uses: cloudflare/wrangler-action@v3
@@ -82,18 +64,7 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
-      - name: Deploy link-preview
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          wranglerVersion: '3'
-          command: deploy -c workers/link-preview-api/wrangler.toml
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-
-  # ─── Rust Workers (worker-build + wasm) ────────────────────────────
+  # ─── Rust Workers (auth, pod, link-preview) ────────────────────────
   deploy-rust:
     name: Deploy Rust Workers
     if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
@@ -104,13 +75,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - crate: preview-worker
-            worker_name: dreamlab-link-preview
+          - crate: auth-worker
+            worker_name: dreamlab-auth-api
           - crate: pod-worker
             worker_name: dreamlab-pod-api
-          # auth-worker: uncomment when Tranche 3 is ready
-          # - crate: auth-worker
-          #   worker_name: dreamlab-auth-api
+          - crate: preview-worker
+            worker_name: dreamlab-link-preview
 
     steps:
       - name: Checkout code
@@ -196,21 +166,18 @@ jobs:
           cat >> $GITHUB_STEP_SUMMARY <<EOF
           ## Cloudflare Workers Deployment
 
+          ### Rust Workers
+          | Worker | Crate | URL |
+          |--------|-------|-----|
+          | dreamlab-auth-api | auth-worker | \`dreamlab-auth-api.${{ env.CF_SUBDOMAIN }}.workers.dev\` |
+          | dreamlab-pod-api | pod-worker | \`dreamlab-pod-api.${{ env.CF_SUBDOMAIN }}.workers.dev\` |
+          | dreamlab-link-preview | preview-worker | \`dreamlab-link-preview.${{ env.CF_SUBDOMAIN }}.workers.dev\` |
+
           ### TypeScript Workers
           | Worker | URL |
           |--------|-----|
-          | auth-api | \`dreamlab-auth-api.${{ env.CF_SUBDOMAIN }}.workers.dev\` |
-          | pod-api | \`dreamlab-pod-api.${{ env.CF_SUBDOMAIN }}.workers.dev\` |
           | search-api | \`dreamlab-search-api.${{ env.CF_SUBDOMAIN }}.workers.dev\` |
           | nostr-relay | \`dreamlab-nostr-relay.${{ env.CF_SUBDOMAIN }}.workers.dev\` |
-          | link-preview | \`dreamlab-link-preview.${{ env.CF_SUBDOMAIN }}.workers.dev\` |
-
-          ### Rust Workers (Tranche 2)
-          | Worker | Crate | Status |
-          |--------|-------|--------|
-          | dreamlab-link-preview | preview-worker | Deployed |
-          | dreamlab-pod-api | pod-worker | Deployed |
-          | dreamlab-auth-api | auth-worker | Pending (Tranche 3) |
 
           - **Branch**: \`${{ github.ref_name }}\`
           - **Commit**: \`${{ github.sha }}\`
