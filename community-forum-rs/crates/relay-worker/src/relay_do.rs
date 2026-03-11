@@ -801,7 +801,7 @@ impl NostrRelayDO {
 }
 
 fn event_matches_filters(event: &NostrEvent, filters: &[NostrFilter]) -> bool {
-    for filter in filters {
+    'outer: for filter in filters {
         if let Some(ref ids) = filter.ids {
             if !ids.iter().any(|id| id == &event.id) {
                 continue;
@@ -827,6 +827,31 @@ fn event_matches_filters(event: &NostrEvent, filters: &[NostrFilter]) -> bool {
                 continue;
             }
         }
+
+        // Tag filters (#e, #p, #t, etc.) — must match at least one value per tag
+        for (key, values) in &filter.extra {
+            if !key.starts_with('#') {
+                continue;
+            }
+            let tag_name = &key[1..];
+            let required: Vec<&str> = match values.as_array() {
+                Some(arr) => arr.iter().filter_map(|v| v.as_str()).collect(),
+                None => continue,
+            };
+            if required.is_empty() {
+                continue;
+            }
+
+            // Check that the event has at least one tag matching this filter
+            let has_match = event.tags.iter().any(|tag| {
+                tag.first().map(|t| t.as_str()) == Some(tag_name)
+                    && tag.get(1).map_or(false, |v| required.contains(&v.as_str()))
+            });
+            if !has_match {
+                continue 'outer;
+            }
+        }
+
         return true;
     }
     false

@@ -123,24 +123,29 @@ impl AdminStore {
         ADMIN_PUBKEYS.contains(&pubkey)
     }
 
-    /// Resolve the auth API base URL from the runtime environment or compile-time default.
+    /// Resolve the API base URL for whitelist/admin operations.
+    ///
+    /// Whitelist endpoints (`/api/whitelist/*`, `/api/check-whitelist`) live on the
+    /// **relay worker**, not the auth worker. Prefer `VITE_RELAY_URL` (converted to
+    /// HTTPS) since that's where these routes are defined. Fall back to
+    /// `VITE_AUTH_API_URL` only if no relay URL is available.
     fn api_base() -> String {
         if let Some(window) = web_sys::window() {
             if let Ok(val) = js_sys::Reflect::get(&window, &"__ENV__".into()) {
                 if !val.is_undefined() && !val.is_null() {
-                    // First try VITE_AUTH_API_URL directly
-                    if let Ok(url) = js_sys::Reflect::get(&val, &"VITE_AUTH_API_URL".into()) {
-                        if let Some(s) = url.as_string() {
-                            if !s.is_empty() {
-                                return s;
-                            }
-                        }
-                    }
-                    // Fallback: derive from relay URL (relay worker also hosts /api/ routes)
+                    // Prefer relay URL — whitelist routes live on the relay worker
                     if let Ok(url) = js_sys::Reflect::get(&val, &"VITE_RELAY_URL".into()) {
                         if let Some(s) = url.as_string() {
                             if !s.is_empty() {
                                 return relay_url_to_http(&s);
+                            }
+                        }
+                    }
+                    // Fallback to auth API URL
+                    if let Ok(url) = js_sys::Reflect::get(&val, &"VITE_AUTH_API_URL".into()) {
+                        if let Some(s) = url.as_string() {
+                            if !s.is_empty() {
+                                return s;
                             }
                         }
                     }

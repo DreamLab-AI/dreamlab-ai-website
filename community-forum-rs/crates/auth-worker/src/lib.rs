@@ -152,13 +152,11 @@ async fn route(req: Request, env: &Env, path: &str, method: &Method) -> Result<R
             .unwrap_or_else(|_| "https://dreamlab-ai.com".to_string());
         let request_url = format!("{expected_origin}{path}");
 
-        // Read body for payload hash verification
-        let body_bytes: Option<Vec<u8>> = if *method == Method::Post || *method == Method::Put {
-            // For GET requests on /api/profile, there's no body
-            None
-        } else {
-            None
-        };
+        // Body is not available here because the request was already consumed
+        // by the route matching above. For GET endpoints (like /api/profile),
+        // there is no body to verify. POST/PUT endpoints that need payload hash
+        // verification read the body themselves (e.g. login_verify).
+        let body_bytes: Option<Vec<u8>> = None;
 
         let result = auth::verify_nip98(
             &auth_header,

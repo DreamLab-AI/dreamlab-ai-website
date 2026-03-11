@@ -292,13 +292,16 @@ pub async fn register_verify(mut req: Request, env: &Env) -> Result<Response> {
         _ => return json_err("Invalid pubkey", 400),
     };
 
-    // Verify a non-expired challenge exists
+    // Verify a non-expired challenge exists. Registration uses a simplified flow
+    // where the challenge is stored with pubkey=challenge_b64 (from register_options).
+    // We fetch the most recent challenge and consume it atomically after use to
+    // prevent replay attacks.
     let now_ms = js_now_ms();
     let five_min_ago = now_ms.saturating_sub(5 * 60 * 1000);
 
     let db = env.d1("DB")?;
     let challenge_row = db
-        .prepare("SELECT challenge FROM challenges WHERE created_at > ?1 LIMIT 1")
+        .prepare("SELECT challenge FROM challenges WHERE created_at > ?1 ORDER BY created_at DESC LIMIT 1")
         .bind(&[js_u64(five_min_ago)])?
         .first::<ChallengeRow>(None)
         .await?;
