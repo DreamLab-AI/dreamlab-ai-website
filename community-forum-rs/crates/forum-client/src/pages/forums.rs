@@ -204,11 +204,13 @@ pub fn ForumsPage() -> impl IntoView {
                                 {if has_cats {
                                     let cards: Vec<_> = cats.iter().map(|(section_id, topic_count)| {
                                         let display_name = humanize_section_id(section_id);
+                                        let sid = section_id.clone();
                                         let count = *topic_count;
                                         view! {
                                             <CategoryCard
                                                 name=display_name
                                                 description=section_description(section_id).to_string()
+                                                section_id=sid
                                                 icon=icon
                                                 section_count=count
                                                 accent_color=accent

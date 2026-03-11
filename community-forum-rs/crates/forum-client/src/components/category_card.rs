@@ -16,6 +16,8 @@ pub fn CategoryCard(
     name: String,
     /// Short description text.
     description: String,
+    /// Raw section ID used for URL routing (e.g. "dreamlab-lobby").
+    section_id: String,
     /// Icon identifier: "globe", "users", "code", or "shield".
     icon: &'static str,
     /// Number of sections in this category.
@@ -28,7 +30,7 @@ pub fn CategoryCard(
     #[prop(optional, into)]
     picture: String,
 ) -> impl IntoView {
-    let href = base_href(&format!("/forums/{}", slug(&name)));
+    let href = base_href(&format!("/forums/{}", section_id));
 
     let gradient_class = match accent_color {
         "amber" => "from-amber-600/20 via-orange-500/10 to-transparent",
@@ -256,14 +258,3 @@ fn WatermarkIcon(icon: &'static str) -> impl IntoView {
     }
 }
 
-/// Convert a category name to a URL slug.
-fn slug(s: &str) -> String {
-    s.to_lowercase()
-        .chars()
-        .map(|c| if c.is_alphanumeric() { c } else { '-' })
-        .collect::<String>()
-        .split('-')
-        .filter(|seg| !seg.is_empty())
-        .collect::<Vec<_>>()
-        .join("-")
-}

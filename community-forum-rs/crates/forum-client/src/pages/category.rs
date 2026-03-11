@@ -208,7 +208,25 @@ pub fn CategoryPage() -> impl IntoView {
             "minimoonoir" => "Minimoonoir".to_string(),
             "dreamlab" => "DreamLab".to_string(),
             "ai-agents" => "AI Agents".to_string(),
-            other => capitalize(other),
+            other => {
+                // For section IDs like "dreamlab-lobby", humanize to "Lobby"
+                if other.contains('-') {
+                    let suffix = other.split_once('-').map(|(_, s)| s).unwrap_or(other);
+                    suffix
+                        .split('-')
+                        .map(|w| {
+                            let mut c = w.chars();
+                            match c.next() {
+                                None => String::new(),
+                                Some(f) => f.to_uppercase().to_string() + c.as_str(),
+                            }
+                        })
+                        .collect::<Vec<_>>()
+                        .join(" ")
+                } else {
+                    capitalize(other)
+                }
+            }
         }
     };
 
