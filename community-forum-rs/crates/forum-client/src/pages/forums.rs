@@ -222,7 +222,27 @@ pub fn ForumsPage() -> impl IntoView {
                                         </div>
                                     }.into_any()
                                 } else {
-                                    {
+                                    if al > 0 {
+                                        // Restricted zone with no visible channels — show access message
+                                        let (title, desc) = match al {
+                                            3 => ("Private zone", "This zone is invite-only. Ask a member to add you."),
+                                            2 => ("Members only", "This zone is for group members. Ask an admin for access."),
+                                            _ => ("Login required", "Sign in to see content in this zone."),
+                                        };
+                                        let lock_icon: Box<dyn FnOnce() -> leptos::prelude::AnyView + Send> = Box::new(|| view! {
+                                            <svg class="w-7 h-7 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                                <rect x="3" y="11" width="18" height="11" rx="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                <path d="M7 11V7a5 5 0 0110 0v4" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                        }.into_any());
+                                        view! {
+                                            <EmptyState
+                                                icon=lock_icon
+                                                title=title.to_string()
+                                                description=desc.to_string()
+                                            />
+                                        }.into_any()
+                                    } else {
                                         let empty_icon: Box<dyn FnOnce() -> leptos::prelude::AnyView + Send> = Box::new(|| view! {
                                             <svg class="w-7 h-7 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                                                 <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" stroke-linecap="round" stroke-linejoin="round"/>

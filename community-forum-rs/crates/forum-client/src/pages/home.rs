@@ -81,8 +81,8 @@ pub fn HomePage() -> impl IntoView {
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-12 text-left">
                     <FeatureCard
                         icon="\u{1F511}"
-                        title="Passkey Auth"
-                        description="Sign in with biometrics. Your key is derived from your passkey -- no seed phrases."
+                        title="Nostr Identity"
+                        description="Instant keypair generation. Sign in with your private key, extension, or passkey."
                     />
                     <FeatureCard
                         icon="\u{1F6E1}"

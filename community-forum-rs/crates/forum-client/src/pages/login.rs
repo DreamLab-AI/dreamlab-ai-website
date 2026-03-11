@@ -24,7 +24,7 @@ pub fn LoginPage() -> impl IntoView {
     // Redirect if already authenticated
     Effect::new(move |_| {
         if is_authed.get() {
-            navigate.with_value(|nav| nav(&base_href("/chat"), NavigateOptions::default()));
+            navigate.with_value(|nav| nav("/chat", NavigateOptions::default()));
         }
     });
 
@@ -39,7 +39,7 @@ pub fn LoginPage() -> impl IntoView {
         auth.clear_error();
         match auth.login_with_local_key(&trimmed) {
             Ok(()) => {
-                navigate.with_value(|nav| nav(&base_href("/chat"), NavigateOptions::default()));
+                navigate.with_value(|nav| nav("/chat", NavigateOptions::default()));
             }
             Err(e) => auth.set_error(&e),
         }
@@ -118,7 +118,7 @@ pub fn LoginPage() -> impl IntoView {
                                         let result = auth.login_with_passkey(stored_pubkey.as_deref()).await;
                                         is_pending.set(false);
                                         if result.is_ok() {
-                                            navigate.with_value(|nav| nav(&base_href("/chat"), NavigateOptions::default()));
+                                            navigate.with_value(|nav| nav("/chat", NavigateOptions::default()));
                                         }
                                     });
                                 }

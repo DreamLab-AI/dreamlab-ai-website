@@ -30,7 +30,7 @@ pub fn SignupPage() -> impl IntoView {
     // Redirect if already authenticated and past backup
     Effect::new(move |_| {
         if is_authed.get() && phase.get() != Phase::Backup {
-            navigate.with_value(|nav| nav(&base_href("/chat"), NavigateOptions::default()));
+            navigate.with_value(|nav| nav("/chat", NavigateOptions::default()));
         }
     });
 
@@ -58,7 +58,7 @@ pub fn SignupPage() -> impl IntoView {
 
     let on_backup_done = Callback::new(move |()| {
         auth.confirm_nsec_backup();
-        navigate.with_value(|nav| nav(&base_href("/chat"), NavigateOptions::default()));
+        navigate.with_value(|nav| nav("/chat", NavigateOptions::default()));
     });
 
     view! {
