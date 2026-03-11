@@ -64,9 +64,9 @@ pub fn CategoryCard(
     };
 
     let count_label = if section_count == 1 {
-        "1 section".to_string()
+        "1 topic".to_string()
     } else {
-        format!("{} sections", section_count)
+        format!("{} topics", section_count)
     };
 
     let name_display = name.clone();

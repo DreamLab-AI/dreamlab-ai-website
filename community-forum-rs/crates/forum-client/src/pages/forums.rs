@@ -202,13 +202,13 @@ pub fn ForumsPage() -> impl IntoView {
                                 </div>
 
                                 {if has_cats {
-                                    let cards: Vec<_> = cats.iter().map(|(cat_name, section_count)| {
-                                        let name = cat_name.clone();
-                                        let count = *section_count;
+                                    let cards: Vec<_> = cats.iter().map(|(section_id, topic_count)| {
+                                        let display_name = humanize_section_id(section_id);
+                                        let count = *topic_count;
                                         view! {
                                             <CategoryCard
-                                                name=name
-                                                description=format!("Browse sections in this category")
+                                                name=display_name
+                                                description=section_description(section_id).to_string()
                                                 icon=icon
                                                 section_count=count
                                                 accent_color=accent
@@ -355,6 +355,47 @@ fn ZoneIcon(icon: &'static str, accent: &'static str) -> impl IntoView {
         <div class=bg_class>
             {svg}
         </div>
+    }
+}
+
+/// Convert a section ID like "minimoonoir-welcome" to "Welcome".
+fn humanize_section_id(id: &str) -> String {
+    // Strip the zone prefix (everything before and including the first '-')
+    let suffix = id
+        .find('-')
+        .map(|i| &id[i + 1..])
+        .unwrap_or(id);
+    // Title-case each word
+    suffix
+        .split('-')
+        .map(|w| {
+            let mut c = w.chars();
+            match c.next() {
+                None => String::new(),
+                Some(f) => f.to_uppercase().to_string() + c.as_str(),
+            }
+        })
+        .collect::<Vec<_>>()
+        .join(" ")
+}
+
+/// Human-friendly descriptions for known section IDs.
+fn section_description(id: &str) -> &'static str {
+    match id {
+        "family-home" => "Family updates and announcements",
+        "family-events" => "Family events and gatherings",
+        "family-photos" => "Shared family photos and memories",
+        "minimoonoir-welcome" => "Welcome info for guests",
+        "minimoonoir-events" => "Upcoming events and activities",
+        "minimoonoir-booking" => "Room availability and reservations",
+        "dreamlab-lobby" => "General discussion and introductions",
+        "dreamlab-training" => "Training courses and materials",
+        "dreamlab-projects" => "Active projects and collaboration",
+        "dreamlab-bookings" => "Session and room bookings",
+        "ai-general" => "General AI discussion",
+        "ai-claude-flow" => "Claude Flow agent coordination",
+        "ai-visionflow" => "VisionFlow AI agents",
+        _ => "Browse topics in this section",
     }
 }
 
