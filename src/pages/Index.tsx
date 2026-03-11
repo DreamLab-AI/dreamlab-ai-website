@@ -38,7 +38,7 @@ const outcomeCards = [
   {
     id: "operationalise-ai",
     title: "Operationalise AI",
-    description: "Move beyond pilots — deploy autonomous systems that power real operations.",
+    description: "Deploy autonomous systems that power real operations.",
     icon: Brain,
     borderClass: "border-sky-500/30 hover:border-sky-500/50",
     iconBg: "bg-sky-500/10",
@@ -218,10 +218,10 @@ const Index = () => {
         <div className="container max-w-6xl mx-auto px-5 md:px-4 relative z-10">
           <div className="text-center mb-12 md:mb-16">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
-              Outcomes, Not Courses
+              Bespoke learning pathways
             </h2>
             <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-              18 residential programmes designed around the results you need. Pick your destination — we handle the journey.
+              18 residential ideas designed around deep tech Every course is unique.
             </p>
           </div>
 

@@ -410,13 +410,13 @@ const Programmes = () => {
         <div className="container relative z-10 px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-purple-400 via-cyan-400 to-teal-400 inline-block text-transparent bg-clip-text px-4">
-              Outcomes, Not Courses
+              Co-design your learning path.
             </h1>
             <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-4 max-w-3xl mx-auto px-4">
-              Choose your destination — we handle the journey. {visibleCount} residential programmes delivered by 44+ specialists at our Lake District facility, each mapped to Innovate UK Technology Readiness Levels.
+              Every course is bespoke, built for you around deep tech modules. {visibleCount} residential programmes delivered by 44+ specialists at our Lake District facility, each mapped to Innovate UK Technology Readiness Levels.
             </p>
             <p className="text-sm text-muted-foreground/60 mb-8">
-              Programmes span multiple outcomes. Pick the lens that fits your challenge.
+              We're outcome driven, able to combine modules across categories to fit your needs.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center px-4">
               <Button size="lg" asChild className="min-h-[44px]">
