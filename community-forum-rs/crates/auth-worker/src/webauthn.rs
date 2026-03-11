@@ -266,7 +266,6 @@ pub async fn register_options(mut req: Request, env: &Env) -> Result<Response> {
             ],
             "timeout": 60000,
             "authenticatorSelection": {
-                "authenticatorAttachment": "platform",
                 "residentKey": "required",
                 "userVerification": "required"
             },
