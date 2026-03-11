@@ -197,6 +197,7 @@ fn json_err(message: &str, status: u16) -> Result<Response> {
 /// Generate a WebAuthn PublicKeyCredentialCreationOptions with a
 /// server-controlled PRF salt and a random challenge.
 pub async fn register_options(mut req: Request, env: &Env) -> Result<Response> {
+    console_log!("[register_options] handler entered");
     let body: RegisterOptionsBody = req
         .json()
         .await
@@ -274,6 +275,7 @@ pub async fn register_options(mut req: Request, env: &Env) -> Result<Response> {
         "prfSalt": prf_salt_b64
     });
 
+    console_log!("[register_options] responding with {} bytes", serde_json::to_string(&response_body).unwrap_or_default().len());
     Response::from_json(&response_body)
 }
 
@@ -282,10 +284,22 @@ pub async fn register_options(mut req: Request, env: &Env) -> Result<Response> {
 /// Verify a WebAuthn registration response, store the credential in D1,
 /// provision a Solid pod, and return the user's DID/WebID/podUrl.
 pub async fn register_verify(mut req: Request, env: &Env) -> Result<Response> {
-    let body: RegisterVerifyBody = req
-        .json()
+    console_log!("[register_verify] handler entered");
+    // Read raw body first so we can log it for debugging
+    let raw_body = req
+        .bytes()
         .await
-        .map_err(|_| Error::RustError("Invalid JSON body".to_string()))?;
+        .map_err(|_| Error::RustError("Failed to read request body".to_string()))?;
+    console_log!(
+        "[register_verify] raw body ({} bytes): {}",
+        raw_body.len(),
+        String::from_utf8_lossy(&raw_body[..raw_body.len().min(500)])
+    );
+    let body: RegisterVerifyBody = serde_json::from_slice(&raw_body)
+        .map_err(|e| {
+            console_error!("[register_verify] JSON parse error: {e}");
+            Error::RustError(format!("Invalid JSON body: {e}"))
+        })?;
 
     let pubkey = match &body.pubkey {
         Some(pk) if is_valid_pubkey(pk) => pk.to_lowercase(),

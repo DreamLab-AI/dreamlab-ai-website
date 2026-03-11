@@ -247,11 +247,15 @@ impl AuthStore {
 
         match passkey::register_passkey(display_name).await {
             Ok(result) => {
+                web_sys::console::log_1(&"[register_with_passkey] success".into());
                 self.apply_passkey_result(&result, Some(display_name));
                 Ok(())
             }
             Err(e) => {
                 let msg = e.to_string();
+                // Log both Display and Debug formats to trace error origin
+                web_sys::console::error_1(&format!("[register_with_passkey] Display: {msg}").into());
+                web_sys::console::error_1(&format!("[register_with_passkey] Debug: {e:?}").into());
                 self.state.update(|s| {
                     s.is_pending = false;
                     s.error = Some(msg.clone());
