@@ -327,6 +327,37 @@ async fn discover_pubkey_from_passkey(base: &str) -> Result<String, PasskeyError
 
 // -- WebAuthn ceremony helpers ------------------------------------------------
 
+/// Detect if `navigator.credentials.create` has been overridden by a browser
+/// extension (e.g. ProtonPass, Bitwarden). Password manager extensions that
+/// intercept WebAuthn use software authenticators that do NOT support the PRF
+/// extension, making PRF-based key derivation impossible.
+fn check_credentials_intercepted() -> Result<(), PasskeyError> {
+    let win = window().ok_or(PasskeyError::NoBrowser)?;
+    let navigator = win.navigator();
+    let credentials: JsValue = navigator.credentials().into();
+
+    // Get credentials.create and check if it's a native function.
+    // Native functions have toString() returning "function create() { [native code] }".
+    // Monkey-patched functions return the actual source or a different format.
+    if let Ok(create_fn) = Reflect::get(&credentials, &"create".into()) {
+        if !create_fn.is_undefined() && !create_fn.is_null() {
+            if let Ok(func) = create_fn.dyn_into::<js_sys::Function>() {
+                let fn_str = func.to_string().as_string().unwrap_or_default();
+                if !fn_str.contains("[native code]") {
+                    return Err(PasskeyError::PrfNotSupported(
+                        "A password manager extension (e.g. ProtonPass) is intercepting \
+                         passkey requests. This prevents the cryptographic key derivation \
+                         needed for your Nostr identity. Please disable the extension's \
+                         passkey feature for this site, or use the private key login instead."
+                            .into(),
+                    ));
+                }
+            }
+        }
+    }
+    Ok(())
+}
+
 async fn create_credential(
     options_json: &serde_json::Value,
     prf_salt_b64: &str,
@@ -334,6 +365,10 @@ async fn create_credential(
     let win = window().ok_or(PasskeyError::NoBrowser)?;
     let navigator = win.navigator();
     let credentials = navigator.credentials();
+
+    // Detect password manager extensions that intercept WebAuthn — their
+    // software authenticators don't support PRF, which we need for key derivation.
+    check_credentials_intercepted()?;
 
     let pk_options = build_creation_options(options_json, prf_salt_b64)?;
 
@@ -367,6 +402,8 @@ async fn get_assertion(
     let win = window().ok_or(PasskeyError::NoBrowser)?;
     let navigator = win.navigator();
     let credentials = navigator.credentials();
+
+    check_credentials_intercepted()?;
 
     let pk_options = build_request_options(options_json, Some(prf_salt_b64))?;
 

@@ -12,85 +12,54 @@ use super::passkey::PasskeyError;
 // -- JS object builders -------------------------------------------------------
 
 /// Build `PublicKeyCredentialCreationOptions` from server JSON with PRF extension.
+///
+/// Uses a spread-like approach: converts the entire server JSON to a JS object
+/// first (preserving ALL fields — like `{...json}` in TypeScript), then overrides
+/// only the fields that need binary conversion (challenge, user.id,
+/// excludeCredentials[].id) and adds the PRF extension. This ensures browser
+/// extensions like ProtonPass that intercept and re-serialize the options object
+/// receive the complete, spec-compliant structure.
 pub(super) fn build_creation_options(
     json: &serde_json::Value,
     prf_salt_b64: &str,
 ) -> Result<JsValue, PasskeyError> {
-    let options = Object::new();
+    // Start with a complete JS object from the server JSON (like TS `{...json}`)
+    let options = json_to_js(json)?;
 
-    // challenge
+    // Override challenge: base64url string → ArrayBuffer
     if let Some(challenge) = json.get("challenge").and_then(|v| v.as_str()) {
         let buf = base64url_to_uint8array(challenge)?;
         Reflect::set(&options, &"challenge".into(), &buf)?;
     }
 
-    // rp
-    if let Some(rp) = json.get("rp") {
-        let rp_obj = json_to_js(rp)?;
-        Reflect::set(&options, &"rp".into(), &rp_obj)?;
-    }
-
-    // user
-    if let Some(user) = json.get("user") {
-        let user_obj = Object::new();
-        if let Some(id) = user.get("id").and_then(|v| v.as_str()) {
-            let buf = base64url_to_uint8array(id)?;
-            Reflect::set(&user_obj, &"id".into(), &buf)?;
+    // Override user.id: base64url string → ArrayBuffer (keep name/displayName as-is)
+    if let Some(user_json) = json.get("user") {
+        let user_obj = Reflect::get(&options, &"user".into())
+            .unwrap_or(JsValue::UNDEFINED);
+        if !user_obj.is_undefined() && !user_obj.is_null() {
+            if let Some(id) = user_json.get("id").and_then(|v| v.as_str()) {
+                let buf = base64url_to_uint8array(id)?;
+                Reflect::set(&user_obj, &"id".into(), &buf)?;
+            }
         }
-        if let Some(name) = user.get("name").and_then(|v| v.as_str()) {
-            Reflect::set(&user_obj, &"name".into(), &JsValue::from_str(name))?;
-        }
-        if let Some(dn) = user.get("displayName").and_then(|v| v.as_str()) {
-            Reflect::set(&user_obj, &"displayName".into(), &JsValue::from_str(dn))?;
-        }
-        Reflect::set(&options, &"user".into(), &user_obj)?;
     }
 
-    // pubKeyCredParams
-    if let Some(params) = json.get("pubKeyCredParams") {
-        let params_js = json_to_js(params)?;
-        Reflect::set(&options, &"pubKeyCredParams".into(), &params_js)?;
-    }
-
-    // timeout
-    if let Some(timeout) = json.get("timeout") {
-        let timeout_js = json_to_js(timeout)?;
-        Reflect::set(&options, &"timeout".into(), &timeout_js)?;
-    }
-
-    // authenticatorSelection
-    if let Some(auth_sel) = json.get("authenticatorSelection") {
-        let sel_js = json_to_js(auth_sel)?;
-        Reflect::set(&options, &"authenticatorSelection".into(), &sel_js)?;
-    }
-
-    // attestation
-    if let Some(att) = json.get("attestation").and_then(|v| v.as_str()) {
-        Reflect::set(&options, &"attestation".into(), &JsValue::from_str(att))?;
-    }
-
-    // excludeCredentials
+    // Override excludeCredentials[].id: base64url string → ArrayBuffer
     if let Some(exclude) = json.get("excludeCredentials").and_then(|v| v.as_array()) {
         let arr = js_sys::Array::new();
         for cred in exclude {
-            let cred_obj = Object::new();
+            // Start from the full JSON object for each credential
+            let cred_obj = json_to_js(cred)?;
             if let Some(id) = cred.get("id").and_then(|v| v.as_str()) {
                 let buf = base64url_to_uint8array(id)?;
                 Reflect::set(&cred_obj, &"id".into(), &buf)?;
-            }
-            if let Some(t) = cred.get("type").and_then(|v| v.as_str()) {
-                Reflect::set(&cred_obj, &"type".into(), &JsValue::from_str(t))?;
-            }
-            if let Some(transports) = cred.get("transports") {
-                let t_js = json_to_js(transports)?;
-                Reflect::set(&cred_obj, &"transports".into(), &t_js)?;
             }
             arr.push(&cred_obj);
         }
         Reflect::set(&options, &"excludeCredentials".into(), &arr)?;
     }
 
-    // extensions with PRF
+    // Add extensions with PRF
     let extensions = Object::new();
     let prf = Object::new();
     let eval_obj = Object::new();
@@ -100,60 +69,41 @@ pub(super) fn build_creation_options(
     Reflect::set(&extensions, &"prf".into(), &prf)?;
     Reflect::set(&options, &"extensions".into(), &extensions)?;
 
-    Ok(options.into())
+    Ok(options)
 }
 
 /// Build `PublicKeyCredentialRequestOptions` from server JSON, optionally with PRF.
+///
+/// Same spread-like approach as `build_creation_options`: converts the entire
+/// server JSON first, then overrides only the binary fields.
 pub(super) fn build_request_options(
     json: &serde_json::Value,
     prf_salt_b64: Option<&str>,
 ) -> Result<JsValue, PasskeyError> {
-    let options = Object::new();
+    // Start with a complete JS object from the server JSON
+    let options = json_to_js(json)?;
 
-    // challenge
+    // Override challenge: base64url string → ArrayBuffer
     if let Some(challenge) = json.get("challenge").and_then(|v| v.as_str()) {
         let buf = base64url_to_uint8array(challenge)?;
         Reflect::set(&options, &"challenge".into(), &buf)?;
     }
 
-    // timeout
-    if let Some(timeout) = json.get("timeout") {
-        let timeout_js = json_to_js(timeout)?;
-        Reflect::set(&options, &"timeout".into(), &timeout_js)?;
-    }
-
-    // rpId
-    if let Some(rp_id) = json.get("rpId").and_then(|v| v.as_str()) {
-        Reflect::set(&options, &"rpId".into(), &JsValue::from_str(rp_id))?;
-    }
-
-    // allowCredentials
+    // Override allowCredentials[].id: base64url string → ArrayBuffer
     if let Some(allow) = json.get("allowCredentials").and_then(|v| v.as_array()) {
         let arr = js_sys::Array::new();
         for cred in allow {
-            let cred_obj = Object::new();
+            let cred_obj = json_to_js(cred)?;
             if let Some(id) = cred.get("id").and_then(|v| v.as_str()) {
                 let buf = base64url_to_uint8array(id)?;
                 Reflect::set(&cred_obj, &"id".into(), &buf)?;
-            }
-            if let Some(t) = cred.get("type").and_then(|v| v.as_str()) {
-                Reflect::set(&cred_obj, &"type".into(), &JsValue::from_str(t))?;
-            }
-            if let Some(transports) = cred.get("transports") {
-                let t_js = json_to_js(transports)?;
-                Reflect::set(&cred_obj, &"transports".into(), &t_js)?;
             }
             arr.push(&cred_obj);
         }
         Reflect::set(&options, &"allowCredentials".into(), &arr)?;
     }
 
-    // userVerification
-    if let Some(uv) = json.get("userVerification").and_then(|v| v.as_str()) {
-        Reflect::set(&options, &"userVerification".into(), &JsValue::from_str(uv))?;
-    }
-
-    // extensions with PRF (if salt provided)
+    // Add extensions with PRF (if salt provided)
     if let Some(salt_b64) = prf_salt_b64 {
         let extensions = Object::new();
         let prf = Object::new();
@@ -165,7 +115,7 @@ pub(super) fn build_request_options(
         Reflect::set(&options, &"extensions".into(), &extensions)?;
     }
 
-    Ok(options.into())
+    Ok(options)
 }
 
 // -- PRF output extraction ----------------------------------------------------
