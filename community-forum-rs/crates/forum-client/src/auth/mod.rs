@@ -291,6 +291,55 @@ impl AuthStore {
         }
     }
 
+    /// Generate a new random keypair and register as a local-key user.
+    ///
+    /// Returns the hex-encoded private key so the signup UI can show it for
+    /// backup. The privkey is held in memory and never persisted to storage.
+    pub fn register_with_generated_key(&self, display_name: &str) -> Result<String, String> {
+        let keypair = nostr_core::generate_keypair()
+            .map_err(|e| format!("Key generation failed: {e}"))?;
+
+        let pubkey = keypair.public.to_hex();
+        let privkey_hex = hex::encode(keypair.secret.as_bytes());
+        self.privkey.set_value(Some(keypair.secret.as_bytes().to_vec()));
+
+        let nickname = Some(display_name.to_string());
+
+        let stored = StoredSession {
+            version: 2,
+            public_key: Some(pubkey.clone()),
+            is_passkey: false,
+            is_nip07: false,
+            is_local_key: true,
+            extension_name: None,
+            nickname: nickname.clone(),
+            avatar: None,
+            account_status: AccountStatus::Incomplete,
+            nsec_backed_up: false,
+        };
+        self.save_session(&stored);
+
+        self.state.set(AuthState {
+            state: AuthPhase::Authenticated,
+            pubkey: Some(pubkey.clone()),
+            is_authenticated: true,
+            public_key: Some(pubkey),
+            nickname,
+            avatar: None,
+            is_pending: false,
+            error: None,
+            account_status: AccountStatus::Incomplete,
+            nsec_backed_up: false,
+            is_ready: true,
+            is_nip07: false,
+            is_passkey: false,
+            is_local_key: true,
+            extension_name: None,
+        });
+
+        Ok(privkey_hex)
+    }
+
     /// Login with a local nsec/hex private key.
     pub fn login_with_local_key(&self, privkey_hex: &str) -> Result<(), String> {
         let bytes = hex::decode(privkey_hex).map_err(|_| "Invalid hex key".to_string())?;

@@ -9,13 +9,13 @@ use wasm_bindgen::JsCast;
 /// localStorage key to track whether the user has dismissed the backup prompt.
 const BACKUP_DISMISSED_KEY: &str = "dreamlab:nsec_backup_dismissed";
 
-/// One-time nsec (private key) backup display.
+/// Private key backup display.
 ///
-/// Renders a warning card with the bech32-encoded nsec string, copy and download
-/// buttons, and a confirmation that permanently dismisses the component.
+/// Renders a card with the hex-encoded private key, copy and download
+/// buttons, and a confirmation that dismisses the component.
 #[component]
 pub(crate) fn NsecBackup(
-    /// The bech32-encoded private key (`nsec1...`).
+    /// The hex-encoded private key (64 characters).
     nsec: String,
     /// Fired when the user confirms backup and dismisses the card.
     on_dismiss: Callback<()>,
@@ -86,31 +86,23 @@ pub(crate) fn NsecBackup(
             aria-labelledby="nsec-backup-title"
             aria-describedby="nsec-backup-desc"
         >
-            // Warning header
+            // Header
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0">
                     <svg class="w-5 h-5 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                        <path d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z"
                             stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                 </div>
                 <div>
-                    <h3 id="nsec-backup-title" class="text-lg font-bold text-white">"Back Up Your Key"</h3>
-                    <p id="nsec-backup-desc" class="text-xs text-amber-300/80">"This is your ONLY chance to save your private key."</p>
+                    <h3 id="nsec-backup-title" class="text-lg font-bold text-white">"Save Your Private Key"</h3>
+                    <p id="nsec-backup-desc" class="text-xs text-gray-400">"You need this to sign back in."</p>
                 </div>
             </div>
 
-            // Warning text
-            <div class="bg-red-900/20 border border-red-500/30 rounded-lg p-3">
-                <p class="text-sm text-red-300">
-                    "Never share this key. Anyone with it has full control of your Nostr identity. "
-                    "If you lose this key, you cannot recover your account."
-                </p>
-            </div>
-
-            // nsec display
+            // Key display
             <div class="bg-gray-900/60 border border-gray-700 rounded-xl p-4">
-                <label class="block text-xs text-gray-500 mb-2 font-medium uppercase tracking-wider">"Private Key (nsec)"</label>
+                <label class="block text-xs text-gray-500 mb-2 font-medium uppercase tracking-wider">"Private Key (hex)"</label>
                 <code class="block text-sm text-amber-300 font-mono break-all select-all leading-relaxed">
                     {nsec.clone()}
                 </code>
