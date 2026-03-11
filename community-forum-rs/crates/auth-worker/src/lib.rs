@@ -38,6 +38,24 @@ fn cors_headers(env: &Env) -> Headers {
     headers
 }
 
+/// Create a JSON error response that NEVER fails.
+/// Falls back to plain text if JSON serialization somehow fails.
+fn error_response(env: &Env, message: &str, status: u16) -> Response {
+    let body = format!(r#"{{"error":"{}"}}"#, message.replace('"', r#"\""#));
+    let cors = cors_headers(env);
+    match Response::ok(&body) {
+        Ok(resp) => {
+            let resp = resp.with_status(status).with_headers(cors);
+            resp.headers().set("Content-Type", "application/json").ok();
+            resp
+        }
+        Err(_) => {
+            // Absolute fallback — should never happen
+            Response::error(message, status).unwrap_or_else(|_| Response::empty().unwrap())
+        }
+    }
+}
+
 /// Create a JSON response with CORS headers.
 fn json_response(env: &Env, body: &serde_json::Value, status: u16) -> Result<Response> {
     let json_str = serde_json::to_string(body).map_err(|e| Error::RustError(e.to_string()))?;
@@ -57,43 +75,55 @@ fn with_cors(resp: Response, env: &Env) -> Response {
 
 #[event(fetch)]
 async fn fetch(req: Request, env: Env, _ctx: Context) -> Result<Response> {
+    // Wrap the entire handler so NO errors ever leak to the workers-rs framework.
+    // The framework formats leaked errors as raw Debug text (e.g. SerializationError(...))
+    // which is not valid JSON and confuses clients.
+    match handle_request(req, &env).await {
+        Ok(resp) => Ok(resp),
+        Err(e) => {
+            console_error!("Unhandled worker error: {e:?}");
+            Ok(error_response(&env, "Internal server error", 500))
+        }
+    }
+}
+
+/// Inner request handler. All errors are caught by the outer `fetch` wrapper.
+async fn handle_request(req: Request, env: &Env) -> Result<Response> {
     // CORS preflight
     if req.method() == Method::Options {
         return Ok(Response::empty()?
             .with_status(204)
-            .with_headers(cors_headers(&env)));
+            .with_headers(cors_headers(env)));
     }
 
     let url = req.url()?;
     let path = url.path();
     let method = req.method();
 
-    let result = route(req, &env, path, &method).await;
+    let result = route(req, env, path, &method).await;
 
     match result {
-        Ok(resp) => Ok(with_cors(resp, &env)),
+        Ok(resp) => Ok(with_cors(resp, env)),
         Err(e) => {
-            console_error!("Worker error: {e}");
-            let msg = e.to_string();
-            // Catch JSON parse errors and serde deserialization errors
-            if msg.contains("JSON")
+            console_error!("Route error: {e:?}");
+            let msg = format!("{e:?}");
+            let status = if msg.contains("Serialization")
+                || msg.contains("JSON")
                 || msg.contains("json")
-                || msg.contains("Serialization")
                 || msg.contains("missing field")
                 || msg.contains("parsing")
+                || msg.contains("Invalid")
             {
-                json_response(
-                    &env,
-                    &serde_json::json!({ "error": "Invalid request body" }),
-                    400,
-                )
+                400u16
             } else {
-                json_response(
-                    &env,
-                    &serde_json::json!({ "error": "Internal server error" }),
-                    500,
-                )
-            }
+                500u16
+            };
+            let user_msg = if status == 400 {
+                "Invalid request body"
+            } else {
+                "Internal server error"
+            };
+            Ok(error_response(env, user_msg, status))
         }
     }
 }
