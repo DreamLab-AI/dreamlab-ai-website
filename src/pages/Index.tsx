@@ -150,8 +150,8 @@ const Index = () => {
             <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 text-transparent bg-clip-text">DREAMLAB APPLIED INNOVATION</span>
           </h1>
 
-          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-foreground/85 max-w-3xl mb-8 animate-slide-up font-light tracking-wide leading-relaxed" style={{ animationDelay: '0.1s' }}>
-             AI, XR, & Cyber Secure Distributed Systems<br />in the Heart of the Lake District
+          <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-foreground/90 max-w-3xl mb-8 animate-slide-up font-normal tracking-wide leading-relaxed" style={{ animationDelay: '0.1s' }}>
+             Agentics, AI, spatial computing, rapid<br />prototyping & secure distributed systems,<br />in the stunning Eskdale Valley
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 animate-scale-in mb-8 w-full sm:w-auto" style={{ animationDelay: '0.2s' }}>
@@ -173,7 +173,7 @@ const Index = () => {
           <div className="animate-slide-up flex flex-col sm:flex-row gap-6 text-sm md:text-base text-muted-foreground" style={{ animationDelay: '0.25s' }}>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 bg-cyan-400 rounded-full" />
-              <span>Enterprise | SME sprints | Knowledge Partnerships</span>
+              <span>Training | Consulting | Bespoke Product</span>
             </div>
           </div>
         </div>
