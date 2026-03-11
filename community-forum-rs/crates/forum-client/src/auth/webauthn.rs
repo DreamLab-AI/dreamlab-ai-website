@@ -278,8 +278,15 @@ pub(super) fn arraybuffer_to_vec(js_val: &JsValue) -> Result<Vec<u8>, PasskeyErr
 // -- JSON to JS helpers -------------------------------------------------------
 
 /// Convert a serde_json::Value to a JsValue via serde_wasm_bindgen.
+///
+/// Uses `serialize_maps_as_objects(true)` so that `serde_json::Value::Object`
+/// produces plain JS objects (with regular properties) instead of JS `Map`
+/// instances. The WebAuthn API and browser extensions expect plain objects.
 pub(super) fn json_to_js(value: &serde_json::Value) -> Result<JsValue, PasskeyError> {
-    serde_wasm_bindgen::to_value(value)
+    use serde::Serialize;
+    let serializer = serde_wasm_bindgen::Serializer::new().serialize_maps_as_objects(true);
+    value
+        .serialize(&serializer)
         .map_err(|e| PasskeyError::Protocol(format!("JSON to JS: {e}")))
 }
 
