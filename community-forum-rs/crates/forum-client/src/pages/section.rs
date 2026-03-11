@@ -43,6 +43,7 @@ pub fn SectionPage() -> impl IntoView {
         RwSignal::<Option<String>>::new(None),
         RwSignal::<Option<String>>::new(None),
     );
+    let relay_for_send = relay.clone();
     let (relay_for_ch, relay_for_msgs, relay_for_cleanup) = (relay.clone(), relay.clone(), relay);
 
     Effect::new(move |_| {
@@ -200,46 +201,49 @@ pub fn SectionPage() -> impl IntoView {
         }
     });
 
-    let do_send_text = move |content: String| {
-        let cid = section_info
-            .get_untracked()
-            .map(|i| i.channel_id)
-            .unwrap_or_default();
-        if cid.is_empty() {
-            return;
-        }
-
-        let pubkey = auth.pubkey().get_untracked().unwrap_or_default();
-        if pubkey.is_empty() {
-            error_msg.set(Some("Not authenticated".to_string()));
-            return;
-        }
-
-        let now = (js_sys::Date::now() / 1000.0) as u64;
-        let unsigned = nostr_core::UnsignedEvent {
-            pubkey: pubkey.clone(),
-            created_at: now,
-            kind: 42,
-            tags: vec![vec![
-                "e".to_string(),
-                cid,
-                String::new(),
-                "root".to_string(),
-            ]],
-            content,
-        };
-
-        let relay = expect_context::<RelayConnection>();
-        match auth.sign_event(unsigned) {
-            Ok(signed) => {
-                relay.publish(&signed);
+    let do_send_text = {
+        let relay = relay_for_send;
+        move |content: String| {
+            let cid = section_info
+                .get_untracked()
+                .map(|i| i.channel_id)
+                .unwrap_or_default();
+            if cid.is_empty() {
+                return;
             }
-            Err(e) => {
-                error_msg.set(Some(e));
+
+            let pubkey = auth.pubkey().get_untracked().unwrap_or_default();
+            if pubkey.is_empty() {
+                error_msg.set(Some("Not authenticated".to_string()));
+                return;
+            }
+
+            let now = (js_sys::Date::now() / 1000.0) as u64;
+            let unsigned = nostr_core::UnsignedEvent {
+                pubkey: pubkey.clone(),
+                created_at: now,
+                kind: 42,
+                tags: vec![vec![
+                    "e".to_string(),
+                    cid,
+                    String::new(),
+                    "root".to_string(),
+                ]],
+                content,
+            };
+
+            match auth.sign_event(unsigned) {
+                Ok(signed) => {
+                    relay.publish(&signed);
+                }
+                Err(e) => {
+                    error_msg.set(Some(e));
+                }
             }
         }
     };
 
+    let send_callback = Callback::new(do_send_text);
     let is_authed = auth.is_authenticated();
 
     view! {
@@ -324,7 +328,7 @@ pub fn SectionPage() -> impl IntoView {
                 <div class="bg-gray-800 border-t border-gray-700 p-3">
                     <div class="max-w-4xl mx-auto">
                         <TypingIndicator typing_pubkeys=typing_pubkeys />
-                        <MessageInput on_send=Callback::new(do_send_text) />
+                        <MessageInput on_send=send_callback />
                     </div>
                 </div>
             </Show>
