@@ -1087,7 +1087,7 @@ impl NostrRelayDO {
         };
 
         let now = auth::js_now_secs();
-        let cohorts_json = r#"["lobby"]"#;
+        let cohorts_json = r#"["home"]"#;
 
         let stmt = db.prepare(
             "INSERT INTO whitelist (pubkey, cohorts, added_at, added_by) \

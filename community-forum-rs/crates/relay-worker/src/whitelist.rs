@@ -93,23 +93,35 @@ pub async fn handle_check_whitelist(req: &Request, env: &Env) -> Result<Response
     let env_admins = auth::admin_pubkeys(env);
     let is_admin_key = env_admins.iter().any(|k| k == &pubkey);
 
-    let mut cohorts: Vec<String> = entry
+    let cohorts: Vec<String> = entry
         .as_ref()
         .and_then(|row| serde_json::from_str(&row.cohorts).ok())
         .unwrap_or_default();
 
-    if is_admin_key && !cohorts.iter().any(|c| c == "admin") {
-        cohorts.push("admin".to_string());
-    }
-
-    let has_admin_cohort = cohorts.iter().any(|c| c == "admin");
+    // Compute 3-boolean access flags from legacy cohort values
+    let has_home = is_admin_key
+        || cohorts.iter().any(|c| matches!(c.as_str(), "home" | "lobby" | "approved" | "cross-access"));
+    let has_dreamlab = is_admin_key
+        || cohorts.iter().any(|c| matches!(c.as_str(),
+            "dreamlab" | "business" | "business-only" | "trainers" | "trainees"
+            | "ai-agents" | "agent" | "visionflow-full" | "cross-access"
+        ));
+    let has_minimoonoir = is_admin_key
+        || cohorts.iter().any(|c| matches!(c.as_str(),
+            "minimoonoir" | "minimoonoir-only" | "minimoonoir-business" | "cross-access"
+        ));
 
     json_response(
         env,
         &json!({
             "isWhitelisted": entry.is_some() || is_admin_key,
-            "isAdmin": is_admin_key || has_admin_cohort,
+            "isAdmin": is_admin_key,
             "cohorts": cohorts,
+            "access": {
+                "home": has_home,
+                "dreamlab": has_dreamlab,
+                "minimoonoir": has_minimoonoir,
+            },
             "verifiedAt": js_sys::Date::now() as u64,
             "source": "relay",
         }),
@@ -269,7 +281,7 @@ pub async fn handle_whitelist_add(mut req: Request, env: &Env) -> Result<Respons
         _ => return json_response(env, &json!({ "error": "Invalid or missing pubkey" }), 400),
     };
 
-    let cohorts = body.cohorts.unwrap_or_else(|| vec!["approved".to_string()]);
+    let cohorts = body.cohorts.unwrap_or_else(|| vec!["home".to_string()]);
     let cohorts_json =
         serde_json::to_string(&cohorts).map_err(|e| worker::Error::RustError(e.to_string()))?;
     let now = auth::js_now_secs();

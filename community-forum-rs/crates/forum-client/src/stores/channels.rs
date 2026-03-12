@@ -9,7 +9,7 @@ use gloo::storage::{LocalStorage, Storage};
 use leptos::prelude::*;
 use nostr_core::NostrEvent;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::rc::Rc;
 use wasm_bindgen::JsCast;
 
@@ -108,11 +108,17 @@ impl ChannelStore {
         let eose_sig = self.eose_received;
         let store = self.clone();
 
+        // Track which channel IDs came from the relay (vs stale cache)
+        let relay_ids = Rc::new(std::cell::RefCell::new(HashSet::<String>::new()));
+        let relay_ids_for_event = relay_ids.clone();
+
         // Kind 40: channel creation events
         let on_event = Rc::new(move |event: NostrEvent| {
             if event.kind != 40 {
                 return;
             }
+
+            relay_ids_for_event.borrow_mut().insert(event.id.clone());
 
             let (name, description, picture) = parse_channel_content(&event.content);
             let section = event
@@ -140,9 +146,22 @@ impl ChannelStore {
 
         let store_for_eose = store.clone();
         let on_eose = Rc::new(move || {
+            // Prune channels that were in the cache but NOT received from relay
+            // (they were deleted or the DB was wiped)
+            let ids = relay_ids.borrow();
+            if ids.is_empty() {
+                // Relay returned zero channels — clear everything
+                channels_sig.set(Vec::new());
+                store_for_eose.message_counts.set(HashMap::new());
+                store_for_eose.last_active.set(HashMap::new());
+            } else {
+                channels_sig.update(|list| {
+                    list.retain(|c| ids.contains(&c.id));
+                });
+            }
             loading_sig.set(false);
             eose_sig.set(true);
-            // Cache after receiving all channel metadata
+            // Cache the pruned result
             store_for_eose.save_cache();
         });
 

@@ -1,39 +1,51 @@
 //! Access denied component for zone-gated content.
 //!
 //! Displays a glassmorphism card with a lock icon, explains the required access
-//! level, and offers a "Request Access" button for Cohort/Private zones or a
-//! link back to public areas.
+//! level, and offers a link back to forums.
 
 use leptos::prelude::*;
 use leptos_router::components::A;
 
 use crate::app::base_href;
-use crate::stores::zone_access::Zone;
 
 /// Access denied page shown when a user lacks the required zone permissions.
 #[component]
 pub fn AccessDenied(
-    /// The zone that was required.
-    zone: Zone,
+    /// The zone that was denied (e.g. "home", "dreamlab", "minimoonoir").
+    #[prop(default = "".to_string())]
+    zone_id: String,
 ) -> impl IntoView {
-    let (title, description) = match zone {
-        Zone::Public => ("Access Denied", "This content is not available."),
-        Zone::Registered => (
+    let (title, description) = match zone_id.as_str() {
+        "home" => (
             "Members Only",
             "You need to be a registered member to access this area. Please log in or sign up.",
         ),
-        Zone::Cohort => (
-            "Cohort Access Required",
-            "This section is restricted to members of a specific cohort. You can request access below.",
+        "dreamlab" => (
+            "DreamLab Access Required",
+            "This section is restricted to DreamLab members. Contact an admin for access.",
         ),
-        Zone::Private => (
-            "Invitation Only",
-            "This is a private area accessible by invitation only. You can request an invitation below.",
+        "minimoonoir" => (
+            "Minimoonoir Access Required",
+            "This section is restricted to Minimoonoir guests. Contact an admin for access.",
         ),
+        _ => ("Access Denied", "This content is not available."),
     };
 
-    let show_request = zone == Zone::Cohort || zone == Zone::Private;
-    let show_login = zone == Zone::Registered;
+    let show_login = zone_id.as_str() == "home" || zone_id.is_empty();
+
+    let badge_class = match zone_id.as_str() {
+        "home" => "text-amber-400 bg-amber-500/10 border-amber-500/20",
+        "dreamlab" => "text-pink-400 bg-pink-500/10 border-pink-500/20",
+        "minimoonoir" => "text-purple-400 bg-purple-500/10 border-purple-500/20",
+        _ => "text-gray-400 bg-gray-500/10 border-gray-500/20",
+    };
+
+    let zone_label = match zone_id.as_str() {
+        "home" => "Home",
+        "dreamlab" => "DreamLab",
+        "minimoonoir" => "Minimoonoir",
+        _ => "Restricted",
+    };
 
     view! {
         <div class="flex items-center justify-center min-h-[60vh] p-4">
@@ -55,17 +67,20 @@ pub fn AccessDenied(
                         // Zone badge
                         <span class=format!(
                             "inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider border rounded-full px-2.5 py-0.5 mb-4 {}",
-                            zone.badge_class()
+                            badge_class
                         )>
-                            {zone_icon(zone)}
-                            {zone.label()}
+                            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M7 11V7a5 5 0 0110 0v4" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            {zone_label}
                         </span>
 
                         <h2 class="text-2xl font-bold text-white mb-2">{title}</h2>
                         <p class="text-gray-400 text-sm leading-relaxed mb-6">{description}</p>
 
                         <div class="flex flex-col gap-3">
-                            // Login button for registered zones
+                            // Login button for home/unknown zones
                             {show_login.then(|| view! {
                                 <A
                                     href=base_href("/login")
@@ -81,13 +96,6 @@ pub fn AccessDenied(
                                 </A>
                             })}
 
-                            // Request access placeholder for cohort/private
-                            {show_request.then(|| view! {
-                                <p class="text-xs text-gray-500 mt-2">
-                                    "Use the \"Request Access\" button on the section page to submit a join request."
-                                </p>
-                            })}
-
                             // Back to forums
                             <A
                                 href=base_href("/forums")
@@ -100,34 +108,5 @@ pub fn AccessDenied(
                 </div>
             </div>
         </div>
-    }
-}
-
-/// Small inline SVG icon for the zone badge.
-fn zone_icon(zone: Zone) -> impl IntoView {
-    match zone {
-        Zone::Public => view! {
-            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/>
-                <path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10A15.3 15.3 0 0112 2z"/>
-            </svg>
-        }.into_any(),
-        Zone::Registered => view! {
-            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
-                <circle cx="9" cy="7" r="4"/>
-            </svg>
-        }.into_any(),
-        Zone::Cohort => view! {
-            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="16 18 22 12 16 6"/>
-                <polyline points="8 6 2 12 8 18"/>
-            </svg>
-        }.into_any(),
-        Zone::Private => view! {
-            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            </svg>
-        }.into_any(),
     }
 }

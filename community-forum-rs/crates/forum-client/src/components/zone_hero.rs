@@ -1,8 +1,7 @@
 //! Zone hero header component.
 //!
 //! Full-width glass banner with zone-specific gradient, title, and description.
-//! Used at the top of category and section pages to visually identify the
-//! access zone (Public, Registered, Cohort, Private).
+//! Used at the top of category and section pages to visually identify the zone.
 
 use leptos::prelude::*;
 
@@ -14,30 +13,30 @@ use leptos::prelude::*;
 pub fn ZoneHero(
     title: String,
     description: String,
-    /// Zone level: 0 = Public, 1 = Registered, 2 = Cohort, 3 = Private.
-    zone: u8,
+    /// Zone identifier: "home", "dreamlab", or "minimoonoir".
+    zone_id: String,
     /// SVG path data for the zone icon.
     icon: &'static str,
 ) -> impl IntoView {
-    let gradient = match zone {
-        0 => "from-blue-500/20 via-gray-500/10 to-slate-500/10",
-        1 => "from-amber-500/20 via-orange-500/10 to-yellow-500/10",
-        2 => "from-purple-500/20 via-indigo-500/10 to-violet-500/10",
-        _ => "from-red-500/20 via-amber-500/10 to-orange-500/10",
+    let gradient = match zone_id.as_str() {
+        "home" => "from-amber-500/20 via-orange-500/10 to-yellow-500/10",
+        "dreamlab" => "from-pink-500/20 via-rose-500/10 to-fuchsia-500/10",
+        "minimoonoir" => "from-purple-500/20 via-indigo-500/10 to-violet-500/10",
+        _ => "from-gray-500/20 via-gray-500/10 to-gray-500/5",
     };
 
-    let zone_label = match zone {
-        0 => "Public",
-        1 => "Registered",
-        2 => "Cohort",
-        _ => "Private",
+    let zone_label = match zone_id.as_str() {
+        "home" => "Home",
+        "dreamlab" => "DreamLab",
+        "minimoonoir" => "Minimoonoir",
+        _ => "Forum",
     };
 
-    let border_color = match zone {
-        0 => "border-blue-500/20",
-        1 => "border-amber-500/20",
-        2 => "border-purple-500/20",
-        _ => "border-red-500/20",
+    let border_color = match zone_id.as_str() {
+        "home" => "border-amber-500/20",
+        "dreamlab" => "border-pink-500/20",
+        "minimoonoir" => "border-purple-500/20",
+        _ => "border-gray-500/20",
     };
 
     view! {
@@ -62,8 +61,8 @@ pub fn ZoneHero(
                         <h1 class="text-2xl sm:text-3xl font-bold text-white truncate">
                             {title}
                         </h1>
-                        // Lock icon for restricted zones
-                        {(zone > 0).then(|| view! {
+                        // Lock icon for non-home zones
+                        {(zone_id.as_str() != "home").then(|| view! {
                             <svg class="w-4 h-4 text-white/50 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2" stroke-linecap="round" stroke-linejoin="round"/>
                                 <path d="M7 11V7a5 5 0 0110 0v4" stroke-linecap="round" stroke-linejoin="round"/>

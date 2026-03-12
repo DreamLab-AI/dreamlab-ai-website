@@ -19,13 +19,11 @@ use crate::components::zone_hero::ZoneHero;
 use crate::relay::{ConnectionState, Filter, RelayConnection};
 use crate::utils::{capitalize, set_timeout_once};
 
-/// Maps zone IDs to their child section IDs (from config/sections.yaml).
+/// Maps zone IDs to their child section IDs.
 const ZONE_SECTIONS: &[(&str, &[&str])] = &[
-    ("fairfield-family", &["family-home", "family-events", "family-photos"]),
+    ("home", &["dreamlab-lobby"]),
+    ("dreamlab", &["dreamlab-training", "dreamlab-projects", "dreamlab-bookings", "ai-general", "ai-claude-flow", "ai-visionflow"]),
     ("minimoonoir", &["minimoonoir-welcome", "minimoonoir-events", "minimoonoir-booking"]),
-    ("dreamlab-lobby", &["dreamlab-lobby"]),
-    ("dreamlab", &["dreamlab-training", "dreamlab-projects", "dreamlab-bookings"]),
-    ("ai-agents", &["ai-general", "ai-claude-flow", "ai-visionflow"]),
 ];
 
 /// Resolve a channel's section tag to its parent zone ID.
@@ -215,10 +213,9 @@ pub fn CategoryPage() -> impl IntoView {
     let display_name = move || {
         let slug = category_slug();
         match slug.as_str() {
-            "fairfield-family" => "Fairfield Family".to_string(),
+            "home" => "Home".to_string(),
             "minimoonoir" => "Minimoonoir".to_string(),
             "dreamlab" => "DreamLab".to_string(),
-            "ai-agents" => "AI Agents".to_string(),
             other => {
                 // For section IDs like "dreamlab-lobby", humanize to "Lobby"
                 if other.contains('-') {
@@ -241,23 +238,16 @@ pub fn CategoryPage() -> impl IntoView {
         }
     };
 
-    // Map category slug to zone access level for ZoneHero
-    let zone_level = move || -> u8 {
+    // Map category slug to zone_id for ZoneHero
+    let zone_id_for_hero = move || -> String {
         let slug = category_slug();
         match slug.as_str() {
-            "fairfield-family" => 3,     // Private
-            "minimoonoir" => 2,          // Cohort
-            "dreamlab" => 2,             // Cohort
-            "dreamlab-lobby" => 1,       // Registered (all whitelisted users)
-            "ai-agents" => 2,            // Cohort
+            "home" | "dreamlab" | "minimoonoir" => slug,
             _ => {
-                // Also match section IDs to their parent zone
-                if slug.starts_with("family-") { 3 }
-                else if slug.starts_with("minimoonoir-") { 2 }
-                else if slug == "dreamlab-lobby" { 1 }
-                else if slug.starts_with("dreamlab-") { 2 }
-                else if slug.starts_with("ai-") { 2 }
-                else { 0 }
+                // Resolve section ID to parent zone
+                section_to_zone_id(&slug)
+                    .unwrap_or("home")
+                    .to_string()
             }
         }
     };
@@ -265,20 +255,12 @@ pub fn CategoryPage() -> impl IntoView {
     // Icon path data per zone
     let zone_icon = move || -> &'static str {
         let slug = category_slug();
-        if slug.starts_with("family") || slug == "fairfield-family" {
-            // Home
-            "M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"
-        } else if slug.starts_with("minimoonoir") {
+        if slug.starts_with("minimoonoir") {
             // Moon
             "M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"
-        } else if slug.starts_with("dreamlab") {
-            // Sparkle
-            "M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8L12 2z"
-        } else if slug.starts_with("ai") {
-            // Bot
-            "M3 11h18v10a2 2 0 01-2 2H5a2 2 0 01-2-2V11zm9-6a2 2 0 100 4 2 2 0 000-4zm0 4v2"
         } else {
-            "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+            // Sparkle for Home and DreamLab
+            "M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8L12 2z"
         }
     };
 
@@ -289,7 +271,7 @@ pub fn CategoryPage() -> impl IntoView {
                 <ZoneHero
                     title=display_name()
                     description="Browse sections and start a discussion".to_string()
-                    zone=zone_level()
+                    zone_id=zone_id_for_hero()
                     icon=zone_icon()
                 />
             }}

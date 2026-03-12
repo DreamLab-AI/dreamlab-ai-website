@@ -5,28 +5,23 @@
 
 use leptos::prelude::*;
 
-use crate::stores::zone_access::Zone;
 
-/// Predefined channel sections matching `community-forum/config/sections.yaml`.
+/// Predefined channel sections.
 /// Format: (section_id, display_label).
 const SECTIONS: &[(&str, &str)] = &[
-    // Fairfield Family
-    ("family-home", "Family Home"),
-    ("family-events", "Family Events"),
-    ("family-photos", "Family Photos"),
+    // Home
+    ("dreamlab-lobby", "Home Lobby"),
+    // DreamLab
+    ("dreamlab-training", "DreamLab Training"),
+    ("dreamlab-projects", "DreamLab Projects"),
+    ("dreamlab-bookings", "DreamLab Bookings"),
+    ("ai-general", "AI General"),
+    ("ai-claude-flow", "AI Claude Flow"),
+    ("ai-visionflow", "AI VisionFlow"),
     // Minimoonoir
     ("minimoonoir-welcome", "Minimoonoir Welcome"),
     ("minimoonoir-events", "Minimoonoir Events"),
     ("minimoonoir-booking", "Minimoonoir Booking"),
-    // DreamLab
-    ("dreamlab-lobby", "DreamLab Lobby"),
-    ("dreamlab-training", "DreamLab Training"),
-    ("dreamlab-projects", "DreamLab Projects"),
-    ("dreamlab-bookings", "DreamLab Bookings"),
-    // AI Agents
-    ("ai-general", "AI General"),
-    ("ai-claude-flow", "AI Claude Flow"),
-    ("ai-visionflow", "AI VisionFlow"),
 ];
 
 /// Data submitted from the channel creation form.
@@ -241,7 +236,7 @@ where
                 <div class="flex items-center gap-1.5 mt-1">
                     <span class=move || zone_color_dot_class(zone.get())></span>
                     <span class="text-xs text-gray-500">
-                        {move || Zone::from_tag(&zone.get().to_string()).label()}
+                        {move || match zone.get() { 0 => "Public", 1 => "Registered", 2 => "Cohort", _ => "Private" }}
                     </span>
                 </div>
             </div>
@@ -283,15 +278,11 @@ where
 /// Color is derived from the parent zone.
 fn section_color_dot_class(section: &str) -> &'static str {
     match section {
-        // Fairfield Family (green)
-        s if s.starts_with("family-") => "w-2 h-2 rounded-full bg-green-400 inline-block",
         // Minimoonoir (purple)
         s if s.starts_with("minimoonoir-") => "w-2 h-2 rounded-full bg-purple-400 inline-block",
-        // DreamLab (pink)
-        s if s.starts_with("dreamlab-") => "w-2 h-2 rounded-full bg-pink-400 inline-block",
-        // AI Agents (sky)
-        s if s.starts_with("ai-") => "w-2 h-2 rounded-full bg-sky-400 inline-block",
-        _ => "w-2 h-2 rounded-full bg-gray-500 inline-block",
+        // DreamLab and AI (pink)
+        s if s.starts_with("dreamlab-") || s.starts_with("ai-") => "w-2 h-2 rounded-full bg-pink-400 inline-block",
+        _ => "w-2 h-2 rounded-full bg-amber-400 inline-block",
     }
 }
 

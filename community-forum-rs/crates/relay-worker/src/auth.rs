@@ -2,12 +2,9 @@
 //!
 //! Verifies the `Authorization: Nostr <base64(event)>` header using
 //! `nostr_core::verify_nip98_token_at`, then checks whether the authenticated
-//! pubkey holds admin privileges (either via the `ADMIN_PUBKEYS` env var or
-//! via the `admin` cohort in the D1 whitelist table).
+//! pubkey holds admin privileges via the `ADMIN_PUBKEYS` env var.
 
 use nostr_core::nip98::{Nip98Error, Nip98Token};
-use serde::Deserialize;
-use wasm_bindgen::JsValue;
 use worker::Env;
 
 // ---------------------------------------------------------------------------
@@ -53,40 +50,9 @@ pub fn is_admin_by_env(pubkey: &str, env: &Env) -> bool {
     admin_pubkeys(env).iter().any(|k| k == pubkey)
 }
 
-/// D1 row for whitelist cohort lookups.
-#[derive(Deserialize)]
-struct CohortRow {
-    cohorts: String,
-}
-
-/// Check whether a pubkey is an admin -- either by env var or by the `admin`
-/// cohort in the D1 whitelist table.
+/// Check whether a pubkey is an admin (env var only).
 pub async fn is_admin(pubkey: &str, env: &Env) -> bool {
-    if is_admin_by_env(pubkey, env) {
-        return true;
-    }
-
-    let db = match env.d1("DB") {
-        Ok(db) => db,
-        Err(_) => return false,
-    };
-
-    let now = js_now_secs();
-    let stmt = match db
-        .prepare("SELECT cohorts FROM whitelist WHERE pubkey = ?1 AND (expires_at IS NULL OR expires_at > ?2)")
-        .bind(&[JsValue::from_str(pubkey), JsValue::from_f64(now as f64)])
-    {
-        Ok(s) => s,
-        Err(_) => return false,
-    };
-
-    match stmt.first::<CohortRow>(None).await {
-        Ok(Some(row)) => match serde_json::from_str::<Vec<String>>(&row.cohorts) {
-            Ok(cohorts) => cohorts.iter().any(|c| c == "admin"),
-            Err(_) => false,
-        },
-        _ => false,
-    }
+    is_admin_by_env(pubkey, env)
 }
 
 /// Verify NIP-98 auth and assert the authenticated pubkey is an admin.

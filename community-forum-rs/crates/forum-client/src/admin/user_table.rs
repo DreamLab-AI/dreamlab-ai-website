@@ -7,24 +7,13 @@ use leptos::prelude::*;
 use send_wrapper::SendWrapper;
 use std::rc::Rc;
 
-use super::WhitelistUser;
-use crate::utils::capitalize;
+use super::{WhitelistUser, ADMIN_PUBKEYS};
 
-/// Available cohorts matching `community-forum/config/sections.yaml`.
-const AVAILABLE_COHORTS: &[&str] = &[
-    "admin",
-    "cross-access",
-    "family",
-    "family-only",
-    "minimoonoir",
-    "minimoonoir-only",
-    "minimoonoir-business",
-    "business",
-    "business-only",
-    "trainers",
-    "trainees",
-    "agent",
-    "visionflow-full",
+/// Available zone flags for cohort editing.
+const AVAILABLE_COHORTS: &[(&str, &str)] = &[
+    ("home", "Home"),
+    ("dreamlab", "DreamLab"),
+    ("minimoonoir", "Minimoonoir"),
 ];
 
 /// Callback type for cohort updates: (pubkey, new_cohorts).
@@ -112,6 +101,7 @@ fn UserRow(
     let pk = user.pubkey.clone();
     let pk_display = truncate_pubkey(&pk);
     let cohorts = user.cohorts.clone();
+    let is_admin_user = ADMIN_PUBKEYS.contains(&pk.as_str());
 
     let pk_for_edit = pk.clone();
     let cohorts_for_edit = cohorts.clone();
@@ -162,6 +152,11 @@ fn UserRow(
                         move || {
                             view! {
                                 <div class="flex flex-wrap gap-1">
+                                    {is_admin_user.then(|| view! {
+                                        <span class="inline-block text-xs rounded px-1.5 py-0.5 bg-red-500/20 text-red-300 border border-red-500/30">
+                                            "Admin"
+                                        </span>
+                                    })}
                                     {cohorts_disp.iter().map(|c| {
                                         let badge_class = cohort_badge_class(c);
                                         let label = c.clone();
@@ -214,13 +209,13 @@ fn UserRow(
     }
 }
 
-/// Inline cohort editor with checkboxes for each available cohort.
+/// Inline cohort editor with checkboxes for each available zone flag.
 #[component]
 fn CohortEditor(editing_cohorts: RwSignal<Vec<String>>) -> impl IntoView {
     view! {
         <div class="flex flex-wrap gap-2">
-            {AVAILABLE_COHORTS.iter().map(|cohort| {
-                let cohort_str = cohort.to_string();
+            {AVAILABLE_COHORTS.iter().map(|&(cohort_id, label)| {
+                let cohort_str = cohort_id.to_string();
                 let cohort_for_check = cohort_str.clone();
                 let cohort_for_toggle = cohort_str.clone();
 
@@ -237,8 +232,6 @@ fn CohortEditor(editing_cohorts: RwSignal<Vec<String>>) -> impl IntoView {
                         }
                     });
                 };
-
-                let label = capitalize(cohort);
 
                 view! {
                     <label class="flex items-center gap-1 cursor-pointer text-xs">
@@ -267,13 +260,9 @@ fn truncate_pubkey(pk: &str) -> String {
 /// Return a Tailwind CSS class string for a cohort badge based on the cohort name.
 fn cohort_badge_class(cohort: &str) -> &'static str {
     match cohort {
-        "admin" => "inline-block text-xs rounded px-1.5 py-0.5 bg-red-500/20 text-red-300 border border-red-500/30 hover:shadow-[0_0_6px_rgba(239,68,68,0.3)] transition-shadow",
-        "cross-access" => "inline-block text-xs rounded px-1.5 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:shadow-[0_0_6px_rgba(245,158,11,0.3)] transition-shadow",
-        "family" | "family-only" => "inline-block text-xs rounded px-1.5 py-0.5 bg-green-500/20 text-green-300 border border-green-500/30 hover:shadow-[0_0_6px_rgba(34,197,94,0.3)] transition-shadow",
-        "minimoonoir" | "minimoonoir-only" | "minimoonoir-business" => "inline-block text-xs rounded px-1.5 py-0.5 bg-purple-500/20 text-purple-300 border border-purple-500/30 hover:shadow-[0_0_6px_rgba(168,85,247,0.3)] transition-shadow",
-        "business" | "business-only" => "inline-block text-xs rounded px-1.5 py-0.5 bg-pink-500/20 text-pink-300 border border-pink-500/30 hover:shadow-[0_0_6px_rgba(236,72,153,0.3)] transition-shadow",
-        "trainers" | "trainees" => "inline-block text-xs rounded px-1.5 py-0.5 bg-blue-500/20 text-blue-300 border border-blue-500/30 hover:shadow-[0_0_6px_rgba(59,130,246,0.3)] transition-shadow",
-        "agent" | "visionflow-full" => "inline-block text-xs rounded px-1.5 py-0.5 bg-sky-500/20 text-sky-300 border border-sky-500/30 hover:shadow-[0_0_6px_rgba(14,165,233,0.3)] transition-shadow",
+        "home" => "inline-block text-xs rounded px-1.5 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:shadow-[0_0_6px_rgba(245,158,11,0.3)] transition-shadow",
+        "dreamlab" => "inline-block text-xs rounded px-1.5 py-0.5 bg-pink-500/20 text-pink-300 border border-pink-500/30 hover:shadow-[0_0_6px_rgba(236,72,153,0.3)] transition-shadow",
+        "minimoonoir" => "inline-block text-xs rounded px-1.5 py-0.5 bg-purple-500/20 text-purple-300 border border-purple-500/30 hover:shadow-[0_0_6px_rgba(168,85,247,0.3)] transition-shadow",
         _ => "inline-block text-xs rounded px-1.5 py-0.5 bg-gray-500/20 text-gray-300 border border-gray-500/30 hover:shadow-[0_0_6px_rgba(107,114,128,0.3)] transition-shadow",
     }
 }

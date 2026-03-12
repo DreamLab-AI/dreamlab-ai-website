@@ -12,27 +12,20 @@ use crate::stores::mute::use_mute_store;
 use crate::stores::read_position::use_read_positions;
 use crate::stores::zone_access::use_zone_access;
 
-/// Zone-based filter pill definitions matching production sections.yaml.
-/// Each entry: (label, zone_id, access_level).
-/// - access_level 0 = always show pill
-/// - access_level 1 = show if whitelisted
-/// - access_level 2+ = show if user has cohort
-const SECTION_FILTERS: &[(&str, &str, u8)] = &[
-    ("All", "", 0),
-    ("Lobby", "dreamlab-lobby", 1),
-    ("DreamLab", "dreamlab", 2),
-    ("AI Agents", "ai-agents", 2),
-    ("Minimoonoir", "minimoonoir", 2),
-    ("Fairfield Family", "fairfield-family", 3),
+/// Zone-based filter pill definitions.
+/// Each entry: (label, zone_id). Empty zone_id = "All".
+const SECTION_FILTERS: &[(&str, &str)] = &[
+    ("All", ""),
+    ("Home", "home"),
+    ("DreamLab", "dreamlab"),
+    ("Minimoonoir", "minimoonoir"),
 ];
 
-/// Maps zone IDs to their child section IDs (from config/sections.yaml).
+/// Maps zone IDs to their child section IDs.
 const ZONE_SECTIONS: &[(&str, &[&str])] = &[
-    ("fairfield-family", &["family-home", "family-events", "family-photos"]),
+    ("home", &["dreamlab-lobby"]),
+    ("dreamlab", &["dreamlab-training", "dreamlab-projects", "dreamlab-bookings", "ai-general", "ai-claude-flow", "ai-visionflow"]),
     ("minimoonoir", &["minimoonoir-welcome", "minimoonoir-events", "minimoonoir-booking"]),
-    ("dreamlab-lobby", &["dreamlab-lobby"]),
-    ("dreamlab", &["dreamlab-training", "dreamlab-projects", "dreamlab-bookings"]),
-    ("ai-agents", &["ai-general", "ai-claude-flow", "ai-visionflow"]),
 ];
 
 /// Resolve a channel's section tag to its parent zone ID.
@@ -45,34 +38,19 @@ fn section_to_zone_id(section: &str) -> Option<&'static str> {
     None
 }
 
-/// Get the access level for a zone ID.
-/// - 0 = Public, 1 = Registered (lobby), 2 = Cohort, 3 = Private
-fn zone_access_level(zone_id: &str) -> u8 {
-    match zone_id {
-        "dreamlab-lobby" => 1,
-        "dreamlab" => 2,
-        "ai-agents" => 2,
-        "minimoonoir" => 2,
-        "fairfield-family" => 3,
-        _ => 0,
-    }
-}
-
 /// Check whether the user can see a channel based on its section's zone access.
 fn can_see_channel(
     section: &str,
-    is_whitelisted: bool,
-    user_cohorts: &[String],
+    home: bool,
+    dreamlab: bool,
+    minimoonoir: bool,
 ) -> bool {
-    let zone_id = match section_to_zone_id(section) {
-        Some(z) => z,
-        None => return true, // Unknown section → show it (public)
-    };
-    let level = zone_access_level(zone_id);
-    match level {
-        0 => true,
-        1 => is_whitelisted,
-        _ => user_cohorts.iter().any(|c| c == zone_id),
+    match section_to_zone_id(section) {
+        Some("home") => home,
+        Some("dreamlab") => dreamlab,
+        Some("minimoonoir") => minimoonoir,
+        Some(_) => false,
+        None => true, // Unknown section → show it
     }
 }
 
@@ -82,8 +60,10 @@ pub fn ChatPage() -> impl IntoView {
     let store = use_channel_store();
     let conn_state = expect_context::<crate::relay::RelayConnection>().connection_state();
     let zone_access = use_zone_access();
-    let za_whitelisted = zone_access.is_whitelisted;
-    let za_cohorts = zone_access.user_cohorts;
+    // Extract Copy signals for use in multiple closures
+    let za_home = zone_access.home;
+    let za_dreamlab = zone_access.dreamlab;
+    let za_minimoonoir = zone_access.minimoonoir;
 
     let query = use_query_map();
     let section_filter = move || query.read().get("section").unwrap_or_default();
@@ -107,17 +87,19 @@ pub fn ChatPage() -> impl IntoView {
         let chans = store.channels.get();
         let counts = store.message_counts.get();
         let active = store.last_active.get();
-        let whitelisted = za_whitelisted.get();
-        let cohorts = za_cohorts.get();
+        let home = za_home.get();
+        let dreamlab = za_dreamlab.get();
+        let minimoonoir = za_minimoonoir.get();
 
         let mut result: Vec<ChannelInfo> = chans
             .iter()
             // Zone access gate: only show channels the user can see
-            .filter(|c| can_see_channel(&c.section, whitelisted, &cohorts))
+            .filter(|c| can_see_channel(&c.section, home, dreamlab, minimoonoir))
             .filter(|c| {
                 if section.is_empty() {
                     return true;
                 }
+                // Match against zone ID or direct section
                 c.section == section || section_to_zone_id(&c.section) == Some(section.as_str())
             })
             .filter(|c| !mute_store.is_channel_muted(&c.id))
@@ -142,12 +124,13 @@ pub fn ChatPage() -> impl IntoView {
         let chans = store.channels.get();
         let counts = store.message_counts.get();
         let active = store.last_active.get();
-        let whitelisted = za_whitelisted.get();
-        let cohorts = za_cohorts.get();
+        let home = za_home.get();
+        let dreamlab = za_dreamlab.get();
+        let minimoonoir = za_minimoonoir.get();
 
         let mut result: Vec<ChannelInfo> = chans
             .iter()
-            .filter(|c| can_see_channel(&c.section, whitelisted, &cohorts))
+            .filter(|c| can_see_channel(&c.section, home, dreamlab, minimoonoir))
             .filter(|c| {
                 if section.is_empty() {
                     return true;
@@ -176,10 +159,9 @@ pub fn ChatPage() -> impl IntoView {
             "Channels".to_string()
         } else {
             match section.as_str() {
-                "fairfield-family" => "Fairfield Family".to_string(),
-                "minimoonoir" => "Minimoonoir".to_string(),
+                "home" => "Home".to_string(),
                 "dreamlab" => "DreamLab".to_string(),
-                "ai-agents" => "AI Agents".to_string(),
+                "minimoonoir" => "Minimoonoir".to_string(),
                 _ => "Channels".to_string(),
             }
         }
@@ -217,16 +199,15 @@ pub fn ChatPage() -> impl IntoView {
             // Section filter pills (only show zones the user can access)
             <div class="flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-none" style="-webkit-overflow-scrolling: touch">
                 {move || {
-                    let whitelisted = za_whitelisted.get();
-                    let cohorts = za_cohorts.get();
                     let current = section_filter();
-                    SECTION_FILTERS.iter().filter(|&&(_, zone_id, level)| {
-                        match level {
-                            0 => true,
-                            1 => whitelisted,
-                            _ => cohorts.iter().any(|c| c == zone_id),
+                    SECTION_FILTERS.iter().filter(|&&(_, zone_id)| {
+                        zone_id.is_empty() || match zone_id {
+                            "home" => za_home.get(),
+                            "dreamlab" => za_dreamlab.get(),
+                            "minimoonoir" => za_minimoonoir.get(),
+                            _ => false,
                         }
-                    }).map(|&(label, value, _)| {
+                    }).map(|&(label, value)| {
                         let is_active = if value.is_empty() {
                             current.is_empty()
                         } else {

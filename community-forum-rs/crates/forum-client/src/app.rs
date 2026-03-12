@@ -222,6 +222,63 @@ pub fn App() -> impl IntoView {
         }
     });
 
+    // Publish kind-0 profile event on first relay connect to trigger auto-whitelist.
+    // Without this, new users who register/login are authenticated client-side but
+    // the relay never sees them, so kind-42 messages get rejected ("not whitelisted").
+    {
+        let published_profile = RwSignal::new(false);
+        let relay_state = relay.connection_state();
+        Effect::new(move |_| {
+            if relay_state.get() != ConnectionState::Connected {
+                return;
+            }
+            if !is_authed.get() {
+                published_profile.set(false);
+                return;
+            }
+            if published_profile.get_untracked() {
+                return;
+            }
+
+            let auth = use_auth();
+            let r = expect_context::<RelayConnection>();
+            let pubkey = match auth.pubkey().get_untracked() {
+                Some(pk) => pk,
+                None => return,
+            };
+
+            let nickname = auth.nickname().get_untracked().unwrap_or_default();
+            let content = serde_json::json!({
+                "name": nickname,
+                "display_name": nickname,
+            }).to_string();
+
+            let now = (js_sys::Date::now() / 1000.0) as u64;
+            let unsigned = nostr_core::UnsignedEvent {
+                pubkey: pubkey.clone(),
+                created_at: now,
+                kind: 0,
+                tags: vec![],
+                content,
+            };
+
+            match auth.sign_event(unsigned) {
+                Ok(signed) => {
+                    r.publish(&signed);
+                    published_profile.set(true);
+                    web_sys::console::log_1(
+                        &format!("[app] Published kind-0 profile for auto-whitelist: {}", &pubkey[..8]).into()
+                    );
+                }
+                Err(e) => {
+                    web_sys::console::warn_1(
+                        &format!("[app] Failed to publish kind-0: {e}").into()
+                    );
+                }
+            }
+        });
+    }
+
     // Start channel sync once relay connects (single subscription for all pages)
     let relay_conn = relay.connection_state();
     Effect::new(move |_| {
