@@ -345,7 +345,7 @@ pub fn CategoryPage() -> impl IntoView {
                                                 creating.set(true);
                                                 create_error.set(None);
 
-                                                match create_topic_event(&auth_create, &relay_create, &name, &desc, &section) {
+                                                match create_topic_event(&auth_create, &relay_create, &name, &desc, &section, create_error) {
                                                     Ok(meta) => {
                                                         // Add to local list immediately
                                                         sections_sig.update(|list| {
@@ -477,14 +477,16 @@ fn SectionSkeleton() -> impl IntoView {
     }
 }
 
-/// Create a kind-40 channel event, sign it, and publish to the relay.
+/// Create a kind-40 channel event, sign it, and publish to the relay with ack.
 /// Returns the `SectionMeta` for optimistic local insertion.
+/// On relay rejection, the error signal is set asynchronously.
 fn create_topic_event(
     auth: &crate::auth::AuthStore,
     relay: &RelayConnection,
     name: &str,
     description: &str,
     section: &str,
+    error_signal: RwSignal<Option<String>>,
 ) -> Result<SectionMeta, String> {
     if relay.connection_state().get_untracked() != ConnectionState::Connected {
         return Err("Relay not connected".to_string());
@@ -518,7 +520,18 @@ fn create_topic_event(
     let signed = auth.sign_event(unsigned)?;
     let channel_id = signed.id.clone();
 
-    relay.publish(&signed);
+    // Publish with ack — show error asynchronously if relay rejects
+    let on_ok = std::rc::Rc::new(move |accepted: bool, msg: String| {
+        if !accepted {
+            let display = if msg.contains("whitelist") {
+                "Your account isn't active yet — try refreshing the page.".to_string()
+            } else {
+                format!("Relay rejected: {msg}")
+            };
+            error_signal.set(Some(display));
+        }
+    });
+    let _ = relay.publish_with_ack(&signed, Some(on_ok));
 
     Ok(SectionMeta {
         channel_id,

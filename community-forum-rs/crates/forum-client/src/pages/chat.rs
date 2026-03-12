@@ -10,14 +10,20 @@ use crate::components::mark_all_read::MarkAllRead;
 use crate::stores::channels::use_channel_store;
 use crate::stores::mute::use_mute_store;
 use crate::stores::read_position::use_read_positions;
+use crate::stores::zone_access::use_zone_access;
 
 /// Zone-based filter pill definitions matching production sections.yaml.
-const SECTION_FILTERS: &[(&str, &str)] = &[
-    ("All", ""),
-    ("Fairfield Family", "fairfield-family"),
-    ("Minimoonoir", "minimoonoir"),
-    ("DreamLab", "dreamlab"),
-    ("AI Agents", "ai-agents"),
+/// Each entry: (label, zone_id, access_level).
+/// - access_level 0 = always show pill
+/// - access_level 1 = show if whitelisted
+/// - access_level 2+ = show if user has cohort
+const SECTION_FILTERS: &[(&str, &str, u8)] = &[
+    ("All", "", 0),
+    ("Lobby", "dreamlab-lobby", 1),
+    ("DreamLab", "dreamlab", 2),
+    ("AI Agents", "ai-agents", 2),
+    ("Minimoonoir", "minimoonoir", 2),
+    ("Fairfield Family", "fairfield-family", 3),
 ];
 
 /// Maps zone IDs to their child section IDs (from config/sections.yaml).
@@ -39,11 +45,45 @@ fn section_to_zone_id(section: &str) -> Option<&'static str> {
     None
 }
 
+/// Get the access level for a zone ID.
+/// - 0 = Public, 1 = Registered (lobby), 2 = Cohort, 3 = Private
+fn zone_access_level(zone_id: &str) -> u8 {
+    match zone_id {
+        "dreamlab-lobby" => 1,
+        "dreamlab" => 2,
+        "ai-agents" => 2,
+        "minimoonoir" => 2,
+        "fairfield-family" => 3,
+        _ => 0,
+    }
+}
+
+/// Check whether the user can see a channel based on its section's zone access.
+fn can_see_channel(
+    section: &str,
+    is_whitelisted: bool,
+    user_cohorts: &[String],
+) -> bool {
+    let zone_id = match section_to_zone_id(section) {
+        Some(z) => z,
+        None => return true, // Unknown section → show it (public)
+    };
+    let level = zone_access_level(zone_id);
+    match level {
+        0 => true,
+        1 => is_whitelisted,
+        _ => user_cohorts.iter().any(|c| c == zone_id),
+    }
+}
+
 /// Channel list page. Reads from shared ChannelStore and supports zone filtering.
 #[component]
 pub fn ChatPage() -> impl IntoView {
     let store = use_channel_store();
     let conn_state = expect_context::<crate::relay::RelayConnection>().connection_state();
+    let zone_access = use_zone_access();
+    let za_whitelisted = zone_access.is_whitelisted;
+    let za_cohorts = zone_access.user_cohorts;
 
     let query = use_query_map();
     let section_filter = move || query.read().get("section").unwrap_or_default();
@@ -61,15 +101,19 @@ pub fn ChatPage() -> impl IntoView {
         }
     });
 
-    // Filtered and sorted channel list (unmuted)
+    // Filtered and sorted channel list (unmuted, zone-gated)
     let filtered_channels = move || {
         let section = section_filter();
         let chans = store.channels.get();
         let counts = store.message_counts.get();
         let active = store.last_active.get();
+        let whitelisted = za_whitelisted.get();
+        let cohorts = za_cohorts.get();
 
         let mut result: Vec<ChannelInfo> = chans
             .iter()
+            // Zone access gate: only show channels the user can see
+            .filter(|c| can_see_channel(&c.section, whitelisted, &cohorts))
             .filter(|c| {
                 if section.is_empty() {
                     return true;
@@ -92,15 +136,18 @@ pub fn ChatPage() -> impl IntoView {
         result
     };
 
-    // Muted channels (shown collapsed at bottom)
+    // Muted channels (shown collapsed at bottom, also zone-gated)
     let muted_channels = move || {
         let section = section_filter();
         let chans = store.channels.get();
         let counts = store.message_counts.get();
         let active = store.last_active.get();
+        let whitelisted = za_whitelisted.get();
+        let cohorts = za_cohorts.get();
 
         let mut result: Vec<ChannelInfo> = chans
             .iter()
+            .filter(|c| can_see_channel(&c.section, whitelisted, &cohorts))
             .filter(|c| {
                 if section.is_empty() {
                     return true;
@@ -167,31 +214,41 @@ pub fn ChatPage() -> impl IntoView {
                 <MarkAllRead on_click=on_mark_all_read />
             </div>
 
-            // Section filter pills
+            // Section filter pills (only show zones the user can access)
             <div class="flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-none" style="-webkit-overflow-scrolling: touch">
-                {SECTION_FILTERS.iter().map(|&(label, value)| {
+                {move || {
+                    let whitelisted = za_whitelisted.get();
+                    let cohorts = za_cohorts.get();
                     let current = section_filter();
-                    let is_active = if value.is_empty() {
-                        current.is_empty()
-                    } else {
-                        current == value
-                    };
-                    let href = if value.is_empty() {
-                        base_href("/chat")
-                    } else {
-                        base_href(&format!("/chat?section={}", value))
-                    };
-                    let class = if is_active {
-                        "inline-block px-3 py-1.5 rounded-full text-sm font-semibold bg-amber-500 text-gray-900 whitespace-nowrap transition-colors"
-                    } else {
-                        "inline-block px-3 py-1.5 rounded-full text-sm bg-gray-800 text-gray-400 border border-gray-700 hover:bg-gray-700 hover:text-gray-200 whitespace-nowrap transition-colors"
-                    };
-                    view! {
-                        <A href=href attr:class=class>
-                            {label}
-                        </A>
-                    }
-                }).collect_view()}
+                    SECTION_FILTERS.iter().filter(|&&(_, zone_id, level)| {
+                        match level {
+                            0 => true,
+                            1 => whitelisted,
+                            _ => cohorts.iter().any(|c| c == zone_id),
+                        }
+                    }).map(|&(label, value, _)| {
+                        let is_active = if value.is_empty() {
+                            current.is_empty()
+                        } else {
+                            current == value
+                        };
+                        let href = if value.is_empty() {
+                            base_href("/chat")
+                        } else {
+                            base_href(&format!("/chat?section={}", value))
+                        };
+                        let class = if is_active {
+                            "inline-block px-3 py-1.5 rounded-full text-sm font-semibold bg-amber-500 text-gray-900 whitespace-nowrap transition-colors"
+                        } else {
+                            "inline-block px-3 py-1.5 rounded-full text-sm bg-gray-800 text-gray-400 border border-gray-700 hover:bg-gray-700 hover:text-gray-200 whitespace-nowrap transition-colors"
+                        };
+                        view! {
+                            <A href=href attr:class=class>
+                                {label}
+                            </A>
+                        }
+                    }).collect_view()
+                }}
             </div>
 
             // Connection banner

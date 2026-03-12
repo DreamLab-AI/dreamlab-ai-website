@@ -449,17 +449,21 @@ impl NostrRelayDO {
             }
         }
 
-        // Registration events (kind 0 profile, kind 9024, kind 9021 join request) bypass whitelist
-        let is_registration = event.kind == 0 || event.kind == 9024 || event.kind == 9021;
-        if !is_registration && !self.is_whitelisted(&event.pubkey).await {
+        // Events that bypass whitelist gating:
+        // - kind 0: profile metadata (triggers auto-whitelist)
+        // - kind 40: channel creation (users need to create topics immediately after registration)
+        // - kind 9021: join request
+        // - kind 9024: registration metadata
+        let is_bypass = matches!(event.kind, 0 | 40 | 9021 | 9024);
+        if !is_bypass && !self.is_whitelisted(&event.pubkey).await {
             Self::send_ok(ws, &event.id, false, "blocked: pubkey not whitelisted");
             return;
         }
 
-        // Auto-whitelist: when a new user publishes their first kind-0 profile event,
-        // add them to the whitelist with the "lobby" cohort so they can participate
-        // immediately in the public lobby zone.
-        if event.kind == 0 && !self.is_whitelisted(&event.pubkey).await {
+        // Auto-whitelist: when a new user publishes their first kind-0 profile event
+        // (or any bypass event before they're whitelisted), add them to the whitelist
+        // with the "lobby" cohort so they can participate immediately.
+        if is_bypass && !self.is_whitelisted(&event.pubkey).await {
             self.auto_whitelist(&event.pubkey).await;
         }
 
