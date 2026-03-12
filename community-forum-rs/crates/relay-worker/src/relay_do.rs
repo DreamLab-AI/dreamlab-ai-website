@@ -449,11 +449,18 @@ impl NostrRelayDO {
             }
         }
 
-        // Registration events (kind 0 profile, kind 9024) bypass whitelist
-        let is_registration = event.kind == 0 || event.kind == 9024;
+        // Registration events (kind 0 profile, kind 9024, kind 9021 join request) bypass whitelist
+        let is_registration = event.kind == 0 || event.kind == 9024 || event.kind == 9021;
         if !is_registration && !self.is_whitelisted(&event.pubkey).await {
             Self::send_ok(ws, &event.id, false, "blocked: pubkey not whitelisted");
             return;
+        }
+
+        // Auto-whitelist: when a new user publishes their first kind-0 profile event,
+        // add them to the whitelist with the "lobby" cohort so they can participate
+        // immediately in the public lobby zone.
+        if event.kind == 0 && !self.is_whitelisted(&event.pubkey).await {
+            self.auto_whitelist(&event.pubkey).await;
         }
 
         // NIP-29: Admin-only group management kinds
@@ -1062,6 +1069,35 @@ impl NostrRelayDO {
         };
 
         matches!(stmt.first::<serde_json::Value>(None).await, Ok(Some(_)))
+    }
+
+    /// Auto-whitelist a new user with the "lobby" cohort.
+    ///
+    /// Called when a user publishes their first kind-0 profile event. Gives them
+    /// immediate access to the DreamLab Lobby zone without admin intervention.
+    /// Admin can later assign additional cohorts for other zones.
+    async fn auto_whitelist(&self, pubkey: &str) {
+        let db = match self.env.d1("DB") {
+            Ok(db) => db,
+            Err(_) => return,
+        };
+
+        let now = auth::js_now_secs();
+        let cohorts_json = r#"["lobby"]"#;
+
+        let stmt = db.prepare(
+            "INSERT INTO whitelist (pubkey, cohorts, added_at, added_by) \
+             VALUES (?1, ?2, ?3, ?4) \
+             ON CONFLICT (pubkey) DO NOTHING",
+        );
+        if let Ok(bound) = stmt.bind(&[
+            JsValue::from_str(pubkey),
+            JsValue::from_str(cohorts_json),
+            JsValue::from_f64(now as f64),
+            JsValue::from_str("auto-registration"),
+        ]) {
+            let _ = bound.run().await;
+        }
     }
 }
 

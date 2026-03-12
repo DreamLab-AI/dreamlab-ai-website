@@ -11,6 +11,7 @@ use crate::components::breadcrumb::{Breadcrumb, BreadcrumbItem};
 use crate::components::category_card::CategoryCard;
 use crate::components::empty_state::EmptyState;
 use crate::stores::channels::use_channel_store;
+use crate::stores::zone_access::use_zone_access;
 
 // -- Zone definitions (matching config/sections.yaml) -------------------------
 
@@ -27,11 +28,45 @@ struct Zone {
     sections: &'static [&'static str],
 }
 
-/// Production zone definitions matching `community-forum/config/sections.yaml`.
-/// Each zone owns a set of section IDs; channels carry a `section` tag with the
-/// section ID, and we resolve zone membership by looking up which zone contains
-/// that section ID.
+/// Production zone definitions.
+///
+/// **Access model:**
+/// - `access_level: 0` = Public (no auth)
+/// - `access_level: 1` = Registered (any whitelisted user)
+/// - `access_level: 2` = Cohort (requires specific cohort membership)
+/// - `access_level: 3` = Private (invite-only, requires cohort)
+///
+/// The DreamLab Lobby is available to ALL registered users (level 1).
+/// All other zones require explicit cohort assignment by an admin.
+/// Zones the user cannot access are completely hidden.
 const ZONES: &[Zone] = &[
+    Zone {
+        id: "dreamlab-lobby",
+        name: "DreamLab Lobby",
+        description: "Welcome! General discussion, introductions, and community chat",
+        icon: "sparkle",
+        accent: "pink",
+        access_level: 1,
+        sections: &["dreamlab-lobby"],
+    },
+    Zone {
+        id: "dreamlab",
+        name: "DreamLab",
+        description: "Business training and collaboration space",
+        icon: "sparkle",
+        accent: "pink",
+        access_level: 2,
+        sections: &["dreamlab-training", "dreamlab-projects", "dreamlab-bookings"],
+    },
+    Zone {
+        id: "ai-agents",
+        name: "AI Agents",
+        description: "VisionFlow AI agents — tiered intelligence via Nostr DM",
+        icon: "bot",
+        accent: "sky",
+        access_level: 2,
+        sections: &["ai-general", "ai-claude-flow", "ai-visionflow"],
+    },
     Zone {
         id: "fairfield-family",
         name: "Fairfield Family",
@@ -50,24 +85,6 @@ const ZONES: &[Zone] = &[
         access_level: 2,
         sections: &["minimoonoir-welcome", "minimoonoir-events", "minimoonoir-booking"],
     },
-    Zone {
-        id: "dreamlab",
-        name: "DreamLab",
-        description: "Business training and collaboration space",
-        icon: "sparkle",
-        accent: "pink",
-        access_level: 2,
-        sections: &["dreamlab-lobby", "dreamlab-training", "dreamlab-projects", "dreamlab-bookings"],
-    },
-    Zone {
-        id: "ai-agents",
-        name: "AI Agents",
-        description: "VisionFlow AI agents — tiered intelligence via Nostr DM",
-        icon: "bot",
-        accent: "sky",
-        access_level: 1,
-        sections: &["ai-general", "ai-claude-flow", "ai-visionflow"],
-    },
 ];
 
 /// Resolve a section tag to its parent zone ID.
@@ -83,11 +100,16 @@ fn section_to_zone(section: &str) -> Option<&'static str> {
 }
 
 /// Main forum index page showing all zones and their categories.
+/// Only shows zones the user has access to — inaccessible zones are hidden.
 /// Reads from the shared ChannelStore — no per-page relay subscription.
 #[component]
 pub fn ForumsPage() -> impl IntoView {
     let store = use_channel_store();
     let loading = store.loading;
+    let zone_access = use_zone_access();
+    // Extract Copy signals so closures in the view can capture them by value
+    let za_whitelisted = zone_access.is_whitelisted;
+    let za_cohorts = zone_access.user_cohorts;
 
     // Derive zone_id -> { section_id -> channel_count } from the shared store
     let zone_categories = Memo::new(move |_| {
@@ -136,18 +158,39 @@ pub fn ForumsPage() -> impl IntoView {
                 </div>
             </Show>
 
-            // Zone sections
+            // Zone sections — only show zones the user can access
             <Show when=move || !loading.get()>
                 {move || {
                     let zc = zone_categories.get();
-                    ZONES.iter().map(|zone| {
+                    let visible_zones: Vec<_> = ZONES.iter().filter(|zone| {
+                        can_access_zone(zone, za_whitelisted, za_cohorts)
+                    }).collect();
+
+                    if visible_zones.is_empty() {
+                        let lock_icon: Box<dyn FnOnce() -> leptos::prelude::AnyView + Send> = Box::new(|| view! {
+                            <svg class="w-7 h-7 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+                                <circle cx="8.5" cy="7" r="4"/>
+                                <line x1="20" y1="8" x2="20" y2="14"/>
+                                <line x1="23" y1="11" x2="17" y2="11"/>
+                            </svg>
+                        }.into_any());
+                        return view! {
+                            <EmptyState
+                                icon=lock_icon
+                                title="Sign in to get started".to_string()
+                                description="Create an account or log in to access the DreamLab community forums.".to_string()
+                            />
+                        }.into_any();
+                    }
+
+                    visible_zones.into_iter().map(|zone| {
                         let cats = zc.get(zone.id).cloned().unwrap_or_default();
                         let zone_id = zone.id;
                         let zone_name = zone.name;
                         let zone_desc = zone.description;
                         let accent = zone.accent;
                         let icon = zone.icon;
-                        let al = zone.access_level;
                         let has_cats = !cats.is_empty();
 
                         let gradient = zone_gradient(accent);
@@ -162,7 +205,6 @@ pub fn ForumsPage() -> impl IntoView {
                                     "relative mb-4 py-6 px-6 rounded-2xl overflow-hidden bg-gradient-to-br {} border {} backdrop-blur-sm",
                                     gradient, border
                                 )>
-                                    // Background hero image (subtle, behind gradient)
                                     {has_hero.then(|| view! {
                                         <img
                                             src=hero_img
@@ -178,24 +220,7 @@ pub fn ForumsPage() -> impl IntoView {
                                     <div class="relative z-10 flex items-start gap-4">
                                         <ZoneIcon icon=icon accent=accent/>
                                         <div class="flex-1 min-w-0">
-                                            <div class="flex items-center gap-2 mb-1">
-                                                <h2 class="text-xl sm:text-2xl font-bold text-white">{zone_name}</h2>
-                                                {(al > 0).then(|| {
-                                                    let badge = crate::stores::zone_access::Zone::from_tag(&al.to_string());
-                                                    view! {
-                                                        <span class=format!(
-                                                            "inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider border rounded-full px-2 py-0.5 {}",
-                                                            badge.badge_class()
-                                                        )>
-                                                            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                                <rect x="3" y="11" width="18" height="11" rx="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                                                <path d="M7 11V7a5 5 0 0110 0v4" stroke-linecap="round" stroke-linejoin="round"/>
-                                                            </svg>
-                                                            {badge.label()}
-                                                        </span>
-                                                    }
-                                                })}
-                                            </div>
+                                            <h2 class="text-xl sm:text-2xl font-bold text-white mb-1">{zone_name}</h2>
                                             <p class="text-gray-300 text-sm">{zone_desc}</p>
                                         </div>
                                     </div>
@@ -224,53 +249,50 @@ pub fn ForumsPage() -> impl IntoView {
                                         </div>
                                     }.into_any()
                                 } else {
-                                    if al > 0 {
-                                        // Restricted zone with no visible channels — show access message
-                                        let (title, desc) = match al {
-                                            3 => ("Private zone", "This zone is invite-only. Ask a member to add you."),
-                                            2 => ("Members only", "This zone is for group members. Ask an admin for access."),
-                                            _ => ("Login required", "Sign in to see content in this zone."),
-                                        };
-                                        let lock_icon: Box<dyn FnOnce() -> leptos::prelude::AnyView + Send> = Box::new(|| view! {
-                                            <svg class="w-7 h-7 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                                <rect x="3" y="11" width="18" height="11" rx="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                                <path d="M7 11V7a5 5 0 0110 0v4" stroke-linecap="round" stroke-linejoin="round"/>
-                                            </svg>
-                                        }.into_any());
-                                        view! {
-                                            <EmptyState
-                                                icon=lock_icon
-                                                title=title.to_string()
-                                                description=desc.to_string()
-                                            />
-                                        }.into_any()
-                                    } else {
-                                        let empty_icon: Box<dyn FnOnce() -> leptos::prelude::AnyView + Send> = Box::new(|| view! {
-                                            <svg class="w-7 h-7 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                                <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" stroke-linecap="round" stroke-linejoin="round"/>
-                                            </svg>
-                                        }.into_any());
-                                        view! {
-                                            <EmptyState
-                                                icon=empty_icon
-                                                title="No categories yet".to_string()
-                                                description="Categories will appear here as channels are created in this zone.".to_string()
-                                            />
-                                        }.into_any()
-                                    }
+                                    let empty_icon: Box<dyn FnOnce() -> leptos::prelude::AnyView + Send> = Box::new(|| view! {
+                                        <svg class="w-7 h-7 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                            <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    }.into_any());
+                                    view! {
+                                        <EmptyState
+                                            icon=empty_icon
+                                            title="No topics yet".to_string()
+                                            description="Be the first to start a conversation in this zone.".to_string()
+                                        />
+                                    }.into_any()
                                 }}
                             </section>
                         }
-                    }).collect_view()
+                    }).collect_view().into_any()
                 }}
             </Show>
         </div>
     }
 }
 
+/// Check whether the user can access a zone based on its access level and
+/// the user's cohort memberships.
+///
+/// - Level 0 (Public): always visible
+/// - Level 1 (Registered): visible if authenticated/whitelisted
+/// - Level 2 (Cohort): visible if user's cohorts contain the zone ID
+/// - Level 3 (Private): visible if user's cohorts contain the zone ID
+///
+/// Takes individual signals (which are `Copy`) so closures in the view macro
+/// can capture them without moving the parent `ZoneAccess` struct.
+fn can_access_zone(zone: &Zone, is_whitelisted: Signal<bool>, user_cohorts: RwSignal<Vec<String>>) -> bool {
+    match zone.access_level {
+        0 => true,
+        1 => is_whitelisted.get_untracked(),
+        _ => user_cohorts.get_untracked().iter().any(|c| c == zone.id),
+    }
+}
+
 /// Map zone IDs to default hero images from the main marketing site.
 fn zone_default_image(zone_id: &str) -> &'static str {
     match zone_id {
+        "dreamlab-lobby" => "/images/heroes/dreamlab-hero.webp",
         "fairfield-family" => "/images/heroes/dreamlab-hero.webp",
         "minimoonoir" => "/images/heroes/corporate-immersive.webp",
         "dreamlab" => "/images/heroes/ai-commander-week.webp",

@@ -3,8 +3,14 @@
 //! Provides reactive zone access context that maps user cohorts to visibility
 //! tiers. Zone enforcement is client-side (UX optimization); the relay is
 //! the source of truth per ADR-022.
+//!
+//! On authentication, fetches the user's whitelist entry (including cohorts)
+//! from the relay's `/api/check-whitelist?pubkey=` endpoint and populates
+//! the reactive `user_cohorts` signal.
 
 use leptos::prelude::*;
+use wasm_bindgen::JsCast;
+use wasm_bindgen_futures::JsFuture;
 
 use crate::auth::use_auth;
 
@@ -107,11 +113,12 @@ impl ZoneAccess {
 /// Create and provide the zone access store into Leptos context.
 ///
 /// Must be called after `provide_auth()`. Derives whitelist status from the
-/// auth store's authentication state. Cohorts are populated when the relay
-/// sends whitelist data (via `set_user_cohorts`).
+/// auth store's authentication state. When the user authenticates, fetches
+/// their cohorts from the relay's `/api/check-whitelist` endpoint.
 pub fn provide_zone_access() {
     let auth = use_auth();
     let is_authed = auth.is_authenticated();
+    let pubkey = auth.pubkey();
     let user_cohorts = RwSignal::new(Vec::<String>::new());
     let is_whitelisted = Signal::derive(move || is_authed.get());
 
@@ -119,7 +126,94 @@ pub fn provide_zone_access() {
         user_cohorts,
         is_whitelisted,
     };
-    provide_context(access);
+    provide_context(access.clone());
+
+    // Fetch cohorts from relay when user authenticates
+    Effect::new(move |_| {
+        let authed = is_authed.get();
+        let pk = pubkey.get();
+        if authed {
+            if let Some(pk) = pk {
+                let cohorts_signal = user_cohorts;
+                leptos::task::spawn_local(async move {
+                    match fetch_user_cohorts(&pk).await {
+                        Ok(cohorts) => {
+                            web_sys::console::log_1(
+                                &format!("[zone_access] cohorts for {}: {:?}", &pk[..8], cohorts).into(),
+                            );
+                            cohorts_signal.set(cohorts);
+                        }
+                        Err(e) => {
+                            web_sys::console::error_1(
+                                &format!("[zone_access] failed to fetch cohorts: {e}").into(),
+                            );
+                        }
+                    }
+                });
+            }
+        } else {
+            user_cohorts.set(Vec::new());
+        }
+    });
+}
+
+/// Resolve the relay HTTP base URL for whitelist API calls.
+fn relay_api_base() -> String {
+    if let Some(window) = web_sys::window() {
+        if let Ok(val) = js_sys::Reflect::get(&window, &"__ENV__".into()) {
+            if !val.is_undefined() && !val.is_null() {
+                if let Ok(url) = js_sys::Reflect::get(&val, &"VITE_RELAY_URL".into()) {
+                    if let Some(s) = url.as_string() {
+                        if !s.is_empty() {
+                            return s
+                                .replace("wss://", "https://")
+                                .replace("ws://", "http://")
+                                .trim_end_matches('/')
+                                .to_string();
+                        }
+                    }
+                }
+            }
+        }
+    }
+    // Compile-time fallback
+    let relay = option_env!("VITE_RELAY_URL").unwrap_or("wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev");
+    relay
+        .replace("wss://", "https://")
+        .replace("ws://", "http://")
+        .trim_end_matches('/')
+        .to_string()
+}
+
+/// Fetch the user's cohort list from the relay's check-whitelist endpoint.
+async fn fetch_user_cohorts(pubkey: &str) -> Result<Vec<String>, String> {
+    let url = format!("{}/api/check-whitelist?pubkey={}", relay_api_base(), pubkey);
+    let win = web_sys::window().ok_or("No window")?;
+    let resp_val = JsFuture::from(win.fetch_with_str(&url))
+        .await
+        .map_err(|e| format!("fetch error: {e:?}"))?;
+    let resp: web_sys::Response = resp_val
+        .dyn_into()
+        .map_err(|_| "Not a Response".to_string())?;
+    if !resp.ok() {
+        return Err(format!("HTTP {}", resp.status()));
+    }
+    let text = JsFuture::from(resp.text().map_err(|e| format!("{e:?}"))?)
+        .await
+        .map_err(|e| format!("{e:?}"))?;
+    let text_str = text.as_string().ok_or("Not a string")?;
+    let val: serde_json::Value =
+        serde_json::from_str(&text_str).map_err(|e| format!("JSON parse: {e}"))?;
+    // Response shape: { isWhitelisted: bool, isAdmin: bool, cohorts: string[] }
+    let cohorts = val["cohorts"]
+        .as_array()
+        .map(|arr| {
+            arr.iter()
+                .filter_map(|v| v.as_str().map(String::from))
+                .collect()
+        })
+        .unwrap_or_default();
+    Ok(cohorts)
 }
 
 /// Retrieve the zone access store from context.
