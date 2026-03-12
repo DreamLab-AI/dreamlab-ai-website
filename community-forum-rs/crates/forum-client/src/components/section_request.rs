@@ -69,23 +69,26 @@ pub fn SectionRequestButton(
             content: format!("Requesting access to {}", section_name_clone),
         };
 
-        match auth.sign_event(unsigned) {
-            Ok(signed) => {
-                relay.publish(&signed);
-                is_pending.set(false);
-                is_sent.set(true);
-                let toasts = use_toasts();
-                toasts.show(
-                    format!("Access request sent for \"{}\"", section_name_clone),
-                    ToastVariant::Success,
-                );
+        let section_name_for_toast = section_name_clone.clone();
+        wasm_bindgen_futures::spawn_local(async move {
+            match auth.sign_event_async(unsigned).await {
+                Ok(signed) => {
+                    relay.publish(&signed);
+                    is_pending.set(false);
+                    is_sent.set(true);
+                    let toasts = use_toasts();
+                    toasts.show(
+                        format!("Access request sent for \"{}\"", section_name_for_toast),
+                        ToastVariant::Success,
+                    );
+                }
+                Err(e) => {
+                    is_pending.set(false);
+                    let toasts = use_toasts();
+                    toasts.show(format!("Failed to send request: {}", e), ToastVariant::Error);
+                }
             }
-            Err(e) => {
-                is_pending.set(false);
-                let toasts = use_toasts();
-                toasts.show(format!("Failed to send request: {}", e), ToastVariant::Error);
-            }
-        }
+        });
     };
 
     let button_text = move || {

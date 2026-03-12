@@ -57,15 +57,17 @@ pub fn JoinRequestButton(
         };
 
         let relay = expect_context::<RelayConnection>();
-        match auth.sign_event(unsigned) {
-            Ok(signed) => {
-                relay.publish(&signed);
-                state.set(RequestState::Sent);
+        wasm_bindgen_futures::spawn_local(async move {
+            match auth.sign_event_async(unsigned).await {
+                Ok(signed) => {
+                    relay.publish(&signed);
+                    state.set(RequestState::Sent);
+                }
+                Err(_) => {
+                    state.set(RequestState::Idle);
+                }
             }
-            Err(_) => {
-                state.set(RequestState::Idle);
-            }
-        }
+        });
     };
 
     let button_class = move || match state.get() {

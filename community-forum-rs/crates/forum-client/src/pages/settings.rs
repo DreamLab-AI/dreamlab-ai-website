@@ -203,36 +203,39 @@ pub fn SettingsPage() -> impl IntoView {
             content,
         };
 
-        match auth.sign_event(unsigned) {
-            Ok(signed) => {
-                let relay = expect_context::<RelayConnection>();
-                let saving_sig = profile_saving;
-                let toast_sig = toasts_for_profile.clone();
-                let auth_for_ack = auth.clone();
-                let name_for_ack = name.clone();
-                let ack = Rc::new(move |accepted: bool, message: String| {
-                    saving_sig.set(false);
-                    if accepted {
-                        auth_for_ack.set_profile(Some(name_for_ack.clone()), None);
-                        toast_sig.show("Profile updated", ToastVariant::Success);
-                    } else {
-                        toast_sig.show(
-                            format!("Profile rejected: {}", message),
-                            ToastVariant::Error,
-                        );
+        let toasts_ok = toasts_for_profile.clone();
+        let toasts_pub = toasts_for_profile.clone();
+        let toasts_err = toasts_for_profile.clone();
+        wasm_bindgen_futures::spawn_local(async move {
+            match auth.sign_event_async(unsigned).await {
+                Ok(signed) => {
+                    let relay = expect_context::<RelayConnection>();
+                    let saving_sig = profile_saving;
+                    let auth_for_ack = auth;
+                    let name_for_ack = name.clone();
+                    let ack = Rc::new(move |accepted: bool, message: String| {
+                        saving_sig.set(false);
+                        if accepted {
+                            auth_for_ack.set_profile(Some(name_for_ack.clone()), None);
+                            toasts_ok.show("Profile updated", ToastVariant::Success);
+                        } else {
+                            toasts_ok.show(
+                                format!("Profile rejected: {}", message),
+                                ToastVariant::Error,
+                            );
+                        }
+                    });
+                    if let Err(e) = relay.publish_with_ack(&signed, Some(ack)) {
+                        profile_saving.set(false);
+                        toasts_pub.show(format!("Publish failed: {}", e), ToastVariant::Error);
                     }
-                });
-                if let Err(e) = relay.publish_with_ack(&signed, Some(ack)) {
+                }
+                Err(e) => {
                     profile_saving.set(false);
-                    toasts_for_profile
-                        .show(format!("Publish failed: {}", e), ToastVariant::Error);
+                    toasts_err.show(format!("Failed to sign: {}", e), ToastVariant::Error);
                 }
             }
-            Err(e) => {
-                profile_saving.set(false);
-                toasts_for_profile.show(format!("Failed to sign: {}", e), ToastVariant::Error);
-            }
-        }
+        });
     };
 
     // -- Unmute handler --

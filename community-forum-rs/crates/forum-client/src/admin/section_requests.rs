@@ -314,9 +314,12 @@ fn approve_request(req: SectionRequest, requests: RwSignal<Vec<SectionRequest>>)
                         ],
                         content: "Approved section access request".to_string(),
                     };
-                    if let Ok(signed) = use_auth().sign_event(unsigned) {
-                        relay.publish(&signed);
-                    }
+                    let auth = use_auth();
+                    wasm_bindgen_futures::spawn_local(async move {
+                        if let Ok(signed) = auth.sign_event_async(unsigned).await {
+                            relay.publish(&signed);
+                        }
+                    });
                 }
             }
             Err(e) => {
@@ -351,16 +354,19 @@ fn deny_request(req: SectionRequest, requests: RwSignal<Vec<SectionRequest>>) {
         content: "Denied section access request".to_string(),
     };
 
-    match auth.sign_event(unsigned) {
-        Ok(signed) => {
-            relay.publish(&signed);
-            requests.update(|list| list.retain(|r| r.event_id != req.event_id));
-            toasts.show("Request denied", ToastVariant::Info);
+    let req_event_id = req.event_id.clone();
+    wasm_bindgen_futures::spawn_local(async move {
+        match auth.sign_event_async(unsigned).await {
+            Ok(signed) => {
+                relay.publish(&signed);
+                requests.update(|list| list.retain(|r| r.event_id != req_event_id));
+                toasts.show("Request denied", ToastVariant::Info);
+            }
+            Err(e) => {
+                toasts.show(format!("Failed to deny: {}", e), ToastVariant::Error);
+            }
         }
-        Err(e) => {
-            toasts.show(format!("Failed to deny: {}", e), ToastVariant::Error);
-        }
-    }
+    });
 }
 
 fn request_icon() -> impl IntoView {

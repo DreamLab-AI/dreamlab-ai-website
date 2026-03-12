@@ -4,6 +4,7 @@
 //! Private key bytes are held in memory only and zeroized on drop/pagehide.
 
 mod http;
+pub mod nip07;
 pub mod nip98;
 pub mod passkey;
 mod session;
@@ -392,6 +393,80 @@ impl AuthStore {
 
         key_bytes.zeroize();
         Ok(())
+    }
+
+    /// Login with a NIP-07 browser extension (nos2x, Alby, etc.).
+    ///
+    /// Calls `window.nostr.getPublicKey()` to get the pubkey. No private key
+    /// is stored — all signing is delegated to the extension via `signEvent()`.
+    pub async fn login_with_nip07(&self) -> Result<(), String> {
+        self.state.update(|s| {
+            s.is_pending = true;
+            s.error = None;
+            s.state = AuthPhase::Authenticating;
+        });
+
+        let ext_name = nip07::get_extension_name();
+
+        match nip07::nip07_get_pubkey().await {
+            Ok(pubkey) => {
+                let (nickname, avatar, account_status, nsec_backed_up) =
+                    self.read_existing_metadata();
+
+                let stored = StoredSession {
+                    version: 2,
+                    public_key: Some(pubkey.clone()),
+                    is_passkey: false,
+                    is_nip07: true,
+                    is_local_key: false,
+                    extension_name: ext_name.clone(),
+                    nickname: nickname.clone(),
+                    avatar: avatar.clone(),
+                    account_status: account_status.clone(),
+                    nsec_backed_up,
+                };
+                self.save_session(&stored);
+
+                self.state.set(AuthState {
+                    state: AuthPhase::Authenticated,
+                    pubkey: Some(pubkey.clone()),
+                    is_authenticated: true,
+                    public_key: Some(pubkey),
+                    nickname,
+                    avatar,
+                    is_pending: false,
+                    error: None,
+                    account_status,
+                    nsec_backed_up,
+                    is_ready: true,
+                    is_nip07: true,
+                    is_passkey: false,
+                    is_local_key: false,
+                    extension_name: ext_name,
+                });
+                Ok(())
+            }
+            Err(e) => {
+                self.state.update(|s| {
+                    s.is_pending = false;
+                    s.error = Some(e.clone());
+                    s.state = AuthPhase::Unauthenticated;
+                });
+                Err(e)
+            }
+        }
+    }
+
+    /// Async event signing that works for all auth paths.
+    ///
+    /// - **Local key / passkey**: Uses the in-memory privkey (sync, wrapped in async).
+    /// - **NIP-07**: Delegates to `window.nostr.signEvent()` (truly async).
+    pub async fn sign_event_async(&self, event: UnsignedEvent) -> Result<NostrEvent, String> {
+        if self.state.get_untracked().is_nip07 {
+            nip07::nip07_sign_event(&event).await
+        } else {
+            self.sign_event(event)
+        }
     }
 
     /// Log out: zero privkey, clear state and storage.

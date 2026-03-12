@@ -154,6 +154,18 @@ jobs:
           cname: dreamlab-ai.com
           commit_message: "Deploy React + Leptos forum from ${{ github.sha }}"
 
+      - name: Deploy to thedreamlab.uk (mirror)
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          personal_token: ${{ secrets.DREAMLAB_UK_TOKEN }}
+          external_repository: TheDreamLabUK/website
+          publish_dir: ./dist
+          publish_branch: gh-pages
+          force_orphan: true
+          cname: thedreamlab.uk
+          commit_message: "Mirror deploy from DreamLab-AI/dreamlab-ai-website @ ${{ github.sha }}"
+
       - name: Deploy to Cloudflare Pages
         if: vars.CLOUDFLARE_PAGES_ENABLED == 'true'
         uses: cloudflare/wrangler-action@v3

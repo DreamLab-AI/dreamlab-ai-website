@@ -9,6 +9,7 @@ use leptos_router::NavigateOptions;
 use wasm_bindgen_futures::spawn_local;
 
 use crate::app::base_href;
+use crate::auth::nip07;
 use crate::auth::use_auth;
 
 #[component]
@@ -20,6 +21,8 @@ pub fn LoginPage() -> impl IntoView {
 
     let key_input = RwSignal::new(String::new());
     let is_pending = RwSignal::new(false);
+    let nip07_pending = RwSignal::new(false);
+    let has_nip07 = RwSignal::new(nip07::has_nip07_extension());
 
     // Redirect if already authenticated
     Effect::new(move |_| {
@@ -91,14 +94,55 @@ pub fn LoginPage() -> impl IntoView {
                             </button>
                         </div>
 
-                        // === YELLOW: NIP-07 extension (coming soon) ===
-                        <div class="bg-gray-800/50 border border-gray-700/50 rounded-xl p-4 opacity-50">
+                        // === YELLOW: NIP-07 extension ===
+                        <div class=move || {
+                            if has_nip07.get() {
+                                "bg-gray-800/50 border border-gray-700 rounded-xl p-4 space-y-3"
+                            } else {
+                                "bg-gray-800/50 border border-gray-700/50 rounded-xl p-4 space-y-3 opacity-50"
+                            }
+                        }>
                             <div class="flex items-center gap-2">
                                 <span class="w-2.5 h-2.5 rounded-full bg-yellow-500"></span>
                                 <span class="text-sm font-medium text-gray-200">"Nostr Extension (NIP-07)"</span>
-                                <span class="text-xs text-gray-500 ml-auto">"Coming soon"</span>
+                                <span class="text-xs text-gray-500 ml-auto">
+                                    {move || {
+                                        if has_nip07.get() {
+                                            nip07::get_extension_name().unwrap_or_else(|| "Detected".to_string())
+                                        } else {
+                                            "Not detected".to_string()
+                                        }
+                                    }}
+                                </span>
                             </div>
-                            <p class="text-xs text-gray-500 mt-2">"Use nos2x, Alby, or another signing extension."</p>
+                            <p class="text-xs text-gray-500">"Use nos2x, Alby, or another signing extension."</p>
+                            <button
+                                on:click=move |_: web_sys::MouseEvent| {
+                                    if !has_nip07.get_untracked() {
+                                        auth.set_error("No NIP-07 extension detected. Install nos2x or Alby.");
+                                        return;
+                                    }
+                                    let auth = auth;
+                                    nip07_pending.set(true);
+                                    spawn_local(async move {
+                                        let result = auth.login_with_nip07().await;
+                                        nip07_pending.set(false);
+                                        if result.is_ok() {
+                                            navigate.with_value(|nav| nav("/chat", NavigateOptions::default()));
+                                        }
+                                    });
+                                }
+                                disabled=move || nip07_pending.get() || !has_nip07.get()
+                                class="w-full bg-yellow-600 hover:bg-yellow-500 disabled:bg-gray-800 disabled:cursor-not-allowed text-white py-2.5 rounded-lg transition-colors text-sm font-semibold flex items-center justify-center gap-2"
+                            >
+                                <Show
+                                    when=move || nip07_pending.get()
+                                    fallback=|| view! { <span>"Sign In with Extension"</span> }
+                                >
+                                    <span class="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full"></span>
+                                    <span>"Connecting..."</span>
+                                </Show>
+                            </button>
                         </div>
 
                         // === RED: Passkey + PRF (secure but limited support) ===

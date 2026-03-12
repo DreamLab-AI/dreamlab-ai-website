@@ -254,15 +254,16 @@ pub fn ChannelPage() -> impl IntoView {
             content,
         };
 
-        match auth.sign_event(unsigned) {
-            Ok(signed) => {
-                let event_id = signed.id.clone();
-                let _ = relay_for_send.publish(&signed);
+        let relay = relay_for_send.clone();
+        wasm_bindgen_futures::spawn_local(async move {
+            match auth.sign_event_async(unsigned).await {
+                Ok(signed) => {
+                    let event_id = signed.id.clone();
+                    let _ = relay.publish(&signed);
 
-                // Auto-index for semantic search in background
-                let channel_for_index = cid;
-                let privkey_bytes = auth.get_privkey_bytes();
-                wasm_bindgen_futures::spawn_local(async move {
+                    // Auto-index for semantic search in background
+                    let channel_for_index = cid;
+                    let privkey_bytes = auth.get_privkey_bytes();
                     if let Some(key) = privkey_bytes {
                         let _ = crate::utils::search_client::ingest_message(
                             &event_id,
@@ -272,12 +273,12 @@ pub fn ChannelPage() -> impl IntoView {
                         )
                         .await;
                     }
-                });
+                }
+                Err(e) => {
+                    error_msg.set(Some(e));
+                }
             }
-            Err(e) => {
-                error_msg.set(Some(e));
-            }
-        }
+        });
     };
 
     let send_callback = Callback::new(do_send_text);

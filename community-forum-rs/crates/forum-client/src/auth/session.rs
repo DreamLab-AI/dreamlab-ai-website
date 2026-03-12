@@ -194,10 +194,11 @@ impl AuthStore {
 
         if stored.is_nip07 {
             if let Some(ref pubkey) = stored.public_key {
+                let has_ext = super::nip07::has_nip07_extension();
                 self.state.set(AuthState {
-                    state: AuthPhase::Unauthenticated,
+                    state: if has_ext { AuthPhase::Authenticated } else { AuthPhase::Unauthenticated },
                     pubkey: Some(pubkey.clone()),
-                    is_authenticated: false,
+                    is_authenticated: has_ext,
                     public_key: Some(pubkey.clone()),
                     nickname: stored.nickname,
                     avatar: stored.avatar,
@@ -206,7 +207,7 @@ impl AuthStore {
                     account_status: stored.account_status,
                     nsec_backed_up: stored.nsec_backed_up,
                     is_ready: true,
-                    is_nip07: false,
+                    is_nip07: has_ext,
                     is_passkey: false,
                     is_local_key: false,
                     extension_name: stored.extension_name,

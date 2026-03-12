@@ -30,10 +30,10 @@ pub fn relay_info(env: &Env) -> serde_json::Value {
 
     json!({
         "name": relay_name,
-        "description": "Private whitelist-only Nostr relay for the DreamLab community. Supports NIP-01, NIP-11, NIP-16, NIP-33, NIP-98.",
+        "description": "Private whitelist-only Nostr relay for the DreamLab community.",
         "pubkey": admin_pubkey,
         "contact": contact,
-        "supported_nips": [1, 11, 16, 33, 98],
+        "supported_nips": [1, 9, 11, 16, 29, 33, 40, 42, 45, 50, 98],
         "software": "https://github.com/DreamLab-AI/dreamlab-ai-website",
         "version": "3.0.0",
         "limitation": {

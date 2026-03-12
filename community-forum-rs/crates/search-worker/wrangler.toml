@@ -1,0 +1,22 @@
+name = "dreamlab-search-api"
+main = "build/worker/shim.mjs"
+compatibility_date = "2024-09-23"
+
+[build]
+command = "worker-build --release"
+
+[[r2_buckets]]
+binding = "VECTORS"
+bucket_name = "dreamlab-vectors"
+
+[[kv_namespaces]]
+binding = "SEARCH_CONFIG"
+id = "440b1f07ff224fb8ad644e094c6766c0"
+
+[vars]
+ALLOWED_ORIGIN = "https://dreamlab-ai.com"
+RVF_STORE_KEY = "dreamlab.rvf"
+ADMIN_PUBKEYS = "11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c"
+
+[triggers]
+crons = ["*/5 * * * *"]

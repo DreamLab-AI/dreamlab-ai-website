@@ -38,6 +38,8 @@ const MAX_QUERY_LIMIT: u32 = 1000;
 /// Cloudflare bills per-wall-clock-second, so keeping an empty DO alive
 /// burns money for zero utility.
 const IDLE_TIMEOUT_MS: i64 = 60_000;
+/// NIP-29: Admin-only group management kinds.
+const NIP29_ADMIN_KINDS: &[u64] = &[9000, 9001, 9005, 39000];
 
 // ---------------------------------------------------------------------------
 // NIP-01 filter type
@@ -58,6 +60,9 @@ pub struct NostrFilter {
     pub until: Option<u64>,
     #[serde(default)]
     pub limit: Option<u32>,
+    /// NIP-50: Full-text search query.
+    #[serde(default)]
+    pub search: Option<String>,
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
 }
@@ -70,6 +75,10 @@ struct SessionInfo {
     ws: WebSocket,
     ip: String,
     subscriptions: HashMap<String, Vec<NostrFilter>>,
+    /// NIP-42: Authenticated pubkey (set after successful AUTH).
+    authed_pubkey: Option<String>,
+    /// NIP-42: Challenge string sent to client on connect.
+    challenge: String,
 }
 
 // ---------------------------------------------------------------------------
@@ -193,6 +202,7 @@ impl DurableObject for NostrRelayDO {
             current
         };
 
+        let challenge = generate_challenge(session_id);
         {
             let mut sessions = self.sessions.borrow_mut();
             sessions.insert(
@@ -201,6 +211,8 @@ impl DurableObject for NostrRelayDO {
                     ws: server,
                     ip: ip.clone(),
                     subscriptions: HashMap::new(),
+                    authed_pubkey: None,
+                    challenge: challenge.clone(),
                 },
             );
         }
@@ -209,6 +221,14 @@ impl DurableObject for NostrRelayDO {
             let mut counts = self.connection_counts.borrow_mut();
             let count = counts.get(&ip).copied().unwrap_or(0);
             counts.insert(ip, count + 1);
+        }
+
+        // NIP-42: Send AUTH challenge to the newly connected client
+        {
+            let sessions = self.sessions.borrow();
+            if let Some(session) = sessions.get(&session_id) {
+                Self::send_auth(&session.ws, &challenge);
+            }
         }
 
         Response::from_websocket(client)
@@ -287,6 +307,30 @@ impl DurableObject for NostrRelayDO {
                 if let Some(sub_id) = arr[1].as_str() {
                     self.handle_close(session_id, sub_id);
                 }
+            }
+            "AUTH" => {
+                let auth_event: NostrEvent = match serde_json::from_value(arr[1].clone()) {
+                    Ok(e) => e,
+                    Err(_) => {
+                        Self::send_notice(&ws, "Invalid auth event");
+                        return Ok(());
+                    }
+                };
+                self.handle_auth(session_id, &ws, auth_event);
+            }
+            "COUNT" => {
+                let sub_id = match arr[1].as_str() {
+                    Some(s) => s.to_string(),
+                    None => {
+                        Self::send_notice(&ws, "Invalid subscription ID");
+                        return Ok(());
+                    }
+                };
+                let filters: Vec<NostrFilter> = arr[2..]
+                    .iter()
+                    .filter_map(|v| serde_json::from_value(v.clone()).ok())
+                    .collect();
+                self.handle_count(&ws, &sub_id, filters).await;
             }
             _ => {
                 Self::send_notice(&ws, &format!("Unknown message type: {msg_type}"));
@@ -395,10 +439,28 @@ impl NostrRelayDO {
             return;
         }
 
+        // NIP-40: Reject events with an expired `expiration` tag
+        if let Some(exp) = tag_value(&event, "expiration") {
+            if let Ok(exp_ts) = exp.parse::<u64>() {
+                if exp_ts < auth::js_now_secs() {
+                    Self::send_ok(ws, &event.id, false, "invalid: event expired");
+                    return;
+                }
+            }
+        }
+
         // Registration events (kind 0 profile, kind 9024) bypass whitelist
         let is_registration = event.kind == 0 || event.kind == 9024;
         if !is_registration && !self.is_whitelisted(&event.pubkey).await {
             Self::send_ok(ws, &event.id, false, "blocked: pubkey not whitelisted");
+            return;
+        }
+
+        // NIP-29: Admin-only group management kinds
+        if NIP29_ADMIN_KINDS.contains(&event.kind)
+            && !auth::is_admin(&event.pubkey, &self.env).await
+        {
+            Self::send_ok(ws, &event.id, false, "blocked: admin-only group action");
             return;
         }
 
@@ -426,6 +488,11 @@ impl NostrRelayDO {
         if self.save_event(&event, treatment).await {
             Self::send_ok(ws, &event.id, true, "");
             self.broadcast_event(&event);
+
+            // NIP-09: Process deletion events — remove targeted events by same author
+            if event.kind == 5 {
+                self.process_deletion(&event).await;
+            }
         } else {
             Self::send_ok(ws, &event.id, false, "error: failed to save event");
         }
@@ -514,6 +581,306 @@ impl NostrRelayDO {
         let mut sessions = self.sessions.borrow_mut();
         if let Some(session) = sessions.get_mut(&session_id) {
             session.subscriptions.remove(sub_id);
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// NIP-42: AUTH challenge/response
+// ---------------------------------------------------------------------------
+
+impl NostrRelayDO {
+    /// Handle an AUTH response from a client (kind 22242 event).
+    fn handle_auth(&self, session_id: u64, ws: &WebSocket, event: NostrEvent) {
+        // Must be kind 22242
+        if event.kind != 22242 {
+            Self::send_ok(ws, &event.id, false, "invalid: expected kind 22242");
+            return;
+        }
+
+        // Verify signature
+        if nostr_core::verify_event_strict(&event).is_err() {
+            Self::send_ok(ws, &event.id, false, "invalid: signature verification failed");
+            return;
+        }
+
+        // Verify challenge tag matches session challenge
+        let challenge_tag = tag_value(&event, "challenge");
+        let expected_challenge = {
+            let sessions = self.sessions.borrow();
+            sessions.get(&session_id).map(|s| s.challenge.clone())
+        };
+
+        match (challenge_tag, expected_challenge) {
+            (Some(c), Some(expected)) if c == expected => {}
+            _ => {
+                Self::send_ok(ws, &event.id, false, "invalid: challenge mismatch");
+                return;
+            }
+        }
+
+        // Timestamp must be within 10 minutes
+        let now = auth::js_now_secs();
+        if now.abs_diff(event.created_at) > 600 {
+            Self::send_ok(ws, &event.id, false, "invalid: auth event too old");
+            return;
+        }
+
+        // Mark session as authenticated
+        {
+            let mut sessions = self.sessions.borrow_mut();
+            if let Some(session) = sessions.get_mut(&session_id) {
+                session.authed_pubkey = Some(event.pubkey.clone());
+            }
+        }
+
+        Self::send_ok(ws, &event.id, true, "");
+    }
+}
+
+// ---------------------------------------------------------------------------
+// NIP-45: COUNT
+// ---------------------------------------------------------------------------
+
+impl NostrRelayDO {
+    /// Handle a COUNT request: return the number of matching events.
+    async fn handle_count(&self, ws: &WebSocket, sub_id: &str, filters: Vec<NostrFilter>) {
+        let db = match self.env.d1("DB") {
+            Ok(db) => db,
+            Err(_) => {
+                Self::send_count(ws, sub_id, 0);
+                return;
+            }
+        };
+
+        let mut total: u64 = 0;
+        let now = auth::js_now_secs();
+
+        for filter in &filters {
+            let mut conditions: Vec<String> = Vec::new();
+            let mut params: Vec<JsValue> = Vec::new();
+            let mut param_idx = 1u32;
+
+            Self::build_filter_conditions(filter, &mut conditions, &mut params, &mut param_idx);
+
+            // NIP-40: Exclude expired events
+            conditions.push(format!(
+                "(NOT EXISTS (SELECT 1 WHERE tags LIKE '%\"expiration\"%') \
+                 OR CAST(json_extract(tags, '$[0]') AS INTEGER) > ?{param_idx})"
+            ));
+            params.push(JsValue::from_f64(now as f64));
+
+            let where_clause = if conditions.is_empty() {
+                String::new()
+            } else {
+                format!("WHERE {}", conditions.join(" AND "))
+            };
+
+            let sql = format!("SELECT COUNT(*) as cnt FROM events {where_clause}");
+            let result = match db.prepare(&sql).bind(&params) {
+                Ok(stmt) => stmt.first::<CountResult>(None).await,
+                Err(_) => continue,
+            };
+
+            if let Ok(Some(row)) = result {
+                total += row.cnt as u64;
+            }
+        }
+
+        Self::send_count(ws, sub_id, total);
+    }
+
+    /// Build WHERE conditions from a NIP-01 filter (shared by REQ and COUNT).
+    fn build_filter_conditions(
+        filter: &NostrFilter,
+        conditions: &mut Vec<String>,
+        params: &mut Vec<JsValue>,
+        param_idx: &mut u32,
+    ) {
+        if let Some(ref ids) = filter.ids {
+            if !ids.is_empty() {
+                let placeholders: Vec<String> = ids
+                    .iter()
+                    .map(|id| {
+                        let p = format!("?{}", *param_idx);
+                        params.push(JsValue::from_str(id));
+                        *param_idx += 1;
+                        p
+                    })
+                    .collect();
+                conditions.push(format!("id IN ({})", placeholders.join(",")));
+            }
+        }
+
+        if let Some(ref authors) = filter.authors {
+            if !authors.is_empty() {
+                let placeholders: Vec<String> = authors
+                    .iter()
+                    .map(|a| {
+                        let p = format!("?{}", *param_idx);
+                        params.push(JsValue::from_str(a));
+                        *param_idx += 1;
+                        p
+                    })
+                    .collect();
+                conditions.push(format!("pubkey IN ({})", placeholders.join(",")));
+            }
+        }
+
+        if let Some(ref kinds) = filter.kinds {
+            if !kinds.is_empty() {
+                let placeholders: Vec<String> = kinds
+                    .iter()
+                    .map(|k| {
+                        let p = format!("?{}", *param_idx);
+                        params.push(JsValue::from_f64(*k as f64));
+                        *param_idx += 1;
+                        p
+                    })
+                    .collect();
+                conditions.push(format!("kind IN ({})", placeholders.join(",")));
+            }
+        }
+
+        if let Some(since) = filter.since {
+            conditions.push(format!("created_at >= ?{}", *param_idx));
+            params.push(JsValue::from_f64(since as f64));
+            *param_idx += 1;
+        }
+
+        if let Some(until) = filter.until {
+            conditions.push(format!("created_at <= ?{}", *param_idx));
+            params.push(JsValue::from_f64(until as f64));
+            *param_idx += 1;
+        }
+
+        // Tag filters (#e, #p, #t, etc.)
+        for (key, values) in &filter.extra {
+            if !key.starts_with('#') {
+                continue;
+            }
+            let tag_name = &key[1..];
+            if !tag_name
+                .bytes()
+                .all(|b| b.is_ascii_alphanumeric() || b == b'_' || b == b'-')
+            {
+                continue;
+            }
+
+            let tag_values: Vec<&str> = match values.as_array() {
+                Some(arr) => arr.iter().filter_map(|v| v.as_str()).collect(),
+                None => continue,
+            };
+            if tag_values.is_empty() {
+                continue;
+            }
+
+            let mut tag_conditions: Vec<String> = Vec::new();
+            for v in &tag_values {
+                if v.is_empty() {
+                    continue;
+                }
+                let escaped = v.replace('%', "\\%").replace('_', "\\_").replace('"', "");
+                let pattern = format!("%\"{tag_name}\",\"{escaped}\"%");
+                tag_conditions.push(format!("tags LIKE ?{} ESCAPE '\\\\'", *param_idx));
+                params.push(JsValue::from_str(&pattern));
+                *param_idx += 1;
+            }
+
+            if !tag_conditions.is_empty() {
+                conditions.push(format!("({})", tag_conditions.join(" OR ")));
+            }
+        }
+
+        // NIP-50: Full-text search on content
+        if let Some(ref search) = filter.search {
+            if !search.is_empty() {
+                let escaped = search.replace('%', "\\%").replace('_', "\\_");
+                let pattern = format!("%{escaped}%");
+                conditions.push(format!("content LIKE ?{} ESCAPE '\\\\'", *param_idx));
+                params.push(JsValue::from_str(&pattern));
+                *param_idx += 1;
+            }
+        }
+    }
+}
+
+/// D1 row for COUNT results.
+#[derive(Deserialize)]
+struct CountResult {
+    cnt: f64,
+}
+
+// ---------------------------------------------------------------------------
+// NIP-09: Deletion processing
+// ---------------------------------------------------------------------------
+
+impl NostrRelayDO {
+    /// Process a kind-5 deletion event: delete targeted events by the same author.
+    async fn process_deletion(&self, deletion_event: &NostrEvent) {
+        let db = match self.env.d1("DB") {
+            Ok(db) => db,
+            Err(_) => return,
+        };
+
+        // Collect "e" tags (direct event ID targets)
+        let target_ids: Vec<&str> = deletion_event
+            .tags
+            .iter()
+            .filter(|t| t.len() >= 2 && t[0] == "e")
+            .map(|t| t[1].as_str())
+            .collect();
+
+        // Delete events owned by the same pubkey
+        for target_id in &target_ids {
+            let stmt = db.prepare(
+                "DELETE FROM events WHERE id = ?1 AND pubkey = ?2",
+            );
+            let _ = match stmt.bind(&[
+                JsValue::from_str(target_id),
+                JsValue::from_str(&deletion_event.pubkey),
+            ]) {
+                Ok(s) => s.run().await,
+                Err(_) => continue,
+            };
+        }
+
+        // Collect "a" tags (parameterized replaceable targets: "kind:pubkey:d-tag")
+        let a_targets: Vec<&str> = deletion_event
+            .tags
+            .iter()
+            .filter(|t| t.len() >= 2 && t[0] == "a")
+            .map(|t| t[1].as_str())
+            .collect();
+
+        for a_ref in &a_targets {
+            let parts: Vec<&str> = a_ref.split(':').collect();
+            if parts.len() < 3 {
+                continue;
+            }
+            let kind: f64 = match parts[0].parse() {
+                Ok(k) => k,
+                Err(_) => continue,
+            };
+            let pubkey = parts[1];
+            let d_tag = parts[2];
+
+            // Only allow deletion of own events
+            if pubkey != deletion_event.pubkey {
+                continue;
+            }
+
+            let stmt = db.prepare(
+                "DELETE FROM events WHERE kind = ?1 AND pubkey = ?2 AND d_tag = ?3",
+            );
+            let _ = match stmt.bind(&[
+                JsValue::from_f64(kind),
+                JsValue::from_str(pubkey),
+                JsValue::from_str(d_tag),
+            ]) {
+                Ok(s) => s.run().await,
+                Err(_) => continue,
+            };
         }
     }
 }
@@ -612,6 +979,7 @@ impl NostrRelayDO {
             Err(_) => return Vec::new(),
         };
 
+        let now = auth::js_now_secs();
         let mut events = Vec::new();
 
         for filter in filters {
@@ -619,101 +987,7 @@ impl NostrRelayDO {
             let mut params: Vec<JsValue> = Vec::new();
             let mut param_idx = 1u32;
 
-            if let Some(ref ids) = filter.ids {
-                if !ids.is_empty() {
-                    let placeholders: Vec<String> = ids
-                        .iter()
-                        .map(|id| {
-                            let p = format!("?{param_idx}");
-                            params.push(JsValue::from_str(id));
-                            param_idx += 1;
-                            p
-                        })
-                        .collect();
-                    conditions.push(format!("id IN ({})", placeholders.join(",")));
-                }
-            }
-
-            if let Some(ref authors) = filter.authors {
-                if !authors.is_empty() {
-                    let placeholders: Vec<String> = authors
-                        .iter()
-                        .map(|a| {
-                            let p = format!("?{param_idx}");
-                            params.push(JsValue::from_str(a));
-                            param_idx += 1;
-                            p
-                        })
-                        .collect();
-                    conditions.push(format!("pubkey IN ({})", placeholders.join(",")));
-                }
-            }
-
-            if let Some(ref kinds) = filter.kinds {
-                if !kinds.is_empty() {
-                    let placeholders: Vec<String> = kinds
-                        .iter()
-                        .map(|k| {
-                            let p = format!("?{param_idx}");
-                            params.push(JsValue::from_f64(*k as f64));
-                            param_idx += 1;
-                            p
-                        })
-                        .collect();
-                    conditions.push(format!("kind IN ({})", placeholders.join(",")));
-                }
-            }
-
-            if let Some(since) = filter.since {
-                conditions.push(format!("created_at >= ?{param_idx}"));
-                params.push(JsValue::from_f64(since as f64));
-                param_idx += 1;
-            }
-
-            if let Some(until) = filter.until {
-                conditions.push(format!("created_at <= ?{param_idx}"));
-                params.push(JsValue::from_f64(until as f64));
-                param_idx += 1;
-            }
-
-            // Tag filters (#e, #p, #t, etc.)
-            for (key, values) in &filter.extra {
-                if !key.starts_with('#') {
-                    continue;
-                }
-                let tag_name = &key[1..];
-                if !tag_name
-                    .bytes()
-                    .all(|b| b.is_ascii_alphanumeric() || b == b'_' || b == b'-')
-                {
-                    continue;
-                }
-
-                let tag_values: Vec<&str> = match values.as_array() {
-                    Some(arr) => arr.iter().filter_map(|v| v.as_str()).collect(),
-                    None => continue,
-                };
-
-                if tag_values.is_empty() {
-                    continue;
-                }
-
-                let mut tag_conditions: Vec<String> = Vec::new();
-                for v in &tag_values {
-                    if v.is_empty() {
-                        continue;
-                    }
-                    let escaped = v.replace('%', "\\%").replace('_', "\\_").replace('"', "");
-                    let pattern = format!("%\"{tag_name}\",\"{escaped}\"%");
-                    tag_conditions.push(format!("tags LIKE ?{param_idx} ESCAPE '\\\\'"));
-                    params.push(JsValue::from_str(&pattern));
-                    param_idx += 1;
-                }
-
-                if !tag_conditions.is_empty() {
-                    conditions.push(format!("({})", tag_conditions.join(" OR ")));
-                }
-            }
+            Self::build_filter_conditions(filter, &mut conditions, &mut params, &mut param_idx);
 
             let where_clause = if conditions.is_empty() {
                 String::new()
@@ -746,6 +1020,14 @@ impl NostrRelayDO {
 
             for row in rows {
                 if let Some(event) = row.into_nostr_event() {
+                    // NIP-40: Skip expired events at application layer
+                    if let Some(exp) = tag_value(&event, "expiration") {
+                        if let Ok(exp_ts) = exp.parse::<u64>() {
+                            if exp_ts < now {
+                                continue;
+                            }
+                        }
+                    }
                     events.push(event);
                 }
             }
@@ -904,4 +1186,36 @@ impl NostrRelayDO {
     fn send_eose(ws: &WebSocket, sub_id: &str) {
         Self::send(ws, &serde_json::json!(["EOSE", sub_id]));
     }
+
+    fn send_auth(ws: &WebSocket, challenge: &str) {
+        Self::send(ws, &serde_json::json!(["AUTH", challenge]));
+    }
+
+    fn send_count(ws: &WebSocket, sub_id: &str, count: u64) {
+        Self::send(ws, &serde_json::json!(["COUNT", sub_id, { "count": count }]));
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+/// Extract the first value for a given tag name from an event.
+fn tag_value(event: &NostrEvent, name: &str) -> Option<String> {
+    event
+        .tags
+        .iter()
+        .find(|t| t.len() >= 2 && t[0] == name)
+        .map(|t| t[1].clone())
+}
+
+/// Generate a unique challenge string for NIP-42 AUTH.
+fn generate_challenge(session_id: u64) -> String {
+    let r1 = js_sys::Math::random();
+    let r2 = js_sys::Math::random();
+    format!(
+        "{:016x}{:016x}",
+        (r1 * u64::MAX as f64) as u64,
+        (r2 * u64::MAX as f64) as u64 ^ session_id
+    )
 }

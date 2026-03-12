@@ -119,24 +119,26 @@ pub fn SetupPage() -> impl IntoView {
             content,
         };
 
-        match auth.sign_event(unsigned) {
-            Ok(signed) => {
-                let relay = expect_context::<RelayConnection>();
-                relay.publish(&signed);
+        let trimmed_for_ack = trimmed.clone();
+        wasm_bindgen_futures::spawn_local(async move {
+            match auth.sign_event_async(unsigned).await {
+                Ok(signed) => {
+                    let relay = expect_context::<RelayConnection>();
+                    relay.publish(&signed);
 
-                // Update auth store with the new profile info
-                auth.set_profile(Some(trimmed), None);
-                auth.complete_signup();
+                    auth.set_profile(Some(trimmed_for_ack), None);
+                    auth.complete_signup();
 
-                navigate.with_value(|nav| {
-                    nav("/chat", NavigateOptions::default());
-                });
+                    navigate.with_value(|nav| {
+                        nav("/chat", NavigateOptions::default());
+                    });
+                }
+                Err(e) => {
+                    is_submitting.set(false);
+                    error.set(Some(format!("Failed to sign event: {}", e)));
+                }
             }
-            Err(e) => {
-                is_submitting.set(false);
-                error.set(Some(format!("Failed to sign event: {}", e)));
-            }
-        }
+        });
     };
 
     let about_chars = Memo::new(move |_| about.get().len());

@@ -321,19 +321,23 @@ fn delete_event(entry: CalendarEventEntry, events: RwSignal<Vec<CalendarEventEnt
         content: "Deleted calendar event".to_string(),
     };
 
-    match auth.sign_event(unsigned) {
-        Ok(signed) => {
-            relay.publish(&signed);
-            events.update(|list| list.retain(|e| e.d_tag != entry.d_tag));
-            toasts.show(
-                format!("Deleted: {}", entry.title),
-                ToastVariant::Success,
-            );
+    let entry_d_tag = entry.d_tag.clone();
+    let entry_title = entry.title.clone();
+    wasm_bindgen_futures::spawn_local(async move {
+        match auth.sign_event_async(unsigned).await {
+            Ok(signed) => {
+                relay.publish(&signed);
+                events.update(|list| list.retain(|e| e.d_tag != entry_d_tag));
+                toasts.show(
+                    format!("Deleted: {}", entry_title),
+                    ToastVariant::Success,
+                );
+            }
+            Err(e) => {
+                toasts.show(format!("Failed to delete: {}", e), ToastVariant::Error);
+            }
         }
-        Err(e) => {
-            toasts.show(format!("Failed to delete: {}", e), ToastVariant::Error);
-        }
-    }
+    });
 }
 
 /// Parse a kind 31923 event into a CalendarEventEntry.

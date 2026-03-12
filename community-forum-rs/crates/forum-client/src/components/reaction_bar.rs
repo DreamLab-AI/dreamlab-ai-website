@@ -84,12 +84,15 @@ pub(crate) fn ReactionBar(
             content: emoji,
         };
 
-        match auth.sign_event(unsigned) {
-            Ok(signed) => relay.publish(&signed),
-            Err(e) => {
-                web_sys::console::error_1(&format!("[ReactionBar] Sign failed: {}", e).into());
+        let relay = relay.clone();
+        wasm_bindgen_futures::spawn_local(async move {
+            match auth.sign_event_async(unsigned).await {
+                Ok(signed) => { let _ = relay.publish(&signed); }
+                Err(e) => {
+                    web_sys::console::error_1(&format!("[ReactionBar] Sign failed: {}", e).into());
+                }
             }
-        }
+        });
     };
 
     let add_from_picker = move |emoji: &'static str| {
@@ -128,12 +131,14 @@ pub(crate) fn ReactionBar(
             content: emoji.to_string(),
         };
 
-        match auth.sign_event(unsigned) {
-            Ok(signed) => relay.publish(&signed),
-            Err(e) => {
-                web_sys::console::error_1(&format!("[ReactionBar] Sign failed: {}", e).into());
+        wasm_bindgen_futures::spawn_local(async move {
+            match auth.sign_event_async(unsigned).await {
+                Ok(signed) => { let _ = relay.publish(&signed); }
+                Err(e) => {
+                    web_sys::console::error_1(&format!("[ReactionBar] Sign failed: {}", e).into());
+                }
             }
-        }
+        });
     };
 
     view! {

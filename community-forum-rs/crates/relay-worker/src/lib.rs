@@ -205,7 +205,7 @@ async fn route(req: Request, env: &Env, path: &str) -> Result<Response> {
                 "status": "healthy",
                 "version": "3.0.0",
                 "runtime": "workers-rs",
-                "nips": [1, 11, 16, 33, 98],
+                "nips": [1, 9, 11, 16, 29, 33, 40, 42, 45, 50, 98],
             }),
             200,
         );

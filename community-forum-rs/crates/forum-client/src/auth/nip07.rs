@@ -4,7 +4,7 @@
 //! nos2x, Alby, etc.) for pubkey retrieval and event signing without
 //! exposing the private key to the web app.
 
-use nostr_core::NostrEvent;
+use nostr_core::{NostrEvent, UnsignedEvent};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::JsFuture;
 
@@ -72,14 +72,12 @@ pub async fn nip07_get_pubkey() -> Result<String, String> {
         .ok_or_else(|| "getPublicKey() did not return a string".to_string())
 }
 
-/// Sign a Nostr event using the NIP-07 extension.
+/// Sign an unsigned Nostr event using the NIP-07 extension.
 ///
-/// Converts the unsigned event to a JS object, calls `window.nostr.signEvent()`,
-/// and converts the result back to a Rust `NostrEvent`.
-///
-/// The input event should have all fields populated except `id` and `sig`,
-/// which will be filled by the extension.
-pub async fn nip07_sign_event(event: &NostrEvent) -> Result<NostrEvent, String> {
+/// Passes the unsigned event fields to `window.nostr.signEvent()`, which
+/// computes the event ID, signs with the extension's private key, and
+/// returns a fully signed `NostrEvent`.
+pub async fn nip07_sign_event(event: &UnsignedEvent) -> Result<NostrEvent, String> {
     let window = web_sys::window().ok_or("No window object")?;
     let nostr = js_sys::Reflect::get(&window, &"nostr".into())
         .map_err(|_| "window.nostr not found")?;
@@ -87,7 +85,7 @@ pub async fn nip07_sign_event(event: &NostrEvent) -> Result<NostrEvent, String> 
         return Err("NIP-07 extension not available".to_string());
     }
 
-    // Serialize the event to a JS object
+    // Build the unsigned event JS object (NIP-07 expects {kind, content, tags, created_at})
     let event_json = serde_json::to_string(event)
         .map_err(|e| format!("Failed to serialize event: {e}"))?;
     let event_js: JsValue = js_sys::JSON::parse(&event_json)
@@ -110,7 +108,6 @@ pub async fn nip07_sign_event(event: &NostrEvent) -> Result<NostrEvent, String> 
         .await
         .map_err(|e| format!("signEvent() rejected: {:?}", e))?;
 
-    // Convert JS result back to a Rust NostrEvent
     let result_json = js_sys::JSON::stringify(&result)
         .map_err(|_| "Failed to stringify signed event")?;
     let result_str = result_json

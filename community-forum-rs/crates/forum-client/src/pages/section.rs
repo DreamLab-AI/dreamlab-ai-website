@@ -6,6 +6,8 @@ use leptos_router::hooks::use_params_map;
 use nostr_core::NostrEvent;
 use std::rc::Rc;
 
+use wasm_bindgen_futures::spawn_local;
+
 use crate::auth::use_auth;
 use crate::components::breadcrumb::{Breadcrumb, BreadcrumbItem};
 use crate::components::message_bubble::{MessageBubble, MessageData};
@@ -232,14 +234,17 @@ pub fn SectionPage() -> impl IntoView {
                 content,
             };
 
-            match auth.sign_event(unsigned) {
-                Ok(signed) => {
-                    relay.publish(&signed);
+            let relay = relay.clone();
+            spawn_local(async move {
+                match auth.sign_event_async(unsigned).await {
+                    Ok(signed) => {
+                        relay.publish(&signed);
+                    }
+                    Err(e) => {
+                        error_msg.set(Some(e));
+                    }
                 }
-                Err(e) => {
-                    error_msg.set(Some(e));
-                }
-            }
+            });
         }
     };
 

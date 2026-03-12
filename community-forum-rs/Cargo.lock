@@ -2501,6 +2501,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "rvf-types"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a497b66e9a16b7e057135e1f0e34f80abaecec0a1c537f662d526ca9a9106e79"
+
+[[package]]
 name = "ryu"
 version = "1.0.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2540,6 +2546,22 @@ dependencies = [
  "pbkdf2",
  "salsa20",
  "sha2",
+]
+
+[[package]]
+name = "search-worker"
+version = "0.1.0"
+dependencies = [
+ "base64",
+ "hex",
+ "js-sys",
+ "nostr-core",
+ "rvf-types",
+ "serde",
+ "serde_json",
+ "sha2",
+ "wasm-bindgen",
+ "worker",
 ]
 
 [[package]]
