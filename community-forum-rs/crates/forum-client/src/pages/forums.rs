@@ -7,6 +7,9 @@
 use leptos::prelude::*;
 use std::collections::HashMap;
 
+use leptos_router::components::A;
+
+use crate::app::base_href;
 use crate::components::breadcrumb::{Breadcrumb, BreadcrumbItem};
 use crate::components::category_card::CategoryCard;
 use crate::components::empty_state::EmptyState;
@@ -249,17 +252,15 @@ pub fn ForumsPage() -> impl IntoView {
                                         </div>
                                     }.into_any()
                                 } else {
-                                    let empty_icon: Box<dyn FnOnce() -> leptos::prelude::AnyView + Send> = Box::new(|| view! {
-                                        <svg class="w-7 h-7 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                            <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" stroke-linecap="round" stroke-linejoin="round"/>
-                                        </svg>
-                                    }.into_any());
+                                    // No topics yet — show a direct link to enter the zone
+                                    let zone_href = base_href(&format!("/forums/{}", zone.sections.first().unwrap_or(&zone_id)));
                                     view! {
-                                        <EmptyState
-                                            icon=empty_icon
-                                            title="No topics yet".to_string()
-                                            description="Be the first to start a conversation in this zone.".to_string()
-                                        />
+                                        <A href=zone_href attr:class="block glass-card-interactive p-4 text-center no-underline text-inherit">
+                                            <p class="text-gray-400 text-sm mb-2">"No topics yet"</p>
+                                            <span class="text-amber-400 font-medium text-sm hover:text-amber-300 transition-colors">
+                                                "Enter & start a conversation →"
+                                            </span>
+                                        </A>
                                     }.into_any()
                                 }}
                             </section>

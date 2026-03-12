@@ -11,6 +11,7 @@ use std::collections::HashMap;
 use std::rc::Rc;
 
 use crate::app::base_href;
+use crate::auth::use_auth;
 use crate::components::breadcrumb::{Breadcrumb, BreadcrumbItem};
 use crate::components::empty_state::EmptyState;
 use crate::components::section_card::SectionCard;
@@ -22,7 +23,8 @@ use crate::utils::{capitalize, set_timeout_once};
 const ZONE_SECTIONS: &[(&str, &[&str])] = &[
     ("fairfield-family", &["family-home", "family-events", "family-photos"]),
     ("minimoonoir", &["minimoonoir-welcome", "minimoonoir-events", "minimoonoir-booking"]),
-    ("dreamlab", &["dreamlab-lobby", "dreamlab-training", "dreamlab-projects", "dreamlab-bookings"]),
+    ("dreamlab-lobby", &["dreamlab-lobby"]),
+    ("dreamlab", &["dreamlab-training", "dreamlab-projects", "dreamlab-bookings"]),
     ("ai-agents", &["ai-general", "ai-claude-flow", "ai-visionflow"]),
 ];
 
@@ -50,6 +52,8 @@ struct SectionMeta {
 pub fn CategoryPage() -> impl IntoView {
     let relay = expect_context::<RelayConnection>();
     let conn_state = relay.connection_state();
+    let auth = use_auth();
+    let is_authed = auth.is_authenticated();
 
     let params = use_params_map();
     let category_slug = move || params.read().get("category").unwrap_or_default();
@@ -59,6 +63,13 @@ pub fn CategoryPage() -> impl IntoView {
     let last_active_map = RwSignal::new(HashMap::<String, u64>::new());
     let loading = RwSignal::new(true);
     let eose_received = RwSignal::new(false);
+
+    // -- New topic creation state --
+    let show_new_topic = RwSignal::new(false);
+    let topic_name = RwSignal::new(String::new());
+    let topic_desc = RwSignal::new(String::new());
+    let creating = RwSignal::new(false);
+    let create_error = RwSignal::new(Option::<String>::None);
 
     let channel_sub_id: RwSignal<Option<String>> = RwSignal::new(None);
     let msg_sub_id: RwSignal<Option<String>> = RwSignal::new(None);
@@ -237,13 +248,15 @@ pub fn CategoryPage() -> impl IntoView {
             "fairfield-family" => 3,     // Private
             "minimoonoir" => 2,          // Cohort
             "dreamlab" => 2,             // Cohort
-            "ai-agents" => 1,            // Registered
+            "dreamlab-lobby" => 1,       // Registered (all whitelisted users)
+            "ai-agents" => 2,            // Cohort
             _ => {
                 // Also match section IDs to their parent zone
                 if slug.starts_with("family-") { 3 }
                 else if slug.starts_with("minimoonoir-") { 2 }
+                else if slug == "dreamlab-lobby" { 1 }
                 else if slug.starts_with("dreamlab-") { 2 }
-                else if slug.starts_with("ai-") { 1 }
+                else if slug.starts_with("ai-") { 2 }
                 else { 0 }
             }
         }
@@ -287,6 +300,102 @@ pub fn CategoryPage() -> impl IntoView {
                 BreadcrumbItem::current(capitalize(&category_slug())),
             ] />
 
+            // New Topic button + inline form
+            <Show when=move || is_authed.get() && !loading.get()>
+                <div class="mb-4">
+                    <Show
+                        when=move || !show_new_topic.get()
+                        fallback=move || {
+                            let relay_create = expect_context::<RelayConnection>();
+                            let auth_create = use_auth();
+                            let sections_sig = sections;
+                            view! {
+                                <div class="bg-gray-800 border border-gray-700 rounded-lg p-5 space-y-3">
+                                    <h3 class="text-lg font-semibold text-white">"New Topic"</h3>
+                                    <input
+                                        type="text"
+                                        maxlength="64"
+                                        placeholder="Topic name"
+                                        prop:value=move || topic_name.get()
+                                        on:input=move |ev| topic_name.set(event_target_value(&ev))
+                                        class="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+                                    />
+                                    <textarea
+                                        placeholder="Description (optional)"
+                                        rows="2"
+                                        prop:value=move || topic_desc.get()
+                                        on:input=move |ev| topic_desc.set(event_target_value(&ev))
+                                        class="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 resize-none"
+                                    />
+                                    {move || create_error.get().map(|e| view! {
+                                        <p class="text-red-400 text-sm">{e}</p>
+                                    })}
+                                    <div class="flex gap-2">
+                                        <button
+                                            type="button"
+                                            disabled=move || creating.get() || topic_name.get().trim().len() < 3
+                                            on:click=move |_| {
+                                                let name = topic_name.get_untracked();
+                                                let desc = topic_desc.get_untracked();
+                                                let section = category_slug();
+                                                if name.trim().len() < 3 {
+                                                    create_error.set(Some("Name must be at least 3 characters".into()));
+                                                    return;
+                                                }
+                                                creating.set(true);
+                                                create_error.set(None);
+
+                                                match create_topic_event(&auth_create, &relay_create, &name, &desc, &section) {
+                                                    Ok(meta) => {
+                                                        // Add to local list immediately
+                                                        sections_sig.update(|list| {
+                                                            if !list.iter().any(|s| s.channel_id == meta.channel_id) {
+                                                                list.push(meta);
+                                                            }
+                                                        });
+                                                        topic_name.set(String::new());
+                                                        topic_desc.set(String::new());
+                                                        show_new_topic.set(false);
+                                                    }
+                                                    Err(e) => create_error.set(Some(e)),
+                                                }
+                                                creating.set(false);
+                                            }
+                                            class="bg-amber-500 hover:bg-amber-400 disabled:bg-gray-600 disabled:cursor-not-allowed text-gray-900 font-semibold px-4 py-2 rounded-lg transition-colors text-sm"
+                                        >
+                                            {move || if creating.get() { "Creating..." } else { "Create Topic" }}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            on:click=move |_| {
+                                                show_new_topic.set(false);
+                                                create_error.set(None);
+                                            }
+                                            class="text-gray-400 hover:text-white px-3 py-2 text-sm transition-colors"
+                                        >
+                                            "Cancel"
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    >
+                        <button
+                            type="button"
+                            on:click=move |_| show_new_topic.set(true)
+                            class="flex items-center gap-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20 px-4 py-2 rounded-lg transition-colors text-sm font-medium"
+                        >
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="12" y1="8" x2="12" y2="16"/>
+                                <line x1="8" y1="12" x2="16" y2="12"/>
+                            </svg>
+                            "New Topic"
+                        </button>
+                    </Show>
+                </div>
+            </Show>
+
             // Loading
             <Show when=move || loading.get()>
                 <div class="space-y-3">
@@ -310,11 +419,16 @@ pub fn CategoryPage() -> impl IntoView {
                                 <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                         }.into_any());
+                        let (title, desc) = if is_authed.get() {
+                            ("No topics yet".to_string(), "Be the first — click \"New Topic\" above to start a conversation.".to_string())
+                        } else {
+                            ("No topics yet".to_string(), "Sign in to start a conversation.".to_string())
+                        };
                         view! {
                             <EmptyState
                                 icon=empty_icon
-                                title="No sections yet".to_string()
-                                description="Sections will appear here as channels are created.".to_string()
+                                title=title
+                                description=desc
                                 action_label="Back to Forums".to_string()
                                 action_href=base_href("/forums")
                             />
@@ -361,6 +475,57 @@ fn SectionSkeleton() -> impl IntoView {
             </div>
         </div>
     }
+}
+
+/// Create a kind-40 channel event, sign it, and publish to the relay.
+/// Returns the `SectionMeta` for optimistic local insertion.
+fn create_topic_event(
+    auth: &crate::auth::AuthStore,
+    relay: &RelayConnection,
+    name: &str,
+    description: &str,
+    section: &str,
+) -> Result<SectionMeta, String> {
+    if relay.connection_state().get_untracked() != ConnectionState::Connected {
+        return Err("Relay not connected".to_string());
+    }
+
+    let content = serde_json::json!({
+        "name": name.trim(),
+        "about": description.trim(),
+        "picture": ""
+    });
+
+    let pubkey = auth
+        .pubkey()
+        .get_untracked()
+        .ok_or_else(|| "Not authenticated".to_string())?;
+
+    let now = (js_sys::Date::now() / 1000.0) as u64;
+    let tags = vec![
+        vec!["section".into(), section.into()],
+        vec!["zone".into(), "1".into()],
+    ];
+
+    let unsigned = nostr_core::UnsignedEvent {
+        pubkey,
+        created_at: now,
+        kind: 40,
+        tags,
+        content: serde_json::to_string(&content).unwrap(),
+    };
+
+    let signed = auth.sign_event(unsigned)?;
+    let channel_id = signed.id.clone();
+
+    relay.publish(&signed);
+
+    Ok(SectionMeta {
+        channel_id,
+        name: name.trim().to_string(),
+        description: description.trim().to_string(),
+        _created_at: now,
+    })
 }
 
 /// Parse kind 40 event content JSON into (name, description).

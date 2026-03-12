@@ -24,7 +24,8 @@ const SECTION_FILTERS: &[(&str, &str)] = &[
 const ZONE_SECTIONS: &[(&str, &[&str])] = &[
     ("fairfield-family", &["family-home", "family-events", "family-photos"]),
     ("minimoonoir", &["minimoonoir-welcome", "minimoonoir-events", "minimoonoir-booking"]),
-    ("dreamlab", &["dreamlab-lobby", "dreamlab-training", "dreamlab-projects", "dreamlab-bookings"]),
+    ("dreamlab-lobby", &["dreamlab-lobby"]),
+    ("dreamlab", &["dreamlab-training", "dreamlab-projects", "dreamlab-bookings"]),
     ("ai-agents", &["ai-general", "ai-claude-flow", "ai-visionflow"]),
 ];
 
