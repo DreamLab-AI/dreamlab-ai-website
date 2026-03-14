@@ -54,10 +54,10 @@ pub struct WhitelistUser {
     pub pubkey: String,
     #[serde(default)]
     pub cohorts: Vec<String>,
-    #[serde(default)]
-    pub nickname: Option<String>,
-    #[serde(default)]
-    pub created_at: Option<u64>,
+    #[serde(default, alias = "displayName")]
+    pub display_name: Option<String>,
+    #[serde(default, alias = "addedAt")]
+    pub added_at: Option<u64>,
 }
 
 /// A channel parsed from a kind-40 event on the relay.

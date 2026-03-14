@@ -19,7 +19,7 @@ const AVAILABLE_COHORTS: &[(&str, &str)] = &[
 /// Callback type for cohort updates: (pubkey, new_cohorts).
 type UpdateCallback = Rc<dyn Fn(String, Vec<String>)>;
 
-/// Whitelist user table. Shows pubkey, cohorts, and an edit button for each user.
+/// Whitelist user table. Shows username, cohorts, and an edit button for each user.
 /// Calls `on_update_cohorts` when cohorts are changed for a user.
 #[component]
 pub fn UserTable(
@@ -34,7 +34,7 @@ pub fn UserTable(
         <div class="bg-gray-800 border border-gray-700 rounded-lg overflow-hidden">
             // Table header
             <div class="grid grid-cols-12 gap-2 px-4 py-3 bg-gray-750 border-b border-gray-700 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                <div class="col-span-5">"Pubkey"</div>
+                <div class="col-span-5">"User"</div>
                 <div class="col-span-5">"Cohorts"</div>
                 <div class="col-span-2 text-right">"Actions"</div>
             </div>
@@ -100,6 +100,7 @@ fn UserRow(
 ) -> impl IntoView {
     let pk = user.pubkey.clone();
     let pk_display = truncate_pubkey(&pk);
+    let display_name = user.display_name.clone();
     let cohorts = user.cohorts.clone();
     let is_admin_user = ADMIN_PUBKEYS.contains(&pk.as_str());
 
@@ -133,14 +134,19 @@ fn UserRow(
 
     view! {
         <div class="grid grid-cols-12 gap-2 px-4 py-3 items-center text-sm hover:bg-gray-750 hover:border-l-2 hover:border-l-amber-500/50 border-l-2 border-l-transparent transition-all">
-            // Pubkey column
+            // User column — display name + truncated pubkey
             <div class="col-span-5">
-                <span
-                    class="font-mono text-gray-300 bg-gray-900 rounded px-2 py-0.5 text-xs"
-                    title=pk.clone()
-                >
-                    {pk_display}
-                </span>
+                <div class="flex flex-col gap-0.5">
+                    {display_name.as_ref().map(|name| view! {
+                        <span class="text-white font-medium text-sm">{name.clone()}</span>
+                    })}
+                    <span
+                        class="font-mono text-gray-500 bg-gray-900 rounded px-2 py-0.5 text-xs w-fit"
+                        title=pk.clone()
+                    >
+                        {pk_display}
+                    </span>
+                </div>
             </div>
 
             // Cohorts column
