@@ -1075,10 +1075,10 @@ impl NostrRelayDO {
         matches!(stmt.first::<serde_json::Value>(None).await, Ok(Some(_)))
     }
 
-    /// Auto-whitelist a new user with the "lobby" cohort.
+    /// Auto-whitelist a new user with the "dreamlab" cohort.
     ///
     /// Called when a user publishes their first kind-0 profile event. Gives them
-    /// immediate access to the DreamLab Lobby zone without admin intervention.
+    /// immediate access to the DreamLab zone without admin intervention.
     /// Admin can later assign additional cohorts for other zones.
     async fn auto_whitelist(&self, pubkey: &str) {
         let db = match self.env.d1("DB") {
@@ -1087,7 +1087,7 @@ impl NostrRelayDO {
         };
 
         let now = auth::js_now_secs();
-        let cohorts_json = r#"["home"]"#;
+        let cohorts_json = r#"["dreamlab"]"#;
 
         let stmt = db.prepare(
             "INSERT INTO whitelist (pubkey, cohorts, added_at, added_by) \

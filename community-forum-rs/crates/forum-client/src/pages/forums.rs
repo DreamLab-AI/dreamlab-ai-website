@@ -226,7 +226,7 @@ pub fn ForumsPage() -> impl IntoView {
                                     }.into_any()
                                 } else {
                                     // No topics yet — show a direct link to enter the zone
-                                    let zone_href = base_href(&format!("/forums/{}", zone.sections.first().unwrap_or(&zone_id)));
+                                    let zone_href = base_href(&format!("/forums/{}", zone_id));
                                     view! {
                                         <A href=zone_href attr:class="block glass-card-interactive p-4 text-center no-underline text-inherit">
                                             <p class="text-gray-400 text-sm mb-2">"No topics yet"</p>

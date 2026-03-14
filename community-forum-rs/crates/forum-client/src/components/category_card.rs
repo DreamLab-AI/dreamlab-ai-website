@@ -30,7 +30,7 @@ pub fn CategoryCard(
     #[prop(optional, into)]
     picture: String,
 ) -> impl IntoView {
-    let href = base_href(&format!("/forums/{}", section_id));
+    let href = base_href(&format!("/forums/{}/{}", zone_id, section_id));
 
     let gradient_class = match accent_color {
         "amber" => "from-amber-600/20 via-orange-500/10 to-transparent",

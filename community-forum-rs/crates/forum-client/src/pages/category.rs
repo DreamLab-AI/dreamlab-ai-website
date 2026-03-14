@@ -37,6 +37,31 @@ fn section_to_zone_id(section: &str) -> Option<&'static str> {
     None
 }
 
+/// Get the section IDs belonging to a zone.
+fn zone_section_ids(zone_id: &str) -> &'static [&'static str] {
+    ZONE_SECTIONS
+        .iter()
+        .find(|&&(id, _)| id == zone_id)
+        .map(|&(_, secs)| secs)
+        .unwrap_or(&[])
+}
+
+/// Convert a section ID like "dreamlab-training" to "Training".
+fn humanize_section_id(id: &str) -> String {
+    let suffix = id.find('-').map(|i| &id[i + 1..]).unwrap_or(id);
+    suffix
+        .split('-')
+        .map(|w| {
+            let mut c = w.chars();
+            match c.next() {
+                None => String::new(),
+                Some(f) => f.to_uppercase().to_string() + c.as_str(),
+            }
+        })
+        .collect::<Vec<_>>()
+        .join(" ")
+}
+
 /// Parsed section data from kind 40 events.
 #[derive(Clone, Debug)]
 struct SectionMeta {
@@ -87,6 +112,7 @@ pub fn CategoryPage() -> impl IntoView {
     let topic_desc = RwSignal::new(String::new());
     let creating = RwSignal::new(false);
     let create_error = RwSignal::new(Option::<String>::None);
+    let selected_section = RwSignal::new(String::new());
 
     let channel_sub_id: RwSignal<Option<String>> = RwSignal::new(None);
     let msg_sub_id: RwSignal<Option<String>> = RwSignal::new(None);
@@ -354,6 +380,7 @@ pub fn CategoryPage() -> impl IntoView {
                             let relay_create = expect_context::<RelayConnection>();
                             let auth_create = use_auth();
                             let sections_sig = sections;
+                            let zone_secs = zone_section_ids(&category_slug());
                             view! {
                                 <div class="bg-gray-800 border border-gray-700 rounded-lg p-5 space-y-3">
                                     <h3 class="text-lg font-semibold text-white">"New Topic"</h3>
@@ -372,6 +399,21 @@ pub fn CategoryPage() -> impl IntoView {
                                         on:input=move |ev| topic_desc.set(event_target_value(&ev))
                                         class="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 resize-none"
                                     />
+                                    // Section picker
+                                    <div>
+                                        <label class="block text-sm text-gray-400 mb-1">"Section"</label>
+                                        <select
+                                            on:change=move |ev| selected_section.set(event_target_value(&ev))
+                                            class="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+                                        >
+                                            {zone_secs.iter().map(|&s| {
+                                                let display = humanize_section_id(s);
+                                                view! {
+                                                    <option value=s>{display}</option>
+                                                }
+                                            }).collect_view()}
+                                        </select>
+                                    </div>
                                     {move || create_error.get().map(|e| view! {
                                         <p class="text-red-400 text-sm">{e}</p>
                                     })}
@@ -382,7 +424,11 @@ pub fn CategoryPage() -> impl IntoView {
                                             on:click=move |_| {
                                                 let name = topic_name.get_untracked();
                                                 let desc = topic_desc.get_untracked();
-                                                let section = category_slug();
+                                                let section = selected_section.get_untracked();
+                                                if section.is_empty() {
+                                                    create_error.set(Some("Please select a section".into()));
+                                                    return;
+                                                }
                                                 if name.trim().len() < 3 {
                                                     create_error.set(Some("Name must be at least 3 characters".into()));
                                                     return;
@@ -427,7 +473,13 @@ pub fn CategoryPage() -> impl IntoView {
                     >
                         <button
                             type="button"
-                            on:click=move |_| show_new_topic.set(true)
+                            on:click=move |_| {
+                                let secs = zone_section_ids(&category_slug());
+                                if let Some(&first) = secs.first() {
+                                    selected_section.set(first.to_string());
+                                }
+                                show_new_topic.set(true);
+                            }
                             class="flex items-center gap-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20 px-4 py-2 rounded-lg transition-colors text-sm font-medium"
                         >
                             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
