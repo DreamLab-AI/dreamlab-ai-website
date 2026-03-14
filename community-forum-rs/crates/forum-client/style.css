@@ -9,7 +9,9 @@
      design-tokens.css  (co-located copy of src/styles/design-tokens.css)
    ========================================================================== */
 
-@import url("design-tokens.css");
+/* design-tokens.css is loaded via <link data-trunk> in index.html.
+   Trunk content-hashes CSS filenames, so @import cannot resolve the
+   original name at runtime. Do NOT re-add an @import here. */
 
 /* ---------------------------------------------------------------------------
    1. CSS Custom Properties (forum-specific aliases)

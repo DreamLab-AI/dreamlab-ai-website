@@ -41,10 +41,17 @@ pub fn ProfilePage() -> impl IntoView {
     let is_loading = RwSignal::new(true);
     let copied = RwSignal::new(false);
 
+    // Validate pubkey format (must be 64 hex characters)
+    let is_valid_pubkey = Memo::new(move |_| {
+        let pk = pubkey.get();
+        pk.len() == 64 && pk.chars().all(|c| c.is_ascii_hexdigit())
+    });
+
     // Fetch kind 0 metadata
     Effect::new(move |_| {
         let pk = pubkey.get();
-        if pk.is_empty() {
+        if pk.is_empty() || !is_valid_pubkey.get() {
+            is_loading.set(false);
             return;
         }
 
@@ -125,6 +132,18 @@ pub fn ProfilePage() -> impl IntoView {
     };
 
     view! {
+        <Show
+            when=move || is_valid_pubkey.get()
+            fallback=|| view! {
+                <div class="max-w-lg mx-auto p-8 text-center">
+                    <div class="glass-card p-8">
+                        <h2 class="text-xl font-bold text-white mb-2">"Invalid Profile"</h2>
+                        <p class="text-gray-400 text-sm mb-4">"The public key in the URL is not valid."</p>
+                        <a href="/" class="text-amber-400 hover:text-amber-300 text-sm underline">"Go home"</a>
+                    </div>
+                </div>
+            }
+        >
         <div class="max-w-3xl mx-auto p-4 sm:p-6 space-y-6">
             // Banner
             <Show when=move || meta.get().banner.is_some()>
@@ -255,5 +274,6 @@ pub fn ProfilePage() -> impl IntoView {
                 </button>
             </div>
         </div>
+        </Show>
     }
 }

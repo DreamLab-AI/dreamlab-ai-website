@@ -58,6 +58,12 @@ pub fn CategoryPage() -> impl IntoView {
     let params = use_params_map();
     let category_slug = move || params.read().get("category").unwrap_or_default();
 
+    // Check if this is a known zone
+    let is_valid_zone = Memo::new(move |_| {
+        let cat = category_slug();
+        ZONE_SECTIONS.iter().any(|&(id, _)| id == cat.as_str())
+    });
+
     // Zone access gate: category slug maps directly to zone ID
     let has_zone_access = Memo::new(move |_| {
         let cat = category_slug();
@@ -65,7 +71,7 @@ pub fn CategoryPage() -> impl IntoView {
             "home" => zone_access.home.get(),
             "dreamlab" => zone_access.dreamlab.get(),
             "minimoonoir" => zone_access.minimoonoir.get(),
-            _ => true,
+            _ => false,
         }
     });
 
@@ -279,6 +285,28 @@ pub fn CategoryPage() -> impl IntoView {
 
     view! {
         <Show
+            when=move || is_valid_zone.get()
+            fallback=move || view! {
+                <div class="max-w-lg mx-auto p-8 text-center">
+                    <div class="glass-card p-8">
+                        <div class="w-14 h-14 rounded-full bg-gray-500/10 flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-7 h-7 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <circle cx="12" cy="12" r="10" stroke-linecap="round"/>
+                                <path d="M12 8v4M12 16h.01" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <h2 class="text-xl font-bold text-white mb-2">"Zone Not Found"</h2>
+                        <p class="text-gray-400 text-sm mb-4">
+                            {move || format!("The zone \"{}\" does not exist.", category_slug())}
+                        </p>
+                        <a href=base_href("/forums") class="text-amber-400 hover:text-amber-300 text-sm underline">
+                            "Back to Forums"
+                        </a>
+                    </div>
+                </div>
+            }
+        >
+        <Show
             when=move || has_zone_access.get()
             fallback=move || view! {
                 <div class="max-w-lg mx-auto p-8 text-center">
@@ -474,6 +502,7 @@ pub fn CategoryPage() -> impl IntoView {
                 }}
             </Show>
         </div>
+        </Show>
         </Show>
     }
 }
