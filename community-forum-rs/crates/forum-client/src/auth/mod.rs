@@ -343,11 +343,18 @@ impl AuthStore {
     }
 
     /// Login with a local nsec/hex private key.
-    pub fn login_with_local_key(&self, privkey_hex: &str) -> Result<(), String> {
-        let bytes = hex::decode(privkey_hex).map_err(|_| "Invalid hex key".to_string())?;
+    ///
+    /// Accepts either a 64-character hex string or an nsec1... bech32 key.
+    pub fn login_with_local_key(&self, key_input: &str) -> Result<(), String> {
+        let bytes = if key_input.starts_with("nsec1") {
+            decode_nsec(key_input)?
+        } else {
+            hex::decode(key_input).map_err(|_| "Invalid key. Paste a 64-char hex key or nsec1... bech32 key.".to_string())?
+        };
         if bytes.len() != 32 {
-            return Err("Key must be 32 bytes (64 hex characters)".to_string());
+            return Err("Key must be 32 bytes (64 hex characters or nsec1 bech32)".to_string());
         }
+        let privkey_hex = &hex::encode(&bytes);
         let mut key_bytes = [0u8; 32];
         key_bytes.copy_from_slice(&bytes);
 
@@ -573,6 +580,21 @@ impl AuthStore {
             extension_name: None,
         });
     }
+}
+
+// -- Bech32 nsec decoder ------------------------------------------------------
+
+/// Decode an nsec1... bech32 string to raw 32-byte secret key.
+fn decode_nsec(nsec: &str) -> Result<Vec<u8>, String> {
+    let (hrp, data) = bech32::decode(nsec)
+        .map_err(|e| format!("Invalid bech32 encoding: {e}"))?;
+    if hrp.as_str() != "nsec" {
+        return Err(format!("Expected nsec prefix, got {}", hrp.as_str()));
+    }
+    if data.len() != 32 {
+        return Err(format!("nsec data must be 32 bytes, got {}", data.len()));
+    }
+    Ok(data)
 }
 
 // -- Context providers --------------------------------------------------------

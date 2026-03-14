@@ -111,3 +111,4 @@ k256 = { workspace = true }
 send_wrapper = "0.6"
 serde-wasm-bindgen = "0.6"
 console_error_panic_hook = "0.1"
+bech32 = "0.11"

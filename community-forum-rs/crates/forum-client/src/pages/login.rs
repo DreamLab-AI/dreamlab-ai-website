@@ -36,7 +36,7 @@ pub fn LoginPage() -> impl IntoView {
         let input = key_input.get_untracked();
         let trimmed = input.trim().to_string();
         if trimmed.is_empty() {
-            auth.set_error("Paste your private key (64 hex characters)");
+            auth.set_error("Paste your private key (hex or nsec1...)");
             return;
         }
         auth.clear_error();
@@ -75,7 +75,7 @@ pub fn LoginPage() -> impl IntoView {
                             </div>
                             <input
                                 type="password"
-                                placeholder="Paste your 64-character hex key"
+                                placeholder="Paste nsec1... or 64-char hex key"
                                 on:input=move |ev| key_input.set(event_target_value(&ev))
                                 on:keydown=move |ev: web_sys::KeyboardEvent| {
                                     if ev.key() == "Enter" {
