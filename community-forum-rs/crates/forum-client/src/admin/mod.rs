@@ -23,13 +23,14 @@ use crate::relay::{ConnectionState, Filter, RelayConnection};
 // -- Constants ----------------------------------------------------------------
 
 /// Admin pubkeys for the DreamLab forum (matches relay-worker ADMIN_PUBKEYS).
+/// The primary admin key (11ed64...) is listed first for display purposes.
 pub const ADMIN_PUBKEYS: &[&str] = &[
-    "a617d2109bdd3f1a607d5a837e885178f6367af296885d7f058c26b2bd03221a",
     "11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c",
+    "a617d2109bdd3f1a607d5a837e885178f6367af296885d7f058c26b2bd03221a",
     "37f922fd632060ee9905505b687f8803090e943ffe92105428b3859a1c4ee7ff",
 ];
 
-/// First admin pubkey (used for display in overview panel).
+/// Primary admin pubkey (used for display in overview panel).
 pub const ADMIN_PUBKEY: &str = ADMIN_PUBKEYS[0];
 
 /// Default auth API base URL (overridable via `window.__ENV__.VITE_AUTH_API_URL`).
