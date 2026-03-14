@@ -29,6 +29,33 @@ fn try_use_name_cache() -> Option<NameCache> {
     use_context::<NameCache>()
 }
 
+/// Resolve a pubkey to a display name using the shared NameCache.
+///
+/// Returns the cached name if available, otherwise falls back to
+/// `shorten_pubkey`. This is the canonical way to get a display name —
+/// use it in every component that shows a user identity.
+pub fn use_display_name(pubkey: &str) -> String {
+    if let Some(cache) = try_use_name_cache() {
+        if let Some(name) = cache.0.get_untracked().get(pubkey).cloned() {
+            return name;
+        }
+    }
+    shorten_pubkey(pubkey)
+}
+
+/// Reactive version of `use_display_name` for use inside `view!` macros.
+/// Returns a `Memo<String>` that re-evaluates when the NameCache changes.
+pub fn use_display_name_memo(pubkey: String) -> Memo<String> {
+    Memo::new(move |_| {
+        if let Some(cache) = try_use_name_cache() {
+            if let Some(name) = cache.0.get().get(&pubkey).cloned() {
+                return name;
+            }
+        }
+        shorten_pubkey(&pubkey)
+    })
+}
+
 // -- Component ----------------------------------------------------------------
 
 /// Size presets for the inline user display.

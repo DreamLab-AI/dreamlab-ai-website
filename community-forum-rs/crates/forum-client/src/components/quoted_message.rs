@@ -3,7 +3,8 @@
 use leptos::prelude::*;
 use wasm_bindgen::JsCast;
 
-use crate::utils::{pubkey_color, shorten_pubkey};
+use crate::components::user_display::use_display_name;
+use crate::utils::pubkey_color;
 
 /// Display a quoted/replied-to message with a left amber border.
 ///
@@ -19,7 +20,7 @@ pub(crate) fn QuotedMessage(
     /// Content of the original message.
     reply_to_content: String,
 ) -> impl IntoView {
-    let short_pk = shorten_pubkey(&reply_to_pubkey);
+    let short_pk = use_display_name(&reply_to_pubkey);
     let avatar_bg = pubkey_color(&reply_to_pubkey);
     let avatar_letter = reply_to_pubkey
         .chars()

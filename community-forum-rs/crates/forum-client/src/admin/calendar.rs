@@ -9,6 +9,7 @@ use std::rc::Rc;
 
 use crate::auth::use_auth;
 use crate::components::toast::{use_toasts, ToastVariant};
+use crate::components::user_display::use_display_name;
 use crate::relay::{ConnectionState, Filter, RelayConnection};
 
 /// A calendar event parsed from a kind 31923 Nostr event.
@@ -226,11 +227,7 @@ where
 
     let start_str = format_datetime(entry.start_time);
     let end_str = entry.end_time.map(format_datetime).unwrap_or_default();
-    let pk_short = format!(
-        "{}...{}",
-        &entry.host_pubkey[..8.min(entry.host_pubkey.len())],
-        &entry.host_pubkey[entry.host_pubkey.len().saturating_sub(4)..]
-    );
+    let pk_short = use_display_name(&entry.host_pubkey);
     let total_rsvp = entry.rsvp_accepted + entry.rsvp_tentative;
 
     let card_opacity = if is_past { "opacity-60" } else { "" };

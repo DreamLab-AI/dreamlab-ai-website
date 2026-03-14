@@ -2,7 +2,7 @@
 
 use leptos::prelude::*;
 
-use crate::utils::shorten_pubkey;
+use crate::components::user_display::use_display_name;
 
 /// Show a "user is typing..." indicator with bouncing dots.
 ///
@@ -21,7 +21,7 @@ pub(crate) fn TypingIndicator(
         let pks = typing_pubkeys.get();
         match pks.len() {
             0 => String::new(),
-            1 => format!("{} is typing", shorten_pubkey(&pks[0])),
+            1 => format!("{} is typing", use_display_name(&pks[0])),
             n => format!("{} people are typing", n),
         }
     };

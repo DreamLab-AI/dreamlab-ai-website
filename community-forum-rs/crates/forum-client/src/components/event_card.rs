@@ -7,7 +7,7 @@
 use leptos::prelude::*;
 
 use crate::components::avatar::{Avatar, AvatarSize};
-use crate::utils::shorten_pubkey;
+use crate::components::user_display::use_display_name;
 
 /// Month abbreviations for date badge display.
 const MONTHS: [&str; 12] = [
@@ -61,7 +61,7 @@ pub(crate) fn EventCard(
     let past = is_past(end_time);
     let (month, day) = extract_date_parts(start_time);
     let time_range = format!("{} - {}", format_time(start_time), format_time(end_time));
-    let host_display = shorten_pubkey(&host_pubkey);
+    let host_display = use_display_name(&host_pubkey);
 
     let card_class = format!(
         "event-card glass-card-interactive p-4 {} {}",

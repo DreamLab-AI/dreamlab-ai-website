@@ -10,7 +10,8 @@ use std::rc::Rc;
 use super::{use_admin, AdminStore};
 use crate::auth::use_auth;
 use crate::relay::{ConnectionState, Filter, RelayConnection};
-use crate::utils::{format_relative_time, search_client, shorten_pubkey};
+use crate::components::user_display::use_display_name;
+use crate::utils::{format_relative_time, search_client};
 
 /// A single recent activity entry.
 #[derive(Clone, Debug)]
@@ -212,7 +213,7 @@ fn StatsDashboardInner() -> impl IntoView {
                             <div class="space-y-2">
                                 {entries.into_iter().map(|entry| {
                                     let (label, color_cls) = kind_icon_label(entry.kind);
-                                    let pk_short = shorten_pubkey(&entry.pubkey);
+                                    let pk_short = use_display_name(&entry.pubkey);
                                     let time_str = format_relative_time(entry.created_at);
                                     let preview = entry.content_preview.clone();
                                     let has_content = !preview.is_empty();

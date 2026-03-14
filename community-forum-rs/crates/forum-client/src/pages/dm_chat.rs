@@ -15,8 +15,9 @@ use wasm_bindgen::JsCast;
 use crate::auth::use_auth;
 use crate::dm::{provide_dm_store, use_dm_store, DMMessage};
 use crate::relay::{ConnectionState, RelayConnection};
+use crate::components::user_display::use_display_name_memo;
 use crate::utils::{
-    arrow_left_svg, format_relative_time, pubkey_color, set_timeout_once, shorten_pubkey,
+    arrow_left_svg, format_relative_time, pubkey_color, set_timeout_once,
 };
 
 /// DM chat view component for a single conversation.
@@ -145,8 +146,11 @@ pub fn DmChatPage() -> impl IntoView {
     let is_loading = dm_store.is_loading();
     let my_pubkey = auth.pubkey();
 
-    // Short display name for recipient
-    let recipient_display = move || shorten_pubkey(&recipient_pubkey());
+    // Short display name for recipient (resolved from NameCache)
+    let recipient_display_memo = {
+        let rpk = recipient_pubkey();
+        use_display_name_memo(rpk)
+    };
 
     view! {
         <div class="flex flex-col h-[calc(100vh-64px)]">
@@ -173,8 +177,8 @@ pub fn DmChatPage() -> impl IntoView {
                         </div>
 
                         <div class="flex-1 min-w-0">
-                            <h1 class="text-lg font-bold text-white truncate font-mono">
-                                {recipient_display}
+                            <h1 class="text-lg font-bold text-white truncate">
+                                {move || recipient_display_memo.get()}
                             </h1>
                             <div class="flex items-center gap-2">
                                 // Connection indicator

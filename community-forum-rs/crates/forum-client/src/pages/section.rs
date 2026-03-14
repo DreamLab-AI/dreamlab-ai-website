@@ -15,6 +15,7 @@ use crate::components::message_input::MessageInput;
 use crate::components::reaction_bar::Reaction;
 use crate::components::typing_indicator::TypingIndicator;
 use crate::relay::{ConnectionState, Filter, RelayConnection};
+use crate::stores::zone_access::use_zone_access;
 use crate::utils::{capitalize, set_timeout_once};
 
 #[derive(Clone, Debug)]
@@ -29,10 +30,22 @@ pub fn SectionPage() -> impl IntoView {
     let relay = expect_context::<RelayConnection>();
     let auth = use_auth();
     let conn_state = relay.connection_state();
+    let zone_access = use_zone_access();
 
     let params = use_params_map();
     let category_slug = move || params.read().get("category").unwrap_or_default();
     let section_slug = move || params.read().get("section").unwrap_or_default();
+
+    // Zone access gate: the category slug IS the zone ID
+    let has_zone_access = Memo::new(move |_| {
+        let cat = category_slug();
+        match cat.as_str() {
+            "home" => zone_access.home.get(),
+            "dreamlab" => zone_access.dreamlab.get(),
+            "minimoonoir" => zone_access.minimoonoir.get(),
+            _ => true, // unknown zones default to accessible
+        }
+    });
 
     let (messages, section_info) = (
         RwSignal::new(Vec::<MessageData>::new()),
@@ -252,6 +265,28 @@ pub fn SectionPage() -> impl IntoView {
     let is_authed = auth.is_authenticated();
 
     view! {
+        <Show
+            when=move || has_zone_access.get()
+            fallback=move || view! {
+                <div class="max-w-lg mx-auto p-8 text-center">
+                    <div class="glass-card p-8">
+                        <div class="w-14 h-14 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-7 h-7 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M7 11V7a5 5 0 0110 0v4" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <h2 class="text-xl font-bold text-white mb-2">"Access Restricted"</h2>
+                        <p class="text-gray-400 text-sm mb-4">
+                            {move || format!("You don't have access to the {} zone.", capitalize(&category_slug()))}
+                        </p>
+                        <a href=crate::app::base_href("/forums") class="text-amber-400 hover:text-amber-300 text-sm underline">
+                            "Back to Forums"
+                        </a>
+                    </div>
+                </div>
+            }
+        >
         <div class="flex flex-col h-[calc(100vh-64px)]">
             <div class="bg-gray-800 border-b border-gray-700 relative">
                 <div class="absolute inset-0 bg-gradient-to-r from-amber-500/5 via-transparent to-purple-500/5"></div>
@@ -338,6 +373,7 @@ pub fn SectionPage() -> impl IntoView {
                 </div>
             </Show>
         </div>
+        </Show>
     }
 }
 

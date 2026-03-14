@@ -82,18 +82,18 @@ impl Hit {
             }
             Self::User { nickname, pubkey } => nickname
                 .clone()
-                .unwrap_or_else(|| crate::utils::shorten_pubkey(pubkey)),
+                .unwrap_or_else(|| crate::components::user_display::use_display_name(pubkey)),
         }
     }
     fn subtitle(&self) -> String {
         match self {
             Self::Channel { desc, .. } => desc.clone(),
-            Self::Message { author, .. } => format!("by {}", crate::utils::shorten_pubkey(author)),
+            Self::Message { author, .. } => format!("by {}", crate::components::user_display::use_display_name(author)),
             Self::SemanticMessage { label, .. } if !label.is_empty() => {
-                format!("by {}", crate::utils::shorten_pubkey(label))
+                format!("by {}", crate::components::user_display::use_display_name(label))
             }
             Self::SemanticMessage { .. } => "semantic match".to_string(),
-            Self::User { pubkey, .. } => crate::utils::shorten_pubkey(pubkey),
+            Self::User { pubkey, .. } => crate::components::user_display::use_display_name(pubkey),
         }
     }
     fn icon(&self) -> (&'static str, &'static str) {

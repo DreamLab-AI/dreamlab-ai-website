@@ -505,69 +505,171 @@ fn format_birthday_date(month: u32, day: u32) -> String {
 
 /// Birthday list sub-component.
 ///
-/// In a real deployment, this would subscribe to kind 0 profiles and parse
-/// the `birthday` field from metadata JSON. For now, displays placeholder data.
+/// Subscribes to kind 0 (profile metadata) events from the relay and parses
+/// the `birthday` field (format: "MM-DD" or "YYYY-MM-DD") from each profile's
+/// metadata JSON. Displays upcoming birthdays sorted by proximity to today.
 #[component]
 fn BirthdayList() -> impl IntoView {
-    // Sample data -- in production, subscribe to kind-0 and parse birthday fields
-    let birthdays = vec![
-        BirthdayEntry { name: "Alice".into(), month: 3, day: 15 },
-        BirthdayEntry { name: "Bob".into(), month: 3, day: 22 },
-        BirthdayEntry { name: "Charlie".into(), month: 4, day: 1 },
-    ];
+    let relay = expect_context::<RelayConnection>();
+    let conn_state = relay.connection_state();
 
-    let now_date = js_sys::Date::new_0();
-    let cur_month = now_date.get_month() + 1;
-    let cur_day = now_date.get_date();
+    let birthdays = RwSignal::new(Vec::<BirthdayEntry>::new());
+    let loading = RwSignal::new(true);
+    let sub_id: RwSignal<Option<String>> = RwSignal::new(None);
 
-    let mut sorted = birthdays;
-    sorted.sort_by(|a, b| {
-        let a_up = if a.month > cur_month || (a.month == cur_month && a.day >= cur_day) { 0u8 } else { 1 };
-        let b_up = if b.month > cur_month || (b.month == cur_month && b.day >= cur_day) { 0u8 } else { 1 };
-        a_up.cmp(&b_up)
-            .then_with(|| a.month.cmp(&b.month))
-            .then_with(|| a.day.cmp(&b.day))
+    let relay_for_sub = relay.clone();
+    let relay_for_cleanup = relay;
+
+    // Subscribe to kind 0 profiles to extract birthday metadata
+    Effect::new(move |_| {
+        let state = conn_state.get();
+        if state != ConnectionState::Connected {
+            return;
+        }
+        if sub_id.get_untracked().is_some() {
+            return;
+        }
+
+        let filter = Filter {
+            kinds: Some(vec![0]),
+            ..Default::default()
+        };
+
+        let bdays = birthdays;
+        let on_event = Rc::new(move |event: NostrEvent| {
+            if event.kind != 0 {
+                return;
+            }
+            // Parse metadata JSON to extract name + birthday
+            if let Ok(meta) = serde_json::from_str::<serde_json::Value>(&event.content) {
+                let birthday_str = meta.get("birthday")
+                    .or_else(|| meta.get("bday"))
+                    .and_then(|v| v.as_str());
+
+                if let Some(bday) = birthday_str {
+                    // Parse "MM-DD" or "YYYY-MM-DD"
+                    let parts: Vec<&str> = bday.split('-').collect();
+                    let (month, day) = if parts.len() == 3 {
+                        // YYYY-MM-DD
+                        (parts[1].parse::<u32>().unwrap_or(0), parts[2].parse::<u32>().unwrap_or(0))
+                    } else if parts.len() == 2 {
+                        // MM-DD
+                        (parts[0].parse::<u32>().unwrap_or(0), parts[1].parse::<u32>().unwrap_or(0))
+                    } else {
+                        (0, 0)
+                    };
+
+                    if month >= 1 && month <= 12 && day >= 1 && day <= 31 {
+                        let name = meta.get("display_name")
+                            .or_else(|| meta.get("name"))
+                            .and_then(|v| v.as_str())
+                            .unwrap_or("")
+                            .to_string();
+                        let name = if name.is_empty() {
+                            crate::components::user_display::use_display_name(&event.pubkey)
+                        } else {
+                            name
+                        };
+
+                        bdays.update(|list| {
+                            // Deduplicate by pubkey — keep latest profile
+                            list.retain(|b| b.name != name);
+                            list.push(BirthdayEntry { name, month, day });
+                        });
+                    }
+                }
+            }
+        });
+
+        let loading_sig = loading;
+        let on_eose = Rc::new(move || {
+            loading_sig.set(false);
+        });
+
+        let id = relay_for_sub.subscribe(vec![filter], on_event, Some(on_eose));
+        sub_id.set(Some(id));
+
+        // Timeout fallback
+        crate::utils::set_timeout_once(
+            move || {
+                if loading_sig.get_untracked() {
+                    loading_sig.set(false);
+                }
+            },
+            8_000,
+        );
     });
 
-    if sorted.is_empty() {
-        return view! {
-            <div class="glass-card p-8 text-center">
-                <h3 class="text-lg font-bold text-white mb-2">"No birthdays yet"</h3>
-                <p class="text-sm text-gray-400">"Set your birthday in Settings to appear here."</p>
-            </div>
-        }.into_any();
-    }
+    on_cleanup(move || {
+        if let Some(id) = sub_id.get_untracked() {
+            relay_for_cleanup.unsubscribe(&id);
+        }
+    });
 
     view! {
-        <div class="space-y-2 fade-in">
-            <p class="text-sm text-gray-400 mb-3">"Upcoming community birthdays"</p>
-            {sorted.into_iter().map(|b| {
-                let is_today = b.month == cur_month && b.day == cur_day;
-                let date_str = format_birthday_date(b.month, b.day);
-                view! {
-                    <div class=if is_today {
-                        "glass-card p-4 flex items-center gap-3 border-amber-500/30 bg-amber-500/5"
-                    } else {
-                        "glass-card p-4 flex items-center gap-3"
-                    }>
-                        <div class="w-10 h-10 rounded-full bg-pink-500/20 flex items-center justify-center flex-shrink-0">
-                            <svg class="w-5 h-5 text-pink-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M2 21h20M4 21V10a1 1 0 011-1h14a1 1 0 011 1v11M12 3v3M8 6h8a2 2 0 012 2H6a2 2 0 012-2z" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M12 3a1 1 0 100-2 1 1 0 000 2z" fill="currentColor"/>
-                            </svg>
+        <Show when=move || loading.get()>
+            <div class="glass-card p-8 text-center animate-pulse">
+                <p class="text-gray-500">"Loading birthdays..."</p>
+            </div>
+        </Show>
+
+        <Show when=move || !loading.get()>
+            {move || {
+                let mut sorted = birthdays.get();
+                let now_date = js_sys::Date::new_0();
+                let cur_month = now_date.get_month() + 1;
+                let cur_day = now_date.get_date();
+
+                sorted.sort_by(|a, b| {
+                    let a_up = if a.month > cur_month || (a.month == cur_month && a.day >= cur_day) { 0u8 } else { 1 };
+                    let b_up = if b.month > cur_month || (b.month == cur_month && b.day >= cur_day) { 0u8 } else { 1 };
+                    a_up.cmp(&b_up)
+                        .then_with(|| a.month.cmp(&b.month))
+                        .then_with(|| a.day.cmp(&b.day))
+                });
+
+                if sorted.is_empty() {
+                    view! {
+                        <div class="glass-card p-8 text-center">
+                            <h3 class="text-lg font-bold text-white mb-2">"No birthdays yet"</h3>
+                            <p class="text-sm text-gray-400">"Set your birthday in Settings to appear here."</p>
                         </div>
-                        <div class="flex-1 min-w-0">
-                            <span class="font-medium text-white">{b.name}</span>
-                            {is_today.then(|| view! {
-                                <span class="ml-2 text-xs bg-amber-500/20 text-amber-400 rounded-full px-2 py-0.5">"Today!"</span>
-                            })}
+                    }.into_any()
+                } else {
+                    view! {
+                        <div class="space-y-2 fade-in">
+                            <p class="text-sm text-gray-400 mb-3">"Upcoming community birthdays"</p>
+                            {sorted.into_iter().map(|b| {
+                                let is_today = b.month == cur_month && b.day == cur_day;
+                                let date_str = format_birthday_date(b.month, b.day);
+                                view! {
+                                    <div class=if is_today {
+                                        "glass-card p-4 flex items-center gap-3 border-amber-500/30 bg-amber-500/5"
+                                    } else {
+                                        "glass-card p-4 flex items-center gap-3"
+                                    }>
+                                        <div class="w-10 h-10 rounded-full bg-pink-500/20 flex items-center justify-center flex-shrink-0">
+                                            <svg class="w-5 h-5 text-pink-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M2 21h20M4 21V10a1 1 0 011-1h14a1 1 0 011 1v11M12 3v3M8 6h8a2 2 0 012 2H6a2 2 0 012-2z" stroke-linecap="round" stroke-linejoin="round"/>
+                                                <path d="M12 3a1 1 0 100-2 1 1 0 000 2z" fill="currentColor"/>
+                                            </svg>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <span class="font-medium text-white">{b.name}</span>
+                                            {is_today.then(|| view! {
+                                                <span class="ml-2 text-xs bg-amber-500/20 text-amber-400 rounded-full px-2 py-0.5">"Today!"</span>
+                                            })}
+                                        </div>
+                                        <span class="text-sm text-gray-400 flex-shrink-0">{date_str}</span>
+                                    </div>
+                                }
+                            }).collect_view()}
                         </div>
-                        <span class="text-sm text-gray-400 flex-shrink-0">{date_str}</span>
-                    </div>
+                    }.into_any()
                 }
-            }).collect_view()}
-        </div>
-    }.into_any()
+            }}
+        </Show>
+    }
 }
 
 /// Parse a kind 31923 event into a CalendarEvent.

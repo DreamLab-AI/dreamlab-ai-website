@@ -12,6 +12,7 @@ use wasm_bindgen_futures::spawn_local;
 use crate::admin::use_admin;
 use crate::auth::use_auth;
 use crate::components::toast::{use_toasts, ToastVariant};
+use crate::components::user_display::use_display_name;
 use crate::relay::{ConnectionState, Filter, RelayConnection};
 use crate::utils::format_relative_time;
 
@@ -216,11 +217,7 @@ where
     FD: Fn() + 'static,
 {
     let time_display = format_relative_time(req.created_at);
-    let pk_short = format!(
-        "{}...{}",
-        &req.requester[..8.min(req.requester.len())],
-        &req.requester[req.requester.len().saturating_sub(4)..]
-    );
+    let pk_short = use_display_name(&req.requester);
 
     view! {
         <div class="grid grid-cols-12 gap-2 px-4 py-3 border-b border-gray-700/50 hover:bg-gray-750 items-center text-sm">
@@ -296,7 +293,7 @@ fn approve_request(req: SectionRequest, requests: RwSignal<Vec<SectionRequest>>)
                 // Remove from pending list
                 requests.update(|list| list.retain(|r| r.event_id != event_id));
                 toasts.show(
-                    format!("Approved: {}...{} added to {}", &pk[..8], &pk[pk.len().saturating_sub(4)..], cohort),
+                    format!("Approved: {} added to {}", use_display_name(&pk), cohort),
                     ToastVariant::Success,
                 );
 

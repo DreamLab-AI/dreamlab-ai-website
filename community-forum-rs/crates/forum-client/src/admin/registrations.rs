@@ -8,7 +8,7 @@ use wasm_bindgen_futures::spawn_local;
 
 use super::{use_admin, AdminStore};
 use crate::auth::use_auth;
-use crate::utils::shorten_pubkey;
+use crate::components::user_display::use_display_name;
 
 /// A pending registration entry. In the current system, pending users are
 /// those who have registered passkeys but have not yet been added to the
@@ -113,7 +113,7 @@ fn RegistrationsInner() -> impl IntoView {
     // Reject a single user (remove from pending list, not from whitelist)
     let reject_user = Callback::<String>::new(move |pubkey: String| {
         pending.update(|list| list.retain(|u| u.pubkey != pubkey));
-        let pk_short = shorten_pubkey(&pubkey);
+        let pk_short = use_display_name(&pubkey);
         action_msg.set(Some((format!("Rejected {}", pk_short), true)));
     });
 
@@ -285,7 +285,7 @@ fn RegistrationsInner() -> impl IntoView {
                                 <div class="divide-y divide-gray-700/50">
                                     {users.into_iter().map(|user| {
                                         let pk = user.pubkey.clone();
-                                        let pk_short = shorten_pubkey(&pk);
+                                        let pk_short = use_display_name(&pk);
                                         let nick = user.nickname.clone().unwrap_or_else(|| "-".to_string());
                                         let time_str = user.registered_at
                                             .map(crate::utils::format_relative_time)

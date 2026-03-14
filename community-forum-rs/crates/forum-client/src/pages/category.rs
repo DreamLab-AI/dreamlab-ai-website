@@ -17,6 +17,7 @@ use crate::components::empty_state::EmptyState;
 use crate::components::section_card::SectionCard;
 use crate::components::zone_hero::ZoneHero;
 use crate::relay::{ConnectionState, Filter, RelayConnection};
+use crate::stores::zone_access::use_zone_access;
 use crate::utils::{capitalize, set_timeout_once};
 
 /// Maps zone IDs to their child section IDs.
@@ -52,9 +53,21 @@ pub fn CategoryPage() -> impl IntoView {
     let conn_state = relay.connection_state();
     let auth = use_auth();
     let is_authed = auth.is_authenticated();
+    let zone_access = use_zone_access();
 
     let params = use_params_map();
     let category_slug = move || params.read().get("category").unwrap_or_default();
+
+    // Zone access gate: category slug maps directly to zone ID
+    let has_zone_access = Memo::new(move |_| {
+        let cat = category_slug();
+        match cat.as_str() {
+            "home" => zone_access.home.get(),
+            "dreamlab" => zone_access.dreamlab.get(),
+            "minimoonoir" => zone_access.minimoonoir.get(),
+            _ => true,
+        }
+    });
 
     let sections = RwSignal::new(Vec::<SectionMeta>::new());
     let message_counts = RwSignal::new(HashMap::<String, u32>::new());
@@ -265,6 +278,28 @@ pub fn CategoryPage() -> impl IntoView {
     };
 
     view! {
+        <Show
+            when=move || has_zone_access.get()
+            fallback=move || view! {
+                <div class="max-w-lg mx-auto p-8 text-center">
+                    <div class="glass-card p-8">
+                        <div class="w-14 h-14 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-7 h-7 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M7 11V7a5 5 0 0110 0v4" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <h2 class="text-xl font-bold text-white mb-2">"Access Restricted"</h2>
+                        <p class="text-gray-400 text-sm mb-4">
+                            {move || format!("You don't have access to the {} zone.", capitalize(&category_slug()))}
+                        </p>
+                        <a href=base_href("/forums") class="text-amber-400 hover:text-amber-300 text-sm underline">
+                            "Back to Forums"
+                        </a>
+                    </div>
+                </div>
+            }
+        >
         <div class="max-w-5xl mx-auto p-4 sm:p-6">
             // Zone hero banner
             {move || view! {
@@ -439,6 +474,7 @@ pub fn CategoryPage() -> impl IntoView {
                 }}
             </Show>
         </div>
+        </Show>
     }
 }
 

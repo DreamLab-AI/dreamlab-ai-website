@@ -13,6 +13,7 @@ use wasm_bindgen::JsCast;
 
 use crate::components::avatar::{Avatar, AvatarSize};
 use crate::relay::{Filter, RelayConnection};
+use crate::components::user_display::use_display_name;
 use crate::utils::shorten_pubkey;
 
 /// Parsed kind 0 metadata fields.
@@ -120,7 +121,7 @@ pub(crate) fn ProfileModal(
 
     let display_name = Memo::new(move |_| {
         let pk = pk_stored.get_value();
-        meta.get().name.unwrap_or_else(|| shorten_pubkey(&pk))
+        meta.get().name.unwrap_or_else(|| use_display_name(&pk))
     });
 
     view! {

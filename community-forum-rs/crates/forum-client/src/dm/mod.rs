@@ -13,8 +13,8 @@ use leptos::prelude::*;
 use nostr_core::gift_wrap::{gift_wrap, unwrap_gift};
 use nostr_core::{nip44_decrypt, NostrEvent};
 
+use crate::components::user_display::use_display_name;
 use crate::relay::{Filter, RelayConnection};
-use crate::utils::shorten_pubkey;
 
 /// A single decrypted direct message.
 #[derive(Clone, Debug, PartialEq)]
@@ -335,7 +335,7 @@ impl DMStore {
                 .entry(recipient_pk_hex.to_string())
                 .or_insert_with(|| DMConversation {
                     pubkey: recipient_pk_hex.to_string(),
-                    name: shorten_pubkey(recipient_pk_hex),
+                    name: use_display_name(recipient_pk_hex),
                     last_message: String::new(),
                     last_timestamp: 0,
                     unread_count: 0,
@@ -525,7 +525,7 @@ fn insert_dm_message(
             .entry(counterparty_pk.to_string())
             .or_insert_with(|| DMConversation {
                 pubkey: counterparty_pk.to_string(),
-                name: shorten_pubkey(counterparty_pk),
+                name: use_display_name(counterparty_pk),
                 last_message: String::new(),
                 last_timestamp: 0,
                 unread_count: 0,

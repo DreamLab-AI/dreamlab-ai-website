@@ -13,7 +13,8 @@ use std::rc::Rc;
 use crate::app::base_href;
 use crate::components::mention_text::MentionText;
 use crate::relay::{ConnectionState, Filter, RelayConnection};
-use crate::utils::{format_relative_time, pubkey_color, set_timeout_once, shorten_pubkey};
+use crate::components::user_display::use_display_name;
+use crate::utils::{format_relative_time, pubkey_color, set_timeout_once};
 
 /// Internal representation of the fetched event for display.
 #[derive(Clone, Debug)]
@@ -206,7 +207,7 @@ pub fn NoteViewPage() -> impl IntoView {
                 } else if let Some(n) = note.get() {
                     let avatar_text = n.pubkey[..2].to_uppercase();
                     let avatar_bg = pubkey_color(&n.pubkey);
-                    let pk_short = shorten_pubkey(&n.pubkey);
+                    let pk_short = use_display_name(&n.pubkey);
                     let time_str = format_relative_time(n.created_at);
                     let label = kind_label(n.kind);
                     let is_private = is_private_kind(n.kind);
