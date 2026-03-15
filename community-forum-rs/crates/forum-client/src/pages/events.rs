@@ -59,12 +59,8 @@ pub fn EventsPage() -> impl IntoView {
 
     let sub_ids: RwSignal<Vec<String>> = RwSignal::new(Vec::new());
 
-    let is_admin_or_mod = Memo::new(move |_| {
-        my_pubkey
-            .get()
-            .map(|pk| AdminStore::is_admin(&pk))
-            .unwrap_or(false)
-    });
+    let zone_access = crate::stores::zone_access::use_zone_access();
+    let is_admin_or_mod = Memo::new(move |_| zone_access.is_admin.get());
 
     let now_ts = (js_sys::Date::now() / 1000.0) as u64;
 

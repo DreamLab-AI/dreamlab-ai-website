@@ -1054,10 +1054,6 @@ impl NostrRelayDO {
 
 impl NostrRelayDO {
     async fn is_whitelisted(&self, pubkey: &str) -> bool {
-        if auth::is_admin_by_env(pubkey, &self.env) {
-            return true;
-        }
-
         let db = match self.env.d1("DB") {
             Ok(db) => db,
             Err(_) => return false,
@@ -1080,6 +1076,9 @@ impl NostrRelayDO {
     /// Called when a user publishes their first kind-0 profile event. Gives them
     /// immediate access to the DreamLab zone without admin intervention.
     /// Admin can later assign additional cohorts for other zones.
+    ///
+    /// **First-user-is-admin**: If the whitelist table is empty, the first user
+    /// to register automatically becomes admin with all-zone access.
     async fn auto_whitelist(&self, pubkey: &str) {
         let db = match self.env.d1("DB") {
             Ok(db) => db,
@@ -1087,11 +1086,26 @@ impl NostrRelayDO {
         };
 
         let now = auth::js_now_secs();
-        let cohorts_json = r#"["dreamlab"]"#;
+
+        // Check if this is the very first user (empty whitelist)
+        let is_first_user = {
+            let count_stmt = db.prepare("SELECT COUNT(*) as count FROM whitelist");
+            match count_stmt.first::<CountResult>(None).await {
+                Ok(Some(row)) => (row.cnt as u64) == 0,
+                _ => false,
+            }
+        };
+
+        let (cohorts_json, admin_flag) = if is_first_user {
+            // First user gets all zones + admin
+            (r#"["home","dreamlab","minimoonoir"]"#, 1i32)
+        } else {
+            (r#"["dreamlab"]"#, 0i32)
+        };
 
         let stmt = db.prepare(
-            "INSERT INTO whitelist (pubkey, cohorts, added_at, added_by) \
-             VALUES (?1, ?2, ?3, ?4) \
+            "INSERT INTO whitelist (pubkey, cohorts, added_at, added_by, is_admin) \
+             VALUES (?1, ?2, ?3, ?4, ?5) \
              ON CONFLICT (pubkey) DO NOTHING",
         );
         if let Ok(bound) = stmt.bind(&[
@@ -1099,8 +1113,16 @@ impl NostrRelayDO {
             JsValue::from_str(cohorts_json),
             JsValue::from_f64(now as f64),
             JsValue::from_str("auto-registration"),
+            JsValue::from_f64(admin_flag as f64),
         ]) {
             let _ = bound.run().await;
+        }
+
+        if is_first_user {
+            worker::console_log!(
+                "[auto_whitelist] First user {} promoted to admin with all zones",
+                &pubkey[..8]
+            );
         }
     }
 }

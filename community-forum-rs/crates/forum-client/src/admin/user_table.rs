@@ -7,7 +7,7 @@ use leptos::prelude::*;
 use send_wrapper::SendWrapper;
 use std::rc::Rc;
 
-use super::{WhitelistUser, ADMIN_PUBKEYS};
+use super::WhitelistUser;
 
 /// Available zone flags for cohort editing.
 const AVAILABLE_COHORTS: &[(&str, &str)] = &[
@@ -19,16 +19,22 @@ const AVAILABLE_COHORTS: &[(&str, &str)] = &[
 /// Callback type for cohort updates: (pubkey, new_cohorts).
 type UpdateCallback = Rc<dyn Fn(String, Vec<String>)>;
 
+/// Callback type for admin toggle: (pubkey, is_admin).
+type AdminToggleCallback = Rc<dyn Fn(String, bool)>;
+
 /// Whitelist user table. Shows username, cohorts, and an edit button for each user.
 /// Calls `on_update_cohorts` when cohorts are changed for a user.
+/// Calls `on_toggle_admin` when admin status is toggled for a user.
 #[component]
 pub fn UserTable(
     users: Signal<Vec<WhitelistUser>>,
     #[prop(into)] on_update_cohorts: UpdateCohortsCb,
+    #[prop(into)] on_toggle_admin: AdminToggleCb,
 ) -> impl IntoView {
     let editing_pubkey = RwSignal::new(Option::<String>::None);
     let editing_cohorts = RwSignal::new(Vec::<String>::new());
     let callback = on_update_cohorts.0;
+    let admin_callback = on_toggle_admin.0;
 
     view! {
         <div class="bg-gray-800 border border-gray-700 rounded-lg overflow-hidden">
@@ -51,14 +57,17 @@ pub fn UserTable(
                         }.into_any()
                     } else {
                         let cb = callback.clone();
+                        let acb = admin_callback.clone();
                         user_list.into_iter().map(move |user| {
                             let cb_for_row = cb.clone();
+                            let acb_for_row = acb.clone();
                             view! {
                                 <UserRow
                                     user=user
                                     editing_pubkey=editing_pubkey
                                     editing_cohorts=editing_cohorts
                                     on_save=UpdateCohortsCb(cb_for_row)
+                                    on_toggle_admin=AdminToggleCb(acb_for_row)
                                 />
                             }
                         }).collect_view().into_any()
@@ -90,6 +99,25 @@ impl<F: Fn(String, Vec<String>) + 'static> From<F> for UpdateCohortsCb {
     }
 }
 
+/// A wrapper to make the admin toggle callback Send+Sync for Leptos context.
+#[derive(Clone)]
+pub struct AdminToggleCb(SendWrapper<AdminToggleCallback>);
+
+impl AdminToggleCb {
+    pub fn new(f: impl Fn(String, bool) + 'static) -> Self {
+        Self(SendWrapper::new(Rc::new(f)))
+    }
+}
+
+unsafe impl Send for AdminToggleCb {}
+unsafe impl Sync for AdminToggleCb {}
+
+impl<F: Fn(String, bool) + 'static> From<F> for AdminToggleCb {
+    fn from(f: F) -> Self {
+        Self::new(f)
+    }
+}
+
 /// A single row in the user table with inline edit capability.
 #[component]
 fn UserRow(
@@ -97,18 +125,20 @@ fn UserRow(
     editing_pubkey: RwSignal<Option<String>>,
     editing_cohorts: RwSignal<Vec<String>>,
     on_save: UpdateCohortsCb,
+    on_toggle_admin: AdminToggleCb,
 ) -> impl IntoView {
     let pk = user.pubkey.clone();
     let pk_display = truncate_pubkey(&pk);
     let display_name = user.display_name.clone();
     let cohorts = user.cohorts.clone();
-    let is_admin_user = ADMIN_PUBKEYS.contains(&pk.as_str());
+    let is_admin_user = user.is_admin;
 
     let pk_for_edit = pk.clone();
     let cohorts_for_edit = cohorts.clone();
     let pk_for_check = pk.clone();
     let pk_for_check2 = pk.clone();
     let pk_for_save = pk.clone();
+    let pk_for_admin = pk.clone();
 
     let is_editing = move || editing_pubkey.get().as_deref() == Some(&*pk_for_check);
     let is_editing2 = move || editing_pubkey.get().as_deref() == Some(&*pk_for_check2);
@@ -128,6 +158,11 @@ fn UserRow(
 
     let on_cancel_click = move |_| {
         editing_pubkey.set(None);
+    };
+
+    let admin_cb = on_toggle_admin.0;
+    let on_admin_toggle = move |_| {
+        admin_cb(pk_for_admin.clone(), !is_admin_user);
     };
 
     let cohorts_for_display = cohorts.clone();
@@ -186,6 +221,16 @@ fn UserRow(
                 <Show
                     when=is_editing2
                     fallback=move || view! {
+                        <button
+                            on:click=on_admin_toggle.clone()
+                            class=if is_admin_user {
+                                "text-xs text-red-400 hover:text-red-300 border border-red-500/30 hover:border-red-400 rounded px-2 py-1 transition-colors"
+                            } else {
+                                "text-xs text-emerald-400 hover:text-emerald-300 border border-emerald-500/30 hover:border-emerald-400 rounded px-2 py-1 transition-colors"
+                            }
+                        >
+                            {if is_admin_user { "Revoke Admin" } else { "Make Admin" }}
+                        </button>
                         <button
                             on:click=on_edit_click.clone()
                             class="text-xs text-amber-400 hover:text-amber-300 border border-amber-500/30 hover:border-amber-400 rounded px-2 py-1 transition-colors flex items-center gap-1"

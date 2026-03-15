@@ -24,6 +24,8 @@ pub struct ZoneAccess {
     pub minimoonoir: Memo<bool>,
     /// Whether the user is on the whitelist (any flag true).
     pub is_whitelisted: Signal<bool>,
+    /// Whether the user has admin privileges (from D1 whitelist).
+    pub is_admin: RwSignal<bool>,
     /// Raw flags signal (set from relay response).
     flags: RwSignal<(bool, bool, bool)>,
 }
@@ -49,6 +51,7 @@ pub fn provide_zone_access() {
     let is_authed = auth.is_authenticated();
     let pubkey = auth.pubkey();
     let flags = RwSignal::new((false, false, false));
+    let is_admin_sig = RwSignal::new(false);
 
     let home = Memo::new(move |_| flags.get().0);
     let dreamlab = Memo::new(move |_| flags.get().1);
@@ -63,6 +66,7 @@ pub fn provide_zone_access() {
         dreamlab,
         minimoonoir,
         is_whitelisted,
+        is_admin: is_admin_sig,
         flags,
     };
     provide_context(access.clone());
@@ -74,17 +78,19 @@ pub fn provide_zone_access() {
         if authed {
             if let Some(pk) = pk {
                 let flags_sig = flags;
+                let admin_sig = is_admin_sig;
                 leptos::task::spawn_local(async move {
                     match fetch_user_access(&pk).await {
-                        Ok((h, d, m)) => {
+                        Ok((h, d, m, admin)) => {
                             web_sys::console::log_1(
                                 &format!(
-                                    "[zone_access] flags for {}: home={}, dreamlab={}, minimoonoir={}",
-                                    &pk[..8], h, d, m
+                                    "[zone_access] flags for {}: home={}, dreamlab={}, minimoonoir={}, admin={}",
+                                    &pk[..8], h, d, m, admin
                                 )
                                 .into(),
                             );
                             flags_sig.set((h, d, m));
+                            admin_sig.set(admin);
                         }
                         Err(e) => {
                             web_sys::console::error_1(
@@ -96,6 +102,7 @@ pub fn provide_zone_access() {
             }
         } else {
             flags.set((false, false, false));
+            is_admin_sig.set(false);
         }
     });
 }
@@ -130,9 +137,10 @@ fn relay_api_base() -> String {
 
 /// Fetch the user's access flags from the relay's check-whitelist endpoint.
 ///
+/// Returns `(home, dreamlab, minimoonoir, is_admin)`.
 /// Parses the `access` object first (new format). Falls back to normalizing
 /// the `cohorts` array for backwards compatibility with old relay versions.
-async fn fetch_user_access(pubkey: &str) -> Result<(bool, bool, bool), String> {
+async fn fetch_user_access(pubkey: &str) -> Result<(bool, bool, bool, bool), String> {
     let url = format!("{}/api/check-whitelist?pubkey={}", relay_api_base(), pubkey);
     let win = web_sys::window().ok_or("No window")?;
     let resp_val = JsFuture::from(win.fetch_with_str(&url))
@@ -151,18 +159,19 @@ async fn fetch_user_access(pubkey: &str) -> Result<(bool, bool, bool), String> {
     let val: serde_json::Value =
         serde_json::from_str(&text_str).map_err(|e| format!("JSON parse: {e}"))?;
 
+    let is_admin = val.get("isAdmin").and_then(|v| v.as_bool()).unwrap_or(false);
+
     // New format: { access: { home, dreamlab, minimoonoir } }
     if let Some(access) = val.get("access") {
         let home = access.get("home").and_then(|v| v.as_bool()).unwrap_or(false);
         let dreamlab = access.get("dreamlab").and_then(|v| v.as_bool()).unwrap_or(false);
         let minimoonoir = access.get("minimoonoir").and_then(|v| v.as_bool()).unwrap_or(false);
-        return Ok((home, dreamlab, minimoonoir));
+        return Ok((home, dreamlab, minimoonoir, is_admin));
     }
 
     // Fallback: normalize from cohorts array
-    let is_admin = val.get("isAdmin").and_then(|v| v.as_bool()).unwrap_or(false);
     if is_admin {
-        return Ok((true, true, true));
+        return Ok((true, true, true, true));
     }
 
     let cohorts: Vec<String> = val["cohorts"]
@@ -179,7 +188,7 @@ async fn fetch_user_access(pubkey: &str) -> Result<(bool, bool, bool), String> {
         "minimoonoir" | "minimoonoir-only" | "minimoonoir-business" | "cross-access"
     ));
 
-    Ok((home, dreamlab, minimoonoir))
+    Ok((home, dreamlab, minimoonoir, false))
 }
 
 /// Retrieve the zone access store from context.

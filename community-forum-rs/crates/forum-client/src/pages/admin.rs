@@ -14,9 +14,11 @@ use crate::admin::channel_form::{ChannelForm, ChannelFormData};
 use crate::admin::overview::{ConnectionStatusBar, OverviewTab};
 use crate::admin::section_requests::SectionRequests;
 use crate::admin::user_table::{UpdateCohortsCb, UserTable};
-use crate::admin::{provide_admin, use_admin, AdminStore, AdminTab};
+use crate::admin::{provide_admin, use_admin, AdminTab};
+use crate::admin::user_table::AdminToggleCb;
 use crate::auth::use_auth;
 use crate::relay::{ConnectionState, RelayConnection};
+use crate::stores::zone_access::use_zone_access;
 
 /// Admin panel page component. Checks auth + admin status before rendering.
 #[component]
@@ -24,16 +26,11 @@ pub fn AdminPage() -> impl IntoView {
     let auth = use_auth();
     let is_authed = auth.is_authenticated();
     let is_ready = auth.is_ready();
-    let pubkey = auth.pubkey();
+    let zone_access = use_zone_access();
     // StoredValue is Copy — safe to capture in multiple Effect closures
     let navigate = StoredValue::new(use_navigate());
 
-    let is_admin = Memo::new(move |_| {
-        pubkey
-            .get()
-            .map(|pk| AdminStore::is_admin(&pk))
-            .unwrap_or(false)
-    });
+    let is_admin = Memo::new(move |_| zone_access.is_admin.get());
 
     // Redirect non-authenticated users (SPA navigation — preserves WASM state)
     Effect::new(move |_| {
@@ -361,6 +358,18 @@ fn UsersTab() -> impl IntoView {
         }
     };
 
+    let admin_for_admin_toggle = admin.clone();
+    let on_toggle_admin = move |pubkey: String, new_admin_status: bool| {
+        if let Some(privkey) = auth.get_privkey_bytes() {
+            let admin_clone = admin_for_admin_toggle.clone();
+            spawn_local(async move {
+                let _ = admin_clone
+                    .set_admin(&pubkey, new_admin_status, &privkey)
+                    .await;
+            });
+        }
+    };
+
     let admin_for_refresh = admin.clone();
     let on_refresh = move |_| {
         if let Some(privkey) = auth.get_privkey_bytes() {
@@ -444,7 +453,7 @@ fn UsersTab() -> impl IntoView {
                         </div>
                     }
                 >
-                    <UserTable users=users_signal on_update_cohorts=UpdateCohortsCb::new(on_update_cohorts.clone()) />
+                    <UserTable users=users_signal on_update_cohorts=UpdateCohortsCb::new(on_update_cohorts.clone()) on_toggle_admin=AdminToggleCb::new(on_toggle_admin.clone()) />
                 </Show>
             </div>
         </div>

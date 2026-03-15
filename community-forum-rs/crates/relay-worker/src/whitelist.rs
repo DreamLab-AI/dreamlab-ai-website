@@ -30,6 +30,7 @@ fn js_f64(v: f64) -> JsValue {
 #[derive(Deserialize)]
 struct CohortRow {
     cohorts: String,
+    is_admin: Option<i32>,
 }
 
 #[derive(Deserialize)]
@@ -39,6 +40,7 @@ struct WhitelistRow {
     added_at: f64,
     added_by: Option<String>,
     profile_content: Option<String>,
+    is_admin: Option<i32>,
 }
 
 #[derive(Deserialize)]
@@ -60,6 +62,12 @@ struct WhitelistAddBody {
 struct WhitelistUpdateCohortsBody {
     pubkey: Option<String>,
     cohorts: Option<Vec<String>>,
+}
+
+#[derive(Deserialize)]
+struct SetAdminBody {
+    pubkey: Option<String>,
+    is_admin: Option<bool>,
 }
 
 // ---------------------------------------------------------------------------
@@ -86,12 +94,14 @@ pub async fn handle_check_whitelist(req: &Request, env: &Env) -> Result<Response
     let now = auth::js_now_secs();
 
     let stmt = db
-        .prepare("SELECT cohorts FROM whitelist WHERE pubkey = ?1 AND (expires_at IS NULL OR expires_at > ?2)")
+        .prepare("SELECT cohorts, is_admin FROM whitelist WHERE pubkey = ?1 AND (expires_at IS NULL OR expires_at > ?2)")
         .bind(&[js_str(&pubkey), js_f64(now as f64)])?;
 
     let entry = stmt.first::<CohortRow>(None).await?;
-    let env_admins = auth::admin_pubkeys(env);
-    let is_admin_key = env_admins.iter().any(|k| k == &pubkey);
+    let is_admin_key = entry
+        .as_ref()
+        .map(|row| row.is_admin.unwrap_or(0) == 1)
+        .unwrap_or(false);
 
     let cohorts: Vec<String> = entry
         .as_ref()
@@ -166,7 +176,7 @@ pub async fn handle_whitelist_list(req: &Request, env: &Env) -> Result<Response>
         let count =
             "SELECT COUNT(*) as count FROM whitelist WHERE (expires_at IS NULL OR expires_at > ?1) AND cohorts LIKE ?2 ESCAPE '\\'".to_string();
         let list =
-            "SELECT w.pubkey, w.cohorts, w.added_at, w.added_by, \
+            "SELECT w.pubkey, w.cohorts, w.added_at, w.added_by, w.is_admin, \
              (SELECT e.content FROM events e WHERE e.pubkey = w.pubkey AND e.kind = 0 ORDER BY e.created_at DESC LIMIT 1) as profile_content \
              FROM whitelist w WHERE (w.expires_at IS NULL OR w.expires_at > ?1) AND w.cohorts LIKE ?2 ESCAPE '\\' \
              ORDER BY w.added_at DESC LIMIT ?3 OFFSET ?4".to_string();
@@ -184,7 +194,7 @@ pub async fn handle_whitelist_list(req: &Request, env: &Env) -> Result<Response>
         let count =
             "SELECT COUNT(*) as count FROM whitelist WHERE (expires_at IS NULL OR expires_at > ?1)"
                 .to_string();
-        let list = "SELECT w.pubkey, w.cohorts, w.added_at, w.added_by, \
+        let list = "SELECT w.pubkey, w.cohorts, w.added_at, w.added_by, w.is_admin, \
              (SELECT e.content FROM events e WHERE e.pubkey = w.pubkey AND e.kind = 0 ORDER BY e.created_at DESC LIMIT 1) as profile_content \
              FROM whitelist w WHERE (w.expires_at IS NULL OR w.expires_at > ?1) \
              ORDER BY w.added_at DESC LIMIT ?2 OFFSET ?3".to_string();
@@ -239,6 +249,7 @@ pub async fn handle_whitelist_list(req: &Request, env: &Env) -> Result<Response>
                 "addedAt": row.added_at as u64,
                 "addedBy": row.added_by,
                 "displayName": display_name,
+                "isAdmin": row.is_admin.unwrap_or(0) == 1,
             })
         })
         .collect();
@@ -300,6 +311,65 @@ pub async fn handle_whitelist_add(mut req: Request, env: &Env) -> Result<Respons
     ])?
     .run()
     .await?;
+
+    json_response(env, &json!({ "success": true }), 200)
+}
+
+/// `POST /api/whitelist/set-admin` (NIP-98 admin only)
+///
+/// Promotes or demotes an admin. Request body:
+/// `{ "pubkey": "<hex>", "is_admin": true }`
+///
+/// Safety: prevents demoting yourself if you're the last admin.
+pub async fn handle_set_admin(mut req: Request, env: &Env) -> Result<Response> {
+    let url = req.url()?;
+    let request_url = format!("{}{}", url.origin().ascii_serialization(), url.path());
+    let auth_header = req.headers().get("Authorization").ok().flatten();
+    let body_bytes = req.bytes().await?;
+
+    let admin_pubkey = match auth::require_nip98_admin(
+        auth_header.as_deref(),
+        &request_url,
+        "POST",
+        Some(&body_bytes),
+        env,
+    )
+    .await
+    {
+        Ok(pk) => pk,
+        Err((body, status)) => return json_response(env, &body, status),
+    };
+
+    let body: SetAdminBody =
+        serde_json::from_slice(&body_bytes).map_err(|e| worker::Error::RustError(e.to_string()))?;
+
+    let target_pubkey = match body.pubkey {
+        Some(ref pk) if pk.len() == 64 && pk.bytes().all(|b| b.is_ascii_hexdigit()) => pk.clone(),
+        _ => return json_response(env, &json!({ "error": "Invalid or missing pubkey" }), 400),
+    };
+
+    let new_admin_status = body.is_admin.unwrap_or(false);
+    let db = env.d1("DB")?;
+
+    // Safety: prevent demoting yourself if you're the last admin
+    if !new_admin_status && target_pubkey == admin_pubkey {
+        let count_stmt = db.prepare("SELECT COUNT(*) as count FROM whitelist WHERE is_admin = 1");
+        if let Ok(Some(row)) = count_stmt.first::<CountRow>(None).await {
+            if (row.count as u64) <= 1 {
+                return json_response(
+                    env,
+                    &json!({ "error": "Cannot remove the last admin" }),
+                    400,
+                );
+            }
+        }
+    }
+
+    let admin_val = if new_admin_status { 1i32 } else { 0i32 };
+    db.prepare("UPDATE whitelist SET is_admin = ?1 WHERE pubkey = ?2")
+        .bind(&[js_f64(admin_val as f64), js_str(&target_pubkey)])?
+        .run()
+        .await?;
 
     json_response(env, &json!({ "success": true }), 200)
 }

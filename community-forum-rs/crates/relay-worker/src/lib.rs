@@ -131,6 +131,9 @@ fn json_response(req: &Request, body: &serde_json::Value, status: u16) -> Result
 
 #[event(fetch)]
 async fn fetch(req: Request, env: Env, _ctx: Context) -> Result<Response> {
+    // Ensure the is_admin column exists (idempotent migration)
+    ensure_admin_column(&env).await;
+
     // CORS preflight
     if req.method() == Method::Options {
         return Ok(Response::empty()?
@@ -231,7 +234,23 @@ async fn route(req: Request, env: &Env, path: &str) -> Result<Response> {
         return whitelist::handle_whitelist_update_cohorts(req, env).await;
     }
 
+    // Set admin status (NIP-98 admin only)
+    if path == "/api/whitelist/set-admin" && method == Method::Post {
+        return whitelist::handle_set_admin(req, env).await;
+    }
+
     json_response(&req, &serde_json::json!({ "error": "Not found" }), 404)
+}
+
+/// Idempotent schema migration: add `is_admin` column to the whitelist table.
+/// Runs once per request but is a no-op if the column already exists.
+async fn ensure_admin_column(env: &Env) {
+    if let Ok(db) = env.d1("DB") {
+        let _ = db
+            .prepare("ALTER TABLE whitelist ADD COLUMN is_admin INTEGER DEFAULT 0")
+            .run()
+            .await;
+    }
 }
 
 /// Check whether the request's Accept header includes `application/nostr+json`.

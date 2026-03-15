@@ -57,12 +57,8 @@ pub fn StatsPanel() -> impl IntoView {
     let auth = use_auth();
     let pubkey = auth.pubkey();
 
-    let is_admin = Memo::new(move |_| {
-        pubkey
-            .get()
-            .map(|pk| AdminStore::is_admin(&pk))
-            .unwrap_or(false)
-    });
+    let zone_access = crate::stores::zone_access::use_zone_access();
+    let is_admin = Memo::new(move |_| zone_access.is_admin.get());
 
     view! {
         <Show

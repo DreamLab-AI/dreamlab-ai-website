@@ -6,27 +6,19 @@
 use serde_json::json;
 use worker::Env;
 
-use crate::auth;
-
 /// Build the NIP-11 relay information JSON value.
 ///
 /// The relay name is taken from the `RELAY_NAME` env var (falling back to
-/// "DreamLab Nostr Relay"), and the pubkey field is populated from the first
-/// entry in `ADMIN_PUBKEYS`.
+/// "DreamLab Nostr Relay"). The pubkey and contact fields are left empty since
+/// admin status is now dynamic (stored in D1).
 pub fn relay_info(env: &Env) -> serde_json::Value {
     let relay_name = env
         .var("RELAY_NAME")
         .map(|v| v.to_string())
         .unwrap_or_else(|_| "DreamLab Nostr Relay".to_string());
 
-    let admins = auth::admin_pubkeys(env);
-    let admin_pubkey = admins.first().cloned().unwrap_or_default();
-
-    let contact = if admin_pubkey.is_empty() {
-        String::new()
-    } else {
-        format!("nostr:{admin_pubkey}")
-    };
+    let admin_pubkey = String::new();
+    let contact = String::new();
 
     json!({
         "name": relay_name,

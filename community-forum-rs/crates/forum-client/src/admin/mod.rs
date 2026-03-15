@@ -19,19 +19,9 @@ use std::rc::Rc;
 
 use crate::auth::nip98::{fetch_with_nip98_get, fetch_with_nip98_post};
 use crate::relay::{ConnectionState, Filter, RelayConnection};
+use crate::stores::zone_access::use_zone_access;
 
 // -- Constants ----------------------------------------------------------------
-
-/// Admin pubkeys for the DreamLab forum (matches relay-worker ADMIN_PUBKEYS).
-/// The primary admin key (11ed64...) is listed first for display purposes.
-pub const ADMIN_PUBKEYS: &[&str] = &[
-    "11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c",
-    "a617d2109bdd3f1a607d5a837e885178f6367af296885d7f058c26b2bd03221a",
-    "37f922fd632060ee9905505b687f8803090e943ffe92105428b3859a1c4ee7ff",
-];
-
-/// Primary admin pubkey (used for display in overview panel).
-pub const ADMIN_PUBKEY: &str = ADMIN_PUBKEYS[0];
 
 /// Default auth API base URL (overridable via `window.__ENV__.VITE_AUTH_API_URL`).
 const DEFAULT_AUTH_API_URL: &str = "https://dreamlab-auth-api.solitary-paper-764d.workers.dev";
@@ -58,6 +48,8 @@ pub struct WhitelistUser {
     pub display_name: Option<String>,
     #[serde(default, alias = "addedAt")]
     pub added_at: Option<u64>,
+    #[serde(default, alias = "isAdmin")]
+    pub is_admin: bool,
 }
 
 /// A channel parsed from a kind-40 event on the relay.
@@ -119,9 +111,9 @@ impl AdminStore {
         }
     }
 
-    /// Check whether the given hex pubkey is in the admin pubkey list.
-    pub fn is_admin(pubkey: &str) -> bool {
-        ADMIN_PUBKEYS.contains(&pubkey)
+    /// Check whether the current user is admin using the zone_access context.
+    pub fn is_current_user_admin() -> bool {
+        use_zone_access().is_admin.get_untracked()
     }
 
     /// Resolve the API base URL for whitelist/admin operations.
@@ -262,6 +254,46 @@ impl AdminStore {
                 )));
                 self.state.is_loading.set(false);
                 // Refresh the whitelist
+                let _ = self.fetch_whitelist(privkey).await;
+                Ok(())
+            }
+            Err(e) => {
+                let msg = e.to_string();
+                self.state.error.set(Some(msg.clone()));
+                self.state.is_loading.set(false);
+                Err(msg)
+            }
+        }
+    }
+
+    // -- Admin management -----------------------------------------------------
+
+    /// Set or revoke admin status for a pubkey via the relay API.
+    pub async fn set_admin(
+        &self,
+        pubkey: &str,
+        is_admin: bool,
+        privkey: &[u8; 32],
+    ) -> Result<(), String> {
+        self.state.is_loading.set(true);
+        self.state.error.set(None);
+        self.state.success.set(None);
+
+        let body = serde_json::json!({
+            "pubkey": pubkey,
+            "is_admin": is_admin,
+        });
+        let url = format!("{}/api/whitelist/set-admin", Self::api_base());
+        match fetch_with_nip98_post(&url, &serde_json::to_string(&body).unwrap(), privkey).await {
+            Ok(_) => {
+                let action = if is_admin { "promoted to admin" } else { "demoted from admin" };
+                self.state.success.set(Some(format!(
+                    "{}...{} {}",
+                    &pubkey[..8],
+                    &pubkey[pubkey.len().saturating_sub(4)..],
+                    action
+                )));
+                self.state.is_loading.set(false);
                 let _ = self.fetch_whitelist(privkey).await;
                 Ok(())
             }

@@ -397,12 +397,8 @@ fn Layout(children: Children) -> impl IntoView {
         })
     });
 
-    let is_admin = Memo::new(move |_| {
-        pubkey
-            .get()
-            .map(|pk| AdminStore::is_admin(&pk))
-            .unwrap_or(false)
-    });
+    let zone_access = crate::stores::zone_access::use_zone_access();
+    let is_admin = Memo::new(move |_| zone_access.is_admin.get());
 
     // Helper: returns active or inactive CSS for nav links
     let nav_link_class = move |prefix: &'static str| {

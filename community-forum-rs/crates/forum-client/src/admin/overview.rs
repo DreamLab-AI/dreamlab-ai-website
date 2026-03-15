@@ -4,7 +4,8 @@
 
 use leptos::prelude::*;
 
-use super::{use_admin, ADMIN_PUBKEY};
+use super::use_admin;
+use crate::auth::use_auth;
 use crate::relay::{ConnectionState, RelayConnection};
 
 // -- Connection status bar ----------------------------------------------------
@@ -96,17 +97,23 @@ pub fn OverviewTab() -> impl IntoView {
             </div>
         </Show>
 
-        // Admin pubkey info
-        <div class="mt-6 bg-gray-800 border border-gray-700 rounded-lg p-4">
-            <h3 class="text-sm font-medium text-gray-400 mb-2 flex items-center gap-1.5">
-                {key_icon()}
-                "Admin Public Key"
-            </h3>
-            <div class="bg-gray-900 rounded-lg px-3 py-2 flex items-center justify-between gap-2">
-                <code class="text-xs text-amber-300 font-mono break-all">{ADMIN_PUBKEY}</code>
-                <span class="text-xs text-gray-600 flex-shrink-0">"click to copy"</span>
-            </div>
-        </div>
+        // Admin pubkey info (shows the current user's pubkey)
+        {move || {
+            let auth = use_auth();
+            auth.pubkey().get().map(|pk| {
+                view! {
+                    <div class="mt-6 bg-gray-800 border border-gray-700 rounded-lg p-4">
+                        <h3 class="text-sm font-medium text-gray-400 mb-2 flex items-center gap-1.5">
+                            {key_icon()}
+                            "Your Admin Public Key"
+                        </h3>
+                        <div class="bg-gray-900 rounded-lg px-3 py-2 flex items-center justify-between gap-2">
+                            <code class="text-xs text-amber-300 font-mono break-all">{pk}</code>
+                        </div>
+                    </div>
+                }
+            })
+        }}
     }
 }
 

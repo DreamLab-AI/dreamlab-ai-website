@@ -2,9 +2,11 @@
 //!
 //! Verifies the `Authorization: Nostr <base64(event)>` header using
 //! `nostr_core::verify_nip98_token_at`, then checks whether the authenticated
-//! pubkey holds admin privileges via the `ADMIN_PUBKEYS` env var.
+//! pubkey holds admin privileges via the D1 `whitelist.is_admin` column.
 
 use nostr_core::nip98::{Nip98Error, Nip98Token};
+use serde::Deserialize;
+use wasm_bindgen::JsValue;
 use worker::Env;
 
 // ---------------------------------------------------------------------------
@@ -34,25 +36,23 @@ pub fn js_now_secs() -> u64 {
 // Admin checks
 // ---------------------------------------------------------------------------
 
-/// Return the list of admin pubkeys from the `ADMIN_PUBKEYS` environment variable.
-pub fn admin_pubkeys(env: &Env) -> Vec<String> {
-    env.var("ADMIN_PUBKEYS")
-        .map(|v| v.to_string())
-        .unwrap_or_default()
-        .split(',')
-        .map(|k| k.trim().to_string())
-        .filter(|k| !k.is_empty())
-        .collect()
+/// D1 row type for admin status queries.
+#[derive(Deserialize)]
+struct IsAdminRow {
+    is_admin: i32,
 }
 
-/// Check whether a pubkey is listed in the `ADMIN_PUBKEYS` environment variable.
-pub fn is_admin_by_env(pubkey: &str, env: &Env) -> bool {
-    admin_pubkeys(env).iter().any(|k| k == pubkey)
-}
-
-/// Check whether a pubkey is an admin (env var only).
+/// Check whether a pubkey is an admin by querying the D1 `whitelist` table.
 pub async fn is_admin(pubkey: &str, env: &Env) -> bool {
-    is_admin_by_env(pubkey, env)
+    if let Ok(db) = env.d1("DB") {
+        let stmt = db.prepare("SELECT is_admin FROM whitelist WHERE pubkey = ?1");
+        if let Ok(bound) = stmt.bind(&[JsValue::from_str(pubkey)]) {
+            if let Ok(Some(row)) = bound.first::<IsAdminRow>(None).await {
+                return row.is_admin == 1;
+            }
+        }
+    }
+    false
 }
 
 /// Verify NIP-98 auth and assert the authenticated pubkey is an admin.
