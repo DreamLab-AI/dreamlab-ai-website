@@ -382,9 +382,26 @@ async fn create_credential(
         )))
         .map_err(|e| PasskeyError::JsError(format!("{e:?}")))?;
 
-    let result = JsFuture::from(promise)
-        .await
-        .map_err(|e| PasskeyError::Cancelled(format!("{e:?}")))?;
+    let result = JsFuture::from(promise).await.map_err(|e| {
+        let msg = format!("{e:?}");
+        // NotAllowedError during creation usually means:
+        // - User cancelled the dialog
+        // - Cross-device (QR/hybrid) authenticator that doesn't support PRF
+        // - Timeout waiting for the authenticator
+        if msg.contains("NotAllowedError") {
+            PasskeyError::Cancelled(
+                "Passkey creation failed. If you were using your phone via QR code, \
+                 note that cross-device passkeys do not support the PRF extension \
+                 required for Nostr key derivation. Please use:\n\
+                 \u{2022} Your computer's built-in biometrics (Touch ID, Windows Hello fingerprint)\n\
+                 \u{2022} A USB security key (YubiKey, etc.)\n\
+                 \u{2022} Or choose \"Generate Key Pair\" instead."
+                    .into(),
+            )
+        } else {
+            PasskeyError::Cancelled(msg)
+        }
+    })?;
 
     if result.is_null() || result.is_undefined() {
         return Err(PasskeyError::Cancelled(

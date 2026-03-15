@@ -350,9 +350,13 @@ fn AdminSetupCta() -> impl IntoView {
                         </A>
                     </div>
 
-                    <p class="text-xs text-gray-600 text-center">
-                        "The first account registered will become the admin."
-                    </p>
+                    <div class="text-xs text-gray-600 text-center space-y-1">
+                        <p>"The first account registered will become the admin."</p>
+                        <p class="text-gray-700">
+                            "Passkey requires device biometrics (Touch ID, fingerprint) or a USB security key. "
+                            "Phone-via-QR is not supported."
+                        </p>
+                    </div>
                 </div>
             </Show>
 
