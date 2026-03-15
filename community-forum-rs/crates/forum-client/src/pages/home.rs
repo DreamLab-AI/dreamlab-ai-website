@@ -78,6 +78,12 @@ pub fn HomePage() -> impl IntoView {
     // Setup status: None = loading, Some(true) = needs setup, Some(false) = normal
     let needs_setup: RwSignal<Option<bool>> = RwSignal::new(None);
 
+    // Track whether the admin setup backup screen is active.
+    // This prevents AdminSetupCta from being unmounted when auth succeeds
+    // mid-flow (register_with_generated_key sets is_authenticated=true
+    // before the user has seen the backup screen).
+    let showing_backup = RwSignal::new(false);
+
     // Fetch setup status on mount
     wasm_bindgen_futures::spawn_local(async move {
         match fetch_needs_setup().await {
@@ -131,23 +137,25 @@ pub fn HomePage() -> impl IntoView {
                     {move || {
                         let setup = needs_setup.get();
                         let authed = is_authed.get();
+                        let backup = showing_backup.get();
 
-                        match (setup, authed) {
+                        match (setup, authed, backup) {
                             // Still loading setup status
-                            (None, _) => view! {
+                            (None, _, _) => view! {
                                 <div class="flex items-center justify-center gap-2 text-gray-500">
                                     <span class="animate-spin inline-block w-4 h-4 border-2 border-gray-500 border-t-transparent rounded-full"></span>
                                     <span class="text-sm">"Checking status..."</span>
                                 </div>
                             }.into_any(),
 
-                            // Needs setup — show admin setup CTA
-                            (Some(true), false) => view! {
-                                <AdminSetupCta />
+                            // Needs setup — show admin setup CTA (not yet authed)
+                            // OR authed but still showing backup screen
+                            (Some(true), false, _) | (Some(true), true, true) => view! {
+                                <AdminSetupCta showing_backup=showing_backup />
                             }.into_any(),
 
                             // Normal, not logged in
-                            (Some(false), false) | (Some(true), true) => view! {
+                            (Some(false), false, _) | (Some(true), true, false) => view! {
                                 <A
                                     href=base_href("/signup")
                                     attr:class="bg-amber-500 hover:bg-amber-400 text-gray-900 font-semibold px-8 py-3 rounded-xl text-lg transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/20"
@@ -163,7 +171,7 @@ pub fn HomePage() -> impl IntoView {
                             }.into_any(),
 
                             // Logged in
-                            (Some(false), true) => view! {
+                            (Some(false), true, _) => view! {
                                 <A
                                     href=base_href("/chat")
                                     attr:class="bg-amber-500 hover:bg-amber-400 text-gray-900 font-semibold px-8 py-3 rounded-xl text-lg transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/20"
@@ -210,7 +218,11 @@ pub fn HomePage() -> impl IntoView {
 /// Prominent CTA shown when no admin exists. Offers three registration methods:
 /// passkey (preferred), generated key, or existing key import.
 #[component]
-fn AdminSetupCta() -> impl IntoView {
+fn AdminSetupCta(
+    /// Parent-level signal to keep this component mounted during the backup phase,
+    /// even after `is_authenticated` becomes true from `register_with_generated_key`.
+    showing_backup: RwSignal<bool>,
+) -> impl IntoView {
     let auth = use_auth();
     let navigate = StoredValue::new(use_navigate());
 
@@ -256,6 +268,8 @@ fn AdminSetupCta() -> impl IntoView {
             Ok(hex) => {
                 privkey_hex.set(hex);
                 phase.set(SetupPhase::Backup);
+                // Tell parent to keep us mounted even after auth succeeds
+                showing_backup.set(true);
             }
             Err(e) => error.set(Some(e)),
         }
@@ -264,6 +278,7 @@ fn AdminSetupCta() -> impl IntoView {
     // After backup, navigate to setup
     let on_backup_done = Callback::new(move |()| {
         auth.confirm_nsec_backup();
+        showing_backup.set(false);
         navigate.with_value(|nav| nav("/setup", NavigateOptions::default()));
     });
 
