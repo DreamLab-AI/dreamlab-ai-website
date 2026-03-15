@@ -264,14 +264,19 @@ fn AdminSetupCta(
             return;
         }
         error.set(None);
+        // Set showing_backup BEFORE register so the reactive system keeps
+        // AdminSetupCta mounted when is_authenticated flips to true inside
+        // register_with_generated_key (synchronous signal update).
+        showing_backup.set(true);
         match auth.register_with_generated_key(&name) {
             Ok(hex) => {
                 privkey_hex.set(hex);
                 phase.set(SetupPhase::Backup);
-                // Tell parent to keep us mounted even after auth succeeds
-                showing_backup.set(true);
             }
-            Err(e) => error.set(Some(e)),
+            Err(e) => {
+                showing_backup.set(false);
+                error.set(Some(e));
+            }
         }
     };
 
