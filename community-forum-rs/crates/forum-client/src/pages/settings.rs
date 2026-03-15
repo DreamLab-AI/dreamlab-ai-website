@@ -65,6 +65,7 @@ fn save_privacy_settings(show_online: bool, allow_dms: bool) {
 pub fn SettingsPage() -> impl IntoView {
     let auth = use_auth();
     let toasts = use_toasts();
+    let relay = expect_context::<RelayConnection>();
 
     // Profile fields
     let nickname = RwSignal::new(auth.nickname().get_untracked().unwrap_or_default());
@@ -96,7 +97,7 @@ pub fn SettingsPage() -> impl IntoView {
 
     // -- Fetch kind-0 metadata on mount to populate fields --
     {
-        let relay = expect_context::<RelayConnection>();
+        let relay = relay.clone();
         let conn_state = relay.connection_state();
         let nickname_sig = nickname;
         let about_sig = about;
@@ -206,7 +207,7 @@ pub fn SettingsPage() -> impl IntoView {
         let toasts_ok = toasts_for_profile.clone();
         let toasts_pub = toasts_for_profile.clone();
         let toasts_err = toasts_for_profile.clone();
-        let relay = expect_context::<RelayConnection>();
+        let relay = relay.clone();
         wasm_bindgen_futures::spawn_local(async move {
             match auth.sign_event_async(unsigned).await {
                 Ok(signed) => {

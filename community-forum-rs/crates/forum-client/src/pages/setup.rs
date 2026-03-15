@@ -37,6 +37,9 @@ fn validate_nickname(name: &str) -> Result<String, String> {
 pub fn SetupPage() -> impl IntoView {
     let auth = use_auth();
     let navigate = StoredValue::new(use_navigate());
+    // Capture relay at component level — reactive context is unavailable
+    // inside event handler closures and spawn_local in Leptos 0.7.
+    let relay = expect_context::<RelayConnection>();
 
     let nickname = RwSignal::new(String::new());
     let about = RwSignal::new(String::new());
@@ -120,9 +123,7 @@ pub fn SetupPage() -> impl IntoView {
         };
 
         let trimmed_for_ack = trimmed.clone();
-        // Capture relay before spawn_local — reactive context is not
-        // propagated into async tasks in Leptos 0.7.
-        let relay = expect_context::<RelayConnection>();
+        let relay = relay.clone();
         wasm_bindgen_futures::spawn_local(async move {
             match auth.sign_event_async(unsigned).await {
                 Ok(signed) => {

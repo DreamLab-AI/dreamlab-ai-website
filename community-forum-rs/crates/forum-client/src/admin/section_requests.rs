@@ -37,6 +37,10 @@ struct SectionRequest {
 #[component]
 pub fn SectionRequests() -> impl IntoView {
     let relay = expect_context::<RelayConnection>();
+    // Capture context at component level — event handler closures lose reactive owner
+    let auth = use_auth();
+    let admin = use_admin();
+    let toasts = use_toasts();
     let conn_state = relay.connection_state();
 
     let requests = RwSignal::new(Vec::<SectionRequest>::new());
@@ -44,7 +48,7 @@ pub fn SectionRequests() -> impl IntoView {
     let sub_id: RwSignal<Option<String>> = RwSignal::new(None);
 
     let relay_for_sub = relay.clone();
-    let relay_for_cleanup = relay;
+    let relay_for_cleanup = relay.clone();
 
     // Subscribe to kind-9021 (join request) events
     Effect::new(move |_| {
@@ -152,7 +156,11 @@ pub fn SectionRequests() -> impl IntoView {
             </Show>
 
             <Show when=move || !loading.get()>
-                {move || {
+                {
+                    let admin = admin.clone();
+                    let toasts = toasts.clone();
+                    let relay = relay.clone();
+                    move || {
                     let reqs = requests.get();
                     if reqs.is_empty() {
                         view! {
@@ -183,15 +191,22 @@ pub fn SectionRequests() -> impl IntoView {
                                     let req_for_approve = req.clone();
                                     let req_for_deny = req.clone();
                                     let requests_sig = requests;
+                                    let auth_a = auth;
+                                    let admin_a = admin.clone();
+                                    let toasts_a = toasts.clone();
+                                    let relay_a = relay.clone();
+                                    let auth_d = auth;
+                                    let toasts_d = toasts.clone();
+                                    let relay_d = relay.clone();
 
                                     view! {
                                         <RequestRow
                                             req=req
                                             on_approve=move || {
-                                                approve_request(req_for_approve.clone(), requests_sig);
+                                                approve_request(req_for_approve.clone(), requests_sig, auth_a, admin_a.clone(), toasts_a.clone(), relay_a.clone());
                                             }
                                             on_deny=move || {
-                                                deny_request(req_for_deny.clone(), requests_sig);
+                                                deny_request(req_for_deny.clone(), requests_sig, auth_d, toasts_d.clone(), relay_d.clone());
                                             }
                                         />
                                     }
@@ -269,11 +284,17 @@ where
 }
 
 /// Approve a request: add user to cohort via whitelist API, then remove from list.
-fn approve_request(req: SectionRequest, requests: RwSignal<Vec<SectionRequest>>) {
-    let auth = use_auth();
-    let admin = use_admin();
-    let toasts = use_toasts();
-
+///
+/// All context (auth, admin, toasts, relay) must be captured at component level
+/// and passed in — event handler closures lose the reactive owner in Leptos 0.7.
+fn approve_request(
+    req: SectionRequest,
+    requests: RwSignal<Vec<SectionRequest>>,
+    auth: crate::auth::AuthStore,
+    admin: crate::admin::AdminStore,
+    toasts: crate::components::toast::ToastStore,
+    relay: RelayConnection,
+) {
     let privkey = match auth.get_privkey_bytes() {
         Some(pk) => pk,
         None => {
@@ -285,8 +306,8 @@ fn approve_request(req: SectionRequest, requests: RwSignal<Vec<SectionRequest>>)
     let event_id = req.event_id.clone();
     let cohort = req.cohort.clone();
     let pk = req.requester.clone();
+    let pk_display = crate::utils::shorten_pubkey(&pk);
 
-    let relay = expect_context::<RelayConnection>();
     spawn_local(async move {
         // Add cohort to user's whitelist entry
         match admin.add_to_whitelist(&pk, &[cohort.clone()], &privkey).await {
@@ -294,7 +315,7 @@ fn approve_request(req: SectionRequest, requests: RwSignal<Vec<SectionRequest>>)
                 // Remove from pending list
                 requests.update(|list| list.retain(|r| r.event_id != event_id));
                 toasts.show(
-                    format!("Approved: {} added to {}", use_display_name(&pk), cohort),
+                    format!("Approved: {} added to {}", pk_display, cohort),
                     ToastVariant::Success,
                 );
 
@@ -311,6 +332,7 @@ fn approve_request(req: SectionRequest, requests: RwSignal<Vec<SectionRequest>>)
                         ],
                         content: "Approved section access request".to_string(),
                     };
+                    let relay = relay.clone();
                     wasm_bindgen_futures::spawn_local(async move {
                         if let Ok(signed) = auth.sign_event_async(unsigned).await {
                             relay.publish(&signed);
@@ -326,11 +348,15 @@ fn approve_request(req: SectionRequest, requests: RwSignal<Vec<SectionRequest>>)
 }
 
 /// Deny a request: publish kind-9005 (delete event) and remove from list.
-fn deny_request(req: SectionRequest, requests: RwSignal<Vec<SectionRequest>>) {
-    let auth = use_auth();
-    let toasts = use_toasts();
-    let relay = expect_context::<RelayConnection>();
-
+///
+/// All context must be captured at component level and passed in.
+fn deny_request(
+    req: SectionRequest,
+    requests: RwSignal<Vec<SectionRequest>>,
+    auth: crate::auth::AuthStore,
+    toasts: crate::components::toast::ToastStore,
+    relay: RelayConnection,
+) {
     let pubkey = match auth.pubkey().get_untracked() {
         Some(pk) => pk,
         None => {
