@@ -26,6 +26,8 @@ pub struct ZoneAccess {
     pub is_whitelisted: Signal<bool>,
     /// Whether the user has admin privileges (from D1 whitelist).
     pub is_admin: RwSignal<bool>,
+    /// Whether the zone access fetch has completed (success or error).
+    pub loaded: RwSignal<bool>,
     /// Raw flags signal (set from relay response).
     flags: RwSignal<(bool, bool, bool)>,
 }
@@ -52,6 +54,7 @@ pub fn provide_zone_access() {
     let pubkey = auth.pubkey();
     let flags = RwSignal::new((false, false, false));
     let is_admin_sig = RwSignal::new(false);
+    let loaded = RwSignal::new(false);
 
     let home = Memo::new(move |_| flags.get().0);
     let dreamlab = Memo::new(move |_| flags.get().1);
@@ -67,6 +70,7 @@ pub fn provide_zone_access() {
         minimoonoir,
         is_whitelisted,
         is_admin: is_admin_sig,
+        loaded,
         flags,
     };
     provide_context(access.clone());
@@ -79,6 +83,8 @@ pub fn provide_zone_access() {
             if let Some(pk) = pk {
                 let flags_sig = flags;
                 let admin_sig = is_admin_sig;
+                let loaded_sig = loaded;
+                loaded_sig.set(false);
                 leptos::task::spawn_local(async move {
                     match fetch_user_access(&pk).await {
                         Ok((h, d, m, admin)) => {
@@ -98,11 +104,13 @@ pub fn provide_zone_access() {
                             );
                         }
                     }
+                    loaded_sig.set(true);
                 });
             }
         } else {
             flags.set((false, false, false));
             is_admin_sig.set(false);
+            loaded.set(false);
         }
     });
 }

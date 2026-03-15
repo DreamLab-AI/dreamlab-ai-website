@@ -244,6 +244,11 @@ async fn route(req: Request, env: &Env, path: &str) -> Result<Response> {
         return whitelist::handle_set_admin(req, env).await;
     }
 
+    // Reset database (NIP-98 admin only)
+    if path == "/api/admin/reset-db" && method == Method::Post {
+        return whitelist::handle_reset_db(req, env).await;
+    }
+
     json_response(&req, &serde_json::json!({ "error": "Not found" }), 404)
 }
 

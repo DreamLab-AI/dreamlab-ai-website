@@ -193,6 +193,9 @@ fn AdminPanelInner() -> impl IntoView {
                     AdminTab::Calendar => view! { <AdminCalendar /> }.into_any(),
                 }
             }}
+
+            // Danger zone
+            <DangerZone />
         </div>
     }
 }
@@ -454,6 +457,72 @@ fn UsersTab() -> impl IntoView {
                     }
                 >
                     <UserTable users=users_signal on_update_cohorts=UpdateCohortsCb::new(on_update_cohorts.clone()) on_toggle_admin=AdminToggleCb::new(on_toggle_admin.clone()) />
+                </Show>
+            </div>
+        </div>
+    }
+}
+
+// -- Danger zone --------------------------------------------------------------
+
+#[component]
+fn DangerZone() -> impl IntoView {
+    let admin = use_admin();
+    let auth = use_auth();
+    let confirm = RwSignal::new(false);
+    let is_loading = admin.state.is_loading;
+
+    let on_initial_click = move |_| {
+        confirm.set(true);
+    };
+
+    let admin_stored = StoredValue::new(admin.clone());
+
+    let on_cancel = move |_| {
+        confirm.set(false);
+    };
+
+    view! {
+        <div class="mt-12 border border-red-800/50 rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-red-400 mb-2">"Danger Zone"</h3>
+            <p class="text-gray-400 text-sm mb-4">
+                "Reset the database to start fresh. This deletes all events and whitelist entries. The first user to register after reset becomes admin."
+            </p>
+            <div class="flex items-center gap-3">
+                <Show when=move || !confirm.get()>
+                    <button
+                        on:click=on_initial_click
+                        disabled=move || is_loading.get()
+                        class="bg-red-600 hover:bg-red-500 disabled:bg-gray-700 text-white font-medium px-4 py-2 rounded-lg transition-colors text-sm"
+                    >
+                        "Reset Database"
+                    </button>
+                </Show>
+                <Show when=move || confirm.get()>
+                    <span class="text-red-300 text-sm">"Are you sure? This cannot be undone."</span>
+                    <button
+                        on:click=move |_| {
+                            admin_stored.with_value(|admin| {
+                                if let Some(privkey) = auth.get_privkey_bytes() {
+                                    let admin_clone = admin.clone();
+                                    spawn_local(async move {
+                                        let _ = admin_clone.reset_db(&privkey).await;
+                                    });
+                                }
+                            });
+                            confirm.set(false);
+                        }
+                        disabled=move || is_loading.get()
+                        class="bg-red-600 hover:bg-red-500 disabled:bg-gray-700 text-white font-medium px-4 py-2 rounded-lg transition-colors text-sm"
+                    >
+                        "Yes, Reset Everything"
+                    </button>
+                    <button
+                        on:click=on_cancel
+                        class="text-gray-400 hover:text-gray-200 text-sm"
+                    >
+                        "Cancel"
+                    </button>
                 </Show>
             </div>
         </div>

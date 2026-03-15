@@ -395,6 +395,40 @@ pub async fn handle_setup_status(_req: &Request, env: &Env) -> Result<Response> 
     )
 }
 
+/// `POST /api/admin/reset-db` (NIP-98 admin only)
+///
+/// Clears both the `whitelist` and `events` tables for a fresh start.
+/// After reset the first user to register will become admin.
+pub async fn handle_reset_db(mut req: Request, env: &Env) -> Result<Response> {
+    let url = req.url()?;
+    let request_url = format!("{}{}", url.origin().ascii_serialization(), url.path());
+    let auth_header = req.headers().get("Authorization").ok().flatten();
+    let body_bytes = req.bytes().await?;
+
+    let _admin_pubkey = match auth::require_nip98_admin(
+        auth_header.as_deref(),
+        &request_url,
+        "POST",
+        Some(&body_bytes),
+        env,
+    )
+    .await
+    {
+        Ok(pk) => pk,
+        Err((body, status)) => return json_response(env, &body, status),
+    };
+
+    let db = env.d1("DB")?;
+    let _ = db.prepare("DELETE FROM events").run().await;
+    let _ = db.prepare("DELETE FROM whitelist").run().await;
+
+    json_response(
+        env,
+        &json!({ "success": true, "message": "Database reset. First user to register will become admin." }),
+        200,
+    )
+}
+
 /// `POST /api/whitelist/update-cohorts` (NIP-98 admin only)
 ///
 /// Updates the cohorts for an existing pubkey. Request body:

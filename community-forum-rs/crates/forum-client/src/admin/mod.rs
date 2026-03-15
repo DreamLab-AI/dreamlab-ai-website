@@ -489,6 +489,33 @@ impl AdminStore {
         );
     }
 
+    /// Reset the database (delete all events and whitelist entries).
+    pub async fn reset_db(&self, privkey: &[u8; 32]) -> Result<(), String> {
+        self.state.is_loading.set(true);
+        self.state.error.set(None);
+        self.state.success.set(None);
+
+        let url = format!("{}/api/admin/reset-db", Self::api_base());
+        match fetch_with_nip98_post(&url, "{}", privkey).await {
+            Ok(_) => {
+                self.state.users.set(Vec::new());
+                self.state.channels.set(Vec::new());
+                self.state.stats.set(AdminStats::default());
+                self.state.success.set(Some(
+                    "Database reset. First user to register will become admin.".to_string(),
+                ));
+                self.state.is_loading.set(false);
+                Ok(())
+            }
+            Err(e) => {
+                let msg = e.to_string();
+                self.state.error.set(Some(msg.clone()));
+                self.state.is_loading.set(false);
+                Err(msg)
+            }
+        }
+    }
+
     /// Clear the current error.
     pub fn clear_error(&self) {
         self.state.error.set(None);

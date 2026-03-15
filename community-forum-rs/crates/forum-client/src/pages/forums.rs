@@ -10,6 +10,7 @@ use std::collections::HashMap;
 use leptos_router::components::A;
 
 use crate::app::base_href;
+use crate::auth::use_auth;
 use crate::components::breadcrumb::{Breadcrumb, BreadcrumbItem};
 use crate::components::category_card::CategoryCard;
 use crate::components::empty_state::EmptyState;
@@ -77,11 +78,14 @@ fn section_to_zone(section: &str) -> Option<&'static str> {
 pub fn ForumsPage() -> impl IntoView {
     let store = use_channel_store();
     let loading = store.loading;
+    let auth = use_auth();
+    let is_authed = auth.is_authenticated();
     let zone_access = use_zone_access();
     // Extract Copy signals so closures can capture them by value
     let za_home = zone_access.home;
     let za_dreamlab = zone_access.dreamlab;
     let za_minimoonoir = zone_access.minimoonoir;
+    let za_loaded = zone_access.loaded;
 
     // Derive zone_id -> { section_id -> channel_count } from the shared store
     let zone_categories = Memo::new(move |_| {
@@ -143,6 +147,35 @@ pub fn ForumsPage() -> impl IntoView {
                     }).collect();
 
                     if visible_zones.is_empty() {
+                        // Authenticated but zone access not yet fetched — show loading
+                        if is_authed.get() && !za_loaded.get() {
+                            return view! {
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                                    <ZoneSkeleton/>
+                                    <ZoneSkeleton/>
+                                    <ZoneSkeleton/>
+                                </div>
+                            }.into_any();
+                        }
+
+                        // Authenticated but no zone access — pending approval
+                        if is_authed.get() {
+                            let clock_icon: Box<dyn FnOnce() -> leptos::prelude::AnyView + Send> = Box::new(|| view! {
+                                <svg class="w-7 h-7 text-amber-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <polyline points="12 6 12 12 16 14"/>
+                                </svg>
+                            }.into_any());
+                            return view! {
+                                <EmptyState
+                                    icon=clock_icon
+                                    title="Awaiting zone access".to_string()
+                                    description="Your account is set up. An admin will grant you zone access shortly.".to_string()
+                                />
+                            }.into_any();
+                        }
+
+                        // Not authenticated — sign in prompt
                         let lock_icon: Box<dyn FnOnce() -> leptos::prelude::AnyView + Send> = Box::new(|| view! {
                             <svg class="w-7 h-7 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                                 <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
