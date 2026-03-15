@@ -1087,42 +1087,53 @@ impl NostrRelayDO {
 
         let now = auth::js_now_secs();
 
-        // Check if this is the very first user (empty whitelist)
-        let is_first_user = {
-            let count_stmt = db.prepare("SELECT COUNT(*) as cnt FROM whitelist");
-            match count_stmt.first::<CountResult>(None).await {
+        // Check if any admin exists (more robust than checking if table is empty —
+        // handles the case where users registered but none got admin due to bugs)
+        let no_admin_exists = {
+            let stmt = db.prepare("SELECT COUNT(*) as cnt FROM whitelist WHERE is_admin = 1");
+            match stmt.first::<CountResult>(None).await {
                 Ok(Some(row)) => (row.cnt as u64) == 0,
                 _ => false,
             }
         };
 
-        let (cohorts_json, admin_flag) = if is_first_user {
-            // First user gets all zones + admin
-            (r#"["home","dreamlab","minimoonoir"]"#, 1i32)
-        } else {
-            (r#"["dreamlab"]"#, 0i32)
-        };
-
-        let stmt = db.prepare(
-            "INSERT INTO whitelist (pubkey, cohorts, added_at, added_by, is_admin) \
-             VALUES (?1, ?2, ?3, ?4, ?5) \
-             ON CONFLICT (pubkey) DO NOTHING",
-        );
-        if let Ok(bound) = stmt.bind(&[
-            JsValue::from_str(pubkey),
-            JsValue::from_str(cohorts_json),
-            JsValue::from_f64(now as f64),
-            JsValue::from_str("auto-registration"),
-            JsValue::from_f64(admin_flag as f64),
-        ]) {
-            let _ = bound.run().await;
-        }
-
-        if is_first_user {
+        if no_admin_exists {
+            // Promote this user to admin with all zones.
+            // Use UPSERT so it works whether the user is new or already in the whitelist.
+            let stmt = db.prepare(
+                "INSERT INTO whitelist (pubkey, cohorts, added_at, added_by, is_admin) \
+                 VALUES (?1, ?2, ?3, ?4, 1) \
+                 ON CONFLICT (pubkey) DO UPDATE SET \
+                   cohorts = excluded.cohorts, \
+                   is_admin = 1",
+            );
+            if let Ok(bound) = stmt.bind(&[
+                JsValue::from_str(pubkey),
+                JsValue::from_str(r#"["home","dreamlab","minimoonoir"]"#),
+                JsValue::from_f64(now as f64),
+                JsValue::from_str("auto-registration"),
+            ]) {
+                let _ = bound.run().await;
+            }
             worker::console_log!(
-                "[auto_whitelist] First user {} promoted to admin with all zones",
+                "[auto_whitelist] No admin exists — promoting {} to admin with all zones",
                 &pubkey[..8]
             );
+        } else {
+            // Normal registration: dreamlab zone only, not admin
+            let stmt = db.prepare(
+                "INSERT INTO whitelist (pubkey, cohorts, added_at, added_by, is_admin) \
+                 VALUES (?1, ?2, ?3, ?4, 0) \
+                 ON CONFLICT (pubkey) DO NOTHING",
+            );
+            if let Ok(bound) = stmt.bind(&[
+                JsValue::from_str(pubkey),
+                JsValue::from_str(r#"["dreamlab"]"#),
+                JsValue::from_f64(now as f64),
+                JsValue::from_str("auto-registration"),
+            ]) {
+                let _ = bound.run().await;
+            }
         }
     }
 }
