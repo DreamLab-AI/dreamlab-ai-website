@@ -1089,7 +1089,7 @@ impl NostrRelayDO {
 
         // Check if this is the very first user (empty whitelist)
         let is_first_user = {
-            let count_stmt = db.prepare("SELECT COUNT(*) as count FROM whitelist");
+            let count_stmt = db.prepare("SELECT COUNT(*) as cnt FROM whitelist");
             match count_stmt.first::<CountResult>(None).await {
                 Ok(Some(row)) => (row.cnt as u64) == 0,
                 _ => false,

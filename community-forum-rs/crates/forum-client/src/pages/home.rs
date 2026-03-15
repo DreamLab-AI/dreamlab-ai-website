@@ -148,7 +148,7 @@ pub fn HomePage() -> impl IntoView {
 
                     // Admin setup CTA — shown when needs_setup=true AND (not authed OR backup in progress)
                     <Show when=move || needs_setup.get() == Some(true) && (!is_authed.get() || in_backup.get())>
-                        <AdminSetupCta setup_phase=setup_phase privkey_hex=privkey_hex />
+                        <AdminSetupCta setup_phase=setup_phase privkey_hex=privkey_hex needs_setup=needs_setup />
                     </Show>
 
                     // Normal login/signup — shown when loaded, not authed, and not in setup flow
@@ -235,6 +235,7 @@ pub fn HomePage() -> impl IntoView {
 fn AdminSetupCta(
     setup_phase: RwSignal<SetupPhase>,
     privkey_hex: RwSignal<String>,
+    needs_setup: RwSignal<Option<bool>>,
 ) -> impl IntoView {
     let auth = use_auth();
     let navigate = StoredValue::new(use_navigate());
@@ -257,6 +258,7 @@ fn AdminSetupCta(
         wasm_bindgen_futures::spawn_local(async move {
             match auth.register_with_passkey(&name).await {
                 Ok(()) => {
+                    needs_setup.set(Some(false));
                     navigate.with_value(|nav| nav("/setup", NavigateOptions::default()));
                 }
                 Err(e) => {
@@ -282,6 +284,7 @@ fn AdminSetupCta(
         match auth.register_with_generated_key(&name) {
             Ok(hex) => {
                 privkey_hex.set(hex);
+                needs_setup.set(Some(false));
             }
             Err(e) => {
                 setup_phase.set(SetupPhase::Cta);
@@ -294,6 +297,7 @@ fn AdminSetupCta(
     let on_backup_done = Callback::new(move |()| {
         auth.confirm_nsec_backup();
         setup_phase.set(SetupPhase::Done);
+        needs_setup.set(Some(false));
         navigate.with_value(|nav| nav("/setup", NavigateOptions::default()));
     });
 
