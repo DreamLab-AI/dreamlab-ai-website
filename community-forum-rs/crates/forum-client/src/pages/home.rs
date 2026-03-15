@@ -284,7 +284,9 @@ fn AdminSetupCta(
         match auth.register_with_generated_key(&name) {
             Ok(hex) => {
                 privkey_hex.set(hex);
-                needs_setup.set(Some(false));
+                // Don't set needs_setup here — the <Show> condition uses it,
+                // and clearing it would unmount us before the backup screen renders.
+                // It's set in on_backup_done after the user saves their key.
             }
             Err(e) => {
                 setup_phase.set(SetupPhase::Cta);
