@@ -78,11 +78,14 @@ pub fn HomePage() -> impl IntoView {
     // Setup status: None = loading, Some(true) = needs setup, Some(false) = normal
     let needs_setup: RwSignal<Option<bool>> = RwSignal::new(None);
 
-    // Track whether the admin setup backup screen is active.
-    // This prevents AdminSetupCta from being unmounted when auth succeeds
-    // mid-flow (register_with_generated_key sets is_authenticated=true
-    // before the user has seen the backup screen).
-    let showing_backup = RwSignal::new(false);
+    // Lifted from AdminSetupCta so they survive reactive re-renders.
+    // The match closure re-creates child views when signals change, so any
+    // local state inside the child component would be lost.
+    let setup_phase = RwSignal::new(SetupPhase::Cta);
+    let privkey_hex = RwSignal::new(String::new());
+
+    // Derived: are we in the backup phase?
+    let in_backup = Memo::new(move |_| setup_phase.get() == SetupPhase::Backup);
 
     // Fetch setup status on mount
     wasm_bindgen_futures::spawn_local(async move {
@@ -132,55 +135,63 @@ pub fn HomePage() -> impl IntoView {
                     </p>
                 </div>
 
-                // CTAs — conditional on setup status
+                // CTAs — uses <Show> blocks to avoid re-instantiating AdminSetupCta
+                // when unrelated signals (is_authed) change.
                 <div class="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-                    {move || {
-                        let setup = needs_setup.get();
-                        let authed = is_authed.get();
-                        let backup = showing_backup.get();
+                    // Loading spinner
+                    <Show when=move || needs_setup.get().is_none()>
+                        <div class="flex items-center justify-center gap-2 text-gray-500">
+                            <span class="animate-spin inline-block w-4 h-4 border-2 border-gray-500 border-t-transparent rounded-full"></span>
+                            <span class="text-sm">"Checking status..."</span>
+                        </div>
+                    </Show>
 
-                        match (setup, authed, backup) {
-                            // Still loading setup status
-                            (None, _, _) => view! {
-                                <div class="flex items-center justify-center gap-2 text-gray-500">
-                                    <span class="animate-spin inline-block w-4 h-4 border-2 border-gray-500 border-t-transparent rounded-full"></span>
-                                    <span class="text-sm">"Checking status..."</span>
-                                </div>
-                            }.into_any(),
+                    // Admin setup CTA — shown when needs_setup=true AND (not authed OR backup in progress)
+                    <Show when=move || needs_setup.get() == Some(true) && (!is_authed.get() || in_backup.get())>
+                        <AdminSetupCta setup_phase=setup_phase privkey_hex=privkey_hex />
+                    </Show>
 
-                            // Needs setup — show admin setup CTA (not yet authed)
-                            // OR authed but still showing backup screen
-                            (Some(true), false, _) | (Some(true), true, true) => view! {
-                                <AdminSetupCta showing_backup=showing_backup />
-                            }.into_any(),
+                    // Normal login/signup — shown when loaded, not authed, and not in setup flow
+                    <Show when=move || needs_setup.get().is_some() && !is_authed.get() && needs_setup.get() != Some(true)>
+                        <A
+                            href=base_href("/signup")
+                            attr:class="bg-amber-500 hover:bg-amber-400 text-gray-900 font-semibold px-8 py-3 rounded-xl text-lg transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/20"
+                        >
+                            "Create Account"
+                        </A>
+                        <A
+                            href=base_href("/login")
+                            attr:class="border border-gray-600 hover:border-amber-500/50 text-gray-200 hover:text-white px-8 py-3 rounded-xl text-lg transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/10"
+                        >
+                            "Sign In"
+                        </A>
+                    </Show>
 
-                            // Normal, not logged in
-                            (Some(false), false, _) | (Some(true), true, false) => view! {
-                                <A
-                                    href=base_href("/signup")
-                                    attr:class="bg-amber-500 hover:bg-amber-400 text-gray-900 font-semibold px-8 py-3 rounded-xl text-lg transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/20"
-                                >
-                                    "Create Account"
-                                </A>
-                                <A
-                                    href=base_href("/login")
-                                    attr:class="border border-gray-600 hover:border-amber-500/50 text-gray-200 hover:text-white px-8 py-3 rounded-xl text-lg transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/10"
-                                >
-                                    "Sign In"
-                                </A>
-                            }.into_any(),
+                    // Setup done, authed, no backup pending — show normal buttons
+                    <Show when=move || is_authed.get() && !in_backup.get() && needs_setup.get() == Some(true)>
+                        <A
+                            href=base_href("/signup")
+                            attr:class="bg-amber-500 hover:bg-amber-400 text-gray-900 font-semibold px-8 py-3 rounded-xl text-lg transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/20"
+                        >
+                            "Create Account"
+                        </A>
+                        <A
+                            href=base_href("/login")
+                            attr:class="border border-gray-600 hover:border-amber-500/50 text-gray-200 hover:text-white px-8 py-3 rounded-xl text-lg transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/10"
+                        >
+                            "Sign In"
+                        </A>
+                    </Show>
 
-                            // Logged in
-                            (Some(false), true, _) => view! {
-                                <A
-                                    href=base_href("/chat")
-                                    attr:class="bg-amber-500 hover:bg-amber-400 text-gray-900 font-semibold px-8 py-3 rounded-xl text-lg transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/20"
-                                >
-                                    "Enter Chat"
-                                </A>
-                            }.into_any(),
-                        }
-                    }}
+                    // Logged in, normal mode
+                    <Show when=move || is_authed.get() && needs_setup.get() == Some(false)>
+                        <A
+                            href=base_href("/chat")
+                            attr:class="bg-amber-500 hover:bg-amber-400 text-gray-900 font-semibold px-8 py-3 rounded-xl text-lg transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/20"
+                        >
+                            "Enter Chat"
+                        </A>
+                    </Show>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-12 text-left">
@@ -217,20 +228,20 @@ pub fn HomePage() -> impl IntoView {
 
 /// Prominent CTA shown when no admin exists. Offers three registration methods:
 /// passkey (preferred), generated key, or existing key import.
+///
+/// `setup_phase` and `privkey_hex` are owned by the parent `HomePage` so they
+/// survive reactive re-renders of the `<Show>` block that gates this component.
 #[component]
 fn AdminSetupCta(
-    /// Parent-level signal to keep this component mounted during the backup phase,
-    /// even after `is_authenticated` becomes true from `register_with_generated_key`.
-    showing_backup: RwSignal<bool>,
+    setup_phase: RwSignal<SetupPhase>,
+    privkey_hex: RwSignal<String>,
 ) -> impl IntoView {
     let auth = use_auth();
     let navigate = StoredValue::new(use_navigate());
 
-    let phase = RwSignal::new(SetupPhase::Cta);
     let display_name = RwSignal::new(String::new());
     let is_pending = RwSignal::new(false);
     let error = RwSignal::new(Option::<String>::None);
-    let privkey_hex = RwSignal::new(String::new());
 
     // Passkey registration
     let on_passkey = move |_: web_sys::MouseEvent| {
@@ -256,7 +267,8 @@ fn AdminSetupCta(
         });
     };
 
-    // Generated key registration
+    // Generated key registration — sets phase to Backup BEFORE calling register
+    // so the parent <Show> keeps us mounted when is_authenticated flips.
     let on_generate_key = move |_: web_sys::MouseEvent| {
         let name = display_name.get_untracked().trim().to_string();
         if name.len() < 2 {
@@ -264,33 +276,31 @@ fn AdminSetupCta(
             return;
         }
         error.set(None);
-        // Set showing_backup BEFORE register so the reactive system keeps
-        // AdminSetupCta mounted when is_authenticated flips to true inside
-        // register_with_generated_key (synchronous signal update).
-        showing_backup.set(true);
+        // Set phase BEFORE register — the parent's <Show> reads in_backup (derived
+        // from setup_phase) to keep this component alive across auth state change.
+        setup_phase.set(SetupPhase::Backup);
         match auth.register_with_generated_key(&name) {
             Ok(hex) => {
                 privkey_hex.set(hex);
-                phase.set(SetupPhase::Backup);
             }
             Err(e) => {
-                showing_backup.set(false);
+                setup_phase.set(SetupPhase::Cta);
                 error.set(Some(e));
             }
         }
     };
 
-    // After backup, navigate to setup
+    // After backup, navigate to profile setup
     let on_backup_done = Callback::new(move |()| {
         auth.confirm_nsec_backup();
-        showing_backup.set(false);
+        setup_phase.set(SetupPhase::Done);
         navigate.with_value(|nav| nav("/setup", NavigateOptions::default()));
     });
 
     view! {
         <div class="w-full max-w-lg mx-auto">
             // Phase: CTA + registration form
-            <Show when=move || phase.get() == SetupPhase::Cta>
+            <Show when=move || setup_phase.get() == SetupPhase::Cta>
                 <div class="glass-card p-8 space-y-6 border-amber-500/30">
                     <div class="text-center space-y-2">
                         <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-amber-500/10 border border-amber-500/20 mb-2">
@@ -381,7 +391,7 @@ fn AdminSetupCta(
             </Show>
 
             // Phase: Backup key
-            <Show when=move || phase.get() == SetupPhase::Backup>
+            <Show when=move || setup_phase.get() == SetupPhase::Backup>
                 <div class="glass-card p-8 space-y-6 border-amber-500/30">
                     <crate::components::nsec_backup::NsecBackup
                         nsec=privkey_hex.get_untracked()
@@ -397,6 +407,7 @@ fn AdminSetupCta(
 enum SetupPhase {
     Cta,
     Backup,
+    Done,
 }
 
 // -- Sub-components -----------------------------------------------------------
