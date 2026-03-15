@@ -286,6 +286,7 @@ fn approve_request(req: SectionRequest, requests: RwSignal<Vec<SectionRequest>>)
     let cohort = req.cohort.clone();
     let pk = req.requester.clone();
 
+    let relay = expect_context::<RelayConnection>();
     spawn_local(async move {
         // Add cohort to user's whitelist entry
         match admin.add_to_whitelist(&pk, &[cohort.clone()], &privkey).await {
@@ -298,8 +299,7 @@ fn approve_request(req: SectionRequest, requests: RwSignal<Vec<SectionRequest>>)
                 );
 
                 // Publish kind-9000 (add user to group) as confirmation
-                let relay = expect_context::<RelayConnection>();
-                if let Some(my_pk) = use_auth().pubkey().get_untracked() {
+                if let Some(my_pk) = auth.pubkey().get_untracked() {
                     let now = (js_sys::Date::now() / 1000.0) as u64;
                     let unsigned = nostr_core::UnsignedEvent {
                         pubkey: my_pk,
@@ -311,7 +311,6 @@ fn approve_request(req: SectionRequest, requests: RwSignal<Vec<SectionRequest>>)
                         ],
                         content: "Approved section access request".to_string(),
                     };
-                    let auth = use_auth();
                     wasm_bindgen_futures::spawn_local(async move {
                         if let Ok(signed) = auth.sign_event_async(unsigned).await {
                             relay.publish(&signed);

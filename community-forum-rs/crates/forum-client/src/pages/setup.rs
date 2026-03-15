@@ -120,10 +120,12 @@ pub fn SetupPage() -> impl IntoView {
         };
 
         let trimmed_for_ack = trimmed.clone();
+        // Capture relay before spawn_local — reactive context is not
+        // propagated into async tasks in Leptos 0.7.
+        let relay = expect_context::<RelayConnection>();
         wasm_bindgen_futures::spawn_local(async move {
             match auth.sign_event_async(unsigned).await {
                 Ok(signed) => {
-                    let relay = expect_context::<RelayConnection>();
                     relay.publish(&signed);
 
                     auth.set_profile(Some(trimmed_for_ack), None);

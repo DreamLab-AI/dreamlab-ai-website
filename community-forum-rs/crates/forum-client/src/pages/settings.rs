@@ -206,10 +206,10 @@ pub fn SettingsPage() -> impl IntoView {
         let toasts_ok = toasts_for_profile.clone();
         let toasts_pub = toasts_for_profile.clone();
         let toasts_err = toasts_for_profile.clone();
+        let relay = expect_context::<RelayConnection>();
         wasm_bindgen_futures::spawn_local(async move {
             match auth.sign_event_async(unsigned).await {
                 Ok(signed) => {
-                    let relay = expect_context::<RelayConnection>();
                     let saving_sig = profile_saving;
                     let auth_for_ack = auth;
                     let name_for_ack = name.clone();
