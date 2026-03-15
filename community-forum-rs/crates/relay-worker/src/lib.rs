@@ -214,6 +214,11 @@ async fn route(req: Request, env: &Env, path: &str) -> Result<Response> {
         );
     }
 
+    // Setup status check (public — returns whether initial admin setup is needed)
+    if path == "/api/setup-status" && method == Method::Get {
+        return whitelist::handle_setup_status(&req, env).await;
+    }
+
     // Whitelist check (public)
     if path == "/api/check-whitelist" && method == Method::Get {
         return whitelist::handle_check_whitelist(&req, env).await;

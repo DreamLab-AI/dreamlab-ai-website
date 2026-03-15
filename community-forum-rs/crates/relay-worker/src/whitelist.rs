@@ -374,6 +374,27 @@ pub async fn handle_set_admin(mut req: Request, env: &Env) -> Result<Response> {
     json_response(env, &json!({ "success": true }), 200)
 }
 
+/// `GET /api/setup-status`
+///
+/// Public endpoint that returns whether the system needs initial admin setup.
+/// Returns `{ "needsSetup": true }` when the whitelist has no admin users.
+pub async fn handle_setup_status(_req: &Request, env: &Env) -> Result<Response> {
+    let db = env.d1("DB")?;
+    let stmt = db.prepare("SELECT COUNT(*) as count FROM whitelist WHERE is_admin = 1");
+    let admin_count = match stmt.first::<CountRow>(None).await {
+        Ok(Some(row)) => row.count as u64,
+        _ => 0,
+    };
+
+    json_response(
+        env,
+        &json!({
+            "needsSetup": admin_count == 0,
+        }),
+        200,
+    )
+}
+
 /// `POST /api/whitelist/update-cohorts` (NIP-98 admin only)
 ///
 /// Updates the cohorts for an existing pubkey. Request body:
