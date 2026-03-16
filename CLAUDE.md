@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-DreamLab AI is a premium AI training and consulting platform. This is a React SPA (Vite + TypeScript + Tailwind CSS) with a SvelteKit community forum, 3D WebGL visualizations (Three.js + Rust WASM), Supabase backend, and Nostr-based decentralized social features.
+DreamLab AI is a premium AI training and consulting platform. This is a React SPA (Vite + TypeScript + Tailwind CSS) with a Leptos community forum (Rust/WASM), 3D WebGL visualizations (Three.js + Rust WASM), Supabase backend, Cloudflare Workers (Rust) backend services, and Nostr-based decentralized social features.
 
 - **Domain:** dreamlab-ai.com
 - **Hosting:** GitHub Pages (static site) + Cloudflare Workers (backend services)
@@ -21,33 +21,36 @@ DreamLab AI is a premium AI training and consulting platform. This is a React SP
 | 3D | Three.js 0.156 + @react-three/fiber + @react-three/drei |
 | WASM | Rust (Voronoi tessellation in `wasm-voronoi/`) |
 | Database | Supabase (PostgreSQL + Auth + Realtime) |
-| Protocol | Nostr (NDK 2.13) for community forum |
+| Protocol | Nostr (nostr-core crate) for community forum |
 | Charts | Recharts 2.12, Mermaid 11.6 |
 | Sanitization | DOMPurify 3.3 |
-| Forum | SvelteKit 2.49 (in `community-forum/`) |
+| Forum | Leptos 0.7 CSR (Rust/WASM in `community-forum-rs/crates/forum-client/`) |
+| Workers | Rust (workers-rs) — 5 Cloudflare Workers in `community-forum-rs/crates/` |
+| Forum Build | Trunk (WASM target) |
 
 ## Build & Test Commands
 
 ```bash
-# Development server (generates workshop list first)
-npm run dev
+# React marketing site
+npm run dev                # Development server (generates workshop list first)
+npm run build              # Production build
+npm run build:dev          # Development build
+npm run lint               # Lint (ESLint 9 flat config, TypeScript rules)
+npm run preview            # Preview production build
 
-# Production build
-npm run build
+# Leptos forum (Rust/WASM)
+cargo check --target wasm32-unknown-unknown -p forum-client   # Type-check forum
+cargo test -p nostr-core                                       # Run nostr-core tests (129 tests)
+trunk build --release community-forum-rs/crates/forum-client/index.html  # Build forum WASM
 
-# Development build
-npm run build:dev
-
-# Lint (ESLint 9 flat config, TypeScript rules)
-npm run lint
-
-# Preview production build
-npm run preview
+# Rust workers
+cargo check -p auth-worker -p pod-worker -p preview-worker -p relay-worker -p search-worker
 ```
 
-- No test runner is configured for the main website (community-forum uses Vitest + Playwright)
+- No test runner is configured for the main React website
 - Build pre-step: `node scripts/generate-workshop-list.mjs` runs automatically before dev/build
 - ESLint config: `eslint.config.js` (flat config, ignores `dist/`)
+- Forum builds via Trunk with `--public-url /community/` for dual-SPA deployment
 
 ## Project Structure
 
@@ -106,35 +109,28 @@ public/
   images/               # Static image assets
   robots.txt, sitemap.xml, site.webmanifest, CNAME
 
-community-forum/        # SvelteKit app (separate package.json)
-  src/routes/           # 16 Svelte routes (channels, DMs, calendar, profiles)
-  src/lib/auth/
-    passkey.ts          # WebAuthn PRF registration/authentication + HKDF key derivation
-    nip98-client.ts     # NIP-98 kind:27235 token creation + fetchWithNip98()
-  src/lib/stores/
-    auth.ts             # Auth store: _privkeyMem closure, passkey login/register
-  src/lib/components/auth/
-    AuthFlow.svelte     # Orchestrates signup→nickname→pending-approval steps
-    Signup.svelte       # Passkey registration UI
-    Login.svelte        # Passkey (primary) / NIP-07 / nsec (advanced) login
-    NicknameSetup.svelte # Profile setup after registration
-    NsecBackup.svelte   # One-time privkey download (gets key from auth store)
-  services/
-    auth-api/           # Reference code (migrated to workers/auth-api/)
-  tests/                # Vitest unit + Playwright e2e
-
-workers/                # Cloudflare Workers (backend services)
-  auth-api/             # WebAuthn + NIP-98 + pod provisioning (D1 + KV + R2)
-    index.ts            # Worker entry point
-  pod-api/              # Solid pods, images/media, WAC ACL (R2 + KV)
-    index.ts            # Worker entry point
-  search-api/           # RuVector WASM, .rvf, /embed (R2 + KV)
-    index.ts            # Worker entry point
-  nostr-relay-api/      # WebSocket relay, NIP-01/42/98 (D1 + DO)
-    index.ts            # Worker entry point
-  link-preview-api/     # OG metadata, Twitter oEmbed (Cache API)
-    index.ts            # Worker entry point
-  shared/               # Shared modules (nip98.ts, types)
+community-forum-rs/     # Rust workspace (Cargo.toml)
+  crates/
+    forum-client/       # Leptos 0.7 CSR forum (WASM target)
+      src/
+        auth/           # passkey.rs, nip98.rs, nip07.rs, webauthn.rs, session.rs, http.rs
+        stores/         # channels.rs, zone_access.rs, preferences.rs, notifications.rs, etc.
+        pages/          # 17 page components (channel, chat, forums, login, settings, etc.)
+        components/     # 58 UI components
+        utils/          # search_client.rs, etc.
+      index.html        # Trunk entry point
+    nostr-core/         # Shared NIP implementations (NIP-01/07/09/29/33/40/42/45/50/52/98)
+      src/nip98.rs      # NIP-98 auth (used by all workers + forum client)
+    auth-worker/        # CF Worker: WebAuthn + NIP-98 + pod provisioning (D1 + KV + R2)
+      src/lib.rs        # Worker entry point
+    pod-worker/         # CF Worker: Solid pods, images/media, WAC ACL (R2 + KV)
+      src/lib.rs        # Worker entry point
+    preview-worker/     # CF Worker: OG metadata, Twitter oEmbed, SSRF protection (Cache API)
+      src/lib.rs        # Worker entry point
+    relay-worker/       # CF Worker: WebSocket relay + Durable Objects (D1 + DO)
+      src/lib.rs        # Worker entry point (NIP-01/09/11/16/29/33/40/42/45/50/98)
+    search-worker/      # CF Worker: RuVector, .rvf, cosine k-NN (R2 + KV)
+      src/lib.rs        # Worker entry point
 
 wasm-voronoi/           # Rust WASM (Cargo.toml, src/lib.rs)
 
@@ -200,31 +196,29 @@ VITE_SUPABASE_ANON_KEY=your-anon-key-here
 VITE_AUTH_API_URL=https://dreamlab-auth-api.*.workers.dev
 ```
 
-### community-forum `.env` (never commit)
-```
-VITE_AUTH_API_URL=https://dreamlab-auth-api.*.workers.dev
-VITE_POD_API_URL=https://dreamlab-pod-api.*.workers.dev
-VITE_SEARCH_API_URL=https://dreamlab-search-api.*.workers.dev
-VITE_RELAY_URL=wss://dreamlab-nostr-relay.*.workers.dev
-VITE_LINK_PREVIEW_URL=https://dreamlab-link-preview.*.workers.dev
-```
+### community-forum-rs (Rust workers + forum client)
+- Rust workers use `wrangler.toml` bindings (D1, KV, R2) — no `.env` files
+- Forum client env vars are compile-time via `FORUM_BASE` env and Trunk build config
+- API URLs are configured in forum-client source constants, not env files
 
 ## Deployment
 
 - **Static site:** `npm run build` → `dist/` → GitHub Pages (gh-pages branch)
-- **Community forum:** SvelteKit static adapter → `dist/community/`
+- **Community forum:** Trunk (Leptos/WASM) → `dist/community/` (dual-SPA with `--public-url /community/`)
 - **Backend:** Cloudflare Workers (deployed via `workers-deploy.yml`)
 - **Custom domain:** dreamlab-ai.com (CNAME file in public/)
 
 ### Cloudflare Workers
 
-| Worker | URL | Storage | Purpose |
-|--------|-----|---------|---------|
-| auth-api | dreamlab-auth-api.*.workers.dev | D1 + KV + R2 | WebAuthn, NIP-98, pod provisioning |
-| pod-api | dreamlab-pod-api.*.workers.dev | R2 + KV | Solid pods, images/media, WAC ACL |
-| search-api | dreamlab-search-api.*.workers.dev | R2 + KV | RuVector WASM, .rvf, /embed |
-| nostr-relay | dreamlab-nostr-relay.*.workers.dev | D1 + DO | WebSocket relay, NIP-01/42/98 |
-| link-preview | dreamlab-link-preview.*.workers.dev | Cache API | OG metadata, Twitter oEmbed |
+| Worker | Source | Storage | Purpose |
+|--------|--------|---------|---------|
+| auth-worker | `community-forum-rs/crates/auth-worker/` | D1 + KV + R2 | WebAuthn, NIP-98, pod provisioning |
+| pod-worker | `community-forum-rs/crates/pod-worker/` | R2 + KV | Solid pods, images/media, WAC ACL |
+| search-worker | `community-forum-rs/crates/search-worker/` | R2 + KV | RuVector, .rvf, cosine k-NN |
+| relay-worker | `community-forum-rs/crates/relay-worker/` | D1 + DO | WebSocket relay, NIP-01/09/11/16/29/33/40/42/45/50/98 |
+| preview-worker | `community-forum-rs/crates/preview-worker/` | Cache API | OG metadata, Twitter oEmbed, SSRF protection |
+
+All workers are Rust (workers-rs), deployed via `workers-deploy.yml`. Runtime: `"workers-rs"`.
 
 ## Behavioral Rules
 
@@ -264,8 +258,7 @@ VITE_LINK_PREVIEW_URL=https://dreamlab-link-preview.*.workers.dev
 
 The community forum uses WebAuthn PRF extension to derive a secp256k1 private key
 deterministically from the user's passkey. The privkey is **never stored** — it lives
-only in the auth store closure (`_privkeyMem: Uint8Array | null`) and is re-derived on
-each login. It is zeroed on `pagehide`.
+only in the auth session state and is re-derived on each login. It is zeroed on `pagehide`.
 
 ### Key derivation flow
 
@@ -325,13 +318,15 @@ Every state-mutating API call uses NIP-98 `Authorization: Nostr <base64(event)>`
 
 | File | Role |
 |------|------|
-| `community-forum/src/lib/auth/passkey.ts` | WebAuthn PRF ceremony, HKDF derivation |
-| `community-forum/src/lib/auth/nip98-client.ts` | NIP-98 token creation + fetch wrapper |
-| `community-forum/src/lib/stores/auth.ts` | Auth state, privkey closure, passkey hooks |
-| `workers/auth-api/index.ts` | CF Worker: WebAuthn + NIP-98 + pod provisioning |
-| `workers/pod-api/index.ts` | CF Worker: Solid pod storage on R2 |
-| `workers/search-api/index.ts` | CF Worker: RuVector WASM vector search |
-| `workers/link-preview-api/index.ts` | CF Worker: OG metadata proxy |
+| `community-forum-rs/crates/forum-client/src/auth/passkey.rs` | WebAuthn PRF ceremony, HKDF derivation |
+| `community-forum-rs/crates/forum-client/src/auth/nip98.rs` | NIP-98 token creation (client-side) |
+| `community-forum-rs/crates/forum-client/src/auth/session.rs` | Auth session state, privkey management |
+| `community-forum-rs/crates/forum-client/src/auth/mod.rs` | Auth module (AuthState, login/register flows) |
+| `community-forum-rs/crates/nostr-core/src/nip98.rs` | NIP-98 verification (shared by all workers) |
+| `community-forum-rs/crates/auth-worker/src/lib.rs` | CF Worker: WebAuthn + NIP-98 + pod provisioning |
+| `community-forum-rs/crates/pod-worker/src/lib.rs` | CF Worker: Solid pod storage on R2 |
+| `community-forum-rs/crates/search-worker/src/lib.rs` | CF Worker: RuVector vector search |
+| `community-forum-rs/crates/preview-worker/src/lib.rs` | CF Worker: OG metadata proxy |
 
 ## Claude Flow V3 Integration
 

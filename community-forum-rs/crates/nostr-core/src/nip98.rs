@@ -587,4 +587,239 @@ mod tests {
         let header = authorization_header(token);
         assert_eq!(header, "Nostr abc123");
     }
+
+    // ── Additional edge-case tests ──────────────────────────────────────
+
+    #[test]
+    fn nip98_reject_wrong_kind() {
+        let sk = test_signing_key();
+        let pubkey = hex::encode(sk.verifying_key().to_bytes());
+        let url = "https://api.example.com/test";
+        let now = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_secs();
+
+        // Manually create an event with wrong kind (kind 1 instead of 27235)
+        let unsigned = UnsignedEvent {
+            pubkey,
+            created_at: now,
+            kind: 1, // wrong kind
+            tags: vec![
+                vec!["u".to_string(), url.to_string()],
+                vec!["method".to_string(), "GET".to_string()],
+            ],
+            content: String::new(),
+        };
+        let signed = sign_event(unsigned, &sk).unwrap();
+        let json = serde_json::to_string(&signed).unwrap();
+        let b64 = BASE64.encode(json.as_bytes());
+        let header = authorization_header(&b64);
+
+        let err = verify_token(&header, url, "GET", None).unwrap_err();
+        assert!(matches!(err, Nip98Error::WrongKind(1)));
+    }
+
+    #[test]
+    fn nip98_reject_missing_url_tag() {
+        let sk = test_signing_key();
+        let pubkey = hex::encode(sk.verifying_key().to_bytes());
+        let url = "https://api.example.com/test";
+        let now = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_secs();
+
+        // Event with method tag but no u tag
+        let unsigned = UnsignedEvent {
+            pubkey,
+            created_at: now,
+            kind: HTTP_AUTH_KIND,
+            tags: vec![
+                vec!["method".to_string(), "GET".to_string()],
+            ],
+            content: String::new(),
+        };
+        let signed = sign_event(unsigned, &sk).unwrap();
+        let json = serde_json::to_string(&signed).unwrap();
+        let b64 = BASE64.encode(json.as_bytes());
+        let header = authorization_header(&b64);
+
+        let err = verify_token(&header, url, "GET", None).unwrap_err();
+        assert!(matches!(err, Nip98Error::MissingTag(_)));
+    }
+
+    #[test]
+    fn nip98_reject_missing_method_tag() {
+        let sk = test_signing_key();
+        let pubkey = hex::encode(sk.verifying_key().to_bytes());
+        let url = "https://api.example.com/test";
+        let now = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_secs();
+
+        // Event with u tag but no method tag
+        let unsigned = UnsignedEvent {
+            pubkey,
+            created_at: now,
+            kind: HTTP_AUTH_KIND,
+            tags: vec![
+                vec!["u".to_string(), url.to_string()],
+            ],
+            content: String::new(),
+        };
+        let signed = sign_event(unsigned, &sk).unwrap();
+        let json = serde_json::to_string(&signed).unwrap();
+        let b64 = BASE64.encode(json.as_bytes());
+        let header = authorization_header(&b64);
+
+        let err = verify_token(&header, url, "GET", None).unwrap_err();
+        assert!(matches!(err, Nip98Error::MissingTag(_)));
+    }
+
+    #[test]
+    fn nip98_empty_body_with_body_bytes_passes() {
+        let sk = test_secret_key();
+        let url = "https://api.example.com/test";
+
+        // Create token without body
+        let token = create_token(&sk, url, "POST", None).unwrap();
+        let header = authorization_header(&token);
+
+        // Verify with empty body slice (not None) -- should pass since body is empty
+        let result = verify_token(&header, url, "POST", Some(b"")).unwrap();
+        assert!(result.payload_hash.is_none());
+    }
+
+    #[test]
+    fn nip98_get_tag_returns_none_for_missing() {
+        let event = NostrEvent {
+            id: "00".repeat(32),
+            pubkey: "aa".repeat(32),
+            created_at: 0,
+            kind: 1,
+            tags: vec![vec!["e".into(), "ref1".into()]],
+            content: String::new(),
+            sig: "00".repeat(64),
+        };
+        assert!(get_tag(&event, "u").is_none());
+        assert_eq!(get_tag(&event, "e"), Some("ref1".to_string()));
+    }
+
+    #[test]
+    fn nip98_create_token_at_deterministic() {
+        let sk = test_secret_key();
+        let url = "https://api.example.com/test";
+        let ts = 1_700_000_000u64;
+
+        // Two tokens created at the same timestamp for same inputs
+        let t1 = create_token_at(&sk, url, "GET", None, ts).unwrap();
+        let t2 = create_token_at(&sk, url, "GET", None, ts).unwrap();
+
+        // Decode both and check they have the same pubkey, url, method, created_at
+        let b1 = BASE64.decode(&t1).unwrap();
+        let e1: NostrEvent = serde_json::from_slice(&b1).unwrap();
+        let b2 = BASE64.decode(&t2).unwrap();
+        let e2: NostrEvent = serde_json::from_slice(&b2).unwrap();
+
+        assert_eq!(e1.pubkey, e2.pubkey);
+        assert_eq!(e1.created_at, e2.created_at);
+        assert_eq!(e1.kind, e2.kind);
+        assert_eq!(e1.tags, e2.tags);
+    }
+}
+
+// ── Property-based tests (native only, proptest not available in wasm32) ─
+
+#[cfg(test)]
+#[cfg(not(target_arch = "wasm32"))]
+mod proptests {
+    use super::*;
+    use proptest::prelude::*;
+
+    fn test_secret_key() -> [u8; 32] {
+        let mut key = [0u8; 32];
+        key[0] = 0x01;
+        key[31] = 0x01;
+        key
+    }
+
+    proptest! {
+        #[test]
+        fn nip98_roundtrip_arbitrary_url(
+            path in "[a-z]{1,20}(/[a-z0-9]{1,10}){0,5}"
+        ) {
+            let sk = test_secret_key();
+            let url = format!("https://api.example.com/{path}");
+            let ts = 1_700_000_000u64;
+
+            let token = create_token_at(&sk, &url, "GET", None, ts).unwrap();
+            let header = authorization_header(&token);
+            let result = verify_token_at(&header, &url, "GET", None, ts);
+            prop_assert!(result.is_ok(), "Failed for URL: {url}");
+            let verified = result.unwrap();
+            prop_assert_eq!(verified.url, url);
+        }
+
+        #[test]
+        fn nip98_roundtrip_arbitrary_method(
+            method in "(GET|POST|PUT|DELETE|PATCH|HEAD)"
+        ) {
+            let sk = test_secret_key();
+            let url = "https://api.example.com/test";
+            let ts = 1_700_000_000u64;
+
+            let token = create_token_at(&sk, url, &method, None, ts).unwrap();
+            let header = authorization_header(&token);
+            let result = verify_token_at(&header, url, &method, None, ts);
+            prop_assert!(result.is_ok());
+        }
+
+        #[test]
+        fn nip98_roundtrip_arbitrary_body(
+            body in prop::collection::vec(any::<u8>(), 1..200)
+        ) {
+            let sk = test_secret_key();
+            let url = "https://api.example.com/upload";
+            let ts = 1_700_000_000u64;
+
+            let token = create_token_at(&sk, url, "POST", Some(&body), ts).unwrap();
+            let header = authorization_header(&token);
+            let result = verify_token_at(&header, url, "POST", Some(&body), ts);
+            prop_assert!(result.is_ok());
+        }
+
+        #[test]
+        fn nip98_timestamp_within_tolerance_always_passes(
+            offset in 0u64..=60
+        ) {
+            let sk = test_secret_key();
+            let url = "https://api.example.com/time";
+            let created_at = 1_700_000_000u64;
+
+            let token = create_token_at(&sk, url, "GET", None, created_at).unwrap();
+            let header = authorization_header(&token);
+
+            // Verify at created_at + offset (within 60s tolerance)
+            let result = verify_token_at(&header, url, "GET", None, created_at + offset);
+            prop_assert!(result.is_ok(), "Failed at offset {offset}s");
+        }
+
+        #[test]
+        fn nip98_timestamp_beyond_tolerance_always_fails(
+            offset in 61u64..=600
+        ) {
+            let sk = test_secret_key();
+            let url = "https://api.example.com/time";
+            let created_at = 1_700_000_000u64;
+
+            let token = create_token_at(&sk, url, "GET", None, created_at).unwrap();
+            let header = authorization_header(&token);
+
+            // Verify at created_at + offset (beyond 60s tolerance)
+            let result = verify_token_at(&header, url, "GET", None, created_at + offset);
+            prop_assert!(result.is_err(), "Should fail at offset {offset}s");
+        }
+    }
 }

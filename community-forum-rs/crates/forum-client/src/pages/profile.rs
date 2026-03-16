@@ -23,6 +23,7 @@ struct ProfileMeta {
     name: Option<String>,
     display_name: Option<String>,
     about: Option<String>,
+    #[allow(dead_code)]
     picture: Option<String>,
     banner: Option<String>,
     nip05: Option<String>,

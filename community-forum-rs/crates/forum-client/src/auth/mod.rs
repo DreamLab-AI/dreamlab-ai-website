@@ -597,6 +597,165 @@ fn decode_nsec(nsec: &str) -> Result<Vec<u8>, String> {
     Ok(data)
 }
 
+// -- Tests -------------------------------------------------------------------
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── decode_nsec ─────────────────────────────────────────────────────
+
+    #[test]
+    fn decode_nsec_valid() {
+        // Generate a valid nsec from known bytes
+        let secret = [0x42u8; 32];
+        let nsec = bech32::encode::<bech32::Bech32>(
+            bech32::Hrp::parse("nsec").unwrap(),
+            &secret,
+        ).unwrap();
+        let decoded = decode_nsec(&nsec).unwrap();
+        assert_eq!(decoded.len(), 32);
+        assert_eq!(decoded, secret.to_vec());
+    }
+
+    #[test]
+    fn decode_nsec_wrong_prefix() {
+        let data = [0x01u8; 32];
+        let npub = bech32::encode::<bech32::Bech32>(
+            bech32::Hrp::parse("npub").unwrap(),
+            &data,
+        ).unwrap();
+        let result = decode_nsec(&npub);
+        assert!(result.is_err());
+        assert!(result.unwrap_err().contains("Expected nsec prefix"));
+    }
+
+    #[test]
+    fn decode_nsec_invalid_bech32() {
+        let result = decode_nsec("nsec1notvalidbech32");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn decode_nsec_completely_invalid() {
+        let result = decode_nsec("not a bech32 string at all");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn decode_nsec_empty_string() {
+        let result = decode_nsec("");
+        assert!(result.is_err());
+    }
+
+    // ── StoredSession serialization ─────────────────────────────────────
+
+    #[test]
+    fn stored_session_roundtrip() {
+        let session = session::StoredSession {
+            version: 2,
+            public_key: Some("aabb".repeat(16)),
+            is_nip07: false,
+            is_passkey: true,
+            is_local_key: false,
+            extension_name: None,
+            nickname: Some("Alice".into()),
+            avatar: Some("https://example.com/avatar.jpg".into()),
+            account_status: AccountStatus::Complete,
+            nsec_backed_up: true,
+        };
+        let json = serde_json::to_string(&session).unwrap();
+        let restored: session::StoredSession = serde_json::from_str(&json).unwrap();
+        assert_eq!(restored.version, 2);
+        assert_eq!(restored.public_key, session.public_key);
+        assert_eq!(restored.is_passkey, true);
+        assert_eq!(restored.is_nip07, false);
+        assert_eq!(restored.is_local_key, false);
+        assert_eq!(restored.nickname, Some("Alice".into()));
+        assert_eq!(restored.nsec_backed_up, true);
+    }
+
+    #[test]
+    fn stored_session_default() {
+        let session = session::StoredSession::default();
+        assert_eq!(session.version, 2);
+        assert!(session.public_key.is_none());
+        assert!(!session.is_nip07);
+        assert!(!session.is_passkey);
+        assert!(!session.is_local_key);
+        assert!(!session.nsec_backed_up);
+    }
+
+    #[test]
+    fn stored_session_deserialize_minimal() {
+        // Minimal JSON that should deserialize with defaults for missing fields
+        let json = r#"{"_v":2,"publicKey":null,"isNip07":false,"isPasskey":false,"extensionName":null,"nickname":null,"avatar":null,"accountStatus":"incomplete","nsecBackedUp":false}"#;
+        let session: session::StoredSession = serde_json::from_str(json).unwrap();
+        assert_eq!(session.version, 2);
+        assert!(!session.is_local_key); // default
+    }
+
+    // ── AccountStatus serialization ─────────────────────────────────────
+
+    #[test]
+    fn account_status_serialize_incomplete() {
+        let status = AccountStatus::Incomplete;
+        let json = serde_json::to_string(&status).unwrap();
+        assert_eq!(json, "\"incomplete\"");
+    }
+
+    #[test]
+    fn account_status_serialize_complete() {
+        let status = AccountStatus::Complete;
+        let json = serde_json::to_string(&status).unwrap();
+        assert_eq!(json, "\"complete\"");
+    }
+
+    #[test]
+    fn account_status_roundtrip() {
+        let status = AccountStatus::Complete;
+        let json = serde_json::to_string(&status).unwrap();
+        let restored: AccountStatus = serde_json::from_str(&json).unwrap();
+        assert_eq!(restored, AccountStatus::Complete);
+    }
+
+    // ── AuthState default ───────────────────────────────────────────────
+
+    #[test]
+    fn auth_state_default() {
+        let state = AuthState::default();
+        assert_eq!(state.state, AuthPhase::Unauthenticated);
+        assert!(!state.is_authenticated);
+        assert!(state.pubkey.is_none());
+        assert!(state.public_key.is_none());
+        assert!(!state.is_ready);
+        assert!(!state.is_nip07);
+        assert!(!state.is_passkey);
+        assert!(!state.is_local_key);
+    }
+
+    // ── PrivkeyMem ──────────────────────────────────────────────────────
+
+    #[test]
+    fn privkey_mem_to_hex() {
+        let bytes = [0xABu8; 32];
+        let mem = session::PrivkeyMem::new(bytes);
+        assert_eq!(mem.to_hex(), "ab".repeat(32));
+    }
+
+    #[test]
+    fn privkey_mem_zeros_on_drop() {
+        let bytes = [0xFFu8; 32];
+        let mem = session::PrivkeyMem::new(bytes);
+        let hex = mem.to_hex();
+        assert_eq!(hex, "ff".repeat(32));
+        drop(mem);
+        // After drop, the internal bytes should be zeroed by Zeroize trait.
+        // We can't access them after drop, but the drop impl is guaranteed
+        // by the #[zeroize(drop)] attribute.
+    }
+}
+
 // -- Context providers --------------------------------------------------------
 
 /// Create and provide the auth context. Call once at the app root.

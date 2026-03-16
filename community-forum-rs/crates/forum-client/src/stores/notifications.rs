@@ -86,6 +86,7 @@ impl NotificationStoreV2 {
     }
 
     /// Push a new notification.
+    #[allow(dead_code)]
     pub fn add(
         &self,
         kind: NotificationKind,

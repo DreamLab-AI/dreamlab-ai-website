@@ -42,32 +42,9 @@ async fn fetch_needs_setup() -> Result<bool, String> {
         .unwrap_or(false))
 }
 
-/// Resolve the relay HTTP base URL (mirrors zone_access logic).
+/// Resolve the relay HTTP base URL.
 fn relay_api_base() -> String {
-    if let Some(window) = web_sys::window() {
-        if let Ok(val) = js_sys::Reflect::get(&window, &"__ENV__".into()) {
-            if !val.is_undefined() && !val.is_null() {
-                if let Ok(url) = js_sys::Reflect::get(&val, &"VITE_RELAY_URL".into()) {
-                    if let Some(s) = url.as_string() {
-                        if !s.is_empty() {
-                            return s
-                                .replace("wss://", "https://")
-                                .replace("ws://", "http://")
-                                .trim_end_matches('/')
-                                .to_string();
-                        }
-                    }
-                }
-            }
-        }
-    }
-    let relay = option_env!("VITE_RELAY_URL")
-        .unwrap_or("wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev");
-    relay
-        .replace("wss://", "https://")
-        .replace("ws://", "http://")
-        .trim_end_matches('/')
-        .to_string()
+    crate::utils::relay_url::relay_api_base()
 }
 
 #[component]
@@ -272,18 +249,23 @@ fn AdminSetupCta(
     // Generated key registration — sets phase to Backup BEFORE calling register
     // so the parent <Show> keeps us mounted when is_authenticated flips.
     let on_generate_key = move |_: web_sys::MouseEvent| {
+        if is_pending.get_untracked() {
+            return;
+        }
         let name = display_name.get_untracked().trim().to_string();
         if name.len() < 2 {
             error.set(Some("Display name must be at least 2 characters".into()));
             return;
         }
         error.set(None);
+        is_pending.set(true);
         // Set phase BEFORE register — the parent's <Show> reads in_backup (derived
         // from setup_phase) to keep this component alive across auth state change.
         setup_phase.set(SetupPhase::Backup);
         match auth.register_with_generated_key(&name) {
             Ok(hex) => {
                 privkey_hex.set(hex);
+                is_pending.set(false);
                 // Don't set needs_setup here — the <Show> condition uses it,
                 // and clearing it would unmount us before the backup screen renders.
                 // It's set in on_backup_done after the user saves their key.
@@ -291,6 +273,7 @@ fn AdminSetupCta(
             Err(e) => {
                 setup_phase.set(SetupPhase::Cta);
                 error.set(Some(e));
+                is_pending.set(false);
             }
         }
     };
@@ -371,7 +354,8 @@ fn AdminSetupCta(
                         // Generate key
                         <button
                             on:click=on_generate_key
-                            class="w-full border border-gray-600 hover:border-amber-500/50 text-gray-200 hover:text-white py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-2 text-sm"
+                            disabled=move || is_pending.get()
+                            class="w-full border border-gray-600 hover:border-amber-500/50 disabled:border-gray-700 disabled:cursor-not-allowed text-gray-200 hover:text-white disabled:text-gray-500 py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-2 text-sm"
                         >
                             {key_icon()}
                             <span>"Generate Key Pair"</span>

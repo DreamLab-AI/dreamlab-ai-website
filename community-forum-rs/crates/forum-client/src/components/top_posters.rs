@@ -13,6 +13,7 @@ pub struct PosterData {
     pub pubkey: String,
     pub name: String,
     pub message_count: u32,
+    #[allow(dead_code)]
     pub avatar_url: Option<String>,
 }
 

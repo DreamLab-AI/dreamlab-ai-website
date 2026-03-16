@@ -2,6 +2,8 @@
 
 pub mod image_compress;
 pub mod pod_client;
+pub mod relay_url;
+pub mod sanitize;
 pub mod search_client;
 
 use leptos::prelude::*;
@@ -135,28 +137,6 @@ pub fn set_timeout_once<F: FnOnce() + 'static>(f: F, delay_ms: i32) {
 
     // Park the closure in the slot so it lives until the callback fires.
     slot.set(Some(closure));
-}
-
-/// Board statistics computed from a slice of kind-42 message events.
-///
-/// Returns `(total_messages, unique_authors, unique_channels)`.
-pub fn compute_board_stats(messages: &[nostr_core::NostrEvent]) -> (u32, u32, u32) {
-    use std::collections::HashSet;
-
-    let total = messages.len() as u32;
-    let authors: HashSet<&str> = messages.iter().map(|e| e.pubkey.as_str()).collect();
-    let channels: HashSet<&str> = messages
-        .iter()
-        .filter_map(|e| {
-            e.tags
-                .iter()
-                .find(|t| t.len() >= 4 && t[0] == "e" && t[3] == "root")
-                .or_else(|| e.tags.iter().find(|t| t.len() >= 2 && t[0] == "e"))
-                .map(|t| t[1].as_str())
-        })
-        .collect();
-
-    (total, authors.len() as u32, channels.len() as u32)
 }
 
 /// Check browser storage quota via `navigator.storage.estimate()`.

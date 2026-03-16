@@ -6,7 +6,7 @@
 use leptos::prelude::*;
 use wasm_bindgen_futures::spawn_local;
 
-use super::{use_admin, AdminStore};
+use super::use_admin;
 use crate::auth::use_auth;
 use crate::components::user_display::use_display_name;
 
@@ -25,7 +25,7 @@ struct PendingUser {
 #[component]
 pub fn RegistrationsPanel() -> impl IntoView {
     let auth = use_auth();
-    let pubkey = auth.pubkey();
+    let _pubkey = auth.pubkey();
 
     let zone_access = crate::stores::zone_access::use_zone_access();
     let is_admin = Memo::new(move |_| zone_access.is_admin.get());

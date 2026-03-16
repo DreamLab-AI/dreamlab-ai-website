@@ -5,8 +5,12 @@ use leptos_router::components::A;
 use leptos_router::hooks::use_query_map;
 
 use crate::app::base_href;
+use crate::components::activity_graph::{ActivityGraph, ActivityPoint};
+use crate::components::board_stats::BoardStats;
 use crate::components::channel_card::{ChannelCard, ChannelInfo};
 use crate::components::mark_all_read::MarkAllRead;
+use crate::components::todays_activity::TodaysActivity;
+use crate::components::top_posters::{TopPosters, PosterData};
 use crate::stores::channels::use_channel_store;
 use crate::stores::mute::use_mute_store;
 use crate::stores::read_position::use_read_positions;
@@ -70,6 +74,80 @@ pub fn ChatPage() -> impl IntoView {
 
     let mute_store = use_mute_store();
     let read_store = use_read_positions();
+
+    // -- Dashboard derived signals from ChannelStore --
+    let total_messages = Signal::derive(move || {
+        store.message_counts.get().values().sum::<u32>()
+    });
+    let total_users = Signal::derive(move || {
+        // Approximate: count unique authors from channel_messages
+        let all = store.channel_messages.get();
+        let mut unique = std::collections::HashSet::new();
+        for events in all.values() {
+            for ev in events {
+                unique.insert(ev.pubkey.clone());
+            }
+        }
+        unique.len() as u32
+    });
+    let total_channels = Signal::derive(move || store.channels.get().len() as u32);
+    let online_count = Signal::derive(move || {
+        // Estimate: channels with activity in last 5 minutes
+        let now = (js_sys::Date::now() / 1000.0) as u64;
+        let active = store.last_active.get();
+        active.values().filter(|&&ts| now.saturating_sub(ts) < 300).count() as u32
+    });
+    let today_messages = Signal::derive(move || {
+        let now = (js_sys::Date::now() / 1000.0) as u64;
+        let day_start = now - (now % 86400);
+        let all = store.channel_messages.get();
+        let mut count = 0u32;
+        for events in all.values() {
+            count += events.iter().filter(|e| e.created_at >= day_start).count() as u32;
+        }
+        count
+    });
+    let today_active_channels = Signal::derive(move || {
+        let now = (js_sys::Date::now() / 1000.0) as u64;
+        let day_start = now - (now % 86400);
+        let active = store.last_active.get();
+        active.values().filter(|&&ts| ts >= day_start).count() as u32
+    });
+    let new_users_today = Signal::derive(move || 0u32); // No join timestamp available
+    let top_posters_data = Signal::derive(move || {
+        let all = store.channel_messages.get();
+        let mut counts: std::collections::HashMap<String, u32> = std::collections::HashMap::new();
+        for events in all.values() {
+            for ev in events {
+                *counts.entry(ev.pubkey.clone()).or_insert(0) += 1;
+            }
+        }
+        let mut sorted: Vec<_> = counts.into_iter().collect();
+        sorted.sort_by(|a, b| b.1.cmp(&a.1));
+        sorted.truncate(10);
+        sorted.into_iter().map(|(pk, count)| PosterData {
+            pubkey: pk.clone(),
+            name: crate::components::user_display::use_display_name(&pk),
+            message_count: count,
+            avatar_url: None,
+        }).collect::<Vec<_>>()
+    });
+    let activity_data = Signal::derive(move || {
+        let now = (js_sys::Date::now() / 1000.0) as u64;
+        let mut hourly = [0u32; 24];
+        let all = store.channel_messages.get();
+        for events in all.values() {
+            for ev in events {
+                if now.saturating_sub(ev.created_at) < 86400 {
+                    let date = js_sys::Date::new_0();
+                    date.set_time((ev.created_at as f64) * 1000.0);
+                    let hour = date.get_hours() as usize;
+                    if hour < 24 { hourly[hour] += 1; }
+                }
+            }
+        }
+        (0..24).map(|h| ActivityPoint { hour: h as u32, count: hourly[h] }).collect::<Vec<_>>()
+    });
 
     // Mark all channels as read callback
     let channels_for_mark = store.channels;
@@ -190,6 +268,23 @@ pub fn ChatPage() -> impl IntoView {
                 </div>
                 <p class="text-gray-400">"Join conversations in public channels"</p>
             </div>
+
+            // Community dashboard — activity pill + stats
+            <Show when=move || !loading.get()>
+                <div class="space-y-3 mb-4">
+                    <TodaysActivity
+                        message_count=today_messages
+                        new_users=new_users_today
+                        active_channels=today_active_channels
+                    />
+                    <BoardStats
+                        total_messages=total_messages
+                        total_users=total_users
+                        total_channels=total_channels
+                        online_count=online_count
+                    />
+                </div>
+            </Show>
 
             // Mark all read button
             <div class="flex justify-end mb-2">
@@ -360,6 +455,17 @@ pub fn ChatPage() -> impl IntoView {
                     })
                 }
             }}
+
+            // Community insights — top posters + activity graph
+            <Show when=move || !loading.get()>
+                <div class="mt-8 space-y-4">
+                    <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wider">"Community Insights"</h2>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <TopPosters posters=top_posters_data />
+                        <ActivityGraph data=activity_data />
+                    </div>
+                </div>
+            </Show>
         </div>
     }
 }

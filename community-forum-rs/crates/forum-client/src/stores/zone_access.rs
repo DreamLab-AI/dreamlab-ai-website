@@ -23,17 +23,20 @@ pub struct ZoneAccess {
     /// Whether the user has Minimoonoir access.
     pub minimoonoir: Memo<bool>,
     /// Whether the user is on the whitelist (any flag true).
+    #[allow(dead_code)]
     pub is_whitelisted: Signal<bool>,
     /// Whether the user has admin privileges (from D1 whitelist).
     pub is_admin: RwSignal<bool>,
     /// Whether the zone access fetch has completed (success or error).
     pub loaded: RwSignal<bool>,
     /// Raw flags signal (set from relay response).
+    #[allow(dead_code)]
     flags: RwSignal<(bool, bool, bool)>,
 }
 
 impl ZoneAccess {
     /// Check access for a zone by its string ID.
+    #[allow(dead_code)]
     pub fn has_access(&self, zone_id: &str) -> bool {
         match zone_id {
             "home" | "dreamlab-lobby" => self.home.get_untracked(),
@@ -117,30 +120,7 @@ pub fn provide_zone_access() {
 
 /// Resolve the relay HTTP base URL for whitelist API calls.
 fn relay_api_base() -> String {
-    if let Some(window) = web_sys::window() {
-        if let Ok(val) = js_sys::Reflect::get(&window, &"__ENV__".into()) {
-            if !val.is_undefined() && !val.is_null() {
-                if let Ok(url) = js_sys::Reflect::get(&val, &"VITE_RELAY_URL".into()) {
-                    if let Some(s) = url.as_string() {
-                        if !s.is_empty() {
-                            return s
-                                .replace("wss://", "https://")
-                                .replace("ws://", "http://")
-                                .trim_end_matches('/')
-                                .to_string();
-                        }
-                    }
-                }
-            }
-        }
-    }
-    // Compile-time fallback
-    let relay = option_env!("VITE_RELAY_URL").unwrap_or("wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev");
-    relay
-        .replace("wss://", "https://")
-        .replace("ws://", "http://")
-        .trim_end_matches('/')
-        .to_string()
+    crate::utils::relay_url::relay_api_base()
 }
 
 /// Fetch the user's access flags from the relay's check-whitelist endpoint.

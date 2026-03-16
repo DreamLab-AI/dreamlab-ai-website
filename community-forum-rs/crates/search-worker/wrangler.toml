@@ -15,6 +15,7 @@ id = "440b1f07ff224fb8ad644e094c6766c0"
 
 [vars]
 ALLOWED_ORIGIN = "https://dreamlab-ai.com"
+ALLOWED_ORIGINS = "https://dreamlab-ai.com,https://thedreamlab.uk,https://dreamlab-ai.github.io"
 RVF_STORE_KEY = "dreamlab.rvf"
 ADMIN_PUBKEYS = "11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c"
 

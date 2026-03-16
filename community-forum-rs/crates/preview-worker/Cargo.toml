@@ -11,4 +11,5 @@ crate-type = ["cdylib"]
 worker = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
+js-sys = { workspace = true }
 regex = "1"

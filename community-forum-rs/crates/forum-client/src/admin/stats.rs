@@ -7,7 +7,7 @@ use leptos::prelude::*;
 use nostr_core::NostrEvent;
 use std::rc::Rc;
 
-use super::{use_admin, AdminStore};
+use super::use_admin;
 use crate::auth::use_auth;
 use crate::relay::{ConnectionState, Filter, RelayConnection};
 use crate::components::user_display::use_display_name;
@@ -55,7 +55,7 @@ fn kind_icon_label(kind: u64) -> (&'static str, &'static str) {
 #[component]
 pub fn StatsPanel() -> impl IntoView {
     let auth = use_auth();
-    let pubkey = auth.pubkey();
+    let _pubkey = auth.pubkey();
 
     let zone_access = crate::stores::zone_access::use_zone_access();
     let is_admin = Memo::new(move |_| zone_access.is_admin.get());

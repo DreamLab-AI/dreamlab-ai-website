@@ -90,7 +90,9 @@ impl UpdateCohortsCb {
     }
 }
 
+#[cfg(target_arch = "wasm32")]
 unsafe impl Send for UpdateCohortsCb {}
+#[cfg(target_arch = "wasm32")]
 unsafe impl Sync for UpdateCohortsCb {}
 
 impl<F: Fn(String, Vec<String>) + 'static> From<F> for UpdateCohortsCb {
@@ -109,7 +111,9 @@ impl AdminToggleCb {
     }
 }
 
+#[cfg(target_arch = "wasm32")]
 unsafe impl Send for AdminToggleCb {}
+#[cfg(target_arch = "wasm32")]
 unsafe impl Sync for AdminToggleCb {}
 
 impl<F: Fn(String, bool) + 'static> From<F> for AdminToggleCb {

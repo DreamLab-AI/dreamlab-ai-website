@@ -10,6 +10,7 @@ use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
 
 /// A single stat entry used by the count-up animation.
+#[allow(dead_code)]
 struct StatDef {
     label: &'static str,
     icon: &'static str,

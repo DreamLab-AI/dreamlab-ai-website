@@ -14,6 +14,7 @@ use wasm_bindgen::JsCast;
 use crate::components::avatar::{Avatar, AvatarSize};
 use crate::relay::{Filter, RelayConnection};
 use crate::components::user_display::use_display_name;
+use crate::stores::mute::use_mute_store;
 use crate::utils::shorten_pubkey;
 
 /// Parsed kind 0 metadata fields.
@@ -36,8 +37,8 @@ pub(crate) fn ProfileModal(
     let navigate = StoredValue::new(use_navigate());
     let meta = RwSignal::new(ProfileMeta::default());
     let is_loading = RwSignal::new(false);
-    let is_muted = RwSignal::new(false);
     let copied = RwSignal::new(false);
+    let mute_store = use_mute_store();
 
     // Store pubkey in StoredValue so it can be captured in Fn closures
     let pk_stored = StoredValue::new(pubkey.clone());
@@ -220,16 +221,19 @@ pub(crate) fn ProfileModal(
                             </button>
 
                             <button
-                                on:click=move |_| is_muted.update(|m| *m = !*m)
+                                on:click=move |_| {
+                                    let pk = pk_stored.get_value();
+                                    mute_store.toggle_mute_user(&pk);
+                                }
                                 class=move || {
-                                    if is_muted.get() {
+                                    if mute_store.is_user_muted(&pk_stored.get_value()) {
                                         "flex-1 bg-red-900/30 hover:bg-red-900/50 text-red-400 py-2.5 px-4 rounded-xl transition-colors flex items-center justify-center gap-2 text-sm border border-red-700/30"
                                     } else {
                                         "flex-1 bg-gray-800 hover:bg-gray-700 text-gray-300 py-2.5 px-4 rounded-xl transition-colors flex items-center justify-center gap-2 text-sm border border-gray-700"
                                     }
                                 }
                             >
-                                {move || if is_muted.get() {
+                                {move || if mute_store.is_user_muted(&pk_stored.get_value()) {
                                     view! { <span>"Unmute"</span> }.into_any()
                                 } else {
                                     view! { <span>"Mute"</span> }.into_any()

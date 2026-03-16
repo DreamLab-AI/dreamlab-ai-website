@@ -7,7 +7,6 @@ use nostr_core::{NostrEvent, RsvpStatus};
 use std::collections::HashMap;
 use std::rc::Rc;
 
-use crate::admin::AdminStore;
 use crate::app::base_href;
 use crate::auth::use_auth;
 use crate::components::create_event_modal::CreateEventModal;

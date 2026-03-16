@@ -29,6 +29,7 @@ pub fn use_announcer() -> AnnouncerSignal {
 ///
 /// Must be called from within a reactive scope (component body).
 /// The signal is cleared and re-set so repeated identical messages still trigger.
+#[allow(dead_code)]
 pub fn announce(ann: AnnouncerSignal, message: &str) {
     ann.0.set(String::new());
     let msg = message.to_string();

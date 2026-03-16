@@ -28,6 +28,7 @@ struct SectionRequest {
     /// Section display name.
     section_name: String,
     /// Section channel event ID.
+    #[allow(dead_code)]
     section_id: String,
     /// Timestamp of the request.
     created_at: u64,

@@ -10,9 +10,11 @@ use crate::app::base_href;
 use crate::auth::use_auth;
 use crate::components::badge::{Badge, BadgeVariant};
 use crate::components::channel_stats::ChannelStats;
+use crate::components::export_modal::ExportModal;
 use crate::components::message_bubble::{MessageBubble, MessageData};
 use crate::components::message_input::MessageInput;
 use crate::components::pinned_messages::{PinnedMessage, PinnedMessages};
+use crate::components::swipeable_message::SwipeableMessage;
 use crate::components::typing_indicator::TypingIndicator;
 use crate::relay::{ConnectionState, Filter, RelayConnection};
 #[allow(unused_imports)]
@@ -47,6 +49,7 @@ pub fn ChannelPage() -> impl IntoView {
     let loading = RwSignal::new(true);
     let last_read_event_id = read_store.last_read_event_id(&channel_id());
     let error_msg: RwSignal<Option<String>> = RwSignal::new(None);
+    let show_export = RwSignal::new(false);
 
     // Derived signals for ChannelStats
     let message_count = Signal::derive(move || messages.get().len() as u32);
@@ -339,6 +342,18 @@ pub fn ChannelPage() -> impl IntoView {
                                 message_count=message_count
                                 member_count=member_count
                             />
+                            // Export button
+                            <button
+                                class="text-gray-500 hover:text-amber-400 transition-colors p-1 rounded hover:bg-gray-700/50"
+                                title="Export messages"
+                                on:click=move |_| show_export.set(true)
+                            >
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <polyline points="7 10 12 15 17 10" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <line x1="12" y1="15" x2="12" y2="3" stroke-linecap="round"/>
+                                </svg>
+                            </button>
                             // Connection indicator
                             {move || {
                                 let state = conn_state.get();
@@ -441,7 +456,9 @@ pub fn ChannelPage() -> impl IntoView {
                                                             <div class="flex-1 h-px bg-amber-500/30"></div>
                                                         </div>
                                                     })}
-                                                    <MessageBubble message=msg/>
+                                                    <SwipeableMessage>
+                                                        <MessageBubble message=msg/>
+                                                    </SwipeableMessage>
                                                 </>
                                             }
                                         }).collect_view()}
@@ -461,6 +478,21 @@ pub fn ChannelPage() -> impl IntoView {
                         <MessageInput on_send=send_callback channel_id=channel_id() />
                     </div>
                 </div>
+            </Show>
+
+            // Export modal
+            <Show when=move || show_export.get()>
+                {move || {
+                    let cid = channel_id();
+                    let msgs = messages.get();
+                    view! {
+                        <ExportModal
+                            channel_id=cid
+                            messages=msgs
+                            on_close=Callback::new(move |()| show_export.set(false))
+                        />
+                    }
+                }}
             </Show>
         </div>
     }

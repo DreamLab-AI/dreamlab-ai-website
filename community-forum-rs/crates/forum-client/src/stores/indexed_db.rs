@@ -99,12 +99,22 @@ async fn open_db_request(
     on_upgrade: impl FnOnce(&IdbDatabase) + 'static,
 ) -> Result<IdbDatabase, JsValue> {
     let upgrade_closure = Closure::once(move |event: web_sys::Event| {
-        let target: web_sys::IdbOpenDbRequest = event
-            .target()
-            .unwrap()
-            .dyn_into()
-            .unwrap();
-        let db: IdbDatabase = target.result().unwrap().dyn_into().unwrap();
+        let Some(target) = event.target() else {
+            web_sys::console::warn_1(&"IndexedDB upgrade: missing event target".into());
+            return;
+        };
+        let Ok(open_req) = target.dyn_into::<web_sys::IdbOpenDbRequest>() else {
+            web_sys::console::warn_1(&"IndexedDB upgrade: target is not IdbOpenDbRequest".into());
+            return;
+        };
+        let Ok(result) = open_req.result() else {
+            web_sys::console::warn_1(&"IndexedDB upgrade: could not get result from request".into());
+            return;
+        };
+        let Ok(db) = result.dyn_into::<IdbDatabase>() else {
+            web_sys::console::warn_1(&"IndexedDB upgrade: result is not IdbDatabase".into());
+            return;
+        };
         on_upgrade(&db);
     });
     request.set_onupgradeneeded(Some(upgrade_closure.as_ref().unchecked_ref()));
@@ -143,47 +153,100 @@ impl ForumDb {
         let request = idb_factory.open_with_u32(DB_NAME, DB_VERSION)?;
 
         let db = open_db_request(&request, |db| {
+            // Helper: log a warning and continue if store/index creation fails.
+            // The `onupgradeneeded` callback cannot propagate errors, so we log
+            // and degrade gracefully — missing stores will surface as errors on
+            // later read/write attempts, which all return `Result`.
+            macro_rules! try_idb {
+                ($expr:expr, $msg:literal) => {
+                    match $expr {
+                        Ok(v) => v,
+                        Err(e) => {
+                            web_sys::console::warn_1(
+                                &format!(concat!("IndexedDB schema: ", $msg, ": {:?}"), e).into(),
+                            );
+                            return;
+                        }
+                    }
+                };
+            }
+
             // --- messages ---
             if !db.object_store_names().contains(STORE_MESSAGES) {
-                let mut params = IdbObjectStoreParameters::new();
-                params.key_path(Some(&JsValue::from_str("event_id")));
-                let store = db.create_object_store_with_optional_parameters(STORE_MESSAGES, &params).unwrap();
+                let params = IdbObjectStoreParameters::new();
+                params.set_key_path(&JsValue::from_str("event_id"));
+                let store = try_idb!(
+                    db.create_object_store_with_optional_parameters(STORE_MESSAGES, &params),
+                    "failed to create messages store"
+                );
                 let key_path = js_sys::Array::new();
                 key_path.push(&JsValue::from_str("channel_id"));
                 key_path.push(&JsValue::from_str("created_at"));
-                store.create_index_with_str_sequence("channel_created", &key_path).unwrap();
+                if let Err(e) = store.create_index_with_str_sequence("channel_created", &key_path) {
+                    web_sys::console::warn_1(
+                        &format!("IndexedDB schema: messages index failed: {:?}", e).into(),
+                    );
+                }
             }
 
             // --- channels ---
             if !db.object_store_names().contains(STORE_CHANNELS) {
-                let mut params = IdbObjectStoreParameters::new();
-                params.key_path(Some(&JsValue::from_str("channel_id")));
-                let store = db.create_object_store_with_optional_parameters(STORE_CHANNELS, &params).unwrap();
-                store.create_index_with_str("section", "section_id").unwrap();
+                let params = IdbObjectStoreParameters::new();
+                params.set_key_path(&JsValue::from_str("channel_id"));
+                let store = try_idb!(
+                    db.create_object_store_with_optional_parameters(STORE_CHANNELS, &params),
+                    "failed to create channels store"
+                );
+                if let Err(e) = store.create_index_with_str("section", "section_id") {
+                    web_sys::console::warn_1(
+                        &format!("IndexedDB schema: channels index failed: {:?}", e).into(),
+                    );
+                }
             }
 
             // --- profiles ---
             if !db.object_store_names().contains(STORE_PROFILES) {
-                let mut params = IdbObjectStoreParameters::new();
-                params.key_path(Some(&JsValue::from_str("pubkey")));
-                let store = db.create_object_store_with_optional_parameters(STORE_PROFILES, &params).unwrap();
-                store.create_index_with_str("updated", "updated_at").unwrap();
+                let params = IdbObjectStoreParameters::new();
+                params.set_key_path(&JsValue::from_str("pubkey"));
+                let store = try_idb!(
+                    db.create_object_store_with_optional_parameters(STORE_PROFILES, &params),
+                    "failed to create profiles store"
+                );
+                if let Err(e) = store.create_index_with_str("updated", "updated_at") {
+                    web_sys::console::warn_1(
+                        &format!("IndexedDB schema: profiles index failed: {:?}", e).into(),
+                    );
+                }
             }
 
             // --- deletions ---
             if !db.object_store_names().contains(STORE_DELETIONS) {
-                let mut params = IdbObjectStoreParameters::new();
-                params.key_path(Some(&JsValue::from_str("event_id")));
-                let store = db.create_object_store_with_optional_parameters(STORE_DELETIONS, &params).unwrap();
-                store.create_index_with_str("target", "target_id").unwrap();
+                let params = IdbObjectStoreParameters::new();
+                params.set_key_path(&JsValue::from_str("event_id"));
+                let store = try_idb!(
+                    db.create_object_store_with_optional_parameters(STORE_DELETIONS, &params),
+                    "failed to create deletions store"
+                );
+                if let Err(e) = store.create_index_with_str("target", "target_id") {
+                    web_sys::console::warn_1(
+                        &format!("IndexedDB schema: deletions index failed: {:?}", e).into(),
+                    );
+                }
             }
 
             // --- outbox ---
             if !db.object_store_names().contains(STORE_OUTBOX) {
-                let mut params = IdbObjectStoreParameters::new();
-                params.auto_increment(true);
-                let store = db.create_object_store_with_optional_parameters(STORE_OUTBOX, &params).unwrap();
-                store.create_index_with_str("created", "created_at").unwrap();
+                let params = IdbObjectStoreParameters::new();
+                params.set_auto_increment(true);
+                let store = try_idb!(
+                    db.create_object_store_with_optional_parameters(STORE_OUTBOX, &params),
+                    "failed to create outbox store"
+                );
+                if let Err(e) = store.create_index_with_str("created", "created_at") {
+                    web_sys::console::warn_1(
+                        &format!("IndexedDB schema: outbox index failed: {:?}", e).into(),
+                    );
+                }
             }
         })
         .await?;

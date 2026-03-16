@@ -17,6 +17,7 @@ use crate::admin::user_table::{UpdateCohortsCb, UserTable};
 use crate::admin::{provide_admin, use_admin, AdminTab};
 use crate::admin::user_table::AdminToggleCb;
 use crate::auth::use_auth;
+use crate::components::admin_checklist::AdminChecklist;
 use crate::relay::{ConnectionState, RelayConnection};
 use crate::stores::zone_access::use_zone_access;
 
@@ -125,6 +126,17 @@ fn AdminPanelInner() -> impl IntoView {
     let admin_for_err_btn = admin.clone();
     let admin_for_suc_btn = admin.clone();
 
+    // Onboarding checklist signals
+    let channels_for_check = admin.state.channels;
+    let users_for_check = admin.state.users;
+    let has_channels = Signal::derive(move || !channels_for_check.get().is_empty());
+    let has_members = Signal::derive(move || users_for_check.get().len() > 1);
+    // Zones are configured if any user has cohorts beyond the default empty list
+    let users_for_zone = admin.state.users;
+    let has_zones = Signal::derive(move || {
+        users_for_zone.get().iter().any(|u| !u.cohorts.is_empty())
+    });
+
     view! {
         <div class="max-w-6xl mx-auto p-4 sm:p-6">
             <div class="mb-6">
@@ -136,6 +148,8 @@ fn AdminPanelInner() -> impl IntoView {
                     "Manage whitelist, channels, and view forum statistics."
                 </p>
             </div>
+
+            <AdminChecklist has_channels=has_channels has_members=has_members has_zones=has_zones />
 
             <ConnectionStatusBar />
 

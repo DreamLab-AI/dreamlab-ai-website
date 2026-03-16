@@ -9,6 +9,7 @@ command = "worker-build --release"
 RELAY_NAME = "DreamLab Nostr Relay"
 ADMIN_PUBKEYS = ""
 ALLOWED_ORIGIN = "https://dreamlab-ai.com"
+ALLOWED_ORIGINS = "https://dreamlab-ai.com,https://thedreamlab.uk,https://dreamlab-ai.github.io"
 
 [[d1_databases]]
 binding = "DB"

@@ -228,7 +228,7 @@ where
     let start_str = format_datetime(entry.start_time);
     let end_str = entry.end_time.map(format_datetime).unwrap_or_default();
     let pk_short = use_display_name(&entry.host_pubkey);
-    let total_rsvp = entry.rsvp_accepted + entry.rsvp_tentative;
+    let _total_rsvp = entry.rsvp_accepted + entry.rsvp_tentative;
 
     let card_opacity = if is_past { "opacity-60" } else { "" };
 

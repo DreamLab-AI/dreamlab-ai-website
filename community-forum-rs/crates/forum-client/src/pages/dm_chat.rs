@@ -13,6 +13,8 @@ use crate::app::base_href;
 use wasm_bindgen::JsCast;
 
 use crate::auth::use_auth;
+use crate::components::image_upload::ImageUpload;
+use crate::components::swipeable_message::SwipeableMessage;
 use crate::dm::{provide_dm_store, use_dm_store, DMMessage};
 use crate::relay::{ConnectionState, RelayConnection};
 use crate::components::user_display::use_display_name_memo;
@@ -40,6 +42,7 @@ pub fn DmChatPage() -> impl IntoView {
     let send_error: RwSignal<Option<String>> = RwSignal::new(None);
     let messages_container = NodeRef::<leptos::html::Div>::new();
     let fetch_started = RwSignal::new(false);
+    let show_image_upload = RwSignal::new(false);
 
     // Subscribe to conversation messages when connected
     let relay_for_sub = relay.clone();
@@ -277,7 +280,39 @@ pub fn DmChatPage() -> impl IntoView {
             // Compose area
             <div class="bg-gray-800 border-t border-gray-700 p-4">
                 <div class="max-w-2xl mx-auto">
+                    // Image upload panel (collapsed by default)
+                    <Show when=move || show_image_upload.get()>
+                        <div class="mb-3">
+                            <ImageUpload on_upload=Callback::new(move |url: String| {
+                                // Insert the image URL into the message input
+                                message_input.update(|v| {
+                                    if !v.is_empty() { v.push(' '); }
+                                    v.push_str(&url);
+                                });
+                                show_image_upload.set(false);
+                            }) />
+                        </div>
+                    </Show>
+
                     <div class="flex gap-2 items-end">
+                        // Image upload toggle button
+                        <button
+                            class=move || {
+                                if show_image_upload.get() {
+                                    "w-10 h-10 rounded-full flex items-center justify-center bg-amber-500/20 text-amber-400 transition-colors flex-shrink-0 border border-amber-500/30"
+                                } else {
+                                    "w-10 h-10 rounded-full flex items-center justify-center bg-gray-700 text-gray-400 hover:text-amber-400 transition-colors flex-shrink-0"
+                                }
+                            }
+                            on:click=move |_| show_image_upload.update(|v| *v = !*v)
+                            title="Attach image"
+                        >
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <circle cx="8.5" cy="8.5" r="1.5"/>
+                                <polyline points="21 15 16 10 5 21" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
                         <input
                             type="text"
                             class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-400 focus:outline-none focus:border-amber-500 transition-colors"
@@ -331,7 +366,11 @@ fn MessageListWithDateSeparators(msgs: Vec<DMMessage>, my_pk: String) -> impl In
         prev_timestamp = msg.timestamp;
 
         let is_mine = msg.sender_pubkey == my_pk;
-        fragments.push(view! { <DmBubble message=msg is_mine=is_mine/> }.into_any());
+        fragments.push(view! {
+            <SwipeableMessage>
+                <DmBubble message=msg is_mine=is_mine/>
+            </SwipeableMessage>
+        }.into_any());
     }
 
     fragments.collect_view()

@@ -7,12 +7,7 @@ use crate::utils::pod_client::upload_image_with_thumbnail;
 use leptos::prelude::*;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
-use wasm_bindgen_futures::JsFuture;
 
-const POD_API: &str = match option_env!("VITE_POD_API_URL") {
-    Some(u) => u,
-    None => "https://dreamlab-pod-api.solitary-paper-764d.workers.dev",
-};
 const MAX_SIZE: u64 = 5 * 1024 * 1024;
 
 #[derive(Clone, Debug, PartialEq)]
@@ -252,42 +247,3 @@ pub(crate) fn ImageUpload(
     }
 }
 
-async fn upload_bytes(url: &str, body: &[u8], auth: &str) -> Result<String, String> {
-    let w = web_sys::window().ok_or("No window")?;
-    let init = web_sys::RequestInit::new();
-    init.set_method("POST");
-    let h = web_sys::Headers::new().map_err(|e| format!("{e:?}"))?;
-    h.set("Authorization", auth).map_err(|e| format!("{e:?}"))?;
-    h.set("Content-Type", "application/octet-stream")
-        .map_err(|e| format!("{e:?}"))?;
-    init.set_headers(&h);
-    init.set_body(&js_sys::Uint8Array::from(body).into());
-    let req = web_sys::Request::new_with_str_and_init(url, &init).map_err(|e| format!("{e:?}"))?;
-    let rv = JsFuture::from(w.fetch_with_request(&req))
-        .await
-        .map_err(|e| format!("Fetch: {e:?}"))?;
-    let resp: web_sys::Response = rv.unchecked_into();
-    if !resp.ok() {
-        let st = resp.status();
-        if let Ok(tp) = resp.text() {
-            if let Ok(t) = JsFuture::from(tp).await {
-                if let Some(s) = t.as_string() {
-                    return Err(format!("HTTP {}: {}", st, s));
-                }
-            }
-        }
-        return Err(format!("HTTP {}", st));
-    }
-    let tp = resp.text().map_err(|e| format!("{e:?}"))?;
-    let t = JsFuture::from(tp).await.map_err(|e| format!("{e:?}"))?;
-    let bs = t.as_string().unwrap_or_default();
-    if let Ok(p) = serde_json::from_str::<serde_json::Value>(&bs) {
-        if let Some(u) = p.get("url").and_then(|v| v.as_str()) {
-            return Ok(u.to_string());
-        }
-    }
-    if bs.starts_with("http") {
-        return Ok(bs);
-    }
-    Ok(url.to_string())
-}

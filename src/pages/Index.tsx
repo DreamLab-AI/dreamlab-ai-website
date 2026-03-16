@@ -431,7 +431,10 @@ const Index = () => {
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none';
-                      e.currentTarget.parentElement!.innerHTML = `<span class="text-xl font-bold text-white">${member.name.split(' ').map(n => n[0]).join('')}</span>`;
+                      const span = document.createElement('span');
+                      span.className = 'text-xl font-bold text-white';
+                      span.textContent = member.name.split(' ').map(n => n[0]).join('');
+                      e.currentTarget.parentElement?.replaceChildren(span);
                     }}
                   />
                 </div>

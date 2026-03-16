@@ -10,9 +10,9 @@ use crate::components::notification_center::NotificationCenter;
 use crate::stores::notifications::use_notification_store;
 
 /// A single notification entry (legacy).
+#[allow(dead_code)]
 #[derive(Clone, Debug)]
 pub struct Notification {
-    #[allow(dead_code)]
     pub id: String,
     pub message: String,
     /// UNIX timestamp.
@@ -40,6 +40,7 @@ impl NotificationStore {
     }
 
     /// Mark all notifications as read.
+    #[allow(dead_code)]
     pub fn mark_all_read(&self) {
         self.items.update(|list| {
             for n in list.iter_mut() {
@@ -49,6 +50,7 @@ impl NotificationStore {
     }
 
     /// Clear all notifications.
+    #[allow(dead_code)]
     pub fn clear_all(&self) {
         self.items.set(Vec::new());
     }

@@ -254,14 +254,13 @@ pub(crate) fn MessageInput(
         attachment.set(None);
     };
 
-    // Render markdown preview via comrak
+    // Render markdown preview via sanitized comrak
     let preview_html = move || {
         let raw = content.get();
         if raw.trim().is_empty() {
             return "<p class=\"text-gray-500 italic\">Nothing to preview</p>".to_string();
         }
-        let opts = comrak::Options::default();
-        comrak::markdown_to_html(&raw, &opts)
+        crate::utils::sanitize::sanitize_markdown(&raw)
     };
 
     let counter_class = move || {

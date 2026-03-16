@@ -40,10 +40,10 @@ pub(crate) fn NsecBackup(
         if let Some(window) = web_sys::window() {
             if let Some(doc) = window.document() {
                 let content = format!(
-                    "DreamLab AI - Nostr Private Key Backup\n\
-                     ========================================\n\n\
-                     nsec: {}\n\n\
-                     WARNING: Anyone with this key controls your identity.\n\
+                    "DreamLab AI - Recovery Key Backup\n\
+                     ==================================\n\n\
+                     Key: {}\n\n\
+                     IMPORTANT: Anyone with this key can access your account.\n\
                      Store this file securely and delete it from your downloads.\n",
                     nsec
                 );
@@ -95,14 +95,14 @@ pub(crate) fn NsecBackup(
                     </svg>
                 </div>
                 <div>
-                    <h3 id="nsec-backup-title" class="text-lg font-bold text-white">"Save Your Private Key"</h3>
+                    <h3 id="nsec-backup-title" class="text-lg font-bold text-white">"Save Your Recovery Key"</h3>
                     <p id="nsec-backup-desc" class="text-xs text-gray-400">"You need this to sign back in."</p>
                 </div>
             </div>
 
             // Key display
             <div class="bg-gray-900/60 border border-gray-700 rounded-xl p-4">
-                <label class="block text-xs text-gray-500 mb-2 font-medium uppercase tracking-wider">"Private Key (hex)"</label>
+                <label class="block text-xs text-gray-500 mb-2 font-medium uppercase tracking-wider">"Recovery Key"</label>
                 <code class="block text-sm text-amber-300 font-mono break-all select-all leading-relaxed">
                     {nsec.clone()}
                 </code>
@@ -160,6 +160,7 @@ pub(crate) fn NsecBackup(
 }
 
 /// Returns `true` if the user has previously dismissed the nsec backup.
+#[allow(dead_code)]
 pub fn is_backup_dismissed() -> bool {
     web_sys::window()
         .and_then(|w| w.local_storage().ok())

@@ -21,11 +21,6 @@ use crate::auth::nip98::{fetch_with_nip98_get, fetch_with_nip98_post};
 use crate::relay::{ConnectionState, Filter, RelayConnection};
 use crate::stores::zone_access::use_zone_access;
 
-// -- Constants ----------------------------------------------------------------
-
-/// Default auth API base URL (overridable via `window.__ENV__.VITE_AUTH_API_URL`).
-const DEFAULT_AUTH_API_URL: &str = "https://dreamlab-auth-api.solitary-paper-764d.workers.dev";
-
 // -- Types --------------------------------------------------------------------
 
 /// Tabs in the admin panel.
@@ -112,6 +107,7 @@ impl AdminStore {
     }
 
     /// Check whether the current user is admin using the zone_access context.
+    #[allow(dead_code)]
     pub fn is_current_user_admin() -> bool {
         use_zone_access().is_admin.get_untracked()
     }
@@ -119,35 +115,10 @@ impl AdminStore {
     /// Resolve the API base URL for whitelist/admin operations.
     ///
     /// Whitelist endpoints (`/api/whitelist/*`, `/api/check-whitelist`) live on the
-    /// **relay worker**, not the auth worker. Prefer `VITE_RELAY_URL` (converted to
-    /// HTTPS) since that's where these routes are defined. Fall back to
-    /// `VITE_AUTH_API_URL` only if no relay URL is available.
+    /// **relay worker**, not the auth worker. Delegates to the centralized
+    /// `relay_url::relay_api_base()`.
     fn api_base() -> String {
-        if let Some(window) = web_sys::window() {
-            if let Ok(val) = js_sys::Reflect::get(&window, &"__ENV__".into()) {
-                if !val.is_undefined() && !val.is_null() {
-                    // Prefer relay URL — whitelist routes live on the relay worker
-                    if let Ok(url) = js_sys::Reflect::get(&val, &"VITE_RELAY_URL".into()) {
-                        if let Some(s) = url.as_string() {
-                            if !s.is_empty() {
-                                return relay_url_to_http(&s);
-                            }
-                        }
-                    }
-                    // Fallback to auth API URL
-                    if let Ok(url) = js_sys::Reflect::get(&val, &"VITE_AUTH_API_URL".into()) {
-                        if let Some(s) = url.as_string() {
-                            if !s.is_empty() {
-                                return s;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        option_env!("VITE_AUTH_API_URL")
-            .unwrap_or(DEFAULT_AUTH_API_URL)
-            .to_string()
+        crate::utils::relay_url::relay_api_base()
     }
 
     // -- Whitelist API --------------------------------------------------------
@@ -207,8 +178,10 @@ impl AdminStore {
             "pubkey": pubkey,
             "cohorts": cohorts,
         });
+        let body_json = serde_json::to_string(&body)
+            .map_err(|e| format!("JSON serialization failed: {e}"))?;
         let url = format!("{}/api/whitelist/add", Self::api_base());
-        match fetch_with_nip98_post(&url, &serde_json::to_string(&body).unwrap(), privkey).await {
+        match fetch_with_nip98_post(&url, &body_json, privkey).await {
             Ok(_) => {
                 self.state.success.set(Some(format!(
                     "Added {}...{} to whitelist",
@@ -244,8 +217,10 @@ impl AdminStore {
             "pubkey": pubkey,
             "cohorts": cohorts,
         });
+        let body_json = serde_json::to_string(&body)
+            .map_err(|e| format!("JSON serialization failed: {e}"))?;
         let url = format!("{}/api/whitelist/update-cohorts", Self::api_base());
-        match fetch_with_nip98_post(&url, &serde_json::to_string(&body).unwrap(), privkey).await {
+        match fetch_with_nip98_post(&url, &body_json, privkey).await {
             Ok(_) => {
                 self.state.success.set(Some(format!(
                     "Updated cohorts for {}...{}",
@@ -283,8 +258,10 @@ impl AdminStore {
             "pubkey": pubkey,
             "is_admin": is_admin,
         });
+        let body_json = serde_json::to_string(&body)
+            .map_err(|e| format!("JSON serialization failed: {e}"))?;
         let url = format!("{}/api/whitelist/set-admin", Self::api_base());
-        match fetch_with_nip98_post(&url, &serde_json::to_string(&body).unwrap(), privkey).await {
+        match fetch_with_nip98_post(&url, &body_json, privkey).await {
             Ok(_) => {
                 let action = if is_admin { "promoted to admin" } else { "demoted from admin" };
                 self.state.success.set(Some(format!(
@@ -309,6 +286,7 @@ impl AdminStore {
     // -- Channel management ---------------------------------------------------
 
     /// Create a kind-40 channel creation event and publish it to the relay.
+    #[allow(dead_code)]
     pub fn create_channel(
         &self,
         name: &str,
@@ -356,12 +334,14 @@ impl AdminStore {
             tags.push(vec!["cohort".into(), c.into()]);
         }
 
+        let content_json = serde_json::to_string(&content)
+            .map_err(|e| format!("JSON serialization failed: {e}"))?;
         let unsigned = nostr_core::UnsignedEvent {
             pubkey: pubkey_hex,
             created_at: now,
             kind: 40,
             tags,
-            content: serde_json::to_string(&content).unwrap(),
+            content: content_json,
         };
 
         let signed =
@@ -580,11 +560,3 @@ fn parse_channel_content(content: &str) -> (String, String) {
     }
 }
 
-/// Convert a WebSocket relay URL (wss://...) to an HTTPS URL for HTTP API calls.
-fn relay_url_to_http(relay_url: &str) -> String {
-    relay_url
-        .replace("wss://", "https://")
-        .replace("ws://", "http://")
-        .trim_end_matches('/')
-        .to_string()
-}

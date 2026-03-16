@@ -15,6 +15,10 @@ pub struct Preferences {
     pub show_link_previews: bool,
     pub compact_messages: bool,
     pub reduced_motion: bool,
+    /// When true, show Nostr protocol names (NIP-07, nsec, pubkey hex, relay URLs).
+    /// When false (default), use friendly labels.
+    #[serde(default)]
+    pub show_technical_details: bool,
 }
 
 /// Visual theme selection.
@@ -65,6 +69,7 @@ impl Default for Preferences {
             show_link_previews: true,
             compact_messages: false,
             reduced_motion: false,
+            show_technical_details: false,
         }
     }
 }

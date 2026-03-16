@@ -9,10 +9,12 @@ use std::rc::Rc;
 use wasm_bindgen_futures::spawn_local;
 
 use crate::auth::use_auth;
+use crate::components::access_denied::AccessDenied;
 use crate::components::breadcrumb::{Breadcrumb, BreadcrumbItem};
 use crate::components::message_bubble::{MessageBubble, MessageData};
 use crate::components::message_input::MessageInput;
 use crate::components::reaction_bar::Reaction;
+use crate::components::swipeable_message::SwipeableMessage;
 use crate::components::typing_indicator::TypingIndicator;
 use crate::relay::{ConnectionState, Filter, RelayConnection};
 use crate::stores::zone_access::use_zone_access;
@@ -268,23 +270,7 @@ pub fn SectionPage() -> impl IntoView {
         <Show
             when=move || has_zone_access.get()
             fallback=move || view! {
-                <div class="max-w-lg mx-auto p-8 text-center">
-                    <div class="glass-card p-8">
-                        <div class="w-14 h-14 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
-                            <svg class="w-7 h-7 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M7 11V7a5 5 0 0110 0v4" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
-                        <h2 class="text-xl font-bold text-white mb-2">"Access Restricted"</h2>
-                        <p class="text-gray-400 text-sm mb-4">
-                            {move || format!("You don't have access to the {} zone.", capitalize(&category_slug()))}
-                        </p>
-                        <a href=crate::app::base_href("/forums") class="text-amber-400 hover:text-amber-300 text-sm underline">
-                            "Back to Forums"
-                        </a>
-                    </div>
-                </div>
+                <AccessDenied zone_id=category_slug() />
             }
         >
         <div class="flex flex-col h-[calc(100vh-64px)]">
@@ -355,7 +341,11 @@ pub fn SectionPage() -> impl IntoView {
                             } else {
                                 view! {
                                     <div class="space-y-1">
-                                        {msgs.into_iter().map(|msg| view! { <MessageBubble message=msg/> }).collect_view()}
+                                        {msgs.into_iter().map(|msg| view! {
+                                            <SwipeableMessage>
+                                                <MessageBubble message=msg/>
+                                            </SwipeableMessage>
+                                        }).collect_view()}
                                     </div>
                                 }.into_any()
                             }

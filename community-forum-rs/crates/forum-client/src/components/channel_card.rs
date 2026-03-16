@@ -14,6 +14,7 @@ pub struct ChannelInfo {
     pub name: String,
     pub description: String,
     pub section: String,
+    #[allow(dead_code)]
     pub picture: String,
     pub message_count: u32,
     pub last_active: u64,

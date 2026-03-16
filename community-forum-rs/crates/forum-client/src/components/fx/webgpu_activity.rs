@@ -25,6 +25,7 @@ pub struct ChannelActivity {
 }
 
 /// Activity visualization component with tiered rendering.
+#[allow(dead_code)]
 #[component]
 pub fn WebGPUActivity(
     /// Reactive channel activity data: (name, activity_level 0..1).

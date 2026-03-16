@@ -6,8 +6,6 @@
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::JsFuture;
 
-const DIMENSIONS: usize = 384;
-
 const SEARCH_API: &str = match option_env!("VITE_SEARCH_API_URL") {
     Some(u) => u,
     None => "https://search.dreamlab-ai.com",
@@ -141,27 +139,6 @@ pub async fn get_search_status() -> Result<SearchStats, String> {
     let url = format!("{}/status", SEARCH_API);
     let response = fetch_get(&url).await?;
     serde_json::from_str(&response).map_err(|e| format!("Parse error: {}", e))
-}
-
-/// Client-side hash fallback embedding (matches server algorithm).
-pub fn generate_fallback_embedding(text: &str) -> Vec<f64> {
-    let mut vector = vec![0.0f64; DIMENSIONS];
-    let normalized = text.to_lowercase();
-    let bytes = normalized.as_bytes();
-
-    for pass in 0..3u32 {
-        for (i, &byte) in bytes.iter().enumerate() {
-            let code = byte as u32;
-            let idx = ((code * (i as u32 + 1) * (pass + 1) + pass * 127) % DIMENSIONS as u32)
-                as usize;
-            vector[idx] += code as f64 / (255.0 * (pass + 1) as f64);
-        }
-    }
-
-    // L2 normalize
-    let norm = vector.iter().map(|v| v * v).sum::<f64>().sqrt().max(1e-10);
-    vector.iter_mut().for_each(|v| *v /= norm);
-    vector
 }
 
 /// Cosine similarity between two vectors.

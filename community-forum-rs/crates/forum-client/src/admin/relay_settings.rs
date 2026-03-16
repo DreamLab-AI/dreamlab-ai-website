@@ -6,7 +6,6 @@
 use leptos::prelude::*;
 use wasm_bindgen::JsCast;
 
-use super::AdminStore;
 use crate::auth::use_auth;
 use crate::components::toast::{use_toasts, ToastVariant};
 use crate::relay::{ConnectionState, RelayConnection};
@@ -35,7 +34,7 @@ fn save_relay_url(url: &str) {
 #[component]
 pub fn RelaySettingsPanel() -> impl IntoView {
     let auth = use_auth();
-    let pubkey = auth.pubkey();
+    let _pubkey = auth.pubkey();
 
     let zone_access = crate::stores::zone_access::use_zone_access();
     let is_admin = Memo::new(move |_| zone_access.is_admin.get());

@@ -1,7 +1,7 @@
 //! Nickname setup page — shown after first-time registration.
 //!
 //! Publishes a kind 0 (metadata) event to the relay with the chosen nickname
-//! and optional bio, then updates the auth store and navigates to `/chat`.
+//! and optional bio, then updates the auth store and navigates to `/forums`.
 
 use leptos::prelude::*;
 use leptos_router::hooks::use_navigate;
@@ -133,7 +133,7 @@ pub fn SetupPage() -> impl IntoView {
                     auth.complete_signup();
 
                     navigate.with_value(|nav| {
-                        nav("/chat", NavigateOptions::default());
+                        nav("/forums", NavigateOptions::default());
                     });
                 }
                 Err(e) => {
@@ -161,7 +161,7 @@ pub fn SetupPage() -> impl IntoView {
                             "Welcome to DreamLab"
                         </h1>
                         <p class="text-gray-400 text-sm">
-                            "Set up your profile to get started"
+                            "Set up your profile to join the community"
                         </p>
                         <div class="inline-flex items-center gap-1.5 bg-gray-800/60 rounded-full px-3 py-1 text-xs text-gray-500 mt-2">
                             {pubkey_icon_svg()}
@@ -245,7 +245,7 @@ pub fn SetupPage() -> impl IntoView {
                     // Security note
                     <div class="flex items-center justify-center gap-2 text-xs text-gray-500 pt-1">
                         {shield_icon_svg()}
-                        <span>"Your profile is published to the Nostr relay"</span>
+                        <span>"Your nickname and bio are visible to other community members"</span>
                     </div>
                 </div>
             </div>

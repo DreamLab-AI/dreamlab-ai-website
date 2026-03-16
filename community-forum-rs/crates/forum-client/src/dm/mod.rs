@@ -57,7 +57,9 @@ pub struct DMStore {
     sub_ids: RwSignal<Vec<String>>,
 }
 
+#[cfg(target_arch = "wasm32")]
 unsafe impl Send for DMStore {}
+#[cfg(target_arch = "wasm32")]
 unsafe impl Sync for DMStore {}
 
 impl DMStore {

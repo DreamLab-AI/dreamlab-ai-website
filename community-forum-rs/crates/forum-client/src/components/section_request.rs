@@ -12,6 +12,7 @@ use crate::relay::{ConnectionState, RelayConnection};
 /// Request access button for gated forum sections.
 ///
 /// Publishes a kind-9021 join request targeting the given section/cohort.
+#[allow(dead_code)]
 #[component]
 pub fn SectionRequestButton(
     /// The section's channel event ID.

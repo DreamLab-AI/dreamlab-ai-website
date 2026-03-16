@@ -55,6 +55,7 @@ impl MuteStore {
     }
 
     /// Reactive signal for whether a specific channel is muted.
+    #[allow(dead_code)]
     pub fn channel_muted_signal(&self, channel_id: String) -> Memo<bool> {
         let inner = self.inner;
         Memo::new(move |_| {
@@ -89,6 +90,7 @@ impl MuteStore {
     }
 
     /// Get list of muted channel IDs (reactive).
+    #[allow(dead_code)]
     pub fn muted_channel_ids(&self) -> Vec<String> {
         self.inner.get().muted_channels.clone()
     }

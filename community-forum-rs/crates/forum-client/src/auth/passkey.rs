@@ -24,36 +24,11 @@ use super::webauthn::{
 // -- Configuration ------------------------------------------------------------
 
 fn auth_api_base() -> String {
-    if let Some(win) = window() {
-        // Try window.__ENV__.VITE_AUTH_API_URL (consistent with admin module)
-        if let Ok(env) = Reflect::get(&win, &JsValue::from_str("__ENV__")) {
-            if !env.is_undefined() && !env.is_null() {
-                if let Ok(url) = Reflect::get(&env, &JsValue::from_str("VITE_AUTH_API_URL")) {
-                    if let Some(s) = url.as_string() {
-                        if !s.is_empty() {
-                            return s;
-                        }
-                    }
-                }
-            }
-        }
-        // Legacy: window.__AUTH_API_URL__
-        if let Ok(val) = Reflect::get(&win, &JsValue::from_str("__AUTH_API_URL__")) {
-            if let Some(s) = val.as_string() {
-                if !s.is_empty() {
-                    return s;
-                }
-            }
-        }
-    }
-    option_env!("VITE_AUTH_API_URL")
-        .unwrap_or("https://dreamlab-auth-api.solitary-paper-764d.workers.dev")
-        .to_string()
+    crate::utils::relay_url::auth_api_base()
 }
 
 // -- Result types -------------------------------------------------------------
 
-#[derive(Clone)]
 pub struct PasskeyRegistrationResult {
     pub pubkey: String,
     pub privkey_bytes: [u8; 32],
@@ -73,7 +48,6 @@ impl Drop for PasskeyRegistrationResult {
     }
 }
 
-#[derive(Clone)]
 pub struct PasskeyAuthResult {
     pub pubkey: String,
     pub privkey_bytes: [u8; 32],

@@ -55,6 +55,7 @@ impl ReadPositionStore {
 
     /// Increment the unread counter for a channel (call when a new message arrives
     /// while the user is NOT viewing that channel).
+    #[allow(dead_code)]
     pub fn increment_unread(&self, channel_id: &str) {
         self.inner.update(|rp| {
             if let Some(pos) = rp.positions.get_mut(channel_id) {
@@ -74,6 +75,7 @@ impl ReadPositionStore {
     }
 
     /// Return the current unread count for a channel.
+    #[allow(dead_code)]
     pub fn get_unread_count(&self, channel_id: &str) -> u32 {
         self.inner
             .get()

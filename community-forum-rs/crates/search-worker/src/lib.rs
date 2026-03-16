@@ -16,6 +16,7 @@
 
 mod auth;
 mod embed;
+mod rate_limit;
 mod store;
 
 use embed::DIM;
@@ -27,32 +28,36 @@ use worker::*;
 // CORS
 // ---------------------------------------------------------------------------
 
-const ALLOWED_ORIGINS: &[&str] = &[
-    "https://dreamlab-ai.com",
-    "https://thedreamlab.uk",
-    "https://dreamlab-ai.github.io",
-    "http://localhost:5173",
-    "http://localhost:5174",
-];
+/// Build allowed origins list from `ALLOWED_ORIGINS` env var (comma-separated)
+/// or fall back to the production domain.
+fn allowed_origins(env: &Env) -> Vec<String> {
+    env.var("ALLOWED_ORIGINS")
+        .map(|v| v.to_string())
+        .unwrap_or_else(|_| "https://dreamlab-ai.com".to_string())
+        .split(',')
+        .map(|s| s.trim().to_string())
+        .collect()
+}
 
-fn cors_origin(req: &Request) -> String {
+fn cors_origin(req: &Request, env: &Env) -> String {
+    let origins = allowed_origins(env);
     let origin = req
         .headers()
         .get("Origin")
         .ok()
         .flatten()
         .unwrap_or_default();
-    if ALLOWED_ORIGINS.contains(&origin.as_str()) {
+    if origins.iter().any(|o| o == &origin) {
         origin
     } else {
-        ALLOWED_ORIGINS[0].to_string()
+        origins.into_iter().next().unwrap_or_else(|| "https://dreamlab-ai.com".to_string())
     }
 }
 
-fn cors_headers(req: &Request) -> Headers {
+fn cors_headers(req: &Request, env: &Env) -> Headers {
     let headers = Headers::new();
     headers
-        .set("Access-Control-Allow-Origin", &cors_origin(req))
+        .set("Access-Control-Allow-Origin", &cors_origin(req, env))
         .ok();
     headers
         .set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
@@ -68,9 +73,9 @@ fn cors_headers(req: &Request) -> Headers {
     headers
 }
 
-fn json_response(req: &Request, body: &serde_json::Value, status: u16) -> Result<Response> {
+fn json_response(req: &Request, env: &Env, body: &serde_json::Value, status: u16) -> Result<Response> {
     let json_str = serde_json::to_string(body).map_err(|e| Error::RustError(e.to_string()))?;
-    let headers = cors_headers(req);
+    let headers = cors_headers(req, env);
     headers.set("Content-Type", "application/json").ok();
     Ok(Response::ok(json_str)?
         .with_status(status)
@@ -219,6 +224,7 @@ async fn handle_search(req: &Request, env: &Env) -> Result<Response> {
     if body.embedding.len() != DIM {
         return json_response(
             req,
+            env,
             &serde_json::json!({ "error": format!("Expected {DIM}-dim embedding") }),
             400,
         );
@@ -230,6 +236,7 @@ async fn handle_search(req: &Request, env: &Env) -> Result<Response> {
     if store.count() == 0 {
         return json_response(
             req,
+            env,
             &serde_json::json!({ "results": [], "totalVectors": 0 }),
             200,
         );
@@ -255,6 +262,7 @@ async fn handle_search(req: &Request, env: &Env) -> Result<Response> {
 
     json_response(
         req,
+        env,
         &serde_json::json!({
             "results": results_json,
             "totalVectors": store.count(),
@@ -265,7 +273,7 @@ async fn handle_search(req: &Request, env: &Env) -> Result<Response> {
     )
 }
 
-async fn handle_embed(req: &Request) -> Result<Response> {
+async fn handle_embed(req: &Request, env: &Env) -> Result<Response> {
     let mut req_clone = req.clone()?;
     let body: EmbedRequest = req_clone.json().await?;
 
@@ -275,6 +283,7 @@ async fn handle_embed(req: &Request) -> Result<Response> {
         (None, None) => {
             return json_response(
                 req,
+                env,
                 &serde_json::json!({ "error": "Missing text or texts field" }),
                 400,
             );
@@ -284,6 +293,7 @@ async fn handle_embed(req: &Request) -> Result<Response> {
     if texts.is_empty() {
         return json_response(
             req,
+            env,
             &serde_json::json!({ "error": "Missing text or texts field" }),
             400,
         );
@@ -291,6 +301,7 @@ async fn handle_embed(req: &Request) -> Result<Response> {
     if texts.len() > 100 {
         return json_response(
             req,
+            env,
             &serde_json::json!({ "error": "Maximum 100 texts per request" }),
             400,
         );
@@ -300,6 +311,7 @@ async fn handle_embed(req: &Request) -> Result<Response> {
 
     json_response(
         req,
+        env,
         &serde_json::json!({
             "embeddings": embeddings,
             "dimensions": DIM,
@@ -325,7 +337,7 @@ async fn handle_ingest(req: &Request, env: &Env) -> Result<Response> {
         Some(&raw_body),
         env,
     ) {
-        return json_response(req, &err_body, status);
+        return json_response(req, env, &err_body, status);
     }
 
     let body: IngestRequest =
@@ -334,6 +346,7 @@ async fn handle_ingest(req: &Request, env: &Env) -> Result<Response> {
     if body.entries.is_empty() {
         return json_response(
             req,
+            env,
             &serde_json::json!({ "error": "Missing entries array" }),
             400,
         );
@@ -366,6 +379,7 @@ async fn handle_ingest(req: &Request, env: &Env) -> Result<Response> {
 
     json_response(
         req,
+        env,
         &serde_json::json!({
             "accepted": accepted,
             "rejected": rejected,
@@ -381,6 +395,7 @@ async fn handle_status(req: &Request, env: &Env) -> Result<Response> {
 
     json_response(
         req,
+        env,
         &serde_json::json!({
             "status": "healthy",
             "totalVectors": store.count(),
@@ -405,7 +420,18 @@ async fn fetch(req: Request, env: Env, _ctx: Context) -> Result<Response> {
     if req.method() == Method::Options {
         return Ok(Response::empty()?
             .with_status(204)
-            .with_headers(cors_headers(&req)));
+            .with_headers(cors_headers(&req, &env)));
+    }
+
+    // Rate limit: 100 requests per 60 seconds per IP
+    let ip = rate_limit::client_ip(&req);
+    if !rate_limit::check_rate_limit(&env, &ip, 100, 60).await {
+        return json_response(
+            &req,
+            &env,
+            &serde_json::json!({ "error": "Too many requests" }),
+            429,
+        );
     }
 
     let url = req.url()?;
@@ -420,12 +446,14 @@ async fn fetch(req: Request, env: Env, _ctx: Context) -> Result<Response> {
             if msg.contains("JSON") || msg.contains("json") || msg.contains("Syntax") {
                 json_response(
                     &req,
+                    &env,
                     &serde_json::json!({ "error": "Invalid JSON body" }),
                     400,
                 )
             } else {
                 json_response(
                     &req,
+                    &env,
                     &serde_json::json!({ "error": "Internal error" }),
                     500,
                 )
@@ -449,7 +477,7 @@ async fn route(req: &Request, env: &Env, path: &str) -> Result<Response> {
 
     // Embed
     if path == "/embed" && method == Method::Post {
-        return handle_embed(req).await;
+        return handle_embed(req, env).await;
     }
 
     // Ingest (NIP-98 admin only)
@@ -457,7 +485,7 @@ async fn route(req: &Request, env: &Env, path: &str) -> Result<Response> {
         return handle_ingest(req, env).await;
     }
 
-    json_response(req, &serde_json::json!({ "error": "Not found" }), 404)
+    json_response(req, env, &serde_json::json!({ "error": "Not found" }), 404)
 }
 
 // ---------------------------------------------------------------------------

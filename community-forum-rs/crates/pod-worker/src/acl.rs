@@ -19,6 +19,14 @@ pub enum AccessMode {
     Control,
 }
 
+/// All access modes, used for iterating when building WAC-Allow headers.
+pub const ALL_MODES: &[AccessMode] = &[
+    AccessMode::Read,
+    AccessMode::Write,
+    AccessMode::Append,
+    AccessMode::Control,
+];
+
 /// A JSON-LD ACL document with an `@graph` array of authorizations.
 #[derive(Debug, Deserialize)]
 pub struct AclDocument {
@@ -241,10 +249,105 @@ pub fn evaluate_access(
 pub fn method_to_mode(method: &str) -> AccessMode {
     match method.to_uppercase().as_str() {
         "GET" | "HEAD" => AccessMode::Read,
-        "PUT" | "DELETE" => AccessMode::Write,
+        "PUT" | "DELETE" | "PATCH" => AccessMode::Write,
         "POST" => AccessMode::Append,
         _ => AccessMode::Read,
     }
+}
+
+/// Return the lowercase WAC mode name for use in WAC-Allow headers.
+pub fn mode_name(mode: AccessMode) -> &'static str {
+    match mode {
+        AccessMode::Read => "read",
+        AccessMode::Write => "write",
+        AccessMode::Append => "append",
+        AccessMode::Control => "control",
+    }
+}
+
+/// Build a `WAC-Allow` header value showing what modes the current agent
+/// and the public (anonymous) have on a resource.
+///
+/// Format: `user="read write", public="read"`
+pub fn wac_allow_header(
+    acl_doc: Option<&AclDocument>,
+    agent_uri: Option<&str>,
+    resource_path: &str,
+) -> String {
+    let mut user_modes = Vec::new();
+    let mut public_modes = Vec::new();
+
+    for mode in ALL_MODES {
+        if evaluate_access(acl_doc, agent_uri, resource_path, *mode) {
+            user_modes.push(mode_name(*mode));
+        }
+        if evaluate_access(acl_doc, None, resource_path, *mode) {
+            public_modes.push(mode_name(*mode));
+        }
+    }
+
+    format!(
+        "user=\"{}\", public=\"{}\"",
+        user_modes.join(" "),
+        public_modes.join(" ")
+    )
+}
+
+// ---------------------------------------------------------------------------
+// Inherited ACL resolution
+// ---------------------------------------------------------------------------
+
+/// Find the effective ACL for a resource by walking up the container tree.
+///
+/// Resolution order:
+/// 1. KV fast-path: `acl:{owner_pubkey}` (the pod-level ACL)
+/// 2. R2 sidecar walk: `{resource_path}.acl` -> `{parent}/.acl` -> ... -> `/.acl`
+///
+/// Returns `None` if no ACL document is found at any level (deny-all).
+pub async fn find_effective_acl(
+    bucket: &worker::Bucket,
+    kv: &worker::kv::KvStore,
+    owner_pubkey: &str,
+    resource_path: &str,
+) -> Option<AclDocument> {
+    // Fast path: pod-level ACL in KV
+    let kv_key = format!("acl:{owner_pubkey}");
+    if let Ok(Some(text)) = kv.get(&kv_key).text().await {
+        if let Ok(doc) = serde_json::from_str::<AclDocument>(&text) {
+            return Some(doc);
+        }
+    }
+
+    // Walk up the container tree looking for `.acl` sidecar files in R2
+    let mut path = resource_path.to_string();
+    loop {
+        let acl_key = format!("pods/{owner_pubkey}{path}.acl");
+        if let Ok(Some(obj)) = bucket.get(&acl_key).execute().await {
+            if let Some(body) = obj.body() {
+                if let Ok(bytes) = body.bytes().await {
+                    if let Ok(text) = String::from_utf8(bytes) {
+                        if let Ok(doc) = serde_json::from_str::<AclDocument>(&text) {
+                            return Some(doc);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Move up one directory level
+        if path == "/" || path.is_empty() {
+            break;
+        }
+        // Strip trailing slash before finding parent
+        let trimmed = path.trim_end_matches('/');
+        path = match trimmed.rfind('/') {
+            Some(0) => "/".to_string(),
+            Some(pos) => trimmed[..pos].to_string(),
+            None => "/".to_string(),
+        };
+    }
+
+    None
 }
 
 // ---------------------------------------------------------------------------
@@ -447,7 +550,7 @@ mod tests {
         assert_eq!(method_to_mode("PUT"), AccessMode::Write);
         assert_eq!(method_to_mode("DELETE"), AccessMode::Write);
         assert_eq!(method_to_mode("POST"), AccessMode::Append);
-        assert_eq!(method_to_mode("PATCH"), AccessMode::Read); // default
+        assert_eq!(method_to_mode("PATCH"), AccessMode::Write);
     }
 
     #[test]
@@ -515,5 +618,56 @@ mod tests {
         );
         let doc: AclDocument = serde_json::from_str(json).unwrap();
         assert!(evaluate_access(Some(&doc), None, "/", AccessMode::Read));
+    }
+
+    #[test]
+    fn mode_name_returns_lowercase() {
+        assert_eq!(mode_name(AccessMode::Read), "read");
+        assert_eq!(mode_name(AccessMode::Write), "write");
+        assert_eq!(mode_name(AccessMode::Append), "append");
+        assert_eq!(mode_name(AccessMode::Control), "control");
+    }
+
+    #[test]
+    fn wac_allow_public_read_only() {
+        let doc = make_doc(vec![auth_read_public("/")]);
+        let header = wac_allow_header(Some(&doc), None, "/");
+        assert_eq!(header, "user=\"read\", public=\"read\"");
+    }
+
+    #[test]
+    fn wac_allow_owner_full_public_read() {
+        let public_read = auth_read_public("/");
+        let owner_full = AclAuthorization {
+            id: None,
+            r#type: None,
+            agent: Some(IdOrIds::Single(IdRef {
+                id: "did:nostr:owner".to_string(),
+            })),
+            agent_class: None,
+            access_to: Some(IdOrIds::Single(IdRef {
+                id: "/".to_string(),
+            })),
+            default: None,
+            mode: Some(IdOrIds::Multiple(vec![
+                IdRef { id: "acl:Read".to_string() },
+                IdRef { id: "acl:Write".to_string() },
+                IdRef { id: "acl:Control".to_string() },
+            ])),
+        };
+        let doc = make_doc(vec![public_read, owner_full]);
+        let header = wac_allow_header(Some(&doc), Some("did:nostr:owner"), "/");
+        assert_eq!(header, "user=\"read write append control\", public=\"read\"");
+    }
+
+    #[test]
+    fn wac_allow_no_acl_denies_everything() {
+        let header = wac_allow_header(None, Some("did:nostr:owner"), "/");
+        assert_eq!(header, "user=\"\", public=\"\"");
+    }
+
+    #[test]
+    fn all_modes_contains_four_entries() {
+        assert_eq!(ALL_MODES.len(), 4);
     }
 }

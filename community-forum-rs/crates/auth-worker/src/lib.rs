@@ -12,6 +12,7 @@
 
 mod auth;
 mod pod;
+mod rate_limit;
 mod webauthn;
 
 use worker::*;
@@ -88,7 +89,7 @@ async fn fetch(req: Request, env: Env, _ctx: Context) -> Result<Response> {
 }
 
 /// Inner request handler. All errors are caught by the outer `fetch` wrapper.
-async fn handle_request(req: Request, env: &Env) -> Result<Response> {
+async fn handle_request(mut req: Request, env: &Env) -> Result<Response> {
     // CORS preflight
     if req.method() == Method::Options {
         return Ok(Response::empty()?
@@ -96,11 +97,30 @@ async fn handle_request(req: Request, env: &Env) -> Result<Response> {
             .with_headers(cors_headers(env)));
     }
 
+    // Rate limit: 20 requests per 60 seconds per IP
+    let ip = rate_limit::client_ip(&req);
+    if !rate_limit::check_rate_limit(env, &ip, 20, 60).await {
+        return json_response(
+            env,
+            &serde_json::json!({ "error": "Too many requests" }),
+            429,
+        );
+    }
+
     let url = req.url()?;
     let path = url.path();
     let method = req.method();
 
-    let result = route(req, env, path, &method).await;
+    // Read body bytes BEFORE routing so they are available for both NIP-98
+    // payload hash verification and route handler consumption.
+    let body_bytes: Vec<u8> = match method {
+        Method::Post | Method::Put | Method::Patch => {
+            req.bytes().await.unwrap_or_default()
+        }
+        _ => Vec::new(),
+    };
+
+    let result = route(&req, env, path, &method, &body_bytes).await;
 
     match result {
         Ok(resp) => Ok(with_cors(resp, env)),
@@ -129,7 +149,17 @@ async fn handle_request(req: Request, env: &Env) -> Result<Response> {
 }
 
 /// Route an incoming request to the appropriate handler.
-async fn route(req: Request, env: &Env, path: &str, method: &Method) -> Result<Response> {
+///
+/// `body_bytes` contains the pre-read request body (non-empty for POST/PUT/PATCH).
+/// This allows NIP-98 payload hash verification BEFORE dispatching to handlers,
+/// and avoids double-consumption of the request stream.
+async fn route(
+    req: &Request,
+    env: &Env,
+    path: &str,
+    method: &Method,
+    body_bytes: &[u8],
+) -> Result<Response> {
     // Health check
     if path == "/health" {
         return json_response(
@@ -145,27 +175,27 @@ async fn route(req: Request, env: &Env, path: &str, method: &Method) -> Result<R
 
     // WebAuthn Registration -- Generate options
     if path == "/auth/register/options" && *method == Method::Post {
-        return webauthn::register_options(req, env).await;
+        return webauthn::register_options(body_bytes, env).await;
     }
 
     // WebAuthn Registration -- Verify
     if path == "/auth/register/verify" && *method == Method::Post {
-        return webauthn::register_verify(req, env).await;
+        return webauthn::register_verify(body_bytes, env).await;
     }
 
     // WebAuthn Authentication -- Generate options
     if path == "/auth/login/options" && *method == Method::Post {
-        return webauthn::login_options(req, env).await;
+        return webauthn::login_options(body_bytes, env).await;
     }
 
     // WebAuthn Authentication -- Verify
     if path == "/auth/login/verify" && *method == Method::Post {
-        return webauthn::login_verify(req, env).await;
+        return webauthn::login_verify(req, body_bytes, env).await;
     }
 
     // Credential lookup (for discoverable login)
     if path == "/auth/lookup" && *method == Method::Post {
-        return webauthn::credential_lookup(req, env).await;
+        return webauthn::credential_lookup(body_bytes, env).await;
     }
 
     // NIP-98 protected endpoints
@@ -187,17 +217,18 @@ async fn route(req: Request, env: &Env, path: &str, method: &Method) -> Result<R
             .unwrap_or_else(|_| "https://dreamlab-ai.com".to_string());
         let request_url = format!("{expected_origin}{path}");
 
-        // Body is not available here because the request was already consumed
-        // by the route matching above. For GET endpoints (like /api/profile),
-        // there is no body to verify. POST/PUT endpoints that need payload hash
-        // verification read the body themselves (e.g. login_verify).
-        let body_bytes: Option<Vec<u8>> = None;
+        // Pass body bytes to NIP-98 for payload hash verification on POST/PUT.
+        // For GET/HEAD/DELETE the body is empty, so we pass None.
+        let body_for_nip98: Option<&[u8]> = match method {
+            Method::Post | Method::Put | Method::Patch => Some(body_bytes),
+            _ => None,
+        };
 
         let result = auth::verify_nip98(
             &auth_header,
             &request_url,
             method_str(method),
-            body_bytes.as_deref(),
+            body_for_nip98,
         );
 
         match result {
@@ -234,6 +265,62 @@ fn method_str(m: &Method) -> &'static str {
         Method::Connect => "CONNECT",
         Method::Trace => "TRACE",
         _ => "GET",
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Tests — pure function coverage (no Worker runtime required)
+// ---------------------------------------------------------------------------
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── method_str ──────────────────────────────────────────────────────
+
+    #[test]
+    fn method_str_get() {
+        assert_eq!(method_str(&Method::Get), "GET");
+    }
+
+    #[test]
+    fn method_str_post() {
+        assert_eq!(method_str(&Method::Post), "POST");
+    }
+
+    #[test]
+    fn method_str_put() {
+        assert_eq!(method_str(&Method::Put), "PUT");
+    }
+
+    #[test]
+    fn method_str_delete() {
+        assert_eq!(method_str(&Method::Delete), "DELETE");
+    }
+
+    #[test]
+    fn method_str_head() {
+        assert_eq!(method_str(&Method::Head), "HEAD");
+    }
+
+    #[test]
+    fn method_str_options() {
+        assert_eq!(method_str(&Method::Options), "OPTIONS");
+    }
+
+    #[test]
+    fn method_str_patch() {
+        assert_eq!(method_str(&Method::Patch), "PATCH");
+    }
+
+    #[test]
+    fn method_str_connect() {
+        assert_eq!(method_str(&Method::Connect), "CONNECT");
+    }
+
+    #[test]
+    fn method_str_trace() {
+        assert_eq!(method_str(&Method::Trace), "TRACE");
     }
 }
 

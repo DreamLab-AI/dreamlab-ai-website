@@ -18,6 +18,7 @@ pub struct ModeratorData {
     /// Role label: "Admin" or "Moderator".
     pub role: String,
     /// Optional avatar image URL (falls back to identicon).
+    #[allow(dead_code)]
     pub avatar_url: Option<String>,
 }
 
@@ -25,6 +26,7 @@ pub struct ModeratorData {
 ///
 /// Each entry shows an avatar, name, and role badge. Clicking a moderator
 /// opens the profile modal via `ProfileModalTarget` context.
+#[allow(dead_code)]
 #[component]
 pub fn ModeratorTeam(
     /// List of moderator data entries.

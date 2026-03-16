@@ -111,7 +111,9 @@ pub struct RelayConnection {
 // SAFETY: In WASM, there is only one thread. SendWrapper enforces this
 // at runtime. These impls allow RelayConnection to be used with
 // provide_context.
+#[cfg(target_arch = "wasm32")]
 unsafe impl Send for RelayConnection {}
+#[cfg(target_arch = "wasm32")]
 unsafe impl Sync for RelayConnection {}
 
 impl RelayConnection {

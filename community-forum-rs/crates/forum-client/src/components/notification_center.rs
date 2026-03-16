@@ -17,7 +17,7 @@ pub fn NotificationCenter(
     is_open: RwSignal<bool>,
 ) -> impl IntoView {
     let store = use_notification_store();
-    let navigate = StoredValue::new(use_navigate());
+    let _navigate = StoredValue::new(use_navigate());
 
     let on_mark_all = move |_| {
         store.mark_all_read();

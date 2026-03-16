@@ -6,7 +6,6 @@ use leptos_router::hooks::{use_location, use_navigate};
 use leptos_router::path;
 use leptos_router::NavigateOptions;
 
-use crate::admin::AdminStore;
 use crate::auth::{provide_auth, use_auth};
 use crate::components::bookmarks_modal::provide_bookmarks;
 use crate::components::bookmarks_modal::BookmarksModal;
@@ -472,6 +471,10 @@ fn Layout(children: Children) -> impl IntoView {
                                 </A>
                             }
                         >
+                            <A href=base_href("/forums") attr:class=nav_link_class("/forums")>
+                                {forums_icon()}
+                                "Forums"
+                            </A>
                             <A href=base_href("/chat") attr:class=nav_link_class("/chat")>
                                 {chat_icon()}
                                 "Chat"
@@ -479,10 +482,6 @@ fn Layout(children: Children) -> impl IntoView {
                             <A href=base_href("/dm") attr:class=nav_link_class("/dm")>
                                 {dm_icon()}
                                 "DMs"
-                            </A>
-                            <A href=base_href("/forums") attr:class=nav_link_class("/forums")>
-                                {forums_icon()}
-                                "Forums"
                             </A>
                             <A href=base_href("/events") attr:class=nav_link_class("/events")>
                                 {events_icon()}
@@ -543,6 +542,10 @@ fn Layout(children: Children) -> impl IntoView {
                                 </A>
                             }
                         >
+                            <A href=base_href("/forums") attr:class=mobile_link_class("/forums") on:click=close_mobile>
+                                {forums_icon()}
+                                "Forums"
+                            </A>
                             <A href=base_href("/chat") attr:class=mobile_link_class("/chat") on:click=close_mobile>
                                 {chat_icon()}
                                 "Chat"
@@ -550,10 +553,6 @@ fn Layout(children: Children) -> impl IntoView {
                             <A href=base_href("/dm") attr:class=mobile_link_class("/dm") on:click=close_mobile>
                                 {dm_icon()}
                                 "DMs"
-                            </A>
-                            <A href=base_href("/forums") attr:class=mobile_link_class("/forums") on:click=close_mobile>
-                                {forums_icon()}
-                                "Forums"
                             </A>
                             <A href=base_href("/events") attr:class=mobile_link_class("/events") on:click=close_mobile>
                                 {events_icon()}
@@ -607,9 +606,7 @@ fn Layout(children: Children) -> impl IntoView {
                             <span class="text-sm">"DreamLab AI"</span>
                         </div>
                         <div class="flex items-center gap-3 text-xs text-gray-600">
-                            <span>"Nostr Protocol"</span>
-                            <span class="text-gray-700">"|"</span>
-                            <span>"NIP-44 Encrypted"</span>
+                            <span>"End-to-end encrypted"</span>
                             <span class="text-gray-700">"|"</span>
                             <span>"Built with Rust + WASM"</span>
                         </div>
@@ -651,10 +648,13 @@ fn AuthGatedChat() -> impl IntoView {
     let is_authed = auth.is_authenticated();
     let is_ready = auth.is_ready();
     let navigate = StoredValue::new(use_navigate());
+    let location = use_location();
 
     Effect::new(move |_| {
         if is_ready.get() && !is_authed.get() {
-            navigate.with_value(|nav| nav("/login", NavigateOptions::default()));
+            let current = location.pathname.get();
+            let target = login_redirect_target(&current);
+            navigate.with_value(|nav| nav(&target, NavigateOptions::default()));
         }
     });
 
@@ -674,10 +674,13 @@ fn AuthGatedChannel() -> impl IntoView {
     let is_authed = auth.is_authenticated();
     let is_ready = auth.is_ready();
     let navigate = StoredValue::new(use_navigate());
+    let location = use_location();
 
     Effect::new(move |_| {
         if is_ready.get() && !is_authed.get() {
-            navigate.with_value(|nav| nav("/login", NavigateOptions::default()));
+            let current = location.pathname.get();
+            let target = login_redirect_target(&current);
+            navigate.with_value(|nav| nav(&target, NavigateOptions::default()));
         }
     });
 
@@ -697,10 +700,13 @@ fn AuthGatedDmList() -> impl IntoView {
     let is_authed = auth.is_authenticated();
     let is_ready = auth.is_ready();
     let navigate = StoredValue::new(use_navigate());
+    let location = use_location();
 
     Effect::new(move |_| {
         if is_ready.get() && !is_authed.get() {
-            navigate.with_value(|nav| nav("/login", NavigateOptions::default()));
+            let current = location.pathname.get();
+            let target = login_redirect_target(&current);
+            navigate.with_value(|nav| nav(&target, NavigateOptions::default()));
         }
     });
 
@@ -720,10 +726,13 @@ fn AuthGatedDmChat() -> impl IntoView {
     let is_authed = auth.is_authenticated();
     let is_ready = auth.is_ready();
     let navigate = StoredValue::new(use_navigate());
+    let location = use_location();
 
     Effect::new(move |_| {
         if is_ready.get() && !is_authed.get() {
-            navigate.with_value(|nav| nav("/login", NavigateOptions::default()));
+            let current = location.pathname.get();
+            let target = login_redirect_target(&current);
+            navigate.with_value(|nav| nav(&target, NavigateOptions::default()));
         }
     });
 
@@ -738,6 +747,20 @@ fn AuthGatedDmChat() -> impl IntoView {
 
 // -- Auth-gated v3.0 pages ----------------------------------------------------
 
+/// Compute a `/login?returnTo=...` target from the current pathname, avoiding
+/// redirect loops when the user is already on `/login` or `/signup`.
+fn login_redirect_target(pathname: &str) -> String {
+    if pathname.is_empty()
+        || pathname == "/login"
+        || pathname == "/signup"
+        || !pathname.starts_with('/')
+    {
+        "/login".to_string()
+    } else {
+        format!("/login?returnTo={}", pathname)
+    }
+}
+
 /// Macro-like helper: all new auth gates follow identical pattern.
 macro_rules! auth_gated {
     ($name:ident, $page:ident) => {
@@ -747,10 +770,13 @@ macro_rules! auth_gated {
             let is_authed = auth.is_authenticated();
             let is_ready = auth.is_ready();
             let navigate = StoredValue::new(use_navigate());
+            let location = use_location();
 
             Effect::new(move |_| {
                 if is_ready.get() && !is_authed.get() {
-                    navigate.with_value(|nav| nav("/login", NavigateOptions::default()));
+                    let current = location.pathname.get();
+                    let target = login_redirect_target(&current);
+                    navigate.with_value(|nav| nav(&target, NavigateOptions::default()));
                 }
             });
 

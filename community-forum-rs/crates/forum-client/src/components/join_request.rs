@@ -20,6 +20,7 @@ enum RequestState {
 /// - Shows "Request Access" in idle state with an amber gradient.
 /// - Transitions to "Pending..." after the event is published.
 /// - Disabled while pending or sent.
+#[allow(dead_code)]
 #[component]
 pub fn JoinRequestButton(
     /// The channel ID to request access to.

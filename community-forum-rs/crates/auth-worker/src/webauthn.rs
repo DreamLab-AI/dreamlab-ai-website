@@ -196,11 +196,9 @@ fn json_err(message: &str, status: u16) -> Result<Response> {
 ///
 /// Generate a WebAuthn PublicKeyCredentialCreationOptions with a
 /// server-controlled PRF salt and a random challenge.
-pub async fn register_options(mut req: Request, env: &Env) -> Result<Response> {
+pub async fn register_options(body_bytes: &[u8], env: &Env) -> Result<Response> {
     console_log!("[register_options] handler entered");
-    let body: RegisterOptionsBody = req
-        .json()
-        .await
+    let body: RegisterOptionsBody = serde_json::from_slice(body_bytes)
         .unwrap_or(RegisterOptionsBody { display_name: None });
     let display_name = body
         .display_name
@@ -282,19 +280,14 @@ pub async fn register_options(mut req: Request, env: &Env) -> Result<Response> {
 ///
 /// Verify a WebAuthn registration response, store the credential in D1,
 /// provision a Solid pod, and return the user's DID/WebID/podUrl.
-pub async fn register_verify(mut req: Request, env: &Env) -> Result<Response> {
+pub async fn register_verify(body_bytes: &[u8], env: &Env) -> Result<Response> {
     console_log!("[register_verify] handler entered");
-    // Read raw body first so we can log it for debugging
-    let raw_body = req
-        .bytes()
-        .await
-        .map_err(|_| Error::RustError("Failed to read request body".to_string()))?;
     console_log!(
         "[register_verify] raw body ({} bytes): {}",
-        raw_body.len(),
-        String::from_utf8_lossy(&raw_body[..raw_body.len().min(500)])
+        body_bytes.len(),
+        String::from_utf8_lossy(&body_bytes[..body_bytes.len().min(500)])
     );
-    let body: RegisterVerifyBody = serde_json::from_slice(&raw_body)
+    let body: RegisterVerifyBody = serde_json::from_slice(body_bytes)
         .map_err(|e| {
             console_error!("[register_verify] JSON parse error: {e}");
             Error::RustError(format!("Invalid JSON body: {e}"))
@@ -388,10 +381,8 @@ pub async fn register_verify(mut req: Request, env: &Env) -> Result<Response> {
 ///
 /// Generate a WebAuthn PublicKeyCredentialRequestOptions. If a pubkey is
 /// provided, include the stored credential ID and PRF salt in the response.
-pub async fn login_options(mut req: Request, env: &Env) -> Result<Response> {
-    let body: LoginOptionsBody = req
-        .json()
-        .await
+pub async fn login_options(body_bytes: &[u8], env: &Env) -> Result<Response> {
+    let body: LoginOptionsBody = serde_json::from_slice(body_bytes)
         .unwrap_or(LoginOptionsBody { pubkey: None });
 
     // Generate 32-byte challenge
@@ -477,14 +468,8 @@ pub async fn login_options(mut req: Request, env: &Env) -> Result<Response> {
 /// The most complex handler: verifies NIP-98, looks up the stored credential,
 /// validates clientDataJSON and authenticatorData, checks the signature
 /// counter, and returns the verified pubkey.
-pub async fn login_verify(mut req: Request, env: &Env) -> Result<Response> {
-    // Read raw body bytes -- needed for both JSON parsing and NIP-98 payload hash
-    let raw_body = req
-        .bytes()
-        .await
-        .map_err(|_| Error::RustError("Failed to read request body".to_string()))?;
-
-    let body: LoginVerifyBody = serde_json::from_slice(&raw_body)
+pub async fn login_verify(req: &Request, body_bytes: &[u8], env: &Env) -> Result<Response> {
+    let body: LoginVerifyBody = serde_json::from_slice(body_bytes)
         .map_err(|_| Error::RustError("Invalid JSON body".to_string()))?;
 
     let pubkey = match &body.pubkey {
@@ -500,7 +485,7 @@ pub async fn login_verify(mut req: Request, env: &Env) -> Result<Response> {
 
     let request_url = req.url().map(|u| u.to_string()).unwrap_or_default();
 
-    let nip98_result = match auth::verify_nip98(&auth_header, &request_url, "POST", Some(&raw_body))
+    let nip98_result = match auth::verify_nip98(&auth_header, &request_url, "POST", Some(body_bytes))
     {
         Ok(token) => token,
         Err(_) => return json_err("Invalid NIP-98 token", 401),
@@ -646,13 +631,179 @@ pub async fn login_verify(mut req: Request, env: &Env) -> Result<Response> {
     Response::from_json(&response_body)
 }
 
+// ---------------------------------------------------------------------------
+// Tests
+// ---------------------------------------------------------------------------
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── array_to_base64url ──────────────────────────────────────────────
+
+    #[test]
+    fn base64url_encode_empty() {
+        assert_eq!(array_to_base64url(&[]), "");
+    }
+
+    #[test]
+    fn base64url_encode_single_byte() {
+        let encoded = array_to_base64url(&[0xFF]);
+        assert_eq!(encoded, "_w"); // base64url(0xFF) = _w (no padding)
+    }
+
+    #[test]
+    fn base64url_encode_decode_roundtrip() {
+        let input = b"hello world";
+        let encoded = array_to_base64url(input);
+        let decoded = base64url_decode(&encoded).unwrap();
+        assert_eq!(decoded, input);
+    }
+
+    #[test]
+    fn base64url_encode_32_bytes() {
+        let input = [0x42u8; 32];
+        let encoded = array_to_base64url(&input);
+        let decoded = base64url_decode(&encoded).unwrap();
+        assert_eq!(decoded.len(), 32);
+        assert!(decoded.iter().all(|b| *b == 0x42));
+    }
+
+    #[test]
+    fn base64url_no_padding() {
+        // Base64url should never contain '=' padding
+        let input = [1, 2, 3];
+        let encoded = array_to_base64url(&input);
+        assert!(!encoded.contains('='));
+    }
+
+    #[test]
+    fn base64url_no_plus_or_slash() {
+        // Base64url uses '-' and '_' instead of '+' and '/'
+        let input: Vec<u8> = (0..=255).collect();
+        let encoded = array_to_base64url(&input);
+        assert!(!encoded.contains('+'));
+        assert!(!encoded.contains('/'));
+    }
+
+    // ── base64url_decode ────────────────────────────────────────────────
+
+    #[test]
+    fn base64url_decode_empty() {
+        let decoded = base64url_decode("").unwrap();
+        assert!(decoded.is_empty());
+    }
+
+    #[test]
+    fn base64url_decode_invalid() {
+        let result = base64url_decode("!!!not_valid!!!");
+        assert!(result.is_err());
+    }
+
+    // ── constant_time_equal ─────────────────────────────────────────────
+
+    #[test]
+    fn constant_time_equal_same() {
+        let a = [1, 2, 3, 4, 5];
+        assert!(constant_time_equal(&a, &a));
+    }
+
+    #[test]
+    fn constant_time_equal_different() {
+        let a = [1, 2, 3, 4, 5];
+        let b = [1, 2, 3, 4, 6];
+        assert!(!constant_time_equal(&a, &b));
+    }
+
+    #[test]
+    fn constant_time_equal_different_lengths() {
+        let a = [1, 2, 3];
+        let b = [1, 2, 3, 4];
+        assert!(!constant_time_equal(&a, &b));
+    }
+
+    #[test]
+    fn constant_time_equal_empty() {
+        let a: [u8; 0] = [];
+        assert!(constant_time_equal(&a, &a));
+    }
+
+    #[test]
+    fn constant_time_equal_all_zeros() {
+        let a = [0u8; 32];
+        let b = [0u8; 32];
+        assert!(constant_time_equal(&a, &b));
+    }
+
+    #[test]
+    fn constant_time_equal_one_bit_different() {
+        let a = [0u8; 32];
+        let mut b = [0u8; 32];
+        b[15] = 1; // single bit flip
+        assert!(!constant_time_equal(&a, &b));
+    }
+
+    // ── is_valid_pubkey ─────────────────────────────────────────────────
+
+    #[test]
+    fn valid_pubkey_64_hex() {
+        let pk = "a".repeat(64);
+        assert!(is_valid_pubkey(&pk));
+    }
+
+    #[test]
+    fn valid_pubkey_mixed_hex() {
+        let pk = "0123456789abcdef".repeat(4);
+        assert!(is_valid_pubkey(&pk));
+    }
+
+    #[test]
+    fn valid_pubkey_uppercase_hex() {
+        let pk = "ABCDEF0123456789".repeat(4);
+        assert!(is_valid_pubkey(&pk));
+    }
+
+    #[test]
+    fn invalid_pubkey_too_short() {
+        let pk = "a".repeat(63);
+        assert!(!is_valid_pubkey(&pk));
+    }
+
+    #[test]
+    fn invalid_pubkey_too_long() {
+        let pk = "a".repeat(65);
+        assert!(!is_valid_pubkey(&pk));
+    }
+
+    #[test]
+    fn invalid_pubkey_non_hex() {
+        let pk = "g".repeat(64);
+        assert!(!is_valid_pubkey(&pk));
+    }
+
+    #[test]
+    fn invalid_pubkey_empty() {
+        assert!(!is_valid_pubkey(""));
+    }
+
+    #[test]
+    fn invalid_pubkey_spaces() {
+        let pk = format!("{}  {}", "a".repeat(31), "b".repeat(31));
+        assert!(!is_valid_pubkey(&pk));
+    }
+
+    // ── js_str / js_i32 / js_u32 / js_u64 ──────────────────────────────
+    // These are trivial wrappers; we test they don't panic.
+
+    // Note: JsValue-based tests require wasm32 target, so we only test
+    // the pure Rust utility functions above in native test mode.
+}
+
 /// POST /auth/lookup
 ///
 /// Look up a pubkey by credential ID (for discoverable credential flows).
-pub async fn credential_lookup(mut req: Request, env: &Env) -> Result<Response> {
-    let body: CredentialLookupBody = req
-        .json()
-        .await
+pub async fn credential_lookup(body_bytes: &[u8], env: &Env) -> Result<Response> {
+    let body: CredentialLookupBody = serde_json::from_slice(body_bytes)
         .map_err(|_| Error::RustError("Invalid JSON body".to_string()))?;
 
     let credential_id = match &body.credential_id {

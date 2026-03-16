@@ -2,7 +2,7 @@
 
 use leptos::prelude::*;
 use leptos_router::components::A;
-use leptos_router::hooks::use_navigate;
+use leptos_router::hooks::{use_navigate, use_query_map};
 use leptos_router::NavigateOptions;
 
 use crate::app::base_href;
@@ -27,10 +27,22 @@ pub fn SignupPage() -> impl IntoView {
     let phase = RwSignal::new(Phase::Name);
     let privkey_hex = RwSignal::new(String::new());
 
+    // Read returnTo query parameter — default to /chat, reject non-path values and loops
+    let query = use_query_map();
+    let return_to = move || {
+        let r = query.read().get("returnTo").unwrap_or_default();
+        if r.is_empty() || !r.starts_with('/') || r == "/login" || r == "/signup" {
+            "/forums".to_string()
+        } else {
+            r
+        }
+    };
+
     // Redirect if already authenticated and past backup
     Effect::new(move |_| {
         if is_authed.get() && phase.get() != Phase::Backup {
-            navigate.with_value(|nav| nav("/chat", NavigateOptions::default()));
+            let dest = return_to();
+            navigate.with_value(|nav| nav(&dest, NavigateOptions::default()));
         }
     });
 
@@ -58,7 +70,8 @@ pub fn SignupPage() -> impl IntoView {
 
     let on_backup_done = Callback::new(move |()| {
         auth.confirm_nsec_backup();
-        navigate.with_value(|nav| nav("/chat", NavigateOptions::default()));
+        let dest = return_to();
+        navigate.with_value(|nav| nav(&dest, NavigateOptions::default()));
     });
 
     view! {
@@ -71,7 +84,7 @@ pub fn SignupPage() -> impl IntoView {
                         <div class="text-center">
                             <h1 class="text-3xl font-bold text-white">"Create Account"</h1>
                             <p class="mt-2 text-gray-400 text-sm">
-                                "A Nostr keypair will be generated for you."
+                                "We'll create a secure identity for you. Back up your key so you can always access your account."
                             </p>
                         </div>
 

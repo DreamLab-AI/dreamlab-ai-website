@@ -158,14 +158,9 @@ fn shorten_mention(s: &str) -> String {
 }
 
 /// Render markdown inline (strip wrapping `<p>` tags for inline use).
+///
+/// Delegates to [`crate::utils::sanitize::sanitize_markdown_inline`] which
+/// strips all raw HTML and applies tag filtering to prevent XSS.
 fn render_markdown_inline(text: &str) -> String {
-    let opts = comrak::Options::default();
-    let html = comrak::markdown_to_html(text, &opts);
-    // Strip outer <p>...</p> for inline rendering
-    let trimmed = html.trim();
-    if trimmed.starts_with("<p>") && trimmed.ends_with("</p>") {
-        trimmed[3..trimmed.len() - 4].to_string()
-    } else {
-        trimmed.to_string()
-    }
+    crate::utils::sanitize::sanitize_markdown_inline(text)
 }

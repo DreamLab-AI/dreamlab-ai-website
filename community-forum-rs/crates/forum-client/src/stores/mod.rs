@@ -5,6 +5,7 @@
 //! larger data sets (messages, profiles, outbox queue).
 
 pub mod channels;
+#[allow(dead_code)]
 pub mod indexed_db;
 pub mod mute;
 pub mod notifications;

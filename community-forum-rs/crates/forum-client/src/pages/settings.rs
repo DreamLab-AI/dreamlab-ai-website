@@ -479,6 +479,24 @@ pub fn SettingsPage() -> impl IntoView {
                         </div>
                     </div>
 
+                    // Show technical details toggle
+                    <label class="flex items-center justify-between cursor-pointer">
+                        <div>
+                            <span class="text-sm text-gray-300">"Show technical details"</span>
+                            <p class="text-xs text-gray-500 mt-0.5">"Display protocol names, public keys, and relay URLs"</p>
+                        </div>
+                        <input
+                            type="checkbox"
+                            prop:checked=move || use_preferences().get().show_technical_details
+                            on:change=move |_| {
+                                let prefs = use_preferences();
+                                prefs.update(|p| p.show_technical_details = !p.show_technical_details);
+                                save_preferences(&prefs.get_untracked());
+                            }
+                            class="rounded border-gray-600 bg-gray-900 text-amber-500 focus:ring-amber-500"
+                        />
+                    </label>
+
                     // Reduced motion toggle
                     <label class="flex items-center justify-between cursor-pointer">
                         <span class="text-sm text-gray-300">"Reduced motion"</span>

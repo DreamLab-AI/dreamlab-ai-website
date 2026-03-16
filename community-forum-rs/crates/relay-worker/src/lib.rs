@@ -30,37 +30,44 @@ use worker::*;
 // CORS
 // ---------------------------------------------------------------------------
 
-const ALLOWED_ORIGINS: &[&str] = &[
-    "https://dreamlab-ai.com",
-    "https://thedreamlab.uk",
-    "https://dreamlab-ai.github.io",
-    "http://localhost:5173",
-    "http://localhost:5174",
-];
+/// Build allowed origins list from `ALLOWED_ORIGINS` env var (comma-separated)
+/// or fall back to the production domain.
+fn allowed_origins(env: &Env) -> Vec<String> {
+    env.var("ALLOWED_ORIGINS")
+        .map(|v| v.to_string())
+        .unwrap_or_else(|_| "https://dreamlab-ai.com".to_string())
+        .split(',')
+        .map(|s| s.trim().to_string())
+        .collect()
+}
 
 /// Determine the allowed CORS origin for a request.
 ///
 /// If the request's `Origin` header matches one of the allowed origins, that
 /// origin is returned. Otherwise falls back to the first allowed origin.
-fn cors_origin(req: &Request) -> String {
+fn cors_origin(req: &Request, env: &Env) -> String {
+    let origins = allowed_origins(env);
     let origin = req
         .headers()
         .get("Origin")
         .ok()
         .flatten()
         .unwrap_or_default();
-    if ALLOWED_ORIGINS.contains(&origin.as_str()) {
+    if origins.iter().any(|o| o == &origin) {
         origin
     } else {
-        ALLOWED_ORIGINS[0].to_string()
+        origins
+            .into_iter()
+            .next()
+            .unwrap_or_else(|| "https://dreamlab-ai.com".to_string())
     }
 }
 
 /// Build CORS response headers.
-fn cors_headers(req: &Request) -> Headers {
+fn cors_headers(req: &Request, env: &Env) -> Headers {
     let headers = Headers::new();
     headers
-        .set("Access-Control-Allow-Origin", &cors_origin(req))
+        .set("Access-Control-Allow-Origin", &cors_origin(req, env))
         .ok();
     headers
         .set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
@@ -76,6 +83,14 @@ fn cors_headers(req: &Request) -> Headers {
     headers
 }
 
+/// Return the default allowed origin from the env or the production domain.
+fn default_origin(env: &Env) -> String {
+    allowed_origins(env)
+        .into_iter()
+        .next()
+        .unwrap_or_else(|| "https://dreamlab-ai.com".to_string())
+}
+
 /// CORS utilities for submodules that lack direct access to the request.
 pub(crate) mod cors {
     use worker::*;
@@ -83,19 +98,13 @@ pub(crate) mod cors {
     /// Create a JSON response with CORS headers attached.
     ///
     /// Used by whitelist handlers that receive `&Env` but not the original
-    /// `&Request`. The origin is resolved from the `ALLOWED_ORIGIN` env var
-    /// or defaults to the first allowed origin.
+    /// `&Request`. The origin is resolved from the env-based allowed origins.
     pub fn json_response(env: &Env, body: &serde_json::Value, status: u16) -> Result<Response> {
         let json_str = serde_json::to_string(body).map_err(|e| Error::RustError(e.to_string()))?;
         let headers = Headers::new();
         headers.set("Content-Type", "application/json").ok();
 
-        // Whitelist handlers do not have access to the request, so we use
-        // the ALLOWED_ORIGIN env var or default to the first allowed origin.
-        let origin = env
-            .var("ALLOWED_ORIGIN")
-            .map(|v| v.to_string())
-            .unwrap_or_else(|_| super::ALLOWED_ORIGINS[0].to_string());
+        let origin = super::default_origin(env);
         headers.set("Access-Control-Allow-Origin", &origin).ok();
         headers
             .set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
@@ -116,9 +125,14 @@ pub(crate) mod cors {
 }
 
 /// Create a JSON response with CORS from the request's Origin header.
-fn json_response(req: &Request, body: &serde_json::Value, status: u16) -> Result<Response> {
+fn json_response(
+    req: &Request,
+    env: &Env,
+    body: &serde_json::Value,
+    status: u16,
+) -> Result<Response> {
     let json_str = serde_json::to_string(body).map_err(|e| Error::RustError(e.to_string()))?;
-    let headers = cors_headers(req);
+    let headers = cors_headers(req, env);
     headers.set("Content-Type", "application/json").ok();
     Ok(Response::ok(json_str)?
         .with_status(status)
@@ -138,7 +152,7 @@ async fn fetch(req: Request, env: Env, _ctx: Context) -> Result<Response> {
     if req.method() == Method::Options {
         return Ok(Response::empty()?
             .with_status(204)
-            .with_headers(cors_headers(&req)));
+            .with_headers(cors_headers(&req, &env)));
     }
 
     // WebSocket upgrade -> Durable Object
@@ -153,11 +167,12 @@ async fn fetch(req: Request, env: Env, _ctx: Context) -> Result<Response> {
     // NIP-11 relay info document
     if path == "/" && accepts_nostr_json(&req) {
         let info = nip11::relay_info(&env);
-        let json_str = serde_json::to_string(&info).map_err(|e| Error::RustError(e.to_string()))?;
+        let json_str =
+            serde_json::to_string(&info).map_err(|e| Error::RustError(e.to_string()))?;
         let headers = Headers::new();
         headers.set("Content-Type", "application/nostr+json").ok();
         headers
-            .set("Access-Control-Allow-Origin", &cors_origin(&req))
+            .set("Access-Control-Allow-Origin", &cors_origin(&req, &env))
             .ok();
         headers.set("Vary", "Origin").ok();
         return Ok(Response::ok(json_str)?.with_headers(headers));
@@ -170,12 +185,12 @@ async fn fetch(req: Request, env: Env, _ctx: Context) -> Result<Response> {
         Err(e) => {
             console_error!("Relay worker error: {e}");
             let msg = e.to_string();
+            let fallback_origin = default_origin(&env);
             if msg.contains("JSON") || msg.contains("json") || msg.contains("Syntax") {
-                // Use a dummy request for CORS since we consumed the original
                 let headers = Headers::new();
                 headers.set("Content-Type", "application/json").ok();
                 headers
-                    .set("Access-Control-Allow-Origin", ALLOWED_ORIGINS[0])
+                    .set("Access-Control-Allow-Origin", &fallback_origin)
                     .ok();
                 headers.set("Vary", "Origin").ok();
                 Ok(Response::ok(r#"{"error":"Invalid JSON"}"#)?
@@ -185,7 +200,7 @@ async fn fetch(req: Request, env: Env, _ctx: Context) -> Result<Response> {
                 let headers = Headers::new();
                 headers.set("Content-Type", "application/json").ok();
                 headers
-                    .set("Access-Control-Allow-Origin", ALLOWED_ORIGINS[0])
+                    .set("Access-Control-Allow-Origin", &fallback_origin)
                     .ok();
                 headers.set("Vary", "Origin").ok();
                 Ok(Response::ok(r#"{"error":"Internal error"}"#)?
@@ -204,6 +219,7 @@ async fn route(req: Request, env: &Env, path: &str) -> Result<Response> {
     if path == "/health" || path == "/" {
         return json_response(
             &req,
+            env,
             &serde_json::json!({
                 "status": "healthy",
                 "version": "3.0.0",
@@ -214,7 +230,7 @@ async fn route(req: Request, env: &Env, path: &str) -> Result<Response> {
         );
     }
 
-    // Setup status check (public — returns whether initial admin setup is needed)
+    // Setup status check (public -- returns whether initial admin setup is needed)
     if path == "/api/setup-status" && method == Method::Get {
         return whitelist::handle_setup_status(&req, env).await;
     }
@@ -249,7 +265,12 @@ async fn route(req: Request, env: &Env, path: &str) -> Result<Response> {
         return whitelist::handle_reset_db(req, env).await;
     }
 
-    json_response(&req, &serde_json::json!({ "error": "Not found" }), 404)
+    json_response(
+        &req,
+        env,
+        &serde_json::json!({ "error": "Not found" }),
+        404,
+    )
 }
 
 /// Idempotent schema migration: add `is_admin` column to the whitelist table.

@@ -71,6 +71,26 @@ fn section_to_zone(section: &str) -> Option<&'static str> {
     None
 }
 
+// -- Welcome card helpers -----------------------------------------------------
+
+fn is_welcome_dismissed() -> bool {
+    web_sys::window()
+        .and_then(|w| w.local_storage().ok())
+        .flatten()
+        .and_then(|s| s.get_item("dreamlab_welcome_dismissed").ok())
+        .flatten()
+        .is_some()
+}
+
+fn dismiss_welcome() {
+    if let Some(storage) = web_sys::window()
+        .and_then(|w| w.local_storage().ok())
+        .flatten()
+    {
+        let _ = storage.set_item("dreamlab_welcome_dismissed", "true");
+    }
+}
+
 /// Main forum index page showing all zones and their categories.
 /// Only shows zones the user has access to — inaccessible zones are hidden.
 /// Reads from the shared ChannelStore — no per-page relay subscription.
@@ -80,6 +100,8 @@ pub fn ForumsPage() -> impl IntoView {
     let loading = store.loading;
     let auth = use_auth();
     let is_authed = auth.is_authenticated();
+    let welcome_name = auth.nickname();
+    let show_welcome = RwSignal::new(!is_welcome_dismissed());
     let zone_access = use_zone_access();
     // Extract Copy signals so closures can capture them by value
     let za_home = zone_access.home;
@@ -123,6 +145,47 @@ pub fn ForumsPage() -> impl IntoView {
                 BreadcrumbItem::link("Home", "/"),
                 BreadcrumbItem::current("Forums"),
             ] />
+
+            // Welcome card — shown once to new users
+            <Show when=move || is_authed.get() && show_welcome.get()>
+                <div class="relative mb-6 p-6 rounded-2xl bg-gradient-to-br from-amber-500/10 via-orange-500/5 to-transparent border border-amber-500/20 backdrop-blur-sm overflow-hidden">
+                    <div class="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-amber-500/5 blur-3xl" aria-hidden="true"></div>
+                    <button
+                        class="absolute top-3 right-3 text-gray-500 hover:text-white p-1 rounded-lg hover:bg-gray-700/50 transition-colors"
+                        on:click=move |_| {
+                            dismiss_welcome();
+                            show_welcome.set(false);
+                        }
+                        aria-label="Dismiss welcome message"
+                    >
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18" stroke-linecap="round"/>
+                            <line x1="6" y1="6" x2="18" y2="18" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                    <div class="relative z-10">
+                        <h2 class="text-xl font-bold text-white mb-2">
+                            {move || {
+                                let name = welcome_name.get().unwrap_or_default();
+                                if name.is_empty() {
+                                    "Welcome to DreamLab!".to_string()
+                                } else {
+                                    format!("Welcome, {}!", name)
+                                }
+                            }}
+                        </h2>
+                        <p class="text-gray-300 text-sm mb-3">
+                            "This is your community hub. Forums are organized into zones \u{2014} "
+                            "each zone has categories and topics for different discussions."
+                        </p>
+                        <p class="text-gray-400 text-xs">
+                            "Start by exploring the "
+                            <span class="text-amber-400 font-medium">"Home"</span>
+                            " zone below."
+                        </p>
+                    </div>
+                </div>
+            </Show>
 
             // Loading state
             <Show when=move || loading.get()>

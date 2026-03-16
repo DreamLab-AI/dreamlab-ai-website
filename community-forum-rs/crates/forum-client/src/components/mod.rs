@@ -85,3 +85,6 @@ pub mod swipeable_message;
 pub mod mark_all_read;
 pub mod zone_hero;
 pub mod channel_stats;
+
+// -- UX Completion (Stream 6) -----------------------------------------------
+pub mod admin_checklist;
