@@ -1,5 +1,7 @@
 # Route Parity Matrix -- DreamLab Rust Port (T1.4)
 
+> **HISTORICAL** — Parity sprint COMPLETE (2026-03-12). All routes have been migrated to Rust/Leptos. The SvelteKit `community-forum/` directory has been deleted. This document tracked the SvelteKit→Leptos route migration and is retained for historical reference only.
+
 [Back to Documentation Index](../README.md)
 
 Generated: 2026-03-08
@@ -11,7 +13,7 @@ crypto operations, Nostr event kinds, access zones, implementation quality, and
 WASM migration priority for each route. It serves as the authoritative reference
 for the Rust port's route-by-route parity tracking.
 
-Source directory: `community-forum/src/routes/`
+Source directory: `community-forum/src/routes/` (historical — now deleted, migrated to `community-forum-rs/crates/forum-client/src/pages/`)
 
 ---
 

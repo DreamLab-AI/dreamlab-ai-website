@@ -1,8 +1,8 @@
 # Bounded Contexts
 
-**Last updated:** 2026-03-08 | [Back to DDD Index](README.md) | [Back to Documentation Index](../README.md)
+**Last updated:** 2026-03-16 | [Back to DDD Index](README.md) | [Back to Documentation Index](../README.md)
 
-This document maps each bounded context to a Rust crate (or existing TypeScript Worker) and defines the responsibilities, public interfaces, and dependencies between contexts.
+This document maps each bounded context to a Rust crate and defines the responsibilities, public interfaces, and dependencies between contexts.
 
 ## Context Map
 
@@ -21,22 +21,20 @@ graph TB
         PW["pod-worker<br/>(Solid Pods + WAC)"]
         PV["preview-worker<br/>(OG + oEmbed)"]
         RW["relay-worker<br/>(NIP-01 WS + D1)"]
-    end
-
-    subgraph "TypeScript CF Workers"
-        SA["search-api<br/>(RVF WASM)"]
+        SW["search-worker<br/>(RVF + cosine k-NN)"]
     end
 
     NC -.->|Cargo dep| FC
     NC -.->|Cargo dep| AW
     NC -.->|Cargo dep| PW
     NC -.->|Cargo dep| RW
+    NC -.->|Cargo dep| SW
 
     FC -->|"HTTP + NIP-98"| AW
     FC -->|"HTTP + NIP-98"| PW
     FC -->|"HTTP (no auth)"| PV
     FC -->|"WebSocket (NIP-01/42)"| RW
-    FC -->|"HTTP"| SA
+    FC -->|"HTTP"| SW
     AW -->|"Internal:<br/>pod provisioning"| PW
 
     style NC fill:#3498db,color:#fff
@@ -45,7 +43,7 @@ graph TB
     style PW fill:#e67e22,color:#fff
     style PV fill:#e67e22,color:#fff
     style RW fill:#e67e22,color:#fff
-    style SA fill:#9b59b6,color:#fff
+    style SW fill:#e67e22,color:#fff
 ```
 
 ## Crate Boundary Diagram
@@ -65,16 +63,14 @@ graph LR
         PW["pod-worker<br/>(worker-build)"]
         PV["preview-worker<br/>(worker-build)"]
         RW["relay-worker<br/>(worker-build)"]
-    end
-
-    subgraph "JavaScript (CF Workers)"
-        SA["search-api<br/>(wrangler)"]
+        SW["search-worker<br/>(worker-build)"]
     end
 
     NC --> FC
     NC --> AW
     NC --> PW
     NC --> RW
+    NC --> SW
 ```
 
 ## 1. Nostr Core Context -- `nostr-core` crate
@@ -120,7 +116,7 @@ pub mod utils;      // Helpers, formatters, config
 
 **Key dependencies**: `nostr-core`, `leptos 0.7`, `leptos_router`, `web-sys`, `gloo`.
 
-**Upstream communication**: Connects to the relay-worker via WebSocket. Calls auth-worker, pod-worker, preview-worker, and search-api via HTTP with NIP-98 auth where required.
+**Upstream communication**: Connects to the relay-worker via WebSocket. Calls auth-worker, pod-worker, preview-worker, and search-worker via HTTP with NIP-98 auth where required.
 
 ## 3. Identity and Auth Context -- `auth-worker` crate
 
@@ -196,16 +192,22 @@ pub mod auth;       // NIP-98 admin verification wrapper
 - HTTP: `/health`, `/api/check-whitelist`, `/api/whitelist/list`, `/api/whitelist/add`, `/api/whitelist/update-cohorts`
 - NIP-11: Relay information document at `/` with `Accept: application/nostr+json`
 
-**Why it was ported to Rust**: The `worker` crate now supports Durable Objects sufficiently for the DreamLab relay's needs. Porting to Rust aligns the relay with the rest of the Rust workspace, enables shared `nostr-core` types for NIP-98 verification, and eliminates the TypeScript/Rust boundary for whitelist management.
+**Why it was ported to Rust**: The `worker` crate now supports Durable Objects sufficiently for the DreamLab relay's needs. Porting to Rust aligns the relay with the rest of the Rust workspace and enables shared `nostr-core` types for NIP-98 verification.
 
-## 7. Search Context -- stays TypeScript
+## 7. Search Context -- `search-worker` crate
 
-**Location**: `workers/search-api/` (unchanged).
+**Responsibility**: RuVector-based vector search with RVF binary format, in-memory cosine k-NN similarity search, R2-backed vector persistence, and KV configuration.
 
-**Why not ported**: The RVF (RuVector Format) core is already Rust compiled to WASM. The TypeScript wrapper is 430 lines of R2/KV orchestration with 0.47ms p50 latency. Porting the thin wrapper gains nothing; eliminating WASM-in-WASM would require restructuring `rvf_wasm` as a library crate -- disproportionate effort.
+**Runtime**: Cloudflare Worker (compiled via `worker-build`).
+
+**Location**: `community-forum-rs/crates/search-worker/`.
+
+**Storage**: R2 (dreamlab-vectors for .rvf containers), KV (SEARCH_CONFIG for id-label mapping).
+
+**Key dependencies**: `nostr-core`, `worker`, `rvf-types`, `serde`.
 
 **Interfaces consumed by other contexts**:
-- HTTP: `/search?q=`, `/embed` (vector embedding endpoint)
+- HTTP: `/search?q=`, `/embed` (vector embedding endpoint), `/ingest` (index new content)
 
 ## Context Dependencies
 
@@ -215,12 +217,13 @@ graph TD
     AW["auth-worker"] -->|"Cargo dep"| NC
     PW["pod-worker"] -->|"Cargo dep"| NC
     RW["relay-worker"] -->|"Cargo dep"| NC
+    SW["search-worker"] -->|"Cargo dep"| NC
 
     FC -->|"HTTP + NIP-98"| AW
     FC -->|"HTTP + NIP-98"| PW
     FC -->|"HTTP (no auth)"| PV["preview-worker"]
     FC -->|"WebSocket<br/>(NIP-01/42)"| RW
-    FC -->|"HTTP"| SA["search-api (TS)"]
+    FC -->|"HTTP"| SW
     AW -->|"Internal:<br/>pod provisioning"| PW
 
     style NC fill:#3498db,color:#fff
@@ -229,7 +232,7 @@ graph TD
     style PW fill:#e67e22,color:#fff
     style PV fill:#e67e22,color:#fff
     style RW fill:#e67e22,color:#fff
-    style SA fill:#9b59b6,color:#fff
+    style SW fill:#e67e22,color:#fff
 ```
 
 | Consumer | Provider | Mechanism |
@@ -238,9 +241,10 @@ graph TD
 | auth-worker | nostr-core | Cargo dependency (compiled into Worker) |
 | pod-worker | nostr-core | Cargo dependency (NIP-98 verification) |
 | relay-worker | nostr-core | Cargo dependency (NIP-98 verification, event types) |
+| search-worker | nostr-core | Cargo dependency (NIP-98 verification) |
 | forum-client | auth-worker | HTTP + NIP-98 |
 | forum-client | pod-worker | HTTP + NIP-98 |
 | forum-client | preview-worker | HTTP (no auth) |
 | forum-client | relay-worker | WebSocket (NIP-01/42) |
-| forum-client | search-api (TS) | HTTP |
+| forum-client | search-worker | HTTP |
 | auth-worker | pod-worker | Internal (pod provisioning at registration) |

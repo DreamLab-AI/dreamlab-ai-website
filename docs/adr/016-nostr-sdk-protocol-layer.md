@@ -1,5 +1,7 @@
 # ADR-016: nostr-sdk 0.44.x as Nostr Protocol Layer
 
+> **Status Update (2026-03-12):** The TS→Rust migration is complete. The relay-worker is now Rust (not TypeScript as stated in the Neutral section below). All workers are in `community-forum-rs/crates/`. NDK has been fully replaced.
+
 [Back to ADR Index](README.md) | [Back to Documentation Index](../README.md)
 
 | Field     | Value                          |

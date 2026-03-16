@@ -1,12 +1,14 @@
 ---
 title: "PRD: DreamLab Community Forum — Rust Port (Refined Delivery Plan)"
 version: "2.1.0"
-status: in-progress
+status: superseded
 date: 2026-03-08
 branch: rust-version
 scope: community-forum + selected workers only
 baseline: "v2.1.0 is the accepted delivery baseline (supersedes v2.0.0 execution model)"
 ---
+
+> **STATUS: SUPERSEDED** — This document is superseded by `prd-rust-port-v4.0.md`. The TS→Rust migration completed on 2026-03-12. All 5 workers (auth, pod, preview, relay, search) and the forum client are now Rust. This document is retained for historical reference only.
 
 # PRD: DreamLab Community Forum — Refined Rust Port Delivery Plan
 

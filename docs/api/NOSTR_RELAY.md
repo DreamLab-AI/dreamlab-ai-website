@@ -1,6 +1,6 @@
-# Nostr Relay API -- nostr-relay (TypeScript, Not Ported)
+# Nostr Relay API -- relay-worker (Rust)
 
-**Last updated:** 2026-03-08 | [Back to Documentation Index](../README.md)
+**Last updated:** 2026-03-16 | [Back to Documentation Index](../README.md)
 
 ---
 
@@ -20,7 +20,9 @@
 
 ## Overview
 
-Private whitelist-only Nostr relay on Cloudflare Workers with Durable Objects for WebSocket management. Stays TypeScript due to WebSocket Hibernation API not being exposed in `workers-rs` v0.7.5.
+Private whitelist-only Nostr relay on Cloudflare Workers with Durable Objects for WebSocket management. Rust Worker using `worker` 0.7.5 with hibernation-safe session recovery via `accept_websocket_with_tags()`.
+
+**Source:** `community-forum-rs/crates/relay-worker/`
 
 **WebSocket:** `wss://dreamlab-nostr-relay.<account>.workers.dev` (production: DNS route via `relay.dreamlab-ai.com`)
 
@@ -113,7 +115,7 @@ flowchart TD
 
     VERIFY_ID[Verify Event ID<br/>SHA-256 of NIP-01 canonical form] --> ID_OK{ID matches?}
     ID_OK -- No --> REJECT_ID["OK: false<br/>'invalid: bad event id'"]
-    ID_OK -- Yes --> VERIFY_SIG[Verify Schnorr Signature<br/>noble/curves secp256k1]
+    ID_OK -- Yes --> VERIFY_SIG[Verify Schnorr Signature<br/>k256 secp256k1]
     VERIFY_SIG --> SIG_OK{Signature valid?}
     SIG_OK -- No --> REJECT_SIG["OK: false<br/>'invalid: bad signature'"]
 
@@ -146,7 +148,7 @@ flowchart TD
 {
   "name": "<RELAY_NAME>",
   "description": "DreamLab AI private community relay",
-  "supported_nips": [1, 11, 16, 33, 98],
+  "supported_nips": [1, 9, 11, 16, 29, 33, 40, 42, 45, 50, 98],
   "software": "dreamlab-nostr-relay",
   "limitation": {
     "max_message_length": 65536,

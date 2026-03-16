@@ -1,6 +1,6 @@
 # Getting Started -- DreamLab Community Forum (Rust Port)
 
-**Last updated:** 2026-03-08 | [Back to Documentation Index](../README.md)
+**Last updated:** 2026-03-16 | [Back to Documentation Index](../README.md)
 
 ## Dev Environment Setup
 
@@ -18,7 +18,7 @@ graph TD
         PW["pod-worker<br/>(worker-build)"]
         PV["preview-worker<br/>(worker-build)"]
         RW["relay-worker<br/>(worker-build)"]
-        TS["search-api<br/>(wrangler dev)"]
+        SW["search-worker<br/>(worker-build)"]
     end
 
     RUST --> FC
@@ -26,7 +26,7 @@ graph TD
     RUST --> PW
     RUST --> PV
     RUST --> RW
-    NODE --> TS
+    RUST --> SW
     NODE --> AW
     NODE --> PW
     NODE --> PV
@@ -39,7 +39,7 @@ graph TD
     style PW fill:#e67e22,color:#fff
     style PV fill:#e67e22,color:#fff
     style RW fill:#e67e22,color:#fff
-    style TS fill:#9b59b6,color:#fff
+    style SW fill:#e67e22,color:#fff
 ```
 
 ## Prerequisites
@@ -50,7 +50,7 @@ rustup target add wasm32-unknown-unknown
 cargo install trunk wasm-bindgen-cli worker-build cargo-criterion
 cargo install wasm-opt --locked
 
-# Node.js 20+ (Tailwind, Playwright, TS Workers)
+# Node.js 20+ (Tailwind, Playwright, wrangler)
 npm install -g wrangler
 ```
 
@@ -58,7 +58,7 @@ npm install -g wrangler
 
 ```bash
 git clone https://github.com/DreamLab-AI/dreamlab-ai-website.git
-cd dreamlab-ai-website && git checkout rust-version
+cd dreamlab-ai-website
 npm install
 cargo check --workspace
 cargo check --workspace --target wasm32-unknown-unknown
@@ -84,19 +84,17 @@ cd community-forum-rs/crates/auth-worker && worker-build --dev && wrangler dev
 cd community-forum-rs/crates/pod-worker && worker-build --dev && wrangler dev
 cd community-forum-rs/crates/preview-worker && worker-build --dev && wrangler dev
 cd community-forum-rs/crates/relay-worker && worker-build --dev && wrangler dev
-
-# TypeScript Worker
-cd workers/search-api && wrangler dev
+cd community-forum-rs/crates/search-worker && worker-build --dev && wrangler dev
 ```
 
 Add `--persist` to `wrangler dev` to keep D1/KV data between restarts.
 
 ## Running Tests
 
-146 tests pass across the workspace with 0 warnings.
+129+ tests pass across the workspace.
 
 ```bash
-# All native tests (146 passing)
+# All native tests
 cargo test --workspace
 
 # WASM tests
@@ -147,6 +145,7 @@ graph TD
             PW["pod-worker/<br/>acl, auth"]
             PV["preview-worker/<br/>lib (OG + oEmbed)"]
             RW["relay-worker/<br/>relay_do, nip11,<br/>whitelist, auth"]
+            SW["search-worker/<br/>lib (RVF WASM, k-NN)"]
         end
 
         subgraph "tests/"
@@ -162,6 +161,7 @@ graph TD
     style PW fill:#e67e22,color:#fff
     style PV fill:#e67e22,color:#fff
     style RW fill:#e67e22,color:#fff
+    style SW fill:#e67e22,color:#fff
 ```
 
 ### Crate Summary
@@ -174,6 +174,7 @@ graph TD
 | `pod-worker` | Solid pod storage + WAC ACL | `acl`, `auth` | CF Worker |
 | `preview-worker` | OG metadata + oEmbed | `lib` | CF Worker |
 | `relay-worker` | NIP-01 WebSocket relay + D1 storage | `relay_do`, `nip11`, `whitelist`, `auth` | CF Worker |
+| `search-worker` | RVF WASM vector search + R2 persistence | `lib` | CF Worker |
 
 ### Key Dependencies
 

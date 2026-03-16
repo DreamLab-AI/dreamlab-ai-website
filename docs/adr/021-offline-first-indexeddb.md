@@ -1,5 +1,7 @@
 # ADR-021: Offline-First Architecture with IndexedDB
 
+> **Status Update (2026-03-12):** The Leptos forum client implements IndexedDB persistence. The SvelteKit Dexie implementation referenced in Context below has been deleted along with the `community-forum/` directory.
+
 [Back to ADR Index](README.md) | [Back to Documentation Index](../README.md)
 
 | Field     | Value                                     |

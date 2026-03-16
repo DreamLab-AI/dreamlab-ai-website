@@ -1,5 +1,7 @@
 # QE Audit: DreamLab Cloudflare Workers (Rust/WASM)
 
+> **Note (2026-03-12):** This audit was conducted on 2026-03-08. Since then, all 5 workers have been migrated to Rust (relay-worker and search-worker were ported after this audit). The SvelteKit forum has been replaced by Leptos (Rust/WASM). Architecture diagrams below showing "SvelteKit" should read "Leptos WASM Client". File paths referencing `workers/` are now at `community-forum-rs/crates/`.
+
 [Back to Documentation Index](../README.md)
 
 **Auditor**: Agentic QE v3 -- Code Quality Assessment Domain
@@ -35,7 +37,7 @@ However, the review identified **4 CRITICAL**, **7 HIGH**, **9 MEDIUM**, and **6
 ```mermaid
 flowchart TB
     subgraph Client["Browser Client"]
-        SvelteKit["SvelteKit Forum App"]
+        LeptosApp["Leptos Forum App<br/>(Rust/WASM)"]
         React["React Main Site"]
     end
 
@@ -44,7 +46,7 @@ flowchart TB
             AUTH["auth-worker<br/>WebAuthn + NIP-98 + Pod Provisioning"]
             POD["pod-worker<br/>Solid Pods + R2 + WAC ACL"]
             PREVIEW["preview-worker<br/>OG Metadata + SSRF Protection"]
-            RELAY["relay-worker<br/>NIP-01 WebSocket Relay"]
+            RELAY["relay-worker<br/>NIP-01 WebSocket Relay<br/>(Rust/WASM + DO)"]
         end
 
         subgraph Storage["Storage Layer"]
@@ -60,10 +62,10 @@ flowchart TB
         NC["nostr-core<br/>NIP-01 events, NIP-98 tokens,<br/>NIP-44 encryption, key derivation,<br/>Schnorr signing/verification"]
     end
 
-    SvelteKit -->|"WebAuthn + NIP-98"| AUTH
-    SvelteKit -->|"NIP-98 + R2 ops"| POD
-    SvelteKit -->|"GET /preview?url="| PREVIEW
-    SvelteKit -->|"WebSocket NIP-01"| RELAY
+    LeptosApp -->|"WebAuthn + NIP-98"| AUTH
+    LeptosApp -->|"NIP-98 + R2 ops"| POD
+    LeptosApp -->|"GET /preview?url="| PREVIEW
+    LeptosApp -->|"WebSocket NIP-01"| RELAY
     React -->|"Health checks"| AUTH
 
     AUTH --> D1

@@ -1,10 +1,12 @@
 # Feature Parity Matrix: SvelteKit Forum -> Rust/WASM Port
 
+> **HISTORICAL** — Parity sprint COMPLETE (2026-03-12). All features have been migrated to Rust/WASM. The SvelteKit `community-forum/` directory has been deleted. This document tracked the SvelteKit→Leptos migration progress and is retained for historical reference only.
+
 [Back to Documentation Index](../README.md)
 
 **Task:** T1.5 -- Feature Audit
 **Date:** 2026-03-08
-**Scope:** All user-facing capabilities in `community-forum/src/`
+**Scope:** All user-facing capabilities in `community-forum/src/` (now deleted — migrated to `community-forum-rs/crates/forum-client/`)
 **WASM Crate:** `community-forum-rs/crates/nostr-core/`
 
 ---
@@ -15,7 +17,7 @@
 |--------|-------------|
 | **Feature** | User-facing capability name |
 | **Category** | Auth, Messaging, DMs, Search, Media, Admin, Calendar, Profile, Navigation |
-| **JS Implementation** | Source file(s) under `community-forum/src/` |
+| **JS Implementation** | Source file(s) under `community-forum/src/` (historical — now deleted) |
 | **Crypto Dep** | NIP-44, NIP-98, Schnorr, HKDF, AES-GCM, ECDH, or none |
 | **WASM Avail** | Y = nostr-core WASM bridge has replacement; N = not yet |
 | **Risk** | LOW = drop-in WASM swap; MEDIUM = partial coverage or refactoring needed; HIGH = no WASM equivalent, complex JS/browser API dependency |

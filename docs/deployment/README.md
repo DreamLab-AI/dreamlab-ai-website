@@ -1,6 +1,6 @@
 # Deployment Overview -- DreamLab AI
 
-**Last updated:** 2026-03-08 | [Back to Documentation Index](../README.md)
+**Last updated:** 2026-03-16 | [Back to Documentation Index](../README.md)
 
 ---
 
@@ -38,11 +38,8 @@ graph TB
         AUTH_W[auth-worker<br/>api.dreamlab-ai.com]
         POD_W[pod-worker<br/>pods.dreamlab-ai.com]
         PREVIEW_W[preview-worker<br/>preview.dreamlab-ai.com]
-    end
-
-    subgraph "TypeScript Workers"
-        RELAY_W[nostr-relay<br/>relay.dreamlab-ai.com]
-        SEARCH_W[search-api<br/>search.dreamlab-ai.com]
+        RELAY_W[relay-worker<br/>relay.dreamlab-ai.com]
+        SEARCH_W[search-worker<br/>search.dreamlab-ai.com]
     end
 
     subgraph "Cloudflare Storage"
@@ -110,11 +107,11 @@ flowchart LR
 
 ### workers-deploy.yml -- Cloudflare Workers
 
-Triggers on push to `main` when files in `workers/` or `community-forum-rs/crates/` change. Guard: `if: github.repository == 'DreamLab-AI/dreamlab-ai-website'`
+Triggers on push to `main` when files in `community-forum-rs/crates/` change. Guard: `if: github.repository == 'DreamLab-AI/dreamlab-ai-website'`
 
 ```mermaid
 flowchart LR
-    PUSH[Push to main<br/>workers/ or crates/ changed] --> SETUP[Install Rust toolchain<br/>+ wasm32-unknown-unknown<br/>+ worker-build]
+    PUSH[Push to main<br/>crates/ changed] --> SETUP[Install Rust toolchain<br/>+ wasm32-unknown-unknown<br/>+ worker-build]
 
     SETUP --> RUST_BUILD
 
@@ -123,6 +120,8 @@ flowchart LR
         AUTH_BUILD[worker-build --release<br/>auth-worker]
         POD_BUILD[worker-build --release<br/>pod-worker]
         PREVIEW_BUILD[worker-build --release<br/>preview-worker]
+        RELAY_BUILD[worker-build --release<br/>relay-worker]
+        SEARCH_BUILD[worker-build --release<br/>search-worker]
     end
 
     RUST_BUILD --> DEPLOY_ALL
@@ -166,24 +165,17 @@ flowchart LR
 
 ## Cloudflare Workers
 
-### Rust Workers (3 services)
+### Rust Workers (5 services)
 
-Built with `worker-build --release` which compiles Rust to `wasm32-unknown-unknown` and packages it as a Workers-compatible module.
+All workers are Rust, compiled to `wasm32-unknown-unknown` via `worker-build --release` and packaged as Workers-compatible ES modules.
 
 | Worker | Crate | Storage | Subdomain |
 |--------|-------|---------|-----------|
-| auth-worker | `crates/auth-worker` | D1 + KV + R2 | `api.dreamlab-ai.com` |
-| pod-worker | `crates/pod-worker` | R2 + KV | `pods.dreamlab-ai.com` |
-| preview-worker | `crates/preview-worker` | Cache API | `preview.dreamlab-ai.com` |
-
-### TypeScript Workers (2 services)
-
-Built and deployed directly with `wrangler`.
-
-| Worker | Source | Storage | Subdomain |
-|--------|--------|---------|-----------|
-| nostr-relay | `workers/nostr-relay/` | D1 + Durable Objects | `relay.dreamlab-ai.com` |
-| search-api | `workers/search-api/` | R2 + KV + WASM | `search.dreamlab-ai.com` |
+| auth-worker | `community-forum-rs/crates/auth-worker` | D1 + KV + R2 | `api.dreamlab-ai.com` |
+| pod-worker | `community-forum-rs/crates/pod-worker` | R2 + KV | `pods.dreamlab-ai.com` |
+| preview-worker | `community-forum-rs/crates/preview-worker` | Cache API | `preview.dreamlab-ai.com` |
+| relay-worker | `community-forum-rs/crates/relay-worker` | D1 + Durable Objects | `relay.dreamlab-ai.com` |
+| search-worker | `community-forum-rs/crates/search-worker` | R2 + KV | `search.dreamlab-ai.com` |
 
 ---
 
@@ -227,8 +219,8 @@ Local Workers use `wrangler dev` which simulates D1, KV, R2, and Durable Objects
 | `RP_ID` | auth-worker | `dreamlab-ai.com` |
 | `RP_NAME` | auth-worker | `DreamLab AI` |
 | `EXPECTED_ORIGIN` | auth-worker, pod-worker | `https://dreamlab-ai.com` |
-| `ADMIN_PUBKEYS` | auth-worker, nostr-relay | Comma-separated admin hex pubkeys |
-| `ALLOWED_ORIGIN` | nostr-relay, search-api | `https://dreamlab-ai.com` |
+| `ADMIN_PUBKEYS` | auth-worker, relay-worker | Comma-separated admin hex pubkeys |
+| `ALLOWED_ORIGIN` | relay-worker, search-worker | `https://dreamlab-ai.com` |
 
 ---
 
@@ -241,9 +233,9 @@ All DNS records are managed in the Cloudflare `dreamlab-ai.com` zone.
 | `dreamlab-ai.com` | CNAME | `dreamlab-ai.github.io` | No (GitHub Pages) |
 | `api.dreamlab-ai.com` | CNAME | auth-worker route | Yes |
 | `pods.dreamlab-ai.com` | CNAME | pod-worker route | Yes |
-| `search.dreamlab-ai.com` | CNAME | search-api route | Yes |
+| `search.dreamlab-ai.com` | CNAME | search-worker route | Yes |
 | `preview.dreamlab-ai.com` | CNAME | preview-worker route | Yes |
-| `relay.dreamlab-ai.com` | CNAME | nostr-relay route | Yes |
+| `relay.dreamlab-ai.com` | CNAME | relay-worker route | Yes |
 
 ---
 

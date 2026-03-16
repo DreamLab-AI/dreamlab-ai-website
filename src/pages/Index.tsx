@@ -100,8 +100,8 @@ const researchVideos = [
 // Featured team members
 const featuredTeam = [
   { name: "Dr John O'Hare", domain: "AI & Immersive Systems", role: "Chief Hallucination Officer", image: "/data/team/04.webp" },
-  { name: "Pete Woodbridge", domain: "Founder, DREAMLAB", role: "CTO", image: "/data/team/02.webp" },
-  { name: "Steve Moyler", domain: "Creative Lead, DREAMLAB", role: "Creative Lead", image: "/data/team/03.webp" },
+  { name: "Pete Woodbridge", domain: "CTO, DREAMLAB", role: "CTO", image: "/data/team/02.webp" },
+  { name: "Steve Moyler", domain: "Chief Creative Officer, DREAMLAB", role: "Creative Lead", image: "/data/team/03.webp" },
 ];
 
 // Facility images for carousel
@@ -151,7 +151,7 @@ const Index = () => {
           </h1>
 
           <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-foreground/90 max-w-3xl mb-8 animate-slide-up font-normal tracking-wide leading-relaxed" style={{ animationDelay: '0.1s' }}>
-             Agentics, AI, spatial computing, rapid<br />prototyping & secure distributed systems,<br />in the stunning Eskdale Valley
+             Agentics, spatial computing, rapid<br />prototyping & secure distributed systems.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 animate-scale-in mb-8 w-full sm:w-auto" style={{ animationDelay: '0.2s' }}>

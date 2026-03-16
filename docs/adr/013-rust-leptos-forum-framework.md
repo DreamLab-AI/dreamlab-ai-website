@@ -1,5 +1,7 @@
 # ADR-013: Rust/Leptos 0.7 as Forum UI Framework
 
+> **Status Update (2026-03-12):** The Leptos forum port is complete (~95% parity, ~22K LOC). SvelteKit `community-forum/` and `workers/shared/` directories have been deleted. All 5 backend workers are Rust in `community-forum-rs/crates/`. File paths referencing SvelteKit or `workers/` below are historical.
+
 [Back to ADR Index](README.md) | [Back to Documentation Index](../README.md)
 
 | Field     | Value                          |

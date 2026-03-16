@@ -255,7 +255,7 @@ pub struct Conversation {
 **Invariants**:
 - All message content is NIP-44 encrypted; plaintext never leaves the `forum-client` WASM boundary.
 - Gift wrapping (kind 1059) hides sender metadata from relays; the relay sees only the outer wrapper addressed to the recipient.
-- Decryption requires the private key in memory; NIP-07 users cannot decrypt DMs (known blind spot from the TypeScript version).
+- Decryption requires the private key in memory; NIP-07 users cannot decrypt DMs (known blind spot).
 
 **Commands**: SendDirectMessage, DecryptMessage, MarkAsRead.
 

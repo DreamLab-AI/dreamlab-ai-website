@@ -1,12 +1,14 @@
 ---
 title: "PRD: DreamLab Community Forum — Full Feature Parity (Rust/WASM)"
 version: "3.0.0"
-status: in-progress
+status: superseded
 date: 2026-03-08
 branch: main
 scope: community-forum-rs full feature parity with SvelteKit forum
 baseline: "v3.0.0 supersedes v2.1.0 — all core infrastructure shipped, now feature completion"
 ---
+
+> **STATUS: SUPERSEDED** — This document is superseded by `prd-rust-port-v4.0.md`. The TS→Rust migration completed on 2026-03-12. All 5 workers (auth, pod, preview, relay, search) and the forum client are now Rust. This document is retained for historical reference only.
 
 # PRD v3.0: Full Feature Parity — Rust/WASM Forum
 

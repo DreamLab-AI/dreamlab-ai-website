@@ -1,5 +1,7 @@
 # ADR-022: NIP-29 Group-Based Access Control Model
 
+> **Status Update (2026-03-12):** NIP-29 relay-side enforcement is implemented in the Rust relay-worker. The SvelteKit forum referenced in Context below has been deleted. The zone model is enforced by `community-forum-rs/crates/relay-worker/`.
+
 [Back to ADR Index](README.md) | [Back to Documentation Index](../README.md)
 
 | Field     | Value                                     |

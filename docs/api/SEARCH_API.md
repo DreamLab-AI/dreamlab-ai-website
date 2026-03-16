@@ -1,6 +1,6 @@
-# Search API -- search-api (TypeScript, Not Ported)
+# Search API -- search-worker (Rust)
 
-**Last updated:** 2026-03-08 | [Back to Documentation Index](../README.md)
+**Last updated:** 2026-03-16 | [Back to Documentation Index](../README.md)
 
 ---
 
@@ -19,7 +19,7 @@
 
 ## Overview
 
-WASM-powered vector similarity search over R2-stored `.rvf` indices. Uses the RuVector `rvf_wasm` microkernel (42 KB, `no_std`) for cosine search on 384-dimensional `all-MiniLM-L6-v2` embeddings. Stays TypeScript: the RVF core is already Rust WASM, and the thin TS wrapper adds no meaningful overhead.
+WASM-powered vector similarity search over R2-stored `.rvf` indices. Uses the RuVector `rvf_wasm` microkernel (42 KB, `no_std`) for cosine search on 384-dimensional `all-MiniLM-L6-v2` embeddings. Rust Worker using `worker` crate — the RVF core compiles directly into the worker binary, eliminating the JS-WASM bridge. Source: `community-forum-rs/crates/search-worker/`.
 
 **Base URL:** `https://search.dreamlab-ai.com`
 
@@ -32,7 +32,7 @@ WASM-powered vector similarity search over R2-stored `.rvf` indices. Uses the Ru
 ```mermaid
 graph LR
     subgraph "Cloudflare Worker Isolate"
-        subgraph "TypeScript Layer"
+        subgraph "Rust Layer"
             ROUTER[Request Router]
             MAPPING[ID-Label Mapping<br/>String ID to u64 label]
             PERSIST[Persistence Logic<br/>R2 read/write]
@@ -230,7 +230,7 @@ Or batch mode (max 100 texts):
 | `rvf_store_export` | Serialize store to .rvf binary |
 | `rvf_store_close` | Release store memory |
 
-The WASM engine uses `u64` labels internally. The TypeScript wrapper translates between application string IDs (Nostr event IDs) and WASM numeric labels using a KV-backed mapping.
+The WASM engine uses `u64` labels internally. The Rust worker translates between application string IDs (Nostr event IDs) and WASM numeric labels using a KV-backed mapping.
 
 ---
 

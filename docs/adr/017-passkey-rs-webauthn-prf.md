@@ -1,5 +1,7 @@
 # ADR-017: passkey-rs for WebAuthn/FIDO2 with PRF Extension
 
+> **Status Update (2026-03-12):** The Rust auth-worker is deployed and operational. The TypeScript `workers/auth-api/` has been deleted. References to "current TS auth-api" below are historical. The auth-worker source is at `community-forum-rs/crates/auth-worker/`.
+
 [Back to ADR Index](README.md) | [Back to Documentation Index](../README.md)
 
 | Field     | Value                          |

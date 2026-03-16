@@ -258,7 +258,7 @@ Returns the authenticated user's Solid profile card from R2.
 {
   "status": "ok",
   "service": "auth-api",
-  "runtime": "workers"
+  "runtime": "workers-rs"
 }
 ```
 

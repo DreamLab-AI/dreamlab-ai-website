@@ -1,5 +1,7 @@
 # ADR-019: Versioned Planning Governance and Tranche-Based Delivery
 
+> **Status Update (2026-03-12):** The Rust port tranches are complete. The "stop after hybrid" option (Section 6) was not exercised — the full Leptos rewrite proceeded. SvelteKit has been deleted. The governance principles in this ADR remain in force for future planning.
+
 [Back to ADR Index](README.md) | [Back to Documentation Index](../README.md)
 
 | Field     | Value                          |

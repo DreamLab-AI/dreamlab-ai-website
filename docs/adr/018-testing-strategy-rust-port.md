@@ -1,5 +1,7 @@
 # ADR-018: Testing Strategy for Rust Port
 
+> **Status Update (2026-03-12):** The Rust port is complete. SvelteKit has been deleted; the Leptos forum client is the sole UI. 129 nostr-core tests pass. References to "current SvelteKit forum" and "visual parity with SvelteKit" below are historical.
+
 [Back to ADR Index](README.md) | [Back to Documentation Index](../README.md)
 
 | Field     | Value                          |

@@ -1,12 +1,15 @@
 ---
 title: "PRD: DreamLab Community Forum — Final Feature Parity Sprint (Rust/WASM)"
 version: "4.0.0"
-status: in-progress
+status: complete
 date: 2026-03-09
 branch: main
 scope: community-forum-rs 100% feature parity with SvelteKit forum
 baseline: "v4.0.0 supersedes v3.0.0 — 54% parity achieved, this sprint completes the remaining 46%"
+completed: 2026-03-12
 ---
+
+**STATUS: COMPLETE** — Migration finished 2026-03-12. All 5 workers (auth, pod, preview, relay, search) and the forum client are Rust. The legacy SvelteKit `community-forum/` directory and all TypeScript `workers/*-api/` directories have been deleted. Code now lives in `community-forum-rs/crates/`.
 
 # PRD v4.0: Final Feature Parity Sprint — Rust/WASM Forum
 

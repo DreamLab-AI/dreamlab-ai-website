@@ -1,6 +1,6 @@
 # Security Overview -- DreamLab Community Forum (Rust Port)
 
-**Last updated:** 2026-03-08 | [Back to Documentation Index](../README.md)
+**Last updated:** 2026-03-16 | [Back to Documentation Index](../README.md)
 
 ---
 
@@ -40,8 +40,8 @@ graph TB
         AUTH_W[auth-worker<br/>Rust WASM]
         POD_W[pod-worker<br/>Rust WASM]
         PREVIEW_W[preview-worker<br/>Rust WASM]
-        RELAY_W[nostr-relay<br/>TypeScript + DO]
-        SEARCH_W[search-api<br/>TypeScript + WASM]
+        RELAY_W[relay-worker<br/>Rust WASM + DO]
+        SEARCH_W[search-worker<br/>Rust WASM]
     end
 
     subgraph "Trust Boundary: Storage"
@@ -250,21 +250,21 @@ The preview-worker (link-preview) validates all target URLs before fetching:
 - `cargo clippy -- -D warnings` must pass with zero warnings
 - No `unsafe` code permitted in any workspace crate
 - `getrandom` must have `features = ["js"]` in all WASM-targeting crates (CI-enforced)
-- `npm audit` runs for TypeScript Workers (nostr-relay, search-api)
 
 ---
 
 ## Admin Identity
 
-The admin pubkey is configured via the `ADMIN_PUBKEYS` environment variable on each Worker. The primary admin pubkey is:
+Admin status uses a **dynamic first-user-is-admin** model (since 2026-03-15). The first registrant gets `is_admin=1` in D1. No hardcoded `ADMIN_PUBKEYS` env var is required. The primary admin pubkey is:
 
 ```
 11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c
 ```
 
 Admin status is checked in two layers:
-1. **Fast path**: Environment variable lookup against `ADMIN_PUBKEYS`
-2. **Database path**: D1 whitelist table `cohorts` column containing `"admin"`
+1. **D1 path**: `is_admin` column on the whitelist table (primary)
+2. **Fallback**: `ADMIN_PUBKEYS` environment variable (legacy, optional)
+3. **Promotion**: `/api/whitelist/set-admin` endpoint for admin promotion/demotion
 
 ---
 

@@ -2110,6 +2110,7 @@ dependencies = [
 name = "preview-worker"
 version = "0.1.0"
 dependencies = [
+ "js-sys",
  "regex",
  "serde",
  "serde_json",

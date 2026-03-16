@@ -1,5 +1,7 @@
 # ADR-015: Selective Workers Port Strategy (3 Rust, 2 TypeScript)
 
+> **Status Update (2026-03-12):** This ADR's "3 Rust, 2 TypeScript" decision has been superseded. **All 5 workers are now Rust** in `community-forum-rs/crates/` (auth-worker, pod-worker, preview-worker, relay-worker, search-worker). The relay-worker uses `accept_websocket_with_tags()` for DO Hibernation. The search-worker uses `rvf-types` natively. All TypeScript workers (`workers/*-api/`) have been deleted. The `workers/` directory no longer exists.
+
 [Back to ADR Index](README.md) | [Back to Documentation Index](../README.md)
 
 | Field     | Value                          |

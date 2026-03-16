@@ -1,6 +1,6 @@
 # Cloudflare Workers Deployment
 
-**Last updated:** 2026-03-08 | [Back to Documentation Index](../README.md)
+**Last updated:** 2026-03-16 | [Back to Documentation Index](../README.md)
 
 ---
 
@@ -9,7 +9,6 @@
 - [Build Pipeline](#build-pipeline)
 - [Resource Relationships](#resource-relationships)
 - [Rust Workers Build](#rust-workers-build)
-- [TypeScript Workers Build](#typescript-workers-build)
 - [Wrangler Configuration](#wrangler-configuration)
 - [Cloudflare Resources](#cloudflare-resources)
 - [Secrets Management](#secrets-management)
@@ -27,7 +26,6 @@
 flowchart TD
     subgraph "Source"
         RUST_SRC[Rust Crates<br/>community-forum-rs/crates/]
-        TS_SRC[TypeScript Workers<br/>workers/]
     end
 
     subgraph "Rust Build Pipeline"
@@ -36,17 +34,12 @@ flowchart TD
         SHIM[Worker shim.mjs<br/>ES module entry]
     end
 
-    subgraph "TypeScript Build Pipeline"
-        WRANGLER_TS[wrangler build<br/>esbuild bundling]
-    end
-
     subgraph "Deploy"
         WRANGLER_DEPLOY[wrangler deploy<br/>Upload to CF Edge]
         CF_EDGE[Cloudflare Edge<br/>Global deployment]
     end
 
     RUST_SRC --> CARGO --> WASM_BINDGEN --> SHIM --> WRANGLER_DEPLOY
-    TS_SRC --> WRANGLER_TS --> WRANGLER_DEPLOY
     WRANGLER_DEPLOY --> CF_EDGE
 ```
 
@@ -60,8 +53,8 @@ graph TB
         AUTH[auth-worker<br/>Rust WASM]
         POD[pod-worker<br/>Rust WASM]
         PREVIEW[preview-worker<br/>Rust WASM]
-        RELAY[nostr-relay<br/>TypeScript]
-        SEARCH[search-api<br/>TypeScript]
+        RELAY[relay-worker<br/>Rust WASM]
+        SEARCH[search-worker<br/>Rust WASM]
     end
 
     subgraph "D1 Databases"
@@ -109,30 +102,23 @@ graph TB
 
 ## Rust Workers Build
 
-Each Rust crate compiles to `wasm32-unknown-unknown` via `worker-build`:
+All 5 workers are Rust crates that compile to `wasm32-unknown-unknown` via `worker-build`:
 
 ```bash
 cd community-forum-rs/crates/auth-worker && worker-build --release
 cd community-forum-rs/crates/pod-worker && worker-build --release
 cd community-forum-rs/crates/preview-worker && worker-build --release
+cd community-forum-rs/crates/relay-worker && worker-build --release
+cd community-forum-rs/crates/search-worker && worker-build --release
 ```
 
 Output lands in `build/worker/`. Wrangler deploys from the generated `shim.mjs`.
 
 ---
 
-## TypeScript Workers Build
-
-```bash
-cd workers/nostr-relay && wrangler deploy
-cd workers/search-api && wrangler deploy
-```
-
----
-
 ## Wrangler Configuration
 
-### Rust Worker Example (auth-worker)
+### Example: auth-worker
 
 ```toml
 name = "dreamlab-auth-api"
@@ -143,12 +129,15 @@ compatibility_date = "2024-09-23"
 command = "worker-build --release"
 ```
 
-### TypeScript Worker Example (nostr-relay)
+### Example: relay-worker (with Durable Objects)
 
 ```toml
 name = "dreamlab-nostr-relay"
-main = "index.ts"
+main = "build/worker/shim.mjs"
 compatibility_date = "2024-09-23"
+
+[build]
+command = "worker-build --release"
 
 [durable_objects]
 bindings = [{ name = "RELAY", class_name = "NostrRelayDO" }]
@@ -167,7 +156,7 @@ new_classes = ["NostrRelayDO"]
 | Database | Worker | Tables |
 |----------|--------|--------|
 | `dreamlab-auth` | auth-worker | `webauthn_credentials`, `challenges` |
-| `dreamlab-relay` | nostr-relay | `events`, `whitelist` |
+| `dreamlab-relay` | relay-worker | `events`, `whitelist` |
 
 ### KV Namespaces
 
@@ -175,7 +164,7 @@ new_classes = ["NostrRelayDO"]
 |-----------|-----------|---------|
 | `SESSIONS` | auth-worker | Session tokens (7-day TTL) |
 | `POD_META` | auth-worker, pod-worker | Pod ACLs + metadata |
-| `SEARCH_CONFIG` | search-api | Vector ID-label mapping |
+| `SEARCH_CONFIG` | search-worker | Vector ID-label mapping |
 | `CONFIG` | auth-worker | General configuration |
 
 ### R2 Buckets
@@ -183,13 +172,13 @@ new_classes = ["NostrRelayDO"]
 | Bucket | Worker(s) | Content |
 |--------|-----------|---------|
 | `dreamlab-pods` | auth-worker, pod-worker | User pod files (profiles, media, data) |
-| `dreamlab-vectors` | search-api | .rvf binary vector stores |
+| `dreamlab-vectors` | search-worker | .rvf binary vector stores |
 
 ### Durable Objects
 
 | Class | Worker | Instance | Purpose |
 |-------|--------|----------|---------|
-| `NostrRelayDO` | nostr-relay | `"main"` (singleton) | WebSocket connection management with Hibernation API |
+| `NostrRelayDO` | relay-worker | `"main"` (singleton) | WebSocket connection management with Hibernation API |
 
 ---
 
@@ -207,11 +196,11 @@ echo "<admin-pubkey>" | wrangler secret put ADMIN_PUBKEYS --name dreamlab-auth-a
 # pod-worker
 echo "https://dreamlab-ai.com" | wrangler secret put EXPECTED_ORIGIN --name dreamlab-pod-api
 
-# nostr-relay
+# relay-worker
 echo "<admin-pubkey>" | wrangler secret put ADMIN_PUBKEYS --name dreamlab-nostr-relay
 echo "https://dreamlab-ai.com" | wrangler secret put ALLOWED_ORIGIN --name dreamlab-nostr-relay
 
-# search-api
+# search-worker
 echo "https://dreamlab-ai.com" | wrangler secret put ALLOWED_ORIGIN --name dreamlab-search-api
 ```
 
@@ -238,8 +227,8 @@ All Workers run a `*/5 * * * *` cron trigger to prevent cold starts:
 | auth-worker | Ping D1 (`SELECT 1`) |
 | pod-worker | No-op (trigger itself warms isolate) |
 | preview-worker | No-op (trigger itself warms isolate) |
-| nostr-relay | Ping D1 (`SELECT 1`) |
-| search-api | Load WASM store from R2 |
+| relay-worker | Ping D1 (`SELECT 1`) |
+| search-worker | Load WASM store from R2 |
 
 ---
 
@@ -252,7 +241,8 @@ Cloudflare paid plan allows 10 MB compressed WASM per Worker. Monitor binary siz
 | auth-worker | ~2 MB | `wasm-opt -Oz` in CI |
 | pod-worker | ~1 MB | `wasm-opt -Oz` in CI |
 | preview-worker | ~1 MB | `wasm-opt -Oz` in CI |
-| search-api (rvf_wasm) | 42 KB | Already minimal (`no_std`) |
+| relay-worker | ~2 MB | `wasm-opt -Oz` in CI |
+| search-worker | ~1 MB | `wasm-opt -Oz` in CI |
 
 ---
 
@@ -272,6 +262,6 @@ Cloudflare paid plan allows 10 MB compressed WASM per Worker. Monitor binary siz
 | [Deployment Overview](README.md) | Architecture, CI/CD pipeline, environments, DNS |
 | [Auth API](../api/AUTH_API.md) | auth-worker endpoints and D1 schema |
 | [Pod API](../api/POD_API.md) | pod-worker endpoints and R2 layout |
-| [Nostr Relay](../api/NOSTR_RELAY.md) | nostr-relay endpoints and DO config |
-| [Search API](../api/SEARCH_API.md) | search-api endpoints and RVF WASM |
+| [Nostr Relay](../api/NOSTR_RELAY.md) | relay-worker endpoints and DO config |
+| [Search API](../api/SEARCH_API.md) | search-worker endpoints and RVF WASM |
 | [Security Overview](../security/SECURITY_OVERVIEW.md) | CORS, input validation, SSRF protection |

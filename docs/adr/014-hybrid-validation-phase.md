@@ -1,5 +1,7 @@
 # ADR-014: Hybrid Validation Phase Before Full Leptos Rewrite
 
+> **Status Update (2026-03-12):** The full Leptos rewrite proceeded and is now complete. The hybrid validation phase described here was superseded by the decision to port all workers to Rust and complete the Leptos client. SvelteKit `community-forum/` has been deleted. References to SvelteKit integration below are historical.
+
 [Back to ADR Index](README.md) | [Back to Documentation Index](../README.md)
 
 | Field     | Value                          |

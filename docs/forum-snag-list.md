@@ -153,9 +153,9 @@ The relay shows "Connected" in the admin panel and reports 78 existing messages,
 2. **Reads partially fail** — channel metadata (kind 40) loads but messages (kind 42) don't, suggesting the subscription filter is wrong or the old messages were published with different tag structures
 
 ### Likely investigation points:
-1. **`community-forum/forum-client/src/stores/relay.rs`** — Check if `publish_event()` returns an error that's being swallowed
-2. **`community-forum/forum-client/src/stores/messages.rs`** — Check the subscription filter for kind 42 events (e.g., `#e` tag filter matching channel ID)
-3. **`community-forum/forum-client/src/nostr/signing.rs`** — Verify that local hex key signing works correctly (the key is loaded into memory but may not be producing valid Schnorr signatures from WASM)
+1. **`community-forum-rs/crates/forum-client/src/relay.rs`** — Check if `publish_event()` returns an error that's being swallowed
+2. **`community-forum-rs/crates/forum-client/src/stores/messages.rs`** — Check the subscription filter for kind 42 events (e.g., `#e` tag filter matching channel ID)
+3. **`community-forum-rs/crates/forum-client/src/auth/mod.rs`** — Verify that local hex key signing works correctly (the key is loaded into memory but may not be producing valid Schnorr signatures from WASM)
 4. **Browser console** — Check for WASM panics or WebSocket errors that might indicate the real failure
 5. **Relay WebSocket** — The relay may accept the connection but reject writes (NIP-42 AUTH not completed, or write policy blocking)
 

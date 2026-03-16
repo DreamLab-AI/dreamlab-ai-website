@@ -86,6 +86,17 @@ wasm-voronoi/target/
 public/data/media/labview*.jpg
 public/data/media/wine.png
 
+# Large videos (>100MB, exceeds GitHub limit)
+public/data/media/videos/*.mp4
+
+# SQLite databases
+*.db
+ruvector.db
+
+# Test screenshots and logs
+logs/
+community-forum-rs/logs/
+
 # Showcase images converted to WebP
 public/showcase/*.png
 !public/showcase/*.webp

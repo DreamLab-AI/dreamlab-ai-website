@@ -1,6 +1,6 @@
 # Ubiquitous Language
 
-**Last updated:** 2026-03-08 | [Back to DDD Index](README.md) | [Back to Documentation Index](../README.md)
+**Last updated:** 2026-03-16 | [Back to DDD Index](README.md) | [Back to Documentation Index](../README.md)
 
 A shared vocabulary for the DreamLab community forum Rust port. Every term here has a precise meaning used consistently across code, documentation, and conversation.
 
@@ -69,7 +69,7 @@ A shared vocabulary for the DreamLab community forum Rust port. Every term here 
 
 | Term | Definition |
 |------|-----------|
-| **Crate** | A Rust compilation unit (library or binary). The workspace has 6 crates: `nostr-core`, `forum-client`, `auth-worker`, `pod-worker`, `preview-worker`, `relay-worker`. |
+| **Crate** | A Rust compilation unit (library or binary). The workspace has 7 crates: `nostr-core`, `forum-client`, `auth-worker`, `pod-worker`, `preview-worker`, `relay-worker`, `search-worker`. |
 | **Signal** | A Leptos reactive primitive. `Signal<T>` holds a value that triggers re-renders when updated. Replaces Svelte's `writable`/`derived` stores. |
 | **Resource** | A Leptos async data primitive. `Resource<T>` loads data asynchronously and integrates with `Suspense` for loading states. |
 | **Memo** | A Leptos derived computation. `Memo<T>` caches a derived value and only recomputes when its dependencies change. |
