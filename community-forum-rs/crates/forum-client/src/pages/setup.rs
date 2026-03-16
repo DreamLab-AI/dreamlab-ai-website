@@ -4,7 +4,7 @@
 //! and optional bio, then updates the auth store and navigates to `/forums`.
 
 use leptos::prelude::*;
-use leptos_router::hooks::use_navigate;
+use leptos_router::hooks::{use_navigate, use_query_map};
 use leptos_router::NavigateOptions;
 use nostr_core::UnsignedEvent;
 
@@ -46,6 +46,17 @@ pub fn SetupPage() -> impl IntoView {
     let error = RwSignal::new(Option::<String>::None);
     let is_submitting = RwSignal::new(false);
     let nick_valid = RwSignal::new(false);
+
+    // Read returnTo query parameter — default to /forums, reject loops
+    let query = use_query_map();
+    let return_to = move || {
+        let r = query.read().get("returnTo").unwrap_or_default();
+        if r.is_empty() || !r.starts_with('/') || r == "/login" || r == "/signup" || r == "/setup" {
+            "/forums".to_string()
+        } else {
+            r
+        }
+    };
 
     // Validate nickname on every keystroke
     let on_nick_input = move |ev: leptos::ev::Event| {
@@ -132,8 +143,9 @@ pub fn SetupPage() -> impl IntoView {
                     auth.set_profile(Some(trimmed_for_ack), None);
                     auth.complete_signup();
 
+                    let dest = return_to();
                     navigate.with_value(|nav| {
-                        nav("/forums", NavigateOptions::default());
+                        nav(&dest, NavigateOptions::default());
                     });
                 }
                 Err(e) => {

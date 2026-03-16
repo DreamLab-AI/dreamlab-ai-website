@@ -27,7 +27,7 @@ pub fn SignupPage() -> impl IntoView {
     let phase = RwSignal::new(Phase::Name);
     let privkey_hex = RwSignal::new(String::new());
 
-    // Read returnTo query parameter — default to /chat, reject non-path values and loops
+    // Read returnTo query parameter — default to /forums, reject non-path values and loops
     let query = use_query_map();
     let return_to = move || {
         let r = query.read().get("returnTo").unwrap_or_default();
