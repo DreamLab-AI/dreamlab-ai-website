@@ -29,8 +29,8 @@ graph TB
         AUTH["auth-worker<br/>(Rust WASM)"]
         POD["pod-worker<br/>(Rust WASM)"]
         PREVIEW["preview-worker<br/>(Rust WASM)"]
-        RELAY["nostr-relay<br/>(TypeScript)"]
-        SEARCH["search-api<br/>(TypeScript)"]
+        RELAY["relay-worker<br/>(Rust)"]
+        SEARCH["search-worker<br/>(Rust)"]
     end
 
     subgraph "Cloudflare Storage"
@@ -61,18 +61,22 @@ graph TB
     style AUTH fill:#dea584,color:#000
     style POD fill:#dea584,color:#000
     style PREVIEW fill:#dea584,color:#000
-    style RELAY fill:#3178C6,color:#fff
-    style SEARCH fill:#3178C6,color:#fff
+    style RELAY fill:#dea584,color:#000
+    style SEARCH fill:#dea584,color:#000
 ```
 
 ## Features
 
 - **Passkey-first authentication** -- WebAuthn PRF derives a secp256k1 private key deterministically via HKDF. The key is never stored; it exists only in a Rust closure and is zeroized on page unload.
 - **End-to-end encrypted DMs** -- NIP-59 Gift Wrap protocol (Rumor, Seal, Wrap) with NIP-44 ChaCha20-Poly1305 encryption. The relay and server never see plaintext.
-- **Zone-based access control** -- Four access zones (Public Lobby, Cohort Channels, Staff Lounge, Admin Zone) enforced at both the relay and client layers.
-- **Solid pods** -- User media stored in Cloudflare R2 with WAC (Web Access Control) ACL per pod, addressable via `did:nostr:{pubkey}`.
-- **WASM vector search** -- RuVector WASM microkernel (42KB) with `.rvf` container format, running in a Cloudflare Worker at 490K vectors/sec.
-- **Compile-time safety** -- All Rust crates enforce `#![deny(unsafe_code)]`. Zero `unsafe` blocks. NCC Group-audited cryptographic primitives.
+- **Zone-based access control** -- Three access zones (Home, DreamLab, Minimoonoir) enforced at both the relay and client layers with cohort-based gating.
+- **Solid pods with LDP compliance** -- Full Linked Data Platform containers, WAC ACL inheritance, conditional requests (ETags), Range streaming, JSON Patch (RFC 6902), per-user quotas, WebID profiles, content negotiation, and pod provisioning.
+- **Agent micropayments** -- HTTP 402 Payment Required with Web Ledgers spec, Bitcoin TXO deposit via mempool verification, per-request satoshi cost for pay-gated resources.
+- **Federation-ready** -- WebFinger discovery (remoteStorage + Solid), NIP-05 verification, Solid Notifications (webhooks), `.well-known/solid` discovery document.
+- **WASM vector search** -- RuVector WASM microkernel (42KB) with `.rvf` container format, running in a Cloudflare Worker at 490K vectors/sec. Cmd/K global semantic search.
+- **Smart auth UX** -- Progressive disclosure login (auto-detects NIP-07 extensions), friendly labels with optional technical mode toggle, forum-first navigation.
+- **Security hardened** -- XSS sanitization on all markdown rendering, NIP-98 body hash verification, rate limiting on all HTTP workers, env-based CORS, hibernation-safe relay subscriptions.
+- **457 tests, 0 warnings** -- Comprehensive test coverage across all 7 crates including property-based tests for cryptographic operations.
 - **3D visualizations** -- Three.js + React Three Fiber powering golden ratio Voronoi, 4D tesseract, and torus knot hero scenes on the marketing site.
 
 ## Tech Stack
@@ -82,16 +86,17 @@ graph TB
 | Marketing Site | React 18.3 + TypeScript 5.5 + Vite 5.4 |
 | Styling | Tailwind CSS 3.4 + shadcn/ui (Radix UI) |
 | 3D | Three.js 0.156 + React Three Fiber |
-| Community Forum | **Rust / Leptos 0.7** (CSR, WASM, amber/gray theme) |
-| Nostr Protocol | nostr-sdk 0.44 (Rust) + NDK 2.13 (legacy TS relay) |
-| Auth | WebAuthn PRF via passkey-rs 0.3 + NIP-98 |
+| Community Forum | **Rust / Leptos 0.7** (CSR, WASM, amber/gray theme, 18 routes, 58+ components) |
+| Nostr Protocol | nostr-core (Rust) — NIP-01/07/09/29/33/40/42/45/50/52/98 |
+| Auth | WebAuthn PRF via passkey-rs + NIP-98 + NIP-07 extension |
 | Encryption | NIP-44 (ChaCha20-Poly1305) + NIP-59 Gift Wrap |
-| Backend (Rust) | 3 Cloudflare Workers via `worker` 0.7.5 |
-| Backend (TS) | 2 Cloudflare Workers (nostr-relay, search-api) |
+| Backend | 5 Cloudflare Workers (Rust) via `worker` 0.7.5 |
 | Storage | Cloudflare D1, KV, R2, Durable Objects |
+| Solid Pods | LDP containers, WAC ACL inheritance, JSON Patch, quotas, WebID, micropayments |
 | Hosting | GitHub Pages (static) + Cloudflare Workers (API) |
-| WASM Search | RuVector microkernel + `.rvf` format |
+| WASM Search | RuVector microkernel + `.rvf` format + Cmd/K semantic search |
 | Crypto | k256, chacha20poly1305, hkdf, sha2 (NCC-audited) |
+| Tests | **457 tests**, 0 failures, 0 compiler warnings |
 
 ## Quick Start
 
@@ -102,7 +107,7 @@ graph TB
 rustup target add wasm32-unknown-unknown
 cargo install trunk wasm-bindgen-cli worker-build wasm-opt
 
-# Node.js 20+ (for React site, Tailwind, TS Workers)
+# Node.js 20+ (for React site and Tailwind)
 npm install -g wrangler
 ```
 
@@ -156,22 +161,18 @@ dreamlab-ai-website/
     hooks/                      Custom React hooks
     lib/                        Utilities, Supabase client
 
-  community-forum-rs/           Rust/Leptos workspace (6 crates)
+  community-forum-rs/           Rust/Leptos workspace (7 crates)
     Cargo.toml                  Workspace root
     Trunk.toml                  trunk build configuration
     index.html                  Leptos SPA entry point
     crates/
-      nostr-core/               Shared crypto + protocol (NIP-01, NIP-44, NIP-59, NIP-98)
-      forum-client/             Leptos 0.7 CSR app (WASM, Tailwind, amber/gray theme)
-      auth-worker/              CF Worker (Rust) -- WebAuthn + NIP-98 + pod provisioning
-      pod-worker/               CF Worker (Rust) -- Solid pods on R2 with WAC ACL
-      preview-worker/           CF Worker (Rust) -- OG metadata / link preview
-      relay-worker/             CF Worker (Rust) -- Nostr relay stub
-
-  workers/                      TypeScript Cloudflare Workers
-    nostr-relay-api/            Nostr relay (D1 + Durable Objects, WebSocket)
-    search-api/                 RuVector WASM vector search (.rvf format)
-    shared/                     Shared modules (nip98.ts, types)
+      nostr-core/               Shared crypto + protocol (NIP-01/07/09/29/33/40/42/45/50/52/98)
+      forum-client/             Leptos 0.7 CSR app (18 pages, 58+ components, smart auth)
+      auth-worker/              CF Worker -- WebAuthn + NIP-98 + rate limiting
+      pod-worker/               CF Worker -- Solid pods (LDP, WAC, PATCH, quotas, WebID, micropayments)
+      preview-worker/           CF Worker -- OG metadata / link preview (modular: ssrf/parse/oembed)
+      relay-worker/             CF Worker -- Nostr relay (modular: session/filter/broadcast/nip_handlers/storage)
+      search-worker/            CF Worker -- RuVector WASM vector search (.rvf) + rate limiting
 
   wasm-voronoi/                 Rust WASM for 3D Voronoi hero effect
   public/data/                  Runtime content (team profiles, workshops, media)
@@ -188,7 +189,7 @@ All documentation lives in the [`docs/`](docs/README.md) directory. Start there 
 | [Documentation Hub](docs/README.md) | Central navigation for all project docs |
 | [PRD: Rust Port v2.0.0](docs/prd-rust-port.md) | Accepted architecture baseline |
 | [PRD: Rust Port v2.1.0](docs/prd-rust-port-v2.1.md) | Refined delivery plan with tranche-based execution |
-| [Architecture Decision Records](docs/adr/README.md) | 19 ADRs tracking every major decision |
+| [Architecture Decision Records](docs/adr/README.md) | 25 ADRs tracking every major decision |
 | [Domain-Driven Design](docs/ddd/README.md) | Domain model, bounded contexts, aggregates, events |
 | [API Reference](docs/api/AUTH_API.md) | Auth, Pod, Relay, and Search API docs |
 | [Security Overview](docs/security/SECURITY_OVERVIEW.md) | Compile-time safety, crypto stack, access control |
@@ -214,7 +215,7 @@ graph LR
         NPM["npm run build<br/>(React)"]
         TRUNK["trunk build --release<br/>(Leptos WASM)"]
         WASM_OPT["wasm-opt -Oz<br/>(Size optimization)"]
-        WORKER_BUILD["worker-build --release<br/>(3 Rust Workers)"]
+        WORKER_BUILD["worker-build --release<br/>(5 Rust Workers)"]
         WRANGLER["wrangler deploy<br/>(5 Workers)"]
     end
 
@@ -241,18 +242,20 @@ All workflows are guarded with `if: github.repository == 'DreamLab-AI/dreamlab-a
 | auth-worker | `api.dreamlab-ai.com` | Cloudflare Worker (Rust WASM) |
 | pod-worker | `pods.dreamlab-ai.com` | Cloudflare Worker (Rust WASM) |
 | preview-worker | `preview.dreamlab-ai.com` | Cloudflare Worker (Rust WASM) |
-| nostr-relay | Cloudflare Worker route | Cloudflare Worker (TypeScript) |
-| search-api | `search.dreamlab-ai.com` | Cloudflare Worker (TypeScript) |
+| relay-worker | `relay.dreamlab-ai.com` | Cloudflare Worker (Rust) |
+| search-worker | `search.dreamlab-ai.com` | Cloudflare Worker (Rust) |
 
 ## Security Highlights
 
-- **Zero `unsafe`** -- All crates enforce `#![deny(unsafe_code)]` at the crate root
+- **XSS sanitization** -- All user markdown rendered via `sanitize_markdown()` with comrak `unsafe_=false` + `tagfilter=true`; zero raw `inner_html` injection
 - **NCC Group-audited cryptography** -- `k256` (secp256k1/Schnorr), `chacha20poly1305` (NIP-44 AEAD)
 - **Key never stored** -- WebAuthn PRF output fed through HKDF; private key lives only in a Rust `Option<SecretKey>` closure, zeroized via the `zeroize` crate on page unload
-- **Compile-time schema enforcement** -- All API boundaries use `serde` deserialization + `validator` runtime checks
-- **SSRF protection** -- Link preview Worker blocks private/loopback/metadata IP ranges
-- **Relay-level enforcement** -- Whitelist, rate limits (10 events/sec), connection limits (20/IP), size limits (64KB)
-- **`cargo audit`** runs in CI on every push; `cargo clippy -- -D warnings` must pass with zero warnings
+- **NIP-98 body verification** -- All POST/PUT workers verify SHA-256 payload hash in the NIP-98 token against the actual request body
+- **Rate limiting** -- KV-backed sliding window on all HTTP workers (auth: 20/min, preview: 30/min, search: 100/min)
+- **Env-based CORS** -- No hardcoded localhost origins in production; `ALLOWED_ORIGINS` env var
+- **SSRF protection** -- Link preview Worker blocks private/loopback/metadata IP ranges (20+ tests)
+- **Relay-level enforcement** -- Whitelist, rate limits (10 events/sec), connection limits (20/IP), size limits (64KB), hibernation-safe subscription persistence
+- **457 tests, 0 warnings** -- Comprehensive test suite including property-based tests for cryptographic operations
 
 ## Licence
 
@@ -260,4 +263,4 @@ Proprietary. Copyright 2024-2026 DreamLab AI Consulting Ltd. All rights reserved
 
 ---
 
-*Last updated: 2026-03-08*
+*Last updated: 2026-03-16*
