@@ -7,7 +7,7 @@ command = "worker-build --release"
 
 [[kv_namespaces]]
 binding = "RATE_LIMIT"
-id = "placeholder-create-in-cloudflare-dashboard"
+id = "c56bfb95f0984b3a8822866b094f3a61"
 
 [vars]
 ALLOWED_ORIGIN = "https://dreamlab-ai.com"
