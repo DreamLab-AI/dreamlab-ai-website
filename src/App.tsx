@@ -19,6 +19,7 @@ const Programmes = lazy(() => import("./pages/Programmes"));
 const CoCreate = lazy(() => import("./pages/CoCreate"));
 const Research = lazy(() => import("./pages/Research"));
 const Testimonials = lazy(() => import("./pages/Testimonials"));
+const Ventures = lazy(() => import("./pages/Ventures"));
 
 // Initialize React Query client
 const queryClient = new QueryClient();
@@ -49,6 +50,9 @@ const App = () => (
 
             {/* Impact Stories (formerly Testimonials) */}
             <Route path="/testimonials" element={<Testimonials />} />
+
+            {/* Venture Lab — unlinked, direct URL only */}
+            <Route path="/ventures" element={<Ventures />} />
 
             <Route path="/contact" element={<Contact />} />
             <Route path="/privacy" element={<Privacy />} />
