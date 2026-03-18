@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Redirecting...</title>
+<script>
+  (function(){
+    var loc = window.location;
+    var path = loc.pathname;
+    if (path.startsWith('/community')) {
+      // Route to forum SPA — encode sub-path as query param
+      var sub = path.slice('/community'.length) || '/';
+      loc.replace(
+        loc.protocol + '//' + loc.host +
+        '/community/?__p=' + encodeURIComponent(sub + loc.search + loc.hash)
+      );
+    } else {
+      // Route to React SPA — standard SPA redirect
+      loc.replace(
+        loc.protocol + '//' + loc.host +
+        '/?__p=' + encodeURIComponent(path + loc.search + loc.hash)
+      );
+    }
+  })();
+</script>
+</head><body></body></html>
