@@ -126,6 +126,9 @@ pub fn ForumsPage() -> impl IntoView {
     });
 
     view! {
+        // Onboarding modal — shown once to new users on first login
+        <crate::components::onboarding_modal::OnboardingModal />
+
         <div class="max-w-6xl mx-auto p-4 sm:p-6">
             // Hero header
             <div class="relative mb-10 py-10 rounded-2xl overflow-hidden mesh-bg aurora-shimmer">

@@ -13,8 +13,10 @@ use leptos_router::NavigateOptions;
 use wasm_bindgen::JsCast;
 
 use crate::components::avatar::{Avatar, AvatarSize};
+use crate::components::badge_display::BadgeGrid;
 use crate::components::user_display::use_display_name;
 use crate::relay::{Filter, RelayConnection};
+use crate::stores::badges::{use_badges, EarnedBadge};
 use crate::utils::shorten_pubkey;
 
 /// Parsed kind 0 metadata.
@@ -99,6 +101,57 @@ pub fn ProfilePage() -> impl IntoView {
             5_000,
         );
     });
+
+    // Fetch badges for this profile's pubkey
+    let profile_badges: RwSignal<Vec<EarnedBadge>> = RwSignal::new(Vec::new());
+    {
+        let _badge_store = use_badges();
+        Effect::new(move |_| {
+            let pk = pubkey.get();
+            if pk.is_empty() || !is_valid_pubkey.get() {
+                return;
+            }
+            // Fetch badge awards (kind-8) for this profile pubkey
+            let relay = expect_context::<RelayConnection>();
+            let filter = Filter {
+                kinds: Some(vec![8]),
+                p_tags: Some(vec![pk.clone()]),
+                limit: Some(100),
+                ..Default::default()
+            };
+            let badges_sig = profile_badges;
+            let on_event = Rc::new(move |event: nostr_core::NostrEvent| {
+                if event.kind != 8 {
+                    return;
+                }
+                let badge_id = event
+                    .tags
+                    .iter()
+                    .find(|t| t.len() >= 2 && t[0] == "a")
+                    .and_then(|t| t[1].rsplit(':').next())
+                    .map(String::from);
+                if let Some(bid) = badge_id {
+                    badges_sig.update(|list| {
+                        if !list.iter().any(|b| b.badge_id == bid) {
+                            list.push(EarnedBadge {
+                                badge_id: bid,
+                                awarded_at: event.created_at,
+                                event_id: event.id.clone(),
+                            });
+                        }
+                    });
+                }
+            });
+            let on_eose = Rc::new(|| {});
+            let sub_id = relay.subscribe(vec![filter], on_event, Some(on_eose));
+            let relay_cleanup = relay.clone();
+            crate::utils::set_timeout_once(
+                move || { relay_cleanup.unsubscribe(&sub_id); },
+                5_000,
+            );
+        });
+    }
+    let badges_signal = Signal::derive(move || profile_badges.get());
 
     let display_name = Memo::new(move |_| {
         let pk = pubkey.get();
@@ -200,6 +253,11 @@ pub fn ProfilePage() -> impl IntoView {
                     </p>
                 </div>
             </Show>
+
+            // Badges
+            <div class="bg-gray-800/50 border border-gray-700/30 rounded-xl p-4">
+                <BadgeGrid badges=badges_signal />
+            </div>
 
             // Details card
             <div class="bg-gray-800/50 border border-gray-700/30 rounded-xl p-4 space-y-3">

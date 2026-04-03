@@ -4,12 +4,15 @@
 //! methods for calling the relay-worker admin endpoints with NIP-98 auth and
 //! creating kind-40 channel events.
 
+pub mod audit_log;
 pub mod calendar;
 pub mod channel_form;
 pub mod overview;
 pub mod registrations;
 pub mod relay_settings;
+pub mod reports;
 pub mod section_requests;
+pub mod settings;
 pub mod stats;
 pub mod user_table;
 
@@ -31,6 +34,9 @@ pub enum AdminTab {
     Users,
     Sections,
     Calendar,
+    Settings,
+    Reports,
+    AuditLog,
 }
 
 /// A whitelisted user returned from the relay API.

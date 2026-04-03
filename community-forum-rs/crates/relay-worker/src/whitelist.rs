@@ -8,6 +8,7 @@ use serde_json::json;
 use wasm_bindgen::JsValue;
 use worker::{Env, Request, Response, Result};
 
+use crate::audit;
 use crate::auth;
 use crate::cors::json_response;
 
@@ -312,6 +313,19 @@ pub async fn handle_whitelist_add(mut req: Request, env: &Env) -> Result<Respons
     .run()
     .await?;
 
+    // Audit trail
+    let _ = audit::log_admin_action(
+        env,
+        &admin_pubkey,
+        "whitelist_add",
+        Some(&pubkey),
+        None,
+        None,
+        Some(&cohorts_json),
+        None,
+    )
+    .await;
+
     json_response(env, &json!({ "success": true }), 200)
 }
 
@@ -370,6 +384,24 @@ pub async fn handle_set_admin(mut req: Request, env: &Env) -> Result<Response> {
         .bind(&[js_f64(admin_val as f64), js_str(&target_pubkey)])?
         .run()
         .await?;
+
+    // Audit trail
+    let action = if new_admin_status {
+        "admin_grant"
+    } else {
+        "admin_revoke"
+    };
+    let _ = audit::log_admin_action(
+        env,
+        &admin_pubkey,
+        action,
+        Some(&target_pubkey),
+        None,
+        Some(if new_admin_status { "0" } else { "1" }),
+        Some(if new_admin_status { "1" } else { "0" }),
+        None,
+    )
+    .await;
 
     json_response(env, &json!({ "success": true }), 200)
 }
@@ -482,6 +514,19 @@ pub async fn handle_whitelist_update_cohorts(mut req: Request, env: &Env) -> Res
     ])?
     .run()
     .await?;
+
+    // Audit trail
+    let _ = audit::log_admin_action(
+        env,
+        &admin_pubkey,
+        "cohort_update",
+        Some(&pubkey),
+        None,
+        None,
+        Some(&cohorts_json),
+        None,
+    )
+    .await;
 
     json_response(env, &json!({ "success": true }), 200)
 }

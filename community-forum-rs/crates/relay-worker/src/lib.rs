@@ -16,9 +16,12 @@
 //! - `whitelist.rs` -- Whitelist management HTTP handlers
 //! - `auth.rs` -- NIP-98 admin verification wrapper
 
+mod audit;
 mod auth;
+mod moderation;
 mod nip11;
 mod relay_do;
+mod trust;
 mod whitelist;
 
 /// Re-export so the `worker` crate runtime can discover the Durable Object.
@@ -145,8 +148,8 @@ fn json_response(
 
 #[event(fetch)]
 async fn fetch(req: Request, env: Env, _ctx: Context) -> Result<Response> {
-    // Ensure the is_admin column exists (idempotent migration)
-    ensure_admin_column(&env).await;
+    // Idempotent schema migrations (trust columns, new tables, etc.)
+    ensure_schema(&env).await;
 
     // CORS preflight
     if req.method() == Method::Options {
@@ -265,6 +268,24 @@ async fn route(req: Request, env: &Env, path: &str) -> Result<Response> {
         return whitelist::handle_reset_db(req, env).await;
     }
 
+    // --- Moderation endpoints (NIP-98 admin only) ---
+
+    // List reports
+    if path == "/api/reports" && method == Method::Get {
+        return moderation::handle_list_reports(&req, env).await;
+    }
+
+    // Resolve a report
+    if path == "/api/reports/resolve" && method == Method::Post {
+        return moderation::handle_resolve_report(req, env).await;
+    }
+
+    // --- Audit log endpoint (NIP-98 admin only) ---
+
+    if path == "/api/admin/audit-log" && method == Method::Get {
+        return audit::handle_audit_log_list(&req, env).await;
+    }
+
     json_response(
         &req,
         env,
@@ -273,14 +294,97 @@ async fn route(req: Request, env: &Env, path: &str) -> Result<Response> {
     )
 }
 
-/// Idempotent schema migration: add `is_admin` column to the whitelist table.
-/// Runs once per request but is a no-op if the column already exists.
-async fn ensure_admin_column(env: &Env) {
-    if let Ok(db) = env.d1("DB") {
-        let _ = db
-            .prepare("ALTER TABLE whitelist ADD COLUMN is_admin INTEGER DEFAULT 0")
-            .run()
-            .await;
+/// Idempotent schema migrations.
+///
+/// All statements use `IF NOT EXISTS` for tables or silently ignore errors
+/// for `ALTER TABLE ADD COLUMN` (D1/SQLite raises an error if the column
+/// already exists, which we swallow).
+async fn ensure_schema(env: &Env) {
+    let db = match env.d1("DB") {
+        Ok(db) => db,
+        Err(_) => return,
+    };
+
+    // --- Whitelist columns (idempotent: errors ignored if column exists) ---
+    let alter_stmts = [
+        "ALTER TABLE whitelist ADD COLUMN is_admin INTEGER DEFAULT 0",
+        "ALTER TABLE whitelist ADD COLUMN trust_level INTEGER NOT NULL DEFAULT 0",
+        "ALTER TABLE whitelist ADD COLUMN days_active INTEGER NOT NULL DEFAULT 0",
+        "ALTER TABLE whitelist ADD COLUMN posts_read INTEGER NOT NULL DEFAULT 0",
+        "ALTER TABLE whitelist ADD COLUMN posts_created INTEGER NOT NULL DEFAULT 0",
+        "ALTER TABLE whitelist ADD COLUMN mod_actions_against INTEGER NOT NULL DEFAULT 0",
+        "ALTER TABLE whitelist ADD COLUMN last_active_at INTEGER",
+        "ALTER TABLE whitelist ADD COLUMN trust_level_updated_at INTEGER",
+        "ALTER TABLE whitelist ADD COLUMN suspended_until INTEGER",
+        "ALTER TABLE whitelist ADD COLUMN silenced INTEGER NOT NULL DEFAULT 0",
+        "ALTER TABLE whitelist ADD COLUMN user_notes TEXT",
+    ];
+    for stmt in alter_stmts {
+        let _ = db.prepare(stmt).run().await;
+    }
+
+    // --- New tables (idempotent via IF NOT EXISTS) ---
+    let create_stmts = [
+        "CREATE TABLE IF NOT EXISTS channel_zones (\
+            channel_id TEXT PRIMARY KEY, \
+            zone TEXT NOT NULL DEFAULT 'home', \
+            archived INTEGER NOT NULL DEFAULT 0\
+        )",
+        "CREATE TABLE IF NOT EXISTS admin_log (\
+            id INTEGER PRIMARY KEY AUTOINCREMENT, \
+            actor_pubkey TEXT NOT NULL, \
+            action TEXT NOT NULL, \
+            target_pubkey TEXT, \
+            target_id TEXT, \
+            previous_value TEXT, \
+            new_value TEXT, \
+            reason TEXT, \
+            created_at INTEGER NOT NULL\
+        )",
+        "CREATE TABLE IF NOT EXISTS settings (\
+            key TEXT PRIMARY KEY, \
+            value TEXT NOT NULL, \
+            type TEXT NOT NULL DEFAULT 'string', \
+            category TEXT NOT NULL DEFAULT 'general'\
+        )",
+        "CREATE TABLE IF NOT EXISTS reports (\
+            id INTEGER PRIMARY KEY AUTOINCREMENT, \
+            report_event_id TEXT NOT NULL UNIQUE, \
+            reporter_pubkey TEXT NOT NULL, \
+            reporter_trust_level INTEGER NOT NULL DEFAULT 0, \
+            reported_event_id TEXT NOT NULL, \
+            reported_pubkey TEXT NOT NULL, \
+            reason TEXT NOT NULL, \
+            reason_text TEXT, \
+            status TEXT NOT NULL DEFAULT 'pending', \
+            resolved_by TEXT, \
+            resolution TEXT, \
+            created_at INTEGER NOT NULL, \
+            resolved_at INTEGER\
+        )",
+        "CREATE TABLE IF NOT EXISTS hidden_events (\
+            event_id TEXT PRIMARY KEY, \
+            hidden_by TEXT NOT NULL, \
+            reason TEXT, \
+            created_at INTEGER NOT NULL\
+        )",
+    ];
+    for stmt in create_stmts {
+        let _ = db.prepare(stmt).run().await;
+    }
+
+    // --- Indexes (idempotent via IF NOT EXISTS) ---
+    let index_stmts = [
+        "CREATE INDEX IF NOT EXISTS idx_reports_status ON reports(status)",
+        "CREATE INDEX IF NOT EXISTS idx_reports_reported_event ON reports(reported_event_id)",
+        "CREATE INDEX IF NOT EXISTS idx_reports_reported_pubkey ON reports(reported_pubkey)",
+        "CREATE INDEX IF NOT EXISTS idx_admin_log_action ON admin_log(action)",
+        "CREATE INDEX IF NOT EXISTS idx_admin_log_actor ON admin_log(actor_pubkey)",
+        "CREATE INDEX IF NOT EXISTS idx_admin_log_target ON admin_log(target_pubkey)",
+        "CREATE INDEX IF NOT EXISTS idx_admin_log_created ON admin_log(created_at)",
+    ];
+    for stmt in index_stmts {
+        let _ = db.prepare(stmt).run().await;
     }
 }
 

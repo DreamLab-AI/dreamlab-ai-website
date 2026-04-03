@@ -100,3 +100,4 @@ community-forum-rs/logs/
 # Showcase images converted to WebP
 public/showcase/*.png
 !public/showcase/*.webp
+discourse-audit/

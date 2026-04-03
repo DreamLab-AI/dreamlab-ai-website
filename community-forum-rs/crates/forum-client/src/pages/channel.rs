@@ -15,6 +15,7 @@ use crate::components::message_bubble::{MessageBubble, MessageData};
 use crate::components::message_input::MessageInput;
 use crate::components::pinned_messages::{PinnedMessage, PinnedMessages};
 use crate::components::swipeable_message::SwipeableMessage;
+use crate::components::thread_view::ThreadReply;
 use crate::components::typing_indicator::TypingIndicator;
 use crate::relay::{ConnectionState, Filter, RelayConnection};
 #[allow(unused_imports)]
@@ -27,6 +28,8 @@ use crate::utils::{arrow_left_svg, set_timeout_once};
 struct ChannelHeader {
     name: String,
     description: String,
+    /// Whether the channel is archived (no new messages allowed).
+    archived: bool,
 }
 
 /// Single channel view: message list + compose input.
@@ -84,6 +87,7 @@ pub fn ChannelPage() -> impl IntoView {
                 channel_info.set(Some(ChannelHeader {
                     name: found.name.clone(),
                     description: found.description.clone(),
+                    archived: false, // ChannelStore doesn't carry archived flag yet
                 }));
             }
         }
@@ -184,6 +188,9 @@ pub fn ChannelPage() -> impl IntoView {
                     reply_to_pubkey: reply_pk,
                     reply_to_content: None,
                     reactions: RwSignal::new(Vec::new()),
+                    is_hidden: false,
+                    channel_id: cid.clone(),
+                    thread_replies: RwSignal::new(Vec::<ThreadReply>::new()),
                 });
             }
             list.sort_by_key(|m| m.created_at);
@@ -286,6 +293,11 @@ pub fn ChannelPage() -> impl IntoView {
 
     let send_callback = Callback::new(do_send_text);
     let is_authed = auth.is_authenticated();
+
+    // Channel archived state (derived from metadata)
+    let is_archived = Memo::new(move |_| {
+        channel_info.get().map(|c| c.archived).unwrap_or(false)
+    });
 
     // Derive avatar letter from channel name
     let avatar_letter = move || {
@@ -392,6 +404,22 @@ pub fn ChannelPage() -> impl IntoView {
                 })
             }}
 
+            // Archive banner
+            <Show when=move || is_archived.get()>
+                <div class="max-w-4xl mx-auto px-4 pt-2">
+                    <div class="bg-gray-800/80 border border-gray-600/50 rounded-lg px-4 py-3 flex items-center gap-3">
+                        <svg class="w-5 h-5 text-gray-500 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="21 8 21 21 3 21 3 8" stroke-linecap="round" stroke-linejoin="round"/>
+                            <rect x="1" y="3" width="22" height="5" rx="1" stroke-linecap="round" stroke-linejoin="round"/>
+                            <line x1="10" y1="12" x2="14" y2="12" stroke-linecap="round"/>
+                        </svg>
+                        <span class="text-sm text-gray-400">
+                            "This channel is archived. No new messages can be posted."
+                        </span>
+                    </div>
+                </div>
+            </Show>
+
             // Messages area
             <div
                 class="flex-1 overflow-y-auto bg-gray-900 relative"
@@ -470,8 +498,8 @@ pub fn ChannelPage() -> impl IntoView {
                 </div>
             </div>
 
-            // Compose area (only when authenticated)
-            <Show when=move || is_authed.get()>
+            // Compose area (only when authenticated and channel is not archived)
+            <Show when=move || is_authed.get() && !is_archived.get()>
                 <div class="bg-gray-800 border-t border-gray-700 p-3">
                     <div class="max-w-4xl mx-auto">
                         <TypingIndicator typing_pubkeys=typing_pubkeys />
@@ -498,7 +526,7 @@ pub fn ChannelPage() -> impl IntoView {
     }
 }
 
-/// Parse kind 40 event content JSON into channel name and description.
+/// Parse kind 40 event content JSON into channel name, description, and archived status.
 fn parse_channel_metadata(content: &str) -> ChannelHeader {
     match serde_json::from_str::<serde_json::Value>(content) {
         Ok(val) => ChannelHeader {
@@ -512,10 +540,15 @@ fn parse_channel_metadata(content: &str) -> ChannelHeader {
                 .and_then(|v| v.as_str())
                 .unwrap_or("")
                 .to_string(),
+            archived: val
+                .get("archived")
+                .and_then(|v| v.as_bool())
+                .unwrap_or(false),
         },
         Err(_) => ChannelHeader {
             name: "Unnamed Channel".to_string(),
             description: String::new(),
+            archived: false,
         },
     }
 }

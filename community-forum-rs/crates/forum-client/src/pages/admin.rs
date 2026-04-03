@@ -9,10 +9,13 @@ use leptos_router::NavigateOptions;
 use wasm_bindgen::JsCast;
 use wasm_bindgen_futures::spawn_local;
 
+use crate::admin::audit_log::AuditLogTab;
 use crate::admin::calendar::AdminCalendar;
 use crate::admin::channel_form::{ChannelForm, ChannelFormData};
 use crate::admin::overview::{ConnectionStatusBar, OverviewTab};
+use crate::admin::reports::ReportsTab;
 use crate::admin::section_requests::SectionRequests;
+use crate::admin::settings::SettingsTab;
 use crate::admin::user_table::{UpdateCohortsCb, UserTable};
 use crate::admin::{provide_admin, use_admin, AdminTab};
 use crate::admin::user_table::AdminToggleCb;
@@ -195,6 +198,9 @@ fn AdminPanelInner() -> impl IntoView {
                 <TabButton tab=AdminTab::Users active=active_tab label="Users" />
                 <TabButton tab=AdminTab::Sections active=active_tab label="Sections" />
                 <TabButton tab=AdminTab::Calendar active=active_tab label="Calendar" />
+                <TabButton tab=AdminTab::Settings active=active_tab label="Settings" />
+                <TabButton tab=AdminTab::Reports active=active_tab label="Reports" />
+                <TabButton tab=AdminTab::AuditLog active=active_tab label="Audit Log" />
             </div>
 
             // Tab content
@@ -205,6 +211,9 @@ fn AdminPanelInner() -> impl IntoView {
                     AdminTab::Users => view! { <UsersTab /> }.into_any(),
                     AdminTab::Sections => view! { <SectionRequests /> }.into_any(),
                     AdminTab::Calendar => view! { <AdminCalendar /> }.into_any(),
+                    AdminTab::Settings => view! { <SettingsTab /> }.into_any(),
+                    AdminTab::Reports => view! { <ReportsTab /> }.into_any(),
+                    AdminTab::AuditLog => view! { <AuditLogTab /> }.into_any(),
                 }
             }}
 

@@ -202,6 +202,7 @@ pub fn App() -> impl IntoView {
     provide_mute_store();
     provide_preferences();
     provide_announcer();
+    crate::stores::badges::provide_badges();
 
     // Provide relay connection as context — connect/disconnect reactively with auth state
     let relay = RelayConnection::new();
@@ -298,6 +299,9 @@ pub fn App() -> impl IntoView {
         let r = expect_context::<RelayConnection>();
         store.start_msg_sync(&r);
     });
+
+    // Start badge sync after relay connects
+    crate::stores::badges::init_badge_sync();
 
     // Cleanup on unmount
     {

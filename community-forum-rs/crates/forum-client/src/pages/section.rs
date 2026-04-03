@@ -178,6 +178,9 @@ pub fn SectionPage() -> impl IntoView {
                 reply_to_pubkey: reply_pk,
                 reply_to_content: None,
                 reactions: RwSignal::new(Vec::<Reaction>::new()),
+                is_hidden: false,
+                channel_id: String::new(),
+                thread_replies: RwSignal::new(Vec::new()),
             };
             messages_sig.update(|list| {
                 if !list.iter().any(|m| m.id == msg.id) {

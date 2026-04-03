@@ -5,12 +5,16 @@
 //! - NIP-42: AUTH challenge/response
 //! - NIP-45: COUNT
 //! - Event validation.
+//! - Trust-level gating (TL0-TL3) for event kinds.
+//! - Zone enforcement on EVENT and REQ.
 
 use nostr_core::event::NostrEvent;
 use wasm_bindgen::JsValue;
 use worker::*;
 
 use crate::auth;
+use crate::moderation;
+use crate::trust::{self, TrustLevel};
 
 use super::broadcast::{event_treatment, EventTreatment};
 use super::filter::{self, NostrFilter};
@@ -60,10 +64,10 @@ impl NostrRelayDO {
 
         // Events that bypass whitelist gating:
         // - kind 0: profile metadata (triggers auto-whitelist)
-        // - kind 40: channel creation (users need to create topics immediately after registration)
         // - kind 9021: join request
         // - kind 9024: registration metadata
-        let is_bypass = matches!(event.kind, 0 | 40 | 9021 | 9024);
+        // NOTE: kind-40 (channel creation) no longer bypasses -- it requires TL2+.
+        let is_bypass = matches!(event.kind, 0 | 9021 | 9024);
         if !is_bypass && !self.is_whitelisted(&event.pubkey).await {
             Self::send_ok(ws, &event.id, false, "blocked: pubkey not whitelisted");
             return;
@@ -76,12 +80,105 @@ impl NostrRelayDO {
             self.auto_whitelist(&event.pubkey).await;
         }
 
+        // Suspension and silence check
+        let (suspended, silenced) = trust::check_suspension(&event.pubkey, &self.env).await;
+        if suspended {
+            Self::send_ok(ws, &event.id, false, "blocked: account suspended");
+            return;
+        }
+        if silenced {
+            Self::send_ok(ws, &event.id, false, "blocked: account silenced (read-only)");
+            return;
+        }
+
+        // Trust-level gating for specific event kinds
+        let is_admin = auth::is_admin(&event.pubkey, &self.env).await;
+        if !is_admin {
+            let trust_level = trust::get_trust_level(&event.pubkey, &self.env).await;
+
+            // kind-40 (channel creation): TL2+ required
+            if event.kind == 40 && trust_level < TrustLevel::Regular {
+                Self::send_ok(
+                    ws,
+                    &event.id,
+                    false,
+                    "restricted: TL2+ required for channel creation",
+                );
+                return;
+            }
+
+            // kind-41 (channel metadata/pin): TL2+ for own channel, TL3+ for any
+            if event.kind == 41 {
+                if trust_level < TrustLevel::Regular {
+                    Self::send_ok(
+                        ws,
+                        &event.id,
+                        false,
+                        "restricted: TL2+ required for channel metadata",
+                    );
+                    return;
+                }
+                // If TL2 (not TL3), verify they are the channel creator
+                if trust_level < TrustLevel::Trusted {
+                    if let Some(channel_id) = filter::tag_value(&event, "e") {
+                        if !self.is_channel_creator(&event.pubkey, &channel_id).await {
+                            Self::send_ok(
+                                ws,
+                                &event.id,
+                                false,
+                                "restricted: TL3+ required to modify others' channels",
+                            );
+                            return;
+                        }
+                    }
+                }
+            }
+
+            // kind-1984 (report): TL1+ required
+            if event.kind == 1984 && trust_level < TrustLevel::Member {
+                Self::send_ok(
+                    ws,
+                    &event.id,
+                    false,
+                    "restricted: TL1+ required to report content",
+                );
+                return;
+            }
+
+            // kind-5 (deletion): own events always allowed; others' events require TL3+
+            if event.kind == 5 {
+                let targets_others = self.deletion_targets_others(&event).await;
+                if targets_others && trust_level < TrustLevel::Trusted {
+                    Self::send_ok(
+                        ws,
+                        &event.id,
+                        false,
+                        "restricted: TL3+ required to delete others' events",
+                    );
+                    return;
+                }
+            }
+        }
+
         // NIP-29: Admin-only group management kinds
-        if NIP29_ADMIN_KINDS.contains(&event.kind)
-            && !auth::is_admin(&event.pubkey, &self.env).await
-        {
+        if NIP29_ADMIN_KINDS.contains(&event.kind) && !is_admin {
             Self::send_ok(ws, &event.id, false, "blocked: admin-only group action");
             return;
+        }
+
+        // Zone enforcement for channel messages (kind-42)
+        if event.kind == 42 {
+            if let Some(channel_id) = filter::tag_value(&event, "e") {
+                let zone = trust::get_channel_zone(&channel_id, &self.env)
+                    .await
+                    .unwrap_or_else(|| "home".to_string());
+                if !is_admin
+                    && !trust::has_zone_access(&event.pubkey, &zone, &self.env).await
+                {
+                    Self::send_ok(ws, &event.id, false, "zone access denied");
+                    return;
+                }
+            }
         }
 
         // Verify event ID and Schnorr signature via nostr_core
@@ -109,9 +206,25 @@ impl NostrRelayDO {
             Self::send_ok(ws, &event.id, true, "");
             self.broadcast_event(&event);
 
+            // Activity tracking: increment posts_created and update last_active
+            // for content-producing event kinds (kind-1 text, kind-42 channel msg,
+            // kind-40 channel create, kind-7 reaction, kind-1984 report).
+            if matches!(event.kind, 1 | 7 | 40 | 42 | 1984) {
+                trust::increment_posts_created(&event.pubkey, &self.env).await;
+            }
+            trust::update_last_active(&event.pubkey, &self.env).await;
+
+            // After activity update, check for trust promotion
+            let _ = trust::check_promotion(&event.pubkey, &self.env).await;
+
             // NIP-09: Process deletion events -- remove targeted events by same author
             if event.kind == 5 {
                 self.process_deletion(&event).await;
+            }
+
+            // NIP-56: Process report events -- insert into reports table and check auto-hide
+            if event.kind == 1984 {
+                self.process_report(&event).await;
             }
         } else {
             Self::send_ok(ws, &event.id, false, "error: failed to save event");
@@ -197,9 +310,35 @@ impl NostrRelayDO {
         // Persist subscriptions to DO storage so they survive hibernation
         self.save_subscriptions(session_id).await;
 
+        // Determine the requesting session's pubkey and zone access for filtering
+        let session_pubkey = {
+            let sessions = self.sessions.borrow();
+            sessions
+                .get(&session_id)
+                .and_then(|s| s.authed_pubkey.clone())
+        };
+
         // Query D1 for matching events
         let events = self.query_events(&filters).await;
+
+        // Zone-filter: exclude events from channels the user lacks zone access for.
+        // Only applies to kind-42 (channel messages) events.
         for event in &events {
+            if event.kind == 42 {
+                if let Some(channel_id) = filter::tag_value(event, "e") {
+                    if let Some(ref pk) = session_pubkey {
+                        let zone = trust::get_channel_zone(&channel_id, &self.env)
+                            .await
+                            .unwrap_or_else(|| "home".to_string());
+                        let is_admin = auth::is_admin(pk, &self.env).await;
+                        if !is_admin
+                            && !trust::has_zone_access(pk, &zone, &self.env).await
+                        {
+                            continue; // skip this event
+                        }
+                    }
+                }
+            }
             Self::send_event(&ws, sub_id, event);
         }
         Self::send_eose(&ws, sub_id);
@@ -365,5 +504,135 @@ impl NostrRelayDO {
                 Err(_) => continue,
             };
         }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Trust / zone helper methods
+// ---------------------------------------------------------------------------
+
+impl NostrRelayDO {
+    /// Check whether a pubkey is the creator of a channel (kind-40 event).
+    pub(crate) async fn is_channel_creator(&self, pubkey: &str, channel_id: &str) -> bool {
+        let db = match self.env.d1("DB") {
+            Ok(db) => db,
+            Err(_) => return false,
+        };
+
+        #[derive(serde::Deserialize)]
+        struct ChannelCreatorRow {
+            pubkey: String,
+        }
+
+        let stmt = db.prepare("SELECT pubkey FROM events WHERE id = ?1 AND kind = 40 LIMIT 1");
+        match stmt.bind(&[JsValue::from_str(channel_id)]) {
+            Ok(s) => match s.first::<ChannelCreatorRow>(None).await {
+                Ok(Some(row)) => row.pubkey == pubkey,
+                _ => false,
+            },
+            Err(_) => false,
+        }
+    }
+
+    /// Check whether a kind-5 deletion event targets events by other authors.
+    ///
+    /// Returns `true` if any `e` tag references an event not authored by the
+    /// deletion event's pubkey.
+    pub(crate) async fn deletion_targets_others(&self, event: &NostrEvent) -> bool {
+        let db = match self.env.d1("DB") {
+            Ok(db) => db,
+            Err(_) => return false,
+        };
+
+        #[derive(serde::Deserialize)]
+        struct EventPubkeyRow {
+            pubkey: String,
+        }
+
+        let target_ids: Vec<&str> = event
+            .tags
+            .iter()
+            .filter(|t| t.len() >= 2 && t[0] == "e")
+            .map(|t| t[1].as_str())
+            .collect();
+
+        for target_id in &target_ids {
+            let stmt = db.prepare("SELECT pubkey FROM events WHERE id = ?1 LIMIT 1");
+            match stmt.bind(&[JsValue::from_str(target_id)]) {
+                Ok(s) => {
+                    if let Ok(Some(row)) = s.first::<EventPubkeyRow>(None).await {
+                        if row.pubkey != event.pubkey {
+                            return true;
+                        }
+                    }
+                }
+                Err(_) => continue,
+            }
+        }
+
+        false
+    }
+}
+
+// ---------------------------------------------------------------------------
+// NIP-56: Report processing
+// ---------------------------------------------------------------------------
+
+impl NostrRelayDO {
+    /// Process a kind-1984 report event.
+    ///
+    /// Extracts the `e` tag (reported event), `p` tag (reported pubkey), and
+    /// reason from the `report` tag or content. Inserts into the `reports`
+    /// table and triggers auto-hide if the threshold is reached.
+    pub(crate) async fn process_report(&self, report_event: &NostrEvent) {
+        // Extract the reported event ID from the `e` tag
+        let reported_event_id = match filter::tag_value(report_event, "e") {
+            Some(id) => id,
+            None => return, // Invalid report: no `e` tag
+        };
+
+        // Extract the reported pubkey from the `p` tag
+        let reported_pubkey = match filter::tag_value(report_event, "p") {
+            Some(pk) => pk,
+            None => return, // Invalid report: no `p` tag
+        };
+
+        // Extract reason from `report` tag first, fall back to content
+        let reason = filter::tag_value(report_event, "report")
+            .unwrap_or_else(|| {
+                if report_event.content.is_empty() {
+                    "other".to_string()
+                } else {
+                    report_event.content.clone()
+                }
+            });
+
+        // Separate structured reason from free-text
+        let (reason_code, reason_text) = match reason.as_str() {
+            r @ ("nudity" | "profanity" | "illegal" | "spam" | "impersonation") => {
+                // Structured reason; content may hold additional free-text
+                let text = if report_event.content.is_empty() {
+                    None
+                } else {
+                    Some(report_event.content.as_str())
+                };
+                (r.to_string(), text)
+            }
+            _ => {
+                // Free-text reason
+                ("other".to_string(), Some(reason.as_str()))
+            }
+        };
+
+        let _ = moderation::insert_report(
+            &self.env,
+            &report_event.id,
+            &report_event.pubkey,
+            &reported_event_id,
+            &reported_pubkey,
+            &reason_code,
+            reason_text,
+        )
+        .await;
     }
 }

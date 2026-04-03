@@ -86,5 +86,14 @@ pub mod mark_all_read;
 pub mod zone_hero;
 pub mod channel_stats;
 
+// -- Moderation (Phase 3 / P2) ----------------------------------------------
+pub mod report_button;
+pub mod hidden_message;
+pub mod thread_view;
+
 // -- UX Completion (Stream 6) -----------------------------------------------
 pub mod admin_checklist;
+
+// -- Onboarding & Badges (Phase 2 P1) --------------------------------------
+pub mod badge_display;
+pub mod onboarding_modal;
