@@ -183,6 +183,12 @@ pub fn DmChatPage() -> impl IntoView {
                             <h1 class="text-lg font-bold text-white truncate">
                                 {move || recipient_display_memo.get()}
                             </h1>
+                            <p class="text-[10px] font-mono text-gray-500 truncate -mt-0.5 mb-0.5">
+                                {move || {
+                                    let rpk = recipient_pubkey();
+                                    crate::utils::shorten_pubkey(&rpk)
+                                }}
+                            </p>
                             <div class="flex items-center gap-2">
                                 // Connection indicator
                                 {move || {

@@ -151,12 +151,13 @@ pub fn DmListPage() -> impl IntoView {
             // New DM input
             <Show when=move || show_new_dm.get()>
                 <div class="bg-gray-800 border border-gray-700 rounded-lg p-4 mb-4">
-                    <label class="block text-sm text-gray-300 mb-2">"Recipient pubkey (64 hex chars)"</label>
+                    <label class="block text-sm text-gray-300 mb-1">"Send to"</label>
+                    <p class="text-xs text-gray-500 mb-2">"Enter their pubkey (64 hex characters)"</p>
                     <div class="flex gap-2">
                         <input
                             type="text"
                             class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-amber-500 transition-colors text-sm font-mono"
-                            placeholder="Enter hex pubkey..."
+                            placeholder="e.g. a1b2c3d4..."
                             prop:value=move || new_pubkey_input.get()
                             on:input=on_new_pubkey_input
                             on:keydown=on_new_pubkey_keydown
@@ -267,6 +268,9 @@ fn ConversationRow(convo: DMConversation) -> impl IntoView {
     let avatar_text = convo.pubkey[..2].to_uppercase();
     let avatar_bg = pubkey_color(&convo.pubkey);
     let name = convo.name.clone();
+    let short_pk = crate::utils::shorten_pubkey(&convo.pubkey);
+    // Show pubkey separately only when name differs from shortened pubkey
+    let _name_is_pubkey = name == short_pk || name == convo.pubkey;
     let last_message = convo.last_message.clone();
     let has_message = !last_message.is_empty();
 
@@ -285,15 +289,20 @@ fn ConversationRow(convo: DMConversation) -> impl IntoView {
                     // Content
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center justify-between gap-2">
-                            <span class=move || {
-                                if has_unread {
-                                    "font-bold text-sm text-white truncate"
-                                } else {
-                                    "font-semibold text-sm text-gray-200 truncate"
-                                }
-                            }>
-                                {name}
-                            </span>
+                            <div class="min-w-0">
+                                <span class=move || {
+                                    if has_unread {
+                                        "font-bold text-sm text-white truncate block"
+                                    } else {
+                                        "font-semibold text-sm text-gray-200 truncate block"
+                                    }
+                                }>
+                                    {name}
+                                </span>
+                                <span class="text-[10px] font-mono text-gray-500 truncate block">
+                                    {short_pk}
+                                </span>
+                            </div>
                             <span class="text-xs text-gray-500 flex-shrink-0">
                                 {time_display}
                             </span>
