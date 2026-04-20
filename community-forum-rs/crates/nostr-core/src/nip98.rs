@@ -305,6 +305,28 @@ pub fn authorization_header(token: &str) -> String {
     format!("{NOSTR_PREFIX}{token}")
 }
 
+/// Build a ready-to-send `Authorization: Nostr <base64>` header value for
+/// an outbound HTTP request.
+///
+/// Convenience wrapper for CLI/worker clients that need the full header
+/// value in one call. Reuses [`create_token`] internally — the signing
+/// logic lives in a single place.
+///
+/// # Arguments
+/// * `secret_key` - 32-byte secp256k1 secret key
+/// * `url` - The full request URL
+/// * `method` - HTTP method (GET, POST, etc.)
+/// * `body` - Optional request body (hashed into the payload tag if present)
+pub fn sign_request_header(
+    secret_key: &[u8; 32],
+    url: &str,
+    method: &str,
+    body: Option<&[u8]>,
+) -> Result<String, Nip98Error> {
+    let token = create_token(secret_key, url, method, body)?;
+    Ok(authorization_header(&token))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

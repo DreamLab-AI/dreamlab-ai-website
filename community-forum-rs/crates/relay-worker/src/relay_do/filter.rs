@@ -215,7 +215,7 @@ pub(crate) fn event_matches_filters(event: &NostrEvent, filters: &[NostrFilter])
             // Check that the event has at least one tag matching this filter
             let has_match = event.tags.iter().any(|tag| {
                 tag.first().map(|t| t.as_str()) == Some(tag_name)
-                    && tag.get(1).map_or(false, |v| required.contains(&v.as_str()))
+                    && tag.get(1).is_some_and(|v| required.contains(&v.as_str()))
             });
             if !has_match {
                 continue 'outer;

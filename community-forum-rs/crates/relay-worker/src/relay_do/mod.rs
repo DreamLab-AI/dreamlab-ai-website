@@ -20,9 +20,12 @@
 
 mod broadcast;
 mod filter;
+mod mod_cache;
 mod nip_handlers;
 mod session;
 mod storage;
+
+pub(crate) use mod_cache::ModCache;
 
 use std::cell::RefCell;
 use std::collections::HashMap;
@@ -47,6 +50,8 @@ pub struct NostrRelayDO {
     pub(crate) next_session_id: RefCell<u64>,
     pub(crate) rate_limits: RefCell<HashMap<String, Vec<f64>>>,
     pub(crate) connection_counts: RefCell<HashMap<String, u32>>,
+    /// WI-2: 60s-TTL cache of active ban/mute actions keyed by target pubkey.
+    pub(crate) mod_cache: ModCache,
 }
 
 impl DurableObject for NostrRelayDO {
@@ -58,6 +63,7 @@ impl DurableObject for NostrRelayDO {
             next_session_id: RefCell::new(1),
             rate_limits: RefCell::new(HashMap::new()),
             connection_counts: RefCell::new(HashMap::new()),
+            mod_cache: ModCache::new(),
         }
     }
 

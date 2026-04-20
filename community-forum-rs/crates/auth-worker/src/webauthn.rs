@@ -89,6 +89,10 @@ struct RegisterVerifyBody {
     public_key_flat: Option<String>,
     #[serde(rename = "prfSalt")]
     prf_salt: Option<String>,
+    /// WI-4: optional invite code allowing registration bypass when
+    /// Web-of-Trust gating is enabled.
+    #[serde(rename = "inviteCode")]
+    invite_code: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -280,7 +284,11 @@ pub async fn register_options(body_bytes: &[u8], env: &Env) -> Result<Response> 
 ///
 /// Verify a WebAuthn registration response, store the credential in D1,
 /// provision a Solid pod, and return the user's DID/WebID/podUrl.
-pub async fn register_verify(body_bytes: &[u8], env: &Env) -> Result<Response> {
+pub async fn register_verify(
+    body_bytes: &[u8],
+    cf_country: Option<&str>,
+    env: &Env,
+) -> Result<Response> {
     console_log!("[register_verify] handler entered");
     console_log!(
         "[register_verify] raw body ({} bytes): {}",
@@ -297,6 +305,32 @@ pub async fn register_verify(body_bytes: &[u8], env: &Env) -> Result<Response> {
         Some(pk) if is_valid_pubkey(pk) => pk.to_lowercase(),
         _ => return json_err("Invalid pubkey", 400),
     };
+
+    // WI-3/WI-4: Web-of-Trust registration gate.
+    // If `instance_settings.wot_enabled = 1`, the pubkey must appear in
+    // `wot_entries` (either referente-sourced or manual_override) OR the
+    // client must supply a valid `inviteCode` (consumed atomically here).
+    // Otherwise registration fails with 403. When WoT is disabled this is
+    // a no-op.
+    if !crate::wot::is_allowed_by_wot(&pubkey, env).await.unwrap_or(false) {
+        match body.invite_code.as_deref() {
+            Some(code) if !code.is_empty() => {
+                if let Err(reason) =
+                    crate::invites::consume_for_registration(code, &pubkey, env).await
+                {
+                    return json_err(reason, 403);
+                }
+                // Invite consumed: pubkey is now a member row. Fall through
+                // to the rest of registration.
+            }
+            _ => {
+                return json_err(
+                    "Registration is gated by Web-of-Trust. Supply a valid inviteCode or ask an admin for access.",
+                    403,
+                );
+            }
+        }
+    }
 
     // Verify a non-expired challenge exists. Registration uses a simplified flow
     // where the challenge is stored with pubkey=challenge_b64 (from register_options).
@@ -365,6 +399,10 @@ pub async fn register_verify(body_bytes: &[u8], env: &Env) -> Result<Response> {
         .bind(&[js_str(&challenge_row.challenge)])?
         .run()
         .await?;
+
+    // WI-5: queue a welcome greeting on successful first registration.
+    // No-ops when the welcome bot is disabled or misconfigured.
+    crate::welcome::send_on_first_registration(&pubkey, cf_country, env).await;
 
     let response_body = serde_json::json!({
         "verified": true,

@@ -57,6 +57,13 @@ impl NostrRelayDO {
     /// to reconstruct session entries, then restores subscriptions and auth
     /// state from DO transactional storage so that event broadcasting and
     /// authenticated operations continue working across hibernation boundaries.
+    ///
+    /// Lints:
+    /// - `await_holding_refcell_ref`: the DO runs single-threaded in a V8
+    ///   isolate, so there is no concurrent borrow hazard.
+    /// - `map_entry`: values depend on async storage loads, which cannot be
+    ///   computed inside an `Entry::or_insert_with` closure.
+    #[allow(clippy::await_holding_refcell_ref, clippy::map_entry)]
     pub(crate) async fn recover_session(&self, ws: &WebSocket) -> u64 {
         let tags = self.state.get_tags(ws);
 
@@ -175,10 +182,7 @@ impl NostrRelayDO {
         session_id: u64,
     ) -> Option<String> {
         let key = format!("ws_auth:{session_id}");
-        match storage.get::<String>(&key).await {
-            Ok(pubkey) => pubkey,
-            Err(_) => None,
-        }
+        storage.get::<String>(&key).await.unwrap_or_default()
     }
 
     /// Persist current subscription state for a session to DO transactional storage.

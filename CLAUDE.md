@@ -27,6 +27,9 @@ DreamLab AI is a premium AI training and consulting platform. This is a React SP
 | Forum | Leptos 0.7 CSR (Rust/WASM in `community-forum-rs/crates/forum-client/`) |
 | Workers | Rust (workers-rs) — 5 Cloudflare Workers in `community-forum-rs/crates/` |
 | Forum Build | Trunk (WASM target) |
+| Admin CLI | `community-forum-rs/crates/admin-cli/` — `forum-admin` Rust binary, NIP-98 authed, AI-agent friendly |
+| Moderation | Nostr event kinds 30910-30914 (Ban, Mute, Warning, Report, ModerationAction) + D1 projections |
+| WoT/Invites | Referente kind-3 whitelist, tenure-based invite credits, welcome bot |
 
 ## Build & Test Commands
 
@@ -131,6 +134,9 @@ community-forum-rs/     # Rust workspace (Cargo.toml)
       src/lib.rs        # Worker entry point (NIP-01/09/11/16/29/33/40/42/45/50/98)
     search-worker/      # CF Worker: RuVector, .rvf, cosine k-NN (R2 + KV)
       src/lib.rs        # Worker entry point
+    admin-cli/          # forum-admin binary: NIP-98 authed HTTP client for ops + AI agents
+      src/              # main.rs, auth.rs, client.rs, commands/{whitelist,wot,invite,mod_ops,channel}.rs
+      AGENT.md          # AI-agent usage cheat sheet
 
 wasm-voronoi/           # Rust WASM (Cargo.toml, src/lib.rs)
 
@@ -212,13 +218,41 @@ VITE_AUTH_API_URL=https://dreamlab-auth-api.*.workers.dev
 
 | Worker | Source | Storage | Purpose |
 |--------|--------|---------|---------|
-| auth-worker | `community-forum-rs/crates/auth-worker/` | D1 + KV + R2 | WebAuthn, NIP-98, pod provisioning |
+| auth-worker | `community-forum-rs/crates/auth-worker/` | D1 + KV + R2 | WebAuthn, NIP-98, pod provisioning, moderation API, WoT, invite credits, welcome bot |
 | pod-worker | `community-forum-rs/crates/pod-worker/` | R2 + KV | Solid pods, images/media, WAC ACL |
 | search-worker | `community-forum-rs/crates/search-worker/` | R2 + KV | RuVector, .rvf, cosine k-NN |
-| relay-worker | `community-forum-rs/crates/relay-worker/` | D1 + DO | WebSocket relay, NIP-01/09/11/16/29/33/40/42/45/50/98 |
+| relay-worker | `community-forum-rs/crates/relay-worker/` | D1 + DO | WebSocket relay + ingress mute/ban enforcement (mod_cache) |
 | preview-worker | `community-forum-rs/crates/preview-worker/` | Cache API | OG metadata, Twitter oEmbed, SSRF protection |
 
 All workers are Rust (workers-rs), deployed via `workers-deploy.yml`. Runtime: `"workers-rs"`.
+
+### Admin CLI
+
+`forum-admin` (crate `admin-cli`) is a headless NIP-98-authed HTTP client for ops and AI coding agents:
+
+```bash
+cargo run -p admin-cli -- --help
+cargo run -p admin-cli -- whitelist add <pubkey>
+cargo run -p admin-cli -- wot set-referente <pubkey>
+cargo run -p admin-cli -- invite create --expiry 168
+cargo run -p admin-cli -- mod ban <pubkey> --reason "spam"
+```
+
+`--json` flag on all commands for machine consumption. nsec is never persisted to disk — supplied via `--nsec`, `FORUM_ADMIN_NSEC` env, or `--bunker` NIP-46 URI. See `community-forum-rs/crates/admin-cli/AGENT.md` for AI-agent cheat sheet.
+
+### Moderation event model
+
+Nostr custom parameterized-replaceable events:
+
+| Kind | Name | `d` tag | Signer |
+|------|------|---------|--------|
+| 30910 | Ban | banned pubkey | admin |
+| 30911 | Mute | muted pubkey | admin (`expires` tag) |
+| 30912 | Warning | warned pubkey + ts | admin |
+| 30913 | Report | reported event id | any authed user |
+| 30914 | ModerationAction | action uuid | admin |
+
+Enforcement: relay-worker rejects kind-1/42 from pubkeys with active mute or any ban (60s DO-cached lookup against D1).
 
 ## Behavioral Rules
 

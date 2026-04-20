@@ -1,22 +1,24 @@
 # DreamLab Community Forum
 
-Rust workspace for the DreamLab community forum — all backend workers and the forum client.
+Rust workspace for the DreamLab community forum — all backend workers, the forum client, and the admin CLI.
 Migration from SvelteKit/TypeScript completed 2026-03-12; this is now the sole implementation.
 **PRD v6.0 hardening + Solid pod upgrade completed 2026-03-16.**
+**Obelisk-Polish sprint (moderation + WoT + invites + welcome bot + admin CLI) landed 2026-04-20.**
 
 ## Architecture
 
-Seven crates in a Cargo workspace:
+Eight crates in a Cargo workspace:
 
 | Crate | Type | Purpose |
 |-------|------|---------|
-| `nostr-core` | Library | Shared Nostr protocol: NIP-01/07/09/29/33/40/42/45/50/52/98, key management, event validation, WASM bridge |
-| `auth-worker` | CF Worker | WebAuthn register/login (passkey-rs), NIP-98 verification, pod provisioning, rate limiting (D1 + KV + R2) |
+| `nostr-core` | Library | Shared Nostr protocol: NIP-01/07/09/29/33/40/42/45/50/52/98, moderation event kinds 30910-30914, key management, event validation, WASM bridge |
+| `auth-worker` | CF Worker | WebAuthn register/login (passkey-rs), NIP-98 verification, pod provisioning, rate limiting, moderation/WoT/invites/welcome-bot APIs (D1 + KV + R2) |
 | `pod-worker` | CF Worker | **Solid pod storage** — LDP containers, WAC ACL inheritance, JSON Patch (RFC 6902), conditional requests, per-user quotas, WebID profiles, content negotiation, micropayments (HTTP 402), WebFinger, NIP-05, notifications (R2 + KV) |
 | `preview-worker` | CF Worker | Link preview with SSRF protection, OG/meta parsing, rate limiting, modular architecture (ssrf/parse/oembed) |
-| `relay-worker` | CF Worker | NIP-01 WebSocket relay via Durable Objects, hibernation-safe sessions with subscription persistence, modular (session/filter/broadcast/nip_handlers/storage) (D1 + DO) |
+| `relay-worker` | CF Worker | NIP-01 WebSocket relay via Durable Objects, hibernation-safe sessions, ingress mute/ban enforcement via D1-backed mod cache (D1 + DO) |
 | `search-worker` | CF Worker | RuVector search, rvf-types binary format, in-memory cosine k-NN, rate limiting (R2 + KV) |
 | `forum-client` | Leptos App | Browser client (Leptos 0.7 CSR + Trunk), passkey auth, 18 pages, 58+ components, smart auth UX, admin checklist |
+| `admin-cli` | Binary | `forum-admin` — NIP-98 authed HTTP client for headless operators and AI coding agents (whitelist, WoT, invites, moderation, channels) |
 
 ## Crate Dependency Graph
 
@@ -34,6 +36,9 @@ pod-worker
     +-- nostr-core
 
 search-worker
+    +-- nostr-core
+
+admin-cli
     +-- nostr-core
 
 preview-worker
@@ -67,14 +72,15 @@ cd crates/forum-client && trunk serve
 
 | Crate | Tests | Coverage |
 |-------|-------|----------|
-| nostr-core | 140 | NIP-01/07/09/29/33/40/42/45/50/52/98, keys, WASM bridge, proptest NIP-98 |
-| relay-worker | 64 | Filter building, event matching, broadcast, rate limiting, session recovery |
-| auth-worker | 31 | WebAuthn utils (base64url, constant-time, pubkey validation), routing |
+| nostr-core | 154 | NIP-01/07/09/29/33/40/42/45/50/52/98, moderation event kinds 30910-30914, keys, WASM bridge, proptest NIP-98 |
+| relay-worker | 24 | Filter building, event matching, broadcast, rate limiting, session recovery, mod-cache mute/ban enforcement |
+| auth-worker | 70 | WebAuthn utils, routing, moderation handlers, WoT gating, invite credits, welcome-bot config, schema migrations |
 | pod-worker | 97 | LDP containers, WAC ACL, JSON Patch, conditional requests, quotas, WebID, provisioning, content negotiation, payments, notifications, remoteStorage |
 | preview-worker | 35 | SSRF protection, OG parsing, oEmbed |
 | search-worker | 41 | Vector store CRUD, cosine similarity, RVF serialization, embedding |
 | forum-client | 49 | HTML sanitization (XSS), relay URL resolution, auth state, session management |
-| **Total** | **457** | |
+| admin-cli | 80 | Argument parsing, NIP-98 signing, URL composition, error mapping, dry-run output shape |
+| **Total** | **550** | |
 
 ## Pod-Worker Features (v6.0)
 
@@ -120,13 +126,29 @@ The relay Durable Object is split into focused modules:
 
 ## Status
 
+**Obelisk-Polish sprint COMPLETE** (2026-04-20) — moderation data model (Nostr kinds 30910-30914), WoT gating, invite credits with tenure, welcome bot, admin CLI.
 **PRD v6.0 COMPLETE** (2026-03-16) — full audit remediation + Solid pod upgrade.
 
-- **~57K LOC** across 7 crates, 241 source files
-- **457 tests**, 0 failures, 0 compiler warnings
-- **18 routes** in forum client (exceeds PRD v3.0 target of 17)
+- **8 crates** in the workspace
+- **550 tests**, 0 failures
 - **All 5 workers** deployed to Cloudflare Workers (runtime: `"workers-rs"`)
 - **Dual SPA**: dreamlab-ai.com/community/ serves the Leptos WASM client
+- **`forum-admin` CLI** shipping for headless operators + AI coding agents
+
+### Sprint 2026-04 (Obelisk-Polish) deliverables
+
+| WI | Description | Artefacts |
+|----|-------------|-----------|
+| WI-1 | Admin CLI | `crates/admin-cli/` (new) |
+| WI-2 | Moderation data model | `nostr-core/moderation_events.rs`, `auth-worker/moderation.rs`, `relay-worker/relay_do/mod_cache.rs`, migration 002 |
+| WI-3 | Web-of-Trust gating | `auth-worker/wot.rs`, `wot_entries` table, registration gate |
+| WI-4 | Invite credits | `auth-worker/invites.rs`, `invitations` + `invitation_redemptions` tables, tenure check |
+| WI-5 | Welcome bot | `auth-worker/welcome.rs`, age-encrypted nsec, locale resolution |
+| WI-6 | UX/UI audit | [`docs/sprint/ux-ui-audit-2026-04.md`](../docs/sprint/ux-ui-audit-2026-04.md) |
+| WI-7 | User-journey audit | [`docs/sprint/user-journey-audit-2026-04.md`](../docs/sprint/user-journey-audit-2026-04.md) |
+| bonus | Security baseline audit | [`docs/sprint/security-audit-2026-04.md`](../docs/sprint/security-audit-2026-04.md) |
+
+Sprint spec: [`docs/sprint/2026-04-obelisk-polish-sprint.md`](../docs/sprint/2026-04-obelisk-polish-sprint.md).
 
 ### PRD History
 
@@ -137,4 +159,5 @@ The relay Durable Object is split into focused modules:
 | [v3.0](../docs/prd-rust-port-v3.0.md) | Superseded by v4.0 | 2026-03-07 |
 | [v4.0](../docs/prd-rust-port-v4.0.md) | Complete | 2026-03-09 |
 | [v5.0-UX](../docs/prd-ux-onboarding-v5.0.md) | Complete | 2026-03-16 |
-| [v6.0](../docs/prd-hardening-solid-v6.0.md) | **Complete** | 2026-03-16 |
+| [v6.0](../docs/prd-hardening-solid-v6.0.md) | Complete | 2026-03-16 |
+| [Sprint 2026-04 (Obelisk-Polish)](../docs/sprint/2026-04-obelisk-polish-sprint.md) | **Complete** | 2026-04-20 |

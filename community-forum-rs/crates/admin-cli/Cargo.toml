@@ -1,0 +1,51 @@
+[package]
+name = "admin-cli"
+version = "0.1.0"
+edition = "2021"
+description = "Headless admin CLI for community-forum-rs — NIP-98 authed HTTP driver"
+
+[[bin]]
+name = "forum-admin"
+path = "src/main.rs"
+
+[dependencies]
+nostr-core = { workspace = true }
+
+# CLI parsing
+clap = { version = "4", features = ["derive", "env"] }
+
+# HTTP client — rustls only, no openssl
+reqwest = { version = "0.12", default-features = false, features = [
+    "rustls-tls",
+    "json",
+    "gzip",
+] }
+
+# Async runtime
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
+async-trait = "0.1"
+
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# Errors
+anyhow = "1"
+thiserror = { workspace = true }
+
+# Secret handling
+zeroize = { workspace = true }
+
+# Bech32 for nsec/npub decoding (NIP-19)
+bech32 = "0.11"
+
+# Encoding
+hex = { workspace = true }
+base64 = { workspace = true }
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "test-util"] }

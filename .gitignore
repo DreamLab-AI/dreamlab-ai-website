@@ -81,6 +81,9 @@ Thumbs.db
 # Rust build artifacts
 wasm-voronoi/target/
 
+# External reference repos (for analysis, not part of this project)
+external/
+
 # Large media source files converted to WebP (keep originals that are <500KB)
 # Converted: labview2.jpg (8.6MB), labview3.jpg (7.4MB), view3.jpeg (3.1MB), wine.png (2.2MB)
 public/data/media/labview*.jpg

@@ -15,6 +15,7 @@ pub mod event;
 pub mod gift_wrap;
 pub mod groups;
 pub mod keys;
+pub mod moderation_events;
 pub mod nip44;
 pub mod nip98;
 pub mod types;
@@ -32,11 +33,18 @@ pub use gift_wrap::{gift_wrap, unwrap_gift, GiftWrapError, UnwrappedGift};
 pub use keys::{derive_from_prf, generate_keypair, Keypair, PublicKey, SecretKey, Signature};
 pub use nip44::{decrypt as nip44_decrypt, encrypt as nip44_encrypt};
 pub use nip98::{
-    create_token as create_nip98_token, verify_token as verify_nip98_token,
-    verify_token_at as verify_nip98_token_at, Nip98Token as VerifiedToken,
+    authorization_header as nip98_authorization_header, create_token as create_nip98_token,
+    sign_request_header as nip98_sign_request_header, verify_token as verify_nip98_token,
+    verify_token_at as verify_nip98_token_at, Nip98Error, Nip98Token as VerifiedToken,
 };
 pub use types::{EventId, Tag, Timestamp};
 
 pub use calendar::{
     create_calendar_event, create_rsvp, CalendarError, RsvpStatus,
+};
+
+pub use moderation_events::{
+    build_ban, build_moderation_action, build_mute, build_report, build_warning, d_tag_of,
+    mute_expires_at, validate_moderation_event, ModerationEventError, ADMIN_ONLY_MOD_KINDS,
+    KIND_BAN, KIND_MODERATION_ACTION, KIND_MUTE, KIND_REPORT, KIND_WARNING, MOD_KINDS,
 };

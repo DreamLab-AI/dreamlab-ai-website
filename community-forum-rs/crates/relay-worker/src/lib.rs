@@ -368,6 +368,19 @@ async fn ensure_schema(env: &Env) {
             reason TEXT, \
             created_at INTEGER NOT NULL\
         )",
+        // WI-2: mirror of auth-worker's moderation_actions. Populated when
+        // kind-30910/30911 Nostr events signed by an admin are saved here.
+        // Consumed by the relay's ingress gate to block muted/banned authors.
+        "CREATE TABLE IF NOT EXISTS moderation_actions (\
+            id TEXT PRIMARY KEY, \
+            action TEXT NOT NULL, \
+            target_pubkey TEXT NOT NULL, \
+            performed_by TEXT NOT NULL, \
+            reason TEXT, \
+            expires_at INTEGER, \
+            event_id TEXT NOT NULL, \
+            created_at INTEGER NOT NULL\
+        )",
     ];
     for stmt in create_stmts {
         let _ = db.prepare(stmt).run().await;
@@ -382,6 +395,8 @@ async fn ensure_schema(env: &Env) {
         "CREATE INDEX IF NOT EXISTS idx_admin_log_actor ON admin_log(actor_pubkey)",
         "CREATE INDEX IF NOT EXISTS idx_admin_log_target ON admin_log(target_pubkey)",
         "CREATE INDEX IF NOT EXISTS idx_admin_log_created ON admin_log(created_at)",
+        "CREATE INDEX IF NOT EXISTS idx_mod_actions_target ON moderation_actions(target_pubkey)",
+        "CREATE INDEX IF NOT EXISTS idx_mod_actions_active ON moderation_actions(action, expires_at)",
     ];
     for stmt in index_stmts {
         let _ = db.prepare(stmt).run().await;

@@ -1,8 +1,10 @@
 # DreamLab Community Forum -- Domain-Driven Design
 
-**Last updated:** 2026-03-16 | [Back to Documentation Index](../README.md)
+**Last updated:** 2026-04-20 | [Back to Documentation Index](../README.md)
 
-Domain-Driven Design documentation for the Rust port of the DreamLab community forum. These documents define the domain model, bounded contexts, aggregates, events, value objects, and shared vocabulary used across the 7-crate Rust workspace (`nostr-core`, `forum-client`, `auth-worker`, `pod-worker`, `preview-worker`, `relay-worker`, `search-worker`).
+Domain-Driven Design documentation for the Rust port of the DreamLab community forum. These documents define the domain model, bounded contexts, aggregates, events, value objects, and shared vocabulary used across the 8-crate Rust workspace (`nostr-core`, `forum-client`, `auth-worker`, `pod-worker`, `preview-worker`, `relay-worker`, `search-worker`, `admin-cli`).
+
+The 2026-04 Obelisk-Polish sprint added moderation (kinds 30910-30914), WoT gating, invite credits, welcome bot, and the `admin-cli` crate. See the [sprint spec](../sprint/2026-04-obelisk-polish-sprint.md).
 
 ## Documents
 
@@ -86,13 +88,14 @@ graph LR
 
 | Crate | Bounded Context | Target | Language |
 |-------|----------------|--------|----------|
-| `nostr-core` | Nostr Core | wasm32 + native | Rust |
+| `nostr-core` | Nostr Core (+ moderation event kinds 30910-30914) | wasm32 + native | Rust |
 | `forum-client` | Forum Client | wasm32 only | Rust |
-| `auth-worker` | Identity and Auth | CF Worker (wasm32) | Rust |
+| `auth-worker` | Identity, Auth, Moderation, WoT, Invites, Welcome Bot | CF Worker (wasm32) | Rust |
 | `pod-worker` | Storage | CF Worker (wasm32) | Rust |
 | `preview-worker` | Preview | CF Worker (wasm32) | Rust |
-| `relay-worker` | Relay | CF Worker (wasm32) | Rust |
+| `relay-worker` | Relay (+ ingress mute/ban enforcement) | CF Worker (wasm32) | Rust |
 | `search-worker` | Search | CF Worker (wasm32) | Rust |
+| `admin-cli` | Operator Tooling (headless NIP-98 client) | native binary | Rust |
 
 ## Related Documents
 

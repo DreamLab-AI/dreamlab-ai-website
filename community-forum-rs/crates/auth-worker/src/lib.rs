@@ -10,10 +10,18 @@
 //! - `pod.rs` -- Pod provisioning and profile retrieval
 //! - `auth.rs` -- NIP-98 verification wrapper
 
+mod admin;
 mod auth;
+mod crypto;
+mod http;
+mod invites;
+mod moderation;
 mod pod;
 mod rate_limit;
+mod schema;
 mod webauthn;
+mod welcome;
+mod wot;
 
 use worker::*;
 
@@ -90,6 +98,12 @@ async fn fetch(req: Request, env: Env, _ctx: Context) -> Result<Response> {
 
 /// Inner request handler. All errors are caught by the outer `fetch` wrapper.
 async fn handle_request(mut req: Request, env: &Env) -> Result<Response> {
+    // Apply the idempotent schema bootstrap on every cold start so newly
+    // added tables (moderation_actions, mod_reports, wot_entries, members,
+    // invitations, invitation_redemptions, instance_settings) exist before
+    // any handler tries to use them. Failures are swallowed inside.
+    schema::ensure_schema(env).await;
+
     // CORS preflight
     if req.method() == Method::Options {
         return Ok(Response::empty()?
@@ -180,7 +194,12 @@ async fn route(
 
     // WebAuthn Registration -- Verify
     if path == "/auth/register/verify" && *method == Method::Post {
-        return webauthn::register_verify(body_bytes, env).await;
+        let cf_country = req
+            .headers()
+            .get("CF-IPCountry")
+            .ok()
+            .flatten();
+        return webauthn::register_verify(body_bytes, cf_country.as_deref(), env).await;
     }
 
     // WebAuthn Authentication -- Generate options
@@ -200,7 +219,20 @@ async fn route(
 
     // NIP-98 protected endpoints
     if path.starts_with("/api/") {
-        let auth_header = match req.headers().get("Authorization").ok().flatten() {
+        let auth_header_opt = req.headers().get("Authorization").ok().flatten();
+
+        // --- Sprint endpoints: moderation / WoT / invites / welcome ------
+        //
+        // These modules perform their own NIP-98 verification + admin/member
+        // gating via `admin::require_admin` / `require_authed` so we dispatch
+        // before the legacy `auth::verify_nip98` branch below.
+        if let Some(resp) =
+            route_sprint_api(req, env, path, method, body_bytes, auth_header_opt.as_deref()).await?
+        {
+            return Ok(resp);
+        }
+
+        let auth_header = match auth_header_opt {
             Some(h) => h,
             None => {
                 return json_response(
@@ -250,6 +282,138 @@ async fn route(
     }
 
     json_response(env, &serde_json::json!({ "error": "Not found" }), 404)
+}
+
+/// Dispatch to the Obelisk-polish sprint endpoints (moderation / WoT /
+/// invites / welcome). Returns `Ok(Some(resp))` if handled, `Ok(None)`
+/// otherwise so the caller can fall through to the legacy `/api/profile`
+/// handler.
+async fn route_sprint_api(
+    req: &Request,
+    env: &Env,
+    path: &str,
+    method: &Method,
+    body_bytes: &[u8],
+    auth_header: Option<&str>,
+) -> Result<Option<Response>> {
+    // Collect query pairs once for GET endpoints.
+    let query: Vec<(String, String)> = req
+        .url()
+        .map(|u| {
+            u.query_pairs()
+                .map(|(k, v)| (k.to_string(), v.to_string()))
+                .collect()
+        })
+        .unwrap_or_default();
+
+    // -- Moderation (WI-2) ----------------------------------------------
+    if matches!(path, "/api/mod/ban" | "/api/mod/mute" | "/api/mod/warn")
+        && *method == Method::Post
+    {
+        let resp = moderation::handle_action(path, body_bytes, auth_header, env).await?;
+        return Ok(Some(resp));
+    }
+    if path == "/api/mod/report" && *method == Method::Post {
+        let resp = moderation::handle_report(body_bytes, auth_header, env).await?;
+        return Ok(Some(resp));
+    }
+    if path == "/api/mod/actions" && *method == Method::Get {
+        let resp = moderation::handle_list_actions(&query, auth_header, env).await?;
+        return Ok(Some(resp));
+    }
+    if path == "/api/mod/reports" && *method == Method::Get {
+        let resp = moderation::handle_list_reports(&query, auth_header, env).await?;
+        return Ok(Some(resp));
+    }
+    // POST /api/mod/reports/:id/action
+    if let Some(rest) = path.strip_prefix("/api/mod/reports/") {
+        if let Some(report_id) = rest.strip_suffix("/action") {
+            if *method == Method::Post && !report_id.is_empty() && !report_id.contains('/') {
+                let resp =
+                    moderation::handle_report_action(report_id, body_bytes, auth_header, env)
+                        .await?;
+                return Ok(Some(resp));
+            }
+        }
+    }
+
+    // -- Web-of-Trust (WI-3) --------------------------------------------
+    if path == "/api/wot/status" && *method == Method::Get {
+        let resp = wot::handle_status(auth_header, env).await?;
+        return Ok(Some(resp));
+    }
+    if path == "/api/wot/set-referente" && *method == Method::Post {
+        let resp = wot::handle_set_referente(body_bytes, auth_header, env).await?;
+        return Ok(Some(resp));
+    }
+    if path == "/api/wot/refresh" && *method == Method::Post {
+        let resp = wot::handle_refresh(body_bytes, auth_header, env).await?;
+        return Ok(Some(resp));
+    }
+    if matches!(path, "/api/wot/override/add" | "/api/wot/override/remove")
+        && *method == Method::Post
+    {
+        let resp = wot::handle_override(path, body_bytes, auth_header, env).await?;
+        return Ok(Some(resp));
+    }
+
+    // -- Invites (WI-4) -------------------------------------------------
+    if path == "/api/invites/create" && *method == Method::Post {
+        let resp = invites::handle_create(body_bytes, auth_header, env).await?;
+        return Ok(Some(resp));
+    }
+    if path == "/api/invites/mine" && *method == Method::Get {
+        let resp = invites::handle_list_mine(auth_header, env).await?;
+        return Ok(Some(resp));
+    }
+    // POST /api/invites/:id/revoke (must be checked before the generic preview)
+    if let Some(rest) = path.strip_prefix("/api/invites/") {
+        if let Some(invite_id) = rest.strip_suffix("/revoke") {
+            if *method == Method::Post && !invite_id.is_empty() && !invite_id.contains('/') {
+                let resp =
+                    invites::handle_revoke(invite_id, body_bytes, auth_header, env).await?;
+                return Ok(Some(resp));
+            }
+        }
+        // POST /api/invites/:code/redeem
+        if let Some(code) = rest.strip_suffix("/redeem") {
+            if *method == Method::Post && !code.is_empty() && !code.contains('/') {
+                let resp =
+                    invites::handle_redeem(code, body_bytes, auth_header, env).await?;
+                return Ok(Some(resp));
+            }
+        }
+        // GET /api/invites/:code (public preview, no auth)
+        if *method == Method::Get
+            && !rest.is_empty()
+            && !rest.contains('/')
+            && rest != "create"
+            && rest != "mine"
+        {
+            let resp = invites::handle_preview(rest, env).await?;
+            return Ok(Some(resp));
+        }
+    }
+
+    // -- Welcome bot (WI-5) --------------------------------------------
+    if path == "/api/welcome/config" && *method == Method::Get {
+        let resp = welcome::handle_get_config(auth_header, env).await?;
+        return Ok(Some(resp));
+    }
+    if path == "/api/welcome/configure" && *method == Method::Post {
+        let resp = welcome::handle_configure(body_bytes, auth_header, env).await?;
+        return Ok(Some(resp));
+    }
+    if path == "/api/welcome/set-bot-key" && *method == Method::Post {
+        let resp = welcome::handle_set_bot_key(body_bytes, auth_header, env).await?;
+        return Ok(Some(resp));
+    }
+    if path == "/api/welcome/test" && *method == Method::Post {
+        let resp = welcome::handle_test(body_bytes, auth_header, env).await?;
+        return Ok(Some(resp));
+    }
+
+    Ok(None)
 }
 
 /// Map a `worker::Method` enum to its string name.
