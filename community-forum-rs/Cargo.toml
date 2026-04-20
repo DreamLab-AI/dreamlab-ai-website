@@ -22,7 +22,12 @@ leptos_router = "0.7"
 leptos_meta = "0.7"
 
 # Cloudflare Workers
-worker = "0.7"
+# Bumped 0.7 → 0.8 (2026-04-20): worker-build latest requires worker@0.8.1+.
+# Breaking changes we audited: Storage.get returns Result<Option<T>> (code was
+# already Option-aware), default out-dir pkg→build (wrangler.toml already uses
+# build/), DurableObject import (we use `use worker::*` glob which still brings
+# it in). Safe to upgrade.
+worker = "0.8"
 
 # WebAuthn with PRF support
 passkey-types = "0.3"

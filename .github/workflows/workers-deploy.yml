@@ -75,6 +75,7 @@ jobs:
           if ! command -v worker-build &>/dev/null; then
             cargo install worker-build --locked
           fi
+          worker-build --version
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
