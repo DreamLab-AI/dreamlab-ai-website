@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DreamLab Forum</title>
+    <meta name="description" content="DreamLab AI Community Forum — Decentralized, private, Nostr-powered" />
+    <meta name="theme-color" content="#111827" />
+
+    <!-- GitHub Pages SPA deep-link restore: picks up redirect from root 404.html -->
+    <script>
+        (function(){
+            var q = new URLSearchParams(window.location.search);
+            var redirect = q.get('__p');
+            if (redirect) {
+                q.delete('__p');
+                var qs = q.toString();
+                var base = '/community';
+                var full = base + redirect + (qs ? '?' + qs : '') + window.location.hash;
+                history.replaceState(null, '', full);
+            }
+        })();
+    </script>
+
+    <!-- Favicon: amber diamond -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%23fbbf24'/><stop offset='100%25' stop-color='%23d97706'/></linearGradient></defs><polygon points='50,5 95,50 50,95 5,50' fill='url(%23g)' rx='8'/></svg>" type="image/svg+xml" />
+
+    <!-- Inter font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+    <!-- Tailwind Play CDN (development only — production uses Tailwind CLI tree-shaking) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'Avenir', 'Helvetica', 'Arial', 'sans-serif'],
+                    },
+                    colors: {
+                        amber: {
+                            50: '#fffbeb',
+                            100: '#fef3c7',
+                            200: '#fde68a',
+                            300: '#fcd34d',
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                            700: '#b45309',
+                            800: '#92400e',
+                            900: '#78350f',
+                            950: '#451a03',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Shared design tokens (same source as React marketing site) -->
+    <link rel="stylesheet" href="/community/design-tokens-eb78ffb9948c3c2.css" integrity="sha384-dcoEpSAN4pBEnqDEByRyVw5NJ7pi4z790oaypUln0k1EcORaoW5qqRltW9eJXqHW"/>
+    <!-- Forum-specific styles (imports design-tokens.css for @import fallback) -->
+    <link rel="stylesheet" href="/community/style-9ed59ccb96b20ce8.css" integrity="sha384-VOF/xm2MGXnI0SICO3z+bYm8GM7xZ/xAx2r7U9yTYM5EH1NI2FlcyWPnGsNCfHP8"/>
+
+    <!-- Trunk WASM bundle injection (workspace: specify package + binary) -->
+    
+<script type="module">
+import init, * as bindings from '/community/forum-client-10584ba84fe39c36.js';
+const wasm = await init({ module_or_path: '/community/forum-client-10584ba84fe39c36_bg.wasm' });
+
+
+window.wasmBindings = bindings;
+
+
+dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
+
+</script>
+<link rel="modulepreload" href="/community/forum-client-10584ba84fe39c36.js" crossorigin="anonymous" integrity="sha384-B8JRWCIbkaTJMePI1mIZcMU2ySvTHmUimwS/DWc5Su2KpJkZ7ZYu64dhqRk3MX7e"><link rel="modulepreload" href="/community/snippets/forum-client-64db01ff691d1dbf/js/webgpu-particles.js" crossorigin="anonymous" integrity="sha384-PBuu3y5gDaNcSFK/3/9rBV74dQxhKz8wIu47WwR/DAskrbf5n5QHBwv/f6t3Qrj2"><link rel="preload" href="/community/forum-client-10584ba84fe39c36_bg.wasm" crossorigin="anonymous" integrity="sha384-5/yn0enwA4OPjz1qUawiM6xWmif8KghAiqYz5R/4kKlAsBMqGzO4n9TpdpdPGirx" as="fetch" type="application/wasm"><script>window.__ENV__={VITE_RELAY_URL:"wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev",VITE_AUTH_API_URL:"https://dreamlab-auth-api.solitary-paper-764d.workers.dev",VITE_POD_API_URL:"https://dreamlab-pod-api.solitary-paper-764d.workers.dev",VITE_SEARCH_API_URL:"https://dreamlab-search-api.solitary-paper-764d.workers.dev",VITE_LINK_PREVIEW_API_URL:"https://dreamlab-link-preview.solitary-paper-764d.workers.dev"};</script></head>
+<body>
+    <!-- Loading screen — replaced by Leptos mount_to_body() -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-ring"></div>
+        <h1 class="loading-logo gradient-text">DreamLab</h1>
+        <p class="loading-status">Initializing&hellip;</p>
+    </div>
+
+    <noscript>This application requires JavaScript and WebAssembly.</noscript>
+</body>
+</html>

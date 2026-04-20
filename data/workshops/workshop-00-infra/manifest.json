@@ -1,0 +1,73 @@
+{
+  "title": "A Creative Technologist's Guide to GitHub & AI-Powered Workflows",
+  "pages": [
+    {
+      "slug": "README.md",
+      "title": "A Creative Technologist's Guide to GitHub & AI-Powered Workflows"
+    },
+    {
+      "slug": "00_introduction.md",
+      "title": "Chapter 0: Introduction & Workshop Overview"
+    },
+    {
+      "slug": "01_why_git.md",
+      "title": "Chapter 1: Why Git? Understanding Version Control"
+    },
+    {
+      "slug": "02_a_github_account.md",
+      "title": "Chapter 2a: Creating Your GitHub Account"
+    },
+    {
+      "slug": "02_b_install_git_vscode.md",
+      "title": "Chapter 2b: Installing Git & VS Code"
+    },
+    {
+      "slug": "02_c_gcp_api_key.md",
+      "title": "Chapter 2c: Setting up AI API Keys (2025 Edition)"
+    },
+    {
+      "slug": "02_d_roo_code_config.md",
+      "title": "Chapter 2d: Configuring AI Code Assistants in VS Code (2025 Edition)"
+    },
+    {
+      "slug": "02_setup_overview.md",
+      "title": "Chapter 2: Essential Setup: Accounts & Installations"
+    },
+    {
+      "slug": "03_core_workflow.md",
+      "title": "Chapter 3: The Core Git Workflow"
+    },
+    {
+      "slug": "04_collaboration_recovery.md",
+      "title": "Chapter 4: Collaboration & Recovery"
+    },
+    {
+      "slug": "05_github_pages.md",
+      "title": "Chapter 5: GitHub Pages: Your Free Portfolio Site"
+    },
+    {
+      "slug": "06_ai_workflows_roo_code.md",
+      "title": "Chapter 6: AI-Powered Workflows with Roo Code"
+    },
+    {
+      "slug": "07_cheat_sheet.md",
+      "title": "Chapter 7: Reference Cheat Sheet"
+    },
+    {
+      "slug": "08_latex_wsl_vscode.md",
+      "title": "Chapter 8: Advanced Typesetting: LaTeX with WSL2, TeXLive, and VS Code"
+    },
+    {
+      "slug": "09_cheat_sheet.md",
+      "title": "Chapter 9: Reference Cheat Sheet"
+    },
+    {
+      "slug": "09_context_management.md",
+      "title": "Chapter 9: Context Management & Advanced Agent Workflows"
+    },
+    {
+      "slug": "10_context_management.md",
+      "title": "Chapter 10: Context Management & Advanced Agent Workflows"
+    }
+  ]
+}
