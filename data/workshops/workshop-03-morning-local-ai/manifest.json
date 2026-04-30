@@ -1,0 +1,45 @@
+{
+  "title": "Module 09: Local AI Models",
+  "pages": [
+    {
+      "slug": "README.md",
+      "title": "Module 09: Local AI Models"
+    },
+    {
+      "slug": "00_introduction.md",
+      "title": "Introduction to Local AI Models"
+    },
+    {
+      "slug": "01_concepts.md",
+      "title": "Core Concepts: Running AI Models Locally"
+    },
+    {
+      "slug": "02_hands_on.md",
+      "title": "Hands-On Practice: Setting Up Local AI"
+    },
+    {
+      "slug": "03_exercises.md",
+      "title": "03_exercises - Module 09: Local AI Models"
+    },
+    {
+      "slug": "04_project.md",
+      "title": "Project: Build a Local AI Assistant"
+    },
+    {
+      "slug": "05_assessment.md",
+      "title": "Assessment: Local AI Models Mastery"
+    },
+    {
+      "slug": "06_resources.md",
+      "title": "Resources: Local AI Models"
+    },
+    {
+      "slug": "objectives.md",
+      "title": "Learning Objectives - Module 09"
+    },
+    {
+      "slug": "prerequisites.md",
+      "title": "Prerequisites - Module 09"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "title": "Module 13: Quality Assurance & Automation",
+  "pages": [
+    {
+      "slug": "README.md",
+      "title": "Module 13: Quality Assurance & Automation"
+    },
+    {
+      "slug": "00_introduction.md",
+      "title": "Module 13: AI-Powered QA Automation"
+    },
+    {
+      "slug": "01_concepts.md",
+      "title": "Testing Concepts & Best Practices"
+    },
+    {
+      "slug": "02_hands_on.md",
+      "title": "Hands-On: Setting Up Your Testing Environment"
+    },
+    {
+      "slug": "03_exercises.md",
+      "title": "Exercises: Build Your Testing Pipeline"
+    },
+    {
+      "slug": "04_project.md",
+      "title": "Project: Complete QA Automation Pipeline"
+    },
+    {
+      "slug": "05_assessment.md",
+      "title": "Assessment: QA Automation Knowledge Check"
+    },
+    {
+      "slug": "06_resources.md",
+      "title": "Resources: QA Automation Tools & Learning"
+    },
+    {
+      "slug": "objectives.md",
+      "title": "Learning Objectives - AI-Powered QA Automation"
+    },
+    {
+      "slug": "prerequisites.md",
+      "title": "Prerequisites - AI-Powered QA Automation"
+    }
+  ]
+}
