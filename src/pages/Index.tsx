@@ -112,6 +112,7 @@ const facilityImages = [
   "/data/media/view.jpeg",
   "/data/media/labview2.webp",
   "/data/media/labview3.webp",
+  "/data/media/remarkable2.webp",
 ];
 
 const Index = () => {
