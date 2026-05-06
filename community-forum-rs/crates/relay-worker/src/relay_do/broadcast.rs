@@ -123,7 +123,10 @@ impl NostrRelayDO {
     }
 
     pub(crate) fn send_count(ws: &WebSocket, sub_id: &str, count: u64) {
-        Self::send(ws, &serde_json::json!(["COUNT", sub_id, { "count": count }]));
+        Self::send(
+            ws,
+            &serde_json::json!(["COUNT", sub_id, { "count": count }]),
+        );
     }
 }
 
@@ -209,17 +212,26 @@ mod tests {
 
     #[test]
     fn parameterized_replaceable_kind_30000() {
-        assert_eq!(event_treatment(30000), EventTreatment::ParameterizedReplaceable);
+        assert_eq!(
+            event_treatment(30000),
+            EventTreatment::ParameterizedReplaceable
+        );
     }
 
     #[test]
     fn parameterized_replaceable_kind_30023_article() {
-        assert_eq!(event_treatment(30023), EventTreatment::ParameterizedReplaceable);
+        assert_eq!(
+            event_treatment(30023),
+            EventTreatment::ParameterizedReplaceable
+        );
     }
 
     #[test]
     fn parameterized_replaceable_kind_39999() {
-        assert_eq!(event_treatment(39999), EventTreatment::ParameterizedReplaceable);
+        assert_eq!(
+            event_treatment(39999),
+            EventTreatment::ParameterizedReplaceable
+        );
     }
 
     // ── boundary tests ──────────────────────────────────────────────────
@@ -241,7 +253,10 @@ mod tests {
 
     #[test]
     fn boundary_30000_is_param_replaceable() {
-        assert_eq!(event_treatment(30000), EventTreatment::ParameterizedReplaceable);
+        assert_eq!(
+            event_treatment(30000),
+            EventTreatment::ParameterizedReplaceable
+        );
     }
 
     #[test]
@@ -290,7 +305,10 @@ mod tests {
     #[test]
     fn kind_31990_handler_info_is_param_replaceable() {
         // kind-31990 falls in the parameterized replaceable range (30000..40000)
-        assert_eq!(event_treatment(31990), EventTreatment::ParameterizedReplaceable);
+        assert_eq!(
+            event_treatment(31990),
+            EventTreatment::ParameterizedReplaceable
+        );
     }
 
     // ── NIP-59 kind-1059 (sealed DM) is regular ─────────────────────────

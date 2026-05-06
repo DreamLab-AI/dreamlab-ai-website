@@ -12,7 +12,10 @@ pub struct PodClient {
 
 impl PodClient {
     pub fn new(pod_url: String, pubkey_hex: String) -> Self {
-        Self { pod_url, pubkey_hex }
+        Self {
+            pod_url,
+            pubkey_hex,
+        }
     }
 
     /// Inbox URL for incoming Linked Data Notifications.
@@ -28,7 +31,11 @@ impl PodClient {
     /// Type index URL. `public=true` returns the public type index,
     /// `public=false` returns the private type index.
     pub fn type_index_url(&self, public: bool) -> String {
-        let idx = if public { "publicTypeIndex" } else { "privateTypeIndex" };
+        let idx = if public {
+            "publicTypeIndex"
+        } else {
+            "privateTypeIndex"
+        };
         format!("{}/settings/{}", self.pod_url.trim_end_matches('/'), idx)
     }
 

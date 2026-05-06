@@ -67,7 +67,11 @@ fn window_env(key: &str) -> Option<String> {
     }
     let val = js_sys::Reflect::get(&env, &key.into()).ok()?;
     let s = val.as_string()?;
-    if s.is_empty() { None } else { Some(s) }
+    if s.is_empty() {
+        None
+    } else {
+        Some(s)
+    }
 }
 
 /// Convert a WebSocket URL to an HTTP(S) URL for API calls.
@@ -122,10 +126,7 @@ mod tests {
 
     #[test]
     fn ws_to_http_preserves_port() {
-        assert_eq!(
-            ws_to_http("ws://localhost:8080"),
-            "http://localhost:8080"
-        );
+        assert_eq!(ws_to_http("ws://localhost:8080"), "http://localhost:8080");
     }
 
     #[test]

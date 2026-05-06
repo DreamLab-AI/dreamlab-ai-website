@@ -23,9 +23,8 @@
 use std::panic;
 
 use nostr_core::nip19::{
-    decode_naddr, decode_nevent, decode_nprofile, decode_note, decode_npub, decode_nsec,
-    encode_nevent, encode_note, encode_npub, encode_nprofile, encode_nsec,
-    NEvent, NProfile,
+    decode_naddr, decode_nevent, decode_note, decode_nprofile, decode_npub, decode_nsec,
+    encode_nevent, encode_note, encode_nprofile, encode_npub, encode_nsec, NEvent, NProfile,
 };
 use proptest::prelude::*;
 

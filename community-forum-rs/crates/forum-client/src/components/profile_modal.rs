@@ -12,8 +12,8 @@ use leptos_router::NavigateOptions;
 use wasm_bindgen::JsCast;
 
 use crate::components::avatar::{Avatar, AvatarSize};
-use crate::relay::{Filter, RelayConnection};
 use crate::components::user_display::use_display_name;
+use crate::relay::{Filter, RelayConnection};
 use crate::stores::mute::use_mute_store;
 use crate::utils::shorten_pubkey;
 

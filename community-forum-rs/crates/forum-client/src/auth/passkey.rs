@@ -114,16 +114,23 @@ pub async fn register_passkey(
     let body = serde_json::json!({ "displayName": display_name });
     let resp_text = fetch_json_post(&format!("{base}/auth/register/options"), &body).await?;
     if cfg!(debug_assertions) {
-        web_sys::console::log_1(&format!("[register_passkey] options response: {} chars", resp_text.len()).into());
+        web_sys::console::log_1(
+            &format!(
+                "[register_passkey] options response: {} chars",
+                resp_text.len()
+            )
+            .into(),
+        );
     }
-    let opts_resp: RegisterOptionsResponse =
-        serde_json::from_str(&resp_text).map_err(|e| {
-            if cfg!(debug_assertions) {
-                web_sys::console::error_1(&format!("[register_passkey] options parse error: {e}").into());
-                web_sys::console::error_1(&format!("[register_passkey] raw text: {resp_text}").into());
-            }
-            PasskeyError::Protocol(e.to_string())
-        })?;
+    let opts_resp: RegisterOptionsResponse = serde_json::from_str(&resp_text).map_err(|e| {
+        if cfg!(debug_assertions) {
+            web_sys::console::error_1(
+                &format!("[register_passkey] options parse error: {e}").into(),
+            );
+            web_sys::console::error_1(&format!("[register_passkey] raw text: {resp_text}").into());
+        }
+        PasskeyError::Protocol(e.to_string())
+    })?;
 
     let prf_salt_b64 = opts_resp
         .prf_salt
@@ -163,16 +170,25 @@ pub async fn register_passkey(
     let verify_text =
         fetch_json_post(&format!("{base}/auth/register/verify"), &verify_body).await?;
     if cfg!(debug_assertions) {
-        web_sys::console::log_1(&format!("[register_passkey] verify response: {} chars", verify_text.len()).into());
+        web_sys::console::log_1(
+            &format!(
+                "[register_passkey] verify response: {} chars",
+                verify_text.len()
+            )
+            .into(),
+        );
     }
-    let verify_resp: RegisterVerifyResponse =
-        serde_json::from_str(&verify_text).map_err(|e| {
-            if cfg!(debug_assertions) {
-                web_sys::console::error_1(&format!("[register_passkey] verify parse error: {e}").into());
-                web_sys::console::error_1(&format!("[register_passkey] raw text: {verify_text}").into());
-            }
-            PasskeyError::Protocol(e.to_string())
-        })?;
+    let verify_resp: RegisterVerifyResponse = serde_json::from_str(&verify_text).map_err(|e| {
+        if cfg!(debug_assertions) {
+            web_sys::console::error_1(
+                &format!("[register_passkey] verify parse error: {e}").into(),
+            );
+            web_sys::console::error_1(
+                &format!("[register_passkey] raw text: {verify_text}").into(),
+            );
+        }
+        PasskeyError::Protocol(e.to_string())
+    })?;
 
     Ok(PasskeyRegistrationResult {
         pubkey,

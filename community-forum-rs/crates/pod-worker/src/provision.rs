@@ -10,13 +10,7 @@
 use worker::*;
 
 /// Default container structure for a new pod.
-const DEFAULT_CONTAINERS: &[&str] = &[
-    "profile/",
-    "public/",
-    "private/",
-    "inbox/",
-    "settings/",
-];
+const DEFAULT_CONTAINERS: &[&str] = &["profile/", "public/", "private/", "inbox/", "settings/"];
 
 /// Storage path of the public type-index document.
 ///
@@ -133,8 +127,7 @@ pub async fn provision_pod(
     }
 
     // Create WebID profile
-    let webid_html =
-        crate::webid::generate_webid_html(owner_pubkey, display_name, pod_base);
+    let webid_html = crate::webid::generate_webid_html(owner_pubkey, display_name, pod_base);
     bucket
         .put(
             &format!("{base}/profile/card"),
@@ -318,10 +311,7 @@ pub async fn provision_pod(
     let public_ti_url = format!("{pod_url}{PUBLIC_TYPE_INDEX_PATH}");
     let public_ti_body = render_type_index_body(&public_ti_url, "solid:ListedDocument");
     bucket
-        .put(
-            &format!("{base}/{PUBLIC_TYPE_INDEX_PATH}"),
-            public_ti_body,
-        )
+        .put(&format!("{base}/{PUBLIC_TYPE_INDEX_PATH}"), public_ti_body)
         .http_metadata(HttpMetadata {
             content_type: Some("application/ld+json".into()),
             ..Default::default()
@@ -409,7 +399,10 @@ mod tests {
 
     #[test]
     fn render_type_index_body_is_valid_json() {
-        let body = render_type_index_body("https://pods.example/settings/publicTypeIndex.jsonld", "solid:ListedDocument");
+        let body = render_type_index_body(
+            "https://pods.example/settings/publicTypeIndex.jsonld",
+            "solid:ListedDocument",
+        );
         let v: serde_json::Value = serde_json::from_slice(&body).unwrap();
         let types = v["@type"].as_array().unwrap();
         let type_strs: Vec<&str> = types.iter().filter_map(|t| t.as_str()).collect();

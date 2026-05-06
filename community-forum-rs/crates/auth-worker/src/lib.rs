@@ -136,9 +136,7 @@ async fn handle_request(mut req: Request, env: &Env) -> Result<Response> {
     // Read body bytes BEFORE routing so they are available for both NIP-98
     // payload hash verification and route handler consumption.
     let body_bytes: Vec<u8> = match method {
-        Method::Post | Method::Put | Method::Patch => {
-            req.bytes().await.unwrap_or_default()
-        }
+        Method::Post | Method::Put | Method::Patch => req.bytes().await.unwrap_or_default(),
         _ => Vec::new(),
     };
 
@@ -202,11 +200,7 @@ async fn route(
 
     // WebAuthn Registration -- Verify
     if path == "/auth/register/verify" && *method == Method::Post {
-        let cf_country = req
-            .headers()
-            .get("CF-IPCountry")
-            .ok()
-            .flatten();
+        let cf_country = req.headers().get("CF-IPCountry").ok().flatten();
         return webauthn::register_verify(body_bytes, cf_country.as_deref(), env).await;
     }
 
@@ -234,8 +228,15 @@ async fn route(
         // These modules perform their own NIP-98 verification + admin/member
         // gating via `admin::require_admin` / `require_authed` so we dispatch
         // before the legacy `auth::verify_nip98` branch below.
-        if let Some(resp) =
-            route_sprint_api(req, env, path, method, body_bytes, auth_header_opt.as_deref()).await?
+        if let Some(resp) = route_sprint_api(
+            req,
+            env,
+            path,
+            method,
+            body_bytes,
+            auth_header_opt.as_deref(),
+        )
+        .await?
         {
             return Ok(resp);
         }
@@ -317,8 +318,7 @@ async fn route_sprint_api(
         .unwrap_or_default();
 
     // -- Moderation (WI-2) ----------------------------------------------
-    if matches!(path, "/api/mod/ban" | "/api/mod/mute" | "/api/mod/warn")
-        && *method == Method::Post
+    if matches!(path, "/api/mod/ban" | "/api/mod/mute" | "/api/mod/warn") && *method == Method::Post
     {
         let resp = moderation::handle_action(path, body_bytes, auth_header, env).await?;
         return Ok(Some(resp));
@@ -380,16 +380,14 @@ async fn route_sprint_api(
     if let Some(rest) = path.strip_prefix("/api/invites/") {
         if let Some(invite_id) = rest.strip_suffix("/revoke") {
             if *method == Method::Post && !invite_id.is_empty() && !invite_id.contains('/') {
-                let resp =
-                    invites::handle_revoke(invite_id, body_bytes, auth_header, env).await?;
+                let resp = invites::handle_revoke(invite_id, body_bytes, auth_header, env).await?;
                 return Ok(Some(resp));
             }
         }
         // POST /api/invites/:code/redeem
         if let Some(code) = rest.strip_suffix("/redeem") {
             if *method == Method::Post && !code.is_empty() && !code.contains('/') {
-                let resp =
-                    invites::handle_redeem(code, body_bytes, auth_header, env).await?;
+                let resp = invites::handle_redeem(code, body_bytes, auth_header, env).await?;
                 return Ok(Some(resp));
             }
         }

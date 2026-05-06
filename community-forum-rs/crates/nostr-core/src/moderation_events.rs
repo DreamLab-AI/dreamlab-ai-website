@@ -168,9 +168,8 @@ pub fn validate_moderation_event(
     match event.kind {
         KIND_BAN | KIND_MUTE | KIND_UNBAN | KIND_UNMUTE => {
             // d-tag is `{admin_pubkey}:{target_pubkey}` — split and validate both parts.
-            let (admin_part, target_part) = d
-                .split_once(':')
-                .ok_or(ModerationEventError::InvalidDTag {
+            let (admin_part, target_part) =
+                d.split_once(':').ok_or(ModerationEventError::InvalidDTag {
                     kind: event.kind,
                     reason: "expected `{admin_pubkey}:{target_pubkey}`",
                 })?;
@@ -195,12 +194,10 @@ pub fn validate_moderation_event(
         }
         KIND_WARNING => {
             // d-tag is `<pubkey>:<ts>` — split and validate
-            let (pk, ts) = d
-                .split_once(':')
-                .ok_or(ModerationEventError::InvalidDTag {
-                    kind: event.kind,
-                    reason: "expected `<pubkey>:<timestamp>`",
-                })?;
+            let (pk, ts) = d.split_once(':').ok_or(ModerationEventError::InvalidDTag {
+                kind: event.kind,
+                reason: "expected `<pubkey>:<timestamp>`",
+            })?;
             if !is_hex64(pk) {
                 return Err(ModerationEventError::InvalidDTag {
                     kind: event.kind,
@@ -496,12 +493,7 @@ mod tests {
 
     #[test]
     fn warning_validates() {
-        let u = build_warning(
-            &admin_pk_hex(),
-            &target_pk(),
-            "off topic",
-            1_700_000_000,
-        );
+        let u = build_warning(&admin_pk_hex(), &target_pk(), "off topic", 1_700_000_000);
         let signed = sign(u);
         assert!(validate_moderation_event(&signed, &admin_set()).is_ok());
     }
@@ -589,7 +581,10 @@ mod tests {
         };
         let signed = sign(u);
         let err = validate_moderation_event(&signed, &admin_set()).unwrap_err();
-        assert!(matches!(err, ModerationEventError::InvalidDTag { kind: KIND_BAN, .. }));
+        assert!(matches!(
+            err,
+            ModerationEventError::InvalidDTag { kind: KIND_BAN, .. }
+        ));
 
         // Colon present but invalid hex in admin part
         let u2 = UnsignedEvent {
@@ -601,7 +596,10 @@ mod tests {
         };
         let signed2 = sign(u2);
         let err2 = validate_moderation_event(&signed2, &admin_set()).unwrap_err();
-        assert!(matches!(err2, ModerationEventError::InvalidDTag { kind: KIND_BAN, .. }));
+        assert!(matches!(
+            err2,
+            ModerationEventError::InvalidDTag { kind: KIND_BAN, .. }
+        ));
     }
 
     #[test]
@@ -647,7 +645,10 @@ mod tests {
         let signed = sign(u);
         assert!(matches!(
             validate_moderation_event(&signed, &admin_set()),
-            Err(ModerationEventError::InvalidDTag { kind: KIND_WARNING, .. }),
+            Err(ModerationEventError::InvalidDTag {
+                kind: KIND_WARNING,
+                ..
+            }),
         ));
     }
 
@@ -668,7 +669,12 @@ mod tests {
 
     #[test]
     fn unmute_builds_and_validates() {
-        let u = build_unmute(&admin_pk_hex(), &target_pk(), "cooldown over", 1_700_000_000);
+        let u = build_unmute(
+            &admin_pk_hex(),
+            &target_pk(),
+            "cooldown over",
+            1_700_000_000,
+        );
         let signed = sign(u);
         assert_eq!(signed.kind, KIND_UNMUTE);
         assert!(validate_moderation_event(&signed, &admin_set()).is_ok());

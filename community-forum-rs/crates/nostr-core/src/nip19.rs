@@ -286,7 +286,11 @@ fn bech32_encode(hrp_str: &str, data: &[u8]) -> Result<String, Nip19Error> {
     bech32::encode::<Bech32>(hrp, data).map_err(|e| Nip19Error::Bech32(e.to_string()))
 }
 
-fn bech32_decode_exact(s: &str, expected_hrp: &str, expected_len: usize) -> Result<Vec<u8>, Nip19Error> {
+fn bech32_decode_exact(
+    s: &str,
+    expected_hrp: &str,
+    expected_len: usize,
+) -> Result<Vec<u8>, Nip19Error> {
     let bytes = bech32_decode_raw(s, expected_hrp)?;
     if bytes.len() != expected_len {
         return Err(Nip19Error::InvalidLength {
@@ -298,8 +302,7 @@ fn bech32_decode_exact(s: &str, expected_hrp: &str, expected_len: usize) -> Resu
 }
 
 fn bech32_decode_raw(s: &str, expected_hrp: &str) -> Result<Vec<u8>, Nip19Error> {
-    let (hrp, bytes) =
-        bech32::decode(s).map_err(|e| Nip19Error::Bech32(e.to_string()))?;
+    let (hrp, bytes) = bech32::decode(s).map_err(|e| Nip19Error::Bech32(e.to_string()))?;
     if hrp.as_str() != expected_hrp {
         return Err(Nip19Error::WrongPrefix {
             expected: expected_hrp.to_string(),

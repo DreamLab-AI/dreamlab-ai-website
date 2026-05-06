@@ -178,8 +178,7 @@ async fn fetch(req: Request, env: Env, _ctx: Context) -> Result<Response> {
     // NIP-11 relay info document
     if path == "/" && accepts_nostr_json(&req) {
         let info = nip11::relay_info(&env);
-        let json_str =
-            serde_json::to_string(&info).map_err(|e| Error::RustError(e.to_string()))?;
+        let json_str = serde_json::to_string(&info).map_err(|e| Error::RustError(e.to_string()))?;
         let headers = Headers::new();
         headers.set("Content-Type", "application/nostr+json").ok();
         headers
@@ -294,12 +293,7 @@ async fn route(req: Request, env: &Env, path: &str) -> Result<Response> {
         return audit::handle_audit_log_list(&req, env).await;
     }
 
-    json_response(
-        &req,
-        env,
-        &serde_json::json!({ "error": "Not found" }),
-        404,
-    )
+    json_response(&req, env, &serde_json::json!({ "error": "Not found" }), 404)
 }
 
 /// Idempotent schema migrations.

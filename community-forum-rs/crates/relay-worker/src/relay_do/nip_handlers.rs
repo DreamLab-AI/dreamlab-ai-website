@@ -87,7 +87,12 @@ impl NostrRelayDO {
             return;
         }
         if silenced {
-            Self::send_ok(ws, &event.id, false, "blocked: account silenced (read-only)");
+            Self::send_ok(
+                ws,
+                &event.id,
+                false,
+                "blocked: account silenced (read-only)",
+            );
             return;
         }
 
@@ -184,9 +189,7 @@ impl NostrRelayDO {
                 let zone = trust::get_channel_zone(&channel_id, &self.env)
                     .await
                     .unwrap_or_else(|| "home".to_string());
-                if !is_admin
-                    && !trust::has_zone_access(&event.pubkey, &zone, &self.env).await
-                {
+                if !is_admin && !trust::has_zone_access(&event.pubkey, &zone, &self.env).await {
                     Self::send_ok(ws, &event.id, false, "zone access denied");
                     return;
                 }
@@ -348,11 +351,9 @@ impl NostrRelayDO {
         // events addressed to the authenticated pubkey are returned, preventing
         // cross-recipient leakage.
         let filters = {
-            let needs_kind_1059 = filters.iter().any(|f| {
-                f.kinds
-                    .as_ref()
-                    .map_or(false, |k| k.contains(&1059))
-            });
+            let needs_kind_1059 = filters
+                .iter()
+                .any(|f| f.kinds.as_ref().map_or(false, |k| k.contains(&1059)));
             if needs_kind_1059 {
                 match &session_pubkey {
                     None => {
@@ -372,10 +373,8 @@ impl NostrRelayDO {
                                     // Enforce the #p filter for the authed pubkey.
                                     // We override any existing #p to prevent a client
                                     // from requesting another user's DMs.
-                                    f.extra.insert(
-                                        "#p".to_string(),
-                                        serde_json::json!([authed_pk]),
-                                    );
+                                    f.extra
+                                        .insert("#p".to_string(), serde_json::json!([authed_pk]));
                                 }
                                 f
                             })
@@ -400,9 +399,7 @@ impl NostrRelayDO {
                             .await
                             .unwrap_or_else(|| "home".to_string());
                         let is_admin = auth::is_admin(pk, &self.env).await;
-                        if !is_admin
-                            && !trust::has_zone_access(pk, &zone, &self.env).await
-                        {
+                        if !is_admin && !trust::has_zone_access(pk, &zone, &self.env).await {
                             continue; // skip this event
                         }
                     }
@@ -441,7 +438,12 @@ impl NostrRelayDO {
 
         // Verify signature
         if nostr_core::verify_event_strict(&event).is_err() {
-            Self::send_ok(ws, &event.id, false, "invalid: signature verification failed");
+            Self::send_ok(
+                ws,
+                &event.id,
+                false,
+                "invalid: signature verification failed",
+            );
             return;
         }
 
@@ -524,9 +526,7 @@ impl NostrRelayDO {
 
         // Delete events owned by the same pubkey
         for target_id in &target_ids {
-            let stmt = db.prepare(
-                "DELETE FROM events WHERE id = ?1 AND pubkey = ?2",
-            );
+            let stmt = db.prepare("DELETE FROM events WHERE id = ?1 AND pubkey = ?2");
             let _ = match stmt.bind(&[
                 JsValue::from_str(target_id),
                 JsValue::from_str(&deletion_event.pubkey),
@@ -561,9 +561,8 @@ impl NostrRelayDO {
                 continue;
             }
 
-            let stmt = db.prepare(
-                "DELETE FROM events WHERE kind = ?1 AND pubkey = ?2 AND d_tag = ?3",
-            );
+            let stmt =
+                db.prepare("DELETE FROM events WHERE kind = ?1 AND pubkey = ?2 AND d_tag = ?3");
             let _ = match stmt.bind(&[
                 JsValue::from_f64(kind),
                 JsValue::from_str(pubkey),
@@ -667,14 +666,13 @@ impl NostrRelayDO {
         };
 
         // Extract reason from `report` tag first, fall back to content
-        let reason = filter::tag_value(report_event, "report")
-            .unwrap_or_else(|| {
-                if report_event.content.is_empty() {
-                    "other".to_string()
-                } else {
-                    report_event.content.clone()
-                }
-            });
+        let reason = filter::tag_value(report_event, "report").unwrap_or_else(|| {
+            if report_event.content.is_empty() {
+                "other".to_string()
+            } else {
+                report_event.content.clone()
+            }
+        });
 
         // Separate structured reason from free-text
         let (reason_code, reason_text) = match reason.as_str() {
@@ -750,9 +748,7 @@ impl NostrRelayDO {
             JsValue::from_str(action),
             JsValue::from_str(&target),
             JsValue::from_str(&event.pubkey),
-            reason
-                .map(JsValue::from_str)
-                .unwrap_or(JsValue::NULL),
+            reason.map(JsValue::from_str).unwrap_or(JsValue::NULL),
             expires_at
                 .map(|v| JsValue::from_f64(v as f64))
                 .unwrap_or(JsValue::NULL),

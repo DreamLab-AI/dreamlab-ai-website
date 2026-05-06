@@ -88,9 +88,15 @@ impl Hit {
     fn subtitle(&self) -> String {
         match self {
             Self::Channel { desc, .. } => desc.clone(),
-            Self::Message { author, .. } => format!("by {}", crate::components::user_display::use_display_name(author)),
+            Self::Message { author, .. } => format!(
+                "by {}",
+                crate::components::user_display::use_display_name(author)
+            ),
             Self::SemanticMessage { label, .. } if !label.is_empty() => {
-                format!("by {}", crate::components::user_display::use_display_name(label))
+                format!(
+                    "by {}",
+                    crate::components::user_display::use_display_name(label)
+                )
             }
             Self::SemanticMessage { .. } => "semantic match".to_string(),
             Self::User { pubkey, .. } => crate::components::user_display::use_display_name(pubkey),

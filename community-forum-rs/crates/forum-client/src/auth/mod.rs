@@ -12,13 +12,13 @@ mod webauthn;
 
 use gloo::storage::{LocalStorage, Storage};
 use leptos::prelude::*;
-use serde::{Deserialize, Serialize};
 use send_wrapper::SendWrapper;
+use serde::{Deserialize, Serialize};
 use std::rc::Rc;
 use zeroize::Zeroize;
 
 use self::passkey::{PasskeyAuthResult, PasskeyRegistrationResult};
-use self::session::{StoredSession, save_privkey_session, clear_privkey_session};
+use self::session::{clear_privkey_session, save_privkey_session, StoredSession};
 use crate::app::base_href;
 use nostr_core::signer::Signer;
 use nostr_core::{NostrEvent, UnsignedEvent};
@@ -165,7 +165,8 @@ impl AuthStore {
 
     /// Get the active Signer, if one has been set.
     pub fn get_signer(&self) -> Option<Rc<dyn Signer>> {
-        self.signer.with_value(|s| s.as_ref().map(|sw| (**sw).clone()))
+        self.signer
+            .with_value(|s| s.as_ref().map(|sw| (**sw).clone()))
     }
 
     /// Build a PodClient from the current pod_url and pubkey, if both are available.
@@ -284,7 +285,9 @@ impl AuthStore {
             Err(e) => {
                 let msg = e.to_string();
                 // Log both Display and Debug formats to trace error origin
-                web_sys::console::error_1(&format!("[register_with_passkey] Display: {msg}").into());
+                web_sys::console::error_1(
+                    &format!("[register_with_passkey] Display: {msg}").into(),
+                );
                 web_sys::console::error_1(&format!("[register_with_passkey] Debug: {e:?}").into());
                 self.state.update(|s| {
                     s.is_pending = false;
@@ -326,12 +329,13 @@ impl AuthStore {
     /// Returns the hex-encoded private key so the signup UI can show it for
     /// backup. The privkey is held in memory and never persisted to storage.
     pub fn register_with_generated_key(&self, display_name: &str) -> Result<String, String> {
-        let keypair = nostr_core::generate_keypair()
-            .map_err(|e| format!("Key generation failed: {e}"))?;
+        let keypair =
+            nostr_core::generate_keypair().map_err(|e| format!("Key generation failed: {e}"))?;
 
         let pubkey = keypair.public.to_hex();
         let privkey_hex = hex::encode(keypair.secret.as_bytes());
-        self.privkey.set_value(Some(keypair.secret.as_bytes().to_vec()));
+        self.privkey
+            .set_value(Some(keypair.secret.as_bytes().to_vec()));
         save_privkey_session(&privkey_hex);
 
         let nickname = Some(display_name.to_string());
@@ -378,7 +382,9 @@ impl AuthStore {
         let bytes = if key_input.starts_with("nsec1") {
             decode_nsec(key_input)?
         } else {
-            hex::decode(key_input).map_err(|_| "Invalid key. Paste a 64-char hex key or nsec1... bech32 key.".to_string())?
+            hex::decode(key_input).map_err(|_| {
+                "Invalid key. Paste a 64-char hex key or nsec1... bech32 key.".to_string()
+            })?
         };
         if bytes.len() != 32 {
             return Err("Key must be 32 bytes (64 hex characters or nsec1 bech32)".to_string());
@@ -646,8 +652,7 @@ impl AuthStore {
 
 /// Decode an nsec1... bech32 string to raw 32-byte secret key.
 fn decode_nsec(nsec: &str) -> Result<Vec<u8>, String> {
-    let (hrp, data) = bech32::decode(nsec)
-        .map_err(|e| format!("Invalid bech32 encoding: {e}"))?;
+    let (hrp, data) = bech32::decode(nsec).map_err(|e| format!("Invalid bech32 encoding: {e}"))?;
     if hrp.as_str() != "nsec" {
         return Err(format!("Expected nsec prefix, got {}", hrp.as_str()));
     }
@@ -669,10 +674,8 @@ mod tests {
     fn decode_nsec_valid() {
         // Generate a valid nsec from known bytes
         let secret = [0x42u8; 32];
-        let nsec = bech32::encode::<bech32::Bech32>(
-            bech32::Hrp::parse("nsec").unwrap(),
-            &secret,
-        ).unwrap();
+        let nsec =
+            bech32::encode::<bech32::Bech32>(bech32::Hrp::parse("nsec").unwrap(), &secret).unwrap();
         let decoded = decode_nsec(&nsec).unwrap();
         assert_eq!(decoded.len(), 32);
         assert_eq!(decoded, secret.to_vec());
@@ -681,10 +684,8 @@ mod tests {
     #[test]
     fn decode_nsec_wrong_prefix() {
         let data = [0x01u8; 32];
-        let npub = bech32::encode::<bech32::Bech32>(
-            bech32::Hrp::parse("npub").unwrap(),
-            &data,
-        ).unwrap();
+        let npub =
+            bech32::encode::<bech32::Bech32>(bech32::Hrp::parse("npub").unwrap(), &data).unwrap();
         let result = decode_nsec(&npub);
         assert!(result.is_err());
         assert!(result.unwrap_err().contains("Expected nsec prefix"));

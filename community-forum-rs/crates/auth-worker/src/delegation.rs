@@ -61,11 +61,11 @@ pub async fn handle_verify(
     env: &Env,
 ) -> Result<Response> {
     let url = canonical_url(env, "/api/delegation/verify");
-    let caller_pubkey =
-        match require_authed(auth_header, &url, "POST", Some(body_bytes), env).await {
-            Ok(pk) => pk,
-            Err((body, status)) => return json_response(env, &body, status),
-        };
+    let caller_pubkey = match require_authed(auth_header, &url, "POST", Some(body_bytes), env).await
+    {
+        Ok(pk) => pk,
+        Err((body, status)) => return json_response(env, &body, status),
+    };
 
     let body: VerifyBody = match serde_json::from_slice(body_bytes) {
         Ok(b) => b,
@@ -98,9 +98,7 @@ pub async fn handle_verify(
     if *delegator_pubkey != caller_pubkey {
         let resp = VerifyResponse {
             valid: false,
-            error: Some(
-                "NIP-98 signer does not match delegation_tag delegator pubkey".to_string(),
-            ),
+            error: Some("NIP-98 signer does not match delegation_tag delegator pubkey".to_string()),
         };
         return json_response(env, &json!(resp), 403);
     }
@@ -222,8 +220,8 @@ fn is_hex64(s: &str) -> bool {
 /// Uses the k256 crate (same as the rest of the nostr-core stack). Returns
 /// `true` only when the signature is cryptographically valid.
 fn verify_schnorr(pubkey_bytes: &[u8], msg_hash: &[u8], sig_bytes: &[u8]) -> bool {
-    use k256::schnorr::{Signature, VerifyingKey};
     use k256::schnorr::signature::Verifier;
+    use k256::schnorr::{Signature, VerifyingKey};
 
     let vk = match VerifyingKey::from_bytes(pubkey_bytes) {
         Ok(vk) => vk,

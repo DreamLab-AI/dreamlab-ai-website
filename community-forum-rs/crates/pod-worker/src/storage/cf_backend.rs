@@ -70,7 +70,11 @@ impl CloudflareStorage {
     /// paginate, but pod containers are expected to remain small.
     pub async fn list_objects(&self, prefix: &str) -> Result<Vec<String>, WorkerError> {
         let result = self.bucket.list().prefix(prefix).execute().await?;
-        Ok(result.objects().iter().map(|o| o.key().to_string()).collect())
+        Ok(result
+            .objects()
+            .iter()
+            .map(|o| o.key().to_string())
+            .collect())
     }
 
     /// Return `true` if the key exists in R2.

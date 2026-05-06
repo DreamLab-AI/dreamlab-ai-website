@@ -217,8 +217,8 @@ fn json_err(message: &str, status: u16) -> Result<Response> {
 /// server-controlled PRF salt and a random challenge.
 pub async fn register_options(body_bytes: &[u8], env: &Env) -> Result<Response> {
     console_log!("[register_options] handler entered");
-    let body: RegisterOptionsBody = serde_json::from_slice(body_bytes)
-        .unwrap_or(RegisterOptionsBody { display_name: None });
+    let body: RegisterOptionsBody =
+        serde_json::from_slice(body_bytes).unwrap_or(RegisterOptionsBody { display_name: None });
     let display_name = body
         .display_name
         .filter(|s| !s.trim().is_empty())
@@ -291,7 +291,12 @@ pub async fn register_options(body_bytes: &[u8], env: &Env) -> Result<Response> 
         "prfSalt": prf_salt_b64
     });
 
-    console_log!("[register_options] responding with {} bytes", serde_json::to_string(&response_body).unwrap_or_default().len());
+    console_log!(
+        "[register_options] responding with {} bytes",
+        serde_json::to_string(&response_body)
+            .unwrap_or_default()
+            .len()
+    );
     Response::from_json(&response_body)
 }
 
@@ -310,11 +315,10 @@ pub async fn register_verify(
         body_bytes.len(),
         String::from_utf8_lossy(&body_bytes[..body_bytes.len().min(500)])
     );
-    let body: RegisterVerifyBody = serde_json::from_slice(body_bytes)
-        .map_err(|e| {
-            console_error!("[register_verify] JSON parse error: {e}");
-            Error::RustError(format!("Invalid JSON body: {e}"))
-        })?;
+    let body: RegisterVerifyBody = serde_json::from_slice(body_bytes).map_err(|e| {
+        console_error!("[register_verify] JSON parse error: {e}");
+        Error::RustError(format!("Invalid JSON body: {e}"))
+    })?;
 
     let pubkey = match &body.pubkey {
         Some(pk) if is_valid_pubkey(pk) => pk.to_lowercase(),
@@ -327,7 +331,10 @@ pub async fn register_verify(
     // client must supply a valid `inviteCode` (consumed atomically here).
     // Otherwise registration fails with 403. When WoT is disabled this is
     // a no-op.
-    if !crate::wot::is_allowed_by_wot(&pubkey, env).await.unwrap_or(false) {
+    if !crate::wot::is_allowed_by_wot(&pubkey, env)
+        .await
+        .unwrap_or(false)
+    {
         match body.invite_code.as_deref() {
             Some(code) if !code.is_empty() => {
                 if let Err(reason) =
@@ -446,8 +453,8 @@ pub async fn register_verify(
 /// (no matching credential available) without the server having confirmed
 /// existence.
 pub async fn login_options(body_bytes: &[u8], env: &Env) -> Result<Response> {
-    let body: LoginOptionsBody = serde_json::from_slice(body_bytes)
-        .unwrap_or(LoginOptionsBody { pubkey: None });
+    let body: LoginOptionsBody =
+        serde_json::from_slice(body_bytes).unwrap_or(LoginOptionsBody { pubkey: None });
 
     // Generate 32-byte challenge
     let mut challenge_bytes = [0u8; 32];

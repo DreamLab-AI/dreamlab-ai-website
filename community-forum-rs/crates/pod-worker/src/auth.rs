@@ -61,7 +61,10 @@ pub async fn verify_nip98_replay(
     let now = js_now_secs();
     let ttl = nostr_core::REPLAY_CACHE_TTL_SECS;
     if let Ok(kv) = env.kv("NIP98_REPLAY") {
-        let store = KvReplayStore { kv: &kv, ttl_secs: ttl };
+        let store = KvReplayStore {
+            kv: &kv,
+            ttl_secs: ttl,
+        };
         nostr_core::verify_nip98_token_at_with_replay(
             auth_header,
             expected_url,

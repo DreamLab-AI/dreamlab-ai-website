@@ -187,11 +187,7 @@ fn merging_starts_from_none() {
 #[test]
 fn ban_dominates_any_mute() {
     // load_state semantics: any 'ban' row short-circuits to Block::Banned.
-    let states = [
-        Block::None,
-        Block::MutedUntil(9_000_000_000),
-        Block::Banned,
-    ];
+    let states = [Block::None, Block::MutedUntil(9_000_000_000), Block::Banned];
     let strongest = states
         .iter()
         .copied()

@@ -9,27 +9,27 @@ use leptos_router::NavigateOptions;
 use crate::auth::{provide_auth, use_auth};
 use crate::components::bookmarks_modal::provide_bookmarks;
 use crate::components::bookmarks_modal::BookmarksModal;
+use crate::components::fx::provide_render_tier;
 use crate::components::global_search::GlobalSearch;
 use crate::components::message_bubble::{provide_profile_modal_target, ProfileModalTarget};
 use crate::components::mobile_bottom_nav::{provide_unread_dm_count, MobileBottomNav};
 use crate::components::notification_bell::{provide_notifications, NotificationBell};
 use crate::components::profile_modal::ProfileModal;
+use crate::components::screen_reader::{provide_announcer, ScreenReaderAnnouncer};
 use crate::components::session_timeout::SessionTimeout;
 use crate::components::toast::{provide_toasts, ToastContainer};
-use crate::components::fx::provide_render_tier;
 use crate::components::user_display::provide_name_cache;
-use crate::components::screen_reader::{provide_announcer, ScreenReaderAnnouncer};
-use crate::stores::channels::{provide_channel_store, use_channel_store};
-use crate::stores::mute::provide_mute_store;
-use crate::stores::preferences::provide_preferences;
-use crate::stores::read_position::provide_read_positions;
-use crate::stores::zone_access::provide_zone_access;
 use crate::pages::{
     AdminPage, CategoryPage, ChannelPage, ChatPage, DmChatPage, DmListPage, EventsPage, ForumsPage,
     HomePage, LoginPage, MarketplacePage, NoteViewPage, PendingPage, ProfilePage, SearchPage,
     SectionPage, SettingsPage, SetupPage, SignupPage,
 };
 use crate::relay::{ConnectionState, RelayConnection};
+use crate::stores::channels::{provide_channel_store, use_channel_store};
+use crate::stores::mute::provide_mute_store;
+use crate::stores::preferences::provide_preferences;
+use crate::stores::read_position::provide_read_positions;
+use crate::stores::zone_access::provide_zone_access;
 
 // -- Base path for sub-directory deployment -----------------------------------
 
@@ -251,7 +251,8 @@ pub fn App() -> impl IntoView {
             let content = serde_json::json!({
                 "name": nickname,
                 "display_name": nickname,
-            }).to_string();
+            })
+            .to_string();
 
             let now = (js_sys::Date::now() / 1000.0) as u64;
             let unsigned = nostr_core::UnsignedEvent {
@@ -267,12 +268,16 @@ pub fn App() -> impl IntoView {
                     r.publish(&signed);
                     published_profile.set(true);
                     web_sys::console::log_1(
-                        &format!("[app] Published kind-0 profile for auto-whitelist: {}", &pubkey[..8]).into()
+                        &format!(
+                            "[app] Published kind-0 profile for auto-whitelist: {}",
+                            &pubkey[..8]
+                        )
+                        .into(),
                     );
                 }
                 Err(e) => {
                     web_sys::console::warn_1(
-                        &format!("[app] Failed to publish kind-0: {e}").into()
+                        &format!("[app] Failed to publish kind-0: {e}").into(),
                     );
                 }
             }
@@ -318,12 +323,16 @@ pub fn App() -> impl IntoView {
                     r.publish(&signed);
                     published_relay_list.set(true);
                     web_sys::console::log_1(
-                        &format!("[app] Published kind-10002 relay list for: {}", &pubkey[..8]).into()
+                        &format!(
+                            "[app] Published kind-10002 relay list for: {}",
+                            &pubkey[..8]
+                        )
+                        .into(),
                     );
                 }
                 Err(e) => {
                     web_sys::console::warn_1(
-                        &format!("[app] Failed to publish kind-10002: {e}").into()
+                        &format!("[app] Failed to publish kind-10002: {e}").into(),
                     );
                 }
             }

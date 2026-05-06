@@ -707,14 +707,23 @@ mod tests {
             })),
             default: None,
             mode: Some(IdOrIds::Multiple(vec![
-                IdRef { id: "acl:Read".to_string() },
-                IdRef { id: "acl:Write".to_string() },
-                IdRef { id: "acl:Control".to_string() },
+                IdRef {
+                    id: "acl:Read".to_string(),
+                },
+                IdRef {
+                    id: "acl:Write".to_string(),
+                },
+                IdRef {
+                    id: "acl:Control".to_string(),
+                },
             ])),
         };
         let doc = make_doc(vec![public_read, owner_full]);
         let header = wac_allow_header(Some(&doc), Some("did:nostr:owner"), "/");
-        assert_eq!(header, "user=\"read write append control\", public=\"read\"");
+        assert_eq!(
+            header,
+            "user=\"read write append control\", public=\"read\""
+        );
     }
 
     #[test]

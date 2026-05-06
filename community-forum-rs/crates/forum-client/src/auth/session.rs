@@ -100,7 +100,10 @@ pub(super) fn save_privkey_session(hex: &str) {
          imported nsec only. Passkey users must re-derive on login."
             .into(),
     );
-    if let Some(storage) = web_sys::window().and_then(|w| w.session_storage().ok()).flatten() {
+    if let Some(storage) = web_sys::window()
+        .and_then(|w| w.session_storage().ok())
+        .flatten()
+    {
         let _ = storage.set_item(SESSION_PRIVKEY_KEY, hex);
     }
 }
@@ -116,7 +119,10 @@ pub(super) fn read_privkey_session() -> Option<String> {
 
 /// Clear privkey from sessionStorage.
 pub(super) fn clear_privkey_session() {
-    if let Some(storage) = web_sys::window().and_then(|w| w.session_storage().ok()).flatten() {
+    if let Some(storage) = web_sys::window()
+        .and_then(|w| w.session_storage().ok())
+        .flatten()
+    {
         let _ = storage.remove_item(SESSION_PRIVKEY_KEY);
     }
 }
@@ -214,7 +220,11 @@ impl AuthStore {
             if let Some(ref pubkey) = stored.public_key {
                 let has_ext = super::nip07::has_nip07_extension();
                 self.state.set(AuthState {
-                    state: if has_ext { AuthPhase::Authenticated } else { AuthPhase::Unauthenticated },
+                    state: if has_ext {
+                        AuthPhase::Authenticated
+                    } else {
+                        AuthPhase::Unauthenticated
+                    },
                     pubkey: Some(pubkey.clone()),
                     is_authenticated: has_ext,
                     public_key: Some(pubkey.clone()),

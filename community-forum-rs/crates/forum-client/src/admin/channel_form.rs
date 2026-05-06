@@ -5,7 +5,6 @@
 
 use leptos::prelude::*;
 
-
 /// Predefined channel sections.
 /// Format: (section_id, display_label).
 const SECTIONS: &[(&str, &str)] = &[
@@ -108,7 +107,11 @@ where
             section: section.get_untracked(),
             picture: picture.get_untracked().trim().to_string(),
             zone: z,
-            cohort: if z >= 2 && !c.trim().is_empty() { Some(c.trim().to_string()) } else { None },
+            cohort: if z >= 2 && !c.trim().is_empty() {
+                Some(c.trim().to_string())
+            } else {
+                None
+            },
         });
         is_submitting.set(false);
         // Form reset is handled by the parent when it signals success via callback.
@@ -281,7 +284,9 @@ fn section_color_dot_class(section: &str) -> &'static str {
         // Minimoonoir (purple)
         s if s.starts_with("minimoonoir-") => "w-2 h-2 rounded-full bg-purple-400 inline-block",
         // DreamLab and AI (pink)
-        s if s.starts_with("dreamlab-") || s.starts_with("ai-") => "w-2 h-2 rounded-full bg-pink-400 inline-block",
+        s if s.starts_with("dreamlab-") || s.starts_with("ai-") => {
+            "w-2 h-2 rounded-full bg-pink-400 inline-block"
+        }
         _ => "w-2 h-2 rounded-full bg-amber-400 inline-block",
     }
 }

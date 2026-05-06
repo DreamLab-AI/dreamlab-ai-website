@@ -14,9 +14,7 @@ use crate::auth::use_auth;
 use crate::components::confirm_dialog::{ConfirmDialog, ConfirmVariant};
 use crate::components::toast::{use_toasts, ToastVariant};
 use crate::relay::{ConnectionState, Filter, RelayConnection};
-use crate::stores::preferences::{
-    save_preferences, use_preferences, NotificationLevel, Theme,
-};
+use crate::stores::preferences::{save_preferences, use_preferences, NotificationLevel, Theme};
 use crate::utils::shorten_pubkey;
 
 /// Key used to persist muted pubkeys in localStorage.
@@ -119,9 +117,7 @@ pub fn SettingsPage() -> impl IntoView {
                     if event.kind != 0 {
                         return;
                     }
-                    if let Ok(obj) =
-                        serde_json::from_str::<serde_json::Value>(&event.content)
-                    {
+                    if let Ok(obj) = serde_json::from_str::<serde_json::Value>(&event.content) {
                         if let Some(name) = obj.get("name").and_then(|v| v.as_str()) {
                             nickname_sig.set(name.to_string());
                         }

@@ -158,12 +158,7 @@ impl AdminSigner {
     /// Produce a ready-to-send `Authorization: Nostr <base64>` header for
     /// the given request. The secret key is held inside `self`; it is
     /// zeroized when the signer is dropped.
-    pub fn sign(
-        &self,
-        url: &str,
-        method: &str,
-        body: Option<&[u8]>,
-    ) -> Result<String, AuthError> {
+    pub fn sign(&self, url: &str, method: &str, body: Option<&[u8]>) -> Result<String, AuthError> {
         match self {
             AdminSigner::Local(sk) => Ok(nip98_sign_request_header(sk, url, method, body)?),
             AdminSigner::Bunker { .. } => Err(AuthError::BunkerUnsupported),
@@ -182,8 +177,7 @@ mod tests {
     use super::*;
 
     // A deterministic test key — 32 bytes of 0x11.
-    const TEST_NSEC_HEX: &str =
-        "1111111111111111111111111111111111111111111111111111111111111111";
+    const TEST_NSEC_HEX: &str = "1111111111111111111111111111111111111111111111111111111111111111";
 
     /// nsec1 for the above hex, generated with nostr-tools (0x11 * 32).
     const TEST_NSEC_BECH32: &str =
@@ -214,8 +208,7 @@ mod tests {
         // hard-coding a possibly-wrong constant. Encode hex → bech32 → decode.
         use bech32::{Bech32, Hrp};
         let hrp = Hrp::parse(NSEC_HRP).unwrap();
-        let encoded =
-            bech32::encode::<Bech32>(hrp, &[0x22u8; 32]).expect("encode");
+        let encoded = bech32::encode::<Bech32>(hrp, &[0x22u8; 32]).expect("encode");
         let out = decode_nsec(&encoded).unwrap();
         assert_eq!(out.as_ref(), &[0x22u8; 32]);
     }

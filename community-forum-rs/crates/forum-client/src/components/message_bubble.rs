@@ -14,8 +14,8 @@ use crate::components::quoted_message::QuotedMessage;
 use crate::components::reaction_bar::{Reaction, ReactionBar};
 use crate::components::report_button::ReportButton;
 use crate::components::thread_view::{ThreadReply, ThreadView};
-use crate::stores::badges::use_badges;
 use crate::components::user_display::NameCache;
+use crate::stores::badges::use_badges;
 use crate::utils::{format_relative_time, shorten_pubkey};
 
 /// Props for a single message in the channel view.
@@ -129,7 +129,12 @@ pub fn MessageBubble(message: MessageData) -> impl IntoView {
         // For other users, return empty (badges shown on profile page instead)
         let auth_pk = crate::auth::use_auth().pubkey().get_untracked();
         if auth_pk.as_deref() == Some(&pk_for_badges) {
-            store.badges.get().iter().map(|b| b.badge_id.clone()).collect::<Vec<_>>()
+            store
+                .badges
+                .get()
+                .iter()
+                .map(|b| b.badge_id.clone())
+                .collect::<Vec<_>>()
         } else {
             Vec::new()
         }

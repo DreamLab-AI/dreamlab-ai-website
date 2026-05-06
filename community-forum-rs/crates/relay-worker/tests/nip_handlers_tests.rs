@@ -178,19 +178,13 @@ fn timestamp_at_exactly_7_days_accepted() {
 #[test]
 fn timestamp_beyond_7_days_past_rejected() {
     let now = 1_700_000_000u64;
-    assert!(!timestamp_within_drift(
-        now,
-        now - MAX_TIMESTAMP_DRIFT - 1
-    ));
+    assert!(!timestamp_within_drift(now, now - MAX_TIMESTAMP_DRIFT - 1));
 }
 
 #[test]
 fn timestamp_beyond_7_days_future_rejected() {
     let now = 1_700_000_000u64;
-    assert!(!timestamp_within_drift(
-        now,
-        now + MAX_TIMESTAMP_DRIFT + 1
-    ));
+    assert!(!timestamp_within_drift(now, now + MAX_TIMESTAMP_DRIFT + 1));
 }
 
 // ---------------------------------------------------------------------------

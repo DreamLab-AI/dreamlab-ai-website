@@ -14,9 +14,9 @@
 //!   - TLV structures: nprofile, nevent, naddr (multi-field encoding)
 
 use nostr_core::nip19::{
-    decode_naddr, decode_nevent, decode_nprofile, decode_npub, decode_note, decode_nsec,
-    encode_naddr, encode_nevent, encode_nprofile, encode_npub, encode_note, encode_nsec,
-    NAddr, NEvent, NProfile, Nip19Error,
+    decode_naddr, decode_nevent, decode_note, decode_nprofile, decode_npub, decode_nsec,
+    encode_naddr, encode_nevent, encode_note, encode_nprofile, encode_npub, encode_nsec, NAddr,
+    NEvent, NProfile, Nip19Error,
 };
 
 // ── npub ──────────────────────────────────────────────────────────────────────
@@ -64,9 +64,7 @@ fn npub_prefix_is_correct() {
 #[test]
 fn npub_decode_wrong_hrp_returns_error() {
     // nsec prefix with pubkey data — wrong hrp for decode_npub
-    let nsec_of_pubkey = encode_npub(FIATJAF_HEX)
-        .unwrap()
-        .replace("npub1", "nsec1");
+    let nsec_of_pubkey = encode_npub(FIATJAF_HEX).unwrap().replace("npub1", "nsec1");
     // Substitute hrp manually so bech32 checksum still validates for nsec
     // (use a real nsec to ensure it at least gets past bech32 decode)
     let result = decode_npub("nsec1vl029mgpspedva04g90vltkh6fvh240zqtv9k0t9af8935ke9laqsnlfe5");
@@ -140,7 +138,10 @@ fn note_roundtrip() {
     let encoded = encode_note(NOTE_HEX).expect("encode_note must succeed");
     assert!(encoded.starts_with("note1"), "note must start with 'note1'");
     let decoded = decode_note(&encoded).expect("decode_note must succeed");
-    assert_eq!(decoded, NOTE_HEX, "note roundtrip must preserve event id hex");
+    assert_eq!(
+        decoded, NOTE_HEX,
+        "note roundtrip must preserve event id hex"
+    );
 }
 
 #[test]
@@ -200,7 +201,10 @@ fn nprofile_roundtrip_no_relays() {
     let encoded = encode_nprofile(&p).unwrap();
     let decoded = decode_nprofile(&encoded).unwrap();
     assert_eq!(decoded.pubkey, p.pubkey);
-    assert!(decoded.relays.is_empty(), "no relays must roundtrip as empty");
+    assert!(
+        decoded.relays.is_empty(),
+        "no relays must roundtrip as empty"
+    );
 }
 
 #[test]
@@ -313,7 +317,10 @@ fn naddr_roundtrip() {
         "naddr must start with 'naddr1'"
     );
     let decoded = decode_naddr(&encoded).expect("decode_naddr must succeed");
-    assert_eq!(decoded.identifier, a.identifier, "identifier must roundtrip");
+    assert_eq!(
+        decoded.identifier, a.identifier,
+        "identifier must roundtrip"
+    );
     assert_eq!(decoded.pubkey, a.pubkey, "pubkey must roundtrip");
     assert_eq!(decoded.kind, a.kind, "kind must roundtrip");
     assert_eq!(decoded.relays, a.relays, "relays must roundtrip");
@@ -397,10 +404,7 @@ fn decode_npub_rejects_nevent() {
     };
     let nevent_str = encode_nevent(&e).unwrap();
     let result = decode_npub(&nevent_str);
-    assert!(
-        result.is_err(),
-        "decode_npub must reject a nevent string"
-    );
+    assert!(result.is_err(), "decode_npub must reject a nevent string");
 }
 
 // ── Bech32 charset compliance ─────────────────────────────────────────────────

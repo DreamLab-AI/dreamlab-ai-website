@@ -747,9 +747,7 @@ mod tests {
             pubkey,
             created_at: now,
             kind: HTTP_AUTH_KIND,
-            tags: vec![
-                vec!["method".to_string(), "GET".to_string()],
-            ],
+            tags: vec![vec!["method".to_string(), "GET".to_string()]],
             content: String::new(),
         };
         let signed = sign_event(unsigned, &sk).unwrap();
@@ -776,9 +774,7 @@ mod tests {
             pubkey,
             created_at: now,
             kind: HTTP_AUTH_KIND,
-            tags: vec![
-                vec!["u".to_string(), url.to_string()],
-            ],
+            tags: vec![vec!["u".to_string(), url.to_string()]],
             content: String::new(),
         };
         let signed = sign_event(unsigned, &sk).unwrap();

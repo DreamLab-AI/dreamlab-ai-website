@@ -382,6 +382,9 @@ mod tests {
     #[test]
     fn ssrf_constants_safe() {
         assert!(MAX_REDIRECTS <= 5, "redirect cap must remain small");
-        assert!(MAX_BODY_BYTES <= 5 * 1024 * 1024, "body cap must remain small");
+        assert!(
+            MAX_BODY_BYTES <= 5 * 1024 * 1024,
+            "body cap must remain small"
+        );
     }
 }

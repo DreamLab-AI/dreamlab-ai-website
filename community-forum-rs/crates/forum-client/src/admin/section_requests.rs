@@ -223,11 +223,7 @@ pub fn SectionRequests() -> impl IntoView {
 
 /// A single row in the requests table.
 #[component]
-fn RequestRow<FA, FD>(
-    req: SectionRequest,
-    on_approve: FA,
-    on_deny: FD,
-) -> impl IntoView
+fn RequestRow<FA, FD>(req: SectionRequest, on_approve: FA, on_deny: FD) -> impl IntoView
 where
     FA: Fn() + 'static,
     FD: Fn() + 'static,
@@ -311,7 +307,10 @@ fn approve_request(
 
     spawn_local(async move {
         // Add cohort to user's whitelist entry
-        match admin.add_to_whitelist(&pk, &[cohort.clone()], &privkey).await {
+        match admin
+            .add_to_whitelist(&pk, &[cohort.clone()], &privkey)
+            .await
+        {
             Ok(_) => {
                 // Remove from pending list
                 requests.update(|list| list.retain(|r| r.event_id != event_id));

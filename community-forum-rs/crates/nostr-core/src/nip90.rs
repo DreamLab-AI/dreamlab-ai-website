@@ -124,11 +124,7 @@ impl JobInput {
 
     /// Encode as a NIP-90 `i` tag: `["i", value, type, relay?, marker?]`.
     pub fn to_tag(&self) -> Vec<String> {
-        let mut tag = vec![
-            "i".into(),
-            self.value.clone(),
-            self.input_type.clone(),
-        ];
+        let mut tag = vec!["i".into(), self.value.clone(), self.input_type.clone()];
         if let Some(ref relay) = self.relay {
             tag.push(relay.clone());
         } else if self.marker.is_some() {
@@ -361,11 +357,7 @@ pub struct DvmJobFeedback {
 }
 
 impl DvmJobFeedback {
-    pub fn new(
-        request_event_id: &str,
-        requester_pubkey: &str,
-        status: JobStatus,
-    ) -> Self {
+    pub fn new(request_event_id: &str, requester_pubkey: &str, status: JobStatus) -> Self {
         Self {
             request_event_id: request_event_id.into(),
             requester_pubkey: requester_pubkey.into(),
@@ -452,17 +444,17 @@ impl DvmCapabilityAd {
         }
 
         if self.price_msats > 0 {
-            tags.push(vec!["amount".into(), self.price_msats.to_string(), "msats".into()]);
+            tags.push(vec![
+                "amount".into(),
+                self.price_msats.to_string(),
+                "msats".into(),
+            ]);
         }
 
         tags
     }
 
-    pub fn sign(
-        &self,
-        dvm_sk: &[u8; 32],
-        created_at: u64,
-    ) -> Result<NostrEvent, Nip90Error> {
+    pub fn sign(&self, dvm_sk: &[u8; 32], created_at: u64) -> Result<NostrEvent, Nip90Error> {
         let signing_key = k256::schnorr::SigningKey::from_bytes(dvm_sk)
             .map_err(|e| Nip90Error::Signing(e.to_string()))?;
 
@@ -489,9 +481,16 @@ pub fn parse_job_inputs(event: &NostrEvent) -> Vec<JobInput> {
         .map(|t| {
             let value = t.get(1).cloned().unwrap_or_default();
             let input_type = t.get(2).cloned().unwrap_or_else(|| "text".into());
-            let relay = t.get(3).and_then(|s| if s.is_empty() { None } else { Some(s.clone()) });
+            let relay = t
+                .get(3)
+                .and_then(|s| if s.is_empty() { None } else { Some(s.clone()) });
             let marker = t.get(4).cloned();
-            JobInput { input_type, value, relay, marker }
+            JobInput {
+                input_type,
+                value,
+                relay,
+                marker,
+            }
         })
         .collect()
 }

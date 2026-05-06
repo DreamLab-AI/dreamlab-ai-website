@@ -219,8 +219,8 @@ pub(crate) fn MessageInput(
                 let fname = file.name();
                 let file_clone = file.clone();
                 if let Ok(reader) = web_sys::FileReader::new() {
-                    let onload = wasm_bindgen::closure::Closure::wrap(Box::new(
-                        move |ev: web_sys::Event| {
+                    let onload =
+                        wasm_bindgen::closure::Closure::wrap(Box::new(move |ev: web_sys::Event| {
                             let r: web_sys::FileReader = ev.target().unwrap().unchecked_into();
                             if let Ok(res) = r.result() {
                                 if let Some(url) = res.as_string() {
@@ -231,9 +231,8 @@ pub(crate) fn MessageInput(
                                     }));
                                 }
                             }
-                        },
-                    )
-                        as Box<dyn FnMut(web_sys::Event)>);
+                        })
+                            as Box<dyn FnMut(web_sys::Event)>);
                     reader.set_onload(Some(onload.as_ref().unchecked_ref()));
                     let _ = reader.read_as_data_url(&file);
                     onload.forget();

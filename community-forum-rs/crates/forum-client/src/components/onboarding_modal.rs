@@ -61,10 +61,8 @@ pub fn OnboardingModal() -> impl IntoView {
         },
     );
     if let Some(doc) = web_sys::window().and_then(|w| w.document()) {
-        let _ = doc.add_event_listener_with_callback(
-            "keydown",
-            esc_closure.as_ref().unchecked_ref(),
-        );
+        let _ =
+            doc.add_event_listener_with_callback("keydown", esc_closure.as_ref().unchecked_ref());
     }
     let esc_ref = send_wrapper::SendWrapper::new(esc_closure);
     on_cleanup(move || drop(esc_ref));

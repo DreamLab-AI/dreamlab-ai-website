@@ -25,10 +25,7 @@ pub enum ClientError {
     Network(String),
 
     #[error("server returned {status}: {body}")]
-    Server {
-        status: u16,
-        body: String,
-    },
+    Server { status: u16, body: String },
 
     #[error("usage error: {0}")]
     Usage(String),
@@ -119,10 +116,7 @@ impl<'a> ForumAdminClient<'a> {
     }
 
     /// Execute a prepared request. Returns the parsed JSON body on 2xx.
-    async fn execute(
-        &self,
-        prepared: &PreparedRequest,
-    ) -> Result<Value, ClientError> {
+    async fn execute(&self, prepared: &PreparedRequest) -> Result<Value, ClientError> {
         let method = Method::from_bytes(prepared.method.as_bytes())
             .map_err(|e| ClientError::Usage(format!("invalid HTTP method: {e}")))?;
         let mut req = self
@@ -150,11 +144,10 @@ impl<'a> ForumAdminClient<'a> {
             if text.is_empty() {
                 return Ok(Value::Null);
             }
-            return serde_json::from_str::<Value>(&text)
-                .map_err(|e| ClientError::Server {
-                    status: status.as_u16(),
-                    body: format!("invalid JSON: {e}"),
-                });
+            return serde_json::from_str::<Value>(&text).map_err(|e| ClientError::Server {
+                status: status.as_u16(),
+                body: format!("invalid JSON: {e}"),
+            });
         }
 
         Err(map_server_error(status, &text))
@@ -215,11 +208,7 @@ impl<'a> ForumAdminClient<'a> {
         self.send::<Value>(Method::GET, path, None).await
     }
 
-    pub async fn post<B: Serialize>(
-        &self,
-        path: &str,
-        body: &B,
-    ) -> Result<Value, ClientError> {
+    pub async fn post<B: Serialize>(&self, path: &str, body: &B) -> Result<Value, ClientError> {
         self.send(Method::POST, path, Some(body)).await
     }
 

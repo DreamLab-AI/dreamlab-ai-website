@@ -119,7 +119,13 @@ mod tests {
     #[test]
     fn parses_invite_create_with_flags() {
         let cli = parse(&[
-            "invite", "create", "--expiry", "72", "--max-uses", "3", "--env",
+            "invite",
+            "create",
+            "--expiry",
+            "72",
+            "--max-uses",
+            "3",
+            "--env",
         ])
         .expect("parse");
         match cli.command {
@@ -138,14 +144,7 @@ mod tests {
 
     #[test]
     fn mod_mute_requires_hours() {
-        let err = parse(&[
-            "mod",
-            "mute",
-            &"c".repeat(64),
-            "--nsec",
-            &"1".repeat(64),
-        ])
-        .unwrap_err();
+        let err = parse(&["mod", "mute", &"c".repeat(64), "--nsec", &"1".repeat(64)]).unwrap_err();
         assert!(err.to_string().to_lowercase().contains("--hours"));
     }
 
@@ -187,14 +186,7 @@ mod tests {
 
     #[test]
     fn mod_warn_requires_reason() {
-        let err = parse(&[
-            "mod",
-            "warn",
-            &"d".repeat(64),
-            "--nsec",
-            &"1".repeat(64),
-        ])
-        .unwrap_err();
+        let err = parse(&["mod", "warn", &"d".repeat(64), "--nsec", &"1".repeat(64)]).unwrap_err();
         assert!(err.to_string().to_lowercase().contains("--reason"));
     }
 }

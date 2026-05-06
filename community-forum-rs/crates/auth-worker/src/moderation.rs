@@ -246,10 +246,7 @@ pub async fn handle_action(
         Err(_) => return error_json(env, "Database unavailable", 500),
     };
 
-    let row_id = body
-        .id
-        .clone()
-        .unwrap_or_else(|| body.event.id.clone());
+    let row_id = body.id.clone().unwrap_or_else(|| body.event.id.clone());
     let now = now_secs();
     let reason = body.reason.clone();
     let expires_at = if expected_kind == KIND_MUTE {
@@ -339,10 +336,7 @@ pub async fn handle_report(
         Err(_) => return error_json(env, "Database unavailable", 500),
     };
 
-    let row_id = body
-        .id
-        .clone()
-        .unwrap_or_else(|| body.event.id.clone());
+    let row_id = body.id.clone().unwrap_or_else(|| body.event.id.clone());
     let now = now_secs();
 
     let insert = db
@@ -564,11 +558,7 @@ pub async fn handle_report_action(
     };
 
     if !matches!(body.status.as_str(), "actioned" | "dismissed") {
-        return error_json(
-            env,
-            "status must be `actioned` or `dismissed`",
-            400,
-        );
+        return error_json(env, "status must be `actioned` or `dismissed`", 400);
     }
 
     let db = match env.d1("DB") {
@@ -639,10 +629,7 @@ struct Nip1984Row {
 ///
 /// The query reads from a `nip1984_reports` table populated by the relay-worker
 /// when it receives kind-1984 events. This table is created by `ensure_schema`.
-pub async fn handle_nip1984_reports(
-    auth_header: Option<&str>,
-    env: &Env,
-) -> Result<Response> {
+pub async fn handle_nip1984_reports(auth_header: Option<&str>, env: &Env) -> Result<Response> {
     let url = canonical_url(env, "/api/moderation/reports");
     if let Err((body, status)) = require_admin(auth_header, &url, "GET", None, env).await {
         return json_response(env, &body, status);
@@ -673,8 +660,8 @@ pub async fn handle_nip1984_reports(
         .into_iter()
         .map(|r| {
             // Parse tags_json back to a Value; fall back to empty array on error.
-            let tags: serde_json::Value = serde_json::from_str(&r.tags_json)
-                .unwrap_or(serde_json::Value::Array(vec![]));
+            let tags: serde_json::Value =
+                serde_json::from_str(&r.tags_json).unwrap_or(serde_json::Value::Array(vec![]));
             json!({
                 "kind": KIND_REPORT_NIP56,
                 "id": r.event_id,
@@ -686,7 +673,11 @@ pub async fn handle_nip1984_reports(
         })
         .collect();
 
-    json_response(env, &json!({ "reports": reports, "kind": KIND_REPORT_NIP56 }), 200)
+    json_response(
+        env,
+        &json!({ "reports": reports, "kind": KIND_REPORT_NIP56 }),
+        200,
+    )
 }
 
 // ---------------------------------------------------------------------------
@@ -714,9 +705,9 @@ const _REF_MOD_KINDS: &[u64] = MOD_KINDS;
 #[cfg(test)]
 mod tests {
     use super::*;
+    use k256::schnorr::SigningKey;
     use nostr_core::event::{sign_event_deterministic, UnsignedEvent};
     use nostr_core::{build_ban, build_mute, build_report};
-    use k256::schnorr::SigningKey;
 
     fn admin_sk() -> SigningKey {
         SigningKey::from_bytes(&[0x02u8; 32]).unwrap()

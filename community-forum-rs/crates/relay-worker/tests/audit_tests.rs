@@ -238,20 +238,12 @@ fn entry_within_since_until_window_visible() {
 
 #[test]
 fn entry_before_since_filtered_out() {
-    assert!(!entry_in_window(
-        1_699_999_999,
-        Some(1_700_000_000),
-        None
-    ));
+    assert!(!entry_in_window(1_699_999_999, Some(1_700_000_000), None));
 }
 
 #[test]
 fn entry_after_until_filtered_out() {
-    assert!(!entry_in_window(
-        1_700_002_000,
-        None,
-        Some(1_700_001_000)
-    ));
+    assert!(!entry_in_window(1_700_002_000, None, Some(1_700_001_000)));
 }
 
 #[test]
@@ -287,5 +279,7 @@ fn audit_log_is_append_only_by_design() {
     let allowed_statements = ["INSERT"];
     let prohibited_statements = ["UPDATE", "DELETE", "DROP", "TRUNCATE"];
     assert!(allowed_statements.contains(&"INSERT"));
-    assert!(!allowed_statements.iter().any(|s| prohibited_statements.contains(s)));
+    assert!(!allowed_statements
+        .iter()
+        .any(|s| prohibited_statements.contains(s)));
 }

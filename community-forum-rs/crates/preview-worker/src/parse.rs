@@ -44,10 +44,8 @@ pub(crate) fn og_regexes() -> &'static OgRegexes {
             r#"(?i)<meta\s+content=["']([^"']+)["']\s+property=["']og:description["']"#,
         )
         .unwrap(),
-        meta_desc: Regex::new(
-            r#"(?i)<meta\s+name=["']description["']\s+content=["']([^"']+)["']"#,
-        )
-        .unwrap(),
+        meta_desc: Regex::new(r#"(?i)<meta\s+name=["']description["']\s+content=["']([^"']+)["']"#)
+            .unwrap(),
         og_image_1: Regex::new(
             r#"(?i)<meta\s+property=["']og:image["']\s+content=["']([^"']+)["']"#,
         )

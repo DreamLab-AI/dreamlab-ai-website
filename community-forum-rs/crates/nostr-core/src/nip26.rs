@@ -177,8 +177,7 @@ impl DelegationToken {
 
         let hash = delegation_token_hash(&self.delegatee_pubkey, &self.conditions_str);
 
-        let sig_bytes =
-            hex::decode(&self.sig).map_err(|e| Nip26Error::HexError(e.to_string()))?;
+        let sig_bytes = hex::decode(&self.sig).map_err(|e| Nip26Error::HexError(e.to_string()))?;
         let sig = k256::schnorr::Signature::try_from(sig_bytes.as_slice())
             .map_err(|_| Nip26Error::InvalidSignature)?;
 

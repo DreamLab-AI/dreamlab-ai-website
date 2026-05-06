@@ -23,8 +23,7 @@ mod storage;
 mod webid;
 
 use acl::{
-    coerce_required_mode_for_acl, evaluate_access, find_effective_acl, wac_allow_header,
-    AccessMode,
+    coerce_required_mode_for_acl, evaluate_access, find_effective_acl, wac_allow_header, AccessMode,
 };
 use base64::Engine as _;
 use worker::*;
@@ -116,9 +115,7 @@ fn add_ldp_headers(headers: &Headers, is_container: bool, resource_path: &str) {
     let mut link_parts = Vec::new();
 
     if is_container {
-        link_parts.push(
-            "<http://www.w3.org/ns/ldp#BasicContainer>; rel=\"type\"".to_string(),
-        );
+        link_parts.push("<http://www.w3.org/ns/ldp#BasicContainer>; rel=\"type\"".to_string());
         link_parts.push("<http://www.w3.org/ns/ldp#Resource>; rel=\"type\"".to_string());
     } else {
         link_parts.push("<http://www.w3.org/ns/ldp#Resource>; rel=\"type\"".to_string());
@@ -261,8 +258,8 @@ async fn fetch(mut req: Request, env: Env, _ctx: Context) -> Result<Response> {
             let host = url.host_str().unwrap_or("dreamlab-ai.com");
             let pod_base = format!("https://{host}");
             let body = remote_storage::webfinger_response(&pk, host, &pod_base);
-            let json_str = serde_json::to_string(&body)
-                .map_err(|e| Error::RustError(e.to_string()))?;
+            let json_str =
+                serde_json::to_string(&body).map_err(|e| Error::RustError(e.to_string()))?;
             let cors = cors_headers(&env);
             let resp = Response::ok(json_str)?.with_headers(cors);
             resp.headers()
@@ -277,8 +274,7 @@ async fn fetch(mut req: Request, env: Env, _ctx: Context) -> Result<Response> {
     if path == "/.well-known/solid" {
         let host = url.host_str().unwrap_or("dreamlab-ai.com");
         let body = remote_storage::solid_discovery(&format!("https://{host}"));
-        let json_str =
-            serde_json::to_string(&body).map_err(|e| Error::RustError(e.to_string()))?;
+        let json_str = serde_json::to_string(&body).map_err(|e| Error::RustError(e.to_string()))?;
         let cors = cors_headers(&env);
         let resp = Response::ok(json_str)?.with_headers(cors);
         resp.headers().set("Content-Type", "application/json").ok();
@@ -301,14 +297,12 @@ async fn fetch(mut req: Request, env: Env, _ctx: Context) -> Result<Response> {
         let pubkey = kv.get(&key).text().await.ok().flatten();
         if let Some(pk) = pubkey {
             let body = remote_storage::nostr_json(&pk, &name);
-            let json_str = serde_json::to_string(&body)
-                .map_err(|e| Error::RustError(e.to_string()))?;
+            let json_str =
+                serde_json::to_string(&body).map_err(|e| Error::RustError(e.to_string()))?;
             let cors = cors_headers(&env);
             let resp = Response::ok(json_str)?.with_headers(cors);
             resp.headers().set("Content-Type", "application/json").ok();
-            resp.headers()
-                .set("Access-Control-Allow-Origin", "*")
-                .ok();
+            resp.headers().set("Access-Control-Allow-Origin", "*").ok();
             return Ok(resp);
         }
         return json_error(&env, "Name not found", 404);
@@ -324,8 +318,8 @@ async fn fetch(mut req: Request, env: Env, _ctx: Context) -> Result<Response> {
                 let host = url.host_str().unwrap_or("dreamlab-ai.com");
                 let pod_base = format!("https://{host}");
                 let did_doc = build_did_nostr_document(pk, &pod_base);
-                let json_str = serde_json::to_string(&did_doc)
-                    .map_err(|e| Error::RustError(e.to_string()))?;
+                let json_str =
+                    serde_json::to_string(&did_doc).map_err(|e| Error::RustError(e.to_string()))?;
                 let cors = cors_headers(&env);
                 let resp = Response::ok(json_str)?.with_headers(cors);
                 resp.headers()
@@ -491,8 +485,7 @@ async fn fetch(mut req: Request, env: Env, _ctx: Context) -> Result<Response> {
     // For `.acl` sidecars we coerce write-class methods up to acl:Control so
     // a principal with mere acl:Write cannot escalate by overwriting the
     // sidecar (audit C3). Non-acl resources retain the standard mapping.
-    let required_mode =
-        coerce_required_mode_for_acl(&resource_path, method_str(&method));
+    let required_mode = coerce_required_mode_for_acl(&resource_path, method_str(&method));
     let acl_doc = find_effective_acl(&bucket, &kv, &owner_pubkey, &resource_path).await;
 
     let has_access = evaluate_access(
@@ -522,8 +515,8 @@ async fn fetch(mut req: Request, env: Env, _ctx: Context) -> Result<Response> {
             if is_container_path {
                 let listing =
                     container::list_container(&bucket, &owner_pubkey, &resource_path).await?;
-                let json_str = serde_json::to_string(&listing)
-                    .map_err(|e| Error::RustError(e.to_string()))?;
+                let json_str =
+                    serde_json::to_string(&listing).map_err(|e| Error::RustError(e.to_string()))?;
                 let cors = cors_headers(&env);
                 let resp = Response::ok(json_str)?.with_headers(cors);
                 resp.headers()
@@ -550,16 +543,10 @@ async fn fetch(mut req: Request, env: Env, _ctx: Context) -> Result<Response> {
                             .ok_or_else(|| Error::RustError("R2 object has no body".into()))?;
                         let bytes = body.bytes().await?;
                         String::from_utf8(bytes).unwrap_or_else(|_| {
-                            webid::generate_webid_html(
-                                &owner_pubkey,
-                                None,
-                                &expected_origin,
-                            )
+                            webid::generate_webid_html(&owner_pubkey, None, &expected_origin)
                         })
                     }
-                    None => {
-                        webid::generate_webid_html(&owner_pubkey, None, &expected_origin)
-                    }
+                    None => webid::generate_webid_html(&owner_pubkey, None, &expected_origin),
                 };
                 let cors = cors_headers(&env);
                 let resp = Response::ok(html)?.with_headers(cors);
@@ -585,10 +572,8 @@ async fn fetch(mut req: Request, env: Env, _ctx: Context) -> Result<Response> {
                 .http_metadata()
                 .content_type
                 .unwrap_or_else(|| "application/octet-stream".to_string());
-            let obj_content_type = content_negotiation::negotiate(
-                accept_header.as_deref(),
-                &stored_content_type,
-            );
+            let obj_content_type =
+                content_negotiation::negotiate(accept_header.as_deref(), &stored_content_type);
             let etag = object.etag();
             let cors = cors_headers(&env);
 
@@ -628,9 +613,7 @@ async fn fetch(mut req: Request, env: Env, _ctx: Context) -> Result<Response> {
             let bytes = body.bytes().await?;
 
             // Range request support
-            if let Some((start, end)) =
-                conditional::parse_range(&req_headers, bytes.len() as u64)
-            {
+            if let Some((start, end)) = conditional::parse_range(&req_headers, bytes.len() as u64) {
                 let slice = &bytes[start as usize..=end as usize];
                 let resp = Response::from_bytes(slice.to_vec())?
                     .with_status(206)
@@ -790,8 +773,7 @@ async fn fetch(mut req: Request, env: Env, _ctx: Context) -> Result<Response> {
                     .ok();
 
                 // Fire notification webhooks (non-blocking)
-                notifications::notify_change(&kv, &owner_pubkey, &resource_path, "Update")
-                    .await;
+                notifications::notify_change(&kv, &owner_pubkey, &resource_path, "Update").await;
 
                 let resp_body = serde_json::json!({ "status": "ok" });
                 let resp = json_ok(&env, &resp_body, 201)?;
@@ -828,8 +810,7 @@ async fn fetch(mut req: Request, env: Env, _ctx: Context) -> Result<Response> {
                 return json_error(&env, &e.to_string(), 413);
             }
 
-            let child_path =
-                container::resolve_slug(&resource_path, slug_header.as_deref());
+            let child_path = container::resolve_slug(&resource_path, slug_header.as_deref());
             let child_r2_key = format!("pods/{owner_pubkey}{child_path}");
 
             bucket
@@ -875,9 +856,8 @@ async fn fetch(mut req: Request, env: Env, _ctx: Context) -> Result<Response> {
             let patch_data = body_bytes.unwrap_or_default();
 
             // Parse patch operations
-            let operations: Vec<patch::PatchOperation> =
-                serde_json::from_slice(&patch_data)
-                    .map_err(|e| Error::RustError(format!("Invalid JSON Patch: {e}")))?;
+            let operations: Vec<patch::PatchOperation> = serde_json::from_slice(&patch_data)
+                .map_err(|e| Error::RustError(format!("Invalid JSON Patch: {e}")))?;
 
             // Read current document
             let current_bytes = match bucket.get(&r2_key).execute().await? {

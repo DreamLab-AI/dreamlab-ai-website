@@ -49,8 +49,8 @@ pub fn get_extension_name() -> Option<String> {
 /// to a hex-encoded x-only public key string.
 pub async fn nip07_get_pubkey() -> Result<String, String> {
     let window = web_sys::window().ok_or("No window object")?;
-    let nostr = js_sys::Reflect::get(&window, &"nostr".into())
-        .map_err(|_| "window.nostr not found")?;
+    let nostr =
+        js_sys::Reflect::get(&window, &"nostr".into()).map_err(|_| "window.nostr not found")?;
     if nostr.is_undefined() || nostr.is_null() {
         return Err("NIP-07 extension not available".to_string());
     }
@@ -84,17 +84,17 @@ pub async fn nip07_get_pubkey() -> Result<String, String> {
 /// returns a fully signed `NostrEvent`.
 pub async fn nip07_sign_event(event: &UnsignedEvent) -> Result<NostrEvent, String> {
     let window = web_sys::window().ok_or("No window object")?;
-    let nostr = js_sys::Reflect::get(&window, &"nostr".into())
-        .map_err(|_| "window.nostr not found")?;
+    let nostr =
+        js_sys::Reflect::get(&window, &"nostr".into()).map_err(|_| "window.nostr not found")?;
     if nostr.is_undefined() || nostr.is_null() {
         return Err("NIP-07 extension not available".to_string());
     }
 
     // Build the unsigned event JS object (NIP-07 expects {kind, content, tags, created_at})
-    let event_json = serde_json::to_string(event)
-        .map_err(|e| format!("Failed to serialize event: {e}"))?;
-    let event_js: JsValue = js_sys::JSON::parse(&event_json)
-        .map_err(|_| "Failed to parse event as JS object")?;
+    let event_json =
+        serde_json::to_string(event).map_err(|e| format!("Failed to serialize event: {e}"))?;
+    let event_js: JsValue =
+        js_sys::JSON::parse(&event_json).map_err(|_| "Failed to parse event as JS object")?;
 
     let sign_fn = js_sys::Reflect::get(&nostr, &"signEvent".into())
         .map_err(|_| "signEvent not found on window.nostr")?;
@@ -113,8 +113,8 @@ pub async fn nip07_sign_event(event: &UnsignedEvent) -> Result<NostrEvent, Strin
         .await
         .map_err(|e| format!("signEvent() rejected: {:?}", e))?;
 
-    let result_json = js_sys::JSON::stringify(&result)
-        .map_err(|_| "Failed to stringify signed event")?;
+    let result_json =
+        js_sys::JSON::stringify(&result).map_err(|_| "Failed to stringify signed event")?;
     let result_str = result_json
         .as_string()
         .ok_or("Signed event is not a string")?;
@@ -138,7 +138,10 @@ impl Nip07Signer {
     /// the pubkey request.
     pub async fn try_connect() -> Result<Self, String> {
         if !has_nip07_extension() {
-            return Err("window.nostr not available — install a NIP-07 extension such as Alby or nos2x".to_string());
+            return Err(
+                "window.nostr not available — install a NIP-07 extension such as Alby or nos2x"
+                    .to_string(),
+            );
         }
         let pubkey_hex = nip07_get_pubkey().await?;
         Ok(Self { pubkey_hex })
@@ -205,10 +208,13 @@ impl Signer for Nip07Signer {
 }
 
 /// NIP-44 encrypt via `window.nostr.nip44.encrypt(pubkey, plaintext)`.
-async fn nip07_nip44_encrypt(recipient_pubkey_hex: &str, plaintext: &str) -> Result<String, String> {
+async fn nip07_nip44_encrypt(
+    recipient_pubkey_hex: &str,
+    plaintext: &str,
+) -> Result<String, String> {
     let window = web_sys::window().ok_or("No window object")?;
-    let nostr = js_sys::Reflect::get(&window, &"nostr".into())
-        .map_err(|_| "window.nostr not found")?;
+    let nostr =
+        js_sys::Reflect::get(&window, &"nostr".into()).map_err(|_| "window.nostr not found")?;
     if nostr.is_undefined() || nostr.is_null() {
         return Err("NIP-07 extension not available".to_string());
     }
@@ -226,7 +232,11 @@ async fn nip07_nip44_encrypt(recipient_pubkey_hex: &str, plaintext: &str) -> Res
         .map_err(|_| "nip44.encrypt is not a function")?;
 
     let promise = encrypt_fn
-        .call2(&nip44, &JsValue::from_str(recipient_pubkey_hex), &JsValue::from_str(plaintext))
+        .call2(
+            &nip44,
+            &JsValue::from_str(recipient_pubkey_hex),
+            &JsValue::from_str(plaintext),
+        )
         .map_err(|e| format!("nip44.encrypt() call failed: {:?}", e))?;
     let promise: js_sys::Promise = promise
         .dyn_into()
@@ -244,8 +254,8 @@ async fn nip07_nip44_encrypt(recipient_pubkey_hex: &str, plaintext: &str) -> Res
 /// NIP-44 decrypt via `window.nostr.nip44.decrypt(pubkey, ciphertext)`.
 async fn nip07_nip44_decrypt(sender_pubkey_hex: &str, ciphertext: &str) -> Result<String, String> {
     let window = web_sys::window().ok_or("No window object")?;
-    let nostr = js_sys::Reflect::get(&window, &"nostr".into())
-        .map_err(|_| "window.nostr not found")?;
+    let nostr =
+        js_sys::Reflect::get(&window, &"nostr".into()).map_err(|_| "window.nostr not found")?;
     if nostr.is_undefined() || nostr.is_null() {
         return Err("NIP-07 extension not available".to_string());
     }
@@ -263,7 +273,11 @@ async fn nip07_nip44_decrypt(sender_pubkey_hex: &str, ciphertext: &str) -> Resul
         .map_err(|_| "nip44.decrypt is not a function")?;
 
     let promise = decrypt_fn
-        .call2(&nip44, &JsValue::from_str(sender_pubkey_hex), &JsValue::from_str(ciphertext))
+        .call2(
+            &nip44,
+            &JsValue::from_str(sender_pubkey_hex),
+            &JsValue::from_str(ciphertext),
+        )
         .map_err(|e| format!("nip44.decrypt() call failed: {:?}", e))?;
     let promise: js_sys::Promise = promise
         .dyn_into()

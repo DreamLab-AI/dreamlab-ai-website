@@ -40,9 +40,12 @@ pub enum Nip04Error {
 /// Compute the NIP-04 shared secret: ECDH x-coordinate → SHA-256.
 ///
 /// The 32-byte output is the AES-256-CBC key.
-pub fn nip04_shared_secret(our_sk_bytes: &[u8; 32], their_pk_hex: &str) -> Result<[u8; 32], Nip04Error> {
-    let secret_key = SecretKey::from_bytes(our_sk_bytes.into())
-        .map_err(|_| Nip04Error::InvalidSecretKey)?;
+pub fn nip04_shared_secret(
+    our_sk_bytes: &[u8; 32],
+    their_pk_hex: &str,
+) -> Result<[u8; 32], Nip04Error> {
+    let secret_key =
+        SecretKey::from_bytes(our_sk_bytes.into()).map_err(|_| Nip04Error::InvalidSecretKey)?;
 
     let pk_bytes = hex::decode(their_pk_hex)
         .map_err(|e| Nip04Error::InvalidPublicKey(format!("hex decode: {e}")))?;
@@ -79,7 +82,11 @@ pub fn nip04_shared_secret(our_sk_bytes: &[u8; 32], their_pk_hex: &str) -> Resul
 /// Encrypt plaintext using NIP-04 (AES-256-CBC).
 ///
 /// Returns `"<ciphertext_base64>?iv=<iv_base64>"`.
-pub fn nip04_encrypt(our_sk: &[u8; 32], their_pk_hex: &str, plaintext: &str) -> Result<String, Nip04Error> {
+pub fn nip04_encrypt(
+    our_sk: &[u8; 32],
+    their_pk_hex: &str,
+    plaintext: &str,
+) -> Result<String, Nip04Error> {
     let aes_key = nip04_shared_secret(our_sk, their_pk_hex)?;
 
     // Generate random 16-byte IV
@@ -101,7 +108,11 @@ pub fn nip04_encrypt(our_sk: &[u8; 32], their_pk_hex: &str, plaintext: &str) -> 
 /// Decrypt a NIP-04 ciphertext string `"<ciphertext_base64>?iv=<iv_base64>"`.
 ///
 /// Returns the plaintext string.
-pub fn nip04_decrypt(our_sk: &[u8; 32], their_pk_hex: &str, ciphertext_with_iv: &str) -> Result<String, Nip04Error> {
+pub fn nip04_decrypt(
+    our_sk: &[u8; 32],
+    their_pk_hex: &str,
+    ciphertext_with_iv: &str,
+) -> Result<String, Nip04Error> {
     let aes_key = nip04_shared_secret(our_sk, their_pk_hex)?;
 
     // Split on "?iv="
@@ -293,11 +304,7 @@ mod tests {
         // encrypt_padded_vec_mut returns Vec<u8> (infallible with alloc feature)
         let ct_bytes: Vec<u8> = enc.encrypt_padded_vec_mut::<Pkcs7>(plaintext.as_bytes());
 
-        let wire = format!(
-            "{}?iv={}",
-            BASE64.encode(&ct_bytes),
-            BASE64.encode(iv)
-        );
+        let wire = format!("{}?iv={}", BASE64.encode(&ct_bytes), BASE64.encode(iv));
 
         let decrypted = nip04_decrypt(&sk_b, &pk_a, &wire).unwrap();
         assert_eq!(decrypted, plaintext, "known-vector decryption must match");
@@ -308,8 +315,15 @@ mod tests {
         let (sk_a, _) = test_keypair();
         let (_, pk_b) = test_keypair();
         let result = nip04_encrypt(&sk_a, &pk_b, "test").unwrap();
-        assert!(result.contains("?iv="), "wire format must contain '?iv=' separator");
-        assert_eq!(result.matches("?iv=").count(), 1, "exactly one ?iv= separator");
+        assert!(
+            result.contains("?iv="),
+            "wire format must contain '?iv=' separator"
+        );
+        assert_eq!(
+            result.matches("?iv=").count(),
+            1,
+            "exactly one ?iv= separator"
+        );
     }
 
     #[test]
@@ -411,7 +425,10 @@ mod tests {
 
         // Correct path: nip04_decrypt succeeds
         let decrypted = nip04_decrypt(&sk_b, &pk_a, &nip04_wire).unwrap();
-        assert_eq!(decrypted, plaintext, "nip04_decrypt must succeed on NIP-04 wire format");
+        assert_eq!(
+            decrypted, plaintext,
+            "nip04_decrypt must succeed on NIP-04 wire format"
+        );
 
         // Bug path: nip44_decrypt must NOT succeed on NIP-04 wire format.
         // NIP-44 expects version byte 0x02 and ChaCha20-Poly1305; a NIP-04

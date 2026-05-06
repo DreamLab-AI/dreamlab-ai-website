@@ -128,7 +128,10 @@ impl PrfSigner {
     /// Create a `PrfSigner` from an existing keypair.
     pub fn new(keypair: Keypair) -> Self {
         let pubkey_hex = keypair.public.to_hex();
-        Self { keypair, pubkey_hex }
+        Self {
+            keypair,
+            pubkey_hex,
+        }
     }
 
     /// Return a reference to the underlying [`Keypair`].
@@ -177,8 +180,12 @@ impl Signer for PrfSigner {
         recipient_pubkey_hex: &str,
         plaintext: &str,
     ) -> Result<String, SignerError> {
-        nip04_enc(self.keypair.secret.as_bytes(), recipient_pubkey_hex, plaintext)
-            .map_err(|e| SignerError::EncryptionFailed(e.to_string()))
+        nip04_enc(
+            self.keypair.secret.as_bytes(),
+            recipient_pubkey_hex,
+            plaintext,
+        )
+        .map_err(|e| SignerError::EncryptionFailed(e.to_string()))
     }
 
     async fn nip04_decrypt(
@@ -186,8 +193,12 @@ impl Signer for PrfSigner {
         sender_pubkey_hex: &str,
         ciphertext: &str,
     ) -> Result<String, SignerError> {
-        nip04_dec(self.keypair.secret.as_bytes(), sender_pubkey_hex, ciphertext)
-            .map_err(|e| SignerError::DecryptionFailed(e.to_string()))
+        nip04_dec(
+            self.keypair.secret.as_bytes(),
+            sender_pubkey_hex,
+            ciphertext,
+        )
+        .map_err(|e| SignerError::DecryptionFailed(e.to_string()))
     }
 }
 
@@ -319,10 +330,10 @@ mod tests {
         E: From<SignerError>,
     {
         fn from_pending_timeout() -> Self {
-            Err(SignerError::Backend(
-                "block_on: future did not resolve within spin budget".into(),
+            Err(
+                SignerError::Backend("block_on: future did not resolve within spin budget".into())
+                    .into(),
             )
-            .into())
         }
     }
 }

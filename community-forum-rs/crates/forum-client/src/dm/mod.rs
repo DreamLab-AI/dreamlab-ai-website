@@ -571,7 +571,11 @@ const KIND_10050_KEY_PREFIX: &str = "nostr_bbs_dm_relay_published_";
 /// with the provided privkey bytes and published to the relay synchronously
 /// (fire-and-forget — failures are logged but don't block the DM send).
 fn ensure_dm_relay_published(relay: &RelayConnection, privkey_bytes: &[u8; 32], my_pubkey: &str) {
-    let storage_key = format!("{}{}", KIND_10050_KEY_PREFIX, &my_pubkey[..8.min(my_pubkey.len())]);
+    let storage_key = format!(
+        "{}{}",
+        KIND_10050_KEY_PREFIX,
+        &my_pubkey[..8.min(my_pubkey.len())]
+    );
 
     // Check localStorage flag first to avoid re-publishing
     let already_published = web_sys::window()
@@ -595,9 +599,7 @@ fn ensure_dm_relay_published(relay: &RelayConnection, privkey_bytes: &[u8; 32], 
     let signing_key = match k256::schnorr::SigningKey::from_bytes(&key_bytes) {
         Ok(sk) => sk,
         Err(e) => {
-            web_sys::console::warn_1(
-                &format!("[DM] kind-10050: invalid signing key: {e}").into(),
-            );
+            web_sys::console::warn_1(&format!("[DM] kind-10050: invalid signing key: {e}").into());
             return;
         }
     };
@@ -622,13 +624,15 @@ fn ensure_dm_relay_published(relay: &RelayConnection, privkey_bytes: &[u8; 32], 
                 let _ = storage.set_item(&storage_key, "1");
             }
             web_sys::console::log_1(
-                &format!("[DM] Published kind-10050 DM relay for: {}", &my_pubkey[..8.min(my_pubkey.len())]).into(),
+                &format!(
+                    "[DM] Published kind-10050 DM relay for: {}",
+                    &my_pubkey[..8.min(my_pubkey.len())]
+                )
+                .into(),
             );
         }
         Err(e) => {
-            web_sys::console::warn_1(
-                &format!("[DM] Failed to publish kind-10050: {e}").into(),
-            );
+            web_sys::console::warn_1(&format!("[DM] Failed to publish kind-10050: {e}").into());
         }
     }
 }

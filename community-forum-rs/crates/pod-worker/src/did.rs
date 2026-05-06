@@ -110,10 +110,7 @@ pub fn render_did_document_tier3(
     let did = did_nostr_uri(pk);
     let vm_id = format!("{did}#nostr-schnorr");
 
-    let also_known_as: Vec<Value> = webid
-        .iter()
-        .map(|w| Value::String(w.to_string()))
-        .collect();
+    let also_known_as: Vec<Value> = webid.iter().map(|w| Value::String(w.to_string())).collect();
 
     let mut services: Vec<Value> = vec![json!({
         "id": format!("{did}#solid-pod"),
@@ -180,8 +177,7 @@ fn format_multibase_schnorr(pk: &[u8; 32]) -> String {
 /// Avoids adding an extra dependency for a single use site.
 /// Mirrors `solid_pod_rs_nostr::did::base58_encode`.
 fn base58_encode(input: &[u8]) -> String {
-    const ALPHABET: &[u8; 58] =
-        b"123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+    const ALPHABET: &[u8; 58] = b"123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
     if input.is_empty() {
         return String::new();
     }
@@ -293,7 +289,10 @@ mod tests {
     fn verify_webid_tag_did_nostr() {
         let pk = "a".repeat(64);
         assert!(verify_webid_tag(&format!("did:nostr:{pk}"), &pk));
-        assert!(!verify_webid_tag(&format!("did:nostr:{pk}"), &"b".repeat(64)));
+        assert!(!verify_webid_tag(
+            &format!("did:nostr:{pk}"),
+            &"b".repeat(64)
+        ));
     }
 
     #[test]

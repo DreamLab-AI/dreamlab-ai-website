@@ -87,13 +87,7 @@ impl NotificationStoreV2 {
 
     /// Push a new notification.
     #[allow(dead_code)]
-    pub fn add(
-        &self,
-        kind: NotificationKind,
-        title: &str,
-        body: &str,
-        link: Option<&str>,
-    ) {
+    pub fn add(&self, kind: NotificationKind, title: &str, body: &str, link: Option<&str>) {
         let now = now_secs();
         // Generate a random ID using js_sys (WASM-safe, no getrandom crate needed)
         let id = {

@@ -81,8 +81,7 @@ fn arb_agent_iri() -> impl Strategy<Value = String> {
 
 /// Generate an `accessTo` path with 1..=5 segments.
 fn arb_access_path() -> impl Strategy<Value = String> {
-    prop::collection::vec("[a-z]{1,8}", 1..=5)
-        .prop_map(|segs| format!("/{}", segs.join("/")))
+    prop::collection::vec("[a-z]{1,8}", 1..=5).prop_map(|segs| format!("/{}", segs.join("/")))
 }
 
 /// Build an authorization JSON node from random parameters.
@@ -93,10 +92,7 @@ fn arb_authorization() -> impl Strategy<Value = Value> {
         arb_access_path(),
     )
         .prop_map(|(agents, modes, path)| {
-            let agent_refs: Vec<Value> = agents
-                .into_iter()
-                .map(|a| json!({ "@id": a }))
-                .collect();
+            let agent_refs: Vec<Value> = agents.into_iter().map(|a| json!({ "@id": a })).collect();
             let mode_refs: Vec<Value> = modes.into_iter().map(|m| json!({ "@id": m })).collect();
             let mut authz = json!({
                 "@type": "acl:Authorization",

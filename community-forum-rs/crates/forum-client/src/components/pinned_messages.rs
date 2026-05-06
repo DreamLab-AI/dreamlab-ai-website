@@ -62,7 +62,12 @@ pub fn PinButton(
             created_at: now,
             kind: 41,
             tags: vec![
-                vec!["e".to_string(), cid.get_value(), String::new(), "root".to_string()],
+                vec![
+                    "e".to_string(),
+                    cid.get_value(),
+                    String::new(),
+                    "root".to_string(),
+                ],
                 vec!["pin".to_string(), eid.get_value()],
             ],
             content: String::new(),

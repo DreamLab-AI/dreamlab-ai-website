@@ -122,7 +122,10 @@ fn conditions_permits_matching_kind_and_time() {
 #[test]
 fn conditions_permits_rejects_wrong_kind() {
     let c = Conditions::from_str("kind=1&created_at>100&created_at<200").unwrap();
-    assert!(!c.permits(2, 150), "kind=2 must be rejected when only kind=1 allowed");
+    assert!(
+        !c.permits(2, 150),
+        "kind=2 must be rejected when only kind=1 allowed"
+    );
 }
 
 #[test]
@@ -141,7 +144,10 @@ fn conditions_permits_rejects_after_window() {
 fn conditions_permits_boundary_at_created_after() {
     // created_at> is strictly greater-than per NIP-26 spec
     let c = Conditions::from_str("created_at>100").unwrap();
-    assert!(!c.permits(1, 100), "ts=100 is NOT strictly greater than 100");
+    assert!(
+        !c.permits(1, 100),
+        "ts=100 is NOT strictly greater than 100"
+    );
     assert!(c.permits(1, 101), "ts=101 is strictly greater than 100");
 }
 
@@ -156,8 +162,14 @@ fn conditions_permits_boundary_at_created_before() {
 #[test]
 fn conditions_permits_no_constraints_allows_anything() {
     let c = Conditions::from_str("").unwrap();
-    assert!(c.permits(0, 0), "no constraints: kind=0 ts=0 must be allowed");
-    assert!(c.permits(999, u64::MAX), "no constraints: any kind/ts allowed");
+    assert!(
+        c.permits(0, 0),
+        "no constraints: kind=0 ts=0 must be allowed"
+    );
+    assert!(
+        c.permits(999, u64::MAX),
+        "no constraints: any kind/ts allowed"
+    );
 }
 
 #[test]
@@ -191,7 +203,9 @@ fn delegation_token_roundtrip_kind_only() {
     let token = DelegationToken::create(&delegator_sk, &delegatee_pk, &conditions)
         .expect("create must succeed");
 
-    token.verify().expect("verify must succeed on a freshly-created token");
+    token
+        .verify()
+        .expect("verify must succeed on a freshly-created token");
 }
 
 #[test]
@@ -201,7 +215,9 @@ fn delegation_token_roundtrip_with_time_bounds() {
     let conditions = Conditions::from_str("kind=1&created_at>1000&created_at<9999999999").unwrap();
 
     let token = DelegationToken::create(&delegator_sk, &delegatee_pk, &conditions).unwrap();
-    token.verify().expect("verify with time bounds must succeed");
+    token
+        .verify()
+        .expect("verify with time bounds must succeed");
 }
 
 #[test]
@@ -211,7 +227,9 @@ fn delegation_token_roundtrip_no_conditions() {
     let conditions = Conditions::from_str("").unwrap();
 
     let token = DelegationToken::create(&delegator_sk, &delegatee_pk, &conditions).unwrap();
-    token.verify().expect("verify with empty conditions must succeed");
+    token
+        .verify()
+        .expect("verify with empty conditions must succeed");
 }
 
 #[test]
@@ -337,7 +355,10 @@ fn validate_delegation_tag_accepts_matching_event() {
         1,             // kind
         1_000_000_000, // created_at — within window
     );
-    assert!(result.is_ok(), "valid event must pass delegation validation");
+    assert!(
+        result.is_ok(),
+        "valid event must pass delegation validation"
+    );
 }
 
 #[test]
@@ -402,7 +423,11 @@ fn delegation_sig_hash_preimage_format() {
     let conditions = Conditions::from_str("kind=1").unwrap();
     let token = DelegationToken::create(&delegator_sk, &delegatee_pk, &conditions).unwrap();
 
-    assert_eq!(token.sig.len(), 128, "Schnorr sig must be 64 bytes = 128 hex chars");
+    assert_eq!(
+        token.sig.len(),
+        128,
+        "Schnorr sig must be 64 bytes = 128 hex chars"
+    );
     assert!(
         token.sig.chars().all(|c: char| c.is_ascii_hexdigit()),
         "sig must be lowercase hex"

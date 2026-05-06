@@ -92,7 +92,12 @@ pub async fn require_admin(
 
     let token = verify(auth, request_url, method, body, env)
         .await
-        .map_err(|_| (serde_json::json!({ "error": "Invalid NIP-98 token" }), 401u16))?;
+        .map_err(|_| {
+            (
+                serde_json::json!({ "error": "Invalid NIP-98 token" }),
+                401u16,
+            )
+        })?;
 
     if !is_admin(&token.pubkey, env).await {
         return Err((serde_json::json!({ "error": "Admin required" }), 403));
@@ -119,7 +124,12 @@ pub async fn require_authed(
     })?;
     let token = verify(auth, request_url, method, body, env)
         .await
-        .map_err(|_| (serde_json::json!({ "error": "Invalid NIP-98 token" }), 401u16))?;
+        .map_err(|_| {
+            (
+                serde_json::json!({ "error": "Invalid NIP-98 token" }),
+                401u16,
+            )
+        })?;
     Ok(token.pubkey)
 }
 

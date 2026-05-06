@@ -175,7 +175,10 @@ pub async fn handle_add(
              VALUES (?1, 1, ?2) \
              ON CONFLICT (pubkey) DO UPDATE SET is_admin = 1",
         )
-        .bind(&[JsValue::from_str(&body.pubkey), JsValue::from_f64(now as f64)])?
+        .bind(&[
+            JsValue::from_str(&body.pubkey),
+            JsValue::from_f64(now as f64),
+        ])?
         .run()
         .await;
 
@@ -190,12 +193,19 @@ pub async fn handle_add(
              VALUES (?1, 1, ?2) \
              ON CONFLICT (pubkey) DO UPDATE SET is_admin = 1",
         )
-        .bind(&[JsValue::from_str(&body.pubkey), JsValue::from_f64(now as f64)])
+        .bind(&[
+            JsValue::from_str(&body.pubkey),
+            JsValue::from_f64(now as f64),
+        ])
         .map(|s| async move { s.run().await });
 
     bust_cache(env).await;
 
-    json_response(env, &json!({ "ok": true, "pubkey": body.pubkey, "action": "admin_added" }), 200)
+    json_response(
+        env,
+        &json!({ "ok": true, "pubkey": body.pubkey, "action": "admin_added" }),
+        200,
+    )
 }
 
 // ---------------------------------------------------------------------------
@@ -248,7 +258,11 @@ pub async fn handle_remove(
 
     bust_cache(env).await;
 
-    json_response(env, &json!({ "ok": true, "pubkey": body.pubkey, "action": "admin_removed" }), 200)
+    json_response(
+        env,
+        &json!({ "ok": true, "pubkey": body.pubkey, "action": "admin_removed" }),
+        200,
+    )
 }
 
 // ---------------------------------------------------------------------------

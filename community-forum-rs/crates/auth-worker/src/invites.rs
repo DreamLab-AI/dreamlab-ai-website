@@ -88,8 +88,7 @@ fn js_i64(v: i64) -> JsValue {
 /// nanoid-style 16-char code from the URL-safe alphabet. Cryptographically
 /// random via `getrandom`.
 fn generate_code(len: usize) -> String {
-    const ALPHABET: &[u8] =
-        b"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-";
+    const ALPHABET: &[u8] = b"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-";
     let mut bytes = vec![0u8; len];
     // Fallback to a deterministic-but-bounded loop if getrandom fails; extremely
     // unlikely in Workers runtime.
@@ -189,11 +188,7 @@ pub async fn handle_create(
     if !caller_is_admin {
         // Tenure gate: first_seen_at must be at least min_days_active days old.
         let Some(ref m) = member else {
-            return error_json(
-                env,
-                "Only registered members can create invites",
-                403,
-            );
+            return error_json(env, "Only registered members can create invites", 403);
         };
         let first_seen = m.first_seen_at.unwrap_or(0);
         let days_active = (now_secs() as i64 - first_seen) / 86_400;
@@ -705,7 +700,9 @@ mod tests {
     fn generate_code_has_expected_length() {
         let c = generate_code(16);
         assert_eq!(c.len(), 16);
-        assert!(c.chars().all(|ch| ch.is_ascii_alphanumeric() || ch == '_' || ch == '-'));
+        assert!(c
+            .chars()
+            .all(|ch| ch.is_ascii_alphanumeric() || ch == '_' || ch == '-'));
     }
 
     #[test]
