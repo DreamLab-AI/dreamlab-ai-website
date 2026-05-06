@@ -170,7 +170,8 @@ impl NostrRelayDO {
 // In-memory filter matching (for broadcast)
 // ---------------------------------------------------------------------------
 
-pub(crate) fn event_matches_filters(event: &NostrEvent, filters: &[NostrFilter]) -> bool {
+#[doc(hidden)]
+pub fn event_matches_filters(event: &NostrEvent, filters: &[NostrFilter]) -> bool {
     'outer: for filter in filters {
         if let Some(ref ids) = filter.ids {
             if !ids.iter().any(|id| id == &event.id) {
@@ -232,7 +233,8 @@ pub(crate) fn event_matches_filters(event: &NostrEvent, filters: &[NostrFilter])
 // ---------------------------------------------------------------------------
 
 /// Extract the first value for a given tag name from an event.
-pub(crate) fn tag_value(event: &NostrEvent, name: &str) -> Option<String> {
+#[doc(hidden)]
+pub fn tag_value(event: &NostrEvent, name: &str) -> Option<String> {
     event
         .tags
         .iter()
@@ -240,7 +242,8 @@ pub(crate) fn tag_value(event: &NostrEvent, name: &str) -> Option<String> {
         .map(|t| t[1].clone())
 }
 
-pub(crate) fn d_tag_value(event: &NostrEvent) -> String {
+#[doc(hidden)]
+pub fn d_tag_value(event: &NostrEvent) -> String {
     for tag in &event.tags {
         if tag.first().map(|s| s.as_str()) == Some("d") {
             return tag.get(1).cloned().unwrap_or_default();

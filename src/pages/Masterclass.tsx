@@ -1,7 +1,10 @@
-import { useRef, useState } from "react";
+import { lazy, Suspense, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Header } from "@/components/Header";
-import { HyperdimensionalHeroBackground } from "@/components/HyperdimensionalHeroBackground";
+// Sprint v9 D8: defer the Voronoi hero chunk.
+const HyperdimensionalHeroBackground = lazy(
+  () => import("@/components/HyperdimensionalHeroBackground")
+);
 import { useOGMeta } from "@/hooks/useOGMeta";
 import { PAGE_OG_CONFIGS } from "@/lib/og-meta";
 import {
@@ -160,7 +163,9 @@ const Masterclass = () => {
         className="relative min-h-screen overflow-hidden flex flex-col items-center justify-center"
         aria-label="Hero section"
       >
-        <HyperdimensionalHeroBackground />
+        <Suspense fallback={null}>
+          <HyperdimensionalHeroBackground />
+        </Suspense>
 
         <div className="container relative z-10 mt-16 flex flex-col items-center text-center px-4">
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 animate-slide-up max-w-4xl leading-tight">

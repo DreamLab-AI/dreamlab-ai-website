@@ -22,7 +22,10 @@ mod remote_storage;
 mod storage;
 mod webid;
 
-use acl::{evaluate_access, find_effective_acl, method_to_mode, wac_allow_header, AccessMode};
+use acl::{
+    coerce_required_mode_for_acl, evaluate_access, find_effective_acl, wac_allow_header,
+    AccessMode,
+};
 use base64::Engine as _;
 use worker::*;
 
@@ -140,6 +143,21 @@ fn add_wac_allow(
 ) {
     let value = wac_allow_header(acl_doc, agent_uri, resource_path);
     headers.set("WAC-Allow", &value).ok();
+}
+
+/// Add Cache-Control header to a response based on resource path.
+///
+/// Media paths under `/media/` are treated as content-addressed and immutable
+/// (1-year cache, immutable directive). All other resources use a short
+/// `max-age=300` with `must-revalidate` since they are mutable Solid pod
+/// resources (profile cards, ACLs, type indexes, etc.).
+fn add_cache_control(headers: &Headers, resource_path: &str) {
+    let value = if resource_path.starts_with("/media/") {
+        "public, max-age=31536000, immutable"
+    } else {
+        "public, max-age=300, must-revalidate"
+    };
+    headers.set("Cache-Control", value).ok();
 }
 
 /// Create a JSON error response with CORS headers.
@@ -361,7 +379,7 @@ async fn fetch(mut req: Request, env: Env, _ctx: Context) -> Result<Response> {
     let requester_pubkey: Option<String> = if let Some(ref header) = auth_header {
         let method_name = method_str(&method);
         let body_ref = body_bytes.as_deref();
-        match auth::verify_nip98(header, &request_url, method_name, body_ref) {
+        match auth::verify_nip98_replay(header, &request_url, method_name, body_ref, &env).await {
             Ok(token) => {
                 // If the event carries a `["webid", uri]` tag, verify the URI
                 // is controlled by the signing pubkey. Reject tokens where the
@@ -402,7 +420,7 @@ async fn fetch(mut req: Request, env: Env, _ctx: Context) -> Result<Response> {
 
         // Only the pod owner or an admin can provision
         let is_owner = req_pk == owner_pubkey;
-        let is_admin = is_admin_user(&kv, &req_pk).await;
+        let is_admin = is_admin_user(&env, &kv, &req_pk).await;
         if !is_owner && !is_admin {
             return json_error(&env, "Only the pod owner or admin can provision", 403);
         }
@@ -470,7 +488,11 @@ async fn fetch(mut req: Request, env: Env, _ctx: Context) -> Result<Response> {
     // -----------------------------------------------------------------------
     // Standard resource ACL check
     // -----------------------------------------------------------------------
-    let required_mode = method_to_mode(method_str(&method));
+    // For `.acl` sidecars we coerce write-class methods up to acl:Control so
+    // a principal with mere acl:Write cannot escalate by overwriting the
+    // sidecar (audit C3). Non-acl resources retain the standard mapping.
+    let required_mode =
+        coerce_required_mode_for_acl(&resource_path, method_str(&method));
     let acl_doc = find_effective_acl(&bucket, &kv, &owner_pubkey, &resource_path).await;
 
     let has_access = evaluate_access(
@@ -514,6 +536,7 @@ async fn fetch(mut req: Request, env: Env, _ctx: Context) -> Result<Response> {
                     agent_uri.as_deref(),
                     &resource_path,
                 );
+                add_cache_control(resp.headers(), &resource_path);
                 return Ok(resp);
             }
 
@@ -548,6 +571,7 @@ async fn fetch(mut req: Request, env: Env, _ctx: Context) -> Result<Response> {
                     agent_uri.as_deref(),
                     &resource_path,
                 );
+                add_cache_control(resp.headers(), &resource_path);
                 return Ok(resp);
             }
 
@@ -594,6 +618,7 @@ async fn fetch(mut req: Request, env: Env, _ctx: Context) -> Result<Response> {
                     agent_uri.as_deref(),
                     &resource_path,
                 );
+                add_cache_control(resp.headers(), &resource_path);
                 return Ok(resp);
             }
 
@@ -625,6 +650,7 @@ async fn fetch(mut req: Request, env: Env, _ctx: Context) -> Result<Response> {
                     agent_uri.as_deref(),
                     &resource_path,
                 );
+                add_cache_control(resp.headers(), &resource_path);
                 return Ok(resp);
             }
 
@@ -639,6 +665,7 @@ async fn fetch(mut req: Request, env: Env, _ctx: Context) -> Result<Response> {
                 agent_uri.as_deref(),
                 &resource_path,
             );
+            add_cache_control(resp.headers(), &resource_path);
             Ok(resp)
         }
 
@@ -1032,6 +1059,7 @@ async fn handle_acl_request(
                     .set("Content-Type", "application/ld+json")
                     .ok();
                 resp.headers().set("ETag", &format!("\"{etag}\"")).ok();
+                add_cache_control(resp.headers(), acl_path);
                 return Ok(resp);
             }
 
@@ -1045,6 +1073,7 @@ async fn handle_acl_request(
                 .ok();
             resp.headers().set("ETag", &format!("\"{etag}\"")).ok();
             add_wac_allow(resp.headers(), parent_acl.as_ref(), agent_uri, parent_path);
+            add_cache_control(resp.headers(), acl_path);
             Ok(resp)
         }
 
@@ -1198,12 +1227,25 @@ fn extract_webid_tag_from_header(auth_header: &str) -> Option<String> {
 // Admin check helper
 // ---------------------------------------------------------------------------
 
-/// Check if a pubkey is an admin user (via KV).
+/// Check if a pubkey is an admin user.
 ///
-/// Uses KV key `admin:{pubkey}` as a lightweight check.
-async fn is_admin_user(kv: &kv::KvStore, pubkey: &str) -> bool {
+/// Reads from the dedicated `ADMIN_KV_RO` binding (audit H6 — split from the
+/// shared `POD_META` namespace so this worker can never *write* admin
+/// flags). Falls back to the legacy `POD_META` lookup during the migration
+/// window so existing admin entries remain effective until ops provisions
+/// `ADMIN_KV_RO` and copies entries across.
+///
+/// Uses KV key `admin:{pubkey}` (value `"1"` / `"true"` => admin).
+async fn is_admin_user(env: &Env, fallback_kv: &kv::KvStore, pubkey: &str) -> bool {
     let key = format!("admin:{pubkey}");
-    kv.get(&key)
+    if let Ok(kv) = env.kv("ADMIN_KV_RO") {
+        if let Ok(Some(v)) = kv.get(&key).text().await {
+            return v == "1" || v == "true";
+        }
+    }
+    // Fallback for unmigrated environments. Removed once ops cuts over.
+    fallback_kv
+        .get(&key)
         .text()
         .await
         .ok()

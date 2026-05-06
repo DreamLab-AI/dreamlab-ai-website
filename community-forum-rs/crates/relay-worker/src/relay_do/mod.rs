@@ -27,6 +27,14 @@ mod storage;
 
 pub(crate) use mod_cache::ModCache;
 
+#[cfg(feature = "test-exports")]
+#[doc(hidden)]
+pub mod test_exports {
+    pub use super::broadcast::{event_treatment, EventTreatment};
+    pub use super::filter::{d_tag_value, event_matches_filters, tag_value, NostrFilter};
+    pub use super::mod_cache::{Block, ModCache};
+}
+
 use std::cell::RefCell;
 use std::collections::HashMap;
 

@@ -73,9 +73,10 @@ const Contact = () => {
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
 
+    // Sprint v9 D4: do NOT log submitted form data (PII) or Supabase error
+    // bodies (which can leak schema hints / project IDs). Show a generic
+    // toast on failure; rely on Supabase server-side logs for diagnosis.
     try {
-      console.log("Submitting contact form:", data);
-
       const { error } = await supabase
         .from('contact_submissions')
         .insert([{
@@ -88,12 +89,6 @@ const Contact = () => {
         }]);
 
       if (error) {
-        console.error('Supabase error details:', {
-          message: error.message,
-          details: error.details,
-          hint: error.hint,
-          code: error.code
-        });
         throw error;
       }
 
@@ -114,8 +109,7 @@ const Contact = () => {
 
       // Reset form
       form.reset();
-    } catch (error) {
-      console.error("Error submitting form:", error);
+    } catch {
       toast({
         title: "Error",
         description: ERROR_MESSAGE_SUBMISSION,

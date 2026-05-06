@@ -1,6 +1,10 @@
 import { lazy, Suspense, useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { HyperdimensionalHeroBackground } from "@/components/HyperdimensionalHeroBackground";
+// Sprint v9 D8: defer the Voronoi hero to a separate chunk so the landing
+// route's initial JS payload shrinks on first paint.
+const HyperdimensionalHeroBackground = lazy(
+  () => import("@/components/HyperdimensionalHeroBackground")
+);
 import { Header } from "@/components/Header";
 import {
   ChevronDown,
@@ -141,7 +145,9 @@ const Index = () => {
         className="relative min-h-screen overflow-hidden flex flex-col items-center justify-center"
         aria-label="Hero section"
       >
-        <HyperdimensionalHeroBackground />
+        <Suspense fallback={null}>
+          <HyperdimensionalHeroBackground />
+        </Suspense>
 
         <div className="container relative z-10 mt-16 flex flex-col items-center text-center px-5 md:px-4">
           <h1

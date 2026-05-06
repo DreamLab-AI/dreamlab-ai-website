@@ -12,14 +12,16 @@ use super::NostrRelayDO;
 // ---------------------------------------------------------------------------
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum EventTreatment {
+#[doc(hidden)]
+pub enum EventTreatment {
     Regular,
     Replaceable,
     Ephemeral,
     ParameterizedReplaceable,
 }
 
-pub(crate) fn event_treatment(kind: u64) -> EventTreatment {
+#[doc(hidden)]
+pub fn event_treatment(kind: u64) -> EventTreatment {
     if (20000..30000).contains(&kind) {
         EventTreatment::Ephemeral
     } else if (10000..20000).contains(&kind) || kind == 0 || kind == 3 {

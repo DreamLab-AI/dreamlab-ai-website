@@ -4,7 +4,7 @@
     "id": "@id",
     "type": "@type",
     "DIDNostr": "https://w3id.org/did/nostr#DIDNostr",
-    "NostrSchnorrKey2024": "https://w3id.org/security#NostrSchnorrKey2024",
+    "SchnorrSecp256k1VerificationKey2019": "https://w3id.org/security#SchnorrSecp256k1VerificationKey2019",
     "Multikey": "https://w3id.org/security#Multikey",
     "controller": {
       "@id": "https://w3id.org/security#controller",

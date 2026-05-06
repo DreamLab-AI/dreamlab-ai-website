@@ -16,22 +16,43 @@ on:
       - 'community-forum-rs/crates/nostr-core/**'
       - 'community-forum-rs/Cargo.lock'
       - '.github/workflows/workers-deploy.yml'
+      - '.github/workflows/test-and-lint.yml'
   workflow_dispatch:
 
+# Cancel in-flight runs of this workflow on the same ref so a newer commit
+# always wins the deploy race.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Default-restrictive workflow permissions; jobs opt in to the minimum needed.
 permissions:
   contents: read
 
 env:
   NODE_VERSION: '20'
+  RUST_TOOLCHAIN: '1.84.0'
+  WRANGLER_VERSION: '3.114.17'
   CF_SUBDOMAIN: 'solitary-paper-764d'
 
 jobs:
+  # ─── Pre-deploy gate ────────────────────────────────────────────────────
+  gate:
+    name: Pre-deploy Gate
+    if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
+    uses: ./.github/workflows/test-and-lint.yml
+    permissions:
+      contents: read
+
   # ─── Rust Workers (auth, pod, link-preview, nostr-relay, search) ───
   deploy-rust:
     name: Deploy Rust Workers
+    needs: [gate]
     if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: read
 
     strategy:
       fail-fast: false
@@ -52,8 +73,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
+      - name: Setup Rust toolchain ${{ env.RUST_TOOLCHAIN }}
+        uses: dtolnay/rust-toolchain@1.84.0
         with:
           targets: wasm32-unknown-unknown
 
@@ -65,10 +86,10 @@ jobs:
             ~/.cargo/git
             ~/.cargo/bin/worker-build
             community-forum-rs/target
-          key: rust-deploy-${{ matrix.crate }}-${{ hashFiles('community-forum-rs/Cargo.lock') }}
+          key: rust-deploy-${{ env.RUST_TOOLCHAIN }}-${{ matrix.crate }}-${{ hashFiles('community-forum-rs/Cargo.lock') }}
           restore-keys: |
-            rust-deploy-${{ matrix.crate }}-
-            rust-deploy-
+            rust-deploy-${{ env.RUST_TOOLCHAIN }}-${{ matrix.crate }}-
+            rust-deploy-${{ env.RUST_TOOLCHAIN }}-
 
       - name: Install worker-build
         run: |
@@ -87,7 +108,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          wranglerVersion: '3'
+          wranglerVersion: ${{ env.WRANGLER_VERSION }}
           command: deploy
           workingDirectory: community-forum-rs/crates/${{ matrix.crate }}
         env:
@@ -101,6 +122,8 @@ jobs:
     needs: [deploy-rust]
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    permissions:
+      contents: read
 
     steps:
       - name: Wait for propagation
@@ -108,24 +131,32 @@ jobs:
 
       - name: Check all workers
         run: |
+          set -euo pipefail
           PASS=0
           FAIL=0
+          FAILED_WORKERS=()
           for worker in dreamlab-auth-api dreamlab-pod-api dreamlab-search-api dreamlab-nostr-relay dreamlab-link-preview; do
             URL="https://${worker}.${{ env.CF_SUBDOMAIN }}.workers.dev/health"
-            STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 "$URL" || true)
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 "$URL" || echo "000")
             echo "${worker}: HTTP ${STATUS}"
-            if [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 500 ]; then
+            if [ "$STATUS" = "200" ]; then
               echo "  PASS"
               PASS=$((PASS + 1))
             else
-              echo "::warning::${worker} health check returned HTTP ${STATUS}"
+              echo "::error::${worker} health check FAILED (HTTP ${STATUS}); only HTTP 200 is accepted as healthy"
               FAIL=$((FAIL + 1))
+              FAILED_WORKERS+=("${worker}(HTTP ${STATUS})")
             fi
           done
           echo ""
-          echo "Results: ${PASS} passed, ${FAIL} warnings"
+          echo "Results: ${PASS} passed, ${FAIL} failed"
+          if [ "$FAIL" -gt 0 ]; then
+            echo "::error::Health check failed for: ${FAILED_WORKERS[*]}"
+            exit 1
+          fi
 
       - name: Deployment summary
+        if: always()
         run: |
           cat >> $GITHUB_STEP_SUMMARY <<EOF
           ## Cloudflare Workers Deployment
@@ -139,6 +170,8 @@ jobs:
           | dreamlab-nostr-relay | relay-worker | \`dreamlab-nostr-relay.${{ env.CF_SUBDOMAIN }}.workers.dev\` |
           | dreamlab-search-api | search-worker | \`dreamlab-search-api.${{ env.CF_SUBDOMAIN }}.workers.dev\` |
 
+          - **Wrangler**: \`${{ env.WRANGLER_VERSION }}\`
+          - **Rust**: \`${{ env.RUST_TOOLCHAIN }}\`
           - **Branch**: \`${{ github.ref_name }}\`
           - **Commit**: \`${{ github.sha }}\`
           - **Actor**: @${{ github.actor }}

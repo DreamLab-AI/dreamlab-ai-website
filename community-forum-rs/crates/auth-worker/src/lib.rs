@@ -49,8 +49,12 @@ fn cors_headers(env: &Env) -> Headers {
     headers
 }
 
-/// Create a JSON error response that NEVER fails.
-/// Falls back to plain text if JSON serialization somehow fails.
+/// Create a JSON error response that NEVER masks failures with an empty 200.
+///
+/// If the primary `Response::ok` builder fails (it never has in practice),
+/// fall through to `Response::error(...)` and unwrap with `expect` so any
+/// actual breakage is visible at the runtime layer instead of being silently
+/// turned into a 200 with an empty body.
 fn error_response(env: &Env, message: &str, status: u16) -> Response {
     let body = format!(r#"{{"error":"{}"}}"#, message.replace('"', r#"\""#));
     let cors = cors_headers(env);
@@ -61,8 +65,10 @@ fn error_response(env: &Env, message: &str, status: u16) -> Response {
             resp
         }
         Err(_) => {
-            // Absolute fallback — should never happen
-            Response::error(message, status).unwrap_or_else(|_| Response::empty().unwrap())
+            // Hard error path. `Response::error` only fails if the static
+            // string allocation fails, which would mean the worker is in a
+            // worse state than this branch can reasonably recover from.
+            Response::error("internal", 500).expect("static error response")
         }
     }
 }
@@ -258,12 +264,14 @@ async fn route(
             _ => None,
         };
 
-        let result = auth::verify_nip98(
+        let result = auth::verify_nip98_replay(
             &auth_header,
             &request_url,
             method_str(method),
             body_for_nip98,
-        );
+            env,
+        )
+        .await;
 
         match result {
             Ok(token) => {

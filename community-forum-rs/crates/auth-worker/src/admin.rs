@@ -17,20 +17,19 @@ pub fn now_secs() -> u64 {
     (js_sys::Date::now() / 1000.0) as u64
 }
 
-/// Verify a NIP-98 `Authorization` header at the current time.
-pub fn verify(
+/// Verify a NIP-98 `Authorization` header at the current time WITH replay
+/// protection enforced via the `NIP98_REPLAY` KV namespace bound to this
+/// worker. If the binding is missing the call falls back to a permissive
+/// store and emits a console warning — production environments MUST bind
+/// `NIP98_REPLAY` (see `wrangler.toml`).
+pub async fn verify(
     auth_header: &str,
     expected_url: &str,
     expected_method: &str,
     body: Option<&[u8]>,
+    env: &Env,
 ) -> Result<Nip98Token, nostr_core::nip98::Nip98Error> {
-    nostr_core::verify_nip98_token_at(
-        auth_header,
-        expected_url,
-        expected_method,
-        body,
-        now_secs(),
-    )
+    crate::auth::verify_nip98_replay(auth_header, expected_url, expected_method, body, env).await
 }
 
 #[derive(Deserialize)]
@@ -91,7 +90,8 @@ pub async fn require_admin(
         )
     })?;
 
-    let token = verify(auth, request_url, method, body)
+    let token = verify(auth, request_url, method, body, env)
+        .await
         .map_err(|_| (serde_json::json!({ "error": "Invalid NIP-98 token" }), 401u16))?;
 
     if !is_admin(&token.pubkey, env).await {
@@ -109,7 +109,7 @@ pub async fn require_authed(
     request_url: &str,
     method: &str,
     body: Option<&[u8]>,
-    _env: &Env,
+    env: &Env,
 ) -> Result<String, (serde_json::Value, u16)> {
     let auth = auth_header.ok_or_else(|| {
         (
@@ -117,7 +117,8 @@ pub async fn require_authed(
             401u16,
         )
     })?;
-    let token = verify(auth, request_url, method, body)
+    let token = verify(auth, request_url, method, body, env)
+        .await
         .map_err(|_| (serde_json::json!({ "error": "Invalid NIP-98 token" }), 401u16))?;
     Ok(token.pubkey)
 }

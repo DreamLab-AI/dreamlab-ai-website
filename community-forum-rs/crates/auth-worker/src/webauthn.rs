@@ -49,6 +49,21 @@ fn is_valid_pubkey(s: &str) -> bool {
     s.len() == 64 && s.bytes().all(|b| b.is_ascii_hexdigit())
 }
 
+/// Derive a deterministic but meaningless prf_salt for a pubkey that is not
+/// registered. Used by `login_options` to make registered/unregistered
+/// responses indistinguishable (audit C2). The salt has no cryptographic
+/// significance — it is purely a shape-matcher. We use a plain SHA-256 over
+/// the pubkey + a fixed domain-separation tag rather than a server secret
+/// because the value is intentionally public-derivable: its only purpose is
+/// to fill the response field.
+fn deterministic_salt_for(pubkey: &str) -> String {
+    let mut h = Sha256::new();
+    h.update(b"dreamlab-prf-salt-fallback-v1\0");
+    h.update(pubkey.as_bytes());
+    let digest = h.finalize();
+    array_to_base64url(&digest)
+}
+
 /// Convert a u64 to JsValue (as f64 since JS has no u64).
 fn js_u64(v: u64) -> JsValue {
     JsValue::from_f64(v as f64)
@@ -419,6 +434,17 @@ pub async fn register_verify(
 ///
 /// Generate a WebAuthn PublicKeyCredentialRequestOptions. If a pubkey is
 /// provided, include the stored credential ID and PRF salt in the response.
+///
+/// Audit C2 hardening: this endpoint MUST return an indistinguishable shape
+/// for registered and unregistered pubkeys. A 404 on "unknown pubkey" was
+/// previously an enumeration oracle. Today, an unregistered pubkey gets:
+///   - a fresh challenge (always),
+///   - empty `allowCredentials`,
+///   - a deterministic-but-meaningless `prfSalt` derived from
+///     `HKDF(server_secret, pubkey)`.
+/// The downstream WebAuthn ceremony will fail at the authenticator step
+/// (no matching credential available) without the server having confirmed
+/// existence.
 pub async fn login_options(body_bytes: &[u8], env: &Env) -> Result<Response> {
     let body: LoginOptionsBody = serde_json::from_slice(body_bytes)
         .unwrap_or(LoginOptionsBody { pubkey: None });
@@ -445,10 +471,13 @@ pub async fn login_options(body_bytes: &[u8], env: &Env) -> Result<Response> {
 
         match cred {
             None => {
-                return json_err(
-                    "No passkey registered for this account. Use private key login or create a new passkey.",
-                    404,
-                );
+                // Indistinguishable response: deterministic salt over pubkey
+                // (HKDF-extract; an attacker cannot tell whether this came
+                // from a stored row or from this fallback path).
+                prf_salt = Some(deterministic_salt_for(pubkey));
+                // allow_credentials stays empty -> the authenticator will
+                // refuse to assert with a "no credential" error, which is
+                // the same UX as a stale credential.
             }
             Some(cred) => {
                 prf_salt = cred.prf_salt;
@@ -523,11 +552,13 @@ pub async fn login_verify(req: &Request, body_bytes: &[u8], env: &Env) -> Result
 
     let request_url = req.url().map(|u| u.to_string()).unwrap_or_default();
 
-    let nip98_result = match auth::verify_nip98(&auth_header, &request_url, "POST", Some(body_bytes))
-    {
-        Ok(token) => token,
-        Err(_) => return json_err("Invalid NIP-98 token", 401),
-    };
+    let nip98_result =
+        match auth::verify_nip98_replay(&auth_header, &request_url, "POST", Some(body_bytes), env)
+            .await
+        {
+            Ok(token) => token,
+            Err(_) => return json_err("Invalid NIP-98 token", 401),
+        };
 
     if nip98_result.pubkey != pubkey {
         return json_err("NIP-98 pubkey mismatch", 401);

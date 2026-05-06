@@ -1,7 +1,10 @@
-import { useState, useRef } from "react";
+import { lazy, Suspense, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Header } from "@/components/Header";
-import { HyperdimensionalHeroBackground } from "@/components/HyperdimensionalHeroBackground";
+// Sprint v9 D8: defer the Voronoi hero chunk.
+const HyperdimensionalHeroBackground = lazy(
+  () => import("@/components/HyperdimensionalHeroBackground")
+);
 import { useOGMeta } from "@/hooks/useOGMeta";
 import {
   ArrowRight,
@@ -244,7 +247,9 @@ const Ventures = () => {
         className="relative min-h-screen overflow-hidden flex flex-col items-center justify-center"
         aria-label="Hero section"
       >
-        <HyperdimensionalHeroBackground />
+        <Suspense fallback={null}>
+          <HyperdimensionalHeroBackground />
+        </Suspense>
 
         <div className="container relative z-10 mt-16 flex flex-col items-center text-center px-5 md:px-4">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-500/10 border border-purple-500/20 rounded-full text-purple-400 text-sm font-medium mb-6 animate-slide-up">

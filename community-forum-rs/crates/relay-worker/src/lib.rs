@@ -27,6 +27,14 @@ mod whitelist;
 /// Re-export so the `worker` crate runtime can discover the Durable Object.
 pub use relay_do::NostrRelayDO;
 
+// Test-only public API for integration tests (Sprint v9 Stream-E2).
+// Activated by `--features test-exports` for tests in `tests/`.
+#[cfg(feature = "test-exports")]
+pub mod test_exports {
+    pub use crate::relay_do::test_exports::*;
+    pub use crate::trust::{compute_trust_level, TrustLevel, TrustThresholds};
+}
+
 use worker::*;
 
 // ---------------------------------------------------------------------------

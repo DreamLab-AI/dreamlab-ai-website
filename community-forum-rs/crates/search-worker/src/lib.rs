@@ -131,7 +131,14 @@ async fn load_store(env: &Env) -> Result<VectorStore> {
     let obj = bucket.get(&store_key).execute().await?;
 
     if let Some(obj) = obj {
-        let bytes = obj.body().unwrap().bytes().await?;
+        // Sprint v9 D5: never panic on a missing body. R2 can in principle
+        // return an object with no body (e.g. zero-length write race or
+        // bucket inconsistency); surface a typed worker::Error instead so
+        // the caller returns a 5xx rather than crashing the isolate.
+        let body = obj
+            .body()
+            .ok_or_else(|| worker::Error::RustError("R2 object missing body".into()))?;
+        let bytes = body.bytes().await?;
         if let Some(store) = VectorStore::from_rvf_bytes(&bytes) {
             return Ok(store);
         }
@@ -336,7 +343,9 @@ async fn handle_ingest(req: &Request, env: &Env) -> Result<Response> {
         "POST",
         Some(&raw_body),
         env,
-    ) {
+    )
+    .await
+    {
         return json_response(req, env, &err_body, status);
     }
 

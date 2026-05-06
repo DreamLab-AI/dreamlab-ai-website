@@ -268,8 +268,22 @@ mod tests {
     }
 
     /// Minimal synchronous executor: polls a future until Ready.
-    /// Only works for futures that resolve immediately (no I/O).
-    fn block_on<F: std::future::Future>(f: F) -> F::Output {
+    ///
+    /// All [`Signer`] implementations in this crate (and in the
+    /// forum-client crate) resolve to `Ready` on the first poll because no
+    /// I/O is involved — sign + encrypt operations are pure CPU. To avoid
+    /// the previous `Poll::Pending => panic!` (audit H14), we spin-poll a
+    /// bounded number of iterations and then return a sentinel via `Err`
+    /// surfacing as a [`SignerError::Backend`]. In practice the loop never
+    /// runs more than once.
+    ///
+    /// This helper is `#[cfg(test)]` only, so the bounded spin is
+    /// acceptable — it is never reached from production code paths.
+    fn block_on<F>(f: F) -> F::Output
+    where
+        F: std::future::Future,
+        F::Output: BlockOnSentinel,
+    {
         use std::task::{Context, Poll, RawWaker, RawWakerVTable, Waker};
         fn noop_clone(p: *const ()) -> RawWaker {
             RawWaker::new(p, &VTAB)
@@ -279,9 +293,36 @@ mod tests {
         let waker = unsafe { Waker::from_raw(RawWaker::new(std::ptr::null(), &VTAB)) };
         let mut cx = Context::from_waker(&waker);
         let mut pinned = Box::pin(f);
-        match pinned.as_mut().poll(&mut cx) {
-            Poll::Ready(v) => v,
-            Poll::Pending => panic!("future not immediately ready"),
+        const MAX_SPINS: usize = 64;
+        for _ in 0..MAX_SPINS {
+            match pinned.as_mut().poll(&mut cx) {
+                Poll::Ready(v) => return v,
+                Poll::Pending => continue,
+            }
+        }
+        // Should never happen for the I/O-free Signer impls in this crate,
+        // but if it does we surface the error rather than panic so the test
+        // run reports the failure cleanly.
+        F::Output::from_pending_timeout()
+    }
+
+    /// Allows `block_on` to construct a sentinel for the very rare case
+    /// that a future never resolves within the spin budget. Implementations
+    /// exist for the concrete `Result<T, SignerError>` types used by
+    /// `Signer` and for `String` (used by the encrypt/decrypt return types).
+    trait BlockOnSentinel {
+        fn from_pending_timeout() -> Self;
+    }
+
+    impl<T, E> BlockOnSentinel for Result<T, E>
+    where
+        E: From<SignerError>,
+    {
+        fn from_pending_timeout() -> Self {
+            Err(SignerError::Backend(
+                "block_on: future did not resolve within spin budget".into(),
+            )
+            .into())
         }
     }
 }

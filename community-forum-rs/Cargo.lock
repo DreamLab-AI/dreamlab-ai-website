@@ -212,6 +212,7 @@ dependencies = [
 name = "auth-worker"
 version = "0.1.0"
 dependencies = [
+ "async-trait",
  "base64",
  "chacha20poly1305",
  "getrandom 0.2.17",
@@ -2380,10 +2381,12 @@ dependencies = [
 name = "pod-worker"
 version = "0.1.0"
 dependencies = [
+ "async-trait",
  "base64",
  "hex",
  "js-sys",
  "nostr-core",
+ "proptest",
  "serde",
  "serde_json",
  "sha2",
@@ -2807,6 +2810,7 @@ checksum = "dc897dd8d9e8bd1ed8cdad82b5966c3e0ecae09fb1907d58efaa013543185d0a"
 name = "relay-worker"
 version = "0.1.0"
 dependencies = [
+ "async-trait",
  "base64",
  "hex",
  "js-sys",
@@ -3019,6 +3023,7 @@ dependencies = [
 name = "search-worker"
 version = "0.1.0"
 dependencies = [
+ "async-trait",
  "base64",
  "hex",
  "js-sys",

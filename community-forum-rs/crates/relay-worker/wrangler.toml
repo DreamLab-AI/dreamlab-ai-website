@@ -1,6 +1,6 @@
 name = "dreamlab-nostr-relay"
 main = "build/worker/shim.mjs"
-compatibility_date = "2024-11-01"
+compatibility_date = "2025-09-01"
 
 [build]
 command = "worker-build --release"
@@ -15,6 +15,12 @@ ALLOWED_ORIGINS = "https://dreamlab-ai.com,https://thedreamlab.uk,https://dreaml
 binding = "DB"
 database_name = "dreamlab-relay"
 database_id = "97c77d23-0e24-4325-ada7-1747eab4095b"
+
+# NIP-98 replay cache (TTL = 2 * tolerance window). Shared id with auth-worker.
+# TODO(ops): provision via `wrangler kv:namespace create dreamlab-nip98-replay`.
+[[kv_namespaces]]
+binding = "NIP98_REPLAY"
+id = "REPLACE_WITH_NEW_NIP98_REPLAY_KV_ID"
 
 [durable_objects]
 bindings = [

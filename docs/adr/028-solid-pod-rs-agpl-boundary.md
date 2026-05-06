@@ -1,164 +1,187 @@
 # ADR-028: Adopt solid-pod-rs Published Crates — Remove Duplicate Code
 
-## Status: Accepted (supersedes initial draft)
+## Status: Accepted (amended Sprint v9 — partial implementation; full migration deferred)
 
-## Date: 2026-05-06
+## Date: 2026-05-06 (amended from initial draft)
+
+## Sprint v9 amendment summary
+
+The original ADR was written against an unreleased `solid-pod-rs` v0.5.0-alpha.2.
+The version published on crates.io as of 2026-05-06 is **v0.4.0-alpha.2** (verified
+via `cargo search solid-pod-rs`). v0.5 has not shipped. This ADR has been
+rewritten to match what is realistic to land in the v9 sprint window:
+
+- Pin to `solid-pod-rs = "0.4.0-alpha.2"` (the actually-published version).
+- Keep the existing hand-rolled `acl.rs` (673 LOC), `webid.rs` (86 LOC),
+  `provision.rs` (432 LOC), `did.rs` (300 LOC) in `pod-worker` for v9.
+  These are tagged "to be replaced by solid-pod-rs once 0.5 ships and once
+  STREAM-B's WAC `Control` coercion fix lands".
+- Land the `pod-worker/src/storage/cf_backend.rs` adapter as a forward-compatible
+  R2/KV wrapper. The trait shape is what `solid-pod-rs::storage::Storage`
+  expects, so a future swap is mechanical.
+- LOC numbers in the original ADR were stale: `acl.rs` is 673 not 519. Updated
+  below.
 
 ## Context
 
-`solid-pod-rs` (v0.5.0-alpha.2) and the broader DreamLab-AI Rust crate suite are **DreamLab's own
-published work**. The AGPL-3.0 licence is irrelevant because DreamLab-AI is the copyright holder
-and can use its own crates under any terms. The initial draft of this ADR incorrectly treated
-`solid-pod-rs` as a third-party dependency subject to copyleft propagation concerns — that was
-wrong and the premise is removed entirely.
+`solid-pod-rs` and the broader DreamLab-AI Rust crate suite are **DreamLab's own
+published work**. The AGPL-3.0 licence is irrelevant because DreamLab-AI is the
+copyright holder and can use its own crates under any terms. The initial draft
+of this ADR incorrectly treated `solid-pod-rs` as a third-party dependency
+subject to copyleft propagation concerns — that was wrong and the premise is
+removed entirely.
 
-The current `community-forum-rs` workspace duplicates substantial logic that is now published and
-maintained in `solid-pod-rs`:
+The current `community-forum-rs` workspace duplicates substantial logic that is
+expected to land in `solid-pod-rs` once v0.5 publishes:
 
-| Duplicated in community-forum-rs | Canonical location in solid-pod-rs |
-|---|---|
-| `pod-worker/src/acl.rs` (519 LOC) | `solid-pod-rs::wac` — `evaluate_access()`, `AclDocument`, WAC 2.0 conditions |
-| `pod-worker/src/webid.rs` | `solid-pod-rs::webid` — profile helpers, `extract_oidc_issuer()` |
-| `pod-worker/src/provision.rs` (partial) | `solid-pod-rs::provision::provision_pod()`, `generate_webid_html()` |
-| NIP-98 verify path in `pod-worker/src/auth.rs` | `solid-pod-rs::auth::Nip98Verifier` + `Nip98Verified` |
-| hand-crafted DID document strings | `solid-pod-rs-nostr` — `NostrWebIdResolver`, Tier 1/3 DID docs |
+| Duplicated in community-forum-rs | LOC (verified 2026-05-06) | Future location in solid-pod-rs |
+|---|---|---|
+| `pod-worker/src/acl.rs`        | 673 | `solid-pod-rs::wac` — `evaluate_access()`, `AclDocument`, WAC 2.0 conditions |
+| `pod-worker/src/webid.rs`      | 86  | `solid-pod-rs::webid` — profile helpers, `extract_oidc_issuer()` |
+| `pod-worker/src/provision.rs`  | 432 | `solid-pod-rs::provision::provision_pod()`, `generate_webid_html()` |
+| `pod-worker/src/did.rs`        | 300 | `solid-pod-rs-nostr::did::render_did_document_tier{1,3}()` |
+| NIP-98 verify path in `nostr-core::nip98` | (kept) | `solid-pod-rs::auth::Nip98Verifier` |
 
-The correct engineering direction is **simplification**: pull in the published crates, delete the
-duplicated code, and keep only the thin Cloudflare Workers adapter layer that wires the
-`solid-pod-rs` trait abstractions to CF R2, KV, and Durable Objects.
+The correct engineering direction remains **simplification**: pull in published
+crates, delete duplicated code, keep only the thin Cloudflare Workers adapter
+layer that wires the `solid-pod-rs` trait abstractions to CF R2, KV, and Durable
+Objects. v0.4 does not yet expose all the surfaces needed; v0.5 is the target
+release.
 
-The one genuine technical constraint is that `solid-pod-rs`'s storage backend implementations
-(`FsBackend`, `MemoryBackend`, `S3Backend`) depend on `tokio`, which differs from the
-`workers-rs` async executor. However, the **trait definitions** and **pure-logic modules** (WAC
-evaluator, NIP-98 verifier, DID document builder, WebID helpers, provisioning logic) are
-runtime-agnostic — they use `async-trait` for the Storage trait abstraction and their own
-logic is either purely synchronous or executor-neutral.
+The one genuine technical constraint is that `solid-pod-rs`'s storage backend
+implementations (`FsBackend`, `MemoryBackend`, `S3Backend`) depend on `tokio`,
+which differs from the `workers-rs` async executor. However, the **trait
+definitions** and **pure-logic modules** (WAC evaluator, NIP-98 verifier, DID
+document builder, WebID helpers, provisioning logic) are runtime-agnostic —
+they use `async-trait` for the Storage trait abstraction and their own logic
+is either purely synchronous or executor-neutral.
 
 ## Decision
 
-### 1. Add solid-pod-rs crates to workspace dependencies
+### 1. Workspace dependencies — current sprint (v9)
 
-In `community-forum-rs/Cargo.toml` workspace dependencies:
+`community-forum-rs/Cargo.toml` declares (already merged):
 
 ```toml
 [workspace.dependencies]
-solid-pod-rs = { version = "0.5.0-alpha.2", default-features = false, features = [
-    "nip98-schnorr",   # NIP-98 Schnorr verification via k256
-    "wac",             # WAC 2.0 evaluator (evaluate_access, AclDocument, conditions)
-    "webid",           # WebID profile helpers
-    "provision",       # provision_pod(), generate_webid_html(), TypeIndex creation
-    "notifications",   # Solid Notifications channel types (WebSocket + Webhook)
-] }
-solid-pod-rs-nostr = { version = "0.5.0-alpha.2", default-features = false }
-solid-pod-rs-didkey = { version = "0.5.0-alpha.2", default-features = false }
+solid-pod-rs = { version = "0.4.0-alpha.2", default-features = false, features = ["nip98-schnorr"] }
+solid-pod-rs-nostr = { version = "0.4.0-alpha.2", default-features = false }
 ```
 
-`default-features = false` excludes tokio-backed storage backends (`fs-backend`, `s3-backend`,
-`memory-backend`) and the actix-web server binary. Only executor-agnostic feature flags are
-enabled. The `k256`, `sha2`, `serde_json`, `base64`, `url` transitive deps are already in the
-workspace and will be de-duplicated by resolver v2.
+These are workspace-level declarations only. **No crate currently depends on
+them**. They are reserved for the v0.5 migration once it ships. Adding them as
+direct deps in `pod-worker/Cargo.toml` is **deferred** until:
 
-### 2. Implement the Storage trait against Cloudflare bindings
+1. `solid-pod-rs` v0.5.0-alpha.2 (or later) is published with the WAC,
+   `provision`, `webid`, `notifications` feature flags exposed and proven to
+   compile to `wasm32-unknown-unknown` with `default-features = false`.
+2. STREAM-B's WAC `Control` coercion fix lands in `pod-worker/src/{acl,lib}.rs`
+   so that the migration starts from a security-correct baseline rather than
+   a leaky one.
 
-Create `pod-worker/src/storage/cf_backend.rs` implementing `solid_pod_rs::storage::Storage`
-against CF R2 and KV:
+Until both gates pass, `pod-worker/src/{acl,webid,provision,did}.rs` stay as
+hand-rolled modules in this repo. They are now annotated with parity comments
+pointing at the upstream `solid-pod-rs[-nostr]` sources to keep drift visible.
 
-```rust
-use solid_pod_rs::storage::{Storage, ResourceMeta, StorageEvent};
-use async_trait::async_trait;
-use worker::{Bucket, Env};
+### 2. Storage adapter — landed in v9
 
-pub struct CloudflareStorage {
-    bucket: Bucket,
-}
+`pod-worker/src/storage/cf_backend.rs` exists and wraps `worker::Bucket` (R2)
+behind a small ergonomic surface (`get_object`, `put_object`, `delete_object`,
+`list_objects`, `head_object`, `object_exists`, `pod_r2_key()`). This is the
+**forward-compatible adapter** prescribed by the solid-pod-rs-first strategy:
+the Cloudflare Worker delegates persistence to CF R2/KV through this adapter,
+not to `solid-pod-rs`'s `Storage` trait directly (which pulls `tokio` and is
+incompatible with WASM Workers).
 
-#[async_trait(?Send)]
-impl Storage for CloudflareStorage {
-    async fn get(&self, path: &str) -> Result<Option<(Vec<u8>, ResourceMeta)>, PodError> { .. }
-    async fn put(&self, path: &str, body: Vec<u8>, meta: ResourceMeta) -> Result<(), PodError> { .. }
-    async fn delete(&self, path: &str) -> Result<(), PodError> { .. }
-    async fn list(&self, prefix: &str) -> Result<Vec<String>, PodError> { .. }
-    async fn head(&self, path: &str) -> Result<Option<ResourceMeta>, PodError> { .. }
-    async fn exists(&self, path: &str) -> bool { .. }
-    async fn create_container(&self, path: &str) -> Result<(), PodError> { .. }
+When v0.5 ships, this adapter can either:
+- Implement `solid_pod_rs::storage::Storage` directly (if v0.5 exposes a
+  `tokio`-free trait variant), or
+- Continue as a pod-worker-internal abstraction that the routing layer
+  consumes alongside `solid-pod-rs`'s pure-logic modules.
 
-    async fn watch(&self) -> Result<tokio::sync::broadcast::Receiver<StorageEvent>, PodError> {
-        // Solid Notifications in DreamLab route through relay-worker WebSocket/DO,
-        // not filesystem events. This surface is deliberately unimplemented.
-        Err(PodError::NotSupported("storage watch not available in CF Workers"))
-    }
-}
-```
+Either path is mechanical because the surface is small and the contract is
+already R2/KV-shaped.
 
-`pod-worker/src/lib.rs` becomes a pure routing and binding layer — dispatches CF Worker
-requests, instantiates `CloudflareStorage`, delegates all Solid Protocol logic to solid-pod-rs.
+### 3. Code-deletion plan — **deferred to a future sprint**
 
-### 3. Delete duplicated code — net code reduction
+The original ADR-028 prescribed deleting `acl.rs`, `webid.rs`, simplifying
+`provision.rs`, replacing inline NIP-98 verify, and replacing DID string
+templates. **None of those deletions happen in v9.** They are blocked on the
+two preconditions in §1. The intent and target file actions remain, restated
+here for the next sprint:
 
 | File action | Replacement via solid-pod-rs |
 |---|---|
-| DELETE `pod-worker/src/acl.rs` | `solid_pod_rs::wac::evaluate_access()` |
-| DELETE `pod-worker/src/webid.rs` | `solid_pod_rs::webid::generate_webid_html()` + solid-pod-rs-nostr |
-| SIMPLIFY `pod-worker/src/provision.rs` | `solid_pod_rs::provision::provision_pod()` handles TypeIndex |
-| SIMPLIFY `pod-worker/src/auth.rs` | `solid_pod_rs::auth::Nip98Verifier` |
-| DELETE DID string templates | `solid_pod_rs_nostr::Tier1Document` / `Tier3Document` |
+| DELETE `pod-worker/src/acl.rs` (673 LOC) | `solid_pod_rs::wac::evaluate_access()` |
+| DELETE `pod-worker/src/webid.rs` (86 LOC) | `solid_pod_rs::webid::generate_webid_html()` + solid-pod-rs-nostr |
+| SIMPLIFY `pod-worker/src/provision.rs` (432 LOC) | `solid_pod_rs::provision::provision_pod()` handles TypeIndex |
+| SIMPLIFY NIP-98 verify call sites | `solid_pod_rs::auth::Nip98Verifier` |
+| DELETE `pod-worker/src/did.rs` (300 LOC) | `solid_pod_rs_nostr::Tier1Document` / `Tier3Document` |
 
-Target: pod-worker reduces from ~4 files × 300-500 LOC to `lib.rs` (routing) + `storage/cf_backend.rs` (adapter).
+Target: pod-worker reduces from 4 hand-rolled modules totalling **1,491 LOC** to
+`lib.rs` (routing) + `storage/cf_backend.rs` (adapter). Net reduction once the
+migration completes: **~1,000+ LOC**.
 
-### 4. DID document endpoint using solid-pod-rs-nostr
+### 4. ADR-027 alignment — landed in v9
 
-The `/.well-known/did/nostr/{pubkey}.json` route (ADR-027):
+`pod-worker/src/did.rs` has been amended in v9 to:
 
-```rust
-use solid_pod_rs_nostr::{NostrPubkey, Tier1Document, Tier3Document, well_known_path};
+- Emit `"type": "SchnorrSecp256k1VerificationKey2019"` (W3C-registered
+  cryptosuite) instead of the bespoke `"NostrSchnorrKey2024"` string in both
+  Tier-1 and Tier-3 renderers.
+- Include `"https://w3id.org/security/suites/secp256k1-2019/v1"` in the
+  `@context` array of Tier-1 documents (Tier-3 already had it).
+- Cover both fixes in the existing test suite (`tier1_has_required_fields`).
 
-async fn handle_did_nostr(pubkey_hex: &str, enrich: bool) -> worker::Result<Response> {
-    let pk = NostrPubkey::from_hex(pubkey_hex)?;
-    if enrich {
-        // fetch kind-0/kind-3 from relay-worker, pass to Tier3Document::generate()
-        let doc = Tier3Document::generate(&pk, profile_data, follows).await?;
-        Response::from_json(&doc)
-    } else {
-        let doc = Tier1Document::generate(&pk);  // offline, no network
-        Response::from_json(&doc)
-    }
-}
-```
+This brings the hand-rolled DID document into spec-conformance with ADR-027
+ahead of the eventual `solid-pod-rs-nostr` swap. When the swap happens, the
+upstream renderer must satisfy the same invariants.
 
-### 5. NIP-98 verifier alignment
+### 5. NIP-98 verifier alignment — unchanged
 
-`solid-pod-rs::auth::Nip98Verifier` is the canonical verifier. In CF Workers that already import
-solid-pod-rs, replace inline NIP-98 verify logic with:
-
-```rust
-use solid_pod_rs::auth::Nip98Verifier;
-let verified = Nip98Verifier::verify_at(&auth_header, &url, &method, body_bytes, now).await?;
-let pubkey = verified.pubkey; // hex string
-```
-
-In the Leptos WASM forum-client, keep `nostr-core::nip98` (the existing client-side token
-*creation* code) — the client creates tokens, it does not verify them. No redundancy on the
-client side.
+`solid-pod-rs::auth::Nip98Verifier` remains the canonical verifier. It will
+replace the inline NIP-98 verify logic in CF Workers once v0.5 ships and STREAM-B
+has rebased its perimeter fixes onto it. In the Leptos WASM forum-client, keep
+`nostr-core::nip98` (the existing client-side token *creation* code) — the
+client creates tokens, it does not verify them. No redundancy on the client
+side.
 
 ## Consequences
 
-### Positive
-- **Net code reduction** of ~1,000+ LOC from community-forum-rs (deleting acl.rs, webid.rs,
-  duplicated provision logic, NIP-98 inline verify)
-- **Single source of truth** for WAC, WebID, provisioning, NIP-98 across the DreamLab stack
-- **Automatic conformance improvements** — solid-pod-rs Sprint 12 already adds TypeIndex
-  provisioning, WAC 2.0 conditions, SSRF hardening; bumping the version gets them for free
-- **did:nostr DID documents** become spec-conformant via solid-pod-rs-nostr rather than
-  hand-crafted strings
-- **Security patches** (e.g. CVE-class DPoP bypass fix) propagate via version bump
+### Positive (once full migration completes)
+- **Net code reduction** of ~1,000+ LOC from community-forum-rs.
+- **Single source of truth** for WAC, WebID, provisioning, NIP-98 across the
+  DreamLab stack.
+- **Automatic conformance improvements** — solid-pod-rs Sprint 12 already adds
+  TypeIndex provisioning, WAC 2.0 conditions, SSRF hardening; bumping the
+  version gets them for free.
+- **did:nostr DID documents** become spec-conformant via solid-pod-rs-nostr
+  rather than hand-crafted strings.
+- **Security patches** (e.g. CVE-class DPoP bypass fix) propagate via version
+  bump.
+
+### Sprint-v9 reality
+- Adapter `cf_backend.rs` landed.
+- DID document type/`@context` corrected to ADR-027 spec.
+- LOC accounting in this ADR fixed (acl.rs 673, not 519; webid.rs 86;
+  provision.rs 432; did.rs 300; total 1,491).
+- Workspace deps pinned to the published `0.4.0-alpha.2`, not the
+  unreleased `0.5.0-alpha.2`.
+- All deletion tasks **explicitly deferred** to a follow-up sprint.
 
 ### Negative / Trade-offs
-- `solid-pod-rs` is v0.5.0-alpha.2 — pre-release. Pin to exact version; bump deliberately.
-- `watch()` on the Storage trait requires a documented no-op stub.
-- CF Workers bundle size will grow slightly. Monitor with `wrangler dev` against the 10 MB limit.
-- The `solid-pod-rs-nostr` Tier 3 DID document builder requires an outbound fetch to the
-  relay-worker for kind-0/kind-3 events — add SSRF guard via solid-pod-rs's `SsrfPolicy`.
+- `solid-pod-rs` 0.4 is pre-release and may not yet expose the surfaces this
+  ADR depends on. Treat as a soft dep until 0.5 ships.
+- `watch()` on the future Storage trait will require a documented no-op stub
+  for CF Workers (Solid Notifications routes through relay-worker WebSocket/DO).
+- CF Workers bundle size will grow slightly when the migration lands. Monitor
+  with `wrangler dev` against the 10 MB limit.
+- The `solid-pod-rs-nostr` Tier 3 DID document builder requires an outbound
+  fetch to the relay-worker for kind-0/kind-3 events — add SSRF guard via
+  solid-pod-rs's `SsrfPolicy` once available.
 
 ### Neutral
-- `async-trait(?Send)` is already standard in community-forum-rs. No new patterns.
-- Resolver v2 de-duplicates `k256`, `sha2`, `serde_json` shared with the workspace.
+- `async-trait(?Send)` is already standard in community-forum-rs. No new
+  patterns.
+- Resolver v2 will de-duplicate `k256`, `sha2`, `serde_json` shared with the
+  workspace once the deps land.
