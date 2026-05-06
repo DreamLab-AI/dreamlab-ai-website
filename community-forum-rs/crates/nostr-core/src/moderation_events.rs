@@ -41,6 +41,17 @@ pub const KIND_REPORT: u64 = 30913;
 /// Freeform audit log entry. `d` tag = action uuid (e.g. nanoid/ulid).
 pub const KIND_MODERATION_ACTION: u64 = 30914;
 
+/// Lifts a ban issued via kind-30910. `d` tag = `{admin_pubkey}:{target_pubkey}`.
+/// A target pubkey is NOT banned if a 30915 event exists with the same admin:target d-tag.
+pub const KIND_UNBAN: u64 = 30915;
+
+/// Lifts a mute issued via kind-30911. `d` tag = `{admin_pubkey}:{target_pubkey}`.
+/// A target pubkey is NOT muted if a 30916 event exists with the same admin:target d-tag.
+pub const KIND_UNMUTE: u64 = 30916;
+
+/// Standard Nostr report event kind (NIP-56). Stored as regular events by the relay.
+pub const KIND_REPORT_NIP56: u64 = 1984;
+
 /// All moderation kinds, handy for bulk checks.
 pub const MOD_KINDS: &[u64] = &[
     KIND_BAN,
@@ -48,6 +59,8 @@ pub const MOD_KINDS: &[u64] = &[
     KIND_WARNING,
     KIND_REPORT,
     KIND_MODERATION_ACTION,
+    KIND_UNBAN,
+    KIND_UNMUTE,
 ];
 
 /// Kinds that MUST be signed by an admin to be accepted.
@@ -56,6 +69,8 @@ pub const ADMIN_ONLY_MOD_KINDS: &[u64] = &[
     KIND_MUTE,
     KIND_WARNING,
     KIND_MODERATION_ACTION,
+    KIND_UNBAN,
+    KIND_UNMUTE,
 ];
 
 // ── Errors ────────────────────────────────────────────────────────────────
@@ -144,19 +159,31 @@ pub fn validate_moderation_event(
         return Err(ModerationEventError::UnknownKind(event.kind));
     }
 
-    // All five kinds are parameterized-replaceable: require a non-empty `d` tag.
+    // All moderation kinds are parameterized-replaceable: require a non-empty `d` tag.
     let d = first_tag_value(event, "d").ok_or(ModerationEventError::MissingDTag)?;
     if d.is_empty() {
         return Err(ModerationEventError::EmptyDTag);
     }
 
     match event.kind {
-        KIND_BAN | KIND_MUTE => {
-            // d-tag is the target pubkey
-            if !is_hex64(d) {
+        KIND_BAN | KIND_MUTE | KIND_UNBAN | KIND_UNMUTE => {
+            // d-tag is `{admin_pubkey}:{target_pubkey}` — split and validate both parts.
+            let (admin_part, target_part) = d
+                .split_once(':')
+                .ok_or(ModerationEventError::InvalidDTag {
+                    kind: event.kind,
+                    reason: "expected `{admin_pubkey}:{target_pubkey}`",
+                })?;
+            if !is_hex64(admin_part) {
                 return Err(ModerationEventError::InvalidDTag {
                     kind: event.kind,
-                    reason: "expected 64-char hex pubkey",
+                    reason: "admin portion of d-tag must be 64-char hex pubkey",
+                });
+            }
+            if !is_hex64(target_part) {
+                return Err(ModerationEventError::InvalidDTag {
+                    kind: event.kind,
+                    reason: "target portion of d-tag must be 64-char hex pubkey",
                 });
             }
             if event.kind == KIND_MUTE {
@@ -205,7 +232,11 @@ pub fn validate_moderation_event(
         KIND_MODERATION_ACTION => {
             // d-tag is the action uuid — any non-empty string acceptable
         }
-        _ => unreachable!(),
+        _ => {
+            // All MOD_KINDS are handled above; this branch is unreachable
+            // but we use a return rather than unreachable!() for safety.
+            return Err(ModerationEventError::UnknownKind(event.kind));
+        }
     }
 
     if ADMIN_ONLY_MOD_KINDS.contains(&event.kind) && !admin_set.contains(&event.pubkey) {
@@ -234,18 +265,44 @@ pub fn mute_expires_at(event: &NostrEvent) -> Result<Option<u64>, ModerationEven
 // ── Public API: unsigned event builders ───────────────────────────────────
 
 /// Build an unsigned Ban event. Caller must sign with an admin key.
+///
+/// The `d` tag is `{admin_pubkey}:{target_pubkey}` so that two different
+/// admins banning the same user produce independent replaceable events that
+/// don't overwrite each other.
 pub fn build_ban(
     admin_pubkey: &str,
     target_pubkey: &str,
     reason: &str,
     created_at: u64,
 ) -> UnsignedEvent {
+    let d_tag = format!("{admin_pubkey}:{target_pubkey}");
     UnsignedEvent {
         pubkey: admin_pubkey.to_string(),
         created_at,
         kind: KIND_BAN,
         tags: vec![
-            vec!["d".to_string(), target_pubkey.to_string()],
+            vec!["d".to_string(), d_tag],
+            vec!["p".to_string(), target_pubkey.to_string()],
+        ],
+        content: reason.to_string(),
+    }
+}
+
+/// Build an unsigned Unban event. Caller must sign with the same admin key
+/// that issued the original ban (same `{admin}:{target}` d-tag pair).
+pub fn build_unban(
+    admin_pubkey: &str,
+    target_pubkey: &str,
+    reason: &str,
+    created_at: u64,
+) -> UnsignedEvent {
+    let d_tag = format!("{admin_pubkey}:{target_pubkey}");
+    UnsignedEvent {
+        pubkey: admin_pubkey.to_string(),
+        created_at,
+        kind: KIND_UNBAN,
+        tags: vec![
+            vec!["d".to_string(), d_tag],
             vec!["p".to_string(), target_pubkey.to_string()],
         ],
         content: reason.to_string(),
@@ -254,6 +311,8 @@ pub fn build_ban(
 
 /// Build an unsigned Mute event. `expires_at` is unix-seconds; pass 0 for
 /// an indefinite mute (the `expires` tag is then omitted).
+///
+/// The `d` tag is `{admin_pubkey}:{target_pubkey}` (same scheme as ban).
 pub fn build_mute(
     admin_pubkey: &str,
     target_pubkey: &str,
@@ -261,8 +320,9 @@ pub fn build_mute(
     reason: &str,
     created_at: u64,
 ) -> UnsignedEvent {
+    let d_tag = format!("{admin_pubkey}:{target_pubkey}");
     let mut tags = vec![
-        vec!["d".to_string(), target_pubkey.to_string()],
+        vec!["d".to_string(), d_tag],
         vec!["p".to_string(), target_pubkey.to_string()],
     ];
     if expires_at > 0 {
@@ -273,6 +333,26 @@ pub fn build_mute(
         created_at,
         kind: KIND_MUTE,
         tags,
+        content: reason.to_string(),
+    }
+}
+
+/// Build an unsigned Unmute event. Same `{admin}:{target}` d-tag as the mute.
+pub fn build_unmute(
+    admin_pubkey: &str,
+    target_pubkey: &str,
+    reason: &str,
+    created_at: u64,
+) -> UnsignedEvent {
+    let d_tag = format!("{admin_pubkey}:{target_pubkey}");
+    UnsignedEvent {
+        pubkey: admin_pubkey.to_string(),
+        created_at,
+        kind: KIND_UNMUTE,
+        tags: vec![
+            vec!["d".to_string(), d_tag],
+            vec!["p".to_string(), target_pubkey.to_string()],
+        ],
         content: reason.to_string(),
     }
 }
@@ -498,17 +578,30 @@ mod tests {
     }
 
     #[test]
-    fn ban_d_tag_must_be_hex64() {
+    fn ban_d_tag_must_be_admin_colon_target_hex64() {
+        // Missing colon entirely — should fail with InvalidDTag
         let u = UnsignedEvent {
             pubkey: admin_pk_hex(),
             created_at: 1_700_000_000,
             kind: KIND_BAN,
-            tags: vec![vec!["d".to_string(), "not-hex".to_string()]],
+            tags: vec![vec!["d".to_string(), "not-hex-no-colon".to_string()]],
             content: String::new(),
         };
         let signed = sign(u);
         let err = validate_moderation_event(&signed, &admin_set()).unwrap_err();
         assert!(matches!(err, ModerationEventError::InvalidDTag { kind: KIND_BAN, .. }));
+
+        // Colon present but invalid hex in admin part
+        let u2 = UnsignedEvent {
+            pubkey: admin_pk_hex(),
+            created_at: 1_700_000_000,
+            kind: KIND_BAN,
+            tags: vec![vec!["d".to_string(), format!("not-hex:{}", target_pk())]],
+            content: String::new(),
+        };
+        let signed2 = sign(u2);
+        let err2 = validate_moderation_event(&signed2, &admin_set()).unwrap_err();
+        assert!(matches!(err2, ModerationEventError::InvalidDTag { kind: KIND_BAN, .. }));
     }
 
     #[test]
@@ -561,6 +654,23 @@ mod tests {
     #[test]
     fn d_tag_of_works() {
         let u = build_ban(&admin_pk_hex(), &target_pk(), "x", 1);
-        assert_eq!(d_tag_of(&u), Some(target_pk().as_str()));
+        let expected = format!("{}:{}", admin_pk_hex(), target_pk());
+        assert_eq!(d_tag_of(&u), Some(expected.as_str()));
+    }
+
+    #[test]
+    fn unban_builds_and_validates() {
+        let u = build_unban(&admin_pk_hex(), &target_pk(), "pardoned", 1_700_000_000);
+        let signed = sign(u);
+        assert_eq!(signed.kind, KIND_UNBAN);
+        assert!(validate_moderation_event(&signed, &admin_set()).is_ok());
+    }
+
+    #[test]
+    fn unmute_builds_and_validates() {
+        let u = build_unmute(&admin_pk_hex(), &target_pk(), "cooldown over", 1_700_000_000);
+        let signed = sign(u);
+        assert_eq!(signed.kind, KIND_UNMUTE);
+        assert!(validate_moderation_event(&signed, &admin_set()).is_ok());
     }
 }

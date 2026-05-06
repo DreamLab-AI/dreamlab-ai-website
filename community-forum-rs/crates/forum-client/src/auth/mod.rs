@@ -13,12 +13,19 @@ mod webauthn;
 use gloo::storage::{LocalStorage, Storage};
 use leptos::prelude::*;
 use serde::{Deserialize, Serialize};
+use send_wrapper::SendWrapper;
+use std::rc::Rc;
 use zeroize::Zeroize;
 
 use self::passkey::{PasskeyAuthResult, PasskeyRegistrationResult};
 use self::session::{StoredSession, save_privkey_session, clear_privkey_session};
 use crate::app::base_href;
+use nostr_core::signer::Signer;
 use nostr_core::{NostrEvent, UnsignedEvent};
+
+/// Thread-local signer: SendWrapper makes `Rc<dyn Signer>` passable across Send boundaries
+/// in WASM's single-threaded environment.
+type SignerHandle = SendWrapper<Rc<dyn Signer>>;
 
 // -- Constants ----------------------------------------------------------------
 
@@ -92,12 +99,19 @@ impl Default for AuthState {
 ///
 /// Holds an `RwSignal<AuthState>` for the reactive UI state and a
 /// `StoredValue<Option<Vec<u8>>>` for the in-memory private key.
+/// Also holds reactive signals for pod_url and web_id from passkey auth.
 #[derive(Clone, Copy)]
 pub struct AuthStore {
     pub(crate) state: RwSignal<AuthState>,
     /// Private key bytes held in a StoredValue so they stay on the WASM thread.
     /// Never serialized or persisted.
     pub(crate) privkey: StoredValue<Option<Vec<u8>>>,
+    /// Signer trait object — additive alongside privkey for trait-based signing.
+    pub(crate) signer: StoredValue<Option<SignerHandle>>,
+    /// Pod URL from passkey auth server response (Solid pod endpoint).
+    pub pod_url: RwSignal<Option<String>>,
+    /// Web ID from passkey auth server response (Solid WebID URI).
+    pub web_id: RwSignal<Option<String>>,
 }
 
 impl AuthStore {
@@ -105,6 +119,9 @@ impl AuthStore {
         Self {
             state: RwSignal::new(AuthState::default()),
             privkey: StoredValue::new(None),
+            signer: StoredValue::new(None),
+            pod_url: RwSignal::new(None),
+            web_id: RwSignal::new(None),
         }
     }
 
@@ -144,6 +161,18 @@ impl AuthStore {
     pub fn nickname(&self) -> Memo<Option<String>> {
         let state = self.state;
         Memo::new(move |_| state.get().nickname)
+    }
+
+    /// Get the active Signer, if one has been set.
+    pub fn get_signer(&self) -> Option<Rc<dyn Signer>> {
+        self.signer.with_value(|s| s.as_ref().map(|sw| (**sw).clone()))
+    }
+
+    /// Build a PodClient from the current pod_url and pubkey, if both are available.
+    pub fn pod_client(&self) -> Option<crate::utils::solid::PodClient> {
+        let pod_url = self.pod_url.get_untracked()?;
+        let pubkey = self.state.get_untracked().pubkey?;
+        Some(crate::utils::solid::PodClient::new(pod_url, pubkey))
     }
 
     /// Sign an unsigned event using the in-memory private key.
@@ -417,6 +446,11 @@ impl AuthStore {
 
         match nip07::nip07_get_pubkey().await {
             Ok(pubkey) => {
+                // Build a Nip07Signer and store it as the active signer
+                let ext_signer = nip07::Nip07Signer::from_pubkey(pubkey.clone());
+                let s: Rc<dyn Signer> = Rc::new(ext_signer);
+                self.signer.set_value(Some(SendWrapper::new(s)));
+
                 let (nickname, avatar, account_status, nsec_backed_up) =
                     self.read_existing_metadata();
 
@@ -484,6 +518,9 @@ impl AuthStore {
             }
             *opt = None;
         });
+        self.signer.set_value(None);
+        self.pod_url.set(None);
+        self.web_id.set(None);
 
         self.state.set(AuthState::default());
         LocalStorage::delete(STORAGE_KEY);
@@ -503,6 +540,18 @@ impl AuthStore {
 
     fn apply_passkey_result(&self, result: &PasskeyRegistrationResult, display_name: Option<&str>) {
         self.privkey.set_value(Some(result.privkey_bytes.to_vec()));
+
+        // Build a PrfSigner from the derived privkey bytes (direct construction, not re-derivation)
+        if let Ok(secret) = nostr_core::keys::SecretKey::from_bytes(result.privkey_bytes) {
+            let public = secret.public_key();
+            let keypair = nostr_core::keys::Keypair { secret, public };
+            let s: Rc<dyn Signer> = Rc::new(nostr_core::signer::PrfSigner::new(keypair));
+            self.signer.set_value(Some(SendWrapper::new(s)));
+        }
+
+        // Wire pod_url and web_id signals
+        self.pod_url.set(result.pod_url.clone());
+        self.web_id.set(result.web_id.clone());
 
         let (existing_nickname, existing_avatar, _existing_status, _existing_nsec) =
             self.read_existing_metadata();
@@ -545,6 +594,17 @@ impl AuthStore {
 
     fn apply_passkey_auth_result(&self, result: &PasskeyAuthResult) {
         self.privkey.set_value(Some(result.privkey_bytes.to_vec()));
+
+        // Build a PrfSigner from the derived privkey bytes (direct construction, not re-derivation)
+        if let Ok(secret) = nostr_core::keys::SecretKey::from_bytes(result.privkey_bytes) {
+            let public = secret.public_key();
+            let keypair = nostr_core::keys::Keypair { secret, public };
+            let s: Rc<dyn Signer> = Rc::new(nostr_core::signer::PrfSigner::new(keypair));
+            self.signer.set_value(Some(SendWrapper::new(s)));
+        }
+
+        // Wire web_id signal (passkey auth returns web_id but not pod_url)
+        self.web_id.set(result.web_id.clone());
 
         let (nickname, avatar, account_status, nsec_backed_up) = self.read_existing_metadata();
 

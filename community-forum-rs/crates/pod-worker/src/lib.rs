@@ -12,14 +12,18 @@ mod auth;
 mod conditional;
 mod container;
 mod content_negotiation;
+mod contexts;
+mod did;
 mod notifications;
 mod patch;
 mod provision;
 mod quota;
 mod remote_storage;
+mod storage;
 mod webid;
 
 use acl::{evaluate_access, find_effective_acl, method_to_mode, wac_allow_header, AccessMode};
+use base64::Engine as _;
 use worker::*;
 
 /// Maximum request body size: 50 MB.
@@ -150,6 +154,28 @@ fn json_error(env: &Env, message: &str, status: u16) -> Result<Response> {
     Ok(resp)
 }
 
+/// Build a did:nostr DID document (Tier 3) for the given x-only pubkey hex.
+///
+/// Delegates to `crate::did::render_did_document_tier3`, which mirrors the
+/// logic from solid-pod-rs-nostr v0.4.0-alpha.2 but without the tokio
+/// dependency that makes that crate incompatible with WASM Workers.
+fn build_did_nostr_document(pubkey_hex: &str, pod_base: &str) -> serde_json::Value {
+    match did::NostrPubkey::from_hex(pubkey_hex) {
+        Ok(pk) => {
+            let pod_url = format!("{pod_base}/pods/{pubkey_hex}/");
+            let webid_url = format!("{pod_url}profile/card#me");
+            did::render_did_document_tier3(
+                &pk,
+                Some(&webid_url),
+                &pod_url,
+                None, // relay URL: not included at Tier 3 without lookup
+                None, // display name: not known at DID resolution time
+            )
+        }
+        Err(_) => serde_json::json!({ "error": "invalid pubkey" }),
+    }
+}
+
 /// Create a JSON success response with CORS headers.
 fn json_ok(env: &Env, body: &serde_json::Value, status: u16) -> Result<Response> {
     let json_str = serde_json::to_string(body).map_err(|e| Error::RustError(e.to_string()))?;
@@ -270,6 +296,29 @@ async fn fetch(mut req: Request, env: Env, _ctx: Context) -> Result<Response> {
         return json_error(&env, "Name not found", 404);
     }
 
+    // DID document: GET /.well-known/did/nostr/{pubkey}.json
+    // Returns a did:nostr DID document for any 64-char hex pubkey known to this pod.
+    // Tier1 (public, no auth) — anyone can resolve. Tier3 (extended) not yet gated.
+    if let Some(rest) = path.strip_prefix("/.well-known/did/nostr/") {
+        if let Some(pk) = rest.strip_suffix(".json") {
+            // Validate: must be exactly 64 lowercase hex chars
+            if pk.len() == 64 && pk.bytes().all(|b| b.is_ascii_hexdigit()) {
+                let host = url.host_str().unwrap_or("dreamlab-ai.com");
+                let pod_base = format!("https://{host}");
+                let did_doc = build_did_nostr_document(pk, &pod_base);
+                let json_str = serde_json::to_string(&did_doc)
+                    .map_err(|e| Error::RustError(e.to_string()))?;
+                let cors = cors_headers(&env);
+                let resp = Response::ok(json_str)?.with_headers(cors);
+                resp.headers()
+                    .set("Content-Type", "application/did+ld+json")
+                    .ok();
+                return Ok(resp);
+            }
+            return json_error(&env, "Invalid pubkey in DID path", 400);
+        }
+    }
+
     // Route: /pods/{pubkey}/...
     let (owner_pubkey, resource_path) = match parse_pod_route(path) {
         Some(parsed) => parsed,
@@ -313,7 +362,17 @@ async fn fetch(mut req: Request, env: Env, _ctx: Context) -> Result<Response> {
         let method_name = method_str(&method);
         let body_ref = body_bytes.as_deref();
         match auth::verify_nip98(header, &request_url, method_name, body_ref) {
-            Ok(token) => Some(token.pubkey),
+            Ok(token) => {
+                // If the event carries a `["webid", uri]` tag, verify the URI
+                // is controlled by the signing pubkey. Reject tokens where the
+                // webid tag references a different identity.
+                if let Some(webid_uri) = extract_webid_tag_from_header(header) {
+                    if !did::verify_webid_tag(&webid_uri, &token.pubkey) {
+                        return json_error(&env, "NIP-98 webid tag identity mismatch", 401);
+                    }
+                }
+                Some(token.pubkey)
+            }
             Err(_) => None,
         }
     } else {
@@ -1102,6 +1161,37 @@ fn validate_webid_html(data: &[u8]) -> Result<(), String> {
     }
 
     Ok(())
+}
+
+// ---------------------------------------------------------------------------
+// NIP-98 webid tag extractor
+// ---------------------------------------------------------------------------
+
+/// Extract the value of the `["webid", uri]` tag from a raw NIP-98
+/// `Authorization: Nostr <base64>` header, if present.
+///
+/// The NIP-98 spec allows extension tags. When a client sends a `webid`
+/// tag, we verify that the URI refers to the same identity as the signing
+/// pubkey (via `did::verify_webid_tag`).
+///
+/// Returns `None` if the header is malformed, the event has no webid tag,
+/// or base64 decoding fails — non-fatal; auth proceeds without webid check.
+fn extract_webid_tag_from_header(auth_header: &str) -> Option<String> {
+    let b64 = auth_header.strip_prefix("Nostr ")?;
+    let bytes = base64::engine::general_purpose::STANDARD
+        .decode(b64.trim())
+        .ok()?;
+    let event: serde_json::Value = serde_json::from_slice(&bytes).ok()?;
+    let tags = event.get("tags")?.as_array()?;
+    for tag in tags {
+        let arr = tag.as_array()?;
+        if arr.first()?.as_str() == Some("webid") {
+            if let Some(uri) = arr.get(1).and_then(|v| v.as_str()) {
+                return Some(uri.to_string());
+            }
+        }
+    }
+    None
 }
 
 // ---------------------------------------------------------------------------

@@ -3,7 +3,12 @@
 //! Provides JS interop with `window.nostr` (NIP-07 browser extensions like
 //! nos2x, Alby, etc.) for pubkey retrieval and event signing without
 //! exposing the private key to the web app.
+//!
+//! Also implements the [`nostr_core::signer::Signer`] trait via `Nip07Signer`
+//! so extension sessions can be used uniformly with passkey/local-key sessions.
 
+use async_trait::async_trait;
+use nostr_core::signer::{Signer, SignerError};
 use nostr_core::{NostrEvent, UnsignedEvent};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::JsFuture;
@@ -116,4 +121,159 @@ pub async fn nip07_sign_event(event: &UnsignedEvent) -> Result<NostrEvent, Strin
 
     serde_json::from_str::<NostrEvent>(&result_str)
         .map_err(|e| format!("Failed to parse signed event: {e}"))
+}
+
+// ── Nip07Signer ──────────────────────────────────────────────────────────────
+
+/// A [`Signer`] that delegates all cryptographic operations to a NIP-07 browser
+/// extension (`window.nostr`). No private key is ever exposed to the app.
+pub struct Nip07Signer {
+    pub(super) pubkey_hex: String,
+}
+
+impl Nip07Signer {
+    /// Attempt to connect to `window.nostr` and retrieve the pubkey.
+    ///
+    /// Returns an error if the extension is not available or the user rejects
+    /// the pubkey request.
+    pub async fn try_connect() -> Result<Self, String> {
+        if !has_nip07_extension() {
+            return Err("window.nostr not available — install a NIP-07 extension such as Alby or nos2x".to_string());
+        }
+        let pubkey_hex = nip07_get_pubkey().await?;
+        Ok(Self { pubkey_hex })
+    }
+
+    /// Create a Nip07Signer directly from a known pubkey (e.g. for session restore).
+    pub fn from_pubkey(pubkey_hex: String) -> Self {
+        Self { pubkey_hex }
+    }
+}
+
+#[async_trait(?Send)]
+impl Signer for Nip07Signer {
+    fn public_key(&self) -> &str {
+        &self.pubkey_hex
+    }
+
+    async fn sign_event(&self, unsigned: UnsignedEvent) -> Result<NostrEvent, SignerError> {
+        nip07_sign_event(&unsigned)
+            .await
+            .map_err(|e| SignerError::Backend(e))
+    }
+
+    async fn nip44_encrypt(
+        &self,
+        recipient_pubkey_hex: &str,
+        plaintext: &str,
+    ) -> Result<String, SignerError> {
+        nip07_nip44_encrypt(recipient_pubkey_hex, plaintext)
+            .await
+            .map_err(|e| SignerError::EncryptionFailed(e))
+    }
+
+    async fn nip44_decrypt(
+        &self,
+        sender_pubkey_hex: &str,
+        ciphertext: &str,
+    ) -> Result<String, SignerError> {
+        nip07_nip44_decrypt(sender_pubkey_hex, ciphertext)
+            .await
+            .map_err(|e| SignerError::DecryptionFailed(e))
+    }
+
+    async fn nip04_encrypt(
+        &self,
+        recipient_pubkey_hex: &str,
+        plaintext: &str,
+    ) -> Result<String, SignerError> {
+        // Fall back to NIP-44 if NIP-04 is not available
+        nip07_nip44_encrypt(recipient_pubkey_hex, plaintext)
+            .await
+            .map_err(|e| SignerError::EncryptionFailed(e))
+    }
+
+    async fn nip04_decrypt(
+        &self,
+        sender_pubkey_hex: &str,
+        ciphertext: &str,
+    ) -> Result<String, SignerError> {
+        nip07_nip44_decrypt(sender_pubkey_hex, ciphertext)
+            .await
+            .map_err(|e| SignerError::DecryptionFailed(e))
+    }
+}
+
+/// NIP-44 encrypt via `window.nostr.nip44.encrypt(pubkey, plaintext)`.
+async fn nip07_nip44_encrypt(recipient_pubkey_hex: &str, plaintext: &str) -> Result<String, String> {
+    let window = web_sys::window().ok_or("No window object")?;
+    let nostr = js_sys::Reflect::get(&window, &"nostr".into())
+        .map_err(|_| "window.nostr not found")?;
+    if nostr.is_undefined() || nostr.is_null() {
+        return Err("NIP-07 extension not available".to_string());
+    }
+
+    let nip44 = js_sys::Reflect::get(&nostr, &"nip44".into())
+        .map_err(|_| "window.nostr.nip44 not found")?;
+    if nip44.is_undefined() || nip44.is_null() {
+        return Err("window.nostr.nip44 not supported by this extension".to_string());
+    }
+
+    let encrypt_fn = js_sys::Reflect::get(&nip44, &"encrypt".into())
+        .map_err(|_| "window.nostr.nip44.encrypt not found")?;
+    let encrypt_fn: js_sys::Function = encrypt_fn
+        .dyn_into()
+        .map_err(|_| "nip44.encrypt is not a function")?;
+
+    let promise = encrypt_fn
+        .call2(&nip44, &JsValue::from_str(recipient_pubkey_hex), &JsValue::from_str(plaintext))
+        .map_err(|e| format!("nip44.encrypt() call failed: {:?}", e))?;
+    let promise: js_sys::Promise = promise
+        .dyn_into()
+        .map_err(|_| "nip44.encrypt() did not return a Promise")?;
+
+    let result = JsFuture::from(promise)
+        .await
+        .map_err(|e| format!("nip44.encrypt() rejected: {:?}", e))?;
+
+    result
+        .as_string()
+        .ok_or_else(|| "nip44.encrypt() did not return a string".to_string())
+}
+
+/// NIP-44 decrypt via `window.nostr.nip44.decrypt(pubkey, ciphertext)`.
+async fn nip07_nip44_decrypt(sender_pubkey_hex: &str, ciphertext: &str) -> Result<String, String> {
+    let window = web_sys::window().ok_or("No window object")?;
+    let nostr = js_sys::Reflect::get(&window, &"nostr".into())
+        .map_err(|_| "window.nostr not found")?;
+    if nostr.is_undefined() || nostr.is_null() {
+        return Err("NIP-07 extension not available".to_string());
+    }
+
+    let nip44 = js_sys::Reflect::get(&nostr, &"nip44".into())
+        .map_err(|_| "window.nostr.nip44 not found")?;
+    if nip44.is_undefined() || nip44.is_null() {
+        return Err("window.nostr.nip44 not supported by this extension".to_string());
+    }
+
+    let decrypt_fn = js_sys::Reflect::get(&nip44, &"decrypt".into())
+        .map_err(|_| "window.nostr.nip44.decrypt not found")?;
+    let decrypt_fn: js_sys::Function = decrypt_fn
+        .dyn_into()
+        .map_err(|_| "nip44.decrypt is not a function")?;
+
+    let promise = decrypt_fn
+        .call2(&nip44, &JsValue::from_str(sender_pubkey_hex), &JsValue::from_str(ciphertext))
+        .map_err(|e| format!("nip44.decrypt() call failed: {:?}", e))?;
+    let promise: js_sys::Promise = promise
+        .dyn_into()
+        .map_err(|_| "nip44.decrypt() did not return a Promise")?;
+
+    let result = JsFuture::from(promise)
+        .await
+        .map_err(|e| format!("nip44.decrypt() rejected: {:?}", e))?;
+
+    result
+        .as_string()
+        .ok_or_else(|| "nip44.decrypt() did not return a string".to_string())
 }

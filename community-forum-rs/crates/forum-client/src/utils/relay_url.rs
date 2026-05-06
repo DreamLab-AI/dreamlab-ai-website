@@ -4,6 +4,16 @@
 //! then production fallback. All forum-client modules should use these functions
 //! instead of duplicating URL resolution logic.
 
+/// The WebSocket relay URL (wss://...) used for Nostr subscriptions.
+pub fn relay_url() -> String {
+    if let Some(url) = window_env("VITE_RELAY_URL") {
+        return url;
+    }
+    option_env!("VITE_RELAY_URL")
+        .unwrap_or("wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev")
+        .to_string()
+}
+
 /// Base URL for the relay HTTP API (whitelist, setup-status, etc.).
 ///
 /// Converts a WebSocket relay URL to HTTPS for HTTP API calls.

@@ -34,9 +34,7 @@ pub struct PasskeyRegistrationResult {
     pub privkey_bytes: [u8; 32],
     #[allow(dead_code)]
     pub credential_id: String,
-    #[allow(dead_code)]
     pub web_id: Option<String>,
-    #[allow(dead_code)]
     pub pod_url: Option<String>,
     #[allow(dead_code)]
     pub did_nostr: String,
@@ -53,7 +51,6 @@ pub struct PasskeyAuthResult {
     pub privkey_bytes: [u8; 32],
     #[allow(dead_code)]
     pub did_nostr: String,
-    #[allow(dead_code)]
     pub web_id: Option<String>,
 }
 

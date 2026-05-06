@@ -26,8 +26,8 @@ use crate::stores::read_position::provide_read_positions;
 use crate::stores::zone_access::provide_zone_access;
 use crate::pages::{
     AdminPage, CategoryPage, ChannelPage, ChatPage, DmChatPage, DmListPage, EventsPage, ForumsPage,
-    HomePage, LoginPage, NoteViewPage, PendingPage, ProfilePage, SearchPage, SectionPage,
-    SettingsPage, SetupPage, SignupPage,
+    HomePage, LoginPage, MarketplacePage, NoteViewPage, PendingPage, ProfilePage, SearchPage,
+    SectionPage, SettingsPage, SetupPage, SignupPage,
 };
 use crate::relay::{ConnectionState, RelayConnection};
 
@@ -279,6 +279,57 @@ pub fn App() -> impl IntoView {
         });
     }
 
+    // Publish kind-10002 (relay list) on first login so peers can discover our relay.
+    // This is a replaceable event, so publishing again is idempotent.
+    {
+        let published_relay_list = RwSignal::new(false);
+        let relay_state = relay.connection_state();
+        Effect::new(move |_| {
+            if relay_state.get() != ConnectionState::Connected {
+                return;
+            }
+            if !is_authed.get() {
+                published_relay_list.set(false);
+                return;
+            }
+            if published_relay_list.get_untracked() {
+                return;
+            }
+
+            let auth = use_auth();
+            let r = expect_context::<RelayConnection>();
+            let pubkey = match auth.pubkey().get_untracked() {
+                Some(pk) => pk,
+                None => return,
+            };
+
+            let relay_url = crate::utils::relay_url::relay_url();
+            let now = (js_sys::Date::now() / 1000.0) as u64;
+            let unsigned = nostr_core::UnsignedEvent {
+                pubkey: pubkey.clone(),
+                created_at: now,
+                kind: 10002,
+                tags: vec![vec!["r".to_string(), relay_url]],
+                content: String::new(),
+            };
+
+            match auth.sign_event(unsigned) {
+                Ok(signed) => {
+                    r.publish(&signed);
+                    published_relay_list.set(true);
+                    web_sys::console::log_1(
+                        &format!("[app] Published kind-10002 relay list for: {}", &pubkey[..8]).into()
+                    );
+                }
+                Err(e) => {
+                    web_sys::console::warn_1(
+                        &format!("[app] Failed to publish kind-10002: {e}").into()
+                    );
+                }
+            }
+        });
+    }
+
     // Start channel sync once relay connects (single subscription for all pages)
     let relay_conn = relay.connection_state();
     Effect::new(move |_| {
@@ -346,6 +397,7 @@ pub fn App() -> impl IntoView {
                     <Route path=path!("/search") view=AuthGatedSearch />
                     <Route path=path!("/settings") view=AuthGatedSettings />
                     <Route path=path!("/admin") view=AdminPage />
+                    <Route path=path!("/marketplace") view=MarketplacePage />
                 </FlatRoutes>
             </Layout>
         </Router>

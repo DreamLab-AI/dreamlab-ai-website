@@ -4,7 +4,7 @@
 use nostr_core::event::NostrEvent;
 use worker::*;
 
-use super::filter::event_matches_filters;
+use super::filter::{event_matches_filters, tag_value};
 use super::NostrRelayDO;
 
 // ---------------------------------------------------------------------------
@@ -37,8 +37,25 @@ pub(crate) fn event_treatment(kind: u64) -> EventTreatment {
 
 impl NostrRelayDO {
     pub(crate) fn broadcast_event(&self, event: &NostrEvent) {
+        // NIP-59: kind-1059 (Sealed DMs) must only be delivered to the session
+        // whose authenticated pubkey matches the event's `p` tag recipient.
+        let kind_1059_recipient: Option<String> = if event.kind == 1059 {
+            tag_value(event, "p")
+        } else {
+            None
+        };
+
         let sessions = self.sessions.borrow();
         for (_id, session) in sessions.iter() {
+            // For kind-1059 events, skip sessions that are not authenticated as
+            // the intended recipient.
+            if let Some(ref recipient) = kind_1059_recipient {
+                match &session.authed_pubkey {
+                    Some(pk) if pk == recipient => {}
+                    _ => continue,
+                }
+            }
+
             for (sub_id, filters) in &session.subscriptions {
                 if event_matches_filters(event, filters) {
                     Self::send_event(&session.ws, sub_id, event);
@@ -256,5 +273,29 @@ mod tests {
     #[test]
     fn kind_2_is_regular() {
         assert_eq!(event_treatment(2), EventTreatment::Regular);
+    }
+
+    // ── NIP-65 kind-10002 (relay list) is replaceable ───────────────────
+
+    #[test]
+    fn nip65_kind_10002_relay_list_is_replaceable() {
+        // kind-10002 falls in the replaceable range (10000..20000)
+        assert_eq!(event_treatment(10002), EventTreatment::Replaceable);
+    }
+
+    // ── NIP-31 kind-31990 (handler information) is parameterized-replaceable ──
+
+    #[test]
+    fn kind_31990_handler_info_is_param_replaceable() {
+        // kind-31990 falls in the parameterized replaceable range (30000..40000)
+        assert_eq!(event_treatment(31990), EventTreatment::ParameterizedReplaceable);
+    }
+
+    // ── NIP-59 kind-1059 (sealed DM) is regular ─────────────────────────
+
+    #[test]
+    fn nip59_kind_1059_sealed_dm_is_regular() {
+        // kind-1059 is a regular event (no special replacement semantics)
+        assert_eq!(event_treatment(1059), EventTreatment::Regular);
     }
 }

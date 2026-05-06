@@ -11,8 +11,10 @@
 //! - `auth.rs` -- NIP-98 verification wrapper
 
 mod admin;
+mod admins;
 mod auth;
 mod crypto;
+mod delegation;
 mod http;
 mod invites;
 mod moderation;
@@ -410,6 +412,32 @@ async fn route_sprint_api(
     }
     if path == "/api/welcome/test" && *method == Method::Post {
         let resp = welcome::handle_test(body_bytes, auth_header, env).await?;
+        return Ok(Some(resp));
+    }
+
+    // -- Admin management (WI-8) ----------------------------------------
+    if path == "/api/admins" && *method == Method::Get {
+        let resp = admins::handle_list(auth_header, env).await?;
+        return Ok(Some(resp));
+    }
+    if path == "/api/admins/add" && *method == Method::Post {
+        let resp = admins::handle_add(body_bytes, auth_header, env).await?;
+        return Ok(Some(resp));
+    }
+    if path == "/api/admins/remove" && *method == Method::Post {
+        let resp = admins::handle_remove(body_bytes, auth_header, env).await?;
+        return Ok(Some(resp));
+    }
+
+    // -- NIP-1984 standard report queue (admin view) --------------------
+    if path == "/api/moderation/reports" && *method == Method::Get {
+        let resp = moderation::handle_nip1984_reports(auth_header, env).await?;
+        return Ok(Some(resp));
+    }
+
+    // -- NIP-26 Delegation verification (stub for W6) -------------------
+    if path == "/api/delegation/verify" && *method == Method::Post {
+        let resp = delegation::handle_verify(body_bytes, auth_header, env).await?;
         return Ok(Some(resp));
     }
 

@@ -39,6 +39,10 @@ hmac = "0.12.1"
 hkdf = "0.12.4"
 sha2 = "0.10.9"
 getrandom = { version = "0.2", features = ["js"] }
+aes = "0.8"
+cbc = { version = "0.1", features = ["alloc"] }
+bech32 = "0.11"
+async-trait = "0.1"
 
 # Serialization
 serde = { version = "1", features = ["derive"] }
@@ -69,6 +73,11 @@ zeroize = { version = "1.8", features = ["derive"] }
 proptest = "1"
 criterion = "0.5"
 wasm-bindgen-test = "0.3"
+
+# DreamLab Solid Pod library (server-side only — pulls tokio; do NOT add to WASM crates)
+# Use for admin-cli, relay-worker, and any non-WASM consumers.
+solid-pod-rs = { version = "0.4.0-alpha.2", default-features = false, features = ["nip98-schnorr"] }
+solid-pod-rs-nostr = { version = "0.4.0-alpha.2", default-features = false }
 
 # Internal crates
 nostr-core = { path = "crates/nostr-core" }

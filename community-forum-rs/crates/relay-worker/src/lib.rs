@@ -227,7 +227,7 @@ async fn route(req: Request, env: &Env, path: &str) -> Result<Response> {
                 "status": "healthy",
                 "version": "3.0.0",
                 "runtime": "workers-rs",
-                "nips": [1, 9, 11, 16, 29, 33, 40, 42, 45, 50, 98],
+                "nips": [1, 9, 11, 16, 17, 26, 29, 33, 40, 42, 45, 50, 59, 65, 90, 98],
             }),
             200,
         );
@@ -397,6 +397,10 @@ async fn ensure_schema(env: &Env) {
         "CREATE INDEX IF NOT EXISTS idx_admin_log_created ON admin_log(created_at)",
         "CREATE INDEX IF NOT EXISTS idx_mod_actions_target ON moderation_actions(target_pubkey)",
         "CREATE INDEX IF NOT EXISTS idx_mod_actions_active ON moderation_actions(action, expires_at)",
+        // NIP-59 (Sealed DMs, kind-1059): index on kind for efficient recipient delivery.
+        // p-tag recipient filtering is applied via the tags LIKE pattern at query time;
+        // this index narrows the scan to kind-1059 rows first.
+        "CREATE INDEX IF NOT EXISTS idx_events_kind ON events(kind)",
     ];
     for stmt in index_stmts {
         let _ = db.prepare(stmt).run().await;

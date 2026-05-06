@@ -342,6 +342,51 @@ impl NostrRelayDO {
                 .and_then(|s| s.authed_pubkey.clone())
         };
 
+        // NIP-59: kind-1059 AUTH gating.
+        // If any filter requests kind-1059 (Sealed DMs), the session must be
+        // authenticated. We inject a mandatory #p tag constraint so that only
+        // events addressed to the authenticated pubkey are returned, preventing
+        // cross-recipient leakage.
+        let filters = {
+            let needs_kind_1059 = filters.iter().any(|f| {
+                f.kinds
+                    .as_ref()
+                    .map_or(false, |k| k.contains(&1059))
+            });
+            if needs_kind_1059 {
+                match &session_pubkey {
+                    None => {
+                        Self::send_notice(
+                            &ws,
+                            "auth-required: must authenticate to receive kind-1059 DMs",
+                        );
+                        return;
+                    }
+                    Some(authed_pk) => {
+                        // Rewrite each filter that includes kind-1059 to also require
+                        // a #p tag matching the authenticated pubkey.
+                        filters
+                            .into_iter()
+                            .map(|mut f| {
+                                if f.kinds.as_ref().map_or(false, |k| k.contains(&1059)) {
+                                    // Enforce the #p filter for the authed pubkey.
+                                    // We override any existing #p to prevent a client
+                                    // from requesting another user's DMs.
+                                    f.extra.insert(
+                                        "#p".to_string(),
+                                        serde_json::json!([authed_pk]),
+                                    );
+                                }
+                                f
+                            })
+                            .collect::<Vec<_>>()
+                    }
+                }
+            } else {
+                filters
+            }
+        };
+
         // Query D1 for matching events
         let events = self.query_events(&filters).await;
 

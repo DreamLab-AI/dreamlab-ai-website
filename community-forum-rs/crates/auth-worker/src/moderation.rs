@@ -25,6 +25,8 @@ use nostr_core::{
     validate_moderation_event, NostrEvent, KIND_BAN, KIND_MUTE, KIND_REPORT, KIND_WARNING,
     MOD_KINDS,
 };
+// Standard Nostr kind-1984 report events (NIP-56).
+use nostr_core::KIND_REPORT_NIP56;
 use serde::Deserialize;
 use serde_json::json;
 use std::collections::HashSet;
@@ -613,6 +615,78 @@ pub async fn handle_report_action(
         &json!({ "ok": true, "id": report_id, "status": body.status }),
         200,
     )
+}
+
+// ---------------------------------------------------------------------------
+// GET /api/moderation/reports — NIP-1984 (kind-1984) standard report queue
+// ---------------------------------------------------------------------------
+
+/// D1 row for a stored kind-1984 event.
+#[derive(Deserialize)]
+struct Nip1984Row {
+    event_id: String,
+    pubkey: String,
+    created_at: i64,
+    content: String,
+    tags_json: String,
+}
+
+/// Return the most recent 50 kind-1984 report events stored in D1.
+///
+/// These are standard NIP-56 report events submitted by any user via the
+/// relay (kind 1984). The relay stores them as `Regular` events. This
+/// endpoint surfaces them to admins for review.
+///
+/// The query reads from a `nip1984_reports` table populated by the relay-worker
+/// when it receives kind-1984 events. This table is created by `ensure_schema`.
+pub async fn handle_nip1984_reports(
+    auth_header: Option<&str>,
+    env: &Env,
+) -> Result<Response> {
+    let url = canonical_url(env, "/api/moderation/reports");
+    if let Err((body, status)) = require_admin(auth_header, &url, "GET", None, env).await {
+        return json_response(env, &body, status);
+    }
+
+    let db = match env.d1("DB") {
+        Ok(db) => db,
+        Err(_) => return error_json(env, "Database unavailable", 500),
+    };
+
+    let result = match db
+        .prepare(
+            "SELECT event_id, pubkey, created_at, content, tags_json \
+             FROM nip1984_reports \
+             ORDER BY created_at DESC \
+             LIMIT 50",
+        )
+        .all()
+        .await
+    {
+        Ok(r) => r,
+        Err(e) => return error_json(env, &format!("Query failed: {e}"), 500),
+    };
+
+    let rows: Vec<Nip1984Row> = result.results().unwrap_or_default();
+
+    let reports: Vec<serde_json::Value> = rows
+        .into_iter()
+        .map(|r| {
+            // Parse tags_json back to a Value; fall back to empty array on error.
+            let tags: serde_json::Value = serde_json::from_str(&r.tags_json)
+                .unwrap_or(serde_json::Value::Array(vec![]));
+            json!({
+                "kind": KIND_REPORT_NIP56,
+                "id": r.event_id,
+                "pubkey": r.pubkey,
+                "created_at": r.created_at,
+                "content": r.content,
+                "tags": tags,
+            })
+        })
+        .collect();
+
+    json_response(env, &json!({ "reports": reports, "kind": KIND_REPORT_NIP56 }), 200)
 }
 
 // ---------------------------------------------------------------------------

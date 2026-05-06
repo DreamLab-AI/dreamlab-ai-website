@@ -40,6 +40,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "aes"
+version = "0.8.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b169f7a6d4742236a0a00c541b845991d0ac43e546831af1249753ab4c3aa3a0"
+dependencies = [
+ "cfg-if",
+ "cipher",
+ "cpufeatures",
+]
+
+[[package]]
 name = "aho-corasick"
 version = "1.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -969,6 +980,7 @@ dependencies = [
 name = "forum-client"
 version = "0.1.0"
 dependencies = [
+ "async-trait",
  "base64",
  "bech32",
  "comrak",
@@ -2137,7 +2149,11 @@ dependencies = [
 name = "nostr-core"
 version = "0.1.0"
 dependencies = [
+ "aes",
+ "async-trait",
  "base64",
+ "bech32",
+ "cbc",
  "chacha20poly1305",
  "criterion",
  "getrandom 0.2.17",

@@ -16,8 +16,13 @@ pub mod gift_wrap;
 pub mod groups;
 pub mod keys;
 pub mod moderation_events;
+pub mod nip04;
+pub mod nip19;
+pub mod nip26;
 pub mod nip44;
+pub mod nip90;
 pub mod nip98;
+pub mod signer;
 pub mod types;
 
 #[cfg(target_arch = "wasm32")]
@@ -44,7 +49,25 @@ pub use calendar::{
 };
 
 pub use moderation_events::{
-    build_ban, build_moderation_action, build_mute, build_report, build_warning, d_tag_of,
-    mute_expires_at, validate_moderation_event, ModerationEventError, ADMIN_ONLY_MOD_KINDS,
-    KIND_BAN, KIND_MODERATION_ACTION, KIND_MUTE, KIND_REPORT, KIND_WARNING, MOD_KINDS,
+    build_ban, build_moderation_action, build_mute, build_report, build_unban, build_unmute,
+    build_warning, d_tag_of, mute_expires_at, validate_moderation_event, ModerationEventError,
+    ADMIN_ONLY_MOD_KINDS, KIND_BAN, KIND_MODERATION_ACTION, KIND_MUTE, KIND_REPORT,
+    KIND_REPORT_NIP56, KIND_UNBAN, KIND_UNMUTE, KIND_WARNING, MOD_KINDS,
 };
+
+pub use nip04::{nip04_decrypt, nip04_encrypt, nip04_shared_secret, Nip04Error};
+pub use nip19::{
+    decode_naddr, decode_nevent, decode_nprofile, decode_note, decode_npub, decode_nsec,
+    encode_naddr, encode_nevent, encode_nprofile, encode_note, encode_npub, encode_nsec,
+    NAddr, NEvent, NProfile, Nip19Error,
+};
+pub use nip26::{
+    validate_delegation_tag, Conditions, DelegationTag, DelegationToken, Nip26Error,
+};
+pub use nip90::{
+    is_job_request, is_job_result, parse_job_inputs, DvmCapabilityAd, DvmJobFeedback,
+    DvmJobRequest, DvmJobResult, JobInput, JobStatus, Nip90Error,
+    KIND_HANDLER_INFO, KIND_JOB_FEEDBACK, KIND_JOB_REQUEST_MAX, KIND_JOB_REQUEST_MIN,
+    KIND_JOB_RESULT_MAX, KIND_JOB_RESULT_MIN,
+};
+pub use signer::{PrfSigner, Signer, SignerError};
