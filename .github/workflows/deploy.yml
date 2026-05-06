@@ -111,12 +111,9 @@ jobs:
 
       - name: Build Leptos forum with Trunk
         working-directory: community-forum-rs/crates/forum-client
-        env:
-          # Disable wasm bulk-memory codegen so wasm-opt 122 (which validates
-          # without --enable-bulk-memory-opt by default) can process the module.
-          # Cost: marginal — WASM only loses memory.copy/memory.fill intrinsics
-          # in favour of explicit loops. Re-enable when bumping wasm-opt + flags.
-          RUSTFLAGS: "-C target-feature=-bulk-memory"
+        # bulk-memory disabled via community-forum-rs/.cargo/config.toml so the
+        # flag participates in the artifact hash and survives cache reuse.
+        # RUSTFLAGS env was unreliable across runs.
         run: trunk build --release --public-url /community/
 
       # ── Combine outputs ────────────────────────────────────────────────

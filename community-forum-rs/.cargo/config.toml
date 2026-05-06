@@ -1,5 +1,13 @@
 [target.wasm32-unknown-unknown]
-rustflags = ["-C", "link-arg=--max-memory=268435456"]
+# -bulk-memory: avoid memory.copy/memory.fill ops that wasm-opt 122 rejects
+#   without --enable-bulk-memory-opt. Until we wire a post-build hook with
+#   the flag, codegen the fallback intrinsics in pure WASM. Marginal cost.
+# Reference-types/multivalue/sign-ext: keep defaults (these don't trip
+#   wasm-opt 122 validation).
+rustflags = [
+  "-C", "link-arg=--max-memory=268435456",
+  "-C", "target-feature=-bulk-memory",
+]
 
 # Note: default target removed to allow native `cargo test` for non-WASM crates.
 # Trunk automatically targets wasm32-unknown-unknown for the forum-client binary.
