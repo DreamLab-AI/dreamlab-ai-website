@@ -103,6 +103,13 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
+      # Pre-install wrangler globally so wrangler-action picks it up via PATH
+      # rather than triggering an interactive `npx wrangler@X.Y.Z` install
+      # that can prompt and stall in CI when its default version disagrees
+      # with our pin (observed: action defaulted to wrangler@4 vs our 3.x pin).
+      - name: Install wrangler ${{ env.WRANGLER_VERSION }}
+        run: npm install -g wrangler@${{ env.WRANGLER_VERSION }}
+
       - name: Build and deploy ${{ matrix.crate }}
         uses: cloudflare/wrangler-action@v3
         with:
@@ -114,6 +121,7 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          npm_config_yes: true
 
   # ─── Health checks ───────────────────────────────────────────────────
   health-check:

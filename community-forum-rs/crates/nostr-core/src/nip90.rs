@@ -160,7 +160,7 @@ pub struct DvmJobRequest {
 
 impl DvmJobRequest {
     pub fn new(kind: u64) -> Result<Self, Nip90Error> {
-        if kind < KIND_JOB_REQUEST_MIN || kind > KIND_JOB_REQUEST_MAX {
+        if !(KIND_JOB_REQUEST_MIN..=KIND_JOB_REQUEST_MAX).contains(&kind) {
             return Err(Nip90Error::InvalidJobKind(kind));
         }
         Ok(Self {
@@ -282,7 +282,7 @@ impl DvmJobResult {
         requester_pubkey: &str,
         content: &str,
     ) -> Result<Self, Nip90Error> {
-        if request_kind < KIND_JOB_REQUEST_MIN || request_kind > KIND_JOB_REQUEST_MAX {
+        if !(KIND_JOB_REQUEST_MIN..=KIND_JOB_REQUEST_MAX).contains(&request_kind) {
             return Err(Nip90Error::InvalidJobKind(request_kind));
         }
         let result_kind = request_kind - KIND_JOB_REQUEST_MIN + KIND_JOB_RESULT_MIN;

@@ -57,6 +57,10 @@ pub struct Conditions {
 
 impl Conditions {
     /// Parse a conditions string such as `"kind=1&created_at>1700000000"`.
+    ///
+    /// Inherent method retained for direct call ergonomics; also exposed via
+    /// `std::str::FromStr` for `.parse()` callers.
+    #[allow(clippy::should_implement_trait)]
     pub fn from_str(s: &str) -> Result<Self, Nip26Error> {
         let mut c = Conditions::default();
         if s.is_empty() {
@@ -91,6 +95,7 @@ impl Conditions {
     }
 
     /// Serialize to the canonical wire format.
+    #[allow(clippy::inherent_to_string)]
     pub fn to_string(&self) -> String {
         let mut parts = Vec::new();
         for k in &self.kinds {
@@ -111,12 +116,12 @@ impl Conditions {
             return false;
         }
         if let Some(after) = self.created_after {
-            if created_at <= after {
+            if !(after + 1..).contains(&created_at) {
                 return false;
             }
         }
         if let Some(before) = self.created_before {
-            if created_at >= before {
+            if !(..before).contains(&created_at) {
                 return false;
             }
         }
