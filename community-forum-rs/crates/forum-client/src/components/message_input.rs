@@ -128,9 +128,7 @@ async fn search_profiles(query: &str) -> Result<Vec<MentionCandidate>, String> {
     if !resp.ok() {
         return Err(format!("HTTP {}", resp.status()));
     }
-    let txt_promise = resp
-        .text()
-        .map_err(|e| format!("text() failed: {:?}", e))?;
+    let txt_promise = resp.text().map_err(|e| format!("text() failed: {:?}", e))?;
     let txt_val = JsFuture::from(txt_promise)
         .await
         .map_err(|e| format!("await text failed: {:?}", e))?;
@@ -395,12 +393,7 @@ pub(crate) fn MessageInput(
         let after_at = &text[start + 1..];
         let token_len = after_at
             .chars()
-            .take_while(|c| {
-                c.is_ascii_lowercase()
-                    || c.is_ascii_digit()
-                    || *c == '_'
-                    || *c == '-'
-            })
+            .take_while(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || *c == '_' || *c == '-')
             .count();
         let token_end = start + 1 + token_len;
         let handle = c.handle();

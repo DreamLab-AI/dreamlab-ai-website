@@ -275,10 +275,7 @@ impl ProfileCache {
             .iter()
             .map(|entry| CachedProfile {
                 pubkey: entry.pubkey.clone(),
-                name: entry
-                    .display_name
-                    .clone()
-                    .or_else(|| entry.name.clone()),
+                name: entry.display_name.clone().or_else(|| entry.name.clone()),
                 picture: entry.picture.clone(),
                 about: None,
                 updated_at: entry.fetched_at,
@@ -306,10 +303,7 @@ impl ProfileCache {
             return;
         }
         // Skip if already cached (race-safe re-check).
-        if self
-            .entries
-            .with_untracked(|map| map.contains_key(pubkey))
-        {
+        if self.entries.with_untracked(|map| map.contains_key(pubkey)) {
             self.in_flight.update(|set| {
                 set.remove(pubkey);
             });
@@ -416,10 +410,7 @@ fn persist_one(entry: &ProfileEntry) {
         };
         let cached = CachedProfile {
             pubkey: entry.pubkey.clone(),
-            name: entry
-                .display_name
-                .clone()
-                .or_else(|| entry.name.clone()),
+            name: entry.display_name.clone().or_else(|| entry.name.clone()),
             picture: entry.picture.clone(),
             about: None,
             updated_at: entry.fetched_at,
@@ -635,7 +626,8 @@ mod tests {
 
     #[test]
     fn parse_wrapped_response() {
-        let json = r#"[{"pubkey":"abc","profile":{"name":"alice","nip05":"alice@dreamlab-ai.com"}}]"#;
+        let json =
+            r#"[{"pubkey":"abc","profile":{"name":"alice","nip05":"alice@dreamlab-ai.com"}}]"#;
         let parsed = parse_batch_response(json);
         assert_eq!(parsed.len(), 1);
         assert_eq!(parsed[0].pubkey, "abc");
@@ -688,8 +680,7 @@ mod tests {
     #[test]
     fn from_kind0_parses_metadata() {
         let content = r#"{"name":"alice","display_name":"Alice","picture":"https://x/y.png","nip05":"alice@dreamlab-ai.com"}"#;
-        let entry =
-            ProfileEntry::from_kind0_content("abc".into(), content, 1234).expect("valid");
+        let entry = ProfileEntry::from_kind0_content("abc".into(), content, 1234).expect("valid");
         assert_eq!(entry.pubkey, "abc");
         assert_eq!(entry.name.as_deref(), Some("alice"));
         assert_eq!(entry.display_name.as_deref(), Some("Alice"));

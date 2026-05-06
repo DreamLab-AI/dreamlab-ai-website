@@ -194,10 +194,7 @@ pub async fn handle_search(req: &Request, env: &Env) -> Result<Response> {
          ORDER BY last_kind0_at DESC LIMIT ?2",
     );
 
-    let binds = [
-        JsValue::from_str(&pattern),
-        JsValue::from_f64(limit as f64),
-    ];
+    let binds = [JsValue::from_str(&pattern), JsValue::from_f64(limit as f64)];
 
     let bound = match stmt.bind(&binds) {
         Ok(s) => s,

@@ -199,10 +199,7 @@ fn parse_mentions(input: &str) -> Vec<Segment> {
                     let name_len = after_at
                         .chars()
                         .take_while(|c| {
-                            c.is_ascii_lowercase()
-                                || c.is_ascii_digit()
-                                || *c == '_'
-                                || *c == '-'
+                            c.is_ascii_lowercase() || c.is_ascii_digit() || *c == '_' || *c == '-'
                         })
                         .count();
                     if name_len >= 3 && name_len <= 30 {
@@ -262,9 +259,7 @@ fn find_next_at(input: &str) -> Option<usize> {
         let after = &input[i + 1..];
         let len = after
             .chars()
-            .take_while(|c| {
-                c.is_ascii_lowercase() || c.is_ascii_digit() || *c == '_' || *c == '-'
-            })
+            .take_while(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || *c == '_' || *c == '-')
             .count();
         if len >= 3
             && after
@@ -355,16 +350,13 @@ mod tests {
         let pk = "a".repeat(64);
         let input = format!("yo @{} bro", pk);
         let segs = parse_mentions(&input);
-        let has_pubkey = segs
-            .iter()
-            .any(|s| matches!(s, Segment::PubkeyMention(_)));
+        let has_pubkey = segs.iter().any(|s| matches!(s, Segment::PubkeyMention(_)));
         assert!(has_pubkey);
     }
 
     #[test]
     fn parse_npub_mention() {
-        let segs =
-            parse_mentions("see nostr:npub1abcdefghijk for more");
+        let segs = parse_mentions("see nostr:npub1abcdefghijk for more");
         let has_npub = segs.iter().any(|s| matches!(s, Segment::NpubMention(_)));
         assert!(has_npub);
     }
@@ -373,10 +365,12 @@ mod tests {
     fn parse_username_mention_starting_with_underscore_rejected() {
         let segs = parse_mentions("@_alice");
         // Should NOT be a UsernameMention because regex requires [a-z0-9] first.
-        let has_mention = segs.iter().any(|s| matches!(
-            s,
-            Segment::UsernameMention { .. } | Segment::PubkeyMention(_)
-        ));
+        let has_mention = segs.iter().any(|s| {
+            matches!(
+                s,
+                Segment::UsernameMention { .. } | Segment::PubkeyMention(_)
+            )
+        });
         assert!(!has_mention);
     }
 

@@ -175,8 +175,7 @@ impl NostrRelayDO {
         }
 
         let name = str_field(obj, "name");
-        let display_name = str_field(obj, "display_name")
-            .or_else(|| str_field(obj, "displayName"));
+        let display_name = str_field(obj, "display_name").or_else(|| str_field(obj, "displayName"));
         let picture = str_field(obj, "picture");
         let banner = str_field(obj, "banner");
         let about = str_field(obj, "about");

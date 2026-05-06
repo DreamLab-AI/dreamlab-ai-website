@@ -170,9 +170,7 @@ async fn check_username_available(name: &str) -> Result<bool, String> {
     if !resp.ok() {
         return Err(format!("HTTP {}", resp.status()));
     }
-    let txt_promise = resp
-        .text()
-        .map_err(|e| format!("text() failed: {:?}", e))?;
+    let txt_promise = resp.text().map_err(|e| format!("text() failed: {:?}", e))?;
     let txt_val = JsFuture::from(txt_promise)
         .await
         .map_err(|e| format!("await text failed: {:?}", e))?;
@@ -357,7 +355,9 @@ pub fn OnboardingModal() -> impl IntoView {
     let on_submit = move |_: web_sys::MouseEvent| {
         let name = username.get_untracked().trim().to_string();
         if !is_valid_format(&name) {
-            submit_error.set(Some("Please enter a valid username (3-30 chars, a-z, 0-9, _, -, no leading -/_)".into()));
+            submit_error.set(Some(
+                "Please enter a valid username (3-30 chars, a-z, 0-9, _, -, no leading -/_)".into(),
+            ));
             return;
         }
         let pubkey = match auth.pubkey().get_untracked() {
@@ -395,10 +395,11 @@ pub fn OnboardingModal() -> impl IntoView {
             match result {
                 Ok(text) => {
                     // Optimistically treat any 2xx body as success; surface error string only if present.
-                    let parsed: ClaimResponse = serde_json::from_str(&text).unwrap_or(ClaimResponse {
-                        success: Some(true),
-                        error: None,
-                    });
+                    let parsed: ClaimResponse =
+                        serde_json::from_str(&text).unwrap_or(ClaimResponse {
+                            success: Some(true),
+                            error: None,
+                        });
                     if let Some(err) = parsed.error.filter(|e| !e.is_empty()) {
                         submit_error.set(Some(err));
                         is_submitting.set(false);
@@ -452,7 +453,8 @@ pub fn OnboardingModal() -> impl IntoView {
                     } else if msg.contains("HTTP") {
                         format!("Server rejected the request ({})", msg)
                     } else {
-                        "Username service is temporarily unavailable. Please try again later.".to_string()
+                        "Username service is temporarily unavailable. Please try again later."
+                            .to_string()
                     };
                     submit_error.set(Some(user_msg));
                     is_submitting.set(false);
@@ -490,7 +492,8 @@ pub fn OnboardingModal() -> impl IntoView {
     };
 
     // Status indicator below the input.
-    let status_view = move || match check_state.get() {
+    let status_view = move || {
+        match check_state.get() {
         CheckState::Idle => view! {
             <p class="text-xs text-gray-500">"3-30 chars: a-z, 0-9, _ or -"</p>
         }
@@ -519,6 +522,7 @@ pub fn OnboardingModal() -> impl IntoView {
             </p>
         }
         .into_any(),
+    }
     };
 
     let can_submit = move || {
@@ -670,7 +674,10 @@ pub async fn release_username() -> Result<(), String> {
             if msg.contains("HTTP") {
                 Err(format!("Server rejected the request ({})", msg))
             } else {
-                Err("Username service is temporarily unavailable. Please try again later.".to_string())
+                Err(
+                    "Username service is temporarily unavailable. Please try again later."
+                        .to_string(),
+                )
             }
         }
     }

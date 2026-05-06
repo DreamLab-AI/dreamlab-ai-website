@@ -162,7 +162,9 @@ pub async fn check(
         .map_err(|e| UsernameError::Backend(format!("D1 unavailable: {e}")))?;
 
     let stmt = db
-        .prepare("SELECT pubkey FROM username_reservations WHERE username = ?1 AND status = 'active'")
+        .prepare(
+            "SELECT pubkey FROM username_reservations WHERE username = ?1 AND status = 'active'",
+        )
         .bind(&[JsValue::from_str(username)])
         .map_err(|e| UsernameError::Backend(format!("bind failed: {e}")))?;
 
@@ -279,7 +281,10 @@ pub async fn lookup_by_pubkey(
 ///
 /// Also clears the `POD_META.nip05:{username}` KV mapping so subsequent
 /// NIP-05 lookups return 404 immediately.
-pub async fn release(env: &Env, pubkey: &str) -> std::result::Result<Option<String>, UsernameError> {
+pub async fn release(
+    env: &Env,
+    pubkey: &str,
+) -> std::result::Result<Option<String>, UsernameError> {
     let existing = lookup_by_pubkey(env, pubkey).await?;
     let Some(username) = existing else {
         return Ok(None);
@@ -339,11 +344,7 @@ pub async fn handle_check(query: &[(String, String)], env: &Env) -> Result<Respo
             &json!({ "available": true, "claimed_by": serde_json::Value::Null }),
             200,
         ),
-        Ok(Some(pk)) => json_response(
-            env,
-            &json!({ "available": false, "claimed_by": pk }),
-            200,
-        ),
+        Ok(Some(pk)) => json_response(env, &json!({ "available": false, "claimed_by": pk }), 200),
         Err(e) => error_json(env, &e.message(), e.http_status()),
     }
 }
@@ -395,11 +396,7 @@ pub async fn handle_release(
     };
 
     match release(env, &pubkey).await {
-        Ok(Some(username)) => json_response(
-            env,
-            &json!({ "ok": true, "released": username }),
-            200,
-        ),
+        Ok(Some(username)) => json_response(env, &json!({ "ok": true, "released": username }), 200),
         Ok(None) => json_response(
             env,
             &json!({ "ok": true, "released": serde_json::Value::Null }),
@@ -523,9 +520,6 @@ mod tests {
         assert_eq!(UsernameError::Reserved.http_status(), 400);
         assert_eq!(UsernameError::UsernameTaken.http_status(), 409);
         assert_eq!(UsernameError::PubkeyHasUsername.http_status(), 409);
-        assert_eq!(
-            UsernameError::Backend("x".into()).http_status(),
-            500
-        );
+        assert_eq!(UsernameError::Backend("x".into()).http_status(), 500);
     }
 }

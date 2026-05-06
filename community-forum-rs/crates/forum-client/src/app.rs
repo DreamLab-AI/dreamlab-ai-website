@@ -498,16 +498,13 @@ fn Layout(children: Children) -> impl IntoView {
     let display_name = Memo::new(move |_| {
         if let Some(pk) = pubkey.get() {
             if !pk.is_empty() {
-                let resolved =
-                    crate::components::user_display::use_display_name(&pk);
+                let resolved = crate::components::user_display::use_display_name(&pk);
                 if !resolved.is_empty() {
                     return resolved;
                 }
             }
         }
-        nickname
-            .get()
-            .unwrap_or_else(|| "Anonymous".to_string())
+        nickname.get().unwrap_or_else(|| "Anonymous".to_string())
     });
 
     let zone_access = crate::stores::zone_access::use_zone_access();
