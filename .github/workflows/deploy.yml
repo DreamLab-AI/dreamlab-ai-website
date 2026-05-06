@@ -111,10 +111,14 @@ jobs:
 
       - name: Build Leptos forum with Trunk
         working-directory: community-forum-rs/crates/forum-client
-        # bulk-memory disabled via community-forum-rs/.cargo/config.toml so the
-        # flag participates in the artifact hash and survives cache reuse.
-        # RUSTFLAGS env was unreliable across runs.
-        run: trunk build --release --public-url /community/
+        # FIXME: --release runs Trunk's bundled wasm-opt 122 which fails
+        # validation on Rust 1.90's bulk-memory ops without --enable-bulk-memory-opt.
+        # Trunk (0.21.12) doesn't expose flag passthrough for wasm-opt and
+        # `[tools] wasm_opt = false` is rejected as invalid TOML. Build without
+        # --release to skip Trunk's wasm-opt step entirely. Tradeoff:
+        # ~3-5x larger /community/ WASM bundle. Follow-up: wire a post_build
+        # hook that calls a manually-installed wasm-opt with the right flag.
+        run: trunk build --public-url /community/
 
       # ── Combine outputs ────────────────────────────────────────────────
       - name: Merge React + Forum into dist/
