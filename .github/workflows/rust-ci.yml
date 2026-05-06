@@ -18,7 +18,7 @@ permissions:
 env:
   CARGO_TERM_COLOR: always
   MANIFEST: community-forum-rs/Cargo.toml
-  RUST_TOOLCHAIN: '1.87.0'
+  RUST_TOOLCHAIN: '1.90.0'
 
 jobs:
   fmt:
@@ -29,7 +29,7 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@1.87.0
+      - uses: dtolnay/rust-toolchain@1.90.0
         with:
           components: rustfmt
       - run: cargo fmt --manifest-path ${{ env.MANIFEST }} --all -- --check
@@ -42,7 +42,7 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@1.87.0
+      - uses: dtolnay/rust-toolchain@1.90.0
         with:
           components: clippy
       - uses: actions/cache@v4
@@ -63,7 +63,7 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@1.87.0
+      - uses: dtolnay/rust-toolchain@1.90.0
       - uses: actions/cache@v4
         with:
           path: |
@@ -82,7 +82,7 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@1.87.0
+      - uses: dtolnay/rust-toolchain@1.90.0
         with:
           targets: wasm32-unknown-unknown
       - uses: actions/cache@v4
@@ -107,7 +107,7 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@1.87.0
+      - uses: dtolnay/rust-toolchain@1.90.0
         with:
           targets: wasm32-unknown-unknown
       - uses: actions/cache@v4
