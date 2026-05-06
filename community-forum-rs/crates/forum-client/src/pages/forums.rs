@@ -134,8 +134,7 @@ pub fn ForumsPage() -> impl IntoView {
     });
 
     view! {
-        // Onboarding modal — shown once to new users on first login
-        <crate::components::onboarding_modal::OnboardingModal />
+        // Onboarding modal mounted globally in app.rs Layout — see N3e.
 
         <div class="max-w-6xl mx-auto p-4 sm:p-6">
             // Hero header

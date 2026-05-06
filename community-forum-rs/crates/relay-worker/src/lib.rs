@@ -20,6 +20,7 @@ mod audit;
 mod auth;
 mod moderation;
 mod nip11;
+mod profiles;
 mod relay_do;
 mod trust;
 mod whitelist;
@@ -293,6 +294,18 @@ async fn route(req: Request, env: &Env, path: &str) -> Result<Response> {
         return audit::handle_audit_log_list(&req, env).await;
     }
 
+    // --- Sprint v10: profiles (public, no auth) ---
+
+    if path == "/api/profiles/batch" && method == Method::Post {
+        let mut req = req;
+        let body_bytes = req.bytes().await.unwrap_or_default();
+        return profiles::handle_batch(&req, &body_bytes, env).await;
+    }
+
+    if path == "/api/profiles/search" && method == Method::Get {
+        return profiles::handle_search(&req, env).await;
+    }
+
     json_response(&req, env, &serde_json::json!({ "error": "Not found" }), 404)
 }
 
@@ -383,6 +396,21 @@ async fn ensure_schema(env: &Env) {
             event_id TEXT NOT NULL, \
             created_at INTEGER NOT NULL\
         )",
+        // Sprint v10: projection of the most-recent kind-0 per pubkey, with
+        // the JSON content fields parsed into typed columns. Maintained by
+        // the kind-0 ingest hook in `relay_do::storage::save_event`.
+        "CREATE TABLE IF NOT EXISTS profiles (\
+            pubkey TEXT PRIMARY KEY NOT NULL, \
+            name TEXT, \
+            display_name TEXT, \
+            picture TEXT, \
+            banner TEXT, \
+            about TEXT, \
+            nip05 TEXT, \
+            lud16 TEXT, \
+            last_kind0_at INTEGER NOT NULL, \
+            raw_event TEXT NOT NULL\
+        )",
     ];
     for stmt in create_stmts {
         let _ = db.prepare(stmt).run().await;
@@ -403,6 +431,10 @@ async fn ensure_schema(env: &Env) {
         // p-tag recipient filtering is applied via the tags LIKE pattern at query time;
         // this index narrows the scan to kind-1059 rows first.
         "CREATE INDEX IF NOT EXISTS idx_events_kind ON events(kind)",
+        // Sprint v10: profiles indexes for batch lookup and prefix typeahead.
+        "CREATE INDEX IF NOT EXISTS idx_profiles_name ON profiles(name)",
+        "CREATE INDEX IF NOT EXISTS idx_profiles_display_name ON profiles(display_name)",
+        "CREATE INDEX IF NOT EXISTS idx_profiles_last_kind0 ON profiles(last_kind0_at DESC)",
     ];
     for stmt in index_stmts {
         let _ = db.prepare(stmt).run().await;

@@ -111,17 +111,17 @@ const Testimonials = () => {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="/masterclass#pricing"
+              href="/programmes"
               className="inline-flex items-center justify-center px-8 py-4 rounded-lg bg-gradient-to-r from-cyan-600 to-cyan-500 text-white font-semibold hover:shadow-xl hover:shadow-cyan-500/30 transition-all hover:scale-105"
             >
-              1-Day Workshop
+              View Programmes
               <ArrowRight className="ml-2 w-5 h-5" />
             </a>
             <a
-              href="/residential-training"
+              href="/contact"
               className="inline-flex items-center justify-center px-8 py-4 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold hover:shadow-xl hover:shadow-purple-500/30 transition-all hover:scale-105"
             >
-              Advanced Residential
+              Talk to Us
               <ArrowRight className="ml-2 w-5 h-5" />
             </a>
           </div>

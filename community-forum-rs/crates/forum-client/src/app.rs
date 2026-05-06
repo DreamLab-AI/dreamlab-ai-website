@@ -14,6 +14,7 @@ use crate::components::global_search::GlobalSearch;
 use crate::components::message_bubble::{provide_profile_modal_target, ProfileModalTarget};
 use crate::components::mobile_bottom_nav::{provide_unread_dm_count, MobileBottomNav};
 use crate::components::notification_bell::{provide_notifications, NotificationBell};
+use crate::components::onboarding_modal::{provide_onboarding_prefill, OnboardingModal};
 use crate::components::profile_modal::ProfileModal;
 use crate::components::screen_reader::{provide_announcer, ScreenReaderAnnouncer};
 use crate::components::session_timeout::SessionTimeout;
@@ -28,6 +29,7 @@ use crate::relay::{ConnectionState, RelayConnection};
 use crate::stores::channels::{provide_channel_store, use_channel_store};
 use crate::stores::mute::provide_mute_store;
 use crate::stores::preferences::provide_preferences;
+use crate::stores::profile_cache::{provide_profile_cache, try_use_profile_cache};
 use crate::stores::read_position::provide_read_positions;
 use crate::stores::zone_access::provide_zone_access;
 
@@ -197,7 +199,9 @@ pub fn App() -> impl IntoView {
     provide_bookmarks();
     provide_unread_dm_count();
     provide_name_cache();
+    provide_profile_cache();
     provide_profile_modal_target();
+    provide_onboarding_prefill();
     provide_read_positions();
     provide_mute_store();
     provide_preferences();
@@ -339,6 +343,42 @@ pub fn App() -> impl IntoView {
         });
     }
 
+    // Subscribe to kind-0 metadata events on the relay and feed them into the
+    // ProfileCache so every component that renders a pubkey gets a live
+    // nickname as soon as the relay sends it. The subscription is unfiltered
+    // (no `authors`) so we receive any kind-0 the relay emits — typically
+    // the contact graph plus anyone who posts in our channels.
+    {
+        let kind0_sub_started = RwSignal::new(false);
+        let relay_state = relay.connection_state();
+        Effect::new(move |_| {
+            if relay_state.get() != ConnectionState::Connected {
+                return;
+            }
+            if kind0_sub_started.get_untracked() {
+                return;
+            }
+            let cache = match try_use_profile_cache() {
+                Some(c) => c,
+                None => return,
+            };
+            let r = expect_context::<RelayConnection>();
+            let filter = crate::relay::Filter {
+                kinds: Some(vec![0]),
+                limit: Some(500),
+                ..Default::default()
+            };
+            let on_event: crate::relay::EventCallback =
+                std::rc::Rc::new(move |event: nostr_core::NostrEvent| {
+                    if event.kind == 0 && !event.content.is_empty() {
+                        cache.upsert_from_kind0(&event.pubkey, &event.content, event.created_at);
+                    }
+                });
+            r.subscribe(vec![filter], on_event, None);
+            kind0_sub_started.set(true);
+        });
+    }
+
     // Start channel sync once relay connects (single subscription for all pages)
     let relay_conn = relay.connection_state();
     Effect::new(move |_| {
@@ -452,13 +492,22 @@ fn Layout(children: Children) -> impl IntoView {
         }
     };
 
+    // Resolve the logged-in user's display name through the layered profile
+    // cache. Falls back to `auth.nickname()` (set during onboarding) and
+    // finally to a shortened hex key + "Anonymous".
     let display_name = Memo::new(move |_| {
-        nickname.get().unwrap_or_else(|| {
-            pubkey
-                .get()
-                .map(|pk| format!("{}...", &pk[..8]))
-                .unwrap_or_else(|| "Anonymous".to_string())
-        })
+        if let Some(pk) = pubkey.get() {
+            if !pk.is_empty() {
+                let resolved =
+                    crate::components::user_display::use_display_name(&pk);
+                if !resolved.is_empty() {
+                    return resolved;
+                }
+            }
+        }
+        nickname
+            .get()
+            .unwrap_or_else(|| "Anonymous".to_string())
     });
 
     let zone_access = crate::stores::zone_access::use_zone_access();
@@ -655,6 +704,9 @@ fn Layout(children: Children) -> impl IntoView {
             <SessionTimeout />
             <MobileBottomNav />
             <BookmarksModal is_open=bookmarks_open />
+            // Username onboarding modal — self-gates on auth + localStorage flags
+            <OnboardingModal />
+
             {move || {
                 let pk = profile_target_pk.get();
                 (!pk.is_empty()).then(|| view! {

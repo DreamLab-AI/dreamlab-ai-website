@@ -335,6 +335,44 @@ impl ForumDb {
         Ok(Some(from_js::<CachedProfile>(result)?))
     }
 
+    /// Retrieve all cached profiles. Used to warm-start the in-memory profile
+    /// cache on app boot so nicknames render synchronously without waiting
+    /// for the network.
+    pub async fn get_all_profiles(&self) -> Result<Vec<CachedProfile>, JsValue> {
+        let tx = self
+            .db
+            .transaction_with_str_and_mode(STORE_PROFILES, IdbTransactionMode::Readonly)?;
+        let store = tx.object_store(STORE_PROFILES)?;
+        let req = store.get_all()?;
+        let result = idb_request_result(&req).await?;
+        let arr: js_sys::Array = result.dyn_into().unwrap_or_else(|_| js_sys::Array::new());
+        let mut profiles: Vec<CachedProfile> = Vec::with_capacity(arr.length() as usize);
+        for i in 0..arr.length() {
+            if let Ok(p) = from_js::<CachedProfile>(arr.get(i)) {
+                profiles.push(p);
+            }
+        }
+        Ok(profiles)
+    }
+
+    /// Bulk-insert cached profiles in a single transaction. Used when
+    /// hydrating the profile cache from a batch fetch response.
+    pub async fn put_profiles(&self, profiles: &[CachedProfile]) -> Result<(), JsValue> {
+        if profiles.is_empty() {
+            return Ok(());
+        }
+        let tx = self
+            .db
+            .transaction_with_str_and_mode(STORE_PROFILES, IdbTransactionMode::Readwrite)?;
+        let store = tx.object_store(STORE_PROFILES)?;
+        for profile in profiles {
+            let js_val = to_js(profile)?;
+            let req = store.put(&js_val)?;
+            idb_request_result(&req).await?;
+        }
+        Ok(())
+    }
+
     // -- Outbox (offline queue) ---------------------------------------------
 
     /// Queue an outgoing event for later publishing when connectivity returns.

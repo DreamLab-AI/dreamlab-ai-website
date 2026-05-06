@@ -188,4 +188,20 @@ pub async fn ensure_schema(env: &Env) {
         .prepare("INSERT OR IGNORE INTO instance_settings (id) VALUES (1)")
         .run()
         .await;
+
+    // --- Sprint v10: username reservations (idempotent) -----------------
+    let username_stmts = [
+        "CREATE TABLE IF NOT EXISTS username_reservations (\
+            username TEXT PRIMARY KEY NOT NULL \
+                CHECK (length(username) BETWEEN 3 AND 30), \
+            pubkey TEXT NOT NULL UNIQUE, \
+            created_at INTEGER NOT NULL DEFAULT (unixepoch()), \
+            status TEXT NOT NULL DEFAULT 'active'\
+        )",
+        "CREATE INDEX IF NOT EXISTS idx_username_reservations_pubkey \
+         ON username_reservations(pubkey)",
+    ];
+    for stmt in username_stmts {
+        let _ = db.prepare(stmt).run().await;
+    }
 }

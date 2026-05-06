@@ -21,6 +21,7 @@ mod moderation;
 mod pod;
 mod rate_limit;
 mod schema;
+mod username;
 mod webauthn;
 mod welcome;
 mod wot;
@@ -444,6 +445,20 @@ async fn route_sprint_api(
     // -- NIP-26 Delegation verification (stub for W6) -------------------
     if path == "/api/delegation/verify" && *method == Method::Post {
         let resp = delegation::handle_verify(body_bytes, auth_header, env).await?;
+        return Ok(Some(resp));
+    }
+
+    // -- Sprint v10: username reservations ------------------------------
+    if path == "/api/username/check" && *method == Method::Get {
+        let resp = username::handle_check(&query, env).await?;
+        return Ok(Some(resp));
+    }
+    if path == "/api/username/claim" && *method == Method::Post {
+        let resp = username::handle_claim(body_bytes, auth_header, env).await?;
+        return Ok(Some(resp));
+    }
+    if path == "/api/username/release" && *method == Method::Post {
+        let resp = username::handle_release(body_bytes, auth_header, env).await?;
         return Ok(Some(resp));
     }
 

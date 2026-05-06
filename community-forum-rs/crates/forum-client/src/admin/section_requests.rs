@@ -303,7 +303,9 @@ fn approve_request(
     let event_id = req.event_id.clone();
     let cohort = req.cohort.clone();
     let pk = req.requester.clone();
-    let pk_display = crate::utils::shorten_pubkey(&pk);
+    // Resolve nickname via the layered profile cache when possible — toasts
+    // and admin actions read better with names than with hex prefixes.
+    let pk_display = crate::components::user_display::use_display_name(&pk);
 
     spawn_local(async move {
         // Add cohort to user's whitelist entry

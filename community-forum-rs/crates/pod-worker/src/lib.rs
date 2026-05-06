@@ -169,6 +169,34 @@ fn json_error(env: &Env, message: &str, status: u16) -> Result<Response> {
     Ok(resp)
 }
 
+/// Sprint v10: lightweight token-bucket rate limit for `/.well-known/nostr.json`.
+///
+/// Counts requests per IP per 60-second bucket. Returns `true` if the request
+/// is allowed, `false` if the bucket is full. KV failures fail-open (we'd
+/// rather serve a few extra hits than silently 429 every legitimate client
+/// when KV is degraded).
+const NIP05_RL_LIMIT: u32 = 60;
+const NIP05_RL_WINDOW_SECS: u64 = 60;
+
+async fn rl_nostr_json(kv: &worker::kv::KvStore, ip: &str) -> bool {
+    let bucket = (js_sys::Date::now() as u64) / (NIP05_RL_WINDOW_SECS * 1000);
+    let key = format!("rl:nostr_json:{ip}:{bucket}");
+
+    let current: u32 = match kv.get(&key).text().await {
+        Ok(Some(val)) => val.parse().unwrap_or(0),
+        _ => 0,
+    };
+    if current >= NIP05_RL_LIMIT {
+        return false;
+    }
+
+    let next = (current + 1).to_string();
+    if let Ok(builder) = kv.put(&key, &next) {
+        let _ = builder.expiration_ttl(NIP05_RL_WINDOW_SECS).execute().await;
+    }
+    true
+}
+
 /// Build a did:nostr DID document (Tier 3) for the given x-only pubkey hex.
 ///
 /// Delegates to `crate::did::render_did_document_tier3`, which mirrors the
@@ -283,6 +311,27 @@ async fn fetch(mut req: Request, env: Env, _ctx: Context) -> Result<Response> {
 
     // NIP-05 verification
     if path == "/.well-known/nostr.json" {
+        // Sprint v10: rate-limit at 60 req/min per IP via POD_META KV. The
+        // endpoint is otherwise unauthenticated and trivially scrape-able,
+        // so without a budget here a single client could enumerate the
+        // entire username table.
+        let kv = env.kv("POD_META")?;
+        let ip = req
+            .headers()
+            .get("CF-Connecting-IP")
+            .ok()
+            .flatten()
+            .unwrap_or_else(|| "unknown".to_string());
+        if !rl_nostr_json(&kv, &ip).await {
+            let cors = cors_headers(&env);
+            let resp = Response::ok(r#"{"error":"Too many requests"}"#)?
+                .with_status(429)
+                .with_headers(cors);
+            resp.headers().set("Content-Type", "application/json").ok();
+            resp.headers().set("Retry-After", "60").ok();
+            return Ok(resp);
+        }
+
         let name = url
             .query_pairs()
             .find(|(k, _)| k == "name")
@@ -292,7 +341,6 @@ async fn fetch(mut req: Request, env: Env, _ctx: Context) -> Result<Response> {
             return json_error(&env, "Missing name parameter", 400);
         }
         // Look up pubkey from KV: nip05:{name} -> pubkey
-        let kv = env.kv("POD_META")?;
         let key = format!("nip05:{name}");
         let pubkey = kv.get(&key).text().await.ok().flatten();
         if let Some(pk) = pubkey {

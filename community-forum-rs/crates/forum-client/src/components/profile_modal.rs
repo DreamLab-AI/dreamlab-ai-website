@@ -42,6 +42,8 @@ pub(crate) fn ProfileModal(
 
     // Store pubkey in StoredValue so it can be captured in Fn closures
     let pk_stored = StoredValue::new(pubkey.clone());
+    // TODO(nicknames): keep raw shortened npub for the "Public Key" technical
+    // section of the modal — users explicitly want to verify the hex pubkey.
     let short_pk = StoredValue::new(shorten_pubkey(&pubkey));
     let pk_for_avatar = pubkey.clone();
 
