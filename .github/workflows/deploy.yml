@@ -27,7 +27,7 @@ permissions:
 
 env:
   CARGO_TERM_COLOR: always
-  RUST_TOOLCHAIN: '1.85.0'
+  RUST_TOOLCHAIN: '1.87.0'
   TRUNK_VERSION: '0.21.12'
   TRUNK_SHA256: 'e5261930aab979dc5d0388fdc71bc32bedf0a15211ef8c8703fa2b7a2016394b'
   # Production API URLs — baked into WASM via option_env!() at compile time
@@ -82,7 +82,7 @@ jobs:
 
       # ── Rust/WASM forum client ─────────────────────────────────────────
       - name: Install Rust toolchain ${{ env.RUST_TOOLCHAIN }}
-        uses: dtolnay/rust-toolchain@1.85.0
+        uses: dtolnay/rust-toolchain@1.87.0
         with:
           targets: wasm32-unknown-unknown
 

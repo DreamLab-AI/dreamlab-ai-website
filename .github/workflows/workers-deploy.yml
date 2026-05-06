@@ -31,7 +31,7 @@ permissions:
 
 env:
   NODE_VERSION: '20'
-  RUST_TOOLCHAIN: '1.85.0'
+  RUST_TOOLCHAIN: '1.87.0'
   WRANGLER_VERSION: '3.114.17'
   CF_SUBDOMAIN: 'solitary-paper-764d'
 
@@ -74,7 +74,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Rust toolchain ${{ env.RUST_TOOLCHAIN }}
-        uses: dtolnay/rust-toolchain@1.85.0
+        uses: dtolnay/rust-toolchain@1.87.0
         with:
           targets: wasm32-unknown-unknown
 
