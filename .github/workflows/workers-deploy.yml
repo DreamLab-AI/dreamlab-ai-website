@@ -123,57 +123,37 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           set -euo pipefail
-          # Wrangler v3 syntax: `kv:namespace list/create` with colon. The v4
-          # `kv namespace ...` (space) variant is what the runner falls back to
-          # in some PATH layouts; try v3 first, fall back to v4. Output is JSON
-          # ([{title,id}, ...]) in either case.
-          kv_list_json() {
-            wrangler kv:namespace list 2>/dev/null \
-              || wrangler kv namespace list 2>/dev/null \
-              || echo '[]'
-          }
-          kv_create() {
-            local title="$1"
-            wrangler kv:namespace create "$title" 2>&1 \
-              || wrangler kv namespace create "$title" 2>&1 \
-              || true
-          }
+          # Bypass wrangler CLI for KV namespace listing — its `kv:namespace
+          # list` and `kv namespace list` subcommands have silently failed in
+          # this CI image (output captured to /dev/null then misparsed). Use
+          # the Cloudflare REST API directly: we already have an account-scoped
+          # API token in env. Idempotent across re-runs.
+          API_BASE="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/storage/kv/namespaces"
+          AUTH=(-H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" -H "Content-Type: application/json")
+
           resolve_or_create() {
             local title="$1"
             local listing existing
-            listing=$(kv_list_json)
-            existing=$(echo "$listing" | jq -r --arg t "$title" '
-              if type == "array" then
-                (.[] | select(.title == $t) | .id) // empty
-              else empty end
-            ' 2>/dev/null | head -n 1)
-            if [ -n "$existing" ]; then
+            listing=$(curl -fsSL "${API_BASE}?per_page=100" "${AUTH[@]}" || echo '{"result":[]}')
+            existing=$(echo "$listing" | jq -r --arg t "$title" \
+              '.result[]? | select(.title == $t) | .id' | head -n 1)
+            if [ -n "$existing" ] && [ "$existing" != "null" ]; then
               echo "[kv] $title -> $existing (existing)" >&2
               echo "$existing"
               return 0
             fi
-            local out
-            out=$(kv_create "$title")
-            echo "$out" >&2
-            # Wrangler create output formats:
-            #   v3: id = "abc123..."
-            #   v4: { "binding": "X", "id": "abc..." } or similar
+            local create_resp
+            create_resp=$(curl -fsSL -X POST "${API_BASE}" "${AUTH[@]}" \
+              --data "{\"title\":\"${title}\"}" || echo '{}')
             local id
-            id=$(echo "$out" | grep -oE '"id"\s*:\s*"[^"]+"' | head -n 1 \
-              | sed -E 's/.*"id"\s*:\s*"([^"]+)".*/\1/')
-            if [ -z "$id" ]; then
-              id=$(echo "$out" | grep -oE 'id = "[^"]+"' | head -n 1 \
-                | sed -E 's/id = "([^"]+)"/\1/')
+            id=$(echo "$create_resp" | jq -r '.result.id // empty' | head -n 1)
+            if [ -z "$id" ] || [ "$id" = "null" ]; then
+              # Race: another matrix job created it. Re-list.
+              listing=$(curl -fsSL "${API_BASE}?per_page=100" "${AUTH[@]}" || echo '{"result":[]}')
+              id=$(echo "$listing" | jq -r --arg t "$title" \
+                '.result[]? | select(.title == $t) | .id' | head -n 1)
             fi
-            # If create returned "already exists", re-list and try to find it.
-            if [ -z "$id" ] && echo "$out" | grep -q "already exists"; then
-              listing=$(kv_list_json)
-              id=$(echo "$listing" | jq -r --arg t "$title" '
-                if type == "array" then
-                  (.[] | select(.title == $t) | .id) // empty
-                else empty end
-              ' 2>/dev/null | head -n 1)
-            fi
+            echo "[kv] $title -> $id (created)" >&2
             echo "$id"
           }
           for placeholder in REPLACE_WITH_NEW_ADMIN_KV_ID REPLACE_WITH_NEW_NIP98_REPLAY_KV_ID; do
@@ -183,12 +163,12 @@ jobs:
                 REPLACE_WITH_NEW_NIP98_REPLAY_KV_ID)  title="${{ matrix.crate }}-nip98-replay" ;;
               esac
               real_id=$(resolve_or_create "$title")
-              if [ -z "$real_id" ]; then
+              if [ -z "$real_id" ] || [ "$real_id" = "null" ]; then
                 echo "::error::failed to provision KV namespace $title" >&2
                 exit 1
               fi
               sed -i "s/$placeholder/$real_id/g" wrangler.toml
-              echo "[kv] substituted $placeholder -> $real_id in wrangler.toml" >&2
+              echo "[kv] substituted $placeholder -> $real_id" >&2
             fi
           done
 
