@@ -9,14 +9,12 @@ watch = ["src", "../nostr-core/src"]
 address = "127.0.0.1"
 port = 8080
 
-# wasm-opt explicitly disabled until --enable-bulk-memory-opt config lands.
-# Rust 1.90 emits memory.copy/memory.fill ops that wasm-opt rejects without
-# the bulk-memory feature flag. Trunk auto-runs wasm-opt unless `false` is
-# set explicitly — commenting out is not enough. Re-enable via post_build
-# hook with explicit feature flag in a follow-up.
-# Net cost: ~30% larger WASM bundle on /community/.
+# Optimize WASM binary size (~30% reduction).
+# Trunk downloads wasm-opt automatically. We disable bulk-memory codegen at
+# the rustc level via RUSTFLAGS in deploy.yml so wasm-opt can validate the
+# resulting module without needing --enable-bulk-memory-opt.
 [tools]
-wasm_opt = false
+wasm_opt = "version_122"
 
 # WebGPU particle system JS module — copied to dist/js/ for wasm-bindgen import
 [[copy]]

@@ -110,6 +110,53 @@ jobs:
       - name: Install wrangler ${{ env.WRANGLER_VERSION }}
         run: npm install -g wrangler@${{ env.WRANGLER_VERSION }}
 
+      # Sprint v9 added new KV bindings (NIP98_REPLAY for replay-protection
+      # cache; ADMIN_KV / ADMIN_KV_RO to split admin KV namespace from POD_META).
+      # Their `id` fields are placeholders in the committed wrangler.toml.
+      # Resolve them at deploy time: ensure each namespace exists in the
+      # account, capture its ID, substitute into a runner-local copy of
+      # wrangler.toml. Idempotent — re-running creates only what's missing.
+      - name: Provision KV namespaces (sprint v9)
+        working-directory: community-forum-rs/crates/${{ matrix.crate }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          resolve_or_create() {
+            local title="$1"
+            local existing
+            existing=$(wrangler kv namespace list 2>/dev/null \
+              | jq -r --arg t "$title" '.[] | select(.title == $t) | .id' \
+              | head -n 1)
+            if [ -n "$existing" ]; then
+              echo "[kv] $title -> $existing (existing)" >&2
+              echo "$existing"
+            else
+              local out
+              out=$(wrangler kv namespace create "$title" 2>&1 | tee /dev/stderr)
+              echo "$out" | grep -oE 'id = "[^"]+"' | head -n 1 \
+                | sed -E 's/id = "([^"]+)"/\1/'
+            fi
+          }
+          # Substitute each placeholder with a real namespace ID. Naming follows
+          # `{worker}-{purpose}` to keep dashboards readable.
+          for placeholder in REPLACE_WITH_NEW_ADMIN_KV_ID REPLACE_WITH_NEW_NIP98_REPLAY_KV_ID; do
+            if grep -q "$placeholder" wrangler.toml; then
+              case "$placeholder" in
+                REPLACE_WITH_NEW_ADMIN_KV_ID)         title="${{ matrix.crate }}-admin-kv" ;;
+                REPLACE_WITH_NEW_NIP98_REPLAY_KV_ID)  title="${{ matrix.crate }}-nip98-replay" ;;
+              esac
+              real_id=$(resolve_or_create "$title")
+              if [ -z "$real_id" ]; then
+                echo "::error::failed to provision KV namespace $title" >&2
+                exit 1
+              fi
+              sed -i "s/$placeholder/$real_id/g" wrangler.toml
+              echo "[kv] substituted $placeholder -> $real_id in wrangler.toml" >&2
+            fi
+          done
+
       - name: Wrangler deploy ${{ matrix.crate }}
         working-directory: community-forum-rs/crates/${{ matrix.crate }}
         env:
