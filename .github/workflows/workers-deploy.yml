@@ -5,18 +5,8 @@ name: Deploy Cloudflare Workers
 # Runs on DreamLab-AI/dreamlab-ai-website fork only.
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'community-forum-rs/crates/relay-worker/**'
-      - 'community-forum-rs/crates/preview-worker/**'
-      - 'community-forum-rs/crates/pod-worker/**'
-      - 'community-forum-rs/crates/auth-worker/**'
-      - 'community-forum-rs/crates/search-worker/**'
-      - 'community-forum-rs/crates/nostr-core/**'
-      - 'community-forum-rs/Cargo.lock'
-      - '.github/workflows/workers-deploy.yml'
-      - '.github/workflows/test-and-lint.yml'
+  # Temporarily disabled: community-forum-rs/ frozen for kit extraction test.
+  # Workers are already deployed on Cloudflare and remain live.
   workflow_dispatch:
 
 # Cancel in-flight runs of this workflow on the same ref so a newer commit

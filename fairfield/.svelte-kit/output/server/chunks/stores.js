@@ -1,0 +1,1 @@
+import{j as e}from"./ssr.js";import"@sveltejs/kit/internal";import"./exports.js";import"./utils.js";import"@sveltejs/kit/internal/server";import"./state.svelte.js";const s=()=>{const t=e("__svelte__");return{page:{subscribe:t.page.subscribe},navigating:{subscribe:t.navigating.subscribe},updated:t.updated}},c={subscribe(t){return s().page.subscribe(t)}};export{c as p};

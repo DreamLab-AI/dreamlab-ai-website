@@ -1,0 +1,78 @@
+{
+	"/": [
+		"src/routes/+layout.ts",
+		"src/routes/+layout.ts"
+	],
+	"/admin": [
+		"src/routes/admin/+page.ts",
+		"src/routes/+layout.ts"
+	],
+	"/admin/calendar": [
+		"src/routes/+layout.ts"
+	],
+	"/admin/stats": [
+		"src/routes/+layout.ts"
+	],
+	"/api/proxy": [
+		"src/routes/api/proxy/+server.ts"
+	],
+	"/chat": [
+		"src/routes/chat/+page.ts",
+		"src/routes/+layout.ts",
+		"src/routes/+layout.ts"
+	],
+	"/chat/[channelId]": [
+		"src/routes/chat/[channelId]/+page.ts",
+		"src/routes/+layout.ts"
+	],
+	"/dm": [
+		"src/routes/dm/+page.ts",
+		"src/routes/+layout.ts"
+	],
+	"/dm/[pubkey]": [
+		"src/routes/dm/[pubkey]/+page.ts",
+		"src/routes/+layout.ts"
+	],
+	"/events": [
+		"src/routes/+layout.ts",
+		"src/routes/+layout.ts"
+	],
+	"/forums": [
+		"src/routes/+layout.ts"
+	],
+	"/login": [
+		"src/routes/+layout.ts"
+	],
+	"/pending": [
+		"src/routes/+layout.ts"
+	],
+	"/settings/muted": [
+		"src/routes/+layout.ts"
+	],
+	"/setup": [
+		"src/routes/setup/+page.ts",
+		"src/routes/+layout.ts"
+	],
+	"/signup": [
+		"src/routes/+layout.ts"
+	],
+	"/view/[noteId]": [
+		"src/routes/view/[noteId]/+page.ts",
+		"src/routes/+layout.ts"
+	],
+	"/[category]": [
+		"src/routes/+layout.ts"
+	],
+	"/[section]/calendar": [
+		"src/routes/+layout.ts"
+	],
+	"/[category]/[section]": [
+		"src/routes/+layout.ts"
+	],
+	"/[category]/[section]/calendar": [
+		"src/routes/+layout.ts"
+	],
+	"/[category]/[section]/[forumId]": [
+		"src/routes/+layout.ts"
+	]
+}

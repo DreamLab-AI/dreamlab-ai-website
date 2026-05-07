@@ -1,0 +1,834 @@
+{
+  ".svelte-kit/generated/server/internal.js": {
+    "file": "internal.js",
+    "name": "internal",
+    "src": ".svelte-kit/generated/server/internal.js",
+    "isEntry": true,
+    "imports": [
+      "_internal.js",
+      "_environment.js",
+      "_server.js"
+    ]
+  },
+  "_ActivityGraph.svelte_svelte_type_style_lang.js": {
+    "file": "chunks/ActivityGraph.svelte_svelte_type_style_lang.js",
+    "name": "ActivityGraph.svelte_svelte_type_style_lang",
+    "imports": [
+      "_index.js",
+      "_db.js",
+      "_ssr.js"
+    ],
+    "css": [
+      "_app/immutable/assets/ActivityGraph.CmaA8n_7.css"
+    ]
+  },
+  "_AvailabilityBlockRenderer.svelte_svelte_type_style_lang.js": {
+    "file": "_app/immutable/assets/AvailabilityBlockRenderer.DmRYWbPT.css",
+    "src": "_AvailabilityBlockRenderer.svelte_svelte_type_style_lang.js"
+  },
+  "_Avatar.svelte_svelte_type_style_lang.js": {
+    "file": "_app/immutable/assets/Avatar.BY0jTnLk.css",
+    "src": "_Avatar.svelte_svelte_type_style_lang.js"
+  },
+  "_CalendarSheet.svelte_svelte_type_style_lang.js": {
+    "file": "chunks/CalendarSheet.svelte_svelte_type_style_lang.js",
+    "name": "CalendarSheet.svelte_svelte_type_style_lang",
+    "imports": [
+      "_index.js",
+      "src/lib/nostr/relay.ts",
+      "_loader.js"
+    ],
+    "css": [
+      "_app/immutable/assets/CalendarSheet.DHd-cMcb.css"
+    ]
+  },
+  "_Modal.js": {
+    "file": "chunks/Modal.js",
+    "name": "Modal",
+    "imports": [
+      "_ssr.js"
+    ],
+    "css": [
+      "_app/immutable/assets/Modal.kJ4MdHVi.css"
+    ]
+  },
+  "_Modal.svelte_svelte_type_style_lang.js": {
+    "file": "_app/immutable/assets/Modal.kJ4MdHVi.css",
+    "src": "_Modal.svelte_svelte_type_style_lang.js"
+  },
+  "_ModeratorTeam.js": {
+    "file": "chunks/ModeratorTeam.js",
+    "name": "ModeratorTeam",
+    "imports": [
+      "_ssr.js",
+      "src/lib/nostr/relay.ts",
+      "_profiles.js",
+      "_loader.js",
+      "_exports.js",
+      "_utils.js",
+      "_state.svelte.js"
+    ],
+    "css": [
+      "_app/immutable/assets/ModeratorTeam.DGnaTJYY.css"
+    ]
+  },
+  "_PendingApproval.svelte_svelte_type_style_lang.js": {
+    "file": "_app/immutable/assets/PendingApproval.lZT0MPyG.css",
+    "src": "_PendingApproval.svelte_svelte_type_style_lang.js"
+  },
+  "_Toast.svelte_svelte_type_style_lang.js": {
+    "file": "_app/immutable/assets/Toast.C4J9ClzN.css",
+    "src": "_Toast.svelte_svelte_type_style_lang.js"
+  },
+  "_UserDisplay.svelte_svelte_type_style_lang.js": {
+    "file": "_app/immutable/assets/UserDisplay.DBwfNe3u.css",
+    "src": "_UserDisplay.svelte_svelte_type_style_lang.js"
+  },
+  "_channelStore.js": {
+    "file": "chunks/channelStore.js",
+    "name": "channelStore",
+    "imports": [
+      "_index.js"
+    ]
+  },
+  "_db.js": {
+    "file": "chunks/db.js",
+    "name": "db"
+  },
+  "_dm.js": {
+    "file": "chunks/dm.js",
+    "name": "dm",
+    "imports": [
+      "_index.js",
+      "_loader.js",
+      "_mute.js",
+      "_profiles.js",
+      "_ssr.js"
+    ],
+    "dynamicImports": [
+      "src/lib/nostr/relay.ts",
+      "src/lib/nostr/relay.ts",
+      "_loader.js",
+      "src/lib/nostr/relay.ts"
+    ]
+  },
+  "_environment.js": {
+    "file": "chunks/environment.js",
+    "name": "environment"
+  },
+  "_exports.js": {
+    "file": "chunks/exports.js",
+    "name": "exports"
+  },
+  "_identicon.js": {
+    "file": "chunks/identicon.js",
+    "name": "identicon"
+  },
+  "_index.js": {
+    "file": "chunks/index.js",
+    "name": "index",
+    "imports": [
+      "_ssr.js"
+    ]
+  },
+  "_internal.js": {
+    "file": "chunks/internal.js",
+    "name": "internal",
+    "imports": [
+      "_ssr.js",
+      "_ssr2.js",
+      "_environment.js",
+      "_server.js"
+    ],
+    "dynamicImports": [
+      "src/hooks.server.ts"
+    ]
+  },
+  "_loader.js": {
+    "file": "chunks/loader.js",
+    "name": "loader",
+    "isDynamicEntry": true,
+    "imports": [
+      "_index.js"
+    ]
+  },
+  "_mute.js": {
+    "file": "chunks/mute.js",
+    "name": "mute",
+    "imports": [
+      "_index.js",
+      "_ssr.js"
+    ]
+  },
+  "_notifications.js": {
+    "file": "chunks/notifications.js",
+    "name": "notifications",
+    "imports": [
+      "_index.js",
+      "_user.js"
+    ]
+  },
+  "_permissions.js": {
+    "file": "chunks/permissions.js",
+    "name": "permissions",
+    "imports": [
+      "_loader.js"
+    ]
+  },
+  "_profiles.js": {
+    "file": "chunks/profiles.js",
+    "name": "profiles",
+    "imports": [
+      "_index.js",
+      "src/lib/nostr/relay.ts",
+      "_loader.js",
+      "_ssr.js"
+    ]
+  },
+  "_readPosition.js": {
+    "file": "chunks/readPosition.js",
+    "name": "readPosition",
+    "imports": [
+      "_index.js",
+      "_ssr.js"
+    ]
+  },
+  "_server.js": {
+    "file": "chunks/server.js",
+    "name": "server"
+  },
+  "_shared.js": {
+    "file": "chunks/shared.js",
+    "name": "shared",
+    "imports": [
+      "_utils.js"
+    ]
+  },
+  "_ssr.js": {
+    "file": "chunks/ssr.js",
+    "name": "ssr"
+  },
+  "_ssr2.js": {
+    "file": "chunks/ssr2.js",
+    "name": "ssr"
+  },
+  "_state.svelte.js": {
+    "file": "chunks/state.svelte.js",
+    "name": "state.svelte",
+    "imports": [
+      "_ssr2.js"
+    ]
+  },
+  "_stores.js": {
+    "file": "chunks/stores.js",
+    "name": "stores",
+    "imports": [
+      "_ssr.js",
+      "_exports.js",
+      "_utils.js",
+      "_state.svelte.js"
+    ]
+  },
+  "_toast.js": {
+    "file": "chunks/toast.js",
+    "name": "toast",
+    "imports": [
+      "_index.js"
+    ]
+  },
+  "_user.js": {
+    "file": "chunks/user.js",
+    "name": "user",
+    "imports": [
+      "_index.js",
+      "_loader.js",
+      "_profiles.js"
+    ]
+  },
+  "_userPermissions.js": {
+    "file": "chunks/userPermissions.js",
+    "name": "userPermissions",
+    "imports": [
+      "_index.js",
+      "_loader.js",
+      "_user.js"
+    ]
+  },
+  "_utils.js": {
+    "file": "chunks/utils.js",
+    "name": "utils"
+  },
+  "node_modules/@sveltejs/kit/src/runtime/app/server/remote/index.js": {
+    "file": "remote-entry.js",
+    "name": "remote-entry",
+    "src": "node_modules/@sveltejs/kit/src/runtime/app/server/remote/index.js",
+    "isEntry": true,
+    "imports": [
+      "_shared.js",
+      "_server.js",
+      "_environment.js"
+    ]
+  },
+  "node_modules/@sveltejs/kit/src/runtime/components/svelte-4/error.svelte": {
+    "file": "entries/fallbacks/error.svelte.js",
+    "name": "entries/fallbacks/error.svelte",
+    "src": "node_modules/@sveltejs/kit/src/runtime/components/svelte-4/error.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js",
+      "_stores.js"
+    ]
+  },
+  "node_modules/@sveltejs/kit/src/runtime/server/index.js": {
+    "file": "index.js",
+    "name": "index",
+    "src": "node_modules/@sveltejs/kit/src/runtime/server/index.js",
+    "isEntry": true,
+    "imports": [
+      "_shared.js",
+      "_server.js",
+      "_exports.js",
+      "_utils.js",
+      "_index.js",
+      "_internal.js"
+    ]
+  },
+  "src/hooks.server.ts": {
+    "file": "chunks/hooks.server.js",
+    "name": "hooks.server",
+    "src": "src/hooks.server.ts",
+    "isDynamicEntry": true
+  },
+  "src/lib/nostr/relay.ts": {
+    "file": "chunks/relay.js",
+    "name": "relay",
+    "src": "src/lib/nostr/relay.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_loader.js",
+      "_index.js"
+    ]
+  },
+  "src/lib/nostr/sections.ts": {
+    "file": "chunks/sections.js",
+    "name": "sections",
+    "src": "src/lib/nostr/sections.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "src/lib/nostr/relay.ts",
+      "_loader.js",
+      "src/routes/admin/+page.svelte"
+    ]
+  },
+  "src/routes/+layout.svelte": {
+    "file": "entries/pages/_layout.svelte.js",
+    "name": "entries/pages/_layout.svelte",
+    "src": "src/routes/+layout.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js",
+      "_stores.js",
+      "_server.js",
+      "_exports.js",
+      "_utils.js",
+      "_state.svelte.js",
+      "_loader.js",
+      "_index.js",
+      "_CalendarSheet.svelte_svelte_type_style_lang.js",
+      "_notifications.js",
+      "_db.js",
+      "_user.js",
+      "_toast.js",
+      "src/lib/nostr/relay.ts",
+      "_profiles.js",
+      "_userPermissions.js"
+    ],
+    "css": [
+      "_app/immutable/assets/_layout.BAqshgBH.css",
+      "_app/immutable/assets/Toast.C4J9ClzN.css",
+      "_app/immutable/assets/AvailabilityBlockRenderer.DmRYWbPT.css"
+    ]
+  },
+  "src/routes/+layout.ts": {
+    "file": "entries/pages/_layout.ts.js",
+    "name": "entries/pages/_layout.ts",
+    "src": "src/routes/+layout.ts",
+    "isEntry": true
+  },
+  "src/routes/+page.svelte": {
+    "file": "entries/pages/_page.svelte.js",
+    "name": "entries/pages/_page.svelte",
+    "src": "src/routes/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js",
+      "_exports.js",
+      "_utils.js",
+      "_server.js",
+      "_state.svelte.js",
+      "_loader.js"
+    ]
+  },
+  "src/routes/[category]/+page.svelte": {
+    "file": "entries/pages/_category_/_page.svelte.js",
+    "name": "entries/pages/_category_/_page.svelte",
+    "src": "src/routes/[category]/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js",
+      "_exports.js",
+      "_utils.js",
+      "_state.svelte.js",
+      "_stores.js",
+      "_loader.js",
+      "_user.js",
+      "src/lib/nostr/relay.ts"
+    ]
+  },
+  "src/routes/[category]/[section]/+page.svelte": {
+    "file": "entries/pages/_category_/_section_/_page.svelte.js",
+    "name": "entries/pages/_category_/_section_/_page.svelte",
+    "src": "src/routes/[category]/[section]/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js",
+      "_exports.js",
+      "_utils.js",
+      "_state.svelte.js",
+      "_stores.js",
+      "_loader.js",
+      "_user.js",
+      "src/lib/nostr/relay.ts",
+      "_readPosition.js",
+      "_profiles.js"
+    ]
+  },
+  "src/routes/[category]/[section]/[forumId]/+page.svelte": {
+    "file": "entries/pages/_category_/_section_/_forumId_/_page.svelte.js",
+    "name": "entries/pages/_category_/_section_/_forumId_/_page.svelte",
+    "src": "src/routes/[category]/[section]/[forumId]/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js",
+      "_exports.js",
+      "_utils.js",
+      "_state.svelte.js",
+      "_stores.js",
+      "_loader.js",
+      "_user.js",
+      "src/lib/nostr/relay.ts"
+    ]
+  },
+  "src/routes/[category]/[section]/calendar/+page.svelte": {
+    "file": "entries/pages/_category_/_section_/calendar/_page.svelte.js",
+    "name": "entries/pages/_category_/_section_/calendar/_page.svelte",
+    "src": "src/routes/[category]/[section]/calendar/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js",
+      "_exports.js",
+      "_utils.js",
+      "_state.svelte.js",
+      "_stores.js",
+      "_loader.js",
+      "_user.js",
+      "_userPermissions.js",
+      "src/lib/nostr/relay.ts",
+      "_server.js"
+    ],
+    "css": [
+      "_app/immutable/assets/AvailabilityBlockRenderer.DmRYWbPT.css"
+    ]
+  },
+  "src/routes/[section]/calendar/+page.svelte": {
+    "file": "entries/pages/_section_/calendar/_page.svelte.js",
+    "name": "entries/pages/_section_/calendar/_page.svelte",
+    "src": "src/routes/[section]/calendar/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js",
+      "_exports.js",
+      "_utils.js",
+      "_state.svelte.js",
+      "_stores.js",
+      "_loader.js",
+      "_user.js",
+      "src/lib/nostr/relay.ts",
+      "_Modal.js"
+    ],
+    "css": [
+      "_app/immutable/assets/AvailabilityBlockRenderer.DmRYWbPT.css"
+    ]
+  },
+  "src/routes/admin/+page.svelte": {
+    "file": "entries/pages/admin/_page.svelte.js",
+    "name": "entries/pages/admin/_page.svelte",
+    "src": "src/routes/admin/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js",
+      "_exports.js",
+      "_utils.js",
+      "_state.svelte.js",
+      "_loader.js",
+      "_user.js",
+      "src/lib/nostr/relay.ts",
+      "_index.js",
+      "_notifications.js",
+      "_channelStore.js",
+      "_profiles.js",
+      "_identicon.js",
+      "_mute.js",
+      "_server.js"
+    ],
+    "dynamicImports": [
+      "src/lib/nostr/sections.ts",
+      "src/lib/nostr/sections.ts",
+      "src/lib/nostr/relay.ts",
+      "_loader.js",
+      "src/lib/nostr/sections.ts"
+    ],
+    "css": [
+      "_app/immutable/assets/Avatar.BY0jTnLk.css",
+      "_app/immutable/assets/UserDisplay.DBwfNe3u.css"
+    ]
+  },
+  "src/routes/admin/+page.ts": {
+    "file": "entries/pages/admin/_page.ts.js",
+    "name": "entries/pages/admin/_page.ts",
+    "src": "src/routes/admin/+page.ts",
+    "isEntry": true
+  },
+  "src/routes/admin/calendar/+page.svelte": {
+    "file": "entries/pages/admin/calendar/_page.svelte.js",
+    "name": "entries/pages/admin/calendar/_page.svelte",
+    "src": "src/routes/admin/calendar/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js",
+      "_exports.js",
+      "_utils.js",
+      "_state.svelte.js",
+      "_loader.js",
+      "_user.js",
+      "src/lib/nostr/relay.ts"
+    ],
+    "css": [
+      "_app/immutable/assets/AvailabilityBlockRenderer.DmRYWbPT.css"
+    ]
+  },
+  "src/routes/admin/stats/+page.svelte": {
+    "file": "entries/pages/admin/stats/_page.svelte.js",
+    "name": "entries/pages/admin/stats/_page.svelte",
+    "src": "src/routes/admin/stats/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js",
+      "_exports.js",
+      "_utils.js",
+      "_state.svelte.js",
+      "_loader.js",
+      "_index.js",
+      "src/lib/nostr/relay.ts",
+      "_ActivityGraph.svelte_svelte_type_style_lang.js"
+    ],
+    "css": [
+      "_app/immutable/assets/_page.BI0d29i7.css"
+    ]
+  },
+  "src/routes/api/proxy/+server.ts": {
+    "file": "entries/endpoints/api/proxy/_server.ts.js",
+    "name": "entries/endpoints/api/proxy/_server.ts",
+    "src": "src/routes/api/proxy/+server.ts",
+    "isEntry": true
+  },
+  "src/routes/chat/+layout.svelte": {
+    "file": "entries/pages/chat/_layout.svelte.js",
+    "name": "entries/pages/chat/_layout.svelte",
+    "src": "src/routes/chat/+layout.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js"
+    ],
+    "css": [
+      "_app/immutable/assets/_layout.DkUNwtL3.css"
+    ]
+  },
+  "src/routes/chat/+page.svelte": {
+    "file": "entries/pages/chat/_page.svelte.js",
+    "name": "entries/pages/chat/_page.svelte",
+    "src": "src/routes/chat/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js",
+      "_exports.js",
+      "_utils.js",
+      "_state.svelte.js",
+      "_stores.js",
+      "_loader.js",
+      "_userPermissions.js",
+      "_user.js",
+      "src/lib/nostr/relay.ts",
+      "_ModeratorTeam.js",
+      "_readPosition.js",
+      "_profiles.js",
+      "_toast.js",
+      "_db.js"
+    ],
+    "css": [
+      "_app/immutable/assets/_page.CeGtfOJy.css",
+      "_app/immutable/assets/Modal.kJ4MdHVi.css",
+      "_app/immutable/assets/Avatar.BY0jTnLk.css",
+      "_app/immutable/assets/Toast.C4J9ClzN.css"
+    ]
+  },
+  "src/routes/chat/+page.ts": {
+    "file": "entries/pages/chat/_page.ts.js",
+    "name": "entries/pages/chat/_page.ts",
+    "src": "src/routes/chat/+page.ts",
+    "isEntry": true
+  },
+  "src/routes/chat/[channelId]/+page.svelte": {
+    "file": "entries/pages/chat/_channelId_/_page.svelte.js",
+    "name": "entries/pages/chat/_channelId_/_page.svelte",
+    "src": "src/routes/chat/[channelId]/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js",
+      "_exports.js",
+      "_utils.js",
+      "_state.svelte.js",
+      "_stores.js",
+      "_loader.js",
+      "_user.js",
+      "src/lib/nostr/relay.ts",
+      "_readPosition.js",
+      "_index.js",
+      "_profiles.js",
+      "_ActivityGraph.svelte_svelte_type_style_lang.js",
+      "_channelStore.js",
+      "_toast.js",
+      "_mute.js"
+    ],
+    "css": [
+      "_app/immutable/assets/_page.B25E46QN.css",
+      "_app/immutable/assets/Avatar.BY0jTnLk.css",
+      "_app/immutable/assets/UserDisplay.DBwfNe3u.css"
+    ]
+  },
+  "src/routes/chat/[channelId]/+page.ts": {
+    "file": "entries/pages/chat/_channelId_/_page.ts.js",
+    "name": "entries/pages/chat/_channelId_/_page.ts",
+    "src": "src/routes/chat/[channelId]/+page.ts",
+    "isEntry": true
+  },
+  "src/routes/dm/+page.svelte": {
+    "file": "entries/pages/dm/_page.svelte.js",
+    "name": "entries/pages/dm/_page.svelte",
+    "src": "src/routes/dm/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js",
+      "_exports.js",
+      "_utils.js",
+      "_state.svelte.js",
+      "_loader.js",
+      "_dm.js"
+    ]
+  },
+  "src/routes/dm/+page.ts": {
+    "file": "entries/pages/dm/_page.ts.js",
+    "name": "entries/pages/dm/_page.ts",
+    "src": "src/routes/dm/+page.ts",
+    "isEntry": true
+  },
+  "src/routes/dm/[pubkey]/+page.svelte": {
+    "file": "entries/pages/dm/_pubkey_/_page.svelte.js",
+    "name": "entries/pages/dm/_pubkey_/_page.svelte",
+    "src": "src/routes/dm/[pubkey]/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js",
+      "_exports.js",
+      "_utils.js",
+      "_state.svelte.js",
+      "_stores.js",
+      "_loader.js",
+      "_dm.js",
+      "_toast.js",
+      "_profiles.js"
+    ]
+  },
+  "src/routes/dm/[pubkey]/+page.ts": {
+    "file": "entries/pages/dm/_pubkey_/_page.ts.js",
+    "name": "entries/pages/dm/_pubkey_/_page.ts",
+    "src": "src/routes/dm/[pubkey]/+page.ts",
+    "isEntry": true
+  },
+  "src/routes/events/+layout.svelte": {
+    "file": "entries/pages/events/_layout.svelte.js",
+    "name": "entries/pages/events/_layout.svelte",
+    "src": "src/routes/events/+layout.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js",
+      "src/lib/nostr/relay.ts",
+      "_loader.js",
+      "_permissions.js",
+      "_CalendarSheet.svelte_svelte_type_style_lang.js",
+      "_userPermissions.js"
+    ],
+    "css": [
+      "_app/immutable/assets/_layout.BTIu-gBt.css",
+      "_app/immutable/assets/AvailabilityBlockRenderer.DmRYWbPT.css"
+    ]
+  },
+  "src/routes/events/+page.svelte": {
+    "file": "entries/pages/events/_page.svelte.js",
+    "name": "entries/pages/events/_page.svelte",
+    "src": "src/routes/events/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js",
+      "_exports.js",
+      "_utils.js",
+      "_state.svelte.js",
+      "_stores.js",
+      "_loader.js",
+      "_user.js",
+      "src/lib/nostr/relay.ts"
+    ],
+    "css": [
+      "_app/immutable/assets/AvailabilityBlockRenderer.DmRYWbPT.css"
+    ]
+  },
+  "src/routes/forums/+page.svelte": {
+    "file": "entries/pages/forums/_page.svelte.js",
+    "name": "entries/pages/forums/_page.svelte",
+    "src": "src/routes/forums/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js",
+      "_exports.js",
+      "_utils.js",
+      "_state.svelte.js",
+      "_loader.js",
+      "_userPermissions.js",
+      "src/lib/nostr/relay.ts",
+      "_permissions.js",
+      "_ModeratorTeam.js"
+    ]
+  },
+  "src/routes/login/+page.svelte": {
+    "file": "entries/pages/login/_page.svelte.js",
+    "name": "entries/pages/login/_page.svelte",
+    "src": "src/routes/login/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js",
+      "_loader.js",
+      "_exports.js",
+      "_utils.js",
+      "_state.svelte.js"
+    ],
+    "css": [
+      "_app/immutable/assets/_page.Pzm-VSrC.css",
+      "_app/immutable/assets/PendingApproval.lZT0MPyG.css"
+    ]
+  },
+  "src/routes/pending/+page.svelte": {
+    "file": "entries/pages/pending/_page.svelte.js",
+    "name": "entries/pages/pending/_page.svelte",
+    "src": "src/routes/pending/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js",
+      "_exports.js",
+      "_utils.js",
+      "_state.svelte.js",
+      "_loader.js",
+      "_user.js"
+    ]
+  },
+  "src/routes/settings/muted/+page.svelte": {
+    "file": "entries/pages/settings/muted/_page.svelte.js",
+    "name": "entries/pages/settings/muted/_page.svelte",
+    "src": "src/routes/settings/muted/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js",
+      "_mute.js",
+      "_exports.js",
+      "_utils.js",
+      "_state.svelte.js",
+      "_identicon.js",
+      "_profiles.js"
+    ]
+  },
+  "src/routes/setup/+page.svelte": {
+    "file": "entries/pages/setup/_page.svelte.js",
+    "name": "entries/pages/setup/_page.svelte",
+    "src": "src/routes/setup/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js",
+      "_exports.js",
+      "_utils.js",
+      "_state.svelte.js",
+      "_index.js"
+    ]
+  },
+  "src/routes/setup/+page.ts": {
+    "file": "entries/pages/setup/_page.ts.js",
+    "name": "entries/pages/setup/_page.ts",
+    "src": "src/routes/setup/+page.ts",
+    "isEntry": true
+  },
+  "src/routes/signup/+page.svelte": {
+    "file": "entries/pages/signup/_page.svelte.js",
+    "name": "entries/pages/signup/_page.svelte",
+    "src": "src/routes/signup/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js",
+      "_loader.js",
+      "_Modal.js",
+      "_profiles.js",
+      "src/lib/nostr/relay.ts",
+      "_exports.js",
+      "_utils.js",
+      "_state.svelte.js"
+    ],
+    "css": [
+      "_app/immutable/assets/_page.9XrFvuXX.css",
+      "_app/immutable/assets/PendingApproval.lZT0MPyG.css"
+    ]
+  },
+  "src/routes/view/[noteId]/+page.svelte": {
+    "file": "entries/pages/view/_noteId_/_page.svelte.js",
+    "name": "entries/pages/view/_noteId_/_page.svelte",
+    "src": "src/routes/view/[noteId]/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js",
+      "_exports.js",
+      "_utils.js",
+      "_server.js",
+      "_state.svelte.js",
+      "_stores.js",
+      "_loader.js",
+      "_profiles.js",
+      "_mute.js"
+    ],
+    "css": [
+      "_app/immutable/assets/Avatar.BY0jTnLk.css",
+      "_app/immutable/assets/UserDisplay.DBwfNe3u.css"
+    ]
+  },
+  "src/routes/view/[noteId]/+page.ts": {
+    "file": "entries/pages/view/_noteId_/_page.ts.js",
+    "name": "entries/pages/view/_noteId_/_page.ts",
+    "src": "src/routes/view/[noteId]/+page.ts",
+    "isEntry": true
+  }
+}

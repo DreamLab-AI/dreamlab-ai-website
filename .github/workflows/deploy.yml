@@ -10,9 +10,9 @@ name: Deploy to GitHub Pages
 # Rollback: revert the merge commit or reset main to `pre-rust-deploy` tag.
 
 on:
-  push:
-    branches:
-      - main
+  # Temporarily disabled: community-forum-rs/ frozen for kit extraction test.
+  # The existing GH Pages + CF Workers deployment remains live. Re-enable once
+  # the forum-client build is restructured to use crates.io kit deps.
   workflow_dispatch:
 
 # Cancel in-flight runs of this workflow on the same ref to avoid

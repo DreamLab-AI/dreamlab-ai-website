@@ -1,0 +1,1 @@
+import{d as o}from"./CEc-lP5l.js";import{a as n}from"./BVL4R8vY.js";import{w as m}from"./B0CCWat9.js";const s=o([n,m],([e,r])=>{if(!e.isAuthenticated||!e.pubkey)return null;const t=r?.cohorts??[],i=r?.isAdmin??!1;return{pubkey:e.pubkey,cohorts:t,globalRole:i?"admin":"member",sectionRoles:[]}});o(s,e=>e?.globalRole==="admin");o(s,e=>e?.pubkey??null);export{s as u};
