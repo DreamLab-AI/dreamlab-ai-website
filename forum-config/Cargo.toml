@@ -1,6 +1,6 @@
 [package]
 name = "dreamlab-forum-config"
-version = "3.0.0-rc3"
+version = "3.0.0-rc4"
 edition = "2021"
 description = "DreamLab AI forum operator overlay for the nostr-bbs kit"
 license = "Proprietary"
@@ -10,26 +10,10 @@ publish = false
 path = "src/lib.rs"
 
 [dependencies]
-# Kit crates from nostr-rust-forum.
-#
-# Phase 4 chain (2026-05-07): the kit is mid-absorption against
-# solid-pod-rs 0.4.0-alpha.3 (`core` feature) and rust-nostr 0.44 per
-# ADR-076/078. Kit version 3.0.0 release is gated on completion of
-# Stage 2A/B/C absorption work — see project-state memory key
-# `phase-4-stage-2-progress`. Until 3.0.0 lands on crates.io, this
-# overlay stays on path-deps. Migration to versioned deps will be a
-# single follow-up commit titled:
-#
-#   chore(deps): switch forum-config to crates.io published nostr-bbs-* deps after kit publish
-#
-# at which point the three lines below become:
-#
-#   nostr-bbs-core = "3.0"
-#   nostr-bbs-config = "3.0"
-#   nostr-bbs-mesh = "3.0"
-nostr-bbs-core = { path = "../../nostr-rust-forum/crates/nostr-bbs-core" }
-nostr-bbs-config = { path = "../../nostr-rust-forum/crates/nostr-bbs-config" }
-nostr-bbs-mesh = { path = "../../nostr-rust-forum/crates/nostr-bbs-mesh" }
+# Kit crates from crates.io (published 2026-05-07 as v3.0.0-rc4).
+nostr-bbs-core = "3.0.0-rc4"
+nostr-bbs-config = "3.0.0-rc4"
+nostr-bbs-mesh = "3.0.0-rc4"
 
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
