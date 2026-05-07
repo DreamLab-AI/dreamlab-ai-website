@@ -65,8 +65,11 @@
     <!-- Forum-specific styles (imports design-tokens.css for @import fallback) -->
     <link data-trunk rel="css" href="style.css" />
 
-    <!-- Trunk WASM bundle injection (workspace: specify package + binary) -->
-    <link data-trunk rel="rust" data-wasm-opt="z" data-cargo-package="forum-client" data-bin="forum-client" />
+    <!-- Trunk WASM bundle injection (workspace: specify package + binary).
+         data-wasm-opt="0" disables Trunk's bundled wasm-opt 122 which rejects
+         Rust 1.90's bulk-memory ops. We run a manually-installed binaryen 119
+         in a post_build Trunk hook instead — see Trunk.toml. -->
+    <link data-trunk rel="rust" data-wasm-opt="0" data-cargo-package="forum-client" data-bin="forum-client" />
 </head>
 <body>
     <!-- Loading screen — replaced by Leptos mount_to_body() -->

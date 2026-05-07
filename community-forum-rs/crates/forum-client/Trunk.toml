@@ -25,7 +25,7 @@ port = 8080
 # is the last release before stricter validation defaults landed in 122.
 
 [[hooks]]
-stage = "build"
+stage = "post_build"
 command = "bash"
 command_arguments = [
     "-c",
