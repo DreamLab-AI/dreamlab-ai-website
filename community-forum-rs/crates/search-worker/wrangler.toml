@@ -1,6 +1,6 @@
 name = "dreamlab-search-api"
 main = "build/worker/shim.mjs"
-compatibility_date = "2024-09-23"
+compatibility_date = "2025-09-01"
 
 [build]
 command = "worker-build --release"
@@ -12,6 +12,12 @@ bucket_name = "dreamlab-vectors"
 [[kv_namespaces]]
 binding = "SEARCH_CONFIG"
 id = "440b1f07ff224fb8ad644e094c6766c0"
+
+# NIP-98 replay cache (TTL = 2 * tolerance window). Shared id with auth-worker.
+# TODO(ops): provision via `wrangler kv:namespace create dreamlab-nip98-replay`.
+[[kv_namespaces]]
+binding = "NIP98_REPLAY"
+id = "REPLACE_WITH_NEW_NIP98_REPLAY_KV_ID"
 
 [vars]
 ALLOWED_ORIGIN = "https://dreamlab-ai.com"

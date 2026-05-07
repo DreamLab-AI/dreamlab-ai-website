@@ -28,8 +28,8 @@ pub fn cors_headers(env: &Env) -> Headers {
 
 /// Serialize a JSON body and build a CORS-wrapped response with `status`.
 pub fn json_response(env: &Env, body: &serde_json::Value, status: u16) -> Result<Response> {
-    let json_str = serde_json::to_string(body)
-        .map_err(|e| worker::Error::RustError(e.to_string()))?;
+    let json_str =
+        serde_json::to_string(body).map_err(|e| worker::Error::RustError(e.to_string()))?;
     let resp = Response::ok(json_str)?
         .with_status(status)
         .with_headers(cors_headers(env));

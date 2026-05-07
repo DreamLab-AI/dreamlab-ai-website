@@ -40,6 +40,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "aes"
+version = "0.8.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b169f7a6d4742236a0a00c541b845991d0ac43e546831af1249753ab4c3aa3a0"
+dependencies = [
+ "cfg-if",
+ "cipher",
+ "cpufeatures",
+]
+
+[[package]]
 name = "aho-corasick"
 version = "1.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -201,6 +212,7 @@ dependencies = [
 name = "auth-worker"
 version = "0.1.0"
 dependencies = [
+ "async-trait",
  "base64",
  "chacha20poly1305",
  "getrandom 0.2.17",
@@ -969,6 +981,7 @@ dependencies = [
 name = "forum-client"
 version = "0.1.0"
 dependencies = [
+ "async-trait",
  "base64",
  "bech32",
  "comrak",
@@ -985,6 +998,7 @@ dependencies = [
  "serde",
  "serde-wasm-bindgen",
  "serde_json",
+ "sha2",
  "thiserror 2.0.18",
  "wasm-bindgen",
  "wasm-bindgen-futures",
@@ -2115,6 +2129,7 @@ version = "0.44.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3aa5e3b6a278ed061835fe1ee293b71641e6bf8b401cfe4e1834bbf4ef0a34e1"
 dependencies = [
+ "aes",
  "base64",
  "bech32",
  "bip39",
@@ -2137,7 +2152,11 @@ dependencies = [
 name = "nostr-core"
 version = "0.1.0"
 dependencies = [
+ "aes",
+ "async-trait",
  "base64",
+ "bech32",
+ "cbc",
  "chacha20poly1305",
  "criterion",
  "getrandom 0.2.17",
@@ -2156,6 +2175,19 @@ dependencies = [
  "wasm-bindgen",
  "wasm-bindgen-test",
  "zeroize",
+]
+
+[[package]]
+name = "nostr-upstream-canary"
+version = "0.1.0"
+dependencies = [
+ "getrandom 0.2.17",
+ "hex",
+ "js-sys",
+ "nostr",
+ "serde",
+ "serde_json",
+ "wasm-bindgen",
 ]
 
 [[package]]
@@ -2364,10 +2396,12 @@ dependencies = [
 name = "pod-worker"
 version = "0.1.0"
 dependencies = [
+ "async-trait",
  "base64",
  "hex",
  "js-sys",
  "nostr-core",
+ "proptest",
  "serde",
  "serde_json",
  "sha2",
@@ -2791,7 +2825,9 @@ checksum = "dc897dd8d9e8bd1ed8cdad82b5966c3e0ecae09fb1907d58efaa013543185d0a"
 name = "relay-worker"
 version = "0.1.0"
 dependencies = [
+ "async-trait",
  "base64",
+ "getrandom 0.2.17",
  "hex",
  "js-sys",
  "nostr-core",
@@ -3003,6 +3039,7 @@ dependencies = [
 name = "search-worker"
 version = "0.1.0"
 dependencies = [
+ "async-trait",
  "base64",
  "hex",
  "js-sys",

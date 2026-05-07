@@ -153,15 +153,25 @@ impl AdminStore {
             }
             Err(e) => {
                 let msg = e.to_string();
-                let user_msg = if msg.contains("401") || msg.contains("403") || msg.contains("Unauthorized") {
-                    format!("Auth failure: your admin key was rejected by the API. {}", msg)
-                } else if msg.contains("404") {
-                    format!("Whitelist endpoint not found. Check API URL configuration. {}", msg)
-                } else if msg.contains("NetworkError") || msg.contains("Failed to fetch") {
-                    format!("Network error: cannot reach the auth API. Check your connection. {}", msg)
-                } else {
-                    format!("Failed to fetch whitelist: {}", msg)
-                };
+                let user_msg =
+                    if msg.contains("401") || msg.contains("403") || msg.contains("Unauthorized") {
+                        format!(
+                            "Auth failure: your admin key was rejected by the API. {}",
+                            msg
+                        )
+                    } else if msg.contains("404") {
+                        format!(
+                            "Whitelist endpoint not found. Check API URL configuration. {}",
+                            msg
+                        )
+                    } else if msg.contains("NetworkError") || msg.contains("Failed to fetch") {
+                        format!(
+                            "Network error: cannot reach the auth API. Check your connection. {}",
+                            msg
+                        )
+                    } else {
+                        format!("Failed to fetch whitelist: {}", msg)
+                    };
                 self.state.error.set(Some(user_msg.clone()));
                 self.state.is_loading.set(false);
                 Err(user_msg)
@@ -184,8 +194,8 @@ impl AdminStore {
             "pubkey": pubkey,
             "cohorts": cohorts,
         });
-        let body_json = serde_json::to_string(&body)
-            .map_err(|e| format!("JSON serialization failed: {e}"))?;
+        let body_json =
+            serde_json::to_string(&body).map_err(|e| format!("JSON serialization failed: {e}"))?;
         let url = format!("{}/api/whitelist/add", Self::api_base());
         match fetch_with_nip98_post(&url, &body_json, privkey).await {
             Ok(_) => {
@@ -223,8 +233,8 @@ impl AdminStore {
             "pubkey": pubkey,
             "cohorts": cohorts,
         });
-        let body_json = serde_json::to_string(&body)
-            .map_err(|e| format!("JSON serialization failed: {e}"))?;
+        let body_json =
+            serde_json::to_string(&body).map_err(|e| format!("JSON serialization failed: {e}"))?;
         let url = format!("{}/api/whitelist/update-cohorts", Self::api_base());
         match fetch_with_nip98_post(&url, &body_json, privkey).await {
             Ok(_) => {
@@ -264,12 +274,16 @@ impl AdminStore {
             "pubkey": pubkey,
             "is_admin": is_admin,
         });
-        let body_json = serde_json::to_string(&body)
-            .map_err(|e| format!("JSON serialization failed: {e}"))?;
+        let body_json =
+            serde_json::to_string(&body).map_err(|e| format!("JSON serialization failed: {e}"))?;
         let url = format!("{}/api/whitelist/set-admin", Self::api_base());
         match fetch_with_nip98_post(&url, &body_json, privkey).await {
             Ok(_) => {
-                let action = if is_admin { "promoted to admin" } else { "demoted from admin" };
+                let action = if is_admin {
+                    "promoted to admin"
+                } else {
+                    "demoted from admin"
+                };
                 self.state.success.set(Some(format!(
                     "{}...{} {}",
                     &pubkey[..8],
@@ -565,4 +579,3 @@ fn parse_channel_content(content: &str) -> (String, String) {
         Err(_) => ("Unnamed Channel".to_string(), String::new()),
     }
 }
-

@@ -1,0 +1,103 @@
+# DreamLab AI Community Forum — operator config (PRD-012 X1, ADR-085).
+#
+# Consumed at startup by `nostr_bbs_config::load_from_path`.
+#
+# Source of truth for every deployment-specific setting; the workers and the
+# forum-client read this rather than hardcoding values. To switch hostnames /
+# rebrand / change cohort taxonomy / federate, edit THIS file (not the kit).
+
+# ─── Deployment ──────────────────────────────────────────────────────────────
+[deployment]
+name     = "DreamLab Community Forum"
+hostname = "https://dreamlab-ai.com"
+
+# ─── WebAuthn ────────────────────────────────────────────────────────────────
+[webauthn]
+rp_id            = "dreamlab-ai.com"
+expected_origin  = "https://dreamlab-ai.com"
+
+# ─── Solid Pod backend (Cloudflare R2) ───────────────────────────────────────
+[pod]
+base_url        = "https://pods.dreamlab-ai.com"
+storage_backend = "cf-r2"
+r2_bucket       = "dreamlab-pods"
+
+# ─── Nostr Relay ─────────────────────────────────────────────────────────────
+[relay]
+url             = "wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev"
+ingress_policy  = "allowlist"
+
+# ─── Admin pubkey resolution ─────────────────────────────────────────────────
+# Static mode — admin pubkeys baked into config rather than resolved from D1.
+# Switch to mode = "d1" when the admins-table backfill ships.
+[admin]
+mode            = "static"
+static_pubkeys  = [
+  # Pete (DreamLab CTO) — placeholder; operator must supply the real value
+  # via DREAMLAB_ADMIN_PUBKEY env-override during deploy.
+  "0000000000000000000000000000000000000000000000000000000000000000",
+]
+
+# ─── Branding ────────────────────────────────────────────────────────────────
+[branding]
+theme         = "amber"
+logo_url      = "https://dreamlab-ai.com/assets/logo.svg"
+welcome_copy  = """
+Welcome to the DreamLab AI Community Forum — \
+a private space for trainers, builders, and the curious.\
+"""
+
+# ─── Zones ───────────────────────────────────────────────────────────────────
+# Three-zone production layout. The cohort access semantics live in the kit's
+# relay-worker (src/whitelist.rs); this file sets ONLY display names + the
+# allowed cohort lists per zone.
+[[zones]]
+id                = "home"
+display_name      = "Lobby"
+required_cohorts  = ["home", "lobby", "approved"]
+
+[[zones]]
+id                = "members"
+display_name      = "DreamLab"
+required_cohorts  = ["members", "trainers", "trainees", "ai-agents", "agent", "business", "business-only"]
+
+[[zones]]
+id                = "private"
+display_name      = "MiniMooNoir"
+required_cohorts  = ["private", "private-only", "private-business"]
+
+# ─── Trust thresholds ────────────────────────────────────────────────────────
+[trust]
+join_threshold  = 0     # any whitelisted user can join open channels
+post_threshold  = 1     # +1 trust required to post in moderated channels
+
+# ─── Invite system ───────────────────────────────────────────────────────────
+[invites]
+enabled              = true
+welcome_bot_pubkey   = "0000000000000000000000000000000000000000000000000000000000000000"
+# ↑ placeholder; operator supplies via DREAMLAB_WELCOME_BOT_PUBKEY env-override.
+
+# ─── Moderation ──────────────────────────────────────────────────────────────
+[moderation]
+kinds_lo = 30910
+kinds_hi = 30916
+
+# ─── Federation mesh ─────────────────────────────────────────────────────────
+[mesh]
+mode         = "standalone"
+peer_relays  = []   # populated post-Sprint-v12 federation rollout
+
+# ─── Rate limits (per-route) ─────────────────────────────────────────────────
+[ratelimit]
+profiles_batch_per_min      = 60     # /api/profiles/batch
+nostr_well_known_per_min    = 60     # /.well-known/nostr.json
+
+# ─── Feature flags ───────────────────────────────────────────────────────────
+[features]
+marketplace = true
+calendar    = true
+dms         = true
+
+# ─── Operator custody tier ───────────────────────────────────────────────────
+[custody]
+operator = "tier-2"   # CF Workers Secrets — DreamLab deployment uses Cloudflare

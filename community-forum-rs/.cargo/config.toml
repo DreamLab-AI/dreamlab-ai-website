@@ -1,5 +1,13 @@
 [target.wasm32-unknown-unknown]
-rustflags = ["-C", "link-arg=--max-memory=268435456"]
+# Bulk-memory codegen is left ENABLED (rustc 1.90 default). Validation is
+# handled at the post-build wasm-opt step in
+# community-forum-rs/crates/forum-client/Trunk.toml using a manually
+# installed binaryen 119 (see .github/workflows/deploy.yml). That wasm-opt
+# accepts the bulk-memory ops with --enable-bulk-memory{,-opt}, unlike
+# Trunk's bundled wasm-opt 122 which rejects them by default.
+rustflags = [
+  "-C", "link-arg=--max-memory=268435456",
+]
 
 # Note: default target removed to allow native `cargo test` for non-WASM crates.
 # Trunk automatically targets wasm32-unknown-unknown for the forum-client binary.

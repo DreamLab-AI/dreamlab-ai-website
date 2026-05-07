@@ -35,9 +35,8 @@ pub async fn upload_to_pod(
     let bytes: Vec<u8> = js_sys::Uint8Array::new(&array_buf).to_vec();
 
     // Create NIP-98 auth token
-    let token =
-        crate::auth::nip98::create_nip98_token(privkey, &url, "POST", Some(&bytes))
-            .map_err(|e| format!("NIP-98 error: {e}"))?;
+    let token = crate::auth::nip98::create_nip98_token(privkey, &url, "POST", Some(&bytes))
+        .map_err(|e| format!("NIP-98 error: {e}"))?;
     let auth_header = format!("Nostr {}", token);
 
     // POST to pod API
@@ -55,8 +54,7 @@ pub async fn upload_to_pod(
     init.set_headers(&headers);
     init.set_body(&js_sys::Uint8Array::from(bytes.as_slice()).into());
 
-    let req =
-        web_sys::Request::new_with_str_and_init(&url, &init).map_err(|e| format!("{e:?}"))?;
+    let req = web_sys::Request::new_with_str_and_init(&url, &init).map_err(|e| format!("{e:?}"))?;
     let resp_val = JsFuture::from(window.fetch_with_request(&req))
         .await
         .map_err(|e| format!("Fetch: {e:?}"))?;

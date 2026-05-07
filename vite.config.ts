@@ -54,9 +54,12 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
+        // Sprint v9 D9: dead `three` manualChunk dropped — no `three` /
+        // `@react-three/*` imports remain anywhere in src/. Rollup emitted
+        // an empty chunk on every build. The packages are still in
+        // package.json deps but never bundled.
         manualChunks: {
           'vendor': ['react', 'react-dom', 'react-router-dom'],
-          'three': ['three', '@react-three/fiber', '@react-three/drei'],
           'ui': ['@radix-ui/react-accordion', '@radix-ui/react-alert-dialog',
                  '@radix-ui/react-avatar', '@radix-ui/react-checkbox', '@radix-ui/react-dialog',
                  '@radix-ui/react-dropdown-menu', '@radix-ui/react-popover',

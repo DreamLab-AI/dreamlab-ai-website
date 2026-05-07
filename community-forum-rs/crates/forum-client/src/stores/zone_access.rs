@@ -147,13 +147,25 @@ async fn fetch_user_access(pubkey: &str) -> Result<(bool, bool, bool, bool), Str
     let val: serde_json::Value =
         serde_json::from_str(&text_str).map_err(|e| format!("JSON parse: {e}"))?;
 
-    let is_admin = val.get("isAdmin").and_then(|v| v.as_bool()).unwrap_or(false);
+    let is_admin = val
+        .get("isAdmin")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false);
 
     // New format: { access: { home, dreamlab, minimoonoir } }
     if let Some(access) = val.get("access") {
-        let home = access.get("home").and_then(|v| v.as_bool()).unwrap_or(false);
-        let dreamlab = access.get("dreamlab").and_then(|v| v.as_bool()).unwrap_or(false);
-        let minimoonoir = access.get("minimoonoir").and_then(|v| v.as_bool()).unwrap_or(false);
+        let home = access
+            .get("home")
+            .and_then(|v| v.as_bool())
+            .unwrap_or(false);
+        let dreamlab = access
+            .get("dreamlab")
+            .and_then(|v| v.as_bool())
+            .unwrap_or(false);
+        let minimoonoir = access
+            .get("minimoonoir")
+            .and_then(|v| v.as_bool())
+            .unwrap_or(false);
         return Ok((home, dreamlab, minimoonoir, is_admin));
     }
 
@@ -164,17 +176,36 @@ async fn fetch_user_access(pubkey: &str) -> Result<(bool, bool, bool, bool), Str
 
     let cohorts: Vec<String> = val["cohorts"]
         .as_array()
-        .map(|arr| arr.iter().filter_map(|v| v.as_str().map(String::from)).collect())
+        .map(|arr| {
+            arr.iter()
+                .filter_map(|v| v.as_str().map(String::from))
+                .collect()
+        })
         .unwrap_or_default();
 
-    let home = cohorts.iter().any(|c| matches!(c.as_str(), "home" | "lobby" | "approved" | "cross-access"));
-    let dreamlab = cohorts.iter().any(|c| matches!(c.as_str(),
-        "dreamlab" | "business" | "business-only" | "trainers" | "trainees"
-        | "ai-agents" | "agent" | "visionflow-full" | "cross-access"
-    ));
-    let minimoonoir = cohorts.iter().any(|c| matches!(c.as_str(),
-        "minimoonoir" | "minimoonoir-only" | "minimoonoir-business" | "cross-access"
-    ));
+    let home = cohorts
+        .iter()
+        .any(|c| matches!(c.as_str(), "home" | "lobby" | "approved" | "cross-access"));
+    let dreamlab = cohorts.iter().any(|c| {
+        matches!(
+            c.as_str(),
+            "dreamlab"
+                | "business"
+                | "business-only"
+                | "trainers"
+                | "trainees"
+                | "ai-agents"
+                | "agent"
+                | "visionflow-full"
+                | "cross-access"
+        )
+    });
+    let minimoonoir = cohorts.iter().any(|c| {
+        matches!(
+            c.as_str(),
+            "minimoonoir" | "minimoonoir-only" | "minimoonoir-business" | "cross-access"
+        )
+    });
 
     Ok((home, dreamlab, minimoonoir, false))
 }

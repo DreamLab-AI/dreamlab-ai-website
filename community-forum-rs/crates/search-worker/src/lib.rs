@@ -50,7 +50,10 @@ fn cors_origin(req: &Request, env: &Env) -> String {
     if origins.iter().any(|o| o == &origin) {
         origin
     } else {
-        origins.into_iter().next().unwrap_or_else(|| "https://dreamlab-ai.com".to_string())
+        origins
+            .into_iter()
+            .next()
+            .unwrap_or_else(|| "https://dreamlab-ai.com".to_string())
     }
 }
 
@@ -73,7 +76,12 @@ fn cors_headers(req: &Request, env: &Env) -> Headers {
     headers
 }
 
-fn json_response(req: &Request, env: &Env, body: &serde_json::Value, status: u16) -> Result<Response> {
+fn json_response(
+    req: &Request,
+    env: &Env,
+    body: &serde_json::Value,
+    status: u16,
+) -> Result<Response> {
     let json_str = serde_json::to_string(body).map_err(|e| Error::RustError(e.to_string()))?;
     let headers = cors_headers(req, env);
     headers.set("Content-Type", "application/json").ok();
@@ -131,7 +139,14 @@ async fn load_store(env: &Env) -> Result<VectorStore> {
     let obj = bucket.get(&store_key).execute().await?;
 
     if let Some(obj) = obj {
-        let bytes = obj.body().unwrap().bytes().await?;
+        // Sprint v9 D5: never panic on a missing body. R2 can in principle
+        // return an object with no body (e.g. zero-length write race or
+        // bucket inconsistency); surface a typed worker::Error instead so
+        // the caller returns a 5xx rather than crashing the isolate.
+        let body = obj
+            .body()
+            .ok_or_else(|| worker::Error::RustError("R2 object missing body".into()))?;
+        let bytes = body.bytes().await?;
         if let Some(store) = VectorStore::from_rvf_bytes(&bytes) {
             return Ok(store);
         }
@@ -177,8 +192,11 @@ async fn persist_store(
 /// Load id↔label mapping from KV.
 async fn load_mapping(
     env: &Env,
-) -> Result<(std::collections::HashMap<String, u64>, std::collections::HashMap<u64, String>, u64)>
-{
+) -> Result<(
+    std::collections::HashMap<String, u64>,
+    std::collections::HashMap<u64, String>,
+    u64,
+)> {
     let store_key = env
         .var("RVF_STORE_KEY")
         .map(|v| v.to_string())
@@ -336,7 +354,9 @@ async fn handle_ingest(req: &Request, env: &Env) -> Result<Response> {
         "POST",
         Some(&raw_body),
         env,
-    ) {
+    )
+    .await
+    {
         return json_response(req, env, &err_body, status);
     }
 

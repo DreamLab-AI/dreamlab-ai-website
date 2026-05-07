@@ -27,6 +27,14 @@ mod storage;
 
 pub(crate) use mod_cache::ModCache;
 
+#[cfg(feature = "test-exports")]
+#[doc(hidden)]
+pub mod test_exports {
+    pub use super::broadcast::{event_treatment, EventTreatment};
+    pub use super::filter::{d_tag_value, event_matches_filters, tag_value, NostrFilter};
+    pub use super::mod_cache::{Block, ModCache};
+}
+
 use std::cell::RefCell;
 use std::collections::HashMap;
 
@@ -101,10 +109,7 @@ impl DurableObject for NostrRelayDO {
         // Tags are persisted by the runtime even when in-memory state is lost.
         self.state.accept_websocket_with_tags(
             &server,
-            &[
-                &format!("sid:{session_id}"),
-                &format!("ip:{ip}"),
-            ],
+            &[&format!("sid:{session_id}"), &format!("ip:{ip}")],
         );
 
         let challenge = generate_challenge(session_id);
@@ -156,7 +161,9 @@ impl DurableObject for NostrRelayDO {
             None => self.recover_session(&ws).await,
         };
 
-        let ip = self.sessions.borrow()
+        let ip = self
+            .sessions
+            .borrow()
             .get(&session_id)
             .map(|s| s.ip.clone())
             .unwrap_or_else(|| "unknown".into());

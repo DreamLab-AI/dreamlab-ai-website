@@ -23,8 +23,25 @@ use crate::utils::{capitalize, set_timeout_once};
 /// Maps zone IDs to their child section IDs.
 const ZONE_SECTIONS: &[(&str, &[&str])] = &[
     ("home", &["dreamlab-lobby"]),
-    ("dreamlab", &["dreamlab-training", "dreamlab-projects", "dreamlab-bookings", "ai-general", "ai-claude-flow", "ai-visionflow"]),
-    ("minimoonoir", &["minimoonoir-welcome", "minimoonoir-events", "minimoonoir-booking"]),
+    (
+        "dreamlab",
+        &[
+            "dreamlab-training",
+            "dreamlab-projects",
+            "dreamlab-bookings",
+            "ai-general",
+            "ai-claude-flow",
+            "ai-visionflow",
+        ],
+    ),
+    (
+        "minimoonoir",
+        &[
+            "minimoonoir-welcome",
+            "minimoonoir-events",
+            "minimoonoir-booking",
+        ],
+    ),
 ];
 
 /// Resolve a channel's section tag to its parent zone ID.
@@ -290,9 +307,7 @@ pub fn CategoryPage() -> impl IntoView {
             "home" | "dreamlab" | "minimoonoir" => slug,
             _ => {
                 // Resolve section ID to parent zone
-                section_to_zone_id(&slug)
-                    .unwrap_or("home")
-                    .to_string()
+                section_to_zone_id(&slug).unwrap_or("home").to_string()
             }
         }
     };

@@ -99,8 +99,25 @@ pub fn locale_from_country(country: Option<&str>) -> &'static str {
         Some(c)
             if matches!(
                 c.as_str(),
-                "ES" | "MX" | "AR" | "CL" | "CO" | "PE" | "VE" | "EC" | "UY" | "PY" | "BO"
-                    | "CR" | "GT" | "HN" | "NI" | "PA" | "DO" | "SV" | "CU" | "PR"
+                "ES" | "MX"
+                    | "AR"
+                    | "CL"
+                    | "CO"
+                    | "PE"
+                    | "VE"
+                    | "EC"
+                    | "UY"
+                    | "PY"
+                    | "BO"
+                    | "CR"
+                    | "GT"
+                    | "HN"
+                    | "NI"
+                    | "PA"
+                    | "DO"
+                    | "SV"
+                    | "CU"
+                    | "PR"
             ) =>
         {
             "es"
@@ -112,8 +129,12 @@ pub fn locale_from_country(country: Option<&str>) -> &'static str {
 /// Default greeting text when the admin hasn't supplied one yet.
 fn default_message(locale: &str) -> &'static str {
     match locale {
-        "es" => "¡Bienvenido/a a la comunidad! Echa un vistazo al foro y preséntate cuando quieras.",
-        _ => "Welcome to the community! Have a look around and introduce yourself when you're ready.",
+        "es" => {
+            "¡Bienvenido/a a la comunidad! Echa un vistazo al foro y preséntate cuando quieras."
+        }
+        _ => {
+            "Welcome to the community! Have a look around and introduce yourself when you're ready."
+        }
     }
 }
 
@@ -134,7 +155,12 @@ fn sign_welcome(
     let mut tags: Vec<Vec<String>> = Vec::new();
     tags.push(vec!["p".to_string(), target_pubkey.to_string()]);
     if let Some(ch) = channel_id {
-        tags.push(vec!["e".to_string(), ch.to_string(), String::new(), "root".to_string()]);
+        tags.push(vec![
+            "e".to_string(),
+            ch.to_string(),
+            String::new(),
+            "root".to_string(),
+        ]);
     }
 
     let unsigned = UnsignedEvent {

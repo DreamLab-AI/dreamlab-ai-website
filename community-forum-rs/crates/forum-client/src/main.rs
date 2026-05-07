@@ -66,21 +66,23 @@ fn run_offline_startup() {
                     Ok(n) => web_sys::console::log_1(
                         &format!("[PWA] Evicted {} stale cached messages", n).into(),
                     ),
-                    Err(e) => web_sys::console::warn_1(
-                        &format!("[PWA] Eviction failed: {:?}", e).into(),
-                    ),
+                    Err(e) => {
+                        web_sys::console::warn_1(&format!("[PWA] Eviction failed: {:?}", e).into())
+                    }
                 }
             }
             Err(e) => {
-                web_sys::console::warn_1(
-                    &format!("[PWA] IndexedDB open failed: {:?}", e).into(),
-                );
+                web_sys::console::warn_1(&format!("[PWA] IndexedDB open failed: {:?}", e).into());
             }
         }
 
         // Check storage quota
         if let Some((usage, quota)) = utils::check_storage_quota().await {
-            let pct = if quota > 0.0 { usage / quota * 100.0 } else { 0.0 };
+            let pct = if quota > 0.0 {
+                usage / quota * 100.0
+            } else {
+                0.0
+            };
             if pct > 80.0 {
                 web_sys::console::warn_1(
                     &format!(

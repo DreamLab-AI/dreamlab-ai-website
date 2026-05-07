@@ -201,7 +201,9 @@ pub async fn handle_set_referente(
     env: &Env,
 ) -> Result<Response> {
     let url = canonical_url(env, "/api/wot/set-referente");
-    if let Err((body, status)) = require_admin(auth_header, &url, "POST", Some(body_bytes), env).await {
+    if let Err((body, status)) =
+        require_admin(auth_header, &url, "POST", Some(body_bytes), env).await
+    {
         return json_response(env, &body, status);
     }
 
@@ -221,9 +223,7 @@ pub async fn handle_set_referente(
         Err(_) => return error_json(env, "Database unavailable", 500),
     };
 
-    let enabled = body
-        .enabled
-        .unwrap_or(body.pubkey.is_some());
+    let enabled = body.enabled.unwrap_or(body.pubkey.is_some());
 
     let update = db
         .prepare(
@@ -260,7 +260,9 @@ pub async fn handle_refresh(
     env: &Env,
 ) -> Result<Response> {
     let url = canonical_url(env, "/api/wot/refresh");
-    if let Err((body, status)) = require_admin(auth_header, &url, "POST", Some(body_bytes), env).await {
+    if let Err((body, status)) =
+        require_admin(auth_header, &url, "POST", Some(body_bytes), env).await
+    {
         return json_response(env, &body, status);
     }
 
@@ -270,7 +272,10 @@ pub async fn handle_refresh(
     };
 
     let settings = load_settings(env).await;
-    let referente = match settings.as_ref().and_then(|s| s.wot_referente_pubkey.clone()) {
+    let referente = match settings
+        .as_ref()
+        .and_then(|s| s.wot_referente_pubkey.clone())
+    {
         Some(r) => r,
         None => {
             return error_json(
@@ -363,7 +368,9 @@ pub async fn handle_override(
     env: &Env,
 ) -> Result<Response> {
     let url = canonical_url(env, path);
-    if let Err((body, status)) = require_admin(auth_header, &url, "POST", Some(body_bytes), env).await {
+    if let Err((body, status)) =
+        require_admin(auth_header, &url, "POST", Some(body_bytes), env).await
+    {
         return json_response(env, &body, status);
     }
 
@@ -453,8 +460,8 @@ pub async fn is_allowed_by_wot(pubkey: &str, env: &Env) -> Result<bool> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use nostr_core::event::{sign_event_deterministic, UnsignedEvent};
     use k256::schnorr::SigningKey;
+    use nostr_core::event::{sign_event_deterministic, UnsignedEvent};
 
     fn ref_sk() -> SigningKey {
         SigningKey::from_bytes(&[0x07u8; 32]).unwrap()

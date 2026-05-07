@@ -28,7 +28,7 @@ DreamLab AI is a premium AI training and consulting platform. This is a React SP
 | Workers | Rust (workers-rs) — 5 Cloudflare Workers in `community-forum-rs/crates/` |
 | Forum Build | Trunk (WASM target) |
 | Admin CLI | `community-forum-rs/crates/admin-cli/` — `forum-admin` Rust binary, NIP-98 authed, AI-agent friendly |
-| Moderation | Nostr event kinds 30910-30914 (Ban, Mute, Warning, Report, ModerationAction) + D1 projections |
+| Moderation | Nostr event kinds 30910-30916 (Ban, Mute, Warning, Report, ModerationAction, Unban, Unmute) + 1984 (NIP-56 Report) + D1 projections |
 | WoT/Invites | Referente kind-3 whitelist, tenure-based invite credits, welcome bot |
 
 ## Build & Test Commands
@@ -251,6 +251,11 @@ Nostr custom parameterized-replaceable events:
 | 30912 | Warning | warned pubkey + ts | admin |
 | 30913 | Report | reported event id | any authed user |
 | 30914 | ModerationAction | action uuid | admin |
+| 30915 | Unban | banned pubkey | admin (revokes 30910) |
+| 30916 | Unmute | muted pubkey | admin (revokes 30911) |
+| 1984 | Report (NIP-56) | reported event id | any authed user (interop) |
+
+Constants live in `nostr-core::moderation_events` (`KIND_BAN`, `KIND_MUTE`, `KIND_WARNING`, `KIND_REPORT`, `KIND_MODERATION_ACTION`, `KIND_UNBAN`, `KIND_UNMUTE`, `KIND_REPORT_NIP56`).
 
 Enforcement: relay-worker rejects kind-1/42 from pubkeys with active mute or any ban (60s DO-cached lookup against D1).
 

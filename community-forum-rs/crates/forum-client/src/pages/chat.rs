@@ -10,7 +10,7 @@ use crate::components::board_stats::BoardStats;
 use crate::components::channel_card::{ChannelCard, ChannelInfo};
 use crate::components::mark_all_read::MarkAllRead;
 use crate::components::todays_activity::TodaysActivity;
-use crate::components::top_posters::{TopPosters, PosterData};
+use crate::components::top_posters::{PosterData, TopPosters};
 use crate::stores::channels::use_channel_store;
 use crate::stores::mute::use_mute_store;
 use crate::stores::read_position::use_read_positions;
@@ -28,8 +28,25 @@ const SECTION_FILTERS: &[(&str, &str)] = &[
 /// Maps zone IDs to their child section IDs.
 const ZONE_SECTIONS: &[(&str, &[&str])] = &[
     ("home", &["dreamlab-lobby"]),
-    ("dreamlab", &["dreamlab-training", "dreamlab-projects", "dreamlab-bookings", "ai-general", "ai-claude-flow", "ai-visionflow"]),
-    ("minimoonoir", &["minimoonoir-welcome", "minimoonoir-events", "minimoonoir-booking"]),
+    (
+        "dreamlab",
+        &[
+            "dreamlab-training",
+            "dreamlab-projects",
+            "dreamlab-bookings",
+            "ai-general",
+            "ai-claude-flow",
+            "ai-visionflow",
+        ],
+    ),
+    (
+        "minimoonoir",
+        &[
+            "minimoonoir-welcome",
+            "minimoonoir-events",
+            "minimoonoir-booking",
+        ],
+    ),
 ];
 
 /// Resolve a channel's section tag to its parent zone ID.
@@ -43,12 +60,7 @@ fn section_to_zone_id(section: &str) -> Option<&'static str> {
 }
 
 /// Check whether the user can see a channel based on its section's zone access.
-fn can_see_channel(
-    section: &str,
-    home: bool,
-    dreamlab: bool,
-    minimoonoir: bool,
-) -> bool {
+fn can_see_channel(section: &str, home: bool, dreamlab: bool, minimoonoir: bool) -> bool {
     match section_to_zone_id(section) {
         Some("home") => home,
         Some("dreamlab") => dreamlab,
@@ -76,9 +88,7 @@ pub fn ChatPage() -> impl IntoView {
     let read_store = use_read_positions();
 
     // -- Dashboard derived signals from ChannelStore --
-    let total_messages = Signal::derive(move || {
-        store.message_counts.get().values().sum::<u32>()
-    });
+    let total_messages = Signal::derive(move || store.message_counts.get().values().sum::<u32>());
     let total_users = Signal::derive(move || {
         // Approximate: count unique authors from channel_messages
         let all = store.channel_messages.get();
@@ -95,7 +105,10 @@ pub fn ChatPage() -> impl IntoView {
         // Estimate: channels with activity in last 5 minutes
         let now = (js_sys::Date::now() / 1000.0) as u64;
         let active = store.last_active.get();
-        active.values().filter(|&&ts| now.saturating_sub(ts) < 300).count() as u32
+        active
+            .values()
+            .filter(|&&ts| now.saturating_sub(ts) < 300)
+            .count() as u32
     });
     let today_messages = Signal::derive(move || {
         let now = (js_sys::Date::now() / 1000.0) as u64;
@@ -125,12 +138,15 @@ pub fn ChatPage() -> impl IntoView {
         let mut sorted: Vec<_> = counts.into_iter().collect();
         sorted.sort_by(|a, b| b.1.cmp(&a.1));
         sorted.truncate(10);
-        sorted.into_iter().map(|(pk, count)| PosterData {
-            pubkey: pk.clone(),
-            name: crate::components::user_display::use_display_name(&pk),
-            message_count: count,
-            avatar_url: None,
-        }).collect::<Vec<_>>()
+        sorted
+            .into_iter()
+            .map(|(pk, count)| PosterData {
+                pubkey: pk.clone(),
+                name: crate::components::user_display::use_display_name(&pk),
+                message_count: count,
+                avatar_url: None,
+            })
+            .collect::<Vec<_>>()
     });
     let activity_data = Signal::derive(move || {
         let now = (js_sys::Date::now() / 1000.0) as u64;
@@ -142,11 +158,18 @@ pub fn ChatPage() -> impl IntoView {
                     let date = js_sys::Date::new_0();
                     date.set_time((ev.created_at as f64) * 1000.0);
                     let hour = date.get_hours() as usize;
-                    if hour < 24 { hourly[hour] += 1; }
+                    if hour < 24 {
+                        hourly[hour] += 1;
+                    }
                 }
             }
         }
-        (0..24).map(|h| ActivityPoint { hour: h as u32, count: hourly[h] }).collect::<Vec<_>>()
+        (0..24)
+            .map(|h| ActivityPoint {
+                hour: h as u32,
+                count: hourly[h],
+            })
+            .collect::<Vec<_>>()
     });
 
     // Mark all channels as read callback

@@ -58,13 +58,7 @@ impl MuteStore {
     #[allow(dead_code)]
     pub fn channel_muted_signal(&self, channel_id: String) -> Memo<bool> {
         let inner = self.inner;
-        Memo::new(move |_| {
-            inner
-                .get()
-                .muted_channels
-                .iter()
-                .any(|c| c == &channel_id)
-        })
+        Memo::new(move |_| inner.get().muted_channels.iter().any(|c| c == &channel_id))
     }
 
     // -- User mute ------------------------------------------------------------

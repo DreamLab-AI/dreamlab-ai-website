@@ -4,6 +4,16 @@
 //! then production fallback. All forum-client modules should use these functions
 //! instead of duplicating URL resolution logic.
 
+/// The WebSocket relay URL (wss://...) used for Nostr subscriptions.
+pub fn relay_url() -> String {
+    if let Some(url) = window_env("VITE_RELAY_URL") {
+        return url;
+    }
+    option_env!("VITE_RELAY_URL")
+        .unwrap_or("wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev")
+        .to_string()
+}
+
 /// Base URL for the relay HTTP API (whitelist, setup-status, etc.).
 ///
 /// Converts a WebSocket relay URL to HTTPS for HTTP API calls.
@@ -57,7 +67,11 @@ fn window_env(key: &str) -> Option<String> {
     }
     let val = js_sys::Reflect::get(&env, &key.into()).ok()?;
     let s = val.as_string()?;
-    if s.is_empty() { None } else { Some(s) }
+    if s.is_empty() {
+        None
+    } else {
+        Some(s)
+    }
 }
 
 /// Convert a WebSocket URL to an HTTP(S) URL for API calls.
@@ -112,10 +126,7 @@ mod tests {
 
     #[test]
     fn ws_to_http_preserves_port() {
-        assert_eq!(
-            ws_to_http("ws://localhost:8080"),
-            "http://localhost:8080"
-        );
+        assert_eq!(ws_to_http("ws://localhost:8080"), "http://localhost:8080");
     }
 
     #[test]

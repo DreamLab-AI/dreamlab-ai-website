@@ -15,8 +15,21 @@ on:
       - main
   workflow_dispatch:
 
+# Cancel in-flight runs of this workflow on the same ref to avoid
+# overlapping deploys racing for gh-pages.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Default-restrictive workflow permissions; jobs opt in to the minimum needed.
+permissions:
+  contents: read
+
 env:
   CARGO_TERM_COLOR: always
+  RUST_TOOLCHAIN: '1.90.0'
+  TRUNK_VERSION: '0.21.12'
+  TRUNK_SHA256: 'e5261930aab979dc5d0388fdc71bc32bedf0a15211ef8c8703fa2b7a2016394b'
   # Production API URLs — baked into WASM via option_env!() at compile time
   VITE_RELAY_URL: 'wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev'
   VITE_AUTH_API_URL: 'https://dreamlab-auth-api.solitary-paper-764d.workers.dev'
@@ -27,11 +40,22 @@ env:
   FORUM_BASE: '/community'
 
 jobs:
+  # Pre-deploy gate: must be green before we touch gh-pages.
+  gate:
+    name: Pre-deploy Gate
+    if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
+    uses: ./.github/workflows/test-and-lint.yml
+    permissions:
+      contents: read
+
   build-and-deploy:
+    name: Build + Deploy
+    needs: [gate]
     if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     permissions:
-      contents: write
+      contents: write   # required to push gh-pages
 
     steps:
       - name: Check out the code
@@ -49,10 +73,16 @@ jobs:
 
       - name: Build React main site
         run: npm run build
+        env:
+          # Inject Supabase credentials into Vite build (consumed via
+          # import.meta.env.VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY).
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_AUTH_API_URL: ${{ env.VITE_AUTH_API_URL }}
 
       # ── Rust/WASM forum client ─────────────────────────────────────────
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
+      - name: Install Rust toolchain ${{ env.RUST_TOOLCHAIN }}
+        uses: dtolnay/rust-toolchain@1.90.0
         with:
           targets: wasm32-unknown-unknown
 
@@ -63,20 +93,69 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             community-forum-rs/target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('community-forum-rs/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-${{ env.RUST_TOOLCHAIN }}-${{ hashFiles('community-forum-rs/Cargo.lock') }}
           restore-keys: |
+            ${{ runner.os }}-cargo-${{ env.RUST_TOOLCHAIN }}-
             ${{ runner.os }}-cargo-
 
-      - name: Install Trunk
+      - name: Install Trunk (pinned + SHA256-verified)
         run: |
-          TRUNK_VERSION="0.21.12"
-          curl -fsSL "https://github.com/trunk-rs/trunk/releases/download/v${TRUNK_VERSION}/trunk-x86_64-unknown-linux-gnu.tar.gz" \
-            | tar xz -C /usr/local/bin
+          set -euo pipefail
+          ARCHIVE="trunk-x86_64-unknown-linux-gnu.tar.gz"
+          URL="https://github.com/trunk-rs/trunk/releases/download/v${TRUNK_VERSION}/${ARCHIVE}"
+          curl -fsSL -o "${ARCHIVE}" "${URL}"
+          echo "${TRUNK_SHA256}  ${ARCHIVE}" | sha256sum -c -
+          tar xzf "${ARCHIVE}" -C /usr/local/bin
+          rm -f "${ARCHIVE}"
           trunk --version
 
-      - name: Build Leptos forum with Trunk
+      # binaryen 119 is the last release whose wasm-opt accepts Rust 1.90's
+      # bulk-memory codegen with --enable-bulk-memory{,-opt}. Trunk's bundled
+      # wasm-opt 122 rejects the same input. Install manually here and let
+      # Trunk.toml's post-build hook drive optimisation, since Trunk has no
+      # flag-passthrough for its built-in wasm-opt step.
+      - name: Install wasm-opt (binaryen 119)
+        run: |
+          set -euo pipefail
+          BINARYEN_VERSION="119"
+          ARCHIVE="binaryen-version_${BINARYEN_VERSION}-x86_64-linux.tar.gz"
+          URL="https://github.com/WebAssembly/binaryen/releases/download/version_${BINARYEN_VERSION}/${ARCHIVE}"
+          curl -fsSL -o "${ARCHIVE}" "${URL}"
+          sudo tar -xzf "${ARCHIVE}" -C /usr/local --strip-components=1
+          rm -f "${ARCHIVE}"
+          wasm-opt --version
+
+      # Standalone Tailwind CLI v3.4.17. The forum-client Trunk pre_build hook
+      # invokes `tailwindcss` to compile tailwind.css → tailwind.dist.css with
+      # tree-shaking, replacing the dev-only cdn.tailwindcss.com script. The
+      # hook downloads the binary itself if not present, but installing it in
+      # CI here makes the build reproducible and saves ~5s per run.
+      - name: Install Tailwind CLI (v3.4.17)
+        run: |
+          set -euo pipefail
+          TW_VERSION="3.4.17"
+          URL="https://github.com/tailwindlabs/tailwindcss/releases/download/v${TW_VERSION}/tailwindcss-linux-x64"
+          # /usr/local/bin requires sudo on GitHub-hosted runners; use sudo
+          # (matches the binaryen install pattern above which uses `sudo tar`).
+          sudo curl -fsSL -o /usr/local/bin/tailwindcss "${URL}"
+          sudo chmod +x /usr/local/bin/tailwindcss
+          tailwindcss --help | head -1
+
+      - name: Build Leptos forum with Trunk (release + post-build wasm-opt)
         working-directory: community-forum-rs/crates/forum-client
+        # --release re-enabled. Trunk.toml omits [tools] wasm_opt so Trunk
+        # skips its bundled wasm-opt 122; a [[hooks]] block runs the manually
+        # installed binaryen 119 wasm-opt with --enable-bulk-memory{,-opt}
+        # plus the other feature flags rustc 1.90 emits by default. A second
+        # pre_build hook runs Tailwind CLI to produce tailwind.dist.css.
         run: trunk build --release --public-url /community/
+
+      - name: Report forum WASM bundle size
+        run: |
+          set -euo pipefail
+          echo "=== Forum WASM bundle size ==="
+          find community-forum-rs/dist -name '*.wasm' -printf '%p  %s bytes\n' | \
+            awk '{printf "%s  %.2f MB\n", $1, $2/1024/1024}'
 
       # ── Combine outputs ────────────────────────────────────────────────
       - name: Merge React + Forum into dist/
@@ -154,8 +233,23 @@ jobs:
           cname: dreamlab-ai.com
           commit_message: "Deploy React + Leptos forum from ${{ github.sha }}"
 
-      - name: Deploy to thedreamlab.uk (mirror)
+      # Mirror push to thedreamlab.uk. Skips gracefully if PAT is not configured
+      # (e.g. on forks or before the secret is set up). Mirror failures must not
+      # block the primary GitHub Pages deploy.
+      - name: Check mirror token
+        id: mirror_token
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        run: |
+          if [ -n "${{ secrets.DREAMLAB_UK_TOKEN }}" ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::DREAMLAB_UK_TOKEN not set — skipping mirror push to thedreamlab.uk"
+          fi
+
+      - name: Deploy to thedreamlab.uk (mirror)
+        if: steps.mirror_token.outputs.available == 'true'
+        continue-on-error: true
         uses: peaceiris/actions-gh-pages@v3
         with:
           personal_token: ${{ secrets.DREAMLAB_UK_TOKEN }}
@@ -172,4 +266,5 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: '3.114.17'
           command: pages deploy dist/ --project-name=dreamlab-ai --commit-dirty=true

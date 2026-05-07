@@ -11,14 +11,17 @@
 //! - `auth.rs` -- NIP-98 verification wrapper
 
 mod admin;
+mod admins;
 mod auth;
 mod crypto;
+mod delegation;
 mod http;
 mod invites;
 mod moderation;
 mod pod;
 mod rate_limit;
 mod schema;
+mod username;
 mod webauthn;
 mod welcome;
 mod wot;
@@ -47,8 +50,12 @@ fn cors_headers(env: &Env) -> Headers {
     headers
 }
 
-/// Create a JSON error response that NEVER fails.
-/// Falls back to plain text if JSON serialization somehow fails.
+/// Create a JSON error response that NEVER masks failures with an empty 200.
+///
+/// If the primary `Response::ok` builder fails (it never has in practice),
+/// fall through to `Response::error(...)` and unwrap with `expect` so any
+/// actual breakage is visible at the runtime layer instead of being silently
+/// turned into a 200 with an empty body.
 fn error_response(env: &Env, message: &str, status: u16) -> Response {
     let body = format!(r#"{{"error":"{}"}}"#, message.replace('"', r#"\""#));
     let cors = cors_headers(env);
@@ -59,8 +66,10 @@ fn error_response(env: &Env, message: &str, status: u16) -> Response {
             resp
         }
         Err(_) => {
-            // Absolute fallback — should never happen
-            Response::error(message, status).unwrap_or_else(|_| Response::empty().unwrap())
+            // Hard error path. `Response::error` only fails if the static
+            // string allocation fails, which would mean the worker is in a
+            // worse state than this branch can reasonably recover from.
+            Response::error("internal", 500).expect("static error response")
         }
     }
 }
@@ -128,9 +137,7 @@ async fn handle_request(mut req: Request, env: &Env) -> Result<Response> {
     // Read body bytes BEFORE routing so they are available for both NIP-98
     // payload hash verification and route handler consumption.
     let body_bytes: Vec<u8> = match method {
-        Method::Post | Method::Put | Method::Patch => {
-            req.bytes().await.unwrap_or_default()
-        }
+        Method::Post | Method::Put | Method::Patch => req.bytes().await.unwrap_or_default(),
         _ => Vec::new(),
     };
 
@@ -194,11 +201,7 @@ async fn route(
 
     // WebAuthn Registration -- Verify
     if path == "/auth/register/verify" && *method == Method::Post {
-        let cf_country = req
-            .headers()
-            .get("CF-IPCountry")
-            .ok()
-            .flatten();
+        let cf_country = req.headers().get("CF-IPCountry").ok().flatten();
         return webauthn::register_verify(body_bytes, cf_country.as_deref(), env).await;
     }
 
@@ -226,8 +229,15 @@ async fn route(
         // These modules perform their own NIP-98 verification + admin/member
         // gating via `admin::require_admin` / `require_authed` so we dispatch
         // before the legacy `auth::verify_nip98` branch below.
-        if let Some(resp) =
-            route_sprint_api(req, env, path, method, body_bytes, auth_header_opt.as_deref()).await?
+        if let Some(resp) = route_sprint_api(
+            req,
+            env,
+            path,
+            method,
+            body_bytes,
+            auth_header_opt.as_deref(),
+        )
+        .await?
         {
             return Ok(resp);
         }
@@ -256,12 +266,14 @@ async fn route(
             _ => None,
         };
 
-        let result = auth::verify_nip98(
+        let result = auth::verify_nip98_replay(
             &auth_header,
             &request_url,
             method_str(method),
             body_for_nip98,
-        );
+            env,
+        )
+        .await;
 
         match result {
             Ok(token) => {
@@ -307,8 +319,7 @@ async fn route_sprint_api(
         .unwrap_or_default();
 
     // -- Moderation (WI-2) ----------------------------------------------
-    if matches!(path, "/api/mod/ban" | "/api/mod/mute" | "/api/mod/warn")
-        && *method == Method::Post
+    if matches!(path, "/api/mod/ban" | "/api/mod/mute" | "/api/mod/warn") && *method == Method::Post
     {
         let resp = moderation::handle_action(path, body_bytes, auth_header, env).await?;
         return Ok(Some(resp));
@@ -370,16 +381,14 @@ async fn route_sprint_api(
     if let Some(rest) = path.strip_prefix("/api/invites/") {
         if let Some(invite_id) = rest.strip_suffix("/revoke") {
             if *method == Method::Post && !invite_id.is_empty() && !invite_id.contains('/') {
-                let resp =
-                    invites::handle_revoke(invite_id, body_bytes, auth_header, env).await?;
+                let resp = invites::handle_revoke(invite_id, body_bytes, auth_header, env).await?;
                 return Ok(Some(resp));
             }
         }
         // POST /api/invites/:code/redeem
         if let Some(code) = rest.strip_suffix("/redeem") {
             if *method == Method::Post && !code.is_empty() && !code.contains('/') {
-                let resp =
-                    invites::handle_redeem(code, body_bytes, auth_header, env).await?;
+                let resp = invites::handle_redeem(code, body_bytes, auth_header, env).await?;
                 return Ok(Some(resp));
             }
         }
@@ -410,6 +419,46 @@ async fn route_sprint_api(
     }
     if path == "/api/welcome/test" && *method == Method::Post {
         let resp = welcome::handle_test(body_bytes, auth_header, env).await?;
+        return Ok(Some(resp));
+    }
+
+    // -- Admin management (WI-8) ----------------------------------------
+    if path == "/api/admins" && *method == Method::Get {
+        let resp = admins::handle_list(auth_header, env).await?;
+        return Ok(Some(resp));
+    }
+    if path == "/api/admins/add" && *method == Method::Post {
+        let resp = admins::handle_add(body_bytes, auth_header, env).await?;
+        return Ok(Some(resp));
+    }
+    if path == "/api/admins/remove" && *method == Method::Post {
+        let resp = admins::handle_remove(body_bytes, auth_header, env).await?;
+        return Ok(Some(resp));
+    }
+
+    // -- NIP-1984 standard report queue (admin view) --------------------
+    if path == "/api/moderation/reports" && *method == Method::Get {
+        let resp = moderation::handle_nip1984_reports(auth_header, env).await?;
+        return Ok(Some(resp));
+    }
+
+    // -- NIP-26 Delegation verification (stub for W6) -------------------
+    if path == "/api/delegation/verify" && *method == Method::Post {
+        let resp = delegation::handle_verify(body_bytes, auth_header, env).await?;
+        return Ok(Some(resp));
+    }
+
+    // -- Sprint v10: username reservations ------------------------------
+    if path == "/api/username/check" && *method == Method::Get {
+        let resp = username::handle_check(&query, env).await?;
+        return Ok(Some(resp));
+    }
+    if path == "/api/username/claim" && *method == Method::Post {
+        let resp = username::handle_claim(body_bytes, auth_header, env).await?;
+        return Ok(Some(resp));
+    }
+    if path == "/api/username/release" && *method == Method::Post {
+        let resp = username::handle_release(body_bytes, auth_header, env).await?;
         return Ok(Some(resp));
     }
 

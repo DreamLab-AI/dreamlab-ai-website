@@ -30,9 +30,7 @@ pub fn WelcomeModal() -> impl IntoView {
 
     let dismiss = move |_: web_sys::MouseEvent| {
         is_open.set(false);
-        if let Some(storage) = web_sys::window()
-            .and_then(|w| w.local_storage().ok().flatten())
-        {
+        if let Some(storage) = web_sys::window().and_then(|w| w.local_storage().ok().flatten()) {
             let _ = storage.set_item("dreamlab:welcomed", "1");
         }
     };
@@ -42,8 +40,8 @@ pub fn WelcomeModal() -> impl IntoView {
         move |ev: web_sys::KeyboardEvent| {
             if is_open.get_untracked() && ev.key() == "Escape" {
                 is_open.set(false);
-                if let Some(storage) = web_sys::window()
-                    .and_then(|w| w.local_storage().ok().flatten())
+                if let Some(storage) =
+                    web_sys::window().and_then(|w| w.local_storage().ok().flatten())
                 {
                     let _ = storage.set_item("dreamlab:welcomed", "1");
                 }
@@ -51,10 +49,8 @@ pub fn WelcomeModal() -> impl IntoView {
         },
     );
     if let Some(doc) = web_sys::window().and_then(|w| w.document()) {
-        let _ = doc.add_event_listener_with_callback(
-            "keydown",
-            esc_closure.as_ref().unchecked_ref(),
-        );
+        let _ =
+            doc.add_event_listener_with_callback("keydown", esc_closure.as_ref().unchecked_ref());
     }
     let esc_ref = send_wrapper::SendWrapper::new(esc_closure);
     on_cleanup(move || drop(esc_ref));

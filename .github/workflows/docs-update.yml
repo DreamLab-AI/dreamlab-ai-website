@@ -6,15 +6,18 @@ on:
     - cron: '0 22 * * 0'
   workflow_dispatch:
 
+# Default-restrictive workflow permissions; jobs opt in to the minimum needed.
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 jobs:
   update-timestamps:
     name: Update Last Modified Timestamps
     if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write       # required to commit timestamp updates
+      pull-requests: write  # required to open the PR
 
     steps:
       - name: Checkout code
@@ -72,6 +75,9 @@ jobs:
     name: Check for Outdated Documentation
     if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read   # only reads docs
+      issues: write    # opens an issue if outdated docs found
 
     steps:
       - name: Checkout code

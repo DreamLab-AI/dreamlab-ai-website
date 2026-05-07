@@ -45,17 +45,22 @@ const WorkshopPage = () => {
 
   // Dynamic mermaid import ref (reduces initial bundle by ~679KB)
   const mermaidRef = useRef<typeof mermaidAPI | null>(null);
+  const [mermaidReady, setMermaidReady] = useState(false);
 
   // Initialize Mermaid.js lazily (only when needed)
   useEffect(() => {
+    let cancelled = false;
     const loadMermaid = async () => {
       if (!mermaidRef.current) {
         const mermaidModule = await import('mermaid');
+        if (cancelled) return;
         mermaidRef.current = mermaidModule.default;
         mermaidRef.current.initialize({ startOnLoad: false, theme: 'default' });
       }
+      if (!cancelled) setMermaidReady(true);
     };
     loadMermaid();
+    return () => { cancelled = true; };
   }, []);
 
   // Effect to load the workshop manifest (with cancellation support)
@@ -163,19 +168,19 @@ const WorkshopPage = () => {
 
   // Effect to render Mermaid diagrams after content is loaded and DOM updated
   useEffect(() => {
-    if (!isLoadingContent && currentPageContent) {
-      setTimeout(() => {
+    if (!isLoadingContent && currentPageContent && mermaidReady && mermaidRef.current) {
+      const renderTimer = setTimeout(() => {
         try {
           const mermaidElements = document.querySelectorAll('code.language-mermaid');
           if (mermaidElements.length > 0) {
             mermaidElements.forEach((el, i) => {
-              const id = `mermaid-diagram-${i}`;
+              const id = `mermaid-diagram-${Date.now()}-${i}`;
               const graphDefinition = (el as HTMLElement).textContent || '';
               if (document.body.contains(el) && !el.getAttribute('data-mermaid-processed')) {
                 try {
                   // Sanitize input to prevent XSS
                   const sanitizedDefinition = graphDefinition.replace(/<script/gi, '&lt;script');
-                  // Use dynamically loaded mermaid
+                  // Use dynamically loaded mermaid (guaranteed non-null by guard above)
                   if (!mermaidRef.current) return;
                   mermaidRef.current.render(id, sanitizedDefinition).then(({ svg, bindFunctions }) => {
                     if (document.body.contains(el)) {
@@ -195,7 +200,9 @@ const WorkshopPage = () => {
                       el.setAttribute('data-mermaid-processed', 'true');
                     }
                   }).catch(caughtRenderError => {
-                    console.error(`Mermaid render error for diagram ${id}:`, caughtRenderError);
+                    if (import.meta.env.DEV) {
+                      console.warn(`Mermaid render failed for ${id}:`, caughtRenderError);
+                    }
                     if (document.body.contains(el)) {
                       // Security: Use textContent instead of innerHTML for error messages
                       const errorMsg = `Error rendering Mermaid diagram: ${caughtRenderError instanceof Error ? caughtRenderError.message : String(caughtRenderError)}`;
@@ -206,7 +213,9 @@ const WorkshopPage = () => {
                     }
                   });
                 } catch (initError) {
-                  console.error(`Mermaid initial render error for diagram ${id}:`, initError);
+                  if (import.meta.env.DEV) {
+                    console.warn(`Mermaid initial render error for ${id}:`, initError);
+                  }
                   if (document.body.contains(el)) {
                     // Security: Use textContent instead of innerHTML for error messages
                     const errorMsg = `Error rendering Mermaid diagram: ${initError instanceof Error ? initError.message : String(initError)}`;
@@ -220,11 +229,12 @@ const WorkshopPage = () => {
             });
           }
         } catch (e) {
-          console.error("Mermaid rendering error:", e);
+          if (import.meta.env.DEV) console.warn("Mermaid rendering error:", e);
         }
       }, 100);
+      return () => clearTimeout(renderTimer);
     }
-  }, [isLoadingContent, currentPageContent]);
+  }, [isLoadingContent, currentPageContent, mermaidReady, currentActualSlug]);
 
   // Calculate current chapter index for progress tracking
   const currentChapterIndex = useMemo(() => {

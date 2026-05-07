@@ -1,0 +1,29 @@
+# relay-worker wrangler manifest for the DreamLab deployment.
+#
+# Preserved CF resource IDs from community-forum-rs/crates/relay-worker/wrangler.toml.
+
+name = "dreamlab-nostr-relay"
+main = "build/worker/shim.mjs"
+compatibility_date = "2025-09-01"
+
+[build]
+command = "worker-build --release"
+
+[vars]
+RELAY_NAME       = "DreamLab Nostr Relay"
+ALLOWED_ORIGIN   = "https://dreamlab-ai.com"
+ALLOWED_ORIGINS  = "https://dreamlab-ai.com,https://thedreamlab.uk,https://dreamlab-ai.github.io"
+
+# D1 + KV resources for the relay's Durable Object.
+# TODO(ops): re-bind these to the production IDs from the legacy fork.
+[[durable_objects.bindings]]
+name        = "RELAY"
+class_name  = "RelayDO"
+
+[[migrations]]
+tag         = "v1"
+new_classes = ["RelayDO"]
+
+[[kv_namespaces]]
+binding = "NIP98_REPLAY"
+id      = "REPLACE_WITH_NEW_NIP98_REPLAY_KV_ID"

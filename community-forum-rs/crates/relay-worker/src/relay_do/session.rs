@@ -121,13 +121,16 @@ impl NostrRelayDO {
                     // Restore auth state from DO storage
                     let authed_pubkey = Self::load_auth(&storage, sid).await;
 
-                    sessions.insert(sid, SessionInfo {
-                        ws: other_ws,
-                        ip: other_ip,
-                        subscriptions,
-                        authed_pubkey,
-                        challenge: ch,
-                    });
+                    sessions.insert(
+                        sid,
+                        SessionInfo {
+                            ws: other_ws,
+                            ip: other_ip,
+                            subscriptions,
+                            authed_pubkey,
+                            challenge: ch,
+                        },
+                    );
                     let mut next = self.next_session_id.borrow_mut();
                     if sid >= *next {
                         *next = sid + 1;
@@ -142,17 +145,23 @@ impl NostrRelayDO {
             let subscriptions = Self::load_subscriptions(&storage, session_id).await;
             let authed_pubkey = Self::load_auth(&storage, session_id).await;
 
-            sessions.insert(session_id, SessionInfo {
-                ws: ws.clone(),
-                ip: recovered_ip,
-                subscriptions,
-                authed_pubkey,
-                challenge,
-            });
+            sessions.insert(
+                session_id,
+                SessionInfo {
+                    ws: ws.clone(),
+                    ip: recovered_ip,
+                    subscriptions,
+                    authed_pubkey,
+                    challenge,
+                },
+            );
         }
 
         let sub_count: usize = sessions.values().map(|s| s.subscriptions.len()).sum();
-        let auth_count = sessions.values().filter(|s| s.authed_pubkey.is_some()).count();
+        let auth_count = sessions
+            .values()
+            .filter(|s| s.authed_pubkey.is_some())
+            .count();
         console_log!(
             "[RelayDO] Recovered {} session(s) from hibernation (active: #{}, {} subs, {} authed)",
             sessions.len(),
@@ -177,10 +186,7 @@ impl NostrRelayDO {
     }
 
     /// Load persisted auth pubkey for a session from DO transactional storage.
-    async fn load_auth(
-        storage: &worker::durable::Storage,
-        session_id: u64,
-    ) -> Option<String> {
+    async fn load_auth(storage: &worker::durable::Storage, session_id: u64) -> Option<String> {
         let key = format!("ws_auth:{session_id}");
         storage.get::<String>(&key).await.unwrap_or_default()
     }
@@ -197,7 +203,11 @@ impl NostrRelayDO {
         if let Some(json) = subs_json {
             let key = format!("ws_sub:{session_id}");
             if let Err(e) = self.state.storage().put(&key, json).await {
-                console_log!("[RelayDO] Failed to persist subscriptions for #{}: {:?}", session_id, e);
+                console_log!(
+                    "[RelayDO] Failed to persist subscriptions for #{}: {:?}",
+                    session_id,
+                    e
+                );
             }
         }
     }
@@ -206,7 +216,11 @@ impl NostrRelayDO {
     pub(crate) async fn save_auth(&self, session_id: u64, pubkey: &str) {
         let key = format!("ws_auth:{session_id}");
         if let Err(e) = self.state.storage().put(&key, pubkey.to_string()).await {
-            console_log!("[RelayDO] Failed to persist auth for #{}: {:?}", session_id, e);
+            console_log!(
+                "[RelayDO] Failed to persist auth for #{}: {:?}",
+                session_id,
+                e
+            );
         }
     }
 
@@ -267,12 +281,18 @@ impl NostrRelayDO {
 // ---------------------------------------------------------------------------
 
 /// Generate a unique challenge string for NIP-42 AUTH.
+///
+/// NIP-42 challenge unpredictability is the entire security property of the
+/// AUTH handshake — a predictable challenge lets a network attacker forge an
+/// AUTH response. `js_sys::Math::random()` is a non-cryptographic PRNG; this
+/// implementation uses `getrandom` which on the CF Workers runtime delegates
+/// to `crypto.getRandomValues` (a CSPRNG). The session id is XOR-mixed in to
+/// preserve uniqueness across collisions in the unlikely event two sessions
+/// observe the same 128-bit draw.
 pub(crate) fn generate_challenge(session_id: u64) -> String {
-    let r1 = js_sys::Math::random();
-    let r2 = js_sys::Math::random();
-    format!(
-        "{:016x}{:016x}",
-        (r1 * u64::MAX as f64) as u64,
-        (r2 * u64::MAX as f64) as u64 ^ session_id
-    )
+    let mut bytes = [0u8; 16];
+    getrandom::getrandom(&mut bytes).expect("crypto.getRandomValues unavailable");
+    let r1 = u64::from_be_bytes(bytes[..8].try_into().expect("8 bytes"));
+    let r2 = u64::from_be_bytes(bytes[8..].try_into().expect("8 bytes"));
+    format!("{:016x}{:016x}", r1, r2 ^ session_id)
 }

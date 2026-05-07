@@ -196,5 +196,9 @@ pub async fn handle_audit_log_list(req: &Request, env: &Env) -> Result<Response>
         })
         .collect();
 
-    json_response(env, &json!({ "entries": entries, "limit": limit, "offset": offset }), 200)
+    json_response(
+        env,
+        &json!({ "entries": entries, "limit": limit, "offset": offset }),
+        200,
+    )
 }

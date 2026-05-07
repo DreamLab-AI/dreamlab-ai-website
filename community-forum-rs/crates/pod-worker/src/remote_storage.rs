@@ -158,8 +158,9 @@ mod tests {
         let pk = "d".repeat(64);
         let resp = webfinger_response(&pk, "dreamlab-ai.com", "https://pods.dreamlab-ai.com");
         let links = resp["links"].as_array().unwrap();
-        assert!(links.iter().any(|l| l["rel"] == "self"
-            && l["type"] == "application/activity+json"));
+        assert!(links
+            .iter()
+            .any(|l| l["rel"] == "self" && l["type"] == "application/activity+json"));
     }
 
     #[test]
@@ -183,10 +184,7 @@ mod tests {
     #[test]
     fn solid_discovery_has_api_base() {
         let resp = solid_discovery("https://pods.dreamlab-ai.com");
-        assert_eq!(
-            resp["apiBase"],
-            "https://pods.dreamlab-ai.com/pods/"
-        );
+        assert_eq!(resp["apiBase"], "https://pods.dreamlab-ai.com/pods/");
     }
 
     #[test]

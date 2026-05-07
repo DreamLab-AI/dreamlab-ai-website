@@ -1,0 +1,34 @@
+# pod-worker wrangler manifest for the DreamLab deployment.
+#
+# Preserved CF resource IDs from community-forum-rs/crates/pod-worker/wrangler.toml.
+
+name = "dreamlab-pod-api"
+main = "build/worker/shim.mjs"
+compatibility_date = "2025-09-01"
+
+[build]
+command = "worker-build --release"
+
+[[r2_buckets]]
+binding     = "PODS"
+bucket_name = "dreamlab-pods"
+
+# Read-only ADMIN_KV view (split per audit H6 — pod-worker reads admin
+# flags but cannot mutate them; auth-worker is the write authority).
+# TODO(ops): provision via `wrangler kv:namespace create dreamlab-admin-kv`
+# and grant pod-worker read-only access (or share the same id and rely on
+# code-level read/write split).
+[[kv_namespaces]]
+binding = "ADMIN_KV_RO"
+id      = "REPLACE_WITH_NEW_ADMIN_KV_ID"
+
+[[kv_namespaces]]
+binding = "POD_META"
+id      = "8ec8759ab40d4709a831bf6b0e5241eb"
+
+[[kv_namespaces]]
+binding = "NIP98_REPLAY"
+id      = "REPLACE_WITH_NEW_NIP98_REPLAY_KV_ID"
+
+[vars]
+EXPECTED_ORIGIN = "https://dreamlab-ai.com"

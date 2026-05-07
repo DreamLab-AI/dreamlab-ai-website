@@ -257,4 +257,3 @@ fn WatermarkIcon(icon: &'static str) -> impl IntoView {
         _ => view! { <span></span> }.into_any(),
     }
 }
-

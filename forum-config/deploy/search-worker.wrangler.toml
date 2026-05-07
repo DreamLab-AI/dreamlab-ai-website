@@ -1,0 +1,25 @@
+# search-worker wrangler manifest for the DreamLab deployment.
+
+name = "dreamlab-search-api"
+main = "build/worker/shim.mjs"
+compatibility_date = "2025-09-01"
+
+[build]
+command = "worker-build --release"
+
+[[r2_buckets]]
+binding     = "VECTORS"
+bucket_name = "dreamlab-vectors"
+
+[[kv_namespaces]]
+binding = "SEARCH_CONFIG"
+id      = "440b1f07ff224fb8ad644e094c6766c0"
+
+[[kv_namespaces]]
+binding = "NIP98_REPLAY"
+id      = "REPLACE_WITH_NEW_NIP98_REPLAY_KV_ID"
+
+[vars]
+ALLOWED_ORIGIN   = "https://dreamlab-ai.com"
+ALLOWED_ORIGINS  = "https://dreamlab-ai.com,https://thedreamlab.uk,https://dreamlab-ai.github.io"
+RVF_STORE_KEY    = "dreamlab.rvf"

@@ -111,16 +111,31 @@ pub async fn handle_check_whitelist(req: &Request, env: &Env) -> Result<Response
 
     // Compute 3-boolean access flags from legacy cohort values
     let has_home = is_admin_key
-        || cohorts.iter().any(|c| matches!(c.as_str(), "home" | "lobby" | "approved" | "cross-access"));
+        || cohorts
+            .iter()
+            .any(|c| matches!(c.as_str(), "home" | "lobby" | "approved" | "cross-access"));
     let has_dreamlab = is_admin_key
-        || cohorts.iter().any(|c| matches!(c.as_str(),
-            "dreamlab" | "business" | "business-only" | "trainers" | "trainees"
-            | "ai-agents" | "agent" | "visionflow-full" | "cross-access"
-        ));
+        || cohorts.iter().any(|c| {
+            matches!(
+                c.as_str(),
+                "dreamlab"
+                    | "business"
+                    | "business-only"
+                    | "trainers"
+                    | "trainees"
+                    | "ai-agents"
+                    | "agent"
+                    | "visionflow-full"
+                    | "cross-access"
+            )
+        });
     let has_minimoonoir = is_admin_key
-        || cohorts.iter().any(|c| matches!(c.as_str(),
-            "minimoonoir" | "minimoonoir-only" | "minimoonoir-business" | "cross-access"
-        ));
+        || cohorts.iter().any(|c| {
+            matches!(
+                c.as_str(),
+                "minimoonoir" | "minimoonoir-only" | "minimoonoir-business" | "cross-access"
+            )
+        });
 
     json_response(
         env,

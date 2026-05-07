@@ -47,8 +47,12 @@ const ZONES: &[Zone] = &[
         icon: "sparkle",
         accent: "pink",
         sections: &[
-            "dreamlab-training", "dreamlab-projects", "dreamlab-bookings",
-            "ai-general", "ai-claude-flow", "ai-visionflow",
+            "dreamlab-training",
+            "dreamlab-projects",
+            "dreamlab-bookings",
+            "ai-general",
+            "ai-claude-flow",
+            "ai-visionflow",
         ],
     },
     Zone {
@@ -57,7 +61,11 @@ const ZONES: &[Zone] = &[
         description: "For friends and visitors staying with us",
         icon: "moon",
         accent: "purple",
-        sections: &["minimoonoir-welcome", "minimoonoir-events", "minimoonoir-booking"],
+        sections: &[
+            "minimoonoir-welcome",
+            "minimoonoir-events",
+            "minimoonoir-booking",
+        ],
     },
 ];
 
@@ -126,8 +134,7 @@ pub fn ForumsPage() -> impl IntoView {
     });
 
     view! {
-        // Onboarding modal — shown once to new users on first login
-        <crate::components::onboarding_modal::OnboardingModal />
+        // Onboarding modal mounted globally in app.rs Layout — see N3e.
 
         <div class="max-w-6xl mx-auto p-4 sm:p-6">
             // Hero header
@@ -416,10 +423,7 @@ fn ZoneIcon(icon: &'static str, accent: &'static str) -> impl IntoView {
 
 /// Convert a section ID like "minimoonoir-welcome" to "Welcome".
 fn humanize_section_id(id: &str) -> String {
-    let suffix = id
-        .find('-')
-        .map(|i| &id[i + 1..])
-        .unwrap_or(id);
+    let suffix = id.find('-').map(|i| &id[i + 1..]).unwrap_or(id);
     suffix
         .split('-')
         .map(|w| {
