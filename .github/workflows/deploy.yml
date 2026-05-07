@@ -135,8 +135,10 @@ jobs:
           set -euo pipefail
           TW_VERSION="3.4.17"
           URL="https://github.com/tailwindlabs/tailwindcss/releases/download/v${TW_VERSION}/tailwindcss-linux-x64"
-          curl -fsSL -o /usr/local/bin/tailwindcss "${URL}"
-          chmod +x /usr/local/bin/tailwindcss
+          # /usr/local/bin requires sudo on GitHub-hosted runners; use sudo
+          # (matches the binaryen install pattern above which uses `sudo tar`).
+          sudo curl -fsSL -o /usr/local/bin/tailwindcss "${URL}"
+          sudo chmod +x /usr/local/bin/tailwindcss
           tailwindcss --help | head -1
 
       - name: Build Leptos forum with Trunk (release + post-build wasm-opt)
