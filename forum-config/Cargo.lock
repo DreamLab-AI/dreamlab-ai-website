@@ -249,7 +249,7 @@ dependencies = [
 
 [[package]]
 name = "dreamlab-forum-config"
-version = "3.0.0-rc3"
+version = "3.0.0-rc4"
 dependencies = [
  "nostr-bbs-config",
  "nostr-bbs-core",
@@ -620,6 +620,7 @@ version = "0.44.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3aa5e3b6a278ed061835fe1ee293b71641e6bf8b401cfe4e1834bbf4ef0a34e1"
 dependencies = [
+ "aes",
  "base64",
  "bech32",
  "bip39",
@@ -640,7 +641,9 @@ dependencies = [
 
 [[package]]
 name = "nostr-bbs-config"
-version = "3.0.0-rc3"
+version = "3.0.0-rc4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cb09e2399161fd848b67e89fbaa1e769206a2f936bdabbcad44722276c8ca922"
 dependencies = [
  "schemars",
  "serde",
@@ -652,7 +655,9 @@ dependencies = [
 
 [[package]]
 name = "nostr-bbs-core"
-version = "3.0.0-rc3"
+version = "3.0.0-rc4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "efcde81fc20ab8f22c293d7b9053ee2ac00d98f438fb9e615356e70dbdb518ef"
 dependencies = [
  "aes",
  "async-trait",
@@ -678,7 +683,9 @@ dependencies = [
 
 [[package]]
 name = "nostr-bbs-mesh"
-version = "3.0.0-rc3"
+version = "3.0.0-rc4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ac1214fb4bd643000b3fd5db5389b55bed37b99ac3667e77e35e0e4d5aaed8cf"
 dependencies = [
  "async-trait",
  "nostr-bbs-config",
