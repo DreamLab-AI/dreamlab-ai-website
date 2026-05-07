@@ -48,6 +48,12 @@
          Rust 1.90's bulk-memory ops. We run a manually-installed binaryen 119
          in a post_build Trunk hook instead — see Trunk.toml. -->
     <link data-trunk rel="rust" data-wasm-opt="0" data-cargo-package="forum-client" data-bin="forum-client" />
+
+    <!-- Service worker copied to dist/community/sw.js so main.rs's
+         navigator.serviceWorker.register('./sw.js') resolves at runtime.
+         Trunk's correct asset-copy directive is rel="copy-file"; the [[copy]]
+         table in Trunk.toml is silently ignored. -->
+    <link data-trunk rel="copy-file" href="sw.js" />
 </head>
 <body>
     <!-- Loading screen — replaced by Leptos mount_to_body() -->

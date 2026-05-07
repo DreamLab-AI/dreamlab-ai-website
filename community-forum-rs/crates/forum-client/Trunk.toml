@@ -55,15 +55,8 @@ command_arguments = [
     "set -euo pipefail; if command -v tailwindcss >/dev/null 2>&1; then BIN=tailwindcss; elif [ -x ./.tailwindcss ]; then BIN=./.tailwindcss; else echo 'Downloading standalone Tailwind CLI v3.4.17...'; curl -fsSL -o ./.tailwindcss https://github.com/tailwindlabs/tailwindcss/releases/download/v3.4.17/tailwindcss-linux-x64; chmod +x ./.tailwindcss; BIN=./.tailwindcss; fi; \"$BIN\" -c tailwind.config.js -i tailwind.css -o tailwind.dist.css --minify"
 ]
 
-# WebGPU particle system JS module — copied to dist/js/ for wasm-bindgen import
-[[copy]]
-src = "js/webgpu-particles.js"
-dest = "js/webgpu-particles.js"
-
-# Service worker — copied to dist/ root so navigator.serviceWorker.register('./sw.js')
-# from main.rs resolves under /community/sw.js. Without this, registration 404s
-# with the generic "A bad HTTP response code (404) was received when fetching
-# the script" Chrome error (cosmetic — does not block the app).
-[[copy]]
-src = "sw.js"
-dest = "sw.js"
+# Note: Trunk's TOML schema does NOT support [[copy]] entries — those were
+# silently ignored. Use the HTML directive `<link data-trunk rel="copy-file">`
+# instead. See index.html for sw.js (registered via main.rs navigator.serviceWorker).
+# webgpu-particles.js gets bundled by wasm-bindgen via the snippets/ pipeline so
+# it doesn't need a top-level copy directive.
