@@ -109,16 +109,36 @@ jobs:
           rm -f "${ARCHIVE}"
           trunk --version
 
-      - name: Build Leptos forum with Trunk
+      # binaryen 119 is the last release whose wasm-opt accepts Rust 1.90's
+      # bulk-memory codegen with --enable-bulk-memory{,-opt}. Trunk's bundled
+      # wasm-opt 122 rejects the same input. Install manually here and let
+      # Trunk.toml's post-build hook drive optimisation, since Trunk has no
+      # flag-passthrough for its built-in wasm-opt step.
+      - name: Install wasm-opt (binaryen 119)
+        run: |
+          set -euo pipefail
+          BINARYEN_VERSION="119"
+          ARCHIVE="binaryen-version_${BINARYEN_VERSION}-x86_64-linux.tar.gz"
+          URL="https://github.com/WebAssembly/binaryen/releases/download/version_${BINARYEN_VERSION}/${ARCHIVE}"
+          curl -fsSL -o "${ARCHIVE}" "${URL}"
+          sudo tar -xzf "${ARCHIVE}" -C /usr/local --strip-components=1
+          rm -f "${ARCHIVE}"
+          wasm-opt --version
+
+      - name: Build Leptos forum with Trunk (release + post-build wasm-opt)
         working-directory: community-forum-rs/crates/forum-client
-        # FIXME: --release runs Trunk's bundled wasm-opt 122 which fails
-        # validation on Rust 1.90's bulk-memory ops without --enable-bulk-memory-opt.
-        # Trunk (0.21.12) doesn't expose flag passthrough for wasm-opt and
-        # `[tools] wasm_opt = false` is rejected as invalid TOML. Build without
-        # --release to skip Trunk's wasm-opt step entirely. Tradeoff:
-        # ~3-5x larger /community/ WASM bundle. Follow-up: wire a post_build
-        # hook that calls a manually-installed wasm-opt with the right flag.
-        run: trunk build --public-url /community/
+        # --release re-enabled. Trunk.toml omits [tools] wasm_opt so Trunk
+        # skips its bundled wasm-opt 122; a [[hooks]] block runs the manually
+        # installed binaryen 119 wasm-opt with --enable-bulk-memory{,-opt}
+        # plus the other feature flags rustc 1.90 emits by default.
+        run: trunk build --release --public-url /community/
+
+      - name: Report forum WASM bundle size
+        run: |
+          set -euo pipefail
+          echo "=== Forum WASM bundle size ==="
+          find community-forum-rs/dist -name '*.wasm' -printf '%p  %s bytes\n' | \
+            awk '{printf "%s  %.2f MB\n", $1, $2/1024/1024}'
 
       # ── Combine outputs ────────────────────────────────────────────────
       - name: Merge React + Forum into dist/

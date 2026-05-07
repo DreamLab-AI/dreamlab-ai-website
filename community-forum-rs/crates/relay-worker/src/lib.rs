@@ -18,6 +18,7 @@
 
 mod audit;
 mod auth;
+mod cron;
 mod moderation;
 mod nip11;
 mod profiles;
@@ -306,7 +307,67 @@ async fn route(req: Request, env: &Env, path: &str) -> Result<Response> {
         return profiles::handle_search(&req, env).await;
     }
 
+    // --- Sprint v11: profiles backfill (NIP-98 admin only, one-shot) ---
+    //
+    // Manually-triggered replay of historic kind-0 events into the `profiles`
+    // projection. Idempotent — the upsert's `last_kind0_at` guard means
+    // re-running is always safe.
+    if path == "/api/admin/profiles/backfill" && method == Method::Post {
+        return handle_profiles_backfill(req, env).await;
+    }
+
     json_response(&req, env, &serde_json::json!({ "error": "Not found" }), 404)
+}
+
+// ---------------------------------------------------------------------------
+// Sprint v11: profiles backfill admin endpoint
+// ---------------------------------------------------------------------------
+
+/// `POST /api/admin/profiles/backfill` — NIP-98 admin only.
+///
+/// Replays every stored kind-0 event through the `profiles` projection upsert
+/// (Sprint v10). Returns `{ scanned, backfilled, skipped, truncated }`.
+async fn handle_profiles_backfill(mut req: Request, env: &Env) -> Result<Response> {
+    let url = req.url()?;
+    let request_url = format!("{}{}", url.origin().ascii_serialization(), url.path());
+    let auth_header = req.headers().get("Authorization").ok().flatten();
+    let body_bytes = req.bytes().await.unwrap_or_default();
+    // Treat empty body as no body for NIP-98 payload-hash semantics; non-empty
+    // is hashed and verified.
+    let body_for_auth: Option<&[u8]> = if body_bytes.is_empty() {
+        None
+    } else {
+        Some(&body_bytes)
+    };
+
+    let _admin_pubkey = match auth::require_nip98_admin(
+        auth_header.as_deref(),
+        &request_url,
+        "POST",
+        body_for_auth,
+        env,
+    )
+    .await
+    {
+        Ok(pk) => pk,
+        Err((body, status)) => return json_response(&req, env, &body, status),
+    };
+
+    match cron::backfill_profiles(env).await {
+        Ok(result) => {
+            let body = serde_json::to_value(result).unwrap_or_else(|_| serde_json::json!({}));
+            json_response(&req, env, &body, 200)
+        }
+        Err(e) => {
+            console_error!("backfill_profiles failed: {e}");
+            json_response(
+                &req,
+                env,
+                &serde_json::json!({ "error": "backfill failed", "detail": e }),
+                500,
+            )
+        }
+    }
 }
 
 /// Idempotent schema migrations.

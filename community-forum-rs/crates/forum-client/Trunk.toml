@@ -9,12 +9,28 @@ watch = ["src", "../nostr-core/src"]
 address = "127.0.0.1"
 port = 8080
 
-# Optimize WASM binary size (~30% reduction).
-# Trunk downloads wasm-opt automatically. We disable bulk-memory codegen at
-# the rustc level via RUSTFLAGS in deploy.yml so wasm-opt can validate the
-# resulting module without needing --enable-bulk-memory-opt.
-[tools]
-wasm_opt = "version_122"
+# WASM optimisation strategy:
+#
+# Trunk (0.21.12)'s bundled wasm-opt resolution downloads version_122, which
+# rejects Rust 1.90's bulk-memory codegen with:
+#   "memory.copy operations require bulk memory operations [--enable-bulk-memory-opt]"
+# Trunk does not expose passthrough flags for wasm-opt, and `wasm_opt = false`
+# is rejected by Trunk's TOML schema.
+#
+# Workaround: omit the [tools] wasm_opt entry so Trunk skips its built-in
+# wasm-opt invocation entirely. Then run a post-build hook that calls a
+# manually-installed binaryen wasm-opt with the right feature flags.
+#
+# CI installs binaryen version_119 (see .github/workflows/deploy.yml). 119
+# is the last release before stricter validation defaults landed in 122.
+
+[[hooks]]
+stage = "build"
+command = "bash"
+command_arguments = [
+    "-c",
+    "if command -v wasm-opt >/dev/null 2>&1; then find \"$TRUNK_STAGING_DIR\" -name '*.wasm' -print0 | while IFS= read -r -d '' f; do echo \"wasm-opt: $f\"; wasm-opt -Oz --enable-bulk-memory --enable-bulk-memory-opt --enable-mutable-globals --enable-nontrapping-float-to-int --enable-sign-ext --enable-reference-types --output \"$f\" \"$f\"; done; else echo 'wasm-opt not found on PATH; skipping size optimisation' >&2; fi"
+]
 
 # WebGPU particle system JS module — copied to dist/js/ for wasm-bindgen import
 [[copy]]

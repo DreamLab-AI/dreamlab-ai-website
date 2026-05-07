@@ -28,7 +28,7 @@ use serde::Deserialize;
 use wasm_bindgen::JsCast;
 use wasm_bindgen_futures::{spawn_local, JsFuture};
 
-use crate::auth::nip98::fetch_with_nip98_post;
+use crate::auth::nip98::fetch_with_nip98_post_signer;
 use crate::auth::use_auth;
 use crate::utils::relay_url::auth_api_base;
 
@@ -367,13 +367,12 @@ pub fn OnboardingModal() -> impl IntoView {
                 return;
             }
         };
-        let privkey = match auth.get_privkey_bytes() {
-            Some(k) => k,
+        // Sprint v11: route signing through the Signer trait so NIP-07 and
+        // future hardware-bunker backends work alongside PRF/local keys.
+        let signer = match auth.get_signer() {
+            Some(s) => s,
             None => {
-                // NIP-07 / hardware-signer flows are not yet wired here.
-                submit_error.set(Some(
-                    "Username claim not yet supported for this signer type. Please use a passkey or local key.".into(),
-                ));
+                submit_error.set(Some("No signer available — please sign in again.".into()));
                 return;
             }
         };
@@ -387,10 +386,7 @@ pub fn OnboardingModal() -> impl IntoView {
         let name_for_meta = name.clone();
 
         spawn_local(async move {
-            // Copy the privkey into a stack array so the Zeroizing wrapper drops cleanly.
-            let key_arr: [u8; 32] = *privkey;
-
-            let result = fetch_with_nip98_post(&url, &body, &key_arr).await;
+            let result = fetch_with_nip98_post_signer(&url, &body, signer.as_ref()).await;
 
             match result {
                 Ok(text) => {
@@ -428,7 +424,9 @@ pub fn OnboardingModal() -> impl IntoView {
                         tags: vec![],
                         content: meta,
                     };
-                    if let Ok(signed) = auth.sign_event(unsigned) {
+                    // Use async signing so the kind-0 publish works for both
+                    // PRF/local-key and NIP-07 sessions.
+                    if let Ok(signed) = auth.sign_event_async(unsigned).await {
                         if let Some(relay) = use_context::<crate::relay::RelayConnection>() {
                             relay.publish(&signed);
                         }
@@ -655,14 +653,16 @@ pub async fn release_username() -> Result<(), String> {
         .pubkey()
         .get_untracked()
         .ok_or_else(|| "Not authenticated".to_string())?;
-    let privkey = auth
-        .get_privkey_bytes()
-        .ok_or_else(|| "Username release requires a passkey or local key signer".to_string())?;
-    let key_arr: [u8; 32] = *privkey;
+    // Sprint v11: route through the Signer trait so NIP-07 / hardware-bunker
+    // backends can release usernames. PRF-derived keys still work transparently
+    // because PrfSigner is the active signer for those sessions.
+    let signer = auth
+        .get_signer()
+        .ok_or_else(|| "No signer available — please sign in again.".to_string())?;
 
     let url = format!("{}/api/username/release", auth_api_base());
     let body = "{}".to_string();
-    let result = fetch_with_nip98_post(&url, &body, &key_arr).await;
+    let result = fetch_with_nip98_post_signer(&url, &body, signer.as_ref()).await;
     match result {
         Ok(_) => {
             clear_claimed_locally(&pubkey);
