@@ -127,8 +127,8 @@ pub fn conversation_key(sk: &[u8; 32], pk: &[u8; 32]) -> Result<[u8; 32], Nip44E
     // and produced HMAC(PRK, 0x01) instead of the PRK itself, breaking interoperability
     // with every reference NIP-44 v2 implementation. Validated against paulmillr/nip44
     // test vectors (`docs/specs/fixtures/nip44-v2.json`).
-    let mut mac = <HmacSha256 as Mac>::new_from_slice(HKDF_SALT)
-        .expect("HMAC accepts variable key length");
+    let mut mac =
+        <HmacSha256 as Mac>::new_from_slice(HKDF_SALT).expect("HMAC accepts variable key length");
     mac.update(&shared_point);
     let prk = mac.finalize().into_bytes();
     let mut conv_key = [0u8; 32];
