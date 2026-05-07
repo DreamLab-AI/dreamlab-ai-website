@@ -125,12 +125,27 @@ jobs:
           rm -f "${ARCHIVE}"
           wasm-opt --version
 
+      # Standalone Tailwind CLI v3.4.17. The forum-client Trunk pre_build hook
+      # invokes `tailwindcss` to compile tailwind.css → tailwind.dist.css with
+      # tree-shaking, replacing the dev-only cdn.tailwindcss.com script. The
+      # hook downloads the binary itself if not present, but installing it in
+      # CI here makes the build reproducible and saves ~5s per run.
+      - name: Install Tailwind CLI (v3.4.17)
+        run: |
+          set -euo pipefail
+          TW_VERSION="3.4.17"
+          URL="https://github.com/tailwindlabs/tailwindcss/releases/download/v${TW_VERSION}/tailwindcss-linux-x64"
+          curl -fsSL -o /usr/local/bin/tailwindcss "${URL}"
+          chmod +x /usr/local/bin/tailwindcss
+          tailwindcss --help | head -1
+
       - name: Build Leptos forum with Trunk (release + post-build wasm-opt)
         working-directory: community-forum-rs/crates/forum-client
         # --release re-enabled. Trunk.toml omits [tools] wasm_opt so Trunk
         # skips its bundled wasm-opt 122; a [[hooks]] block runs the manually
         # installed binaryen 119 wasm-opt with --enable-bulk-memory{,-opt}
-        # plus the other feature flags rustc 1.90 emits by default.
+        # plus the other feature flags rustc 1.90 emits by default. A second
+        # pre_build hook runs Tailwind CLI to produce tailwind.dist.css.
         run: trunk build --release --public-url /community/
 
       - name: Report forum WASM bundle size

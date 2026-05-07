@@ -32,7 +32,38 @@ command_arguments = [
     "if command -v wasm-opt >/dev/null 2>&1; then find \"$TRUNK_STAGING_DIR\" -name '*.wasm' -print0 | while IFS= read -r -d '' f; do echo \"wasm-opt: $f\"; wasm-opt -Oz --enable-bulk-memory --enable-bulk-memory-opt --enable-mutable-globals --enable-nontrapping-float-to-int --enable-sign-ext --enable-reference-types --output \"$f\" \"$f\"; done; else echo 'wasm-opt not found on PATH; skipping size optimisation' >&2; fi"
 ]
 
+# Tailwind CSS pre-build:
+#
+# Replaces the legacy <script src='cdn.tailwindcss.com'> Play-CDN script in
+# index.html (Chrome warns it should not be used in production). Uses the
+# standalone Tailwind CLI binary so the forum has zero Node dependencies —
+# CI downloads tailwindcss-linux-x64 once if not already on PATH.
+#
+# Inputs : tailwind.css       (source: @tailwind base/components/utilities)
+#          tailwind.config.js (mirrors the inline config previously in HTML)
+#          src/**/*.rs        (Leptos view! macros containing utility classes)
+#          index.html         (any inline class names)
+# Output : tailwind.dist.css  (tree-shaken, ready for Trunk to fingerprint
+#          via the data-trunk <link rel='css'> directive in index.html)
+#
+# Runs at stage = "pre_build" so Trunk picks up the freshly-compiled CSS.
+[[hooks]]
+stage = "pre_build"
+command = "bash"
+command_arguments = [
+    "-c",
+    "set -euo pipefail; if command -v tailwindcss >/dev/null 2>&1; then BIN=tailwindcss; elif [ -x ./.tailwindcss ]; then BIN=./.tailwindcss; else echo 'Downloading standalone Tailwind CLI v3.4.17...'; curl -fsSL -o ./.tailwindcss https://github.com/tailwindlabs/tailwindcss/releases/download/v3.4.17/tailwindcss-linux-x64; chmod +x ./.tailwindcss; BIN=./.tailwindcss; fi; \"$BIN\" -c tailwind.config.js -i tailwind.css -o tailwind.dist.css --minify"
+]
+
 # WebGPU particle system JS module — copied to dist/js/ for wasm-bindgen import
 [[copy]]
 src = "js/webgpu-particles.js"
 dest = "js/webgpu-particles.js"
+
+# Service worker — copied to dist/ root so navigator.serviceWorker.register('./sw.js')
+# from main.rs resolves under /community/sw.js. Without this, registration 404s
+# with the generic "A bad HTTP response code (404) was received when fetching
+# the script" Chrome error (cosmetic — does not block the app).
+[[copy]]
+src = "sw.js"
+dest = "sw.js"
