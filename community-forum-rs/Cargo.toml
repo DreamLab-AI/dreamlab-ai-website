@@ -9,6 +9,10 @@ members = [
     "crates/relay-worker",
     "crates/search-worker",
     "crates/admin-cli",
+    # F26 / ADR-076 D5 — upstream `nostr` crate WASM/CF Workers compatibility
+    # canary. Validates that the absorption path (Shape A) is viable on the
+    # forum's specific build matrix before any nostr-core module deletion.
+    "crates/nostr-upstream-canary",
 ]
 
 [workspace.dependencies]
