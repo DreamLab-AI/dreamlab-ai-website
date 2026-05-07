@@ -1,15 +1,4 @@
-/**
- * Tailwind config for the DreamLab community forum (Leptos CSR).
- *
- * Mirrors the inline `tailwind.config = { ... }` block that previously sat
- * next to the CDN <script> in index.html. Production builds use the
- * standalone Tailwind CLI (downloaded by Trunk pre-build hook) to produce
- * tree-shaken CSS, eliminating the dev-only Play CDN warning.
- *
- * Content scanning: Leptos `view! { ... }` macros expand to Rust source,
- * so utility classes appear in `src/**/*.rs`. The HTML shell is also
- * scanned for any inline classes.
- */
+/** @type {import('tailwindcss').Config} */
 module.exports = {
     darkMode: 'class',
     content: [
