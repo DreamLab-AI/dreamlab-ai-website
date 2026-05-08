@@ -22,12 +22,7 @@ class_name  = "NostrRelayDO"
 
 [[migrations]]
 tag         = "v1"
-new_classes = ["RelayDO"]
-
-[[migrations]]
-tag         = "v2"
-deleted_classes = ["RelayDO"]
-new_classes     = ["NostrRelayDO"]
+new_sqlite_classes = ["NostrRelayDO"]
 
 [[kv_namespaces]]
 binding = "NIP98_REPLAY"
