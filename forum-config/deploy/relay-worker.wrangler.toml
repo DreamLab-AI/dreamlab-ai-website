@@ -18,11 +18,15 @@ ALLOWED_ORIGINS  = "https://dreamlab-ai.com,https://thedreamlab.uk,https://dream
 # TODO(ops): re-bind these to the production IDs from the legacy fork.
 [[durable_objects.bindings]]
 name        = "RELAY"
-class_name  = "RelayDO"
+class_name  = "NostrRelayDO"
 
 [[migrations]]
 tag         = "v1"
 new_classes = ["RelayDO"]
+
+[[migrations]]
+tag         = "v2"
+renamed_classes = [{from = "RelayDO", to = "NostrRelayDO"}]
 
 [[kv_namespaces]]
 binding = "NIP98_REPLAY"
