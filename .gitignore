@@ -84,8 +84,7 @@ wasm-voronoi/target/
 # External reference repos (for analysis, not part of this project)
 external/
 
-# Large videos (>100MB, exceeds GitHub limit)
-public/data/media/videos/*.mp4
+# Videos are served from GitHub Pages — must be tracked
 
 # SQLite databases
 *.db
