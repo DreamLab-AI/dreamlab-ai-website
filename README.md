@@ -168,12 +168,11 @@ dreamlab-ai-website/
     lib/                        Utilities, Supabase client
 
   forum-config/                 Operator overlay for nostr-rust-forum kit
-    Cargo.toml                  Path-deps to nostr-bbs-{core,config,mesh} kit crates
+    Cargo.toml                  Depends on nostr-bbs-{core,config,mesh} from crates.io
     dreamlab.toml               DreamLab-specific operator config
     src/                        Branding + per-worker entry shims
-    deploy/                     Per-worker wrangler.toml with preserved CF resource IDs
+    deploy/                     Per-worker wrangler.toml with DreamLab CF resource IDs
 
-  community-forum-rs.frozen/    [LEGACY -- pending deletion] Original forum workspace
   wasm-voronoi/                 Rust WASM for 3D Voronoi hero effect
   public/data/                  Runtime content (team profiles, workshops, media)
   scripts/                      Build and utility scripts
@@ -203,35 +202,57 @@ All documentation lives in the [`docs/`](docs/README.md) directory. Start there 
 
 ## Deployment
 
+This repo is a **consumer** of the [nostr-rust-forum](https://github.com/DreamLab-AI/nostr-rust-forum) kit. It does not contain forum source code. All Rust worker and forum-client source lives upstream in the kit repo. CI workflows shallow-clone the kit at build time and overlay DreamLab-specific wrangler.toml configs from `forum-config/deploy/`.
+
 ```mermaid
 graph LR
     subgraph "GitHub Actions"
-        PUSH["Push to main"]
+        PUSH["Push to main<br/>(or workflow_dispatch)"]
         DEPLOY_YML["deploy.yml"]
         WORKERS_YML["workers-deploy.yml"]
     end
 
     subgraph "Build Steps"
+        CLONE["git clone --depth 1<br/>nostr-rust-forum → kit/"]
+        OVERLAY["cp forum-config/deploy/*.wrangler.toml<br/>→ kit/crates/"]
         NPM["npm run build<br/>(React)"]
-        TRUNK["trunk build --release<br/>(Leptos WASM)"]
+        TRUNK["trunk build --release<br/>(Leptos WASM from kit)"]
         WASM_OPT["wasm-opt -Oz<br/>(Size optimization)"]
-        WORKER_BUILD["worker-build --release<br/>(5 Rust Workers)"]
-        WRANGLER["wrangler deploy<br/>(5 Workers)"]
+        WORKER_BUILD["worker-build --release<br/>(5 kit crates)"]
+        WRANGLER["wrangler deploy<br/>(DreamLab configs)"]
     end
 
     subgraph "Hosting"
         GH_PAGES["GitHub Pages<br/>dreamlab-ai.com"]
-        CF_WORKERS["Cloudflare Workers<br/>api. / pods. / search. / preview."]
+        CF_WORKERS["Cloudflare Workers<br/>5 workers"]
     end
 
     PUSH --> DEPLOY_YML
     PUSH --> WORKERS_YML
-    DEPLOY_YML --> NPM --> TRUNK --> WASM_OPT --> GH_PAGES
-    WORKERS_YML --> WORKER_BUILD --> WRANGLER --> CF_WORKERS
+    DEPLOY_YML --> CLONE --> NPM --> TRUNK --> WASM_OPT --> GH_PAGES
+    WORKERS_YML --> CLONE
+    CLONE --> OVERLAY --> WORKER_BUILD --> WRANGLER --> CF_WORKERS
 
     style GH_PAGES fill:#24292e,color:#fff
     style CF_WORKERS fill:#F38020,color:#fff
+    style CLONE fill:#8B5CF6,color:#fff
+    style OVERLAY fill:#8B5CF6,color:#fff
 ```
+
+### Kit Consumer Architecture
+
+The separation follows **PRD-012** (kit adoption) and **ADR-085** (forum-config package):
+
+| Concern | Location | Owned by |
+|---------|----------|----------|
+| Worker source code | `nostr-rust-forum` (kit repo, crates.io) | Kit maintainers |
+| Forum client (Leptos WASM) | `nostr-rust-forum` (kit repo) | Kit maintainers |
+| CF resource IDs (D1, KV, R2) | `forum-config/deploy/*.wrangler.toml` | **This repo** |
+| Operator config (branding, vars) | `forum-config/dreamlab.toml` | **This repo** |
+| React marketing site | `src/` | **This repo** |
+| Test suites | `tests/` | **This repo** |
+
+To upgrade the kit version, update `KIT_REF` in the workflow env (currently tracks `main`). For pinned releases, set it to a tag like `v3.0.0`.
 
 All workflows are guarded with `if: github.repository == 'DreamLab-AI/dreamlab-ai-website'`.
 
