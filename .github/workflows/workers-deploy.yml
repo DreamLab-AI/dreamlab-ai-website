@@ -1,29 +1,20 @@
 name: Deploy Cloudflare Workers
 
-# Deploys all 5 Rust Workers from community-forum-rs/crates/.
-# Auth, Pod, Link-Preview, Nostr-Relay, and Search are all Rust.
-# Runs on DreamLab-AI/dreamlab-ai-website fork only.
+# Deploys all 5 Rust Workers from the nostr-bbs kit (nostr-rust-forum).
+# Source is cloned at build time; DreamLab-specific wrangler.toml configs
+# from forum-config/deploy/ override the kit defaults.
 
 on:
   push:
     branches: [main]
     paths:
-      - 'community-forum-rs/crates/auth-worker/**'
-      - 'community-forum-rs/crates/pod-worker/**'
-      - 'community-forum-rs/crates/preview-worker/**'
-      - 'community-forum-rs/crates/relay-worker/**'
-      - 'community-forum-rs/crates/search-worker/**'
-      - 'community-forum-rs/crates/nostr-core/**'
-      - 'community-forum-rs/Cargo.lock'
+      - 'forum-config/deploy/**'
   workflow_dispatch:
 
-# Cancel in-flight runs of this workflow on the same ref so a newer commit
-# always wins the deploy race.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-# Default-restrictive workflow permissions; jobs opt in to the minimum needed.
 permissions:
   contents: read
 
@@ -32,9 +23,10 @@ env:
   RUST_TOOLCHAIN: '1.90.0'
   WRANGLER_VERSION: '3.114.17'
   CF_SUBDOMAIN: 'solitary-paper-764d'
+  KIT_REPO: 'https://github.com/DreamLab-AI/nostr-rust-forum.git'
+  KIT_REF: 'main'
 
 jobs:
-  # ─── Pre-deploy gate ────────────────────────────────────────────────────
   gate:
     name: Pre-deploy Gate
     if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
@@ -42,7 +34,6 @@ jobs:
     permissions:
       contents: read
 
-  # ─── Rust Workers (auth, pod, link-preview, nostr-relay, search) ───
   deploy-rust:
     name: Deploy Rust Workers
     needs: [gate]
@@ -56,20 +47,31 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - crate: auth-worker
+          - kit_crate: nostr-bbs-auth-worker
+            config: auth-worker
             worker_name: dreamlab-auth-api
-          - crate: pod-worker
+          - kit_crate: nostr-bbs-pod-worker
+            config: pod-worker
             worker_name: dreamlab-pod-api
-          - crate: preview-worker
+          - kit_crate: nostr-bbs-preview-worker
+            config: preview-worker
             worker_name: dreamlab-link-preview
-          - crate: relay-worker
+          - kit_crate: nostr-bbs-relay-worker
+            config: relay-worker
             worker_name: dreamlab-nostr-relay
-          - crate: search-worker
+          - kit_crate: nostr-bbs-search-worker
+            config: search-worker
             worker_name: dreamlab-search-api
 
     steps:
-      - name: Checkout code
+      - name: Checkout consumer repo
         uses: actions/checkout@v4
+
+      - name: Clone kit (nostr-rust-forum)
+        run: git clone --depth 1 --branch ${{ env.KIT_REF }} ${{ env.KIT_REPO }} kit
+
+      - name: Override wrangler.toml with DreamLab config
+        run: cp forum-config/deploy/${{ matrix.config }}.wrangler.toml kit/crates/${{ matrix.kit_crate }}/wrangler.toml
 
       - name: Setup Rust toolchain ${{ env.RUST_TOOLCHAIN }}
         uses: dtolnay/rust-toolchain@1.90.0
@@ -83,10 +85,10 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             ~/.cargo/bin/worker-build
-            community-forum-rs/target
-          key: rust-deploy-${{ env.RUST_TOOLCHAIN }}-${{ matrix.crate }}-${{ hashFiles('community-forum-rs/Cargo.lock') }}
+            kit/target
+          key: rust-deploy-${{ env.RUST_TOOLCHAIN }}-${{ matrix.kit_crate }}-${{ hashFiles('kit/Cargo.lock') }}
           restore-keys: |
-            rust-deploy-${{ env.RUST_TOOLCHAIN }}-${{ matrix.crate }}-
+            rust-deploy-${{ env.RUST_TOOLCHAIN }}-${{ matrix.kit_crate }}-
             rust-deploy-${{ env.RUST_TOOLCHAIN }}-
 
       - name: Install worker-build
@@ -101,31 +103,16 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      # Bypass cloudflare/wrangler-action because it ignored wranglerVersion
-      # and tried to npx wrangler@4 interactively — fix-forward by pre-installing
-      # our pinned version and invoking wrangler deploy directly. Same secrets,
-      # same outcome, deterministic version.
       - name: Install wrangler ${{ env.WRANGLER_VERSION }}
         run: npm install -g wrangler@${{ env.WRANGLER_VERSION }}
 
-      # Sprint v9 added new KV bindings (NIP98_REPLAY for replay-protection
-      # cache; ADMIN_KV / ADMIN_KV_RO to split admin KV namespace from POD_META).
-      # Their `id` fields are placeholders in the committed wrangler.toml.
-      # Resolve them at deploy time: ensure each namespace exists in the
-      # account, capture its ID, substitute into a runner-local copy of
-      # wrangler.toml. Idempotent — re-running creates only what's missing.
-      - name: Provision KV namespaces (sprint v9)
-        working-directory: community-forum-rs/crates/${{ matrix.crate }}
+      - name: Provision KV namespaces
+        working-directory: kit/crates/${{ matrix.kit_crate }}
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           set -euo pipefail
-          # Bypass wrangler CLI for KV namespace listing — its `kv:namespace
-          # list` and `kv namespace list` subcommands have silently failed in
-          # this CI image (output captured to /dev/null then misparsed). Use
-          # the Cloudflare REST API directly: we already have an account-scoped
-          # API token in env. Idempotent across re-runs.
           API_BASE="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/storage/kv/namespaces"
           AUTH=(-H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" -H "Content-Type: application/json")
 
@@ -146,7 +133,6 @@ jobs:
             local id
             id=$(echo "$create_resp" | jq -r '.result.id // empty' | head -n 1)
             if [ -z "$id" ] || [ "$id" = "null" ]; then
-              # Race: another matrix job created it. Re-list.
               listing=$(curl -fsSL "${API_BASE}?per_page=100" "${AUTH[@]}" || echo '{"result":[]}')
               id=$(echo "$listing" | jq -r --arg t "$title" \
                 '.result[]? | select(.title == $t) | .id' | head -n 1)
@@ -157,8 +143,8 @@ jobs:
           for placeholder in REPLACE_WITH_NEW_ADMIN_KV_ID REPLACE_WITH_NEW_NIP98_REPLAY_KV_ID; do
             if grep -q "$placeholder" wrangler.toml; then
               case "$placeholder" in
-                REPLACE_WITH_NEW_ADMIN_KV_ID)         title="${{ matrix.crate }}-admin-kv" ;;
-                REPLACE_WITH_NEW_NIP98_REPLAY_KV_ID)  title="${{ matrix.crate }}-nip98-replay" ;;
+                REPLACE_WITH_NEW_ADMIN_KV_ID)         title="${{ matrix.config }}-admin-kv" ;;
+                REPLACE_WITH_NEW_NIP98_REPLAY_KV_ID)  title="${{ matrix.config }}-nip98-replay" ;;
               esac
               real_id=$(resolve_or_create "$title")
               if [ -z "$real_id" ] || [ "$real_id" = "null" ]; then
@@ -170,14 +156,13 @@ jobs:
             fi
           done
 
-      - name: Wrangler deploy ${{ matrix.crate }}
-        working-directory: community-forum-rs/crates/${{ matrix.crate }}
+      - name: Wrangler deploy ${{ matrix.kit_crate }}
+        working-directory: kit/crates/${{ matrix.kit_crate }}
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: wrangler deploy
 
-  # ─── Health checks ───────────────────────────────────────────────────
   health-check:
     name: Health Checks
     if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
@@ -223,18 +208,15 @@ jobs:
           cat >> $GITHUB_STEP_SUMMARY <<EOF
           ## Cloudflare Workers Deployment
 
-          ### Rust Workers (all 5)
-          | Worker | Crate | URL |
-          |--------|-------|-----|
-          | dreamlab-auth-api | auth-worker | \`dreamlab-auth-api.${{ env.CF_SUBDOMAIN }}.workers.dev\` |
-          | dreamlab-pod-api | pod-worker | \`dreamlab-pod-api.${{ env.CF_SUBDOMAIN }}.workers.dev\` |
-          | dreamlab-link-preview | preview-worker | \`dreamlab-link-preview.${{ env.CF_SUBDOMAIN }}.workers.dev\` |
-          | dreamlab-nostr-relay | relay-worker | \`dreamlab-nostr-relay.${{ env.CF_SUBDOMAIN }}.workers.dev\` |
-          | dreamlab-search-api | search-worker | \`dreamlab-search-api.${{ env.CF_SUBDOMAIN }}.workers.dev\` |
+          | Worker | Kit Crate | URL |
+          |--------|-----------|-----|
+          | dreamlab-auth-api | nostr-bbs-auth-worker | \`dreamlab-auth-api.${{ env.CF_SUBDOMAIN }}.workers.dev\` |
+          | dreamlab-pod-api | nostr-bbs-pod-worker | \`dreamlab-pod-api.${{ env.CF_SUBDOMAIN }}.workers.dev\` |
+          | dreamlab-link-preview | nostr-bbs-preview-worker | \`dreamlab-link-preview.${{ env.CF_SUBDOMAIN }}.workers.dev\` |
+          | dreamlab-nostr-relay | nostr-bbs-relay-worker | \`dreamlab-nostr-relay.${{ env.CF_SUBDOMAIN }}.workers.dev\` |
+          | dreamlab-search-api | nostr-bbs-search-worker | \`dreamlab-search-api.${{ env.CF_SUBDOMAIN }}.workers.dev\` |
 
+          - **Kit**: \`nostr-rust-forum@${{ env.KIT_REF }}\`
           - **Wrangler**: \`${{ env.WRANGLER_VERSION }}\`
           - **Rust**: \`${{ env.RUST_TOOLCHAIN }}\`
-          - **Branch**: \`${{ github.ref_name }}\`
-          - **Commit**: \`${{ github.sha }}\`
-          - **Actor**: @${{ github.actor }}
           EOF
