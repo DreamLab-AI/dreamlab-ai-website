@@ -19,7 +19,7 @@ const ResearchPaper = () => {
         {/* Header Image */}
         <div className="mb-12 text-center">
           <img
-            src="/showcase/image (9).webp"
+            src="/images/showcase/showcase-9.webp"
             alt="Multi-Viewpoint Immersive AI Research Platform"
             className="mx-auto rounded-lg shadow-2xl max-w-2xl w-full"
           />
@@ -45,7 +45,7 @@ const ResearchPaper = () => {
             <div className="grid md:grid-cols-3 gap-4 my-8">
               <div>
                 <img
-                  src="/showcase/image (6).webp"
+                  src="/images/showcase/showcase-6.webp"
                   alt="Narrative Fusion"
                   className="w-full h-48 object-cover rounded-lg"
                 />
@@ -53,7 +53,7 @@ const ResearchPaper = () => {
               </div>
               <div>
                 <img
-                  src="/showcase/image (1).webp"
+                  src="/images/showcase/showcase-1.webp"
                   alt="Immersive Collaboration"
                   className="w-full h-48 object-cover rounded-lg"
                 />
@@ -95,7 +95,7 @@ const ResearchPaper = () => {
             <div className="grid md:grid-cols-3 gap-4 my-8">
               <div>
                 <img
-                  src="/showcase/image (2).webp"
+                  src="/images/showcase/showcase-2.webp"
                   alt="Flow State"
                   className="w-full h-48 object-cover rounded-lg"
                 />
@@ -130,7 +130,7 @@ const ResearchPaper = () => {
             <div className="grid md:grid-cols-3 gap-4 my-8">
               <div>
                 <img
-                  src="/showcase/image.webp"
+                  src="/images/showcase/showcase-0.webp"
                   alt="AI Learning System"
                   className="w-full h-48 object-cover rounded-lg"
                 />
@@ -154,7 +154,7 @@ const ResearchPaper = () => {
             <div className="grid md:grid-cols-3 gap-4 my-8">
               <div>
                 <img
-                  src="/showcase/image (3).webp"
+                  src="/images/showcase/showcase-3.webp"
                   alt="Knowledge Graph"
                   className="w-full h-48 object-cover rounded-lg"
                 />
@@ -162,7 +162,7 @@ const ResearchPaper = () => {
               </div>
               <div>
                 <img
-                  src="/showcase/image (7).webp"
+                  src="/images/showcase/showcase-7.webp"
                   alt="Real-World Applications"
                   className="w-full h-48 object-cover rounded-lg"
                 />
@@ -225,7 +225,7 @@ const ResearchPaper = () => {
             <div className="grid md:grid-cols-3 gap-4 p-6">
               <div>
                 <img
-                  src="/showcase/image (10).webp"
+                  src="/images/showcase/showcase-10.webp"
                   alt="Ontology Engine"
                   className="w-full h-48 object-cover rounded-lg"
                 />
@@ -233,7 +233,7 @@ const ResearchPaper = () => {
               </div>
               <div>
                 <img
-                  src="/showcase/image (1).webp"
+                  src="/images/showcase/showcase-1.webp"
                   alt="System Architecture"
                   className="w-full h-48 object-cover rounded-lg"
                 />
@@ -328,7 +328,7 @@ const ResearchPaper = () => {
                 <video
                   controls
                   className="w-full h-full object-cover"
-                  poster="/data/media/unity-vr-thumb.jpg"
+                  poster="/images/portfolio/unity-vr-thumb.webp"
                 >
                   <source src="/data/media/videos/unity-vr.mp4" type="video/mp4" />
                   Your browser does not support the video tag.
@@ -344,7 +344,7 @@ const ResearchPaper = () => {
                 <video
                   controls
                   className="w-full h-full object-cover"
-                  poster="/data/media/nuclear-robot-thumb.jpg"
+                  poster="/images/portfolio/nuclear-robot-thumb.webp"
                 >
                   <source src="/data/media/videos/nuclear-robot.mp4" type="video/mp4" />
                   Your browser does not support the video tag.
@@ -366,7 +366,7 @@ const ResearchPaper = () => {
                   <video
                     controls
                     className="w-full h-full object-cover"
-                    poster="/data/media/hand-interact-thumb.jpg"
+                    poster="/images/portfolio/hand-interact-thumb.webp"
                   >
                     <source src="/data/media/videos/hand-interact.mp4" type="video/mp4" />
                     Your browser does not support the video tag.
@@ -382,7 +382,7 @@ const ResearchPaper = () => {
                   <video
                     controls
                     className="w-full h-full object-cover"
-                    poster="/data/media/box-interact-thumb.jpg"
+                    poster="/images/portfolio/box-interact-thumb.webp"
                   >
                     <source src="/data/media/videos/box-interact.mp4" type="video/mp4" />
                     Your browser does not support the video tag.
@@ -398,7 +398,7 @@ const ResearchPaper = () => {
                   <video
                     controls
                     className="w-full h-full object-cover"
-                    poster="/data/media/fisheye-test-thumb.jpg"
+                    poster="/images/portfolio/fisheye-test-thumb.webp"
                   >
                     <source src="/data/media/videos/fisheye-test.mp4" type="video/mp4" />
                     Your browser does not support the video tag.
@@ -421,7 +421,7 @@ const ResearchPaper = () => {
                   <video
                     controls
                     className="w-full h-full object-cover"
-                    poster="/data/media/bigdata-viz-thumb.jpg"
+                    poster="/images/portfolio/bigdata-viz-thumb.webp"
                   >
                     <source src="/data/media/videos/bigdata-viz.mp4" type="video/mp4" />
                     Your browser does not support the video tag.
@@ -437,7 +437,7 @@ const ResearchPaper = () => {
                   <video
                     controls
                     className="w-full h-full object-cover"
-                    poster="/data/media/robot-arm-thumb.jpg"
+                    poster="/images/portfolio/robot-arm-thumb.webp"
                   >
                     <source src="/data/media/videos/robot-arm.mp4" type="video/mp4" />
                     Your browser does not support the video tag.
@@ -453,7 +453,7 @@ const ResearchPaper = () => {
                   <video
                     controls
                     className="w-full h-full object-cover"
-                    poster="/data/media/pit-room-thumb.jpg"
+                    poster="/images/portfolio/pit-room-thumb.webp"
                   >
                     <source src="/data/media/videos/pit-room.mp4" type="video/mp4" />
                     Your browser does not support the video tag.
@@ -469,7 +469,7 @@ const ResearchPaper = () => {
                   <video
                     controls
                     className="w-full h-full object-cover"
-                    poster="/data/media/motorway-sim-thumb.jpg"
+                    poster="/images/portfolio/motorway-sim-thumb.webp"
                   >
                     <source src="/data/media/videos/motorway-sim.mp4" type="video/mp4" />
                     Your browser does not support the video tag.
@@ -511,7 +511,7 @@ const ResearchPaper = () => {
                   <video
                     controls
                     className="w-full h-full object-cover rounded-lg"
-                    poster="/data/media/student-2015-thumb.jpg"
+                    poster="/images/portfolio/student-2015-thumb.webp"
                   >
                     <source src="/data/media/videos/student-2015.mp4" type="video/mp4" />
                     Your browser does not support the video tag.

@@ -46,10 +46,10 @@ const Team = () => {
               const { headline, fullDetails } = parseTeamMarkdown(markdownText);
 
               // Prefer WebP with PNG fallback for older browsers
-              const webpResponse = await fetch(`/data/team/${id}.webp`, { method: 'HEAD' });
+              const webpResponse = await fetch(`/images/team/${id}.webp`, { method: 'HEAD' });
               const imageSrc = webpResponse.ok
-                ? `/data/team/${id}.webp`
-                : `/data/team/${id}.png`;
+                ? `/images/team/${id}.webp`
+                : `/images/team/${id}.png`;
 
               return {
                 id,

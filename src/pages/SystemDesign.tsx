@@ -24,37 +24,37 @@ const SystemDesign = () => {
   // Images based on the critical text
   const systemImages = [
     {
-      src: '/showcase/image (9).webp',
+      src: '/images/showcase/showcase-9.webp',
       title: 'Multi-Viewpoint Immersive AI Research Platform',
       description: 'Revolutionary collaborative intelligence system'
     },
     {
-      src: '/showcase/image (6).webp',
+      src: '/images/showcase/showcase-6.webp',
       title: 'Narrative Fusion',
       description: 'AI observes all communication channels in real-time'
     },
     {
-      src: '/showcase/image (1).webp',
+      src: '/images/showcase/showcase-1.webp',
       title: 'Immersive Collaboration',
       description: 'Natural spatial interaction preserved'
     },
     {
-      src: '/showcase/image (2).webp',
+      src: '/images/showcase/showcase-2.webp',
       title: 'Flow State',
       description: 'Peak performance through optimized data presentation'
     },
     {
-      src: '/showcase/image.webp',
+      src: '/images/showcase/showcase-0.webp',
       title: 'AI Learning System',
       description: 'Building multi-viewpoint knowledge graphs'
     },
     {
-      src: '/showcase/image (3).webp',
+      src: '/images/showcase/showcase-3.webp',
       title: 'Knowledge Graph',
       description: 'Living ontology richer than any single perspective'
     },
     {
-      src: '/showcase/image (7).webp',
+      src: '/images/showcase/showcase-7.webp',
       title: 'Real-World Applications',
       description: 'Transforming complex planning and collaboration'
     }
@@ -118,7 +118,7 @@ const SystemDesign = () => {
                 className="w-full h-full object-cover transition-all duration-1000"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
-                  target.src = '/showcase/image.webp';
+                  target.src = '/images/showcase/showcase-0.webp';
                 }}
               />
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent p-4 sm:p-6 md:p-8">
@@ -341,7 +341,7 @@ const SystemDesign = () => {
                 <video
                   controls
                   className="w-full h-full object-cover"
-                  poster="/data/media/unity-vr-thumb.jpg"
+                  poster="/images/portfolio/unity-vr-thumb.webp"
                 >
                   <source src="/data/media/videos/unity-vr.mp4" type="video/mp4" />
                   Your browser does not support the video tag.
@@ -365,7 +365,7 @@ const SystemDesign = () => {
                 <video
                   controls
                   className="w-full h-full object-cover"
-                  poster="/data/media/nuclear-robot-thumb.jpg"
+                  poster="/images/portfolio/nuclear-robot-thumb.webp"
                 >
                   <source src="/data/media/videos/nuclear-robot.mp4" type="video/mp4" />
                   Your browser does not support the video tag.
@@ -395,7 +395,7 @@ const SystemDesign = () => {
                   <video
                     controls
                     className="w-full h-full object-cover"
-                    poster="/data/media/hand-interact-thumb.jpg"
+                    poster="/images/portfolio/hand-interact-thumb.webp"
                   >
                     <source src="/data/media/videos/hand-interact.mp4" type="video/mp4" />
                     Your browser does not support the video tag.
@@ -411,7 +411,7 @@ const SystemDesign = () => {
                   <video
                     controls
                     className="w-full h-full object-cover"
-                    poster="/data/media/box-interact-thumb.jpg"
+                    poster="/images/portfolio/box-interact-thumb.webp"
                   >
                     <source src="/data/media/videos/box-interact.mp4" type="video/mp4" />
                     Your browser does not support the video tag.
@@ -427,7 +427,7 @@ const SystemDesign = () => {
                   <video
                     controls
                     className="w-full h-full object-cover"
-                    poster="/data/media/fisheye-test-thumb.jpg"
+                    poster="/images/portfolio/fisheye-test-thumb.webp"
                   >
                     <source src="/data/media/videos/fisheye-test.mp4" type="video/mp4" />
                     Your browser does not support the video tag.
@@ -443,7 +443,7 @@ const SystemDesign = () => {
                   <video
                     controls
                     className="w-full h-full object-cover"
-                    poster="/data/media/robot-arm-thumb.jpg"
+                    poster="/images/portfolio/robot-arm-thumb.webp"
                   >
                     <source src="/data/media/videos/robot-arm.mp4" type="video/mp4" />
                     Your browser does not support the video tag.
@@ -466,7 +466,7 @@ const SystemDesign = () => {
                   <video
                     controls
                     className="w-full h-full object-cover"
-                    poster="/data/media/motorway-sim-thumb.jpg"
+                    poster="/images/portfolio/motorway-sim-thumb.webp"
                   >
                     <source src="/data/media/videos/motorway-sim.mp4" type="video/mp4" />
                     Your browser does not support the video tag.
@@ -486,7 +486,7 @@ const SystemDesign = () => {
                   <video
                     controls
                     className="w-full h-full object-cover"
-                    poster="/data/media/bigdata-viz-thumb.jpg"
+                    poster="/images/portfolio/bigdata-viz-thumb.webp"
                   >
                     <source src="/data/media/videos/bigdata-viz.mp4" type="video/mp4" />
                     Your browser does not support the video tag.
@@ -506,7 +506,7 @@ const SystemDesign = () => {
                   <video
                     controls
                     className="w-full h-full object-cover"
-                    poster="/data/media/pit-room-thumb.jpg"
+                    poster="/images/portfolio/pit-room-thumb.webp"
                   >
                     <source src="/data/media/videos/pit-room.mp4" type="video/mp4" />
                     Your browser does not support the video tag.
@@ -558,7 +558,7 @@ const SystemDesign = () => {
                 <video
                   controls
                   className="w-full h-full object-cover rounded-lg"
-                  poster="/data/media/student-2015-thumb.jpg"
+                  poster="/images/portfolio/student-2015-thumb.webp"
                 >
                   <source src="/data/media/videos/student-2015.mp4" type="video/mp4" />
                   Your browser does not support the video tag.
@@ -579,7 +579,7 @@ const SystemDesign = () => {
                 <video
                   controls
                   className="mx-auto max-w-md h-48 object-cover rounded-lg"
-                  poster="/data/media/heaton-park-thumb.jpg"
+                  poster="/images/portfolio/heaton-park-thumb.webp"
                 >
                   <source src="/data/media/videos/heaton-park.mp4" type="video/mp4" />
                   Your browser does not support the video tag.

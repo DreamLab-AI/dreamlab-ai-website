@@ -93,30 +93,30 @@ const outcomeCards = [
 
 // Research video demonstrations
 const researchVideos = [
-  { src: "nuclear-robot.mp4", thumb: "nuclear-robot-thumb.jpg", caption: "Nuclear decommissioning planning" },
-  { src: "unity-vr.mp4", thumb: "unity-vr-thumb.jpg", caption: "Multi-viewpoint VR collaboration" },
-  { src: "hand-interact.mp4", thumb: "hand-interact-thumb.jpg", caption: "Natural gesture interfaces" },
-  { src: "bigdata-viz.mp4", thumb: "bigdata-viz-thumb.jpg", caption: "Immersive data visualisation" },
-  { src: "robot-arm.mp4", thumb: "robot-arm-thumb.jpg", caption: "Robotic control systems" },
-  { src: "motorway-sim.mp4", thumb: "motorway-sim-thumb.jpg", caption: "Infrastructure simulation" },
+  { src: "nuclear-robot.mp4", thumb: "nuclear-robot-thumb.webp", caption: "Nuclear decommissioning planning" },
+  { src: "unity-vr.mp4", thumb: "unity-vr-thumb.webp", caption: "Multi-viewpoint VR collaboration" },
+  { src: "hand-interact.mp4", thumb: "hand-interact-thumb.webp", caption: "Natural gesture interfaces" },
+  { src: "bigdata-viz.mp4", thumb: "bigdata-viz-thumb.webp", caption: "Immersive data visualisation" },
+  { src: "robot-arm.mp4", thumb: "robot-arm-thumb.webp", caption: "Robotic control systems" },
+  { src: "motorway-sim.mp4", thumb: "motorway-sim-thumb.webp", caption: "Infrastructure simulation" },
 ];
 
 // Featured team members
 const featuredTeam = [
-  { name: "Dr John O'Hare", domain: "AI & Immersive Systems", role: "Chief Hallucination Officer", image: "/data/team/04.webp" },
-  { name: "Pete Woodbridge", domain: "CTO, DREAMLAB", role: "CTO", image: "/data/team/02.webp" },
-  { name: "Steve Moyler", domain: "Chief Creative Officer, DREAMLAB", role: "Creative Lead", image: "/data/team/03.webp" },
+  { name: "Dr John O'Hare", domain: "AI & Immersive Systems", role: "Chief Hallucination Officer", image: "/images/team/04.webp" },
+  { name: "Pete Woodbridge", domain: "CTO, DREAMLAB", role: "CTO", image: "/images/team/02.webp" },
+  { name: "Steve Moyler", domain: "Chief Creative Officer, DREAMLAB", role: "Creative Lead", image: "/images/team/03.webp" },
 ];
 
 // Facility images for carousel
 const facilityImages = [
-  "/data/media/aerial.jpeg",
-  "/data/media/fairfield-front.jpg",
-  "/data/media/fairfield-back.jpeg",
-  "/data/media/view.jpeg",
-  "/data/media/labview2.webp",
-  "/data/media/labview3.webp",
-  "/data/media/remarkable2.webp",
+  "/images/venue/aerial.webp",
+  "/images/venue/fairfield-front.webp",
+  "/images/venue/fairfield-back.webp",
+  "/images/venue/view.webp",
+  "/images/venue/labview2.webp",
+  "/images/venue/labview3.webp",
+  "/images/venue/remarkable2.webp",
 ];
 
 const Index = () => {
@@ -339,7 +339,7 @@ const Index = () => {
                   <video
                     controls
                     className="w-full h-full object-cover"
-                    poster={`/data/media/${video.thumb}`}
+                    poster={`/images/portfolio/${video.thumb}`}
                     preload="none"
                   >
                     <source src={`/data/media/videos/${video.src}`} type="video/mp4" />

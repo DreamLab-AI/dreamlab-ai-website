@@ -84,11 +84,6 @@ wasm-voronoi/target/
 # External reference repos (for analysis, not part of this project)
 external/
 
-# Large media source files converted to WebP (keep originals that are <500KB)
-# Converted: labview2.jpg (8.6MB), labview3.jpg (7.4MB), view3.jpeg (3.1MB), wine.png (2.2MB)
-public/data/media/labview*.jpg
-public/data/media/wine.png
-
 # Large videos (>100MB, exceeds GitHub limit)
 public/data/media/videos/*.mp4
 
@@ -98,9 +93,8 @@ ruvector.db
 
 # Test screenshots and logs
 logs/
-community-forum-rs/logs/
-
-# Showcase images converted to WebP
-public/showcase/*.png
-!public/showcase/*.webp
 discourse-audit/
+
+# Legacy directories (deleted, guard against re-creation)
+fairfield/
+community-forum-rs/

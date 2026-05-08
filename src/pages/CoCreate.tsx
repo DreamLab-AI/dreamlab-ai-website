@@ -30,12 +30,12 @@ const processSteps = [
 ];
 
 const facilityImages = [
-  "/data/media/aerial.jpeg",
-  "/data/media/fairfield-front.jpg",
-  "/data/media/labview2.webp",
-  "/data/media/labview3.webp",
-  "/data/media/view.jpeg",
-  "/data/media/view3.webp",
+  "/images/venue/aerial.webp",
+  "/images/venue/fairfield-front.webp",
+  "/images/venue/labview2.webp",
+  "/images/venue/labview3.webp",
+  "/images/venue/view.webp",
+  "/images/venue/view3.webp",
 ];
 
 const CoCreate = () => {
