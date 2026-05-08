@@ -6,8 +6,14 @@ name: Rust CI
 # default branch.
 
 on:
-  # Temporarily disabled: community-forum-rs/ frozen for kit extraction test.
-  # Rust quality gates now run via test-and-lint.yml against forum-config/ only.
+  push:
+    branches: [main]
+    paths:
+      - 'community-forum-rs/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'community-forum-rs/**'
   workflow_dispatch:
 
 # Default-restrictive workflow permissions; jobs opt in if needed.
