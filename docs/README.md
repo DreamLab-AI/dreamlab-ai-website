@@ -1,6 +1,6 @@
 # DreamLab AI -- Documentation Hub
 
-**Last updated:** 2026-03-08 | **Repository:** [DreamLab-AI/dreamlab-ai-website](https://github.com/DreamLab-AI/dreamlab-ai-website) | **Project README:** [../README.md](../README.md)
+**Last updated:** 2026-05-08 | **Repository:** [DreamLab-AI/dreamlab-ai-website](https://github.com/DreamLab-AI/dreamlab-ai-website) | **Project README:** [../README.md](../README.md)
 
 This documentation covers the full DreamLab AI platform: a React marketing site, a Rust/Leptos WASM community forum, and five Cloudflare Workers providing authentication, storage, relay, search, and link preview services.
 
@@ -8,13 +8,13 @@ This documentation covers the full DreamLab AI platform: a React marketing site,
 
 ## System Architecture
 
-Seven services (6 Rust crates + 2 TypeScript Workers) compose the backend and forum client. The `nostr-core` crate is the shared foundation, consumed by the forum client and all three Rust Workers.
+Seven services (7 Rust crates) compose the backend and forum client. The `nostr-core` crate is the shared foundation, consumed by the forum client and all five Rust Workers. The forum is now powered by the upstream [nostr-rust-forum](https://github.com/DreamLab-AI/nostr-rust-forum) kit; DreamLab-specific configuration lives in `forum-config/`.
 
 ```mermaid
 graph TB
     subgraph "Static Sites (GitHub Pages)"
         REACT["React SPA<br/>Marketing Site<br/><i>src/</i>"]
-        LEPTOS["Leptos 0.7 CSR<br/>Community Forum<br/><i>community-forum-rs/crates/forum-client/</i>"]
+        LEPTOS["Leptos 0.7 CSR<br/>Community Forum<br/><i>nostr-rust-forum kit + forum-config/</i>"]
     end
 
     subgraph "Shared Library"
@@ -25,11 +25,8 @@ graph TB
         AUTH["auth-worker<br/>WebAuthn PRF + NIP-98<br/>Pod provisioning"]
         POD["pod-worker<br/>Solid Pods on R2<br/>WAC ACL"]
         PREVIEW["preview-worker<br/>OG metadata<br/>SSRF protection"]
-    end
-
-    subgraph "TypeScript Cloudflare Workers"
-        RELAY["nostr-relay<br/>WebSocket NIP-01/42/98<br/>D1 + Durable Objects"]
-        SEARCH["search-api<br/>RuVector WASM<br/>.rvf format"]
+        RELAY["relay-worker<br/>WebSocket NIP-01/42/98<br/>D1 + Durable Objects"]
+        SEARCH["search-worker<br/>RuVector WASM<br/>.rvf format"]
     end
 
     subgraph "Cloudflare Storage"
@@ -66,8 +63,8 @@ graph TB
     style AUTH fill:#dea584,color:#000
     style POD fill:#dea584,color:#000
     style PREVIEW fill:#dea584,color:#000
-    style RELAY fill:#3178C6,color:#fff
-    style SEARCH fill:#3178C6,color:#fff
+    style RELAY fill:#dea584,color:#000
+    style SEARCH fill:#dea584,color:#000
 ```
 
 ---
@@ -128,8 +125,8 @@ Six documents defining the domain model for the Rust workspace. See [ddd/README.
 |----------|--------|----------|-------------|
 | [Auth API](api/AUTH_API.md) | auth-worker | Rust | WebAuthn PRF registration/login, NIP-98 verification, pod provisioning. D1 + KV + R2. |
 | [Pod API](api/POD_API.md) | pod-worker | Rust | Solid pod CRUD, media upload, WAC ACL management. R2 + KV. |
-| [Nostr Relay](api/NOSTR_RELAY.md) | nostr-relay | TypeScript | WebSocket NIP-01 relay with NIP-42 AUTH and NIP-98 verification. D1 + Durable Objects. |
-| [Search API](api/SEARCH_API.md) | search-api | TypeScript | RuVector WASM vector search, `.rvf` format, `/embed` endpoint. R2 + KV. |
+| [Nostr Relay](api/NOSTR_RELAY.md) | relay-worker | Rust | WebSocket NIP-01 relay with NIP-42 AUTH and NIP-98 verification. D1 + Durable Objects. |
+| [Search API](api/SEARCH_API.md) | search-worker | Rust | RuVector WASM vector search, `.rvf` format, `/embed` endpoint. R2 + KV. |
 
 ### Security
 
@@ -226,7 +223,7 @@ How Nostr events flow from the forum client through the relay to persistent stor
 ```mermaid
 sequenceDiagram
     participant Author as Forum Client<br/>(Author)
-    participant Relay as nostr-relay<br/>(TypeScript Worker)
+    participant Relay as relay-worker<br/>(Rust CF Worker)
     participant DO as Durable Object<br/>(WebSocket State)
     participant D1 as Cloudflare D1
     participant Sub as Forum Client<br/>(Subscriber)
@@ -398,7 +395,7 @@ graph LR
 |-----------|--------|
 | `api.dreamlab-ai.com` | auth-worker (Rust) |
 | `pods.dreamlab-ai.com` | pod-worker (Rust) |
-| `search.dreamlab-ai.com` | search-api (TypeScript) |
+| `search.dreamlab-ai.com` | search-worker (Rust) |
 | `preview.dreamlab-ai.com` | preview-worker (Rust) |
 
 ### Development URLs
@@ -430,4 +427,4 @@ graph LR
 
 **Project README:** [../README.md](../README.md) | **ADR Index:** [adr/README.md](adr/README.md) | **DDD Hub:** [ddd/README.md](ddd/README.md)
 
-*Last updated: 2026-03-08*
+*Last updated: 2026-05-08*

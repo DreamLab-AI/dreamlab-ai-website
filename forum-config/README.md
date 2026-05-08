@@ -16,15 +16,15 @@ generic `nostr-bbs-*` kit crates living in the `nostr-rust-forum` repo.
 ## Status
 
 **Phase X3** per [PRD-012] — overlay exists; the legacy
-[`community-forum-rs/`](../community-forum-rs/) workers continue to ship
-production. No D2 cutover yet.
+`community-forum-rs/` has been renamed to `community-forum-rs.frozen/` and is
+pending deletion. No D2 cutover yet.
 
 **Phase X4** (Sprint v12+) — D2 cutover happens once the kit's
 `nostr-bbs-*-worker::dispatch` extension API is available. At that point:
 
 1. Switch CF Routes from legacy workers to forum-config/ workers.
 2. Run regression suite + canary.
-3. Delete `community-forum-rs/` once stable.
+3. Delete `community-forum-rs.frozen/` once stable.
 
 ## Usage at deploy time
 
@@ -54,14 +54,13 @@ NOSTR_BBS_NIP05_DOMAIN=dreamlab-ai.com \
 ## Migration plan summary (PRD-012)
 
 ```
-   Today              Phase X3 (now)          Phase X4 (Sprint v12+)
-   ─────              ──────────────          ──────────────────────
-   community-         community-              forum-config/
-   forum-rs/          forum-rs/               (production)
-   (production)       (production)
-                      forum-config/           [community-forum-rs/
-                      (overlay only;          deleted]
-                      not deployed)
+   Phase X3 (now)                    Phase X4 (Sprint v12+)
+   ──────────────                    ──────────────────────
+   community-forum-rs.frozen/        forum-config/
+   (frozen, pending deletion)        (production)
+
+   forum-config/                     [community-forum-rs.frozen/
+   (overlay only; not deployed)      deleted]
 ```
 
 [PRD-012]: ../docs/PRD-012.md

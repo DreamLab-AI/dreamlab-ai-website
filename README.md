@@ -13,9 +13,36 @@
 
 ---
 
+## Ecosystem
+
+dreamlab-ai-website consumes the [nostr-rust-forum](https://github.com/DreamLab-AI/nostr-rust-forum) kit as its forum backend, with DreamLab-specific branding and configuration in `forum-config/`. It is part of the DreamLab open-source ecosystem.
+
+```mermaid
+graph LR
+    SPR["solid-pod-rs<br/><i>Foundation</i>"] -->|dep| NRF["nostr-rust-forum<br/><i>Forum Kit</i>"]
+    SPR -->|dep| AB["agentbox<br/><i>Agent Container</i>"]
+    SPR -->|dep| VC["VisionClaw<br/><i>Integration Substrate</i>"]
+    NRF -->|kit| DW["dreamlab-ai-website<br/><i>Deployment</i>"]
+    AB <-.->|"relay mesh"| VC
+    AB <-.->|"relay mesh"| NRF
+    VC <-.->|"relay mesh"| NRF
+
+    style DW fill:#4a9eff,stroke:#2563eb,color:#fff
+```
+
+| Repository | Role | Key Technology |
+|---|---|---|
+| [solid-pod-rs](https://github.com/DreamLab-AI/solid-pod-rs) | Foundation library | Solid Protocol, DID:Nostr, WAC |
+| [nostr-rust-forum](https://github.com/DreamLab-AI/nostr-rust-forum) | Forum kit | 11 `nostr-bbs-*` Rust crates, CF Workers |
+| [agentbox](https://github.com/DreamLab-AI/agentbox) | Agent container | Nix, nostr-rs-relay, mesh peer |
+| [VisionClaw](https://github.com/DreamLab-AI/VisionClaw) | Integration substrate | Knowledge graph, GPU physics, XR |
+| **[dreamlab-ai-website](https://github.com/DreamLab-AI/dreamlab-ai-website)** | **Branded deployment** | **React SPA, WASM forum, `forum-config/`** |
+
+---
+
 ## Architecture
 
-The platform consists of a React marketing site, a Rust/Leptos WASM community forum, and five Cloudflare Workers providing backend services. All communication is built on the Nostr protocol with end-to-end encryption.
+The platform consists of a React marketing site, a Rust/Leptos WASM community forum powered by the upstream [nostr-rust-forum](https://github.com/DreamLab-AI/nostr-rust-forum) kit, and five Cloudflare Workers providing backend services. All communication is built on the Nostr protocol with end-to-end encryption. DreamLab-specific branding and operator configuration live in `forum-config/`.
 
 ```mermaid
 graph TB
@@ -103,39 +130,23 @@ graph TB
 ### Prerequisites
 
 ```bash
-# Rust toolchain + WASM target
-rustup target add wasm32-unknown-unknown
-cargo install trunk wasm-bindgen-cli worker-build wasm-opt
-
-# Node.js 20+ (for React site and Tailwind)
+# Node.js 20+ (for React marketing site)
 npm install -g wrangler
 ```
 
-### Clone and Build
+The WASM forum is pre-built and deployed to GitHub Pages via CI. For local React site development, only Node.js is required.
+
+### Clone and Develop
 
 ```bash
 git clone https://github.com/DreamLab-AI/dreamlab-ai-website.git
 cd dreamlab-ai-website
 
-# Verify Rust workspace compiles (native + WASM)
-cargo check --workspace
-cargo check --workspace --target wasm32-unknown-unknown
-
 # Install Node dependencies (React site + Tailwind)
 npm install
-```
 
-### Development Servers
-
-```bash
 # React marketing site (http://localhost:5173)
 npm run dev
-
-# Leptos community forum (http://localhost:8080)
-cd community-forum-rs && trunk serve
-
-# Cloudflare Workers (local dev with D1/KV/R2 simulators)
-cd community-forum-rs/crates/auth-worker && worker-build --dev && wrangler dev
 ```
 
 ### Commands
@@ -145,11 +156,6 @@ cd community-forum-rs/crates/auth-worker && worker-build --dev && wrangler dev
 | `npm run dev` | React marketing site with HMR |
 | `npm run build` | Production build of React site |
 | `npm run lint` | ESLint code quality checks |
-| `trunk serve` | Leptos forum dev server with hot reload |
-| `trunk build --release` | Production WASM build of forum |
-| `cargo test --workspace` | Run all Rust tests (native) |
-| `cargo test --workspace --target wasm32-unknown-unknown` | Run WASM tests |
-| `cargo clippy --workspace -- -D warnings` | Lint all Rust code |
 
 ## Project Structure
 
@@ -161,23 +167,17 @@ dreamlab-ai-website/
     hooks/                      Custom React hooks
     lib/                        Utilities, Supabase client
 
-  community-forum-rs/           Rust/Leptos workspace (7 crates)
-    Cargo.toml                  Workspace root
-    Trunk.toml                  trunk build configuration
-    index.html                  Leptos SPA entry point
-    crates/
-      nostr-core/               Shared crypto + protocol (NIP-01/07/09/29/33/40/42/45/50/52/98)
-      forum-client/             Leptos 0.7 CSR app (18 pages, 58+ components, smart auth)
-      auth-worker/              CF Worker -- WebAuthn + NIP-98 + rate limiting
-      pod-worker/               CF Worker -- Solid pods (LDP, WAC, PATCH, quotas, WebID, micropayments)
-      preview-worker/           CF Worker -- OG metadata / link preview (modular: ssrf/parse/oembed)
-      relay-worker/             CF Worker -- Nostr relay (modular: session/filter/broadcast/nip_handlers/storage)
-      search-worker/            CF Worker -- RuVector WASM vector search (.rvf) + rate limiting
+  forum-config/                 Operator overlay for nostr-rust-forum kit
+    Cargo.toml                  Path-deps to nostr-bbs-{core,config,mesh} kit crates
+    dreamlab.toml               DreamLab-specific operator config
+    src/                        Branding + per-worker entry shims
+    deploy/                     Per-worker wrangler.toml with preserved CF resource IDs
 
+  community-forum-rs.frozen/    [LEGACY -- pending deletion] Original forum workspace
   wasm-voronoi/                 Rust WASM for 3D Voronoi hero effect
   public/data/                  Runtime content (team profiles, workshops, media)
   scripts/                      Build and utility scripts
-  docs/                         Full documentation suite (28 files)
+  docs/                         Full documentation suite
 ```
 
 ## Documentation
@@ -263,4 +263,4 @@ Proprietary. Copyright 2024-2026 DreamLab AI Consulting Ltd. All rights reserved
 
 ---
 
-*Last updated: 2026-03-16*
+*Last updated: 2026-05-08*
