@@ -16,6 +16,11 @@ interface ImportMetaEnv {
   readonly VITE_IMAGE_BUCKET?: string;
   readonly VITE_IMAGE_ENCRYPTION_ENABLED?: string;
   readonly VITE_AI_CHAT_URL?: string;
+  readonly DEV: boolean;
+  readonly PROD: boolean;
+  readonly MODE: string;
+  readonly BASE_URL: string;
+  readonly SSR: boolean;
 }
 
 interface ImportMeta {

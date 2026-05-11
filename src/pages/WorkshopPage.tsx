@@ -55,7 +55,13 @@ const WorkshopPage = () => {
         const mermaidModule = await import('mermaid');
         if (cancelled) return;
         mermaidRef.current = mermaidModule.default;
-        mermaidRef.current.initialize({ startOnLoad: false, theme: 'default' });
+        mermaidRef.current.initialize({
+          startOnLoad: false,
+          theme: 'default',
+          // P2-11: securityLevel 'strict' disables click events, javascript:
+          // URIs, and all interactive callbacks inside Mermaid diagrams.
+          securityLevel: 'strict',
+        });
       }
       if (!cancelled) setMermaidReady(true);
     };
@@ -178,11 +184,17 @@ const WorkshopPage = () => {
               const graphDefinition = (el as HTMLElement).textContent || '';
               if (document.body.contains(el) && !el.getAttribute('data-mermaid-processed')) {
                 try {
-                  // Sanitize input to prevent XSS
-                  const sanitizedDefinition = graphDefinition.replace(/<script/gi, '&lt;script');
+                  // P2-11: Sanitize Mermaid definition to prevent XSS vectors.
+                  // Strip <script> tags, click callbacks (Mermaid click/href
+                  // interactivity), javascript: URIs, and on* event handlers.
+                  const sanitizedDefinition = graphDefinition
+                    .replace(/<script[\s>]/gi, '&lt;script')
+                    .replace(/\bclick\s+\S+\s+(call|href)\b/gi, '%% click removed %%')
+                    .replace(/\bhref\s*\(\s*["']javascript:/gi, 'href("about:blank')
+                    .replace(/\bon\w+\s*=/gi, 'data-removed=');
                   // Use dynamically loaded mermaid (guaranteed non-null by guard above)
                   if (!mermaidRef.current) return;
-                  mermaidRef.current.render(id, sanitizedDefinition).then(({ svg, bindFunctions }) => {
+                  mermaidRef.current.render(id, sanitizedDefinition).then(({ svg, bindFunctions: _bindFunctions }) => {
                     if (document.body.contains(el)) {
                       // Sanitize SVG output with DOMPurify to prevent XSS
                       const sanitizedSvg = DOMPurify.sanitize(svg, {
@@ -194,9 +206,10 @@ const WorkshopPage = () => {
                       wrapper.innerHTML = sanitizedSvg;
                       el.textContent = '';
                       el.appendChild(wrapper);
-                      if (bindFunctions) {
-                        bindFunctions(el);
-                      }
+                      // P2-11: Do NOT call _bindFunctions — it re-attaches
+                      // click handlers that could bypass DOMPurify sanitisation.
+                      // With securityLevel:'strict', Mermaid should not produce
+                      // any interactive bindings anyway.
                       el.setAttribute('data-mermaid-processed', 'true');
                     }
                   }).catch(caughtRenderError => {

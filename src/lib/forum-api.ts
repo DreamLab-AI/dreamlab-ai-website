@@ -19,17 +19,20 @@
 // Configuration
 // ---------------------------------------------------------------------------
 
-const POD_API_URL =
-  import.meta.env.VITE_POD_API_URL ||
-  "https://dreamlab-pod-api.solitary-paper-764d.workers.dev";
+function requireEnv(name: string): string {
+  const value = import.meta.env[name];
+  if (!value) {
+    throw new Error(
+      `Missing required environment variable: ${name}. ` +
+      `Set it in your .env file or deployment configuration.`,
+    );
+  }
+  return value as string;
+}
 
-const AUTH_API_URL =
-  import.meta.env.VITE_AUTH_API_URL ||
-  "https://dreamlab-auth-api.solitary-paper-764d.workers.dev";
-
-const SEARCH_API_URL =
-  import.meta.env.VITE_SEARCH_API_URL ||
-  "https://dreamlab-search-api.solitary-paper-764d.workers.dev";
+const POD_API_URL = requireEnv("VITE_POD_API_URL");
+const AUTH_API_URL = requireEnv("VITE_AUTH_API_URL");
+const SEARCH_API_URL = requireEnv("VITE_SEARCH_API_URL");
 
 // ---------------------------------------------------------------------------
 // Types
@@ -345,6 +348,57 @@ export async function postJobEstimate(
     body: JSON.stringify({ endpoint, params }),
   });
   return handleResponse<JobEstimate>(resp);
+}
+
+// ---------------------------------------------------------------------------
+// Agent Jobs API (pod-worker /pay/.jobs routes)
+// ---------------------------------------------------------------------------
+
+/** Status values for agent jobs stored in the D1 agent_jobs table. */
+export type AgentJobStatus =
+  | "estimated"
+  | "held"
+  | "running"
+  | "settled"
+  | "failed"
+  | "cancelled";
+
+/** A single agent job record as returned by GET /pay/.jobs. */
+export interface AgentJob {
+  job_id: string;
+  requester_did: string;
+  agent_did: string;
+  endpoint: string;
+  params_json: string | null;
+  status: AgentJobStatus;
+  estimated_sats: number;
+  held_sats: number;
+  actual_sats: number | null;
+  created_at: number;
+  started_at: number | null;
+  completed_at: number | null;
+  error: string | null;
+}
+
+/** Response from GET /pay/.jobs. */
+export interface AgentJobsListResponse {
+  jobs: AgentJob[];
+  count: number;
+}
+
+/**
+ * Fetch the authenticated user's agent jobs (most recent 50).
+ * Requires a NIP-98 Authorization header.
+ */
+export async function getAgentJobs(
+  nip98AuthHeader: string,
+): Promise<AgentJobsListResponse> {
+  const resp = await fetch(`${POD_API_URL}/pay/.jobs`, {
+    headers: {
+      Authorization: nip98AuthHeader,
+    },
+  });
+  return handleResponse<AgentJobsListResponse>(resp);
 }
 
 // ---------------------------------------------------------------------------
