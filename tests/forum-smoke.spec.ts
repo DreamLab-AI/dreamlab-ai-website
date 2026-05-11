@@ -292,7 +292,7 @@ test.describe('Nostr relay messaging', () => {
               ws.close();
               resolve(state);
             }
-          } catch {}
+          } catch (_e) { /* expected */ }
         };
 
         ws.onerror = () => resolve({ ...state, error: 'WebSocket error' });
@@ -325,7 +325,7 @@ test.describe('Nostr relay messaging', () => {
               ws.close();
               resolve({ profiles });
             }
-          } catch {}
+          } catch (_e) { /* expected */ }
         };
 
         ws.onerror = () => resolve({ profiles, error: 'error' });
@@ -359,7 +359,7 @@ test.describe('Nostr relay messaging', () => {
               ws.close();
               resolve({ channels, messages });
             }
-          } catch {}
+          } catch (_e) { /* expected */ }
         };
 
         ws.onerror = () => resolve({ channels, messages, error: 'error' });

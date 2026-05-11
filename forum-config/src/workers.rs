@@ -85,8 +85,7 @@ impl RateLimitConfig {
     ) -> Result<String, worker::Response> {
         let ip = nostr_bbs_rate_limit::client_ip(req);
         let limit = self.limit_for_path(path);
-        let allowed =
-            nostr_bbs_rate_limit::check_rate_limit(env, kv_binding, &ip, limit, 60).await;
+        let allowed = nostr_bbs_rate_limit::check_rate_limit(env, kv_binding, &ip, limit, 60).await;
         if allowed {
             Ok(ip)
         } else {
@@ -125,23 +124,19 @@ pub fn client_ip(req: &Request) -> String {
 pub mod deployed_urls {
     /// Auth Worker: WebAuthn registration/login, NIP-98, admin resolution.
     /// Deployed via `deploy/auth-worker.wrangler.toml` as `dreamlab-auth-api`.
-    pub const AUTH_WORKER: &str =
-        "https://dreamlab-auth-api.solitary-paper-764d.workers.dev";
+    pub const AUTH_WORKER: &str = "https://dreamlab-auth-api.solitary-paper-764d.workers.dev";
 
     /// Pod Worker: Solid pod CRUD, quota management, /pay/ payment routes.
     /// Deployed via `deploy/pod-worker.wrangler.toml` as `dreamlab-pod-api`.
-    pub const POD_WORKER: &str =
-        "https://dreamlab-pod-api.solitary-paper-764d.workers.dev";
+    pub const POD_WORKER: &str = "https://dreamlab-pod-api.solitary-paper-764d.workers.dev";
 
     /// Relay Worker: Nostr relay (WebSocket), NIP event handling, whitelist.
     /// Deployed via `deploy/relay-worker.wrangler.toml` as `dreamlab-nostr-relay`.
-    pub const RELAY_WORKER: &str =
-        "wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev";
+    pub const RELAY_WORKER: &str = "wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev";
 
     /// Search Worker: full-text + vector search over relay events.
     /// Deployed via `deploy/search-worker.wrangler.toml` as `dreamlab-search-api`.
-    pub const SEARCH_WORKER: &str =
-        "https://dreamlab-search-api.solitary-paper-764d.workers.dev";
+    pub const SEARCH_WORKER: &str = "https://dreamlab-search-api.solitary-paper-764d.workers.dev";
 
     /// Preview Worker: link preview / Open Graph unfurling.
     /// Deployed via `deploy/preview-worker.wrangler.toml` as `dreamlab-link-preview`.
