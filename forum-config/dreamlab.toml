@@ -98,6 +98,17 @@ marketplace = true
 calendar    = true
 dms         = true
 
+# ─── Payments (HTTP 402 Web Ledgers + MRC20 token) ──────────────────────────
+[payments]
+enabled   = true
+cost_sats = 1
+
+[payments.token]
+ticker = "DREAM"
+rate   = 10       # 10 DREAM per sat
+supply = 1000000  # 1M total supply
+issuer = ""       # operator sets via DREAMLAB_TOKEN_ISSUER env-override
+
 # ─── Operator custody tier ───────────────────────────────────────────────────
 [custody]
 operator = "tier-2"   # CF Workers Secrets — DreamLab deployment uses Cloudflare

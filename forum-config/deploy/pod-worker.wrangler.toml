@@ -30,5 +30,15 @@ id      = "8ec8759ab40d4709a831bf6b0e5241eb"
 binding = "NIP98_REPLAY"
 id      = "REPLACE_WITH_NEW_NIP98_REPLAY_KV_ID"
 
+# D1 database for payment/quota tables (webledger_accounts, txo_deposits,
+# quota_usage) and NIP-98 replay protection.  Shared with auth-worker (same
+# database, different binding name: auth-worker uses "DB", pod-worker "REPLAY_DB").
+[[d1_databases]]
+binding       = "REPLAY_DB"
+database_name = "dreamlab-auth"
+database_id   = "e3981999-e8f0-4c07-9e4b-2e50859b8524"
+
 [vars]
 EXPECTED_ORIGIN = "https://dreamlab-ai.com"
+PAY_ENABLED     = "true"
+PAY_COST_SATS   = "1"

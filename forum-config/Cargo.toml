@@ -1,6 +1,6 @@
 [package]
 name = "dreamlab-forum-config"
-version = "3.0.0-rc4"
+version = "3.0.0-rc6"
 edition = "2021"
 description = "DreamLab AI forum operator overlay for the nostr-bbs kit"
 license = "Proprietary"
@@ -10,12 +10,17 @@ publish = false
 path = "src/lib.rs"
 
 [dependencies]
-# Kit crates from crates.io (published 2026-05-07 as v3.0.0-rc4).
-nostr-bbs-core = "3.0.0-rc4"
-nostr-bbs-config = "3.0.0-rc4"
-nostr-bbs-mesh = "3.0.0-rc4"
+# Kit crates from crates.io (published 2026-05-11 as v3.0.0-rc6).
+nostr-bbs-core = "3.0.0-rc6"
+nostr-bbs-config = "3.0.0-rc6"
+nostr-bbs-mesh = "3.0.0-rc6"
+nostr-bbs-rate-limit = "3.0.0-rc6"
 
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 toml = "0.8"
 thiserror = "2"
+
+# Required by nostr-bbs-rate-limit (Cloudflare Workers runtime).
+# Must match the version used by nostr-bbs-rate-limit to avoid type mismatches.
+worker = "0.8"
