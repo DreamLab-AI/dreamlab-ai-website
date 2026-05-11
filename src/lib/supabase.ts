@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 // These should be environment variables in production
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -13,26 +14,24 @@ if (import.meta.env.DEV) {
   });
 }
 
-let supabase;
+let supabase: SupabaseClient | null = null;
 
 if (supabaseUrl && supabaseAnonKey) {
   supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: false,
-    detectSessionInUrl: false
-  },
-  global: {
-    headers: {
-      'apikey': supabaseAnonKey,
-      'Authorization': `Bearer ${supabaseAnonKey}`
-    }
-  }
+    auth: {
+      autoRefreshToken: true,
+      persistSession: false,
+      detectSessionInUrl: false,
+    },
+    global: {
+      headers: {
+        'apikey': supabaseAnonKey,
+        'Authorization': `Bearer ${supabaseAnonKey}`,
+      },
+    },
   });
 } else {
   console.warn('Supabase environment variables are not set. Supabase client not initialized.');
-  // Provide a mock/dummy client if needed, or just leave it undefined
-  supabase = null;
 }
 
 export { supabase };
