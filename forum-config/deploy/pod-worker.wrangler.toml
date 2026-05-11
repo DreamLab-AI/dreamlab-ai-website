@@ -39,6 +39,9 @@ database_name = "dreamlab-auth"
 database_id   = "e3981999-e8f0-4c07-9e4b-2e50859b8524"
 
 [vars]
-EXPECTED_ORIGIN = "https://dreamlab-ai.com"
-PAY_ENABLED     = "true"
-PAY_COST_SATS   = "1"
+EXPECTED_ORIGIN  = "https://dreamlab-ai.com"
+PAY_ENABLED      = "true"
+PAY_COST_SATS    = "1"
+PAY_TOKEN_TICKER = "DREAM"
+PAY_TOKEN_RATE   = "10"
+PAY_TOKEN_SUPPLY = "1000000"

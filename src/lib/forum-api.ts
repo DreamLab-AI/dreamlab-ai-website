@@ -311,6 +311,43 @@ export async function postTokenWithdraw(
 }
 
 // ---------------------------------------------------------------------------
+// Agent Job Estimation API (pod-worker /pay/.estimate route)
+// ---------------------------------------------------------------------------
+
+/** Agent job cost estimate returned by POST /pay/.estimate. */
+export interface JobEstimate {
+  did: string;
+  endpoint: string;
+  estimated_sats: number;
+  unit: string;
+  note: string;
+}
+
+/**
+ * Request a cost estimate for an agent job before submission.
+ * Requires a NIP-98 Authorization header.
+ *
+ * @param nip98AuthHeader - NIP-98 `Nostr <base64-event>` authorization header
+ * @param endpoint - The VisionClaw inference endpoint (e.g. `/api/inference/run`)
+ * @param params - Optional parameters that may affect cost estimation
+ */
+export async function postJobEstimate(
+  nip98AuthHeader: string,
+  endpoint: string,
+  params?: Record<string, unknown>,
+): Promise<JobEstimate> {
+  const resp = await fetch(`${POD_API_URL}/pay/.estimate`, {
+    method: "POST",
+    headers: {
+      Authorization: nip98AuthHeader,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ endpoint, params }),
+  });
+  return handleResponse<JobEstimate>(resp);
+}
+
+// ---------------------------------------------------------------------------
 // Auth API helpers
 // ---------------------------------------------------------------------------
 
