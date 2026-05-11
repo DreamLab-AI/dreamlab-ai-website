@@ -71,6 +71,16 @@ const Contact = () => {
   }, [selectedTeam, form]);
 
   const onSubmit = async (data: FormValues) => {
+    if (!supabase) {
+      toast({
+        title: "Unavailable",
+        description: "Service temporarily unavailable. Please try again later.",
+        variant: "destructive",
+        duration: 5000,
+      });
+      return;
+    }
+
     setIsSubmitting(true);
 
     // Sprint v9 D4: do NOT log submitted form data (PII) or Supabase error

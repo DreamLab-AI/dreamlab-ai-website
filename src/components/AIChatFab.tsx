@@ -58,7 +58,7 @@ export const AIChatFab = () => {
   }, [showTierMenu]);
 
   const requestNostrAuth = useCallback(async (): Promise<string | null> => {
-    const nostr = (window as Record<string, unknown>).nostr as { getPublicKey: () => Promise<string> } | undefined;
+    const nostr = (window as unknown as Record<string, unknown>).nostr as { getPublicKey: () => Promise<string> } | undefined;
     if (!nostr) return null;
     try {
       const pk = await nostr.getPublicKey();

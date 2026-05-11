@@ -40,6 +40,11 @@ export const EmailSignupForm = () => {
       return;
     }
 
+    if (!supabase) {
+      toast.error("Service temporarily unavailable. Please try again later.");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
