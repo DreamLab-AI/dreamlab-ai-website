@@ -37,6 +37,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { AgentJobsDashboard } from "@/components/AgentJobsDashboard";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -78,6 +89,12 @@ export function PaymentDashboard({ nip98AuthHeader }: PaymentDashboardProps) {
   >(null);
   const [tokenOpStatus, setTokenOpStatus] = useState<Status>("idle");
   const [tokenOpError, setTokenOpError] = useState<string | null>(null);
+
+  // -- confirmation dialog --------------------------------------------------
+  const [pendingAction, setPendingAction] = useState<{
+    type: "buy" | "withdraw";
+    amount: number;
+  } | null>(null);
 
   // -- fetch gateway info ---------------------------------------------------
   const fetchInfo = useCallback(async () => {
@@ -142,45 +159,46 @@ export function PaymentDashboard({ nip98AuthHeader }: PaymentDashboardProps) {
     }
   };
 
-  // -- token buy handler ----------------------------------------------------
-  const handleTokenBuy = async () => {
+  // -- token buy/withdraw: request confirmation first ----------------------
+  const requestTokenBuy = () => {
     if (!nip98AuthHeader || !tokenAmount.trim()) return;
     const amount = parseInt(tokenAmount, 10);
     if (isNaN(amount) || amount <= 0) return;
-    setTokenOpStatus("loading");
-    setTokenOpError(null);
-    setTokenOpResult(null);
-    try {
-      const result = await postTokenBuy(nip98AuthHeader, amount);
-      setTokenOpResult(result);
-      setTokenOpStatus("idle");
-      setTokenAmount("");
-      fetchBalance();
-    } catch (err) {
-      const msg =
-        err instanceof ForumApiError ? err.message : "Token purchase failed";
-      setTokenOpError(msg);
-      setTokenOpStatus("error");
-    }
+    setPendingAction({ type: "buy", amount });
   };
 
-  // -- token withdraw handler -----------------------------------------------
-  const handleTokenWithdraw = async () => {
+  const requestTokenWithdraw = () => {
     if (!nip98AuthHeader || !tokenAmount.trim()) return;
     const amount = parseInt(tokenAmount, 10);
     if (isNaN(amount) || amount <= 0) return;
+    setPendingAction({ type: "withdraw", amount });
+  };
+
+  // -- execute the confirmed token operation --------------------------------
+  const executeConfirmedTokenOp = async () => {
+    if (!pendingAction || !nip98AuthHeader) return;
+    const { type, amount } = pendingAction;
+    setPendingAction(null);
+
     setTokenOpStatus("loading");
     setTokenOpError(null);
     setTokenOpResult(null);
     try {
-      const result = await postTokenWithdraw(nip98AuthHeader, amount);
+      const result =
+        type === "buy"
+          ? await postTokenBuy(nip98AuthHeader, amount)
+          : await postTokenWithdraw(nip98AuthHeader, amount);
       setTokenOpResult(result);
       setTokenOpStatus("idle");
       setTokenAmount("");
       fetchBalance();
     } catch (err) {
       const msg =
-        err instanceof ForumApiError ? err.message : "Token withdrawal failed";
+        err instanceof ForumApiError
+          ? err.message
+          : type === "buy"
+            ? "Token purchase failed"
+            : "Token withdrawal failed";
       setTokenOpError(msg);
       setTokenOpStatus("error");
     }
@@ -219,7 +237,7 @@ export function PaymentDashboard({ nip98AuthHeader }: PaymentDashboardProps) {
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground">Cost per request:</span>
                 <Badge variant="secondary">
-                  {info.cost_sats ?? (info as Record<string, unknown>).cost} sat
+                  {info.cost_sats ?? (info as unknown as Record<string, unknown>).cost} sat
                 </Badge>
               </div>
               <div className="flex items-center gap-2">
@@ -374,14 +392,14 @@ export function PaymentDashboard({ nip98AuthHeader }: PaymentDashboardProps) {
                 disabled={tokenOpStatus === "loading"}
               />
               <Button
-                onClick={handleTokenBuy}
+                onClick={requestTokenBuy}
                 disabled={tokenOpStatus === "loading" || !tokenAmount.trim()}
               >
                 Buy
               </Button>
               <Button
                 variant="outline"
-                onClick={handleTokenWithdraw}
+                onClick={requestTokenWithdraw}
                 disabled={tokenOpStatus === "loading" || !tokenAmount.trim()}
               >
                 Withdraw
@@ -410,6 +428,11 @@ export function PaymentDashboard({ nip98AuthHeader }: PaymentDashboardProps) {
         </Card>
       )}
 
+      {/* Agent Jobs Dashboard (authed only) — P2-12 */}
+      {isAuthed && (
+        <AgentJobsDashboard nip98AuthHeader={nip98AuthHeader} />
+      )}
+
       {/* Unauthenticated prompt */}
       {!isAuthed && (
         <Card>
@@ -421,6 +444,48 @@ export function PaymentDashboard({ nip98AuthHeader }: PaymentDashboardProps) {
           </CardContent>
         </Card>
       )}
+
+      {/* Confirmation dialog for token buy/withdraw */}
+      <AlertDialog
+        open={pendingAction !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingAction(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Confirm token {pendingAction?.type === "buy" ? "purchase" : "withdrawal"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {pendingAction?.type === "buy" ? (
+                <>
+                  You are about to purchase{" "}
+                  <strong>
+                    {pendingAction.amount.toLocaleString()} {tokenConfig?.ticker ?? "tokens"}
+                  </strong>
+                  . This will debit your sat balance at a rate of{" "}
+                  {tokenConfig?.rate ?? "?"} {tokenConfig?.ticker ?? "tokens"}/sat.
+                </>
+              ) : (
+                <>
+                  You are about to withdraw{" "}
+                  <strong>
+                    {pendingAction?.amount.toLocaleString() ?? 0} {tokenConfig?.ticker ?? "tokens"}
+                  </strong>
+                  . The equivalent sats will be credited to your balance.
+                </>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={executeConfirmedTokenOp}>
+              {pendingAction?.type === "buy" ? "Confirm Purchase" : "Confirm Withdrawal"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
