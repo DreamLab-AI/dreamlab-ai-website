@@ -1,5 +1,15 @@
 # Claude Code Configuration - DreamLab AI Website
 
+## Security Audit Sprint (2026-05-11)
+
+A DreamLab ecosystem-wide security audit applied 10 fixes to
+dreamlab-ai-website. See CHANGELOG.md `[Security Audit Sprint] -
+2026-05-11` for the full manifest. Key areas hardened: GDPR consent model
+(P0-15), Supabase null safety (P0-16), production URL fallback removal
+(P0-17), GDPR erasure pipeline (P1-29), strictNullChecks enforcement
+(P1-30), payment confirmation dialogs (P1-31), Mermaid XSS hardening
+(P2-11), and dead code/dependency cleanup (P3-06, P3-07).
+
 ## Project Overview
 
 DreamLab AI is a premium AI training and consulting platform. This is a React SPA (Vite + TypeScript + Tailwind CSS) with a Leptos community forum (Rust/WASM), 3D WebGL visualizations (Three.js + Rust WASM), Supabase backend, Cloudflare Workers (Rust) backend services, and Nostr-based decentralized social features.
