@@ -36,7 +36,7 @@ kinds_lo      = 31400
 kinds_hi      = 31405
 relay_url     = "wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev"
 agent_pubkeys = [
-  "0000000000000000000000000000000000000000000000000000000000000001",
+  "11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c",
 ]
 ```
 

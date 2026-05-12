@@ -33,9 +33,7 @@ ingress_policy  = "allowlist"
 [admin]
 mode            = "static"
 static_pubkeys  = [
-  # Pete (DreamLab CTO) — placeholder; operator must supply the real value
-  # via DREAMLAB_ADMIN_PUBKEY env-override during deploy.
-  "0000000000000000000000000000000000000000000000000000000000000000",
+  "11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c",
 ]
 
 # ─── Branding ────────────────────────────────────────────────────────────────
@@ -74,8 +72,7 @@ post_threshold  = 1     # +1 trust required to post in moderated channels
 # ─── Invite system ───────────────────────────────────────────────────────────
 [invites]
 enabled              = true
-welcome_bot_pubkey   = "0000000000000000000000000000000000000000000000000000000000000000"
-# ↑ placeholder; operator supplies via DREAMLAB_WELCOME_BOT_PUBKEY env-override.
+welcome_bot_pubkey   = "11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c"
 
 # ─── Moderation ──────────────────────────────────────────────────────────────
 [moderation]
@@ -115,9 +112,7 @@ relay_url     = "wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev"
 
 # Agent pubkeys allowed to publish control surface events (kinds 31400-31405).
 agent_pubkeys = [
-  "0000000000000000000000000000000000000000000000000000000000000001",
-  "0000000000000000000000000000000000000000000000000000000000000002",
-  "0000000000000000000000000000000000000000000000000000000000000003",
+  "11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c",
 ]
 
 # ─── Payments (HTTP 402 Web Ledgers + MRC20 token) ──────────────────────────
