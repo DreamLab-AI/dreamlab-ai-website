@@ -13,6 +13,40 @@ generic `nostr-bbs-*` kit crates living in the `nostr-rust-forum` repo.
 | `src/workers.rs`                    | Per-worker entry shims (kit `dispatch` API not yet available)        |
 | `deploy/<worker>.wrangler.toml`     | Preserved CF resource IDs for D2 zero-downtime route handover        |
 
+## Feature flags
+
+Feature flags live in `dreamlab.toml` under `[features]`:
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `marketplace` | `true` | NIP-90 agent job marketplace |
+| `calendar` | `true` | NIP-52 calendar events |
+| `dms` | `true` | NIP-59 encrypted direct messages |
+| `governance` | `true` | Agent Control Surface dashboard at `/governance` (kinds 31400-31405) |
+
+## Governance configuration
+
+The `[governance]` section in `dreamlab.toml` controls the Agent Control Surface:
+
+```toml
+[governance]
+enabled       = true
+route         = "/governance"
+kinds_lo      = 31400
+kinds_hi      = 31405
+relay_url     = "wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev"
+agent_pubkeys = [
+  "0000000000000000000000000000000000000000000000000000000000000001",
+]
+```
+
+- `agent_pubkeys` -- Pre-registered agent pubkeys authorised to publish governance
+  control panel events. Replace placeholders with real agent pubkeys at deploy time
+  via `DREAMLAB_GOVERNANCE_AGENT_PUBKEYS` env-override.
+- `relay_url` -- Relay endpoint for governance events. Uses the main relay by default;
+  set to a separate endpoint to isolate governance traffic.
+- `kinds_lo`/`kinds_hi` -- Nostr event kind range for governance events (31400-31405).
+
 ## Status
 
 **Phase X3** per [PRD-012] — overlay exists; the legacy

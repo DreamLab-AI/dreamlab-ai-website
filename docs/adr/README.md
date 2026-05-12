@@ -35,6 +35,17 @@ This directory contains the Architecture Decision Records (ADRs) for the DreamLa
 | 023 | [Forum Relay Layer Hardening](023-forum-relay-hardening.md) | Accepted | present |
 | 024 | [Security Hardening Sprint](024-security-hardening-sprint.md) | Accepted | present |
 | 025 | [Solid Pod Infrastructure Upgrade](025-solid-pod-infrastructure-upgrade.md) | Accepted | present |
+| 026 | [Forum Professionalisation](026-forum-professionalisation.md) | Accepted | present |
+| 027 | [Canonical Identity Stack](027-canonical-identity-stack.md) | Accepted | present |
+| 028 | [Solid Pod RS AGPL Boundary](028-solid-pod-rs-agpl-boundary.md) | Accepted | present |
+| 029 | [JSON-LD Processing Strategy](029-json-ld-processing-strategy.md) | Accepted | present |
+| 030 | [Authentication Signer Abstraction](030-authentication-signer-abstraction.md) | Accepted | present |
+| 031 | [DM Protocol Standardisation](031-dm-protocol-standardisation.md) | Accepted | present |
+| 032 | [Agent Job Marketplace (NIP-90)](032-agent-job-marketplace-nip90.md) | Accepted | present |
+| 033 | [Multi-Admin Moderation Architecture](033-multi-admin-moderation-architecture.md) | Accepted | present |
+| 034 | [Nostr Relay NIP Conformance](034-nostr-relay-nip-conformance.md) | Accepted | present |
+
+> **Note:** ADR-032 (Agent Job Marketplace) established the agent interaction model. The Agent Control Surface governance feature (kinds 31400-31405, `/governance` route) builds on this foundation. See [forum-config/README.md](../../forum-config/README.md#governance-configuration) for the operator config.
 
 ## Supersession Chain
 

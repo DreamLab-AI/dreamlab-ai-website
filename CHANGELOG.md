@@ -4,6 +4,22 @@ All notable changes to the DreamLab AI website will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Governance Sprint] - 2026-05-12
+
+### Added
+
+- **Agent Control Surface**: Governance dashboard at `/governance` route with
+  reactive agent panel for human-in-the-loop oversight of autonomous AI systems.
+  Custom Nostr event kinds 31400-31405 carry agent control surface events;
+  approve/reject action responses are NIP-98 signed.
+- **Governance feature flag**: `governance = true` in `forum-config/dreamlab.toml`
+  `[features]` section, with full `[governance]` configuration block (route,
+  kinds range, relay URL, agent pubkey allowlist).
+- **Header navigation**: Governance submenu added under Community dropdown in
+  `src/components/Header.tsx`, linking to `/community/#/governance`.
+- **Outcome card**: "Agent Control Surface" card added to the landing page
+  outcome grid in `src/pages/Index.tsx`.
+
 ## [Security Audit Sprint] - 2026-05-11
 
 DreamLab ecosystem-wide security audit. 10 fixes applied to

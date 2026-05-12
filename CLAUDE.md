@@ -1,5 +1,16 @@
 # Claude Code Configuration - DreamLab AI Website
 
+## Governance Sprint (2026-05-12)
+
+Agent Control Surface feature shipped. The forum now exposes a `/governance`
+route with a reactive agent panel dashboard. Custom Nostr event kinds
+31400-31405 carry governance control surface events. NIP-98 gated API
+endpoints handle approve/reject action response signing. The feature is
+toggled via `governance = true` in `forum-config/dreamlab.toml` with a full
+`[governance]` config section (route, kinds range, relay URL, agent pubkey
+allowlist). Header.tsx gained a Governance submenu under Community; Index.tsx
+gained an "Agent Control Surface" outcome card.
+
 ## Security Audit Sprint (2026-05-11)
 
 A DreamLab ecosystem-wide security audit applied 10 fixes to
@@ -180,6 +191,7 @@ All routes are lazy-loaded via `React.lazy()` in `src/App.tsx`:
 | `/system-design` | SystemDesign | Architecture docs |
 | `/research-paper` | ResearchPaper | Research content |
 | `/testimonials` | Testimonials | Customer reviews |
+| `/community/#/governance` | (Leptos WASM) | Agent Control Surface governance dashboard |
 | `*` | NotFound | 404 page |
 
 ## Path Aliases
@@ -199,7 +211,7 @@ All routes are lazy-loaded via `React.lazy()` in `src/App.tsx`:
 
 ## TypeScript Configuration
 
-- Strict mode: **disabled** (noImplicitAny: false, strictNullChecks: false)
+- Strict mode: **partial** (noImplicitAny: false, strictNullChecks: **true** since P1-30 security audit)
 - Unused vars/params: **not enforced**
 - Target: ES2020, Module: ESNext, JSX: react-jsx
 
@@ -264,6 +276,21 @@ Nostr custom parameterized-replaceable events:
 | 30915 | Unban | banned pubkey | admin (revokes 30910) |
 | 30916 | Unmute | muted pubkey | admin (revokes 30911) |
 | 1984 | Report (NIP-56) | reported event id | any authed user (interop) |
+
+### Governance / Agent Control Surface event model
+
+| Kind | Name | `d` tag | Signer |
+|------|------|---------|--------|
+| 31400 | AgentControlPanel | panel id | agent (pre-registered pubkey) |
+| 31401 | AgentStatusUpdate | panel id + ts | agent |
+| 31402 | AgentActionRequest | action uuid | agent |
+| 31403 | HumanActionResponse | action uuid | admin (NIP-98 signed approve/reject) |
+| 31404 | GovernancePolicy | policy id | admin |
+| 31405 | GovernanceAuditLog | audit entry id | system |
+
+Agent pubkeys must be pre-registered in `forum-config/dreamlab.toml` `[governance].agent_pubkeys`.
+The relay filters these kinds to only accept events from registered agent or admin pubkeys.
+The feature is gated behind `[features] governance = true` in the operator config.
 
 Constants live in `nostr-core::moderation_events` (`KIND_BAN`, `KIND_MUTE`, `KIND_WARNING`, `KIND_REPORT`, `KIND_MODERATION_ACTION`, `KIND_UNBAN`, `KIND_UNMUTE`, `KIND_REPORT_NIP56`).
 

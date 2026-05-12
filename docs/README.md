@@ -1,8 +1,8 @@
 # DreamLab AI -- Documentation Hub
 
-**Last updated:** 2026-05-08 | **Repository:** [DreamLab-AI/dreamlab-ai-website](https://github.com/DreamLab-AI/dreamlab-ai-website) | **Project README:** [../README.md](../README.md)
+**Last updated:** 2026-05-12 | **Repository:** [DreamLab-AI/dreamlab-ai-website](https://github.com/DreamLab-AI/dreamlab-ai-website) | **Project README:** [../README.md](../README.md)
 
-This documentation covers the full DreamLab AI platform: a React marketing site, a Rust/Leptos WASM community forum, and five Cloudflare Workers providing authentication, storage, relay, search, and link preview services.
+This documentation covers the full DreamLab AI platform: a React marketing site, a Rust/Leptos WASM community forum (including the Agent Control Surface governance dashboard), and five Cloudflare Workers providing authentication, storage, relay, search, and link preview services.
 
 ---
 
@@ -77,10 +77,11 @@ graph TB
 |----------|--------|-------------|
 | [PRD: Rust Port v2.0.0](prd-rust-port.md) | Accepted | Architecture baseline for the Rust port. Scope, crate survey, timeline, risk register. |
 | [PRD: Rust Port v2.1.0](prd-rust-port-v2.1.md) | In Progress | Refined delivery plan with tranche-based execution, governance gates, and rollback design. |
+| [Forum Config: Governance](../forum-config/README.md#governance-configuration) | Active | Agent Control Surface config -- feature flag, event kinds 31400-31405, agent pubkey allowlist. |
 
 ### Architecture Decision Records
 
-Full index of all 19 ADRs. See [adr/README.md](adr/README.md) for conventions and supersession chains.
+Full index of all 34 ADRs. See [adr/README.md](adr/README.md) for conventions and supersession chains.
 
 | ADR | Title | Status | Link |
 |-----|-------|--------|------|
@@ -103,6 +104,10 @@ Full index of all 19 ADRs. See [adr/README.md](adr/README.md) for conventions an
 | 017 | passkey-rs for WebAuthn/FIDO2 with PRF Extension | Accepted | [adr/017-passkey-rs-webauthn-prf.md](adr/017-passkey-rs-webauthn-prf.md) |
 | 018 | Testing Strategy for Rust Port | Accepted | [adr/018-testing-strategy-rust-port.md](adr/018-testing-strategy-rust-port.md) |
 | 019 | Versioned Planning Governance and Tranche-Based Delivery | Accepted | [adr/019-plan-governance-and-delivery-structure.md](adr/019-plan-governance-and-delivery-structure.md) |
+| 020-025 | WebGPU Fallback, Offline-First, NIP-29, Relay Hardening, Security Sprint, Solid Pod Upgrade | Accepted | See [adr/README.md](adr/README.md) |
+| 026-031 | Forum Professionalisation, Canonical Identity, AGPL Boundary, JSON-LD, Signer Abstraction, DM Protocol | Accepted | See [adr/README.md](adr/README.md) |
+| 032 | Agent Job Marketplace (NIP-90) | Accepted | [adr/032-agent-job-marketplace-nip90.md](adr/032-agent-job-marketplace-nip90.md) |
+| 033-034 | Multi-Admin Moderation, Relay NIP Conformance | Accepted | See [adr/README.md](adr/README.md) |
 
 **Supersession chain:** ADR-003 (GCP) -> ADR-010 (Cloudflare) | ADR-007 (SvelteKit) -> ADR-013 (Rust/Leptos) | ADR-008 (PostgreSQL) -> ADR-010 (D1)
 
@@ -412,19 +417,19 @@ graph LR
 
 | Category | Files | Status |
 |----------|-------|--------|
-| Planning (PRDs) | 2 | v2.0.0 accepted, v2.1.0 in progress |
-| ADRs (001-019) | 8 files (013-019 present; 001-012 tracked in index) | Current |
-| DDD | 7 (including README) | Aligned to v2.0.0 baseline |
+| Planning (PRDs) | 2 + governance config | v2.0.0 accepted, v2.1.0 in progress, governance active |
+| ADRs (001-034) | 22 files (013-034 present; 001-012 tracked in index) | Current |
+| DDD | 10 (including README) | Aligned to v2.0.0 baseline + governance events |
 | API | 4 | Current for Rust port |
 | Security | 6 | Current for Rust port (2 docs + 3 QE audits + 1 coverage report) |
-| Deployment | 2 | Current for Rust port |
+| Deployment | 2 | Current for Rust port + governance feature flags |
 | Developer | 2 | Current for Rust port |
 | Benchmarks | 1 | Baseline established |
-| Tranche 1 | 2 | Active migration tracking |
-| **Total** | **34** | |
+| Tranche 1 | 2 | Historical (migration complete) |
+| **Total** | **51+** | |
 
 ---
 
 **Project README:** [../README.md](../README.md) | **ADR Index:** [adr/README.md](adr/README.md) | **DDD Hub:** [ddd/README.md](ddd/README.md)
 
-*Last updated: 2026-05-08*
+*Last updated: 2026-05-12*

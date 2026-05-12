@@ -21,6 +21,7 @@ import {
   Handshake,
   GraduationCap,
   Play,
+  Bot,
 } from "lucide-react";
 import { useOGMeta } from "@/hooks/useOGMeta";
 import { PAGE_OG_CONFIGS } from "@/lib/og-meta";
@@ -78,6 +79,16 @@ const outcomeCards = [
     iconBg: "bg-green-500/10",
     iconColor: "text-green-400",
     count: 3,
+  },
+  {
+    id: "agent-governance",
+    title: "Agent Control Surface",
+    description: "AI agents publish interactive control panels for human-in-the-loop governance of autonomous systems.",
+    icon: Bot,
+    borderClass: "border-orange-500/30 hover:border-orange-500/50",
+    iconBg: "bg-orange-500/10",
+    iconColor: "text-orange-400",
+    count: 1,
   },
   {
     id: "creative-production",

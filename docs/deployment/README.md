@@ -239,11 +239,27 @@ All DNS records are managed in the Cloudflare `dreamlab-ai.com` zone.
 
 ---
 
+## Feature Flags
+
+Operator feature flags in `forum-config/dreamlab.toml` under `[features]` control which capabilities are active. The relay and forum client respect these flags at startup.
+
+| Flag | Purpose | Default |
+|------|---------|---------|
+| `marketplace` | NIP-90 agent job marketplace | `true` |
+| `calendar` | NIP-52 calendar events | `true` |
+| `dms` | NIP-59 encrypted direct messages | `true` |
+| `governance` | Agent Control Surface dashboard (`/governance`, kinds 31400-31405) | `true` |
+
+The `governance` flag additionally requires configuration in the `[governance]` section of `dreamlab.toml` -- see [forum-config/README.md](../../forum-config/README.md#governance-configuration) for the full schema (route, relay URL, agent pubkey allowlist).
+
+---
+
 ## Related Documents
 
 | Document | Description |
 |----------|-------------|
 | [Cloudflare Workers](CLOUDFLARE_WORKERS.md) | Build pipeline, resource bindings, secrets |
+| [Forum Config](../../forum-config/README.md) | Operator overlay, feature flags, governance config |
 | [Auth API](../api/AUTH_API.md) | WebAuthn + NIP-98 endpoints |
 | [Pod API](../api/POD_API.md) | Solid pod storage |
 | [Nostr Relay](../api/NOSTR_RELAY.md) | WebSocket relay |

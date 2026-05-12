@@ -29,6 +29,13 @@ Every Nostr event has a `kind` that determines its semantics. The DreamLab forum
 | 27235 | HttpAuth | NIP-98 | HTTP authentication token |
 | 31922 | CalendarEvent | NIP-52 | Time-based calendar event |
 | 31923 | CalendarDateEvent | NIP-52 | Date-based calendar event |
+| 30910-30916 | Moderation | Custom | Ban, Mute, Warning, Report, ModerationAction, Unban, Unmute |
+| 31400 | AgentControlPanel | Custom | Agent publishes interactive governance control panel |
+| 31401 | AgentStatusUpdate | Custom | Agent status/telemetry update for governance panel |
+| 31402 | AgentActionRequest | Custom | Agent requests human approval for an action |
+| 31403 | HumanActionResponse | Custom | Admin approve/reject of agent action (NIP-98 signed) |
+| 31404 | GovernancePolicy | Custom | Governance policy definition |
+| 31405 | GovernanceAuditLog | Custom | Immutable audit trail entry for governance actions |
 | 39000 | GroupMetadata | NIP-29 | Group metadata |
 | 39002 | GroupMembers | NIP-29 | Group member list |
 
@@ -52,6 +59,13 @@ pub enum EventKind {
     ChannelMuteUser       = 44,
     RelayList             = 10002,
     HttpAuth              = 27235,
+    // Governance / Agent Control Surface (kinds 31400-31405)
+    AgentControlPanel     = 31400,
+    AgentStatusUpdate     = 31401,
+    AgentActionRequest    = 31402,
+    HumanActionResponse   = 31403,
+    GovernancePolicy      = 31404,
+    GovernanceAuditLog    = 31405,
     CalendarEvent         = 31922,
     CalendarDateEvent     = 31923,
     GroupMetadata         = 39000,
@@ -118,6 +132,19 @@ These are state transitions within the DreamLab application, triggered by receiv
 | `MediaUploaded` | PUT to pod-worker | Adds MediaAsset to Pod |
 | `MediaDeleted` | DELETE to pod-worker | Removes MediaAsset from Pod |
 | `AclUpdated` | Admin modifies ACL | Updates WacAcl rules |
+
+### Governance Domain Events (Agent Control Surface)
+
+| Event | Trigger | Effect |
+|-------|---------|--------|
+| `ControlPanelPublished` | Kind 31400 event from agent | Adds/updates agent control panel in governance dashboard |
+| `AgentStatusChanged` | Kind 31401 event from agent | Updates agent telemetry/status display |
+| `ActionRequested` | Kind 31402 event from agent | Creates pending action requiring human approval |
+| `ActionResolved` | Kind 31403 event from admin | Marks action as approved/rejected; triggers agent callback |
+| `PolicyUpdated` | Kind 31404 event from admin | Updates governance policy rules |
+| `AuditEntryCreated` | Kind 31405 event | Appends immutable audit log entry |
+
+Governance events are gated: the relay only accepts kinds 31400-31405 from pubkeys listed in `[governance].agent_pubkeys` (for agent events) or `[admin].static_pubkeys` (for admin responses). The feature must be enabled via `[features] governance = true` in the operator config.
 
 ## Event Flow Diagrams
 

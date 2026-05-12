@@ -97,6 +97,7 @@ graph TB
 - **Passkey-first authentication** -- WebAuthn PRF derives a secp256k1 private key deterministically via HKDF. The key is never stored; it exists only in a Rust closure and is zeroized on page unload.
 - **End-to-end encrypted DMs** -- NIP-59 Gift Wrap protocol (Rumor, Seal, Wrap) with NIP-44 ChaCha20-Poly1305 encryption. The relay and server never see plaintext.
 - **Zone-based access control** -- Three access zones (Home, DreamLab, Minimoonoir) enforced at both the relay and client layers with cohort-based gating.
+- **Agent Control Surface** -- Governance dashboard at `/governance` powered by custom Nostr event kinds 31400-31405. AI agents publish interactive control panels; human operators approve/reject actions via NIP-98 signed responses. Gated behind `governance = true` feature flag in `forum-config/dreamlab.toml`.
 - **Solid pods with LDP compliance** -- Full Linked Data Platform containers, WAC ACL inheritance, conditional requests (ETags), Range streaming, JSON Patch (RFC 6902), per-user quotas, WebID profiles, content negotiation, and pod provisioning.
 - **Agent micropayments** -- HTTP 402 Payment Required with Web Ledgers spec, Bitcoin TXO deposit via mempool verification, per-request satoshi cost for pay-gated resources.
 - **Federation-ready** -- WebFinger discovery (remoteStorage + Solid), NIP-05 verification, Solid Notifications (webhooks), `.well-known/solid` discovery document.
@@ -113,8 +114,8 @@ graph TB
 | Marketing Site | React 18.3 + TypeScript 5.5 + Vite 5.4 |
 | Styling | Tailwind CSS 3.4 + shadcn/ui (Radix UI) |
 | 3D | Three.js 0.156 + React Three Fiber |
-| Community Forum | **Rust / Leptos 0.7** (CSR, WASM, amber/gray theme, 18 routes, 58+ components) |
-| Nostr Protocol | nostr-core (Rust) — NIP-01/07/09/29/33/40/42/45/50/52/98 |
+| Community Forum | **Rust / Leptos 0.7** (CSR, WASM, amber/gray theme, 19 routes incl. `/governance`, 58+ components) |
+| Nostr Protocol | nostr-core (Rust) — NIP-01/07/09/29/33/40/42/45/50/52/98 + kinds 31400-31405 (governance) |
 | Auth | WebAuthn PRF via passkey-rs + NIP-98 + NIP-07 extension |
 | Encryption | NIP-44 (ChaCha20-Poly1305) + NIP-59 Gift Wrap |
 | Backend | 5 Cloudflare Workers (Rust) via `worker` 0.7.5 |
@@ -284,4 +285,4 @@ Proprietary. Copyright 2024-2026 DreamLab AI Consulting Ltd. All rights reserved
 
 ---
 
-*Last updated: 2026-05-08*
+*Last updated: 2026-05-12*

@@ -94,9 +94,31 @@ nostr_well_known_per_min    = 60     # /.well-known/nostr.json
 
 # ─── Feature flags ───────────────────────────────────────────────────────────
 [features]
-marketplace = true
-calendar    = true
-dms         = true
+marketplace  = true
+calendar     = true
+dms          = true
+governance   = true
+
+# ─── Agent Governance (kinds 31400-31405) ────────────────────────────────────
+# Pre-registered agent pubkeys authorised to publish governance control panels.
+# Replace placeholder keys with real agent pubkeys at deployment time via
+# DREAMLAB_GOVERNANCE_AGENT_PUBKEYS env-override.
+[governance]
+enabled       = true
+route         = "/governance"
+kinds_lo      = 31400
+kinds_hi      = 31405
+
+# Relay for governance events. Uses the main relay by default; set to a
+# separate endpoint if governance traffic should be isolated.
+relay_url     = "wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev"
+
+# Agent pubkeys allowed to publish control surface events (kinds 31400-31405).
+agent_pubkeys = [
+  "0000000000000000000000000000000000000000000000000000000000000001",
+  "0000000000000000000000000000000000000000000000000000000000000002",
+  "0000000000000000000000000000000000000000000000000000000000000003",
+]
 
 # ─── Payments (HTTP 402 Web Ledgers + MRC20 token) ──────────────────────────
 [payments]
