@@ -14,8 +14,13 @@ RELAY_NAME       = "DreamLab Nostr Relay"
 ALLOWED_ORIGIN   = "https://dreamlab-ai.com"
 ALLOWED_ORIGINS  = "https://dreamlab-ai.com,https://thedreamlab.uk,https://dreamlab-ai.github.io"
 
-# D1 + KV resources for the relay's Durable Object.
-# TODO(ops): re-bind these to the production IDs from the legacy fork.
+# D1 database for whitelist, events, and trust tables.
+[[d1_databases]]
+binding       = "DB"
+database_name = "dreamlab-relay"
+database_id   = "97c77d23-0e24-4325-ada7-1747eab4095b"
+
+# Durable Object for real-time WebSocket relay.
 [[durable_objects.bindings]]
 name        = "RELAY"
 class_name  = "NostrRelayDO"
@@ -26,4 +31,4 @@ new_sqlite_classes = ["NostrRelayDO"]
 
 [[kv_namespaces]]
 binding = "NIP98_REPLAY"
-id      = "REPLACE_WITH_NEW_NIP98_REPLAY_KV_ID"
+id      = "c5f76343697f473aa9e43965bb21ae2c"
