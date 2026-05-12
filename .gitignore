@@ -97,3 +97,4 @@ discourse-audit/
 # Legacy directories (deleted, guard against re-creation)
 fairfield/
 community-forum-rs/
+.nostr-identities.env
