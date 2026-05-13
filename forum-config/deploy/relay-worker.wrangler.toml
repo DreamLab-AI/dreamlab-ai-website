@@ -14,6 +14,12 @@ RELAY_NAME       = "DreamLab Nostr Relay"
 ALLOWED_ORIGIN   = "https://dreamlab-ai.com"
 ALLOWED_ORIGINS  = "https://dreamlab-ai.com,https://thedreamlab.uk,https://dreamlab-ai.github.io"
 
+# Mesh federation (PRD-010 Phase 3 / ADR-073)
+MESH_MODE               = "standalone"
+MESH_PEER_RELAYS        = ""
+MESH_FEDERATED_KINDS    = "1,1059,30001,30050,30910,31400,31401,31402,31403,31404,31405"
+MESH_ALLOWED_REMOTE_DIDS = ""
+
 # D1 database for whitelist, events, and trust tables.
 [[d1_databases]]
 binding       = "DB"
@@ -29,6 +35,12 @@ class_name  = "NostrRelayDO"
 tag         = "v1"
 new_sqlite_classes = ["NostrRelayDO"]
 
-[[kv_namespaces]]
-binding = "NIP98_REPLAY"
-id      = "c5f76343697f473aa9e43965bb21ae2c"
+# D1 database for NIP-98 replay protection (atomic INSERT OR IGNORE).
+# Shares the auth-worker's D1 database so cross-worker replay is detected.
+# The relay's own DB binding (dreamlab-relay) does not contain the
+# nip98_replay table.
+# (Legacy NIP98_REPLAY KV binding removed — D1 INSERT OR IGNORE is atomic.)
+[[d1_databases]]
+binding       = "REPLAY_DB"
+database_name = "dreamlab-auth"
+database_id   = "e3981999-e8f0-4c07-9e4b-2e50859b8524"

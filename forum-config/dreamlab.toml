@@ -83,10 +83,18 @@ welcome_bot_pubkey   = "94f74e9c8938e0eae3223fcd9ce3a799e84cff389fd994aeb9dd336a
 kinds_lo = 30910
 kinds_hi = 30916
 
-# ─── Federation mesh ─────────────────────────────────────────────────────────
+# ─── Federation mesh (PRD-010 Phase 3 / ADR-073) ────────────────────────────
+# Controls cross-substrate federation behaviour. mode values:
+#   "standalone"  — no federation; relay is loopback-only (default)
+#   "federated"   — relay exposed externally; accepts peer connections
+#   "client"      — subscribes to peers but does not accept inbound
 [mesh]
-mode         = "standalone"
-peer_relays  = []   # populated post-Sprint-v12 federation rollout
+mode                    = "standalone"
+peer_relays             = []              # ws:// or wss:// URLs of mesh peers; populated post-Sprint-v12
+federated_kinds         = [1, 1059, 30001, 30050, 30910, 31400, 31401, 31402, 31403, 31404, 31405]
+allowed_remote_dids     = []              # did:nostr:<hex> of trusted peers
+subscribed_kinds        = []              # subset of federated_kinds to pull; empty = all
+honor_remote_moderation = false           # accept kind-30910 bans from peers
 
 # ─── Rate limits (per-route) ─────────────────────────────────────────────────
 [ratelimit]
