@@ -16,6 +16,14 @@ database_name   = "dreamlab-auth"
 database_id     = "e3981999-e8f0-4c07-9e4b-2e50859b8524"
 migrations_dir  = "migrations"
 
+# Cross-D1 binding: relay worker's D1 for admin/whitelist lookups.
+# The relay-worker is the authority for admin flags (via /api/whitelist/set-admin).
+# The auth-worker needs read access to check admin status for governance APIs.
+[[d1_databases]]
+binding       = "RELAY_DB"
+database_name = "dreamlab-relay"
+database_id   = "97c77d23-0e24-4325-ada7-1747eab4095b"
+
 [[kv_namespaces]]
 binding = "SESSIONS"
 id      = "901345296c2848788066686aa67d5909"
