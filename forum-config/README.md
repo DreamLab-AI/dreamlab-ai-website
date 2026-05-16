@@ -229,6 +229,29 @@ rate_limit_per_min       = 6                # per-IP; export is bandwidth-heavy
 The matching `[ratelimit].export_per_min = 6` entry is what `RateLimitConfig::limit_for_path`
 actually consults when gating `/api/exports/*` requests at the worker edge.
 
+### `[git]` — git-versioned pods (JSS #471, alpha.12)
+
+```toml
+[git]
+enabled        = false                  # CF Workers limitation; flip for native deploys
+auto_init      = true                   # informational; takes effect when enabled = true
+default_branch = "main"                 # pinned per JSS #471
+clone_url_base = "https://pods.dreamlab-ai.com"  # surfaces in forum-client
+```
+
+| Field | Default | Operational implication |
+|-------|---------|-------------------------|
+| `enabled` | `false` on the DreamLab CF deployment | When `true`, the pod backend `git init`'s each pod at creation with `receive.denyCurrentBranch=updateInstead`. Stays `false` here because **CF Workers cannot spawn subprocesses** — see NRF `docs/adr/ADR-089-git-pods-cf-workers-limitation.md` in the nostr-rust-forum repo — and lying about it in config would be worse than disabling it. Flip on for non-CF backends (e.g. agentbox, self-hosted native solid-pod-rs). |
+| `auto_init` | `true` | Informational. Takes effect only when `enabled = true`; pre-armed so non-CF operators only have to flip `enabled`. |
+| `default_branch` | `"main"` | Branch name used by `git init`. Pinned per JSS #471 contract. |
+| `clone_url_base` | `https://pods.dreamlab-ai.com` | Base URL the forum-client uses to compose `git clone` instructions when surfacing the per-pod repository to members. Empty disables the UI hint. |
+
+The CF Workers limitation is a hard runtime constraint, not a packaging
+omission: the Workers runtime has no `posix_spawn` / `fork` / `exec`, so
+neither libgit2's `spawn`-based callbacks nor a shelled-out `git init` can
+run. Migrating off Workers (or routing pod provisioning through a native
+sidecar) is the only path to flipping `enabled = true` for this deployment.
+
 **Defaults fully flipped on 2026-05-16**: provision / nip05 / export all live
 against solid-pod-rs v0.4.0-alpha.11 + nostr-rust-forum commit `1fe95fd`.
 Operators wanting to disable any feature flip the relevant `enabled` (or

@@ -4,7 +4,7 @@
 //! does not know about these sections; the overlay parses them locally and
 //! feeds the resulting struct into worker config. This keeps the operator
 //! overlay additive — no upstream schema change is required to ship the
-//! DreamLab opt-in surface for the three JSS Phase 1 features:
+//! DreamLab opt-in surface for the JSS Phase 1 features:
 //!
 //! 1. **provision-keys** — auto-generate a Schnorr secp256k1 keypair at
 //!    `POST /.pods` signup, NIP-19 bech32-encode it, and write the result to
@@ -14,6 +14,9 @@
 //!    through to the pod's `/.well-known/nostr.json` on miss.
 //! 3. **export-jsonld** — operator opt-in for the `/api/exports/*` surface,
 //!    with private-data inclusion default and per-IP rate limit.
+//! 4. **git-versioned pods** — per-pod `git init` at creation (JSS #471,
+//!    solid-pod-rs alpha.12). Disabled on the CF deployment per NRF ADR-089
+//!    (Workers cannot spawn subprocesses); flips on for native backends.
 //!
 //! Pending solid-pod-rs v0.4.0-alpha.11; defaults here are conservative
 //! (opt-in only) until the upstream features land.
@@ -118,7 +121,52 @@ fn default_export_rate_limit() -> u32 {
     6
 }
 
-/// Aggregate of the three Phase 1 operator overlays.
+/// `[git]` — git-versioned pods (JSS #471, solid-pod-rs alpha.12).
+///
+/// When `enabled`, the pod backend `git init`'s each pod at creation with the
+/// configured `default_branch` and `receive.denyCurrentBranch=updateInstead`,
+/// giving members a per-pod audit trail and easy backup. The DreamLab
+/// Cloudflare deployment cannot honour `enabled = true` because CF Workers
+/// cannot spawn subprocesses (see NRF ADR-089); the overlay therefore stays
+/// disabled by default and flips on for non-CF backends (e.g. agentbox or a
+/// self-hosted native solid-pod-rs deployment).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GitConfig {
+    /// Master switch. `false` on the CF deployment per NRF ADR-089.
+    #[serde(default)]
+    pub enabled: bool,
+    /// Informational — automatically `git init` each new pod when
+    /// [`enabled`](Self::enabled) is `true`.
+    #[serde(default = "default_git_auto_init")]
+    pub auto_init: bool,
+    /// Default branch name for newly-initialised pod repositories.
+    #[serde(default = "default_git_default_branch")]
+    pub default_branch: String,
+    /// Base URL surfaced to the forum-client for `git clone` instructions.
+    /// Empty string disables the UI hint.
+    #[serde(default)]
+    pub clone_url_base: String,
+}
+
+impl Default for GitConfig {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            auto_init: default_git_auto_init(),
+            default_branch: default_git_default_branch(),
+            clone_url_base: String::new(),
+        }
+    }
+}
+
+fn default_git_auto_init() -> bool {
+    true
+}
+fn default_git_default_branch() -> String {
+    "main".into()
+}
+
+/// Aggregate of the Phase 1 operator overlays.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct Phase1Config {
     /// `[provision]` toggle block.
@@ -130,6 +178,9 @@ pub struct Phase1Config {
     /// `[export]` opt-in block.
     #[serde(default)]
     pub export: ExportConfig,
+    /// `[git]` git-versioned pods block (JSS #471; CF-disabled per NRF ADR-089).
+    #[serde(default)]
+    pub git: GitConfig,
 }
 
 /// Errors surfaced when loading the Phase 1 overlay.
@@ -138,7 +189,7 @@ pub enum Phase1LoadError {
     /// A Phase 1 section was present but the inner shape did not deserialize.
     #[error("failed to deserialize Phase 1 section `{section}`: {source}")]
     Section {
-        /// TOML section name (`provision`, `nip05`, or `export`).
+        /// TOML section name (`provision`, `nip05`, `export`, or `git`).
         section: &'static str,
         /// Underlying serde error.
         #[source]
@@ -157,6 +208,7 @@ impl Phase1Config {
             provision: extract_section(value, "provision")?,
             nip05: extract_section(value, "nip05")?,
             export: extract_section(value, "export")?,
+            git: extract_section(value, "git")?,
         })
     }
 }
@@ -190,6 +242,11 @@ mod tests {
         assert!(!cfg.export.enabled);
         assert!(!cfg.export.include_private_default);
         assert_eq!(cfg.export.rate_limit_per_min, 6);
+        // [git] — disabled by default; auto_init pre-armed for non-CF flips.
+        assert!(!cfg.git.enabled);
+        assert!(cfg.git.auto_init);
+        assert_eq!(cfg.git.default_branch, "main");
+        assert_eq!(cfg.git.clone_url_base, "");
     }
 
     #[test]
@@ -204,6 +261,8 @@ mod tests {
         assert!(!cfg.provision.enabled);
         assert_eq!(cfg.nip05.resolver_mode, "d1");
         assert_eq!(cfg.export.rate_limit_per_min, 6);
+        assert!(!cfg.git.enabled);
+        assert!(cfg.git.auto_init);
     }
 
     #[test]
@@ -229,6 +288,14 @@ mod tests {
         assert!(cfg.export.enabled);
         assert!(!cfg.export.include_private_default);
         assert_eq!(cfg.export.rate_limit_per_min, 6);
+
+        // [git] — disabled on CF deployment per NRF ADR-089 (Workers cannot
+        // spawn subprocesses); auto_init pre-armed so non-CF operators only
+        // need to flip `enabled = true`.
+        assert!(!cfg.git.enabled, "CF deployment cannot honour git=true");
+        assert!(cfg.git.auto_init);
+        assert_eq!(cfg.git.default_branch, "main");
+        assert_eq!(cfg.git.clone_url_base, "https://pods.dreamlab-ai.com");
     }
 
     #[test]
@@ -249,6 +316,26 @@ mod tests {
         assert!(cfg.provision.enabled, "provision must be enabled");
         assert!(cfg.export.enabled, "export must be enabled");
         assert_eq!(cfg.nip05.resolver_mode, "federated");
+    }
+
+    #[test]
+    fn git_block_parses_with_expected_defaults() {
+        // Operator overlay convention: the [git] block is present but
+        // disabled on the DreamLab CF deployment (NRF ADR-089), with
+        // auto_init = true so a non-CF operator only flips `enabled`.
+        let toml_str = r#"
+            [git]
+            enabled        = false
+            auto_init      = true
+            default_branch = "main"
+            clone_url_base = "https://pods.dreamlab-ai.com"
+        "#;
+        let v: toml::Value = toml::from_str(toml_str).unwrap();
+        let cfg = Phase1Config::load_from_value(&v).unwrap();
+        assert!(!cfg.git.enabled);
+        assert!(cfg.git.auto_init);
+        assert_eq!(cfg.git.default_branch, "main");
+        assert_eq!(cfg.git.clone_url_base, "https://pods.dreamlab-ai.com");
     }
 
     #[test]

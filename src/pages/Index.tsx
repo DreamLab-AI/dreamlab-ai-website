@@ -25,6 +25,7 @@ import {
   Fingerprint,
   KeyRound,
   Download,
+  GitBranch,
 } from "lucide-react";
 import { useOGMeta } from "@/hooks/useOGMeta";
 import { PAGE_OG_CONFIGS } from "@/lib/og-meta";
@@ -96,12 +97,12 @@ const outcomeCards = [
   {
     id: "sovereign-identity",
     title: "Sovereign Identity",
-    description: "Federated NIP-05 verification, pod-provisioned signup keys, and full data portability — your forum identity lives on your own pod.",
+    description: "Federated NIP-05 verification, pod-provisioned signup keys, full data portability, and git-versioned pods — your forum identity lives on your own pod.",
     icon: Fingerprint,
     borderClass: "border-indigo-500/30 hover:border-indigo-500/50",
     iconBg: "bg-indigo-500/10",
     iconColor: "text-indigo-400",
-    count: 3,
+    count: 4,
   },
   {
     id: "creative-production",
@@ -354,6 +355,19 @@ const Index = () => {
                     <h3 className="font-semibold text-base mb-1">Take your data with you</h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">
                       A single call to <code className="text-xs px-1 py-0.5 rounded bg-background/70 border border-indigo-500/20">/api/exports/all</code> returns a time-chain JSON-LD bundle of everything in your pod. GDPR-friendly, audit-trail-ready, and portable to any compliant Solid host.
+                    </p>
+                  </div>
+                </li>
+
+                <li className="flex gap-4">
+                  <div className="w-10 h-10 bg-amber-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <GitBranch className="w-5 h-5 text-amber-400" aria-hidden="true" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-base mb-1">Versioned pods</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      Where the operator supports it, each member pod is a git repository — every change is a commit, giving you an audit trail and easy backup via <code className="text-xs px-1 py-0.5 rounded bg-background/70 border border-indigo-500/20">git clone</code>.
+                      <span className="block mt-1 text-xs text-muted-foreground/70">DreamLab's Cloudflare deployment doesn't currently support this (Workers can't spawn git); enabled on native solid-pod-rs and agentbox backends.</span>
                     </p>
                   </div>
                 </li>

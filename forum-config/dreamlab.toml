@@ -141,6 +141,18 @@ enabled                  = true            # live as of alpha.11
 include_private_default  = false           # owner WAC always required for /private/*
 rate_limit_per_min       = 6                # per-IP; export is bandwidth-heavy
 
+# ─── Git-versioned pods (JSS #471, alpha.12) ────────────────────────────────
+# When enabled at the pod backend (e.g. agentbox or a non-CF solid-pod-rs
+# deployment), each pod is `git init`'d at creation with main branch and
+# receive.denyCurrentBranch=updateInstead. DreamLab's Cloudflare deployment
+# cannot auto-init (CF Workers can't spawn subprocesses; see NRF ADR-089),
+# so this stays disabled here; flip on for non-CF deployments.
+[git]
+enabled        = false                  # CF Workers limitation; flip for native deploys
+auto_init      = true                   # informational; takes effect when enabled = true
+default_branch = "main"                 # pinned per JSS #471
+clone_url_base = "https://pods.dreamlab-ai.com"  # surfaces in forum-client
+
 # ─── Agent Governance (kinds 31400-31405) ────────────────────────────────────
 # Pre-registered agent pubkeys authorised to publish governance control panels.
 # Replace placeholder keys with real agent pubkeys at deployment time via
