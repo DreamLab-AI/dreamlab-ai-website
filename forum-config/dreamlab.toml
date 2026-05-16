@@ -100,6 +100,7 @@ honor_remote_moderation = false           # accept kind-30910 bans from peers
 [ratelimit]
 profiles_batch_per_min      = 60     # /api/profiles/batch
 nostr_well_known_per_min    = 60     # /.well-known/nostr.json
+export_per_min              = 6      # /api/exports/*  (JSS Phase 1; bandwidth-heavy)
 
 # ─── Feature flags ───────────────────────────────────────────────────────────
 [features]
@@ -107,6 +108,33 @@ marketplace  = true
 calendar     = true
 dms          = true
 governance   = true
+
+# ─── Key provisioning (JSS Phase 1) ─────────────────────────────────────────
+# When enabled, the auth-worker generates a Schnorr secp256k1 keypair on
+# /.pods signup, NIP-19 bech32-encodes it, and writes the result to the
+# user's pod at /private/privkey.jsonld with WAC locked to the owner.
+# Phase 1 port: pending solid-pod-rs v0.4.0-alpha.11 (provision-keys feature).
+[provision]
+enabled           = false                  # opt-in until alpha.11 ships
+keys_at_signup    = true                   # when enabled=true, default to autogenerate
+private_dir       = "/private/"             # WAC-locked container path
+privkey_filename  = "privkey.jsonld"        # NIP-19 bech32 keypair filename
+
+# ─── NIP-05 resolution mode (JSS Phase 1) ───────────────────────────────────
+# "d1"        — central registry only (legacy POD_META.nip05:{user} → pubkey).
+# "federated" — D1 cache first, fall through to pod's /.well-known/nostr.json
+#               on miss. Requires solid-pod-rs nip05-endpoint feature.
+[nip05]
+resolver_mode = "d1"                       # safe default until alpha.11 ships
+pod_base_url  = "https://pods.dreamlab-ai.com"
+
+# ─── Pod data export (JSS Phase 1) ──────────────────────────────────────────
+# Operator opt-in for the JSS Phase 1 export surface. Disabled by default
+# because the rate-limit budget is non-trivial.
+[export]
+enabled                  = false
+include_private_default  = false           # owner WAC always required for /private/*
+rate_limit_per_min       = 6                # per-IP; export is bandwidth-heavy
 
 # ─── Agent Governance (kinds 31400-31405) ────────────────────────────────────
 # Pre-registered agent pubkeys authorised to publish governance control panels.

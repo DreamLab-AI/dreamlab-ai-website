@@ -37,24 +37,50 @@ use worker::{Env, Request};
 ///
 /// Wraps the `[ratelimit]` section of `nostr_bbs_config::schema::RateLimit`
 /// and delegates enforcement to `nostr_bbs_rate_limit::check_rate_limit`.
+///
+/// # JSS Phase 1 routing (May 2026)
+///
+/// Phase 1 added the `/api/exports/*` surface (pod data export). Because the
+/// upstream `nostr-bbs-config` schema (3.0.0-rc6) does not yet know about
+/// `export_per_min`, the field is populated by the operator overlay through
+/// [`crate::phase1::Phase1Config`] and applied via [`RateLimitConfig::with_export_per_min`].
+/// See `dreamlab.toml` `[ratelimit].export_per_min` for the operator setting.
 #[derive(Debug, Clone)]
 pub struct RateLimitConfig {
     /// Max requests per minute for `/api/profiles/batch`.
     pub profiles_batch_per_min: u32,
     /// Max requests per minute for `/.well-known/nostr.json`.
     pub nostr_well_known_per_min: u32,
+    /// Max requests per minute for `/api/exports/*` (JSS Phase 1).
+    pub export_per_min: u32,
     /// Default per-route limit when no specific override exists.
     pub default_per_min: u32,
 }
 
 impl RateLimitConfig {
     /// Build from the operator TOML's `[ratelimit]` section.
+    ///
+    /// `export_per_min` defaults to 6 (the JSS Phase 1 reference budget);
+    /// override via [`Self::with_export_per_min`] once the overlay has parsed
+    /// the unknown-to-upstream `export_per_min` field out of `dreamlab.toml`.
     pub fn from_schema(rl: &RateLimit) -> Self {
         Self {
             profiles_batch_per_min: rl.profiles_batch_per_min.unwrap_or(60),
             nostr_well_known_per_min: rl.nostr_well_known_per_min.unwrap_or(60),
+            export_per_min: 6,
             default_per_min: 120,
         }
+    }
+
+    /// Apply the operator-overlay `export_per_min` value (JSS Phase 1).
+    ///
+    /// Builder-style helper used after [`Self::from_schema`] so the overlay
+    /// can layer the new field on top of the upstream typed schema without
+    /// requiring a `nostr-bbs-config` bump.
+    #[must_use]
+    pub fn with_export_per_min(mut self, n: u32) -> Self {
+        self.export_per_min = n;
+        self
     }
 
     /// Resolve the per-minute limit for a given request path.
@@ -63,6 +89,8 @@ impl RateLimitConfig {
             self.profiles_batch_per_min
         } else if path.starts_with("/.well-known/nostr.json") {
             self.nostr_well_known_per_min
+        } else if path.starts_with("/api/exports/") {
+            self.export_per_min
         } else {
             self.default_per_min
         }
@@ -243,6 +271,7 @@ mod tests {
         let cfg = RateLimitConfig::from_schema(&rl);
         assert_eq!(cfg.profiles_batch_per_min, 60);
         assert_eq!(cfg.nostr_well_known_per_min, 60);
+        assert_eq!(cfg.export_per_min, 6);
         assert_eq!(cfg.default_per_min, 120);
     }
 
@@ -258,10 +287,21 @@ mod tests {
     }
 
     #[test]
+    fn rate_limit_config_with_export_per_min_overlay() {
+        let rl = RateLimit {
+            profiles_batch_per_min: None,
+            nostr_well_known_per_min: None,
+        };
+        let cfg = RateLimitConfig::from_schema(&rl).with_export_per_min(12);
+        assert_eq!(cfg.export_per_min, 12);
+    }
+
+    #[test]
     fn limit_for_path_profiles() {
         let cfg = RateLimitConfig {
             profiles_batch_per_min: 42,
             nostr_well_known_per_min: 60,
+            export_per_min: 6,
             default_per_min: 120,
         };
         assert_eq!(cfg.limit_for_path("/api/profiles/batch"), 42);
@@ -272,9 +312,22 @@ mod tests {
         let cfg = RateLimitConfig {
             profiles_batch_per_min: 60,
             nostr_well_known_per_min: 15,
+            export_per_min: 6,
             default_per_min: 120,
         };
         assert_eq!(cfg.limit_for_path("/.well-known/nostr.json"), 15);
+    }
+
+    #[test]
+    fn limit_for_path_exports() {
+        let cfg = RateLimitConfig {
+            profiles_batch_per_min: 60,
+            nostr_well_known_per_min: 60,
+            export_per_min: 9,
+            default_per_min: 120,
+        };
+        assert_eq!(cfg.limit_for_path("/api/exports/profile"), 9);
+        assert_eq!(cfg.limit_for_path("/api/exports/full.jsonld"), 9);
     }
 
     #[test]
@@ -282,6 +335,7 @@ mod tests {
         let cfg = RateLimitConfig {
             profiles_batch_per_min: 60,
             nostr_well_known_per_min: 60,
+            export_per_min: 6,
             default_per_min: 200,
         };
         assert_eq!(cfg.limit_for_path("/some/other/route"), 200);

@@ -172,6 +172,63 @@ agent_pubkeys = [
   set to a separate endpoint to isolate governance traffic.
 - `kinds_lo`/`kinds_hi` -- Nostr event kind range for governance events (31400-31405).
 
+## JSS Phase 1 features
+
+Three additive operator-overlay blocks gate the JSS v0.0.190 Phase 1 surface.
+All defaults are conservative (opt-in only) so DreamLab inherits Phase 1
+behaviour only when the upstream `solid-pod-rs` v0.4.0-alpha.11 features land.
+These blocks are parsed locally by `src/phase1.rs` via `toml::Value` rather than
+through the upstream `nostr-bbs-config` typed schema, so the overlay stays
+additive — no upstream crate bump is required.
+
+### `[provision]` — key provisioning at signup
+
+```toml
+[provision]
+enabled           = false                  # opt-in until alpha.11 ships
+keys_at_signup    = true                   # when enabled=true, default to autogenerate
+private_dir       = "/private/"             # WAC-locked container path
+privkey_filename  = "privkey.jsonld"        # NIP-19 bech32 keypair filename
+```
+
+| Field | Default | Operational implication |
+|-------|---------|-------------------------|
+| `enabled` | `false` | When `true`, auth-worker generates a Schnorr secp256k1 keypair at `POST /.pods` signup. Requires `solid-pod-rs` provision-keys feature. |
+| `keys_at_signup` | `true` | When the feature is enabled, auto-generate at signup rather than waiting for an explicit user request. |
+| `private_dir` | `/private/` | WAC-locked container path on the pod; the keypair is written here. |
+| `privkey_filename` | `privkey.jsonld` | NIP-19 bech32-encoded keypair filename. |
+
+### `[nip05]` — NIP-05 resolution mode
+
+```toml
+[nip05]
+resolver_mode = "d1"                       # safe default until alpha.11 ships
+pod_base_url  = "https://pods.dreamlab-ai.com"
+```
+
+| Field | Default | Operational implication |
+|-------|---------|-------------------------|
+| `resolver_mode` | `"d1"` | `"d1"` — central registry only (legacy `POD_META.nip05:{user}` → pubkey). `"federated"` — D1 cache first, fall through to pod-resident `/.well-known/nostr.json` on miss. Federated mode requires the `solid-pod-rs` nip05-endpoint feature. |
+| `pod_base_url` | `https://pods.dreamlab-ai.com` | Base URL used to build fallback NIP-05 lookups when in federated mode. |
+
+### `[export]` — `/api/exports/*` opt-in
+
+```toml
+[export]
+enabled                  = false
+include_private_default  = false           # owner WAC always required for /private/*
+rate_limit_per_min       = 6                # per-IP; export is bandwidth-heavy
+```
+
+| Field | Default | Operational implication |
+|-------|---------|-------------------------|
+| `enabled` | `false` | When `true`, exposes the JSS Phase 1 `/api/exports/*` surface. Disabled by default because the rate-limit budget is non-trivial. |
+| `include_private_default` | `false` | Default for whether `/private/*` is included when the caller omits an explicit query parameter. Owner WAC is always required for private inclusion regardless of this default. |
+| `rate_limit_per_min` | `6` | Per-IP cap mirrored into `[ratelimit].export_per_min`; export responses are bandwidth-heavy. |
+
+The matching `[ratelimit].export_per_min = 6` entry is what `RateLimitConfig::limit_for_path`
+actually consults when gating `/api/exports/*` requests at the worker edge.
+
 ## Zone layout
 
 Three zones with cohort-based access control:
