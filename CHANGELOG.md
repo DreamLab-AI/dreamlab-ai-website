@@ -4,6 +4,67 @@ All notable changes to the DreamLab AI website will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [JSS Phase 1 Sprint] - 2026-05-16
+
+Cross-repo sprint landing JSS v0.0.190 Phase 1 features through the
+ecosystem. Three Phase 1 outcomes are live on the operator overlay:
+federated NIP-05 identity, pod-resident key provisioning, and pod
+data export.
+
+### Added
+
+- **Federated NIP-05 identity (live)**: `nostr-bbs-auth-worker` now
+  resolves `/.well-known/nostr.json` against the local D1 whitelist
+  first and falls back to the user's Solid pod over HTTP when the
+  D1 row is absent. Verified `name@dreamlab.ai` badges work for any
+  user with a provisioned pod.
+- **Pod-resident key provisioning (live)**: Signup generates a
+  BIP-340 Schnorr secp256k1 keypair inside the user's pod, writes
+  `/private/privkey.jsonld` under an owner-only WAC ACL, and patches
+  the WebID `/profile/card` with the `nostr:pubkey` triple. Removes
+  the previous "paste your nsec" friction.
+- **Pod data export endpoint (live)**: `GET /api/export` returns a
+  JSON-LD bundle of the user's pod contents,
+  `@context = "https://solid-pod-rs.dev/ns/export/v1"`, time-chain
+  ordered ascending by `created`, `/private/*` excluded by default.
+  Operator opt-in via `[export]` overlay block.
+- **Operator overlay config blocks**: Three new manifest sections in
+  `forum-config/dreamlab.toml` — `[provision]`, `[nip05]`, and
+  `[export]` — with `Phase1Config` schema in
+  `forum-config/src/phase1.rs`. Operators can flip each feature
+  independently and tune resolver mode, fallback timeouts, and
+  default exclusions without touching auth-worker source.
+- **Wrangler env wiring**: `NIP05_RESOLVER_MODE` and `POD_BASE_URL`
+  env-vars threaded through `workers/auth-worker/wrangler.toml` so
+  the federated resolver picks up overlay values at build time.
+
+### Changed
+
+- **solid-pod-rs dependency bumped** to `0.4.0-alpha.11` via the
+  upstream `nostr-rust-forum` kit. All seven sibling crates were
+  published to crates.io in the same release window, so the
+  workspace `[patch.crates-io]` override has been removed.
+
+### Notes
+
+- Cross-repo commit chain:
+  [solid-pod-rs d8a1c81](https://github.com/DreamLab-AI/solid-pod-rs/commit/d8a1c81)
+  (v0.4.0-alpha.11) →
+  [nostr-rust-forum 1fe95fd](https://github.com/DreamLab-AI/nostr-rust-forum/commit/1fe95fd)
+  (federated NIP-05 resolver, [ADR-086](https://github.com/DreamLab-AI/nostr-rust-forum/blob/main/docs/adr/ADR-086-nip05-pod-federation.md))
+  → forum-config
+  [aad6aad](https://github.com/DreamLab-AI/dreamlab-ai-website/commit/aad6aad)
+  (overlay flipped to federated).
+- See the operator overlay README "JSS Phase 1 features" subsection
+  (`forum-config/README.md`) for the per-block configuration
+  reference.
+- Two follow-up ADRs are open upstream:
+  [ADR-087](https://github.com/DreamLab-AI/nostr-rust-forum/blob/main/docs/adr/ADR-087-cf-workers-portable-cores.md)
+  (CF-Workers-portable cores — blocks pod-resident signup UX, data
+  export UX, and NIP-05 badge in the CF Workers runtime) and
+  [ADR-088](https://github.com/DreamLab-AI/nostr-rust-forum/blob/main/docs/adr/ADR-088-wac-turtle-serializer-quirk.md)
+  (WAC Turtle serializer bare-path IRI quirk).
+
 ## [Governance Sprint] - 2026-05-12
 
 ### Added

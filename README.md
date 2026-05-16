@@ -101,6 +101,7 @@ graph TB
 - **Solid pods with LDP compliance** -- Full Linked Data Platform containers, WAC ACL inheritance, conditional requests (ETags), Range streaming, JSON Patch (RFC 6902), per-user quotas, WebID profiles, content negotiation, and pod provisioning.
 - **Agent micropayments** -- HTTP 402 Payment Required with Web Ledgers spec, Bitcoin TXO deposit via mempool verification, per-request satoshi cost for pay-gated resources.
 - **Federation-ready** -- WebFinger discovery (remoteStorage + Solid), NIP-05 verification, Solid Notifications (webhooks), `.well-known/solid` discovery document.
+- **JSS Phase 1 (May 2026)** -- Verified identity (federated NIP-05 with pod fallback), frictionless signup (pod-resident BIP-340 key provisioning, no `nsec` paste), and data portability (JSON-LD pod export). Tracks `solid-pod-rs` v0.4.0-alpha.11; configured via `[provision]`/`[nip05]`/`[export]` operator overlay blocks. See [CHANGELOG.md](CHANGELOG.md#jss-phase-1-sprint---2026-05-16).
 - **WASM vector search** -- RuVector WASM microkernel (42KB) with `.rvf` container format, running in a Cloudflare Worker at 490K vectors/sec. Cmd/K global semantic search.
 - **Smart auth UX** -- Progressive disclosure login (auto-detects NIP-07 extensions), friendly labels with optional technical mode toggle, forum-first navigation.
 - **Security hardened** -- XSS sanitization on all markdown rendering, NIP-98 body hash verification, rate limiting on all HTTP workers, env-based CORS, hibernation-safe relay subscriptions.
