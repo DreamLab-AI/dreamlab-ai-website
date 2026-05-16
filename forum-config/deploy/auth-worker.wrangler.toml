@@ -55,6 +55,12 @@ binding     = "PODS"
 bucket_name = "dreamlab-pods"
 
 [vars]
-RP_ID            = "dreamlab-ai.com"
-RP_NAME          = "DreamLab Community"
-EXPECTED_ORIGIN  = "https://dreamlab-ai.com"
+RP_ID                = "dreamlab-ai.com"
+RP_NAME              = "DreamLab Community"
+EXPECTED_ORIGIN      = "https://dreamlab-ai.com"
+
+# JSS Phase 1 — federated NIP-05 resolution (ADR-086 §9, NRF commit 1fe95fd).
+# auth-worker reads these to drive the resolve(env, name) D1→pod-HTTP fallback
+# under GET /api/username/resolve. Must mirror dreamlab.toml [nip05].
+NIP05_RESOLVER_MODE  = "federated"
+POD_BASE_URL         = "https://pods.dreamlab-ai.com"

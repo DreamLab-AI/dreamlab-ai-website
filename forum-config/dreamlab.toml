@@ -124,11 +124,12 @@ privkey_filename  = "privkey.jsonld"        # NIP-19 bech32 keypair filename
 # ─── NIP-05 resolution mode (JSS Phase 1) ───────────────────────────────────
 # "d1"        — central registry only (legacy POD_META.nip05:{user} → pubkey).
 # "federated" — D1 cache first, fall through to pod's /.well-known/nostr.json
-#               on miss. Federated path is pending NRF task #5 (auth-worker
-#               pod-fallback resolver implementation, ADR-086 §8). Do NOT
-#               flip to "federated" until that lands and nrf-aligner DMs.
+#               on miss. Live as of NRF commit 1fe95fd (auth-worker resolve()
+#               D1→pod-HTTP fallback under GET /api/username/resolve;
+#               ADR-086 §9). Mirrored at deploy time via NIP05_RESOLVER_MODE
+#               and POD_BASE_URL [vars] in deploy/auth-worker.wrangler.toml.
 [nip05]
-resolver_mode = "d1"                       # pending NRF task #5
+resolver_mode = "federated"                # live as of NRF 1fe95fd
 pod_base_url  = "https://pods.dreamlab-ai.com"
 
 # ─── Pod data export (JSS Phase 1) ──────────────────────────────────────────

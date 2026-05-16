@@ -175,12 +175,11 @@ agent_pubkeys = [
 ## JSS Phase 1 features
 
 Three additive operator-overlay blocks gate the JSS v0.0.190 Phase 1 surface.
-Provision and export are **live as of solid-pod-rs v0.4.0-alpha.11**; NIP-05
-federation remains on the conservative `"d1"` default pending NRF task #5
-(auth-worker pod-fallback resolver implementation, ADR-086 §8). These blocks
-are parsed locally by `src/phase1.rs` via `toml::Value` rather than through
-the upstream `nostr-bbs-config` typed schema, so the overlay stays additive —
-no upstream crate bump is required.
+All three are **live as of solid-pod-rs v0.4.0-alpha.11** and nostr-rust-forum
+commit `1fe95fd` (auth-worker `resolve()` D1→pod-HTTP fallback, ADR-086 §9).
+These blocks are parsed locally by `src/phase1.rs` via `toml::Value` rather
+than through the upstream `nostr-bbs-config` typed schema, so the overlay
+stays additive — no upstream crate bump is required.
 
 ### `[provision]` — key provisioning at signup
 
@@ -203,14 +202,14 @@ privkey_filename  = "privkey.jsonld"        # NIP-19 bech32 keypair filename
 
 ```toml
 [nip05]
-resolver_mode = "d1"                       # pending NRF task #5
+resolver_mode = "federated"                # live as of NRF 1fe95fd
 pod_base_url  = "https://pods.dreamlab-ai.com"
 ```
 
 | Field | Default | Operational implication |
 |-------|---------|-------------------------|
-| `resolver_mode` | `"d1"` (**pending NRF task #5 — federated lookup not yet implemented in auth-worker**) | `"d1"` — central registry only (legacy `POD_META.nip05:{user}` → pubkey). `"federated"` — D1 cache first, fall through to pod-resident `/.well-known/nostr.json` on miss. Federated mode activates after NRF auth-worker implements the pod-fallback path (ADR-086 §8); flipping prematurely will ship a config asserting behaviour the code does not yet implement. |
-| `pod_base_url` | `https://pods.dreamlab-ai.com` | Base URL used to build fallback NIP-05 lookups when in federated mode. |
+| `resolver_mode` | `"federated"` (live as of nostr-rust-forum commit `1fe95fd`) | `"d1"` — central registry only (legacy `POD_META.nip05:{user}` → pubkey). `"federated"` — D1 cache first, fall through to pod-resident `/.well-known/nostr.json` on miss. Driven at deploy time by auth-worker's `NIP05_RESOLVER_MODE` env var (mirrored in `deploy/auth-worker.wrangler.toml [vars]`); exposed publicly as `GET /api/username/resolve?name=<X>`. See ADR-086 §9. |
+| `pod_base_url` | `https://pods.dreamlab-ai.com` | Base URL used to build fallback NIP-05 lookups; mirrored to auth-worker via the `POD_BASE_URL` env var. |
 
 ### `[export]` — `/api/exports/*` opt-in
 
@@ -230,10 +229,12 @@ rate_limit_per_min       = 6                # per-IP; export is bandwidth-heavy
 The matching `[ratelimit].export_per_min = 6` entry is what `RateLimitConfig::limit_for_path`
 actually consults when gating `/api/exports/*` requests at the worker edge.
 
-**Defaults partial-flipped on 2026-05-16**: `[provision].enabled` and
-`[export].enabled` are now `true`; `nip05` federation activates after NRF
-auth-worker implements the pod-fallback path (ADR-086 §8). Operators wanting
-to disable provision or export flip the relevant `enabled` back to `false`.
+**Defaults fully flipped on 2026-05-16**: provision / nip05 / export all live
+against solid-pod-rs v0.4.0-alpha.11 + nostr-rust-forum commit `1fe95fd`.
+Operators wanting to disable any feature flip the relevant `enabled` (or
+`resolver_mode = "d1"`) back to the conservative default; the auth-worker
+honours `NIP05_RESOLVER_MODE` at deploy time, so the env var in
+`deploy/auth-worker.wrangler.toml` must be flipped in lockstep.
 
 ## Zone layout
 

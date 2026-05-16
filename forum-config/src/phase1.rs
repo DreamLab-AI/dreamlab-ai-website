@@ -221,8 +221,8 @@ mod tests {
         assert_eq!(cfg.provision.private_dir, "/private/");
         assert_eq!(cfg.provision.privkey_filename, "privkey.jsonld");
 
-        // [nip05] — central D1-only until NRF task #5 lands.
-        assert_eq!(cfg.nip05.resolver_mode, "d1");
+        // [nip05] — federated as of NRF commit 1fe95fd (ADR-086 §9).
+        assert_eq!(cfg.nip05.resolver_mode, "federated");
         assert_eq!(cfg.nip05.pod_base_url, "https://pods.dreamlab-ai.com");
 
         // [export] — live as of solid-pod-rs v0.4.0-alpha.11; budget 6/min/IP.
@@ -243,15 +243,12 @@ mod tests {
         let v: toml::Value = toml::from_str(&toml_str).expect("parse dreamlab.toml");
         let cfg = Phase1Config::load_from_value(&v).expect("load phase1");
 
-        // Live as of solid-pod-rs v0.4.0-alpha.11.
+        // All three Phase 1 features live: solid-pod-rs v0.4.0-alpha.11
+        // (provision + export) and nostr-rust-forum commit 1fe95fd
+        // (auth-worker resolve() D1→pod-HTTP fallback, ADR-086 §9).
         assert!(cfg.provision.enabled, "provision must be enabled");
         assert!(cfg.export.enabled, "export must be enabled");
-
-        // TODO(phase1-nip05): flip to "federated" once NRF task #5 lands
-        // the auth-worker pod-fallback resolver implementation
-        // (ADR-086 §8). Until then, federated mode would assert behaviour
-        // the code does not implement.
-        assert_eq!(cfg.nip05.resolver_mode, "d1");
+        assert_eq!(cfg.nip05.resolver_mode, "federated");
     }
 
     #[test]
