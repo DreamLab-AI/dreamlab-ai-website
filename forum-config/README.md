@@ -175,26 +175,27 @@ agent_pubkeys = [
 ## JSS Phase 1 features
 
 Three additive operator-overlay blocks gate the JSS v0.0.190 Phase 1 surface.
-All defaults are conservative (opt-in only) so DreamLab inherits Phase 1
-behaviour only when the upstream `solid-pod-rs` v0.4.0-alpha.11 features land.
-These blocks are parsed locally by `src/phase1.rs` via `toml::Value` rather than
-through the upstream `nostr-bbs-config` typed schema, so the overlay stays
-additive — no upstream crate bump is required.
+Provision and export are **live as of solid-pod-rs v0.4.0-alpha.11**; NIP-05
+federation remains on the conservative `"d1"` default pending NRF task #5
+(auth-worker pod-fallback resolver implementation, ADR-086 §8). These blocks
+are parsed locally by `src/phase1.rs` via `toml::Value` rather than through
+the upstream `nostr-bbs-config` typed schema, so the overlay stays additive —
+no upstream crate bump is required.
 
 ### `[provision]` — key provisioning at signup
 
 ```toml
 [provision]
-enabled           = false                  # opt-in until alpha.11 ships
-keys_at_signup    = true                   # when enabled=true, default to autogenerate
+enabled           = true                   # live as of alpha.11
+keys_at_signup    = true                   # auto-generate keypair at signup
 private_dir       = "/private/"             # WAC-locked container path
 privkey_filename  = "privkey.jsonld"        # NIP-19 bech32 keypair filename
 ```
 
 | Field | Default | Operational implication |
 |-------|---------|-------------------------|
-| `enabled` | `false` | When `true`, auth-worker generates a Schnorr secp256k1 keypair at `POST /.pods` signup. Requires `solid-pod-rs` provision-keys feature. |
-| `keys_at_signup` | `true` | When the feature is enabled, auto-generate at signup rather than waiting for an explicit user request. |
+| `enabled` | `true` (live as of solid-pod-rs v0.4.0-alpha.11) | When `true`, the pod-worker generates a Schnorr secp256k1 keypair at `POST /.pods` signup. Served by pod-worker's CF-Workers-native `provision.rs` path (the upstream `solid-pod-rs-idp` crate is not reachable from wasm32, see ADR-086 §8). |
+| `keys_at_signup` | `true` | Auto-generate at signup rather than waiting for an explicit user request. |
 | `private_dir` | `/private/` | WAC-locked container path on the pod; the keypair is written here. |
 | `privkey_filename` | `privkey.jsonld` | NIP-19 bech32-encoded keypair filename. |
 
@@ -202,32 +203,37 @@ privkey_filename  = "privkey.jsonld"        # NIP-19 bech32 keypair filename
 
 ```toml
 [nip05]
-resolver_mode = "d1"                       # safe default until alpha.11 ships
+resolver_mode = "d1"                       # pending NRF task #5
 pod_base_url  = "https://pods.dreamlab-ai.com"
 ```
 
 | Field | Default | Operational implication |
 |-------|---------|-------------------------|
-| `resolver_mode` | `"d1"` | `"d1"` — central registry only (legacy `POD_META.nip05:{user}` → pubkey). `"federated"` — D1 cache first, fall through to pod-resident `/.well-known/nostr.json` on miss. Federated mode requires the `solid-pod-rs` nip05-endpoint feature. |
+| `resolver_mode` | `"d1"` (**pending NRF task #5 — federated lookup not yet implemented in auth-worker**) | `"d1"` — central registry only (legacy `POD_META.nip05:{user}` → pubkey). `"federated"` — D1 cache first, fall through to pod-resident `/.well-known/nostr.json` on miss. Federated mode activates after NRF auth-worker implements the pod-fallback path (ADR-086 §8); flipping prematurely will ship a config asserting behaviour the code does not yet implement. |
 | `pod_base_url` | `https://pods.dreamlab-ai.com` | Base URL used to build fallback NIP-05 lookups when in federated mode. |
 
 ### `[export]` — `/api/exports/*` opt-in
 
 ```toml
 [export]
-enabled                  = false
+enabled                  = true            # live as of alpha.11
 include_private_default  = false           # owner WAC always required for /private/*
 rate_limit_per_min       = 6                # per-IP; export is bandwidth-heavy
 ```
 
 | Field | Default | Operational implication |
 |-------|---------|-------------------------|
-| `enabled` | `false` | When `true`, exposes the JSS Phase 1 `/api/exports/*` surface. Disabled by default because the rate-limit budget is non-trivial. |
+| `enabled` | `true` (live as of solid-pod-rs v0.4.0-alpha.11) | Exposes the JSS Phase 1 `/api/exports/*` surface; re-exported through `nostr-bbs-pod-worker::export` (phase1 feature). |
 | `include_private_default` | `false` | Default for whether `/private/*` is included when the caller omits an explicit query parameter. Owner WAC is always required for private inclusion regardless of this default. |
 | `rate_limit_per_min` | `6` | Per-IP cap mirrored into `[ratelimit].export_per_min`; export responses are bandwidth-heavy. |
 
 The matching `[ratelimit].export_per_min = 6` entry is what `RateLimitConfig::limit_for_path`
 actually consults when gating `/api/exports/*` requests at the worker edge.
+
+**Defaults partial-flipped on 2026-05-16**: `[provision].enabled` and
+`[export].enabled` are now `true`; `nip05` federation activates after NRF
+auth-worker implements the pod-fallback path (ADR-086 §8). Operators wanting
+to disable provision or export flip the relevant `enabled` back to `false`.
 
 ## Zone layout
 

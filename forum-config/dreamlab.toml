@@ -113,26 +113,30 @@ governance   = true
 # When enabled, the auth-worker generates a Schnorr secp256k1 keypair on
 # /.pods signup, NIP-19 bech32-encodes it, and writes the result to the
 # user's pod at /private/privkey.jsonld with WAC locked to the owner.
-# Phase 1 port: pending solid-pod-rs v0.4.0-alpha.11 (provision-keys feature).
+# Live as of solid-pod-rs v0.4.0-alpha.11 (provision-keys feature, served by
+# pod-worker's CF-Workers-native provision.rs path — see ADR-086 §8).
 [provision]
-enabled           = false                  # opt-in until alpha.11 ships
-keys_at_signup    = true                   # when enabled=true, default to autogenerate
+enabled           = true                   # live as of alpha.11
+keys_at_signup    = true                   # auto-generate keypair at signup
 private_dir       = "/private/"             # WAC-locked container path
 privkey_filename  = "privkey.jsonld"        # NIP-19 bech32 keypair filename
 
 # ─── NIP-05 resolution mode (JSS Phase 1) ───────────────────────────────────
 # "d1"        — central registry only (legacy POD_META.nip05:{user} → pubkey).
 # "federated" — D1 cache first, fall through to pod's /.well-known/nostr.json
-#               on miss. Requires solid-pod-rs nip05-endpoint feature.
+#               on miss. Federated path is pending NRF task #5 (auth-worker
+#               pod-fallback resolver implementation, ADR-086 §8). Do NOT
+#               flip to "federated" until that lands and nrf-aligner DMs.
 [nip05]
-resolver_mode = "d1"                       # safe default until alpha.11 ships
+resolver_mode = "d1"                       # pending NRF task #5
 pod_base_url  = "https://pods.dreamlab-ai.com"
 
 # ─── Pod data export (JSS Phase 1) ──────────────────────────────────────────
-# Operator opt-in for the JSS Phase 1 export surface. Disabled by default
-# because the rate-limit budget is non-trivial.
+# Operator opt-in for the JSS Phase 1 export surface. Live as of
+# solid-pod-rs v0.4.0-alpha.11 — re-exported through
+# nostr-bbs-pod-worker::export (phase1 feature).
 [export]
-enabled                  = false
+enabled                  = true            # live as of alpha.11
 include_private_default  = false           # owner WAC always required for /private/*
 rate_limit_per_min       = 6                # per-IP; export is bandwidth-heavy
 

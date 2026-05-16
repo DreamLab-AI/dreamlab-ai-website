@@ -215,20 +215,43 @@ mod tests {
         let v: toml::Value = toml::from_str(&toml_str).expect("parse dreamlab.toml");
         let cfg = Phase1Config::load_from_value(&v).expect("load phase1");
 
-        // [provision] — opt-in until alpha.11 ships.
-        assert!(!cfg.provision.enabled);
+        // [provision] — live as of solid-pod-rs v0.4.0-alpha.11.
+        assert!(cfg.provision.enabled);
         assert!(cfg.provision.keys_at_signup);
         assert_eq!(cfg.provision.private_dir, "/private/");
         assert_eq!(cfg.provision.privkey_filename, "privkey.jsonld");
 
-        // [nip05] — safe default is central D1-only resolution.
+        // [nip05] — central D1-only until NRF task #5 lands.
         assert_eq!(cfg.nip05.resolver_mode, "d1");
         assert_eq!(cfg.nip05.pod_base_url, "https://pods.dreamlab-ai.com");
 
-        // [export] — opt-in; budget is 6/min/IP.
-        assert!(!cfg.export.enabled);
+        // [export] — live as of solid-pod-rs v0.4.0-alpha.11; budget 6/min/IP.
+        assert!(cfg.export.enabled);
         assert!(!cfg.export.include_private_default);
         assert_eq!(cfg.export.rate_limit_per_min, 6);
+    }
+
+    #[test]
+    fn dreamlab_defaults_are_phase1_live() {
+        // Pins the operator's intent post-2026-05-16 default flip. If a
+        // future revert lands, this test catches it before the config
+        // ships to production.
+        let toml_str = std::fs::read_to_string(
+            concat!(env!("CARGO_MANIFEST_DIR"), "/dreamlab.toml"),
+        )
+        .expect("read dreamlab.toml");
+        let v: toml::Value = toml::from_str(&toml_str).expect("parse dreamlab.toml");
+        let cfg = Phase1Config::load_from_value(&v).expect("load phase1");
+
+        // Live as of solid-pod-rs v0.4.0-alpha.11.
+        assert!(cfg.provision.enabled, "provision must be enabled");
+        assert!(cfg.export.enabled, "export must be enabled");
+
+        // TODO(phase1-nip05): flip to "federated" once NRF task #5 lands
+        // the auth-worker pod-fallback resolver implementation
+        // (ADR-086 §8). Until then, federated mode would assert behaviour
+        // the code does not implement.
+        assert_eq!(cfg.nip05.resolver_mode, "d1");
     }
 
     #[test]
