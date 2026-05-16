@@ -141,12 +141,14 @@ enabled                  = true            # live as of alpha.11
 include_private_default  = false           # owner WAC always required for /private/*
 rate_limit_per_min       = 6                # per-IP; export is bandwidth-heavy
 
-# ─── Git-versioned pods (JSS #471, alpha.12) ────────────────────────────────
+# ─── Git-versioned pods (JSS #471, solid-pod-rs alpha.12) ───────────────────
 # When enabled at the pod backend (e.g. agentbox or a non-CF solid-pod-rs
 # deployment), each pod is `git init`'d at creation with main branch and
-# receive.denyCurrentBranch=updateInstead. DreamLab's Cloudflare deployment
+# receive.denyCurrentBranch=updateInstead (solid_pod_rs_git::init::GitAutoInit,
+# parity rows 199-200, shipped 2026-05-16). DreamLab's Cloudflare deployment
 # cannot auto-init (CF Workers can't spawn subprocesses; see NRF ADR-089),
-# so this stays disabled here; flip on for non-CF deployments.
+# so this stays disabled here; flip on for non-CF deployments (e.g. agentbox
+# which has [sovereign_mesh.git].enabled = true as of agentbox commit ea64824b).
 [git]
 enabled        = false                  # CF Workers limitation; flip for native deploys
 auto_init      = true                   # informational; takes effect when enabled = true

@@ -18,8 +18,9 @@
 //!    solid-pod-rs alpha.12). Disabled on the CF deployment per NRF ADR-089
 //!    (Workers cannot spawn subprocesses); flips on for native backends.
 //!
-//! Pending solid-pod-rs v0.4.0-alpha.11; defaults here are conservative
-//! (opt-in only) until the upstream features land.
+//! All four features live: Phase 1 (provision-keys, nip05-endpoint,
+//! export-jsonld) in solid-pod-rs v0.4.0-alpha.11; git-versioned pods in
+//! v0.4.0-alpha.12. CF [git].enabled stays false (NRF ADR-089).
 
 use serde::{Deserialize, Serialize};
 
