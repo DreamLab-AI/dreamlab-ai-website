@@ -1,5 +1,15 @@
 # Claude Code Configuration - DreamLab AI Website
 
+## Git Control Panel Sprint (2026-05-17)
+
+Full git Version Control surface for Solid pods shipped. `components/git_panel.rs`
+in the forum client provides a VS Code–style Source Control panel: staged/unstaged/
+untracked sections, inline diff viewer, commit form, branch management. `AppManifestPanel`
+implements JSS #464 — pods as first-class app repositories, with `/.well-known/apps`
+server-side aggregation. Pod browser auto-probes on mount; CF Workers settle gracefully
+to "Git API not available" (ADR-089). forum-config pinned to NRF rc10 (`23c0c5b`) /
+solid-pod-rs alpha.14 (`4ac7670`).
+
 ## Governance Sprint (2026-05-12)
 
 Agent Control Surface feature shipped. The forum now exposes a `/governance`

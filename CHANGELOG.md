@@ -4,12 +4,62 @@ All notable changes to the DreamLab AI website will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Git Control Panel Sprint] - 2026-05-17
+
+Full git Version Control surface for Solid pods. Users on native-server
+deployments can stage, diff, commit, branch, and publish directly from the
+forum pod browser. Pods also become first-class app distribution repositories
+(JSS issue #464). CF Workers deployments gracefully show "Git API not
+available".
+
+### Added
+
+- **Git control panel** (`components/git_panel.rs` in forum client): VS Code
+  Source Control panel UI. Staged/unstaged/untracked file sections. Per-file
+  stage, unstage, discard, and inline diff viewer (green/red line colouring).
+  Commit message textarea + button. Lazy-loaded commit history log. Busy guard
+  prevents concurrent mutations.
+- **App manifest panel** (JSS #464 — Apps in pods): collapsible form below the
+  git card. Reads/writes `{pod}/apps/manifest.json` via NIP-98-authenticated
+  GET/PUT. Makes pods usable as decentralised app-distribution repositories:
+  store an app manifest in your pod and the server aggregates them at
+  `/.well-known/apps`.
+- **Auto-probe on pod mount**: the pod browser fires a one-shot probe as soon
+  as the pod URL and signer are ready, with no "Check Git" button required.
+  Probe result gates the full git card (Available), a compact note
+  (Unavailable), or a spinner (Probing). CF Workers pods settle immediately to
+  Unavailable.
+- **solid-pod-rs alpha.14 server endpoints** (nine `/_git/{pk}/*` REST routes,
+  NIP-98 + pod-owner guarded): status, log, diff, stage, unstage, commit,
+  branches, create-branch, discard. `/.well-known/apps` discovery
+  unconditional. Native server only (ADR-089).
+
+### Changed
+
+- **forum-config pinned to `nostr-rust-forum` rc10 (`23c0c5b`)** and
+  `solid-pod-rs` alpha.14 (`4ac7670`).
+
+## [Unreleased]
+
+### Changed
+
+- **Pinned forum kit to `nostr-rust-forum` `a7c9c40`** for the JSS v0.0.197
+  Solid surface and DreamLab's public `POD_BASE_URL` fix. The operator overlay
+  now consumes the same upstream code that exposes authenticated `POST /.pods`,
+  JSS-compatible CORS/auth headers, `Updates-Via`, TypeIndex/media
+  provisioning, and public WebID URLs on `pods.dreamlab-ai.com`.
+- **Corrected Cloudflare feature flags**: pod creation and federated NIP-05 are
+  live, but pod-stored private keys, native JSON-LD export, and git-init remain
+  disabled on the CF Workers tier until those upstream paths are Worker-portable.
+- **Forum build endpoints now use custom DreamLab domains** (`api.`,
+  `pods.`, `search.`, `preview.`, `relay.`) instead of `workers.dev` URLs.
+
 ## [JSS Phase 1 Sprint] - 2026-05-16
 
 Cross-repo sprint landing JSS v0.0.190 Phase 1 features through the
-ecosystem. Three Phase 1 outcomes are live on the operator overlay:
-federated NIP-05 identity, pod-resident key provisioning, and pod
-data export.
+ecosystem. Federated NIP-05 identity and pod provisioning are live on the
+operator overlay; native key-provisioning and export paths remain tracked
+upstream for Worker portability.
 
 ### Added
 
