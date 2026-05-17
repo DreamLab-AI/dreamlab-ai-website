@@ -195,6 +195,7 @@ echo "<admin-pubkey>" | wrangler secret put ADMIN_PUBKEYS --name dreamlab-auth-a
 
 # pod-worker
 echo "https://dreamlab-ai.com" | wrangler secret put EXPECTED_ORIGIN --name dreamlab-pod-api
+echo "https://pods.dreamlab-ai.com" | wrangler secret put POD_BASE_URL --name dreamlab-pod-api
 
 # relay-worker
 echo "<admin-pubkey>" | wrangler secret put ADMIN_PUBKEYS --name dreamlab-nostr-relay
@@ -260,6 +261,7 @@ Cloudflare paid plan allows 10 MB compressed WASM per Worker. Monitor binary siz
 | Document | Description |
 |----------|-------------|
 | [Deployment Overview](README.md) | Architecture, CI/CD pipeline, environments, DNS |
+| [Native Pod Mesh](NATIVE_POD_MESH.md) | Native pod tier (git support): CF Tunnel, agentbox sidecar, wrangler secrets, build env |
 | [Auth API](../api/AUTH_API.md) | auth-worker endpoints and D1 schema |
 | [Pod API](../api/POD_API.md) | pod-worker endpoints and R2 layout |
 | [Nostr Relay](../api/NOSTR_RELAY.md) | relay-worker endpoints and DO config |

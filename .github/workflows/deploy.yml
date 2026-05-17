@@ -31,11 +31,11 @@ env:
   RUST_TOOLCHAIN: '1.90.0'
   TRUNK_VERSION: '0.21.12'
   TRUNK_SHA256: 'e5261930aab979dc5d0388fdc71bc32bedf0a15211ef8c8703fa2b7a2016394b'
-  VITE_RELAY_URL: 'wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev'
-  VITE_AUTH_API_URL: 'https://dreamlab-auth-api.solitary-paper-764d.workers.dev'
-  VITE_POD_API_URL: 'https://dreamlab-pod-api.solitary-paper-764d.workers.dev'
-  VITE_SEARCH_API_URL: 'https://dreamlab-search-api.solitary-paper-764d.workers.dev'
-  VITE_LINK_PREVIEW_API_URL: 'https://dreamlab-link-preview.solitary-paper-764d.workers.dev'
+  VITE_RELAY_URL: 'wss://relay.dreamlab-ai.com'
+  VITE_AUTH_API_URL: 'https://api.dreamlab-ai.com'
+  VITE_POD_API_URL: 'https://pods.dreamlab-ai.com'
+  VITE_SEARCH_API_URL: 'https://search.dreamlab-ai.com'
+  VITE_LINK_PREVIEW_API_URL: 'https://preview.dreamlab-ai.com'
   FORUM_BASE: '/community'
   KIT_REPO: 'https://github.com/DreamLab-AI/nostr-rust-forum.git'
   KIT_REF: 'main'
@@ -133,6 +133,8 @@ jobs:
       - name: Build Leptos forum with Trunk
         working-directory: kit/crates/nostr-bbs-forum-client
         run: trunk build --release --public-url /community/
+        env:
+          NATIVE_POD_URL: ${{ secrets.NATIVE_POD_URL }}
 
       - name: Report forum WASM bundle size
         run: |
