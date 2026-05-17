@@ -1,6 +1,6 @@
 [package]
 name = "dreamlab-forum-config"
-version = "3.0.0-rc6"
+version = "3.0.0-rc9"
 edition = "2021"
 description = "DreamLab AI forum operator overlay for the nostr-bbs kit"
 license = "Proprietary"
@@ -10,11 +10,13 @@ publish = false
 path = "src/lib.rs"
 
 [dependencies]
-# Kit crates from crates.io (published 2026-05-11 as v3.0.0-rc6).
-nostr-bbs-core = "3.0.0-rc6"
-nostr-bbs-config = "3.0.0-rc6"
-nostr-bbs-mesh = "3.0.0-rc6"
-nostr-bbs-rate-limit = "3.0.0-rc6"
+# Kit crates from nostr-rust-forum 3.0.0-rc9 (e3f7185). rc9 pins
+# solid-pod-rs alpha.13: git-pods server wiring, JSS v0.0.197 HTTP parity,
+# federated NIP-05 resolver (ADR-086), TypeIndex/.jsonld fix, media containers.
+nostr-bbs-core = { git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "e3f7185", package = "nostr-bbs-core" }
+nostr-bbs-config = { git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "e3f7185", package = "nostr-bbs-config" }
+nostr-bbs-mesh = { git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "e3f7185", package = "nostr-bbs-mesh" }
+nostr-bbs-rate-limit = { git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "e3f7185", package = "nostr-bbs-rate-limit" }
 
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
