@@ -268,10 +268,9 @@ mod tests {
 
     #[test]
     fn parses_phase1_section_from_dreamlab_toml() {
-        let toml_str = std::fs::read_to_string(
-            concat!(env!("CARGO_MANIFEST_DIR"), "/dreamlab.toml"),
-        )
-        .expect("read dreamlab.toml");
+        let toml_str =
+            std::fs::read_to_string(concat!(env!("CARGO_MANIFEST_DIR"), "/dreamlab.toml"))
+                .expect("read dreamlab.toml");
         let v: toml::Value = toml::from_str(&toml_str).expect("parse dreamlab.toml");
         let cfg = Phase1Config::load_from_value(&v).expect("load phase1");
 
@@ -304,10 +303,9 @@ mod tests {
         // Pins the operator's intent post-2026-05-16 default flip. If a
         // future revert lands, this test catches it before the config
         // ships to production.
-        let toml_str = std::fs::read_to_string(
-            concat!(env!("CARGO_MANIFEST_DIR"), "/dreamlab.toml"),
-        )
-        .expect("read dreamlab.toml");
+        let toml_str =
+            std::fs::read_to_string(concat!(env!("CARGO_MANIFEST_DIR"), "/dreamlab.toml"))
+                .expect("read dreamlab.toml");
         let v: toml::Value = toml::from_str(&toml_str).expect("parse dreamlab.toml");
         let cfg = Phase1Config::load_from_value(&v).expect("load phase1");
 
