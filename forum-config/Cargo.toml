@@ -10,13 +10,14 @@ publish = false
 path = "src/lib.rs"
 
 [dependencies]
-# Kit crates from nostr-rust-forum 3.0.0-rc9 (e3f7185). rc9 pins
+# Kit crates from nostr-rust-forum 3.0.0-rc9 (bcebe87). rc9 pins
 # solid-pod-rs alpha.13: git-pods server wiring, JSS v0.0.197 HTTP parity,
 # federated NIP-05 resolver (ADR-086), TypeIndex/.jsonld fix, media containers.
-nostr-bbs-core = { git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "e3f7185", package = "nostr-bbs-core" }
-nostr-bbs-config = { git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "e3f7185", package = "nostr-bbs-config" }
-nostr-bbs-mesh = { git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "e3f7185", package = "nostr-bbs-mesh" }
-nostr-bbs-rate-limit = { git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "e3f7185", package = "nostr-bbs-rate-limit" }
+# bcebe87 adds: pod-browser git card gated on probe result (auto-probe on mount).
+nostr-bbs-core = { git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "bcebe87", package = "nostr-bbs-core" }
+nostr-bbs-config = { git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "bcebe87", package = "nostr-bbs-config" }
+nostr-bbs-mesh = { git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "bcebe87", package = "nostr-bbs-mesh" }
+nostr-bbs-rate-limit = { git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "bcebe87", package = "nostr-bbs-rate-limit" }
 
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
