@@ -1,5 +1,16 @@
 # Claude Code Configuration - DreamLab AI Website
 
+## Native Pod Sprint (2026-05-17)
+
+Encrypted agentbox↔forum link via Cloudflare Tunnel. `docker-compose.solid-pods.yml`
+runs `solid-pod-rs-server --features git` + `cloudflared` in the agentbox. Users in
+`[native_pod].allowlist_cohorts` see a second pod card in the pod browser pointing at
+`pods-native.dreamlab-ai.com`. Admin panel "Native Pods" tab provisions pods via
+`POST /api/native-pod/provision` → auth-worker → native `/_admin/provision/{pk}` (PSK).
+CORS allowlist (`SOLID_ALLOWED_ORIGINS`) + admin key (`SOLID_ADMIN_KEY`) configurable
+via env. forum-config pinned to NRF rc11 (`8d31f3a`) / solid-pod-rs alpha.15 (`0c5fa42`).
+project/agentbox submodule synced to ff19b01f via HTTPS remote.
+
 ## Git Control Panel Sprint (2026-05-17)
 
 Full git Version Control surface for Solid pods shipped. `components/git_panel.rs`

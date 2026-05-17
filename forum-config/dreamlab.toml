@@ -110,14 +110,13 @@ dms          = true
 governance   = true
 
 # ─── Key provisioning (JSS Phase 1) ─────────────────────────────────────────
-# When enabled, the auth-worker generates a Schnorr secp256k1 keypair on
-# /.pods signup, NIP-19 bech32-encodes it, and writes the result to the
-# user's pod at /private/privkey.jsonld with WAC locked to the owner.
-# Live as of solid-pod-rs v0.4.0-alpha.11 (provision-keys feature, served by
-# pod-worker's CF-Workers-native provision.rs path — see ADR-086 §8).
+# DreamLab's CF tier provisions the Solid pod itself through the Worker-native
+# `POST /.pods` / `/pods/{pubkey}/.provision` paths. Private keys are generated
+# on-device by the forum client and never written to R2. The upstream
+# solid-pod-rs-idp `provision-keys` helper remains native/tokio-only.
 [provision]
-enabled           = true                   # live as of alpha.11
-keys_at_signup    = true                   # auto-generate keypair at signup
+enabled           = true                   # live: authenticated pod creation
+keys_at_signup    = false                  # CF tier does not store private keys
 private_dir       = "/private/"             # WAC-locked container path
 privkey_filename  = "privkey.jsonld"        # NIP-19 bech32 keypair filename
 
@@ -133,11 +132,11 @@ resolver_mode = "federated"                # live as of NRF 1fe95fd
 pod_base_url  = "https://pods.dreamlab-ai.com"
 
 # ─── Pod data export (JSS Phase 1) ──────────────────────────────────────────
-# Operator opt-in for the JSS Phase 1 export surface. Live as of
-# solid-pod-rs v0.4.0-alpha.11 — re-exported through
-# nostr-bbs-pod-worker::export (phase1 feature).
+# The native solid-pod-rs export surface is tokio/Storage based and is not
+# reachable from the Cloudflare Worker target yet. Keep disabled on DreamLab's
+# CF deployment; enable only on a native pod backend that serves /api/exports/*.
 [export]
-enabled                  = true            # live as of alpha.11
+enabled                  = false           # CF tier: native export route unavailable
 include_private_default  = false           # owner WAC always required for /private/*
 rate_limit_per_min       = 6                # per-IP; export is bandwidth-heavy
 
@@ -154,6 +153,25 @@ enabled        = false                  # CF Workers limitation; flip for native
 auto_init      = true                   # informational; takes effect when enabled = true
 default_branch = "main"                 # pinned per JSS #471
 clone_url_base = "https://pods.dreamlab-ai.com"  # surfaces in forum-client
+
+# ─── Native pod server (agentbox tier, solid-pod-rs alpha.15) ───────────────
+# When enabled, the forum pod browser shows a SECOND pod card for the native
+# agentbox server alongside the CF Workers pod. The native server has full git
+# support (GitPanel + AppManifestPanel). Exposed via Cloudflare Tunnel.
+#
+# admin_provision_url: CF auth-worker calls this to provision a pod on the
+# native server. The native server validates via X-Pod-Admin-Key (PSK).
+# Match NATIVE_POD_ADMIN_KEY in the auth-worker CF secret with SOLID_ADMIN_KEY
+# in the agentbox .env.
+#
+# allowlist_cohorts: only users in these cohorts see the native pod card.
+# Empty list = all authenticated users.
+[native_pod]
+enabled              = true
+base_url             = "https://pods-native.dreamlab-ai.com"
+allowlist_cohorts    = ["members", "trainers", "private", "business"]
+git_enabled          = true
+admin_provision_url  = "https://pods-native.dreamlab-ai.com/_admin/provision"
 
 # ─── Agent Governance (kinds 31400-31405) ────────────────────────────────────
 # Pre-registered agent pubkeys authorised to publish governance control panels.

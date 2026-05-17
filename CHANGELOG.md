@@ -4,6 +4,30 @@ All notable changes to the DreamLab AI website will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Native Pod Sprint] - 2026-05-17
+
+Encrypted agentbox ↔ forum link via Cloudflare Tunnel. Users in eligible
+cohorts see a second "Native pod" card in the pod browser backed by the
+agentbox `solid-pod-rs-server`. Full git panel and app manifest panel available
+on the native tier. Admin can provision native pods from the admin control panel.
+
+### Added
+
+- **`[native_pod]` in dreamlab.toml**: `base_url`, `allowlist_cohorts`,
+  `admin_provision_url`. Wires the forum client to `pods-native.dreamlab-ai.com`.
+- **Native pod card in pod browser**: second pod section showing when user is in
+  an allowlisted cohort; probes native server, renders GitPanel + AppManifestPanel
+  on `Available`.
+- **Admin "Native Pods" tab**: enter any pubkey and provision a native pod
+  without CLI access. Calls `POST /api/native-pod/provision` → CF auth-worker →
+  native server `/_admin/provision/{pubkey}` (PSK-gated).
+- **`solid-pod-rs-server` alpha.15**: `--allowed-origins` / `SOLID_ALLOWED_ORIGINS`
+  CORS allowlist; `--admin-key` / `SOLID_ADMIN_KEY` PSK for the provision endpoint.
+- **Agentbox sidecar** (`docker-compose.solid-pods.yml`): `solid-pod-rs-server`
+  (built from source with `--features git`) + `cloudflared-pod` tunnel; shared
+  `agentbox-solid-data` volume.
+- **forum-config pinned to NRF rc11 (`8d31f3a`) / solid-pod-rs alpha.15 (`0c5fa42`)**.
+
 ## [Git Control Panel Sprint] - 2026-05-17
 
 Full git Version Control surface for Solid pods. Users on native-server

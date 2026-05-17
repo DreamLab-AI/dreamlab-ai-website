@@ -1,6 +1,6 @@
 [package]
 name = "dreamlab-forum-config"
-version = "3.0.0-rc10"
+version = "3.0.0-rc11"
 edition = "2021"
 description = "DreamLab AI forum operator overlay for the nostr-bbs kit"
 license = "Proprietary"
@@ -10,14 +10,14 @@ publish = false
 path = "src/lib.rs"
 
 [dependencies]
-# Kit crates from nostr-rust-forum 3.0.0-rc10 (23c0c5b). rc10 pins
-# solid-pod-rs alpha.14: git control API (/_git/* REST endpoints, 9 ops),
-# /.well-known/apps discovery (JSS #464 app-in-pod), GitPanel + AppManifestPanel
-# forum components, auto-probe on pod mount, busy guard, inline diff viewer.
-nostr-bbs-core = { git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "23c0c5b", package = "nostr-bbs-core" }
-nostr-bbs-config = { git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "23c0c5b", package = "nostr-bbs-config" }
-nostr-bbs-mesh = { git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "23c0c5b", package = "nostr-bbs-mesh" }
-nostr-bbs-rate-limit = { git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "23c0c5b", package = "nostr-bbs-rate-limit" }
+# Kit crates from nostr-rust-forum 3.0.0-rc11 (8d31f3a). rc11 pins
+# solid-pod-rs alpha.15: CORS allowlist, /_admin/provision endpoint, native
+# pod config schema ([native_pod]), pod browser second native pod card,
+# admin panel "Native Pods" tab, auth-worker /api/native-pod/provision relay.
+nostr-bbs-core = { git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "8d31f3a", package = "nostr-bbs-core" }
+nostr-bbs-config = { git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "8d31f3a", package = "nostr-bbs-config" }
+nostr-bbs-mesh = { git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "8d31f3a", package = "nostr-bbs-mesh" }
+nostr-bbs-rate-limit = { git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "8d31f3a", package = "nostr-bbs-rate-limit" }
 
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
