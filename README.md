@@ -282,6 +282,21 @@ All workflows are guarded with `if: github.repository == 'DreamLab-AI/dreamlab-a
 - **Relay-level enforcement** -- Whitelist, rate limits (10 events/sec), connection limits (20/IP), size limits (64KB), hibernation-safe subscription persistence
 - **457 tests, 0 warnings** -- Comprehensive test suite including property-based tests for cryptographic operations
 
+---
+
+## Part of VisionFlow
+
+dreamlab-ai-website is the **branded edge deployment** of the [VisionFlow](https://github.com/DreamLab-AI/VisionFlow) coordination platform — a federated architecture for human–AI intelligence built on `did:nostr` identity, OWL 2 EL reasoning, and Nostr message passing.
+
+| Substrate | Repository | Role |
+|:----------|:-----------|:-----|
+| **VisionFlow** | [DreamLab-AI/VisionFlow](https://github.com/DreamLab-AI/VisionFlow) | Ecosystem guide and coordination architecture |
+| **VisionClaw** | [DreamLab-AI/VisionClaw](https://github.com/DreamLab-AI/VisionClaw) | Knowledge engineering — OWL 2 EL, 92 CUDA kernels, XR |
+| **Agentbox** | [DreamLab-AI/agentbox](https://github.com/DreamLab-AI/agentbox) | Harness engineering — Nix, 90+ skills, sovereign pods |
+| **solid-pod-rs** | [DreamLab-AI/solid-pod-rs](https://github.com/DreamLab-AI/solid-pod-rs) | Cryptographic foundation — JSS Rust port, DID:Nostr |
+| **nostr-rust-forum** | [DreamLab-AI/nostr-rust-forum](https://github.com/DreamLab-AI/nostr-rust-forum) | Forum kit — passkey auth, governance events |
+| **dreamlab-ai-website** | **[DreamLab-AI/dreamlab-ai-website](https://github.com/DreamLab-AI/dreamlab-ai-website)** | **Branded deployment — React, WASM, Cloudflare Workers** |
+
 ## Licence
 
 Proprietary. Copyright 2024-2026 DreamLab AI Consulting Ltd. All rights reserved.
