@@ -172,57 +172,57 @@ agent_pubkeys = [
   set to a separate endpoint to isolate governance traffic.
 - `kinds_lo`/`kinds_hi` -- Nostr event kind range for governance events (31400-31405).
 
-## JSS Phase 1 features
+## JSS / Solid features
 
-Three additive operator-overlay blocks gate the JSS v0.0.190 Phase 1 surface.
-All three are **live as of solid-pod-rs v0.4.0-alpha.11** and nostr-rust-forum
-commit `1fe95fd` (auth-worker `resolve()` D1→pod-HTTP fallback, ADR-086 §9).
-These blocks are parsed locally by `src/phase1.rs` via `toml::Value` rather
-than through the upstream `nostr-bbs-config` typed schema, so the overlay
-stays additive — no upstream crate bump is required.
+The overlay is pinned to `nostr-rust-forum` commit `a7c9c40`, which includes
+the JSS v0.0.197 Solid surface from `solid-pod-rs` commit `8668792` plus the
+DreamLab `POD_BASE_URL` integration fix. On Cloudflare Workers the live pieces
+are authenticated pod creation, federated NIP-05, TypeIndex/media provisioning,
+Solid browser headers, and correct public WebID URLs. Native-only export,
+pod-stored key provisioning, and git-init remain disabled here.
 
-### `[provision]` — key provisioning at signup
+### `[provision]` — pod creation at signup
 
 ```toml
 [provision]
-enabled           = true                   # live as of alpha.11
-keys_at_signup    = true                   # auto-generate keypair at signup
-private_dir       = "/private/"             # WAC-locked container path
-privkey_filename  = "privkey.jsonld"        # NIP-19 bech32 keypair filename
+enabled           = true                   # live: authenticated pod creation
+keys_at_signup    = false                  # CF tier does not store private keys
+private_dir       = "/private/"             # reserved for native key storage
+privkey_filename  = "privkey.jsonld"        # reserved filename
 ```
 
 | Field | Default | Operational implication |
 |-------|---------|-------------------------|
-| `enabled` | `true` (live as of solid-pod-rs v0.4.0-alpha.11) | When `true`, the pod-worker generates a Schnorr secp256k1 keypair at `POST /.pods` signup. Served by pod-worker's CF-Workers-native `provision.rs` path (the upstream `solid-pod-rs-idp` crate is not reachable from wasm32, see ADR-086 §8). |
-| `keys_at_signup` | `true` | Auto-generate at signup rather than waiting for an explicit user request. |
-| `private_dir` | `/private/` | WAC-locked container path on the pod; the keypair is written here. |
-| `privkey_filename` | `privkey.jsonld` | NIP-19 bech32-encoded keypair filename. |
+| `enabled` | `true` | Enables authenticated pod creation through `POST /.pods` and `/pods/{pubkey}/.provision`. |
+| `keys_at_signup` | `false` on CF | Private keys are generated on-device by the forum client and never written to R2. Set only for a native backend that actually stores keys under WAC. |
+| `private_dir` | `/private/` | Reserved WAC-locked container path for native key-storage deployments. |
+| `privkey_filename` | `privkey.jsonld` | Reserved keypair filename for native key-storage deployments. |
 
 ### `[nip05]` — NIP-05 resolution mode
 
 ```toml
 [nip05]
-resolver_mode = "federated"                # live as of NRF 1fe95fd
+resolver_mode = "federated"                # live as of NRF a7c9c40
 pod_base_url  = "https://pods.dreamlab-ai.com"
 ```
 
 | Field | Default | Operational implication |
 |-------|---------|-------------------------|
-| `resolver_mode` | `"federated"` (live as of nostr-rust-forum commit `1fe95fd`) | `"d1"` — central registry only (legacy `POD_META.nip05:{user}` → pubkey). `"federated"` — D1 cache first, fall through to pod-resident `/.well-known/nostr.json` on miss. Driven at deploy time by auth-worker's `NIP05_RESOLVER_MODE` env var (mirrored in `deploy/auth-worker.wrangler.toml [vars]`); exposed publicly as `GET /api/username/resolve?name=<X>`. See ADR-086 §9. |
-| `pod_base_url` | `https://pods.dreamlab-ai.com` | Base URL used to build fallback NIP-05 lookups; mirrored to auth-worker via the `POD_BASE_URL` env var. |
+| `resolver_mode` | `"federated"` | `"d1"` — central registry only. `"federated"` — D1 cache first, fall through to pod-resident `/.well-known/nostr.json` on miss. Driven at deploy time by auth-worker's `NIP05_RESOLVER_MODE` env var. |
+| `pod_base_url` | `https://pods.dreamlab-ai.com` | Base URL used to build fallback NIP-05 lookups and public WebID/pod URLs; mirrored to both auth-worker and pod-worker via `POD_BASE_URL`. |
 
 ### `[export]` — `/api/exports/*` opt-in
 
 ```toml
 [export]
-enabled                  = true            # live as of alpha.11
+enabled                  = false           # CF tier: native export route unavailable
 include_private_default  = false           # owner WAC always required for /private/*
 rate_limit_per_min       = 6                # per-IP; export is bandwidth-heavy
 ```
 
 | Field | Default | Operational implication |
 |-------|---------|-------------------------|
-| `enabled` | `true` (live as of solid-pod-rs v0.4.0-alpha.11) | Exposes the JSS Phase 1 `/api/exports/*` surface; re-exported through `nostr-bbs-pod-worker::export` (phase1 feature). |
+| `enabled` | `false` on CF | Native solid-pod-rs export uses tokio/Storage and is not available in the Worker target yet. |
 | `include_private_default` | `false` | Default for whether `/private/*` is included when the caller omits an explicit query parameter. Owner WAC is always required for private inclusion regardless of this default. |
 | `rate_limit_per_min` | `6` | Per-IP cap mirrored into `[ratelimit].export_per_min`; export responses are bandwidth-heavy. |
 
@@ -252,12 +252,11 @@ neither libgit2's `spawn`-based callbacks nor a shelled-out `git init` can
 run. Migrating off Workers (or routing pod provisioning through a native
 sidecar) is the only path to flipping `enabled = true` for this deployment.
 
-**Defaults fully flipped on 2026-05-16**: provision / nip05 / export all live
-against solid-pod-rs v0.4.0-alpha.11 + nostr-rust-forum commit `1fe95fd`.
-Operators wanting to disable any feature flip the relevant `enabled` (or
-`resolver_mode = "d1"`) back to the conservative default; the auth-worker
-honours `NIP05_RESOLVER_MODE` at deploy time, so the env var in
-`deploy/auth-worker.wrangler.toml` must be flipped in lockstep.
+**Cloudflare defaults as of 2026-05-17**: pod creation and federated NIP-05 are
+live; export and git remain off. `POD_BASE_URL` must be set in both auth-worker
+and pod-worker manifests so returned `webId`, `podUrl`, `podUri`, and
+`Location` values use `https://pods.dreamlab-ai.com` while `EXPECTED_ORIGIN`
+continues to allow browser requests from `https://dreamlab-ai.com`.
 
 ## Zone layout
 

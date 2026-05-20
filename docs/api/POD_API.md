@@ -192,7 +192,8 @@ This works because the default ACL grants `foaf:Agent` (anyone) Read access on `
 |---------|------|---------|
 | `PODS` | R2Bucket | `dreamlab-pods` -- all pod storage |
 | `POD_META` | KVNamespace | ACL documents + pod metadata |
-| `EXPECTED_ORIGIN` | Secret | `https://dreamlab-ai.com` |
+| `EXPECTED_ORIGIN` | Secret | `https://dreamlab-ai.com` (browser CORS origin) |
+| `POD_BASE_URL` | Var | `https://pods.dreamlab-ai.com` (public WebID/pod URI origin) |
 | `ADMIN_PUBKEYS` | Secret | Comma-separated admin hex pubkeys |
 
 ---

@@ -297,9 +297,9 @@ const Index = () => {
 
       {/* Section 3b: Sovereign Identity (Phase 1 forum features)
           Surfaces the JSS Phase 1 cross-repo deliverable:
-          - solid-pod-rs d8a1c81 (pod-resident keys + WAC lock)
-          - nostr-rust-forum 1fe95fd (federated NIP-05 D1→pod resolve)
-          - forum-config aad6aad (operator overlay + exports endpoint)
+          - solid-pod-rs 8668792 (JSS v0.0.197 HTTP parity)
+          - nostr-rust-forum a7c9c40 (public POD_BASE_URL + Worker pod parity)
+          - forum-config pins the DreamLab CF deployment to those surfaces
       */}
       <section
         id="sovereign-identity"
@@ -340,9 +340,9 @@ const Index = () => {
                     <KeyRound className="w-5 h-5 text-cyan-400" aria-hidden="true" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-base mb-1">Frictionless signup with pod-provisioned keys</h3>
+                    <h3 className="font-semibold text-base mb-1">Frictionless signup with pod provisioning</h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">
-                      A Schnorr secp256k1 keypair is generated at signup and written to your pod at <code className="text-xs px-1 py-0.5 rounded bg-background/70 border border-indigo-500/20">/private/privkey.jsonld</code> with an owner-only WAC lock. No browser extension, no wallet UX — and the keys live on your pod, not ours.
+                      A Schnorr secp256k1 keypair is generated on-device and never leaves the browser. The forum provisions your Solid pod through <code className="text-xs px-1 py-0.5 rounded bg-background/70 border border-indigo-500/20">POST /.pods</code>, including WebID, TypeIndex, inbox, and public media containers.
                     </p>
                   </div>
                 </li>
@@ -352,9 +352,9 @@ const Index = () => {
                     <Download className="w-5 h-5 text-emerald-400" aria-hidden="true" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-base mb-1">Take your data with you</h3>
+                    <h3 className="font-semibold text-base mb-1">Portable by default</h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">
-                      A single call to <code className="text-xs px-1 py-0.5 rounded bg-background/70 border border-indigo-500/20">/api/exports/all</code> returns a time-chain JSON-LD bundle of everything in your pod. GDPR-friendly, audit-trail-ready, and portable to any compliant Solid host.
+                      Your profile, uploads, notifications, and access rules live in a Solid-compatible pod at <code className="text-xs px-1 py-0.5 rounded bg-background/70 border border-indigo-500/20">pods.dreamlab-ai.com</code>. The Cloudflare tier keeps native JSON-LD export disabled until the upstream exporter is Worker-portable.
                     </p>
                   </div>
                 </li>

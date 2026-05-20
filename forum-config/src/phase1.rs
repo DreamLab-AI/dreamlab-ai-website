@@ -4,34 +4,38 @@
 //! does not know about these sections; the overlay parses them locally and
 //! feeds the resulting struct into worker config. This keeps the operator
 //! overlay additive — no upstream schema change is required to ship the
-//! DreamLab opt-in surface for the JSS Phase 1 features:
+//! DreamLab opt-in surface for the JSS/solid-pod-rs features:
 //!
-//! 1. **provision-keys** — auto-generate a Schnorr secp256k1 keypair at
-//!    `POST /.pods` signup, NIP-19 bech32-encode it, and write the result to
-//!    the user's pod at `/private/privkey.jsonld` with WAC locked to the
-//!    owner.
+//! 1. **pod creation** — authenticated `POST /.pods` and
+//!    `/pods/{pubkey}/.provision` create the user's Solid pod, WebID profile,
+//!    TypeIndex documents, and media containers. Private keys are generated
+//!    on-device by the forum client on the Cloudflare tier; the native
+//!    `solid-pod-rs-idp` key-provisioning helper remains tokio-only.
 //! 2. **nip05-endpoint** — federated NIP-05 resolution: D1 cache first, fall
 //!    through to the pod's `/.well-known/nostr.json` on miss.
-//! 3. **export-jsonld** — operator opt-in for the `/api/exports/*` surface,
-//!    with private-data inclusion default and per-IP rate limit.
+//! 3. **export-jsonld** — operator opt-in for the `/api/exports/*` surface on
+//!    native pod backends. It is disabled on DreamLab's Cloudflare deployment.
 //! 4. **git-versioned pods** — per-pod `git init` at creation (JSS #471,
 //!    solid-pod-rs alpha.12). Disabled on the CF deployment per NRF ADR-089
 //!    (Workers cannot spawn subprocesses); flips on for native backends.
 //!
-//! All four features live: Phase 1 (provision-keys, nip05-endpoint,
-//! export-jsonld) in solid-pod-rs v0.4.0-alpha.11; git-versioned pods in
-//! v0.4.0-alpha.12. CF [git].enabled stays false (NRF ADR-089).
+//! The DreamLab CF deployment enables the portable pieces from
+//! nostr-rust-forum `a7c9c40`: pod creation, federated NIP-05, JSS-compatible
+//! CORS/auth/notification headers, TypeIndex and media provisioning. Native
+//! export and git-init stay disabled.
 
 use serde::{Deserialize, Serialize};
 
-/// `[provision]` — key provisioning at signup.
+/// `[provision]` — pod creation/provisioning policy.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProvisionConfig {
     /// Master switch. When `false`, the auth-worker behaves as in rc6:
     /// no keypair is written to the pod at signup.
     #[serde(default)]
     pub enabled: bool,
-    /// When [`enabled`](Self::enabled) is `true`, auto-generate the keypair at signup.
+    /// When [`enabled`](Self::enabled) is `true`, write generated keys into the
+    /// pod at signup. DreamLab keeps this `false` on CF because the browser
+    /// generates keys on-device and the Worker does not store private keys.
     #[serde(default = "default_keys_at_signup")]
     pub keys_at_signup: bool,
     /// WAC-locked container path on the pod (e.g. `/private/`).
@@ -274,9 +278,9 @@ mod tests {
         let v: toml::Value = toml::from_str(&toml_str).expect("parse dreamlab.toml");
         let cfg = Phase1Config::load_from_value(&v).expect("load phase1");
 
-        // [provision] — live as of solid-pod-rs v0.4.0-alpha.11.
+        // [provision] — live Worker pod creation; no private-key storage on CF.
         assert!(cfg.provision.enabled);
-        assert!(cfg.provision.keys_at_signup);
+        assert!(!cfg.provision.keys_at_signup);
         assert_eq!(cfg.provision.private_dir, "/private/");
         assert_eq!(cfg.provision.privkey_filename, "privkey.jsonld");
 
@@ -284,8 +288,8 @@ mod tests {
         assert_eq!(cfg.nip05.resolver_mode, "federated");
         assert_eq!(cfg.nip05.pod_base_url, "https://pods.dreamlab-ai.com");
 
-        // [export] — live as of solid-pod-rs v0.4.0-alpha.11; budget 6/min/IP.
-        assert!(cfg.export.enabled);
+        // [export] — disabled on CF; native/tokio surface only.
+        assert!(!cfg.export.enabled);
         assert!(!cfg.export.include_private_default);
         assert_eq!(cfg.export.rate_limit_per_min, 6);
 
@@ -309,11 +313,10 @@ mod tests {
         let v: toml::Value = toml::from_str(&toml_str).expect("parse dreamlab.toml");
         let cfg = Phase1Config::load_from_value(&v).expect("load phase1");
 
-        // All three Phase 1 features live: solid-pod-rs v0.4.0-alpha.11
-        // (provision + export) and nostr-rust-forum commit 1fe95fd
-        // (auth-worker resolve() D1→pod-HTTP fallback, ADR-086 §9).
+        // Portable JSS features live on CF: pod creation and federated NIP-05.
+        // Native export stays off until the pod backend can serve it.
         assert!(cfg.provision.enabled, "provision must be enabled");
-        assert!(cfg.export.enabled, "export must be enabled");
+        assert!(!cfg.export.enabled, "CF export route must remain disabled");
         assert_eq!(cfg.nip05.resolver_mode, "federated");
     }
 

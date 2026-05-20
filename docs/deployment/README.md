@@ -219,6 +219,7 @@ Local Workers use `wrangler dev` which simulates D1, KV, R2, and Durable Objects
 | `RP_ID` | auth-worker | `dreamlab-ai.com` |
 | `RP_NAME` | auth-worker | `DreamLab AI` |
 | `EXPECTED_ORIGIN` | auth-worker, pod-worker | `https://dreamlab-ai.com` |
+| `POD_BASE_URL` | auth-worker, pod-worker | `https://pods.dreamlab-ai.com` |
 | `ADMIN_PUBKEYS` | auth-worker, relay-worker | Comma-separated admin hex pubkeys |
 | `ALLOWED_ORIGIN` | relay-worker, search-worker | `https://dreamlab-ai.com` |
 
