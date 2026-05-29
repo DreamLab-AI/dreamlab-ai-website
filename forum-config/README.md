@@ -7,7 +7,7 @@ generic `nostr-bbs-*` kit crates living in the `nostr-rust-forum` repo.
 
 | Path                                | Purpose                                                              |
 |-------------------------------------|----------------------------------------------------------------------|
-| `Cargo.toml`                        | Path-deps to `nostr-bbs-{core,config,mesh}` (kit crates)             |
+| `Cargo.toml`                        | Git-pinned deps on `nostr-bbs-{core,config,mesh,rate-limit}` (NRF rc11, rev `8d31f3a`) |
 | `dreamlab.toml`                     | Operator-supplied config consumed by `nostr_bbs_config::load_from_*` |
 | `src/branding.rs`                   | DreamLab `BrandingConfig` populator (theme, logos, copy, zones)      |
 | `src/workers.rs`                    | Per-worker entry shims (kit `dispatch` API not yet available)        |

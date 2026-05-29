@@ -283,6 +283,33 @@ cargo run -p admin-cli -- mod ban <pubkey> --reason "spam"
 
 `--json` flag on all commands for machine consumption. nsec is never persisted to disk — supplied via `--nsec`, `FORUM_ADMIN_NSEC` env, or `--bunker` NIP-46 URI. See `community-forum-rs/crates/admin-cli/AGENT.md` for AI-agent cheat sheet.
 
+## Federation Transports
+
+The DreamLab ecosystem uses two transport layers for inter-service communication (Cloudflare public path and Tailscale private path), plus a CF Tunnel that bridges the two for the native pod tier. dreamlab-ai-website only ever touches the Cloudflare path.
+
+### Cloudflare (public path)
+
+Primary transport for the website and forum. CF Workers relay Nostr events, R2 stores pod data, and a CF Tunnel fronts native pods hosted on agentbox infrastructure.
+
+### Tailscale (private path)
+
+Encrypted tailnet for agentbox-to-agentbox and agentbox-to-solid-pod-rs traffic. CF Workers do not join the tailnet. The forum relay bridges to agentbox's Nostr relay over public `wss://`; agentbox handles tailnet-side federation internally.
+
+### Website's role
+
+This project (dreamlab-ai-website) connects exclusively via Cloudflare infrastructure (Workers, D1, R2). It never joins a tailnet. The relay-worker bridges forum events to agentbox's Nostr relay over public WebSocket, and agentbox propagates those events across the tailnet mesh on its own.
+
+### Endpoint map
+
+| Surface | Endpoint | Transport |
+|---------|----------|-----------|
+| Public relay | `dreamlab-nostr-relay.*.workers.dev` | Cloudflare Workers |
+| Public pods | `dreamlab-pod-api.*.workers.dev` | Cloudflare Workers (R2) |
+| Private relay | `<agentbox-host>.ts.net` (tailnet) | Tailscale |
+| Private pods | `<agentbox-host>.ts.net` (tailnet) | Tailscale |
+| Private API | `<agentbox-host>.ts.net` (tailnet) | Tailscale |
+| Hybrid native pods | `pods-native.dreamlab-ai.com` | CF Tunnel to agentbox solid-pod-rs |
+
 ### Moderation event model
 
 Nostr custom parameterized-replaceable events:

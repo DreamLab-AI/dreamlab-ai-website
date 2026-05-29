@@ -1,6 +1,6 @@
 # Deployment Overview -- DreamLab AI
 
-**Last updated:** 2026-03-16 | [Back to Documentation Index](../README.md)
+**Last updated:** 2026-05-29 | [Back to Documentation Index](../README.md)
 
 ---
 
@@ -107,7 +107,7 @@ flowchart LR
 
 ### workers-deploy.yml -- Cloudflare Workers
 
-Triggers on push to `main` when files in `community-forum-rs/crates/` change. Guard: `if: github.repository == 'DreamLab-AI/dreamlab-ai-website'`
+Triggers on push to `main` when files under `forum-config/deploy/**` change. The workflow clones the `nostr-rust-forum` kit at `KIT_REF` (currently `main`), overlays each `forum-config/deploy/*.wrangler.toml` onto the matching kit crate, then builds and deploys. Guard: `if: github.repository == 'DreamLab-AI/dreamlab-ai-website'`
 
 ```mermaid
 flowchart LR
@@ -155,7 +155,7 @@ flowchart LR
 
 | Property | Value |
 |----------|-------|
-| Source | `community-forum-rs/crates/forum-client/` |
+| Source | `nostr-rust-forum` kit (cloned at build time), overlaid with `forum-config/` |
 | Build command | `trunk build --release` |
 | Optimization | `wasm-opt -Oz` (target: <2 MB gzipped) |
 | Output | Copied to `dist/community/` |
@@ -167,15 +167,15 @@ flowchart LR
 
 ### Rust Workers (5 services)
 
-All workers are Rust, compiled to `wasm32-unknown-unknown` via `worker-build --release` and packaged as Workers-compatible ES modules.
+All workers are Rust, compiled to `wasm32-unknown-unknown` via `worker-build --release` and packaged as Workers-compatible ES modules. Source lives upstream in the `nostr-rust-forum` kit; this repo overlays per-worker `wrangler.toml` from `forum-config/deploy/`.
 
-| Worker | Crate | Storage | Subdomain |
-|--------|-------|---------|-----------|
-| auth-worker | `community-forum-rs/crates/auth-worker` | D1 + KV + R2 | `api.dreamlab-ai.com` |
-| pod-worker | `community-forum-rs/crates/pod-worker` | R2 + KV | `pods.dreamlab-ai.com` |
-| preview-worker | `community-forum-rs/crates/preview-worker` | Cache API | `preview.dreamlab-ai.com` |
-| relay-worker | `community-forum-rs/crates/relay-worker` | D1 + Durable Objects | `relay.dreamlab-ai.com` |
-| search-worker | `community-forum-rs/crates/search-worker` | R2 + KV | `search.dreamlab-ai.com` |
+| Worker | Kit crate | Storage | Subdomain |
+|--------|-----------|---------|-----------|
+| auth-worker | `nostr-bbs-auth-worker` | D1 + KV + R2 | `api.dreamlab-ai.com` |
+| pod-worker | `nostr-bbs-pod-worker` | R2 + KV | `pods.dreamlab-ai.com` |
+| preview-worker | `nostr-bbs-preview-worker` | Cache API | `preview.dreamlab-ai.com` |
+| relay-worker | `nostr-bbs-relay-worker` | D1 + Durable Objects | `relay.dreamlab-ai.com` |
+| search-worker | `nostr-bbs-search-worker` | R2 + KV | `search.dreamlab-ai.com` |
 
 ---
 
@@ -222,6 +222,10 @@ Local Workers use `wrangler dev` which simulates D1, KV, R2, and Durable Objects
 | `POD_BASE_URL` | auth-worker, pod-worker | `https://pods.dreamlab-ai.com` |
 | `ADMIN_PUBKEYS` | auth-worker, relay-worker | Comma-separated admin hex pubkeys |
 | `ALLOWED_ORIGIN` | relay-worker, search-worker | `https://dreamlab-ai.com` |
+| `NATIVE_POD_URL` | auth-worker | `https://pods-native.dreamlab-ai.com` (native pod tier; only when `[native_pod]` enabled) |
+| `NATIVE_POD_ADMIN_KEY` | auth-worker | PSK matching the native server's `SOLID_ADMIN_KEY` for `/_admin/provision` |
+
+`NATIVE_POD_URL` is also consumed at WASM compile time (`option_env!`) so the native pod UI compiles out when absent. The [`set-worker-secrets.yml`](../../.github/workflows/set-worker-secrets.yml) workflow pushes both values to the CF Worker in one shot. Full runbook: [Native Pod Mesh](NATIVE_POD_MESH.md).
 
 ---
 
@@ -260,6 +264,7 @@ The `governance` flag additionally requires configuration in the `[governance]` 
 | Document | Description |
 |----------|-------------|
 | [Cloudflare Workers](CLOUDFLARE_WORKERS.md) | Build pipeline, resource bindings, secrets |
+| [Native Pod Mesh](NATIVE_POD_MESH.md) | CF Tunnel to agentbox `solid-pod-rs`, native pod provisioning |
 | [Forum Config](../../forum-config/README.md) | Operator overlay, feature flags, governance config |
 | [Auth API](../api/AUTH_API.md) | WebAuthn + NIP-98 endpoints |
 | [Pod API](../api/POD_API.md) | Solid pod storage |

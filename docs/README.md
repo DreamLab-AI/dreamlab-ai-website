@@ -8,7 +8,7 @@ This documentation covers the full DreamLab AI platform: a React marketing site,
 
 ## System Architecture
 
-Seven services (7 Rust crates) compose the backend and forum client. The `nostr-core` crate is the shared foundation, consumed by the forum client and all five Rust Workers. The forum is now powered by the upstream [nostr-rust-forum](https://github.com/DreamLab-AI/nostr-rust-forum) kit; DreamLab-specific configuration lives in `forum-config/`.
+The forum is now powered by the upstream [nostr-rust-forum](https://github.com/DreamLab-AI/nostr-rust-forum) kit. DreamLab-specific configuration lives in `forum-config/`, which pins the kit crates and overlays branding, zones, governance pubkeys, and Cloudflare deployment manifests.
 
 ```mermaid
 graph TB
@@ -17,8 +17,8 @@ graph TB
         LEPTOS["Leptos 0.7 CSR<br/>Community Forum<br/><i>nostr-rust-forum kit + forum-config/</i>"]
     end
 
-    subgraph "Shared Library"
-        CORE["nostr-core<br/>NIP-01, NIP-44, NIP-59, NIP-98<br/>Key derivation, Schnorr signing"]
+    subgraph "Forum Kit"
+        CORE["nostr-bbs-core<br/>+ upstream nostr crate<br/>NIP-01, NIP-44, NIP-59, NIP-98<br/>Governance kinds 31400-31405"]
     end
 
     subgraph "Rust Cloudflare Workers"
@@ -40,6 +40,8 @@ graph TB
     AUTH --> CORE
     POD --> CORE
     PREVIEW --> CORE
+    RELAY --> CORE
+    SEARCH --> CORE
 
     LEPTOS -- "HTTPS" --> AUTH
     LEPTOS -- "HTTPS" --> POD
@@ -348,27 +350,34 @@ graph TB
 
 ## Crate Dependency Graph
 
+All crates ship from the upstream `nostr-rust-forum` kit; `forum-config/` overlays
+DreamLab branding and CF resource configuration. `nostr-bbs-core` is the shared
+foundation consumed by the forum client and all five Workers.
+
 ```mermaid
 graph LR
-    CORE["nostr-core"]
+    CORE["nostr-bbs-core"]
     CLIENT["forum-client<br/>(Leptos WASM)"]
-    AUTH["auth-worker"]
-    POD["pod-worker"]
-    PREVIEW["preview-worker"]
-    RELAY_STUB["relay-worker<br/>(Rust stub)"]
+    AUTH["nostr-bbs-auth-worker"]
+    POD["nostr-bbs-pod-worker"]
+    PREVIEW["nostr-bbs-preview-worker"]
+    RELAY["nostr-bbs-relay-worker"]
+    SEARCH["nostr-bbs-search-worker"]
 
     CLIENT --> CORE
     AUTH --> CORE
     POD --> CORE
     PREVIEW --> CORE
-    RELAY_STUB --> CORE
+    RELAY --> CORE
+    SEARCH --> CORE
 
     style CORE fill:#dea584,color:#000
     style CLIENT fill:#ef3939,color:#fff
     style AUTH fill:#F38020,color:#000
     style POD fill:#F38020,color:#000
     style PREVIEW fill:#F38020,color:#000
-    style RELAY_STUB fill:#F38020,color:#000
+    style RELAY fill:#F38020,color:#000
+    style SEARCH fill:#F38020,color:#000
 ```
 
 ---

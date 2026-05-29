@@ -35,7 +35,7 @@ graph LR
 | Repository | Role | Key Technology |
 |---|---|---|
 | [solid-pod-rs](https://github.com/DreamLab-AI/solid-pod-rs) | Foundation library | Solid Protocol, DID:Nostr, WAC |
-| [nostr-rust-forum](https://github.com/DreamLab-AI/nostr-rust-forum) | Forum kit | 11 `nostr-bbs-*` Rust crates, CF Workers |
+| [nostr-rust-forum](https://github.com/DreamLab-AI/nostr-rust-forum) | Forum kit | `nostr-bbs-*` Rust crates, CF Workers |
 | [agentbox](https://github.com/DreamLab-AI/agentbox) | Agent container | Nix, nostr-rs-relay, mesh peer |
 | [VisionClaw](https://github.com/DreamLab-AI/VisionClaw) | Integration substrate | Knowledge graph, GPU physics, XR |
 | **[dreamlab-ai-website](https://github.com/DreamLab-AI/dreamlab-ai-website)** | **Branded deployment** | **React SPA, WASM forum, `forum-config/`** |
@@ -107,7 +107,7 @@ graph TB
 - **WASM vector search** -- RuVector WASM microkernel (42KB) with `.rvf` container format, running in a Cloudflare Worker at 490K vectors/sec. Cmd/K global semantic search.
 - **Smart auth UX** -- Progressive disclosure login (auto-detects NIP-07 extensions), friendly labels with optional technical mode toggle, forum-first navigation.
 - **Security hardened** -- XSS sanitization on all markdown rendering, NIP-98 body hash verification, rate limiting on all HTTP workers, env-based CORS, hibernation-safe relay subscriptions.
-- **457 tests, 0 warnings** -- Comprehensive test coverage across all 7 crates including property-based tests for cryptographic operations.
+- **Property-tested crypto** -- The upstream kit ships comprehensive test coverage, including property-based tests for cryptographic operations. Operator-owned tests in `tests/` cover the `forum-config/` overlay.
 - **3D visualizations** -- Three.js + React Three Fiber powering golden ratio Voronoi, 4D tesseract, and torus knot hero scenes on the marketing site.
 
 ## Tech Stack
@@ -118,16 +118,16 @@ graph TB
 | Styling | Tailwind CSS 3.4 + shadcn/ui (Radix UI) |
 | 3D | Three.js 0.156 + React Three Fiber |
 | Community Forum | **Rust / Leptos 0.7** (CSR, WASM, amber/gray theme, 19 routes incl. `/governance`, 58+ components) |
-| Nostr Protocol | nostr-core (Rust) — NIP-01/07/09/29/33/40/42/45/50/52/98 + kinds 31400-31405 (governance) |
+| Nostr Protocol | nostr-bbs-core / upstream `nostr` crate — NIP-01/07/09/29/33/40/42/45/50/52/98 + kinds 31400-31405 (governance) |
 | Auth | WebAuthn PRF via passkey-rs + NIP-98 + NIP-07 extension |
 | Encryption | NIP-44 (ChaCha20-Poly1305) + NIP-59 Gift Wrap |
 | Backend | 5 Cloudflare Workers (Rust) via `worker` 0.7.5 |
 | Storage | Cloudflare D1, KV, R2, Durable Objects |
 | Solid Pods | LDP containers, WAC ACL inheritance, JSON Patch, quotas, WebID, micropayments |
-| Hosting | GitHub Pages (static) + Cloudflare Workers (API) |
+| Hosting | GitHub Pages (static, primary) + optional Cloudflare Pages mirror + 5 Cloudflare Workers (API) |
 | WASM Search | RuVector microkernel + `.rvf` format + Cmd/K semantic search |
 | Crypto | k256, chacha20poly1305, hkdf, sha2 (NCC-audited) |
-| Tests | **457 tests**, 0 failures, 0 compiler warnings |
+| Tests | Kit-owned suite upstream; `forum-config/` overlay tests in `tests/` |
 
 ## Quick Start
 
@@ -281,6 +281,37 @@ All workflows are guarded with `if: github.repository == 'DreamLab-AI/dreamlab-a
 - **SSRF protection** -- Link preview Worker blocks private/loopback/metadata IP ranges (20+ tests)
 - **Relay-level enforcement** -- Whitelist, rate limits (10 events/sec), connection limits (20/IP), size limits (64KB), hibernation-safe subscription persistence
 - **457 tests, 0 warnings** -- Comprehensive test suite including property-based tests for cryptographic operations
+
+---
+
+## Federation Transports
+
+dreamlab-ai-website participates in two of the three DreamLab federation transport strata. As a Cloudflare Pages + Workers deployment, it cannot join a Tailscale tailnet.
+
+### Stratum 2: Nostr relays
+
+The forum's relay-worker (Durable Objects WebSocket) connects browser clients to the Nostr relay. Governance events (kinds 31400-31405) surface in the forum UI. All events are authenticated via NIP-98/NIP-42 `did:nostr` Schnorr signatures.
+
+The `[mesh]` block in `forum-config/dreamlab.toml` declares the federation mesh (PRD-010 Phase 3 / ADR-073). `peer_relays` is currently empty and is populated when mesh peers come online, at which point governance events from agentbox and VisionClaw propagate through to the forum.
+
+### Stratum 3: Cloudflare Tunnel to the native pod tier
+
+When the `[native_pod]` section is enabled, the auth-worker forwards provisioning requests to an agentbox-hosted `solid-pod-rs` server fronted by a Cloudflare Tunnel at `pods-native.dreamlab-ai.com`. The CF Workers pod tier (pod-worker) stores pod data directly in R2 and does not tunnel out.
+
+| Worker | Target | Purpose |
+|---|---|---|
+| auth-worker | `pods-native.dreamlab-ai.com` (CF Tunnel) | Native pod provisioning via `/_admin/provision`, NIP-05 resolution |
+| pod-worker | Cloudflare R2 | CF-tier pod reads/writes, `.pods` creation |
+
+The tunnel provides transport security; `did:nostr` NIP-98 signatures provide request-level authentication.
+
+### Transport matrix
+
+| Stratum | dreamlab-ai-website | Why |
+|---|---|---|
+| 1: Tailscale | Not applicable | CF Pages/Workers cannot join a tailnet |
+| 2: Nostr relays | relay-worker (DO) | Browser-to-relay bridge, governance events |
+| 3: CF Tunnel | auth-worker (when `[native_pod]` enabled) | Reach the agentbox native pod tier |
 
 ---
 
