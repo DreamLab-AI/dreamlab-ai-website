@@ -64,3 +64,18 @@ EXPECTED_ORIGIN      = "https://dreamlab-ai.com"
 # under GET /api/username/resolve. Must mirror dreamlab.toml [nip05].
 NIP05_RESOLVER_MODE  = "federated"
 POD_BASE_URL         = "https://dreamlab-pod-api.solitary-paper-764d.workers.dev"
+
+# Native pod tier (agentbox solid-pod-rs via CF Tunnel). The kit auth-worker's
+# /api/native-pod/provision handler reads NATIVE_POD_URL and constructs
+# POST {NATIVE_POD_URL}/_admin/provision/{pubkey}; absent it returns 503
+# "native pod not configured" (Gap 3). Mirrors dreamlab.toml [native_pod].base_url
+# — the worker owns the /_admin/provision path segment, so this is the base URL
+# (= [native_pod].admin_provision_url minus the /_admin/provision suffix), not
+# the full admin_provision_url. Follows the POD_BASE_URL [vars] mirroring
+# convention above.
+#
+# NATIVE_POD_ADMIN_KEY is the matching PSK and stays an operator-provided CF
+# secret (= SOLID_ADMIN_KEY on the agentbox side) — never a [vars] value. It is
+# gated at deploy time in workers-deploy.yml and validated by forum-config's
+# deploy_config::REQUIRED_AUTH_SECRETS.
+NATIVE_POD_URL       = "https://pods-native.dreamlab-ai.com"

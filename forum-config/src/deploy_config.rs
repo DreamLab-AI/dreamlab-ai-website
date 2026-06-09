@@ -58,7 +58,15 @@ pub const REQUIRED_WRANGLER_MANIFESTS: &[&str] = &[
 /// - `PRF_SERVER_SECRET` — server-side salt mixed into the WebAuthn PRF →
 ///   HKDF derivation. Absent ⇒ the auth-worker 500s on register/login.
 /// - `ADMIN_PUBKEYS` — comma-separated admin hex pubkeys for governance auth.
-pub const REQUIRED_AUTH_SECRETS: &[&str] = &["PRF_SERVER_SECRET", "ADMIN_PUBKEYS"];
+///   Also the static admin bootstrap set (mirrors `dreamlab.toml [admin]
+///   static_pubkeys`); absent ⇒ a fresh deploy with empty D1 has zero admins.
+/// - `NATIVE_POD_ADMIN_KEY` — PSK (`X-Pod-Admin-Key`) the auth-worker sends to
+///   the native solid-pod-rs server when provisioning a native pod (must match
+///   the agentbox `SOLID_ADMIN_KEY`). Absent ⇒ `/api/native-pod/provision`
+///   503s "native pod not configured". The paired `NATIVE_POD_URL` is a
+///   `[vars]` value in `auth-worker.wrangler.toml`, not a secret.
+pub const REQUIRED_AUTH_SECRETS: &[&str] =
+    &["PRF_SERVER_SECRET", "ADMIN_PUBKEYS", "NATIVE_POD_ADMIN_KEY"];
 
 /// A single deploy-config defect, located precisely enough for an operator to fix.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -316,6 +324,7 @@ mod tests {
         let configured = vec![
             ("PRF_SERVER_SECRET", "a-real-secret-value"),
             ("ADMIN_PUBKEYS", "6407eed8...,deadbeef..."),
+            ("NATIVE_POD_ADMIN_KEY", "a-native-pod-psk"),
             ("RP_ID", "dreamlab-ai.com"),
         ];
         assert!(validate_required_secrets(configured).is_ok());
@@ -323,15 +332,20 @@ mod tests {
 
     #[test]
     fn required_secret_missing_fails_fast() {
+        // Only ADMIN_PUBKEYS supplied: PRF_SERVER_SECRET and
+        // NATIVE_POD_ADMIN_KEY are both reported missing.
         let configured = vec![("ADMIN_PUBKEYS", "6407eed8...")];
         let errors = validate_required_secrets(configured).unwrap_err();
-        assert_eq!(errors.len(), 1);
-        assert_eq!(
-            errors[0],
-            DeployConfigError::MissingSecret {
-                name: "PRF_SERVER_SECRET".to_string()
-            }
-        );
+        let missing: Vec<&str> = errors
+            .iter()
+            .filter_map(|e| match e {
+                DeployConfigError::MissingSecret { name } => Some(name.as_str()),
+                _ => None,
+            })
+            .collect();
+        assert!(missing.contains(&"PRF_SERVER_SECRET"));
+        assert!(missing.contains(&"NATIVE_POD_ADMIN_KEY"));
+        assert!(!missing.contains(&"ADMIN_PUBKEYS"));
     }
 
     #[test]
@@ -339,8 +353,10 @@ mod tests {
         let configured = vec![
             ("PRF_SERVER_SECRET", "REPLACE_WITH_SECRET"),
             ("ADMIN_PUBKEYS", "6407eed8..."),
+            ("NATIVE_POD_ADMIN_KEY", "a-native-pod-psk"),
         ];
         let errors = validate_required_secrets(configured).unwrap_err();
+        assert_eq!(errors.len(), 1);
         assert_eq!(
             errors[0],
             DeployConfigError::MissingSecret {
@@ -351,7 +367,11 @@ mod tests {
 
     #[test]
     fn empty_secret_value_counts_as_missing() {
-        let configured = vec![("PRF_SERVER_SECRET", "   "), ("ADMIN_PUBKEYS", "x")];
+        let configured = vec![
+            ("PRF_SERVER_SECRET", "   "),
+            ("ADMIN_PUBKEYS", "x"),
+            ("NATIVE_POD_ADMIN_KEY", "psk"),
+        ];
         let errors = validate_required_secrets(configured).unwrap_err();
         assert_eq!(errors.len(), 1);
         assert_eq!(
@@ -359,6 +379,21 @@ mod tests {
             DeployConfigError::MissingSecret {
                 name: "PRF_SERVER_SECRET".into()
             }
+        );
+    }
+
+    #[test]
+    fn native_pod_admin_key_is_required() {
+        let configured = vec![
+            ("PRF_SERVER_SECRET", "a-real-secret-value"),
+            ("ADMIN_PUBKEYS", "6407eed8..."),
+        ];
+        let errors = validate_required_secrets(configured).unwrap_err();
+        assert_eq!(
+            errors,
+            vec![DeployConfigError::MissingSecret {
+                name: "NATIVE_POD_ADMIN_KEY".to_string()
+            }]
         );
     }
 
