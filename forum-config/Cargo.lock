@@ -302,7 +302,7 @@ dependencies = [
 
 [[package]]
 name = "dreamlab-forum-config"
-version = "3.0.0-rc9"
+version = "3.0.0-rc11"
 dependencies = [
  "nostr-bbs-config",
  "nostr-bbs-core",
@@ -836,8 +836,8 @@ dependencies = [
 
 [[package]]
 name = "nostr-bbs-config"
-version = "3.0.0-rc9"
-source = "git+https://github.com/DreamLab-AI/nostr-rust-forum.git?rev=bcebe87#bcebe8727f9f89cbf3e22e889fb3cd5d2364434a"
+version = "3.0.0-rc11"
+source = "git+https://github.com/DreamLab-AI/nostr-rust-forum.git?rev=8d31f3a#8d31f3a7b5eb73a781072f7f1fba948070e1b56f"
 dependencies = [
  "schemars",
  "serde",
@@ -849,8 +849,8 @@ dependencies = [
 
 [[package]]
 name = "nostr-bbs-core"
-version = "3.0.0-rc9"
-source = "git+https://github.com/DreamLab-AI/nostr-rust-forum.git?rev=bcebe87#bcebe8727f9f89cbf3e22e889fb3cd5d2364434a"
+version = "3.0.0-rc11"
+source = "git+https://github.com/DreamLab-AI/nostr-rust-forum.git?rev=8d31f3a#8d31f3a7b5eb73a781072f7f1fba948070e1b56f"
 dependencies = [
  "aes",
  "async-trait",
@@ -877,8 +877,8 @@ dependencies = [
 
 [[package]]
 name = "nostr-bbs-mesh"
-version = "3.0.0-rc9"
-source = "git+https://github.com/DreamLab-AI/nostr-rust-forum.git?rev=bcebe87#bcebe8727f9f89cbf3e22e889fb3cd5d2364434a"
+version = "3.0.0-rc11"
+source = "git+https://github.com/DreamLab-AI/nostr-rust-forum.git?rev=8d31f3a#8d31f3a7b5eb73a781072f7f1fba948070e1b56f"
 dependencies = [
  "async-trait",
  "nostr-bbs-config",
@@ -890,8 +890,8 @@ dependencies = [
 
 [[package]]
 name = "nostr-bbs-rate-limit"
-version = "3.0.0-rc9"
-source = "git+https://github.com/DreamLab-AI/nostr-rust-forum.git?rev=bcebe87#bcebe8727f9f89cbf3e22e889fb3cd5d2364434a"
+version = "3.0.0-rc11"
+source = "git+https://github.com/DreamLab-AI/nostr-rust-forum.git?rev=8d31f3a#8d31f3a7b5eb73a781072f7f1fba948070e1b56f"
 dependencies = [
  "async-trait",
  "hex",
@@ -1368,8 +1368,8 @@ checksum = "67b1b7a3b5fe4f1376887184045fcf45c69e92af734b7aaddc05fb777b6fbd03"
 
 [[package]]
 name = "solid-pod-rs"
-version = "0.4.0-alpha.13"
-source = "git+https://github.com/DreamLab-AI/solid-pod-rs.git?rev=a146723#a146723bb488df6a7587ff96f8d9d6aab4a4f434"
+version = "0.4.0-alpha.14"
+source = "git+https://github.com/DreamLab-AI/solid-pod-rs.git?rev=4ac7670#4ac76709d23e2e94bd4547d2c61a51113b8e24c9"
 dependencies = [
  "async-trait",
  "base64",
