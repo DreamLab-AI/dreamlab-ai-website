@@ -21,7 +21,10 @@ function bytesToHex(bytes) {
 const FORUM_RELAY = 'wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev';
 const AGENTBOX_RELAY = 'ws://127.0.0.1:7777';
 
-const ADMIN_SK_HEX = '05db7bd41258001c7d8b420ebf5710d5d0e5b1eabdf94ba1c03fb1658af29c27';
+// SECURITY: throwaway test-only keypair, generated locally. MUST NEVER reuse a
+// live operator identity (e.g. operator-jjohare in dreamlab.toml). A prior
+// revision embedded the live admin private key here; do not reintroduce it.
+const ADMIN_SK_HEX = '7ce4076eb09286c50075e2663bddac3eaadec6c539db9c84f7ea682977101caa';
 const ADMIN_SK = hexToBytes(ADMIN_SK_HEX);
 const ADMIN_PK = getPublicKey(ADMIN_SK);
 

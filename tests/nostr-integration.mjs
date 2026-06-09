@@ -18,7 +18,12 @@ function bytesToHex(bytes) {
 }
 
 const RELAY_URL = 'wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev';
-const ADMIN_SK_HEX = '05db7bd41258001c7d8b420ebf5710d5d0e5b1eabdf94ba1c03fb1658af29c27';
+// SECURITY: This is a throwaway test-only keypair generated locally for fixtures.
+// It MUST NEVER reuse a live operator identity (e.g. operator-jjohare in
+// dreamlab.toml). A prior revision embedded the live admin private key here,
+// which derived to the production admin pubkey — never do that again. Regenerate
+// with: node -e "import('nostr-tools/pure').then(m=>console.log(Array.from(m.generateSecretKey()).map(b=>b.toString(16).padStart(2,'0')).join('')))"
+const ADMIN_SK_HEX = '7ce4076eb09286c50075e2663bddac3eaadec6c539db9c84f7ea682977101caa';
 const ADMIN_SK = hexToBytes(ADMIN_SK_HEX);
 const ADMIN_PK = getPublicKey(ADMIN_SK);
 

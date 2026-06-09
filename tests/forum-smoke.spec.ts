@@ -6,7 +6,11 @@ const AUTH_API = 'https://dreamlab-auth-api.solitary-paper-764d.workers.dev';
 const POD_API = 'https://dreamlab-pod-api.solitary-paper-764d.workers.dev';
 const SEARCH_API = 'https://dreamlab-search-api.solitary-paper-764d.workers.dev';
 const LINK_PREVIEW_API = 'https://dreamlab-link-preview.solitary-paper-764d.workers.dev';
-const ADMIN_NSEC = '05db7bd41258001c7d8b420ebf5710d5d0e5b1eabdf94ba1c03fb1658af29c27';
+// SECURITY: throwaway test-only secret key (hex), generated locally. MUST NEVER
+// reuse a live operator identity (e.g. operator-jjohare in dreamlab.toml). A
+// prior revision embedded the live admin private key here; do not reintroduce it.
+// (Named *_NSEC for historical reasons but holds a 64-char hex secret key.)
+const ADMIN_NSEC = '7ce4076eb09286c50075e2663bddac3eaadec6c539db9c84f7ea682977101caa';
 
 // ─── 1. Worker health checks ──────────────────────────────────────────
 test.describe('Worker health checks', () => {
