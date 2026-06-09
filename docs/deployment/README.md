@@ -216,6 +216,7 @@ Local Workers use `wrangler dev` which simulates D1, KV, R2, and Durable Objects
 
 | Secret | Workers | Value |
 |--------|---------|-------|
+| `PRF_SERVER_SECRET` | auth-worker | **Operator-generated** — `openssl rand -hex 32`. Server-side salt for WebAuthn PRF→HKDF. Unset ⇒ register/login 500. Deploy is blocked if absent (see [Cloudflare Workers › Operator-Provided Values](CLOUDFLARE_WORKERS.md#operator-provided-values)). |
 | `RP_ID` | auth-worker | `dreamlab-ai.com` |
 | `RP_NAME` | auth-worker | `DreamLab AI` |
 | `EXPECTED_ORIGIN` | auth-worker, pod-worker | `https://dreamlab-ai.com` |

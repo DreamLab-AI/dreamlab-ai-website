@@ -162,6 +162,36 @@ jobs:
             fi
           done
 
+      # Fail fast (deploy time, not request time) when an operator-provided
+      # server secret is missing on the auth-worker. The kit auth-worker derives
+      # the WebAuthn PRF salt from PRF_SERVER_SECRET; absent, register/login 500
+      # on the first request. R-09: surface this as a deploy blocker instead.
+      # Secrets are operator data — this only checks presence, never sets values.
+      - name: Validate required auth-worker secrets are set
+        if: matrix.config == 'auth-worker'
+        working-directory: kit/crates/${{ matrix.kit_crate }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          # `wrangler secret list` returns [{ "name": "...", "type": "secret_text" }, ...]
+          SET_SECRETS=$(wrangler secret list 2>/dev/null | jq -r '.[].name' || true)
+          MISSING=()
+          for required in PRF_SERVER_SECRET ADMIN_PUBKEYS; do
+            if ! grep -qxF "$required" <<<"$SET_SECRETS"; then
+              MISSING+=("$required")
+            fi
+          done
+          if [ "${#MISSING[@]}" -gt 0 ]; then
+            echo "::error::auth-worker is missing required secret(s): ${MISSING[*]}." \
+                 "Set them with 'wrangler secret put <NAME> --name dreamlab-auth-api'" \
+                 "(or run set-worker-secrets.yml) before deploying. These are" \
+                 "operator-provided values — the pipeline never generates them." >&2
+            exit 1
+          fi
+          echo "[secrets] all required auth-worker secrets present: PRF_SERVER_SECRET, ADMIN_PUBKEYS"
+
       - name: Wrangler deploy ${{ matrix.kit_crate }}
         working-directory: kit/crates/${{ matrix.kit_crate }}
         env:

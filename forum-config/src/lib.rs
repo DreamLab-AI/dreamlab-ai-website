@@ -31,5 +31,6 @@
 #![warn(missing_docs)]
 
 pub mod branding;
+pub mod deploy_config;
 pub mod phase1;
 pub mod workers;
