@@ -25,7 +25,7 @@
 ```mermaid
 flowchart TD
     subgraph "Source"
-        RUST_SRC[Rust Crates<br/>community-forum-rs/crates/]
+        RUST_SRC[Rust Crates<br/>kit/crates/nostr-bbs-*-worker/<br/>cloned from nostr-rust-forum]
     end
 
     subgraph "Rust Build Pipeline"
@@ -102,14 +102,19 @@ graph TB
 
 ## Rust Workers Build
 
-All 5 workers are Rust crates that compile to `wasm32-unknown-unknown` via `worker-build`:
+All 5 workers are Rust crates from the `nostr-rust-forum` kit. The deploy
+workflow clones the kit into `kit/` (pinned to the SHA in
+`forum-config/Cargo.lock`), copies the DreamLab `wrangler.toml` overrides from
+`forum-config/deploy/`, then compiles each crate to `wasm32-unknown-unknown`
+via `worker-build`:
 
 ```bash
-cd community-forum-rs/crates/auth-worker && worker-build --release
-cd community-forum-rs/crates/pod-worker && worker-build --release
-cd community-forum-rs/crates/preview-worker && worker-build --release
-cd community-forum-rs/crates/relay-worker && worker-build --release
-cd community-forum-rs/crates/search-worker && worker-build --release
+# Kit is cloned to ./kit by the deploy workflow (see .github/workflows/workers-deploy.yml)
+cd kit/crates/nostr-bbs-auth-worker && worker-build --release
+cd kit/crates/nostr-bbs-pod-worker && worker-build --release
+cd kit/crates/nostr-bbs-preview-worker && worker-build --release
+cd kit/crates/nostr-bbs-relay-worker && worker-build --release
+cd kit/crates/nostr-bbs-search-worker && worker-build --release
 ```
 
 Output lands in `build/worker/`. Wrangler deploys from the generated `shim.mjs`.
