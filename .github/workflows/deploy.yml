@@ -38,7 +38,11 @@ env:
   VITE_LINK_PREVIEW_API_URL: 'https://preview.dreamlab-ai.com'
   FORUM_BASE: '/community'
   KIT_REPO: 'https://github.com/DreamLab-AI/nostr-rust-forum.git'
-  KIT_REF: 'main'
+  # Pinned to the exact commit resolved in forum-config/Cargo.lock (nostr-bbs-* rc11).
+  # Do NOT float on `main`: a breaking upstream push would silently ship untested
+  # worker/WASM code while the lockfile stays at this tested revision. Keep this SHA
+  # in sync with the `rev = "..."` in forum-config/Cargo.lock when bumping the kit.
+  KIT_REF: '8d31f3a7b5eb73a781072f7f1fba948070e1b56f'
 
 jobs:
   gate:
@@ -61,8 +65,10 @@ jobs:
       - name: Check out the code
         uses: actions/checkout@v4
 
-      - name: Clone kit (nostr-rust-forum)
-        run: git clone --depth 1 --branch ${{ env.KIT_REF }} ${{ env.KIT_REPO }} kit
+      - name: Clone kit (nostr-rust-forum) at pinned SHA
+        run: |
+          git clone --filter=blob:none --no-checkout ${{ env.KIT_REPO }} kit
+          git -C kit checkout --detach ${{ env.KIT_REF }}
 
       # ── React main site ────────────────────────────────────────────────
       - name: Set up Node.js
