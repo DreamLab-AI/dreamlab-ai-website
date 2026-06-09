@@ -31,11 +31,19 @@ env:
   RUST_TOOLCHAIN: '1.90.0'
   TRUNK_VERSION: '0.21.12'
   TRUNK_SHA256: 'e5261930aab979dc5d0388fdc71bc32bedf0a15211ef8c8703fa2b7a2016394b'
-  VITE_RELAY_URL: 'wss://relay.dreamlab-ai.com'
-  VITE_AUTH_API_URL: 'https://api.dreamlab-ai.com'
-  VITE_POD_API_URL: 'https://pods.dreamlab-ai.com'
-  VITE_SEARCH_API_URL: 'https://search.dreamlab-ai.com'
-  VITE_LINK_PREVIEW_API_URL: 'https://preview.dreamlab-ai.com'
+  # API bases point at the deployed workers.dev hosts. The branded custom
+  # domains (relay./api./pods./search./preview.dreamlab-ai.com) are the
+  # documented end-state but are NOT provisioned in DNS (verified 2026-06-09:
+  # ERR_NAME_NOT_RESOLVED; the apex is on GitHub Pages). Shipping them baked
+  # into window.__ENV__ severed every client API call. All five workers are
+  # live on workers.dev and already send Access-Control-Allow-Origin for
+  # https://dreamlab-ai.com. When the operator provisions the custom domains,
+  # flip these back in one commit.
+  VITE_RELAY_URL: 'wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev'
+  VITE_AUTH_API_URL: 'https://dreamlab-auth-api.solitary-paper-764d.workers.dev'
+  VITE_POD_API_URL: 'https://dreamlab-pod-api.solitary-paper-764d.workers.dev'
+  VITE_SEARCH_API_URL: 'https://dreamlab-search-api.solitary-paper-764d.workers.dev'
+  VITE_LINK_PREVIEW_API_URL: 'https://dreamlab-link-preview.solitary-paper-764d.workers.dev'
   FORUM_BASE: '/community'
   KIT_REPO: 'https://github.com/DreamLab-AI/nostr-rust-forum.git'
   # Pinned to the exact commit resolved in forum-config/Cargo.lock (nostr-bbs-* rc11).

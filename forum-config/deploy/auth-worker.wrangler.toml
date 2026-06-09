@@ -63,4 +63,4 @@ EXPECTED_ORIGIN      = "https://dreamlab-ai.com"
 # auth-worker reads these to drive the resolve(env, name) D1→pod-HTTP fallback
 # under GET /api/username/resolve. Must mirror dreamlab.toml [nip05].
 NIP05_RESOLVER_MODE  = "federated"
-POD_BASE_URL         = "https://pods.dreamlab-ai.com"
+POD_BASE_URL         = "https://dreamlab-pod-api.solitary-paper-764d.workers.dev"
