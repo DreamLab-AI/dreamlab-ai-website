@@ -62,11 +62,11 @@ a private space for trainers, builders, and the curious.\
 # agent (+ admin via [admin].static_pubkeys). visibility: public|locked|hidden.
 [[zones]]
 id                = "public"
-display_name      = "MiniMooNoir"
+display_name      = "Landing"
 required_cohorts  = []
 write_cohorts     = ["friends", "agent"]
 visibility        = "public"
-banner_image_url  = "/images/heroes/minimoonoir-hero.webp"
+banner_image_url  = "/images/heroes/lake-district-dawn.webp"
 encrypted         = false
 
 [[zones]]
