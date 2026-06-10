@@ -89,9 +89,6 @@ export const Header = () => {
                 <DropdownMenuItem asChild>
                   <a href="/community/" className="w-full">Forum</a>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <a href="/community/#/governance" className="w-full">Governance</a>
-                </DropdownMenuItem>
               </DropdownMenuSubContent>
             </DropdownMenuSub>
             <DropdownMenuSeparator />
