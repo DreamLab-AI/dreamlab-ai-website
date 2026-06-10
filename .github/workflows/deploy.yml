@@ -53,7 +53,7 @@ env:
   # Do NOT float on `main`: a breaking upstream push would silently ship untested
   # worker/WASM code while the lockfile stays at this tested revision. Keep this SHA
   # in sync with the `rev = "..."` in forum-config/Cargo.lock when bumping the kit.
-  KIT_REF: 'ae774d448c53c14fe366c4272dacdb9fddf8acc7'
+  KIT_REF: 'e5e7d8518da22969841f7634bd8715c79c6c8409'
 
 jobs:
   gate:
@@ -152,6 +152,14 @@ jobs:
         run: trunk build --release --public-url /community/
         env:
           NATIVE_POD_URL: ${{ secrets.NATIVE_POD_URL }}
+          # Bakes the real RP domain into NIP-05 handles (was hardcoded
+          # "example.test"). Used by signup.rs, onboarding_modal.rs, profile_cache.rs.
+          NOSTR_BBS_NIP05_DOMAIN: 'dreamlab-ai.com'
+          # signup.rs reads these via option_env! at build time (its fallbacks
+          # were pod.example.com / auth.example.com). Relay/search are runtime
+          # via window.__ENV__, so they are not needed here.
+          VITE_AUTH_API_URL: ${{ env.VITE_AUTH_API_URL }}
+          VITE_POD_API_URL: ${{ env.VITE_POD_API_URL }}
 
       - name: Report forum WASM bundle size
         run: |
