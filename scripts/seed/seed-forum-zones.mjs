@@ -74,7 +74,7 @@ for (const u of Object.values(users)) await adminPost('/api/whitelist/add', { pu
 
 // 2. channels (kind 40) — one per zone, signed by admin
 const zones = ['public', 'friends', 'family', 'business'];
-const chanNames = { public: 'MiniMooNoir Lounge', friends: 'Friends Hangout', family: 'Family Room', business: 'DreamLab Training' };
+const chanNames = { public: 'Public', friends: 'Friends', family: 'Family', business: 'Business' };
 const channels = {};
 const chanEvents = zones.map((z) => {
   const ev = finalizeEvent({ kind: 40, created_at: now(), tags: [['section', z]], content: JSON.stringify({ name: chanNames[z], about: `${z} zone channel`, picture: '' }) }, adminSk);
