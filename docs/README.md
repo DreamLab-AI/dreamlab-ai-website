@@ -1,6 +1,6 @@
 # DreamLab AI -- Documentation Hub
 
-**Last updated:** 2026-05-12 | **Repository:** [DreamLab-AI/dreamlab-ai-website](https://github.com/DreamLab-AI/dreamlab-ai-website) | **Project README:** [../README.md](../README.md)
+**Last updated:** 2026-06-10 | **Repository:** [DreamLab-AI/dreamlab-ai-website](https://github.com/DreamLab-AI/dreamlab-ai-website) | **Project README:** [../README.md](../README.md)
 
 This documentation covers the full DreamLab AI platform: a React marketing site, a Rust/Leptos WASM community forum (including the Agent Control Surface governance dashboard), and five Cloudflare Workers providing authentication, storage, relay, search, and link preview services.
 
@@ -75,10 +75,20 @@ graph TB
 
 ### Planning and Governance
 
+All product requirement documents live in [`prd/`](prd/); sprint plans, snag lists, and audits live in [`sprint/`](sprint/).
+
 | Document | Status | Description |
 |----------|--------|-------------|
-| [PRD: Rust Port v2.0.0](prd-rust-port.md) | Accepted | Architecture baseline for the Rust port. Scope, crate survey, timeline, risk register. |
-| [PRD: Rust Port v2.1.0](prd-rust-port-v2.1.md) | In Progress | Refined delivery plan with tranche-based execution, governance gates, and rollback design. |
+| [PRD: Rust Port v2.0.0](prd/prd-rust-port.md) | Accepted | Architecture baseline for the Rust port. Scope, crate survey, timeline, risk register. |
+| [PRD: Rust Port v2.1.0](prd/prd-rust-port-v2.1.md) | Delivered | Refined delivery plan with tranche-based execution, governance gates, and rollback design. |
+| [PRD: Rust Port v3.0](prd/prd-rust-port-v3.0.md) | Delivered | Tranche 2+ delivery plan. |
+| [PRD: Rust Port v4.0](prd/prd-rust-port-v4.0.md) | Delivered | Completion plan for the Rust port. |
+| [PRD: Forum Hardening v5.0](prd/prd-forum-hardening-v5.0.md) | Delivered | Relay and client hardening wave. |
+| [PRD: UX Onboarding v5.0](prd/prd-ux-onboarding-v5.0.md) | Delivered | Smart auth UX and progressive disclosure login. |
+| [PRD: Hardening + Solid v6.0](prd/prd-hardening-solid-v6.0.md) | Delivered | Solid pod infrastructure upgrade. |
+| [PRD: Forum Professionalisation v7.0](prd/prd-forum-professionalisation-v7.0.md) | Delivered | Trust, moderation, badges, settings, audit trail. |
+| [PRD: Nostr/Solid Identity Refactor v8.0](prd/prd-nostr-solid-identity-refactor-v8.0.md) | Delivered | Canonical identity stack (did:nostr, WebID, NIP-05). |
+| [Sprint plans & audits](sprint/) | Archive | Obelisk-polish sprint, Discourse parity audit, security/UX/user-journey audits, snag lists. |
 | [Forum Config: Governance](../forum-config/README.md#governance-configuration) | Active | Agent Control Surface config -- feature flag, event kinds 31400-31405, agent pubkey allowlist. |
 
 ### Architecture Decision Records
@@ -441,4 +451,4 @@ graph LR
 
 **Project README:** [../README.md](../README.md) | **ADR Index:** [adr/README.md](adr/README.md) | **DDD Hub:** [ddd/README.md](ddd/README.md)
 
-*Last updated: 2026-05-12*
+*Last updated: 2026-06-10*

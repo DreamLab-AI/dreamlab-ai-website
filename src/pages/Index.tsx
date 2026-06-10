@@ -331,7 +331,7 @@ const Index = () => {
                   <div>
                     <h3 className="font-semibold text-base mb-1">Cryptographic identity at protocol layer</h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">
-                      Every actor—human, agent, server—is identified by secp256k1 <code className="text-xs px-1 py-0.5 rounded bg-background/70 border border-cyan-500/20">did:nostr</code>. Identity is verified at the relay, at every HTTP request, and embedded in every provenance bead. No shared session store. The cryptographic primitive is the coordination primitive.
+                      Every actor is identified by secp256k1 <code className="text-xs px-1 py-0.5 rounded bg-background/70 border border-cyan-500/20">did:nostr</code>. Verified at relay, HTTP layer, and embedded in provenance. No shared session store.
                     </p>
                   </div>
                 </li>
@@ -341,9 +341,9 @@ const Index = () => {
                     <Brain className="w-5 h-5 text-purple-400" aria-hidden="true" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-base mb-1">Formal reasoning mesh with GPU physics</h3>
+                    <h3 className="font-semibold text-base mb-1">Formal reasoning with GPU physics</h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">
-                      VisionClaw runs OWL 2 EL ontology reasoning across 92 CUDA kernels, not probabilistic LLM inference. Semantic relationships create forces in a GPU-accelerated graph: <code className="text-xs px-1 py-0.5 rounded bg-background/70 border border-cyan-500/20">subClassOf</code> attracts, <code className="text-xs px-1 py-0.5 rounded bg-background/70 border border-cyan-500/20">disjointWith</code> repels. Humans see patterns; agents traverse them algorithmically.
+                      OWL 2 EL reasoning across 92 CUDA kernels. <code className="text-xs px-1 py-0.5 rounded bg-background/70 border border-cyan-500/20">subClassOf</code> creates attraction, <code className="text-xs px-1 py-0.5 rounded bg-background/70 border border-cyan-500/20">disjointWith</code> creates repulsion in the semantic graph.
                     </p>
                   </div>
                 </li>
@@ -355,7 +355,7 @@ const Index = () => {
                   <div>
                     <h3 className="font-semibold text-base mb-1">Sovereign agent autonomy</h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">
-                      Agentbox agents get secp256k1 keypairs at bootstrap, embedding a cryptographic identity root into every action, memory, and event. 90+ skills, 180+ tools, built on Nix for byte-for-byte reproducibility. When agents leave the mesh, they take their data—cryptographically owned in Solid pods—with them.
+                      Agents bootstrap with secp256k1 keypairs. 90+ skills, 180+ tools, reproducible Nix runtime. Data owned in Solid pods—agents take it with them when they leave.
                     </p>
                   </div>
                 </li>
@@ -367,80 +367,71 @@ const Index = () => {
                   <div>
                     <h3 className="font-semibold text-base mb-1">Human-in-the-loop governance</h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">
-                      The Judgment Broker surfaces agent decisions for human approval via the governance dashboard. Every decision is an immutable Nostr event with <code className="text-xs px-1 py-0.5 rounded bg-background/70 border border-cyan-500/20">prior_decision_id</code> chain. Auditors traverse provenance beads from any point back to first principles. Governance is an accelerant, not a bottleneck.
+                      Judgment Broker surfaces agent decisions for human approval. Each decision is an immutable Nostr event with <code className="text-xs px-1 py-0.5 rounded bg-background/70 border border-cyan-500/20">prior_decision_id</code> chain back to first principles.
                     </p>
                   </div>
                 </li>
               </ul>
             </div>
 
-            {/* Five substrates diagram — inline SVG */}
+            {/* Five substrates diagram */}
             <div className="lg:sticky lg:top-24">
               <div className="bg-background/60 backdrop-blur border border-cyan-500/20 rounded-2xl p-6 md:p-8 shadow-xl shadow-cyan-500/5">
-                <h3 className="text-sm font-semibold text-cyan-300 mb-6 text-center uppercase tracking-wider">
+                <h3 className="text-sm font-semibold text-cyan-300 mb-8 text-center uppercase tracking-wider">
                   Five substrates, one identity
                 </h3>
                 <svg
-                  viewBox="0 0 360 280"
+                  viewBox="0 0 400 420"
                   className="w-full h-auto"
                   role="img"
-                  aria-labelledby="substrates-diagram-title substrates-diagram-desc"
+                  aria-labelledby="substrates-diagram-title"
                 >
-                  <title id="substrates-diagram-title">VisionFlow five-substrate architecture</title>
-                  <desc id="substrates-diagram-desc">
-                    Five independent systems (VisionClaw, Agentbox, solid-pod-rs, nostr-rust-forum, DreamLab Edge) mesh together through a shared DID:Nostr cryptographic identity spine and Nostr relay mesh.
-                  </desc>
-                  <g fontFamily="ui-sans-serif, system-ui, sans-serif" fontSize="10">
-                    {/* Center identity spine */}
-                    <circle cx="180" cy="140" r="35" fill="rgba(233,69,96,0.15)" stroke="rgb(233,69,96)" strokeWidth="2" />
-                    <text x="180" y="140" textAnchor="middle" dominantBaseline="middle" fill="rgb(244,63,94)" fontWeight="bold" fontSize="11">DID:Nostr</text>
-                    <text x="180" y="155" textAnchor="middle" dominantBaseline="middle" fill="rgb(244,63,94)" fontSize="8">secp256k1</text>
+                  <title id="substrates-diagram-title">VisionFlow five-substrate architecture with DID:Nostr identity spine</title>
 
-                    {/* VisionClaw */}
-                    <rect x="20" y="20" width="90" height="60" rx="8" fill="rgba(0,212,255,0.10)" stroke="rgb(0,212,255)" strokeWidth="1.5" />
-                    <text x="65" y="40" textAnchor="middle" fill="rgb(34,211,238)" fontWeight="600">VisionClaw</text>
-                    <text x="65" y="54" textAnchor="middle" fill="rgb(34,211,238,0.8)" fontSize="8">OWL 2 EL</text>
-                    <text x="65" y="64" textAnchor="middle" fill="rgb(34,211,238,0.8)" fontSize="8">GPU Physics</text>
+                  {/* Center circle: DID:Nostr */}
+                  <circle cx="200" cy="200" r="50" fill="rgba(233,69,96,0.2)" stroke="rgb(233,69,96)" strokeWidth="2.5" />
+                  <text x="200" y="195" textAnchor="middle" fill="rgb(244,63,94)" fontWeight="bold" fontSize="14" fontFamily="system-ui, sans-serif">DID:Nostr</text>
+                  <text x="200" y="213" textAnchor="middle" fill="rgb(244,63,94)" fontSize="11" fontFamily="system-ui, sans-serif">secp256k1</text>
 
-                    {/* Agentbox */}
-                    <rect x="250" y="20" width="90" height="60" rx="8" fill="rgba(139,92,246,0.10)" stroke="rgb(139,92,246)" strokeWidth="1.5" />
-                    <text x="295" y="40" textAnchor="middle" fill="rgb(196,181,253)" fontWeight="600">Agentbox</text>
-                    <text x="295" y="54" textAnchor="middle" fill="rgb(196,181,253,0.8)" fontSize="8">90+ Skills</text>
-                    <text x="295" y="64" textAnchor="middle" fill="rgb(196,181,253,0.8)" fontSize="8">180+ Tools</text>
+                  {/* Connection lines (dashed red) */}
+                  <line x1="200" y1="150" x2="200" y2="70" stroke="rgb(233,69,96)" strokeWidth="2" strokeDasharray="5 3" />
+                  <line x1="265" y1="165" x2="320" y2="110" stroke="rgb(233,69,96)" strokeWidth="2" strokeDasharray="5 3" />
+                  <line x1="265" y1="235" x2="320" y2="290" stroke="rgb(233,69,96)" strokeWidth="2" strokeDasharray="5 3" />
+                  <line x1="135" y1="235" x2="80" y2="290" stroke="rgb(233,69,96)" strokeWidth="2" strokeDasharray="5 3" />
+                  <line x1="135" y1="165" x2="80" y2="110" stroke="rgb(233,69,96)" strokeWidth="2" strokeDasharray="5 3" />
 
-                    {/* solid-pod-rs */}
-                    <rect x="135" y="100" width="90" height="60" rx="8" fill="rgba(16,185,129,0.10)" stroke="rgb(16,185,129)" strokeWidth="1.5" />
-                    <text x="180" y="120" textAnchor="middle" fill="rgb(52,211,153)" fontWeight="600">solid-pod-rs</text>
-                    <text x="180" y="134" textAnchor="middle" fill="rgb(52,211,153,0.8)" fontSize="8">WAC ACLs</text>
-                    <text x="180" y="144" textAnchor="middle" fill="rgb(52,211,153,0.8)" fontSize="8">Solid Protocol</text>
+                  {/* VisionClaw (top) */}
+                  <rect x="130" y="20" width="140" height="70" rx="12" fill="rgba(0,212,255,0.12)" stroke="rgb(0,212,255)" strokeWidth="2" />
+                  <text x="200" y="45" textAnchor="middle" fill="rgb(34,211,238)" fontWeight="700" fontSize="13" fontFamily="system-ui, sans-serif">VisionClaw</text>
+                  <text x="200" y="62" textAnchor="middle" fill="rgb(34,211,238)" fontSize="11" fontFamily="system-ui, sans-serif">OWL 2 EL + GPU Physics</text>
 
-                    {/* nostr-rust-forum */}
-                    <rect x="20" y="200" width="100" height="60" rx="8" fill="rgba(168,85,247,0.10)" stroke="rgb(168,85,247)" strokeWidth="1.5" />
-                    <text x="70" y="220" textAnchor="middle" fill="rgb(216,180,254)" fontWeight="600">nostr-rust-forum</text>
-                    <text x="70" y="234" textAnchor="middle" fill="rgb(216,180,254,0.8)" fontSize="8">Governance</text>
-                    <text x="70" y="244" textAnchor="middle" fill="rgb(216,180,254,0.8)" fontSize="8">Dashboard</text>
+                  {/* Agentbox (top-right) */}
+                  <rect x="295" y="60" width="100" height="70" rx="12" fill="rgba(139,92,246,0.12)" stroke="rgb(139,92,246)" strokeWidth="2" />
+                  <text x="345" y="85" textAnchor="middle" fill="rgb(196,181,253)" fontWeight="700" fontSize="13" fontFamily="system-ui, sans-serif">Agentbox</text>
+                  <text x="345" y="102" textAnchor="middle" fill="rgb(196,181,253)" fontSize="11" fontFamily="system-ui, sans-serif">90+ Skills</text>
 
-                    {/* DreamLab Edge */}
-                    <rect x="240" y="200" width="100" height="60" rx="8" fill="rgba(245,158,11,0.10)" stroke="rgb(245,158,11)" strokeWidth="1.5" />
-                    <text x="290" y="220" textAnchor="middle" fill="rgb(253,224,71)" fontWeight="600">DreamLab Edge</text>
-                    <text x="290" y="234" textAnchor="middle" fill="rgb(253,224,71,0.8)" fontSize="8">React SPA</text>
-                    <text x="290" y="244" textAnchor="middle" fill="rgb(253,224,71,0.8)" fontSize="8">CF Workers</text>
+                  {/* DreamLab Edge (bottom-right) */}
+                  <rect x="295" y="330" width="100" height="70" rx="12" fill="rgba(245,158,11,0.12)" stroke="rgb(245,158,11)" strokeWidth="2" />
+                  <text x="345" y="355" textAnchor="middle" fill="rgb(253,224,71)" fontWeight="700" fontSize="13" fontFamily="system-ui, sans-serif">DreamLab Edge</text>
+                  <text x="345" y="372" textAnchor="middle" fill="rgb(253,224,71)" fontSize="11" fontFamily="system-ui, sans-serif">React + Workers</text>
 
-                    {/* Connections to center */}
-                    <line x1="110" y1="50" x2="147" y2="117" stroke="rgb(233,69,96)" strokeWidth="1.5" strokeDasharray="3 2" />
-                    <line x1="250" y1="50" x2="213" y2="117" stroke="rgb(233,69,96)" strokeWidth="1.5" strokeDasharray="3 2" />
-                    <line x1="180" y1="100" x2="180" y2="168" stroke="rgb(233,69,96)" strokeWidth="1.5" strokeDasharray="3 2" />
-                    <line x1="100" y1="240" x2="147" y2="170" stroke="rgb(233,69,96)" strokeWidth="1.5" strokeDasharray="3 2" />
-                    <line x1="260" y1="240" x2="213" y2="170" stroke="rgb(233,69,96)" strokeWidth="1.5" strokeDasharray="3 2" />
+                  {/* nostr-rust-forum (bottom-left) */}
+                  <rect x="5" y="330" width="100" height="70" rx="12" fill="rgba(168,85,247,0.12)" stroke="rgb(168,85,247)" strokeWidth="2" />
+                  <text x="55" y="355" textAnchor="middle" fill="rgb(216,180,254)" fontWeight="700" fontSize="13" fontFamily="system-ui, sans-serif">nostr-rust-forum</text>
+                  <text x="55" y="372" textAnchor="middle" fill="rgb(216,180,254)" fontSize="11" fontFamily="system-ui, sans-serif">Governance</text>
 
-                    {/* Relay label */}
-                    <text x="180" y="275" textAnchor="middle" fill="rgb(156,163,175)" fontSize="9" fontStyle="italic">
-                      Nostr relay mesh (NIP-01/42/98)
-                    </text>
-                  </g>
+                  {/* solid-pod-rs (top-left) */}
+                  <rect x="5" y="60" width="100" height="70" rx="12" fill="rgba(16,185,129,0.12)" stroke="rgb(16,185,129)" strokeWidth="2" />
+                  <text x="55" y="85" textAnchor="middle" fill="rgb(52,211,153)" fontWeight="700" fontSize="13" fontFamily="system-ui, sans-serif">solid-pod-rs</text>
+                  <text x="55" y="102" textAnchor="middle" fill="rgb(52,211,153)" fontSize="11" fontFamily="system-ui, sans-serif">WAC + Solid</text>
+
+                  {/* Bottom label */}
+                  <text x="200" y="410" textAnchor="middle" fill="rgb(156,163,175)" fontSize="11" fontStyle="italic" fontFamily="system-ui, sans-serif">
+                    Nostr relay mesh (NIP-01/42/98)
+                  </text>
                 </svg>
-                <p className="text-xs text-muted-foreground mt-4 text-center leading-relaxed">
-                  Identity flows through all five. Coordination happens via Nostr relay mesh. No single point of control.
+                <p className="text-xs text-muted-foreground mt-4 text-center">
+                  Identity flows through all five. Coordination via Nostr relay mesh.
                 </p>
               </div>
             </div>

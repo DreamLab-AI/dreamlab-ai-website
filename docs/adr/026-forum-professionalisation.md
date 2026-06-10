@@ -6,7 +6,7 @@
 
 ## Context
 
-A source-level audit comparing DreamLab's community forum against Discourse identified critical maturity gaps (see `docs/audit-discourse-vs-dreamlab-forum.md`). DreamLab's forum has strong architectural foundations -- passkey-first auth, Nostr protocol portability, Cloudflare edge deployment, Solid pod data sovereignty -- but weak product foundations. Specifically:
+A source-level audit comparing DreamLab's community forum against Discourse identified critical maturity gaps (see `docs/sprint/audit-discourse-vs-dreamlab-forum.md`). DreamLab's forum has strong architectural foundations -- passkey-first auth, Nostr protocol portability, Cloudflare edge deployment, Solid pod data sovereignty -- but weak product foundations. Specifically:
 
 - **Trust is binary**: users are whitelisted or not. No graduated privileges, no automatic promotion, no demotion for inactivity. The 3-flag zone model (`home`, `dreamlab`, `minimoonoir`) gates access areas but does not gate actions within them.
 - **Moderation is admin-only deletion**: no user-facing report flow, no moderation queue, no priority scoring, no auto-hide on multiple reports. Admin must manually discover problematic content.

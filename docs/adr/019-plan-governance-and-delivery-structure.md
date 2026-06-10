@@ -136,7 +136,7 @@ purity.
 
 ## References
 
-- [PRD v2.0.0](../prd-rust-port.md)
-- [PRD v2.1.0 (proposed)](../prd-rust-port-v2.1.md)
+- [PRD v2.0.0](../prd/prd-rust-port.md)
+- [PRD v2.1.0 (proposed)](../prd/prd-rust-port-v2.1.md)
 - [ADR-014: Hybrid Validation Phase Before Full Rewrite](./014-hybrid-validation-phase.md)
 - [DDD Overview](../ddd/README.md)

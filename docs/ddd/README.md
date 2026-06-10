@@ -120,5 +120,5 @@ graph LR
 
 - [Documentation Index](../README.md)
 - [ADR Index](../adr/README.md)
-- [PRD: Rust Port v2.0.0](../prd-rust-port.md)
+- [PRD: Rust Port v2.0.0](../prd/prd-rust-port.md)
 - [Getting Started](../developer/GETTING_STARTED.md)

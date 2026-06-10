@@ -112,6 +112,6 @@ active REQ messages. Do not clear subscriptions on disconnect.
 
 - [NIP-01: Basic protocol](https://github.com/nostr-protocol/nips/blob/master/01.md) — OK message format
 - [NIP-42: Authentication](https://github.com/nostr-protocol/nips/blob/master/42.md) — AUTH flow
-- `docs/forum-snag-list.md` — 18 QA findings
+- `docs/sprint/forum-snag-list.md` — 18 QA findings
 - `docs/gpt5-forum-review-response.md` — GPT-5.4 root cause analysis
-- `docs/prd-forum-hardening-v5.0.md` — Sprint plan
+- `docs/prd/prd-forum-hardening-v5.0.md` — Sprint plan

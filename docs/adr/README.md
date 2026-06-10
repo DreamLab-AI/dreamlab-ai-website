@@ -90,7 +90,7 @@ stateDiagram-v2
 ## Related Documents
 
 - [Documentation Index](../README.md)
-- [PRD: Rust Port v2.0.0](../prd-rust-port.md)
-- [PRD: Rust Port v2.1.0](../prd-rust-port-v2.1.md)
+- [PRD: Rust Port v2.0.0](../prd/prd-rust-port.md)
+- [PRD: Rust Port v2.1.0](../prd/prd-rust-port-v2.1.md)
 - [DDD Overview](../ddd/README.md)
 - [Deployment Overview](../deployment/README.md)

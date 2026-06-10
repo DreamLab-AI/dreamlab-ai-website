@@ -1,348 +1,214 @@
 # Claude Code Configuration - DreamLab AI Website
 
-## Native Pod Sprint (2026-05-17)
-
-Encrypted agentbox↔forum link via Cloudflare Tunnel. `docker-compose.solid-pods.yml`
-runs `solid-pod-rs-server --features git` + `cloudflared` in the agentbox. Users in
-`[native_pod].allowlist_cohorts` see a second pod card in the pod browser pointing at
-`pods-native.dreamlab-ai.com`. Admin panel "Native Pods" tab provisions pods via
-`POST /api/native-pod/provision` → auth-worker → native `/_admin/provision/{pk}` (PSK).
-CORS allowlist (`SOLID_ALLOWED_ORIGINS`) + admin key (`SOLID_ADMIN_KEY`) configurable
-via env. forum-config pinned to NRF rc11 (`8d31f3a`) / solid-pod-rs alpha.15 (`0c5fa42`).
-project/agentbox submodule synced to ff19b01f via HTTPS remote.
-
-## Git Control Panel Sprint (2026-05-17)
-
-Full git Version Control surface for Solid pods shipped. `components/git_panel.rs`
-in the forum client provides a VS Code–style Source Control panel: staged/unstaged/
-untracked sections, inline diff viewer, commit form, branch management. `AppManifestPanel`
-implements JSS #464 — pods as first-class app repositories, with `/.well-known/apps`
-server-side aggregation. Pod browser auto-probes on mount; CF Workers settle gracefully
-to "Git API not available" (ADR-089). forum-config pinned to NRF rc10 (`23c0c5b`) /
-solid-pod-rs alpha.14 (`4ac7670`).
-
-## Governance Sprint (2026-05-12)
-
-Agent Control Surface feature shipped. The forum now exposes a `/governance`
-route with a reactive agent panel dashboard. Custom Nostr event kinds
-31400-31405 carry governance control surface events. NIP-98 gated API
-endpoints handle approve/reject action response signing. The feature is
-toggled via `governance = true` in `forum-config/dreamlab.toml` with a full
-`[governance]` config section (route, kinds range, relay URL, agent pubkey
-allowlist). Header.tsx gained a Governance submenu under Community; Index.tsx
-gained an "Agent Control Surface" outcome card.
-
-## Security Audit Sprint (2026-05-11)
-
-A DreamLab ecosystem-wide security audit applied 10 fixes to
-dreamlab-ai-website. See CHANGELOG.md `[Security Audit Sprint] -
-2026-05-11` for the full manifest. Key areas hardened: GDPR consent model
-(P0-15), Supabase null safety (P0-16), production URL fallback removal
-(P0-17), GDPR erasure pipeline (P1-29), strictNullChecks enforcement
-(P1-30), payment confirmation dialogs (P1-31), Mermaid XSS hardening
-(P2-11), and dead code/dependency cleanup (P3-06, P3-07).
-
 ## Project Overview
 
-DreamLab AI is a premium AI training and consulting platform. This is a React SPA (Vite + TypeScript + Tailwind CSS) with a Leptos community forum (Rust/WASM), 3D WebGL visualizations (Three.js + Rust WASM), Supabase backend, Cloudflare Workers (Rust) backend services, and Nostr-based decentralized social features.
+DreamLab AI is a premium AI training and consulting platform. This repo is the
+**branded deployment** of the DreamLab stack: a React marketing SPA at `/`, a
+Rust/Leptos WASM community forum at `/community/`, and five Rust Cloudflare
+Workers. The forum source code lives **upstream** in the
+[nostr-rust-forum](https://github.com/DreamLab-AI/nostr-rust-forum) kit — this
+repo only carries the operator overlay (`forum-config/`) that pins the kit and
+supplies DreamLab branding, zones, and Cloudflare resource IDs.
 
 - **Domain:** dreamlab-ai.com
-- **Hosting:** GitHub Pages (static site) + Cloudflare Workers (backend services)
+- **Hosting:** GitHub Pages (static dual-SPA) + Cloudflare Workers (backend)
 - **Repository:** https://github.com/DreamLab-AI/dreamlab-ai-website
+- **Ecosystem:** part of [VisionFlow](https://github.com/DreamLab-AI/VisionFlow)
+  (VisionClaw, agentbox, solid-pod-rs, nostr-rust-forum)
 
 ## Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
-| Framework | React 18.3 + TypeScript 5.5 |
+| Framework | React 18.3 + TypeScript 5.9 |
 | Build | Vite 5.4 (SWC plugin) |
 | Styling | Tailwind CSS 3.4 + shadcn/ui (Radix UI) |
 | Routing | React Router DOM 6.26 (lazy-loaded routes) |
-| State/Data | TanStack React Query 5.56 |
-| Forms | React Hook Form 7.53 + Zod 3.23 |
-| 3D | Three.js 0.156 + @react-three/fiber + @react-three/drei |
-| WASM | Rust (Voronoi tessellation in `wasm-voronoi/`) |
-| Database | Supabase (PostgreSQL + Auth + Realtime) |
-| Protocol | Nostr (nostr-core crate) for community forum |
-| Charts | Recharts 2.12, Mermaid 11.6 |
-| Sanitization | DOMPurify 3.3 |
-| Forum | Leptos 0.7 CSR (Rust/WASM in `community-forum-rs/crates/forum-client/`) |
-| Workers | Rust (workers-rs) — 5 Cloudflare Workers in `community-forum-rs/crates/` |
-| Forum Build | Trunk (WASM target) |
-| Admin CLI | `community-forum-rs/crates/admin-cli/` — `forum-admin` Rust binary, NIP-98 authed, AI-agent friendly |
-| Moderation | Nostr event kinds 30910-30916 (Ban, Mute, Warning, Report, ModerationAction, Unban, Unmute) + 1984 (NIP-56 Report) + D1 projections |
-| WoT/Invites | Referente kind-3 whitelist, tenure-based invite credits, welcome bot |
+| State/Data | TanStack React Query 5 |
+| Forms | React Hook Form 7 + Zod 3 |
+| Hero scenes | Canvas-based Voronoi/golden-ratio rendering (no Three.js) |
+| Database | Supabase (PostgreSQL + Auth) |
+| Sanitization | DOMPurify + react-markdown/remark-gfm |
+| Forum | Upstream nostr-rust-forum kit (Leptos 0.7 CSR, WASM) + `forum-config/` overlay |
+| Workers | 5 Rust Cloudflare Workers (auth, pod, relay, search, preview) — source upstream |
+| Unit tests | Vitest + Testing Library (jsdom) |
+| E2E/smoke | Playwright (`tests/*.spec.ts`) + Node probes (`tests/*.mjs`) |
 
 ## Build & Test Commands
 
 ```bash
 # React marketing site
-npm run dev                # Development server (generates workshop list first)
-npm run build              # Production build
-npm run build:dev          # Development build
-npm run lint               # Lint (ESLint 9 flat config, TypeScript rules)
+npm run dev                # Dev server (pre-step generates workshop list + testimonials)
+npm run build              # Production build (same pre-step)
+npm run lint               # ESLint 9 flat config
+npm run test               # Vitest unit tests (src/**/__tests__)
 npm run preview            # Preview production build
 
-# Leptos forum (Rust/WASM)
-cargo check --target wasm32-unknown-unknown -p forum-client   # Type-check forum
-cargo test -p nostr-core                                       # Run nostr-core tests (129 tests)
-trunk build --release community-forum-rs/crates/forum-client/index.html  # Build forum WASM
+# Forum overlay (Rust)
+cd forum-config && cargo test   # Operator-overlay tests (config parsing, branding, deploy manifests)
 
-# Rust workers
-cargo check -p auth-worker -p pod-worker -p preview-worker -p relay-worker -p search-worker
+# E2E (requires a running deployment; see playwright.config.ts)
+npx playwright test
 ```
 
-- No test runner is configured for the main React website
-- Build pre-step: `node scripts/generate-workshop-list.mjs` runs automatically before dev/build
+- Pre-build step: `scripts/generate-workshop-list.mjs` scans
+  `public/data/workshops/` → `src/data/workshop-list.json`, and
+  `scripts/generate-testimonials.mjs` reads `content/site-content.yaml` →
+  `src/data/testimonials.json`. Both run automatically before dev/build.
 - ESLint config: `eslint.config.js` (flat config, ignores `dist/`)
-- Forum builds via Trunk with `--public-url /community/` for dual-SPA deployment
+- Always run `npm run build` and `npm run lint` before committing.
 
 ## Project Structure
 
 ```
 src/
-  App.tsx              # Root: QueryClient, TooltipProvider, BrowserRouter, lazy routes
+  App.tsx              # Root: QueryClient, BrowserRouter, lazy routes
   main.tsx             # Vite entry point
-  pages/               # 13 route pages (lazy-loaded)
-    Index.tsx           # Landing page (hero, featured, CTAs)
-    Team.tsx            # Team profiles (loads markdown from public/data/team/)
-    Work.tsx            # Portfolio/case studies
-    Contact.tsx         # Contact form (React Hook Form + Zod)
-    WorkshopIndex.tsx   # Workshop catalog
-    WorkshopPage.tsx    # Individual workshop (:workshopId/:pageSlug)
-    ResidentialTraining.tsx  # 2-day masterclass details
-    Masterclass.tsx     # AI agent training program
-    SystemDesign.tsx    # Architecture documentation
-    ResearchPaper.tsx   # Research content
-    Testimonials.tsx    # Customer reviews
-    Privacy.tsx         # Privacy policy
-    NotFound.tsx        # 404 page
-  components/
-    ui/                 # 50+ shadcn/ui primitives (Radix-based)
-    VoronoiGoldenHero.tsx     # 3D golden ratio Voronoi (Three.js)
-    TesseractProjection.tsx   # 4D hyperdimensional visualization
-    TorusKnot.tsx             # Mathematical knot visualization
-    Header.tsx                # Site navigation
-    CourseCard.tsx             # Training card component
-    WorkshopCard.tsx          # Workshop listing card
-    WorkshopHeader.tsx        # Workshop page header
-    EmailSignupForm.tsx       # Newsletter subscription
-    ErrorBoundary.tsx         # Error boundary wrapper
-    RouteLoader.tsx           # Suspense fallback
-  hooks/
-    use-mobile.tsx            # Mobile breakpoint detection
-    use-toast.ts              # Toast notification hook
-    use-optimized-images.ts   # Image optimization hook
-    useOGMeta.ts              # Open Graph metadata hook
-  lib/
-    supabase.ts         # Supabase client init (uses VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY)
-    utils.ts            # cn() utility (clsx + tailwind-merge)
-    og-meta.ts          # Open Graph metadata generation
-    image-utils.ts      # Image optimization (lazy load, srcset, WebP)
-    markdown.ts         # Markdown processing
-  data/
-    skills.json         # Skills taxonomy
-    workshop-list.json  # Generated workshop metadata (from scripts/)
-    work/               # Case study data
+  pages/               # Route pages (lazy-loaded) + __tests__/
+  components/          # React components (shadcn/ui primitives in ui/)
+  hooks/               # use-mobile, use-toast, useOGMeta
+  lib/                 # supabase, utils, og-meta, image-utils, markdown,
+                       # gdpr-erasure + __tests__/
+  data/                # skills.json + GENERATED: workshop-list.json,
+                       # testimonials.json (do not hand-edit generated files)
+  styles/              # design-tokens.css
+  test/                # vitest setup
 
 public/
-  data/
-    team/               # 44 expert profiles (markdown + images)
-    workshops/          # 15 workshop directories with content
-    showcase/           # Portfolio project manifests
-    media/              # Videos, thumbnails
-  images/               # Static image assets
-  robots.txt, sitemap.xml, site.webmanifest, CNAME
+  images/              # All site imagery, by category:
+    heroes/            #   programme + forum-zone hero banners
+    partners/          #   partner logos
+    portfolio/         #   research video poster thumbnails (*-thumb.webp)
+    showcase/          #   research/showcase stills
+    team/              #   team portraits (01..44.webp), loaded via manifest
+    venue/             #   Lake District facility photos
+  data/                # Runtime-fetched content:
+    team/              #   manifest.json + per-member markdown bios
+    workshops/         #   workshop directories (markdown, scanned at build)
+    media/videos/      #   research videos (mp4, referenced by Research page)
+  sitemap.xml, robots.txt, site.webmanifest, CNAME, 404.html, _redirects
 
-community-forum-rs/     # Rust workspace (Cargo.toml)
-  crates/
-    forum-client/       # Leptos 0.7 CSR forum (WASM target)
-      src/
-        auth/           # passkey.rs, nip98.rs, nip07.rs, webauthn.rs, session.rs, http.rs
-        stores/         # channels.rs, zone_access.rs, preferences.rs, notifications.rs, etc.
-        pages/          # 17 page components (channel, chat, forums, login, settings, etc.)
-        components/     # 58 UI components
-        utils/          # search_client.rs, etc.
-      index.html        # Trunk entry point
-    nostr-core/         # Shared NIP implementations (NIP-01/07/09/29/33/40/42/45/50/52/98)
-      src/nip98.rs      # NIP-98 auth (used by all workers + forum client)
-    auth-worker/        # CF Worker: WebAuthn + NIP-98 + pod provisioning (D1 + KV + R2)
-      src/lib.rs        # Worker entry point
-    pod-worker/         # CF Worker: Solid pods, images/media, WAC ACL (R2 + KV)
-      src/lib.rs        # Worker entry point
-    preview-worker/     # CF Worker: OG metadata, Twitter oEmbed, SSRF protection (Cache API)
-      src/lib.rs        # Worker entry point
-    relay-worker/       # CF Worker: WebSocket relay + Durable Objects (D1 + DO)
-      src/lib.rs        # Worker entry point (NIP-01/09/11/16/29/33/40/42/45/50/98)
-    search-worker/      # CF Worker: RuVector, .rvf, cosine k-NN (R2 + KV)
-      src/lib.rs        # Worker entry point
-    admin-cli/          # forum-admin binary: NIP-98 authed HTTP client for ops + AI agents
-      src/              # main.rs, auth.rs, client.rs, commands/{whitelist,wot,invite,mod_ops,channel}.rs
-      AGENT.md          # AI-agent usage cheat sheet
+content/
+  site-content.yaml    # Source for testimonials (and future site copy)
 
-wasm-voronoi/           # Rust WASM (Cargo.toml, src/lib.rs)
+forum-config/          # Operator overlay for the nostr-rust-forum kit
+  Cargo.toml           # Pins nostr-bbs-* crates at the kit commit (dual-pin rule!)
+  dreamlab.toml        # Operator config: branding, [[zones]], governance, [mesh]
+  src/                 # Branding + per-worker entry shims
+  deploy/              # Per-worker wrangler.toml with DreamLab CF resource IDs
 
 scripts/
-  generate-workshop-list.mjs  # Pre-build: scans public/data/workshops/ → workshop-list.json
-  generate-heroes.sh          # Hero image generation
-  optimize-images.sh          # Image compression
+  generate-workshop-list.mjs   # Pre-build: workshops → src/data/workshop-list.json
+  generate-testimonials.mjs    # Pre-build: content YAML → src/data/testimonials.json
+  seed/                        # Zone seeding + relay/calendar/pod probes (live ops)
+  embeddings/                  # Search embedding tooling
+  optimize-images.sh, generate-heroes.sh, optimize-team-portraits.sh
 
-.github/workflows/
-  deploy.yml                  # GitHub Pages + CF Pages
-  workers-deploy.yml          # 5 Cloudflare Workers
-  docs-update.yml             # Documentation
+tests/                 # Playwright smoke specs + Node integration probes
+docs/                  # Documentation suite — start at docs/README.md
+  adr/                 # Architecture Decision Records (013+)
+  api/                 # Auth/Pod/Relay/Search/Moderation API docs
+  architecture/        # Forum org redesign (zones, cohorts, calendar tiers)
+  ddd/                 # Domain model and bounded contexts
+  deployment/          # CI/CD, environments, DNS
+  developer/           # Getting started, Rust style guide
+  prd/                 # Product requirement documents (historical record)
+  security/            # Security overview, authentication, audits
+  sprint/              # Sprint plans, snag lists, audits
+  tranche-1/           # Rust-port parity matrices
+  images/screenshots/  # README screenshots
+.github/workflows/     # ci, deploy, workers-deploy, rust-ci, docs-update,
+                       # set-worker-secrets, test-and-lint
 ```
 
 ## Routing
 
 All routes are lazy-loaded via `React.lazy()` in `src/App.tsx`:
 
-| Route | Component | Description |
-|-------|-----------|-------------|
-| `/` | Index | Landing page |
-| `/team` | Team | Expert profiles |
-| `/work` | Work | Case studies |
-| `/workshops` | WorkshopIndex | Workshop catalog |
-| `/workshops/:workshopId` | WorkshopPage | Workshop detail |
-| `/workshops/:workshopId/:pageSlug` | WorkshopPage | Workshop sub-page |
-| `/residential-training` | ResidentialTraining | 2-day masterclass |
-| `/masterclass` | Masterclass | AI agent training |
-| `/contact` | Contact | Contact form |
-| `/privacy` | Privacy | Privacy policy |
-| `/system-design` | SystemDesign | Architecture docs |
-| `/research-paper` | ResearchPaper | Research content |
-| `/testimonials` | Testimonials | Customer reviews |
-| `/community/#/governance` | (Leptos WASM) | Agent Control Surface governance dashboard |
-| `*` | NotFound | 404 page |
+| Route | Component |
+|-------|-----------|
+| `/` | Index |
+| `/programmes` | Programmes |
+| `/co-create` | CoCreate |
+| `/research` | Research |
+| `/team` | Team |
+| `/workshops` | WorkshopIndex |
+| `/workshops/:workshopId(/:pageSlug)` | WorkshopPage |
+| `/testimonials` | Testimonials |
+| `/ventures` | Ventures |
+| `/contact` | Contact |
+| `/privacy` | Privacy |
+| `*` | NotFound |
+
+Legacy redirects: `/residential-training` and `/masterclass` → `/programmes`;
+`/system-design`, `/research-paper`, and `/work` → `/research`.
+The forum is a separate SPA served at `/community/` (not a React route).
+
+Keep `public/sitemap.xml` in sync with this table when routes change.
 
 ## Path Aliases
 
-- `@/*` maps to `./src/*` (configured in tsconfig.json and vite.config.ts)
+- `@/*` maps to `./src/*` (tsconfig.json, vite.config.ts, vitest.config.ts)
 
 ## Key Patterns
 
-- **Component style:** shadcn/ui primitives (Radix + Tailwind + CVA)
-- **Styling:** Tailwind utility classes, CSS variables for theming (HSL), dark mode via `dark:` class
-- **Forms:** React Hook Form + Zod schemas for validation
-- **Data fetching:** TanStack React Query for server state
-- **Content:** Workshop/team data stored as markdown in `public/data/`, loaded at runtime
-- **3D scenes:** Three.js via @react-three/fiber (declarative), wrapped in Canvas components
-- **Code splitting:** Vite manual chunks (vendor, three, ui) + route-level lazy loading
-- **Image optimization:** Custom hooks for lazy loading, srcset, WebP conversion
+- **Components:** shadcn/ui primitives (Radix + Tailwind + CVA)
+- **Forms:** React Hook Form + Zod schemas at form boundaries
+- **Data fetching:** TanStack React Query
+- **Content:** team bios and workshops are markdown under `public/data/`,
+  fetched at runtime; testimonials come from `content/site-content.yaml` via
+  the pre-build script
+- **OG/social meta:** `src/lib/og-meta.ts` — image URLs must point at files
+  that actually exist under `public/` (there is no OG-image generation pipeline)
+- **Code splitting:** Vite manual chunks (vendor, ui) + route-level lazy loading
+- **Dev-server hardening:** `vite.config.ts` middleware validates
+  `/data/team` requests against path traversal
 
 ## TypeScript Configuration
 
-- Strict mode: **partial** (noImplicitAny: false, strictNullChecks: **true** since P1-30 security audit)
-- Unused vars/params: **not enforced**
+- Strict mode: **partial** (noImplicitAny: false, strictNullChecks: **true**)
 - Target: ES2020, Module: ESNext, JSX: react-jsx
 
 ## Environment Variables
 
-### Main site `.env` (never commit)
+Main site `.env` (never commit; see `.env.example`):
+
 ```
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key-here
-VITE_AUTH_API_URL=https://dreamlab-auth-api.*.workers.dev
+VITE_AUTH_API_URL=https://dreamlab-auth-api.solitary-paper-764d.workers.dev
+VITE_POD_API_URL=https://dreamlab-pod-api.solitary-paper-764d.workers.dev
+VITE_SEARCH_API_URL=https://dreamlab-search-api.solitary-paper-764d.workers.dev
 ```
 
-### community-forum-rs (Rust workers + forum client)
-- Rust workers use `wrangler.toml` bindings (D1, KV, R2) — no `.env` files
-- Forum client env vars are compile-time via `FORUM_BASE` env and Trunk build config
-- API URLs are configured in forum-client source constants, not env files
+Workers use `forum-config/deploy/*.wrangler.toml` bindings (D1, KV, R2, DO) —
+no `.env` files. The forum client receives runtime config via
+`window.__ENV__` injected by `deploy.yml`.
 
 ## Deployment
 
-- **Static site:** `npm run build` → `dist/` → GitHub Pages (gh-pages branch)
-- **Community forum:** Trunk (Leptos/WASM) → `dist/community/` (dual-SPA with `--public-url /community/`)
-- **Backend:** Cloudflare Workers (deployed via `workers-deploy.yml`)
-- **Custom domain:** dreamlab-ai.com (CNAME file in public/)
+- **Static site:** `npm run build` → `dist/` → GitHub Pages (`gh-pages` branch)
+- **Forum:** CI clones the kit at `KIT_REF`, builds with Trunk
+  (`--public-url /community/`), outputs to `dist/community/`
+- **Workers:** `workers-deploy.yml` builds the five kit worker crates with the
+  `forum-config/deploy/` wrangler configs overlaid
 
-### Cloudflare Workers
+### The dual-pin rule (critical)
 
-| Worker | Source | Storage | Purpose |
-|--------|--------|---------|---------|
-| auth-worker | `community-forum-rs/crates/auth-worker/` | D1 + KV + R2 | WebAuthn, NIP-98, pod provisioning, moderation API, WoT, invite credits, welcome bot |
-| pod-worker | `community-forum-rs/crates/pod-worker/` | R2 + KV | Solid pods, images/media, WAC ACL |
-| search-worker | `community-forum-rs/crates/search-worker/` | R2 + KV | RuVector, .rvf, cosine k-NN |
-| relay-worker | `community-forum-rs/crates/relay-worker/` | D1 + DO | WebSocket relay + ingress mute/ban enforcement (mod_cache) |
-| preview-worker | `community-forum-rs/crates/preview-worker/` | Cache API | OG metadata, Twitter oEmbed, SSRF protection |
+The kit commit is pinned in **three places that must move together** in one
+commit, or client/worker/test skew ships:
 
-All workers are Rust (workers-rs), deployed via `workers-deploy.yml`. Runtime: `"workers-rs"`.
+1. `KIT_REF` in `.github/workflows/deploy.yml`
+2. `KIT_REF` in `.github/workflows/workers-deploy.yml`
+3. The `rev = "..."` pins on every `nostr-bbs-*` dependency in `forum-config/Cargo.toml`
 
-### Admin CLI
+### Zones
 
-`forum-admin` (crate `admin-cli`) is a headless NIP-98-authed HTTP client for ops and AI coding agents:
-
-```bash
-cargo run -p admin-cli -- --help
-cargo run -p admin-cli -- whitelist add <pubkey>
-cargo run -p admin-cli -- wot set-referente <pubkey>
-cargo run -p admin-cli -- invite create --expiry 168
-cargo run -p admin-cli -- mod ban <pubkey> --reason "spam"
-```
-
-`--json` flag on all commands for machine consumption. nsec is never persisted to disk — supplied via `--nsec`, `FORUM_ADMIN_NSEC` env, or `--bunker` NIP-46 URI. See `community-forum-rs/crates/admin-cli/AGENT.md` for AI-agent cheat sheet.
-
-## Federation Transports
-
-The DreamLab ecosystem uses two transport layers for inter-service communication (Cloudflare public path and Tailscale private path), plus a CF Tunnel that bridges the two for the native pod tier. dreamlab-ai-website only ever touches the Cloudflare path.
-
-### Cloudflare (public path)
-
-Primary transport for the website and forum. CF Workers relay Nostr events, R2 stores pod data, and a CF Tunnel fronts native pods hosted on agentbox infrastructure.
-
-### Tailscale (private path)
-
-Encrypted tailnet for agentbox-to-agentbox and agentbox-to-solid-pod-rs traffic. CF Workers do not join the tailnet. The forum relay bridges to agentbox's Nostr relay over public `wss://`; agentbox handles tailnet-side federation internally.
-
-### Website's role
-
-This project (dreamlab-ai-website) connects exclusively via Cloudflare infrastructure (Workers, D1, R2). It never joins a tailnet. The relay-worker bridges forum events to agentbox's Nostr relay over public WebSocket, and agentbox propagates those events across the tailnet mesh on its own.
-
-### Endpoint map
-
-| Surface | Endpoint | Transport |
-|---------|----------|-----------|
-| Public relay | `dreamlab-nostr-relay.*.workers.dev` | Cloudflare Workers |
-| Public pods | `dreamlab-pod-api.*.workers.dev` | Cloudflare Workers (R2) |
-| Private relay | `<agentbox-host>.ts.net` (tailnet) | Tailscale |
-| Private pods | `<agentbox-host>.ts.net` (tailnet) | Tailscale |
-| Private API | `<agentbox-host>.ts.net` (tailnet) | Tailscale |
-| Hybrid native pods | `pods-native.dreamlab-ai.com` | CF Tunnel to agentbox solid-pod-rs |
-
-### Moderation event model
-
-Nostr custom parameterized-replaceable events:
-
-| Kind | Name | `d` tag | Signer |
-|------|------|---------|--------|
-| 30910 | Ban | banned pubkey | admin |
-| 30911 | Mute | muted pubkey | admin (`expires` tag) |
-| 30912 | Warning | warned pubkey + ts | admin |
-| 30913 | Report | reported event id | any authed user |
-| 30914 | ModerationAction | action uuid | admin |
-| 30915 | Unban | banned pubkey | admin (revokes 30910) |
-| 30916 | Unmute | muted pubkey | admin (revokes 30911) |
-| 1984 | Report (NIP-56) | reported event id | any authed user (interop) |
-
-### Governance / Agent Control Surface event model
-
-| Kind | Name | `d` tag | Signer |
-|------|------|---------|--------|
-| 31400 | AgentControlPanel | panel id | agent (pre-registered pubkey) |
-| 31401 | AgentStatusUpdate | panel id + ts | agent |
-| 31402 | AgentActionRequest | action uuid | agent |
-| 31403 | HumanActionResponse | action uuid | admin (NIP-98 signed approve/reject) |
-| 31404 | GovernancePolicy | policy id | admin |
-| 31405 | GovernanceAuditLog | audit entry id | system |
-
-Agent pubkeys must be pre-registered in `forum-config/dreamlab.toml` `[governance].agent_pubkeys`.
-The relay filters these kinds to only accept events from registered agent or admin pubkeys.
-The feature is gated behind `[features] governance = true` in the operator config.
-
-Constants live in `nostr-core::moderation_events` (`KIND_BAN`, `KIND_MUTE`, `KIND_WARNING`, `KIND_REPORT`, `KIND_MODERATION_ACTION`, `KIND_UNBAN`, `KIND_UNMUTE`, `KIND_REPORT_NIP56`).
-
-Enforcement: relay-worker rejects kind-1/42 from pubkeys with active mute or any ban (60s DO-cached lookup against D1).
+The four-zone org model (public / friends / family / business) is authored
+once in `forum-config/dreamlab.toml` `[[zones]]` and projected into the
+relay's `ZONE_CONFIG` var (server enforcement) and the client's
+`window.__ENV__.ZONE_CONFIG` (rendering) — keep both in sync. See
+`docs/architecture/forum-org-redesign.md`.
 
 ## Behavioral Rules
 
@@ -353,153 +219,16 @@ Enforcement: relay-worker rejects kind-1/42 from pubkeys with active mute or any
 - ALWAYS read a file before editing it
 - NEVER commit secrets, credentials, or .env files
 - NEVER save working files to the root folder
-- Run `npm run build` to verify changes compile before committing
-- Run `npm run lint` to check for linting issues
+- Run `npm run build` and `npm run lint` to verify changes before committing
+- Forum behaviour changes belong upstream in nostr-rust-forum, not here —
+  this repo only configures and pins the kit
 
 ## Security Rules
 
 - NEVER hardcode API keys, secrets, or credentials in source files
 - NEVER commit .env files or any file containing secrets
 - Always validate user input at form boundaries (Zod schemas)
-- Always sanitize rendered HTML with DOMPurify
+- Always sanitize rendered HTML/markdown (DOMPurify, react-markdown)
 - Always validate file paths to prevent directory traversal (see vite.config.ts middleware)
-
-## File Organization
-
-- `/src/pages/` for route page components
-- `/src/components/` for reusable components
-- `/src/components/ui/` for shadcn/ui primitives
-- `/src/hooks/` for custom React hooks
-- `/src/lib/` for utilities and client setup
-- `/src/data/` for static data files
-- `/public/data/` for runtime-loaded content (markdown, manifests)
-- `/scripts/` for build and utility scripts
-- `/docs/` for project documentation
-
-## Forum Auth Architecture
-
-### Overview: Passkey-first, privkey-never-stored
-
-The community forum uses WebAuthn PRF extension to derive a secp256k1 private key
-deterministically from the user's passkey. The privkey is **never stored** — it lives
-only in the auth session state and is re-derived on each login. It is zeroed on `pagehide`.
-
-### Key derivation flow
-
-```
-WebAuthn PRF output (32 bytes, HMAC-SHA-256 from authenticator)
-  → HKDF(SHA-256, salt=[], info="nostr-secp256k1-v1")
-  → 32-byte secp256k1 private key
-  → getPublicKey() → hex pubkey (Nostr identity)
-```
-
-**Critical constraints:**
-- Same passkey credential + same PRF salt → same privkey (deterministic)
-- Cross-device QR auth produces DIFFERENT PRF output → cannot derive key → blocked
-- Windows Hello has no PRF support → blocked with error message
-- PRF salt is generated at registration and stored server-side in `webauthn_credentials.prf_salt`
-
-### Auth flow
-
-```
-Registration:
-  1. Client: navigator.credentials.create() with PRF extension
-  2. Client: check extensions.prf.enabled (abort if false)
-  3. Client: HKDF(PRF output) → privkey → pubkey
-  4. Server: store credential + prf_salt in D1
-  5. Server: provision Solid pod in R2 with WAC ACL
-  6. Server: return { didNostr, webId, podUrl }
-  7. Client: store pubkey in auth state, privkey in closure
-
-Authentication:
-  1. Client: fetch /auth/login/options (returns stored prf_salt in extensions)
-  2. Client: navigator.credentials.get() with same prf_salt
-  3. Client: block hybrid transport (QR) but allow USB security keys
-  4. Client: HKDF(PRF output) → privkey (same result as registration)
-  5. Server: verify assertion, verify counter advanced, update counter
-  6. Client: privkey in closure, ready to sign NIP-98 tokens
-
-Note: Discoverable credentials allow new-device login — the authenticator stores
-the credential ID, so the user can authenticate on any device with the same passkey
-provider without needing to remember which credential was used.
-```
-
-### NIP-98 HTTP Auth
-
-Every state-mutating API call uses NIP-98 `Authorization: Nostr <base64(event)>`:
-- `kind: 27235`, tags: `u` (URL), `method`, optional `payload` (SHA-256 of body)
-- Schnorr-signed with privkey from auth store closure
-- Server recomputes event ID from NIP-01 canonical form and verifies independently
-- Payload hash uses raw body bytes (server captures raw body for payload hash verification)
-
-### Identity
-
-- Nostr pubkey (hex) is the primary identity
-- `did:nostr:<pubkey>` for DID-based interop
-- WebID at `https://pods.dreamlab-ai.com/{pubkey}/profile/card#me` (Solid/Linked Data)
-
-### Key files
-
-| File | Role |
-|------|------|
-| `community-forum-rs/crates/forum-client/src/auth/passkey.rs` | WebAuthn PRF ceremony, HKDF derivation |
-| `community-forum-rs/crates/forum-client/src/auth/nip98.rs` | NIP-98 token creation (client-side) |
-| `community-forum-rs/crates/forum-client/src/auth/session.rs` | Auth session state, privkey management |
-| `community-forum-rs/crates/forum-client/src/auth/mod.rs` | Auth module (AuthState, login/register flows) |
-| `community-forum-rs/crates/nostr-core/src/nip98.rs` | NIP-98 verification (shared by all workers) |
-| `community-forum-rs/crates/auth-worker/src/lib.rs` | CF Worker: WebAuthn + NIP-98 + pod provisioning |
-| `community-forum-rs/crates/pod-worker/src/lib.rs` | CF Worker: Solid pod storage on R2 |
-| `community-forum-rs/crates/search-worker/src/lib.rs` | CF Worker: RuVector vector search |
-| `community-forum-rs/crates/preview-worker/src/lib.rs` | CF Worker: OG metadata proxy |
-
-## Claude Flow V3 Integration
-
-### MCP Server
-Configured in `.mcp.json` — claude-flow MCP with v3 mode, hierarchical-mesh topology, max 15 agents, hybrid memory.
-
-### Hooks
-7 hook types in `.claude/settings.json`: PreToolUse, PostToolUse, UserPromptSubmit, SessionStart, SessionEnd, Stop, PreCompact, SubagentStart, TeammateIdle, TaskCompleted.
-
-### Skills & Agents
-- 29 skills in `.claude/skills/`
-- 10 command groups in `.claude/commands/`
-- 24 agent categories in `.claude/agents/`
-
-### Agentic QE v3
-14 domains: test-generation, test-execution, coverage-analysis, quality-assessment, defect-intelligence, requirements-validation, code-intelligence, security-compliance, contract-testing, visual-accessibility, chaos-resilience, learning-optimization, enterprise-integration, coordination.
-
-### CLI Quick Reference
-
-```bash
-# Claude Flow
-claude-flow daemon start           # Start background workers
-claude-flow memory init            # Initialize memory database
-claude-flow swarm init             # Initialize a swarm
-claude-flow doctor --fix           # Diagnose and fix issues
-
-# Agentic QE
-agentic-qe status                  # System status
-agentic-qe health                  # Health check
-agentic-qe domain list             # List all domains
-agentic-qe fleet spawn             # Spawn multi-agent fleet
-agentic-qe test generate <target>  # Generate tests
-agentic-qe coverage <target>       # Coverage analysis
-agentic-qe security                # Security scanning
-agentic-qe code analyze <target>   # Code intelligence
-```
-
-## Concurrency Rules
-
-- All independent operations MUST be concurrent/parallel in a single message
-- Use Claude Code's Task tool for spawning agents
-- Batch all related file reads/writes/edits in one message
-- Batch all Bash commands in one message when independent
-- Never continuously poll after spawning agents — wait for results
-
-## Swarm Configuration
-
-- Topology: hierarchical-mesh
-- Max agents: 15
-- Memory backend: hybrid (HNSW enabled)
-- Use `run_in_background: true` for all agent Task calls
-- Put all agent Task calls in one message for parallel execution
+- The seed/probe scripts read the admin key from the environment and must
+  never print or persist secret material

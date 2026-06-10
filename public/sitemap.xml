@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
         http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
@@ -8,39 +7,39 @@
   <!-- Homepage -->
   <url>
     <loc>https://dreamlab-ai.com/</loc>
-    <lastmod>2026-01-23</lastmod>
+    <lastmod>2026-06-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
 
-  <!-- AI Agent Masterclass - Primary Product -->
+  <!-- Programme tracks -->
   <url>
-    <loc>https://dreamlab-ai.com/masterclass</loc>
-    <lastmod>2026-01-23</lastmod>
+    <loc>https://dreamlab-ai.com/programmes</loc>
+    <lastmod>2026-06-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.95</priority>
   </url>
 
-  <!-- Residential Training Programs -->
+  <!-- Co-creation engagements -->
   <url>
-    <loc>https://dreamlab-ai.com/residential-training</loc>
-    <lastmod>2026-01-23</lastmod>
+    <loc>https://dreamlab-ai.com/co-create</loc>
+    <lastmod>2026-06-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
 
-  <!-- Workshops Index -->
+  <!-- Workshops index -->
   <url>
     <loc>https://dreamlab-ai.com/workshops</loc>
-    <lastmod>2026-01-23</lastmod>
+    <lastmod>2026-06-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
   </url>
 
-  <!-- Work Portfolio -->
+  <!-- Research lineage -->
   <url>
-    <loc>https://dreamlab-ai.com/work</loc>
-    <lastmod>2026-01-23</lastmod>
+    <loc>https://dreamlab-ai.com/research</loc>
+    <lastmod>2026-06-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -48,31 +47,31 @@
   <!-- Team -->
   <url>
     <loc>https://dreamlab-ai.com/team</loc>
-    <lastmod>2026-01-23</lastmod>
+    <lastmod>2026-06-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
-  <!-- System Design Showcase -->
+  <!-- Ventures -->
   <url>
-    <loc>https://dreamlab-ai.com/system-design</loc>
-    <lastmod>2026-01-23</lastmod>
+    <loc>https://dreamlab-ai.com/ventures</loc>
+    <lastmod>2026-06-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
-  <!-- Research Paper -->
+  <!-- Testimonials -->
   <url>
-    <loc>https://dreamlab-ai.com/research-paper</loc>
-    <lastmod>2026-01-23</lastmod>
-    <changefreq>yearly</changefreq>
+    <loc>https://dreamlab-ai.com/testimonials</loc>
+    <lastmod>2026-06-10</lastmod>
+    <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
 
   <!-- Contact -->
   <url>
     <loc>https://dreamlab-ai.com/contact</loc>
-    <lastmod>2026-01-23</lastmod>
+    <lastmod>2026-06-10</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -80,7 +79,7 @@
   <!-- Privacy Policy -->
   <url>
     <loc>https://dreamlab-ai.com/privacy</loc>
-    <lastmod>2026-01-23</lastmod>
+    <lastmod>2026-06-10</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>

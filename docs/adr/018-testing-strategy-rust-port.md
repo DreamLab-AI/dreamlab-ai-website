@@ -142,7 +142,7 @@ Four parallel CI jobs:
 
 ## References
 
-- [PRD: DreamLab Forum Rust Port v2.0.0, Section 9](../prd-rust-port.md)
+- [PRD: DreamLab Forum Rust Port v2.0.0, Section 9](../prd/prd-rust-port.md)
 - [proptest book](https://proptest-rs.github.io/proptest/intro.html)
 - [criterion.rs user guide](https://bheisler.github.io/criterion.rs/book/)
 - [wasm-bindgen-test](https://rustwasm.github.io/docs/wasm-bindgen/wasm-bindgen-test/index.html)

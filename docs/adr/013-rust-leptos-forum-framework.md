@@ -116,7 +116,7 @@ Key technical choices within this decision:
 
 ## References
 
-- [PRD: DreamLab Forum Rust Port v2.0.0](../prd-rust-port.md)
+- [PRD: DreamLab Forum Rust Port v2.0.0](../prd/prd-rust-port.md)
 - [Leptos Book](https://book.leptos.dev/)
 - [lemmy-ui-leptos](https://github.com/LemmyNet/lemmy-ui-leptos) (134 stars)
 - [Leptos 0.7 release notes](https://github.com/leptos-rs/leptos/releases)
