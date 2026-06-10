@@ -81,11 +81,19 @@ export const Header = () => {
             <DropdownMenuItem asChild>
               <Link to="/testimonials" className="w-full">Impact Stories</Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <a href="/community/" className="w-full">
-                Community<span className="sr-only"> (DreamLab community forum)</span>
-              </a>
-            </DropdownMenuItem>
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>
+                <span>Community</span>
+              </DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                <DropdownMenuItem asChild>
+                  <a href="/community/" className="w-full">Forum</a>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <a href="/community/#/governance" className="w-full">Governance</a>
+                </DropdownMenuItem>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
               <Link to="/contact" className="w-full">Contact</Link>

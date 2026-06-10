@@ -15,11 +15,16 @@ bucket_name = "dreamlab-vectors"
 binding = "SEARCH_CONFIG"
 id      = "440b1f07ff224fb8ad644e094c6766c0"
 
-[[kv_namespaces]]
-binding = "NIP98_REPLAY"
-id      = "REPLACE_WITH_NEW_NIP98_REPLAY_KV_ID"
+# D1 database for NIP-98 replay protection (atomic INSERT OR IGNORE).
+# Shares the auth-worker's D1 database so cross-worker replay is detected.
+# (Legacy NIP98_REPLAY KV binding removed — D1 INSERT OR IGNORE is atomic.)
+[[d1_databases]]
+binding       = "REPLAY_DB"
+database_name = "dreamlab-auth"
+database_id   = "e3981999-e8f0-4c07-9e4b-2e50859b8524"
 
 [vars]
 ALLOWED_ORIGIN   = "https://dreamlab-ai.com"
 ALLOWED_ORIGINS  = "https://dreamlab-ai.com,https://thedreamlab.uk,https://dreamlab-ai.github.io"
 RVF_STORE_KEY    = "dreamlab.rvf"
+ADMIN_PUBKEYS    = "6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425a,11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c"

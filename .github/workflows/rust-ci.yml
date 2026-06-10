@@ -1,24 +1,21 @@
 name: Rust CI
 
-# Triggers on every push and PR to main, so fmt/clippy/test cannot be bypassed
-# by a direct push to main. Combined with branch protection (see
-# scripts/setup-branch-protection.sh), this enforces a quality gate on the
-# default branch.
+# Runs fmt/clippy/test against the nostr-bbs kit crates.
+# Triggered by workflow_dispatch (manual) since kit source lives in a
+# separate repo. The test-and-lint.yml workflow covers forum-config/ on
+# every push/PR automatically.
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+  workflow_dispatch:
 
-# Default-restrictive workflow permissions; jobs opt in if needed.
 permissions:
   contents: read
 
 env:
   CARGO_TERM_COLOR: always
-  MANIFEST: community-forum-rs/Cargo.toml
   RUST_TOOLCHAIN: '1.90.0'
+  KIT_REPO: 'https://github.com/DreamLab-AI/nostr-rust-forum.git'
+  KIT_REF: 'main'
 
 jobs:
   fmt:
@@ -29,24 +26,21 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
+      - run: git clone --depth 1 --branch ${{ env.KIT_REF }} ${{ env.KIT_REPO }} kit
       - uses: dtolnay/rust-toolchain@1.90.0
         with:
           components: rustfmt
-      - run: cargo fmt --manifest-path ${{ env.MANIFEST }} --all -- --check
+      - run: cargo fmt --manifest-path kit/Cargo.toml --all -- --check
 
   clippy:
     name: Clippy (advisory)
-    # Advisory job: pre-existing nostr-core baseline (4 lints in nip26.rs/nip90.rs)
-    # plus ~24 dead_code warnings would force every commit red.
-    # Strategy: run clippy WITHOUT -D warnings so it reports issues but doesn't
-    # fail. Annotations still surface in the PR review. Tighten back to -D
-    # warnings once baseline-cleanup sprint clears the residue.
     runs-on: ubuntu-latest
     if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
     permissions:
       contents: read
     steps:
       - uses: actions/checkout@v4
+      - run: git clone --depth 1 --branch ${{ env.KIT_REF }} ${{ env.KIT_REPO }} kit
       - uses: dtolnay/rust-toolchain@1.90.0
         with:
           components: clippy
@@ -55,11 +49,11 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            community-forum-rs/target
-          key: rust-${{ env.RUST_TOOLCHAIN }}-${{ hashFiles('community-forum-rs/Cargo.lock') }}
+            kit/target
+          key: rust-${{ env.RUST_TOOLCHAIN }}-${{ hashFiles('kit/Cargo.lock') }}
           restore-keys: rust-${{ env.RUST_TOOLCHAIN }}-
-      - name: Clippy (warnings reported, not enforced against baseline)
-        run: cargo clippy --manifest-path ${{ env.MANIFEST }} --all-targets
+      - name: Clippy (warnings reported, not enforced)
+        run: cargo clippy --manifest-path kit/Cargo.toml --all-targets
 
   test-native:
     name: Test (native)
@@ -69,28 +63,27 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
+      - run: git clone --depth 1 --branch ${{ env.KIT_REF }} ${{ env.KIT_REPO }} kit
       - uses: dtolnay/rust-toolchain@1.90.0
       - uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            community-forum-rs/target
-          key: rust-${{ env.RUST_TOOLCHAIN }}-${{ hashFiles('community-forum-rs/Cargo.lock') }}
+            kit/target
+          key: rust-${{ env.RUST_TOOLCHAIN }}-${{ hashFiles('kit/Cargo.lock') }}
           restore-keys: rust-${{ env.RUST_TOOLCHAIN }}-
       - name: Test (native, all crates)
         run: |
-          # relay-worker test binaries gate behind the `test-exports` feature
-          # to expose pub(crate) helpers without polluting prod surface.
-          cargo test --manifest-path ${{ env.MANIFEST }} \
-            -p nostr-core \
-            -p auth-worker \
-            -p pod-worker \
-            -p preview-worker \
-            -p search-worker \
-            -p admin-cli
-          cargo test --manifest-path ${{ env.MANIFEST }} \
-            -p relay-worker --features test-exports
+          cargo test --manifest-path kit/Cargo.toml \
+            -p nostr-bbs-core \
+            -p nostr-bbs-auth-worker \
+            -p nostr-bbs-pod-worker \
+            -p nostr-bbs-preview-worker \
+            -p nostr-bbs-search-worker \
+            -p nostr-bbs-admin-cli
+          cargo test --manifest-path kit/Cargo.toml \
+            -p nostr-bbs-relay-worker --features test-exports
 
   test-wasm:
     name: Test (wasm)
@@ -100,6 +93,7 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
+      - run: git clone --depth 1 --branch ${{ env.KIT_REF }} ${{ env.KIT_REPO }} kit
       - uses: dtolnay/rust-toolchain@1.90.0
         with:
           targets: wasm32-unknown-unknown
@@ -108,14 +102,11 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            community-forum-rs/target
-          key: rust-${{ env.RUST_TOOLCHAIN }}-${{ hashFiles('community-forum-rs/Cargo.lock') }}
+            kit/target
+          key: rust-${{ env.RUST_TOOLCHAIN }}-${{ hashFiles('kit/Cargo.lock') }}
           restore-keys: rust-${{ env.RUST_TOOLCHAIN }}-
       - run: cargo install wasm-bindgen-cli --locked || true
-      # --no-run: compile tests for wasm32 but don't execute (no wasm_bindgen_test runner configured).
-      # Standard #[test] functions can't run on wasm32 without a WASM runtime. The check-wasm-client
-      # job verifies compilation for the forum-client; this job validates nostr-core test compilation.
-      - run: cargo test --manifest-path ${{ env.MANIFEST }} --target wasm32-unknown-unknown -p nostr-core --no-run
+      - run: cargo test --manifest-path kit/Cargo.toml --target wasm32-unknown-unknown -p nostr-bbs-core --no-run
 
   check-wasm-client:
     name: Check (wasm client)
@@ -125,6 +116,7 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
+      - run: git clone --depth 1 --branch ${{ env.KIT_REF }} ${{ env.KIT_REPO }} kit
       - uses: dtolnay/rust-toolchain@1.90.0
         with:
           targets: wasm32-unknown-unknown
@@ -133,7 +125,7 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            community-forum-rs/target
-          key: rust-${{ env.RUST_TOOLCHAIN }}-${{ hashFiles('community-forum-rs/Cargo.lock') }}
+            kit/target
+          key: rust-${{ env.RUST_TOOLCHAIN }}-${{ hashFiles('kit/Cargo.lock') }}
           restore-keys: rust-${{ env.RUST_TOOLCHAIN }}-
-      - run: cargo check --manifest-path ${{ env.MANIFEST }} --target wasm32-unknown-unknown -p forum-client
+      - run: cargo check --manifest-path kit/Cargo.toml --target wasm32-unknown-unknown -p nostr-bbs-forum-client

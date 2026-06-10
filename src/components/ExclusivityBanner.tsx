@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { Clock, Users } from "lucide-react";
@@ -9,6 +11,7 @@ const EMAIL_REGEX = /^\S+@\S+\.\S+$/;
 
 export const ExclusivityBanner = () => {
   const [email, setEmail] = useState("");
+  const [hasConsent, setHasConsent] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -16,6 +19,16 @@ export const ExclusivityBanner = () => {
 
     if (!email.trim() || !EMAIL_REGEX.test(email)) {
       toast.error("Please enter a valid email address");
+      return;
+    }
+
+    if (!hasConsent) {
+      toast.error("Please accept our privacy policy to join the waitlist");
+      return;
+    }
+
+    if (!supabase) {
+      toast.error("Service temporarily unavailable. Please try again later.");
       return;
     }
 
@@ -27,7 +40,7 @@ export const ExclusivityBanner = () => {
         .upsert({
           email: email.trim().toLowerCase(),
           source: 'waitlist_exclusivity_banner',
-          has_consent: true
+          has_consent: hasConsent,
         }, {
           onConflict: 'email'
         });
@@ -35,6 +48,7 @@ export const ExclusivityBanner = () => {
       if (error) throw error;
 
       setEmail("");
+      setHasConsent(false);
       toast.success("You're on the list. We'll be in touch when Q2 opens.");
     } catch (error) {
       console.error('Waitlist submission error:', error);
@@ -101,7 +115,25 @@ export const ExclusivityBanner = () => {
             </Button>
           </form>
 
-          <p className="text-xs text-slate-500 mt-4">
+          <div className="flex items-start gap-2 mt-4 max-w-md mx-auto text-left">
+            <Checkbox
+              id="waitlist-consent"
+              checked={hasConsent}
+              onCheckedChange={(checked) => setHasConsent(checked === true)}
+              disabled={isSubmitting}
+              className="mt-0.5 border-white/30 data-[state=checked]:bg-purple-600 data-[state=checked]:border-purple-600"
+            />
+            <Label
+              htmlFor="waitlist-consent"
+              className="text-xs text-slate-400 leading-tight cursor-pointer hover:text-slate-300 transition-colors"
+            >
+              I agree to receive emails from DreamLab about upcoming cohorts and programme updates.
+              You can unsubscribe at any time. See our{" "}
+              <a href="/privacy" className="underline hover:text-purple-400 transition-colors">Privacy Policy</a>.
+            </Label>
+          </div>
+
+          <p className="text-xs text-slate-500 mt-3">
             No spam. Priority notification when spaces open.
           </p>
         </div>

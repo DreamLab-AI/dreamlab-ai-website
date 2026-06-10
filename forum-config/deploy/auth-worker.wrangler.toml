@@ -16,6 +16,14 @@ database_name   = "dreamlab-auth"
 database_id     = "e3981999-e8f0-4c07-9e4b-2e50859b8524"
 migrations_dir  = "migrations"
 
+# Cross-D1 binding: relay worker's D1 for admin/whitelist lookups.
+# The relay-worker is the authority for admin flags (via /api/whitelist/set-admin).
+# The auth-worker needs read access to check admin status for governance APIs.
+[[d1_databases]]
+binding       = "RELAY_DB"
+database_name = "dreamlab-relay"
+database_id   = "97c77d23-0e24-4325-ada7-1747eab4095b"
+
 [[kv_namespaces]]
 binding = "SESSIONS"
 id      = "901345296c2848788066686aa67d5909"
@@ -32,12 +40,10 @@ id      = "8ec8759ab40d4709a831bf6b0e5241eb"
 binding = "ADMIN_KV"
 id      = "REPLACE_WITH_NEW_ADMIN_KV_ID"
 
-# NIP-98 replay cache. TTL = 2 * tolerance per
-# nostr_bbs_core::REPLAY_CACHE_TTL_SECS. Production deployments MUST set this.
-# TODO(ops): provision via `wrangler kv:namespace create dreamlab-nip98-replay`.
-[[kv_namespaces]]
-binding = "NIP98_REPLAY"
-id      = "REPLACE_WITH_NEW_NIP98_REPLAY_KV_ID"
+# NIP-98 replay protection uses the shared D1 database (dreamlab-auth, bound
+# as "DB" above). The nip98_replay table is created at startup via
+# nostr_bbs_rate_limit::ensure_replay_schema(). No separate KV namespace needed.
+# (Legacy NIP98_REPLAY KV binding removed — D1 INSERT OR IGNORE is atomic.)
 
 # Legacy alias used by admins.rs cache.
 [[kv_namespaces]]
@@ -49,6 +55,27 @@ binding     = "PODS"
 bucket_name = "dreamlab-pods"
 
 [vars]
-RP_ID            = "dreamlab-ai.com"
-RP_NAME          = "DreamLab Community"
-EXPECTED_ORIGIN  = "https://dreamlab-ai.com"
+RP_ID                = "dreamlab-ai.com"
+RP_NAME              = "DreamLab Community"
+EXPECTED_ORIGIN      = "https://dreamlab-ai.com"
+
+# JSS Phase 1 — federated NIP-05 resolution (ADR-086 §9, NRF commit 1fe95fd).
+# auth-worker reads these to drive the resolve(env, name) D1→pod-HTTP fallback
+# under GET /api/username/resolve. Must mirror dreamlab.toml [nip05].
+NIP05_RESOLVER_MODE  = "federated"
+POD_BASE_URL         = "https://dreamlab-pod-api.solitary-paper-764d.workers.dev"
+
+# Native pod tier (agentbox solid-pod-rs via CF Tunnel). The kit auth-worker's
+# /api/native-pod/provision handler reads NATIVE_POD_URL and constructs
+# POST {NATIVE_POD_URL}/_admin/provision/{pubkey}; absent it returns 503
+# "native pod not configured" (Gap 3). Mirrors dreamlab.toml [native_pod].base_url
+# — the worker owns the /_admin/provision path segment, so this is the base URL
+# (= [native_pod].admin_provision_url minus the /_admin/provision suffix), not
+# the full admin_provision_url. Follows the POD_BASE_URL [vars] mirroring
+# convention above.
+#
+# NATIVE_POD_ADMIN_KEY is the matching PSK and stays an operator-provided CF
+# secret (= SOLID_ADMIN_KEY on the agentbox side) — never a [vars] value. It is
+# gated at deploy time in workers-deploy.yml and validated by forum-config's
+# deploy_config::REQUIRED_AUTH_SECRETS.
+NATIVE_POD_URL       = "https://pods-native.dreamlab-ai.com"

@@ -1,5 +1,47 @@
 # Claude Code Configuration - DreamLab AI Website
 
+## Native Pod Sprint (2026-05-17)
+
+Encrypted agentbox↔forum link via Cloudflare Tunnel. `docker-compose.solid-pods.yml`
+runs `solid-pod-rs-server --features git` + `cloudflared` in the agentbox. Users in
+`[native_pod].allowlist_cohorts` see a second pod card in the pod browser pointing at
+`pods-native.dreamlab-ai.com`. Admin panel "Native Pods" tab provisions pods via
+`POST /api/native-pod/provision` → auth-worker → native `/_admin/provision/{pk}` (PSK).
+CORS allowlist (`SOLID_ALLOWED_ORIGINS`) + admin key (`SOLID_ADMIN_KEY`) configurable
+via env. forum-config pinned to NRF rc11 (`8d31f3a`) / solid-pod-rs alpha.15 (`0c5fa42`).
+project/agentbox submodule synced to ff19b01f via HTTPS remote.
+
+## Git Control Panel Sprint (2026-05-17)
+
+Full git Version Control surface for Solid pods shipped. `components/git_panel.rs`
+in the forum client provides a VS Code–style Source Control panel: staged/unstaged/
+untracked sections, inline diff viewer, commit form, branch management. `AppManifestPanel`
+implements JSS #464 — pods as first-class app repositories, with `/.well-known/apps`
+server-side aggregation. Pod browser auto-probes on mount; CF Workers settle gracefully
+to "Git API not available" (ADR-089). forum-config pinned to NRF rc10 (`23c0c5b`) /
+solid-pod-rs alpha.14 (`4ac7670`).
+
+## Governance Sprint (2026-05-12)
+
+Agent Control Surface feature shipped. The forum now exposes a `/governance`
+route with a reactive agent panel dashboard. Custom Nostr event kinds
+31400-31405 carry governance control surface events. NIP-98 gated API
+endpoints handle approve/reject action response signing. The feature is
+toggled via `governance = true` in `forum-config/dreamlab.toml` with a full
+`[governance]` config section (route, kinds range, relay URL, agent pubkey
+allowlist). Header.tsx gained a Governance submenu under Community; Index.tsx
+gained an "Agent Control Surface" outcome card.
+
+## Security Audit Sprint (2026-05-11)
+
+A DreamLab ecosystem-wide security audit applied 10 fixes to
+dreamlab-ai-website. See CHANGELOG.md `[Security Audit Sprint] -
+2026-05-11` for the full manifest. Key areas hardened: GDPR consent model
+(P0-15), Supabase null safety (P0-16), production URL fallback removal
+(P0-17), GDPR erasure pipeline (P1-29), strictNullChecks enforcement
+(P1-30), payment confirmation dialogs (P1-31), Mermaid XSS hardening
+(P2-11), and dead code/dependency cleanup (P3-06, P3-07).
+
 ## Project Overview
 
 DreamLab AI is a premium AI training and consulting platform. This is a React SPA (Vite + TypeScript + Tailwind CSS) with a Leptos community forum (Rust/WASM), 3D WebGL visualizations (Three.js + Rust WASM), Supabase backend, Cloudflare Workers (Rust) backend services, and Nostr-based decentralized social features.
@@ -170,6 +212,7 @@ All routes are lazy-loaded via `React.lazy()` in `src/App.tsx`:
 | `/system-design` | SystemDesign | Architecture docs |
 | `/research-paper` | ResearchPaper | Research content |
 | `/testimonials` | Testimonials | Customer reviews |
+| `/community/#/governance` | (Leptos WASM) | Agent Control Surface governance dashboard |
 | `*` | NotFound | 404 page |
 
 ## Path Aliases
@@ -189,7 +232,7 @@ All routes are lazy-loaded via `React.lazy()` in `src/App.tsx`:
 
 ## TypeScript Configuration
 
-- Strict mode: **disabled** (noImplicitAny: false, strictNullChecks: false)
+- Strict mode: **partial** (noImplicitAny: false, strictNullChecks: **true** since P1-30 security audit)
 - Unused vars/params: **not enforced**
 - Target: ES2020, Module: ESNext, JSX: react-jsx
 
@@ -240,6 +283,33 @@ cargo run -p admin-cli -- mod ban <pubkey> --reason "spam"
 
 `--json` flag on all commands for machine consumption. nsec is never persisted to disk — supplied via `--nsec`, `FORUM_ADMIN_NSEC` env, or `--bunker` NIP-46 URI. See `community-forum-rs/crates/admin-cli/AGENT.md` for AI-agent cheat sheet.
 
+## Federation Transports
+
+The DreamLab ecosystem uses two transport layers for inter-service communication (Cloudflare public path and Tailscale private path), plus a CF Tunnel that bridges the two for the native pod tier. dreamlab-ai-website only ever touches the Cloudflare path.
+
+### Cloudflare (public path)
+
+Primary transport for the website and forum. CF Workers relay Nostr events, R2 stores pod data, and a CF Tunnel fronts native pods hosted on agentbox infrastructure.
+
+### Tailscale (private path)
+
+Encrypted tailnet for agentbox-to-agentbox and agentbox-to-solid-pod-rs traffic. CF Workers do not join the tailnet. The forum relay bridges to agentbox's Nostr relay over public `wss://`; agentbox handles tailnet-side federation internally.
+
+### Website's role
+
+This project (dreamlab-ai-website) connects exclusively via Cloudflare infrastructure (Workers, D1, R2). It never joins a tailnet. The relay-worker bridges forum events to agentbox's Nostr relay over public WebSocket, and agentbox propagates those events across the tailnet mesh on its own.
+
+### Endpoint map
+
+| Surface | Endpoint | Transport |
+|---------|----------|-----------|
+| Public relay | `dreamlab-nostr-relay.*.workers.dev` | Cloudflare Workers |
+| Public pods | `dreamlab-pod-api.*.workers.dev` | Cloudflare Workers (R2) |
+| Private relay | `<agentbox-host>.ts.net` (tailnet) | Tailscale |
+| Private pods | `<agentbox-host>.ts.net` (tailnet) | Tailscale |
+| Private API | `<agentbox-host>.ts.net` (tailnet) | Tailscale |
+| Hybrid native pods | `pods-native.dreamlab-ai.com` | CF Tunnel to agentbox solid-pod-rs |
+
 ### Moderation event model
 
 Nostr custom parameterized-replaceable events:
@@ -254,6 +324,21 @@ Nostr custom parameterized-replaceable events:
 | 30915 | Unban | banned pubkey | admin (revokes 30910) |
 | 30916 | Unmute | muted pubkey | admin (revokes 30911) |
 | 1984 | Report (NIP-56) | reported event id | any authed user (interop) |
+
+### Governance / Agent Control Surface event model
+
+| Kind | Name | `d` tag | Signer |
+|------|------|---------|--------|
+| 31400 | AgentControlPanel | panel id | agent (pre-registered pubkey) |
+| 31401 | AgentStatusUpdate | panel id + ts | agent |
+| 31402 | AgentActionRequest | action uuid | agent |
+| 31403 | HumanActionResponse | action uuid | admin (NIP-98 signed approve/reject) |
+| 31404 | GovernancePolicy | policy id | admin |
+| 31405 | GovernanceAuditLog | audit entry id | system |
+
+Agent pubkeys must be pre-registered in `forum-config/dreamlab.toml` `[governance].agent_pubkeys`.
+The relay filters these kinds to only accept events from registered agent or admin pubkeys.
+The feature is gated behind `[features] governance = true` in the operator config.
 
 Constants live in `nostr-core::moderation_events` (`KIND_BAN`, `KIND_MUTE`, `KIND_WARNING`, `KIND_REPORT`, `KIND_MODERATION_ACTION`, `KIND_UNBAN`, `KIND_UNMUTE`, `KIND_REPORT_NIP56`).
 

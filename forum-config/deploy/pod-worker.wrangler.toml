@@ -26,9 +26,21 @@ id      = "REPLACE_WITH_NEW_ADMIN_KV_ID"
 binding = "POD_META"
 id      = "8ec8759ab40d4709a831bf6b0e5241eb"
 
-[[kv_namespaces]]
-binding = "NIP98_REPLAY"
-id      = "REPLACE_WITH_NEW_NIP98_REPLAY_KV_ID"
+# D1 database for NIP-98 replay protection (atomic INSERT OR IGNORE),
+# payment/quota tables (webledger_accounts, txo_deposits, quota_usage),
+# and admin checks (members.is_admin / whitelist.is_admin).
+# Shares the auth-worker's D1 database so cross-worker replay is detected.
+# (Legacy NIP98_REPLAY KV binding removed — D1 INSERT OR IGNORE is atomic.)
+[[d1_databases]]
+binding       = "REPLAY_DB"
+database_name = "dreamlab-auth"
+database_id   = "e3981999-e8f0-4c07-9e4b-2e50859b8524"
 
 [vars]
-EXPECTED_ORIGIN = "https://dreamlab-ai.com"
+EXPECTED_ORIGIN  = "https://dreamlab-ai.com"
+POD_BASE_URL     = "https://dreamlab-pod-api.solitary-paper-764d.workers.dev"
+PAY_ENABLED      = "true"
+PAY_COST_SATS    = "1"
+PAY_TOKEN_TICKER = "DREAM"
+PAY_TOKEN_RATE   = "10"
+PAY_TOKEN_SUPPLY = "1000000"

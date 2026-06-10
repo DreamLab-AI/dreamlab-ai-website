@@ -21,6 +21,11 @@ import {
   Handshake,
   GraduationCap,
   Play,
+  Bot,
+  Fingerprint,
+  KeyRound,
+  Download,
+  GitBranch,
 } from "lucide-react";
 import { useOGMeta } from "@/hooks/useOGMeta";
 import { PAGE_OG_CONFIGS } from "@/lib/og-meta";
@@ -80,6 +85,26 @@ const outcomeCards = [
     count: 3,
   },
   {
+    id: "agent-governance",
+    title: "Agent Control Surface",
+    description: "AI agents publish interactive control panels for human-in-the-loop governance of autonomous systems.",
+    icon: Bot,
+    borderClass: "border-orange-500/30 hover:border-orange-500/50",
+    iconBg: "bg-orange-500/10",
+    iconColor: "text-orange-400",
+    count: 1,
+  },
+  {
+    id: "sovereign-identity",
+    title: "Sovereign Identity",
+    description: "Federated NIP-05 verification, pod-provisioned signup keys, full data portability, and git-versioned pods — your forum identity lives on your own pod.",
+    icon: Fingerprint,
+    borderClass: "border-indigo-500/30 hover:border-indigo-500/50",
+    iconBg: "bg-indigo-500/10",
+    iconColor: "text-indigo-400",
+    count: 4,
+  },
+  {
     id: "creative-production",
     title: "Creative Production",
     description: "Future-proof creative workflows with spatial audio, neural rendering, and emerging tech.",
@@ -93,30 +118,30 @@ const outcomeCards = [
 
 // Research video demonstrations
 const researchVideos = [
-  { src: "nuclear-robot.mp4", thumb: "nuclear-robot-thumb.jpg", caption: "Nuclear decommissioning planning" },
-  { src: "unity-vr.mp4", thumb: "unity-vr-thumb.jpg", caption: "Multi-viewpoint VR collaboration" },
-  { src: "hand-interact.mp4", thumb: "hand-interact-thumb.jpg", caption: "Natural gesture interfaces" },
-  { src: "bigdata-viz.mp4", thumb: "bigdata-viz-thumb.jpg", caption: "Immersive data visualisation" },
-  { src: "robot-arm.mp4", thumb: "robot-arm-thumb.jpg", caption: "Robotic control systems" },
-  { src: "motorway-sim.mp4", thumb: "motorway-sim-thumb.jpg", caption: "Infrastructure simulation" },
+  { src: "nuclear-robot.mp4", thumb: "nuclear-robot-thumb.webp", caption: "Nuclear decommissioning planning" },
+  { src: "unity-vr.mp4", thumb: "unity-vr-thumb.webp", caption: "Multi-viewpoint VR collaboration" },
+  { src: "hand-interact.mp4", thumb: "hand-interact-thumb.webp", caption: "Natural gesture interfaces" },
+  { src: "bigdata-viz.mp4", thumb: "bigdata-viz-thumb.webp", caption: "Immersive data visualisation" },
+  { src: "robot-arm.mp4", thumb: "robot-arm-thumb.webp", caption: "Robotic control systems" },
+  { src: "motorway-sim.mp4", thumb: "motorway-sim-thumb.webp", caption: "Infrastructure simulation" },
 ];
 
 // Featured team members
 const featuredTeam = [
-  { name: "Dr John O'Hare", domain: "AI & Immersive Systems", role: "Chief Hallucination Officer", image: "/data/team/04.webp" },
-  { name: "Pete Woodbridge", domain: "CTO, DREAMLAB", role: "CTO", image: "/data/team/02.webp" },
-  { name: "Steve Moyler", domain: "Chief Creative Officer, DREAMLAB", role: "Creative Lead", image: "/data/team/03.webp" },
+  { name: "Dr John O'Hare", domain: "AI & Immersive Systems", role: "Chief Hallucination Officer", image: "/images/team/04.webp" },
+  { name: "Pete Woodbridge", domain: "CTO, DREAMLAB", role: "CTO", image: "/images/team/02.webp" },
+  { name: "Steve Moyler", domain: "Chief Creative Officer, DREAMLAB", role: "Creative Lead", image: "/images/team/03.webp" },
 ];
 
 // Facility images for carousel
 const facilityImages = [
-  "/data/media/aerial.jpeg",
-  "/data/media/fairfield-front.jpg",
-  "/data/media/fairfield-back.jpeg",
-  "/data/media/view.jpeg",
-  "/data/media/labview2.webp",
-  "/data/media/labview3.webp",
-  "/data/media/remarkable2.webp",
+  "/images/venue/aerial.webp",
+  "/images/venue/fairfield-front.webp",
+  "/images/venue/fairfield-back.webp",
+  "/images/venue/view.webp",
+  "/images/venue/labview2.webp",
+  "/images/venue/labview3.webp",
+  "/images/venue/remarkable2.webp",
 ];
 
 const Index = () => {
@@ -235,26 +260,200 @@ const Index = () => {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
             {outcomeCards.map((card) => {
               const Icon = card.icon;
+              // Sovereign-identity card scrolls to the in-page explainer
+              // rather than the programmes route, since it describes a
+              // forum capability, not a residential programme cohort.
+              const target =
+                card.id === "sovereign-identity"
+                  ? "#sovereign-identity"
+                  : `/programmes#${card.id}`;
+              const countLabel =
+                card.id === "sovereign-identity"
+                  ? `${card.count} capabilities`
+                  : `${card.count} programmes`;
               return (
                 <Link
                   key={card.id}
-                  to={`/programmes#${card.id}`}
+                  to={target}
                   className={`glass-card-interactive border ${card.borderClass} !rounded-xl p-5 md:p-6 group`}
                 >
                   <div className="flex items-center gap-3 mb-4">
                     <div className={`w-10 h-10 ${card.iconBg} rounded-lg flex items-center justify-center`}>
-                      <Icon className={`w-5 h-5 ${card.iconColor}`} />
+                      <Icon className={`w-5 h-5 ${card.iconColor}`} aria-hidden="true" />
                     </div>
-                    <span className="text-xs text-muted-foreground/60">{card.count} programmes</span>
+                    <span className="text-xs text-muted-foreground/60">{countLabel}</span>
                   </div>
                   <h3 className="font-semibold text-base md:text-lg mb-2">{card.title}</h3>
                   <p className="text-muted-foreground text-sm leading-relaxed mb-3">{card.description}</p>
                   <span className={`text-sm ${card.iconColor} group-hover:underline flex items-center gap-1`}>
-                    Explore <ArrowRight className="w-3.5 h-3.5" />
+                    Explore <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
                   </span>
                 </Link>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      {/* Section 3b: Sovereign Identity (Phase 1 forum features)
+          Surfaces the JSS Phase 1 cross-repo deliverable:
+          - solid-pod-rs 8668792 (JSS v0.0.197 HTTP parity)
+          - nostr-rust-forum a7c9c40 (public POD_BASE_URL + Worker pod parity)
+          - forum-config pins the DreamLab CF deployment to those surfaces
+      */}
+      <section
+        id="sovereign-identity"
+        className="py-16 md:py-20 bg-gradient-to-b from-background via-indigo-950/10 to-background"
+        aria-labelledby="sovereign-identity-heading"
+      >
+        <div className="container max-w-6xl mx-auto px-5 md:px-4">
+          <div className="grid lg:grid-cols-2 gap-10 md:gap-12 items-start">
+            <div>
+              <p className="text-xs uppercase tracking-widest text-indigo-400 mb-3 font-semibold">
+                Forum · Phase 1
+              </p>
+              <h2
+                id="sovereign-identity-heading"
+                className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4"
+              >
+                Sovereign identity, built into the forum
+              </h2>
+              <p className="text-base md:text-lg text-foreground/80 leading-relaxed mb-8">
+                The DreamLab community forum federates identity and storage through your own Solid pod. Your keys, your verification, your data — held by you, not us.
+              </p>
+
+              <ul className="space-y-5">
+                <li className="flex gap-4">
+                  <div className="w-10 h-10 bg-indigo-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Fingerprint className="w-5 h-5 text-indigo-400" aria-hidden="true" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-base mb-1">Verified identity via pod-resident NIP-05</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      Federated NIP-05 lookup — the forum checks its D1 cache first, then falls back to your pod's published record. Your handle is verified against the pod you control, not just a central registry.
+                    </p>
+                  </div>
+                </li>
+
+                <li className="flex gap-4">
+                  <div className="w-10 h-10 bg-cyan-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <KeyRound className="w-5 h-5 text-cyan-400" aria-hidden="true" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-base mb-1">Frictionless signup with pod provisioning</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      A Schnorr secp256k1 keypair is generated on-device and never leaves the browser. The forum provisions your Solid pod through <code className="text-xs px-1 py-0.5 rounded bg-background/70 border border-indigo-500/20">POST /.pods</code>, including WebID, TypeIndex, inbox, and public media containers.
+                    </p>
+                  </div>
+                </li>
+
+                <li className="flex gap-4">
+                  <div className="w-10 h-10 bg-emerald-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Download className="w-5 h-5 text-emerald-400" aria-hidden="true" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-base mb-1">Portable by default</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      Your profile, uploads, notifications, and access rules live in a Solid-compatible pod at <code className="text-xs px-1 py-0.5 rounded bg-background/70 border border-indigo-500/20">pods.dreamlab-ai.com</code>. The Cloudflare tier keeps native JSON-LD export disabled until the upstream exporter is Worker-portable.
+                    </p>
+                  </div>
+                </li>
+
+                <li className="flex gap-4">
+                  <div className="w-10 h-10 bg-amber-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <GitBranch className="w-5 h-5 text-amber-400" aria-hidden="true" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-base mb-1">Versioned pods</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      Where the operator supports it, each member pod is a git repository — every change is a commit, giving you an audit trail and easy backup via <code className="text-xs px-1 py-0.5 rounded bg-background/70 border border-indigo-500/20">git clone</code>.
+                      <span className="block mt-1 text-xs text-muted-foreground/70">DreamLab's Cloudflare deployment doesn't currently support this (Workers can't spawn git); enabled on native solid-pod-rs and agentbox backends.</span>
+                    </p>
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            {/* Federation diagram — inline SVG, no extra deps, decorative */}
+            <div className="lg:sticky lg:top-24">
+              <div className="bg-background/60 backdrop-blur border border-indigo-500/20 rounded-2xl p-6 md:p-8 shadow-xl shadow-indigo-500/5">
+                <h3 className="text-sm font-semibold text-indigo-300 mb-4 text-center uppercase tracking-wider">
+                  How NIP-05 federation works
+                </h3>
+                <svg
+                  viewBox="0 0 360 260"
+                  className="w-full h-auto"
+                  role="img"
+                  aria-labelledby="fed-diagram-title fed-diagram-desc"
+                >
+                  <title id="fed-diagram-title">Federated NIP-05 identity resolution flow</title>
+                  <desc id="fed-diagram-desc">
+                    Visitor queries the forum's D1 cache for an identity. If cached, the forum responds with the verified key. If not, the forum fetches the user's pod, reads the published NIP-05 record, caches it, and returns the verified key to the visitor.
+                  </desc>
+                  {/* nodes */}
+                  <g fontFamily="ui-sans-serif, system-ui, sans-serif" fontSize="11">
+                    {/* visitor */}
+                    <rect x="10" y="105" width="80" height="50" rx="10" fill="rgba(34,211,238,0.10)" stroke="rgb(34,211,238)" strokeWidth="1.5" />
+                    <text x="50" y="128" textAnchor="middle" fill="rgb(165,243,252)" fontWeight="600">Visitor</text>
+                    <text x="50" y="143" textAnchor="middle" fill="rgb(165,243,252,0.8)" fontSize="9">queries handle</text>
+
+                    {/* forum + D1 cache */}
+                    <rect x="140" y="20" width="100" height="70" rx="10" fill="rgba(168,85,247,0.10)" stroke="rgb(168,85,247)" strokeWidth="1.5" />
+                    <text x="190" y="46" textAnchor="middle" fill="rgb(216,180,254)" fontWeight="600">Forum</text>
+                    <text x="190" y="62" textAnchor="middle" fill="rgb(216,180,254,0.9)" fontSize="9">D1 cache</text>
+                    <text x="190" y="76" textAnchor="middle" fill="rgb(216,180,254,0.7)" fontSize="9">(fast path)</text>
+
+                    {/* user pod */}
+                    <rect x="140" y="170" width="100" height="70" rx="10" fill="rgba(99,102,241,0.10)" stroke="rgb(99,102,241)" strokeWidth="1.5" />
+                    <text x="190" y="196" textAnchor="middle" fill="rgb(199,210,254)" fontWeight="600">User Pod</text>
+                    <text x="190" y="212" textAnchor="middle" fill="rgb(199,210,254,0.9)" fontSize="9">/public/nip05.json</text>
+                    <text x="190" y="226" textAnchor="middle" fill="rgb(199,210,254,0.7)" fontSize="9">(authoritative)</text>
+
+                    {/* verified key */}
+                    <rect x="280" y="105" width="70" height="50" rx="10" fill="rgba(16,185,129,0.10)" stroke="rgb(16,185,129)" strokeWidth="1.5" />
+                    <text x="315" y="128" textAnchor="middle" fill="rgb(167,243,208)" fontWeight="600">Verified</text>
+                    <text x="315" y="143" textAnchor="middle" fill="rgb(167,243,208,0.8)" fontSize="9">pubkey</text>
+                  </g>
+
+                  {/* arrows */}
+                  <defs>
+                    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                      <path d="M 0 0 L 10 5 L 0 10 z" fill="rgb(168,85,247)" />
+                    </marker>
+                    <marker id="arrow-fallback" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                      <path d="M 0 0 L 10 5 L 0 10 z" fill="rgb(99,102,241)" />
+                    </marker>
+                    <marker id="arrow-out" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                      <path d="M 0 0 L 10 5 L 0 10 z" fill="rgb(16,185,129)" />
+                    </marker>
+                  </defs>
+
+                  {/* visitor -> forum */}
+                  <path d="M 90 120 Q 115 80 140 60" fill="none" stroke="rgb(168,85,247)" strokeWidth="1.5" markerEnd="url(#arrow)" />
+                  {/* forum -> pod (fallback) */}
+                  <path d="M 190 90 L 190 170" fill="none" stroke="rgb(99,102,241)" strokeWidth="1.5" strokeDasharray="4 3" markerEnd="url(#arrow-fallback)" />
+                  <text x="200" y="135" fill="rgb(165,180,252)" fontSize="9" fontFamily="ui-sans-serif, system-ui, sans-serif">cache miss</text>
+                  {/* pod -> forum (record) */}
+                  <path d="M 178 170 Q 155 130 178 92" fill="none" stroke="rgb(99,102,241)" strokeWidth="1.5" markerEnd="url(#arrow-fallback)" />
+                  {/* forum -> verified */}
+                  <path d="M 240 60 Q 280 90 295 105" fill="none" stroke="rgb(16,185,129)" strokeWidth="1.5" markerEnd="url(#arrow-out)" />
+                  {/* verified -> visitor */}
+                  <path d="M 280 130 L 90 130" fill="none" stroke="rgb(16,185,129)" strokeWidth="1.5" markerEnd="url(#arrow-out)" />
+                </svg>
+                <p className="text-xs text-muted-foreground mt-4 text-center leading-relaxed">
+                  Cache-first, pod-authoritative. If the forum's edge cache misses, the user's pod is the source of truth.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center mt-10">
+            <a
+              href="/community/"
+              className="inline-flex items-center text-indigo-400 hover:text-indigo-300 font-medium text-sm hover:underline gap-1"
+            >
+              Join the community forum <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+            </a>
           </div>
         </div>
       </section>
@@ -339,7 +538,7 @@ const Index = () => {
                   <video
                     controls
                     className="w-full h-full object-cover"
-                    poster={`/data/media/${video.thumb}`}
+                    poster={`/images/portfolio/${video.thumb}`}
                     preload="none"
                   >
                     <source src={`/data/media/videos/${video.src}`} type="video/mp4" />

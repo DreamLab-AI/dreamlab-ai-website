@@ -5,23 +5,24 @@ name: Deploy to GitHub Pages
 #
 # Layout:
 #   /              → React marketing site
-#   /community/    → Leptos forum (Rust WASM)
-#
-# Rollback: revert the merge commit or reset main to `pre-rust-deploy` tag.
+#   /community/    → Leptos forum (Rust WASM, built from nostr-bbs kit)
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+    paths:
+      - 'forum-config/**'
+      - 'src/**'
+      - 'public/**'
+      - 'index.html'
+      - 'package.json'
+      - 'vite.config.*'
   workflow_dispatch:
 
-# Cancel in-flight runs of this workflow on the same ref to avoid
-# overlapping deploys racing for gh-pages.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-# Default-restrictive workflow permissions; jobs opt in to the minimum needed.
 permissions:
   contents: read
 
@@ -30,17 +31,28 @@ env:
   RUST_TOOLCHAIN: '1.90.0'
   TRUNK_VERSION: '0.21.12'
   TRUNK_SHA256: 'e5261930aab979dc5d0388fdc71bc32bedf0a15211ef8c8703fa2b7a2016394b'
-  # Production API URLs — baked into WASM via option_env!() at compile time
+  # API bases point at the deployed workers.dev hosts. The branded custom
+  # domains (relay./api./pods./search./preview.dreamlab-ai.com) are the
+  # documented end-state but are NOT provisioned in DNS (verified 2026-06-09:
+  # ERR_NAME_NOT_RESOLVED; the apex is on GitHub Pages). Shipping them baked
+  # into window.__ENV__ severed every client API call. All five workers are
+  # live on workers.dev and already send Access-Control-Allow-Origin for
+  # https://dreamlab-ai.com. When the operator provisions the custom domains,
+  # flip these back in one commit.
   VITE_RELAY_URL: 'wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev'
   VITE_AUTH_API_URL: 'https://dreamlab-auth-api.solitary-paper-764d.workers.dev'
   VITE_POD_API_URL: 'https://dreamlab-pod-api.solitary-paper-764d.workers.dev'
   VITE_SEARCH_API_URL: 'https://dreamlab-search-api.solitary-paper-764d.workers.dev'
   VITE_LINK_PREVIEW_API_URL: 'https://dreamlab-link-preview.solitary-paper-764d.workers.dev'
-  # Forum base path for leptos_router (sub-directory deployment)
   FORUM_BASE: '/community'
+  KIT_REPO: 'https://github.com/DreamLab-AI/nostr-rust-forum.git'
+  # Pinned to the exact commit resolved in forum-config/Cargo.lock (nostr-bbs-* rc11).
+  # Do NOT float on `main`: a breaking upstream push would silently ship untested
+  # worker/WASM code while the lockfile stays at this tested revision. Keep this SHA
+  # in sync with the `rev = "..."` in forum-config/Cargo.lock when bumping the kit.
+  KIT_REF: 'b1b4466fc80b65e908357086f3318667ab0bd88b'
 
 jobs:
-  # Pre-deploy gate: must be green before we touch gh-pages.
   gate:
     name: Pre-deploy Gate
     if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
@@ -55,11 +67,16 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     permissions:
-      contents: write   # required to push gh-pages
+      contents: write
 
     steps:
       - name: Check out the code
         uses: actions/checkout@v4
+
+      - name: Clone kit (nostr-rust-forum) at pinned SHA
+        run: |
+          git clone --filter=blob:none --no-checkout ${{ env.KIT_REPO }} kit
+          git -C kit checkout --detach ${{ env.KIT_REF }}
 
       # ── React main site ────────────────────────────────────────────────
       - name: Set up Node.js
@@ -74,8 +91,6 @@ jobs:
       - name: Build React main site
         run: npm run build
         env:
-          # Inject Supabase credentials into Vite build (consumed via
-          # import.meta.env.VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY).
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
           VITE_AUTH_API_URL: ${{ env.VITE_AUTH_API_URL }}
@@ -92,8 +107,8 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            community-forum-rs/target
-          key: ${{ runner.os }}-cargo-${{ env.RUST_TOOLCHAIN }}-${{ hashFiles('community-forum-rs/Cargo.lock') }}
+            kit/target
+          key: ${{ runner.os }}-cargo-${{ env.RUST_TOOLCHAIN }}-${{ hashFiles('kit/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-cargo-${{ env.RUST_TOOLCHAIN }}-
             ${{ runner.os }}-cargo-
@@ -109,11 +124,6 @@ jobs:
           rm -f "${ARCHIVE}"
           trunk --version
 
-      # binaryen 119 is the last release whose wasm-opt accepts Rust 1.90's
-      # bulk-memory codegen with --enable-bulk-memory{,-opt}. Trunk's bundled
-      # wasm-opt 122 rejects the same input. Install manually here and let
-      # Trunk.toml's post-build hook drive optimisation, since Trunk has no
-      # flag-passthrough for its built-in wasm-opt step.
       - name: Install wasm-opt (binaryen 119)
         run: |
           set -euo pipefail
@@ -125,45 +135,33 @@ jobs:
           rm -f "${ARCHIVE}"
           wasm-opt --version
 
-      # Standalone Tailwind CLI v3.4.17. The forum-client Trunk pre_build hook
-      # invokes `tailwindcss` to compile tailwind.css → tailwind.dist.css with
-      # tree-shaking, replacing the dev-only cdn.tailwindcss.com script. The
-      # hook downloads the binary itself if not present, but installing it in
-      # CI here makes the build reproducible and saves ~5s per run.
       - name: Install Tailwind CLI (v3.4.17)
         run: |
           set -euo pipefail
           TW_VERSION="3.4.17"
           URL="https://github.com/tailwindlabs/tailwindcss/releases/download/v${TW_VERSION}/tailwindcss-linux-x64"
-          # /usr/local/bin requires sudo on GitHub-hosted runners; use sudo
-          # (matches the binaryen install pattern above which uses `sudo tar`).
           sudo curl -fsSL -o /usr/local/bin/tailwindcss "${URL}"
           sudo chmod +x /usr/local/bin/tailwindcss
           tailwindcss --help | head -1
 
-      - name: Build Leptos forum with Trunk (release + post-build wasm-opt)
-        working-directory: community-forum-rs/crates/forum-client
-        # --release re-enabled. Trunk.toml omits [tools] wasm_opt so Trunk
-        # skips its bundled wasm-opt 122; a [[hooks]] block runs the manually
-        # installed binaryen 119 wasm-opt with --enable-bulk-memory{,-opt}
-        # plus the other feature flags rustc 1.90 emits by default. A second
-        # pre_build hook runs Tailwind CLI to produce tailwind.dist.css.
+      - name: Build Leptos forum with Trunk
+        working-directory: kit/crates/nostr-bbs-forum-client
         run: trunk build --release --public-url /community/
+        env:
+          NATIVE_POD_URL: ${{ secrets.NATIVE_POD_URL }}
 
       - name: Report forum WASM bundle size
         run: |
           set -euo pipefail
           echo "=== Forum WASM bundle size ==="
-          find community-forum-rs/dist -name '*.wasm' -printf '%p  %s bytes\n' | \
+          find kit/dist -name '*.wasm' -printf '%p  %s bytes\n' | \
             awk '{printf "%s  %.2f MB\n", $1, $2/1024/1024}'
 
       # ── Combine outputs ────────────────────────────────────────────────
       - name: Merge React + Forum into dist/
         run: |
-          # React build already in dist/
-          # Copy forum output into dist/community/
           mkdir -p dist/community
-          cp -r community-forum-rs/dist/* dist/community/
+          cp -r kit/dist/* dist/community/
 
           echo "=== React site ==="
           ls dist/index.html dist/assets/ | head -5
@@ -179,8 +177,6 @@ jobs:
 
       - name: Create GitHub Pages SPA routing files
         run: |
-          # Smart 404.html: routes /community/* to the forum SPA,
-          # all other paths to the React SPA.
           cat > dist/404.html << 'REDIRECT_EOF'
           <!DOCTYPE html>
           <html><head><meta charset="utf-8"><title>Redirecting...</title>
@@ -189,14 +185,12 @@ jobs:
               var loc = window.location;
               var path = loc.pathname;
               if (path.startsWith('/community')) {
-                // Route to forum SPA — encode sub-path as query param
                 var sub = path.slice('/community'.length) || '/';
                 loc.replace(
                   loc.protocol + '//' + loc.host +
                   '/community/?__p=' + encodeURIComponent(sub + loc.search + loc.hash)
                 );
               } else {
-                // Route to React SPA — standard SPA redirect
                 loc.replace(
                   loc.protocol + '//' + loc.host +
                   '/?__p=' + encodeURIComponent(path + loc.search + loc.hash)
@@ -207,17 +201,12 @@ jobs:
           </head><body></body></html>
           REDIRECT_EOF
 
-          # Forum also needs its own 404.html for direct community/ sub-paths
           cp dist/community/index.html dist/community/404.html
-
-          # Prevent Jekyll processing
           touch dist/.nojekyll
-
           echo "SPA routing files created"
 
       - name: Inject React SPA redirect pickup
         run: |
-          # Add redirect pickup script to React index.html (before </head>)
           PICKUP='<script>(function(){var q=new URLSearchParams(window.location.search);var r=q.get("__p");if(r){q.delete("__p");var s=q.toString();history.replaceState(null,"",r+(s?"?"+s:""));}})();</script>'
           sed -i "s|</head>|${PICKUP}</head>|" dist/index.html
           echo "Injected SPA redirect pickup into React index.html"
@@ -233,9 +222,6 @@ jobs:
           cname: dreamlab-ai.com
           commit_message: "Deploy React + Leptos forum from ${{ github.sha }}"
 
-      # Mirror push to thedreamlab.uk. Skips gracefully if PAT is not configured
-      # (e.g. on forks or before the secret is set up). Mirror failures must not
-      # block the primary GitHub Pages deploy.
       - name: Check mirror token
         id: mirror_token
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'

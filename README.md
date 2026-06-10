@@ -11,11 +11,40 @@
 
 **Website**: [dreamlab-ai.com](https://dreamlab-ai.com) | **Repository**: [DreamLab-AI/dreamlab-ai-website](https://github.com/DreamLab-AI/dreamlab-ai-website)
 
+**Maintainer**: [John O'Hare](https://github.com/jjohare) · **Upstream IP**: [Melvin Carvalho](https://github.com/melvincarvalho) ([JSS](https://github.com/JavaScriptSolidServer/JavaScriptSolidServer), [DID:Nostr](https://github.com/nicholasgasior/did-nostr)) · [MAINTAINERS.md](MAINTAINERS.md)
+
+---
+
+## Ecosystem
+
+dreamlab-ai-website consumes the [nostr-rust-forum](https://github.com/DreamLab-AI/nostr-rust-forum) kit as its forum backend, with DreamLab-specific branding and configuration in `forum-config/`. It is part of the DreamLab open-source ecosystem.
+
+```mermaid
+graph LR
+    SPR["solid-pod-rs<br/><i>Foundation</i>"] -->|dep| NRF["nostr-rust-forum<br/><i>Forum Kit</i>"]
+    SPR -->|dep| AB["agentbox<br/><i>Agent Container</i>"]
+    SPR -->|dep| VC["VisionClaw<br/><i>Integration Substrate</i>"]
+    NRF -->|kit| DW["dreamlab-ai-website<br/><i>Deployment</i>"]
+    AB <-.->|"relay mesh"| VC
+    AB <-.->|"relay mesh"| NRF
+    VC <-.->|"relay mesh"| NRF
+
+    style DW fill:#4a9eff,stroke:#2563eb,color:#fff
+```
+
+| Repository | Role | Key Technology |
+|---|---|---|
+| [solid-pod-rs](https://github.com/DreamLab-AI/solid-pod-rs) | Foundation library | Solid Protocol, DID:Nostr, WAC |
+| [nostr-rust-forum](https://github.com/DreamLab-AI/nostr-rust-forum) | Forum kit | `nostr-bbs-*` Rust crates, CF Workers |
+| [agentbox](https://github.com/DreamLab-AI/agentbox) | Agent container | Nix, nostr-rs-relay, mesh peer |
+| [VisionClaw](https://github.com/DreamLab-AI/VisionClaw) | Integration substrate | Knowledge graph, GPU physics, XR |
+| **[dreamlab-ai-website](https://github.com/DreamLab-AI/dreamlab-ai-website)** | **Branded deployment** | **React SPA, WASM forum, `forum-config/`** |
+
 ---
 
 ## Architecture
 
-The platform consists of a React marketing site, a Rust/Leptos WASM community forum, and five Cloudflare Workers providing backend services. All communication is built on the Nostr protocol with end-to-end encryption.
+The platform consists of a React marketing site, a Rust/Leptos WASM community forum powered by the upstream [nostr-rust-forum](https://github.com/DreamLab-AI/nostr-rust-forum) kit, and five Cloudflare Workers providing backend services. All communication is built on the Nostr protocol with end-to-end encryption. DreamLab-specific branding and operator configuration live in `forum-config/`.
 
 ```mermaid
 graph TB
@@ -70,13 +99,15 @@ graph TB
 - **Passkey-first authentication** -- WebAuthn PRF derives a secp256k1 private key deterministically via HKDF. The key is never stored; it exists only in a Rust closure and is zeroized on page unload.
 - **End-to-end encrypted DMs** -- NIP-59 Gift Wrap protocol (Rumor, Seal, Wrap) with NIP-44 ChaCha20-Poly1305 encryption. The relay and server never see plaintext.
 - **Zone-based access control** -- Three access zones (Home, DreamLab, Minimoonoir) enforced at both the relay and client layers with cohort-based gating.
+- **Agent Control Surface** -- Governance dashboard at `/governance` powered by custom Nostr event kinds 31400-31405. AI agents publish interactive control panels; human operators approve/reject actions via NIP-98 signed responses. Gated behind `governance = true` feature flag in `forum-config/dreamlab.toml`.
 - **Solid pods with LDP compliance** -- Full Linked Data Platform containers, WAC ACL inheritance, conditional requests (ETags), Range streaming, JSON Patch (RFC 6902), per-user quotas, WebID profiles, content negotiation, and pod provisioning.
 - **Agent micropayments** -- HTTP 402 Payment Required with Web Ledgers spec, Bitcoin TXO deposit via mempool verification, per-request satoshi cost for pay-gated resources.
 - **Federation-ready** -- WebFinger discovery (remoteStorage + Solid), NIP-05 verification, Solid Notifications (webhooks), `.well-known/solid` discovery document.
+- **JSS v0.0.197 Solid alignment (May 2026)** -- Verified identity (federated NIP-05 with pod fallback), authenticated `POST /.pods` pod creation, JSS-compatible CORS/auth headers, TypeIndex/media provisioning, and correct public WebID URLs on `pods.dreamlab-ai.com`. The Cloudflare tier keeps native JSON-LD export and git-init disabled until those paths are Worker-portable. See [CHANGELOG.md](CHANGELOG.md#jss-phase-1-sprint---2026-05-16).
 - **WASM vector search** -- RuVector WASM microkernel (42KB) with `.rvf` container format, running in a Cloudflare Worker at 490K vectors/sec. Cmd/K global semantic search.
 - **Smart auth UX** -- Progressive disclosure login (auto-detects NIP-07 extensions), friendly labels with optional technical mode toggle, forum-first navigation.
 - **Security hardened** -- XSS sanitization on all markdown rendering, NIP-98 body hash verification, rate limiting on all HTTP workers, env-based CORS, hibernation-safe relay subscriptions.
-- **457 tests, 0 warnings** -- Comprehensive test coverage across all 7 crates including property-based tests for cryptographic operations.
+- **Property-tested crypto** -- The upstream kit ships comprehensive test coverage, including property-based tests for cryptographic operations. Operator-owned tests in `tests/` cover the `forum-config/` overlay.
 - **3D visualizations** -- Three.js + React Three Fiber powering golden ratio Voronoi, 4D tesseract, and torus knot hero scenes on the marketing site.
 
 ## Tech Stack
@@ -86,56 +117,40 @@ graph TB
 | Marketing Site | React 18.3 + TypeScript 5.5 + Vite 5.4 |
 | Styling | Tailwind CSS 3.4 + shadcn/ui (Radix UI) |
 | 3D | Three.js 0.156 + React Three Fiber |
-| Community Forum | **Rust / Leptos 0.7** (CSR, WASM, amber/gray theme, 18 routes, 58+ components) |
-| Nostr Protocol | nostr-core (Rust) — NIP-01/07/09/29/33/40/42/45/50/52/98 |
+| Community Forum | **Rust / Leptos 0.7** (CSR, WASM, amber/gray theme, 19 routes incl. `/governance`, 58+ components) |
+| Nostr Protocol | nostr-bbs-core / upstream `nostr` crate — NIP-01/07/09/29/33/40/42/45/50/52/98 + kinds 31400-31405 (governance) |
 | Auth | WebAuthn PRF via passkey-rs + NIP-98 + NIP-07 extension |
 | Encryption | NIP-44 (ChaCha20-Poly1305) + NIP-59 Gift Wrap |
 | Backend | 5 Cloudflare Workers (Rust) via `worker` 0.7.5 |
 | Storage | Cloudflare D1, KV, R2, Durable Objects |
 | Solid Pods | LDP containers, WAC ACL inheritance, JSON Patch, quotas, WebID, micropayments |
-| Hosting | GitHub Pages (static) + Cloudflare Workers (API) |
+| Hosting | GitHub Pages (static, primary) + optional Cloudflare Pages mirror + 5 Cloudflare Workers (API) |
 | WASM Search | RuVector microkernel + `.rvf` format + Cmd/K semantic search |
 | Crypto | k256, chacha20poly1305, hkdf, sha2 (NCC-audited) |
-| Tests | **457 tests**, 0 failures, 0 compiler warnings |
+| Tests | Kit-owned suite upstream; `forum-config/` overlay tests in `tests/` |
 
 ## Quick Start
 
 ### Prerequisites
 
 ```bash
-# Rust toolchain + WASM target
-rustup target add wasm32-unknown-unknown
-cargo install trunk wasm-bindgen-cli worker-build wasm-opt
-
-# Node.js 20+ (for React site and Tailwind)
+# Node.js 20+ (for React marketing site)
 npm install -g wrangler
 ```
 
-### Clone and Build
+The WASM forum is pre-built and deployed to GitHub Pages via CI. For local React site development, only Node.js is required.
+
+### Clone and Develop
 
 ```bash
 git clone https://github.com/DreamLab-AI/dreamlab-ai-website.git
 cd dreamlab-ai-website
 
-# Verify Rust workspace compiles (native + WASM)
-cargo check --workspace
-cargo check --workspace --target wasm32-unknown-unknown
-
 # Install Node dependencies (React site + Tailwind)
 npm install
-```
 
-### Development Servers
-
-```bash
 # React marketing site (http://localhost:5173)
 npm run dev
-
-# Leptos community forum (http://localhost:8080)
-cd community-forum-rs && trunk serve
-
-# Cloudflare Workers (local dev with D1/KV/R2 simulators)
-cd community-forum-rs/crates/auth-worker && worker-build --dev && wrangler dev
 ```
 
 ### Commands
@@ -145,11 +160,6 @@ cd community-forum-rs/crates/auth-worker && worker-build --dev && wrangler dev
 | `npm run dev` | React marketing site with HMR |
 | `npm run build` | Production build of React site |
 | `npm run lint` | ESLint code quality checks |
-| `trunk serve` | Leptos forum dev server with hot reload |
-| `trunk build --release` | Production WASM build of forum |
-| `cargo test --workspace` | Run all Rust tests (native) |
-| `cargo test --workspace --target wasm32-unknown-unknown` | Run WASM tests |
-| `cargo clippy --workspace -- -D warnings` | Lint all Rust code |
 
 ## Project Structure
 
@@ -161,23 +171,16 @@ dreamlab-ai-website/
     hooks/                      Custom React hooks
     lib/                        Utilities, Supabase client
 
-  community-forum-rs/           Rust/Leptos workspace (7 crates)
-    Cargo.toml                  Workspace root
-    Trunk.toml                  trunk build configuration
-    index.html                  Leptos SPA entry point
-    crates/
-      nostr-core/               Shared crypto + protocol (NIP-01/07/09/29/33/40/42/45/50/52/98)
-      forum-client/             Leptos 0.7 CSR app (18 pages, 58+ components, smart auth)
-      auth-worker/              CF Worker -- WebAuthn + NIP-98 + rate limiting
-      pod-worker/               CF Worker -- Solid pods (LDP, WAC, PATCH, quotas, WebID, micropayments)
-      preview-worker/           CF Worker -- OG metadata / link preview (modular: ssrf/parse/oembed)
-      relay-worker/             CF Worker -- Nostr relay (modular: session/filter/broadcast/nip_handlers/storage)
-      search-worker/            CF Worker -- RuVector WASM vector search (.rvf) + rate limiting
+  forum-config/                 Operator overlay for nostr-rust-forum kit
+    Cargo.toml                  Pins nostr-bbs-* crates from nostr-rust-forum git
+    dreamlab.toml               DreamLab-specific operator config
+    src/                        Branding + per-worker entry shims
+    deploy/                     Per-worker wrangler.toml with DreamLab CF resource IDs
 
   wasm-voronoi/                 Rust WASM for 3D Voronoi hero effect
   public/data/                  Runtime content (team profiles, workshops, media)
   scripts/                      Build and utility scripts
-  docs/                         Full documentation suite (28 files)
+  docs/                         Full documentation suite
 ```
 
 ## Documentation
@@ -203,35 +206,57 @@ All documentation lives in the [`docs/`](docs/README.md) directory. Start there 
 
 ## Deployment
 
+This repo is a **consumer** of the [nostr-rust-forum](https://github.com/DreamLab-AI/nostr-rust-forum) kit. It does not contain forum source code. All Rust worker and forum-client source lives upstream in the kit repo. CI workflows shallow-clone the kit at build time and overlay DreamLab-specific wrangler.toml configs from `forum-config/deploy/`.
+
 ```mermaid
 graph LR
     subgraph "GitHub Actions"
-        PUSH["Push to main"]
+        PUSH["Push to main<br/>(or workflow_dispatch)"]
         DEPLOY_YML["deploy.yml"]
         WORKERS_YML["workers-deploy.yml"]
     end
 
     subgraph "Build Steps"
+        CLONE["git clone --depth 1<br/>nostr-rust-forum → kit/"]
+        OVERLAY["cp forum-config/deploy/*.wrangler.toml<br/>→ kit/crates/"]
         NPM["npm run build<br/>(React)"]
-        TRUNK["trunk build --release<br/>(Leptos WASM)"]
+        TRUNK["trunk build --release<br/>(Leptos WASM from kit)"]
         WASM_OPT["wasm-opt -Oz<br/>(Size optimization)"]
-        WORKER_BUILD["worker-build --release<br/>(5 Rust Workers)"]
-        WRANGLER["wrangler deploy<br/>(5 Workers)"]
+        WORKER_BUILD["worker-build --release<br/>(5 kit crates)"]
+        WRANGLER["wrangler deploy<br/>(DreamLab configs)"]
     end
 
     subgraph "Hosting"
         GH_PAGES["GitHub Pages<br/>dreamlab-ai.com"]
-        CF_WORKERS["Cloudflare Workers<br/>api. / pods. / search. / preview."]
+        CF_WORKERS["Cloudflare Workers<br/>5 workers"]
     end
 
     PUSH --> DEPLOY_YML
     PUSH --> WORKERS_YML
-    DEPLOY_YML --> NPM --> TRUNK --> WASM_OPT --> GH_PAGES
-    WORKERS_YML --> WORKER_BUILD --> WRANGLER --> CF_WORKERS
+    DEPLOY_YML --> CLONE --> NPM --> TRUNK --> WASM_OPT --> GH_PAGES
+    WORKERS_YML --> CLONE
+    CLONE --> OVERLAY --> WORKER_BUILD --> WRANGLER --> CF_WORKERS
 
     style GH_PAGES fill:#24292e,color:#fff
     style CF_WORKERS fill:#F38020,color:#fff
+    style CLONE fill:#8B5CF6,color:#fff
+    style OVERLAY fill:#8B5CF6,color:#fff
 ```
+
+### Kit Consumer Architecture
+
+The separation follows **PRD-012** (kit adoption) and **ADR-085** (forum-config package):
+
+| Concern | Location | Owned by |
+|---------|----------|----------|
+| Worker source code | `nostr-rust-forum` (kit repo, crates.io) | Kit maintainers |
+| Forum client (Leptos WASM) | `nostr-rust-forum` (kit repo) | Kit maintainers |
+| CF resource IDs (D1, KV, R2) | `forum-config/deploy/*.wrangler.toml` | **This repo** |
+| Operator config (branding, vars) | `forum-config/dreamlab.toml` | **This repo** |
+| React marketing site | `src/` | **This repo** |
+| Test suites | `tests/` | **This repo** |
+
+To upgrade the kit version, update `KIT_REF` in the workflow env (currently tracks `main`). For pinned releases, set it to a tag like `v3.0.0`.
 
 All workflows are guarded with `if: github.repository == 'DreamLab-AI/dreamlab-ai-website'`.
 
@@ -257,10 +282,56 @@ All workflows are guarded with `if: github.repository == 'DreamLab-AI/dreamlab-a
 - **Relay-level enforcement** -- Whitelist, rate limits (10 events/sec), connection limits (20/IP), size limits (64KB), hibernation-safe subscription persistence
 - **457 tests, 0 warnings** -- Comprehensive test suite including property-based tests for cryptographic operations
 
+---
+
+## Federation Transports
+
+dreamlab-ai-website participates in two of the three DreamLab federation transport strata. As a Cloudflare Pages + Workers deployment, it cannot join a Tailscale tailnet.
+
+### Stratum 2: Nostr relays
+
+The forum's relay-worker (Durable Objects WebSocket) connects browser clients to the Nostr relay. Governance events (kinds 31400-31405) surface in the forum UI. All events are authenticated via NIP-98/NIP-42 `did:nostr` Schnorr signatures.
+
+The `[mesh]` block in `forum-config/dreamlab.toml` declares the federation mesh (PRD-010 Phase 3 / ADR-073). `peer_relays` is currently empty and is populated when mesh peers come online, at which point governance events from agentbox and VisionClaw propagate through to the forum.
+
+### Stratum 3: Cloudflare Tunnel to the native pod tier
+
+When the `[native_pod]` section is enabled, the auth-worker forwards provisioning requests to an agentbox-hosted `solid-pod-rs` server fronted by a Cloudflare Tunnel at `pods-native.dreamlab-ai.com`. The CF Workers pod tier (pod-worker) stores pod data directly in R2 and does not tunnel out.
+
+| Worker | Target | Purpose |
+|---|---|---|
+| auth-worker | `pods-native.dreamlab-ai.com` (CF Tunnel) | Native pod provisioning via `/_admin/provision`, NIP-05 resolution |
+| pod-worker | Cloudflare R2 | CF-tier pod reads/writes, `.pods` creation |
+
+The tunnel provides transport security; `did:nostr` NIP-98 signatures provide request-level authentication.
+
+### Transport matrix
+
+| Stratum | dreamlab-ai-website | Why |
+|---|---|---|
+| 1: Tailscale | Not applicable | CF Pages/Workers cannot join a tailnet |
+| 2: Nostr relays | relay-worker (DO) | Browser-to-relay bridge, governance events |
+| 3: CF Tunnel | auth-worker (when `[native_pod]` enabled) | Reach the agentbox native pod tier |
+
+---
+
+## Part of VisionFlow
+
+dreamlab-ai-website is the **branded edge deployment** of the [VisionFlow](https://github.com/DreamLab-AI/VisionFlow) coordination platform — a federated architecture for human–AI intelligence built on `did:nostr` identity, OWL 2 EL reasoning, and Nostr message passing.
+
+| Substrate | Repository | Role |
+|:----------|:-----------|:-----|
+| **VisionFlow** | [DreamLab-AI/VisionFlow](https://github.com/DreamLab-AI/VisionFlow) | Ecosystem guide and coordination architecture |
+| **VisionClaw** | [DreamLab-AI/VisionClaw](https://github.com/DreamLab-AI/VisionClaw) | Knowledge engineering — OWL 2 EL, 92 CUDA kernels, XR |
+| **Agentbox** | [DreamLab-AI/agentbox](https://github.com/DreamLab-AI/agentbox) | Harness engineering — Nix, 90+ skills, sovereign pods |
+| **solid-pod-rs** | [DreamLab-AI/solid-pod-rs](https://github.com/DreamLab-AI/solid-pod-rs) | Cryptographic foundation — JSS Rust port, DID:Nostr |
+| **nostr-rust-forum** | [DreamLab-AI/nostr-rust-forum](https://github.com/DreamLab-AI/nostr-rust-forum) | Forum kit — passkey auth, governance events |
+| **dreamlab-ai-website** | **[DreamLab-AI/dreamlab-ai-website](https://github.com/DreamLab-AI/dreamlab-ai-website)** | **Branded deployment — React, WASM, Cloudflare Workers** |
+
 ## Licence
 
 Proprietary. Copyright 2024-2026 DreamLab AI Consulting Ltd. All rights reserved.
 
 ---
 
-*Last updated: 2026-03-16*
+*Last updated: 2026-05-12*

@@ -14,8 +14,8 @@ use web_sys::CanvasRenderingContext2d;
 const GOLDEN_ANGLE: f64 = 2.39996322972865332;
 
 /// Color palette
-const BRONZE: (u8, u8, u8) = (205, 127, 50);    // #CD7F32
-const GOLD: (u8, u8, u8) = (212, 165, 116);     // #D4A574
+const BRONZE: (u8, u8, u8) = (205, 127, 50); // #CD7F32
+const GOLD: (u8, u8, u8) = (212, 165, 116); // #D4A574
 const BRIGHT_GOLD: (u8, u8, u8) = (255, 215, 0); // #FFD700
 
 /// Voronoi seed point
@@ -250,8 +250,7 @@ impl VoronoiHero {
 
         // Draw seed nodes
         for seed in &self.seeds {
-            let dist =
-                ((seed.x - self.center_x).powi(2) + (seed.y - self.center_y).powi(2)).sqrt();
+            let dist = ((seed.x - self.center_x).powi(2) + (seed.y - self.center_y).powi(2)).sqrt();
             let ratio = (dist / self.radius).min(1.0);
             let color = interpolate_color(ratio);
             let node_size = 1.5 + (1.0 - ratio) * 1.5;
@@ -373,8 +372,11 @@ fn compute_delaunay_edges(seeds: &[Seed], width: f64, height: f64) -> Vec<Edge> 
                 for &bj in &bad_triangles {
                     if bi != bj {
                         let other = &triangles[bj];
-                        let other_edges =
-                            [(other.p1, other.p2), (other.p2, other.p3), (other.p3, other.p1)];
+                        let other_edges = [
+                            (other.p1, other.p2),
+                            (other.p2, other.p3),
+                            (other.p3, other.p1),
+                        ];
                         for oe in other_edges {
                             if (edge.0 == oe.0 && edge.1 == oe.1)
                                 || (edge.0 == oe.1 && edge.1 == oe.0)
@@ -414,8 +416,7 @@ fn compute_delaunay_edges(seeds: &[Seed], width: f64, height: f64) -> Vec<Edge> 
     triangles.retain(|t| t.p1 < st_idx && t.p2 < st_idx && t.p3 < st_idx);
 
     // Extract unique edges
-    let mut edge_set: std::collections::HashSet<(usize, usize)> =
-        std::collections::HashSet::new();
+    let mut edge_set: std::collections::HashSet<(usize, usize)> = std::collections::HashSet::new();
 
     for tri in &triangles {
         let mut add_edge = |a: usize, b: usize| {

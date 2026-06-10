@@ -18,7 +18,7 @@ expected_origin  = "https://dreamlab-ai.com"
 
 # ─── Solid Pod backend (Cloudflare R2) ───────────────────────────────────────
 [pod]
-base_url        = "https://pods.dreamlab-ai.com"
+base_url        = "https://dreamlab-pod-api.solitary-paper-764d.workers.dev"
 storage_backend = "cf-r2"
 r2_bucket       = "dreamlab-pods"
 
@@ -33,9 +33,10 @@ ingress_policy  = "allowlist"
 [admin]
 mode            = "static"
 static_pubkeys  = [
-  # Pete (DreamLab CTO) — placeholder; operator must supply the real value
-  # via DREAMLAB_ADMIN_PUBKEY env-override during deploy.
-  "0000000000000000000000000000000000000000000000000000000000000000",
+  # operator-jjohare — human admin (Dr John O'Hare)
+  "6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425a",
+  # moderation-bot — automated moderation agent
+  "5d80b5facd2d746689d7d2e400db6acce5843456967054adcf6956e4c734c54c",
 ]
 
 # ─── Branding ────────────────────────────────────────────────────────────────
@@ -74,29 +75,192 @@ post_threshold  = 1     # +1 trust required to post in moderated channels
 # ─── Invite system ───────────────────────────────────────────────────────────
 [invites]
 enabled              = true
-welcome_bot_pubkey   = "0000000000000000000000000000000000000000000000000000000000000000"
-# ↑ placeholder; operator supplies via DREAMLAB_WELCOME_BOT_PUBKEY env-override.
+# welcome-bot — dedicated agent identity (not the server key)
+welcome_bot_pubkey   = "94f74e9c8938e0eae3223fcd9ce3a799e84cff389fd994aeb9dd336add0adf8f"
 
 # ─── Moderation ──────────────────────────────────────────────────────────────
 [moderation]
 kinds_lo = 30910
 kinds_hi = 30916
 
-# ─── Federation mesh ─────────────────────────────────────────────────────────
+# ─── Federation mesh (PRD-010 Phase 3 / ADR-073) ────────────────────────────
+# Controls cross-substrate federation behaviour. mode values:
+#   "standalone"  — no federation; relay is loopback-only (default)
+#   "federated"   — relay exposed externally; accepts peer connections
+#   "client"      — subscribes to peers but does not accept inbound
 [mesh]
-mode         = "standalone"
-peer_relays  = []   # populated post-Sprint-v12 federation rollout
+mode                    = "standalone"
+peer_relays             = []              # ws:// or wss:// URLs of mesh peers; populated post-Sprint-v12
+federated_kinds         = [1, 1059, 30001, 30050, 30910, 31400, 31401, 31402, 31403, 31404, 31405]
+allowed_remote_dids     = []              # did:nostr:<hex> of trusted peers
+subscribed_kinds        = []              # subset of federated_kinds to pull; empty = all
+honor_remote_moderation = false           # accept kind-30910 bans from peers
 
 # ─── Rate limits (per-route) ─────────────────────────────────────────────────
 [ratelimit]
 profiles_batch_per_min      = 60     # /api/profiles/batch
 nostr_well_known_per_min    = 60     # /.well-known/nostr.json
+export_per_min              = 6      # /api/exports/*  (JSS Phase 1; bandwidth-heavy)
 
 # ─── Feature flags ───────────────────────────────────────────────────────────
 [features]
-marketplace = true
-calendar    = true
-dms         = true
+marketplace  = true
+calendar     = true
+dms          = true
+governance   = true
+
+# ─── Key provisioning (JSS Phase 1) ─────────────────────────────────────────
+# DreamLab's CF tier provisions the Solid pod itself through the Worker-native
+# `POST /.pods` / `/pods/{pubkey}/.provision` paths. Private keys are generated
+# on-device by the forum client and never written to R2. The upstream
+# solid-pod-rs-idp `provision-keys` helper remains native/tokio-only.
+[provision]
+enabled           = true                   # live: authenticated pod creation
+keys_at_signup    = false                  # CF tier does not store private keys
+private_dir       = "/private/"             # WAC-locked container path
+privkey_filename  = "privkey.jsonld"        # NIP-19 bech32 keypair filename
+
+# ─── NIP-05 resolution mode (JSS Phase 1) ───────────────────────────────────
+# "d1"        — central registry only (legacy POD_META.nip05:{user} → pubkey).
+# "federated" — D1 cache first, fall through to pod's /.well-known/nostr.json
+#               on miss. Live as of NRF commit 1fe95fd (auth-worker resolve()
+#               D1→pod-HTTP fallback under GET /api/username/resolve;
+#               ADR-086 §9). Mirrored at deploy time via NIP05_RESOLVER_MODE
+#               and POD_BASE_URL [vars] in deploy/auth-worker.wrangler.toml.
+[nip05]
+resolver_mode = "federated"                # live as of NRF 1fe95fd
+pod_base_url  = "https://dreamlab-pod-api.solitary-paper-764d.workers.dev"
+
+# ─── Pod data export (JSS Phase 1) ──────────────────────────────────────────
+# The native solid-pod-rs export surface is tokio/Storage based and is not
+# reachable from the Cloudflare Worker target yet. Keep disabled on DreamLab's
+# CF deployment; enable only on a native pod backend that serves /api/exports/*.
+[export]
+enabled                  = false           # CF tier: native export route unavailable
+include_private_default  = false           # owner WAC always required for /private/*
+rate_limit_per_min       = 6                # per-IP; export is bandwidth-heavy
+
+# ─── Git-versioned pods (JSS #471, solid-pod-rs alpha.12) ───────────────────
+# When enabled at the pod backend (e.g. agentbox or a non-CF solid-pod-rs
+# deployment), each pod is `git init`'d at creation with main branch and
+# receive.denyCurrentBranch=updateInstead (solid_pod_rs_git::init::GitAutoInit,
+# parity rows 199-200, shipped 2026-05-16). DreamLab's Cloudflare deployment
+# cannot auto-init (CF Workers can't spawn subprocesses; see NRF ADR-089),
+# so this stays disabled here; flip on for non-CF deployments (e.g. agentbox
+# which has [sovereign_mesh.git].enabled = true as of agentbox commit ea64824b).
+[git]
+enabled        = false                  # CF Workers limitation; flip for native deploys
+auto_init      = true                   # informational; takes effect when enabled = true
+default_branch = "main"                 # pinned per JSS #471
+clone_url_base = "https://dreamlab-pod-api.solitary-paper-764d.workers.dev"  # surfaces in forum-client
+
+# ─── Native pod server (agentbox tier, solid-pod-rs alpha.15) ───────────────
+# When enabled, the forum pod browser shows a SECOND pod card for the native
+# agentbox server alongside the CF Workers pod. The native server has full git
+# support (GitPanel + AppManifestPanel). Exposed via Cloudflare Tunnel.
+#
+# admin_provision_url: CF auth-worker calls this to provision a pod on the
+# native server. The native server validates via X-Pod-Admin-Key (PSK).
+# Match NATIVE_POD_ADMIN_KEY in the auth-worker CF secret with SOLID_ADMIN_KEY
+# in the agentbox .env.
+#
+# allowlist_cohorts: only users in these cohorts see the native pod card.
+# Empty list = all authenticated users.
+[native_pod]
+enabled              = true
+base_url             = "https://pods-native.dreamlab-ai.com"
+allowlist_cohorts    = ["members", "trainers", "private", "business"]
+git_enabled          = true
+admin_provision_url  = "https://pods-native.dreamlab-ai.com/_admin/provision"
+
+# ─── Agent Governance (kinds 31400-31405) ────────────────────────────────────
+# Pre-registered agent pubkeys authorised to publish governance control panels.
+# Replace placeholder keys with real agent pubkeys at deployment time via
+# DREAMLAB_GOVERNANCE_AGENT_PUBKEYS env-override.
+[governance]
+enabled       = true
+route         = "/governance"
+kinds_lo      = 31400
+kinds_hi      = 31405
+
+# Relay for governance events. Uses the main relay by default; set to a
+# separate endpoint if governance traffic should be isolated.
+relay_url     = "wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev"
+
+# Agent pubkeys allowed to publish control surface events (kinds 31400-31405).
+agent_pubkeys = [
+  # visionclaw-server — BrokerActor publishes panel definitions (31400) and action requests (31402)
+  "11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c",
+  # knowledge-enrichment-agent — proposes KG updates via governance
+  "e18f1dc1d0bdf06aa5d9f9834f50077e550770eba8ce4435e83cf016647a0d30",
+]
+
+# ─── Payments (HTTP 402 Web Ledgers + MRC20 token) ──────────────────────────
+[payments]
+enabled   = true
+cost_sats = 1
+
+[payments.token]
+ticker = "DREAM"
+rate   = 10       # 10 DREAM per sat
+supply = 1000000  # 1M total supply
+issuer = ""       # operator sets via DREAMLAB_TOKEN_ISSUER env-override
+
+# ─── Registered agents ───────────────────────────────────────────────────────
+# Agent roster for relay whitelist seeding and documentation.
+# Private keys are in .nostr-identities.env (git-ignored).
+# Each agent has a distinct identity per the trust-domain separation model.
+[[agents]]
+label    = "welcome-bot"
+pubkey   = "94f74e9c8938e0eae3223fcd9ce3a799e84cff389fd994aeb9dd336add0adf8f"
+role     = "Welcome Bot — greets new members, issues invite credits"
+cohorts  = ["home", "dreamlab", "minimoonoir", "agent"]
+
+[[agents]]
+label    = "moderation-bot"
+pubkey   = "5d80b5facd2d746689d7d2e400db6acce5843456967054adcf6956e4c734c54c"
+role     = "Moderation Bot — enforces zone rules, auto-hides spam"
+cohorts  = ["home", "dreamlab", "minimoonoir", "agent"]
+
+[[agents]]
+label    = "calendar-bot"
+pubkey   = "be92ccf53d9d535fd21f3388201fd83b49588552fff5a1395fb60b6998df2243"
+role     = "Calendar Bot — NIP-52 event scheduling and reminders"
+cohorts  = ["home", "dreamlab", "agent"]
+
+[[agents]]
+label    = "search-indexer"
+pubkey   = "d5194639ee3560204a1b5584a0714a6dd2a6c59953d0869b483e72ee185ada26"
+role     = "Search Indexer — indexes relay events for full-text search"
+cohorts  = ["home", "dreamlab", "minimoonoir", "agent"]
+
+[[agents]]
+label    = "marketplace-agent"
+pubkey   = "9305ca45fcdae8652754dea236384002d13edd05e77ffaee63623d129cb9496b"
+role     = "Marketplace Agent — NIP-90 job broker, cost estimation"
+cohorts  = ["dreamlab", "agent"]
+
+[[agents]]
+label    = "knowledge-enrichment-agent"
+pubkey   = "e18f1dc1d0bdf06aa5d9f9834f50077e550770eba8ce4435e83cf016647a0d30"
+role     = "Knowledge Enrichment Agent — proposes KG updates via governance"
+cohorts  = ["dreamlab", "agent"]
+
+# ─── Test users ──────────────────────────────────────────────────────────────
+[[test_users]]
+label    = "test-trainer-alice"
+pubkey   = "42db1320c1ce598e9728310cdeacf3a223657fc9deec8a1b794a586f90bfa27d"
+cohorts  = ["home", "dreamlab", "members", "trainers"]
+
+[[test_users]]
+label    = "test-trainee-bob"
+pubkey   = "894682be259b65b99fa9ea2fc8368bdd546aa571b10cfa3fb7497196bb597b9f"
+cohorts  = ["home", "dreamlab", "members", "trainees"]
+
+[[test_users]]
+label    = "test-private-carol"
+pubkey   = "d5a99f75a1c7470f1160a91fea36e02b45e2274bc188fde0062265e2b46dc9cb"
+cohorts  = ["home", "dreamlab", "minimoonoir", "private", "members"]
 
 # ─── Operator custody tier ───────────────────────────────────────────────────
 [custody]

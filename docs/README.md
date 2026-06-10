@@ -1,35 +1,32 @@
 # DreamLab AI -- Documentation Hub
 
-**Last updated:** 2026-03-08 | **Repository:** [DreamLab-AI/dreamlab-ai-website](https://github.com/DreamLab-AI/dreamlab-ai-website) | **Project README:** [../README.md](../README.md)
+**Last updated:** 2026-05-12 | **Repository:** [DreamLab-AI/dreamlab-ai-website](https://github.com/DreamLab-AI/dreamlab-ai-website) | **Project README:** [../README.md](../README.md)
 
-This documentation covers the full DreamLab AI platform: a React marketing site, a Rust/Leptos WASM community forum, and five Cloudflare Workers providing authentication, storage, relay, search, and link preview services.
+This documentation covers the full DreamLab AI platform: a React marketing site, a Rust/Leptos WASM community forum (including the Agent Control Surface governance dashboard), and five Cloudflare Workers providing authentication, storage, relay, search, and link preview services.
 
 ---
 
 ## System Architecture
 
-Seven services (6 Rust crates + 2 TypeScript Workers) compose the backend and forum client. The `nostr-core` crate is the shared foundation, consumed by the forum client and all three Rust Workers.
+The forum is now powered by the upstream [nostr-rust-forum](https://github.com/DreamLab-AI/nostr-rust-forum) kit. DreamLab-specific configuration lives in `forum-config/`, which pins the kit crates and overlays branding, zones, governance pubkeys, and Cloudflare deployment manifests.
 
 ```mermaid
 graph TB
     subgraph "Static Sites (GitHub Pages)"
         REACT["React SPA<br/>Marketing Site<br/><i>src/</i>"]
-        LEPTOS["Leptos 0.7 CSR<br/>Community Forum<br/><i>community-forum-rs/crates/forum-client/</i>"]
+        LEPTOS["Leptos 0.7 CSR<br/>Community Forum<br/><i>nostr-rust-forum kit + forum-config/</i>"]
     end
 
-    subgraph "Shared Library"
-        CORE["nostr-core<br/>NIP-01, NIP-44, NIP-59, NIP-98<br/>Key derivation, Schnorr signing"]
+    subgraph "Forum Kit"
+        CORE["nostr-bbs-core<br/>+ upstream nostr crate<br/>NIP-01, NIP-44, NIP-59, NIP-98<br/>Governance kinds 31400-31405"]
     end
 
     subgraph "Rust Cloudflare Workers"
         AUTH["auth-worker<br/>WebAuthn PRF + NIP-98<br/>Pod provisioning"]
         POD["pod-worker<br/>Solid Pods on R2<br/>WAC ACL"]
         PREVIEW["preview-worker<br/>OG metadata<br/>SSRF protection"]
-    end
-
-    subgraph "TypeScript Cloudflare Workers"
-        RELAY["nostr-relay<br/>WebSocket NIP-01/42/98<br/>D1 + Durable Objects"]
-        SEARCH["search-api<br/>RuVector WASM<br/>.rvf format"]
+        RELAY["relay-worker<br/>WebSocket NIP-01/42/98<br/>D1 + Durable Objects"]
+        SEARCH["search-worker<br/>RuVector WASM<br/>.rvf format"]
     end
 
     subgraph "Cloudflare Storage"
@@ -43,6 +40,8 @@ graph TB
     AUTH --> CORE
     POD --> CORE
     PREVIEW --> CORE
+    RELAY --> CORE
+    SEARCH --> CORE
 
     LEPTOS -- "HTTPS" --> AUTH
     LEPTOS -- "HTTPS" --> POD
@@ -66,8 +65,8 @@ graph TB
     style AUTH fill:#dea584,color:#000
     style POD fill:#dea584,color:#000
     style PREVIEW fill:#dea584,color:#000
-    style RELAY fill:#3178C6,color:#fff
-    style SEARCH fill:#3178C6,color:#fff
+    style RELAY fill:#dea584,color:#000
+    style SEARCH fill:#dea584,color:#000
 ```
 
 ---
@@ -80,10 +79,11 @@ graph TB
 |----------|--------|-------------|
 | [PRD: Rust Port v2.0.0](prd-rust-port.md) | Accepted | Architecture baseline for the Rust port. Scope, crate survey, timeline, risk register. |
 | [PRD: Rust Port v2.1.0](prd-rust-port-v2.1.md) | In Progress | Refined delivery plan with tranche-based execution, governance gates, and rollback design. |
+| [Forum Config: Governance](../forum-config/README.md#governance-configuration) | Active | Agent Control Surface config -- feature flag, event kinds 31400-31405, agent pubkey allowlist. |
 
 ### Architecture Decision Records
 
-Full index of all 19 ADRs. See [adr/README.md](adr/README.md) for conventions and supersession chains.
+Full index of all 34 ADRs. See [adr/README.md](adr/README.md) for conventions and supersession chains.
 
 | ADR | Title | Status | Link |
 |-----|-------|--------|------|
@@ -106,6 +106,10 @@ Full index of all 19 ADRs. See [adr/README.md](adr/README.md) for conventions an
 | 017 | passkey-rs for WebAuthn/FIDO2 with PRF Extension | Accepted | [adr/017-passkey-rs-webauthn-prf.md](adr/017-passkey-rs-webauthn-prf.md) |
 | 018 | Testing Strategy for Rust Port | Accepted | [adr/018-testing-strategy-rust-port.md](adr/018-testing-strategy-rust-port.md) |
 | 019 | Versioned Planning Governance and Tranche-Based Delivery | Accepted | [adr/019-plan-governance-and-delivery-structure.md](adr/019-plan-governance-and-delivery-structure.md) |
+| 020-025 | WebGPU Fallback, Offline-First, NIP-29, Relay Hardening, Security Sprint, Solid Pod Upgrade | Accepted | See [adr/README.md](adr/README.md) |
+| 026-031 | Forum Professionalisation, Canonical Identity, AGPL Boundary, JSON-LD, Signer Abstraction, DM Protocol | Accepted | See [adr/README.md](adr/README.md) |
+| 032 | Agent Job Marketplace (NIP-90) | Accepted | [adr/032-agent-job-marketplace-nip90.md](adr/032-agent-job-marketplace-nip90.md) |
+| 033-034 | Multi-Admin Moderation, Relay NIP Conformance | Accepted | See [adr/README.md](adr/README.md) |
 
 **Supersession chain:** ADR-003 (GCP) -> ADR-010 (Cloudflare) | ADR-007 (SvelteKit) -> ADR-013 (Rust/Leptos) | ADR-008 (PostgreSQL) -> ADR-010 (D1)
 
@@ -128,8 +132,8 @@ Six documents defining the domain model for the Rust workspace. See [ddd/README.
 |----------|--------|----------|-------------|
 | [Auth API](api/AUTH_API.md) | auth-worker | Rust | WebAuthn PRF registration/login, NIP-98 verification, pod provisioning. D1 + KV + R2. |
 | [Pod API](api/POD_API.md) | pod-worker | Rust | Solid pod CRUD, media upload, WAC ACL management. R2 + KV. |
-| [Nostr Relay](api/NOSTR_RELAY.md) | nostr-relay | TypeScript | WebSocket NIP-01 relay with NIP-42 AUTH and NIP-98 verification. D1 + Durable Objects. |
-| [Search API](api/SEARCH_API.md) | search-api | TypeScript | RuVector WASM vector search, `.rvf` format, `/embed` endpoint. R2 + KV. |
+| [Nostr Relay](api/NOSTR_RELAY.md) | relay-worker | Rust | WebSocket NIP-01 relay with NIP-42 AUTH and NIP-98 verification. D1 + Durable Objects. |
+| [Search API](api/SEARCH_API.md) | search-worker | Rust | RuVector WASM vector search, `.rvf` format, `/embed` endpoint. R2 + KV. |
 
 ### Security
 
@@ -226,7 +230,7 @@ How Nostr events flow from the forum client through the relay to persistent stor
 ```mermaid
 sequenceDiagram
     participant Author as Forum Client<br/>(Author)
-    participant Relay as nostr-relay<br/>(TypeScript Worker)
+    participant Relay as relay-worker<br/>(Rust CF Worker)
     participant DO as Durable Object<br/>(WebSocket State)
     participant D1 as Cloudflare D1
     participant Sub as Forum Client<br/>(Subscriber)
@@ -346,27 +350,34 @@ graph TB
 
 ## Crate Dependency Graph
 
+All crates ship from the upstream `nostr-rust-forum` kit; `forum-config/` overlays
+DreamLab branding and CF resource configuration. `nostr-bbs-core` is the shared
+foundation consumed by the forum client and all five Workers.
+
 ```mermaid
 graph LR
-    CORE["nostr-core"]
+    CORE["nostr-bbs-core"]
     CLIENT["forum-client<br/>(Leptos WASM)"]
-    AUTH["auth-worker"]
-    POD["pod-worker"]
-    PREVIEW["preview-worker"]
-    RELAY_STUB["relay-worker<br/>(Rust stub)"]
+    AUTH["nostr-bbs-auth-worker"]
+    POD["nostr-bbs-pod-worker"]
+    PREVIEW["nostr-bbs-preview-worker"]
+    RELAY["nostr-bbs-relay-worker"]
+    SEARCH["nostr-bbs-search-worker"]
 
     CLIENT --> CORE
     AUTH --> CORE
     POD --> CORE
     PREVIEW --> CORE
-    RELAY_STUB --> CORE
+    RELAY --> CORE
+    SEARCH --> CORE
 
     style CORE fill:#dea584,color:#000
     style CLIENT fill:#ef3939,color:#fff
     style AUTH fill:#F38020,color:#000
     style POD fill:#F38020,color:#000
     style PREVIEW fill:#F38020,color:#000
-    style RELAY_STUB fill:#F38020,color:#000
+    style RELAY fill:#F38020,color:#000
+    style SEARCH fill:#F38020,color:#000
 ```
 
 ---
@@ -398,7 +409,7 @@ graph LR
 |-----------|--------|
 | `api.dreamlab-ai.com` | auth-worker (Rust) |
 | `pods.dreamlab-ai.com` | pod-worker (Rust) |
-| `search.dreamlab-ai.com` | search-api (TypeScript) |
+| `search.dreamlab-ai.com` | search-worker (Rust) |
 | `preview.dreamlab-ai.com` | preview-worker (Rust) |
 
 ### Development URLs
@@ -415,19 +426,19 @@ graph LR
 
 | Category | Files | Status |
 |----------|-------|--------|
-| Planning (PRDs) | 2 | v2.0.0 accepted, v2.1.0 in progress |
-| ADRs (001-019) | 8 files (013-019 present; 001-012 tracked in index) | Current |
-| DDD | 7 (including README) | Aligned to v2.0.0 baseline |
+| Planning (PRDs) | 2 + governance config | v2.0.0 accepted, v2.1.0 in progress, governance active |
+| ADRs (001-034) | 22 files (013-034 present; 001-012 tracked in index) | Current |
+| DDD | 10 (including README) | Aligned to v2.0.0 baseline + governance events |
 | API | 4 | Current for Rust port |
 | Security | 6 | Current for Rust port (2 docs + 3 QE audits + 1 coverage report) |
-| Deployment | 2 | Current for Rust port |
+| Deployment | 2 | Current for Rust port + governance feature flags |
 | Developer | 2 | Current for Rust port |
 | Benchmarks | 1 | Baseline established |
-| Tranche 1 | 2 | Active migration tracking |
-| **Total** | **34** | |
+| Tranche 1 | 2 | Historical (migration complete) |
+| **Total** | **51+** | |
 
 ---
 
 **Project README:** [../README.md](../README.md) | **ADR Index:** [adr/README.md](adr/README.md) | **DDD Hub:** [ddd/README.md](ddd/README.md)
 
-*Last updated: 2026-03-08*
+*Last updated: 2026-05-12*

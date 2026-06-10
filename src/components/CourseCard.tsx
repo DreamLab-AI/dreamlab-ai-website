@@ -127,15 +127,15 @@ const courseHeroImages: Record<string, string> = {
 
 // Fallback category images (WebP for modern browsers)
 const categoryImages: Record<string, string> = {
-  'AI/ML': '/data/media/labview2.webp',
-  'Creative Tech': '/data/media/labview3.webp',
-  'XR/VR': '/data/media/bedroom.jpeg',
-  'Audio': '/data/media/wine.webp',
-  'Engineering': '/data/media/view.jpeg',
-  'Emerging Tech': '/data/media/view2.jpeg',
-  'Web3 Tech': '/data/media/view3.webp',
-  'Enterprise': '/data/media/fairfield-front.jpg',
-  'Foundation': '/data/media/aerial.jpeg',
+  'AI/ML': '/images/venue/labview2.webp',
+  'Creative Tech': '/images/venue/labview3.webp',
+  'XR/VR': '/images/venue/bedroom.webp',
+  'Audio': '/images/venue/wine.webp',
+  'Engineering': '/images/venue/view.webp',
+  'Emerging Tech': '/images/venue/view2.webp',
+  'Web3 Tech': '/images/venue/view3.webp',
+  'Enterprise': '/images/venue/fairfield-front.webp',
+  'Foundation': '/images/venue/aerial.webp',
 };
 
 export interface CourseCardProps {
@@ -178,7 +178,7 @@ export function CourseCard({
   const config = categoryConfig[category] || categoryConfig['Foundation'];
   const parsedInstructors = parseInstructors(instructors);
   // Use course-specific hero image if available, fall back to category image
-  const heroImage = courseHeroImages[id] || categoryImages[category] || '/data/media/aerial.jpeg';
+  const heroImage = courseHeroImages[id] || categoryImages[category] || '/images/venue/aerial.webp';
 
   // Calculate animation delay based on index
   const animationDelay = `${index * 100}ms`;

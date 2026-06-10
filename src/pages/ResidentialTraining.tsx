@@ -20,18 +20,18 @@ const ResidentialTraining = () => {
   const navigate = useNavigate();
 
   const images = [
-    "/data/media/aerial.jpeg",
-    "/data/media/fairfield-front.jpg",
-    "/data/media/fairfield-back.jpeg",
-    "/data/media/view.jpeg",
-    "/data/media/view2.jpeg",
-    "/data/media/view3.webp",
-    "/data/media/bedroom.jpeg",
-    "/data/media/bedroom-two.jpeg",
-    "/data/media/main-bedroom.jpeg",
-    "/data/media/labview2.webp",
-    "/data/media/labview3.webp",
-    "/data/media/wine.webp",
+    "/images/venue/aerial.webp",
+    "/images/venue/fairfield-front.webp",
+    "/images/venue/fairfield-back.webp",
+    "/images/venue/view.webp",
+    "/images/venue/view2.webp",
+    "/images/venue/view3.webp",
+    "/images/venue/bedroom.webp",
+    "/images/venue/bedroom-two.webp",
+    "/images/venue/main-bedroom.webp",
+    "/images/venue/labview2.webp",
+    "/images/venue/labview3.webp",
+    "/images/venue/wine.webp",
   ];
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 

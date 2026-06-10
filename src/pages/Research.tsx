@@ -20,13 +20,13 @@ import {
 import { useOGMeta } from "@/hooks/useOGMeta";
 
 const systemImages = [
-  { src: "/showcase/image (9).webp", title: "Multi-Viewpoint Immersive AI Research Platform" },
-  { src: "/showcase/image (6).webp", title: "Narrative Fusion" },
-  { src: "/showcase/image (1).webp", title: "Immersive Collaboration" },
-  { src: "/showcase/image (2).webp", title: "Flow State Optimisation" },
-  { src: "/showcase/image.webp", title: "AI Learning System" },
-  { src: "/showcase/image (3).webp", title: "Knowledge Graph" },
-  { src: "/showcase/image (7).webp", title: "Real-World Applications" },
+  { src: "/images/showcase/showcase-9.webp", title: "Multi-Viewpoint Immersive AI Research Platform" },
+  { src: "/images/showcase/showcase-6.webp", title: "Narrative Fusion" },
+  { src: "/images/showcase/showcase-1.webp", title: "Immersive Collaboration" },
+  { src: "/images/showcase/showcase-2.webp", title: "Flow State Optimisation" },
+  { src: "/images/showcase/showcase-0.webp", title: "AI Learning System" },
+  { src: "/images/showcase/showcase-3.webp", title: "Knowledge Graph" },
+  { src: "/images/showcase/showcase-7.webp", title: "Real-World Applications" },
 ];
 
 const technicalSpecs = [
@@ -74,7 +74,7 @@ const Research = () => {
                 src={systemImages[currentImageIndex].src}
                 alt={systemImages[currentImageIndex].title}
                 className="w-full h-full object-cover transition-all duration-1000"
-                onError={(e) => { (e.target as HTMLImageElement).src = "/showcase/image.webp"; }}
+                onError={(e) => { (e.target as HTMLImageElement).src = "/images/showcase/showcase-0.webp"; }}
               />
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent p-4 sm:p-6 md:p-8">
                 <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-1">{systemImages[currentImageIndex].title}</h3>
@@ -242,7 +242,7 @@ const Research = () => {
           <div className="grid md:grid-cols-2 gap-8 mb-12">
             <Card className="overflow-hidden bg-black/30 backdrop-blur-md border-blue-500/30">
               <div className="aspect-video relative group">
-                <video controls className="w-full h-full object-cover" poster="/data/media/unity-vr-thumb.jpg" preload="none">
+                <video controls className="w-full h-full object-cover" poster="/images/portfolio/unity-vr-thumb.webp" preload="none">
                   <source src="/data/media/videos/unity-vr.mp4" type="video/mp4" />
                 </video>
               </div>
@@ -261,7 +261,7 @@ const Research = () => {
             </Card>
             <Card className="overflow-hidden bg-black/30 backdrop-blur-md border-blue-500/30">
               <div className="aspect-video relative group">
-                <video controls className="w-full h-full object-cover" poster="/data/media/nuclear-robot-thumb.jpg" preload="none">
+                <video controls className="w-full h-full object-cover" poster="/images/portfolio/nuclear-robot-thumb.webp" preload="none">
                   <source src="/data/media/videos/nuclear-robot.mp4" type="video/mp4" />
                 </video>
               </div>
@@ -292,7 +292,7 @@ const Research = () => {
               ].map((item) => (
                 <Card key={item.file} className={`overflow-hidden bg-black/30 backdrop-blur-md border-${item.color}-500/30`}>
                   <div className="aspect-video">
-                    <video controls className="w-full h-full object-cover" poster={`/data/media/${item.file}-thumb.jpg`} preload="none">
+                    <video controls className="w-full h-full object-cover" poster={`/images/portfolio/${item.file}-thumb.webp`} preload="none">
                       <source src={`/data/media/videos/${item.file}.mp4`} type="video/mp4" />
                     </video>
                   </div>
@@ -316,7 +316,7 @@ const Research = () => {
               ].map((item) => (
                 <Card key={item.file} className={`overflow-hidden bg-black/30 backdrop-blur-md border-${item.color}-500/30`}>
                   <div className="aspect-video">
-                    <video controls className="w-full h-full object-cover" poster={`/data/media/${item.file}-thumb.jpg`} preload="none">
+                    <video controls className="w-full h-full object-cover" poster={`/images/portfolio/${item.file}-thumb.webp`} preload="none">
                       <source src={`/data/media/videos/${item.file}.mp4`} type="video/mp4" />
                     </video>
                   </div>
@@ -364,7 +364,7 @@ const Research = () => {
                 </div>
               </div>
               <div className="aspect-video">
-                <video controls className="w-full h-full object-cover rounded-lg" poster="/data/media/student-2015-thumb.jpg" preload="none">
+                <video controls className="w-full h-full object-cover rounded-lg" poster="/images/portfolio/student-2015-thumb.webp" preload="none">
                   <source src="/data/media/videos/student-2015.mp4" type="video/mp4" />
                 </video>
                 <p className="text-sm text-slate-300 mt-2 text-center">Research presentation (2015)</p>

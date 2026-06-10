@@ -147,3 +147,61 @@ describe("DOMPurify sanitisation contract", () => {
     expect(clean).toBe("<p>Hello <strong>world</strong></p>");
   });
 });
+
+// ---------------------------------------------------------------------------
+// P2-11: Mermaid definition sanitisation — these tests pin the pre-render
+// input sanitisation that WorkshopPage.tsx applies before passing diagram
+// text to mermaid.render(). They ensure XSS vectors in crafted Mermaid
+// syntax are neutralised before Mermaid ever sees the definition.
+// ---------------------------------------------------------------------------
+describe("Mermaid definition sanitisation (P2-11)", () => {
+  /** Mirror of the sanitisation pipeline in WorkshopPage.tsx. */
+  function sanitizeMermaidDefinition(input: string): string {
+    return input
+      .replace(/<script[\s>]/gi, "&lt;script")
+      .replace(/\bclick\s+\S+\s+(call|href)\b/gi, "%% click removed %%")
+      .replace(/\bhref\s*\(\s*["']javascript:/gi, 'href("about:blank')
+      .replace(/\bon\w+\s*=/gi, "data-removed=");
+  }
+
+  it("strips <script> tags from Mermaid definitions", () => {
+    const input = 'graph TD\nA[<script>alert(1)</script>]';
+    const clean = sanitizeMermaidDefinition(input);
+    expect(clean).not.toContain("<script>");
+    expect(clean).toContain("&lt;script");
+  });
+
+  it("neutralises Mermaid click-call callbacks", () => {
+    const input = 'click nodeA call maliciousFunction()';
+    const clean = sanitizeMermaidDefinition(input);
+    expect(clean).not.toContain("call maliciousFunction");
+    expect(clean).toContain("%% click removed %%");
+  });
+
+  it("neutralises Mermaid click-href callbacks", () => {
+    const input = 'click nodeA href "javascript:alert(1)"';
+    const clean = sanitizeMermaidDefinition(input);
+    expect(clean).not.toContain('href "javascript:');
+    expect(clean).toContain("%% click removed %%");
+  });
+
+  it("neutralises javascript: URIs in href()", () => {
+    const input = 'href("javascript:alert(1)")';
+    const clean = sanitizeMermaidDefinition(input);
+    expect(clean).not.toContain("javascript:");
+    expect(clean).toContain("about:blank");
+  });
+
+  it("strips inline event handlers (onclick, onerror, etc.)", () => {
+    const input = 'A["<div onmouseover=steal()>hover</div>"]';
+    const clean = sanitizeMermaidDefinition(input);
+    expect(clean).not.toContain("onmouseover=");
+    expect(clean).toContain("data-removed=");
+  });
+
+  it("preserves benign diagram definitions untouched", () => {
+    const input = "graph TD\n  A[Start] --> B[End]";
+    const clean = sanitizeMermaidDefinition(input);
+    expect(clean).toBe(input);
+  });
+});

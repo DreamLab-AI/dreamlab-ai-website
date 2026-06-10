@@ -6,6 +6,8 @@ Domain-Driven Design documentation for the Rust port of the DreamLab community f
 
 The 2026-04 Obelisk-Polish sprint added moderation (kinds 30910-30914), WoT gating, invite credits, welcome bot, and the `admin-cli` crate. See the [sprint spec](../sprint/2026-04-obelisk-polish-sprint.md).
 
+The 2026-05-12 Governance sprint added the Agent Control Surface: a `/governance` route with kinds 31400-31405 for agent control panels, action requests, human approve/reject responses, governance policies, and audit logging. See [04-domain-events.md](04-domain-events.md#governance-domain-events-agent-control-surface) and the `[governance]` section in [forum-config/dreamlab.toml](../../forum-config/README.md#governance-configuration).
+
 ## Documents
 
 | Document | Description |

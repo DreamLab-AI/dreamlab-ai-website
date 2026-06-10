@@ -22,8 +22,6 @@ permissions:
 
 env:
   CARGO_TERM_COLOR: always
-  RUST_TOOLCHAIN: '1.90.0'
-  MANIFEST: community-forum-rs/Cargo.toml
 
 jobs:
   gate:
@@ -49,9 +47,6 @@ jobs:
       - name: Install Node deps
         run: npm ci
 
-      # ESLint baseline has 194 pre-existing problems; non-blocking until
-      # baseline cleanup ships (tracked separately). New code should still be
-      # lint-clean — reviewers gate on diff during PR.
       - name: Lint (ESLint, non-blocking baseline)
         run: npm run lint
         continue-on-error: true
@@ -59,17 +54,17 @@ jobs:
       - name: Build React site (verifies type/build correctness)
         run: npm run build
         env:
-          # Build-time env stubs so build doesn't crash if secrets are absent
-          # in PR runs. Real values are injected only in deploy.yml.
           VITE_SUPABASE_URL: 'https://stub.invalid'
           VITE_SUPABASE_ANON_KEY: 'stub'
 
-      # ── Rust gates ──────────────────────────────────────────────────────
-      - name: Install Rust toolchain ${{ env.RUST_TOOLCHAIN }}
+      # ── Rust gates (forum-config overlay only) ──────────────────────────
+      # community-forum-rs/ has been frozen and its crates published to
+      # crates.io as nostr-bbs-* v3.0.0-rc4. The forum-config/ overlay
+      # package is the only Rust code that changes going forward.
+      - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@1.90.0
         with:
           components: rustfmt, clippy
-          targets: wasm32-unknown-unknown
 
       - name: Cache Cargo registry + build
         uses: actions/cache@v4
@@ -77,36 +72,20 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            community-forum-rs/target
-          key: rust-gate-${{ runner.os }}-${{ env.RUST_TOOLCHAIN }}-${{ hashFiles('community-forum-rs/Cargo.lock') }}
+            forum-config/target
+          key: rust-gate-${{ runner.os }}-forum-config-${{ hashFiles('forum-config/Cargo.lock') }}
           restore-keys: |
-            rust-gate-${{ runner.os }}-${{ env.RUST_TOOLCHAIN }}-
-            rust-gate-${{ runner.os }}-
+            rust-gate-${{ runner.os }}-forum-config-
 
-      - name: cargo fmt --check
-        run: cargo fmt --manifest-path ${{ env.MANIFEST }} --all -- --check
+      - name: cargo fmt --check (forum-config)
+        run: cargo fmt --manifest-path forum-config/Cargo.toml --all -- --check
 
-      # Clippy non-blocking against pre-existing dead-code baseline (~24
-      # warnings); tightens to -D warnings once baseline is cleared.
-      - name: cargo clippy (non-blocking baseline)
-        run: cargo clippy --manifest-path ${{ env.MANIFEST }} --workspace --all-targets
+      - name: cargo clippy (forum-config)
+        run: cargo clippy --manifest-path forum-config/Cargo.toml --all-targets
         continue-on-error: true
 
-      - name: cargo test (native crates)
-        run: |
-          cargo test --manifest-path ${{ env.MANIFEST }} \
-            -p nostr-core \
-            -p auth-worker \
-            -p pod-worker \
-            -p preview-worker \
-            -p search-worker \
-            -p admin-cli
-          # relay-worker tests require test-exports feature for internal helper access
-          cargo test --manifest-path ${{ env.MANIFEST }} \
-            -p relay-worker --features test-exports
-
-      - name: cargo check (forum-client wasm)
-        run: cargo check --manifest-path ${{ env.MANIFEST }} --target wasm32-unknown-unknown -p forum-client
+      - name: cargo test (forum-config)
+        run: cargo test --manifest-path forum-config/Cargo.toml
 
       - name: Summary
         id: summary

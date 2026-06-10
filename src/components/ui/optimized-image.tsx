@@ -188,7 +188,7 @@ export const OptimizedImage = memo(
       const [isInView, setIsInView] = useState(priority);
       const [hasWebP, setHasWebP] = useState<boolean | null>(null);
       const containerRef = useRef<HTMLDivElement>(null);
-      const imageRef = useRef<HTMLImageElement>(null);
+      const imageRef = useRef<HTMLImageElement | null>(null) as React.MutableRefObject<HTMLImageElement | null>;
 
       // Merge refs
       const mergedRef = useCallback(
@@ -197,7 +197,7 @@ export const OptimizedImage = memo(
           if (typeof ref === "function") {
             ref(node);
           } else if (ref) {
-            ref.current = node;
+            (ref as React.MutableRefObject<HTMLImageElement | null>).current = node;
           }
         },
         [ref]

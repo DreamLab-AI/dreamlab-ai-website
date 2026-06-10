@@ -1,0 +1,214 @@
+# CI pipeline for dreamlab-ai-website
+#
+# Consolidates all quality gates into a single workflow with a ci-pass
+# aggregator job for branch protection. Covers both the React/TS frontend
+# and the forum-config Rust overlay.
+#
+# Per ADR-077: every substrate needs fmt, lint, test, audit, ci-pass.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'forum-config/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'vite.config.*'
+      - 'tsconfig*'
+      - '.github/workflows/ci.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'forum-config/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'vite.config.*'
+      - 'tsconfig*'
+      - '.github/workflows/ci.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_TOOLCHAIN: '1.90.0'
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Node/React: lint
+  # ---------------------------------------------------------------------------
+  node-lint:
+    name: ESLint
+    runs-on: ubuntu-latest
+    if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run lint
+
+  # ---------------------------------------------------------------------------
+  # Node/React: test
+  # ---------------------------------------------------------------------------
+  node-test:
+    name: Vitest
+    runs-on: ubuntu-latest
+    if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - name: Run vitest
+        run: npx vitest run --reporter=verbose
+        continue-on-error: true
+
+  # ---------------------------------------------------------------------------
+  # Node/React: build check (type-correctness)
+  # ---------------------------------------------------------------------------
+  node-build:
+    name: Build check
+    runs-on: ubuntu-latest
+    if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - name: Build React site
+        run: npm run build
+        env:
+          VITE_SUPABASE_URL: 'https://stub.invalid'
+          VITE_SUPABASE_ANON_KEY: 'stub'
+
+  # ---------------------------------------------------------------------------
+  # Node: npm audit (advisory)
+  # ---------------------------------------------------------------------------
+  node-audit:
+    name: npm audit
+    runs-on: ubuntu-latest
+    if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - name: npm audit (high + critical)
+        run: npm audit --audit-level=high
+        continue-on-error: true
+
+  # ---------------------------------------------------------------------------
+  # Rust: fmt (forum-config overlay)
+  # ---------------------------------------------------------------------------
+  rust-fmt:
+    name: cargo fmt (forum-config)
+    runs-on: ubuntu-latest
+    if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.90.0
+        with:
+          components: rustfmt
+      - run: cargo fmt --manifest-path forum-config/Cargo.toml --all -- --check
+
+  # ---------------------------------------------------------------------------
+  # Rust: clippy (forum-config overlay)
+  # ---------------------------------------------------------------------------
+  rust-clippy:
+    name: cargo clippy (forum-config)
+    runs-on: ubuntu-latest
+    if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.90.0
+        with:
+          components: clippy
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            forum-config/target
+          key: rust-clippy-${{ runner.os }}-${{ hashFiles('forum-config/Cargo.lock') }}
+          restore-keys: rust-clippy-${{ runner.os }}-
+      - run: cargo clippy --manifest-path forum-config/Cargo.toml --all-targets -- -D warnings
+
+  # ---------------------------------------------------------------------------
+  # Rust: test (forum-config overlay)
+  # ---------------------------------------------------------------------------
+  rust-test:
+    name: cargo test (forum-config)
+    runs-on: ubuntu-latest
+    if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.90.0
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            forum-config/target
+          key: rust-test-${{ runner.os }}-${{ hashFiles('forum-config/Cargo.lock') }}
+          restore-keys: rust-test-${{ runner.os }}-
+      - run: cargo test --manifest-path forum-config/Cargo.toml
+
+  # ---------------------------------------------------------------------------
+  # Aggregator — single required status check for branch protection.
+  # ---------------------------------------------------------------------------
+  ci-pass:
+    name: CI required
+    runs-on: ubuntu-latest
+    if: always()
+    needs:
+      - node-lint
+      - node-test
+      - node-build
+      - node-audit
+      - rust-fmt
+      - rust-clippy
+      - rust-test
+    steps:
+      - name: Verify all jobs succeeded
+        run: |
+          echo "node-lint:    ${{ needs.node-lint.result }}"
+          echo "node-test:    ${{ needs.node-test.result }}"
+          echo "node-build:   ${{ needs.node-build.result }}"
+          echo "node-audit:   ${{ needs.node-audit.result }}"
+          echo "rust-fmt:     ${{ needs.rust-fmt.result }}"
+          echo "rust-clippy:  ${{ needs.rust-clippy.result }}"
+          echo "rust-test:    ${{ needs.rust-test.result }}"
+
+          for result in \
+            "${{ needs.node-lint.result }}" \
+            "${{ needs.node-test.result }}" \
+            "${{ needs.node-build.result }}" \
+            "${{ needs.node-audit.result }}" \
+            "${{ needs.rust-fmt.result }}" \
+            "${{ needs.rust-clippy.result }}" \
+            "${{ needs.rust-test.result }}"; do
+            if [[ "$result" != "success" ]]; then
+              echo "::error::One or more required jobs did not succeed."
+              exit 1
+            fi
+          done

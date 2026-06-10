@@ -1,4 +1,5 @@
 import { Header } from "@/components/Header";
+import { DataErasureRequest } from "@/components/DataErasureRequest";
 
 const Privacy = () => {
   return (
@@ -52,6 +53,16 @@ const Privacy = () => {
             <p>
               We retain your email address only for as long as necessary to fulfill the purpose for which it was collected, or until you request its deletion. You can unsubscribe from our updates at any time by clicking the unsubscribe link in any email we send you.
             </p>
+          </section>
+
+          <section className="mb-8">
+            <h2 className="text-2xl font-semibold mb-4">Delete Your Data</h2>
+            <p className="mb-4">
+              Under GDPR Article 17, you have the right to request erasure of your personal data.
+              Enter the email address you used when contacting us or subscribing to our updates,
+              and we will permanently delete all associated records from our systems.
+            </p>
+            <DataErasureRequest />
           </section>
 
           <section className="mb-8">

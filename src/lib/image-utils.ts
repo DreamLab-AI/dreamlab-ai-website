@@ -373,23 +373,23 @@ export const getDominantColor = async (
  */
 export const CRITICAL_IMAGES = {
   home: [
-    "/showcase/image (9).webp",
-    "/showcase/image (6).webp",
+    "/images/showcase/showcase-9.webp",
+    "/images/showcase/showcase-6.webp",
   ],
   systemDesign: [
-    "/showcase/image (9).webp",
-    "/showcase/image (6).webp",
-    "/showcase/image (1).webp",
-    "/showcase/image (2).webp",
+    "/images/showcase/showcase-9.webp",
+    "/images/showcase/showcase-6.webp",
+    "/images/showcase/showcase-1.webp",
+    "/images/showcase/showcase-2.webp",
   ],
   residentialTraining: [
-    "/data/media/aerial.jpeg",
-    "/data/media/fairfield-front.jpg",
+    "/images/venue/aerial.webp",
+    "/images/venue/fairfield-front.webp",
   ],
   research: [
-    "/showcase/image (9).webp",
-    "/showcase/image (6).webp",
-    "/showcase/image (1).webp",
+    "/images/showcase/showcase-9.webp",
+    "/images/showcase/showcase-6.webp",
+    "/images/showcase/showcase-1.webp",
   ],
 };
 
