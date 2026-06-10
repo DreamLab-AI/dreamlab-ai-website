@@ -295,153 +295,152 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Section 3b: Sovereign Identity (Phase 1 forum features)
-          Surfaces the JSS Phase 1 cross-repo deliverable:
-          - solid-pod-rs 8668792 (JSS v0.0.197 HTTP parity)
-          - nostr-rust-forum a7c9c40 (public POD_BASE_URL + Worker pod parity)
-          - forum-config pins the DreamLab CF deployment to those surfaces
+      {/* Section 3b: VisionFlow Ecosystem
+          Highlights the five-substrate coordination engineering platform:
+          - Cryptographic identity via DID:Nostr
+          - Federated knowledge reasoning via VisionClaw
+          - Sovereign agent autonomy via Agentbox
+          - Immutable provenance and human-in-the-loop governance via Judgment Broker
       */}
       <section
         id="sovereign-identity"
-        className="py-16 md:py-20 bg-gradient-to-b from-background via-indigo-950/10 to-background"
-        aria-labelledby="sovereign-identity-heading"
+        className="py-16 md:py-20 bg-gradient-to-b from-background via-cyan-950/10 to-background"
+        aria-labelledby="visionflow-heading"
       >
         <div className="container max-w-6xl mx-auto px-5 md:px-4">
           <div className="grid lg:grid-cols-2 gap-10 md:gap-12 items-start">
             <div>
-              <p className="text-xs uppercase tracking-widest text-indigo-400 mb-3 font-semibold">
-                Forum · Phase 1
+              <p className="text-xs uppercase tracking-widest text-cyan-400 mb-3 font-semibold">
+                VisionFlow Ecosystem
               </p>
               <h2
-                id="sovereign-identity-heading"
+                id="visionflow-heading"
                 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4"
               >
-                Sovereign identity, built into the forum
+                Coordination engineering for federated human–AI intelligence
               </h2>
               <p className="text-base md:text-lg text-foreground/80 leading-relaxed mb-8">
-                The DreamLab community forum federates identity and storage through your own Solid pod. Your keys, your verification, your data — held by you, not us.
+                VisionFlow is a five-substrate architecture where autonomous agents and human judgment mesh together through shared cryptographic identity, formal reasoning, and immutable governance. Agents own their data, humans shape their autonomy.
               </p>
 
               <ul className="space-y-5">
                 <li className="flex gap-4">
-                  <div className="w-10 h-10 bg-indigo-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Fingerprint className="w-5 h-5 text-indigo-400" aria-hidden="true" />
+                  <div className="w-10 h-10 bg-cyan-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Fingerprint className="w-5 h-5 text-cyan-400" aria-hidden="true" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-base mb-1">Verified identity via pod-resident NIP-05</h3>
+                    <h3 className="font-semibold text-base mb-1">Cryptographic identity at protocol layer</h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">
-                      Federated NIP-05 lookup — the forum checks its D1 cache first, then falls back to your pod's published record. Your handle is verified against the pod you control, not just a central registry.
+                      Every actor—human, agent, server—is identified by secp256k1 <code className="text-xs px-1 py-0.5 rounded bg-background/70 border border-cyan-500/20">did:nostr</code>. Identity is verified at the relay, at every HTTP request, and embedded in every provenance bead. No shared session store. The cryptographic primitive is the coordination primitive.
                     </p>
                   </div>
                 </li>
 
                 <li className="flex gap-4">
-                  <div className="w-10 h-10 bg-cyan-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <KeyRound className="w-5 h-5 text-cyan-400" aria-hidden="true" />
+                  <div className="w-10 h-10 bg-purple-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Brain className="w-5 h-5 text-purple-400" aria-hidden="true" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-base mb-1">Frictionless signup with pod provisioning</h3>
+                    <h3 className="font-semibold text-base mb-1">Formal reasoning mesh with GPU physics</h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">
-                      A Schnorr secp256k1 keypair is generated on-device and never leaves the browser. The forum provisions your Solid pod through <code className="text-xs px-1 py-0.5 rounded bg-background/70 border border-indigo-500/20">POST /.pods</code>, including WebID, TypeIndex, inbox, and public media containers.
+                      VisionClaw runs OWL 2 EL ontology reasoning across 92 CUDA kernels, not probabilistic LLM inference. Semantic relationships create forces in a GPU-accelerated graph: <code className="text-xs px-1 py-0.5 rounded bg-background/70 border border-cyan-500/20">subClassOf</code> attracts, <code className="text-xs px-1 py-0.5 rounded bg-background/70 border border-cyan-500/20">disjointWith</code> repels. Humans see patterns; agents traverse them algorithmically.
                     </p>
                   </div>
                 </li>
 
                 <li className="flex gap-4">
                   <div className="w-10 h-10 bg-emerald-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Download className="w-5 h-5 text-emerald-400" aria-hidden="true" />
+                    <Bot className="w-5 h-5 text-emerald-400" aria-hidden="true" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-base mb-1">Portable by default</h3>
+                    <h3 className="font-semibold text-base mb-1">Sovereign agent autonomy</h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">
-                      Your profile, uploads, notifications, and access rules live in a Solid-compatible pod at <code className="text-xs px-1 py-0.5 rounded bg-background/70 border border-indigo-500/20">pods.dreamlab-ai.com</code>. The Cloudflare tier keeps native JSON-LD export disabled until the upstream exporter is Worker-portable.
+                      Agentbox agents get secp256k1 keypairs at bootstrap, embedding a cryptographic identity root into every action, memory, and event. 90+ skills, 180+ tools, built on Nix for byte-for-byte reproducibility. When agents leave the mesh, they take their data—cryptographically owned in Solid pods—with them.
                     </p>
                   </div>
                 </li>
 
                 <li className="flex gap-4">
                   <div className="w-10 h-10 bg-amber-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <GitBranch className="w-5 h-5 text-amber-400" aria-hidden="true" />
+                    <Handshake className="w-5 h-5 text-amber-400" aria-hidden="true" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-base mb-1">Versioned pods</h3>
+                    <h3 className="font-semibold text-base mb-1">Human-in-the-loop governance</h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">
-                      Where the operator supports it, each member pod is a git repository — every change is a commit, giving you an audit trail and easy backup via <code className="text-xs px-1 py-0.5 rounded bg-background/70 border border-indigo-500/20">git clone</code>.
-                      <span className="block mt-1 text-xs text-muted-foreground/70">DreamLab's Cloudflare deployment doesn't currently support this (Workers can't spawn git); enabled on native solid-pod-rs and agentbox backends.</span>
+                      The Judgment Broker surfaces agent decisions for human approval via the governance dashboard. Every decision is an immutable Nostr event with <code className="text-xs px-1 py-0.5 rounded bg-background/70 border border-cyan-500/20">prior_decision_id</code> chain. Auditors traverse provenance beads from any point back to first principles. Governance is an accelerant, not a bottleneck.
                     </p>
                   </div>
                 </li>
               </ul>
             </div>
 
-            {/* Federation diagram — inline SVG, no extra deps, decorative */}
+            {/* Five substrates diagram — inline SVG */}
             <div className="lg:sticky lg:top-24">
-              <div className="bg-background/60 backdrop-blur border border-indigo-500/20 rounded-2xl p-6 md:p-8 shadow-xl shadow-indigo-500/5">
-                <h3 className="text-sm font-semibold text-indigo-300 mb-4 text-center uppercase tracking-wider">
-                  How NIP-05 federation works
+              <div className="bg-background/60 backdrop-blur border border-cyan-500/20 rounded-2xl p-6 md:p-8 shadow-xl shadow-cyan-500/5">
+                <h3 className="text-sm font-semibold text-cyan-300 mb-6 text-center uppercase tracking-wider">
+                  Five substrates, one identity
                 </h3>
                 <svg
-                  viewBox="0 0 360 260"
+                  viewBox="0 0 360 280"
                   className="w-full h-auto"
                   role="img"
-                  aria-labelledby="fed-diagram-title fed-diagram-desc"
+                  aria-labelledby="substrates-diagram-title substrates-diagram-desc"
                 >
-                  <title id="fed-diagram-title">Federated NIP-05 identity resolution flow</title>
-                  <desc id="fed-diagram-desc">
-                    Visitor queries the forum's D1 cache for an identity. If cached, the forum responds with the verified key. If not, the forum fetches the user's pod, reads the published NIP-05 record, caches it, and returns the verified key to the visitor.
+                  <title id="substrates-diagram-title">VisionFlow five-substrate architecture</title>
+                  <desc id="substrates-diagram-desc">
+                    Five independent systems (VisionClaw, Agentbox, solid-pod-rs, nostr-rust-forum, DreamLab Edge) mesh together through a shared DID:Nostr cryptographic identity spine and Nostr relay mesh.
                   </desc>
-                  {/* nodes */}
-                  <g fontFamily="ui-sans-serif, system-ui, sans-serif" fontSize="11">
-                    {/* visitor */}
-                    <rect x="10" y="105" width="80" height="50" rx="10" fill="rgba(34,211,238,0.10)" stroke="rgb(34,211,238)" strokeWidth="1.5" />
-                    <text x="50" y="128" textAnchor="middle" fill="rgb(165,243,252)" fontWeight="600">Visitor</text>
-                    <text x="50" y="143" textAnchor="middle" fill="rgb(165,243,252,0.8)" fontSize="9">queries handle</text>
+                  <g fontFamily="ui-sans-serif, system-ui, sans-serif" fontSize="10">
+                    {/* Center identity spine */}
+                    <circle cx="180" cy="140" r="35" fill="rgba(233,69,96,0.15)" stroke="rgb(233,69,96)" strokeWidth="2" />
+                    <text x="180" y="140" textAnchor="middle" dominantBaseline="middle" fill="rgb(244,63,94)" fontWeight="bold" fontSize="11">DID:Nostr</text>
+                    <text x="180" y="155" textAnchor="middle" dominantBaseline="middle" fill="rgb(244,63,94)" fontSize="8">secp256k1</text>
 
-                    {/* forum + D1 cache */}
-                    <rect x="140" y="20" width="100" height="70" rx="10" fill="rgba(168,85,247,0.10)" stroke="rgb(168,85,247)" strokeWidth="1.5" />
-                    <text x="190" y="46" textAnchor="middle" fill="rgb(216,180,254)" fontWeight="600">Forum</text>
-                    <text x="190" y="62" textAnchor="middle" fill="rgb(216,180,254,0.9)" fontSize="9">D1 cache</text>
-                    <text x="190" y="76" textAnchor="middle" fill="rgb(216,180,254,0.7)" fontSize="9">(fast path)</text>
+                    {/* VisionClaw */}
+                    <rect x="20" y="20" width="90" height="60" rx="8" fill="rgba(0,212,255,0.10)" stroke="rgb(0,212,255)" strokeWidth="1.5" />
+                    <text x="65" y="40" textAnchor="middle" fill="rgb(34,211,238)" fontWeight="600">VisionClaw</text>
+                    <text x="65" y="54" textAnchor="middle" fill="rgb(34,211,238,0.8)" fontSize="8">OWL 2 EL</text>
+                    <text x="65" y="64" textAnchor="middle" fill="rgb(34,211,238,0.8)" fontSize="8">GPU Physics</text>
 
-                    {/* user pod */}
-                    <rect x="140" y="170" width="100" height="70" rx="10" fill="rgba(99,102,241,0.10)" stroke="rgb(99,102,241)" strokeWidth="1.5" />
-                    <text x="190" y="196" textAnchor="middle" fill="rgb(199,210,254)" fontWeight="600">User Pod</text>
-                    <text x="190" y="212" textAnchor="middle" fill="rgb(199,210,254,0.9)" fontSize="9">/public/nip05.json</text>
-                    <text x="190" y="226" textAnchor="middle" fill="rgb(199,210,254,0.7)" fontSize="9">(authoritative)</text>
+                    {/* Agentbox */}
+                    <rect x="250" y="20" width="90" height="60" rx="8" fill="rgba(139,92,246,0.10)" stroke="rgb(139,92,246)" strokeWidth="1.5" />
+                    <text x="295" y="40" textAnchor="middle" fill="rgb(196,181,253)" fontWeight="600">Agentbox</text>
+                    <text x="295" y="54" textAnchor="middle" fill="rgb(196,181,253,0.8)" fontSize="8">90+ Skills</text>
+                    <text x="295" y="64" textAnchor="middle" fill="rgb(196,181,253,0.8)" fontSize="8">180+ Tools</text>
 
-                    {/* verified key */}
-                    <rect x="280" y="105" width="70" height="50" rx="10" fill="rgba(16,185,129,0.10)" stroke="rgb(16,185,129)" strokeWidth="1.5" />
-                    <text x="315" y="128" textAnchor="middle" fill="rgb(167,243,208)" fontWeight="600">Verified</text>
-                    <text x="315" y="143" textAnchor="middle" fill="rgb(167,243,208,0.8)" fontSize="9">pubkey</text>
+                    {/* solid-pod-rs */}
+                    <rect x="135" y="100" width="90" height="60" rx="8" fill="rgba(16,185,129,0.10)" stroke="rgb(16,185,129)" strokeWidth="1.5" />
+                    <text x="180" y="120" textAnchor="middle" fill="rgb(52,211,153)" fontWeight="600">solid-pod-rs</text>
+                    <text x="180" y="134" textAnchor="middle" fill="rgb(52,211,153,0.8)" fontSize="8">WAC ACLs</text>
+                    <text x="180" y="144" textAnchor="middle" fill="rgb(52,211,153,0.8)" fontSize="8">Solid Protocol</text>
+
+                    {/* nostr-rust-forum */}
+                    <rect x="20" y="200" width="100" height="60" rx="8" fill="rgba(168,85,247,0.10)" stroke="rgb(168,85,247)" strokeWidth="1.5" />
+                    <text x="70" y="220" textAnchor="middle" fill="rgb(216,180,254)" fontWeight="600">nostr-rust-forum</text>
+                    <text x="70" y="234" textAnchor="middle" fill="rgb(216,180,254,0.8)" fontSize="8">Governance</text>
+                    <text x="70" y="244" textAnchor="middle" fill="rgb(216,180,254,0.8)" fontSize="8">Dashboard</text>
+
+                    {/* DreamLab Edge */}
+                    <rect x="240" y="200" width="100" height="60" rx="8" fill="rgba(245,158,11,0.10)" stroke="rgb(245,158,11)" strokeWidth="1.5" />
+                    <text x="290" y="220" textAnchor="middle" fill="rgb(253,224,71)" fontWeight="600">DreamLab Edge</text>
+                    <text x="290" y="234" textAnchor="middle" fill="rgb(253,224,71,0.8)" fontSize="8">React SPA</text>
+                    <text x="290" y="244" textAnchor="middle" fill="rgb(253,224,71,0.8)" fontSize="8">CF Workers</text>
+
+                    {/* Connections to center */}
+                    <line x1="110" y1="50" x2="147" y2="117" stroke="rgb(233,69,96)" strokeWidth="1.5" strokeDasharray="3 2" />
+                    <line x1="250" y1="50" x2="213" y2="117" stroke="rgb(233,69,96)" strokeWidth="1.5" strokeDasharray="3 2" />
+                    <line x1="180" y1="100" x2="180" y2="168" stroke="rgb(233,69,96)" strokeWidth="1.5" strokeDasharray="3 2" />
+                    <line x1="100" y1="240" x2="147" y2="170" stroke="rgb(233,69,96)" strokeWidth="1.5" strokeDasharray="3 2" />
+                    <line x1="260" y1="240" x2="213" y2="170" stroke="rgb(233,69,96)" strokeWidth="1.5" strokeDasharray="3 2" />
+
+                    {/* Relay label */}
+                    <text x="180" y="275" textAnchor="middle" fill="rgb(156,163,175)" fontSize="9" fontStyle="italic">
+                      Nostr relay mesh (NIP-01/42/98)
+                    </text>
                   </g>
-
-                  {/* arrows */}
-                  <defs>
-                    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                      <path d="M 0 0 L 10 5 L 0 10 z" fill="rgb(168,85,247)" />
-                    </marker>
-                    <marker id="arrow-fallback" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                      <path d="M 0 0 L 10 5 L 0 10 z" fill="rgb(99,102,241)" />
-                    </marker>
-                    <marker id="arrow-out" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                      <path d="M 0 0 L 10 5 L 0 10 z" fill="rgb(16,185,129)" />
-                    </marker>
-                  </defs>
-
-                  {/* visitor -> forum */}
-                  <path d="M 90 120 Q 115 80 140 60" fill="none" stroke="rgb(168,85,247)" strokeWidth="1.5" markerEnd="url(#arrow)" />
-                  {/* forum -> pod (fallback) */}
-                  <path d="M 190 90 L 190 170" fill="none" stroke="rgb(99,102,241)" strokeWidth="1.5" strokeDasharray="4 3" markerEnd="url(#arrow-fallback)" />
-                  <text x="200" y="135" fill="rgb(165,180,252)" fontSize="9" fontFamily="ui-sans-serif, system-ui, sans-serif">cache miss</text>
-                  {/* pod -> forum (record) */}
-                  <path d="M 178 170 Q 155 130 178 92" fill="none" stroke="rgb(99,102,241)" strokeWidth="1.5" markerEnd="url(#arrow-fallback)" />
-                  {/* forum -> verified */}
-                  <path d="M 240 60 Q 280 90 295 105" fill="none" stroke="rgb(16,185,129)" strokeWidth="1.5" markerEnd="url(#arrow-out)" />
-                  {/* verified -> visitor */}
-                  <path d="M 280 130 L 90 130" fill="none" stroke="rgb(16,185,129)" strokeWidth="1.5" markerEnd="url(#arrow-out)" />
                 </svg>
                 <p className="text-xs text-muted-foreground mt-4 text-center leading-relaxed">
-                  Cache-first, pod-authoritative. If the forum's edge cache misses, the user's pod is the source of truth.
+                  Identity flows through all five. Coordination happens via Nostr relay mesh. No single point of control.
                 </p>
               </div>
             </div>
@@ -449,10 +448,12 @@ const Index = () => {
 
           <div className="text-center mt-10">
             <a
-              href="/community/"
-              className="inline-flex items-center text-indigo-400 hover:text-indigo-300 font-medium text-sm hover:underline gap-1"
+              href="https://github.com/DreamLab-AI/VisionFlow"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center text-cyan-400 hover:text-cyan-300 font-medium text-sm hover:underline gap-1"
             >
-              Join the community forum <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+              Explore VisionFlow on GitHub <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
             </a>
           </div>
         </div>
