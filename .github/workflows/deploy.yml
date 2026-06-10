@@ -44,13 +44,16 @@ env:
   VITE_POD_API_URL: 'https://dreamlab-pod-api.solitary-paper-764d.workers.dev'
   VITE_SEARCH_API_URL: 'https://dreamlab-search-api.solitary-paper-764d.workers.dev'
   VITE_LINK_PREVIEW_API_URL: 'https://dreamlab-link-preview.solitary-paper-764d.workers.dev'
+  # Zone (section) model for the forum client. Mirrors forum-config/dreamlab.toml
+  # [[zones]] and the relay's ZONE_CONFIG [vars]. Injected into window.__ENV__ below.
+  ZONE_CONFIG_JSON: '[{"id":"public","display_name":"MiniMooNoir","required_cohorts":[],"write_cohorts":["friends","agent"],"banner_image_url":"/images/heroes/minimoonoir-hero.webp","visibility":"public","encrypted":false},{"id":"friends","display_name":"Friends","required_cohorts":["friends"],"banner_image_url":"/images/heroes/minimoonoir-hero.webp","visibility":"locked","encrypted":false},{"id":"family","display_name":"Family","required_cohorts":["family"],"banner_image_url":"/images/heroes/family-hero.webp","visibility":"locked","encrypted":true},{"id":"business","display_name":"DreamLab","required_cohorts":["business"],"banner_image_url":"/images/heroes/business-hero.webp","visibility":"locked","encrypted":false}]'
   FORUM_BASE: '/community'
   KIT_REPO: 'https://github.com/DreamLab-AI/nostr-rust-forum.git'
   # Pinned to the exact commit resolved in forum-config/Cargo.lock (nostr-bbs-* rc11).
   # Do NOT float on `main`: a breaking upstream push would silently ship untested
   # worker/WASM code while the lockfile stays at this tested revision. Keep this SHA
   # in sync with the `rev = "..."` in forum-config/Cargo.lock when bumping the kit.
-  KIT_REF: 'b1b4466fc80b65e908357086f3318667ab0bd88b'
+  KIT_REF: 'a91e7c79b53648352d3bb86f3a016f3c4ea8ac50'
 
 jobs:
   gate:
@@ -171,7 +174,7 @@ jobs:
 
       - name: Inject runtime env config into forum
         run: |
-          ENV_SCRIPT='<script>window.__ENV__={VITE_RELAY_URL:"'"$VITE_RELAY_URL"'",VITE_AUTH_API_URL:"'"$VITE_AUTH_API_URL"'",VITE_POD_API_URL:"'"$VITE_POD_API_URL"'",VITE_SEARCH_API_URL:"'"$VITE_SEARCH_API_URL"'",VITE_LINK_PREVIEW_API_URL:"'"$VITE_LINK_PREVIEW_API_URL"'"};</script>'
+          ENV_SCRIPT='<script>window.__ENV__={VITE_RELAY_URL:"'"$VITE_RELAY_URL"'",VITE_AUTH_API_URL:"'"$VITE_AUTH_API_URL"'",VITE_POD_API_URL:"'"$VITE_POD_API_URL"'",VITE_SEARCH_API_URL:"'"$VITE_SEARCH_API_URL"'",VITE_LINK_PREVIEW_API_URL:"'"$VITE_LINK_PREVIEW_API_URL"'",ZONE_CONFIG:'"$ZONE_CONFIG_JSON"'};</script>'
           sed -i "s|</head>|${ENV_SCRIPT}</head>|" dist/community/index.html
           echo "Injected window.__ENV__ into forum index.html"
 

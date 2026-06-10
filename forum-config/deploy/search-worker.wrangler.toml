@@ -7,6 +7,10 @@ compatibility_date = "2025-09-01"
 [build]
 command = "worker-build --release"
 
+# Workers AI binding — semantic embeddings via @cf/baai/bge-small-en-v1.5 (384-dim).
+[ai]
+binding = "AI"
+
 [[r2_buckets]]
 binding     = "VECTORS"
 bucket_name = "dreamlab-vectors"

@@ -33,10 +33,16 @@ ingress_policy  = "allowlist"
 [admin]
 mode            = "static"
 static_pubkeys  = [
+  # power-user — primary admin (matches auth-worker ADMIN_PUBKEYS CF secret)
+  "11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c",
   # operator-jjohare — human admin (Dr John O'Hare)
   "6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425a",
   # moderation-bot — automated moderation agent
   "5d80b5facd2d746689d7d2e400db6acce5843456967054adcf6956e4c734c54c",
+  # calendar-bot — cross-zone NIP-52 scheduling (needs all zones)
+  "be92ccf53d9d535fd21f3388201fd83b49588552fff5a1395fb60b6998df2243",
+  # search-indexer — indexes all zones for search
+  "d5194639ee3560204a1b5584a0714a6dd2a6c59953d0869b483e72ee185ada26",
 ]
 
 # ─── Branding ────────────────────────────────────────────────────────────────
@@ -49,23 +55,43 @@ a private space for trainers, builders, and the curious.\
 """
 
 # ─── Zones ───────────────────────────────────────────────────────────────────
-# Three-zone production layout. The cohort access semantics live in the kit's
-# relay-worker (src/whitelist.rs); this file sets ONLY display names + the
-# allowed cohort lists per zone.
+# Four-zone org model — see docs/architecture/forum-org-redesign.md. The relay
+# enforces access from ZONE_CONFIG (deploy/relay-worker.wrangler.toml [vars]); the
+# client renders tiles from window.__ENV__.ZONE_CONFIG (injected by deploy.yml).
+# This block is the authored source for both. Cohorts: family, friends, business,
+# agent (+ admin via [admin].static_pubkeys). visibility: public|locked|hidden.
 [[zones]]
-id                = "home"
-display_name      = "Lobby"
-required_cohorts  = ["home", "lobby", "approved"]
-
-[[zones]]
-id                = "members"
-display_name      = "DreamLab"
-required_cohorts  = ["members", "trainers", "trainees", "ai-agents", "agent", "business", "business-only"]
-
-[[zones]]
-id                = "private"
+id                = "public"
 display_name      = "MiniMooNoir"
-required_cohorts  = ["private", "private-only", "private-business"]
+required_cohorts  = []
+write_cohorts     = ["friends", "agent"]
+visibility        = "public"
+banner_image_url  = "/images/heroes/minimoonoir-hero.webp"
+encrypted         = false
+
+[[zones]]
+id                = "friends"
+display_name      = "Friends"
+required_cohorts  = ["friends"]
+visibility        = "locked"
+banner_image_url  = "/images/heroes/minimoonoir-hero.webp"
+encrypted         = false
+
+[[zones]]
+id                = "family"
+display_name      = "Family"
+required_cohorts  = ["family"]
+visibility        = "locked"
+banner_image_url  = "/images/heroes/family-hero.webp"
+encrypted         = true
+
+[[zones]]
+id                = "business"
+display_name      = "DreamLab"
+required_cohorts  = ["business"]
+visibility        = "locked"
+banner_image_url  = "/images/heroes/business-hero.webp"
+encrypted         = false
 
 # ─── Trust thresholds ────────────────────────────────────────────────────────
 [trust]
@@ -169,7 +195,7 @@ clone_url_base = "https://dreamlab-pod-api.solitary-paper-764d.workers.dev"  # s
 [native_pod]
 enabled              = true
 base_url             = "https://pods-native.dreamlab-ai.com"
-allowlist_cohorts    = ["members", "trainers", "private", "business"]
+allowlist_cohorts    = ["family", "friends", "business"]
 git_enabled          = true
 admin_provision_url  = "https://pods-native.dreamlab-ai.com/_admin/provision"
 
