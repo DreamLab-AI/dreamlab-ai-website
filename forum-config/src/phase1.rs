@@ -243,7 +243,10 @@ mod tests {
         assert_eq!(cfg.provision.private_dir, "/private/");
         assert_eq!(cfg.provision.privkey_filename, "privkey.jsonld");
         assert_eq!(cfg.nip05.resolver_mode, "d1");
-        assert_eq!(cfg.nip05.pod_base_url, "https://dreamlab-pod-api.solitary-paper-764d.workers.dev");
+        assert_eq!(
+            cfg.nip05.pod_base_url,
+            "https://dreamlab-pod-api.solitary-paper-764d.workers.dev"
+        );
         assert!(!cfg.export.enabled);
         assert!(!cfg.export.include_private_default);
         assert_eq!(cfg.export.rate_limit_per_min, 6);
@@ -286,7 +289,10 @@ mod tests {
 
         // [nip05] — federated as of NRF commit 1fe95fd (ADR-086 §9).
         assert_eq!(cfg.nip05.resolver_mode, "federated");
-        assert_eq!(cfg.nip05.pod_base_url, "https://dreamlab-pod-api.solitary-paper-764d.workers.dev");
+        assert_eq!(
+            cfg.nip05.pod_base_url,
+            "https://dreamlab-pod-api.solitary-paper-764d.workers.dev"
+        );
 
         // [export] — disabled on CF; native/tokio surface only.
         assert!(!cfg.export.enabled);
@@ -299,7 +305,10 @@ mod tests {
         assert!(!cfg.git.enabled, "CF deployment cannot honour git=true");
         assert!(cfg.git.auto_init);
         assert_eq!(cfg.git.default_branch, "main");
-        assert_eq!(cfg.git.clone_url_base, "https://dreamlab-pod-api.solitary-paper-764d.workers.dev");
+        assert_eq!(
+            cfg.git.clone_url_base,
+            "https://dreamlab-pod-api.solitary-paper-764d.workers.dev"
+        );
     }
 
     #[test]
