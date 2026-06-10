@@ -141,7 +141,7 @@ against alpha-stage API changes.
 
 ## References
 
-- [PRD: DreamLab Forum Rust Port v2.0.0, Section 4.1](../prd-rust-port.md)
+- [PRD: DreamLab Forum Rust Port v2.0.0, Section 4.1](../prd/prd-rust-port.md)
 - [rust-nostr/nostr](https://github.com/rust-nostr/nostr) (605 stars)
 - [nostr-sdk WASM examples](https://github.com/rust-nostr/nostr/tree/master/crates/nostr-sdk/examples)
 - [Gossip client](https://github.com/mikedilger/gossip) (851 stars, uses nostr crate)

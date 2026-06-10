@@ -244,4 +244,4 @@ Estimated new LOC: ~2,000 across pod-worker (currently 898 LOC → ~2,900 LOC ac
 - [N3 Patch](https://solidproject.org/TR/n3-patch) — PATCH method for RDF resources
 - `community-forum-rs/crates/pod-worker/` — Current implementation (898 LOC)
 - `docs/adr/011-images-to-solid-pods.md` — Initial Solid pod decision
-- `docs/prd-rust-port-v4.0.md` — Parity sprint plan
+- `docs/prd/prd-rust-port-v4.0.md` — Parity sprint plan

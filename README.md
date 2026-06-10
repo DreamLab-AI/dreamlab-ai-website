@@ -20,7 +20,7 @@ Two SPAs, one origin: a React marketing site at `/` and a Rust/Leptos WASM forum
 ## Screenshots
 
 ![Marketing landing](docs/images/screenshots/main-site-hero.webp)
-*Marketing site hero at [dreamlab-ai.com](https://dreamlab-ai.com) — React + Three.js network scene.*
+*Marketing site hero at [dreamlab-ai.com](https://dreamlab-ai.com) — canvas-rendered golden-ratio Voronoi scene.*
 
 ![Forum landing, signed out](docs/images/screenshots/forum-landing.webp)
 *MiniMooNoir forum landing (signed out) — passkey-first onboarding, Nostr identity, E2E encryption.*
@@ -174,15 +174,15 @@ Calendar events carry a zone tag; the relay projects each event per viewer tier 
 - **JSS v0.0.197 Solid alignment (May 2026)** -- Verified identity (federated NIP-05 with pod fallback), authenticated `POST /.pods` pod creation, JSS-compatible CORS/auth headers, TypeIndex/media provisioning. See [CHANGELOG.md](CHANGELOG.md).
 - **Smart auth UX** -- Progressive disclosure login (auto-detects NIP-07 extensions), friendly labels with optional technical mode toggle, forum-first navigation.
 - **Security hardened** -- XSS sanitization on all markdown rendering, NIP-98 body hash verification with D1-backed replay protection, rate limiting on all HTTP workers, env-based CORS, hibernation-safe relay subscriptions.
-- **3D visualizations** -- Three.js + React Three Fiber hero scenes on the marketing site.
+- **Generative hero scenes** -- canvas-rendered golden-ratio Voronoi tessellation on the marketing site (no WebGL dependency).
 
 ## Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
-| Marketing Site | React 18.3 + TypeScript 5.5 + Vite 5.4 |
+| Marketing Site | React 18.3 + TypeScript 5.9 + Vite 5.4 |
 | Styling | Tailwind CSS 3.4 + shadcn/ui (Radix UI) |
-| 3D | Three.js 0.156 + React Three Fiber |
+| Hero scenes | Canvas 2D golden-ratio Voronoi (zero-dependency) |
 | Community Forum | **Rust / Leptos 0.7** (CSR, WASM, amber/gray theme, 19 routes incl. `/governance`) |
 | Nostr Protocol | nostr-bbs-core / upstream `nostr` crate — NIP-01/05/07/09/28/29/33/40/42/44/45/50/52/59/98 + kinds 31400-31405 (governance) |
 | Auth | WebAuthn PRF via passkey-rs + NIP-98 + NIP-07 extension |
@@ -243,10 +243,11 @@ Operator tooling for exercising the live four-zone deployment. The admin key is 
 ```
 dreamlab-ai-website/
   src/                          React SPA (lazy-loaded routes)
-    pages/                      Route pages (Index, Team, Workshops, Contact, ...)
-    components/                 70+ React components (shadcn/ui primitives in ui/)
+    pages/                      Route pages (Index, Programmes, CoCreate, Research, ...)
+    components/                 React components (shadcn/ui primitives in ui/)
     hooks/                      Custom React hooks
-    lib/                        Utilities
+    lib/                        Utilities (Supabase, OG meta, markdown, GDPR erasure)
+    data/                       skills.json + generated workshop-list/testimonials JSON
 
   forum-config/                 Operator overlay for nostr-rust-forum kit
     Cargo.toml                  Pins nostr-bbs-* crates from nostr-rust-forum git
@@ -254,12 +255,19 @@ dreamlab-ai-website/
     src/                        Branding + per-worker entry shims
     deploy/                     Per-worker wrangler.toml with DreamLab CF resource IDs
 
-  public/data/                  Runtime content (team profiles, workshops, media)
-  public/images/heroes/         Per-zone hero banners
+  public/images/                Site imagery by category (heroes, partners,
+                                portfolio, showcase, team, venue)
+  public/data/                  Runtime content (team bios, workshops, research videos)
+  content/                      site-content.yaml (testimonials source)
   scripts/                      Build and utility scripts
     seed/                       Zone seeding + relay/calendar/pod probes
   tests/                        Operator-owned smoke + integration tests
-  docs/                         Full documentation suite
+  docs/                         Full documentation suite (start at docs/README.md)
+    adr/  api/  architecture/   Decision records, API reference, zone model
+    ddd/  prd/  sprint/         Domain model, PRDs, sprint plans & audits
+    security/  deployment/      Security docs, CI/CD pipelines
+    developer/  benchmarks/     Onboarding, perf baselines
+    tranche-1/                  Rust-port parity matrices
     images/screenshots/         README screenshots
 ```
 

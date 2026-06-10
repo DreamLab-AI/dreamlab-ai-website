@@ -156,7 +156,7 @@ Key implementation details:
 
 ## References
 
-- [PRD: DreamLab Forum Rust Port v2.0.0, Section 4.1](../prd-rust-port.md)
+- [PRD: DreamLab Forum Rust Port v2.0.0, Section 4.1](../prd/prd-rust-port.md)
 - [passkey-rs](https://github.com/nichochar/passkey-rs) (1Password, 263 stars)
 - [webauthn-rs](https://github.com/kanidm/webauthn-rs) (480 stars, no PRF)
 - [W3C WebAuthn Level 3 PRF Extension](https://www.w3.org/TR/webauthn-3/#prf-extension)

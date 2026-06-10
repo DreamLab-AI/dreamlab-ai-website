@@ -37,6 +37,17 @@ const DEFAULT_CONFIG: Partial<OGMetaConfig> = {
 
 const BASE_URL = 'https://dreamlab-ai.com';
 
+// Social-card images must point at files that actually exist in public/.
+// There is no OG-image generation pipeline; we reuse site imagery.
+const OG_IMAGES = {
+  default: `${BASE_URL}/images/venue/aerial.webp`,
+  programmes: `${BASE_URL}/images/heroes/ai-commander-week.webp`,
+  coCreate: `${BASE_URL}/images/venue/labview2.webp`,
+  research: `${BASE_URL}/images/showcase/showcase-9.webp`,
+  workshops: `${BASE_URL}/images/heroes/creative-technology-fundamentals.webp`,
+  team: `${BASE_URL}/images/venue/fairfield-front.webp`,
+} as const;
+
 /**
  * Page-specific OG configurations
  */
@@ -45,14 +56,14 @@ export const PAGE_OG_CONFIGS: Record<string, OGMetaConfig> = {
     title: 'DreamLab Applied Innovation — Agentics, AI, Spatial Computing & Secure Distributed Systems',
     description: 'Agentics, AI, spatial computing, rapid prototyping & secure distributed systems in the stunning Eskdale Valley. Training, consulting, and bespoke product development with 44+ deep tech specialists.',
     url: BASE_URL,
-    image: `${BASE_URL}/og/home.png`,
+    image: OG_IMAGES.default,
     imageAlt: 'DreamLab Applied Innovation Lab',
   },
   programmes: {
     title: 'Programmes | DreamLab Applied Innovation Lab',
     description: 'Outcome-based residential programmes: scale innovation, operationalise AI, unlock geospatial intelligence, create immersive experiences, secure infrastructure, and modernise creative production. TRL 2-8, Lake District.',
     url: `${BASE_URL}/programmes`,
-    image: `${BASE_URL}/og/programmes.png`,
+    image: OG_IMAGES.programmes,
     imageAlt: 'DreamLab Programme Tracks',
     type: 'product',
   },
@@ -60,42 +71,42 @@ export const PAGE_OG_CONFIGS: Record<string, OGMetaConfig> = {
     title: 'Co-Create With Us | DreamLab Applied Innovation Lab',
     description: 'Embed your team in our Lake District innovation lab. Enterprise residencies, SME innovation sprints, and Innovate UK KTP partnerships for deep tech co-creation.',
     url: `${BASE_URL}/co-create`,
-    image: `${BASE_URL}/og/co-create.png`,
+    image: OG_IMAGES.coCreate,
     imageAlt: 'DreamLab Co-Creation Model',
   },
   research: {
     title: 'Research Lineage | DreamLab Applied Innovation Lab',
     description: '16 years of deep tech research (Octave 2007-2023) powering applied innovation. Multi-viewpoint immersive AI, nuclear decommissioning, collaborative intelligence.',
     url: `${BASE_URL}/research`,
-    image: `${BASE_URL}/og/research.png`,
+    image: OG_IMAGES.research,
     imageAlt: 'DreamLab Research Heritage',
   },
   workshops: {
     title: 'Self-Guided Workshops | DreamLab Applied Innovation Lab',
     description: 'Self-paced AI-powered knowledge work workshops. 14 comprehensive modules covering AI integration, agentic workflows, RAG systems, and professional automation.',
     url: `${BASE_URL}/workshops`,
-    image: `${BASE_URL}/og/workshops.png`,
+    image: OG_IMAGES.workshops,
     imageAlt: 'DreamLab Workshops - AI-Powered Knowledge Work',
   },
   team: {
     title: 'Our Team | DreamLab Applied Innovation Lab',
     description: 'Meet the DreamLab collective — 44+ specialists including Emmy nominees, PhD researchers, and BAFTA-recognised talent across AI, XR, cyber, audio, and creative technology.',
     url: `${BASE_URL}/team`,
-    image: `${BASE_URL}/og/team.png`,
+    image: OG_IMAGES.team,
     imageAlt: 'DreamLab Team - Multi-Disciplinary Expertise',
   },
   contact: {
     title: 'Contact Us | DreamLab Applied Innovation Lab',
     description: 'Get in touch with DreamLab. Book a discovery call, schedule a lab visit, or enquire about programme tracks and co-creation engagements.',
     url: `${BASE_URL}/contact`,
-    image: `${BASE_URL}/og/contact.png`,
+    image: OG_IMAGES.team,
     imageAlt: 'Contact DreamLab',
   },
   privacy: {
     title: 'Privacy Policy | DreamLab AI Consulting',
     description: 'DreamLab AI Consulting privacy policy. Learn how we protect your data and maintain your privacy.',
     url: `${BASE_URL}/privacy`,
-    image: `${BASE_URL}/og/default.png`,
+    image: OG_IMAGES.default,
     imageAlt: 'DreamLab AI Privacy Policy',
   },
 };
@@ -108,25 +119,10 @@ export function getWorkshopOGConfig(workshopId: string, workshopTitle: string, w
     title: `${workshopTitle} | DreamLab AI Workshops`,
     description: workshopDescription,
     url: `${BASE_URL}/workshops/${workshopId}`,
-    image: `${BASE_URL}/og/workshop-${workshopId}.png`,
+    image: OG_IMAGES.workshops,
     imageAlt: `DreamLab AI Workshop - ${workshopTitle}`,
     type: 'article',
     section: 'Workshops',
-  };
-}
-
-/**
- * Generates course-specific OG config
- */
-export function getCourseOGConfig(courseId: string, courseTitle: string, courseDescription: string, category: string): OGMetaConfig {
-  return {
-    title: `${courseTitle} | DreamLab AI Training`,
-    description: courseDescription,
-    url: `${BASE_URL}/residential-training#${courseId}`,
-    image: `${BASE_URL}/og/course-${category.toLowerCase().replace(/\s+/g, '-')}.png`,
-    imageAlt: `DreamLab AI Course - ${courseTitle}`,
-    type: 'product',
-    section: category,
   };
 }
 
@@ -137,7 +133,7 @@ export function mergeOGConfig(config: Partial<OGMetaConfig>): OGMetaConfig {
   return {
     ...DEFAULT_CONFIG,
     ...config,
-    image: config.image || `${BASE_URL}/og/default.png`,
+    image: config.image || OG_IMAGES.default,
   } as OGMetaConfig;
 }
 
@@ -255,7 +251,7 @@ export function generateStructuredData(config: OGMetaConfig, additionalData?: Re
       name: 'DreamLab AI Consulting Ltd.',
       logo: {
         '@type': 'ImageObject',
-        url: `${BASE_URL}/logo.png`,
+        url: `${BASE_URL}/favicon.ico`,
       },
     },
     ...additionalData,

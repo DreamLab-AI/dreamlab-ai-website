@@ -96,3 +96,9 @@ fairfield/
 community-forum-rs/
 .nostr-identities.env
 scripts/seed/.test-keys.json
+
+# AI tooling artifacts (never commit)
+.claude-flow/
+.swarm/
+.claude/
+.mcp.json

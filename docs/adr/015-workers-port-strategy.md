@@ -136,7 +136,7 @@ both in the same `.github/workflows/workers-deploy.yml`.
 
 ## References
 
-- [PRD: DreamLab Forum Rust Port v2.0.0, Section 5](../prd-rust-port.md)
+- [PRD: DreamLab Forum Rust Port v2.0.0, Section 5](../prd/prd-rust-port.md)
 - [workers-rs](https://github.com/cloudflare/workers-rs) (0.7.5, 3,400 stars)
 - [cloudflare/workers-rs#736](https://github.com/cloudflare/workers-rs/issues) (Hibernation tracking)
 - ADR-010: Return to Cloudflare Platform

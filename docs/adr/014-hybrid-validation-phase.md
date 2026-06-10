@@ -114,7 +114,7 @@ a full rewrite. The `nostr-core` crate remains useful for Workers ports.
 
 ## References
 
-- [PRD: DreamLab Forum Rust Port v2.0.0, Section 6 Phase 1](../prd-rust-port.md)
+- [PRD: DreamLab Forum Rust Port v2.0.0, Section 6 Phase 1](../prd/prd-rust-port.md)
 - [Gossip client](https://github.com/mikedilger/gossip) (851 stars, desktop-only)
 - [wasm-bindgen guide](https://rustwasm.github.io/docs/wasm-bindgen/)
 - ADR-013: Rust/Leptos Forum Framework

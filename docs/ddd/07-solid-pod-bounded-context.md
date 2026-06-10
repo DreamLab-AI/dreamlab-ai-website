@@ -935,7 +935,7 @@ Each phase is independently deployable and backward-compatible with the existing
 - [03 - Aggregates](03-aggregates.md) -- Aggregate 5 (Pod) defines the current Pod aggregate
 - [04 - Domain Events](04-domain-events.md) -- Storage domain events (MediaUploaded, MediaDeleted, AclUpdated)
 - [06 - Ubiquitous Language](06-ubiquitous-language.md) -- Pod, WAC, Whitelist Status definitions
-- [ADR-011: Images to Solid Pods](../adr/011-images-to-solid-pods.md)
+- ADR-011: Images to Solid Pods (pre-migration ADR, superseded by [ADR-025](../adr/025-solid-pod-infrastructure-upgrade.md))
 - [Security Overview](../security/SECURITY_OVERVIEW.md)
 - [Cloudflare Workers Deployment](../deployment/CLOUDFLARE_WORKERS.md)
 - [Solid Protocol Specification](https://solidproject.org/TR/protocol)
