@@ -78,9 +78,6 @@ tests/*.jpg
 # OS artifacts
 Thumbs.db
 
-# Rust build artifacts
-wasm-voronoi/target/
-
 # External reference repos (for analysis, not part of this project)
 external/
 
