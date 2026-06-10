@@ -15,10 +15,10 @@ path = "src/lib.rs"
 # unified admin source across workers (Gap 2), fail-closed CORS (Gap 5), and a
 # truthful NIP-11 write-policy (Gap 7). Keep this rev in sync with KIT_REF in
 # .github/workflows/{deploy,workers-deploy}.yml.
-nostr-bbs-core = { git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "6f9c2d0", package = "nostr-bbs-core" }
-nostr-bbs-config = { git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "6f9c2d0", package = "nostr-bbs-config" }
-nostr-bbs-mesh = { git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "6f9c2d0", package = "nostr-bbs-mesh" }
-nostr-bbs-rate-limit = { git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "6f9c2d0", package = "nostr-bbs-rate-limit" }
+nostr-bbs-core = { git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "3172438", package = "nostr-bbs-core" }
+nostr-bbs-config = { git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "3172438", package = "nostr-bbs-config" }
+nostr-bbs-mesh = { git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "3172438", package = "nostr-bbs-mesh" }
+nostr-bbs-rate-limit = { git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "3172438", package = "nostr-bbs-rate-limit" }
 
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
