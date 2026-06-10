@@ -853,7 +853,7 @@ dependencies = [
 [[package]]
 name = "nostr-bbs-config"
 version = "3.0.0-rc11"
-source = "git+https://github.com/DreamLab-AI/nostr-rust-forum.git?rev=a70beb9#a70beb912b0858a75a55383a4a7ee623868d413c"
+source = "git+https://github.com/DreamLab-AI/nostr-rust-forum.git?rev=c16b35e#c16b35e856d8010b966ab8ebdb1eb983cf25e40d"
 dependencies = [
  "schemars",
  "serde",
@@ -866,7 +866,7 @@ dependencies = [
 [[package]]
 name = "nostr-bbs-core"
 version = "3.0.0-rc11"
-source = "git+https://github.com/DreamLab-AI/nostr-rust-forum.git?rev=a70beb9#a70beb912b0858a75a55383a4a7ee623868d413c"
+source = "git+https://github.com/DreamLab-AI/nostr-rust-forum.git?rev=c16b35e#c16b35e856d8010b966ab8ebdb1eb983cf25e40d"
 dependencies = [
  "aes",
  "async-trait",
@@ -894,7 +894,7 @@ dependencies = [
 [[package]]
 name = "nostr-bbs-mesh"
 version = "3.0.0-rc11"
-source = "git+https://github.com/DreamLab-AI/nostr-rust-forum.git?rev=a70beb9#a70beb912b0858a75a55383a4a7ee623868d413c"
+source = "git+https://github.com/DreamLab-AI/nostr-rust-forum.git?rev=c16b35e#c16b35e856d8010b966ab8ebdb1eb983cf25e40d"
 dependencies = [
  "async-trait",
  "nostr-bbs-config",
@@ -907,7 +907,7 @@ dependencies = [
 [[package]]
 name = "nostr-bbs-rate-limit"
 version = "3.0.0-rc11"
-source = "git+https://github.com/DreamLab-AI/nostr-rust-forum.git?rev=a70beb9#a70beb912b0858a75a55383a4a7ee623868d413c"
+source = "git+https://github.com/DreamLab-AI/nostr-rust-forum.git?rev=c16b35e#c16b35e856d8010b966ab8ebdb1eb983cf25e40d"
 dependencies = [
  "async-trait",
  "hex",
@@ -1384,8 +1384,9 @@ checksum = "67b1b7a3b5fe4f1376887184045fcf45c69e92af734b7aaddc05fb777b6fbd03"
 
 [[package]]
 name = "solid-pod-rs"
-version = "0.4.0-alpha.16"
-source = "git+https://github.com/DreamLab-AI/solid-pod-rs?tag=v0.4.0-alpha.16#6340a468a9b6e6bbaf33b2f5b9d5c74d792bc7bd"
+version = "0.4.0-alpha.17"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "979b8b44734650b1b6d068071d3bebb574721ea6e119a5cf6b37588c68597846"
 dependencies = [
  "async-trait",
  "base64",

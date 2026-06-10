@@ -10,15 +10,15 @@ publish = false
 path = "src/lib.rs"
 
 [dependencies]
-# Kit crates from nostr-rust-forum 3.0.0-rc11 (a70beb9). This bump adds the
+# Kit crates from nostr-rust-forum 3.0.0-rc11 (c16b35e). This bump adds the
 # forum-flow-cartography fixes: static ADMIN_PUBKEYS admin resolution (Gap 1),
 # unified admin source across workers (Gap 2), fail-closed CORS (Gap 5), and a
 # truthful NIP-11 write-policy (Gap 7). Keep this rev in sync with KIT_REF in
 # .github/workflows/{deploy,workers-deploy}.yml.
-nostr-bbs-core = { git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "a70beb9", package = "nostr-bbs-core" }
-nostr-bbs-config = { git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "a70beb9", package = "nostr-bbs-config" }
-nostr-bbs-mesh = { git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "a70beb9", package = "nostr-bbs-mesh" }
-nostr-bbs-rate-limit = { git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "a70beb9", package = "nostr-bbs-rate-limit" }
+nostr-bbs-core = { git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "c16b35e", package = "nostr-bbs-core" }
+nostr-bbs-config = { git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "c16b35e", package = "nostr-bbs-config" }
+nostr-bbs-mesh = { git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "c16b35e", package = "nostr-bbs-mesh" }
+nostr-bbs-rate-limit = { git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "c16b35e", package = "nostr-bbs-rate-limit" }
 
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
