@@ -95,3 +95,4 @@ discourse-audit/
 fairfield/
 community-forum-rs/
 .nostr-identities.env
+scripts/seed/.test-keys.json
