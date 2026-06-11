@@ -853,7 +853,7 @@ dependencies = [
 [[package]]
 name = "nostr-bbs-config"
 version = "3.0.0-rc11"
-source = "git+https://github.com/DreamLab-AI/nostr-rust-forum.git?rev=63c3c03#63c3c03d130217cf17fd2fc76c2afe61c97c9406"
+source = "git+https://github.com/DreamLab-AI/nostr-rust-forum.git?rev=25ca8a1#25ca8a11e199ced9b1be4a4fb0601239e31aff54"
 dependencies = [
  "schemars",
  "serde",
@@ -866,7 +866,7 @@ dependencies = [
 [[package]]
 name = "nostr-bbs-core"
 version = "3.0.0-rc11"
-source = "git+https://github.com/DreamLab-AI/nostr-rust-forum.git?rev=63c3c03#63c3c03d130217cf17fd2fc76c2afe61c97c9406"
+source = "git+https://github.com/DreamLab-AI/nostr-rust-forum.git?rev=25ca8a1#25ca8a11e199ced9b1be4a4fb0601239e31aff54"
 dependencies = [
  "aes",
  "async-trait",
@@ -894,7 +894,7 @@ dependencies = [
 [[package]]
 name = "nostr-bbs-mesh"
 version = "3.0.0-rc11"
-source = "git+https://github.com/DreamLab-AI/nostr-rust-forum.git?rev=63c3c03#63c3c03d130217cf17fd2fc76c2afe61c97c9406"
+source = "git+https://github.com/DreamLab-AI/nostr-rust-forum.git?rev=25ca8a1#25ca8a11e199ced9b1be4a4fb0601239e31aff54"
 dependencies = [
  "async-trait",
  "nostr-bbs-config",
@@ -907,7 +907,7 @@ dependencies = [
 [[package]]
 name = "nostr-bbs-rate-limit"
 version = "3.0.0-rc11"
-source = "git+https://github.com/DreamLab-AI/nostr-rust-forum.git?rev=63c3c03#63c3c03d130217cf17fd2fc76c2afe61c97c9406"
+source = "git+https://github.com/DreamLab-AI/nostr-rust-forum.git?rev=25ca8a1#25ca8a11e199ced9b1be4a4fb0601239e31aff54"
 dependencies = [
  "async-trait",
  "hex",
