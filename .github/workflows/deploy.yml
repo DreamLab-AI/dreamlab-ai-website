@@ -53,7 +53,7 @@ env:
   # Do NOT float on `main`: a breaking upstream push would silently ship untested
   # worker/WASM code while the lockfile stays at this tested revision. Keep this SHA
   # in sync with the `rev = "..."` in forum-config/Cargo.lock when bumping the kit.
-  KIT_REF: 'f9acbf1fa2a2a871b5c413dcb8ec28fa4b887d37'
+  KIT_REF: '63c3c03d130217cf17fd2fc76c2afe61c97c9406'
 
 jobs:
   gate:
