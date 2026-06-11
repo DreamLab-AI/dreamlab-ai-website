@@ -97,6 +97,9 @@ community-forum-rs/
 .nostr-identities.env
 scripts/seed/.test-keys.json
 
+# one-off live-debug probes — keep out of the operational seed surface
+scripts/seed/probes/
+
 # AI tooling artifacts (never commit)
 .claude-flow/
 .swarm/

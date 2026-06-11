@@ -1,6 +1,7 @@
 # relay-worker wrangler manifest for the DreamLab deployment.
 #
-# Preserved CF resource IDs from community-forum-rs/crates/relay-worker/wrangler.toml.
+# CF resource IDs originally provisioned for the legacy community-forum-rs tree;
+# now consumed by the nostr-rust-forum kit workers.
 
 name = "dreamlab-nostr-relay"
 main = "build/worker/shim.mjs"

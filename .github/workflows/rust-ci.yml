@@ -15,7 +15,8 @@ env:
   CARGO_TERM_COLOR: always
   RUST_TOOLCHAIN: '1.90.0'
   KIT_REPO: 'https://github.com/DreamLab-AI/nostr-rust-forum.git'
-  KIT_REF: 'main'
+  # Pinned kit SHA — keep in lockstep with workers-deploy.yml/deploy.yml KIT_REF.
+  KIT_REF: '25ca8a11e199ced9b1be4a4fb0601239e31aff54'
 
 jobs:
   fmt:
@@ -26,7 +27,9 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
-      - run: git clone --depth 1 --branch ${{ env.KIT_REF }} ${{ env.KIT_REPO }} kit
+      - run: |
+          git clone --filter=blob:none --no-checkout ${{ env.KIT_REPO }} kit
+          git -C kit checkout --detach ${{ env.KIT_REF }}
       - uses: dtolnay/rust-toolchain@1.90.0
         with:
           components: rustfmt
@@ -40,7 +43,9 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
-      - run: git clone --depth 1 --branch ${{ env.KIT_REF }} ${{ env.KIT_REPO }} kit
+      - run: |
+          git clone --filter=blob:none --no-checkout ${{ env.KIT_REPO }} kit
+          git -C kit checkout --detach ${{ env.KIT_REF }}
       - uses: dtolnay/rust-toolchain@1.90.0
         with:
           components: clippy
@@ -63,7 +68,9 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
-      - run: git clone --depth 1 --branch ${{ env.KIT_REF }} ${{ env.KIT_REPO }} kit
+      - run: |
+          git clone --filter=blob:none --no-checkout ${{ env.KIT_REPO }} kit
+          git -C kit checkout --detach ${{ env.KIT_REF }}
       - uses: dtolnay/rust-toolchain@1.90.0
       - uses: actions/cache@v4
         with:
@@ -93,7 +100,9 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
-      - run: git clone --depth 1 --branch ${{ env.KIT_REF }} ${{ env.KIT_REPO }} kit
+      - run: |
+          git clone --filter=blob:none --no-checkout ${{ env.KIT_REPO }} kit
+          git -C kit checkout --detach ${{ env.KIT_REF }}
       - uses: dtolnay/rust-toolchain@1.90.0
         with:
           targets: wasm32-unknown-unknown
@@ -116,7 +125,9 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
-      - run: git clone --depth 1 --branch ${{ env.KIT_REF }} ${{ env.KIT_REPO }} kit
+      - run: |
+          git clone --filter=blob:none --no-checkout ${{ env.KIT_REPO }} kit
+          git -C kit checkout --detach ${{ env.KIT_REF }}
       - uses: dtolnay/rust-toolchain@1.90.0
         with:
           targets: wasm32-unknown-unknown

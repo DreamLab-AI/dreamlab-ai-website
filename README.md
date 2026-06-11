@@ -433,8 +433,25 @@ dreamlab-ai-website is the **branded edge deployment** of the [VisionFlow](https
 
 ## Licence
 
-Proprietary. Copyright 2024-2026 DreamLab AI Consulting Ltd. All rights reserved.
+This repository is **dual-licensed by surface**:
+
+**1. Branded React site (proprietary).** The branded React/WASM application —
+everything outside `forum-config/` and the forum surfaces — is proprietary.
+Copyright 2024-2026 DreamLab AI Consulting Ltd. All rights reserved. The root
+`package.json` is marked `UNLICENSED` and applies to this React site.
+
+**2. Forum surfaces (AGPL-3.0-only).** The forum surfaces — `forum-config/`, the
+deployed Cloudflare workers (auth/pod/relay/preview/search), and the Leptos forum
+client — are **combined works** of the AGPL-3.0-only
+[nostr-rust-forum](https://github.com/DreamLab-AI/nostr-rust-forum) kit, whose
+AGPL crates `forum-config` statically links. They are therefore licensed under
+**AGPL-3.0-only**. Per **AGPL §13**, users who interact with these surfaces over
+a network are entitled to the corresponding source: the canonical source offer is
+the upstream kit repository (pinned at the rev recorded in
+[`forum-config/Cargo.toml`](forum-config/Cargo.toml)), and the local operator
+overlay source lives in [`forum-config/`](forum-config/) (see
+[`forum-config/LICENSE`](forum-config/LICENSE)).
 
 ---
 
-*Last updated: 2026-06-10*
+*Last updated: 2026-06-11*

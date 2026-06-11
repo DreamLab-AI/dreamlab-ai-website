@@ -3,18 +3,21 @@ name = "dreamlab-forum-config"
 version = "3.0.0-rc11"
 edition = "2021"
 description = "DreamLab AI forum operator overlay for the nostr-bbs kit"
-license = "Proprietary"
+# Statically links the AGPL-3.0-only nostr-rust-forum kit crates below, so this
+# overlay is a combined work and inherits AGPL-3.0-only. "Proprietary" here was
+# legally incoherent. See LICENSE and README.md §Licence (AGPL §13 network source).
+license = "AGPL-3.0-only"
 publish = false
 
 [lib]
 path = "src/lib.rs"
 
 [dependencies]
-# Kit crates from nostr-rust-forum 3.0.0-rc11 (b1b4466). This bump adds the
-# forum-flow-cartography fixes: static ADMIN_PUBKEYS admin resolution (Gap 1),
-# unified admin source across workers (Gap 2), fail-closed CORS (Gap 5), and a
-# truthful NIP-11 write-policy (Gap 7). Keep this rev in sync with KIT_REF in
-# .github/workflows/{deploy,workers-deploy}.yml.
+# Kit crates from nostr-rust-forum @ 25ca8a1 (1.0.0-beta.2 line, ADR-098 /connect).
+# Carries the forum-flow-cartography fixes (static ADMIN_PUBKEYS admin resolution,
+# unified admin source across workers, fail-closed CORS, truthful NIP-11
+# write-policy) plus the ADR-098 /connect magic-link onboarding. Keep this rev in
+# sync with KIT_REF in .github/workflows/{deploy,workers-deploy,rust-ci}.yml.
 nostr-bbs-core = { git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "25ca8a1", package = "nostr-bbs-core" }
 nostr-bbs-config = { git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "25ca8a1", package = "nostr-bbs-config" }
 nostr-bbs-mesh = { git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "25ca8a1", package = "nostr-bbs-mesh" }

@@ -1,7 +1,8 @@
 # auth-worker wrangler manifest for the DreamLab deployment.
 #
-# Preserved CF resource IDs from community-forum-rs/crates/auth-worker/wrangler.toml
-# so the D2 zero-downtime route handover keeps the same D1, KV, and R2 bindings.
+# CF resource IDs originally provisioned for the legacy community-forum-rs tree;
+# now consumed by the nostr-rust-forum kit workers. Preserving them keeps the D2
+# zero-downtime route handover on the same D1, KV, and R2 bindings.
 
 name = "dreamlab-auth-api"
 main = "build/worker/shim.mjs"
