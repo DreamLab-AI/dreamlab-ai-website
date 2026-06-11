@@ -1,6 +1,21 @@
 # ADR-031: DM Protocol Standardisation — NIP-04 Compat Fix + NIP-17 Primary
 
-## Status: Proposed
+## Status: Proposed — partially superseded by the kit; remainder not overlay-verifiable
+
+> **Adjudication (2026-06-11):** This ADR fixes the kind-4 decryption bug in
+> `forum-client/src/stores/dms.rs`, adds relay-side NIP-42 AUTH gating for
+> kind-1059, publishes kind-10050, and adds a `p_tag_pubkey` D1 index — all
+> against the deleted in-tree `community-forum-rs` port. Partial overlay
+> evidence exists: the relay's mesh config federates the gift-wrap kind
+> (`MESH_FEDERATED_KINDS` includes `1059` in `relay-worker.wrangler.toml`), and
+> the relay advertises NIP-42 AUTH as required (`auth_required` posture is the
+> kit default). But the deployed migration `001_init.sql` shows **no**
+> `p_tag_pubkey` column or `idx_events_kind_p_tag` index, and there is no
+> overlay-observable evidence of the NIP-04 decrypt fix or kind-10050
+> auto-publish — those live inside the kit's event-handling and client code.
+> **Blocked on:** confirming the NIP-04 compat fix, kind-1059 AUTH gating, and
+> kind-10050 publish shipped in the kit at `25ca8a1` (a kit-side audit), at
+> which point the relevant sections become Accepted-via-kit. Kept Proposed.
 
 ## Date: 2026-05-06
 

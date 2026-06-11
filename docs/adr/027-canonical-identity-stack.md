@@ -1,6 +1,19 @@
 # ADR-027: Canonical Identity Stack — did:nostr + WebID + NIP-05
 
-## Status: Proposed
+## Status: Proposed — not yet implemented in the deployed overlay
+
+> **Adjudication (2026-06-11):** This ADR targets `pod-worker/src/lib.rs`,
+> `pod-worker/src/profile.rs`, and `relay-worker/src/auth.rs` — modules of the
+> in-tree `community-forum-rs` port that was deleted on 2026-03-12 in favour of
+> the upstream `nostr-rust-forum` kit (`nostr-bbs-*`, pinned `25ca8a1`). The
+> deployed overlay (`forum-config/deploy/*.wrangler.toml`, `dreamlab.toml`,
+> `001_init.sql`) shows **no** `/.well-known/did/nostr/{pubkey}.json` endpoint,
+> no `webid` NIP-98 tag wiring, and no `owl:sameAs`/`alsoKnownAs` profile
+> additions. `did:nostr:<hex>` is used as a peer/identity identifier in the
+> mesh config (`allowed_remote_dids`) but the three-layer resolvable identity
+> web this ADR specifies is **not built**. **Blocked on:** a kit-side
+> implementation of the DID document endpoint and the WebID `nostr:pubkey`
+> link, or a decision to carry it in the overlay's pod surface. Kept Proposed.
 
 ## Date: 2026-05-06
 

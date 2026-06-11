@@ -1,6 +1,30 @@
 # ADR-032: Agent Job Marketplace — NIP-90 DVMs + NIP-26 Delegation
 
-## Status: Proposed
+## Status: Superseded by [ADR-036](036-agent-delegation-via-device-keys.md)
+
+> **Superseded-by:** [ADR-036 — Agent Delegation via Device Keys](036-agent-delegation-via-device-keys.md) (2026-06-11).
+>
+> **Why (2026-06-11):** This ADR's entire technical basis was removed from the
+> upstream `nostr-rust-forum` kit. The kit deleted `nip26.rs` and `nip90.rs`
+> (~1220 lines) — NIP-90 Data Vending Machines and NIP-26 delegated event
+> signing are no longer implemented or exposed. The sanctioned delegation model
+> is now the kit's **device-key** mechanism (upstream ADR-099), which gives an
+> agent or second device a distinct, individually-revocable key rather than a
+> time-boxed-but-irrevocable NIP-26 token. Every concrete change this ADR
+> mandated — `nostr-core/src/nip90.rs`, `nostr-core/src/nip26.rs`, the
+> `DelegationToken`, the kind-31990 relay treatment, the `/community/marketplace`
+> page, and `POST /api/delegation/create` — has no implementation target left:
+> the modules were part of the deleted in-tree port, and the upstream
+> replacements removed the underlying NIPs. The cross-reference from ADR-034
+> (kind-31990 in `supported_nips`) and from ADR-030 (`DelegationToken` using the
+> `Signer` trait) are likewise void.
+>
+> The *marketplace concept* — agents advertising capabilities and users
+> commissioning tasks — is not rejected. It can be revisited atop the device-key
+> model (ADR-036): a `marketplace-agent` device key publishes a capability
+> record, users address jobs to it, and the agent's authority is bounded and
+> revoked at the key level. That would be a fresh ADR if and when prioritised;
+> nothing below is binding.
 
 ## Date: 2026-05-06
 

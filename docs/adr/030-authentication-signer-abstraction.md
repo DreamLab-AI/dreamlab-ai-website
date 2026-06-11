@@ -1,6 +1,19 @@
 # ADR-030: Authentication Signer Abstraction — WebAuthn PRF + NIP-07 + NIP-46
 
-## Status: Proposed
+## Status: Proposed — not yet implemented in the deployed overlay
+
+> **Adjudication (2026-06-11):** This ADR defines a `Signer` trait and three
+> implementations (`PrfSigner`, `Nip07Signer`, `Nip46BunkerSigner`) in
+> `nostr-core`, refactors `forum-client`'s `AuthState`, and resolves WI-1 in
+> `admin-cli` — all modules of the deleted in-tree `community-forum-rs` port.
+> The deployed forum now uses the upstream kit's onboarding (the `/connect`
+> magic-link, upstream ADR-098 — see ADR-039 and `docs/forum-onboarding.md`),
+> with the tear-off device-key path gated off (`DEVICE_KEYS_ENABLED=false`).
+> The kit may carry its own signer abstraction internally, but nothing in the
+> overlay (`forum-config/`) evidences this specific three-signer trait or a
+> NIP-46 bunker CLI path. **Blocked on:** the authentication surface being a
+> kit-internal concern; revisit only if the overlay needs to assert a signer
+> contract on the kit. Kept Proposed.
 
 ## Date: 2026-05-06
 

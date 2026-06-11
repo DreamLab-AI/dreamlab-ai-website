@@ -1,6 +1,26 @@
 # ADR-033: Multi-Admin Moderation Architecture
 
-## Status: Proposed
+## Status: Accepted — outcome shipped via the kit (mechanism differs from §2)
+
+> **Adjudication (2026-06-11):** The *decision* — multiple independent admins,
+> reliable revocation, and standards-based reporting — **shipped** in the
+> deployed overlay, though via a different mechanism than the kind-30910 d-tag
+> scheme this ADR's §2 specified. Evidence from `forum-config/deploy/migrations/001_init.sql`:
+> a relational `moderation_actions` table records each action with a
+> `performed_by` admin column (so two admins acting on the same target do **not**
+> overwrite each other — the d-tag collision this ADR set out to fix cannot occur
+> in a relational store); `ban`/`mute`/`unban`/`unmute` are first-class `action`
+> values (explicit revocation, §3 intent met); an `is_admin` column exists on
+> **both** `members` and `whitelist` and is read by auth-worker and pod-worker
+> (the single-`ADMIN_PUBKEY` dependency this ADR removed is gone); an append-only
+> `admin_log` records `actor_pubkey`/`target_pubkey`/`action`; and NIP-56
+> reporting shipped as `nip1984_reports` + `mod_reports` (kind-1984 standard, §4
+> intent met). The deployed admin set is currently sourced from
+> `[admin].static_pubkeys` in `dreamlab.toml` (mode `static`), with `mode = "d1"`
+> switching to the `is_admin` table once the admins-table backfill ships.
+> **The §2 d-tag mechanism is NOT what was built — treat §1, §3, §4, §5 as the
+> binding decisions; §2's d-tag rewrite is moot under the relational design.**
+> Accepted.
 
 ## Date: 2026-05-06
 

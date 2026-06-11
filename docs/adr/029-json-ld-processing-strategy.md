@@ -1,6 +1,18 @@
 # ADR-029: JSON-LD Processing Strategy — json-ld 0.21.4 with NoLoader
 
-## Status: Proposed
+## Status: Proposed — not yet implemented in the deployed overlay
+
+> **Adjudication (2026-06-11):** This ADR adds `json-ld`, `iref`, `rdf-types`,
+> and `oxigraph` to `pod-worker/Cargo.toml` and the workspace root, and replaces
+> hand-crafted JSON-LD string templates with typed builders — all against the
+> deleted in-tree `community-forum-rs` port. None of those crates appear in
+> `forum-config/Cargo.toml` (the overlay pins only `nostr-bbs-{core,config,mesh,rate-limit}`,
+> `serde`, `serde_json`, `toml`, `thiserror`, `worker`). The pod surface's WebID
+> emission and ACL-container resolution are now governed by the upstream kit
+> (see `nostr-rust-forum` ADR-096, referenced in `docs/forum-onboarding.md`).
+> Whether the kit adopts a typed JSON-LD processor is a kit decision, not
+> overlay-observable here. **Blocked on:** upstream adoption (or an explicit
+> overlay-level decision to vendor the RDF stack). Kept Proposed.
 
 ## Date: 2026-05-06
 

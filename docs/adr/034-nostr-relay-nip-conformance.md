@@ -1,6 +1,22 @@
 # ADR-034: Nostr Relay NIP Conformance — NIP-65, Kind-10002, NIP-19 TLV, NIP-11 Update
 
-## Status: Proposed
+## Status: Proposed — kit-internal; not overlay-verifiable
+
+> **Adjudication (2026-06-11):** This ADR adds kind-10002 auto-publish, NIP-19
+> TLV encode/decode, an extended NIP-11 document, and a proactive NIP-42 AUTH
+> challenge — all against the deleted in-tree `community-forum-rs` port
+> (`forum-client/src/stores/auth.rs`, `nostr-core/src/nip19.rs`,
+> `relay-worker/src/nip11.rs`, `relay-worker/src/relay_do/mod.rs`). The NIP-11
+> document, NIP-19 codec, and AUTH-challenge behaviour are now properties of the
+> upstream kit's relay-worker and client, not of the overlay. The overlay's
+> `relay-worker.wrangler.toml` sets relay identity (`RELAY_NAME`,
+> `ALLOWED_ORIGINS`) and the kit derives the NIP-11 `supported_nips` from its
+> compiled feature set — neither confirms nor denies the specific NIP set this
+> ADR lists. **Blocked on:** a kit-side audit of `25ca8a1`'s NIP-11
+> `supported_nips`, NIP-19 module, kind-10002 publish, and proactive AUTH; on
+> confirmation each clause becomes Accepted-via-kit. Note that the `ADR-032`
+> cross-reference (kind-31990 in `supported_nips`) is now void — see ADR-032's
+> supersession and ADR-036. Kept Proposed.
 
 ## Date: 2026-05-06
 

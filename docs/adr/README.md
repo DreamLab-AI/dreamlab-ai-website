@@ -36,16 +36,23 @@ This directory contains the Architecture Decision Records (ADRs) for the DreamLa
 | 024 | [Security Hardening Sprint](024-security-hardening-sprint.md) | Accepted | present |
 | 025 | [Solid Pod Infrastructure Upgrade](025-solid-pod-infrastructure-upgrade.md) | Accepted | present |
 | 026 | [Forum Professionalisation](026-forum-professionalisation.md) | Accepted | present |
-| 027 | [Canonical Identity Stack](027-canonical-identity-stack.md) | Accepted | present |
+| 027 | [Canonical Identity Stack](027-canonical-identity-stack.md) | Proposed (not yet implemented — blocked on kit DID/WebID support) | present |
 | 028 | [Solid Pod RS AGPL Boundary](028-solid-pod-rs-agpl-boundary.md) | Accepted | present |
-| 029 | [JSON-LD Processing Strategy](029-json-ld-processing-strategy.md) | Accepted | present |
-| 030 | [Authentication Signer Abstraction](030-authentication-signer-abstraction.md) | Accepted | present |
-| 031 | [DM Protocol Standardisation](031-dm-protocol-standardisation.md) | Accepted | present |
-| 032 | [Agent Job Marketplace (NIP-90)](032-agent-job-marketplace-nip90.md) | Accepted | present |
-| 033 | [Multi-Admin Moderation Architecture](033-multi-admin-moderation-architecture.md) | Accepted | present |
-| 034 | [Nostr Relay NIP Conformance](034-nostr-relay-nip-conformance.md) | Accepted | present |
+| 029 | [JSON-LD Processing Strategy](029-json-ld-processing-strategy.md) | Proposed (not yet implemented — kit-internal; RDF stack absent from overlay) | present |
+| 030 | [Authentication Signer Abstraction](030-authentication-signer-abstraction.md) | Proposed (not yet implemented — auth surface is kit-internal) | present |
+| 031 | [DM Protocol Standardisation](031-dm-protocol-standardisation.md) | Proposed (partial — kind-1059 federated; NIP-04 fix/p_tag index/10050 not overlay-verifiable) | present |
+| 032 | [Agent Job Marketplace (NIP-90)](032-agent-job-marketplace-nip90.md) | Superseded by 036 | present |
+| 033 | [Multi-Admin Moderation Architecture](033-multi-admin-moderation-architecture.md) | Accepted (outcome shipped via kit; §2 d-tag mechanism moot) | present |
+| 034 | [Nostr Relay NIP Conformance](034-nostr-relay-nip-conformance.md) | Proposed (kit-internal — not overlay-verifiable) | present |
+| 035 | [AGPL Combined-Work Licensing Posture](035-agpl-combined-work-licensing.md) | Accepted | present |
+| 036 | [Agent Delegation via Device Keys](036-agent-delegation-via-device-keys.md) | Accepted (supersedes 032) | present |
+| 037 | [Config Single Source of Truth](037-config-single-source-of-truth.md) | Accepted (implementation pending) | present |
+| 038 | [Kit-Ref Pin Governance](038-kit-ref-pin-governance.md) | Accepted | present |
+| 039 | [/connect Onboarding Adoption](039-connect-onboarding-adoption.md) | Accepted | present |
 
-> **Note:** ADR-032 (Agent Job Marketplace) established the agent interaction model. The Agent Control Surface governance feature (kinds 31400-31405, `/governance` route) builds on this foundation. See [forum-config/README.md](../../forum-config/README.md#governance-configuration) for the operator config.
+> **Note:** ADR-032 (Agent Job Marketplace, NIP-90 DVMs + NIP-26) is **superseded by [ADR-036](036-agent-delegation-via-device-keys.md)** — the kit removed `nip26.rs`+`nip90.rs` upstream, and agent delegation now uses the device-key model (upstream ADR-099). The Agent Control Surface governance feature (kinds 31400-31405, `/governance` route) stands on the deployed kit, not on ADR-032's NIP-90 design. See [forum-config/README.md](../../forum-config/README.md#governance-configuration) for the operator config.
+>
+> **Adjudication note (2026-06-11):** ADRs 027, 029, 030, 031, 034 were written against the in-tree `community-forum-rs` port deleted on 2026-03-12. Their literal code targets no longer exist; the forum now runs the upstream `nostr-rust-forum` kit. Each is held Proposed with a per-file blocked/partial note pending a kit-side audit, rather than blanket-marked Accepted. ADR-033's *outcome* shipped via the kit's relational moderation tables (`moderation_actions`, `is_admin`, `admin_log`, `nip1984_reports`), so it is Accepted with its §2 d-tag mechanism noted moot.
 
 ## Supersession Chain
 
@@ -55,14 +62,17 @@ graph LR
     ADR007["ADR-007<br/>SvelteKit + NDK"] -->|superseded by| ADR013["ADR-013<br/>Rust/Leptos 0.7"]
     ADR008["ADR-008<br/>PostgreSQL Relay"] -->|superseded by| ADR010
     ADR015["ADR-015<br/>3 Rust, 2 TS Workers"] -->|superseded by<br/>full migration| ADR015N["All 5 Workers Rust<br/>(2026-03-12)"]
+    ADR032["ADR-032<br/>NIP-90 + NIP-26<br/>marketplace"] -->|superseded by<br/>kit removed nip26/nip90| ADR036["ADR-036<br/>Device-Key Delegation<br/>(upstream ADR-099)"]
 
     style ADR003 fill:#f9d6d6,stroke:#c0392b
     style ADR007 fill:#f9d6d6,stroke:#c0392b
     style ADR008 fill:#f9d6d6,stroke:#c0392b
     style ADR015 fill:#f9d6d6,stroke:#c0392b
+    style ADR032 fill:#f9d6d6,stroke:#c0392b
     style ADR010 fill:#d5f5e3,stroke:#27ae60
     style ADR013 fill:#d5f5e3,stroke:#27ae60
     style ADR015N fill:#d5f5e3,stroke:#27ae60
+    style ADR036 fill:#d5f5e3,stroke:#27ae60
 ```
 
 ## ADR Lifecycle
