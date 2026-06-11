@@ -162,6 +162,7 @@ Six documents defining the domain model for the Rust workspace. See [ddd/README.
 |----------|-------------|
 | [Deployment Overview](deployment/README.md) | CI/CD pipelines, environments (production/dev), DNS records, required GitHub secrets. |
 | [Cloudflare Workers](deployment/CLOUDFLARE_WORKERS.md) | Rust Worker build (`worker-build`), TypeScript Worker build (`wrangler`), wrangler.toml configuration. |
+| [Forum Onboarding & Agent Operations](forum-onboarding.md) | Operator overlay: signup recovery/device-onboarding sheet (ADR-095), atomic agent provisioning endpoint (ADR-097), pod delegation via container ACLs (ADR-096). |
 
 ### Developer
 
