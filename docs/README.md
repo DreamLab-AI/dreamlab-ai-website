@@ -130,7 +130,7 @@ Six documents defining the domain model for the Rust workspace. See [ddd/README.
 | Document | Description |
 |----------|-------------|
 | [01 - Domain Model](ddd/01-domain-model.md) | Core entities: identity, authentication, community, messaging, content, storage. Includes Rust type definitions. |
-| [02 - Bounded Contexts](ddd/02-bounded-contexts.md) | Maps each bounded context to a Rust crate or TypeScript Worker. Dependency graph and ACL boundaries. |
+| [02 - Bounded Contexts](ddd/02-bounded-contexts.md) | Maps each bounded context to a Rust crate. Dependency graph and ACL boundaries. |
 | [03 - Aggregates](ddd/03-aggregates.md) | Five aggregate roots: UserIdentity, Channel, Conversation, ForumThread, Pod. Invariants and commands. |
 | [04 - Domain Events](ddd/04-domain-events.md) | Nostr protocol events vs. application domain events. Event kind registry and flow diagrams. |
 | [05 - Value Objects](ddd/05-value-objects.md) | Immutable types: EventId, PublicKey, Signature, Timestamp, RoleId, Nip44Ciphertext, GiftWrap. |
@@ -161,7 +161,7 @@ Six documents defining the domain model for the Rust workspace. See [ddd/README.
 | Document | Description |
 |----------|-------------|
 | [Deployment Overview](deployment/README.md) | CI/CD pipelines, environments (production/dev), DNS records, required GitHub secrets. |
-| [Cloudflare Workers](deployment/CLOUDFLARE_WORKERS.md) | Rust Worker build (`worker-build`), TypeScript Worker build (`wrangler`), wrangler.toml configuration. |
+| [Cloudflare Workers](deployment/CLOUDFLARE_WORKERS.md) | Rust Worker build (`worker-build`) — all five workers are Rust — and `wrangler.toml` configuration. |
 | [Forum Onboarding & Agent Operations](forum-onboarding.md) | Operator overlay: signup recovery/device-onboarding sheet (ADR-095), atomic agent provisioning endpoint (ADR-097), pod delegation via container ACLs (ADR-096). |
 
 ### Developer

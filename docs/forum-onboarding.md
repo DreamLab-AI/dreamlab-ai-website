@@ -85,6 +85,26 @@ delegated to the grantee.
 
 Reference: [nostr-rust-forum ADR-096](https://github.com/DreamLab-AI/nostr-rust-forum/blob/main/docs/adr/ADR-096-acl-container-resolution-and-delegation.md).
 
+## ADR-098 — /connect magic-link onboarding
+
+Signup now prints a **recovery sheet** whose primary QR encodes a magic-link of
+the form `https://<forum>/connect#k=<key>`. The key travels only in the URL
+**fragment**, so it is never sent to the server.
+
+The cross-device flow:
+
+1. The user scans the QR with their **phone camera**, which opens
+   `https://<forum>/connect#k=<key>`.
+2. The forum **PWA** reads the `#k=<key>` fragment, **logs in locally** with it,
+   then immediately strips the fragment from the address bar via
+   `history.replaceState` so the key does not linger in history or get shared.
+
+The recovery sheet also carries a **tear-off device-key card** for adding a
+second device, but this path is **gated off** in the DreamLab deployment
+(`DEVICE_KEYS_ENABLED=false`); only the `/connect` magic-link onboarding is live.
+
+Reference: [nostr-rust-forum ADR-098](https://github.com/DreamLab-AI/nostr-rust-forum/blob/main/docs/adr/ADR-098-connect-magic-link-onboarding.md).
+
 ## Related
 
 - [Documentation Index](README.md)

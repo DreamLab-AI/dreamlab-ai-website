@@ -7,10 +7,14 @@ branch: main
 scope: "Forum-first UX, simplified auth, guided onboarding, Nostr abstraction"
 baseline: "Post-parity: 95% feature parity achieved (v4.0), all 5 Rust workers deployed, all features wired in. This PRD addresses journey/UX gaps identified in external audit."
 supersedes: null
+superseded-by: "ADR-098 (upstream) — see docs/forum-onboarding.md"
 depends-on: ["prd-rust-port-v4.0.md"]
 ---
 
 # PRD v5.0: UX Onboarding & Journey Refinement
+
+> **Superseded by ADR-098 (upstream).** The onboarding journey is now the kit's
+> `/connect` magic-link flow — see [docs/forum-onboarding.md](../forum-onboarding.md).
 
 ## 1. Context
 

@@ -3,8 +3,13 @@
 **Version:** 7.0
 **Date:** 2026-04-03
 **Author:** DreamLab Engineering
-**Status:** Draft
+**Status:** Draft (Historical)
 **Depends on:** [Discourse vs DreamLab Audit](../sprint/audit-discourse-vs-dreamlab-forum.md), [ADR-022 NIP-29 Group Access](../adr/022-nip29-group-access-model.md), [PRD v6.0](prd-hardening-solid-v6.0.md), [PRD v4.0 Rust Port](./prd-rust-port-v4.0.md)
+
+> **Historical.** This PRD predates the upstream-kit migration: its paths
+> reference the deleted `community-forum-rs` tree. The forum source now lives
+> upstream at [github.com/DreamLab-AI/nostr-rust-forum](https://github.com/DreamLab-AI/nostr-rust-forum)
+> (pinned in `forum-config/`). Retained for product-history context.
 
 ---
 

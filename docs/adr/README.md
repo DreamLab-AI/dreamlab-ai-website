@@ -1,10 +1,10 @@
 # Architecture Decision Records
 
-**Last updated:** 2026-03-16 | [Back to Documentation Index](../README.md)
+**Last updated:** 2026-06-11 | [Back to Documentation Index](../README.md)
 
 This directory contains the Architecture Decision Records (ADRs) for the DreamLab community forum Rust port. ADRs 001--012 are historical (source files not present in this tree); ADRs 013--023 have full files in this directory.
 
-> **Migration Complete (2026-03-12):** All 5 backend workers are Rust in `community-forum-rs/crates/`. The Leptos forum client is at ~95% parity. SvelteKit `community-forum/` and TypeScript `workers/` directories have been deleted. ADRs written before 2026-03-12 may reference deleted paths — see status update notes on individual ADRs.
+> **Migration Complete (2026-03-12):** All 5 backend workers are Rust, now built from the upstream kit [github.com/DreamLab-AI/nostr-rust-forum](https://github.com/DreamLab-AI/nostr-rust-forum) (pinned in `forum-config/`) plus the `forum-config/` operator overlay. The Leptos forum client is at ~95% parity. SvelteKit `community-forum/` and TypeScript `workers/` directories have been deleted. ADRs written before 2026-03-12 may reference deleted paths — see status update notes on individual ADRs.
 
 ## Index
 

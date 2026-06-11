@@ -2,6 +2,8 @@
 
 [Back to Documentation Index](../README.md)
 
+> **Note:** Citations reference a developer-local snapshot (`project2/community-forum-rs`); line numbers are not reproducible against the current upstream kit — retained as historical audit evidence.
+
 **Audit Date:** 2026-03-08
 **Auditor:** QE Security Auditor v3 (Security-Compliance Domain)
 **Scope:** `community-forum-rs/crates/nostr-core/src/` (8 files, ~1650 LOC)

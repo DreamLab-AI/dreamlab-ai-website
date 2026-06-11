@@ -2,6 +2,8 @@
 
 [Back to Documentation Index](../README.md)
 
+> **Note:** Citations reference a developer-local snapshot (`project2/community-forum-rs`); line numbers are not reproducible against the current upstream kit — retained as historical audit evidence.
+
 **Date**: 2026-03-08
 **Scope**: `community-forum-rs/crates/forum-client/src/` -- all 29 source files
 **Target**: `wasm32-unknown-unknown` (Leptos 0.7 CSR, single-threaded WASM)
