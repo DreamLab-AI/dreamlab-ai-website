@@ -381,53 +381,64 @@ const Index = () => {
                   Five substrates, one identity
                 </h3>
                 <svg
-                  viewBox="0 0 400 420"
+                  viewBox="0 0 480 480"
                   className="w-full h-auto"
                   role="img"
                   aria-labelledby="substrates-diagram-title"
                 >
                   <title id="substrates-diagram-title">VisionFlow five-substrate architecture with DID:Nostr identity spine</title>
 
-                  {/* Center circle: DID:Nostr */}
-                  <circle cx="200" cy="200" r="50" fill="rgba(233,69,96,0.2)" stroke="rgb(233,69,96)" strokeWidth="2.5" />
-                  <text x="200" y="195" textAnchor="middle" fill="rgb(244,63,94)" fontWeight="bold" fontSize="14" fontFamily="system-ui, sans-serif">DID:Nostr</text>
-                  <text x="200" y="213" textAnchor="middle" fill="rgb(244,63,94)" fontSize="11" fontFamily="system-ui, sans-serif">secp256k1</text>
+                  {/* Defs for subtle glow effects */}
+                  <defs>
+                    <filter id="glow-pink">
+                      <feGaussianBlur stdDeviation="2" result="coloredBlur" />
+                      <feMerge>
+                        <feMergeNode in="coloredBlur" />
+                        <feMergeNode in="SourceGraphic" />
+                      </feMerge>
+                    </filter>
+                  </defs>
 
-                  {/* Connection lines (dashed red) */}
-                  <line x1="200" y1="150" x2="200" y2="70" stroke="rgb(233,69,96)" strokeWidth="2" strokeDasharray="5 3" />
-                  <line x1="265" y1="165" x2="320" y2="110" stroke="rgb(233,69,96)" strokeWidth="2" strokeDasharray="5 3" />
-                  <line x1="265" y1="235" x2="320" y2="290" stroke="rgb(233,69,96)" strokeWidth="2" strokeDasharray="5 3" />
-                  <line x1="135" y1="235" x2="80" y2="290" stroke="rgb(233,69,96)" strokeWidth="2" strokeDasharray="5 3" />
-                  <line x1="135" y1="165" x2="80" y2="110" stroke="rgb(233,69,96)" strokeWidth="2" strokeDasharray="5 3" />
+                  {/* Connection lines (refined) */}
+                  <line x1="240" y1="140" x2="240" y2="50" stroke="rgb(233,69,96)" strokeWidth="1.5" strokeDasharray="6 4" opacity="0.6" />
+                  <line x1="310" y1="145" x2="370" y2="75" stroke="rgb(233,69,96)" strokeWidth="1.5" strokeDasharray="6 4" opacity="0.6" />
+                  <line x1="310" y1="295" x2="370" y2="365" stroke="rgb(233,69,96)" strokeWidth="1.5" strokeDasharray="6 4" opacity="0.6" />
+                  <line x1="170" y1="295" x2="110" y2="365" stroke="rgb(233,69,96)" strokeWidth="1.5" strokeDasharray="6 4" opacity="0.6" />
+                  <line x1="170" y1="145" x2="110" y2="75" stroke="rgb(233,69,96)" strokeWidth="1.5" strokeDasharray="6 4" opacity="0.6" />
 
-                  {/* VisionClaw (top) */}
-                  <rect x="130" y="20" width="140" height="70" rx="12" fill="rgba(0,212,255,0.12)" stroke="rgb(0,212,255)" strokeWidth="2" />
-                  <text x="200" y="45" textAnchor="middle" fill="rgb(34,211,238)" fontWeight="700" fontSize="13" fontFamily="system-ui, sans-serif">VisionClaw</text>
-                  <text x="200" y="62" textAnchor="middle" fill="rgb(34,211,238)" fontSize="11" fontFamily="system-ui, sans-serif">OWL 2 EL + GPU Physics</text>
+                  {/* Center circle: DID:Nostr - larger and more prominent */}
+                  <circle cx="240" cy="220" r="70" fill="rgba(233,69,96,0.15)" stroke="rgb(233,69,96)" strokeWidth="3" filter="url(#glow-pink)" />
+                  <text x="240" y="210" textAnchor="middle" fill="rgb(244,63,94)" fontWeight="900" fontSize="18" fontFamily="system-ui, sans-serif">DID:Nostr</text>
+                  <text x="240" y="235" textAnchor="middle" fill="rgb(200,100,120)" fontSize="12" fontFamily="system-ui, sans-serif">secp256k1</text>
+
+                  {/* VisionClaw (top) - larger and refined */}
+                  <rect x="140" y="15" width="200" height="85" rx="14" fill="rgba(0,212,255,0.1)" stroke="rgb(0,212,255)" strokeWidth="2.5" />
+                  <text x="240" y="45" textAnchor="middle" fill="rgb(34,211,238)" fontWeight="800" fontSize="15" fontFamily="system-ui, sans-serif">VisionClaw</text>
+                  <text x="240" y="68" textAnchor="middle" fill="rgb(120,200,220)" fontSize="12" fontFamily="system-ui, sans-serif">OWL 2 EL + GPU</text>
 
                   {/* Agentbox (top-right) */}
-                  <rect x="295" y="60" width="100" height="70" rx="12" fill="rgba(139,92,246,0.12)" stroke="rgb(139,92,246)" strokeWidth="2" />
-                  <text x="345" y="85" textAnchor="middle" fill="rgb(196,181,253)" fontWeight="700" fontSize="13" fontFamily="system-ui, sans-serif">Agentbox</text>
-                  <text x="345" y="102" textAnchor="middle" fill="rgb(196,181,253)" fontSize="11" fontFamily="system-ui, sans-serif">90+ Skills</text>
+                  <rect x="345" y="40" width="120" height="85" rx="14" fill="rgba(139,92,246,0.1)" stroke="rgb(139,92,246)" strokeWidth="2.5" />
+                  <text x="405" y="70" textAnchor="middle" fill="rgb(196,181,253)" fontWeight="800" fontSize="15" fontFamily="system-ui, sans-serif">Agentbox</text>
+                  <text x="405" y="93" textAnchor="middle" fill="rgb(170,150,200)" fontSize="12" fontFamily="system-ui, sans-serif">90+ Skills</text>
 
                   {/* DreamLab Edge (bottom-right) */}
-                  <rect x="295" y="330" width="100" height="70" rx="12" fill="rgba(245,158,11,0.12)" stroke="rgb(245,158,11)" strokeWidth="2" />
-                  <text x="345" y="355" textAnchor="middle" fill="rgb(253,224,71)" fontWeight="700" fontSize="13" fontFamily="system-ui, sans-serif">DreamLab Edge</text>
-                  <text x="345" y="372" textAnchor="middle" fill="rgb(253,224,71)" fontSize="11" fontFamily="system-ui, sans-serif">React + Workers</text>
+                  <rect x="345" y="375" width="120" height="85" rx="14" fill="rgba(245,158,11,0.1)" stroke="rgb(245,158,11)" strokeWidth="2.5" />
+                  <text x="405" y="405" textAnchor="middle" fill="rgb(253,224,71)" fontWeight="800" fontSize="15" fontFamily="system-ui, sans-serif">DreamLab</text>
+                  <text x="405" y="428" textAnchor="middle" fill="rgb(220,190,100)" fontSize="12" fontFamily="system-ui, sans-serif">Edge</text>
 
                   {/* nostr-rust-forum (bottom-left) */}
-                  <rect x="5" y="330" width="100" height="70" rx="12" fill="rgba(168,85,247,0.12)" stroke="rgb(168,85,247)" strokeWidth="2" />
-                  <text x="55" y="355" textAnchor="middle" fill="rgb(216,180,254)" fontWeight="700" fontSize="13" fontFamily="system-ui, sans-serif">nostr-rust-forum</text>
-                  <text x="55" y="372" textAnchor="middle" fill="rgb(216,180,254)" fontSize="11" fontFamily="system-ui, sans-serif">Governance</text>
+                  <rect x="15" y="375" width="120" height="85" rx="14" fill="rgba(168,85,247,0.1)" stroke="rgb(168,85,247)" strokeWidth="2.5" />
+                  <text x="75" y="400" textAnchor="middle" fill="rgb(216,180,254)" fontWeight="800" fontSize="14" fontFamily="system-ui, sans-serif">nostr-rust</text>
+                  <text x="75" y="420" textAnchor="middle" fill="rgb(200,170,220)" fontSize="12" fontFamily="system-ui, sans-serif">forum</text>
 
                   {/* solid-pod-rs (top-left) */}
-                  <rect x="5" y="60" width="100" height="70" rx="12" fill="rgba(16,185,129,0.12)" stroke="rgb(16,185,129)" strokeWidth="2" />
-                  <text x="55" y="85" textAnchor="middle" fill="rgb(52,211,153)" fontWeight="700" fontSize="13" fontFamily="system-ui, sans-serif">solid-pod-rs</text>
-                  <text x="55" y="102" textAnchor="middle" fill="rgb(52,211,153)" fontSize="11" fontFamily="system-ui, sans-serif">WAC + Solid</text>
+                  <rect x="15" y="40" width="120" height="85" rx="14" fill="rgba(16,185,129,0.1)" stroke="rgb(16,185,129)" strokeWidth="2.5" />
+                  <text x="75" y="68" textAnchor="middle" fill="rgb(52,211,153)" fontWeight="800" fontSize="15" fontFamily="system-ui, sans-serif">solid-pod-rs</text>
+                  <text x="75" y="91" textAnchor="middle" fill="rgb(100,180,150)" fontSize="12" fontFamily="system-ui, sans-serif">WAC</text>
 
                   {/* Bottom label */}
-                  <text x="200" y="410" textAnchor="middle" fill="rgb(156,163,175)" fontSize="11" fontStyle="italic" fontFamily="system-ui, sans-serif">
-                    Nostr relay mesh (NIP-01/42/98)
+                  <text x="240" y="470" textAnchor="middle" fill="rgb(120,130,150)" fontSize="12" fontStyle="italic" fontFamily="system-ui, sans-serif" fontWeight="500">
+                    Nostr relay mesh
                   </text>
                 </svg>
                 <p className="text-xs text-muted-foreground mt-4 text-center">
