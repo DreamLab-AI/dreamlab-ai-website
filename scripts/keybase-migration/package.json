@@ -1,0 +1,17 @@
+{
+  "name": "keybase-to-nostr-migration",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Local utility: migrate a Keybase team (channels, users, messages) onto the DreamLab Nostr relay",
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node test/convert.test.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "nostr-tools": "^2.10.4"
+  }
+}
