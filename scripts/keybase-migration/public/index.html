@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Keybase → Nostr migration · DreamLab</title>
+<style>
+  :root {
+    --bg: #1a1a2e; --panel: #20203a; --panel2: #262648; --line: #34345c;
+    --text: #e8e8f0; --dim: #9a9ab8; --accent: #e94560; --cyan: #00d4ff;
+    --amber: #f59e0b; --green: #2dd4a0; --red: #ff6b6b;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 24px 20px 80px; }
+  h1 { font-size: 22px; margin: 8px 0 2px; }
+  h1 small { color: var(--dim); font-weight: 400; font-size: 14px; margin-left: 10px; }
+  .step { background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+    margin-top: 18px; padding: 18px 20px; }
+  .step h2 { margin: 0 0 4px; font-size: 16px; }
+  .step h2 .n { display: inline-block; width: 24px; height: 24px; line-height: 24px;
+    text-align: center; border-radius: 50%; background: var(--accent); color: #fff;
+    font-size: 13px; margin-right: 9px; }
+  .hint { color: var(--dim); font-size: 13px; margin: 2px 0 12px; }
+  label { font-size: 13px; color: var(--dim); display: block; margin-bottom: 3px; }
+  input[type=text], input[type=password], select {
+    background: var(--panel2); color: var(--text); border: 1px solid var(--line);
+    border-radius: 8px; padding: 8px 10px; font-size: 14px; width: 100%; }
+  input:focus, select:focus { outline: 1px solid var(--cyan); }
+  .row { display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 10px; }
+  .row > div { flex: 1; min-width: 180px; }
+  button { background: var(--accent); border: 0; color: #fff; border-radius: 8px;
+    padding: 9px 18px; font-size: 14px; font-weight: 600; cursor: pointer; }
+  button.secondary { background: var(--panel2); border: 1px solid var(--line); color: var(--text); }
+  button:disabled { opacity: .45; cursor: default; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 8px 0; }
+  th { text-align: left; color: var(--dim); font-weight: 600; font-size: 12px;
+    text-transform: uppercase; letter-spacing: .04em; padding: 6px 8px;
+    border-bottom: 1px solid var(--line); }
+  td { padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  td input[type=text] { padding: 5px 8px; font-size: 13px; }
+  .pill { display: inline-block; padding: 1px 9px; border-radius: 99px; font-size: 12px;
+    background: var(--panel2); border: 1px solid var(--line); color: var(--dim); }
+  .pill.ok { color: var(--green); border-color: var(--green); }
+  .pill.bad { color: var(--red); border-color: var(--red); }
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; }
+  .bar { height: 8px; background: var(--panel2); border-radius: 99px; overflow: hidden; margin: 8px 0; }
+  .bar > div { height: 100%; background: linear-gradient(90deg, var(--accent), var(--amber));
+    width: 0%; transition: width .4s; }
+  pre.log { background: #14142a; border: 1px solid var(--line); border-radius: 8px;
+    padding: 10px 12px; max-height: 260px; overflow: auto; font-size: 12px;
+    color: #b8c4d8; white-space: pre-wrap; }
+  .stats { display: flex; gap: 12px; flex-wrap: wrap; margin: 10px 0; }
+  .stat { background: var(--panel2); border: 1px solid var(--line); border-radius: 10px;
+    padding: 10px 16px; min-width: 110px; }
+  .stat b { display: block; font-size: 20px; color: var(--cyan); }
+  .stat span { font-size: 12px; color: var(--dim); }
+  .warn { color: var(--amber); font-size: 13px; }
+  .err { color: var(--red); font-size: 13px; white-space: pre-wrap; }
+  .cohorts label { display: inline-flex; gap: 3px; margin-right: 8px; font-size: 12px; align-items: center; }
+  .zone-note { font-size: 12px; color: var(--dim); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Keybase → Nostr migration <small>DreamLab community relay</small></h1>
+  <div class="hint">Runs entirely on this machine. Paper key and admin key are kept in memory only.
+    Generated member keys are written to <span class="mono">work/keys.json</span> (gitignored) and the CSV export.</div>
+
+  <!-- STEP 1 -->
+  <div class="step">
+    <h2><span class="n">1</span>Connect to Keybase</h2>
+    <div class="hint">If your desktop Keybase client is already logged in, no paper key is needed.</div>
+    <div id="kb-status" class="hint">checking…</div>
+    <div class="row">
+      <div><label>Keybase username</label><input type="text" id="kb-user" autocomplete="off" /></div>
+      <div style="flex:2"><label>Paper key</label><input type="password" id="kb-paper" autocomplete="off" /></div>
+      <div style="flex:0"><button id="btn-login" class="secondary">Log in (oneshot)</button></div>
+    </div>
+    <div class="row">
+      <div><label>Team name</label><input type="text" id="team" placeholder="myteam" /></div>
+      <div style="flex:0"><button id="btn-inventory">Fetch inventory</button></div>
+    </div>
+    <div id="inv-error" class="err"></div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step">
+    <h2><span class="n">2</span>Select channels &amp; members</h2>
+    <div class="hint">Pick the channels to migrate and the forum zone each lands in. Tick members to
+      generate Nostr identities for them; their Keybase username becomes their handle. Fill in real
+      names (prefilled from Keybase where available). Cohorts gate which zones a member can write to
+      — public/friends zones need <b>friends</b>, etc.</div>
+    <div id="channels"></div>
+    <div id="members"></div>
+    <div class="row">
+      <div style="flex:0"><button id="btn-save-selection" class="secondary">Save selection &amp; generate identities</button></div>
+      <div style="flex:0"><a href="/api/identities.csv"><button class="secondary" type="button">Download keys CSV</button></a></div>
+      <div class="zone-note">CSV contains <b>nsec private keys</b> — share each row only with its owner, then delete.</div>
+    </div>
+    <div id="sel-error" class="err"></div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step">
+    <h2><span class="n">3</span>Export messages from Keybase</h2>
+    <div class="hint">Pages through full history of every selected channel (300 msgs/page) into
+      <span class="mono">work/archive/</span>. Re-running refreshes the archive.</div>
+    <button id="btn-export">Export selected channels</button>
+    <span id="export-summary" class="hint"></span>
+    <div class="bar"><div id="export-bar"></div></div>
+    <pre class="log" id="export-log" hidden></pre>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="step">
+    <h2><span class="n">4</span>Build conversion plan (dry run)</h2>
+    <div class="hint">Applies Keybase edits/deletes, resolves reply threads, maps senders to the
+      generated identities, and reports what will be published. Nothing is written yet.</div>
+    <div class="row">
+      <div style="flex:0"><label style="display:inline-flex;gap:6px;align-items:center">
+        <input type="checkbox" id="opt-reactions" checked /> include reactions (kind 7)</label></div>
+      <div style="flex:0"><button id="btn-plan">Build plan</button></div>
+    </div>
+    <div class="stats" id="plan-stats"></div>
+    <div id="plan-skips" class="warn"></div>
+    <div id="plan-error" class="err"></div>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="step">
+    <h2><span class="n">5</span>Publish to DreamLab</h2>
+    <div class="hint">Whitelists members and creates channels via the relay's NIP-98 admin API, then
+      bulk-writes signed events. <b>Direct D1</b> inserts straight into the
+      <span class="mono">dreamlab-relay</span> database via wrangler (needs
+      <span class="mono">CLOUDFLARE_API_TOKEN</span> / <span class="mono">CLOUDFLARE_ACCOUNT_ID</span>
+      in the server's environment, or a prior <span class="mono">wrangler login</span>) — minutes, not hours.
+      <b>Relay websocket</b> goes through full validation at ~8 events/sec. Both are idempotent: re-runs skip
+      what's already there.</div>
+    <div class="row">
+      <div style="flex:2"><label>Relay admin key (hex or nsec) — <span id="admin-env-note">checking env…</span></label>
+        <input type="password" id="admin-key" autocomplete="off" /></div>
+      <div><label>Write mode</label>
+        <select id="pub-mode">
+          <option value="d1">Direct D1 (fast, wrangler)</option>
+          <option value="relay">Relay websocket (slow, validated)</option>
+        </select></div>
+      <div style="flex:0"><button id="btn-publish">Publish</button></div>
+    </div>
+    <div class="bar"><div id="pub-bar"></div></div>
+    <pre class="log" id="pub-log" hidden></pre>
+    <div id="pub-error" class="err"></div>
+  </div>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const api = async (path, opts) => {
+  const r = await fetch(path, opts && {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(opts) });
+  const j = await r.json();
+  if (!r.ok) throw new Error(j.error || r.status);
+  return j;
+};
+
+const ZONES = ['public', 'friends', 'family', 'business'];
+const COHORTS = ['friends', 'family', 'business'];
+let state = { inventory: null, selection: null, identities: {}, archive: {} };
+
+function channelRows() {
+  const sel = Object.fromEntries((state.selection?.channels || []).map((c) => [c.topic, c]));
+  return (state.inventory?.channels || []).map((c) => {
+    const s = sel[c.topic] || {};
+    return { topic: c.topic, include: s.include ?? true, zone: s.zone || 'friends' };
+  });
+}
+function memberRows() {
+  const ids = state.identities;
+  return (state.inventory?.members || []).map((m) => {
+    const k = ids[m.username] || {};
+    return {
+      username: m.username, role: m.role,
+      include: k.include ?? true,
+      realName: k.realName ?? m.fullName ?? '',
+      cohorts: k.cohorts || ['friends'],
+      npub: k.npub || null,
+    };
+  });
+}
+
+function renderChannels() {
+  const rows = channelRows();
+  if (!rows.length) { $('channels').innerHTML = '<div class="hint">No inventory yet — fetch it in step 1.</div>'; return; }
+  $('channels').innerHTML = '<table><tr><th></th><th>Channel</th><th>Zone</th><th>Archived</th></tr>' +
+    rows.map((r, i) => `<tr>
+      <td><input type="checkbox" data-ch="${i}" ${r.include ? 'checked' : ''}></td>
+      <td class="mono">#${r.topic}</td>
+      <td><select data-chzone="${i}">${ZONES.map((z) => `<option ${z === r.zone ? 'selected' : ''}>${z}</option>`).join('')}</select></td>
+      <td>${state.archive[r.topic.replace(/[^a-zA-Z0-9_-]/g, '_')] != null
+        ? `<span class="pill ok">${state.archive[r.topic.replace(/[^a-zA-Z0-9_-]/g, '_')]} msgs</span>`
+        : '<span class="pill">not yet</span>'}</td>
+    </tr>`).join('') + '</table>';
+}
+function renderMembers() {
+  const rows = memberRows();
+  if (!rows.length) { $('members').innerHTML = ''; return; }
+  $('members').innerHTML = '<table><tr><th></th><th>Keybase user</th><th>Real name</th><th>Cohorts</th><th>npub</th></tr>' +
+    rows.map((r, i) => `<tr>
+      <td><input type="checkbox" data-mem="${i}" ${r.include ? 'checked' : ''}></td>
+      <td class="mono">${r.username} <span class="pill">${r.role || ''}</span></td>
+      <td><input type="text" data-name="${i}" value="${r.realName.replace(/"/g, '&quot;')}"></td>
+      <td class="cohorts">${COHORTS.map((c) =>
+        `<label><input type="checkbox" data-cohort="${i}" value="${c}" ${r.cohorts.includes(c) ? 'checked' : ''}>${c}</label>`).join('')}</td>
+      <td class="mono">${r.npub ? r.npub.slice(0, 14) + '…' : '<span class="pill">no key yet</span>'}</td>
+    </tr>`).join('') + '</table>';
+}
+
+function readChannelSelection() {
+  return channelRows().map((r, i) => ({
+    topic: r.topic,
+    include: document.querySelector(`[data-ch="${i}"]`)?.checked ?? r.include,
+    zone: document.querySelector(`[data-chzone="${i}"]`)?.value || r.zone,
+  }));
+}
+function readMemberSelection() {
+  return memberRows().map((r, i) => ({
+    username: r.username,
+    include: document.querySelector(`[data-mem="${i}"]`)?.checked ?? r.include,
+    realName: document.querySelector(`[data-name="${i}"]`)?.value ?? r.realName,
+    cohorts: [...document.querySelectorAll(`[data-cohort="${i}"]:checked`)].map((el) => el.value),
+  }));
+}
+
+async function refresh() {
+  const s = await api('/api/state');
+  state.inventory = s.inventory; state.selection = s.selection;
+  state.identities = s.identities || {}; state.archive = s.archive || {};
+  $('kb-status').innerHTML = s.keybase.installed
+    ? (s.keybase.loggedIn
+        ? `<span class="pill ok">logged in as ${s.keybase.username}</span>`
+        : `<span class="pill bad">keybase installed, not logged in</span> ${s.keybase.error || ''}`)
+    : '<span class="pill bad">keybase CLI not found — install keybase-bin</span>';
+  if (s.inventory?.team) $('team').value = s.inventory.team;
+  $('admin-env-note').textContent = s.adminKeyInEnv
+    ? 'DREAMLAB_ADMIN_KEY found in env; leave blank to use it'
+    : 'or set DREAMLAB_ADMIN_KEY in the server env';
+  renderChannels(); renderMembers();
+  if (s.planStats) renderPlanStats(s.planStats);
+}
+
+function renderPlanStats(st) {
+  $('plan-stats').innerHTML = [
+    ['channels', st.channels], ['messages', st.messages], ['reactions', st.reactions],
+    ['profiles', st.profiles], ['truncated', st.truncated],
+  ].map(([k, v]) => `<div class="stat"><b>${v}</b><span>${k}</span></div>`).join('');
+  const skips = Object.entries(st.skippedSenders || {});
+  $('plan-skips').textContent = skips.length
+    ? 'Dropped messages from unselected senders: ' + skips.map(([u, n]) => `${u} (${n})`).join(', ')
+    : '';
+}
+
+async function pollJob(jobId, barEl, logEl, doneCb) {
+  logEl.hidden = false;
+  const tick = async () => {
+    const j = await api('/api/job/' + jobId);
+    logEl.textContent = j.log.join('\n');
+    logEl.scrollTop = logEl.scrollHeight;
+    if (j.total) barEl.style.width = Math.round((100 * j.progress) / j.total) + '%';
+    if (j.status === 'running') return setTimeout(tick, 1200);
+    barEl.style.width = j.status === 'done' ? '100%' : barEl.style.width;
+    if (doneCb) doneCb(j);
+    refresh();
+  };
+  tick();
+}
+
+$('btn-login').onclick = async () => {
+  $('btn-login').disabled = true;
+  try {
+    await api('/api/keybase/login', { username: $('kb-user').value.trim(), paperkey: $('kb-paper').value });
+    $('kb-paper').value = '';
+    await refresh();
+  } catch (e) { $('inv-error').textContent = e.message; }
+  $('btn-login').disabled = false;
+};
+
+$('btn-inventory').onclick = async () => {
+  $('inv-error').textContent = ''; $('btn-inventory').disabled = true;
+  try {
+    await api('/api/inventory', { team: $('team').value.trim() });
+    await refresh();
+  } catch (e) { $('inv-error').textContent = e.message; }
+  $('btn-inventory').disabled = false;
+};
+
+$('btn-save-selection').onclick = async () => {
+  $('sel-error').textContent = '';
+  try {
+    await api('/api/selection', { channels: readChannelSelection() });
+    await api('/api/identities', { users: readMemberSelection() });
+    await refresh();
+  } catch (e) { $('sel-error').textContent = e.message; }
+};
+
+$('btn-export').onclick = async () => {
+  try {
+    await api('/api/selection', { channels: readChannelSelection() });
+    await api('/api/identities', { users: readMemberSelection() });
+    const topics = readChannelSelection().filter((c) => c.include).map((c) => c.topic);
+    const { jobId } = await api('/api/export', { team: $('team').value.trim(), topics });
+    pollJob(jobId, $('export-bar'), $('export-log'));
+  } catch (e) { $('export-log').hidden = false; $('export-log').textContent = 'ERROR: ' + e.message; }
+};
+
+$('btn-plan').onclick = async () => {
+  $('plan-error').textContent = '';
+  try {
+    await api('/api/selection', { channels: readChannelSelection() });
+    await api('/api/identities', { users: readMemberSelection() });
+    const { stats } = await api('/api/plan', { includeReactions: $('opt-reactions').checked });
+    renderPlanStats(stats);
+  } catch (e) { $('plan-error').textContent = e.message; }
+};
+
+$('btn-publish').onclick = async () => {
+  $('pub-error').textContent = '';
+  if (!confirm('Publish the plan to the LIVE DreamLab relay?')) return;
+  try {
+    const { jobId } = await api('/api/publish', {
+      adminKey: $('admin-key').value.trim() || undefined,
+      mode: $('pub-mode').value,
+    });
+    $('admin-key').value = '';
+    pollJob(jobId, $('pub-bar'), $('pub-log'));
+  } catch (e) { $('pub-error').textContent = e.message; }
+};
+
+refresh().catch((e) => { $('kb-status').textContent = 'server error: ' + e.message; });
+</script>
+</body>
+</html>

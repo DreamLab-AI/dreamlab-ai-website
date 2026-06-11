@@ -1,0 +1,6 @@
+# Migration working data — contains exported chat archives and GENERATED
+# USER PRIVATE KEYS. Never commit.
+work/
+*.csv
+
+node_modules/
