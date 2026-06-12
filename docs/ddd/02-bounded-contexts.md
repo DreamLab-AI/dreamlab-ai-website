@@ -35,7 +35,7 @@ graph TB
     FC -->|"HTTP (no auth)"| PV
     FC -->|"WebSocket (NIP-01/42)"| RW
     FC -->|"HTTP"| SW
-    AW -->|"Internal:<br/>pod provisioning"| PW
+    AW -->|"Shared R2 bucket (PODS):<br/>pod provisioning writes"| PW
 
     style NC fill:#3498db,color:#fff
     style FC fill:#2ecc71,color:#fff
@@ -100,7 +100,7 @@ pub mod wasm_bridge; // #[cfg(wasm32)] wasm-bindgen entry points
 
 **Compilation target**: `wasm32-unknown-unknown` only (via `trunk`).
 
-**Trunk.toml location**: `community-forum-rs/crates/forum-client/Trunk.toml` (moved from workspace root per trunk-rs#909 workaround).
+**Trunk.toml location**: `nostr-rust-forum/crates/nostr-bbs-forum-client/Trunk.toml` (the legacy `community-forum-rs` tree is superseded by the kit).
 
 ```rust
 // Modules
@@ -200,7 +200,7 @@ pub mod auth;       // NIP-98 admin verification wrapper
 
 **Runtime**: Cloudflare Worker (compiled via `worker-build`).
 
-**Location**: `community-forum-rs/crates/search-worker/`.
+**Location**: `nostr-rust-forum/crates/nostr-bbs-search-worker/`.
 
 **Storage**: R2 (dreamlab-vectors for .rvf containers), KV (SEARCH_CONFIG for id-label mapping).
 
@@ -224,7 +224,7 @@ graph TD
     FC -->|"HTTP (no auth)"| PV["preview-worker"]
     FC -->|"WebSocket<br/>(NIP-01/42)"| RW
     FC -->|"HTTP"| SW
-    AW -->|"Internal:<br/>pod provisioning"| PW
+    AW -->|"Shared R2 bucket (PODS):<br/>pod provisioning writes"| PW
 
     style NC fill:#3498db,color:#fff
     style FC fill:#2ecc71,color:#fff
@@ -247,4 +247,4 @@ graph TD
 | forum-client | preview-worker | HTTP (no auth) |
 | forum-client | relay-worker | WebSocket (NIP-01/42) |
 | forum-client | search-worker | HTTP |
-| auth-worker | pod-worker | Internal (pod provisioning at registration) |
+| auth-worker | pod-worker | Shared R2 bucket `PODS` + KV `POD_META` (auth-worker seeds profile card/ACL directly at registration; no HTTP call to pod-worker) |

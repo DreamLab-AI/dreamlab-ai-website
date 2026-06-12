@@ -329,13 +329,14 @@ graph LR
 
 ### Kit pinning — the dual-pin rule
 
-The kit is pinned at commit `6f9c2d0` in **three places that must move together**:
+The kit is pinned at commit `25ca8a1` in **four places that must move together**:
 
 1. `KIT_REF` in `.github/workflows/deploy.yml` (forum client build)
 2. `KIT_REF` in `.github/workflows/workers-deploy.yml` (worker builds)
-3. The `rev = "6f9c2d0"` pins on every `nostr-bbs-*` dependency in `forum-config/Cargo.toml` (overlay tests compile against the same kit)
+3. `KIT_REF` in `.github/workflows/rust-ci.yml` (kit-level fmt/clippy/test gates)
+4. The `rev = "25ca8a1"` pins on every `nostr-bbs-*` dependency in `forum-config/Cargo.toml` (overlay tests compile against the same kit)
 
-Bumping one without the others ships a client/worker/test skew. Always update all three in a single commit.
+Bumping one without the others ships a client/worker/test skew. Always update all four in a single commit.
 
 ### ZONE_CONFIG flow
 

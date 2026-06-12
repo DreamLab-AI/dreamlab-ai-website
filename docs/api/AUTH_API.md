@@ -20,7 +20,7 @@
 
 WebAuthn registration/authentication with PRF extension, NIP-98 verification, and Solid pod provisioning. Rust Worker using `worker` 0.7.5 and `passkey-rs` 0.3.x.
 
-**Base URL:** `https://api.dreamlab-ai.com`
+**Base URL:** `https://dreamlab-auth-api.solitary-paper-764d.workers.dev` (live). The branded `https://api.dreamlab-ai.com` is the documented end-state but is not provisioned in DNS.
 
 ---
 
@@ -281,7 +281,7 @@ See [Authentication](../security/AUTHENTICATION.md) for the full NIP-98 verifica
 ```mermaid
 erDiagram
     WEBAUTHN_CREDENTIALS {
-        TEXT pubkey PK "64-char hex, Nostr identity"
+        TEXT pubkey "64-char hex, Nostr identity (one row per device credential)"
         TEXT credential_id "Base64url credential ID"
         TEXT public_key "Base64url COSE public key"
         INTEGER counter "Signature counter for replay detection"
@@ -302,7 +302,7 @@ erDiagram
 
 ```sql
 CREATE TABLE webauthn_credentials (
-  pubkey TEXT PRIMARY KEY,
+  pubkey TEXT NOT NULL,  -- not a PK: multi-device support stores one row per credential
   credential_id TEXT NOT NULL,
   public_key TEXT NOT NULL,
   counter INTEGER DEFAULT 0,
@@ -326,14 +326,21 @@ CREATE INDEX idx_credentials_cred_id ON webauthn_credentials(credential_id);
 
 | Binding | Type | Purpose |
 |---------|------|---------|
-| `DB` | D1Database | `dreamlab-auth` -- credentials + challenges |
+| `DB` | D1Database | `dreamlab-auth` -- credentials + challenges + members + nip98_replay |
+| `RELAY_DB` | D1Database | `dreamlab-relay` -- cross-D1 read of `whitelist.is_admin` |
 | `SESSIONS` | KVNamespace | Session tokens (7-day TTL) |
-| `POD_META` | KVNamespace | Pod ACLs and metadata |
+| `POD_META` | KVNamespace | Pod ACLs and metadata (backwards-compat reads) |
+| `ADMIN_KV` | KVNamespace | Admin-flag writes (auth-worker is the write authority) |
 | `PODS` | R2Bucket | `dreamlab-pods` -- profile cards, media |
-| `RP_ID` | Secret | `dreamlab-ai.com` |
-| `RP_NAME` | Secret | `DreamLab AI` |
-| `EXPECTED_ORIGIN` | Secret | `https://dreamlab-ai.com` |
-| `ADMIN_PUBKEYS` | Secret | Comma-separated admin hex pubkeys |
+| `RP_ID` | [vars] | `dreamlab-ai.com` |
+| `RP_NAME` | [vars] | `DreamLab Community` |
+| `EXPECTED_ORIGIN` | [vars] | `https://dreamlab-ai.com` |
+| `NATIVE_POD_URL` | [vars] | `https://pods-native.dreamlab-ai.com` (native pod provisioning base) |
+| `PRF_SERVER_SECRET` | Secret | WebAuthn PRF salt derivation (deploy-gated) |
+| `ADMIN_PUBKEYS` | Secret | Comma-separated admin hex pubkeys (static admin set) |
+| `NATIVE_POD_ADMIN_KEY` | Secret | PSK for native pod provisioning (deploy-gated) |
+
+Source: `forum-config/deploy/auth-worker.wrangler.toml`, `.github/workflows/workers-deploy.yml` (secret validation step).
 
 ---
 

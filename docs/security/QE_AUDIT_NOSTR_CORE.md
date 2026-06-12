@@ -1,5 +1,7 @@
 # Security Audit Report: nostr-core Rust Crate
 
+> **Audit snapshot.** Findings reflect the audit date; verify against current code before acting.
+
 [Back to Documentation Index](../README.md)
 
 > **Note:** Citations reference a developer-local snapshot (`project2/community-forum-rs`); line numbers are not reproducible against the current upstream kit — retained as historical audit evidence.

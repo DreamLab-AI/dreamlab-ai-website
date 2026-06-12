@@ -19,6 +19,8 @@
 
 ## Architecture
 
+> Workers serve live traffic on `*.solitary-paper-764d.workers.dev`. The branded subdomains (`api.`/`pods.`/`preview.`/`relay.`/`search.dreamlab-ai.com`) are the documented end-state but are **not provisioned in DNS** (verified 2026-06-09; see `.github/workflows/deploy.yml` env comments).
+
 ```mermaid
 graph TB
     subgraph "Client Browser"
@@ -34,12 +36,12 @@ graph TB
         CF_EDGE[TLS Termination + Routing]
     end
 
-    subgraph "Rust Workers (WASM)"
-        AUTH_W[auth-worker<br/>api.dreamlab-ai.com]
-        POD_W[pod-worker<br/>pods.dreamlab-ai.com]
-        PREVIEW_W[preview-worker<br/>preview.dreamlab-ai.com]
-        RELAY_W[relay-worker<br/>relay.dreamlab-ai.com]
-        SEARCH_W[search-worker<br/>search.dreamlab-ai.com]
+    subgraph "Rust Workers (WASM) — live on *.solitary-paper-764d.workers.dev"
+        AUTH_W[auth-worker<br/>dreamlab-auth-api]
+        POD_W[pod-worker<br/>dreamlab-pod-api]
+        PREVIEW_W[preview-worker<br/>dreamlab-link-preview]
+        RELAY_W[relay-worker<br/>dreamlab-nostr-relay]
+        SEARCH_W[search-worker<br/>dreamlab-search-api]
     end
 
     subgraph "Cloudflare Storage"
@@ -107,11 +109,12 @@ flowchart LR
 
 ### workers-deploy.yml -- Cloudflare Workers
 
-Triggers on push to `main` when files under `forum-config/deploy/**` change. The workflow clones the `nostr-rust-forum` kit at `KIT_REF` (currently `main`), overlays each `forum-config/deploy/*.wrangler.toml` onto the matching kit crate, then builds and deploys. Guard: `if: github.repository == 'DreamLab-AI/dreamlab-ai-website'`
+Triggers on push to `main` when files under `forum-config/deploy/**` change. The workflow clones the `nostr-rust-forum` kit at the pinned `KIT_REF` (currently `25ca8a11e199ced9b1be4a4fb0601239e31aff54`, kept in lockstep with `deploy.yml`, `rust-ci.yml`, and `forum-config/Cargo.toml`), overlays each `forum-config/deploy/*.wrangler.toml` onto the matching kit crate, then builds and deploys. Guard: `if: github.repository == 'DreamLab-AI/dreamlab-ai-website'`
 
 ```mermaid
 flowchart LR
-    PUSH[Push to main<br/>crates/ changed] --> SETUP[Install Rust toolchain<br/>+ wasm32-unknown-unknown<br/>+ worker-build]
+    PUSH[Push to main<br/>forum-config/deploy/** changed] --> CLONE[Clone kit at pinned KIT_REF<br/>overlay forum-config/deploy/*.wrangler.toml]
+    CLONE --> SETUP[Install Rust toolchain<br/>+ wasm32-unknown-unknown<br/>+ worker-build + wrangler 3.114.17]
 
     SETUP --> RUST_BUILD
 
@@ -169,13 +172,13 @@ flowchart LR
 
 All workers are Rust, compiled to `wasm32-unknown-unknown` via `worker-build --release` and packaged as Workers-compatible ES modules. Source lives upstream in the `nostr-rust-forum` kit; this repo overlays per-worker `wrangler.toml` from `forum-config/deploy/`.
 
-| Worker | Kit crate | Storage | Subdomain |
-|--------|-----------|---------|-----------|
-| auth-worker | `nostr-bbs-auth-worker` | D1 + KV + R2 | `api.dreamlab-ai.com` |
-| pod-worker | `nostr-bbs-pod-worker` | R2 + KV | `pods.dreamlab-ai.com` |
-| preview-worker | `nostr-bbs-preview-worker` | Cache API | `preview.dreamlab-ai.com` |
-| relay-worker | `nostr-bbs-relay-worker` | D1 + Durable Objects | `relay.dreamlab-ai.com` |
-| search-worker | `nostr-bbs-search-worker` | R2 + KV | `search.dreamlab-ai.com` |
+| Worker | Kit crate | Storage | Live host (workers.dev) | Planned subdomain |
+|--------|-----------|---------|-----------|-----------|
+| auth-worker | `nostr-bbs-auth-worker` | D1 + KV + R2 | `dreamlab-auth-api` | `api.dreamlab-ai.com` |
+| pod-worker | `nostr-bbs-pod-worker` | R2 + KV + D1 | `dreamlab-pod-api` | `pods.dreamlab-ai.com` |
+| preview-worker | `nostr-bbs-preview-worker` | KV (rate limit) + Cache API | `dreamlab-link-preview` | `preview.dreamlab-ai.com` |
+| relay-worker | `nostr-bbs-relay-worker` | D1 + Durable Objects | `dreamlab-nostr-relay` | `relay.dreamlab-ai.com` |
+| search-worker | `nostr-bbs-search-worker` | R2 + KV + D1 + Workers AI | `dreamlab-search-api` | `search.dreamlab-ai.com` |
 
 ---
 
@@ -186,7 +189,7 @@ All workers are Rust, compiled to `wasm32-unknown-unknown` via `worker-build --r
 | Property | Value |
 |----------|-------|
 | Domain | `dreamlab-ai.com` |
-| Workers subdomains | `api.`, `pods.`, `search.`, `preview.`, `relay.` |
+| Workers hosts | `dreamlab-{auth-api,pod-api,search-api,nostr-relay,link-preview}.solitary-paper-764d.workers.dev` (branded `api.`/`pods.`/`search.`/`preview.`/`relay.` subdomains are planned, not provisioned) |
 | GitHub Pages branch | `gh-pages` |
 | TLS | Cloudflare-managed (edge + origin) |
 
@@ -217,14 +220,11 @@ Local Workers use `wrangler dev` which simulates D1, KV, R2, and Durable Objects
 | Secret | Workers | Value |
 |--------|---------|-------|
 | `PRF_SERVER_SECRET` | auth-worker | **Operator-generated** — `openssl rand -hex 32`. Server-side salt for WebAuthn PRF→HKDF. Unset ⇒ register/login 500. Deploy is blocked if absent (see [Cloudflare Workers › Operator-Provided Values](CLOUDFLARE_WORKERS.md#operator-provided-values)). |
-| `RP_ID` | auth-worker | `dreamlab-ai.com` |
-| `RP_NAME` | auth-worker | `DreamLab AI` |
-| `EXPECTED_ORIGIN` | auth-worker, pod-worker | `https://dreamlab-ai.com` |
-| `POD_BASE_URL` | auth-worker, pod-worker | `https://pods.dreamlab-ai.com` |
-| `ADMIN_PUBKEYS` | auth-worker, relay-worker | Comma-separated admin hex pubkeys |
-| `ALLOWED_ORIGIN` | relay-worker, search-worker | `https://dreamlab-ai.com` |
-| `NATIVE_POD_URL` | auth-worker | `https://pods-native.dreamlab-ai.com` (native pod tier; only when `[native_pod]` enabled) |
-| `NATIVE_POD_ADMIN_KEY` | auth-worker | PSK matching the native server's `SOLID_ADMIN_KEY` for `/_admin/provision` |
+| `ADMIN_PUBKEYS` | auth-worker | Comma-separated admin hex pubkeys (static admin set; deploy-gated). The relay's admin authority is D1 `whitelist.is_admin`; the search-worker carries its own `ADMIN_PUBKEYS` as a plaintext `[vars]` value. |
+| `NATIVE_POD_URL` | auth-worker | `https://pods-native.dreamlab-ai.com` (native pod tier; also present as a `[vars]` value — the secret wins when both are set) |
+| `NATIVE_POD_ADMIN_KEY` | auth-worker | PSK matching the native server's `SOLID_ADMIN_KEY` for `/_admin/provision` (deploy-gated) |
+
+Non-secret configuration (`RP_ID`, `RP_NAME`, `EXPECTED_ORIGIN`, `POD_BASE_URL`, `ALLOWED_ORIGIN`/`ALLOWED_ORIGINS`, `ZONE_CONFIG`) ships as plaintext `[vars]` in `forum-config/deploy/*.wrangler.toml`, not as CF secrets.
 
 `NATIVE_POD_URL` is also consumed at WASM compile time (`option_env!`) so the native pod UI compiles out when absent. The [`set-worker-secrets.yml`](../../.github/workflows/set-worker-secrets.yml) workflow pushes both values to the CF Worker in one shot. Full runbook: [Native Pod Mesh](NATIVE_POD_MESH.md).
 
@@ -232,7 +232,7 @@ Local Workers use `wrangler dev` which simulates D1, KV, R2, and Durable Objects
 
 ## DNS Records
 
-All DNS records are managed in the Cloudflare `dreamlab-ai.com` zone.
+The apex record is live; the worker subdomains below are the **planned end-state** and are not currently provisioned (clients use the `workers.dev` hosts injected via `window.__ENV__`).
 
 | Subdomain | Type | Target | Proxied |
 |-----------|------|--------|---------|

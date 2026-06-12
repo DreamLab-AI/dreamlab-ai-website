@@ -4,7 +4,9 @@
 **Method:** Diagram-Driven Diagnosis, read-only static trace, file:line evidence only.
 **Live system:** https://dreamlab-ai.com/community/ — Leptos/WASM forum client + 5 Cloudflare Workers (`nostr-rust-forum` kit), configured by `forum-config/dreamlab.toml`.
 **Repos traced:** `dreamlab-ai-website` (deploy + config), `nostr-rust-forum` (workers + Leptos client).
-**Pinned kit:** `nostr-rust-forum@8d31f3a` (`.github/workflows/deploy.yml:45`, `workers-deploy.yml:31`).
+**Pinned kit:** `nostr-rust-forum@25ca8a1` (`.github/workflows/deploy.yml:56`, `workers-deploy.yml:31`, `rust-ci.yml:19`; originally traced at `8d31f3a`, re-verified 2026-06-12).
+
+> **Host note (2026-06-12).** The branded `api./relay./pods./search./preview.dreamlab-ai.com` hosts named in the diagrams below are the documented end-state but are **not provisioned in DNS**; live traffic uses `https://dreamlab-<name>.solitary-paper-764d.workers.dev` (injected via `window.__ENV__`, `deploy.yml`).
 
 > No secrets reproduced. Admin/agent pubkeys referenced by role only.
 
@@ -64,7 +66,7 @@ sequenceDiagram
     W->>A: POST /auth/login/options {pubkey} (passkey.rs:235, lib.rs:264)
     A-->>W: {options, prfSalt}
     W->>B: navigator.credentials.get({prf}) (passkey.rs:246)
-    W->>W: PRF -> HKDF -> sk -> pubkey; block hybrid/QR (passkey.rs:249)
+    W->>W: PRF -> HKDF -> sk -> pubkey, block hybrid/QR (passkey.rs:249)
     W->>A: POST /auth/login/verify {response,pubkey}<br/>Authorization: Nostr <nip98> (passkey.rs:286, lib.rs:269)
     A->>D1A: nip98 verify + replay INSERT OR IGNORE
     A-->>W: {token / session}
@@ -84,7 +86,7 @@ sequenceDiagram
     W->>R: ["EVENT", signed] publish_with_ack (relay.rs:375)
     R->>R: verify_event_strict (Schnorr) + is_whitelisted (nip_handlers.rs:92)
     R->>R: trust level + zone access gate (nip_handlers.rs:145,267)
-    R->>D1R: INSERT event; broadcast to DO subscribers
+    R->>D1R: INSERT event, broadcast to DO subscribers
 
     Note over W,R: 6) Read receipt of own post
     R-->>W: ["OK", event_id, true, ""] (relay.rs:537)
@@ -112,18 +114,19 @@ sequenceDiagram
     participant S as Search Worker
     participant NP as Native Pod Tier<br/>(pods-native via CF Tunnel)
 
-    Note over Admin,A: Admin authorization is D1-sourced, NOT dreamlab.toml
-    Admin->>A: any /api/* with Authorization: Nostr <nip98> (lib.rs:280)
+    Note over Admin,A: Admin authorization = static (ADMIN_PUBKEYS) ∪ D1
+    Admin->>A: any /api/* with Authorization: Nostr <nip98> (lib.rs)
     A->>A: verify_nip98_replay (auth.rs)
-    A->>D1R: WHITELIST_IS_ADMIN_SQL (admin.rs:50)
-    A->>D1A: MEMBERS_IS_ADMIN_SQL fallback (admin.rs:65)
-    A-->>A: is_admin = true/false (admin.rs:48)
-    Note right of A: dreamlab.toml [admin].static_pubkeys NOT read here (Gap 1)
+    A->>A: is_static_admin(pubkey, ADMIN_PUBKEYS env) (admin.rs — Gap 1 fix)
+    A->>D1R: WHITELIST_IS_ADMIN_SQL (admin.rs)
+    A->>D1A: MEMBERS_IS_ADMIN_SQL fallback (admin.rs)
+    A-->>A: is_admin = static ∪ D1 (admin.rs::is_admin)
+    Note right of A: ADMIN_PUBKEYS mirrors dreamlab.toml [admin].static_pubkeys (Gap 1 RESOLVED)
 
     Note over Admin,A: Moderation actions (admin-gated, P0-3/P0-4 sprint)
     Admin->>A: POST /api/mod/{ban|mute|warn|unban|unmute} (lib.rs:375, moderation.rs)
     A->>D1R: persist moderation_actions (signed created_at)
-    Admin->>A: POST /api/mod/report ; GET /api/mod/reports (lib.rs:387,395)
+    Admin->>A: POST /api/mod/report + GET /api/mod/reports (lib.rs:387,395)
     Admin->>A: POST /api/mod/reports/:id/action (lib.rs:400)
 
     Note over Admin,R: Moderation enforced at relay (latest-wins, fail-closed)
@@ -131,31 +134,31 @@ sequenceDiagram
     R->>R: Block::{Banned|MutedUntil|None|Unknown} -> reject/accept EVENT
 
     Note over Admin,A: Agent governance / control surface (kinds 31400-31405)
-    Admin->>A: GET /api/governance/agents ; POST agents/register|revoke (lib.rs:507-519)
+    Admin->>A: GET /api/governance/agents + POST agents/register|revoke (lib.rs:507-519)
     A->>D1R: agent_registry insert/active (governance_api.rs)
-    Admin->>A: GET /api/governance/cases ; /cases/:id (lib.rs:521-530, broker_cases)
-    Admin->>A: POST /api/governance/roles/{grant|revoke} ; GET roles (lib.rs:531-542)
-    Note over Admin,R: Relay gates 31400-31405 on agent_registry; 31403 admin-only
+    Admin->>A: GET /api/governance/cases + /cases/:id (lib.rs:521-530, broker_cases)
+    Admin->>A: POST /api/governance/roles/{grant|revoke} + GET roles (lib.rs:531-542)
+    Note over Admin,R: Relay gates 31400-31405 on agent_registry (31403 admin-only)
     Admin->>R: ["EVENT", kind-31403 ActionResponse] (nip_handlers.rs:235,246)
     R->>R: is_registered_agent() / governance_response_blocked() admin gate (nip_handlers.rs:680)
 
-    Note over Admin,S: Search admin uses a SEPARATE admin source
+    Note over Admin,S: Search admin = static ADMIN_PUBKEYS only (no D1)
     Admin->>S: admin ops gated by ADMIN_PUBKEYS env (search auth.rs:47,56)
-    Note right of S: search-worker admin set != auth/relay D1 set (Gap 2)
+    Note right of S: Known gap (narrowed): D1-only admins still invisible to search (Gap 2)
 
-    Note over Admin,NP: Native pod provisioning (8d31f3a rc11)
+    Note over Admin,NP: Native pod provisioning
     Admin->>A: POST /api/native-pod/provision {pubkey} (lib.rs:557,593)
     A->>A: require admin NIP-98 (lib.rs:629)
     A->>NP: POST {NATIVE_POD_URL}/_admin/provision/{pubkey}<br/>X-Pod-Admin-Key: <PSK> (lib.rs:689-707)
     NP-->>A: provisioned (git-enabled pod)
-    Note right of A: dreamlab.toml admin_provision_url=/_admin/provision<br/>but worker posts /_admin/provision/{pubkey} (Gap 3)
+    Note right of A: NATIVE_POD_URL now set in auth-worker [vars],<br/>NATIVE_POD_ADMIN_KEY deploy-gated (Gap 3 RESOLVED).<br/>Worker still ignores dreamlab.toml admin_provision_url<br/>and builds /_admin/provision/{pubkey} itself.
 ```
 
-**`ADMIN_PUBKEYS` check** is implemented in **two unrelated places**: (a) search-worker reads the `ADMIN_PUBKEYS` env (`search-worker/src/auth.rs:45-58`, comma-separated hex); (b) auth-worker + relay read **D1 `whitelist.is_admin` / `members.is_admin`** (`auth-worker/admin.rs:48-78`, `relay/whitelist.rs:91`). The `dreamlab.toml [admin] static_pubkeys` and the auth-worker `ADMIN_PUBKEYS` secret (required by `workers-deploy.yml:181`) are **not** consumed by the auth-worker admin gate.
+**`ADMIN_PUBKEYS` check** (updated 2026-06-12): the auth-worker now resolves admin status as **static (`ADMIN_PUBKEYS` env) ∪ D1** (`auth-worker/admin.rs::is_admin` — static check first, then `whitelist.is_admin` via `RELAY_DB`, then `members.is_admin`). The search-worker reads the same `ADMIN_PUBKEYS` env name but as its **only** authority (`search-worker/src/auth.rs:45-65`) — D1-promoted admins remain invisible to it (Gap 2, narrowed). The relay's own gate stays D1 (`whitelist.is_admin`).
 
 **Governance / agent surface** (NIP-11 `agent_control_surface`, advertised `nip11.rs:77`): kinds 31400 PanelDefinition, 31401 PanelState, 31402 ActionRequest, 31403 ActionResponse, 31404 PanelUpdate, 31405 PanelRetired. Relay accepts 31400/31401/31402/31404/31405 only from `agent_registry` pubkeys (D1), and 31403 only from admins (`nip_handlers.rs:228-246`). `broker_cases` is the governance inbox surfaced via `/api/governance/cases` (`governance_api.rs:206-251`).
 
-**Native pod tier** (`dreamlab.toml:169-174`, `8d31f3a`): `[native_pod] enabled=true`, git-enabled, cohort-gated; auth-worker proxies provisioning with `X-Pod-Admin-Key` PSK (`lib.rs:695`). Match `NATIVE_POD_ADMIN_KEY` (CF secret) ↔ `SOLID_ADMIN_KEY` (agentbox).
+**Native pod tier** (`dreamlab.toml [native_pod]`): `enabled=true`, git-enabled, cohort-gated; auth-worker proxies provisioning with `X-Pod-Admin-Key` PSK (`lib.rs`). Match `NATIVE_POD_ADMIN_KEY` (CF secret) ↔ `SOLID_ADMIN_KEY` (agentbox). `NATIVE_POD_URL` is set in `auth-worker.wrangler.toml [vars]` and the PSK is deploy-gated in `workers-deploy.yml`.
 
 ---
 
@@ -163,17 +166,23 @@ sequenceDiagram
 
 Severity scale: **P0** critical / **P1** high (deploy or auth blocker) / **P2** medium / **P3** low.
 
-### Gap 1 — `dreamlab.toml [admin] static_pubkeys` is read by no runtime admin gate — **P1**
+### Gap 1 — `dreamlab.toml [admin] static_pubkeys` is read by no runtime admin gate — **RESOLVED** (was P1)
+
+> **Resolved in the deployed kit (`25ca8a1`):** `auth-worker/src/admin.rs::is_admin` now resolves **static (`ADMIN_PUBKEYS` env) ∪ D1** — it checks `nostr_bbs_core::is_static_admin(pubkey, ADMIN_PUBKEYS)` before the `RELAY_DB`/`DB` queries, and `workers-deploy.yml` blocks deploy if the `ADMIN_PUBKEYS` secret is unset. A fresh deployment with empty D1 tables now has working static admins. (The original finding below is retained for history.)
 - **Evidence:** `forum-config/dreamlab.toml:33-40` declares `[admin] mode="static"` + `static_pubkeys`. The auth-worker admin gate `is_admin()` queries only D1 `whitelist.is_admin` (`admin.rs:50`) and `members.is_admin` (`admin.rs:65`). No code path reads `static_pubkeys` or the auth-worker `ADMIN_PUBKEYS` secret. The relay also uses D1 (`whitelist.rs:91`).
 - **Impact:** A fresh deployment whose D1 `whitelist`/`members` tables have no `is_admin=1` row has **zero admins** despite `dreamlab.toml` declaring two static admin pubkeys. The human operator cannot moderate, register agents, or provision native pods until a D1 admin row is seeded out-of-band. The "static admin" config is silently inert.
 - **Minimal fix:** In `auth-worker/admin.rs::is_admin`, add a third check that reads the `ADMIN_PUBKEYS` env (mirror `search-worker/src/auth.rs:47`) before returning `false`; and have the deploy pipeline seed `dreamlab.toml [admin].static_pubkeys` into `ADMIN_PUBKEYS` (already required as a secret at `workers-deploy.yml:181`). One env read closes it.
 
-### Gap 2 — Two divergent admin sources (D1 vs `ADMIN_PUBKEYS`) across workers — **P2**
+### Gap 2 — Two divergent admin sources (D1 vs `ADMIN_PUBKEYS`) across workers — **Known gap (narrowed)** — P3
+
+> **Update (2026-06-12):** the *static* admin set is now shared — auth-worker, relay (via auth-worker writes), and search-worker all honour `ADMIN_PUBKEYS`, and the auth-worker unions it with D1. The residual gap: a *dynamically* promoted admin (D1 `whitelist.is_admin` / `members.is_admin` row, no `ADMIN_PUBKEYS` entry) is still invisible to the search-worker, whose only authority is its env var (`search-worker/src/auth.rs`), and the 2-pubkey `[vars]` copy in `search-worker.wrangler.toml` is not pipeline-synchronised with the auth-worker secret (see anomaly register O2).
 - **Evidence:** auth-worker/relay admin = D1 (`admin.rs:48`, `whitelist.rs:91`); search-worker admin = `ADMIN_PUBKEYS` env (`search-worker/src/auth.rs:56`), with `search-worker/wrangler.toml:27` hardcoding only the visionclaw-server pubkey. The relay also carries an empty `ADMIN_PUBKEYS=""` (`relay-worker/wrangler.toml:10`) that nothing reads.
 - **Impact:** An admin authorized via D1 whitelist is **not** an admin to the search worker unless separately listed in its env, and vice-versa. Admin-gated search reindex/ingest ops can succeed/fail inconsistently with the rest of the stack. This is the audit-05 "two sources of truth" flag, now confirmed to span three workers.
 - **Minimal fix:** Pick one source. Either route search-worker admin checks through the relay D1 (cross-D1 binding like auth-worker `RELAY_DB`), or feed all three workers the same `ADMIN_PUBKEYS` derived from `dreamlab.toml [admin].static_pubkeys` at deploy time. Document the chosen authority in `CLOUDFLARE_WORKERS.md`.
 
-### Gap 3 — Native-pod provision URL path disagreement (config vs worker) — **P2**
+### Gap 3 — Native-pod provision URL path disagreement (config vs worker) — **RESOLVED at the deploy layer** (was P2)
+
+> **Resolved (2026-06-12):** `auth-worker.wrangler.toml [vars]` now sets `NATIVE_POD_URL = "https://pods-native.dreamlab-ai.com"`, and `workers-deploy.yml` gates the deploy on the `NATIVE_POD_ADMIN_KEY` secret being present — the 503 "native pod not configured" deploy-blocker is closed. The residual doc-level quirk stands: the worker still ignores `dreamlab.toml [native_pod].admin_provision_url` and constructs `{NATIVE_POD_URL}/_admin/provision/{pubkey}` itself (`NATIVE_POD_URL` is the base = `admin_provision_url` minus the `/_admin/provision` suffix, as documented in the wrangler comment). `NATIVE_POD_URL` also exists as a CF secret via `set-worker-secrets.yml`; the secret wins over the `[vars]` copy (see deployment-sequence F-3).
 - **Evidence:** `dreamlab.toml:174` sets `admin_provision_url = ".../\_admin/provision"`. The auth-worker ignores that value and constructs `POST {NATIVE_POD_URL}/_admin/provision/{pubkey}` from the `NATIVE_POD_URL` env (`lib.rs:667,689`). `admin_provision_url` from `dreamlab.toml` is read by nothing in the worker; the worker needs `NATIVE_POD_URL` + `NATIVE_POD_ADMIN_KEY` as separate env bindings that are **not present** in `auth-worker.wrangler.toml` (`[vars]` lines 57-66 have no `NATIVE_POD_URL`).
 - **Impact:** `/api/native-pod/provision` returns 503 "native pod not configured" (`lib.rs:669-686`) on the live deployment because `NATIVE_POD_URL`/`NATIVE_POD_ADMIN_KEY` are unset, even though `dreamlab.toml [native_pod].enabled=true`. The native pod tier (8d31f3a feature) is advertised but unreachable through the documented config key.
 - **Minimal fix:** Add `NATIVE_POD_URL = "https://pods-native.dreamlab-ai.com"` to `auth-worker.wrangler.toml [vars]` and set `NATIVE_POD_ADMIN_KEY` as a CF secret; OR make the worker read `admin_provision_url` from config. Reconcile the trailing `/{pubkey}` path-segment convention between the two.
@@ -183,7 +192,9 @@ Severity scale: **P0** critical / **P1** high (deploy or auth blocker) / **P2** 
 - **Impact:** Works today only because the trunk build also sets the `VITE_*` env at compile time (`deploy.yml:36-38`). If the runtime `__ENV__` injection is the intended override mechanism (it is, per `relay_url.rs:1-5` doc), any operator who rebrands by editing `__ENV__` without rebuilding the WASM will silently keep the baked-in URLs for pod/search/preview, falling back to `pod.example.com` / `search.example.com` / `members-link-preview...` if the compile-time vars were ever absent. Inconsistent override surface.
 - **Minimal fix:** Give `pod_client`/`search_client`/`link_preview` the same `window_env("VITE_POD_API_URL")`-first resolution helper used in `relay_url.rs:62-75`.
 
-### Gap 5 — Default CORS / RP fallback strings are placeholders (fail-open shape) — **P3 (mitigated)**
+### Gap 5 — Default CORS / RP fallback strings are placeholders (fail-open shape) — **RESOLVED** (was P3)
+
+> **Resolved in the deployed kit (`25ca8a1`):** `auth-worker/src/http.rs::cors_headers` is now fail-closed — when `EXPECTED_ORIGIN` is unset it emits **no** `Access-Control-Allow-Origin` header instead of the `https://example.com` placeholder, mirroring `expected_origin_required()`. The client-side `relay_url.rs` fallback string `https://api.example.com` remains (harmless: `window.__ENV__` is always injected in deploys).
 - **Evidence:** `auth-worker/lib.rs:40` defaults `Access-Control-Allow-Origin` to `https://example.com` when `EXPECTED_ORIGIN` is unset; `auth_api_base()` falls back to `https://api.example.com` (`relay_url.rs:57`). Wrangler sets `EXPECTED_ORIGIN=https://dreamlab-ai.com` (`auth-worker.wrangler.toml:60`) so production is correct.
 - **Impact:** Low while wrangler vars are set, but a misconfigured deploy CORS-allows `example.com`. Audit-04 Anomaly 3 hardened the WebAuthn RP_ID/origin path to fail-closed; the CORS default here is still fail-to-placeholder rather than fail-closed.
 - **Minimal fix:** Make `cors_headers` return no `Access-Control-Allow-Origin` (or 500) when `EXPECTED_ORIGIN` is unset, mirroring `expected_origin_required()` in `webauthn.rs`.
@@ -199,7 +210,7 @@ Severity scale: **P0** critical / **P1** high (deploy or auth blocker) / **P2** 
 - **Minimal fix:** Either advertise the whitelist requirement or document the trust-gated write model in the relay info doc.
 
 ### Gap 8 — `KIT_REF` / `ADMIN_KV` / doc-drift from audit 05 — **CLOSED, verify** (was P1/P2)
-- **Status:** `deploy.yml:45` and `workers-deploy.yml:31` now pin `KIT_REF=8d31f3a...` (audit-05 A3 fixed). `workers-deploy.yml:115-163` auto-provisions the `ADMIN_KV` namespace via the CF API, substituting `REPLACE_WITH_NEW_ADMIN_KV_ID` at deploy time (audit-05 A2 / register R-09 addressed at the pipeline layer). `workers-deploy.yml:170-193` gates deploy on `PRF_SERVER_SECRET` + `ADMIN_PUBKEYS` presence. Register R-13c marks the `community-forum-rs/` doc refs fixed in `182cc23`.
+- **Status:** `deploy.yml:56` and `workers-deploy.yml:31` now pin `KIT_REF=25ca8a11...` (was `8d31f3a` at trace time; `rust-ci.yml:19` pins the same SHA) (audit-05 A3 fixed). `workers-deploy.yml:115-163` auto-provisions the `ADMIN_KV` namespace via the CF API, substituting `REPLACE_WITH_NEW_ADMIN_KV_ID` at deploy time (audit-05 A2 / register R-09 addressed at the pipeline layer). `workers-deploy.yml:170-193` gates deploy on `PRF_SERVER_SECRET` + `ADMIN_PUBKEYS` presence. Register R-13c marks the `community-forum-rs/` doc refs fixed in `182cc23`.
 - **Residual:** The wrangler.toml files still literally contain `REPLACE_WITH_NEW_ADMIN_KV_ID` (`auth-worker.wrangler.toml:41`); a `wrangler deploy` run **outside** the CI pipeline (manual local deploy) still fails. Keep this as a P3 note: the placeholder is only safe because CI rewrites it.
 
 ---
@@ -232,7 +243,7 @@ For an automated browser session (chrome-devtools-mcp / Playwright via the `brow
 | # | Step | URL / action | Selector hint | Expected network call |
 |---|---|---|---|---|
 | A1 | Login as admin | as U6 with operator passkey | — | `POST .../auth/login/verify` → 200 |
-| A2 | Admin page loads | navigate `/community/admin` | admin nav visible only if admin (`pages/admin.rs`) | first admin-gated `GET /api/...` returns 200 (not 403) — **asserts Gap 1**: against a fresh D1, expect **403** here despite `dreamlab.toml` static admin |
+| A2 | Admin page loads | navigate `/community/admin` | admin nav visible only if admin (`pages/admin.rs`) | first admin-gated `GET /api/...` returns 200 (not 403) — Gap 1 is RESOLVED: a static `ADMIN_PUBKEYS` admin gets **200** even against a fresh D1 |
 | A3 | List reports | open Reports tab | `admin/reports.rs` table | `GET api.../api/mod/reports` → 200 `{reports:[...]}` (`lib.rs:395`) |
 | A4 | Ban a user | click ban in user table | `admin/user_table.rs` | `POST api.../api/mod/ban` → 200 (`lib.rs:375`) |
 | A5 | Unban | click unban | — | `POST api.../api/mod/unban` → 200 |
@@ -240,8 +251,8 @@ For an automated browser session (chrome-devtools-mcp / Playwright via the `brow
 | A7 | Register agent | submit agent pubkey | governance form | `POST api.../api/governance/agents/register` → 200 (`lib.rs:511`) |
 | A8 | List broker cases | Governance → Cases | case list | `GET api.../api/governance/cases` → 200 (`lib.rs:521`) |
 | A9 | Governance response | approve/reject an ActionRequest | — | WSS `["EVENT", {kind:31403}]` → `["OK", id, true]` only if admin (`nip_handlers.rs:246`) |
-| A10 | Native pod provision | provision a member pod | `pages/pod_browser.rs` native card | `POST api.../api/native-pod/provision {pubkey}` — **asserts Gap 3**: expect **503 "native pod not configured"** until `NATIVE_POD_URL` is set |
-| A11 | Search admin op | admin-only reindex | — | search op gated by `ADMIN_PUBKEYS` — **asserts Gap 2**: a D1-only admin may get 401/403 here |
+| A10 | Native pod provision | provision a member pod | `pages/pod_browser.rs` native card | `POST api.../api/native-pod/provision {pubkey}` — Gap 3 RESOLVED: `NATIVE_POD_URL` is set in `[vars]`, expect 200/502 from the tunnel rather than 503 "native pod not configured" |
+| A11 | Search admin op | admin-only reindex | — | search op gated by `ADMIN_PUBKEYS` — **asserts Gap 2 (known gap, narrowed)**: a D1-only admin (not in `ADMIN_PUBKEYS`) still gets 401/403 here |
 
 **Negative assertions worth baking in:** (a) any `/api/webauthn/*` URL → 404 (Gap 6); (b) non-admin pubkey on `POST /api/mod/ban` → 403; (c) non-whitelisted pubkey publishing kind-42 → WSS `["OK", id, false, "blocked: pubkey not whitelisted"]` (`nip_handlers.rs:92`); (d) non-agent pubkey publishing kind-31400 → rejected (`nip_handlers.rs:235`).
 

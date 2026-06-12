@@ -22,9 +22,9 @@
 
 Private whitelist-only Nostr relay on Cloudflare Workers with Durable Objects for WebSocket management. Rust Worker using `worker` 0.7.5 with hibernation-safe session recovery via `accept_websocket_with_tags()`.
 
-**Source:** `community-forum-rs/crates/relay-worker/`
+**Source:** `nostr-rust-forum/crates/nostr-bbs-relay-worker/` (the legacy `community-forum-rs` tree is superseded by the kit)
 
-**WebSocket:** `wss://dreamlab-nostr-relay.<account>.workers.dev` (production: DNS route via `relay.dreamlab-ai.com`)
+**WebSocket:** `wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev` (live). The branded `relay.dreamlab-ai.com` route is the documented end-state but is not provisioned in DNS.
 
 ---
 
@@ -148,8 +148,8 @@ flowchart TD
 {
   "name": "<RELAY_NAME>",
   "description": "DreamLab AI private community relay",
-  "supported_nips": [1, 9, 11, 16, 29, 33, 40, 42, 45, 50, 98],
-  "software": "dreamlab-nostr-relay",
+  "supported_nips": [1, 9, 11, 16, 29, 33, 40, 42, 45, 50, 56, 59, 65, 90, 98],
+  "software": "https://github.com/DreamLab-AI/nostr-rust-forum",
   "limitation": {
     "max_message_length": 65536,
     "max_subscriptions": 20,
@@ -265,11 +265,17 @@ graph TD
 
 | Binding | Type | Purpose |
 |---------|------|---------|
-| `DB` | D1Database | `dreamlab-relay` -- events + whitelist |
+| `DB` | D1Database | `dreamlab-relay` -- events + whitelist + trust tables |
+| `REPLAY_DB` | D1Database | `dreamlab-auth` -- shared NIP-98 replay table (cross-worker) |
 | `RELAY` | DurableObjectNamespace | NostrRelayDO |
-| `ADMIN_PUBKEYS` | Secret | Comma-separated admin hex pubkeys |
-| `RELAY_NAME` | Var | Display name for NIP-11 |
-| `ALLOWED_ORIGIN` | Secret | Primary CORS origin |
+| `RELAY_NAME` | [vars] | Display name for NIP-11 |
+| `ALLOWED_ORIGIN` / `ALLOWED_ORIGINS` | [vars] | CORS origins |
+| `ZONE_CONFIG` | [vars] | JSON zone/cohort access model (deny-by-default if absent) |
+| `MESH_MODE` / `MESH_PEER_RELAYS` / `MESH_FEDERATED_KINDS` | [vars] | Mesh federation (currently `standalone`, no peers) |
+
+Admin authority at the relay is the D1 `whitelist.is_admin` column (written via
+`/api/whitelist/set-admin`), not an `ADMIN_PUBKEYS` env var.
+Source: `forum-config/deploy/relay-worker.wrangler.toml`.
 
 ---
 

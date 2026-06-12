@@ -24,6 +24,8 @@ The 2026-05-12 Governance sprint added the Agent Control Surface: a `/governance
 
 ## Architecture Overview
 
+> **Note:** crate names below are the logical DDD names; in the deployed kit (`nostr-rust-forum@25ca8a1`) they ship as `nostr-bbs-core`, `nostr-bbs-forum-client`, `nostr-bbs-{auth,pod,preview,relay,search}-worker`. The `agent-worker` node is **aspirational design — not implemented as of 2026-06-12** (no such crate exists; see [08-agent-identity-messaging-context.md](08-agent-identity-messaging-context.md)).
+
 ```mermaid
 graph TB
     NC["nostr-core<br/>(shared library)"]
@@ -64,6 +66,8 @@ graph TB
 ```
 
 ## Bounded Context Map
+
+> **Note:** `agent-worker` (and its `AgentRegistered` / DVM / LDN edges) is aspirational design — not implemented as of 2026-06-12.
 
 ```mermaid
 graph LR

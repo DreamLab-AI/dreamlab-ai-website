@@ -4,7 +4,7 @@
 **Method:** Static trace of actual CI files, wrangler manifests, and Rust source.
 No secrets reproduced; CI secret names are referenced by name only.
 **Pinned kit ref:** `nostr-rust-forum@25ca8a11e199ced9b1be4a4fb0601239e31aff54`
-(both `deploy.yml:56` and `workers-deploy.yml:31`; see Finding F-1 for the divergence).
+(`deploy.yml:56`, `workers-deploy.yml:31`, and — since the F-1 fix — `rust-ci.yml:19`).
 
 ---
 
@@ -41,7 +41,7 @@ sequenceDiagram
     GH->>GH: Install Node 20 + wrangler 3.114.17<br/>workers-deploy.yml:107-113
 
     GH->>CF_API: Provision KV namespaces (idempotent)<br/>workers-deploy.yml:115-163
-    Note right of GH: Secrets used: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID<br/>Looks up existing KV by title; creates if absent<br/>Substitutes REPLACE_WITH_NEW_ADMIN_KV_ID in wrangler.toml<br/>Affects: auth-worker (ADMIN_KV), pod-worker (ADMIN_KV_RO)
+    Note right of GH: Secrets used: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID<br/>Looks up existing KV by title, creates if absent<br/>Substitutes REPLACE_WITH_NEW_ADMIN_KV_ID in wrangler.toml<br/>Affects: auth-worker (ADMIN_KV), pod-worker (ADMIN_KV_RO)
 
     alt matrix.config == 'auth-worker'
         GH->>CF_API: wrangler secret list → check PRF_SERVER_SECRET,<br/>ADMIN_PUBKEYS, NATIVE_POD_ADMIN_KEY are present<br/>workers-deploy.yml:166-198
@@ -220,7 +220,7 @@ sequenceDiagram
     B->>AUTH: POST /auth/register/options (NIP-98 signed)<br/>AUTH validates: RP_ID [vars], PRF_SERVER_SECRET [secret]<br/>auth-worker.wrangler.toml:58, deploy_config.rs:57
     AUTH->>D1A: INSERT challenge (nip98_replay check via INSERT OR IGNORE)
     AUTH-->>B: {publicKeyOptions, prfSalt}
-    B->>B: navigator.credentials.create() → PRF output<br/>→ HKDF → secp256k1 keypair (on-device; no key escrow)
+    B->>B: navigator.credentials.create() → PRF output<br/>→ HKDF → secp256k1 keypair (on-device, no key escrow)
     B->>AUTH: POST /auth/register/verify {credential, pubkey}<br/>AUTH checks ADMIN_PUBKEYS [secret] for admin flag
     AUTH->>D1A: INSERT members, pod_meta
     AUTH->>R2: PUT /{pubkey}/profile WebID document (pod provisioning)<br/>phase1.rs:13 — enabled=true, keys_at_signup=false
@@ -250,7 +250,7 @@ sequenceDiagram
 
     Note over B,AUTH: Native pod provisioning (cohort-gated)
     B->>AUTH: POST /api/native-pod/provision<br/>AUTH sends X-Pod-Admin-Key (NATIVE_POD_ADMIN_KEY [secret])<br/>to NATIVE_POD_URL [vars] = https://pods-native.dreamlab-ai.com<br/>auth-worker.wrangler.toml:69-81
-    Note right of AUTH: AGPL Source-Code header: NOT emitted by any worker.<br/>Workers are self-authored (DreamLab copyright holder per ADR-028);<br/>no third-party AGPL dependency is shipped in the worker binaries.<br/>The obligation is therefore moot — but no header is emitted as<br/>affirmative compliance evidence either (see Finding F-6).
+    Note right of AUTH: AGPL Source-Code header: NOT emitted by any worker.<br/>Workers are self-authored (DreamLab copyright holder per ADR-028),<br/>no third-party AGPL dependency is shipped in the worker binaries.<br/>The obligation is therefore moot — but no header is emitted as<br/>affirmative compliance evidence either (see Finding F-6).
 ```
 
 ---
@@ -258,7 +258,7 @@ sequenceDiagram
 ## Findings
 
 ### F-1 — KIT_REF divergence between rust-ci.yml and deploy pipelines
-**Severity:** MEDIUM
+**Severity:** MEDIUM — **RESOLVED**: `rust-ci.yml:18-19` now pins `KIT_REF: '25ca8a11e199ced9b1be4a4fb0601239e31aff54'` in lockstep with both deploy pipelines (commit c82bb29). Original finding retained below.
 **File:line:** `.github/workflows/rust-ci.yml:18`
 **Description:** `rust-ci.yml` sets `KIT_REF: 'main'` and clones with `--depth 1 --branch main`. Both `deploy.yml:56` and `workers-deploy.yml:31` pin `KIT_REF: '25ca8a11e199ced9b1be4a4fb0601239e31aff54'`. This means the CI that validates fmt/clippy/test runs against whatever HEAD of `main` is at execution time — potentially a different commit from the one that ships. A breaking upstream push to `nostr-rust-forum:main` will pass `rust-ci.yml` (which floats) and fail the actual deploy pipelines (which are pinned), or vice versa if the kit introduces a regression after the pinned SHA but before the next pin bump.
 **Classification:** Config divergence / test-vs-deploy gap.

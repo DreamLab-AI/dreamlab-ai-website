@@ -67,7 +67,7 @@ sequenceDiagram
     Auth->>KV: Store pod metadata
 
     Auth-->>Client: { verified: true, pubkey, didNostr,<br/>webId, podUrl }
-    Client->>Client: Store pubkey in auth signal<br/>Hold privkey in Option&lt;SecretKey&gt;
+    Client->>Client: Store pubkey in auth signal<br/>Hold privkey in Option#lt;SecretKey#gt;
     Client-->>User: Registration complete
 ```
 
@@ -96,7 +96,7 @@ sequenceDiagram
     Client->>Client: HKDF(PRF output) -> same privkey
     Client->>Client: Sign NIP-98 token with privkey
 
-    Client->>Auth: POST /auth/login/verify<br/>Authorization: Nostr &lt;token&gt;<br/>{ response: assertion }
+    Client->>Auth: POST /auth/login/verify<br/>Authorization: Nostr #lt;token#gt;<br/>{ response: assertion }
 
     Auth->>Auth: Verify NIP-98 token<br/>(kind, timestamp, URL, method, signature)
     Auth->>Auth: Verify assertion<br/>(rpIdHash, UP/UV flags, counter)
@@ -222,8 +222,8 @@ sequenceDiagram
     Signer-->>NIP98: 64-byte signature
 
     NIP98->>NIP98: base64(JSON(event))
-    NIP98-->>App: "Nostr &lt;base64&gt;"
-    App->>Server: HTTP request<br/>Authorization: Nostr &lt;base64&gt;
+    NIP98-->>App: "Nostr #lt;base64#gt;"
+    App->>Server: HTTP request<br/>Authorization: Nostr #lt;base64#gt;
 ```
 
 ### Token Verification (Server)
@@ -277,7 +277,7 @@ stateDiagram-v2
 
     note right of Holding
         Key exists only in
-        Option&lt;SecretKey&gt; within
+        Option#lt;SecretKey#gt; within
         the auth signal closure.
         Never persisted to disk,
         localStorage, or cookies.

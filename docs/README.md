@@ -93,7 +93,7 @@ All product requirement documents live in [`prd/`](prd/); sprint plans, snag lis
 
 ### Architecture Decision Records
 
-Full index of all 34 ADRs. See [adr/README.md](adr/README.md) for conventions and supersession chains.
+Full index of all 39 ADRs. See [adr/README.md](adr/README.md) for conventions and supersession chains.
 
 | ADR | Title | Status | Link |
 |-----|-------|--------|------|
@@ -118,8 +118,9 @@ Full index of all 34 ADRs. See [adr/README.md](adr/README.md) for conventions an
 | 019 | Versioned Planning Governance and Tranche-Based Delivery | Accepted | [adr/019-plan-governance-and-delivery-structure.md](adr/019-plan-governance-and-delivery-structure.md) |
 | 020-025 | WebGPU Fallback, Offline-First, NIP-29, Relay Hardening, Security Sprint, Solid Pod Upgrade | Accepted | See [adr/README.md](adr/README.md) |
 | 026-031 | Forum Professionalisation, Canonical Identity, AGPL Boundary, JSON-LD, Signer Abstraction, DM Protocol | Accepted | See [adr/README.md](adr/README.md) |
-| 032 | Agent Job Marketplace (NIP-90) | Accepted | [adr/032-agent-job-marketplace-nip90.md](adr/032-agent-job-marketplace-nip90.md) |
-| 033-034 | Multi-Admin Moderation, Relay NIP Conformance | Accepted | See [adr/README.md](adr/README.md) |
+| 032 | Agent Job Marketplace (NIP-90) | Superseded by 036 | [adr/032-agent-job-marketplace-nip90.md](adr/032-agent-job-marketplace-nip90.md) |
+| 033-034 | Multi-Admin Moderation, Relay NIP Conformance | Accepted / Proposed | See [adr/README.md](adr/README.md) |
+| 035-039 | AGPL Combined-Work, Device-Key Delegation, Config SSoT, Kit-Ref Pin Governance, /connect Onboarding | Accepted | See [adr/README.md](adr/README.md) |
 
 **Supersession chain:** ADR-003 (GCP) -> ADR-010 (Cloudflare) | ADR-007 (SvelteKit) -> ADR-013 (Rust/Leptos) | ADR-008 (PostgreSQL) -> ADR-010 (D1)
 
@@ -321,40 +322,43 @@ sequenceDiagram
 
 ## Zone-Based Access Control
 
-Four access zones with relay-level and client-level enforcement.
+Four access zones with relay-level and client-level enforcement. The deployed
+zone set is authored in `forum-config/dreamlab.toml` `[[zones]]` and mirrored
+into the relay's `ZONE_CONFIG` var and the client's `window.__ENV__.ZONE_CONFIG`
+(`forum-config/deploy/relay-worker.wrangler.toml`, `.github/workflows/deploy.yml`).
 
 ```mermaid
 graph TB
     subgraph "Zone Hierarchy"
-        PL["Public Lobby<br/>All whitelisted users"]
-        CC["Cohort Channels<br/>Members of cohort only"]
-        SL["Staff Lounge<br/>Staff + Admin"]
-        AZ["Admin Zone<br/>Admin only"]
+        PL["public<br/>MiniMooNoir landing<br/>read: everyone; write: friends, agent, admin"]
+        FR["friends<br/>cohort: friends<br/>relay-ACL"]
+        FA["family<br/>cohort: family<br/>NIP-44 encrypted"]
+        BU["business / DreamLab<br/>cohort: business<br/>relay-ACL"]
     end
 
     USER["Authenticated User"] --> PL
-    USER -.->|"if cohort member"| CC
-    USER -.->|"if staff role"| SL
-    USER -.->|"if admin"| AZ
+    USER -.->|"if friends cohort"| FR
+    USER -.->|"if family cohort"| FA
+    USER -.->|"if business cohort"| BU
 
     subgraph "Enforcement"
-        RELAY_CHECK["Relay: whitelist check<br/>before event storage"]
-        CLIENT_CHECK["Client: UI filtering<br/>based on auth store cohorts"]
+        RELAY_CHECK["Relay: whitelist + ZONE_CONFIG<br/>cohort gate (deny-by-default)<br/>before event storage"]
+        CLIENT_CHECK["Client: zone tiles from<br/>window.__ENV__.ZONE_CONFIG<br/>(locked zones stay visible)"]
     end
 
     PL --> RELAY_CHECK
-    CC --> RELAY_CHECK
-    SL --> RELAY_CHECK
-    AZ --> RELAY_CHECK
+    FR --> RELAY_CHECK
+    FA --> RELAY_CHECK
+    BU --> RELAY_CHECK
     PL --> CLIENT_CHECK
-    CC --> CLIENT_CHECK
-    SL --> CLIENT_CHECK
-    AZ --> CLIENT_CHECK
+    FR --> CLIENT_CHECK
+    FA --> CLIENT_CHECK
+    BU --> CLIENT_CHECK
 
     style PL fill:#4ade80,color:#000
-    style CC fill:#60a5fa,color:#000
-    style SL fill:#facc15,color:#000
-    style AZ fill:#f87171,color:#000
+    style FR fill:#60a5fa,color:#000
+    style FA fill:#facc15,color:#000
+    style BU fill:#f87171,color:#000
 ```
 
 ---
@@ -414,14 +418,19 @@ graph LR
 11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c
 ```
 
-### DNS Subdomains
+### Worker Hosts
 
-| Subdomain | Worker |
-|-----------|--------|
-| `api.dreamlab-ai.com` | auth-worker (Rust) |
-| `pods.dreamlab-ai.com` | pod-worker (Rust) |
-| `search.dreamlab-ai.com` | search-worker (Rust) |
-| `preview.dreamlab-ai.com` | preview-worker (Rust) |
+Live traffic is served from `*.solitary-paper-764d.workers.dev`. The branded
+subdomains below are the documented end-state but are **not provisioned in DNS**
+(see `.github/workflows/deploy.yml` env comments).
+
+| Live host (workers.dev) | Planned subdomain | Worker |
+|-----------|-----------|--------|
+| `dreamlab-auth-api.solitary-paper-764d.workers.dev` | `api.dreamlab-ai.com` | auth-worker (Rust) |
+| `dreamlab-pod-api.solitary-paper-764d.workers.dev` | `pods.dreamlab-ai.com` | pod-worker (Rust) |
+| `dreamlab-search-api.solitary-paper-764d.workers.dev` | `search.dreamlab-ai.com` | search-worker (Rust) |
+| `dreamlab-link-preview.solitary-paper-764d.workers.dev` | `preview.dreamlab-ai.com` | preview-worker (Rust) |
+| `dreamlab-nostr-relay.solitary-paper-764d.workers.dev` | `relay.dreamlab-ai.com` | relay-worker (Rust, DO) |
 
 ### Development URLs
 
@@ -438,7 +447,7 @@ graph LR
 | Category | Files | Status |
 |----------|-------|--------|
 | Planning (PRDs) | 2 + governance config | v2.0.0 accepted, v2.1.0 in progress, governance active |
-| ADRs (001-034) | 22 files (013-034 present; 001-012 tracked in index) | Current |
+| ADRs (001-039) | 27 files (013-039 present; 001-012 tracked in index) | Current |
 | DDD | 10 (including README) | Aligned to v2.0.0 baseline + governance events |
 | API | 4 | Current for Rust port |
 | Security | 6 | Current for Rust port (2 docs + 3 QE audits + 1 coverage report) |

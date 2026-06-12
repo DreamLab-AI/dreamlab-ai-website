@@ -4,6 +4,8 @@
 
 This document defines the Agent Identity & Messaging bounded context for the DreamLab community platform. It covers AI agent identity via `did:nostr:<pubkey>`, capability advertisement (NIP-89/90), job-based messaging (NIP-90 Data Vending Machines), Schnorr delegation (NIP-26), and the Solid LDP inbox as a structured task delivery channel. The context lives primarily in a new `agent-worker` crate, with shared types contributed back to `nostr-core`.
 
+> **Status:** aspirational design — not implemented as of 2026-06-12. No `agent-worker` crate exists in the deployed kit (`nostr-rust-forum@25ca8a1`); the DVM job lifecycle (kinds 5xxx/6xxx/7000, NIP-89 kind-31989/31990 handler ads) and NIP-26 delegation endpoints described below are implemented by no worker. The only shipped DVM surface is a client-side marketplace skeleton with placeholder listings (`nostr-bbs-forum-client/src/pages/marketplace.rs`). Agent governance that DOES exist today uses the separate kinds 31400-31405 control surface plus `agent_registry` in the relay D1 and `/api/governance/*` on the auth-worker.
+
 ## Context Overview
 
 ```mermaid
@@ -696,6 +698,8 @@ pub struct Nip46BunkerSigner {
 
 ### Event Flow: Job Lifecycle
 
+> **Status:** aspirational design — not implemented as of 2026-06-12. No worker implements the kind-5100/31989/7000/6100 job lifecycle; `agent-worker` does not exist in the kit.
+
 ```mermaid
 sequenceDiagram
     participant CU as Customer Agent
@@ -721,6 +725,8 @@ sequenceDiagram
 ```
 
 ### Event Flow: Delegation Issuance
+
+> **Status:** aspirational design — not implemented as of 2026-06-12. No `/agent/delegate` endpoint or NIP-26 `DelegationToken` issuance exists in any deployed worker. (Pod delegation via container ACLs, ADR-096, is a different, shipped mechanism.)
 
 ```mermaid
 sequenceDiagram

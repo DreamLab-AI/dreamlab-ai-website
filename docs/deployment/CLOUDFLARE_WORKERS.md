@@ -81,22 +81,39 @@ graph TB
         CACHE[Cache API<br/>Link preview results]
     end
 
+    subgraph "Workers AI"
+        AI[bge-small-en-v1.5<br/>384-dim embeddings]
+    end
+
+    KV_RATE[(RATE_LIMIT<br/>preview rate limiting)]
+    KV_ADMIN[(ADMIN_KV / ADMIN_KV_RO<br/>admin flags)]
+
     AUTH --> D1_AUTH
+    AUTH -- "RELAY_DB (cross-D1<br/>whitelist.is_admin)" --> D1_RELAY
     AUTH --> KV_SESSIONS
     AUTH --> KV_POD_META
+    AUTH --> KV_ADMIN
     AUTH --> R2_PODS
 
     POD --> R2_PODS
     POD --> KV_POD_META
+    POD --> KV_ADMIN
+    POD -- "REPLAY_DB (NIP-98 replay,<br/>payments/quota)" --> D1_AUTH
 
     PREVIEW --> CACHE
+    PREVIEW --> KV_RATE
 
     RELAY --> D1_RELAY
     RELAY --> DO
+    RELAY -- "REPLAY_DB (NIP-98 replay)" --> D1_AUTH
 
     SEARCH --> R2_VECTORS
     SEARCH --> KV_SEARCH
+    SEARCH --> AI
+    SEARCH -- "REPLAY_DB (NIP-98 replay)" --> D1_AUTH
 ```
+
+The `nip98_replay` table lives in the shared `dreamlab-auth` D1 database so a NIP-98 token replayed against a *different* worker is still detected (bindings in `forum-config/deploy/*.wrangler.toml`).
 
 ---
 
@@ -128,7 +145,7 @@ Output lands in `build/worker/`. Wrangler deploys from the generated `shim.mjs`.
 ```toml
 name = "dreamlab-auth-api"
 main = "build/worker/shim.mjs"
-compatibility_date = "2024-09-23"
+compatibility_date = "2025-09-01"
 
 [build]
 command = "worker-build --release"
@@ -139,17 +156,18 @@ command = "worker-build --release"
 ```toml
 name = "dreamlab-nostr-relay"
 main = "build/worker/shim.mjs"
-compatibility_date = "2024-09-23"
+compatibility_date = "2025-09-01"
 
 [build]
 command = "worker-build --release"
 
-[durable_objects]
-bindings = [{ name = "RELAY", class_name = "NostrRelayDO" }]
+[[durable_objects.bindings]]
+name        = "RELAY"
+class_name  = "NostrRelayDO"
 
 [[migrations]]
 tag = "v1"
-new_classes = ["NostrRelayDO"]
+new_sqlite_classes = ["NostrRelayDO"]
 ```
 
 ---
@@ -170,7 +188,8 @@ new_classes = ["NostrRelayDO"]
 | `SESSIONS` | auth-worker | Session tokens (7-day TTL) |
 | `POD_META` | auth-worker, pod-worker | Pod ACLs + metadata |
 | `SEARCH_CONFIG` | search-worker | Vector ID-label mapping |
-| `CONFIG` | auth-worker | General configuration |
+| `ADMIN_KV` / `ADMIN_KV_RO` | auth-worker (rw), pod-worker (ro) | Admin flags (provisioned at deploy time; see Operator-Provided Values) |
+| `RATE_LIMIT` | preview-worker | Sliding-window rate limiting |
 
 ### R2 Buckets
 
@@ -189,33 +208,33 @@ new_classes = ["NostrRelayDO"]
 
 ## Secrets Management
 
-Set Worker secrets via `wrangler secret put`:
+Non-secret configuration (`RP_ID`, `RP_NAME`, `EXPECTED_ORIGIN`, `POD_BASE_URL`,
+`ALLOWED_ORIGIN`/`ALLOWED_ORIGINS`, `ZONE_CONFIG`, `NATIVE_POD_URL`) ships as
+plaintext `[vars]` in `forum-config/deploy/*.wrangler.toml` — do NOT push those
+as secrets. Only true secret material is set via `wrangler secret put`:
 
 ```bash
-# auth-worker
-echo "dreamlab-ai.com" | wrangler secret put RP_ID --name dreamlab-auth-api
-echo "DreamLab AI" | wrangler secret put RP_NAME --name dreamlab-auth-api
-echo "https://dreamlab-ai.com" | wrangler secret put EXPECTED_ORIGIN --name dreamlab-auth-api
-echo "<admin-pubkey>" | wrangler secret put ADMIN_PUBKEYS --name dreamlab-auth-api
+# auth-worker — the only worker with required CF secrets
+echo "<admin-pubkey[,admin-pubkey...]>" | wrangler secret put ADMIN_PUBKEYS --name dreamlab-auth-api
 
 # REQUIRED — operator-generated, never committed. The auth-worker mixes this
 # server-held secret into the WebAuthn PRF → HKDF derivation. If it is unset,
 # register/login return HTTP 500 at request time. Generate a fresh 32-byte
 # value and set it before the first deploy:
-#   openssl rand -hex 32 | wrangler secret put PRF_SERVER_SECRET --name dreamlab-auth-api
-echo "<generate-with: openssl rand -hex 32>" | wrangler secret put PRF_SERVER_SECRET --name dreamlab-auth-api
+openssl rand -hex 32 | wrangler secret put PRF_SERVER_SECRET --name dreamlab-auth-api
 
-# pod-worker
-echo "https://dreamlab-ai.com" | wrangler secret put EXPECTED_ORIGIN --name dreamlab-pod-api
-echo "https://pods.dreamlab-ai.com" | wrangler secret put POD_BASE_URL --name dreamlab-pod-api
-
-# relay-worker
-echo "<admin-pubkey>" | wrangler secret put ADMIN_PUBKEYS --name dreamlab-nostr-relay
-echo "https://dreamlab-ai.com" | wrangler secret put ALLOWED_ORIGIN --name dreamlab-nostr-relay
-
-# search-worker
-echo "https://dreamlab-ai.com" | wrangler secret put ALLOWED_ORIGIN --name dreamlab-search-api
+# REQUIRED when [native_pod] is enabled — PSK matching the native server's
+# SOLID_ADMIN_KEY for /_admin/provision:
+echo "<psk>" | wrangler secret put NATIVE_POD_ADMIN_KEY --name dreamlab-auth-api
 ```
+
+The `workers-deploy.yml` pipeline blocks the auth-worker deploy if
+`PRF_SERVER_SECRET`, `ADMIN_PUBKEYS`, or `NATIVE_POD_ADMIN_KEY` is absent.
+The relay-worker takes no `ADMIN_PUBKEYS` secret — its admin authority is the
+D1 `whitelist.is_admin` column. The search-worker's `ADMIN_PUBKEYS` is a
+plaintext `[vars]` value in `search-worker.wrangler.toml`.
+The [`set-worker-secrets.yml`](../../.github/workflows/set-worker-secrets.yml)
+workflow pushes the native-pod values in one shot.
 
 ---
 
@@ -240,7 +259,7 @@ errors instead of request-time 500s:
    manifests.
 2. The `workers-deploy.yml` "Validate required auth-worker secrets are set"
    step runs `wrangler secret list` before `wrangler deploy` and blocks the
-   deploy if `PRF_SERVER_SECRET` or `ADMIN_PUBKEYS` is absent. Deploy pipelines
+   deploy if `PRF_SERVER_SECRET`, `ADMIN_PUBKEYS`, or `NATIVE_POD_ADMIN_KEY` is absent. Deploy pipelines
    can also call `deploy_config::validate_required_secrets()` directly.
 
 ---
@@ -265,6 +284,8 @@ These require operator access to live infrastructure or to secret material and
 
 ## DNS Routes
 
+> **Planned end-state — not provisioned.** These branded routes do not exist in DNS (verified 2026-06-09); live traffic uses `https://<worker>.solitary-paper-764d.workers.dev`.
+
 | Subdomain | Worker Name | Protocol |
 |-----------|------------|----------|
 | `api.dreamlab-ai.com` | `dreamlab-auth-api` | HTTPS |
@@ -277,15 +298,12 @@ These require operator access to live infrastructure or to secret material and
 
 ## Cron Keep-Warm
 
-All Workers run a `*/5 * * * *` cron trigger to prevent cold starts:
+> **Not configured in this deployment.** The kit's default `wrangler.toml` files declare `*/5 * * * *` crons for the relay and search workers, but the DreamLab deploy replaces every `wrangler.toml` with `forum-config/deploy/*.wrangler.toml`, none of which declare `[triggers] crons`. No cron triggers are live; the table below describes the kit defaults only.
 
-| Worker | Cron Action |
+| Worker | Kit-default cron action |
 |--------|-------------|
-| auth-worker | Ping D1 (`SELECT 1`) |
-| pod-worker | No-op (trigger itself warms isolate) |
-| preview-worker | No-op (trigger itself warms isolate) |
-| relay-worker | Ping D1 (`SELECT 1`) |
-| search-worker | Load WASM store from R2 |
+| relay-worker | `*/5 * * * *` (D1 ping / sweep) |
+| search-worker | `*/5 * * * *` (warm store from R2) |
 
 ---
 

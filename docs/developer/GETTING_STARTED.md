@@ -69,7 +69,7 @@ cargo check --workspace --target wasm32-unknown-unknown
 The `Trunk.toml` is located in `crates/forum-client/` (not the workspace root) due to the trunk-rs#909 workaround.
 
 ```bash
-# From community-forum-rs/crates/forum-client/
+# From nostr-rust-forum/crates/nostr-bbs-forum-client/ (clone the kit; this repo only carries the forum-config overlay)
 trunk serve
 # Opens at http://localhost:8080, hot-reloads on .rs changes
 ```
@@ -80,11 +80,11 @@ trunk serve
 
 ```bash
 # Rust Workers (build first)
-cd community-forum-rs/crates/auth-worker && worker-build --dev && wrangler dev
-cd community-forum-rs/crates/pod-worker && worker-build --dev && wrangler dev
-cd community-forum-rs/crates/preview-worker && worker-build --dev && wrangler dev
-cd community-forum-rs/crates/relay-worker && worker-build --dev && wrangler dev
-cd community-forum-rs/crates/search-worker && worker-build --dev && wrangler dev
+cd nostr-rust-forum/crates/nostr-bbs-auth-worker && worker-build --dev && wrangler dev
+cd nostr-rust-forum/crates/nostr-bbs-pod-worker && worker-build --dev && wrangler dev
+cd nostr-rust-forum/crates/nostr-bbs-preview-worker && worker-build --dev && wrangler dev
+cd nostr-rust-forum/crates/nostr-bbs-relay-worker && worker-build --dev && wrangler dev
+cd nostr-rust-forum/crates/nostr-bbs-search-worker && worker-build --dev && wrangler dev
 ```
 
 Add `--persist` to `wrangler dev` to keep D1/KV data between restarts.
@@ -133,25 +133,26 @@ ADMIN_PUBKEYS = "<your-test-pubkey>"
 
 ## Project Structure
 
+The forum workspace lives upstream in the `nostr-rust-forum` kit (the legacy in-tree `community-forum-rs/` was deleted on 2026-03-12); this repo carries only the `forum-config/` operator overlay.
+
 ```mermaid
 graph TD
-    subgraph "community-forum-rs/"
+    subgraph "nostr-rust-forum/ (kit)"
         CARGO["Cargo.toml<br/>(workspace root)"]
 
         subgraph "crates/"
-            NC["nostr-core/<br/>event, keys, nip44, nip98,<br/>gift_wrap, types, wasm_bridge"]
-            FC["forum-client/<br/>app, auth, pages, components,<br/>admin, dm, relay, utils<br/><em>Trunk.toml is here</em>"]
-            AW["auth-worker/<br/>auth, webauthn, pod"]
-            PW["pod-worker/<br/>acl, auth"]
-            PV["preview-worker/<br/>lib (OG + oEmbed)"]
-            RW["relay-worker/<br/>relay_do, nip11,<br/>whitelist, auth"]
-            SW["search-worker/<br/>lib (RVF WASM, k-NN)"]
+            NC["nostr-bbs-core/<br/>event, keys, nip44, nip98,<br/>gift_wrap, calendar, groups"]
+            FC["nostr-bbs-forum-client/<br/>app, auth, pages, components,<br/>dm, relay, utils<br/><em>Trunk.toml is here</em>"]
+            AW["nostr-bbs-auth-worker/<br/>auth, webauthn, pod, admin,<br/>governance_api, invites"]
+            PW["nostr-bbs-pod-worker/<br/>acl, container, patch, quota,<br/>provision, payments, webid"]
+            PV["nostr-bbs-preview-worker/<br/>lib (OG + oEmbed, SSRF guard)"]
+            RW["nostr-bbs-relay-worker/<br/>relay_do, nip11, whitelist,<br/>trust, zone_config"]
+            SW["nostr-bbs-search-worker/<br/>lib, store (RVF), embed, auth"]
         end
 
         subgraph "tests/"
-            UT["unit/"]
-            IT["integration/"]
-            E2E["e2e/ (Playwright)"]
+            IT["tests/ (workspace integration)"]
+            E2E["e2e-forum-test.mjs / e2e-smoke-test.mjs"]
         end
     end
 

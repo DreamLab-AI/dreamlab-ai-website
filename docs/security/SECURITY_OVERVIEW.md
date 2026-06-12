@@ -137,44 +137,44 @@ The `getrandom` crate requires `features = ["js"]` in every crate's `Cargo.toml`
 
 ## Zone-Based Access Control
 
-The forum implements 4 access zones with cohort-based hierarchy. Zone enforcement happens at two layers: the relay (whitelist check before event storage) and the client (UI filtering based on user cohorts from the auth store).
+The forum implements 4 access zones, authored in `forum-config/dreamlab.toml` `[[zones]]` and enforced at two layers: the relay (`ZONE_CONFIG` cohort gates in `trust.rs::has_zone_access` / `has_zone_write_access`, deny-by-default) and the client (zone tiles from `window.__ENV__.ZONE_CONFIG`; locked zones render as visible-but-locked tiles).
 
 ```mermaid
 graph TB
-    subgraph "Zone 1: Public Lobby"
-        PL[Public Lobby Channels]
+    subgraph "Zone: public (MiniMooNoir landing)"
+        PL["Public channels<br/>read: everyone incl. unauthenticated"]
     end
 
-    subgraph "Zone 2: Cohort Channels"
-        CC[Cohort-Specific Channels]
+    subgraph "Zone: friends"
+        FR["Friends channels<br/>relay-ACL"]
     end
 
-    subgraph "Zone 3: Staff Lounge"
-        SL[Staff-Only Channels]
+    subgraph "Zone: family"
+        FA["Family channels<br/>NIP-44 encrypted"]
     end
 
-    subgraph "Zone 4: Admin Zone"
-        AZ[Admin-Only Channels]
+    subgraph "Zone: business (DreamLab)"
+        BU["Business channels<br/>relay-ACL"]
     end
 
-    USER_PUBLIC[Whitelisted User] --> PL
-    USER_COHORT[Cohort Member] --> PL
-    USER_COHORT --> CC
-    USER_STAFF[Staff Member] --> PL
-    USER_STAFF --> CC
-    USER_STAFF --> SL
+    ANON[Unauthenticated reader] --> PL
+    USER_FR[friends cohort] --> PL
+    USER_FR --> FR
+    USER_FA[family cohort] --> FA
+    USER_BU[business cohort] --> BU
+    USER_AG[agent cohort] -- write --> PL
     USER_ADMIN[Admin] --> PL
-    USER_ADMIN --> CC
-    USER_ADMIN --> SL
-    USER_ADMIN --> AZ
+    USER_ADMIN --> FR
+    USER_ADMIN --> FA
+    USER_ADMIN --> BU
 ```
 
 | Zone | Visibility | Write Access | Enforcement Layer |
 |------|-----------|-------------|-------------------|
-| Public Lobby | All whitelisted users | All whitelisted users | Relay whitelist + client filter |
-| Cohort Channels | Members of the cohort | Members of the cohort | Relay whitelist + client filter |
-| Staff Lounge | Staff + Admin | Staff + Admin | Relay whitelist + client filter |
-| Admin Zone | Admin only | Admin only | Relay whitelist + client filter |
+| public | Everyone (incl. unauthenticated) | `friends`, `agent`, admin | Relay `ZONE_CONFIG` write gate + client |
+| friends | `friends` cohort, admin | `friends`, admin | Relay `ZONE_CONFIG` + client locked tile |
+| family | `family` cohort, admin | `family`, admin | Relay `ZONE_CONFIG` + NIP-44 + client locked tile |
+| business | `business` cohort, admin | `business`, admin | Relay `ZONE_CONFIG` + client locked tile |
 
 ---
 
@@ -255,16 +255,18 @@ The preview-worker (link-preview) validates all target URLs before fetching:
 
 ## Admin Identity
 
-Admin status uses a **dynamic first-user-is-admin** model (since 2026-03-15). The first registrant gets `is_admin=1` in D1. No hardcoded `ADMIN_PUBKEYS` env var is required. The primary admin pubkey is:
+Admin status resolves as **static (`ADMIN_PUBKEYS`) ∪ D1** in the deployed kit (`nostr-bbs-auth-worker/src/admin.rs::is_admin`). The first-user-is-admin bootstrap remains for fresh D1 state (`GET /api/setup-status` reports `needsSetup` when no `is_admin=1` row exists), and `workers-deploy.yml` blocks the auth-worker deploy if the `ADMIN_PUBKEYS` secret is unset. The primary admin pubkey is:
 
 ```
 11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c
 ```
 
-Admin status is checked in two layers:
-1. **D1 path**: `is_admin` column on the whitelist table (primary)
-2. **Fallback**: `ADMIN_PUBKEYS` environment variable (legacy, optional)
-3. **Promotion**: `/api/whitelist/set-admin` endpoint for admin promotion/demotion
+Admin status is checked in three layers:
+1. **Static set**: `ADMIN_PUBKEYS` env (mirrors `dreamlab.toml [admin].static_pubkeys`; deploy-gated, checked first)
+2. **D1 path**: `whitelist.is_admin` (relay D1 via `RELAY_DB`), then `members.is_admin` (auth D1)
+3. **Promotion**: `/api/whitelist/set-admin` endpoint for admin promotion/demotion (last-admin demotion is blocked)
+
+Note: the search-worker honours only its own `ADMIN_PUBKEYS` `[vars]` value — D1-promoted admins are not visible to it (known gap; see the forum-flow cartography Gap 2).
 
 ---
 

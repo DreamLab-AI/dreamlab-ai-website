@@ -1,16 +1,24 @@
 # DreamLab Forum — Organisational Redesign
 
-> Status: **DESIGN — pending operator sign-off on the access matrix.**
+> Status: **IMPLEMENTED** (verified against the kit at the deployed pin `25ca8a1`, 2026-06-12).
+> Config-driven zones ship in `nostr-bbs-relay-worker/src/trust.rs::has_zone_access` /
+> `has_zone_write_access` (reads `ZONE_CONFIG`, deny-by-default), and the calendar tier
+> projection ships in `nostr-bbs-relay-worker/src/relay_do/calendar_projection.rs`, which
+> implements the §4 matrix verbatim (kinds 31922/31923/31925). The four zones are live in
+> `forum-config/dreamlab.toml` `[[zones]]` → relay `ZONE_CONFIG` → client `window.__ENV__`.
+> The external venue calendar mirror (§7) remains an open input.
 > Decisions locked (2026-06-10): privacy = **hybrid** (relay-ACL + NIP-44 for family & calendar detail);
 > calendar = **both** (native NIP-52 + external venue mirror); minimoonoir = **public face of the friends
 > forum**; business view of other sections = **visible but locked**.
 
 ## 1. The lever
 
-The kit already routes every section access decision through **one function** —
-`nostr-bbs-relay-worker/src/trust.rs::has_zone_access` — which today hardcodes
-`home / members / private`. Wiring it to `Zone.required_cohorts` from config makes
-arbitrary private sections pure data. The whole redesign lands in three existing
+The kit routes every section access decision through **one function** —
+`nostr-bbs-relay-worker/src/trust.rs::has_zone_access` — which originally hardcoded
+`home / members / private` and is now wired to `Zone.required_cohorts` from
+`ZONE_CONFIG` (delivered; write access goes through the sibling
+`has_zone_write_access` with `write_cohorts ?? required_cohorts`). Arbitrary private
+sections are pure data. The whole redesign lands in three existing
 crates (`nostr-bbs-relay-worker`, `nostr-bbs-config`, `nostr-bbs-core`) + config +
 the Leptos client. **No new crates.**
 
@@ -83,23 +91,32 @@ graph TD
 
 ### 5.2 Read path — relay REQ zone + calendar-tier projection (the debug seam)
 
+As built, calendar kinds (31922/31923/31925) bypass the zone read-gate entirely:
+`calendar_projection.rs` is the **complete** access decision for those kinds (a
+gate-then-project ordering was probed live and omitted cross-zone free/busy
+blocks, so the projector answers the whole question per viewer/event pair).
+
 ```mermaid
 sequenceDiagram
   participant C as Client (Leptos)
   participant R as relay-worker
   participant T as trust.rs::has_zone_access
-  participant K as calendar tier projector
+  participant K as calendar_projection.rs
   C->>R: REQ {kinds:[40,42,31922,31923], #zone}
   R->>R: resolve session_pubkey (NIP-42 AUTH)
-  R->>T: zone(channel) ∩ cohorts(pubkey)?
-  alt member or admin
-    T-->>R: allow
-    R->>K: if kind∈{31922,31923}: project by viewer tier
-    K-->>R: full detail | free/busy redacted | drop
+  alt kind ∈ {31922,31923,31925} (calendar)
+    R->>K: project per (viewer, event): full | free/busy | omit
+    K-->>R: projected events (deny-by-default for unknown zones)
     R-->>C: events
-  else non-member
-    T-->>R: deny
-    R-->>C: (kind-40 def → locked-tile stub; kind-42/cal → omitted)
+  else channel kinds (40/42)
+    R->>T: zone(channel) ∩ cohorts(pubkey)?
+    alt member or admin
+      T-->>R: allow
+      R-->>C: events
+    else non-member
+      T-->>R: deny
+      R-->>C: (kind-40 def → locked-tile stub, kind-42 → omitted)
+    end
   end
 ```
 

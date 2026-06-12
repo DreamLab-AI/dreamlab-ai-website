@@ -1,5 +1,7 @@
 # QE Coverage Report: community-forum-rs Workspace
 
+> **Audit snapshot.** Findings reflect the audit date; verify against current code before acting.
+
 [Back to Documentation Index](../README.md)
 
 **Generated:** 2026-03-08

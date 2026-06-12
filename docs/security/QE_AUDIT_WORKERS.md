@@ -1,5 +1,7 @@
 # QE Audit: DreamLab Cloudflare Workers (Rust/WASM)
 
+> **Audit snapshot.** Findings reflect the audit date; verify against current code before acting.
+
 > **Note (2026-03-12):** This audit was conducted on 2026-03-08. Since then, all 5 workers have been migrated to Rust (relay-worker and search-worker were ported after this audit). The SvelteKit forum has been replaced by Leptos (Rust/WASM). Architecture diagrams below showing "SvelteKit" should read "Leptos WASM Client". File paths referencing `workers/` are now at `community-forum-rs/crates/`.
 
 [Back to Documentation Index](../README.md)
@@ -116,6 +118,8 @@ The query should be `WHERE challenge = ?1 AND created_at > ?2`, matching the cha
 **Impact**: Any valid, non-expired challenge satisfies registration, enabling parallel-session challenge reuse.
 
 **Recommendation**: Extract the challenge from `clientDataJSON` in the registration response and use it as the D1 lookup key, exactly as `login_verify` does (lines 554-563).
+
+> **Resolved upstream:** the deployed kit (`nostr-rust-forum@25ca8a1`, commit `dcd6bed` 2026-06-09) looks up `WHERE challenge = ?1 AND created_at > ?2 AND pubkey = ?3` and additionally bucket-binds the challenge (registration rows store `pubkey = challenge`; login accepts the claimed pubkey or the `__discoverable__` sentinel) — `nostr-bbs-auth-worker/src/webauthn.rs:893-905, 1253-1268`.
 
 #### CRITICAL-002: WebAuthn Assertion Not Cryptographically Verified
 

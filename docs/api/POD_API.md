@@ -21,7 +21,7 @@
 
 Per-user Solid pod storage backed by Cloudflare R2 with Web Access Control (WAC). All write operations require NIP-98 authentication. Rust Worker using `worker` 0.7.5.
 
-**Base URL:** `https://pods.dreamlab-ai.com`
+**Base URL:** `https://dreamlab-pod-api.solitary-paper-764d.workers.dev` (live; matches the deployed `POD_BASE_URL` var). The branded `https://pods.dreamlab-ai.com` is the documented end-state but is not provisioned in DNS.
 
 ---
 
@@ -71,12 +71,12 @@ Delete a resource. Requires NIP-98 header with `Write` access per WAC.
 
 ## WAC Access Control
 
-Web Access Control (WAC) governs all pod operations. Each pod has an ACL stored in KV at `acl:{pubkey}` in JSON-LD format. When no ACL document exists, access is denied by default (secure by default).
+Web Access Control (WAC) governs all pod operations. ACL resolution (`find_effective_acl`, kit `nostr-bbs-pod-worker/src/acl.rs`) checks a pod-level ACL in KV (`acl:{pubkey}`) as the fast path, then walks `.acl` sidecar documents in R2: the resource's own sidecar first, then each enclosing container sidecar (ancestor ACLs apply only their `acl:default` rules per WAC §4.2). When no ACL document is found at any level, access is denied (secure by default).
 
 ```mermaid
 flowchart TD
     REQ[Incoming Request<br/>GET/PUT/DELETE /pods/pubkey/path] --> EXTRACT[Extract pubkey + path<br/>from URL]
-    EXTRACT --> LOAD_ACL[Load ACL from KV<br/>key: acl:pubkey]
+    EXTRACT --> LOAD_ACL["Resolve effective ACL:<br/>KV acl:pubkey fast path,<br/>then R2 .acl sidecar walk-up"]
     LOAD_ACL --> ACL_EXISTS{ACL exists?}
     ACL_EXISTS -- No --> DENY[403 Forbidden<br/>Secure default]
     ACL_EXISTS -- Yes --> MAP_METHOD[Map HTTP method<br/>to access mode]
@@ -179,7 +179,7 @@ Content-Type: image/webp
 
 The uploaded file is publicly readable at:
 ```
-https://pods.dreamlab-ai.com/11ed6422.../media/public/avatar.webp
+https://dreamlab-pod-api.solitary-paper-764d.workers.dev/pods/11ed6422.../media/public/avatar.webp
 ```
 
 This works because the default ACL grants `foaf:Agent` (anyone) Read access on `./media/public/`.
@@ -192,9 +192,13 @@ This works because the default ACL grants `foaf:Agent` (anyone) Read access on `
 |---------|------|---------|
 | `PODS` | R2Bucket | `dreamlab-pods` -- all pod storage |
 | `POD_META` | KVNamespace | ACL documents + pod metadata |
-| `EXPECTED_ORIGIN` | Secret | `https://dreamlab-ai.com` (browser CORS origin) |
-| `POD_BASE_URL` | Var | `https://pods.dreamlab-ai.com` (public WebID/pod URI origin) |
-| `ADMIN_PUBKEYS` | Secret | Comma-separated admin hex pubkeys |
+| `ADMIN_KV_RO` | KVNamespace | Read-only view of admin flags (auth-worker is the write authority) |
+| `REPLAY_DB` | D1Database | `dreamlab-auth` -- shared NIP-98 replay table + payment/quota tables |
+| `EXPECTED_ORIGIN` | [vars] | `https://dreamlab-ai.com` (browser CORS origin) |
+| `POD_BASE_URL` | [vars] | `https://dreamlab-pod-api.solitary-paper-764d.workers.dev` (public WebID/pod URI origin) |
+| `PAY_ENABLED` / `PAY_COST_SATS` / `PAY_TOKEN_*` | [vars] | Micropayment / quota configuration |
+
+Source: `forum-config/deploy/pod-worker.wrangler.toml`.
 
 ---
 

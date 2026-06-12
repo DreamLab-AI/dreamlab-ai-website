@@ -1,5 +1,7 @@
 # QE Audit — Human-Agent Collaboration Forum (cross-repo mesh)
 
+> **Audit snapshot.** Findings reflect the audit date; verify against current code before acting.
+
 **Date:** 2026-06-07
 **Method:** ruflo-coordinated mesh (`swarm_1780864092696`, topology=mesh) of 6 Opus
 audit agents (auth, workers, solid-pod, protocol, consumer, runtime), diagram-based

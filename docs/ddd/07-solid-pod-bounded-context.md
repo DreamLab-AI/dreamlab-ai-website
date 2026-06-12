@@ -4,9 +4,11 @@
 
 This document defines the bounded context for the Solid Pod Storage domain within the DreamLab community platform. It describes the upgrade path from the current minimal R2+KV storage layer to full Solid Protocol compliance, including aggregates, domain services, domain events, value objects, the anti-corruption layer, and the target module structure.
 
-## Current State
+> **Status (2026-06-12):** the upgrade described here is **delivered** in the kit (`nostr-rust-forum/crates/nostr-bbs-pod-worker/`, ~7,500 LOC). The target modules ship in a flat layout (`acl.rs`, `conditional.rs`, `container.rs`, `patch.rs`, `provision.rs`, `quota.rs`, `webid.rs`, `storage/`, plus modules this design predates: `payments.rs`, `git.rs`, `notifications.rs`, `content_negotiation.rs`, `nip05_endpoint.rs`, `remote_storage.rs`) rather than the `acl/` / `ldp/` subdirectory tree diagrammed below. The "Current State" section below describes the pre-upgrade legacy `community-forum-rs` tree and is retained as historical context.
 
-The `pod-worker` crate (`community-forum-rs/crates/pod-worker/`) is 898 LOC across 3 files:
+## Current State (historical — pre-kit)
+
+The legacy `pod-worker` crate (`community-forum-rs/crates/pod-worker/`, superseded by the kit) was 898 LOC across 3 files:
 
 | File | LOC | Responsibility |
 |------|-----|----------------|

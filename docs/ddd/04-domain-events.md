@@ -19,7 +19,7 @@ Every Nostr event has a `kind` that determines its semantics. The DreamLab forum
 | 14 | DirectMessage | NIP-17 | Encrypted direct message content |
 | 1059 | GiftWrap | NIP-59 | Gift wrap envelope, hides sender metadata |
 | 9021 | JoinRequest | Custom | Join request for a gated channel |
-| 9024 | Thread | Custom | Thread / long-form post |
+| 9024 | RegistrationRequest | Custom | Registration request (whitelist-exempt, like kind 0) |
 | 40 | ChannelCreation | NIP-28 | Channel creation |
 | 41 | ChannelMetadata | NIP-28 | Channel metadata update |
 | 42 | ChannelMessage | NIP-28 | Channel message |
@@ -27,8 +27,8 @@ Every Nostr event has a `kind` that determines its semantics. The DreamLab forum
 | 44 | ChannelMuteUser | NIP-28 | Channel mute user |
 | 10002 | RelayList | NIP-65 | Relay list metadata |
 | 27235 | HttpAuth | NIP-98 | HTTP authentication token |
-| 31922 | CalendarEvent | NIP-52 | Time-based calendar event |
-| 31923 | CalendarDateEvent | NIP-52 | Date-based calendar event |
+| 31922 | CalendarDateEvent | NIP-52 | Date-based calendar event |
+| 31923 | CalendarTimeEvent | NIP-52 | Time-based calendar event |
 | 30910-30916 | Moderation | Custom | Ban, Mute, Warning, Report, ModerationAction, Unban, Unmute |
 | 31400 | AgentControlPanel | Custom | Agent publishes interactive governance control panel |
 | 31401 | AgentStatusUpdate | Custom | Agent status/telemetry update for governance panel |
@@ -51,7 +51,7 @@ pub enum EventKind {
     DirectMessage         = 14,
     GiftWrap              = 1059,
     JoinRequest           = 9021,
-    Thread                = 9024,
+    RegistrationRequest   = 9024,
     ChannelCreation       = 40,
     ChannelMetadata       = 41,
     ChannelMessage        = 42,
@@ -66,8 +66,8 @@ pub enum EventKind {
     HumanActionResponse   = 31403,
     GovernancePolicy      = 31404,
     GovernanceAuditLog    = 31405,
-    CalendarEvent         = 31922,
-    CalendarDateEvent     = 31923,
+    CalendarDateEvent     = 31922,
+    CalendarTimeEvent     = 31923,
     GroupMetadata         = 39000,
     GroupMembers          = 39002,
 }

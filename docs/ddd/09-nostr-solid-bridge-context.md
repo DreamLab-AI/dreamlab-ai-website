@@ -4,6 +4,8 @@
 
 This document defines the Nostr-Solid Bridge bounded context for the DreamLab community platform. It manages the translation, synchronisation, and conformance layer between the Nostr event graph and the Solid Linked Data world. Responsibilities include bidirectional identity resolution (`did:nostr:` ↔ WebID), kind-0 event projection to RDF WebID profiles, JSON-LD context compilation, Solid notification channels, the `WebIdTagVerifier` NIP-98 extension, and the long-term WAC-to-ACP migration path. This context lives primarily in `pod-worker`, with DID document serving shared with `agent-worker`.
 
+> **Status (2026-06-12):** partially delivered. The kit's `nostr-bbs-pod-worker` ships the identity/JSON-LD/notification pieces in a flat layout (`did.rs`, `webid.rs`, `nip05_endpoint.rs`, `contexts.rs`, `notifications.rs`, TypeIndex provisioning in `provision.rs`) rather than the `bridge/` / `jsonld/` / `notifications/` / `auth_bridge/` module tree diagrammed below. The `WebIdTagVerifier` NIP-98 extension and the WAC→ACP translator are **aspirational — not implemented**, and `agent-worker` does not exist (see [08-agent-identity-messaging-context.md](08-agent-identity-messaging-context.md)).
+
 ## Context Overview
 
 ```mermaid

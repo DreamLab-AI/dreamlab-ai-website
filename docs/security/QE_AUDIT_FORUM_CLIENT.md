@@ -1,5 +1,7 @@
 # QE Audit: DreamLab Forum Client (Leptos WASM)
 
+> **Audit snapshot.** Findings reflect the audit date; verify against current code before acting.
+
 [Back to Documentation Index](../README.md)
 
 > **Note:** Citations reference a developer-local snapshot (`project2/community-forum-rs`); line numbers are not reproducible against the current upstream kit — retained as historical audit evidence.
@@ -468,7 +470,7 @@ graph TD
 ```mermaid
 flowchart LR
     subgraph AuthModule["Auth Module"]
-        AuthStore["AuthStore<br/>RwSignal&lt;AuthState&gt;<br/>StoredValue&lt;privkey&gt;"]
+        AuthStore["AuthStore<br/>RwSignal#lt;AuthState#gt;<br/>StoredValue#lt;privkey#gt;"]
         Passkey["passkey.rs<br/>WebAuthn PRF"]
         NIP98["nip98.rs<br/>Token creation"]
         Session["session.rs<br/>localStorage"]
@@ -477,11 +479,11 @@ flowchart LR
     end
 
     subgraph RelayModule["Relay Module"]
-        RelayConn["RelayConnection<br/>Rc&lt;RefCell&lt;RelayInner&gt;&gt;<br/>RwSignal&lt;ConnectionState&gt;"]
+        RelayConn["RelayConnection<br/>Rc#lt;RefCell#lt;RelayInner#gt;#gt;<br/>RwSignal#lt;ConnectionState#gt;"]
     end
 
     subgraph DMModule["DM Module"]
-        DMStore["DMStore<br/>RwSignal&lt;DMStateInner&gt;"]
+        DMStore["DMStore<br/>RwSignal#lt;DMStateInner#gt;"]
     end
 
     subgraph AdminModule["Admin Module"]
@@ -554,9 +556,9 @@ sequenceDiagram
 
 ```mermaid
 graph TD
-    AS["RwSignal&lt;AuthState&gt;"]
-    PK["StoredValue&lt;privkey&gt;"]
-    CS["RwSignal&lt;ConnectionState&gt;"]
+    AS["RwSignal#lt;AuthState#gt;"]
+    PK["StoredValue#lt;privkey#gt;"]
+    CS["RwSignal#lt;ConnectionState#gt;"]
 
     AS -->|"Memo"| IsAuth["is_authenticated()"]
     AS -->|"Memo"| IsReady["is_ready()"]

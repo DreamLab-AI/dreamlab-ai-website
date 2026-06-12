@@ -90,7 +90,7 @@ graph TD
     subgraph "Library Crates (nostr-core)"
         TE["thiserror<br/>#[derive(Error)]"]
         TE --> TYPED["Typed errors<br/>(Nip44Error, KeyError, etc.)"]
-        TYPED --> RES["Result&lt;T, SpecificError&gt;"]
+        TYPED --> RES["Result#lt;T, SpecificError#gt;"]
     end
 
     subgraph "Worker Crates"
