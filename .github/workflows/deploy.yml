@@ -17,6 +17,7 @@ on:
       - 'index.html'
       - 'package.json'
       - 'vite.config.*'
+      - '.github/workflows/deploy.yml'
   workflow_dispatch:
 
 concurrency:
@@ -53,7 +54,7 @@ env:
   # Do NOT float on `main`: a breaking upstream push would silently ship untested
   # worker/WASM code while the lockfile stays at this tested revision. Keep this SHA
   # in sync with the `rev = "..."` in forum-config/Cargo.lock when bumping the kit.
-  KIT_REF: 'f43d970ec859b6a097e4e1debef8c9e3012b8636'
+  KIT_REF: '5d4ed215a6306d645057b415b4e413645dbb98d7'
 
 jobs:
   gate:
@@ -186,7 +187,7 @@ jobs:
 
       - name: Inject runtime env config into forum
         run: |
-          ENV_SCRIPT='<script>window.__ENV__={VITE_RELAY_URL:"'"$VITE_RELAY_URL"'",VITE_AUTH_API_URL:"'"$VITE_AUTH_API_URL"'",VITE_POD_API_URL:"'"$VITE_POD_API_URL"'",VITE_SEARCH_API_URL:"'"$VITE_SEARCH_API_URL"'",VITE_LINK_PREVIEW_API_URL:"'"$VITE_LINK_PREVIEW_API_URL"'",ZONE_CONFIG:'"$ZONE_CONFIG_JSON"'};</script>'
+          ENV_SCRIPT='<script>window.__ENV__={FORUM_NAME:"Minimoonoir Forums",VITE_RELAY_URL:"'"$VITE_RELAY_URL"'",VITE_AUTH_API_URL:"'"$VITE_AUTH_API_URL"'",VITE_POD_API_URL:"'"$VITE_POD_API_URL"'",VITE_SEARCH_API_URL:"'"$VITE_SEARCH_API_URL"'",VITE_LINK_PREVIEW_API_URL:"'"$VITE_LINK_PREVIEW_API_URL"'",ZONE_CONFIG:'"$ZONE_CONFIG_JSON"'};</script>'
           sed -i "s|</head>|${ENV_SCRIPT}</head>|" dist/community/index.html
           echo "Injected window.__ENV__ into forum index.html"
 
