@@ -155,11 +155,15 @@ jobs:
           # Bakes the real RP domain into NIP-05 handles (was hardcoded
           # "example.test"). Used by signup.rs, onboarding_modal.rs, profile_cache.rs.
           NOSTR_BBS_NIP05_DOMAIN: 'dreamlab-ai.com'
-          # signup.rs reads these via option_env! at build time (its fallbacks
-          # were pod.example.com / auth.example.com). Relay/search are runtime
-          # via window.__ENV__, so they are not needed here.
+          # signup.rs / the search client read these via option_env! at build
+          # time (fallbacks were *.example.com / a dead members-search-api host).
+          # The RELAY url is sourced at runtime from window.__ENV__, but the
+          # search client (global_search.rs, search_client.rs) and the auth/pod
+          # bases are compile-time option_env! — they MUST be passed here or the
+          # WASM bakes the dead fallback and search silently fails.
           VITE_AUTH_API_URL: ${{ env.VITE_AUTH_API_URL }}
           VITE_POD_API_URL: ${{ env.VITE_POD_API_URL }}
+          VITE_SEARCH_API_URL: ${{ env.VITE_SEARCH_API_URL }}
 
       - name: Report forum WASM bundle size
         run: |
