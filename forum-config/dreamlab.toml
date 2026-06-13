@@ -64,7 +64,7 @@ a private space for trainers, builders, and the curious.\
 id                = "public"
 display_name      = "Landing"
 required_cohorts  = []
-write_cohorts     = ["friends", "agent"]
+write_cohorts     = ["members", "friends", "agent"]
 visibility        = "public"
 banner_image_url  = "/images/heroes/lake-district-dawn.webp"
 encrypted         = false

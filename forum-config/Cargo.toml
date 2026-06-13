@@ -13,23 +13,26 @@ publish = false
 path = "src/lib.rs"
 
 [dependencies]
-# Kit crates from nostr-rust-forum @ 00b6f19 (1.0.0-beta.2 line, ADR-098 /connect).
+# Kit crates from nostr-rust-forum @ 489c86c (1.0.0-beta.2 line, ADR-098 /connect).
 # Carries the forum-flow-cartography fixes (static ADMIN_PUBKEYS admin resolution,
 # unified admin source across workers, fail-closed CORS, truthful NIP-11
 # write-policy), the ADR-098 /connect magic-link onboarding, the solid-pod-rs 0.5
 # session batch, NIP-07 async signing for topic-create + governance responses,
-# and the simplified signup (display name + optional admin-only real name only;
-# the federated @-handle is opt-in later from Settings). Keep this rev in sync
-# with KIT_REF in .github/workflows/{deploy,workers-deploy,rust-ci}.yml.
+# the simplified signup (display name + optional admin-only real name only),
+# the relay WebSocket teardown fix (no more "closure invoked after being dropped"
+# + reconnect storm), publish-time @handle -> ["p", pubkey] resolution so typed
+# agent mentions (@junkiejarvis) route, and the NIP-07 session-restore signer fix
+# (admin Users tab + authed fetches work after reload). Keep this rev in sync with
+# KIT_REF in .github/workflows/{deploy,workers-deploy,rust-ci}.yml.
 # Cargo's bare "*" requirement (the default for a versionless git dep) refuses to
 # match a prerelease, so the kit's 1.0.0-beta.2 crates must be requested with an
 # explicit prerelease version alongside the git rev (cargo: "if you are looking
 # for the prerelease package it needs to be specified explicitly"). Keep this
 # version in lockstep with the crate version at `rev` when bumping the kit.
-nostr-bbs-core = { version = "1.0.0-beta.2", git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "00b6f19", package = "nostr-bbs-core" }
-nostr-bbs-config = { version = "1.0.0-beta.2", git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "00b6f19", package = "nostr-bbs-config" }
-nostr-bbs-mesh = { version = "1.0.0-beta.2", git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "00b6f19", package = "nostr-bbs-mesh" }
-nostr-bbs-rate-limit = { version = "1.0.0-beta.2", git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "00b6f19", package = "nostr-bbs-rate-limit" }
+nostr-bbs-core = { version = "1.0.0-beta.2", git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "489c86c", package = "nostr-bbs-core" }
+nostr-bbs-config = { version = "1.0.0-beta.2", git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "489c86c", package = "nostr-bbs-config" }
+nostr-bbs-mesh = { version = "1.0.0-beta.2", git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "489c86c", package = "nostr-bbs-mesh" }
+nostr-bbs-rate-limit = { version = "1.0.0-beta.2", git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "489c86c", package = "nostr-bbs-rate-limit" }
 
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"

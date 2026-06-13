@@ -46,14 +46,14 @@ env:
   VITE_LINK_PREVIEW_API_URL: 'https://dreamlab-link-preview.solitary-paper-764d.workers.dev'
   # Zone (section) model for the forum client. Mirrors forum-config/dreamlab.toml
   # [[zones]] and the relay's ZONE_CONFIG [vars]. Injected into window.__ENV__ below.
-  ZONE_CONFIG_JSON: '[{"id":"public","display_name":"Landing","required_cohorts":[],"write_cohorts":["friends","agent"],"banner_image_url":"/images/heroes/lake-district-dawn.webp","visibility":"public","encrypted":false},{"id":"friends","display_name":"Friends","required_cohorts":["friends"],"banner_image_url":"/images/heroes/minimoonoir-hero.webp","visibility":"locked","encrypted":false},{"id":"family","display_name":"Family","required_cohorts":["family"],"banner_image_url":"/images/heroes/family-hero.webp","visibility":"locked","encrypted":true},{"id":"business","display_name":"DreamLab","required_cohorts":["business"],"banner_image_url":"/images/heroes/business-hero.webp","visibility":"locked","encrypted":false}]'
+  ZONE_CONFIG_JSON: '[{"id":"public","display_name":"Landing","required_cohorts":[],"write_cohorts":["members","friends","agent"],"banner_image_url":"/images/heroes/lake-district-dawn.webp","visibility":"public","encrypted":false},{"id":"friends","display_name":"Friends","required_cohorts":["friends"],"banner_image_url":"/images/heroes/minimoonoir-hero.webp","visibility":"locked","encrypted":false},{"id":"family","display_name":"Family","required_cohorts":["family"],"banner_image_url":"/images/heroes/family-hero.webp","visibility":"locked","encrypted":true},{"id":"business","display_name":"DreamLab","required_cohorts":["business"],"banner_image_url":"/images/heroes/business-hero.webp","visibility":"locked","encrypted":false}]'
   FORUM_BASE: '/community'
   KIT_REPO: 'https://github.com/DreamLab-AI/nostr-rust-forum.git'
   # Pinned to the exact commit resolved in forum-config/Cargo.lock (nostr-bbs-* rc11).
   # Do NOT float on `main`: a breaking upstream push would silently ship untested
   # worker/WASM code while the lockfile stays at this tested revision. Keep this SHA
   # in sync with the `rev = "..."` in forum-config/Cargo.lock when bumping the kit.
-  KIT_REF: '00b6f19c4037cb1445c32cf213cdf895fd038461'
+  KIT_REF: '489c86c4115e836dcdd2d5c4b3844f3fe6b9d148'
 
 jobs:
   gate:
