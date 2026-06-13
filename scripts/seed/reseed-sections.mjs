@@ -74,11 +74,11 @@ const SECTIONS = [
   // public / Landing
   { zone: 'public', slug: 'public-support',          name: 'Support',          about: 'Help, questions, and support' },
   { zone: 'public', slug: 'public-introductions',    name: 'Introductions',    about: 'Say hello — who you are and what you make' },
-  // friends
-  { zone: 'friends', slug: 'friends-rants',           name: 'Rants',            about: 'Vent, debate, and hot takes' },
-  { zone: 'friends', slug: 'friends-photos',          name: 'Photos',           about: 'Share photos and moments' },
-  { zone: 'friends', slug: 'friends-music',           name: 'Music',            about: 'Records, gigs, and recommendations' },
-  { zone: 'friends', slug: 'friends-fairfield-events', name: 'Fairfield Events', about: 'Events and nights out at Fairfield' },
+  // minimoonoir (social zone — formerly 'friends'; zone id renamed, cohort 'friends' kept)
+  { zone: 'minimoonoir', slug: 'minimoonoir-rants',           name: 'Rants',            about: 'Vent, debate, and hot takes' },
+  { zone: 'minimoonoir', slug: 'minimoonoir-photos',          name: 'Photos',           about: 'Share photos and moments' },
+  { zone: 'minimoonoir', slug: 'minimoonoir-music',           name: 'Music',            about: 'Records, gigs, and recommendations' },
+  { zone: 'minimoonoir', slug: 'minimoonoir-fairfield-events', name: 'Fairfield Events', about: 'Events and nights out at Fairfield' },
   // family
   { zone: 'family', slug: 'family-chat',              name: 'Family Chat',      about: 'Family catch-up and chat' },
   { zone: 'family', slug: 'family-fairfield-events',  name: 'Fairfield Events', about: 'Family events at Fairfield' },

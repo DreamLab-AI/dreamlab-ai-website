@@ -70,8 +70,8 @@ banner_image_url  = "/images/heroes/lake-district-dawn.webp"
 encrypted         = false
 
 [[zones]]
-id                = "friends"
-display_name      = "Friends"
+id                = "minimoonoir"
+display_name      = "Minimoonoir"
 required_cohorts  = ["friends"]
 visibility        = "locked"
 banner_image_url  = "/images/heroes/minimoonoir-hero.webp"
