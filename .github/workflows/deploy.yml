@@ -54,7 +54,7 @@ env:
   # Do NOT float on `main`: a breaking upstream push would silently ship untested
   # worker/WASM code while the lockfile stays at this tested revision. Keep this SHA
   # in sync with the `rev = "..."` in forum-config/Cargo.lock when bumping the kit.
-  KIT_REF: 'a484f6899470f4c24b0483ccae5050b142f2b696'
+  KIT_REF: 'f251b148fac79341a4daa9ce915c07f04cc7b332'
 
 jobs:
   gate:
@@ -195,6 +195,13 @@ jobs:
           ENV_SCRIPT='<script>window.__ENV__={FORUM_NAME:"Minimoonoir Forums",VITE_RELAY_URL:"'"$VITE_RELAY_URL"'",VITE_AUTH_API_URL:"'"$VITE_AUTH_API_URL"'",VITE_POD_API_URL:"'"$VITE_POD_API_URL"'",VITE_SEARCH_API_URL:"'"$VITE_SEARCH_API_URL"'",VITE_LINK_PREVIEW_API_URL:"'"$VITE_LINK_PREVIEW_API_URL"'",BUILD_VERSION:"'"$BUILD_VERSION"'",BUILD_HASH:"'"$BUILD_HASH"'",ZONE_CONFIG:'"$ZONE_CONFIG_JSON"'};</script>'
           sed -i "s|</head>|${ENV_SCRIPT}</head>|" dist/community/index.html
           echo "Injected window.__ENV__ into forum index.html (build $BUILD_VERSION $BUILD_HASH)"
+          # Per-deploy service-worker cache name so a new build evicts the old
+          # cache on activate (the SW already network-firsts the HTML; this just
+          # isolates static-asset caches per build). No-op if the token is absent.
+          if [ -f dist/community/sw.js ]; then
+            sed -i "s/__SW_BUILD__/${BUILD_HASH}/g" dist/community/sw.js
+            echo "Stamped sw.js cache version: ${BUILD_HASH}"
+          fi
 
       # Operator rebrand (kept out of the shared kit). The forum is presented as
       # "Minimoonoir Forums" (encapsulating Minimoonoir / Family / DreamLab). The
