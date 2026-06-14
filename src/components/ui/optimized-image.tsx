@@ -8,6 +8,10 @@ import React, {
   type ImgHTMLAttributes,
 } from "react";
 import { cn } from "@/lib/utils";
+import {
+  generateResponsiveSrcSet,
+  generateSizes,
+} from "@/lib/image-utils";
 
 /**
  * Image loading states for progressive loading
@@ -106,41 +110,11 @@ const generateBlurDataUrl = (width: number, height: number): string => {
   return `data:image/svg+xml;base64,${btoa(svg.trim())}`;
 };
 
-/**
- * Generates responsive srcset from base URL
- */
-export const generateSrcSet = (
-  src: string,
-  widths: number[] = [320, 640, 768, 1024, 1280, 1536]
-): string => {
-  const extension = src.split(".").pop()?.toLowerCase();
-  const basePath = src.substring(0, src.lastIndexOf("."));
-
-  return widths
-    .map((w) => `${basePath}-${w}w.${extension} ${w}w`)
-    .join(", ");
-};
-
-/**
- * Generates sizes attribute for responsive images
- */
-export const generateSizes = (
-  breakpoints: Record<string, string> = {
-    "(max-width: 640px)": "100vw",
-    "(max-width: 768px)": "90vw",
-    "(max-width: 1024px)": "80vw",
-    default: "70vw",
-  }
-): string => {
-  const entries = Object.entries(breakpoints);
-  const defaultSize = breakpoints.default || "100vw";
-  const mediaQueries = entries
-    .filter(([key]) => key !== "default")
-    .map(([query, size]) => `${query} ${size}`)
-    .join(", ");
-
-  return mediaQueries ? `${mediaQueries}, ${defaultSize}` : defaultSize;
-};
+// Responsive srcset/sizes helpers live in @/lib/image-utils (single source of
+// truth). Re-export the canonical implementations here for backwards-compatible
+// imports of `generateSrcSet`/`generateSizes` from this module.
+export { generateSizes };
+export { generateResponsiveSrcSet as generateSrcSet };
 
 /**
  * OptimizedImage component with lazy loading, WebP detection, and progressive loading

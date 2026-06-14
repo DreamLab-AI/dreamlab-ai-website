@@ -20,8 +20,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { requestDataErasure, type ErasureReport } from "@/lib/gdpr-erasure";
-
-const EMAIL_REGEX = /^\S+@\S+\.\S+$/;
+import { EMAIL_REGEX } from "@/lib/utils";
 
 export function DataErasureRequest() {
   const [email, setEmail] = useState("");

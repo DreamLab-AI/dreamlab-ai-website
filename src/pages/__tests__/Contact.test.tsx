@@ -2,16 +2,18 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { BrowserRouter } from "react-router-dom";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // --- Mocks (must be set up before importing Contact) ---
 // vi.mock factories are hoisted above all imports, so locals referenced
 // inside them must be created via vi.hoisted to be hoisted alongside.
-const { insertMock, upsertMock, toastMock } = vi.hoisted(() => ({
-  insertMock: vi.fn(),
-  upsertMock: vi.fn(),
-  toastMock: vi.fn(),
-}));
+const { insertMock, upsertMock, toastSuccessMock, toastErrorMock } = vi.hoisted(
+  () => ({
+    insertMock: vi.fn(),
+    upsertMock: vi.fn(),
+    toastSuccessMock: vi.fn(),
+    toastErrorMock: vi.fn(),
+  })
+);
 
 vi.mock("@/lib/supabase", () => ({
   supabase: {
@@ -39,10 +41,12 @@ vi.mock("@/lib/og-meta", () => ({
   updateOGMetaTags: () => undefined,
 }));
 
-// Toast hook: capture toast invocations.
-vi.mock("@/components/ui/use-toast", () => ({
-  useToast: () => ({ toast: toastMock }),
-  toast: toastMock,
+// Toast: Contact uses sonner's `toast`. Capture success/error invocations.
+vi.mock("sonner", () => ({
+  toast: {
+    success: toastSuccessMock,
+    error: toastErrorMock,
+  },
 }));
 
 // Header pulls in lots of route plumbing; replace with a stub.
@@ -57,15 +61,10 @@ import Contact from "../Contact";
 const ue = userEvent.default ?? userEvent;
 
 const renderContact = () => {
-  const client = new QueryClient({
-    defaultOptions: { queries: { retry: false } },
-  });
   return render(
-    <QueryClientProvider client={client}>
-      <BrowserRouter>
-        <Contact />
-      </BrowserRouter>
-    </QueryClientProvider>
+    <BrowserRouter>
+      <Contact />
+    </BrowserRouter>
   );
 };
 
@@ -73,7 +72,8 @@ describe("Contact page", () => {
   beforeEach(() => {
     insertMock.mockReset();
     upsertMock.mockReset();
-    toastMock.mockReset();
+    toastSuccessMock.mockReset();
+    toastErrorMock.mockReset();
     insertMock.mockResolvedValue({ error: null });
     upsertMock.mockResolvedValue({ error: null });
   });
