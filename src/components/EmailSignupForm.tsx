@@ -5,13 +5,13 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { Checkbox } from "@/components/ui/checkbox";
+import { EMAIL_REGEX } from "@/lib/utils";
 
 // --- Constants ---
 const SUCCESS_MESSAGE = "Thanks for signing up! We'll be in touch soon.";
 const ERROR_MESSAGE_INVALID_EMAIL = "Please enter a valid email address";
 const ERROR_MESSAGE_CONSENT = "Please accept our privacy policy to sign up";
 const ERROR_MESSAGE_SUBMISSION = "Failed to sign up. Please try again later.";
-const EMAIL_REGEX = /^\S+@\S+\.\S+$/; // Basic email format regex
 const SUBMITTING_TEXT = "Submitting...";
 const SUBMIT_TEXT = "Sign Up";
 

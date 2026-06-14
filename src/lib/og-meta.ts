@@ -227,15 +227,6 @@ export function updateOGMetaTags(config: Partial<OGMetaConfig>): void {
 }
 
 /**
- * React hook for managing OG meta tags
- * Usage: useOGMeta(PAGE_OG_CONFIGS.home)
- */
-export function useOGMeta(config: Partial<OGMetaConfig>): void {
-  // This is a helper for the effect - actual implementation in components
-  updateOGMetaTags(config);
-}
-
-/**
  * Generates structured data for a page (JSON-LD)
  */
 export function generateStructuredData(config: OGMetaConfig, additionalData?: Record<string, unknown>): string {

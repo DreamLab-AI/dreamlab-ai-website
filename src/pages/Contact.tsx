@@ -15,7 +15,7 @@ import {
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { useOGMeta } from "@/hooks/useOGMeta";
 import { PAGE_OG_CONFIGS } from "@/lib/og-meta";
@@ -40,7 +40,6 @@ const Contact = () => {
   useOGMeta(PAGE_OG_CONFIGS.contact);
 
   const location = useLocation();
-  const { toast } = useToast();
   const [selectedTeam, setSelectedTeam] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -72,10 +71,7 @@ const Contact = () => {
 
   const onSubmit = async (data: FormValues) => {
     if (!supabase) {
-      toast({
-        title: "Unavailable",
-        description: "Service temporarily unavailable. Please try again later.",
-        variant: "destructive",
+      toast.error("Service temporarily unavailable. Please try again later.", {
         duration: 5000,
       });
       return;
@@ -111,21 +107,12 @@ const Contact = () => {
         });
 
       // Show success message
-      toast({
-        title: "Success!",
-        description: SUCCESS_MESSAGE,
-        duration: 5000
-      });
+      toast.success(SUCCESS_MESSAGE, { duration: 5000 });
 
       // Reset form
       form.reset();
     } catch {
-      toast({
-        title: "Error",
-        description: ERROR_MESSAGE_SUBMISSION,
-        variant: "destructive",
-        duration: 5000
-      });
+      toast.error(ERROR_MESSAGE_SUBMISSION, { duration: 5000 });
     } finally {
       setIsSubmitting(false);
     }

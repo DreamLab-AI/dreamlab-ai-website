@@ -24,20 +24,21 @@
 export {
   OptimizedImage,
   Picture,
-  generateSrcSet,
-  generateSizes,
   type OptimizedImageProps,
   type PictureProps,
 } from "../optimized-image";
 
-// Re-export utilities from image-utils
+// Responsive helpers + utilities — single source of truth in image-utils.
+// `generateResponsiveSrcSet` is also exported as `generateSrcSet` for
+// backwards-compatible imports from this barrel.
 export {
   supportsWebP,
   supportsAVIF,
   isWebPSupported,
   isAVIFSupported,
   generateResponsiveSrcSet,
-  generateSizes as generateImageSizes,
+  generateResponsiveSrcSet as generateSrcSet,
+  generateSizes,
   getOptimalImageFormat,
   getOptimalImageSize,
   getLQIPUrl,
