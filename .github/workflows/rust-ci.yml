@@ -16,7 +16,7 @@ env:
   RUST_TOOLCHAIN: '1.90.0'
   KIT_REPO: 'https://github.com/DreamLab-AI/nostr-rust-forum.git'
   # Pinned kit SHA — keep in lockstep with workers-deploy.yml/deploy.yml KIT_REF.
-  KIT_REF: '17f251d2c63643ad247d86d79e5344b053c56280'
+  KIT_REF: '83317bb1d04dd2fd627fa7abb1eb37c98d336575'
 
 jobs:
   fmt:
