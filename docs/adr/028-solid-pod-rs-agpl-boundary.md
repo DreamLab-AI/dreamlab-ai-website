@@ -126,16 +126,19 @@ migration completes: **~1,000+ LOC**.
 
 `pod-worker/src/did.rs` has been amended in v9 to:
 
-- Emit `"type": "SchnorrSecp256k1VerificationKey2019"` (W3C-registered
-  cryptosuite) instead of the bespoke `"NostrSchnorrKey2024"` string in both
-  Tier-1 and Tier-3 renderers.
-- Include `"https://w3id.org/security/suites/secp256k1-2019/v1"` in the
-  `@context` array of Tier-1 documents (Tier-3 already had it).
-- Cover both fixes in the existing test suite (`tier1_has_required_fields`).
+- Emit verification-method `"type": "Multikey"` with `publicKeyMultibase`
+  (`fe70102` + x-only hex) instead of the bespoke `"NostrSchnorrKey2024"`
+  string. (The interim `"SchnorrSecp256k1VerificationKey2019"` + `publicKeyHex`
+  form is superseded by ADR-125 — no dual-publish.)
+- Set `@context` to `["https://w3id.org/did","https://w3id.org/nostr/context"]`
+  and add top-level `"type": "DIDNostr"`.
+- Cover the fixes in the existing test suite (`tier1_has_required_fields`).
 
-This brings the hand-rolled DID document into spec-conformance with ADR-027
-ahead of the eventual `solid-pod-rs-nostr` swap. When the swap happens, the
-upstream renderer must satisfy the same invariants.
+This brings the hand-rolled DID document into spec-conformance with the
+converged did:nostr CG / `create-agent` form (ADR-125, superseding the
+ADR-027 shape) ahead of the eventual `solid-pod-rs-nostr` swap. When the swap
+happens, the upstream renderer must satisfy the same invariants. The
+`did:nostr:<hex>` identifier and NIP-98 auth path are unchanged.
 
 ### 5. NIP-98 verifier alignment — unchanged
 

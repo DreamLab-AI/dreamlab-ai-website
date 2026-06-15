@@ -14,6 +14,16 @@
 > overlay-observable here. **Blocked on:** upstream adoption (or an explicit
 > overlay-level decision to vendor the RDF stack). Kept Proposed.
 
+> **DID context updated (2026-06-15) for ADR-125 convergence.** The converged
+> did:nostr CG / `create-agent` DID document uses
+> `@context` `["https://w3id.org/did","https://w3id.org/nostr/context"]` (top-level
+> `"type": "DIDNostr"`, `"type": "Multikey"` verification method). The bundled
+> `StaticLoader` below has been re-pinned from the old
+> `https://www.w3.org/ns/did/v1` / `secp256k1-2019` contexts to these two converged
+> contexts so converged DID documents expand offline with `NoLoader`. This is a
+> context-bundling change only; the `did:nostr:<hex>` identifier and the NIP-98
+> auth path are unchanged.
+
 ## Date: 2026-05-06
 
 ## Context
@@ -71,9 +81,14 @@ Create `pod-worker/src/contexts.rs` with all required JSON-LD contexts bundled a
 //! Sources: fetched once from authoritative URLs, reviewed, and pinned.
 //! Re-pin when context versions change (check Context-Type: ETag header).
 
-/// W3C DID Core context 1.0
-/// Source: https://www.w3.org/ns/did/v1
-pub static DID_CONTEXT: &str = include_str!("../contexts/did-v1.jsonld");
+/// W3C DID context (converged did:nostr CG form, per ADR-125)
+/// Source: https://w3id.org/did
+pub static DID_CONTEXT: &str = include_str!("../contexts/did.jsonld");
+
+/// did:nostr CG context — defines `DIDNostr`, `Multikey`, and the Nostr service
+/// terms used by the converged DID document (per ADR-125).
+/// Source: https://w3id.org/nostr/context
+pub static NOSTR_DID_CONTEXT: &str = include_str!("../contexts/nostr-did.jsonld");
 
 /// W3C FOAF ontology context
 /// Source: http://xmlns.com/foaf/0.1/
@@ -99,10 +114,17 @@ pub static NOSTR_CONTEXT: &str = include_str!("../contexts/nostr-ontology.jsonld
 pub fn bundled_loader() -> json_ld::loader::StaticLoader {
     let mut loader = json_ld::loader::StaticLoader::new();
     loader.insert(
-        iref::IriBuf::new("https://www.w3.org/ns/did/v1").unwrap(),
+        iref::IriBuf::new("https://w3id.org/did").unwrap(),
         json_ld::RemoteDocument::new(
             None, None,
             serde_json::from_str(DID_CONTEXT).expect("bundled DID context is valid JSON-LD"),
+        ),
+    );
+    loader.insert(
+        iref::IriBuf::new("https://w3id.org/nostr/context").unwrap(),
+        json_ld::RemoteDocument::new(
+            None, None,
+            serde_json::from_str(NOSTR_DID_CONTEXT).expect("bundled did:nostr context is valid JSON-LD"),
         ),
     );
     loader.insert(

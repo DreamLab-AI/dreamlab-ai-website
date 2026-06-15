@@ -6,6 +6,23 @@ This document defines the Nostr-Solid Bridge bounded context for the DreamLab co
 
 > **Status (2026-06-12):** partially delivered. The kit's `nostr-bbs-pod-worker` ships the identity/JSON-LD/notification pieces in a flat layout (`did.rs`, `webid.rs`, `nip05_endpoint.rs`, `contexts.rs`, `notifications.rs`, TypeIndex provisioning in `provision.rs`) rather than the `bridge/` / `jsonld/` / `notifications/` / `auth_bridge/` module tree diagrammed below. The `WebIdTagVerifier` NIP-98 extension and the WAC→ACP translator are **aspirational — not implemented**, and `agent-worker` does not exist (see [08-agent-identity-messaging-context.md](08-agent-identity-messaging-context.md)).
 
+> **DID-doc shape superseded (2026-06-15) by ADR-125.** The DID-document model
+> in this context (the `DidTier` Tier-1/Tier-3 split, the
+> `SchnorrSecp256k1VerificationKey2019` + `publicKeyHex` verification method, and
+> the `https://www.w3.org/ns/did/v1` / `secp256k1-2019` `@context`) is replaced by
+> the converged did:nostr CG / `create-agent` single canonical form:
+> `@context` `["https://w3id.org/did","https://w3id.org/nostr/context"]`,
+> top-level `"type": "DIDNostr"`, one `"type": "Multikey"` verification method with
+> `publicKeyMultibase` = `fe70102` + the same 64-char x-only hex, fragment `#key1`,
+> and `authentication`/`assertionMethod` `["#key1"]`. There is **no Tier-1/Tier-3
+> dual-publish** — a single document is served. The `did:nostr:<hex>` identifier
+> string, the hex pubkey identity, and the NIP-98 Schnorr auth path (which verifies
+> against the raw event pubkey and **never reads** the DID-doc verification method)
+> are **unchanged**. The `DidTier`/`Tier3RelayEnriched` and
+> `VerificationMethod { public_key_hex }` shapes below are retained as historical
+> design notes only; see [ADR-027](../adr/027-canonical-identity-stack.md) and the
+> backend `ADR-125-did-nostr-multikey-convergence.md` for the binding spec.
+
 ## Context Overview
 
 ```mermaid

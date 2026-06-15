@@ -1,5 +1,20 @@
 # ADR-027: Canonical Identity Stack — did:nostr + WebID + NIP-05
 
+## Status: Proposed — DID-document shape superseded by ADR-125
+
+> **DID-doc shape superseded (2026-06-15) by ADR-125.** The DID-document
+> examples below have been updated to the converged did:nostr CG / `create-agent`
+> canonical single form: `@context` `["https://w3id.org/did","https://w3id.org/nostr/context"]`,
+> top-level `"type": "DIDNostr"`, verification method `"type": "Multikey"` with
+> `publicKeyMultibase` = `fe70102` + x-only hex, fragment `#key1`, and
+> `authentication`/`assertionMethod` `["#key1"]`. The old 2019 suite
+> (`SchnorrSecp256k1VerificationKey2019` + `publicKeyHex` + `#key-0`) and the
+> Tier-1/Tier-3 document split are **dropped** (no dual-publish). This is a
+> document-shape change only — the `did:nostr:<hex>` identifier string, the
+> hex pubkey identity, and the NIP-98 auth path are **unchanged** (ADR-074 §D1
+> stays). See `docs/adr/ADR-125-did-nostr-multikey-convergence.md` in the
+> backend repo for the binding spec.
+
 ## Status: Proposed — not yet implemented in the deployed overlay
 
 > **Adjudication (2026-06-11):** This ADR targets `pod-worker/src/lib.rs`,
@@ -43,54 +58,52 @@ Adopt a three-layer canonical identity model and implement the infrastructure re
 
 Add `/.well-known/did/nostr/{pubkey}.json` to pod-worker. The route handler produces a Tier 1 document when called without relay access, and a Tier 3 enriched document when kind-0, kind-10002, and kind-3 events are available from the relay.
 
-**Tier 1 document** (offline-derivable, always served):
+**Canonical document** (offline-derivable from the pubkey, always served — single converged form per ADR-125):
 
 ```json
 {
   "@context": [
-    "https://www.w3.org/ns/did/v1",
-    "https://w3id.org/security/suites/secp256k1-2019/v1"
+    "https://w3id.org/did",
+    "https://w3id.org/nostr/context"
   ],
   "id": "did:nostr:79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+  "type": "DIDNostr",
   "verificationMethod": [
     {
-      "id": "did:nostr:79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798#key-0",
-      "type": "SchnorrSecp256k1VerificationKey2019",
+      "id": "did:nostr:79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798#key1",
+      "type": "Multikey",
       "controller": "did:nostr:79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
-      "publicKeyHex": "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+      "publicKeyMultibase": "fe7010279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
     }
   ],
-  "authentication": [
-    "did:nostr:79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798#key-0"
-  ],
-  "assertionMethod": [
-    "did:nostr:79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798#key-0"
-  ],
-  "alsoKnownAs": [
-    "https://pods.dreamlab-ai.com/79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798/profile/card#me"
-  ]
+  "authentication": ["#key1"],
+  "assertionMethod": ["#key1"],
+  "service": []
 }
 ```
 
-**Tier 3 enrichment** (added when relay data is available — fetched from relay D1 via internal service binding):
+`publicKeyMultibase` = `f` (base16-lower multibase) ‖ `e701` (varint of multicodec `0xe7` = secp256k1-pub) ‖ `02` (SEC1 compressed even-y prefix; BIP-340 `lift_x` always selects even-y, so this is invariantly `02`) ‖ the same 64-char x-only hex as the `did:nostr:<hex>` body. Fixed 71-char string. It round-trips to the identical key — no key bytes change.
+
+**agentbox extensions** (optional, NOT part of the canonical create-agent form — the canonical reference output is `service: []`). Populating `service[]` with these entries remains spec-conformant (the spec marks `service` optional):
 
 ```json
 {
   "service": [
     {
       "id": "did:nostr:{pubkey}#relay",
-      "type": "NostrRelay",
+      "type": "Relay",
       "serviceEndpoint": "wss://relay.dreamlab-ai.com"
     },
     {
       "id": "did:nostr:{pubkey}#nip05",
       "type": "NIP05Verification",
       "serviceEndpoint": "https://dreamlab-ai.com/.well-known/nostr.json?name={localname}"
+    },
+    {
+      "id": "did:nostr:{pubkey}#webid",
+      "type": "SolidWebID",
+      "serviceEndpoint": "https://pods.dreamlab-ai.com/{pubkey}/profile/card#me"
     }
-  ],
-  "alsoKnownAs": [
-    "https://pods.dreamlab-ai.com/{pubkey}/profile/card#me",
-    "nostr:{npub_bech32}"
   ]
 }
 ```
@@ -267,11 +280,13 @@ This forms a resolvable identity web: starting from any of the three representat
 - ADR-025: Solid pod infrastructure — defines the pod-worker architecture this ADR extends.
 - ADR-017: Passkey-rs WebAuthn PRF — defines the passkey auth flow whose NIP-98 verification path gains `webid` tag support.
 - ADR-028: AGPL boundary — governs how solid-pod-rs algorithms are used without triggering copyleft.
+- ADR-125: did:nostr Multikey convergence — supersedes the DID-document shape in this ADR (drops the 2019 suite / `publicKeyHex` / Tier-1/Tier-3 split for the single `DIDNostr` / `Multikey` / `fe70102` form). Identifier string and identity unchanged.
 
 ## References
 
 - [W3C DID Core 1.0](https://www.w3.org/TR/did-core/)
 - [did:nostr CG Draft](https://github.com/w3c-cg/nostr/blob/main/did-nostr.md)
+- [did:nostr CG spec (converged target)](https://nostrcg.github.io/did-nostr/)
 - [HTTP Schnorr Auth CG Draft](https://github.com/w3c-cg/nostr/blob/main/schnorr-auth.md)
 - [NIP-05: Mapping Nostr Keys to DNS](https://github.com/nostr-protocol/nostr/blob/master/05.md)
 - [NIP-98: HTTP Auth](https://github.com/nostr-protocol/nostr/blob/master/98.md)

@@ -742,39 +742,44 @@ pub fn augment_with_relay_data(
 pub fn to_json_ld(doc: &DidDocument) -> serde_json::Value;
 ```
 
-**DID Document Structure (per W3C Nostr CG draft):**
+**DID Document Structure (converged did:nostr CG / `create-agent` single form, per ADR-125):**
+
+> The shape below was updated 2026-06-15 to the converged scheme. It supersedes
+> the earlier 2019-suite shape (`SchnorrSecp256k1VerificationKey2019` /
+> `publicKeyHex` / `#key-0`). This is a document-shape change only — the
+> `did:nostr:<hex-pubkey>` identifier, the hex pubkey identity, and the NIP-98
+> auth path are unchanged.
 
 ```json
 {
   "@context": [
-    "https://www.w3.org/ns/did/v1",
-    "https://w3id.org/security/suites/secp256k1-2019/v1"
+    "https://w3id.org/did",
+    "https://w3id.org/nostr/context"
   ],
   "id": "did:nostr:<hex-pubkey>",
+  "type": "DIDNostr",
   "verificationMethod": [{
-    "id": "did:nostr:<hex-pubkey>#key-0",
-    "type": "SchnorrSecp256k1VerificationKey2019",
+    "id": "did:nostr:<hex-pubkey>#key1",
+    "type": "Multikey",
     "controller": "did:nostr:<hex-pubkey>",
-    "publicKeyHex": "<hex-pubkey>"
+    "publicKeyMultibase": "fe70102<hex-pubkey>"
   }],
-  "authentication": ["did:nostr:<hex-pubkey>#key-0"],
-  "assertionMethod": ["did:nostr:<hex-pubkey>#key-0"],
+  "authentication": ["#key1"],
+  "assertionMethod": ["#key1"],
+  "service": []
+}
+```
+
+`publicKeyMultibase` = literal `fe70102` + the same 64-char lowercase x-only hex (`f` base16-lower multibase ‖ `e701` varint of multicodec `0xe7` secp256k1-pub ‖ `02` SEC1 compressed even-y prefix ‖ 32-byte x-only key); fixed 71-char string, round-trips to the identical key.
+
+The canonical `create-agent` form emits `service: []`. DreamLab populates `service[]` with **agentbox extensions** (`Relay`, `SolidStorage`, `SolidWebID`) — these are optional/permitted, NOT part of the canonical reference form:
+
+```json
+{
   "service": [
-    {
-      "id": "did:nostr:<hex-pubkey>#nostr-relay",
-      "type": "NostrRelay",
-      "serviceEndpoint": "wss://relay.dreamlab-ai.com"
-    },
-    {
-      "id": "did:nostr:<hex-pubkey>#solid-pod",
-      "type": "SolidPod",
-      "serviceEndpoint": "https://pods.dreamlab-ai.com/<hex-pubkey>/"
-    },
-    {
-      "id": "did:nostr:<hex-pubkey>#webid",
-      "type": "WebID",
-      "serviceEndpoint": "https://pods.dreamlab-ai.com/<hex-pubkey>/profile/card#me"
-    }
+    { "id": "did:nostr:<hex-pubkey>#nostr-relay", "type": "Relay",       "serviceEndpoint": "wss://relay.dreamlab-ai.com" },
+    { "id": "did:nostr:<hex-pubkey>#solid-pod",   "type": "SolidStorage", "serviceEndpoint": "https://pods.dreamlab-ai.com/<hex-pubkey>/" },
+    { "id": "did:nostr:<hex-pubkey>#webid",       "type": "SolidWebID",   "serviceEndpoint": "https://pods.dreamlab-ai.com/<hex-pubkey>/profile/card#me" }
   ]
 }
 ```
@@ -1247,7 +1252,14 @@ This endpoint enables cross-pod agent reasoning -- an agent can run a SPARQL que
 3. Call `augment_with_relay_data()` from `nostr-core::did_nostr`.
 4. Return augmented document with `service` entries for all known relays from kind-10002, and `alsoKnownAs` for the NIP-05 identifier.
 
-**Caching:** Cache Tier-3 DID documents in KV with a 10-minute TTL. The cache key is `did:nostr:{pubkey}:tier3`.
+**Caching:** Cache the resolved DID document in KV with a 10-minute TTL. The cache key is `did:nostr:{pubkey}:doc`.
+
+> **Note (2026-06-15, ADR-125 convergence):** the Tier-1/Tier-3 split is superseded
+> by a single canonical document form, so there is no separate `:tier3` cache
+> variant — one cache entry per pubkey. The cache key is an internal KV string, not
+> the DID identifier; the `did:nostr:<hex>` identifier is unchanged. The relay
+> enrichment above populates the optional `service[]`/`alsoKnownAs` of that single
+> document rather than producing a distinct tier.
 
 | File | Change |
 |------|--------|

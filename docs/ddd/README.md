@@ -20,7 +20,7 @@ The 2026-05-12 Governance sprint added the Agent Control Surface: a `/governance
 | [06 - Ubiquitous Language](06-ubiquitous-language.md) | Glossary of 60+ terms organized by domain area: Nostr protocol, DreamLab forum, authentication, Rust/Leptos. |
 | [07 - Solid Pod Storage Context](07-solid-pod-bounded-context.md) | Full Solid Protocol bounded context: LDP containers, WAC ACL inheritance, quota enforcement, N3 Patch, WebID profile generation, pod provisioning. Target module structure for pod-worker upgrade from 898 to ~2,900 LOC. |
 | [08 - Agent Identity & Messaging Context](08-agent-identity-messaging-context.md) | AI agent identity (`did:nostr:`), NIP-90 Data Vending Machine job protocol (kinds 5000-6999/7000), NIP-26 delegation tokens, Solid LDP inbox delivery, and the `Signer` trait abstraction. New `agent-worker` crate. |
-| [09 - Nostr-Solid Bridge Context](09-nostr-solid-bridge-context.md) | Translation layer between Nostr events and Solid Linked Data: DID document tiers (offline/relay-enriched), kind-0 → WebID projection, typed AclBuilder, JSON-LD context compilation, Solid Notification channels, WebIdTagVerifier NIP-98 extension, and WAC→ACP migration path. |
+| [09 - Nostr-Solid Bridge Context](09-nostr-solid-bridge-context.md) | Translation layer between Nostr events and Solid Linked Data: the converged single-form did:nostr DID document (`DIDNostr` / `Multikey` / `fe70102`, per ADR-125 — the Tier-1/Tier-3 split is superseded), kind-0 → WebID projection, typed AclBuilder, JSON-LD context compilation, Solid Notification channels, WebIdTagVerifier NIP-98 extension, and WAC→ACP migration path. |
 
 ## Architecture Overview
 

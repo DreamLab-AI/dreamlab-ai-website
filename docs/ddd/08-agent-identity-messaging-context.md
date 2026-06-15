@@ -634,13 +634,13 @@ pub struct DidNostrDocument {
 pub struct VerificationMethod {
     pub id: String,
     pub controller: String,
-    pub r#type: String,          // "SchnorrSecp256k1VerificationKey2019"
-    pub public_key_hex: String,
+    pub r#type: String,                  // "Multikey" (per ADR-125)
+    pub public_key_multibase: String,    // "fe70102" + x-only hex; fixed 71 chars
 }
 
 pub struct DidService {
     pub id: String,
-    pub r#type: String,          // "SolidPod", "NostrRelay", etc.
+    pub r#type: String,          // canonical form is service:[]; extensions: "SolidStorage", "Relay", "SolidWebID"
     pub service_endpoint: String,
 }
 ```

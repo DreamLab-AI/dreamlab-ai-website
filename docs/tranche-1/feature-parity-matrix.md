@@ -134,7 +134,7 @@
 | P1 | Profile metadata (kind 0) | `lib/nostr/events.ts` | Schnorr | Partial | LOW | Standard metadata event. Signing via WASM. |
 | P2 | Profile sync/indexing confirmation | `lib/nostr/profile-sync.ts` | NIP-98 | Y | LOW | HTTP polling with NIP-98 auth. Exponential backoff. Token via WASM. |
 | P3 | DID:NOSTR generation | `lib/nostr/did.ts` | none | N | LOW | Pure string formatting: `did:nostr:<hex-pubkey>`. No crypto. |
-| P4 | DID Document generation (W3C) | `lib/nostr/did.ts` | none | N | LOW | JSON-LD construction with multikey encoding. Secp256k1 multicodec prefix (0xe701). No signing needed. |
+| P4 | DID Document generation (W3C) | `lib/nostr/did.ts` | none | N | LOW | JSON-LD construction with `Multikey` encoding (per ADR-125 / did:nostr CG). `publicKeyMultibase` = literal `fe70102` + 64-char lowercase x-only hex: `f` (base16-lower multibase) ‖ `e701` (varint of multicodec `0xe7` secp256k1-pub) ‖ `02` (SEC1 compressed even-y prefix — load-bearing multicodec payload, not a separator) ‖ 32-byte x-only key. Fixed 71-char string. No signing needed. |
 | P5 | NIP-19 encode/decode | `lib/nostr/events.ts`, `lib/nostr/did.ts` | none | N | LOW | Bech32 encoding (npub, nsec, note, nevent, nprofile). Uses `nostr-tools/nip19`. Not in nostr-core. Consider adding. |
 | P6 | Public key hex derivation | `lib/nostr/keys.ts` | Schnorr | Y | LOW | `pubkey_hex()` in nostr-core. Direct replacement. |
 
