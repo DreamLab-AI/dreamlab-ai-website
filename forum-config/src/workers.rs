@@ -40,10 +40,10 @@ use worker::{Env, Request};
 ///
 /// # JSS Phase 1 routing (May 2026)
 ///
-/// Phase 1 added the `/api/exports/*` surface (pod data export). Because the
-/// upstream `nostr-bbs-config` schema (3.0.0-rc6) does not yet know about
-/// `export_per_min`, the field is populated by the operator overlay through
-/// [`crate::phase1::Phase1Config`] and applied via [`RateLimitConfig::with_export_per_min`].
+/// Phase 1 added the `/api/exports/*` surface (pod data export). The kit
+/// `nostr-bbs-config` schema now owns the `[export]` section directly, so the
+/// operator reads the budget from the typed kit config and applies it via
+/// [`RateLimitConfig::with_export_per_min`].
 /// See `dreamlab.toml` `[ratelimit].export_per_min` for the operator setting.
 #[derive(Debug, Clone)]
 pub struct RateLimitConfig {
@@ -61,8 +61,8 @@ impl RateLimitConfig {
     /// Build from the operator TOML's `[ratelimit]` section.
     ///
     /// `export_per_min` defaults to 6 (the JSS Phase 1 reference budget);
-    /// override via [`Self::with_export_per_min`] once the overlay has parsed
-    /// the unknown-to-upstream `export_per_min` field out of `dreamlab.toml`.
+    /// override via [`Self::with_export_per_min`] with the value read from the
+    /// kit's typed `[export]` / `[ratelimit]` config in `dreamlab.toml`.
     pub fn from_schema(rl: &RateLimit) -> Self {
         Self {
             profiles_batch_per_min: rl.profiles_batch_per_min.unwrap_or(60),
