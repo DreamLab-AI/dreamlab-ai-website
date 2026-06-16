@@ -8,7 +8,16 @@ on:
   push:
     branches: [main]
     paths:
+      # Deploy-config overrides (wrangler bindings, ZONE_CONFIG, migrations).
       - 'forum-config/deploy/**'
+      # A kit re-pin moves the worker code too: the workers build from the kit
+      # cloned at KIT_REF (this file) and the canonical pin is recorded in
+      # forum-config/Cargo.lock. Without these paths, a re-pin commit that does
+      # not touch deploy/** ships a new CLIENT (deploy.yml fires on any push)
+      # while leaving the WORKERS on the old kit — the exact client/worker skew
+      # that wiped the forum on 2026-06-15. Treat any pin move as a worker deploy.
+      - 'forum-config/Cargo.lock'
+      - '.github/workflows/workers-deploy.yml'
   workflow_dispatch:
 
 concurrency:

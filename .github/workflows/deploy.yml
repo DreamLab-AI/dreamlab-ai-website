@@ -195,6 +195,17 @@ jobs:
           ENV_SCRIPT='<script>window.__ENV__={FORUM_NAME:"Minimoonoir Forums",VITE_RELAY_URL:"'"$VITE_RELAY_URL"'",VITE_AUTH_API_URL:"'"$VITE_AUTH_API_URL"'",VITE_POD_API_URL:"'"$VITE_POD_API_URL"'",VITE_SEARCH_API_URL:"'"$VITE_SEARCH_API_URL"'",VITE_LINK_PREVIEW_API_URL:"'"$VITE_LINK_PREVIEW_API_URL"'",BUILD_VERSION:"'"$BUILD_VERSION"'",BUILD_HASH:"'"$BUILD_HASH"'",ZONE_CONFIG:'"$ZONE_CONFIG_JSON"'};</script>'
           sed -i "s|</head>|${ENV_SCRIPT}</head>|" dist/community/index.html
           echo "Injected window.__ENV__ into forum index.html (build $BUILD_VERSION $BUILD_HASH)"
+          # SPA deep-link pickup for the forum. A hard load of /community/login
+          # hits GitHub Pages' root 404.html, which redirects to
+          # /community/?__p=%2Flogin. The Leptos router never reads __p, so the
+          # app booted at the landing and the login route never rendered ("login
+          # does nothing unless you enter from the top"). This synchronous head
+          # script restores the original sub-path BEFORE the WASM app reads
+          # window.location — note it re-prepends /community (the 404.html strips
+          # it into __p), mirroring the React pickup injected into dist/index.html.
+          FORUM_PICKUP='<script>(function(){var q=new URLSearchParams(window.location.search);var r=q.get("__p");if(r){q.delete("__p");var s=q.toString();history.replaceState(null,"","/community"+r+(s?"?"+s:""));}})();</script>'
+          sed -i "s|</head>|${FORUM_PICKUP}</head>|" dist/community/index.html
+          echo "Injected SPA __p deep-link pickup into forum index.html"
           # Per-deploy service-worker cache name so a new build evicts the old
           # cache on activate (the SW already network-firsts the HTML; this just
           # isolates static-asset caches per build). No-op if the token is absent.
