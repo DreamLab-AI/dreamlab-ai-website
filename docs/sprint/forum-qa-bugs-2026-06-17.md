@@ -74,6 +74,17 @@ Owner: **KIT** = nostr-rust-forum client · **DATA** = relay seed · **AGENTBOX*
 - **Root cause:** the bridge's `hasSchedulingIntent()` gate (suppress calendar
   creation for chit-chat) is pending an agentbox rebuild. Out of kit scope.
 
+### B8 — Cold deep-link load bounces to /login (session not restored in time) — SEV2 — KIT (follow-up)
+- **Where:** a full-page load of any gated deep link (e.g. `/forums/:zone/:section`,
+  `/events`, `/admin`) after having signed in — including a refresh.
+- **Observed:** lands on `/login?returnTo=…` instead of restoring the session;
+  signing in again (now possible cold, thanks to B7) returns you to the target.
+- **Hypothesis:** the auth-gate Effect fires before the async session restore
+  completes (same one-shot-before-ready class as B3/B7). This is the deeper layer
+  of "I have to come in from the very top". **Not fixed this pass** — a focused
+  auth-store restore-timing fix; flagged for a follow-up so it isn't bundled with
+  the verified batch.
+
 ### B6 — Session-mirror gift-wraps appear in operator DMs — SEV3 — note
 - **Where:** DMs list shows `fb868e…` "■ session … ended" entries (the Nostr
   Claude-Code session mirror self-DMing the operator). Harmless noise; could be
@@ -84,6 +95,17 @@ Owner: **KIT** = nostr-rust-forum client · **DATA** = relay seed · **AGENTBOX*
 ---
 
 ## Resolution (2026-06-17)
+
+**Shipped** — kit re-pinned `2f411f0 → c7cb1534` (website `efbe758`, deploy
+green, CDN serving `efbe758`). Live-verified on the deployed bundle:
+- **B7** ✅ cold `/community/login` now shows "Sign in with browser extension …
+  detected" by default (was the recovery-key flow); sign-in works cold + on
+  `returnTo` deep-links.
+- **B1** ✅ new-topic composer in a fresh channel now shows the mention dropdown
+  and fires `/api/profiles/search` (was silent).
+- **B2** ✅ junkiejarvis renders as "JunkieJarvis" in Events + admin Users.
+- **B3** ✅ shipped (admin guard waits on `ZoneAccess::loaded`).
+- **B8** ⬜ newly found during live verification (see below) — follow-up.
 
 Kit PR **DreamLab-AI/nostr-rust-forum#61** (`fix/new-topic-mentions-and-admin-direct-load`):
 - **B1** — New Topic composer now reuses `MessageInput` (full mention autocomplete
