@@ -1,54 +1,124 @@
 # 3.a: Effective Prompting Strategies
 
-The quality of output from Codex, much like other large language models, is heavily dependent on the quality of the input prompt. Developing strong prompting skills is therefore essential for getting the best results. The workshop discussion touched on this, with one participant noting the tendency to "just prompt it and trust the model." While trust is part of the process, effective prompting guides that trust.
+The quality of output from AI coding agents is heavily dependent on the quality of your input. Whether you are using Claude Code, Codex CLI, or any other tool, developing strong prompting skills is essential.
 
 ## Clarity and Specificity
 
-Vague instructions can lead to ambiguous or incorrect outputs. Your prompts should be as clear and specific as possible.
+Vague instructions lead to ambiguous or incorrect outputs. Your prompts should be as clear and specific as possible.
 
-*   **Define the Action:** Clearly state what you want Codex to do (e.g., "refactor," "generate," "explain," "fix," "add unit tests").
-*   **Specify the Context:** Mention the specific file(s), function(s), or class(es) involved. For example, instead of "fix this code," a more effective prompt would be:
+*   **Define the action:** Clearly state what you want the agent to do (e.g., "refactor," "generate," "explain," "fix," "add unit tests").
+*   **Specify the context:** Mention specific files, functions, or classes. Instead of "fix this code," use:
     > "Refactor the `calculateTotal` function in `billing.js` to use a `for...of` loop instead of `forEach` and ensure it handles empty arrays gracefully."
-*   **Outline Constraints:** If there are any specific requirements, libraries to use, versions to adhere to, or patterns to avoid, include them in the prompt.
+*   **Outline constraints:** Include requirements, library preferences, version constraints, or patterns to avoid.
 
 ## Providing Context
 
-Supply relevant context within the prompt or ensure the agent has access to it.
+Supply relevant context within the prompt or ensure the agent has access to it through configuration files.
 
-*   **Code Snippets:** Include snippets of existing code if relevant.
-*   **Error Messages:** If fixing a bug, provide the full error message and stack trace.
-*   **Desired Output Formats:** If you need output in a specific format (e.g., JSON with certain keys, a Markdown table), describe it.
-*   **Implicit Context (Cloud Agent):** For the Codex cloud agent, the connected repository provides a lot of implicit context. However, explicitly mentioning key files or modules in your prompt can still help focus its attention.
-*   **Scoping (CLI):** As mentioned in the workshop:
-    > "a lot of my prompts start with like I'm working in this subdirectory um here's what I like to accomplish right can you please um do it for me um and so giving that guidance at scoping uh helps" - Josh, OpenAI
+*   **For Claude Code:** The CLAUDE.md file provides persistent project context. Within a session, you can also reference specific files:
+    > "Look at src/auth/middleware.ts and add rate limiting. Follow the patterns in src/auth/validator.ts."
 
-The more context Codex has, the better it can tailor its response to your specific situation.
+*   **For Codex CLI:** The AGENTS.MD file provides project context. Scope your prompts to specific areas:
+    > "I'm working in the src/api/ subdirectory. Add input validation to all POST endpoints using Zod schemas."
 
-## Iterative Refinement (Multi-Prompt/Prompt Chaining)
+*   **Error messages:** When fixing bugs, provide the full error message and stack trace.
+*   **Desired output:** If you need a specific format, describe it explicitly.
 
-Complex tasks often benefit from being broken down into a sequence of smaller, more manageable prompts. This "prompt chaining" or multi-pass approach allows for iterative refinement and validation at each step.
+## Iterative Refinement
 
-*   **Example Workflow:**
-    1.  Ask Codex to modernise a piece of code.
-    2.  In a subsequent prompt, ask it to review its own output for logical errors or edge cases.
-    3.  Finally, ask it to generate unit tests for the refined code.
-*   This structured interaction can yield more accurate and robust results than a single, overly complex prompt.
+Complex tasks benefit from being broken down into a sequence of smaller prompts. This "prompt chaining" approach allows for validation at each step.
 
-## Asking for Reflection/Self-Correction
+**Example workflow with Claude Code:**
 
-Prompting techniques like "reflexion," where the AI is asked to review its own response or explain "why it was wrong," can improve accuracy and help mitigate issues like hallucinations or logical errors. This encourages a form of self-correction within the model's generation process.
+```
+Session 1:
+> "Modernise the user service to use async/await instead of callbacks"
 
-*   Example: "Review the Python code you just generated. Are there any potential off-by-one errors or unhandled exceptions?"
+> "Now review your changes for potential race conditions or unhandled rejections"
 
-## Abundance Mindset in Prompting
+> "Generate unit tests for the refactored user service"
 
-An interesting point from the workshop was about the "abundance mindset" when using the cloud agent:
-> "the way we see people who like love codeex the most using it is they don't they think for like maybe 30 seconds max about their prompt it's just like oh I have this idea like boom oh there's this thing I want to do like boom oh like I just saw this bug or like this customer feedback thing like and you just send it off." - Alexander, OpenAI
+> "Run the tests and fix any failures"
+```
 
-This suggests that for certain workflows, especially with the cloud agent designed for longer, more autonomous tasks, rapid-fire prompting for multiple independent tasks can be very effective, rather than over-crafting a single prompt for a single computer session.
+**Example workflow with Codex CLI:**
 
-Mastering these prompting strategies transforms your interaction with Codex from a simple command-response exchange into a more nuanced dialogue, enabling you to guide the AI more effectively towards your desired outcomes. This skill is becoming increasingly valuable as AI tools become more integrated into development workflows.
+```bash
+# Step 1: Refactor
+codex "Convert the user service from callbacks to async/await"
+
+# Step 2: Review
+codex "Review the user service for race conditions"
+
+# Step 3: Test
+codex "Generate unit tests for the user service"
+```
+
+## Asking for Reflection
+
+Prompting the agent to review its own output can catch errors and improve quality:
+
+*   "Review the code you just generated. Are there any potential off-by-one errors or unhandled exceptions?"
+*   "What edge cases does this implementation miss?"
+*   "Is there a simpler way to achieve the same result?"
+
+## The "Abundance Mindset" for Agentic Tools
+
+With terminal agents, particularly those that support parallel execution, a rapid-fire approach to task delegation is often more effective than over-crafting a single prompt:
+
+- Think for 30 seconds about what you want, then send the task
+- Let the agent iterate on failures autonomously
+- Review the final result rather than micromanaging each step
+- Send multiple independent tasks in parallel (Claude Code subagents)
+
+This approach works because agentic tools can:
+- Read your codebase for context (you do not need to paste it)
+- Run tests to verify their own work
+- Iterate on failures without your intervention
+- Consult CLAUDE.md/AGENTS.MD for project standards
+
+## Prompting Patterns That Work Well
+
+### The Scoped Task Pattern
+
+```
+"In the src/components/Dashboard/ directory, refactor the chart components
+to use the new ChartJS v4 API. Keep the same visual output.
+Run the existing tests to verify nothing breaks."
+```
+
+### The "Fix and Verify" Pattern
+
+```
+"Fix the failing test in tests/auth.test.ts. The error is:
+[paste error message]
+Run the test suite after fixing to confirm it passes."
+```
+
+### The "Implement Like This" Pattern
+
+```
+"Add a delete endpoint to the posts API. Follow the same patterns
+used in src/routes/users.ts for error handling, validation, and response format."
+```
+
+### The "Explain Then Implement" Pattern
+
+```
+"First, explain how the payment processing flow works in this codebase.
+Then, add support for refunds following the same architectural patterns."
+```
+
+## Common Pitfalls
+
+*   **Being too vague:** "Make the code better" gives the agent no direction.
+*   **Providing too much context:** Pasting entire files when only one function is relevant wastes context window.
+*   **Not specifying the tech stack:** "Add tests" is ambiguous. "Add Vitest unit tests using Testing Library" is actionable.
+*   **Ignoring the agent's questions:** If the agent asks for clarification, answer it rather than repeating the original prompt.
+*   **Not reviewing output:** Always examine diffs and test results before accepting changes.
+
+Mastering these prompting strategies transforms your interaction with AI coding agents from a simple command-response exchange into a nuanced dialogue that produces consistently high-quality results.
 
 ---
 
-Next: [3.b: The Crucial Role of AGENTS.MD](./03_b_the_crucial_role_of_agents_md.md)
+Next: [3.b: CLAUDE.md and AGENTS.MD Configuration](./03_b_the_crucial_role_of_agents_md.md)

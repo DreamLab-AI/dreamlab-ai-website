@@ -4,25 +4,25 @@
 
 ### Question 1: Agent Architecture (10 points)
 
-Explain the key components of an AI agent and how they work together. Include:
-- The role of the LLM
-- Tool management
-- Memory systems
-- Planning engine
+Explain the key components of a modern AI agent and how they work together. Include:
+- The role of the LLM (reasoning engine)
+- Tool integration via MCP
+- Memory systems (short-term, project config, long-term)
+- The agent loop (ReAct pattern)
 
-**Model Answer**: An AI agent consists of a Large Language Model as the "brain" for reasoning and decision-making. The Tool Manager provides access to external capabilities (APIs, code execution, search). Memory systems maintain both short-term conversation context and long-term knowledge storage using vector databases. The Planning Engine breaks down complex goals into executable steps using strategies like task decomposition and hierarchical planning.
+**Model Answer**: A modern AI agent uses a Large Language Model (such as Claude Sonnet 4.6 or Opus 4.8) as its reasoning engine. The LLM decides which actions to take based on the user's goal. Tools are provided via the Model Context Protocol (MCP) or direct function calling -- these give the agent capabilities like web search, file operations, code execution, and API access. Memory operates at three levels: short-term conversation context (the message history), project configuration (CLAUDE.md files that persist across sessions), and long-term storage (vector databases for knowledge retrieval). The agent loop follows the ReAct pattern: think, act, observe, repeat until the goal is achieved or a stopping condition is met.
 
 ---
 
-### Question 2: ReAct Pattern (10 points)
+### Question 2: MCP and Tool Use (10 points)
 
-Describe the ReAct (Reasoning + Acting) pattern. Why is it effective for agent systems?
+What is the Model Context Protocol (MCP)? Explain how it differs from direct function calling, and give two examples of MCP servers you might use in a development workflow.
 
 **Key Points**:
-- Interleaving thought and action
-- Observation-based iteration
-- Self-correction capability
-- Transparency in reasoning process
+- MCP is a standardised protocol for connecting AI agents to external tools
+- Unlike direct function calling (where tools are defined per-request), MCP servers run as persistent processes that expose tools dynamically
+- MCP enables tool reuse across different AI clients (Claude Code, Cursor, Windsurf, etc.)
+- Examples: `server-filesystem` for file operations, `server-github` for issue/PR management, `server-postgres` for database queries
 
 ---
 
@@ -33,26 +33,27 @@ Compare and contrast tool use in agents versus Retrieval-Augmented Generation (R
 **Comparison Table**:
 | Aspect | Tool Use | RAG |
 |--------|----------|-----|
-| Purpose | Execute actions | Retrieve information |
-| Dynamism | Real-time data | Static knowledge base |
-| Use Case | APIs, calculations | Document Q&A |
-| Complexity | Higher | Lower |
+| Purpose | Execute actions, fetch live data | Retrieve from a knowledge base |
+| Data freshness | Real-time | Static (updated on indexing schedule) |
+| Use case | APIs, calculations, file operations | Document Q&A, knowledge search |
+| Protocol | MCP, function calling | Embedding + vector search |
+| Complexity | Higher (tool definitions, execution) | Lower (indexing pipeline) |
 
 ---
 
-### Question 4: Memory Systems (10 points)
+### Question 4: Agent Patterns (10 points)
 
-Explain the difference between:
-1. Conversational memory
-2. Working memory
-3. Long-term memory
+Describe the difference between these three agent patterns:
+1. ReAct (Reasoning + Acting)
+2. Subagent delegation
+3. Plan-and-Execute
 
-When would you use each type?
+When would you choose each?
 
 **Expected Coverage**:
-- Conversational: Recent dialogue context
-- Working: Current task state
-- Long-term: Persistent knowledge across sessions
+- **ReAct**: Best for general-purpose tasks; interleaves thinking and tool use; simple to implement
+- **Subagent delegation**: Best for large, decomposable tasks; parent spawns focused child agents; enables parallelism (Claude Code's subagent model)
+- **Plan-and-Execute**: Best for complex multi-step tasks with dependencies; plans upfront, adapts on failure; more efficient token usage than pure ReAct
 
 ---
 
@@ -60,7 +61,7 @@ When would you use each type?
 
 ### Question 5: Identify Issues (15 points)
 
-Review this agent code and identify 3 problems:
+Review this agent code and identify at least 3 problems:
 
 ```python
 def buggy_agent(user_query):
@@ -75,11 +76,12 @@ def buggy_agent(user_query):
 ```
 
 **Issues**:
-1. No tool use API integration - directly calling LLM
-2. Simple keyword matching instead of proper tool selection
-3. No error handling
-4. No iteration/observation loop
-5. Tools not properly formatted for LLM
+1. No tool use API -- calling LLM without tool schemas, so the model cannot select tools properly
+2. Keyword matching ("calculate" in response) instead of structured tool selection via `stop_reason` and `tool_use` blocks
+3. No agent loop -- single LLM call cannot handle multi-step tasks
+4. No error handling for tool execution failures
+5. Tools are not formatted as schemas for the LLM
+6. Passes raw `user_query` to calculator instead of extracting the expression from the LLM's tool call
 
 ---
 
@@ -95,7 +97,7 @@ client = Anthropic()
 tools = [
     {
         "name": "search_web",
-        "description": "Search the internet",
+        "description": "Search the internet for information",
         "input_schema": {
             "type": "object",
             "properties": {
@@ -118,11 +120,59 @@ def run_agent(user_message):
     pass
 ```
 
-**Expected Implementation**:
-- Message loop with tool results
-- Tool execution handling
-- Stop condition check
-- Error handling
+**Expected Solution**:
+```python
+def run_agent(user_message):
+    messages = [{"role": "user", "content": user_message}]
+
+    for _ in range(5):  # Max 5 iterations
+        response = client.messages.create(
+            model="claude-sonnet-4-6",
+            max_tokens=1024,
+            tools=tools,
+            messages=messages
+        )
+
+        messages.append({
+            "role": "assistant",
+            "content": response.content
+        })
+
+        if response.stop_reason == "end_turn":
+            return next(
+                (block.text for block in response.content if hasattr(block, "text")),
+                "No response"
+            )
+
+        if response.stop_reason == "tool_use":
+            tool_results = []
+
+            for block in response.content:
+                if block.type == "tool_use":
+                    if block.name == "search_web":
+                        result = search_web(block.input["query"])
+                    else:
+                        result = f"Unknown tool: {block.name}"
+
+                    tool_results.append({
+                        "type": "tool_result",
+                        "tool_use_id": block.id,
+                        "content": result
+                    })
+
+            messages.append({
+                "role": "user",
+                "content": tool_results
+            })
+
+    return "Max iterations reached"
+```
+
+**Grading**:
+- Correct message loop: 5 points
+- Proper tool execution with `tool_use_id`: 5 points
+- Stop condition handling: 3 points
+- Iteration limit: 2 points
 
 ---
 
@@ -134,53 +184,61 @@ Design an agent system for: **"Automated code review agent"**
 
 Specify:
 1. Required tools (minimum 3)
-2. Memory requirements
-3. Workflow/planning strategy
-4. Success criteria
+2. Which Claude model to use and why
+3. Memory/configuration requirements
+4. Workflow strategy
+5. Success criteria
 
 **Example Answer**:
 ```
 Tools:
-1. code_analyzer: Parse and analyze code structure
-2. security_scanner: Check for vulnerabilities
-3. style_checker: Verify code standards
-4. test_coverage: Analyze test completeness
+1. read_file -- read source code files via MCP filesystem server
+2. run_tests -- execute the project's test suite
+3. search_codebase -- grep/search for patterns across files
+4. (optional) check_style -- run linter (eslint, ruff, etc.)
 
-Memory:
-- Project coding standards (long-term)
-- Previous review feedback (episodic)
-- Current file context (working)
+Model: Claude Sonnet 4.6 -- good balance of reasoning quality and cost
+  for code review. Opus 4.8 only if the codebase is unusually complex.
 
-Workflow:
-1. Parse code structure
-2. Run security scan
-3. Check style compliance
-4. Verify test coverage
-5. Generate report with suggestions
+Configuration (CLAUDE.md):
+- Project coding standards and conventions
+- Preferred linter and test commands
+- Known areas of technical debt
 
-Success:
-- All files reviewed
-- Issues categorized by severity
-- Actionable recommendations provided
+Workflow (Plan-and-Execute):
+1. Read the diff or changed files
+2. Run existing tests to establish baseline
+3. Analyse code for bugs, security issues, style violations
+4. Cross-reference with project conventions in CLAUDE.md
+5. Generate structured review with severity ratings
+
+Success criteria:
+- All changed files reviewed
+- Issues categorised by severity (critical/high/medium/low)
+- Actionable recommendations with code suggestions
+- No false positives on established project patterns
 ```
 
 ---
 
-### Question 8: Error Handling Strategy (15 points)
+### Question 8: Safety and Cost Strategy (15 points)
 
-Design an error handling and recovery strategy for an agent that:
-- Searches web
+Design a safety and cost management strategy for an agent that:
+- Searches the web
 - Executes Python code
-- Reads files
+- Reads and writes files
 
 What could go wrong and how would you handle it?
 
 **Expected Coverage**:
-- Network errors (retry logic)
-- Code execution errors (sandboxing, timeouts)
-- File access errors (permission checks, path validation)
-- LLM errors (fallbacks, rate limiting)
-- Invalid tool parameters (validation, helpful errors)
+- **Token budget**: Set a maximum token spend per task; track usage via `response.usage`
+- **Iteration limit**: Cap the number of agent loop iterations (e.g. 10-20)
+- **Code sandboxing**: Execute code in E2B, Modal, or a Docker container -- never on the host
+- **File access controls**: Restrict filesystem MCP server to specific directories; never grant write access to system paths
+- **Network errors**: Retry with exponential backoff; fail gracefully if a source is unreachable
+- **Model selection**: Use Haiku 4.5 for cheap subtasks, Sonnet 4.6 for main reasoning
+- **Human-in-the-loop**: Require approval for destructive actions (file writes, deployments)
+- **Audit logging**: Log every tool call with timestamp, inputs, and outputs
 
 ---
 
@@ -204,222 +262,96 @@ User: "If I have 3 apples and buy 5 more, then give away 2, how many do I have?"
 Agent:
 - Parses: 3 + 5 - 2
 - Calculates: 6
-- Explains: "Starting with 3 apples, adding 5 gives 8, then removing 2 leaves 6"
+- Explains: "Starting with 3, adding 5 gives 8, removing 2 leaves 6"
 
 Tools provided:
-- calculator(expression: str) -> float
-- extract_numbers(text: str) -> list[int]
+- calculator(expression: str) -> str
 """
 
 # Your implementation here
 ```
 
-**Evaluation Criteria**:
-- Correct tool usage (5 points)
-- Proper ReAct loop (5 points)
-- Clear explanations (5 points)
-- Error handling (5 points)
-
----
-
-## Answer Key
-
-### Part 1: Conceptual (Grading Rubric)
-
-**Q1-Q4**: Each worth 10 points
-- Full understanding: 9-10 points
-- Good understanding: 7-8 points
-- Basic understanding: 5-6 points
-- Incomplete: 0-4 points
-
-### Part 2: Code (Grading Rubric)
-
-**Q5**: (15 points)
-- Identifies 4+ issues: 15 points
-- Identifies 3 issues: 12 points
-- Identifies 2 issues: 8 points
-- Identifies 1 issue: 4 points
-
-**Q6**: (15 points)
-- Complete working implementation: 15 points
-- Working with minor issues: 12 points
-- Partial implementation: 8 points
-- Incomplete: 0-6 points
-
-### Part 3: Design (Grading Rubric)
-
-**Q7 & Q8**: Each worth 15 points
-- Comprehensive design: 14-15 points
-- Good design with gaps: 11-13 points
-- Basic design: 8-10 points
-- Incomplete: 0-7 points
-
-## Sample Solutions
-
-### Question 6: Complete Solution
-
-```python
-def run_agent(user_message):
-    messages = [{"role": "user", "content": user_message}]
-
-    for _ in range(5):  # Max 5 iterations
-        response = client.messages.create(
-            model="claude-3-5-sonnet-20241022",
-            max_tokens=1024,
-            tools=tools,
-            messages=messages
-        )
-
-        # Add assistant response to messages
-        messages.append({
-            "role": "assistant",
-            "content": response.content
-        })
-
-        # Check stop reason
-        if response.stop_reason == "end_turn":
-            # Extract text response
-            return next(
-                (block.text for block in response.content if hasattr(block, "text")),
-                "No response"
-            )
-
-        # Handle tool use
-        if response.stop_reason == "tool_use":
-            tool_results = []
-
-            for block in response.content:
-                if block.type == "tool_use":
-                    # Execute tool
-                    if block.name == "search_web":
-                        result = search_web(block.input["query"])
-                    else:
-                        result = "Unknown tool"
-
-                    tool_results.append({
-                        "type": "tool_result",
-                        "tool_use_id": block.id,
-                        "content": result
-                    })
-
-            # Add tool results to messages
-            messages.append({
-                "role": "user",
-                "content": tool_results
-            })
-
-    return "Max iterations reached"
-```
-
-### Question 9: Complete Solution
+**Complete Solution**:
 
 ```python
 from anthropic import Anthropic
 
 client = Anthropic()
 
-def calculator(expression: str) -> float:
-    """Safely evaluate mathematical expression"""
+def calculator(expression: str) -> str:
     try:
-        return eval(expression, {"__builtins__": {}}, {})
+        return str(eval(expression, {"__builtins__": {}}, {}))
     except Exception as e:
         return f"Error: {e}"
-
-def extract_numbers(text: str) -> list:
-    """Extract numbers from text"""
-    import re
-    return [int(n) for n in re.findall(r'\d+', text)]
 
 tools = [
     {
         "name": "calculator",
-        "description": "Calculate mathematical expression",
+        "description": "Evaluate a mathematical expression and return the result",
         "input_schema": {
             "type": "object",
             "properties": {
-                "expression": {"type": "string"}
+                "expression": {
+                    "type": "string",
+                    "description": "Mathematical expression, e.g. '3 + 5 - 2'"
+                }
             },
             "required": ["expression"]
-        }
-    },
-    {
-        "name": "extract_numbers",
-        "description": "Extract numbers from text",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "text": {"type": "string"}
-            },
-            "required": ["text"]
         }
     }
 ]
 
 def math_agent(word_problem: str) -> str:
-    """Solve mathematical word problems"""
-    messages = [
-        {
-            "role": "user",
-            "content": f"""Solve this word problem step by step:
+    messages = [{
+        "role": "user",
+        "content": f"""Solve this word problem step by step:
 {word_problem}
 
-1. Extract the numbers and operations
-2. Create mathematical expression
-3. Calculate the answer
-4. Explain the solution clearly"""
-        }
-    ]
+1. Identify the numbers and operations
+2. Use the calculator tool to compute the answer
+3. Explain the solution clearly"""
+    }]
 
     for _ in range(10):
         response = client.messages.create(
-            model="claude-3-5-sonnet-20241022",
+            model="claude-sonnet-4-6",
             max_tokens=2048,
             tools=tools,
             messages=messages
         )
 
-        messages.append({
-            "role": "assistant",
-            "content": response.content
-        })
+        messages.append({"role": "assistant", "content": response.content})
 
         if response.stop_reason == "end_turn":
             return next(
-                (block.text for block in response.content if hasattr(block, "text")),
+                (b.text for b in response.content if hasattr(b, "text")),
                 "No response"
             )
 
         if response.stop_reason == "tool_use":
             tool_results = []
-
             for block in response.content:
                 if block.type == "tool_use":
-                    if block.name == "calculator":
-                        result = str(calculator(block.input["expression"]))
-                    elif block.name == "extract_numbers":
-                        result = str(extract_numbers(block.input["text"]))
-                    else:
-                        result = "Unknown tool"
-
+                    result = calculator(block.input["expression"])
                     tool_results.append({
                         "type": "tool_result",
                         "tool_use_id": block.id,
                         "content": result
                     })
-
-            messages.append({
-                "role": "user",
-                "content": tool_results
-            })
+            messages.append({"role": "user", "content": tool_results})
 
     return "Could not solve problem"
 
-# Test
 if __name__ == "__main__":
     problem = "If I have 3 apples and buy 5 more, then give away 2, how many do I have?"
-    solution = math_agent(problem)
-    print(solution)
+    print(math_agent(problem))
 ```
+
+**Evaluation Criteria**:
+- Correct tool usage with proper schema: 5 points
+- Proper agent loop with stop conditions: 5 points
+- Clear step-by-step explanations: 5 points
+- Error handling: 5 points
 
 ## Passing Criteria
 
@@ -428,7 +360,7 @@ if __name__ == "__main__":
 - **Part 3**: Minimum 21/30 points
 - **Overall**: Minimum 70/100 points to pass
 
-Bonus points can help achieve higher grades or compensate for weaker areas.
+Bonus points can compensate for weaker areas.
 
 ## Navigation
 - Previous: [Final Project](04_project.md)

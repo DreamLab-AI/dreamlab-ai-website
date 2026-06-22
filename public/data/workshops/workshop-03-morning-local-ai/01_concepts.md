@@ -2,7 +2,7 @@
 
 ## Overview
 
-Running Large Language Models (LLMs) locally gives you privacy, control, and cost-effectiveness. This session explores the modern landscape of local AI in 2025.
+Running Large Language Models (LLMs) locally gives you privacy, control, and cost-effectiveness. This session explores the modern landscape of local AI in 2026.
 
 ---
 
@@ -38,7 +38,7 @@ Running Large Language Models (LLMs) locally gives you privacy, control, and cos
 
 ### GGUF Format (GPT-Generated Unified Format)
 
-The standard for local LLMs in 2025:
+The standard for local LLMs in 2026:
 
 ```
 model-name-Q4_K_M.gguf
@@ -93,7 +93,7 @@ model-name-Q4_K_M.gguf
 
 ---
 
-## Model Selection Guide 2025
+## Model Selection Guide 2026
 
 ### General Purpose Models
 
@@ -110,7 +110,7 @@ ollama pull llama3.3:70b
 ```
 
 **Mistral/Mixtral (Mistral AI)**
-- **Sizes**: 7B, 8x7B (Mixtral)
+- **Sizes**: 7B (v0.3), 8x7B (Mixtral), Mistral Large
 - **Strengths**: Fast, efficient, good reasoning
 - **Use Case**: Balanced performance
 - **VRAM**: 6GB (7B), 24GB (Mixtral)
@@ -131,24 +131,45 @@ ollama pull qwen2.5:7b
 ollama pull qwen2.5:32b
 ```
 
-### Specialized Models
-
-**CodeLlama (Meta)**
-- **Sizes**: 7B, 13B, 34B
-- **Strengths**: Code generation, debugging
-- **Use Case**: Programming assistance
-- **VRAM**: 6GB (7B), 24GB (34B)
+**DeepSeek-R1 (DeepSeek)**
+- **Sizes**: 7B, 14B, 32B, 70B (distilled)
+- **Strengths**: Strong reasoning and mathematics
+- **Use Case**: Complex problem solving, research
+- **VRAM**: 6GB (7B), 48GB (70B)
 
 ```bash
-ollama pull codellama:7b
-ollama pull codellama:13b
+ollama pull deepseek-r1:7b
+ollama pull deepseek-r1:14b
+```
+
+### Specialised Models
+
+**Qwen 2.5 Coder (Alibaba)**
+- **Sizes**: 7B, 14B, 32B
+- **Strengths**: Code generation, debugging, refactoring
+- **Use Case**: Programming assistance
+- **VRAM**: 6GB (7B), 24GB (32B)
+
+```bash
+ollama pull qwen2.5-coder:7b
+ollama pull qwen2.5-coder:14b
+```
+
+**Phi-4 (Microsoft)**
+- **Sizes**: 14B
+- **Strengths**: Small but highly capable, strong reasoning
+- **Use Case**: Resource-constrained environments
+- **VRAM**: 10GB (14B)
+
+```bash
+ollama pull phi4
 ```
 
 **Phi-3 (Microsoft)**
-- **Sizes**: 3.8B, 14B
-- **Strengths**: Small but capable
-- **Use Case**: Resource-constrained environments
-- **VRAM**: 4GB (3.8B), 10GB (14B)
+- **Sizes**: 3.8B
+- **Strengths**: Extremely lightweight
+- **Use Case**: Edge devices, quick responses
+- **VRAM**: 4GB (3.8B)
 
 ```bash
 ollama pull phi3
@@ -361,7 +382,14 @@ ollama run llama3.3:8b
 **Apple Metal (M-series):**
 ```bash
 # Ollama automatically uses Metal
-# Excellent performance on M1/M2/M3 Pro/Max
+# Excellent performance on M1/M2/M3/M4 Pro/Max/Ultra
+```
+
+**Apple MLX (Native):**
+```bash
+# For maximum performance on Apple Silicon
+pip install mlx-lm
+mlx_lm.generate --model mlx-community/Meta-Llama-3.3-8B-Instruct-4bit
 ```
 
 ### Context Length vs Performance
@@ -409,7 +437,7 @@ responses = ollama.batch_generate(
 ```python
 # Analyze sensitive code locally
 code_analysis = ollama.generate(
-    model="codellama",
+    model="qwen2.5-coder:7b",
     prompt=f"Review this code for security:\n{sensitive_code}"
 )
 ```

@@ -373,7 +373,7 @@ Create `docs/getting-started/installation.md`:
 
 ## Prerequisites
 
-- Node.js 18 or higher
+- Node.js 20 or higher
 - npm or yarn package manager
 
 ## Install via npm
@@ -388,8 +388,8 @@ npm install my-package
 yarn add my-package
 \`\`\`
 
-!!! warning "Python 3.8+"
-    This package requires Python 3.8 or higher for CLI tools.
+!!! warning "Python 3.10+"
+    This package requires Python 3.10 or higher for CLI tools.
 ```
 
 Test locally:

@@ -89,13 +89,18 @@ graph TB
 - **Codecov**: Coverage reporting and analysis
 - **SonarQube**: Code quality and security scanning
 - **Stryker**: Mutation testing framework
-- **Percy**: Visual regression testing
+- **Percy / Chromatic**: Visual regression testing
 - **Lighthouse CI**: Performance and accessibility testing
+
+### AI-Assisted QA
+- **Claude Code**: Generate test suites from the terminal, fix failing tests in a loop
+- **GitHub Copilot**: Inline test suggestions and chat-driven test generation
+- **Cursor AI / Windsurf**: IDE-integrated AI test authoring
 
 ### CI/CD Integration
 - **GitHub Actions**: Automated workflow execution
 - **Pre-commit hooks**: Local quality gates
-- **Dependabot**: Automated dependency updates
+- **Dependabot / Renovate**: Automated dependency updates
 
 ## Module Structure
 

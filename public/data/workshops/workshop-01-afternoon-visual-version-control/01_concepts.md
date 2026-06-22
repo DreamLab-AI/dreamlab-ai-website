@@ -88,8 +88,8 @@ gantt
     title Project Development Timeline
     dateFormat  YYYY-MM-DD
     section Research
-    Literature Review     :done,    des1, 2024-01-01, 2024-01-15
-    User Interviews      :active,  des2, 2024-01-10, 10d
+    Literature Review     :done,    des1, 2026-06-01, 2026-06-15
+    User Interviews      :active,  des2, 2026-06-10, 10d
     
     section Design
     Wireframes          :         des3, after des2, 5d

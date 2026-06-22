@@ -114,4 +114,4 @@ After this workshop, you should be able to:
 
 ---
 
-*These objectives align with industry standards for quality assurance in modern software development (2025).*
+*These objectives align with industry standards for quality assurance in modern software development (2026).*

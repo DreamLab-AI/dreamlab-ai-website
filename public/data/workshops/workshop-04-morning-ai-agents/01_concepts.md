@@ -1,50 +1,71 @@
-# Core Agent Concepts (2025)
+# Core Agent Concepts (2026)
 
 > **Duration**: 45 minutes
-> **Difficulty**: ⭐⭐ Intermediate
-> **Prerequisites**: LLM API experience, Python basics
+> **Difficulty**: Intermediate
+> **Prerequisites**: LLM API experience, Python or TypeScript basics
 
-## Agent Frameworks Landscape (2025)
+## The Agent Tooling Landscape (2026)
 
-The AI agent ecosystem has matured significantly. Here's your framework decision tree:
+The AI agent ecosystem has matured from experimental frameworks into production-grade tools. Here is your decision tree:
 
 ```mermaid
 graph TD
-    Start[Choose Framework] --> Q1{Using Claude?}
-    Q1 -->|Yes| Claude[Claude Agent SDK]
-    Q1 -->|No| Q2{Using GPT-4?}
-    Q2 -->|Yes| OpenAI[OpenAI Assistants API]
-    Q2 -->|No| Q3{Need flexibility?}
-    Q3 -->|Yes| LangChain[LangChain/LangGraph]
-    Q3 -->|No| Q4{Multi-agent?}
-    Q4 -->|Yes| Multi{Team-based?}
-    Multi -->|Yes| CrewAI[CrewAI]
-    Multi -->|No| AutoGen[AutoGen]
-    Q4 -->|No| LangChain
+    Start[Choose Your Approach] --> Q1{Building a<br/>coding agent?}
+    Q1 -->|Yes| Q1a{Custom or<br/>off-the-shelf?}
+    Q1a -->|Off-the-shelf| ClaudeCode[Claude Code /<br/>Codex CLI / Aider]
+    Q1a -->|Custom| AgentSDK[Anthropic Agent SDK]
+    Q1 -->|No| Q2{Need tool<br/>integration?}
+    Q2 -->|Yes| MCP[MCP Servers +<br/>Claude API]
+    Q2 -->|No| Q3{Multi-agent<br/>orchestration?}
+    Q3 -->|Yes| Orch[Claude Code Workflows /<br/>LangGraph / CrewAI]
+    Q3 -->|No| Direct[Direct API<br/>with tool use]
 
-    style Claude fill:#ff9999
-    style OpenAI fill:#99ccff
-    style LangChain fill:#99ff99
+    style ClaudeCode fill:#ff9999
+    style AgentSDK fill:#ff9999
+    style MCP fill:#99ccff
+    style Orch fill:#99ff99
 ```
 
-### 1. Claude Agent SDK (Anthropic Official)
+### 1. Claude Code: The Production Coding Agent
 
-**Best for**: Production Claude applications with type safety
+**Best for**: Software development, refactoring, debugging, multi-file changes
 
-**Strengths**:
-- ✅ Official Anthropic support
-- ✅ Built-in error handling and retries
-- ✅ Native MCP server integration
-- ✅ Type-safe tool definitions
-- ✅ Excellent documentation
+Claude Code is Anthropic's standalone terminal agent. It is not a VS Code extension -- it is a full agent that runs in your terminal (and can also run inside VS Code's integrated terminal, or as a desktop/web app).
 
-**Example**: Basic tool use
+**Key capabilities**:
+- Subagents: delegate subtasks to child agents running in parallel
+- Workflows: multi-step pipelines defined in CLAUDE.md or via slash commands
+- Hooks system: run custom scripts on events (pre-edit, post-commit, session start)
+- MCP servers: connect to any tool via the Model Context Protocol
+- `/fast` mode: switch to faster output when speed matters more than depth
+- CLAUDE.md: project-level configuration that shapes agent behaviour
+
+**Installation**:
+```bash
+npm install -g @anthropic-ai/claude-code
+```
+
+**Example -- using Claude Code as a subagent from a script**:
+```bash
+# Spawn a subagent to analyse a codebase
+claude-code --print "Analyse src/ for security vulnerabilities and report findings"
+
+# Pipe context into a focused task
+cat error.log | claude-code --print "Diagnose the root cause of these errors"
+```
+
+**When to use**: Day-to-day development, codebase-wide refactors, CI/CD integration, any task where the agent needs to read/write files and run commands.
+
+### 2. Anthropic Agent SDK
+
+**Best for**: Building custom agents with full control over tool definitions, memory, and orchestration logic.
+
+The Agent SDK provides the building blocks for creating agents in Python or TypeScript:
 
 ```python
 import anthropic
-import os
 
-client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+client = anthropic.Anthropic()
 
 tools = [
     {
@@ -70,31 +91,27 @@ tools = [
 
 def process_tool_call(tool_name, tool_input):
     if tool_name == "get_weather":
-        # Call weather API
-        return f"Weather in {tool_input['location']}: 18°C, Sunny"
+        return f"Weather in {tool_input['location']}: 18C, Sunny"
 
 # Agent loop
 messages = [{"role": "user", "content": "What's the weather in Paris?"}]
 
 while True:
     response = client.messages.create(
-        model="claude-3-5-sonnet-20241022",
+        model="claude-sonnet-4-6",
         max_tokens=1024,
         tools=tools,
         messages=messages
     )
 
-    # Add assistant response
     messages.append({"role": "assistant", "content": response.content})
 
     if response.stop_reason == "end_turn":
-        # Extract final answer
         text = next((b.text for b in response.content if hasattr(b, "text")), "")
         print(f"Answer: {text}")
         break
 
     if response.stop_reason == "tool_use":
-        # Process tool calls
         tool_results = []
         for block in response.content:
             if block.type == "tool_use":
@@ -104,76 +121,93 @@ while True:
                     "tool_use_id": block.id,
                     "content": result
                 })
-
-        # Add tool results
         messages.append({"role": "user", "content": tool_results})
 ```
 
-**When to use**: Building serious Claude applications, need reliability, want official support
+**When to use**: Building domain-specific agents, customer-facing AI products, when you need fine-grained control over the agent loop.
 
-### 2. OpenAI Assistants API
+### 3. MCP (Model Context Protocol)
 
-**Best for**: Rapid prototyping with GPT-4, managed infrastructure
+MCP is the standardised protocol for connecting AI agents to tools. Think of it as USB for AI -- one plug, any device.
 
-**Strengths**:
-- ✅ Fully managed (no server code needed)
-- ✅ Built-in code interpreter
-- ✅ File search and retrieval
-- ✅ Persistent threads
-- ✅ Function calling
+**How it works**:
+```mermaid
+graph LR
+    Agent[AI Agent] --> |MCP Protocol| Server1[Filesystem Server]
+    Agent --> |MCP Protocol| Server2[GitHub Server]
+    Agent --> |MCP Protocol| Server3[Database Server]
+    Agent --> |MCP Protocol| Server4[Search Server]
 
-**Example**: Assistant with code interpreter
-
-```python
-from openai import OpenAI
-
-client = OpenAI()
-
-# Create assistant (one-time setup)
-assistant = client.beta.assistants.create(
-    name="Data Analyst",
-    instructions="You analyze data and create visualizations using Python",
-    tools=[{"type": "code_interpreter"}],
-    model="gpt-4-turbo-preview"
-)
-
-# Create conversation thread
-thread = client.beta.threads.create()
-
-# Add message
-message = client.beta.threads.messages.create(
-    thread_id=thread.id,
-    role="user",
-    content="Analyze this data: [1, 5, 3, 9, 2] and create a bar chart"
-)
-
-# Run assistant
-run = client.beta.threads.runs.create_and_poll(
-    thread_id=thread.id,
-    assistant_id=assistant.id
-)
-
-if run.status == 'completed':
-    # Get messages
-    messages = client.beta.threads.messages.list(thread_id=thread.id)
-    for msg in messages.data:
-        print(f"{msg.role}: {msg.content[0].text.value}")
+    style Agent fill:#f9f,stroke:#333,stroke-width:2px
 ```
 
-**When to use**: Need quick prototype, want managed infrastructure, GPT-4 preference
+**Popular MCP Servers** (2026):
+- **@modelcontextprotocol/server-filesystem** -- File read/write operations
+- **@modelcontextprotocol/server-github** -- Issues, PRs, repo management
+- **@modelcontextprotocol/server-postgres** -- Database queries
+- **@modelcontextprotocol/server-brave-search** -- Web search
+- **@modelcontextprotocol/server-slack** -- Slack messaging
+- **@modelcontextprotocol/server-memory** -- Persistent key-value memory
+- Community servers for Jira, Notion, Google Drive, and hundreds more
 
-### 3. LangChain & LangGraph
+**Configuring MCP in Claude Code** (`.mcp.json`):
+```json
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/path/to/project"]
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_TOKEN": "your-token"
+      }
+    }
+  }
+}
+```
 
-**Best for**: Complex workflows, framework-agnostic, advanced orchestration
+**When to use**: Whenever an agent needs to interact with external systems. MCP is now the default way to give agents tools.
 
-**Strengths**:
-- ✅ Works with any LLM
-- ✅ Massive tool ecosystem
-- ✅ Advanced agent types (ReAct, Plan-and-Execute)
-- ✅ LangGraph for state machines
-- ✅ Strong community
+### 4. OpenAI Codex CLI
 
-**Example**: ReAct agent with multiple tools
+**Best for**: Open-source terminal agent with OpenAI models.
+
+```bash
+# Install
+npm install -g @openai/codex
+
+# Use interactively
+codex "refactor this function to use async/await"
+
+# Autonomous mode
+codex --approval-mode full-auto "add input validation to all API endpoints"
+```
+
+**When to use**: When you prefer OpenAI models, want an open-source tool, or need a second opinion alongside Claude Code.
+
+### 5. Other Terminal Agents
+
+**Aider** (open-source, multi-model):
+```bash
+pip install aider-chat
+aider --model claude-sonnet-4-6  # works with Claude, GPT, local models
+```
+
+**Cursor AI** (IDE-native, $20/month):
+- VS Code fork with deep AI integration
+- Agent mode for multi-file edits
+- Built-in MCP support
+
+**Windsurf** (IDE-native, $10-15/month):
+- Cascade agent for multi-step workflows
+- Good for smaller, focused tasks
+
+### 6. LangChain & LangGraph
+
+**Best for**: Complex custom workflows, multi-model support, graph-based orchestration.
 
 ```python
 from langchain.agents import create_react_agent, AgentExecutor
@@ -181,10 +215,8 @@ from langchain_anthropic import ChatAnthropic
 from langchain_community.tools.tavily_search import TavilySearchResults
 from langchain import hub
 
-# Initialize LLM
-llm = ChatAnthropic(model="claude-3-5-sonnet-20241022")
+llm = ChatAnthropic(model="claude-sonnet-4-6")
 
-# Create tools
 search = TavilySearchResults(max_results=3)
 
 from langchain.tools import Tool
@@ -205,141 +237,28 @@ tools = [
     )
 ]
 
-# Get ReAct prompt
 prompt = hub.pull("hwchase17/react")
-
-# Create agent
 agent = create_react_agent(llm, tools, prompt)
-
-# Create executor
 agent_executor = AgentExecutor(
-    agent=agent,
-    tools=tools,
-    verbose=True,
-    max_iterations=5
+    agent=agent, tools=tools, verbose=True, max_iterations=5
 )
 
-# Run
 result = agent_executor.invoke({
     "input": "What's the population of Tokyo and what's 15% of that number?"
 })
-
 print(result["output"])
 ```
 
-**When to use**: Need flexibility, complex workflows, multi-model support
-
-### 4. AutoGen (Microsoft)
-
-**Best for**: Multi-agent conversations, code generation
-
-**Strengths**:
-- ✅ Agent-to-agent communication
-- ✅ Built-in code execution
-- ✅ Group chat patterns
-- ✅ Human-in-the-loop
-- ✅ Great for coding tasks
-
-**Example**: Two agents collaborating
-
-```python
-import autogen
-
-config_list = [{
-    "model": "gpt-4",
-    "api_key": os.environ["OPENAI_API_KEY"]
-}]
-
-# Create assistant agent
-assistant = autogen.AssistantAgent(
-    name="assistant",
-    llm_config={"config_list": config_list}
-)
-
-# Create user proxy (executes code)
-user_proxy = autogen.UserProxyAgent(
-    name="user_proxy",
-    human_input_mode="NEVER",
-    max_consecutive_auto_reply=10,
-    code_execution_config={"work_dir": "coding"},
-)
-
-# Start conversation
-user_proxy.initiate_chat(
-    assistant,
-    message="Write Python code to calculate the 10th Fibonacci number and execute it"
-)
-```
-
-**When to use**: Multi-agent scenarios, code generation, collaborative problem-solving
-
-### 5. CrewAI
-
-**Best for**: Role-based agent teams, content creation
-
-**Strengths**:
-- ✅ Simple API
-- ✅ Role-based abstraction
-- ✅ Built-in collaboration patterns
-- ✅ Good documentation
-- ✅ Rapid development
-
-**Example**: Research and writing crew
-
-```python
-from crewai import Agent, Task, Crew
-
-# Define agents
-researcher = Agent(
-    role="Research Analyst",
-    goal="Find accurate information on topics",
-    backstory="Expert researcher with attention to detail",
-    tools=[search_tool],
-    verbose=True
-)
-
-writer = Agent(
-    role="Content Writer",
-    goal="Write engaging content based on research",
-    backstory="Experienced writer with clear communication style",
-    verbose=True
-)
-
-# Define tasks
-research_task = Task(
-    description="Research the latest AI agent frameworks in 2025",
-    agent=researcher,
-    expected_output="Detailed research notes with sources"
-)
-
-writing_task = Task(
-    description="Write a blog post about AI agent frameworks based on research",
-    agent=writer,
-    expected_output="800-word blog post in markdown"
-)
-
-# Create crew
-crew = Crew(
-    agents=[researcher, writer],
-    tasks=[research_task, writing_task],
-    verbose=True
-)
-
-# Execute
-result = crew.kickoff()
-print(result)
-```
-
-**When to use**: Content creation, team-based workflows, rapid prototyping
+**When to use**: When you need framework-agnostic flexibility, complex state machines (LangGraph), or integration with many different LLM providers.
 
 ## Tool Use: The Agent's Hands
 
-### Modern Tool Calling (2025)
+### Modern Tool Calling (2026)
 
-All major LLMs now support structured tool calling. Here's the pattern:
+All major LLMs support structured tool calling. The pattern is consistent:
 
 ```python
-# 1. Define tool schema
+# 1. Define tool schema (same format works with Claude, GPT, Gemini)
 tool_schema = {
     "name": "search_database",
     "description": "Search product database",
@@ -362,60 +281,25 @@ tool_schema = {
 
 # 2. Implement tool function
 def search_database(query: str, filters: dict = None):
-    # Your implementation
-    results = db.search(query, **filters)
+    results = db.search(query, **(filters or {}))
     return {"results": results, "count": len(results)}
 
-# 3. LLM chooses tool automatically
-# (framework handles routing)
-
-# 4. Execute and return results
+# 3. LLM chooses tool automatically based on the user's request
+# 4. Your agent loop executes the tool and feeds results back
 ```
-
-### MCP (Model Context Protocol)
-
-MCP standardizes tool integration across frameworks:
-
-```typescript
-// MCP Server Example (filesystem)
-{
-  "tools": [
-    {
-      "name": "read_file",
-      "description": "Read file contents",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "path": {"type": "string"}
-        }
-      }
-    }
-  ]
-}
-```
-
-**Popular MCP Servers** (2025):
-- **@modelcontextprotocol/server-filesystem** - File operations
-- **@modelcontextprotocol/server-github** - GitHub integration
-- **@modelcontextprotocol/server-postgres** - Database queries
-- **@modelcontextprotocol/server-brave-search** - Web search
-- **@modelcontextprotocol/server-slack** - Slack integration
 
 ### Code Execution Sandboxes
 
-For safe code execution:
+For safe code execution within agents:
 
 **E2B Sandboxes**:
 ```python
 from e2b import Sandbox
 
 sandbox = Sandbox(template="base")
-
-# Execute code safely
 result = sandbox.process.start_and_wait(
     cmd="python -c 'print(sum([1, 2, 3, 4, 5]))'"
 )
-
 print(result.stdout)  # "15"
 sandbox.close()
 ```
@@ -428,10 +312,8 @@ app = modal.App("agent-sandbox")
 
 @app.function()
 def execute_code(code: str):
-    # Runs in isolated container
     exec(code)
 
-# Call from agent
 result = execute_code.remote("print('Hello from sandbox')")
 ```
 
@@ -454,24 +336,41 @@ Loop until goal achieved:
 
 ### 2. Plan-and-Execute
 
-Create complete plan first, then execute:
+Create a complete plan first, then execute:
 
 ```
 1. PLANNING PHASE:
-   - Analyze goal
+   - Analyse goal
    - Break into subtasks
    - Order by dependencies
 
 2. EXECUTION PHASE:
-   - Execute each subtask
-   - Adapt plan if failures
-   - Synthesize results
+   - Execute each subtask (potentially via subagents)
+   - Adapt plan if failures occur
+   - Synthesise results
 ```
 
-**Strengths**: More efficient, better for complex tasks, parallelizable
-**Weaknesses**: Harder to implement, less flexible to changes
+**Strengths**: More efficient, better for complex tasks, parallelisable with subagents
+**Weaknesses**: Harder to implement, less flexible to mid-course changes
 
-### 3. Reflection
+### 3. Subagent Delegation (Claude Code Pattern)
+
+The parent agent delegates specialised subtasks to child agents:
+
+```
+1. PARENT receives complex goal
+2. DECOMPOSE into independent subtasks
+3. SPAWN subagents for each subtask (parallel)
+4. COLLECT results from subagents
+5. SYNTHESISE final answer
+```
+
+This is how Claude Code's `--print` flag and internal subagent system work. Each subagent gets a focused context and returns a result.
+
+**Strengths**: Parallel execution, focused contexts, scales to large tasks
+**Weaknesses**: Coordination overhead, cost of multiple agent invocations
+
+### 4. Reflection
 
 Agent evaluates its own work:
 
@@ -479,26 +378,11 @@ Agent evaluates its own work:
 1. GENERATE: Produce initial solution
 2. CRITIQUE: Identify issues
 3. REFINE: Improve based on critique
-4. [Repeat 2-3 until quality threshold]
+4. [Repeat 2-3 until quality threshold met]
 ```
 
 **Strengths**: Higher quality outputs, learns from mistakes
 **Weaknesses**: More expensive (extra LLM calls), slower
-
-### 4. Tree of Thoughts
-
-Explore multiple reasoning paths:
-
-```
-1. Generate multiple approaches
-2. Evaluate each approach
-3. Expand most promising paths
-4. Backtrack if dead end
-5. Select best solution
-```
-
-**Strengths**: Best for complex reasoning, finds optimal solutions
-**Weaknesses**: Very expensive, slow, overkill for simple tasks
 
 ## Memory Systems
 
@@ -513,11 +397,35 @@ class ConversationMemory:
     def add(self, role, content):
         self.messages.append({"role": role, "content": content})
         if len(self.messages) > self.max_messages:
-            self.messages.pop(0)  # Remove oldest
+            self.messages.pop(0)
 
     def get_context(self):
         return self.messages
 ```
+
+### Project Configuration (CLAUDE.md)
+
+Claude Code uses `CLAUDE.md` files as persistent project memory:
+
+```markdown
+# Project: My API Server
+
+## Build Commands
+- npm run build
+- npm run test
+
+## Architecture
+- Express.js REST API
+- PostgreSQL via Prisma ORM
+- JWT authentication
+
+## Conventions
+- British English in user-facing strings
+- All endpoints return JSON
+- Error responses use RFC 7807 format
+```
+
+This gives the agent context about the project without consuming conversation tokens on every turn.
 
 ### Long-term Memory (Vector Store)
 
@@ -536,39 +444,13 @@ class AgentMemory:
     def remember(self, content, metadata=None):
         """Store in long-term memory"""
         self.vectorstore.add_texts(
-            texts=[content],
-            metadatas=[metadata or {}]
+            texts=[content], metadatas=[metadata or {}]
         )
 
     def recall(self, query, k=5):
         """Retrieve relevant memories"""
         docs = self.vectorstore.similarity_search(query, k=k)
         return [doc.page_content for doc in docs]
-```
-
-### Working Memory (Task State)
-
-```python
-class WorkingMemory:
-    def __init__(self):
-        self.current_goal = None
-        self.plan = []
-        self.completed_steps = []
-        self.tool_results = {}
-
-    def set_goal(self, goal):
-        self.current_goal = goal
-
-    def add_step_result(self, step, result):
-        self.completed_steps.append(step)
-        self.tool_results[step] = result
-
-    def get_context(self):
-        return {
-            "goal": self.current_goal,
-            "progress": f"{len(self.completed_steps)}/{len(self.plan)} steps",
-            "recent_results": self.tool_results
-        }
 ```
 
 ## Error Handling & Robustness
@@ -588,7 +470,7 @@ def call_tool_with_retry(tool_name, params):
         return execute_tool(tool_name, params)
     except Exception as e:
         print(f"Tool call failed: {e}, retrying...")
-        raise  # Tenacity will retry
+        raise
 ```
 
 ### Validation and Self-Correction
@@ -600,14 +482,11 @@ def execute_with_validation(agent, task):
 
     for attempt in range(max_retries):
         result = agent.run(task)
-
-        # Validate result
         validation = agent.validate_result(result, task)
 
         if validation["is_valid"]:
             return result
 
-        # Ask agent to correct
         correction_prompt = f"""
         Your previous result had issues:
         {validation['issues']}
@@ -615,7 +494,6 @@ def execute_with_validation(agent, task):
         Please correct and try again.
         Previous attempt: {result}
         """
-
         task = correction_prompt
 
     raise Exception("Failed to produce valid result")
@@ -640,29 +518,18 @@ class CostController:
         print(f"Tokens: {self.tokens_used}/{self.max_tokens}")
 ```
 
-### 2. Timeout Protection
+### 2. Model Selection for Cost Efficiency
 
-```python
-import signal
+Choose the right model for each task:
 
-class TimeoutError(Exception):
-    pass
+| Task | Recommended Model | Why |
+|------|------------------|-----|
+| Complex reasoning | Opus 4.8 | Highest accuracy |
+| General agent work | Sonnet 4.6 | Best balance of speed, quality, cost |
+| Simple tool routing | Haiku 4.5 | Fastest and cheapest |
+| Subagent subtasks | Sonnet 4.6 or Haiku 4.5 | Keeps costs manageable at scale |
 
-def timeout_handler(signum, frame):
-    raise TimeoutError("Agent execution timeout")
-
-def run_with_timeout(agent, task, timeout_seconds=60):
-    signal.signal(signal.SIGALRM, timeout_handler)
-    signal.alarm(timeout_seconds)
-
-    try:
-        result = agent.run(task)
-        signal.alarm(0)  # Cancel alarm
-        return result
-    except TimeoutError:
-        print("Agent took too long, stopping...")
-        return None
-```
+Check the [Anthropic console](https://console.anthropic.com/) for current pricing.
 
 ### 3. Monitoring and Logging
 
@@ -699,14 +566,14 @@ class AgentMonitor:
 
 ## Next Steps
 
-**Continue to**: [Hands-On Practice](02_hands_on.md) - Build your first agents
+**Continue to**: [Hands-On Practice](02_hands_on.md) -- Build your first agents
 
 **Key Takeaways**:
-- Choose framework based on your needs (Claude SDK, OpenAI Assistants, LangChain, AutoGen, CrewAI)
-- All modern LLMs support structured tool calling
-- ReAct is the most common agent pattern
-- Memory systems combine short-term, working, and long-term storage
-- Production agents need cost control, timeouts, and monitoring
+- Claude Code is the go-to production coding agent; the Agent SDK is for building custom agents
+- MCP is the standard protocol for giving agents tools -- learn it well
+- ReAct and subagent delegation are the two most important agent patterns
+- Choose models strategically: Opus for reasoning, Sonnet for general work, Haiku for routing
+- Production agents need cost control, timeouts, and monitoring from day one
 
 ## Navigation
 - Previous: [Introduction](00_introduction.md)

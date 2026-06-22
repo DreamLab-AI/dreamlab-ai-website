@@ -176,22 +176,22 @@ This is the most crucial and often trickiest part, as the interface varies betwe
 *   **`CNAME` File Issues:**
     *   If GitHub created a `CNAME` file in your repository, ensure it's present and contains only your custom domain (e.g., `www.yourcreativeproject.com`).
 
-### Using Roo Code for DNS and Custom Domains:
+### Using Claude Code for DNS and Custom Domains:
 
-While Roo Code can't directly configure your DNS settings (as that's done via your domain registrar's website), it can be a valuable assistant:
+While Claude Code cannot directly configure your DNS settings (as that is done via your domain registrar's website), it can be a valuable assistant. Launch Claude Code and try:
 
 *   **Understanding DNS Concepts:**
     *   "Explain the difference between an A record and a CNAME record in DNS."
     *   "What is DNS propagation and why does it take time?"
     *   "What does TTL mean for a DNS record?"
-*   **Generating Example Configurations (Conceptual):**
+*   **Generating Example Configurations:**
     *   "Show me an example of how to configure A records for an apex domain pointing to GitHub Pages IPs."
     *   "What should a CNAME record look like for pointing `blog.mydomain.com` to `myusername.github.io`?"
 *   **Troubleshooting Guidance:**
-    *   "My custom domain for GitHub Pages isn't working. I've set up A records. What are common things to check?"
+    *   "My custom domain for GitHub Pages is not working. I have set up A records. What are common things to check?"
     *   "GitHub says 'DNS check failed' for my custom domain. What steps can I take to diagnose this?"
-*   **Explaining Registrar-Specific Instructions (if you provide them):**
-    *   If you copy instructions from your domain registrar's help pages, you could ask Roo Code: "My registrar says to 'create an A record pointing to an IP address'. Can you explain what 'Host' and 'Value' fields typically mean in this context?"
+*   **Explaining Registrar-Specific Instructions:**
+    *   If you copy instructions from your domain registrar's help pages, you could ask Claude Code: "My registrar says to 'create an A record pointing to an IP address'. Can you explain what 'Host' and 'Value' fields typically mean in this context?"
 
 Setting up a custom domain adds a layer of professionalism to your GitHub Pages site. While it involves interacting with DNS settings outside of GitHub, following these steps carefully will lead to a successful configuration.
 
@@ -319,22 +319,22 @@ Finally, configure your **public** repository to serve GitHub Pages from the bra
 
 Your site should be live at `https://yourusername.github.io/your-public-repo-name/` after the first successful workflow run.
 
-### Leveraging Roo Code for This Workflow
+### Leveraging Claude Code for This Workflow
 
-Setting up GitHub Actions, especially for the first time, can be intricate. Here’s how Roo Code (powered by Gemini) can assist you:
+Setting up GitHub Actions, especially for the first time, can be intricate. Here is how Claude Code can assist you:
 
 *   **Generating the Workflow File:**
-    *   Prompt Roo Code: "Create a GitHub Actions workflow to build a [Your SSG, e.g., Hugo, Next.js] site from this private repository and deploy it to the `gh-pages` branch of a public repository named `yourusername/public-repo-name` using a PAT stored as `DEPLOY_TOKEN`. The build output is in the `./build` directory."
-    *   Roo Code can generate a well-structured starting point for your `deploy-to-public-ghpages.yml` file.
+    *   Ask Claude Code: "Create a GitHub Actions workflow to build a [Your SSG, e.g., Hugo, Next.js] site from this private repository and deploy it to the `gh-pages` branch of a public repository named `yourusername/public-repo-name` using a PAT stored as `DEPLOY_TOKEN`. The build output is in the `./build` directory."
+    *   Claude Code can generate a well-structured starting point for your `deploy-to-public-ghpages.yml` file and write it directly to your project.
 *   **Understanding YAML and Actions Syntax:**
-    *   Select a part of the YAML file and ask Roo Code: "Explain what `uses: actions/checkout@v4` does in this GitHub Action."
+    *   "Explain what `uses: actions/checkout@v4` does in the workflow file."
 *   **Customising Build Steps:**
-    *   If you're unsure about the build commands for your specific SSG, ask: "What are the typical build commands for a [Your SSG] project, and how do I ensure the output goes to a `./public` directory?"
+    *   If you are unsure about the build commands for your specific SSG, ask: "What are the typical build commands for a [Your SSG] project, and how do I ensure the output goes to a `./public` directory?"
 *   **Finding Specific Actions:**
-    *   "I need to use Hugo to build my site in a GitHub Action. Is there a recommended action for setting up Hugo?" (Roo Code might suggest `peaceiris/actions-hugo`).
+    *   "I need to use Hugo to build my site in a GitHub Action. Is there a recommended action for setting up Hugo?"
 *   **Troubleshooting Workflow Failures:**
-    *   If your GitHub Action fails, copy the error messages from the Actions log and paste them into Roo Code: "My GitHub Action failed with this error: `[paste error log]`. What could be the cause, and how can I fix it?"
-    *   Roo Code can help decipher cryptic error messages related to PAT permissions, incorrect paths, or build failures.
+    *   If your GitHub Action fails, copy the error messages from the Actions log and ask Claude Code: "My GitHub Action failed with this error: `[paste error log]`. What could be the cause, and how can I fix it?"
+    *   Claude Code can help decipher cryptic error messages related to PAT permissions, incorrect paths, or build failures.
 *   **PAT Security and Scopes:**
     *   "What are the security best practices for using Personal Access Tokens in GitHub Actions?"
     *   "Explain the `repo` and `workflow` scopes for a GitHub PAT."
@@ -356,4 +356,4 @@ This advanced method provides a robust way to manage private source code while s
 
 ---
 
-Next: [Chapter 6: AI-Powered Workflows with Roo Code](./06_ai_workflows_roo_code.md)
+Next: [Chapter 6: AI-Powered Workflows with Claude Code](./06_ai_workflows_roo_code.md)

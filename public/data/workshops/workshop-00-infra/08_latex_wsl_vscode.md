@@ -12,7 +12,7 @@ This guide assumes you have a working Windows environment and are familiar with 
 2.  Installing TeXLive, a comprehensive LaTeX distribution, on Ubuntu.
 3.  Connecting VS Code to your WSL2 environment.
 4.  Configuring the LaTeX Workshop extension in VS Code for an optimal experience.
-5.  Leveraging Roo Code for AI-assisted LaTeX development.
+5.  Leveraging Claude Code for AI-assisted LaTeX development.
 
 ## 8.2 Setting up Windows Subsystem for Linux (WSL2) and Ubuntu
 
@@ -135,21 +135,21 @@ The [LaTeX Workshop](https://marketplace.visualstudio.com/items?itemName=James-Y
 5.  **Spell Checking:**
     *   Consider installing a spell-checking extension like "Code Spell Checker" (by Street Side Software) for your LaTeX documents. It supports multiple languages, including UK English.
 
-## 8.6 Enhancing Your LaTeX Workflow with Roo Code
+## 8.6 Enhancing Your LaTeX Workflow with Claude Code
 
-Just as Roo Code can assist with general programming tasks (as discussed in [Chapter 6](./06_ai_workflows_roo_code.md)), it can also be a valuable companion for writing LaTeX:
+Just as Claude Code can assist with general programming tasks (as discussed in [Chapter 6](./06_ai_workflows_roo_code.md)), it can also be a valuable companion for writing LaTeX. Launch Claude Code from your LaTeX project directory and try:
 
 *   **Understanding Complex Syntax:**
-    *   Select a convoluted LaTeX command or environment and ask Roo Code: "Explain this LaTeX code."
+    *   "Explain what the `\usepackage{tikz}` and `\begin{tikzpicture}` commands do in my document."
 *   **Generating Structures:**
-    *   Prompt: "Generate a LaTeX `article` document structure with sections for Introduction, Methods, Results, and Conclusion."
-    *   Prompt: "Create a LaTeX `beamer` slide template for a presentation titled 'My Research'."
+    *   "Generate a LaTeX `article` document structure with sections for Introduction, Methods, Results, and Conclusion."
+    *   "Create a LaTeX `beamer` slide template for a presentation titled 'My Research'."
 *   **Debugging Errors:**
-    *   Copy a LaTeX compilation error message and ask Roo Code: "What does this LaTeX error mean and how can I fix it? Error: `[error message]`"
+    *   "I'm getting this LaTeX compilation error: `[paste error message]`. What does it mean and how can I fix it?"
 *   **Finding Packages:**
-    *   Prompt: "What LaTeX package can I use to create timelines?"
+    *   "What LaTeX package can I use to create timelines?"
 *   **Refining Content:**
-    *   Select a paragraph and ask: "Suggest alternative phrasing for this text in a formal academic style."
+    *   "Suggest alternative phrasing for the abstract in mydocument.tex in a formal academic style."
 
 Remember to use Git for version control, especially when incorporating AI-generated LaTeX code, to easily track changes and revert if necessary.
 
@@ -180,7 +180,7 @@ Before relying entirely on the LaTeX Workshop extension, it can be instructive t
 
 This manual step helps confirm that TeXLive is installed correctly and provides a basic understanding of the compilation process.
 
-This comprehensive LaTeX setup empowers you to create professional-quality documents efficiently, combining the strengths of LaTeX, the Linux environment via WSL2, and the versatile VS Code editor, further enhanced by AI assistance from Roo Code.
+This comprehensive LaTeX setup empowers you to create professional-quality documents efficiently, combining the strengths of LaTeX, the Linux environment via WSL2, and the versatile VS Code editor, further enhanced by AI assistance from Claude Code.
 
 ---
 

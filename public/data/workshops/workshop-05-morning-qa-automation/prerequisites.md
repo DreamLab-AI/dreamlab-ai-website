@@ -26,9 +26,9 @@
 
 ### Essential Software
 
-1. **Node.js 18+**
+1. **Node.js 20+**
    ```bash
-   node --version  # Should be 18.0.0 or higher
+   node --version  # Should be 20.0.0 or higher
    npm --version   # Should be 9.0.0 or higher
    ```
    Install from: [nodejs.org](https://nodejs.org/)
@@ -115,7 +115,7 @@ npm install -D @testing-library/react @testing-library/jest-dom
 Complete this **24 hours before** the workshop:
 
 ### Software Installation
-- [ ] Node.js 18+ installed and verified (`node --version`)
+- [ ] Node.js 20+ installed and verified (`node --version`)
 - [ ] npm package manager working (`npm --version`)
 - [ ] Git installed (`git --version`)
 - [ ] VS Code or preferred editor installed

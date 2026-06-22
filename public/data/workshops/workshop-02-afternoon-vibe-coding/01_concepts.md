@@ -8,7 +8,7 @@ Before we start building amazing things, let's understand the revolutionary conc
 
 ### The Communication Bridge
 
-Vibe coding works because modern AI has become fluent in translating human intent into computer instructions:
+Vibe coding works because modern AI has become fluent in translating human intent into computer instructions. You describe what you want in plain English — the AI writes the code.
 
 ```mermaid
 graph TD
@@ -59,7 +59,64 @@ graph TD
    - You provide vision
    - AI handles implementation
 
-## 1.2 The Language of Creation
+## 1.2 The Vibe Coding Tool Landscape (2026)
+
+A year ago, vibe coding meant pasting prompts into ChatGPT and copying code back. Today there is a rich ecosystem of tools that let you describe what you want and watch it materialise.
+
+### AI Coding Agents (Full Autonomy)
+
+These tools read your project, write files, run commands, and iterate — you direct, they build.
+
+| Tool | What It Is | Cost |
+|------|-----------|------|
+| **Claude Code** | Anthropic's CLI coding agent. Describe what you want; it reads your codebase, writes code, runs tests, and iterates. Also available as a desktop app, web app (claude.ai/code), and VS Code/JetBrains extensions. | API usage (pay-per-token) |
+| **OpenAI Codex CLI** | Open-source terminal agent from OpenAI. Similar concept — describe, it builds. | API usage |
+| **Cursor AI** | VS Code fork with deep AI integration. Chat with your codebase, inline edits, multi-file changes. | From $20/month |
+| **Windsurf** | AI-native editor (formerly Codeium). Flow mode for autonomous multi-step tasks. | From $10/month |
+
+### AI-Assisted Editors (Copilot Style)
+
+These provide suggestions, completions, and chat — you remain in the driving seat.
+
+| Tool | What It Is | Cost |
+|------|-----------|------|
+| **GitHub Copilot** | Inline suggestions + chat + workspace mode in VS Code/JetBrains. | From $10/month (free for students/OSS) |
+| **Continue.dev** | Free, open-source, multi-model extension for VS Code. | Free |
+| **Aider** | Free, terminal-based, open-source pair programmer. | Free (API costs only) |
+
+### Chat Interfaces (Copy-Paste Workflow)
+
+For quick prototyping, you can still use chat interfaces and copy the generated code.
+
+| Tool | What It Is |
+|------|-----------|
+| **ChatGPT** (GPT-4o, o3, canvas mode) | Conversational, good for single-file prototypes |
+| **Claude.ai** | Excellent for longer code generation with artifacts |
+| **Google AI Studio** | Gemini models, massive context for large codebases |
+
+### Why Claude Code Excels at Vibe Coding
+
+Claude Code is particularly well-suited to vibe coding because:
+
+1. **It understands your whole project** — it reads your files, directory structure, and `CLAUDE.md` instructions automatically
+2. **It executes iteratively** — describe what you want, it builds it, you refine with natural language
+3. **It runs your code** — it can execute scripts, run tests, and fix errors without you touching the terminal
+4. **It uses slash commands** — `/fast` for quick iterations, `/cost` to monitor spend
+5. **It works everywhere** — terminal, desktop app, web app, or inside your IDE
+
+```
+# Example vibe coding session in Claude Code:
+> Build me a landing page for a yoga studio. Modern, calming 
+  colours, hero section with a background image placeholder,
+  class schedule, and a contact form. Use Tailwind CSS.
+
+# Claude Code creates the files, then you refine:
+> Make the hero text bigger and add a gradient overlay.
+> The contact form needs a phone number field too.
+> Add smooth scroll when clicking nav links.
+```
+
+## 1.3 The Language of Creation
 
 ### Effective Vibe Coding Vocabulary
 
@@ -100,7 +157,7 @@ mindmap
       "Fade on scroll"
 ```
 
-## 1.3 The Anatomy of a Vibe Coding Session
+## 1.4 The Anatomy of a Vibe Coding Session
 
 ### Phase 1: Vision Setting
 
@@ -143,7 +200,7 @@ Final touches and going live:
 Add smooth transitions between all interactions."
 ```
 
-## 1.4 Understanding What AI Creates
+## 1.5 Understanding What AI Creates
 
 ### The Three Languages of the Web
 
@@ -180,7 +237,7 @@ graph LR
 
 You don't need to understand this code—just know it exists and works together.
 
-## 1.5 The Power of Examples
+## 1.6 The Power of Examples
 
 ### Reference-Based Creation
 
@@ -209,7 +266,7 @@ graph TD
     style E fill:#4fc3f7,stroke:#01579b,stroke-width:3px
 ```
 
-## 1.6 Common Vibe Coding Patterns
+## 1.7 Common Vibe Coding Patterns
 
 ### The Enhancement Loop
 
@@ -243,7 +300,7 @@ flowchart LR
 5. **Polish Details**
    - "Add subtle animations and loading transitions"
 
-## 1.7 Debugging Through Conversation
+## 1.8 Debugging Through Conversation
 
 ### When Things Don't Look Right
 
@@ -272,7 +329,7 @@ graph TD
     style F fill:#4fc3f7,stroke:#01579b,stroke-width:3px
 ```
 
-## 1.8 Advanced Vibe Coding Concepts
+## 1.9 Advanced Vibe Coding Concepts
 
 ### Conditional Descriptions
 
@@ -289,7 +346,7 @@ and hide the form. If there's an error, highlight the problem fields."
 "Load the project data from a list and create a card for each one. 
 When clicked, expand to show more details."
 
-## 1.9 The Mindset for Success
+## 1.10 The Mindset for Success
 
 ### Think Like a Director, Not a Developer
 
@@ -320,7 +377,7 @@ mindmap
 - Iterate quickly
 - Trust the process
 
-## 1.10 Real-World Applications
+## 1.11 Real-World Applications
 
 ### What People Build with Vibe Coding
 

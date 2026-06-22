@@ -454,7 +454,7 @@ export default {
 
 ### AI Test Generation
 
-**Using ChatGPT/Claude for test creation**:
+**Using Claude or ChatGPT for test creation**:
 
 ```javascript
 // Prompt: "Generate comprehensive unit tests for this function"
@@ -503,11 +503,24 @@ describe('validatePassword', () => {
 
 ### AI Test Maintenance
 
-Tools like **GitHub Copilot** can:
-- Auto-update tests when code changes
-- Suggest missing test cases
-- Generate mock data
-- Refactor test code
+AI coding tools can significantly accelerate test maintenance:
+
+**Claude Code** (terminal-based agent):
+- Generate comprehensive test suites from existing code
+- Identify untested edge cases and suggest additions
+- Refactor test code to follow best practices
+- Run tests and fix failures in a feedback loop
+
+**GitHub Copilot** (inline IDE assistant):
+- Auto-complete test assertions as you type
+- Suggest missing test cases based on code coverage
+- Generate mock data from type definitions
+- Update test expectations when code changes
+
+**Cursor AI / Windsurf** (AI-native editors):
+- Chat-driven test generation with full codebase context
+- Bulk test creation across multiple files
+- AI-assisted debugging of flaky tests
 
 ## Test-Driven Development (TDD)
 

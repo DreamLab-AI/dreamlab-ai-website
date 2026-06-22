@@ -1,53 +1,164 @@
-# 5.c: The Evolving Toolkit: New OpenAI APIs and Agentic Capabilities (Brief Overview)
+# 5.c: The Evolving Toolkit: MCP, Agent Frameworks, and What Comes Next
 
-OpenAI's development efforts extend beyond the current Codex offerings, with new APIs and tools continually emerging. These advancements signal a broader strategy towards more versatile and capable AI agents, which are likely to influence future iterations of coding assistants and developer tools.
+The AI coding landscape is evolving rapidly. Beyond the current tools, several emerging capabilities and standards are shaping the future of AI-assisted development. Understanding these trends helps you prepare for what comes next and make better decisions about your tooling investments today.
 
-## Responses API
+## Model Context Protocol (MCP) — The Open Standard
 
-The Responses API is a newer offering that aims to combine the simplicity of the Chat Completions API with the sophisticated tool-use capabilities previously more central to the Assistants API. It's positioned as a new primitive for building more powerful and flexible agents. This could simplify how developers integrate complex, tool-using AI into their applications, potentially including custom coding tools.
+MCP is arguably the most important emerging standard in AI tooling. Created by Anthropic and adopted increasingly across the ecosystem, it provides a standard protocol for connecting AI models to external tools and data sources.
 
-## Built-in Tools for Agents
+### Why MCP Matters
 
-The Responses API and related agent frameworks are increasingly supporting built-in tools designed to connect models to the real world and enhance their capabilities:
+Before MCP, every tool integration was bespoke — each AI tool had its own way of connecting to databases, APIs, and services. MCP standardises this into a single protocol, similar to how HTTP standardised web communication.
 
-*   **Web Search:**
-    *   Enables agents to access and incorporate real-time information from the internet.
-    *   Crucially, it often provides citations for sources, which is important for verifying information and understanding its origin.
-    *   This could help coding agents stay up-to-date with new libraries, API changes, or security vulnerabilities that post-date their training data.
+```mermaid
+graph LR
+    A[AI Coding Agent] --> B[MCP Protocol]
+    B --> C[Database Server]
+    B --> D[GitHub Server]
+    B --> E[Browser Server]
+    B --> F[Slack Server]
+    B --> G[Custom Server]
 
-*   **File Search (Knowledge Retrieval):**
-    *   Allows agents to query and retrieve information from a provided set of documents (e.g., technical documentation, project wikis, internal knowledge bases).
-    *   For example, an agent could be given access to a project's entire documentation suite to answer specific questions or guide implementation according to established patterns.
-    *   The [`detailed_overview.md`](../detailed_overview.md) mentions Navan using a similar capability for its AI-powered travel agent to access company travel policies.
+    style B fill:#45b7d1
+```
 
-*   **Computer Use (Code Execution & Environment Interaction):**
-    *   This is a highly relevant area for coding agents. It aims to give agents the ability to interact with computer environments more broadly.
-    *   Benchmarking for such capabilities often involves tasks like OS navigation (e.g., OSWorld benchmark) and web browsing/interaction (e.g., WebArena, WebVoyager benchmarks).
-    *   For coding, this could mean more sophisticated ways for agents to set up environments, run complex build processes, or interact with development tools beyond simple command execution.
-    *   The workshop touched on the safety aspects of this:
-        > "we still don't fully understand what letting it loose an agent in its own environment is going to do right um you know for now the safety tests all have come back very stir sturdily... but there's still a lot of risk to this category we don't know and um that's why to start we're being more conservative there and when the agent's running it doesn't have uh full network access" - Josh, OpenAI (discussing the Cloud Agent's environment). Future tools will likely build on these safety learnings.
+### Current MCP Adoption
 
-## Agent Framework Improvements
+| Tool | MCP Support | Status |
+|------|------------|--------|
+| Claude Code | Full, native | Production |
+| Claude Desktop | Full, native | Production |
+| Cursor | Partial | Growing |
+| Continue.dev | Partial | Growing |
+| Codex CLI | Limited | Early |
+| VS Code (GitHub) | Emerging | Preview |
 
-OpenAI is also focusing on enhancing the overall framework for building agents, with features such as:
+### Building MCP Servers
 
-*   **Easily Configurable LLMs:** More straightforward ways to specify and switch between different language models for various agent tasks.
-*   **Intelligent Handoffs:** Mechanisms for one specialised agent to hand off tasks to another specialised agent, allowing for more complex, multi-agent workflows.
-*   **Configurable Guardrails:** Better tools for defining input/output validation, content moderation, and safety checks for agent behavior.
-*   **Improved Tracing and Observability:** Enhanced capabilities for debugging agent execution, understanding their decision-making processes, and monitoring their performance.
+MCP servers are straightforward to build. An MCP server exposes "tools" that AI agents can call:
 
-## Implications for Codex and Future Developer Tools
+```typescript
+// Example: A simple MCP server that queries a database
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 
-While these new APIs and tools (Responses API, built-in search/computer use tools) are distinct from the current Codex Cloud Agent and CLI offerings, they represent the underlying technological direction. Future versions of Codex or entirely new AI-powered developer tools from OpenAI will likely leverage these advancements.
+const server = new McpServer({ name: 'my-db' });
 
-This suggests a future with:
+server.tool('query_users', { schema: { query: 'string' } }, async (args) => {
+  const results = await db.query(args.query);
+  return { content: [{ type: 'text', text: JSON.stringify(results) }] };
+});
+```
 
-*   **More Capable Coding Assistants:** Agents that can more effectively research solutions online, consult project documentation, and interact with development environments in more sophisticated ways.
-*   **Context-Awareness:** Even better understanding of the specific project context, dependencies, and coding standards.
-*   **Integrated Experiences:** Tighter integration with developer workflows and tools.
-*   **Unified Platform:** A potential convergence towards a more unified and powerful platform for building various types of AI agents, including those highly specialised for software development.
+This means your team can build MCP servers for internal tools — deployment systems, monitoring dashboards, ticket trackers — and make them accessible to Claude Code or any MCP-compatible agent.
 
-Developers utilising Codex should remain aware of these broader platform developments, as they may offer new avenues for customising, extending, or integrating AI coding assistance in the future. The journey is towards increasingly autonomous, knowledgeable, and interactive AI co-developers.
+## Agent Frameworks and SDKs
+
+Both Anthropic and OpenAI are investing heavily in agent frameworks that go beyond simple chat.
+
+### Claude Code Agent SDK
+
+Anthropic's Agent SDK allows building custom coding agents programmatically:
+
+```typescript
+import { Agent } from '@anthropic-ai/claude-code';
+
+// Build a custom code review agent
+const reviewer = new Agent({
+  model: 'claude-sonnet-4-6',
+  cwd: '/path/to/project',
+  systemPrompt: 'You are a security-focused code reviewer...'
+});
+
+const findings = await reviewer.run('Review all changes since the last release tag');
+```
+
+This enables:
+- Custom CI/CD review bots
+- Specialised coding assistants for specific domains
+- Automated maintenance workflows (dependency updates, security patches)
+- Multi-agent systems where agents coordinate on complex tasks
+
+### OpenAI Responses API and Agents SDK
+
+OpenAI's Responses API combines the simplicity of the Chat Completions API with sophisticated tool-use capabilities. Their Agents SDK provides a framework for building multi-agent systems with handoffs and guardrails.
+
+## Emerging Capabilities
+
+### Computer Use and Browser Agents
+
+AI agents are increasingly able to interact with graphical interfaces — clicking buttons, filling forms, navigating web applications. This is relevant for:
+
+- End-to-end testing of web applications
+- Automated QA workflows
+- Interacting with tools that lack APIs (legacy systems, admin panels)
+
+Both Anthropic (via Claude's computer use capability) and OpenAI (via CUA — Computer Using Agent) are developing these capabilities.
+
+### Agentic Web Search
+
+Agents can now search the web for current information during coding tasks:
+
+- Finding up-to-date API documentation
+- Checking for known issues with specific library versions
+- Researching best practices for unfamiliar frameworks
+
+### Multi-Agent Orchestration
+
+Complex development tasks increasingly involve multiple specialised agents working together:
+
+- A **planner agent** breaks down the task
+- A **coder agent** implements changes
+- A **reviewer agent** checks for issues
+- A **tester agent** verifies the implementation
+
+Tools like Claude Code's subagents and OpenAI's Agents SDK make this pattern practical.
+
+## Impact on Developer Workflows
+
+### Short-Term (2026-2027)
+
+What to expect in the near term:
+
+- **MCP becomes standard:** Most IDE tools will support MCP servers, creating a portable tool ecosystem
+- **Deeper Git integration:** Agents will manage entire PR lifecycle — creation, responding to review comments, rebasing
+- **Better project understanding:** Agents will build and maintain mental models of large codebases across sessions
+- **Voice-driven coding:** Mobile and voice interfaces become viable for delegating tasks
+
+### Medium-Term (2027-2028)
+
+- **Autonomous maintenance:** Agents handle routine dependency updates, security patches, and deprecation migrations
+- **Specification-to-implementation:** More reliable generation of working code from high-level specifications
+- **Cross-repository understanding:** Agents that understand how changes in one repository affect downstream projects
+
+### What Does Not Change
+
+Regardless of how capable AI coding agents become, certain fundamentals remain:
+
+- **Architecture matters more than ever:** Agents work better in well-structured codebases
+- **Code review is non-negotiable:** AI output must be reviewed by humans
+- **Domain knowledge is irreplaceable:** Understanding the business context is a human responsibility
+- **Security is a first-class concern:** More generated code means more surface area to audit
+- **Testing remains essential:** AI-generated code needs the same (or more) testing rigour as human-written code
+
+## Preparing for the Future
+
+### Practical Steps
+
+1. **Adopt CLAUDE.md/AGENTS.MD now.** Even if you change tools later, the practice of formalising project conventions is permanently valuable.
+2. **Invest in MCP.** Build MCP servers for your internal tools. This investment ports across any MCP-compatible agent.
+3. **Modularise your codebase.** Well-structured, testable code is dramatically easier for AI agents to work with.
+4. **Build review habits.** Develop systematic code review practices for AI-generated code — they are different from reviewing human code.
+5. **Stay informed.** Follow Anthropic, OpenAI, and the broader AI coding community for announcements. The landscape changes quarterly.
+
+### What to Evaluate Quarterly
+
+- New model releases from Anthropic and OpenAI
+- MCP server ecosystem growth
+- IDE tool capabilities (Cursor, Copilot, Windsurf)
+- Open-source alternatives (Codex CLI, Aider, Continue.dev)
+- Your team's cost and productivity metrics with current tools
+
+The direction is clear: AI coding agents are becoming more autonomous, more capable, and more deeply integrated into every aspect of software development. The developers who master these tools today will define how software is built tomorrow.
 
 ---
 

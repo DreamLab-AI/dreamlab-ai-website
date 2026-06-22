@@ -1,93 +1,137 @@
-# Chapter 7: Best Practices for Using AI Agents
+# Chapter 7: Best Practices for Using AI Coding Agents (2026)
 
-The workshop with OpenAI experts provided valuable insights into best practices for effectively using AI coding agents like Codex. These go beyond simple prompting and touch upon how to structure your code, environment, and mindset for optimal collaboration with AI.
+These best practices are drawn from real-world experience with Claude Code, OpenAI Codex CLI, and IDE-integrated tools across thousands of development workflows. They go beyond prompting technique to cover how you structure your code, environment, and collaboration patterns for optimal results with agentic tools.
 
-## 1. Make Your Codebase Discoverable
+## 1. Make Your Codebase Agent-Friendly
 
-The easier it is for an AI agent to understand your codebase, the better it can assist you. This mirrors good practices for human onboarding.
+The easier it is for an AI agent to understand your codebase, the better its output. This mirrors good practices for human onboarding — and in practice, improving discoverability for agents also improves it for new team members.
 
-*   **Clear Structure and Naming:**
-    > "make your codebase discoverable it's like the equivalent of maintaining good engineering practices for uh new hires that you make and letting them understand your codebase faster right" - Josh, OpenAI
-    Use logical directory structures, clear file names, and descriptive variable/function names.
-*   **Scoped Prompts:** Help the agent by pointing it to the right area.
-    > "a lot of my prompts start with like I'm working in this subdirectory um here's what I like to accomplish right can you please um do it for me um and so giving that guidance at scoping uh helps" - Josh, OpenAI
-*   **Intentional Naming for AI (Advanced):** Consider how names might be tokenized or searched by an AI.
-    > "the code name the internal code name for our project is wham like wh um and we chose it... whenever we prompt we can be very efficient we can just say in wham right and then wham code that is like you know for our web uh codebase or our server codebase... is like really efficient for the agent to find... as you start to think ahead like oh I'm going to have an agent it's going to be using terminal to GP uh then you know you can start like naming things intentionally" - Alexander, OpenAI
-    While human readability is paramount, unique, easily searchable project or module names can be beneficial.
+*   **Clear structure and naming:** Use logical directory structures, descriptive file names, and meaningful variable/function names. Agents navigate by reading filenames and directory structures before diving into code.
+*   **Scope your prompts:** Tell the agent where to look. "Add input validation to `src/routes/auth.ts`" is far more effective than "add input validation to the auth code."
+*   **Use consistent patterns:** If every route handler follows the same structure, the agent can replicate that pattern reliably. Inconsistency leads to inconsistent output.
 
-## 2. Language Choice and Typing
+## 2. Use Static Types
 
-Static typing and modern language features can significantly help AI agents.
+Static typing is one of the highest-leverage changes you can make for AI agent effectiveness.
 
-*   **Use Types:**
-    > "You're still using JavaScript like no wonder like you just like you know you use at least TypeScript like give it some types." - Alexander, OpenAI
-    TypeScript (over plain JavaScript), Python with type hints, and other statically-typed languages provide more context for the AI, leading to more accurate suggestions and error detection.
+*   **TypeScript over JavaScript:** Type annotations give the agent dramatically more context about function signatures, data shapes, and expected behaviour.
+*   **Python type hints:** Similarly, `def process_order(order: Order) -> Result[Invoice, Error]` tells the agent far more than `def process_order(order)`.
+*   **Typed languages in general:** Rust, Go, C#, and other statically-typed languages provide richer context for code generation and refactoring.
 
-## 3. Modularity and Testability
+The agent can infer types from well-typed code, validate its own output against type signatures, and catch errors that would be invisible in dynamically-typed code.
 
-Well-structured, modular code is easier for both humans and AI to work with.
+## 3. Design for Modularity
 
-*   **Modular Design:**
-    > "just make your code modular right the more modular and testable it is the better but you don't even have to write the test it's like an agent can write the tests but you kind of need to design the architecture to be modular" - Alexander, OpenAI
-    Break down complex systems into smaller, independent modules with clear interfaces.
-*   **Good Architecture Matters More Than Ever:**
-    > "architecture like good architecture is like even more important than ever and like I guess the fun thing is like for now that's a thing that humans are really good at so like you know kind of good you know important for the software engineers to do their job" - Alexander, OpenAI
-    A poorly architected monolith can hinder AI effectiveness just as it hinders human developers.
+Modular, well-factored code is easier for agents to work with — and the results are easier for you to review.
 
-## 4. Leverage `AGENTS.MD`
+*   **Small, focused modules:** Break complex systems into independent modules with clear interfaces. An agent working on a 200-line module is more effective than one navigating a 5,000-line monolith.
+*   **Clear boundaries:** Use explicit imports/exports and well-defined API surfaces between modules. This helps the agent understand what it can safely change and what it should not touch.
+*   **Architecture matters more than ever:** A well-architected codebase amplifies agent effectiveness. A poorly-architected one limits it. Invest in clean separation of concerns — the agent handles implementation, you handle architecture.
 
-As detailed in [Chapter 3.b](./03_b_the_crucial_role_of_agents_md.md), `AGENTS.MD` is crucial.
+## 4. Invest in CLAUDE.md / AGENTS.MD
 
-*   **Start Simple, Iterate:**
-    > "I would start simple and not try to overdo it and like a simple agent MD will get you a long way rather than no agents MD... it's more of like you learn over time" - Josh, OpenAI
-*   **Automate `AGENTS.MD` Generation (Future):**
-    > "what we would really like to do is autogenerate this at some point for you based on the PRs you create and the feedback you give but um you know we figured we ship faster uh rather than later" - Josh, OpenAI
-    For now, maintain it manually, but expect tools to help in the future. The workshop even mentioned using `codex-1` to help write `AGENTS.MD` files by traversing the directory tree.
+As detailed in [Chapter 3.b](./03_b_the_crucial_role_of_agents_md.md), project configuration files are the single highest-impact lever for improving agent output quality.
 
-## 5. Linters and Formatters
+*   **Start simple, iterate:** Begin with tech stack, test commands, and three or four key conventions. Add more when you notice the agent making avoidable mistakes.
+*   **Document forbidden actions:** Explicit "do not" instructions prevent costly mistakes. If there is a directory the agent should never touch, say so.
+*   **Keep it current:** Treat your configuration file as living documentation. When you correct the agent, add that correction to the file so it does not recur.
+*   **Use the hierarchy:** Global settings in `~/.claude/CLAUDE.md`, project settings at the root, module-specific overrides in subdirectories.
 
-These tools provide immediate feedback and ensure consistency, which benefits AI agents.
+## 5. Use Linters, Formatters, and Hooks
 
-*   **In-the-Loop Verifiers:**
-    > "pro users install llin llin llin llin llin llin llin llin llin llin llinters and formatterers so that basically these are in the loop verifiers that the agent can kind of use right" - Swyx (workshop host)
-    Tools like ESLint, Prettier, Black, Flake8, etc., help the agent produce code that conforms to project standards.
-*   **Commit Hooks:**
-    > "for agents it's actually really good to have commit hooks" - Josh, OpenAI
-    Automated checks at commit time can catch issues early.
+Automated verification tools act as guardrails that catch agent mistakes immediately.
 
-## 6. Adopt an Abundance Mindset (Especially with Cloud Agent)
+*   **Linters and formatters in the loop:** ESLint, Prettier, Black, rustfmt, and similar tools enforce coding standards. When configured as Claude Code hooks or Codex CLI post-edit checks, they catch style violations before you see them.
+*   **Claude Code hooks:** Configure `PostEdit` hooks to run linters automatically after every change. Configure `PreCommit` hooks to run the test suite.
+    ```json
+    {
+      "hooks": {
+        "PostEdit": [{"command": "npx eslint --fix ${file}"}],
+        "PreCommit": [{"command": "npm test"}]
+      }
+    }
+    ```
+*   **Git commit hooks:** `pre-commit` hooks (via Husky, lefthook, or similar) catch issues at commit time regardless of which tool made the change.
+*   **CI/CD as final validation:** Even with hooks, run your full test suite in CI. Agents can bypass local checks if hooks are not configured.
 
-Don't be afraid to delegate and run multiple tasks in parallel.
+## 6. Review Agent Output Like You Review PRs
 
-*   **Quick Delegation:**
-    > "the way we see people who like love codeex the most using it is they don't they think for like maybe 30 seconds max about their prompt it's just like oh I have this idea like boom... and you just send it off." - Alexander, OpenAI
-    This is particularly true for the Cloud Agent, which can handle multiple long-running tasks.
-*   **Use Your Phone (Experiment):**
-    > "one thing that's quite fun is like use it on your phone because somehow just like being on your phone just like flips the way people think about things... try it like it's actually like super fun and satisfying" - Alexander, OpenAI
-    This encourages a different mode of interaction – quick delegation of tasks you think of on the go.
+AI agents produce good code most of the time, but not all of the time. Treat agent output with the same rigour you apply to pull request reviews.
 
-## 7. Understand the Agent's "Experience Level"
+*   **Read the diff, not just the description:** Agents explain what they did, but the explanation can be more confident than the code deserves. Read the actual changes.
+*   **Check edge cases:** Agents handle the happy path well. They sometimes miss boundary conditions, error handling, or race conditions.
+*   **Verify business logic:** Agents do not understand your business domain as deeply as you do. Double-check any logic that depends on domain-specific rules.
+*   **Run the tests:** Do not assume the code works because the agent says it does. Run the test suite yourself.
 
-Think of the AI agent as a highly intelligent but new team member.
+## 7. Delegate Liberally, Verify Carefully
 
-*   **Base Model as a Grad:**
-    > "if you start with like a base reasoning model actually you basically have this like really precocious like incredibly intelligent incredibly knowledgeable... college grad" - Alexander, OpenAI
-*   **Fine-tuning as Job Experience:**
-    > "a lot of what we've done with with codeex one is basically give it its first few years of job experience uh and like that's effectively what the training is right" - Alexander, OpenAI
-*   **`AGENTS.MD` as Onboarding:**
-    > "every time you kick off a task it's kind of like their first day at your company right and so agents.md is basically a method for you to kind of compress that like test time exploration that it has to do so it can like know more" - Alexander, OpenAI
+The most productive developers using agentic tools in 2026 share a common pattern: they delegate aggressively and review carefully.
 
-## 8. Iterative Deployment and Feedback
+*   **Quick delegation:** Do not over-think your prompts. State what you want, send it off, and review the result. A 30-second prompt that gets you 80% of the way is better than a 10-minute prompt that gets you 95%.
+*   **Parallel tasks:** Both Claude Code (via subagents) and the Codex CLI support working on multiple tasks. Use this to keep your pipeline full.
+*   **Iterate rather than specify:** It is often faster to send a rough instruction, review the output, and ask for corrections than to write a perfect specification upfront.
 
-The tools are constantly evolving.
+## 8. Choose the Right Tool for the Task
 
-*   **Provide Feedback:**
-    > "we're really curious to see um because this is like such a new form factor... especially would love feedback from folks on how they would like to see their environment customized" - Josh, OpenAI
-    Your feedback helps shape future development.
-*   **Experiment:**
-    > "I would just love for people to take advantage especially now like we're very intentionally just providing like very generous rate limits so people can try it like we just want you to try it and figure out what sticks what works what doesn't how do you prompt it and then we want to learn from that and use that to lean in" - Alexander, OpenAI
+Different tools excel at different tasks. Match the tool to the work.
 
-By adopting these practices, you can create a more synergistic relationship with AI coding agents, leading to increased productivity and higher quality software.
+| Task | Best Tool | Why |
+|------|-----------|-----|
+| Multi-file refactoring | Claude Code or Codex CLI | Full codebase access, shell execution |
+| Quick inline edit | Copilot or Cursor | Immediate, no context switch |
+| Architecture discussion | Claude.ai or ChatGPT | Long-form conversation, no side effects |
+| Test generation | Claude Code (Sonnet via `/fast`) | Fast, cost-effective, runs tests in loop |
+| Code review | Claude Code or Codex CLI | Can read full PRs and run checks |
+| Learning a new library | ChatGPT or Claude.ai | Interactive Q&A, web search |
+| CI/CD automation | Codex CLI (full-auto) | Sandboxed execution, scriptable |
+
+## 9. Manage Context Deliberately
+
+Even with 200K-token context windows, context management matters.
+
+*   **Use `/compact` in Claude Code** to summarise long conversations and free up context space.
+*   **Break large tasks into subtasks:** Instead of "refactor the entire application to use the new API", work module by module.
+*   **Start fresh sessions for unrelated tasks:** Leftover context from a previous task can confuse the agent on a new one.
+*   **Point the agent to specific files:** "Read `src/lib/auth.ts` and `src/middleware/auth.ts` first" is better than letting the agent search the whole tree.
+
+## 10. Secure Your Workflow
+
+AI agents have significant access to your codebase and shell. Treat security seriously.
+
+*   **Never put secrets in configuration files:** CLAUDE.md and AGENTS.MD are committed to Git. Use environment variables and `.env` files (gitignored) for secrets.
+*   **Review commands before execution:** In Claude Code's default mode, you approve each command. Use `full-auto` modes only on trusted tasks in sandboxed environments.
+*   **Codex CLI sandboxing:** Codex CLI runs with network disabled and directory-scoped by default in full-auto mode. Do not weaken these defaults without good reason.
+*   **Audit what the agent commits:** Review diffs before pushing. Agents occasionally include debug logging, hard-coded test values, or commented-out code.
+*   **Rotate API keys** if you suspect they have been exposed.
+
+## 11. Optimise for Cost
+
+AI coding tools consume tokens, and costs can add up with heavy use.
+
+*   **Use cheaper models for simpler tasks:** Sonnet 4.6 (`/fast`) and o4-mini handle routine work well at a fraction of the cost of Opus 4.8 or o3.
+*   **Monitor session costs:** Use Claude Code's `/cost` command and OpenAI's usage dashboard.
+*   **Avoid unnecessary context:** Do not paste your entire codebase into a prompt. Let the agent navigate to what it needs.
+*   **Set spending limits:** Both Anthropic and OpenAI support monthly spending caps.
+
+## 12. Build Team Standards
+
+For teams adopting AI coding tools, consistency matters.
+
+*   **Standardise on a configuration file:** Commit a well-maintained CLAUDE.md (and/or AGENTS.MD) so every team member's agent follows the same conventions.
+*   **Share prompt patterns:** Document effective prompts for common tasks (e.g., "add a new API endpoint", "write tests for module X") in your team wiki or CLAUDE.md.
+*   **Agree on review standards:** Define how thoroughly AI-generated code should be reviewed. Some teams require the same review rigour as human-written code; others differentiate based on risk.
+*   **Track adoption metrics:** Monitor how the team uses AI tools — which tasks, which models, what costs — to optimise over time.
+
+## Summary: The 2026 Best Practices Checklist
+
+- [ ] CLAUDE.md or AGENTS.MD committed to every active repository
+- [ ] Static types used throughout (TypeScript, Python type hints, etc.)
+- [ ] Linters and formatters configured as hooks or pre-commit checks
+- [ ] Modular architecture with clear module boundaries
+- [ ] Agent output reviewed with the same rigour as human PRs
+- [ ] Cost monitoring enabled (per-session and monthly)
+- [ ] Security practices in place (no secrets in config, command review, sandboxing)
+- [ ] Team standards documented for AI-assisted workflows
 
 ---
 

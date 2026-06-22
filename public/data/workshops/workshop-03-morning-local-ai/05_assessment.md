@@ -39,7 +39,7 @@ Q8_0 would be unnecessary overhead given the minimal quality improvement and sig
 
 **Question 3: Hardware Selection (5 points)**
 
-Compare running Llama 3.1 70B Q4_K_M on:
+Compare running Llama 3.3 70B Q4_K_M on:
 - Option A: NVIDIA RTX 4090 (24 GB VRAM) + 32 GB system RAM
 - Option B: Apple M3 Max (64 GB unified memory)
 
@@ -50,7 +50,7 @@ Which is better and why?
 
 **Apple M3 Max is better** for this specific model:
 
-Llama 3.1 70B Q4_K_M requires ~39GB memory.
+Llama 3.3 70B Q4_K_M requires ~39GB memory.
 
 - **RTX 4090**: Can only fit partial model in VRAM, requiring constant CPU-GPU transfers, severely degrading performance
 - **M3 Max**: Entire model fits in unified memory (39GB < 64GB), enabling smooth inference at ~35-45 tok/s
@@ -88,7 +88,7 @@ D. Write and analyze code for a sorting algorithm
 
 Models:
 1. phi3:3.8b
-2. llama3.1:8b
+2. llama3.3:8b
 3. qwen2.5-coder:7b
 4. qwen2.5:7b
 
@@ -96,15 +96,15 @@ Models:
 <summary>Answer</summary>
 
 - A → 3 (qwen2.5-coder:7b) - Code generation specialist
-- B → 1 (phi3:3.8b) - Simple factual query, fast model
-- C → 4 (qwen2.5:7b) - Reasoning/explanation task
+- B → 1 (phi3:3.8b) -- Simple factual query, fast model
+- C → 4 (qwen2.5:7b) -- Reasoning/explanation task
 - D → 3 (qwen2.5-coder:7b) - Code-focused task
 
 </details>
 
 **Question 6: Performance Optimization (5 points)**
 
-You're running llama3.1:8b on a system with NVIDIA RTX 3060 (12GB VRAM). Inference is slow. List 3 optimization strategies in order of impact.
+You're running llama3.3:8b on a system with NVIDIA RTX 3060 (12GB VRAM). Inference is slow. List 3 optimisation strategies in order of impact.
 
 <details>
 <summary>Sample Answer</summary>
@@ -112,9 +112,9 @@ You're running llama3.1:8b on a system with NVIDIA RTX 3060 (12GB VRAM). Inferen
 1. **Ensure GPU acceleration is enabled** (biggest impact):
    ```bash
    # Verify GPU detected
-   ollama run llama3.1:8b  # Should show "Using GPU"
+   ollama run llama3.3:8b  # Should show "Using GPU"
    # Set all layers to GPU
-   OLLAMA_NUM_GPU_LAYERS=32 ollama run llama3.1:8b
+   OLLAMA_NUM_GPU_LAYERS=32 ollama run llama3.3:8b
    ```
 
 2. **Use Q4_K_M instead of Q5/Q8** (20-30% speedup):
@@ -124,7 +124,7 @@ You're running llama3.1:8b on a system with NVIDIA RTX 3060 (12GB VRAM). Inferen
 3. **Reduce context window if not needed**:
    ```python
    ollama.generate(
-       model='llama3.1:8b',
+       model='llama3.3:8b',
        prompt=prompt,
        options={'num_ctx': 2048}  # Instead of default 4096
    )
@@ -140,14 +140,14 @@ Complete these steps and document the results:
 
 ```bash
 # 1. Install two models
-ollama pull llama3.1:8b-q4_k_m
+ollama pull llama3.3:8b-q4_k_m
 ollama pull phi3:3.8b
 
 # 2. Test both with the same prompt
 echo "Compare these models on: 'Explain machine learning in 50 words'"
 
 # 3. Measure performance
-time ollama run llama3.1:8b-q4_k_m "Explain machine learning in 50 words"
+time ollama run llama3.3:8b-q4_k_m "Explain machine learning in 50 words"
 time ollama run phi3:3.8b "Explain machine learning in 50 words"
 
 # 4. Document:
@@ -236,7 +236,7 @@ justification: |
 
 **Scenario 1: Troubleshooting (10 points)**
 
-A user reports: "I installed Ollama and ran `ollama run llama3.1:8b` but it's extremely slow, taking 30+ seconds per response on a computer with RTX 4070."
+A user reports: "I installed Ollama and ran `ollama run llama3.3:8b` but it's extremely slow, taking 30+ seconds per response on a computer with RTX 4070."
 
 Diagnose the issue and provide step-by-step troubleshooting:
 
@@ -248,7 +248,7 @@ Diagnose the issue and provide step-by-step troubleshooting:
 1. **Verify GPU detection:**
    ```bash
    nvidia-smi  # Check GPU is detected
-   ollama run llama3.1:8b "test"  # Should print "Using GPU: NVIDIA..."
+   ollama run llama3.3:8b "test"  # Should print "Using GPU: NVIDIA..."
    ```
 
 2. **Check CUDA installation:**
@@ -264,7 +264,7 @@ Diagnose the issue and provide step-by-step troubleshooting:
 
 4. **Check layer distribution:**
    ```bash
-   OLLAMA_DEBUG=1 ollama run llama3.1:8b "test"
+   OLLAMA_DEBUG=1 ollama run llama3.3:8b "test"
    # Look for GPU layer allocation
    ```
 
@@ -277,10 +277,10 @@ Diagnose the issue and provide step-by-step troubleshooting:
 **Fix:**
 ```bash
 # Reinstall Ollama with GPU support
-curl -fsSL https://ollama.ai/install.sh | sh
+curl -fsSL https://ollama.com/install.sh | sh
 
 # Verify GPU usage
-OLLAMA_DEBUG=1 ollama run llama3.1:8b "test"
+OLLAMA_DEBUG=1 ollama run llama3.3:8b "test"
 ```
 
 </details>
@@ -313,8 +313,8 @@ Specify:
 - Monitoring/misc: $350
 
 **Models:**
-- Support chatbot: `llama3.1:8b-q4_k_m` (general purpose, good quality)
-- Document Q&A: `llama3.1:8b-q4_k_m` + ChromaDB for RAG
+- Support chatbot: `llama3.3:8b-q4_k_m` (general purpose, good quality)
+- Document Q&A: `llama3.3:8b-q4_k_m` + ChromaDB for RAG
 - Code generation: `qwen2.5-coder:7b-q4_k_m`
 
 **Architecture:**

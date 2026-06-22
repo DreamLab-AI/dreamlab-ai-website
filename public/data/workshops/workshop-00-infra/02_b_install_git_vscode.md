@@ -74,9 +74,10 @@ Launch VS Code after installation. You will see a welcome screen; you can explor
 
 VS Code's functionality is significantly enhanced by extensions. Install extensions via the Extensions view (click the square icon in the Activity Bar or press `Ctrl+Shift+X` / `Cmd+Shift+X`):
 
-- **Roo Code (AI Assistant):**
-  - Provides AI-powered code generation, explanation, and refactoring.
-  - Search for `Roo Code` and install it. Configuration details are covered in [Chapter 2d](./02_d_roo_code_config.md).
+- **Claude Code (AI Coding Agent):**
+  - Provides AI-powered code generation, explanation, refactoring, and project understanding.
+  - Claude Code is a standalone terminal tool. Install it with `npm install -g @anthropic-ai/claude-code` and type `claude` to start. Full setup details are covered in [Chapter 2d](./02_d_roo_code_config.md).
+  - Optionally, install the Claude Code VS Code extension from the marketplace for an integrated panel.
 
 - **Git Graph:**
   - Visualises your Git repository's history, branches, and merges.
@@ -92,4 +93,4 @@ With Git and VS Code installed and configured, your local development environmen
 
 ---
 
-Next: [Chapter 2c: Setting up a Google Cloud API Key for AI](./02_c_gcp_api_key.md)
+Next: [Chapter 2c: Setting Up AI API Keys (2026 Edition)](./02_c_gcp_api_key.md)

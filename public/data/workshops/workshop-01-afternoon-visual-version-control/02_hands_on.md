@@ -508,7 +508,7 @@ temporary
 
 **What are hooks?** Scripts that run before/after Git actions
 
-### Setup Husky (2025 Best Practices)
+### Setup Husky (2026 Best Practices)
 
 **1. Install Husky:**
 ```bash
@@ -712,10 +712,29 @@ Feature: Suggest commit messages based on changes
 
 Usage:
 1. Stage changes
-2. Click sparkle icon ✨ in commit message box
+2. Click sparkle icon in commit message box
 3. AI suggests message!
 4. Edit and commit
 ```
+
+### GitHub Copilot Workspace
+
+**AI-powered issue-to-PR workflow** (available on github.com):
+
+```
+What it does:
+  - Start from a GitHub Issue
+  - Copilot analyses the codebase and proposes a plan
+  - Generates a multi-file implementation
+  - Opens a pull request with all changes
+
+Use case:
+  - Turn bug reports into fixes
+  - Implement feature requests from issue descriptions
+  - Great for open-source contribution workflows
+```
+
+💡 **Tip**: Copilot Workspace works directly on GitHub — no local setup needed. Pair it with local VS Code review for best results.
 
 ---
 

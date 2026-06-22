@@ -193,8 +193,20 @@ code --install-extension ms-vscode-remote.remote-containers
 ```
 
 **Prerequisites:**
-- Docker Desktop installed
-- Docker daemon running
+- A container runtime installed and running (see options below)
+
+### Container Runtime Options
+
+**Docker Desktop** remains the most common choice, but several alternatives have matured:
+
+| Runtime | Platform | Cost | Notes |
+|---------|----------|------|-------|
+| **Docker Desktop** | Windows, macOS, Linux | Free for personal/small business, paid for enterprise | Most widely used, easiest setup |
+| **Podman Desktop** | Windows, macOS, Linux | Free (open-source) | Daemonless, rootless by default, Docker-compatible CLI |
+| **Rancher Desktop** | Windows, macOS, Linux | Free (open-source) | Includes both containerd and dockerd, built-in Kubernetes |
+| **Colima** | macOS, Linux | Free (open-source) | Lightweight, CLI-only, uses Lima VMs on macOS |
+
+**For Dev Containers specifically**, Docker Desktop or Podman Desktop are the most straightforward choices. VS Code's Dev Containers extension works with any Docker-API-compatible runtime.
 
 ### Creating a Dev Container
 
@@ -240,7 +252,7 @@ code --install-extension ms-vscode-remote.remote-containers
 
 **Create `.devcontainer/Dockerfile`:**
 ```dockerfile
-FROM node:18-bullseye
+FROM node:22-bookworm
 
 # Install additional tools
 RUN apt-get update && apt-get install -y \
@@ -337,12 +349,14 @@ Synced via devcontainer.json
   "service": "app",
   "workspaceFolder": "/workspace",
   "forwardPorts": [3000, 5432],
-  "postCreateCommand": "npm install",
+  "postCreateCommand": "npm install && npm install -g @anthropic-ai/claude-code",
   "customizations": {
     "vscode": {
       "extensions": [
         "dbaeumer.vscode-eslint",
         "esbenp.prettier-vscode",
+        "eamodio.gitlens",
+        "GitHub.copilot",
         "ms-azuretools.vscode-docker"
       ]
     }
@@ -354,14 +368,15 @@ Synced via devcontainer.json
 ```json
 {
   "name": "Python 3 & Jupyter",
-  "image": "mcr.microsoft.com/vscode/devcontainers/python:3.11",
+  "image": "mcr.microsoft.com/vscode/devcontainers/python:3.12",
   "postCreateCommand": "pip install -r requirements.txt",
   "customizations": {
     "vscode": {
       "extensions": [
         "ms-python.python",
         "ms-toolsai.jupyter",
-        "ms-python.vscode-pylance"
+        "ms-python.vscode-pylance",
+        "Continue.continue"
       ]
     }
   }
@@ -382,7 +397,7 @@ code --install-extension ms-vscode-remote.remote-wsl
 wsl --install
 
 # Or install specific distro
-wsl --install -d Ubuntu-22.04
+wsl --install -d Ubuntu-24.04
 
 # Set default version
 wsl --set-default-version 2
@@ -406,7 +421,7 @@ code .
 
 **Status Indicator:**
 ```
-Bottom left: "><" WSL: Ubuntu-22.04
+Bottom left: "><" WSL: Ubuntu-24.04
 ```
 
 ### WSL Best Practices
@@ -625,16 +640,19 @@ wsl --update
 
 ### Tip 4: Custom Container Images
 
-**Use Docker Hub images:**
+**Use Dev Container images and features:**
 ```json
 {
-  "image": "mcr.microsoft.com/vscode/devcontainers/typescript-node:18",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:22",
   "features": {
     "ghcr.io/devcontainers/features/github-cli:1": {},
-    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/node:1": {}
   }
 }
 ```
+
+Browse the full feature catalogue at [containers.dev/features](https://containers.dev/features).
 
 ### Tip 5: SSH Keep-Alive
 

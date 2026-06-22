@@ -1,106 +1,200 @@
-# 3.b: The Crucial Role of AGENTS.MD
+# 3.b: Project Configuration — CLAUDE.md and AGENTS.MD
 
-For both the Codex cloud agent and the Codex CLI, `AGENTS.MD` files serve as a powerful mechanism for providing persistent, repository-specific instructions to the AI. These Markdown files act as a "developer manual for AI teammates," guiding how Codex should navigate the codebase, which commands to run for testing and linting, and how to adhere to project standards.
+Both Claude Code and OpenAI Codex CLI support project-specific configuration files that provide persistent instructions to the AI agent. These files encode "tribal knowledge" — coding conventions, testing procedures, architectural decisions, and forbidden actions — into a machine-readable format that the agent consults on every task.
 
-The workshop discussion heavily emphasized the importance and utility of `AGENTS.MD`:
-> "agents.md and um like we put a lot of effort into making sure the agent like understand this hierarchy of instructions right you can put them in subdirectories and it'll understand which ones take presence over um which others" - Josh, OpenAI
+This is one of the most impactful things you can do to improve agent output quality. A well-crafted configuration file eliminates the need to repeat project context in every prompt.
 
-## Purpose and Content
+## CLAUDE.md — Claude Code's Project Configuration
 
-The primary purpose of `AGENTS.MD` is to inform Codex about project-specific conventions and requirements. It's a way to encode "tribal knowledge" and project standards into a machine-readable format.
+Claude Code reads `CLAUDE.md` files at startup and uses their contents to guide behaviour throughout the session. This is Claude Code's most distinctive feature: a persistent, hierarchical project configuration system.
 
-**Common content includes:**
+### Hierarchy and Merging
 
-*   **Code Style:**
-    *   Preferred formatting (e.g., "Use Black for Python formatting," "Use Prettier for JavaScript/TypeScript formatting. Run `npx prettier --write`.")
-    *   Naming conventions (e.g., "Avoid abbreviations in variable names," "Variable names should be in camelCase.")
-    *   Commenting standards (e.g., "Add JSDoc comments for all public functions.")
-*   **Testing Procedures:**
-    *   Commands to run tests (e.g., "Run `pytest tests/` before finalizing a PR," "Run `npm test` to execute all tests.")
-    *   Requirements for test coverage (e.g., "All new features must include unit tests using Jest," "Ensure test coverage does not decrease.")
-    *   Mocking strategies (e.g., "Mock all external API calls in tests. Use `msw` for mocking.")
-*   **Pull Request (PR) Instructions:**
-    *   Templates for PR titles and messages (e.g., "PR titles must follow the format: `<type>: Brief description`").
-    *   Required sections in PR body (e.g., "Include a one-line summary and a 'Testing Done' section," "PR body must include: Summary of changes, How to test, Any relevant issue numbers.").
-    *   The workshop highlighted how Codex can be trained for this: "some of the other stuff we started to train was like PR descriptions like let's really nail this idea of like a good concise PR description that like highlights the relevant things so our model will actually write like a nice short PR description with like a PR title that like adheres to your like you know repo format we have a way to prompt that more if you want with agents.mmd" - Alexander, OpenAI.
-*   **Forbidden Actions:**
-    *   Directives on what the agent should *not* do (e.g., "Never call `npm install` directly," "Never enable network during tests," "Do not commit directly to the `main` or `develop` branches," "Do not introduce new dependencies without prior approval noted in the task," "Never disable linting or type-checking rules," "Do not write to `src/generated/` directory by hand.").
-*   **Codebase Specifics:**
-    *   Information about parts of the codebase being migrated or requiring special attention.
-*   **Presentation of Work:**
-    *   How the agent should present its work (e.g., when to write documentation).
-*   **General Instructions:**
-    *   Guidance on refactoring (e.g., "When refactoring, prioritize readability and maintainability.").
-    *   Instructions for UI changes (e.g., "If a task involves UI changes, describe the visual impact if possible.").
-    *   Logging requirements (e.g., "Log failing commands and their output for review.").
+Claude Code looks for CLAUDE.md files in a specific order and merges their contents, with more specific files taking precedence:
 
-Alexander from OpenAI suggested starting simple:
-> "I would start simple and not try to overdo it and like a simple agent MD will get you a long way rather than no agents MD... it's more of like you learn over time right what we would really like to do is autogenerate this at some point for you based on the PRs you create and the feedback you give"
+1.  **`~/.claude/CLAUDE.md`** — Personal, global guidance applicable across all projects
+2.  **`CLAUDE.md` at the repository root** — Shared project-wide standards (commit this to Git)
+3.  **`CLAUDE.md` in subdirectories** — Specific instructions for particular components
 
-## Structure
+This cascading system lets you set organisation-wide defaults, project standards, and component-specific overrides.
 
-`AGENTS.MD` is a standard Markdown file. While the exact structure can vary, a common approach is to use headings for different categories of instructions (e.g., `# Code Style`, `# Testing`, `# PR Instructions`).
+### What to Include in CLAUDE.md
 
-## Hierarchy and Merging
-
-Codex tools look for `AGENTS.MD` files in a specific hierarchical order and merge their contents, with more specific files overriding more general ones. This cascading system provides flexibility in managing configurations.
-
-**Typical lookup order:**
-
-1.  **`~/.codex/AGENTS.MD`** (or `~/.codex/instructions.md`): Personal, global guidance applicable across all projects.
-2.  **`AGENTS.MD` at the repository root:** Shared project-wide notes and rules.
-3.  **`AGENTS.MD` in the current working directory (or sub-folder):** Specific instructions for a particular component or feature.
-
-This allows for global defaults, project-level standards, and fine-grained control for specific parts of a codebase.
-
-## Why `AGENTS.MD` and not `README.MD` or a Branded Name?
-
-The workshop provided insight into the naming choice:
-
-*   **Specificity for Agents:**
-    > "probably there's things that you want to tell an agent that you don't need to tell a contributor and similarly there's things you want to tell contributors... that you don't need to tell the agent... so we kind of made that decision [to have a separate file]" - Alexander, OpenAI
-    > "for agents I don't think you have really had to tell it a code style it it looks at your codebase and just writes code that's consistent to that um whereas like a human's not going to take its time... to go through the codebase and uh you know follow all the conventions" - Josh, OpenAI
-*   **Avoiding Namespace Clutter / Promoting Openness:**
-    > "we just think it kind of sucks if you have to like create like all these different agents and whatever you know is like part of why we made the codeex CCLI open source... so that's why we went for like a non-branded uh name [`AGENTS.MD`]" - Alexander, OpenAI
-
-The goal is to have a common, non-proprietary way to instruct AI agents, regardless of the specific model or vendor.
-
-## Example `AGENTS.MD` Structure
-
+**Project Identity and Tech Stack:**
 ```markdown
-# AGENTS.MD - Project-Specific Guidance for Codex
+# My Project
 
-## Code Style
-- Use Prettier for JavaScript/TypeScript formatting. Run `npx prettier --write .`
-- Variable names should be in camelCase.
-- Add JSDoc comments for all public functions.
-
-## Testing
-- All new features must include unit tests using Jest.
-- Run `npm test` to execute all tests. All tests must pass before proposing a PR.
-- Ensure test coverage does not decrease.
-- Mock all external API calls in tests. Use `msw` for mocking.
-
-## PR Instructions
-- PR titles must follow the format: `<type>(<scope>): <subject>` (e.g., `feat(api): Add user authentication endpoint`).
-- PR body must include:
-  - Summary of changes.
-  - How to test.
-  - Any relevant issue numbers.
-
-## Forbidden Actions
-- Do not commit directly to the `main` or `develop` branches.
-- Do not introduce new dependencies without prior approval noted in the task.
-- Never disable linting or type-checking rules.
-- Do not write to `src/generated/` directory by hand.
-
-## General Instructions
-- When refactoring, prioritize readability and maintainability.
-- If a task involves UI changes, describe the visual impact if possible.
-- Log failing commands and their output for review.
+## Tech Stack
+- Framework: React 18 + TypeScript 5.9
+- Build: Vite 5
+- Testing: Vitest + Testing Library
+- Styling: Tailwind CSS 3 + shadcn/ui
+- Backend: Node.js + Express + PostgreSQL
 ```
 
-The use of `AGENTS.MD` files represents a significant step in formalising the interaction between human developers and AI coding assistants. It compels teams to explicitly document their development standards, which not only guides the AI effectively but can also improve consistency among human developers and serve as a valuable onboarding resource.
+**Build and Test Commands:**
+```markdown
+## Commands
+- `npm run dev` — Start development server
+- `npm run build` — Production build
+- `npm run test` — Run unit tests
+- `npm run lint` — ESLint checks
+- Always run `npm run build && npm run lint` before committing
+```
+
+**Coding Conventions:**
+```markdown
+## Conventions
+- Use functional components with hooks (no class components)
+- Prefer named exports over default exports
+- Use Zod schemas for all input validation
+- All public functions must have JSDoc comments
+- Error handling: never swallow errors silently
+```
+
+**Forbidden Actions:**
+```markdown
+## Forbidden
+- Do not modify files in src/generated/ (these are auto-generated)
+- Do not add new npm dependencies without asking first
+- Never disable ESLint rules with eslint-disable comments
+- Do not commit directly to main — always use feature branches
+- Never hardcode API keys, secrets, or credentials
+```
+
+**Architecture Notes:**
+```markdown
+## Architecture
+- src/lib/ contains shared utilities — prefer extending these over creating new ones
+- The auth middleware in src/middleware/auth.ts must not be modified without review
+- Database migrations live in db/migrations/ — use sequential numbering
+- API routes follow REST conventions: /api/v1/{resource}
+```
+
+### CLAUDE.md vs README
+
+CLAUDE.md is specifically for the AI agent, not human readers. Key differences:
+
+| CLAUDE.md | README.md |
+|-----------|-----------|
+| Instructions for the AI agent | Documentation for human developers |
+| Coding conventions and constraints | Project description and setup guide |
+| Build/test commands to execute | How to get started |
+| Forbidden actions | Feature overview |
+| Architecture decisions | Contributing guidelines |
+
+There is deliberate overlap (both might mention the tech stack), but CLAUDE.md focuses on operational instructions: what to do, what not to do, and how to verify work.
+
+### Real-World CLAUDE.md Example
+
+```markdown
+# E-Commerce API
+
+## Stack
+TypeScript 5.9, Express 4, PostgreSQL 16, Drizzle ORM, Vitest
+
+## Commands
+- `npm test` — Run all tests
+- `npm run test:unit` — Unit tests only
+- `npm run lint` — ESLint + Prettier check
+- `npm run db:migrate` — Run pending migrations
+- Run `npm test && npm run lint` before every commit
+
+## Conventions
+- All endpoints return { data, error, meta } response envelope
+- Use Zod schemas for request validation (see src/schemas/)
+- Database queries go in src/repositories/, not in route handlers
+- Errors use the AppError class from src/lib/errors.ts
+- Logging via the logger instance from src/lib/logger.ts
+
+## Testing
+- Unit tests live alongside source: src/foo/__tests__/foo.test.ts
+- Integration tests in tests/integration/
+- Mock external services using msw (see tests/mocks/)
+- Database tests use the test database (see .env.test)
+
+## Forbidden
+- Never use raw SQL — always use Drizzle ORM
+- Do not add express middleware to app.ts — use the middleware/ directory
+- Do not modify the migration runner in db/migrate.ts
+- Never store passwords in plain text — use bcrypt
+- Do not import from src/internal/ outside of that directory
+
+## Current Focus
+- We are migrating from Sequelize to Drizzle ORM
+- Files in src/models/ are legacy Sequelize — do not extend them
+- New code should use src/repositories/ with Drizzle
+```
+
+## AGENTS.MD — Codex CLI's Project Configuration
+
+The OpenAI Codex CLI reads `AGENTS.MD` files for project-specific instructions. The concept is similar to CLAUDE.md but with some differences in convention and hierarchy.
+
+### Hierarchy
+
+1.  **`~/.codex/AGENTS.MD`** (or `~/.codex/instructions.md`) — Personal, global guidance
+2.  **`AGENTS.MD` at the repository root** — Project-wide standards
+3.  **`AGENTS.MD` in subdirectories** — Component-specific instructions
+
+### AGENTS.MD Example
+
+```markdown
+# AGENTS.MD - Project Guidance
+
+## Code Style
+- Use Prettier for formatting: `npx prettier --write .`
+- Variable names in camelCase
+- JSDoc comments for all public functions
+
+## Testing
+- All new features must include unit tests using Jest
+- Run `npm test` before proposing changes
+- Ensure test coverage does not decrease
+- Mock external API calls using msw
+
+## PR Instructions
+- PR titles: `<type>(<scope>): <subject>` (e.g., `feat(api): Add user endpoint`)
+- PR body must include: summary, how to test, related issue numbers
+
+## Forbidden Actions
+- Do not commit to main or develop branches
+- Do not introduce new dependencies without approval
+- Never disable linting or type-checking rules
+- Do not write to src/generated/ by hand
+```
+
+### Why Separate Files? Why Not README?
+
+Both CLAUDE.md and AGENTS.MD exist because AI agents need different information than human developers. A human reading a README wants to understand what the project does and how to set it up. An AI agent needs to know what conventions to follow, what commands to run, and what actions are forbidden.
+
+The non-branded name "AGENTS.MD" was chosen by OpenAI to be tool-agnostic — any AI coding tool can read it. Claude Code's "CLAUDE.md" is specific to Claude Code but offers deeper integration (hierarchical merging, hooks, etc.).
+
+## Cross-Tool Compatibility
+
+If your team uses both Claude Code and Codex CLI (or expects different team members to use different tools), you can maintain both files:
+
+```
+project-root/
+  CLAUDE.md      # Claude Code reads this
+  AGENTS.MD      # Codex CLI reads this
+  README.md      # Humans read this
+```
+
+Alternatively, keep a single source of truth and symlink:
+
+```bash
+# Write your conventions in CLAUDE.md, symlink for Codex CLI
+ln -s CLAUDE.md AGENTS.MD
+```
+
+## Best Practices for Configuration Files
+
+1.  **Start simple:** A few lines about your tech stack and test commands is enough to start. Add more as you discover what the agent gets wrong.
+2.  **Be explicit about commands:** Do not assume the agent knows how to run your tests. Spell out the exact command.
+3.  **List forbidden actions:** Agents will try to be helpful, which sometimes means doing things you do not want. Explicit "do not" instructions prevent this.
+4.  **Update iteratively:** When the agent makes a mistake that better instructions would have prevented, add that instruction to your configuration file.
+5.  **Commit to version control:** These files are part of your project. Commit them so the whole team benefits.
+6.  **Keep it focused:** Do not turn the file into a novel. A concise, well-organised file is more effective than a verbose one.
 
 ---
 

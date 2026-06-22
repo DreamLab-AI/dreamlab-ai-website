@@ -20,30 +20,31 @@ graph LR
 
 ---
 
-## 2.1 Essential Extensions 2025
+## 2.1 Essential Extensions 2026
 
 ### 🤖 AI Coding Assistants
 
-#### 1. GitHub Copilot (Premium, Recommended)
+#### 1. GitHub Copilot (Industry Standard)
 
-💡 **Best for**: Production code, enterprise teams, comprehensive AI pair programming
+💡 **Best for**: Inline code completion, enterprise teams, integrated chat and workspace features
 
 ```
 Extension ID: GitHub.copilot
 Features:
-  - Inline code suggestions
-  - Chat interface
-  - Context-aware completions
+  - Inline code suggestions with multi-line completions
+  - Copilot Chat sidebar and inline chat (Ctrl+I)
+  - Workspace-aware context (@workspace)
+  - Test generation, documentation, and code explanation
   - 50+ language support
-Cost: $10/month ($100/year for individuals)
+Cost: From $10/month (free for students & OSS maintainers)
 ```
 
 **Installation:**
 1. Open Extensions (`Ctrl+Shift+X`)
 2. Search: "GitHub Copilot"
-3. Click **Install**
+3. Click **Install** (installs both Copilot and Copilot Chat)
 4. Sign in with GitHub account
-5. Activate subscription
+5. Activate subscription (check [github.com/features/copilot](https://github.com/features/copilot) for current plans)
 
 **Quick Test:**
 ```javascript
@@ -51,102 +52,97 @@ Cost: $10/month ($100/year for individuals)
 // Function to calculate fibonacci sequence
 
 // Copilot will suggest complete implementation!
+// Press Tab to accept, or Alt+] / Alt+[ to cycle suggestions
 ```
 
-#### 2. Claude Dev (Anthropic's Official Extension)
+#### 2. Claude Code (Anthropic's AI Agent for the Terminal)
 
-💡 **Best for**: Complex reasoning, refactoring, documentation
+💡 **Best for**: Complex reasoning, multi-file refactoring, agentic coding workflows
 
 ```
-Extension ID: saoudrizwan.claude-dev
+Tool: Claude Code (standalone CLI + VS Code terminal integration)
+Install: npm install -g @anthropic-ai/claude-code
 Features:
-  - Chat with Claude 3.5 Sonnet
-  - Edit files directly
-  - Terminal command execution
-  - Multi-file awareness
-Cost: Pay-per-use (Anthropic API)
+  - Agentic coding assistant that runs in your terminal
+  - Reads, writes, and refactors across your entire codebase
+  - Built-in tool use: file editing, bash commands, search
+  - Project configuration via CLAUDE.md files
+  - Hooks system, slash commands, MCP server integration
+  - Subagent workflows for complex multi-step tasks
+Cost: Pay-per-use via Anthropic API (or included with Max plan)
 ```
 
 **Setup:**
-1. Install extension
-2. Get API key from [console.anthropic.com](https://console.anthropic.com)
-3. `Ctrl+Shift+P` → "Claude Dev: Set API Key"
-4. Start chatting in sidebar!
+1. Install: `npm install -g @anthropic-ai/claude-code`
+2. Set your API key: `export ANTHROPIC_API_KEY=your-key` (from [console.anthropic.com](https://console.anthropic.com))
+3. Open VS Code's integrated terminal (`Ctrl+``)
+4. Navigate to your project and type `claude` to start a session
+5. Describe what you want — Claude Code reads your codebase and makes changes directly
 
-#### 3. Continue (Open Source AI)
+**Why it works brilliantly in VS Code:**
+Claude Code runs in the integrated terminal, so you see file changes reflected immediately in the editor. It is not a VS Code extension — it is a standalone tool that complements VS Code perfectly.
 
-💡 **Best for**: Free tier, multiple model support, customization
+#### 3. Continue.dev (Open Source, Multi-Model)
+
+💡 **Best for**: Free and open-source, multiple model support, full customisation
 
 ```
 Extension ID: Continue.continue
 Features:
-  - Free tier with Groq/Gemini
-  - Support for 20+ AI models
-  - Tab autocomplete
-  - Custom model integration
-Cost: FREE (with free API keys)
+  - Connect any model: Claude, GPT, Gemini, Ollama (local), and more
+  - Tab autocomplete with configurable models
+  - Chat sidebar with @file, @folder, @docs context
+  - Inline editing (Ctrl+I)
+  - Fully open-source and self-hostable
+Cost: FREE (bring your own API keys, or use free-tier providers)
 ```
 
-**Configuration for 2025:**
+**Configuration for 2026:**
 ```json
 {
   "models": [
     {
-      "title": "Claude 3.5 Sonnet",
+      "title": "Claude Sonnet 4.6",
       "provider": "anthropic",
-      "model": "claude-3-5-sonnet-20241022",
+      "model": "claude-sonnet-4-6",
       "apiKey": "YOUR_KEY"
     },
     {
-      "title": "GPT-4 Turbo",
+      "title": "GPT-4o",
       "provider": "openai",
-      "model": "gpt-4-turbo-preview",
+      "model": "gpt-4o",
       "apiKey": "YOUR_KEY"
     },
     {
-      "title": "Gemini 2.0 Flash (FREE)",
+      "title": "Gemini 2.5 Flash (FREE tier)",
       "provider": "gemini",
-      "model": "gemini-2.0-flash",
+      "model": "gemini-2.5-flash",
       "apiKey": "YOUR_FREE_KEY"
     }
   ],
   "tabAutocompleteModel": {
     "title": "Gemini Flash",
     "provider": "gemini",
-    "model": "gemini-2.0-flash"
+    "model": "gemini-2.5-flash"
   }
 }
 ```
 
-#### 4. Cody by Sourcegraph
-
-💡 **Best for**: Codebase understanding, large context windows
-
-```
-Extension ID: sourcegraph.cody-ai
-Features:
-  - Free tier: 500 completions/month
-  - Understands entire codebase
-  - Smart code search
-  - Multi-repo awareness
-Cost: FREE tier, Pro $9/month
-```
-
 <details>
-<summary>🎯 <strong>Exercise: AI Assistant Speed Test</strong></summary>
+<summary>🎯 <strong>Exercise: AI Assistant Comparison</strong></summary>
 
-**Try this with each AI assistant:**
+**Try this with each AI tool:**
 
 1. Create `test-ai.js`
 2. Type: `// Create a React component for a todo list with add/delete`
-3. Press `Tab` or `Ctrl+I`
-4. Compare speed and quality!
+3. With **Copilot**: press `Tab` to accept inline suggestion
+4. With **Claude Code**: in the terminal, ask `claude "add a todo list component to test-ai.js"`
+5. With **Continue**: select the comment, press `Ctrl+I`, type "implement this"
 
 **Expected Results:**
-- **Copilot**: Instant, high quality
-- **Claude Dev**: Thoughtful, well-documented
-- **Continue**: Fast with free models
-- **Cody**: Context-aware suggestions
+- **Copilot**: Instant inline completions, great for flow
+- **Claude Code**: Thorough, multi-file-aware, handles complex tasks
+- **Continue**: Flexible, lets you choose your preferred model
 
 </details>
 
@@ -154,19 +150,19 @@ Cost: FREE tier, Pro $9/month
 
 ### 🛠️ Essential Productivity Extensions
 
-#### 5. GitLens — Git Supercharged
+#### 4. GitLens — Git Supercharged
 
 ```
 Extension ID: eamodio.gitlens
 Why: See who changed what, when, and why
 Features:
   - Inline blame annotations
-  - File history
-  - Visual commit graph
-  - Compare branches
+  - File history & visual commit graph
+  - Compare branches side-by-side
+  - Interactive rebase editor
 ```
 
-#### 6. Error Lens
+#### 5. Error Lens
 
 ```
 Extension ID: usernamehw.errorlens
@@ -175,23 +171,50 @@ Before: Hover to see error
 After: Error displayed directly in editor
 ```
 
-#### 7. TODO Highlight
+#### 6. Remote Development (SSH, Containers, WSL)
 
 ```
-Extension ID: wayou.vscode-todo-highlight
-Why: Never lose track of TODOs
-Highlights: TODO, FIXME, NOTE, HACK
+Extension ID: ms-vscode-remote.vscode-remote-extensionpack
+Why: Develop anywhere — remote servers, containers, WSL
+Includes:
+  - Remote - SSH
+  - Dev Containers
+  - WSL
 ```
 
-#### 8. Live Server
+#### 7. Dev Containers
 
 ```
-Extension ID: ritwickdey.LiveServer
-Why: Instant preview for HTML/web projects
-Launch: Right-click HTML → "Open with Live Server"
+Extension ID: ms-vscode-remote.remote-containers
+Why: Reproducible, shareable development environments
+Benefits:
+  - Project-specific environments in Docker
+  - "Works on every machine" guaranteed
+  - Team onboarding in minutes
 ```
 
-#### 9. Prettier - Code Formatter
+#### 8. Docker
+
+```
+Extension ID: ms-azuretools.vscode-docker
+Why: Build, manage, and deploy containers visually
+Features:
+  - Dockerfile and Compose IntelliSense
+  - Container explorer sidebar
+  - Image management and registry access
+```
+
+#### 9. REST Client / Thunder Client
+
+```
+Extension ID: humao.rest-client (text-based)
+  OR: rangav.vscode-thunder-client (GUI-based)
+Why: Test APIs without leaving VS Code
+REST Client: Write HTTP requests in .http files
+Thunder Client: Postman-like GUI inside VS Code
+```
+
+#### 10. Prettier - Code Formatter
 
 ```
 Extension ID: esbenp.prettier-vscode
@@ -199,27 +222,27 @@ Why: Auto-format on save
 Supports: JavaScript, TypeScript, HTML, CSS, JSON, Markdown
 ```
 
-#### 10. Path Intellisense
-
-```
-Extension ID: christian-kohler.path-intellisense
-Why: Autocomplete file paths
-Super useful for: imports, links, images
-```
-
 📝 **Quick Install All:**
 ```bash
 # Copy-paste into terminal (Ctrl+`)
+# AI Assistants
 code --install-extension GitHub.copilot
-code --install-extension saoudrizwan.claude-dev
 code --install-extension Continue.continue
-code --install-extension sourcegraph.cody-ai
+npm install -g @anthropic-ai/claude-code   # Claude Code (terminal tool)
+
+# Productivity & Git
 code --install-extension eamodio.gitlens
 code --install-extension usernamehw.errorlens
-code --install-extension wayou.vscode-todo-highlight
-code --install-extension ritwickdey.LiveServer
 code --install-extension esbenp.prettier-vscode
-code --install-extension christian-kohler.path-intellisense
+
+# Remote Development & Containers
+code --install-extension ms-vscode-remote.vscode-remote-extensionpack
+code --install-extension ms-vscode-remote.remote-containers
+code --install-extension ms-azuretools.vscode-docker
+
+# API Testing
+code --install-extension humao.rest-client
+code --install-extension rangav.vscode-thunder-client
 ```
 
 ---
@@ -302,7 +325,7 @@ Open Settings JSON: `Ctrl+Shift+P` → "Preferences: Open User Settings (JSON)"
 
 ## 2.3 Keyboard Shortcuts for Productivity
 
-### Essential Shortcuts (2025 Edition)
+### Essential Shortcuts (2026 Edition)
 
 | Action | Windows/Linux | Mac | Description |
 |--------|--------------|-----|-------------|
@@ -370,7 +393,7 @@ Create `.devcontainer/devcontainer.json`:
 ```json
 {
   "name": "Node.js AI Dev",
-  "image": "mcr.microsoft.com/devcontainers/javascript-node:20",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
   "features": {
     "ghcr.io/devcontainers/features/github-cli:1": {}
   },
@@ -379,11 +402,12 @@ Create `.devcontainer/devcontainer.json`:
       "extensions": [
         "GitHub.copilot",
         "Continue.continue",
-        "esbenp.prettier-vscode"
+        "esbenp.prettier-vscode",
+        "eamodio.gitlens"
       ]
     }
   },
-  "postCreateCommand": "npm install",
+  "postCreateCommand": "npm install && npm install -g @anthropic-ai/claude-code",
   "forwardPorts": [3000]
 }
 ```
@@ -517,7 +541,9 @@ Create `.vscode/extensions.json`:
     "continue.continue",
     "eamodio.gitlens",
     "esbenp.prettier-vscode",
-    "usernamehw.errorlens"
+    "usernamehw.errorlens",
+    "ms-vscode-remote.remote-containers",
+    "ms-azuretools.vscode-docker"
   ]
 }
 ```
@@ -546,13 +572,13 @@ Create `.vscode/extensions.json`:
 #### 2. Use AI Chat for Planning
 
 ```
-You: "I need to build a REST API for user authentication"
+You (in Claude Code): "I need to build a REST API for user authentication"
 
-Claude Dev:
+Claude Code:
 1. First, let's plan the architecture
 2. We'll need these endpoints: /register, /login, /logout
 3. Here's the file structure I recommend...
-4. Let's start with...
+4. Let me create the files and implement this...
 ```
 
 #### 3. Iterate and Refine
@@ -667,10 +693,10 @@ Create `test.js`:
 
 **Pro Tips:**
 
-💡 Switch AI models based on task:
-- **Quick fixes**: Gemini Flash (free & fast)
-- **Complex logic**: Claude 3.5 Sonnet (best reasoning)
-- **Production code**: GitHub Copilot (enterprise quality)
+💡 Switch AI tools based on task:
+- **Quick inline fixes**: GitHub Copilot (instant completions)
+- **Complex multi-file tasks**: Claude Code in the terminal (agentic reasoning)
+- **Flexible model choice**: Continue.dev (swap between Claude, GPT, Gemini, local models)
 
 📝 Create keyboard shortcut cheat sheet and pin it near monitor
 

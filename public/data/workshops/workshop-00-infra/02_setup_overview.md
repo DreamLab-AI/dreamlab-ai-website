@@ -10,11 +10,11 @@ The setup process includes:
 2. **[Installing Git & VS Code](./02_b_install_git_vscode.md):**
    - Install Git, the core version control system, and Visual Studio Code, your primary code editor.
 
-3. **[Setting up a Google Cloud API Key](./02_c_gcp_api_key.md):**
-   - Obtain a free API key from Google Cloud Platform to access powerful AI models like Google Gemini.
+3. **[Setting Up AI API Keys (2026 Edition)](./02_c_gcp_api_key.md):**
+   - Set up access to AI coding tools. Claude Code works with your free claude.ai account (no API key needed), or you can obtain API keys from Anthropic, Google, or OpenAI for advanced use.
 
-4. **[Configuring Roo Code in VS Code](./02_d_roo_code_config.md):**
-   - Integrate AI capabilities directly into your VS Code environment using the Roo Code extension.
+4. **[Configuring AI Coding Assistants in VS Code (2026 Edition)](./02_d_roo_code_config.md):**
+   - Set up Claude Code and other AI tools to work with your development environment.
 
 The following Mermaid diagram summarises the setup workflow clearly:
 
@@ -23,20 +23,20 @@ graph TD
     A[Start Setup] --> B[Create GitHub Account]
     B --> C[Install Git]
     C --> D[Install VS Code]
-    D --> E[Set up Google Cloud API Key]
-    E --> F[Install Roo Code Extension]
-    F --> G[Configure Roo Code with API Key]
+    D --> E[Install Claude Code]
+    E --> F[Authenticate with claude.ai]
+    F --> G[Optional: Set Up Additional AI Tools]
     G --> H[Setup Complete]
 
     subgraph Cloud Accounts
         B
-        E
+        F
     end
 
     subgraph Local Software
         C
         D
-        F
+        E
         G
     end
 ```

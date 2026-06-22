@@ -41,7 +41,7 @@ Cloud AI services charge per token or request. At scale, costs accumulate rapidl
 *After initial hardware investment
 
 **Real-World Example:**
-A development team using GPT-4 for code reviews might spend $800/month. A one-time investment of $1,500 in a good GPU pays for itself in under 2 months.
+A development team using cloud AI for code reviews might spend hundreds of pounds per month. A one-time investment of around 1,500 GBP in a good GPU pays for itself within a few months.
 
 ### Offline Operation
 
@@ -66,25 +66,30 @@ With local models, you have unprecedented flexibility:
 ### Model Families
 
 **Llama Family (Meta)**
-- Llama 3.1 (8B, 70B, 405B parameters)
-- Llama 3.2 (1B, 3B, 11B, 90B)
-- Open weights, permissive license
+- Llama 3.3 (8B, 70B) -- current recommended general-purpose
+- Llama 3.2 (1B, 3B) -- lightweight on-device models
+- Open weights, permissive licence
 - Best overall performance for open models
 
 **Mistral Family**
-- Mistral 7B, Mixtral 8x7B, 8x22B
+- Mistral 7B v0.3, Mixtral 8x7B, Mistral Large
 - Excellent instruction following
 - Strong coding capabilities
 
 **Qwen Family (Alibaba)**
-- Qwen 2.5 (0.5B to 72B)
+- Qwen 2.5 (0.5B to 72B), Qwen 3 (emerging)
 - Multilingual excellence
 - Strong reasoning abilities
 
 **Phi Family (Microsoft)**
-- Phi-3 (3.8B, 7B, 14B)
+- Phi-4 (14B), Phi-3 (3.8B)
 - Extremely efficient
 - Surprising capability for size
+
+**DeepSeek Family**
+- DeepSeek-R1 (distilled 7B, 14B, 32B, 70B)
+- Strong reasoning and mathematics
+- Open weights with permissive licence
 
 ### Model Formats Explained
 
@@ -129,12 +134,13 @@ Common quantization levels:
 
 **Apple Silicon Performance:**
 ```
-Model: Llama 3.1 8B Q4_K_M
+Model: Llama 3.3 8B Q4_K_M
 
 M1 Pro (16 GB):     ~15 tokens/sec
 M2 Max (32 GB):     ~25 tokens/sec
 M3 Max (64 GB):     ~35 tokens/sec
-M3 Ultra (128 GB):  ~50 tokens/sec
+M4 Max (128 GB):    ~55 tokens/sec
+M4 Ultra (192 GB):  ~65 tokens/sec
 ```
 
 Apple's unified memory architecture allows running larger models than NVIDIA GPUs with equivalent VRAM.
@@ -155,14 +161,14 @@ Ollama is the Docker of AI models - simple, powerful, and developer-friendly.
 **Quick Start:**
 ```bash
 # Install
-curl -fsSL https://ollama.ai/install.sh | sh
+curl -fsSL https://ollama.com/install.sh | sh
 
 # Run a model
-ollama run llama3.1:8b
+ollama run llama3.3:8b
 
 # Use in code
 curl http://localhost:11434/api/generate -d '{
-  "model": "llama3.1:8b",
+  "model": "llama3.3:8b",
   "prompt": "Why is local AI important?"
 }'
 ```
@@ -179,10 +185,18 @@ Best for users who prefer graphical interfaces:
 ### llama.cpp (The Engine)
 
 The underlying C++ engine that powers Ollama and LM Studio:
-- Extremely optimized for CPU inference
+- Extremely optimised for CPU inference
 - Support for GPU acceleration (CUDA, Metal, Vulkan)
-- Quantization tools
+- Quantisation tools
 - For advanced users and integration scenarios
+
+### MLX (Apple Silicon Native)
+
+Apple's machine learning framework for M-series Macs:
+- Optimised for unified memory architecture
+- Excellent performance on M1/M2/M3/M4 chips
+- Growing model ecosystem via `mlx-community` on Hugging Face
+- Python-first API with easy model conversion
 
 ### GPT4All (All-in-One)
 

@@ -1,70 +1,128 @@
-# 5.a: Codex vs. General GPT Models (e.g., GPT-4 API) for Coding
+# 5.a: Agentic Tools vs. Chat Models for Coding
 
-While both specialised Codex tools (Cloud Agent and CLI) and general GPT models (like GPT-4 accessed via API) can generate, explain, and refactor code, they are designed with different operational paradigms and strengths. Understanding these differences is key to choosing the right tool for the job.
+While both agentic coding tools (Claude Code, Codex CLI) and chat-based models (ChatGPT, Claude.ai) can generate, explain, and refactor code, they operate with fundamentally different paradigms. Understanding this distinction is key to choosing the right tool for each task.
 
-## Codex (Cloud Agent and CLI)
+## Agentic Tools: Active Agents in Your Environment
 
-*   **Strengths:**
-    *   **Specialised for Development Environments:** These tools are specifically designed for direct interaction with software development environments.
-    *   **Repository Context:** They can understand repository structure, read/write files, and manage Git operations. The Cloud Agent (powered by `codex-1`) is particularly adept at this, cloning the repo into its sandbox.
-    *   **Code Execution & Testing:** Capable of executing code, running tests, linters, and other commands within sandboxed environments. This allows for iterative development where the AI can test its own suggestions.
-    *   **`AGENTS.MD` Guidance:** Can be guided by project-specific `AGENTS.MD` files for conventions and instructions.
-    *   **Optimised Models:** `codex-1` (Cloud Agent) is reported to produce cleaner patches and align better with human pull request preferences compared to more general models like `o3`. The CLI also has optimised models like `codex-mini-latest`.
-    *   The workshop highlighted this specialisation:
-        > "we don't just want it to be co good at code and like we don't just want it to like solve like say like SWEBench tasks... we spent a lot of time like making sure that our model is like great at adhering to instructions uh great at inferring code style" - Alexander, OpenAI (referring to `codex-1`)
+Agentic tools like Claude Code and Codex CLI act as **active agents** within your development environment. They:
 
-*   **Use When:**
-    *   Tasks require an AI to perform actions *within* a codebase (e.g., automated refactoring across multiple files, implementing features based on repository analysis).
-    *   You need the AI to run tests and iterate on failures.
-    *   Generating pull requests directly from the AI's work is desired (Cloud Agent).
-    *   Terminal-based workflows, local file manipulation, and automation/scripting are preferred (CLI).
+*   **Read your codebase:** Navigate directory structures, read file contents, understand project architecture
+*   **Write files:** Create new files and modify existing ones directly on disk
+*   **Execute commands:** Run tests, linters, build tools, and shell commands
+*   **Manage Git:** Create commits, branches, and pull requests
+*   **Iterate autonomously:** If tests fail, they can analyse the failure and try a different approach
+*   **Follow project configuration:** Read CLAUDE.md or AGENTS.MD for context
 
-## General GPT Models (e.g., GPT-4o, o1 via API)
+### When to Use Agentic Tools
 
-*   **Strengths:**
-    *   **Broad Capabilities:** Models like GPT-4o and o1 are highly capable at a wide range of natural language and code-related tasks, including generation, explanation, refactoring, and translation. The o1 model offers enhanced reasoning for complex problem-solving.
-    *   **Versatile Access:** Typically accessed via an API for integration into custom applications or used in conversational interfaces like the general ChatGPT.
-    *   **Extensive Knowledge Base:** Possess a broad knowledge base from general training.
-    *   **Foundation for Custom Tools:** Excellent for building custom developer tools that require powerful language and code understanding without needing the AI to directly execute commands in a specific environment.
+- Tasks that require changes across multiple files
+- Implementing features that need to integrate with existing code
+- Refactoring that must maintain test coverage
+- Bug fixing where the agent needs to reproduce and verify the fix
+- Any task where you would otherwise need to explain your entire codebase
 
-*   **Use When:**
-    *   The primary need is for code snippets, conceptual explanations, language translation, or refactoring suggestions *outside* of direct repository manipulation.
-    *   You are building a custom application that integrates AI code generation/analysis capabilities.
-    *   Interactive chat for brainstorming code solutions or understanding concepts is the main goal.
+## Chat Models: Powerful but Passive
 
-## Fundamental Difference: Active Agent vs. Passive Brain
+Chat-based interfaces (ChatGPT, Claude.ai web) function as **powerful but passive brains**. They:
 
-The core distinction lies in their operational mode:
+*   Generate text-based code output in response to prompts
+*   Cannot access your local filesystem
+*   Cannot execute code on your machine (with limited exceptions like ChatGPT's Code Interpreter for Python)
+*   Cannot create Git commits or pull requests
+*   Require you to copy-paste code context into the conversation
 
-*   **Codex Tools (Agentic):** Act more as "active agents" within a development environment. They are capable of performing actions, interacting with the file system, running commands, and managing version control.
-    > "an agent is like a reasoning model with like tools and an environment um guardrails and then maybe like training on like specific tasks" - Alexander, OpenAI (from workshop transcript)
-*   **General GPT Models (via API for coding):** Function more like a "passive but powerful brain." They provide text-based code outputs and analyses in response to prompts but don't typically execute or interact with a live coding environment themselves (unless explicitly given tools through a framework like the Assistants API or the new Responses API).
+### When to Use Chat Models
 
-This distinction highlights a spectrum of AI assistance:
+- Learning and exploring new concepts
+- Brainstorming architecture and design decisions
+- Getting explanations of complex algorithms
+- Generating isolated code snippets
+- Quick debugging with a pasted error message
+- Mobile coding (ChatGPT app)
 
-1.  **In-IDE Autocompletion:** (e.g., GitHub Copilot, historically powered by Codex models)
-2.  **API-Driven Code Generation/Analysis:** (e.g., Using GPT-4 API for snippets)
-3.  **Interactive Terminal-Based Agency:** (e.g., Codex CLI)
-4.  **Integrated, Autonomous Task Completion:** (e.g., Codex Cloud Agent)
+## The Spectrum of AI Assistance
 
-This spectrum suggests a strategic direction towards increasingly autonomous AI software engineering capabilities, allowing developers to choose their preferred level of AI involvement.
+| Level | Type | Example | Autonomy |
+|-------|------|---------|----------|
+| **1** | Autocomplete | GitHub Copilot inline | Suggests as you type |
+| **2** | Chat-based | ChatGPT, Claude.ai | Generates code on request |
+| **3** | IDE-integrated agent | Cursor Composer, Copilot Workspace | Edits multiple files with approval |
+| **4** | Terminal agent | Claude Code, Codex CLI | Full codebase access, command execution |
+| **5** | Autonomous agent | Claude Code with hooks + MCP | Continuous operation with tool integration |
 
-## Feature Comparison Summary
+Most developers benefit from using tools at multiple levels simultaneously: Copilot for inline suggestions (Level 1), Claude Code for complex tasks (Level 4-5), and ChatGPT for quick questions (Level 2).
 
-| Feature                 | Codex Cloud Agent                      | Codex CLI                                                                 | General GPT API (e.g., GPT-4)        |
-| :---------------------- | :------------------------------------- | :------------------------------------------------------------------------ | :----------------------------------- |
-| **Primary Interface**   | ChatGPT Sidebar (Web UI)               | Terminal / Command Line                                                   | HTTP API, SDKs                       |
-| **Primary Model(s)**    | `codex-1` (specialised `o3`)           | `codex-mini-latest`, `o4-mini` (default), other GPT/provider models       | Various (GPT-4o, o1, etc.)       |
-| **Repo Interaction**    | Deep (clones repo, reads/writes files) | Deep (operates on local repo files)                                       | Indirect (via prompt context)        |
-| **Code Execution**      | Yes (tests, linters, commands)         | Yes (commands in local sandbox)                                           | No (generates code, doesn't execute) |
-| **Sandboxing**          | Yes (isolated cloud micro-VMs)         | Yes (OS-level or Docker)                                                  | Not applicable (API endpoint)        |
-| **`AGENTS.MD` Support** | Yes                                    | Yes                                                                       | No                                   |
-| **Multimodal Input**    | Primarily text                         | Yes (screenshots, diagrams)                                               | Model-dependent (e.g., GPT-4 Vision) |
-| **Open Source**         | No (service)                           | Yes                                                                       | No (API service)                     |
-| **Best Use Cases**      | Complex repo tasks, automated PRs      | Terminal dev, scripting, quick tasks, local iteration, multimodal tasks | Snippet generation, explanation      |
+## Feature Comparison
 
-Choosing the right approach depends on whether you need an AI that can *do things* in your environment or an AI that can *tell you things* about code.
+| Feature | Claude Code | Codex CLI | ChatGPT | Claude.ai | Cursor |
+|---------|-------------|-----------|---------|-----------|--------|
+| **Paradigm** | Active agent | Active agent | Passive chat | Passive chat | IDE agent |
+| **Codebase access** | Full (local) | Full (local) | None (paste only) | None (paste only) | Full (local) |
+| **File editing** | Direct on disk | Direct on disk | Copy-paste output | Copy-paste output | Direct in IDE |
+| **Command execution** | Yes (shell) | Yes (sandboxed) | Python only | No | Yes (local) |
+| **Git operations** | Yes | Yes | No | No | Yes |
+| **Project config** | CLAUDE.md | AGENTS.MD | Custom instructions | Projects | .cursorrules |
+| **Tool integration** | MCP servers | Limited | Plugins | Limited | Built-in |
+| **Context window** | 200K tokens | 128K tokens | 128K tokens | 200K tokens | Model-dependent |
+| **Offline capable** | No | Limited | No | No | No |
+| **Open source** | No | Yes | No | No | No |
+
+## The Hybrid Approach
+
+The most productive developers use a combination of tools:
+
+```mermaid
+graph TD
+    A[Task Arrives] --> B{Complexity?}
+
+    B -->|Quick question| C[Chat Model]
+    B -->|Multi-file change| D[Terminal Agent]
+    B -->|While typing| E[IDE Autocomplete]
+
+    C --> F[ChatGPT / Claude.ai]
+    D --> G{Preference?}
+    E --> H[Copilot / Cursor]
+
+    G -->|Feature-rich| I[Claude Code]
+    G -->|Open source| J[Codex CLI]
+
+    I --> K[Review + Commit]
+    J --> K
+    F --> L[Copy to Project]
+    H --> K
+
+    style I fill:#45b7d1
+    style J fill:#4ecdc4
+```
+
+### Practical Example
+
+**Morning workflow using multiple tools:**
+
+1. **Quick question** (Claude.ai): "What's the best approach for implementing rate limiting in Express.js?"
+2. **Implementation** (Claude Code): "Add rate limiting to all API endpoints following the approach we discussed. Use express-rate-limit with Redis store."
+3. **Inline refinement** (Copilot): Tab-complete as you review and adjust the generated code
+4. **Documentation** (Claude Code): "Update the API documentation to reflect the new rate limiting behaviour"
+5. **Review** (Claude Code): "Run all tests and show me the diff summary"
+
+## Choosing Between Claude Code and Codex CLI
+
+For teams deciding between the two terminal agents:
+
+| Consideration | Claude Code | Codex CLI |
+|---------------|-------------|-----------|
+| **Feature depth** | More features (MCP, hooks, subagents, SDK) | Simpler, focused |
+| **Open source** | No | Yes (audit, fork, contribute) |
+| **Sandboxing** | OS-level | Docker/Seatbelt (network-disabled) |
+| **Model flexibility** | Anthropic models | Multi-provider (OpenAI, Anthropic, Azure, Ollama) |
+| **Desktop/web access** | Yes (desktop app, web app, IDE extensions) | Terminal only |
+| **Configuration** | CLAUDE.md (hierarchical, deep integration) | AGENTS.MD |
+| **Best for** | Teams invested in Anthropic ecosystem | Teams wanting OSS or multi-provider |
+
+Many developers maintain both and choose based on the task:
+- Claude Code for complex, multi-step work requiring MCP and hooks
+- Codex CLI for quick tasks or when they want sandboxed execution
 
 ---
 
-Next: [5.b: Understanding Model Choices](./05_b_understanding_model_choices.md)
+Next: [5.b: Understanding Model & Tool Choices](./05_b_understanding_model_choices.md)

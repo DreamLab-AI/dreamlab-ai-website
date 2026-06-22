@@ -26,9 +26,9 @@
 
 ### Essential Software
 
-1. **Node.js 18+**
+1. **Node.js 20+**
    ```bash
-   node --version  # Should be 18.0.0 or higher
+   node --version  # Should be 20.0.0 or higher
    npm --version   # Should be 9.0.0 or higher
    ```
    Install from: [nodejs.org](https://nodejs.org/)
@@ -111,7 +111,7 @@ Create accounts on these platforms **before the workshop**:
 
 ### Optional Preparation
 
-- **Python 3.8+** (for MkDocs documentation)
+- **Python 3.10+** (for MkDocs documentation)
   ```bash
   python3 --version
   pip3 --version
@@ -155,7 +155,7 @@ Complete this checklist **24 hours before** the workshop:
 - [ ] Git authentication working (SSH or HTTPS)
 
 ### Software Installation
-- [ ] Node.js 18+ installed and verified
+- [ ] Node.js 20+ installed and verified
 - [ ] npm or yarn package manager working
 - [ ] Git installed and configured
 - [ ] Code editor installed with recommended extensions

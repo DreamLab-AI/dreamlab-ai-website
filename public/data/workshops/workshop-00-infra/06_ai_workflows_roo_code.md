@@ -1,164 +1,257 @@
-# Chapter 6: AI-Powered Workflows with Roo Code
+# Chapter 6: AI-Powered Workflows with Claude Code
 
-This chapter brings together the [Git](https://git-scm.com/)/[GitHub](https://github.com/) foundation and your [VS Code](https://code.visualstudio.com/) setup with the power of Artificial Intelligence. We'll focus on using the [Roo Code extension](./02_d_roo_code_config.md), connected to your [Google Gemini API key](./02_c_gcp_api_key.md), to create an "AI-powered coding assistant" integrated directly into your editor.
+This chapter brings together the [Git](https://git-scm.com/)/[GitHub](https://github.com/) foundation and your [VS Code](https://code.visualstudio.com/) setup with the power of Artificial Intelligence. We will focus on using [Claude Code](./02_d_roo_code_config.md), Anthropic's AI coding agent, to create an AI-powered workflow integrated directly into your development environment.
 
-The workshop described this as the point where "suddenly what you've got is the world's strongest AI... connected through a Vibe coding agent into GitHub. Then you've got absolutely everything you need to build projects."
+The workshop described this as the point where "suddenly what you've got is the world's strongest AI... connected through a coding agent into GitHub. Then you've got absolutely everything you need to build projects."
 
-## 6.1 What is Roo Code? (Recap)
+## 6.1 What is Claude Code?
 
-As outlined in the original `workshop.md` and discussed:
+[Claude Code](https://docs.anthropic.com/en/docs/claude-code) is Anthropic's official AI coding agent. Unlike simple autocomplete tools, Claude Code is an agentic assistant that can:
 
-[Roo Code](https://marketplace.visualstudio.com/items?itemName=RooAI.roo-code) is a VS Code extension that acts as an AI co-pilot. It allows you to:
+*   **Understand your entire project** -- it reads your files, understands your codebase, and navigates between files automatically.
+*   **Generate Code** -- ask it to write functions, classes, or boilerplate based on descriptions.
+*   **Explain Code** -- point it at any file and ask for a plain English explanation.
+*   **Refactor Code** -- get suggestions to improve or restructure existing code.
+*   **Debug** -- ask for help identifying and fixing bugs; it can read error messages and trace through your code.
+*   **Run commands** -- it can execute terminal commands (with your permission) to test, build, and verify its work.
+*   **Generate Documentation** -- create docstrings, comments, README files, or entire documentation suites.
 
-*   **Generate Code:** Ask it to write functions, classes, or boilerplate based on descriptions.
-*   **Explain Code:** Select code and ask for a plain English explanation.
-*   **Refactor Code:** Get suggestions to improve or restructure existing code.
-*   **Debug:** Ask for help identifying and fixing bugs.
-*   **Answer Questions:** Get quick programming-related answers without leaving VS Code.
-*   **Generate Documentation:** Create docstrings, comments, or even entire Markdown documents.
+Claude Code runs in your terminal and communicates with Claude's AI models. It has deep access to your local file system (with checks and safeguards), making it far more capable than a web-based chat interface for project work.
 
-It uses your configured API key to communicate with powerful AI models like Google Gemini. The workshop emphasized its utility: "This is like connecting the AI directly to your file system but with checks and balances."
+### How Claude Code Differs from Chat-Based AI
 
-## 6.2 How to Use Roo Code: The "Vibe Coding" Approach
+| Feature | Web Chat (e.g., claude.ai) | Claude Code |
+|---------|---------------------------|-------------|
+| Reads your files | No (you must paste them in) | Yes, automatically |
+| Writes/edits files | No | Yes (with your permission) |
+| Runs terminal commands | No | Yes (with your permission) |
+| Understands project structure | No | Yes |
+| Persistent project context | No | Yes, via CLAUDE.md |
+| Works offline | No | No (needs internet for AI) |
 
-"Vibe coding" was a central theme in the workshop – an iterative, exploratory, and often conversational way of working with the AI.
+## 6.2 Getting Started: Your First Claude Code Session
 
-1.  **Open the Roo Code Sidebar:**
-    *   Click the Roo Code icon (the kangaroo) in the VS Code Activity Bar.
+### Step 1: Launch Claude Code
 
-2.  **Interact via Chat:**
-    *   Type questions or instructions into the Roo Code chat panel.
-    *   **Be Specific (but also Conversational):** Instead of "write code," try "write a Python function that takes a list of numbers and returns their sum." Or, as the workshop demonstrated for project layout: "Lay out a project in this git directory for eye tracking in Python with a readme and all of the best directories."
-    *   **Iterate:** If the first response isn't perfect, refine your question, ask follow-up questions, or provide more context. "If it gets confusing, you just ask it what the fuck's going on and it will tell you... Just keep asking it... until eventually you sort of break through."
+Open your terminal (or VS Code's integrated terminal), navigate to your project, and start Claude Code:
 
-3.  **Leverage Editor Context:**
-    *   **Selection:** Select a piece of code in your editor *before* asking a question or giving an instruction. Roo Code will use the selected code as context (e.g., "Explain this selected code," "Refactor this function to be more efficient," "Suggest color‑blind‑safe palette variations for this palette.json").
-    *   **Active File/Project:** Roo Code can consider the content of your currently active file and even other files in your project (especially if you've enabled "Read" in Auto-Approve settings). This allows for deep contextual understanding. "You can put all of your project documents into your directory here... and say just look through this lot and make me a document out of it."
+```bash
+cd ~/my-project
+claude
+```
 
-4.  **Apply Suggestions & Manage Output:**
-    *   Roo Code might offer code snippets, patches, or entire file structures.
-    *   You can copy these, or Roo Code might directly write/modify files if "Write" is enabled in Auto-Approve.
-    *   **Crucially, use Git:** "You can't work with AI unless you're using this [version control] because it will smash up everything that it made before all the time... So you need to be doing source control." Commit your changes frequently so you can roll back if the AI generates something undesirable.
+Claude Code will greet you and begin understanding your project by reading key files.
 
-5.  **Control Roo Code Modes:**
-    *   Remember the **Ask**, **Code**, and **Architect** modes at the bottom of the Roo Code panel. Switch between them based on your needs. For generating project structures or writing code, ensure you're in **Code** mode.
+### Step 2: Ask Your First Question
 
-6.  **Manage Rate Limiting & Costs:**
-    *   If you configured the 30-second rate limit, Roo Code will pause between operations. "Your rate limiter should have kicked in at 30 seconds. This is how it remains free."
-    *   If you need faster responses for intensive work and are willing to use your Google Cloud free credits (or pay), you can create another Roo Code profile *without* the rate limit enabled and switch to it.
-    *   Keep an eye on the cost ticker in Roo Code if you're on an un-rate-limited profile: "You see the little cost ticker there? That's real cost... if you wanted to put it into unconstrained mode, you can keep an eye on your cost up there."
+Start with something simple to see how it works:
 
-## 6.3 Prompt Ideas for Creative Technologists
+```
+> What does this project do?
+```
 
-The `workshop.md` and transcript offered several ideas:
+Claude Code will scan your files and give you a summary. This is a great way to orient yourself in an unfamiliar codebase too.
 
-*   **Project Scaffolding:** "Lay out a project in this git directory for an eye tracker in Python with a readme and all of the best directories."
-*   **Documentation:** "Refactor this README into a beginner‑friendly tutorial."
-*   **Creative Asset Generation/Modification:** "Suggest color‑blind‑safe palette variations for palette.json." (Roo Code might embed suggestions as a Git patch).
-*   **Complex Document Creation:** "Make a directory called horizon-bid and populate it with a project structure for an academic bid... including Mermaid, Gantt charts, and costing plan templates."
-*   **Diagrams as Code:** "Create me a complex and delightful Gantt chart for bootstrapping a creative technology agency called Dreamloop" (using Mermaid syntax, which can then be rendered).
-    ```mermaid
-    gantt
-        dateFormat  YYYY-MM-DD
-        title Dreamloop Agency Bootstrap
-        section Foundation
-        Research & Planning       :a1, 2024-01-01, 30d
-        Legal & Financial Setup   :a2, after a1, 14d
-        section Branding & Online Presence
-        Brand Identity Development :b1, after a1, 21d
-        Website & Portfolio Dev   :b2, after b1, 45d
-        section Operations
-        Service Definition        :c1, after a2, 14d
-        Tooling & Workflow Setup  :c2, after c1, 30d
+### Step 3: Try a Creative Task
+
+```
+> Create a new file called "about.html" with a professional about page
+  that matches the style of index.html
+```
+
+Claude Code will:
+1. Read `index.html` to understand your existing style
+2. Create `about.html` with matching structure and styling
+3. Show you what it has created and ask for confirmation before writing
+
+### Step 4: Use Git After Each Significant Change
+
+This is critical. After Claude Code makes changes you are happy with:
+
+```bash
+git add .
+git commit -m "Add about page (AI-generated)"
+```
+
+As the workshop emphasised: "You can't work with AI unless you're using version control because it will smash up everything it made before all the time... So you need to be doing source control."
+
+## 6.3 Essential Claude Code Commands
+
+### Slash Commands
+
+Claude Code has built-in slash commands for common operations:
+
+| Command | What it Does |
+|---------|-------------|
+| `/help` | Show all available commands and tips |
+| `/fast` | Switch to a faster, cheaper model for quick tasks |
+| `/clear` | Clear the conversation and start fresh |
+| `/compact` | Summarise the conversation to free up context space |
+| `/init` | Create a CLAUDE.md file for your project |
+
+### The CLAUDE.md File
+
+The `CLAUDE.md` file is how you teach Claude Code about your project. Create one in your project root:
+
+```bash
+claude
+> /init
+```
+
+Or create it manually. Here is an example:
+
+```markdown
+# My Portfolio Website
+
+## Overview
+A personal portfolio site built with HTML, CSS, and vanilla JavaScript.
+Hosted on GitHub Pages.
+
+## Structure
+- index.html -- home page
+- about.html -- about page
+- projects/ -- individual project pages
+- styles/ -- CSS files
+- scripts/ -- JavaScript files
+- images/ -- all imagery
+
+## Conventions
+- Use British English in all content
+- Mobile-first responsive design
+- Semantic HTML5 elements
+- No frameworks -- vanilla JS only
+- All images must have alt text
+
+## Build & Deploy
+- No build step -- static files served directly
+- Deploy by pushing to main branch (GitHub Pages)
+```
+
+Claude Code reads this file automatically at the start of every session, giving it persistent knowledge about your project.
+
+### MCP Servers (Connecting External Tools)
+
+Model Context Protocol (MCP) servers let Claude Code interact with external services. Some useful examples:
+
+*   **GitHub** -- create issues, open pull requests, review code
+*   **File system** -- access files outside your current project
+*   **Web search** -- look up documentation and references
+
+MCP configuration lives in your project's `.mcp.json` or your global Claude Code settings. This is an advanced feature -- you do not need it to get started.
+
+## 6.4 The "Vibe Coding" Approach
+
+"Vibe coding" was a central theme in the workshop -- an iterative, exploratory, and conversational way of working with the AI.
+
+1.  **Start with a broad request:**
     ```
-*   **Understanding Existing Code:** "Describe this project" (after cloning a complex repository like ComfyUI).
+    > Lay out a project in this git directory for eye tracking in Python
+      with a readme and all of the best directories
+    ```
 
-The key is experimentation. "Think of something off the cuff... Honestly, you don't know what ballpark you're in until you've tried it. This is wildly jagged frontier vibe code madness. It will do anything you ask."
+2.  **Iterate on the result:**
+    ```
+    > The README needs more detail in the installation section.
+      Add step-by-step instructions for beginners.
+    ```
 
-## 6.4 The Power of AI with Local File Access
+3.  **Ask for explanations when needed:**
+    ```
+    > Why did you choose this directory structure?
+      What is the purpose of the tests/ folder?
+    ```
 
-A significant advantage of using Roo Code in VS Code over web-based AI chat interfaces is its ability to read from and write to your local file system (with your permission via Auto-Approve settings).
+4.  **Commit frequently:**
+    After each meaningful change, commit with Git so you can always roll back.
 
-*   **Contextual Understanding:** It can read multiple files in your project to understand the broader context, leading to more relevant and accurate suggestions.
-*   **Bulk Operations:** It can generate entire directory structures, fill them with template files, or refactor code across multiple files. "You can get it to lay out whole directory structures and fill them with text files and do an enormous amount of bulk work in a way that you just can't do with the other interfaces."
-*   **Persistent Memory (within session):** The AI's "understanding" of your project grows as you interact with it within a session.
+5.  **Reset when the conversation gets long:**
+    Use `/compact` to summarise the conversation, or `/clear` to start fresh. Long conversations can lead to the AI losing track of earlier instructions.
 
-This local integration, combined with robust version control via Git, creates a highly dynamic and powerful development environment. "The whole of the AI is connected to the whole of the documents, the whole of the time on your own system in a private way, connected to the version management system, connected to the rest of the team."
+The key is experimentation. "Think of something off the cuff... Honestly, you don't know what ballpark you're in until you've tried it."
 
-The workshop concluded that this setup provides "the ultimate version of AI tool working." The learning curve involves "three months of frustrated, repeatedly asking it what the fuck's going on" but ultimately leads to a profound new way of working.
+## 6.5 Prompt Ideas for Creative Technologists
 
-## 6.5 Context Windows, Cost Management &amp; Tool Comparison
+Here are practical examples to try:
 
-Working effectively with AI coding assistants like Roo Code involves more than just writing good prompts; it requires a strategic approach to managing context, understanding costs, and choosing the right tools for the job. These applied best practices will help you maximise the benefits while minimising potential pitfalls like runaway spend or model confusion.
+*   **Project Scaffolding:**
+    "Lay out a project structure for an academic research paper, including directories for data, figures, LaTeX source, and a Makefile for building the PDF."
 
-### Understanding Context Windows and Token Costs (Insights 1, 9)
+*   **Documentation:**
+    "Refactor this README into a beginner-friendly tutorial with step-by-step instructions."
 
-AI models operate within a "context window"—a limit on the amount of information (text, code, etc.) they can consider at any one time. This context is measured in "tokens," which roughly correspond to words or parts of words. As your conversation with the AI grows, so does the context.
+*   **Creative Asset Work:**
+    "Suggest colour-blind-safe palette variations for the colours used in styles/main.css."
 
-**Key Practices:**
+*   **Complex Document Creation:**
+    "Create a directory called horizon-bid and populate it with a project structure for an academic funding bid, including Mermaid Gantt charts and costing plan templates."
 
-*   **Monitor Actively:** Keep an eye on Roo Code's live "context bar" and, if applicable, the cost counter. This gives you real-time feedback on how much information the AI is processing and the associated expense.
-*   **Cost Mechanics:** Remember that token cost is roughly a product of the context size and the number of calls made to the AI. Many small, focused calls with a lean context are often more cost-effective and can lead to clearer, more accurate responses than a few calls with an enormous, sprawling context.
-*   **Strategic Reset/Summarise (Insight 8):** When the context window is about one-third full, or if you notice the AI's logic starting to degrade (e.g., it forgets previous instructions or generates less relevant output), it's time for a manual reset. You can either start a fresh session or ask the AI to summarise the current conversation, using that summary as the starting point for a new, leaner context.
+*   **Diagrams as Code:**
+    "Create a Mermaid sequence diagram showing the authentication flow for this application."
 
-### The Two-Profile Strategy for Cost Control (Insight 2)
+*   **Understanding Existing Code:**
+    "Describe this project" (after navigating to any codebase -- even one you did not write).
 
-A practical way to manage costs, especially when using models with per-token pricing, is the "two-profile" strategy within Roo Code:
+## 6.6 Context Management and Cost Control
 
-&gt; **Note: The Rate-Limited vs. Unlimited Profile Trick**
-&gt;
-&gt; Configure two distinct profiles in Roo Code:
-&gt; 1.  **"Rate-Limited Daily Driver":** Set this profile to use a cost-effective model (like a free-tier option if available, or a less expensive model) and enable a significant rate limit (e.g., 30-60 seconds between calls). This is your go-to for routine tasks, explanations, and general assistance, helping you stay within free-tier limits or keep costs very low.
-&gt; 2.  **"Unlimited Creative Burst":** Configure this profile with your most capable model (e.g., Gemini 2.5 Pro) and *no rate limit* (or a very short one). Reserve this profile for intensive tasks like generating large codebases, complex refactoring, or deep ideation sessions where you need the AI's full power without interruption. Actively monitor the cost ticker when using this profile.
-&gt;
-&gt; By switching between these profiles, you can balance capability with cost-effectiveness.
+Working effectively with Claude Code involves understanding how AI processes information.
 
-### Tooling Choices: Roo Code vs. Cursor (Insight 3)
+### Understanding Context Windows
 
-While various AI coding tools exist, understanding their differences in transparency and control is crucial. Here's a comparison between Roo Code (as used in this workshop, typically with a user-provided API key and direct model access) and a tool like Cursor:
+AI models operate within a "context window" -- a limit on the amount of information they can consider at once. As your conversation grows, so does the context. When the context fills up, the AI may start forgetting earlier instructions or producing less focused output.
 
-| Feature             | Roo Code (with direct model access)                                  | Cursor (typical behaviour)                                       |
-| ------------------- | -------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| **Context Display** | Explicit context bar, showing token count.                           | Often opaque; context size not always clear.                     |
-| **Cost Tracking**   | Direct cost display (if API provides it &amp; profile is un-rate-limited). | Hidden; costs are part of a subscription or abstracted.          |
-| **Prompting**       | Plain-text prompts, direct interaction with the chosen model.        | May involve hidden pre-prompts or system-level instructions.     |
-| **RAG**             | No hidden Retrieval Augmented Generation (RAG) by default. User controls what context is provided. | Often includes built-in RAG, automatically pulling from project files, which can be helpful but also opaque. |
-| **Transparency**    | High: User knows what model is used, what context is sent, and (often) the cost. | Lower: Internal workings, model choices, and exact context can be less visible. |
-| **Control**         | High: User directly manages API keys, model selection, and context.  | Moderate: More "managed" experience, less direct control over underlying AI. |
+**Key practices:**
 
-Choosing the right tool depends on your needs. Roo Code, when configured directly, offers greater transparency and control, which is beneficial for learning the nuances of AI interaction and managing spend. Tools like Cursor might offer a more streamlined, "it just works" experience but with less insight into the underlying mechanics.
+*   **Use `/compact` regularly** -- this asks Claude Code to summarise the conversation, freeing up context space while retaining the key points.
+*   **Use `/clear` for fresh starts** -- when switching to a completely different task, start a new session.
+*   **Use CLAUDE.md for persistent context** -- information in CLAUDE.md is loaded at the start of every session, so you never lose project-level knowledge.
 
-### Effective Prompting with the Tree-plus-Docs Pattern (Insight 4)
+### Cost Management
 
-To minimise AI "hallucinations" (generating incorrect or irrelevant information), avoid duplicate directory creation, and ensure the AI works with the most current information, use the "Tree-plus-Docs" pattern for your prompts, especially when asking for file modifications or project-level changes:
+*   **Claude.ai authentication:** If you use Claude Code with your claude.ai account, usage is included in your subscription tier. Check [claude.ai](https://claude.ai/) for current plan details.
+*   **API key usage:** If you use an API key, costs are per-token. Use `/fast` for routine tasks (switches to a faster, cheaper model). Monitor your usage at [console.anthropic.com](https://console.anthropic.com/).
+*   **The `/fast` toggle:** Use `/fast` for simple questions and quick tasks. Use the default mode (Opus) for complex reasoning, architecture decisions, and large refactoring tasks.
 
-1.  **Provide the Directory Tree:** Use a command like `tree -L 2` (or a similar representation) to show the AI the current structure of the relevant part of your project.
-2.  **Include Key Document Snippets:** Paste in the most relevant sections of any files the AI needs to understand or modify. Don't assume it remembers everything from previous turns.
-3.  **Be Specific about the Action:** Clearly state what you want the AI to do with this information.
+### The Core Interaction Loop
 
-This focused approach provides a narrow, deterministic context for each significant request.
-
-### The Core Interaction Loop: Tree → Prompt → Reset (Insights 1, 8, 10)
-
-A sustainable workflow for complex tasks often involves a loop:
+A sustainable workflow for complex tasks follows this pattern:
 
 ```mermaid
 sequenceDiagram
     participant User
-    participant AI (Roo Code)
-    User-&gt;&gt;AI: Provide Project Tree + Key Docs Snippets
-    User-&gt;&gt;AI: Specific Prompt/Task (e.g., "Add feature X to file Y.md")
-    AI--&gt;&gt;User: Generates Code/Text/Response
-    User-&gt;&gt;User: Review &amp; Integrate Changes (Commit with Git!)
-    User-&gt;&gt;User: Monitor Context Size / Cost
-    alt Context Full or Logic Degrades
-        User-&gt;&gt;AI: "Summarise our conversation" OR Start Fresh Session
-        User-&gt;&gt;User: Reset/Update Context
+    participant Claude Code
+    User->>Claude Code: Start session (CLAUDE.md loaded automatically)
+    User->>Claude Code: Specific task or question
+    Claude Code-->>User: Generates code / explanation / files
+    User->>User: Review changes, commit with Git
+    User->>User: Check context usage
+    alt Context getting large
+        User->>Claude Code: /compact (summarise) or /clear (fresh start)
     end
-    User-&gt;&gt;AI: (Repeat with new prompt or refined task)
+    User->>Claude Code: Next task
 ```
 
-This iterative cycle, combined with vigilant context management and version control, forms the backbone of effective AI-assisted development. If the AI seems lost or is producing unhelpful output, a good "debug" pattern (Insight 10) is to ask it: "Tell me about this project," providing the current file tree and key document snippets. The AI's summary can help you understand its current "mental model" of your project, allowing you to correct misunderstandings or provide better context for the next iteration.
+### Choosing the Right Tool for the Job
+
+| Task | Best Tool |
+|------|-----------|
+| Complex refactoring across multiple files | Claude Code |
+| Quick inline code completion while typing | GitHub Copilot |
+| Exploring a new codebase you have never seen | Claude Code |
+| Writing a single function | Claude Code or Copilot |
+| Understanding what code does | Claude Code (can read whole files) |
+| Generating project scaffolding | Claude Code |
+| Experimenting with different AI models | Continue.dev |
+
+## 6.7 The Power of AI with Local File Access
+
+A significant advantage of using Claude Code over web-based AI chat interfaces is its ability to read from and write to your local file system (with your permission).
+
+*   **Contextual Understanding:** It can read multiple files in your project to understand the broader context, leading to more relevant and accurate suggestions.
+*   **Bulk Operations:** It can generate entire directory structures, fill them with template files, or refactor code across multiple files.
+*   **Persistent Memory:** The CLAUDE.md file gives Claude Code persistent knowledge about your project across sessions.
+
+This local integration, combined with robust version control via Git, creates a highly dynamic and powerful development environment. "The whole of the AI is connected to the whole of the documents, the whole of the time on your own system in a private way, connected to the version management system, connected to the rest of the team."
+
 ---
 
 Next: [Chapter 7: Reference Cheat Sheet](./07_cheat_sheet.md)

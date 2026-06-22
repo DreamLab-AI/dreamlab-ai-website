@@ -1,57 +1,291 @@
 # 3.d: Advanced Techniques
 
-Beyond basic prompting and task management, several advanced techniques can enhance the utility of Codex, particularly the CLI, and provide a deeper understanding of the underlying AI technology.
+Beyond basic prompting and task management, several advanced techniques can dramatically enhance the utility of AI coding agents. This section covers MCP servers, hooks, subagents, CI/CD integration, model selection, and multimodal input.
 
-## CLI for Automation and Recipes
+## MCP Servers (Claude Code)
 
-The Codex CLI is well-suited for automation and leveraging pre-defined "recipes" for common tasks.
+Model Context Protocol (MCP) is an open standard that lets Claude Code connect to external tools and data sources. This transforms Claude Code from a code editor into a general-purpose development agent with access to databases, APIs, browsers, and more.
 
-*   **Non-Interactive Mode:** The CLI can be run in non-interactive or "quiet" mode (often using flags like `-q` or `--quiet`, check `codex --help` for specifics). This makes it suitable for integration into:
-    *   CI/CD (Continuous Integration/Continuous Deployment) pipelines.
-    *   Git hooks (e.g., pre-commit hooks to format code or run linters).
-    *   Other automated scripts and workflows.
-*   **Recipes:** The CLI supports "recipes," which are essentially pre-defined, reusable prompts tailored for common developer tasks. Examples include:
-    *   Refactoring components (e.g., `codex "Refactor the Dashboard component in src/components/Dashboard.jsx to use React Hooks instead of class components."`)
-    *   Generating SQL migrations (e.g., `codex "Generate a SQL migration using SQLAlchemy to add an 'email_verified' boolean column to the 'users' table."`)
-    *   Writing unit tests for specific files or functions.
-    *   Bulk-renaming files and updating their imports/usages across a project.
-    *   Explaining complex regular expressions.
-    *   Proposing impactful Pull Requests based on an analysis of the repository.
-    *   Finding potential security vulnerabilities.
+### Configuring MCP Servers
 
-## Model Selection with CLI
+Create a `.mcp.json` file in your project root:
 
-A significant advantage of the Codex CLI is its flexibility in model selection.
-*   **`--model` Flag:** Use the `--model` flag to specify different OpenAI models (e.g., `gpt-4.1`, `o4-mini`) or even models from other providers that support the OpenAI Chat Completions API.
-    ```bash
-    codex --model gpt-4.1 "Translate this Python function to idiomatic Rust."
-    ```
-*   **Experimentation:** This allows for experimentation to find the best model for specific tasks, balancing capability, speed, and cost. Different models have varying strengths in reasoning, code generation quality, and context window size. (More on model choices in [Chapter 5.b: Understanding Model Choices](./05_b_understanding_model_choices.md)).
+```json
+{
+  "mcpServers": {
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres"],
+      "env": {
+        "DATABASE_URL": "postgresql://localhost:5432/mydb"
+      }
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/path/to/docs"]
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+      }
+    }
+  }
+}
+```
 
-## Multimodal Input (CLI)
+### What MCP Enables
 
-A powerful, emerging feature of the Codex CLI is its ability to accept multimodal inputs.
-*   **Visual Guidance:** Developers can pass in screenshots (e.g., of a UI mockup) or diagrams (e.g., a flowchart of desired logic) to guide the AI in implementing features or UI elements.
-*   **Example:**
-    ```bash
-    codex "Implement an HTML and CSS structure that looks like this: [path/to/screenshot.png]"
-    ```
-    (The exact syntax for passing images may vary; consult the CLI's documentation.)
-*   The workshop mentioned this as a key area of development:
-    > "multimmodal inputs um you know we've we've tal Yeah that right yeah like another another example would be like you know just giving it a little bit more access to the world" - Alexander, OpenAI (though this quote also touches on network access, the multimodal aspect is relevant for advanced CLI use).
+With MCP servers configured, Claude Code can:
 
-## Understanding Fine-tuning (General OpenAI Concept)
+- **Query your database:** "Show me all users who signed up in the last 7 days"
+- **Browse documentation:** "Read the API docs in /docs and update the client to match"
+- **Interact with GitHub:** "Create a PR for these changes with a description"
+- **Control a browser:** "Navigate to the staging site and check if the login flow works"
+- **Access Slack/email:** "Post a summary of today's changes to the #dev channel"
 
-While end-users typically do not fine-tune the core `codex-1` model (powering the Cloud Agent) directly, understanding the principles of fine-tuning provides crucial context on how specialised models like Codex are created and optimised.
+### Available MCP Servers
 
-*   **What is Fine-tuning?** Fine-tuning involves taking a base pre-trained OpenAI model (like GPT-3 or GPT-4) and further training it on a smaller, domain-specific dataset of example prompts and their corresponding ideal outputs. This dataset is usually provided in JSONL (JSON Lines) format.
-*   **Purpose:** This process enhances the model's performance for specific tasks, styles, or domains, making it more aligned with particular needs. For example, `codex-1` is fine-tuned for software engineering tasks.
-*   **Dataset Size:** OpenAI generally recommends starting with 50-100 high-quality examples to see noticeable improvements, although the minimum is around 10. More data typically leads to better results.
-*   **Platforms:** Platforms like Azure AI Studio (formerly Azure AI Foundry) provide interfaces and tools for fine-tuning OpenAI models.
-*   **Relevance to Codex Users:** This knowledge is more for a "hero" level understanding of AI model specialisation rather than a daily operational task for most Codex users. It helps appreciate why specialised models like `codex-1` or `codex-mini-latest` might perform better on coding tasks than general-purpose models out-of-the-box.
+The MCP ecosystem is growing rapidly. Key servers include:
 
-The adoption of these advanced techniques and AI-specific development patterns—such as sophisticated prompt engineering, structured guidance via `AGENTS.MD`, leveraging CLI recipes, utilising multimodal inputs, and understanding the implications of model specialisation—marks a shift in development methodologies. Mastering these new patterns is key to unlocking the full potential of AI coding assistants like Codex.
+| Server | Purpose |
+|--------|---------|
+| `@modelcontextprotocol/server-postgres` | Query PostgreSQL databases |
+| `@modelcontextprotocol/server-filesystem` | Read/write specific file trees |
+| `@modelcontextprotocol/server-github` | GitHub API operations |
+| `@modelcontextprotocol/server-memory` | Persistent key-value memory |
+| Community servers | Slack, Jira, browser automation, and more |
+
+## Hooks System (Claude Code)
+
+Hooks are automated actions triggered before or after specific Claude Code events. They run shell commands or scripts at defined points in the workflow.
+
+### Configuring Hooks
+
+Hooks are configured in your Claude Code settings (`.claude/settings.json` or project-level):
+
+```json
+{
+  "hooks": {
+    "PostEditFile": [
+      {
+        "command": "npx eslint --fix ${file}",
+        "description": "Auto-fix ESLint issues after each edit"
+      }
+    ],
+    "PreCommit": [
+      {
+        "command": "npm run lint && npm test",
+        "description": "Verify lint and tests before committing"
+      }
+    ],
+    "PostCommit": [
+      {
+        "command": "echo 'Committed: ${commitHash}'",
+        "description": "Log commit hash"
+      }
+    ]
+  }
+}
+```
+
+### Hook Events
+
+| Event | Trigger |
+|-------|---------|
+| `PreEditFile` | Before Claude Code modifies a file |
+| `PostEditFile` | After a file is modified |
+| `PreCommit` | Before creating a Git commit |
+| `PostCommit` | After a commit is created |
+| `SessionStart` | When a Claude Code session begins |
+| `SessionEnd` | When a session ends |
+
+Hooks ensure consistent code quality without requiring you to remember to run linters or tests manually.
+
+## Subagents (Claude Code)
+
+Subagents are child Claude Code processes that can work on independent tasks in parallel. This is particularly powerful for large, decomposable tasks.
+
+### How Subagents Work
+
+When Claude Code encounters a task that can be parallelised, it can spawn subagents:
+
+```
+> "I need to update all 12 API endpoints to use the new response envelope format.
+   Each endpoint is independent — work on them in parallel."
+```
+
+Claude Code may spawn multiple subagents, each handling a subset of endpoints, then merge the results.
+
+### The Agent SDK
+
+For programmatic control, Claude Code offers an Agent SDK that lets you build custom agent workflows:
+
+```typescript
+import { Agent } from '@anthropic-ai/claude-code';
+
+const agent = new Agent({
+  model: 'claude-sonnet-4-6',
+  cwd: '/path/to/project',
+});
+
+const result = await agent.run('Add input validation to all API endpoints');
+console.log(result.changes);
+```
+
+This enables building custom CI/CD integrations, code review bots, or specialised coding workflows.
+
+## CI/CD Integration
+
+Both Claude Code and Codex CLI can be integrated into automated pipelines.
+
+### Claude Code in CI/CD
+
+```yaml
+# .github/workflows/ai-review.yml
+name: AI Code Review
+on: [pull_request]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+      - name: Review PR
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          claude -p "Review the changes in this PR for:
+            1. Security vulnerabilities
+            2. Performance issues
+            3. Missing error handling
+            4. Test coverage gaps
+            Provide a summary of findings."
+```
+
+### Codex CLI in CI/CD
+
+```yaml
+# .github/workflows/codex-review.yml
+name: Codex Code Review
+on: [pull_request]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Codex CLI
+        run: npm install -g @openai/codex
+      - name: Review PR
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          codex --approval-mode suggest \
+            "Review the changed files for security issues and suggest improvements"
+```
+
+## Model Selection Strategies
+
+Choosing the right model for each task balances capability, speed, and cost.
+
+### Claude Code Model Selection
+
+| Task Type | Recommended Model | Rationale |
+|-----------|------------------|-----------|
+| Complex architecture | Opus 4.8 (default) | Best reasoning capability |
+| Routine refactoring | Sonnet 4.6 (`/fast`) | Good quality, faster, cheaper |
+| Simple formatting/fixes | Haiku 4.5 | Fastest, most cost-effective |
+| Novel/creative problems | Fable 5 | Latest capabilities |
+
+```bash
+# Use Sonnet for routine work
+claude --model claude-sonnet-4-6
+
+# Inside a session, toggle fast mode
+/fast
+```
+
+### Codex CLI Model Selection
+
+```bash
+# Default: codex-mini-latest (fast, optimised for CLI)
+codex "Fix the typo in the README"
+
+# GPT-4o for more complex tasks
+codex --model gpt-4o "Architect a caching strategy for the API layer"
+
+# o4-mini for cost-effective reasoning
+codex --model o4-mini "Add comprehensive error handling"
+
+# Use Claude models via Codex CLI
+codex --provider anthropic --model claude-sonnet-4-6 "Refactor this module"
+```
+
+### Cost Optimisation Tips
+
+- Use cheaper models (Sonnet, o4-mini, Haiku) for routine tasks
+- Reserve expensive models (Opus, o3) for complex reasoning
+- Monitor per-session costs (Claude Code's `/cost` command)
+- Use non-interactive mode for batch operations to avoid idle token costs
+- Leverage CLAUDE.md/AGENTS.MD to reduce prompt repetition
+
+## Multimodal Input
+
+Both agents support visual input, enabling powerful new workflows.
+
+### Image-to-Code
+
+```bash
+# Claude Code: paste or reference screenshots
+claude
+> "Implement the UI shown in this screenshot: [paste image]"
+
+# Codex CLI: pass image files
+codex --image mockup.png "Implement this UI design using React and Tailwind CSS"
+```
+
+### Diagram-to-Architecture
+
+```bash
+# Describe architecture from a whiteboard photo
+claude
+> "Here's a photo of our architecture whiteboard. [paste image]
+   Generate the infrastructure-as-code for this architecture using Terraform."
+```
+
+## Automation Recipes
+
+### Git Hooks Integration
+
+```bash
+# .git/hooks/pre-commit (with Claude Code)
+#!/bin/bash
+claude -p "Review staged changes for obvious bugs or security issues. Exit 1 if critical issues found."
+
+# .git/hooks/pre-commit (with Codex CLI)
+#!/bin/bash
+codex --approval-mode suggest "Review staged changes for issues"
+```
+
+### Batch Operations
+
+```bash
+# Process multiple files with Claude Code
+for file in src/services/*.ts; do
+  claude -p "Add comprehensive JSDoc comments to all exported functions in $file"
+done
+
+# Parallel batch with Codex CLI
+find src/components -name "*.tsx" | xargs -P 4 -I {} \
+  codex "Add accessibility attributes to all interactive elements in {}"
+```
+
+The adoption of these advanced techniques — MCP integration, hooks, subagents, CI/CD automation, model selection, and multimodal input — marks a shift from using AI as a chat interface to orchestrating AI as a development platform.
 
 ---
 
-Next: [Chapter 4: Practical Codex](./04_practical_codex.md)
+Next: [Chapter 4: Practical Applications](./04_practical_codex.md)

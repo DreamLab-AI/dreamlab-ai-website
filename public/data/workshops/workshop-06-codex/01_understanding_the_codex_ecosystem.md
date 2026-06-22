@@ -1,621 +1,342 @@
 # Chapter 1: Understanding the Modern AI Coding Ecosystem
 
-> **2025 Reality Check:** The original OpenAI Codex API was sunset in March 2023. This chapter covers the modern successor tools: ChatGPT with GPT-4o/o1, Claude Code CLI, and the broader ecosystem of AI coding assistants that have evolved to fill this space.
+> **June 2026:** The AI coding landscape is no longer centred on a single tool. Two terminal-based agents — Claude Code and OpenAI Codex CLI — lead the agentic coding category, while Cursor, Copilot, and a rich open-source ecosystem serve different workflows. This chapter maps the full landscape and explains what makes each tool distinctive.
 
-## The 2025 AI Coding Landscape
-
-The modern AI coding ecosystem is no longer centered on a single "Codex" API but rather distributed across multiple tools and platforms, each optimized for different workflows:
+## The 2026 AI Coding Landscape
 
 ```mermaid
 graph TB
-    subgraph "OpenAI Coding Tools 2025"
-        A[Developer] --> B{Access Method}
+    subgraph "Terminal-Based Agents"
+        A[Developer] --> B{Choose Your Agent}
 
-        B --> C[ChatGPT Web/App]
-        B --> D[OpenAI API]
-        B --> E[Third-Party Tools]
+        B --> C[Claude Code]
+        B --> D[OpenAI Codex CLI]
+        B --> E[Aider]
 
-        C --> F[GPT-4o - Fast & Capable]
-        C --> G[o1-preview - Deep Reasoning]
-        C --> H[o1-mini - Efficient Reasoning]
+        C --> F[Fable 5 - Latest & most capable]
+        C --> G[Opus 4.8 - Top-tier reasoning]
+        C --> H[Sonnet 4.6 - Best speed/quality balance]
 
-        D --> I[Direct API Integration]
-        D --> J[Function Calling]
-        D --> K[Structured Outputs]
-
-        E --> L[Cursor AI]
-        E --> M[Continue.dev]
-        E --> N[Aider CLI]
+        D --> I[codex-mini-latest - Fast]
+        D --> J[o4-mini - Reasoning]
+        D --> K[GPT-4o - Flagship]
     end
 
-    subgraph "Anthropic Claude Coding Tools"
-        O[Claude.ai Web]
-        P[Claude API]
-        Q[Claude Code CLI]
+    subgraph "IDE-Integrated"
+        L[Cursor AI - VS Code fork]
+        M[GitHub Copilot - Extensions]
+        N[Windsurf - Flow state]
+        O[Continue.dev - OSS]
     end
 
-    subgraph "Backend Models Available"
-        R[GPT-4o - $5/1M tokens]
-        S[o1-preview - $15/1M tokens]
-        T[Claude Sonnet 4 - $3/1M tokens]
-        U[Claude Opus 4.5 - $15/1M tokens]
+    subgraph "Chat & API"
+        P[ChatGPT - GPT-4o / o3]
+        Q[Claude.ai - Artifacts]
+        R[Anthropic SDK]
+        S[OpenAI API]
     end
 
-    C --> R
-    C --> S
-    D --> R
-    E --> R
-    O --> T
-    P --> T
-    Q --> U
-
-    style A fill:#4ecdc4
-    style R fill:#ff6b6b
-    style T fill:#45b7d1
+    style C fill:#45b7d1
+    style D fill:#4ecdc4
+    style L fill:#96ceb4
 ```
 
-As Josh from OpenAI mentioned in the workshop, the form factor is a key consideration:
+## A. Claude Code — Anthropic's Agentic Coding Tool
 
-> "I remember actually you know In our interview we ripped on the form factor right should it be CLI the issues with that waiting for it to finish and not be able to interrupt all the time wanting to run it four times 10 times in parallel um and you know at that point I said maybe it should be both and we sort of are you know going for that right now..."
+Claude Code is the most feature-rich terminal-based coding agent available in 2026. It is a standalone tool — not an IDE extension — that runs in your terminal and operates directly on your codebase.
 
-## A. ChatGPT with Code Capabilities (2025)
+### Installation & Access
 
-**Important:** There is no longer a separate "Codex Cloud Agent." Instead, ChatGPT (web and mobile) offers robust coding capabilities through GPT-4o and o1 models:
+```bash
+# Install the CLI globally
+npm install -g @anthropic-ai/claude-code
 
-- **GPT-4o**: Fast, capable general-purpose model excellent for coding tasks
-- **o1-preview**: Deep reasoning model for complex algorithmic problems
-- **o1-mini**: Cost-effective reasoning for coding challenges
-- **Canvas Mode**: Interactive code editing environment (similar to Claude's Artifacts)
+# Start Claude Code in your project directory
+cd ~/projects/my-app
+claude
 
-These models are accessed through chat.openai.com with a ChatGPT Plus ($20/mo) or Pro ($200/mo) subscription.
+# Claude Code is also available as:
+# - Desktop app (Mac and Windows)
+# - Web app at claude.ai/code
+# - VS Code extension (runs inside terminal panel)
+# - JetBrains extension
+```
 
-Alexander from OpenAI elaborated on the vision for this agent:
-
-> "...this is an agent that is good at like independent software engineering work and like the more we lent into that the more like things started to feel really special... we don't just want it to be good at code and like we don't just want it to like solve like say like SWEBench tasks... we spent a lot of time like making sure that our model is like great at adhering to instructions uh great at inferring code style so that you don't have to tell it."
-
-### Key Features (2024-2025)
+### Key Features
 
 | Feature | Description | Benefit |
 |---------|-------------|---------|
-| **Isolated Cloud Sandbox** | Each task runs in dedicated micro-VM | Safe, reproducible execution |
-| **128K Context Window** | ~300 pages of code | Handle large codebases |
-| **Multi-File Editing** | Up to 20 files simultaneously | Complex refactoring |
-| **Git Integration** | Commit, branch, PR creation | Seamless version control |
-| **Real-time Monitoring** | Live progress, logs, diffs | Transparency and control |
-| **Canvas Mode** | Interactive code editing | Visual feedback |
-| **Voice Input** | Speak your coding tasks | Hands-free operation |
+| **CLAUDE.md** | Project configuration file read at startup | Persistent project context, coding standards, and instructions |
+| **MCP Servers** | Model Context Protocol for tool integration | Connect to databases, APIs, browsers, and custom tools |
+| **Hooks System** | Pre/post hooks for automation | Run linters, tests, or custom scripts automatically |
+| **Subagents** | Spawn parallel child agents | Tackle multiple tasks simultaneously |
+| **Slash Commands** | Built-in commands like `/fast`, `/compact` | Quick mode switching and workflow control |
+| **Agent SDK** | Build custom agents programmatically | Create specialised coding workflows |
+| **200K Context** | Large context window | Handle large codebases and long sessions |
+| **Git-Native** | Full Git integration | Create commits, branches, and PRs directly |
 
-### Cloud Agent Workflow Example
+### Claude Code Models (June 2026)
+
+| Model | ID | Use Case |
+|-------|-----|----------|
+| **Fable 5** | `claude-fable-5` | Latest and most capable — best for complex architecture and novel problems |
+| **Opus 4.8** | `claude-opus-4-8` | Top-tier reasoning — default for Claude Code |
+| **Sonnet 4.6** | `claude-sonnet-4-6` | Best balance of speed, quality, and cost — use via `/fast` |
+| **Haiku 4.5** | `claude-haiku-4-5-20251001` | Fastest and cheapest — good for simple tasks and high-volume operations |
+
+### Claude Code Workflow Example
 
 ```mermaid
 sequenceDiagram
     participant Dev as Developer
-    participant Cloud as Codex Cloud Agent
-    participant Sandbox as Cloud Sandbox
-    participant Git as GitHub
+    participant CC as Claude Code
+    participant FS as File System
+    participant Git as Git
 
-    Dev->>Cloud: "Refactor user service to use dependency injection"
-    Cloud->>Sandbox: Clone repository
-    Sandbox->>Sandbox: Analyze codebase
-    Cloud->>Sandbox: Generate refactoring plan
-    Sandbox->>Sandbox: Execute edits across files
-    Sandbox->>Sandbox: Run tests
-    Sandbox->>Git: Create PR with changes
-    Cloud->>Dev: Present results + PR link
+    Dev->>CC: "Refactor user service to use dependency injection"
+    CC->>FS: Read CLAUDE.md for project context
+    CC->>FS: Analyse codebase structure
+    CC->>CC: Plan refactoring approach
+    CC->>FS: Edit files across the project
+    CC->>CC: Run tests via hooks
+    CC->>Git: Create commit with changes
+    CC->>Dev: Present results and diff
 ```
 
-### When to Use Cloud Agent
+### What Makes Claude Code Unique
 
-✅ **Ideal For:**
-- Complex, multi-file refactoring
-- Learning and experimentation
-- Collaborative coding sessions
-- Mobile development (via ChatGPT app)
-- Teams needing shared context
-- PR generation and review
+**CLAUDE.md** — A markdown file at your project root that Claude Code reads every time it starts. It contains project-specific instructions: tech stack, coding conventions, testing procedures, forbidden actions, and architectural decisions. Unlike a README, it is specifically tailored for the AI agent, not human readers.
 
-❌ **Not Ideal For:**
-- High-frequency automated tasks (cost)
-- Strict on-premise requirements
-- Low-latency needs (<1 second)
-- Direct IDE integration
+**MCP (Model Context Protocol)** — An open standard that lets Claude Code connect to external tools. You can configure MCP servers for databases, browser automation, Slack, GitHub, or any custom API. This transforms Claude Code from a code editor into a general-purpose development agent.
 
-### Cost Structure (2024)
+**Hooks** — Automated actions triggered before or after specific events. For example: run ESLint after every edit, execute tests before committing, or send notifications when a task completes.
 
-| Plan | Price | Best For |
-|------|-------|----------|
-| **Free Tier** | $0 | Limited monthly usage, learning |
-| **ChatGPT Plus** | $20/mo | Individual developers, unlimited usage |
-| **ChatGPT Pro** | $200/mo | Power users, priority access, O3 model |
-| **ChatGPT Teams** | $30/user/mo | Small teams, shared workspaces |
-| **Enterprise** | Custom | Large organizations, SSO, admin controls |
+**Subagents** — Claude Code can spawn child agents that work in parallel. You can delegate independent subtasks to subagents while continuing to work on the main task.
 
-## B. The Codex CLI (Command Line Interface)
+### When to Use Claude Code
 
-For developers who prefer working within their terminal, OpenAI offers the Codex CLI, a lightweight, open-source coding agent. This tool brings chat-driven development capabilities directly to the command line, enabling users to instruct the AI to run code, manipulate files, and iterate on solutions, all while understanding the context of the local repository.
+**Ideal For:**
+- Complex, multi-file refactoring and feature implementation
+- Projects requiring deep codebase understanding
+- Teams wanting consistent, configurable AI behaviour (via CLAUDE.md)
+- Workflows requiring tool integration (MCP)
+- Developers who prefer terminal-first workflows
+- Building custom AI agents (Agent SDK)
 
-Alexander touched upon the origins of the CLI:
+**Less Ideal For:**
+- Quick inline completions while typing (use Copilot/Cursor instead)
+- Teams that need fully offline operation
 
-> "a lot of those those learnings ended up becoming the codec CLI was shipped recently um you know a lot of the work there like you know the the thinking that I'm like most proud of is like enabling things like full auto mode and like when you do that we actually like increase the amount of sandboxing so that's still safe for you"
+## B. OpenAI Codex CLI — Open-Source Terminal Agent
 
-### Installation & Setup (2024)
+The OpenAI Codex CLI is an open-source coding agent that brings agentic capabilities to the terminal. Released in 2025, it emphasises sandboxed execution and supports multiple model providers.
+
+### Installation & Setup
 
 ```bash
 # Install via npm
-npm install -g openai-codex-cli
+npm install -g @openai/codex
 
-# Or via Homebrew (macOS)
-brew install openai-codex
+# Set your API key
+export OPENAI_API_KEY="your-api-key-here"
 
-# Initialize with API key
-codex init
-# Follow prompts to enter OpenAI API key
+# Start Codex CLI in your project
+cd ~/projects/my-app
+codex
 
-# Verify installation
-codex --version
-# codex-cli v2.1.0
-
-# Check available commands
-codex --help
+# Or provide a direct prompt
+codex "Add user authentication with JWT tokens"
 ```
 
 ### Key Features
 
 | Feature | Details | Use Case |
 |---------|---------|----------|
-| **Local Execution** | Runs on your machine | Fast iteration, privacy |
-| **Sandboxed Mode** | Docker/Seatbelt isolation | Security without risk |
-| **Model Selection** | Choose GPT-4, Codex-1, others | Cost optimization |
-| **Git-Native** | Direct repository interaction | Commit, branch, PR workflow |
-| **AGENTS.MD Support** | Reads project context files | Consistent behavior |
+| **Open Source** | Full source on GitHub | Audit, fork, contribute |
+| **Sandboxed Execution** | Docker/Seatbelt isolation | Safe autonomous execution |
+| **AGENTS.MD Support** | Project context files | Consistent agent behaviour |
+| **Multi-Provider** | OpenAI, Anthropic, Azure, Ollama | Flexible model choice |
+| **Model Selection** | `--model` flag | Optimise for cost or capability |
 | **Multimodal Input** | Screenshots, diagrams | Visual task specification |
-| **Streaming Output** | Real-time response | Interactive experience |
+| **Git-Native** | Direct repository interaction | Commit, branch, PR workflow |
 
-### CLI Workflow Example
-
-```bash
-# Navigate to project
-cd ~/projects/my-app
-
-# Create AGENTS.MD for context
-cat > .codex/AGENTS.MD <<EOF
-# Project: My App
-Framework: React + TypeScript + Node.js
-Style: Functional components, hooks
-Testing: Jest, React Testing Library
-Linting: ESLint (Airbnb config)
-EOF
-
-# Execute task
-codex "Add user authentication with JWT tokens"
-
-# Codex will:
-# 1. Read .codex/AGENTS.MD for context
-# 2. Analyze existing codebase
-# 3. Generate authentication logic
-# 4. Create tests
-# 5. Prompt for review
-# 6. Optionally commit changes
-
-# Review changes
-git diff
-
-# Interactive mode for refinement
-codex --interactive
-> "Update the login endpoint to use bcrypt for password hashing"
-> "Add rate limiting to prevent brute force attacks"
-> exit
-
-# Commit with AI-generated message
-codex commit --auto
-```
-
-### Advanced CLI Features (2024)
-
-**1. Multi-Step Task Automation**
+### Codex CLI Approval Modes
 
 ```bash
-codex task --multi-step << EOF
-1. Add Redis caching layer to API
-2. Update all endpoints to use caching
-3. Add cache invalidation on writes
-4. Generate tests for cache behavior
-5. Update documentation
-EOF
+# Suggest mode (default) — safest, shows changes for approval
+codex --approval-mode suggest "Fix the login bug"
+
+# Auto-edit — reads files and applies patches automatically
+codex --approval-mode auto-edit "Refactor to TypeScript"
+
+# Full-auto — reads, writes, and executes commands (sandboxed)
+codex --approval-mode full-auto "Add comprehensive test suite"
 ```
 
-**2. Parallel Execution**
+### When to Use Codex CLI
 
-```bash
-# Run multiple independent tasks
-codex parallel << EOF
-- "Add TypeScript types to user module"
-- "Optimize database queries in posts service"
-- "Update dependencies to latest versions"
-EOF
+**Ideal For:**
+- Open-source projects wanting an auditable AI agent
+- Teams using multiple model providers
+- Privacy-sensitive environments needing sandboxed execution
+- Developers who want to contribute to the tool itself
+- CI/CD pipeline integration
+- Terminal-first workflows
+
+**Less Ideal For:**
+- Workflows requiring deep tool integration (Claude Code's MCP is more mature)
+- Teams wanting a full desktop/web app experience
+
+## C. IDE-Integrated Tools
+
+### Cursor AI
+
+A VS Code fork with deep AI integration. Its standout feature is **Composer** — a multi-file editing interface that lets you describe changes in natural language and see them applied across your project.
+
+```
+Key Features:
+- Composer for multi-file natural language editing
+- Tab completion with inline suggestions
+- Chat sidebar for questions and explanations
+- Agent mode for autonomous task execution
+- Supports Claude and GPT models as backend
 ```
 
-**3. Custom Model Selection**
+### GitHub Copilot
 
-```bash
-# Use GPT-4 Turbo for complex tasks
-codex --model gpt-4-turbo "Architect a microservices migration plan"
+The most widely adopted AI coding tool, integrated directly into VS Code and JetBrains. In 2026, it offers:
 
-# Use Codex-1 for standard coding
-codex --model codex-1 "Add input validation to form"
-
-# Use GPT-4o-mini for simple tasks (cost-effective)
-codex --model gpt-4o-mini "Format code with prettier"
+```
+Key Features:
+- Inline suggestions (the original tab-completion experience)
+- Copilot Chat for questions and explanations
+- Copilot Workspace for multi-file planning and implementation
+- Enterprise features: SSO, policy controls, code referencing
+- Free tier for students and open-source maintainers
 ```
 
-**4. Integration with CI/CD**
+### Windsurf (formerly Codeium)
 
-```yaml
-# .github/workflows/codex-review.yml
-name: AI Code Review
-on: [pull_request]
+Focuses on "flow state" coding with its Cascade feature for multi-file editing.
 
-jobs:
-  codex-review:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install Codex CLI
-        run: npm install -g openai-codex-cli
-      - name: Review PR
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: |
-          codex review pr ${{ github.event.pull_request.number }} \
-            --suggest-improvements \
-            --check-security \
-            --verify-tests
-```
+### Continue.dev
 
-### When to Use CLI
+Free, open-source extension for VS Code and JetBrains. Connects to any model provider (OpenAI, Anthropic, Ollama, etc.). Ideal for teams wanting full control over their AI coding setup.
 
-✅ **Ideal For:**
-- Local development workflows
-- Git-integrated tasks (commits, PRs)
-- Automated CI/CD pipelines
-- Privacy-sensitive projects
-- Pay-per-use cost model
-- Terminal-first developers
-- Custom tooling integration
-
-❌ **Not Ideal For:**
-- Beginners unfamiliar with CLI
-- Need for visual feedback
-- Team collaboration without Git
-- Mobile development
-
-### CLI Cost Analysis
-
-```mermaid
-graph TD
-    A[CLI Usage Cost Factors] --> B[Model Choice]
-    A --> C[Task Complexity]
-    A --> D[Context Size]
-
-    B --> E[GPT-4o-mini: $0.15/1M input tokens]
-    B --> F[GPT-4 Turbo: $10/1M input tokens]
-    B --> G[Codex-1: $2/1M input tokens]
-
-    C --> H[Simple task: ~1K tokens]
-    C --> I[Medium task: ~10K tokens]
-    C --> J[Complex task: ~50K tokens]
-
-    D --> K[Small repo: <100 files]
-    D --> L[Medium repo: 100-1000 files]
-    D --> M[Large repo: 1000+ files]
-```
-
-**Real-World Cost Examples (100 tasks/month):**
-
-| Task Type | Tokens/Task | Model | Monthly Cost |
-|-----------|-------------|-------|--------------|
-| Simple fixes | 1K | GPT-4o-mini | $0.15 |
-| Feature implementation | 10K | Codex-1 | $2.00 |
-| Complex refactoring | 50K | GPT-4 Turbo | $50.00 |
-| Mixed workload | Varies | Codex-1 avg | $15-30 |
-
-## C. API Integration
-
-For teams building custom tools or integrating Codex into existing platforms, direct API access provides maximum flexibility:
-
-```javascript
-// Modern API Integration Example (2024)
-import OpenAI from 'openai';
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-async function generateCode(prompt, files = [], config = {}) {
-  const response = await openai.chat.completions.create({
-    model: config.model || "codex-1-preview",
-    messages: [
-      {
-        role: "system",
-        content: "You are an expert software engineer. Generate production-quality code."
-      },
-      {
-        role: "user",
-        content: prompt,
-        // Multi-file context (new in 2024)
-        files: files.map(f => ({
-          name: f.name,
-          content: f.content,
-          language: f.language
-        }))
-      }
-    ],
-    tools: [
-      { type: "code_interpreter" },
-      { type: "file_search" }
-    ],
-    temperature: config.temperature || 0.2,
-    max_tokens: config.maxTokens || 4096,
-    // Enable streaming for real-time output
-    stream: config.stream || false
-  });
-
-  if (config.stream) {
-    // Handle streaming response
-    for await (const chunk of response) {
-      process.stdout.write(chunk.choices[0]?.delta?.content || '');
-    }
-  } else {
-    return response.choices[0].message.content;
-  }
-}
-
-// Usage example
-const files = [
-  { name: "user.ts", content: "...", language: "typescript" },
-  { name: "api.ts", content: "...", language: "typescript" }
-];
-
-const code = await generateCode(
-  "Add comprehensive error handling to the user service",
-  files,
-  { model: "codex-1-preview", temperature: 0.1 }
-);
-
-console.log(code);
-```
-
-## D. Key Distinctions and Choosing the Right Tool
-
-Josh from OpenAI framed the cloud agent as more than just a hosted CLI:
-
-> "I think that's a short of it right allowing you to run codeex agents um in OpenAI's cloud um but I think that the form factor like it's a lot more than just where the computer runs right it's um how does this bind to the UI how does this scale out over time um how do you manage uh caching and permissioning and how do you do the collaboration story and so I let me know if you disagree but I think the really is like form factor is the core of it."
+## D. Choosing the Right Tool
 
 ### Comprehensive Comparison Matrix
 
-| Feature | Cloud Agent | CLI | API Integration |
-|---------|-------------|-----|-----------------|
-| **Interface** | Web/mobile chat | Terminal | Programmatic |
-| **Primary Model** | Codex-1 (O3) | Configurable | Configurable |
-| **Execution** | OpenAI cloud | Local machine | Custom environment |
-| **Context Window** | 128K tokens | 128K tokens | 128K-200K tokens |
-| **Multi-File Editing** | Yes (20 files) | Yes (unlimited) | Yes (unlimited) |
-| **Git Integration** | Automated | Native | Custom |
-| **Cost Model** | Subscription | Pay-per-use | Pay-per-use |
-| **Setup Complexity** | None | Low | Medium-High |
-| **Customization** | Limited | High | Complete |
-| **Team Features** | Excellent | Good | Custom build |
-| **Offline Support** | No | Limited cache | No |
-| **Response Latency** | 3-10s | 1-5s | 1-3s |
-| **Mobile Access** | Yes | No | Via custom app |
-| **Voice Input** | Yes | No | Via custom impl |
-| **Canvas Mode** | Yes | No | N/A |
-| **Open Source** | No | Yes | Client libraries |
+| Feature | Claude Code | Codex CLI | Cursor | Copilot |
+|---------|-------------|-----------|--------|---------|
+| **Interface** | Terminal + desktop + web | Terminal | IDE (VS Code fork) | IDE extension |
+| **Open Source** | No | Yes | No | No |
+| **Project Config** | CLAUDE.md | AGENTS.MD | .cursorrules | - |
+| **Tool Integration** | MCP servers | Limited | Built-in | GitHub ecosystem |
+| **Multi-File Editing** | Excellent | Excellent | Excellent (Composer) | Good (Workspace) |
+| **Inline Completion** | No (use with Copilot) | No | Yes | Yes |
+| **Sandboxing** | OS-level | Docker/Seatbelt | N/A | N/A |
+| **Subagents** | Yes | No | No | No |
+| **Hooks/Automation** | Yes (hooks system) | CI/CD integration | No | GitHub Actions |
+| **Custom Agents** | Agent SDK | Fork the source | No | No |
+| **Context Window** | 200K tokens | 128K tokens | Model-dependent | Model-dependent |
+| **Offline Support** | No | Limited | No | Limited |
+| **Mobile Access** | Yes (web app) | No | No | GitHub Mobile |
 
 ### Decision Framework
 
 ```mermaid
 graph TD
-    A[Choose Your Codex Access Method] --> B{Primary Need}
+    A[Choose Your AI Coding Setup] --> B{Primary Workflow}
 
-    B -->|Learning & Exploration| C[Cloud Agent Free/Plus]
-    B -->|Daily Professional Coding| D{Team Size}
-    B -->|Custom Integration| E[API]
+    B -->|Terminal-first| C{Open source needed?}
+    B -->|IDE-native| D{Budget?}
+    B -->|Chat/exploration| E[ChatGPT or Claude.ai]
 
-    D -->|Solo Developer| F{Budget & Workflow}
-    D -->|2-10 Team Members| G[Cloud Agent Teams]
-    D -->|Enterprise 10+| H[Enterprise + API]
+    C -->|Yes| F[OpenAI Codex CLI]
+    C -->|No| G[Claude Code]
 
-    F -->|Budget Conscious| I[CLI Pay-per-use]
-    F -->|Prefer Subscription| J[Cloud Agent Plus]
-    F -->|Terminal Focused| K[CLI]
+    D -->|Premium| H[Cursor AI]
+    D -->|Budget/free| I{Existing IDE?}
 
-    C --> L[Start: chat.openai.com]
-    E --> M[Build Custom Tool]
-    G --> N[Setup Team Workspace]
-    H --> O[Enterprise Sales]
-    I --> P[Install CLI]
-    J --> L
-    K --> P
+    I -->|VS Code/JetBrains| J[GitHub Copilot]
+    I -->|Want OSS| K[Continue.dev]
 
-    style L fill:#90EE90
-    style M fill:#FFA07A
-    style N fill:#FFD700
-    style P fill:#87CEEB
+    style G fill:#45b7d1
+    style F fill:#4ecdc4
+    style H fill:#96ceb4
+    style J fill:#90EE90
+```
+
+### Recommended Combinations
+
+Many developers use multiple tools together. Common pairings:
+
+**1. Claude Code + GitHub Copilot** (Most popular)
+```yaml
+Workflow:
+  - Copilot for inline completions while typing
+  - Claude Code for complex multi-file tasks, refactoring, and architecture
+  - CLAUDE.md ensures consistent behaviour across sessions
+```
+
+**2. Codex CLI + Cursor** (Open-source focused)
+```yaml
+Workflow:
+  - Cursor for IDE-native editing with Composer
+  - Codex CLI for terminal automation and CI/CD
+  - AGENTS.MD shared between both tools
+```
+
+**3. Claude Code + Cursor** (Maximum capability)
+```yaml
+Workflow:
+  - Cursor for quick inline edits and visual feedback
+  - Claude Code for deep refactoring, MCP tool integration, and agent workflows
+  - Both share the same codebase context
 ```
 
 ### Recommended Workflows by Persona
 
 **1. Junior Developer (Learning AI Coding)**
-
 ```yaml
-Access Method: Cloud Agent (Free → Plus)
+Start With: ChatGPT or Claude.ai (web)
+Then Add: GitHub Copilot (free for students)
+Graduate To: Claude Code or Codex CLI
 Monthly Cost: $0-20
-Setup Time: 5 minutes
-
-Workflow:
-  - Week 1-2: Experiment with simple tasks
-  - Week 3-4: Build complete small projects
-  - Month 2+: Upgrade to Plus for unlimited usage
-
-Benefits:
-  - Zero setup friction
-  - Learn prompt engineering
-  - Mobile access for learning on-the-go
-  - Easy sharing for feedback
 ```
 
 **2. Professional Developer (Individual Contributor)**
-
 ```yaml
-Access Method: CLI + Cloud Agent (Hybrid)
-Monthly Cost: $20-40
-Setup Time: 30 minutes
-
-Workflow:
-  - Brainstorm architecture in Cloud Agent
-  - Implement features via CLI
-  - Review in IDE
-  - Use Cloud for complex multi-file refactoring
-
-Tools:
-  - AGENTS.MD files in all projects
-  - Git hooks for automated commits
-  - Custom aliases for common tasks
-
-Benefits:
-  - Best of both worlds
-  - Cost-effective for routine tasks
-  - Full Git integration
-  - Local privacy for sensitive code
+Primary: Claude Code (terminal agent)
+Secondary: GitHub Copilot (inline completions)
+Monthly Cost: API usage + $10/mo
 ```
 
 **3. Engineering Team (5-10 Members)**
-
 ```yaml
-Access Method: ChatGPT Teams + API for automation
-Monthly Cost: $150-300 (base) + $50-200 (API)
-Setup Time: 1 week
-
-Infrastructure:
-  - Shared AGENTS.MD templates
-  - Centralized prompt library
-  - CI/CD integration for automated reviews
-  - Team style guides enforced by Codex
-
-Workflow:
-  - Shared Team workspace for collaboration
-  - API for automated code reviews in PRs
-  - CLI for individual development
-  - Knowledge sharing via shared conversations
-
-Benefits:
-  - Team consistency
-  - Collaboration features
-  - Automated workflows
-  - Centralized billing
+Standardise: Claude Code with shared CLAUDE.md templates
+Supplement: Copilot Enterprise or Cursor Business
+Monthly Cost: API usage + $10-20/developer
 ```
 
 **4. Enterprise (50+ Developers)**
-
 ```yaml
-Access Method: ChatGPT Enterprise + Custom API Platform
-Monthly Cost: $1000-5000+
-Setup Time: 1-3 months
-
-Infrastructure:
-  - SSO integration
-  - Custom AI code review platform
-  - Automated refactoring pipelines
-  - Security scanning integration
-  - Compliance and audit logging
-
-Governance:
-  - Admin controls for model selection
-  - Usage analytics and reporting
-  - Data residency compliance
-  - Custom model fine-tuning
-
-Benefits:
-  - Enterprise-grade security
-  - Complete customization
-  - Scalable to thousands of developers
-  - ROI tracking and optimization
-```
-
-## Competitive Landscape (2024 Comparison)
-
-### How Codex Stacks Up
-
-| Tool | Type | Strengths | Weaknesses | Pricing |
-|------|------|-----------|------------|---------|
-| **OpenAI Codex** | Cloud + CLI | Superior reasoning, complex refactoring | Higher cost, learning curve | $20-200/mo + API |
-| **Claude Code** | Agent | 200K context, excellent instructions | Slower responses | $20/mo + API |
-| **Cursor** | IDE Fork | Fast, native IDE feel | Subscription required | $20/mo |
-| **GitHub Copilot X** | Extension | GitHub integration, cheap | Limited autonomy | $10/mo |
-| **Windsurf** | IDE Fork | Flow state, Cascade UI | New, less mature | $10-15/mo |
-| **Continue.dev** | OSS Extension | Self-hosted, flexible | Requires setup | Free |
-| **Aider** | CLI | Git-native, efficient | Limited UI | Pay-per-use |
-| **Tabnine** | Extension | Privacy-focused, on-prem | Less capable | $12-39/mo |
-
-### Benchmark Performance (2024)
-
-```mermaid
-graph LR
-    A[HumanEval Pass@1] --> B[Codex-1: 89.2%]
-    A --> C[Claude Sonnet 4: 91.4%]
-    A --> D[GPT-4 Turbo: 87.1%]
-    A --> E[GitHub Copilot: 83.5%]
-
-    F[Multi-File Accuracy] --> G[Codex: 94%]
-    F --> H[Claude Code: 96%]
-    F --> I[Cursor: 89%]
-    F --> J[Copilot: 83%]
-
-    K[Speed (avg response)] --> L[Codex Cloud: 5s]
-    K --> M[Codex CLI: 2s]
-    K --> N[Cursor: 1s]
-    K --> O[Copilot: <1s]
-```
-
-## Modern Codex Features (2024-2025)
-
-### Canvas Mode
-
-Interactive code editing environment within ChatGPT:
-
-- ✅ Live code preview
-- ✅ Inline suggestions and edits
-- ✅ Side-by-side version comparison
-- ✅ Direct export to GitHub
-- ✅ Collaborative editing (Teams)
-
-### Multi-Modal Capabilities
-
-```bash
-# Voice-to-code (mobile app)
-"Create a Python function that processes CSV files"
-
-# Image-to-code (screenshot analysis)
-codex --image screenshot.png "Implement this UI design"
-
-# Diagram-to-code (architecture)
-codex --diagram architecture.mmd "Generate microservices structure"
+Evaluate: Claude Code (Agent SDK for custom workflows)
+Governance: Centralised CLAUDE.md templates, usage monitoring
+Integration: MCP servers for internal tools
+Monthly Cost: Custom (volume API pricing + tool subscriptions)
 ```
 
 ## Next Steps
 
-Now that you understand the Codex ecosystem:
+Now that you understand the AI coding ecosystem:
 
-1. Choose your access method (Cloud, CLI, or API)
+1. Choose your primary tool (Claude Code or Codex CLI recommended for this workshop)
 2. Set up authentication and configuration
 3. Practice with hands-on examples
 
-The workshop participants emphasized:
-
-> "you really want both modes" — Josh, OpenAI
-
-Start with the Cloud Agent to learn, then graduate to CLI for production workflows.
+The best approach is often to start with one terminal agent and one IDE tool, then expand as you discover your preferred workflow.
 
 ---
 
@@ -623,4 +344,4 @@ Start with the Cloud Agent to learn, then graduate to CLI for production workflo
 
 ---
 
-*Last Updated: December 2024 | Codex-1 (O3) + GPT-4 Turbo | 200+ Integration Partners*
+*Last Updated: June 2026 | Claude Code + OpenAI Codex CLI + Cursor + Copilot*

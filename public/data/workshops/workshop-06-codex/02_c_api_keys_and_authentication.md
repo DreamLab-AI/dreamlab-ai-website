@@ -1,51 +1,164 @@
 # 2.c: API Keys and Authentication
 
-Secure and correct authentication is fundamental for using any OpenAI service, including the Codex tools that rely on API access (primarily the CLI, as the Cloud Agent handles authentication through your ChatGPT session).
+Secure authentication is fundamental for using AI coding tools. This section covers obtaining and managing API keys for Anthropic (Claude Code) and OpenAI (Codex CLI), as well as best practices that apply across all providers.
 
-## Obtaining OpenAI API Keys
+## Obtaining API Keys
 
-*   **OpenAI Platform:** API keys are generated and managed through your organisation's settings on the [OpenAI platform](https://platform.openai.com).
-*   You will typically find an "API keys" section in your account settings where you can create new secret keys.
+### Anthropic (for Claude Code)
+
+1. Visit [console.anthropic.com](https://console.anthropic.com)
+2. Create an account or sign in
+3. Navigate to "API Keys" in your account settings
+4. Click "Create Key" and give it a descriptive name (e.g., "claude-code-laptop")
+5. Copy the key immediately — it will not be shown again
+
+### OpenAI (for Codex CLI)
+
+1. Visit [platform.openai.com](https://platform.openai.com)
+2. Create an account or sign in
+3. Navigate to "API keys" in your account settings
+4. Click "Create new secret key"
+5. Copy the key immediately — it will not be shown again
+
+### Other Providers
+
+For tools that support multiple providers (like Codex CLI with its `--provider` flag or Continue.dev):
+
+- **Azure OpenAI:** portal.azure.com — Azure OpenAI Service resource
+- **Google (Gemini):** ai.google.dev — API key from Google AI Studio
+- **Ollama (local):** No API key needed — models run locally
 
 ## Secure Handling of API Keys
 
-API keys are confidential and should be treated with the same level of security as passwords.
-**Crucial Security Practices:**
+API keys are confidential credentials. Treat them with the same care as passwords.
 
-*   **Never Share Publicly:** Do not share your API keys in public forums, version control systems (like Git), or client-side code (e.g., JavaScript running in a browser, mobile app code).
-*   **Environment Variables:** The standard and recommended practice is to load API keys from environment variables on your local machine or server-side. This keeps them out of your codebase. (See [Setting Up the Codex CLI](./02_b_setting_up_the_codex_cli.md) for how to do this).
-*   **Secure Key Management:** For applications deployed to production, use a secure key management service provided by your cloud provider (e.g., AWS Secrets Manager, Google Secret Manager, Azure Key Vault).
-*   **Restrict Key Permissions (If Possible):** While not always granularly available for all API key types, if your provider allows, restrict the permissions associated with an API key to only what is necessary for its intended use.
-*   **Rotate Keys Regularly:** Periodically generate new API keys and decommission old ones, especially if you suspect a key might have been compromised.
+### Essential Practices
 
-## Authentication Method (for Direct API Calls)
+*   **Never share publicly:** Do not commit keys to Git, paste them in public forums, or include them in client-side code.
+*   **Use environment variables:** The standard and recommended practice. This keeps keys out of your codebase entirely.
 
-While the Codex CLI handles authentication for you once the API key is set up, if you were to make direct API calls to OpenAI (e.g., when building custom tools), the OpenAI API uses **Bearer Authentication**.
+    ```bash
+    # In your shell config (~/.bashrc, ~/.zshrc, or ~/.config/fish/config.fish)
+    export ANTHROPIC_API_KEY="sk-ant-..."
+    export OPENAI_API_KEY="sk-..."
+    ```
 
-The API key is provided in the `Authorization` header of HTTP requests:
+*   **Use .env files locally (with .gitignore):** For project-specific keys, create a `.env` file and ensure it is listed in `.gitignore`.
 
+    ```bash
+    # .env (never commit this file)
+    ANTHROPIC_API_KEY=sk-ant-...
+    OPENAI_API_KEY=sk-...
+    ```
+
+    ```bash
+    # .gitignore
+    .env
+    .env.local
+    .env.*.local
+    ```
+
+*   **Use secret managers in production:** For CI/CD and deployed applications, use your platform's secret management:
+    - GitHub Actions: Repository secrets
+    - AWS: Secrets Manager
+    - Google Cloud: Secret Manager
+    - Azure: Key Vault
+
+*   **Rotate keys regularly:** Generate new keys periodically, especially if you suspect compromise. Revoke old keys immediately.
+
+*   **Use project-scoped keys where possible:** Both Anthropic and OpenAI support project-level key scoping, which limits what each key can access.
+
+## Authentication for Claude Code
+
+Claude Code handles authentication automatically once your API key is set:
+
+```bash
+# Method 1: Environment variable (recommended)
+export ANTHROPIC_API_KEY="sk-ant-..."
+
+# Method 2: Claude Code will prompt you to authenticate
+# on first run if no key is found — it opens a browser
+# for OAuth-style authentication
+
+# Method 3: For CI/CD or non-interactive use
+ANTHROPIC_API_KEY="sk-ant-..." claude -p "Run the test suite"
 ```
-Authorization: Bearer YOUR_OPENAI_API_KEY
+
+### Checking Authentication
+
+```bash
+# Claude Code shows your authentication status at startup
+claude
+# Look for: "Authenticated as: your-email@example.com"
 ```
 
-Replace `YOUR_OPENAI_API_KEY` with your actual secret key.
+## Authentication for Codex CLI
 
-## Organisation and Project IDs (for API Requests)
+```bash
+# Method 1: Environment variable (recommended)
+export OPENAI_API_KEY="sk-..."
 
-For users belonging to multiple organisations or projects within the OpenAI platform, you can specify which organisation/project API usage should be attributed to. This is done by including specific headers in your API requests:
+# Method 2: .env file in project root
+echo 'OPENAI_API_KEY=sk-...' > .env
 
-*   `OpenAI-Organization: YOUR_ORG_ID`
-*   `OpenAI-Project: YOUR_PROJECT_ID`
+# Method 3: Using a different provider
+export ANTHROPIC_API_KEY="sk-ant-..."
+codex --provider anthropic "Your task here"
+```
 
-**Where to find these IDs:**
+## Organisation and Project IDs
 
-*   **Organisation IDs (`YOUR_ORG_ID`):** Found in your organisation settings on the OpenAI platform.
-*   **Project IDs (`YOUR_PROJECT_ID`):** Found on the general settings page for a selected project on the OpenAI platform.
+### OpenAI
 
-Using these headers ensures that API usage is correctly tracked and billed to the intended entity. The Codex CLI might handle some of this automatically based on your default settings or if configured, but it's good to be aware of if you're managing multiple contexts.
+For users belonging to multiple organisations on the OpenAI platform:
 
-By following these setup and authentication procedures, you can securely access and begin utilising the powerful features offered by OpenAI's models, whether through the Codex tools or direct API integration.
+*   **Organisation IDs:** Found in your organisation settings on platform.openai.com
+*   **Project IDs:** Found in the project settings page
+
+When making direct API calls, include these headers:
+```
+OpenAI-Organization: YOUR_ORG_ID
+OpenAI-Project: YOUR_PROJECT_ID
+```
+
+The Codex CLI may handle this automatically based on your default settings.
+
+### Anthropic
+
+Anthropic's console supports Workspaces for team organisation. API keys are scoped to a workspace, providing natural access control.
+
+## Cost Management
+
+Both providers charge based on token usage. Monitor your spending:
+
+### Anthropic
+- Check usage at console.anthropic.com under "Usage"
+- Set spending limits and alerts
+- Claude Code shows per-session costs via the `/cost` command
+
+### OpenAI
+- Check usage at platform.openai.com/usage
+- Set monthly spending limits
+- Configure per-key usage limits
+
+### Practical Tips
+
+- Start with conservative spending limits and increase as needed
+- Use faster/cheaper models (Sonnet 4.6, o4-mini) for routine tasks
+- Reserve expensive models (Opus 4.8, o3) for complex reasoning
+- Monitor cost per task to optimise your model selection
+
+## Summary: Authentication Quick Reference
+
+| Tool | Environment Variable | Where to Get Key |
+|------|---------------------|-----------------|
+| Claude Code | `ANTHROPIC_API_KEY` | console.anthropic.com |
+| Codex CLI (OpenAI) | `OPENAI_API_KEY` | platform.openai.com |
+| Codex CLI (Anthropic) | `ANTHROPIC_API_KEY` | console.anthropic.com |
+| Cursor | Built-in auth | cursor.sh (account settings) |
+| GitHub Copilot | GitHub OAuth | github.com (Copilot settings) |
+| Continue.dev | Per-provider | Depends on configured provider |
 
 ---
 
-Next: [Chapter 3: Mastering Codex](./03_mastering_codex.md)
+Next: [Chapter 3: Mastering AI Coding Agents](./03_mastering_codex.md)

@@ -376,10 +376,13 @@ Download multiple models and compare their strengths.
 ollama pull mistral
 
 # Code-focused
-ollama pull codellama:7b
+ollama pull qwen2.5-coder:7b
 
 # Lightweight
 ollama pull phi3
+
+# Reasoning-focused
+ollama pull deepseek-r1:7b
 
 # Check sizes
 ollama list
@@ -420,7 +423,7 @@ prompts = {
     'creative': "Write a haiku about artificial intelligence."
 }
 
-models = ['llama3.3:8b', 'mistral', 'codellama:7b', 'phi3']
+models = ['llama3.3:8b', 'mistral', 'qwen2.5-coder:7b', 'phi3']
 
 # Compare
 for prompt_type, prompt in prompts.items():
@@ -448,12 +451,12 @@ python model_comparison.py
 
 Create a comparison table:
 
-| Model         | Reasoning | Coding | Creative | Speed  |
-|---------------|-----------|--------|----------|--------|
-| llama3.3:8b   | ⭐⭐⭐⭐  | ⭐⭐⭐  | ⭐⭐⭐⭐  | Fast   |
-| mistral       | ⭐⭐⭐    | ⭐⭐⭐  | ⭐⭐⭐    | Faster |
-| codellama:7b  | ⭐⭐      | ⭐⭐⭐⭐⭐| ⭐⭐      | Fast   |
-| phi3          | ⭐⭐      | ⭐⭐    | ⭐⭐      | Fastest|
+| Model              | Reasoning | Coding | Creative | Speed  |
+|--------------------|-----------|--------|----------|--------|
+| llama3.3:8b        | ⭐⭐⭐⭐  | ⭐⭐⭐  | ⭐⭐⭐⭐  | Fast   |
+| mistral            | ⭐⭐⭐    | ⭐⭐⭐  | ⭐⭐⭐    | Faster |
+| qwen2.5-coder:7b  | ⭐⭐      | ⭐⭐⭐⭐⭐| ⭐⭐      | Fast   |
+| phi3               | ⭐⭐      | ⭐⭐    | ⭐⭐      | Fastest|
 
 ---
 
@@ -485,15 +488,15 @@ Set up Continue.dev for AI-powered coding assistance.
       "model": "llama3.3:8b"
     },
     {
-      "title": "CodeLlama",
+      "title": "Qwen 2.5 Coder",
       "provider": "ollama",
-      "model": "codellama:7b"
+      "model": "qwen2.5-coder:7b"
     }
   ],
   "tabAutocompleteModel": {
-    "title": "CodeLlama",
+    "title": "Qwen 2.5 Coder",
     "provider": "ollama",
-    "model": "codellama:7b"
+    "model": "qwen2.5-coder:7b"
   }
 }
 ```
@@ -656,9 +659,9 @@ Create a script that:
 **Difficulty**: ⭐⭐⭐
 
 Build a system that:
-- Analyzes the query type
+- Analyses the query type
 - Routes to appropriate model:
-  - Code → CodeLlama
+  - Code → Qwen 2.5 Coder
   - General → Llama 3.3
   - Fast → Phi-3
 - Returns result with metadata

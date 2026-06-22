@@ -1,403 +1,192 @@
-# 2.a: Accessing ChatGPT for Code (2025)
+# 2.a: Web & IDE Tools for AI-Powered Coding
 
-> **2025 Update:** The dedicated "Codex Cloud Agent" no longer exists. This chapter covers accessing ChatGPT's powerful coding capabilities through GPT-4o, o1-preview, and Canvas Mode.
+> **June 2026:** Before diving into terminal agents (Chapter 2.b), this section covers web-based and IDE-integrated tools that many developers use alongside or before adopting Claude Code or Codex CLI.
 
-## The Evolution: From Codex to ChatGPT Code
+## ChatGPT for Coding
 
-**Historical Timeline:**
-- **2021-2023**: OpenAI Codex API (specialized for code)
-- **March 2023**: Codex API deprecated
-- **2023-2024**: GPT-4 becomes primary coding model
-- **2024**: GPT-4o (optimized, multimodal) released
-- **Late 2024**: o1-preview (deep reasoning) released
-- **2025**: ChatGPT offers comprehensive coding through Canvas Mode
+ChatGPT (chat.openai.com) offers robust coding capabilities through GPT-4o and o3 models. It is the most accessible starting point for AI-assisted coding — no local setup required.
 
-## Prerequisites
+### What You Get
 
-### ChatGPT Access Tiers (2025)
+| Tier | Code Capabilities | Best For |
+|------|-------------------|----------|
+| **Free** | GPT-4o (limited) | Learning, simple queries |
+| **Plus** | GPT-4o unlimited, o3 limited, Canvas | Professional developers |
+| **Pro** | o3 unlimited, priority access | Power users, complex tasks |
+| **Team** | Shared workspace, admin controls | Small teams |
 
-| Tier | Cost | Code Capabilities | Best For |
-|------|------|-------------------|----------|
-| **Free** | $0 | GPT-3.5, limited GPT-4o | Learning, simple queries |
-| **Plus** | $20/mo | GPT-4o unlimited, o1-preview limited, Canvas | Professional developers |
-| **Pro** | $200/mo | o1 unlimited, priority access, extended limits | Power users, complex tasks |
-| **Team** | $30/user/mo | Shared workspace, admin controls | Small teams (2-10 developers) |
-| **Enterprise** | Custom | SSO, data governance, fine-tuning | Large organizations |
+### Canvas Mode
 
-### What You'll Need
+ChatGPT's Canvas is an interactive code editing environment:
 
-1. **OpenAI Account**
-   - Sign up at chat.openai.com
-   - Verify email address
-   - Choose subscription tier (Plus recommended minimum)
-
-2. **For Code Integration (Optional)**
-   - GitHub account for repository examples
-   - Local development environment
-   - Code editor (VS Code recommended)
-
-## Step-by-Step Setup
-
-### 1. Create OpenAI Account
-
-```bash
-# Navigate to
-https://chat.openai.com
-
-# Click "Sign up"
-# Provide email and create password
-# Or sign in with Google/Microsoft/Apple
-```
-
-### 2. Upgrade to ChatGPT Plus (Recommended)
-
-For serious coding work, ChatGPT Plus ($20/mo) is the minimum recommended tier:
-
-**Benefits for Coding:**
-- ✅ Unlimited GPT-4o access (fast, capable)
-- ✅ Limited o1-preview access (deep reasoning)
-- ✅ Canvas Mode for interactive code editing
-- ✅ Priority access during peak times
-- ✅ Faster response times
-- ✅ Mobile app access
-
-**To Upgrade:**
-1. Click your profile icon (bottom left)
-2. Select "Upgrade to Plus"
-3. Enter payment information
-4. Subscription activates immediately
-
-### 3. Access Canvas Mode for Coding
-
-Canvas Mode is ChatGPT's interactive coding environment (similar to Claude Artifacts):
-
-**How to Use Canvas:**
-
-```
-Method 1: Automatic Activation
-> "Create a Python web scraper in Canvas"
-(Canvas opens automatically)
-
-Method 2: Manual Activation
-1. Start a new chat
-2. Click the "+" icon next to the message input
-3. Select "Canvas"
-4. Provide your coding task
-
-Method 3: Project-Based
-> "I'm building a React app. Open Canvas so we can work on components together."
-```
-
-**Canvas Features:**
 - Side-by-side code viewing and editing
 - Inline AI suggestions
-- Version comparison
-- Direct code execution (for Python)
-- Export to GitHub Gist
+- Direct code execution (Python)
 - Syntax highlighting for 50+ languages
 
-### 4. Select the Right Model for Your Task
-
-ChatGPT offers different models optimized for different coding tasks:
-
-**GPT-4o - Fast & Capable (Default)**
 ```
-> Implement a REST API with rate limiting in Express.js
-```
-- ✅ Best for: General coding, web development, scripting
-- ✅ Speed: 2-5 seconds response
-- ✅ Cost: Included in Plus subscription
-- ⚠️ Limitations: May struggle with very complex algorithms
-
-**o1-preview - Deep Reasoning**
-```
-> Solve this dynamic programming problem: [complex algorithm]
-> Design a distributed system architecture for...
-```
-- ✅ Best for: Algorithms, system design, complex logic
-- ✅ Thinking: Shows reasoning process
-- ✅ Accuracy: PhD-level math and logic
-- ⚠️ Speed: 10-30 seconds response
-- ⚠️ Limits: 50 messages/week on Plus, unlimited on Pro
-
-**How to Switch Models:**
-1. Look for model selector above chat input
-2. Click dropdown menu
-3. Choose GPT-4o or o1-preview
-4. Model preference persists for that conversation
-
-### 5. Configure for Code Projects (Optional)
-
-**Custom Instructions** help ChatGPT remember your coding preferences:
-
-1. Click profile icon → "Settings" → "Personalization"
-2. Enable "Custom Instructions"
-3. Add coding preferences:
-
-```markdown
-What would you like ChatGPT to know about you?
-- I'm a senior full-stack developer
-- Primary stack: React, Node.js, PostgreSQL
-- I prefer TypeScript over JavaScript
-- Code style: Functional programming, modern ES6+
-- Testing: Jest, React Testing Library
-
-How would you like ChatGPT to respond?
-- Provide production-ready code, not placeholders
-- Include error handling and edge cases
-- Add inline comments for complex logic
-- Suggest unit tests when appropriate
-- Use modern best practices (2024-2025)
+Example workflow:
+> "Create a Python web scraper that handles pagination and rate limiting, in Canvas"
+(Canvas opens with interactive code editing)
 ```
 
-## Real-World Coding Workflows
+### When to Use ChatGPT for Code
 
-### Workflow 1: Feature Implementation
+- Learning new frameworks or concepts
+- Quick prototyping and brainstorming
+- Debugging with error messages
+- Generating isolated code snippets
+- Mobile coding (via ChatGPT app)
 
-```
-You: "I need to add user authentication to my Express app.
-Requirements:
-- JWT tokens
-- Password hashing with bcrypt
-- Login/register endpoints
-- Token refresh mechanism
-- Rate limiting on auth endpoints"
+### Limitations
 
-ChatGPT: [Opens Canvas with complete implementation]
+- No direct repository access (cannot clone repos or create PRs)
+- Cannot execute most languages locally (Python only via Code Interpreter)
+- Context limited to what you paste in
+- No persistent project configuration
 
-You: "Add 2FA support with TOTP"
+## Claude.ai for Coding
 
-ChatGPT: [Updates code with 2FA integration]
+Claude.ai provides web access to Claude models with Artifacts — an interactive panel for code, documents, and visualisations.
 
-You: "Generate unit tests"
+### What You Get
 
-ChatGPT: [Creates comprehensive Jest test suite]
-```
+- **Free tier:** Access to Claude Sonnet with limited usage
+- **Pro ($20/mo):** Higher usage limits, priority access, Projects feature
+- **Artifacts:** Interactive code panels with preview
 
-### Workflow 2: Code Review & Refactoring
+### When to Use Claude.ai
 
-```
-You: "Review this code for security issues:
-[paste code]"
+- Exploring ideas before committing to implementation
+- Working with long documents or large code samples (200K context)
+- Using Projects to organise related conversations with shared context
+- When you want to evaluate Claude's output before adopting Claude Code CLI
 
-ChatGPT: [Provides detailed security analysis]
+## Cursor AI
 
-You: "Refactor to use async/await instead of callbacks"
+Cursor is a VS Code fork with deep AI integration. It is the leading IDE-integrated AI coding tool.
 
-ChatGPT: [Rewrites with modern async patterns]
-```
+### Setup
 
-### Workflow 3: Debugging
+1. Download from cursor.sh
+2. Import your VS Code settings and extensions (automatic)
+3. Sign in and choose a plan (free tier available)
+4. Configure your preferred AI model (Claude or GPT options)
 
-```
-You: "Getting this error:
-TypeError: Cannot read property 'map' of undefined
-at Array.map (<anonymous>)
-[stack trace]
+### Key Features
 
-Here's my code: [paste code]"
-
-ChatGPT: [Identifies issue, explains root cause, provides fix]
-```
-
-### Workflow 4: Learning & Explanation
+**Composer** — The standout feature. Describe changes in natural language and Composer applies them across multiple files simultaneously:
 
 ```
-You: "Explain how React's useEffect hook works with dependencies"
-
-ChatGPT: [Detailed explanation with examples]
-
-You: "Show me common mistakes and how to avoid them"
-
-ChatGPT: [Lists anti-patterns with corrections]
+Example:
+> "Add error handling to all API endpoints in src/routes/ and create
+   corresponding error response types in src/types/"
+(Composer edits multiple files in a single pass)
 ```
 
-## Advanced Features (2025)
+**Tab Completion** — Inline suggestions as you type, with multi-line predictions.
 
-### 1. Web Browsing for Current Libraries
+**Chat** — Ask questions about your codebase with full project context.
 
-ChatGPT Plus can browse the web for up-to-date documentation:
+**Agent Mode** — Autonomous task execution similar to terminal agents, but within the IDE.
 
+### When to Use Cursor
+
+- You prefer a visual IDE experience
+- You want inline completions plus agentic capabilities in one tool
+- Your workflow centres on a single project at a time
+- You want fast iteration with visual diffs
+
+## GitHub Copilot
+
+The most widely adopted AI coding tool, integrated directly into VS Code and JetBrains.
+
+### Setup
+
+1. Install the GitHub Copilot extension in your IDE
+2. Sign in with your GitHub account
+3. Choose a plan (free for students and open-source maintainers)
+
+### Key Features
+
+**Inline Suggestions** — The original tab-completion experience. Copilot predicts what you will type next.
+
+**Copilot Chat** — Ask questions, explain code, generate tests, all from a sidebar panel.
+
+**Copilot Workspace** — Multi-file planning and implementation from GitHub Issues. You describe what you want, Copilot creates a plan, and you approve or modify each step.
+
+### When to Use Copilot
+
+- You want seamless GitHub integration (Issues, PRs, Actions)
+- You need enterprise features (SSO, policy controls, IP indemnity)
+- You want the free student/OSS tier
+- You prefer unobtrusive inline suggestions over agentic workflows
+
+## Continue.dev
+
+A free, open-source extension for VS Code and JetBrains that connects to any model provider.
+
+### Setup
+
+```bash
+# Install from VS Code marketplace or JetBrains plugin repository
+# Then configure your model provider in config.json:
+{
+  "models": [
+    {
+      "title": "Claude Sonnet 4.6",
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-6",
+      "apiKey": "your-key"
+    }
+  ]
+}
 ```
-> "What are the latest features in React 19? Search the official docs."
 
-ChatGPT: [Browses react.dev, summarizes new features with code examples]
-```
+### When to Use Continue.dev
 
-### 2. DALL-E 3 for Architecture Diagrams
+- You want full control over which models and providers you use
+- Privacy is paramount (self-hosted option)
+- You want a free, open-source solution
+- You want to combine multiple model providers in one interface
 
-```
-> "Generate a system architecture diagram for a microservices e-commerce platform"
+## Comparison: Web & IDE Tools
 
-ChatGPT: [Creates visual diagram using DALL-E 3]
-```
+| Feature | ChatGPT | Claude.ai | Cursor | Copilot | Continue.dev |
+|---------|---------|-----------|--------|---------|--------------|
+| **Cost** | $0-200/mo | $0-20/mo | $0-40/mo | $0-39/mo | Free (+ API) |
+| **Interface** | Web/mobile | Web | IDE | IDE extension | IDE extension |
+| **Multi-File** | Limited | Artifacts | Excellent | Good (Workspace) | Good |
+| **Inline Completion** | No | No | Yes | Yes | Yes |
+| **Code Execution** | Python only | No | Local | No | No |
+| **Repo Access** | No | No | Full local | GitHub | Full local |
+| **Open Source** | No | No | No | No | Yes |
+| **Best For** | Learning, mobile | Long context, exploration | IDE-native AI | GitHub ecosystem | OSS, multi-model |
 
-### 3. Data Analysis with Code Interpreter
-
-Upload CSV/Excel files for analysis:
-
-```
-> "Analyze this sales data and create visualizations"
-[Upload CSV]
-
-ChatGPT: [Runs Python code, generates charts, provides insights]
-```
-
-### 4. Multi-File Project Management
-
-```
-You: "Create a full-stack Todo app:
-- Frontend: React + TypeScript
-- Backend: Node.js + Express
-- Database: PostgreSQL
-- Include Docker setup
-- Add CI/CD pipeline"
-
-ChatGPT: [Generates complete file structure in Canvas]
-```
-
-## Comparison: ChatGPT vs. Claude vs. Local IDE Tools
-
-| Feature | ChatGPT Plus | ChatGPT Pro | Claude Pro | Cursor Pro |
-|---------|--------------|-------------|------------|------------|
-| **Cost** | $20/mo | $200/mo | $20/mo | $20/mo |
-| **Primary Model** | GPT-4o | o1 | Sonnet 4 | GPT-4o/Claude |
-| **Context Window** | 128K tokens | 128K tokens | 200K tokens | Project-aware |
-| **Reasoning Mode** | o1-preview (limited) | o1 (unlimited) | No | No |
-| **Code Execution** | Python only | Python only | No | Local |
-| **Canvas/Artifacts** | Yes (Canvas) | Yes (Canvas) | Yes (Artifacts) | Native IDE |
-| **Multi-File Editing** | Limited | Limited | Yes | Excellent |
-| **Web Search** | Yes | Yes | No | No |
-| **Mobile Access** | Yes | Yes | Yes | No |
-| **Best For** | General coding | Complex algorithms | Long refactoring | IDE workflow |
-
-## Common Use Cases & Limitations
-
-### ✅ Excellent For:
-
-1. **Learning & Exploration**
-   - Understanding new frameworks
-   - Explaining complex code
-   - Comparing approaches
-
-2. **Rapid Prototyping**
-   - Scaffolding new projects
-   - Generating boilerplate
-   - API endpoint creation
-
-3. **Code Review**
-   - Security analysis
-   - Performance suggestions
-   - Best practice recommendations
-
-4. **Debugging**
-   - Error interpretation
-   - Root cause analysis
-   - Fix suggestions
-
-5. **Documentation**
-   - README generation
-   - API documentation
-   - Code comments
-
-### ⚠️ Limitations:
-
-1. **No Direct Repository Access**
-   - Cannot clone repos (use Claude Code CLI for this)
-   - Cannot create PRs directly
-   - Cannot run local commands
-
-2. **Context Limits**
-   - Large codebases require selective pasting
-   - Conversation history has limits
-   - May lose context in long sessions
-
-3. **No Local Execution (except Python)**
-   - Cannot run Node.js, Rust, etc.
-   - Cannot test on your machine
-   - Cannot access local databases
-
-4. **Knowledge Cutoff**
-   - Training data cutoff (varies by model)
-   - May suggest outdated approaches
-   - Use web browsing for current info
-
-## Tips for Effective ChatGPT Coding
-
-### 🎯 Prompting Best Practices
+## Tips for Getting the Most from Web & IDE Tools
 
 **DO:**
-- ✅ Be specific about tech stack and versions
-- ✅ Provide context about your project
-- ✅ Ask for explanations along with code
-- ✅ Request tests and error handling
-- ✅ Iterate and refine incrementally
+- Be specific about your tech stack and versions
+- Provide context about your project architecture
+- Ask for explanations alongside code
+- Request tests and error handling
+- Iterate and refine incrementally
 
 **DON'T:**
-- ❌ Paste thousands of lines at once
-- ❌ Expect it to understand your entire codebase
-- ❌ Trust output blindly without review
-- ❌ Use for production secrets/credentials
-- ❌ Assume it knows your custom libraries
-
-### 📝 Example Progression
-
-```
-Step 1: "Explain how to implement OAuth2 in Express"
-→ Get conceptual understanding
-
-Step 2: "Show me the basic OAuth2 flow with Passport.js"
-→ Get starter code
-
-Step 3: "Add Google OAuth provider with proper error handling"
-→ Refine implementation
-
-Step 4: "Generate unit tests for the OAuth routes"
-→ Add testing
-
-Step 5: "Review for security vulnerabilities"
-→ Validate and improve
-```
-
-## Troubleshooting Common Issues
-
-### Issue: "I've reached my message limit"
-
-**Solutions:**
-- Wait for limit reset (3-hour windows on Plus)
-- Upgrade to Pro for unlimited o1 access
-- Switch to GPT-4o (unlimited on Plus)
-- Use API for unlimited access (pay-per-use)
-
-### Issue: "Code is cut off mid-response"
-
-**Solutions:**
-- Prompt: "Continue where you left off"
-- Ask for specific file: "Show me just the auth.js file"
-- Use Canvas Mode for longer code
-- Request chunked output: "Break this into 3 parts"
-
-### Issue: "ChatGPT suggested outdated approach"
-
-**Solutions:**
-- Specify versions: "using React 19 with Server Components"
-- Enable web browsing: "Search for current best practices"
-- Provide recent documentation: "According to [link]..."
+- Paste thousands of lines without context
+- Expect the tool to understand your entire codebase from a snippet
+- Trust output blindly without review
+- Use for production secrets or credentials
+- Assume it knows your custom internal libraries
 
 ## Next Steps
 
-Now that you have ChatGPT set up for coding:
-
-1. **Practice** with simple tasks first
-2. **Experiment** with Canvas Mode
-3. **Compare** GPT-4o vs o1-preview for your use cases
-4. **Consider** Claude Code CLI for terminal workflows
-5. **Evaluate** whether you need IDE integration (Cursor)
+Web and IDE tools are excellent starting points, but for full agentic coding — where the AI navigates your repository, runs commands, and manages Git — you will want a terminal-based agent. The next section covers setting up Claude Code and OpenAI Codex CLI.
 
 ---
 
-**Next:** [2.b: OpenAI API for Programmatic Access](./02_b_setting_up_the_codex_cli.md)
+**Next:** [2.b: Setting Up Terminal Agents](./02_b_setting_up_the_codex_cli.md)
 
 ---
 
-*Last Updated: January 2025 | ChatGPT Plus/Pro | GPT-4o & o1-preview*
+*Last Updated: June 2026 | ChatGPT, Claude.ai, Cursor, Copilot, Continue.dev*

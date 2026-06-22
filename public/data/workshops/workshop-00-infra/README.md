@@ -9,18 +9,18 @@ The journey involves some initial setup, which can feel a bit intensive, but the
 This guide will walk you through:
 
 1.  **Understanding Git & GitHub:** What are they, and why are they indispensable for modern creative work? ([See Chapter 1](./01_why_git.md))
-2.  **Essential Setup:** Getting your accounts and tools in place, including GitHub, Git, VS Code, and a free AI API key. ([See Chapter 2](./02_setup_overview.md))
+2.  **Essential Setup:** Getting your accounts and tools in place, including GitHub, Git, VS Code, and AI coding assistants. ([See Chapter 2](./02_setup_overview.md))
 3.  **Core Git Workflow:** The fundamental commands and practices for version controlling your projects. ([See Chapter 3](./03_core_workflow.md))
 4.  **Collaboration & Recovery:** Working with others and leveraging Git's power to experiment safely and recover from mistakes. ([See Chapter 4](./04_collaboration_recovery.md))
 5.  **GitHub Pages:** Hosting your own free portfolio or project websites directly from your repositories. ([See Chapter 5](./05_github_pages.md))
-6.  **AI-Powered Workflows:** Using tools like Roo Code within VS Code to accelerate your development, documentation, and creative processes. ([See Chapter 6](./06_ai_workflows_roo_code.md))
-*   Understanding context windows, token costs, and best practices for AI interaction ([See Chapter 6.5](./06_ai_workflows_roo_code.md#65-context-windows-cost--tool-comparison))
+6.  **AI-Powered Workflows:** Using Claude Code and other AI tools to accelerate your development, documentation, and creative processes. ([See Chapter 6](./06_ai_workflows_roo_code.md))
+*   Understanding context windows, token costs, and best practices for AI interaction ([See Chapter 6.6](./06_ai_workflows_roo_code.md#66-context-management-and-cost-control))
 7.  **Advanced Typesetting:** Setting up LaTeX with WSL2, TeXLive, and VS Code for professional document creation. ([See Chapter 8](./08_latex_wsl_vscode.md))
 8.  **Context Management & Advanced Workflows:** Mastering AI interactions. ([See Chapter 9](./09_context_management.md))
 
 ## Philosophy
 
-This workshop and guide are built on the idea of "vibe coding" – an iterative, exploratory approach to creation, supercharged by AI. While the tools are powerful, the process is about learning, experimenting, and not being afraid to ask the AI (or your collaborators) for help.
+This workshop and guide are built on the idea of "vibe coding" -- an iterative, exploratory approach to creation, supercharged by AI. While the tools are powerful, the process is about learning, experimenting, and not being afraid to ask the AI (or your collaborators) for help.
 
 Let's begin this journey to unlock new potentials in your creative practice!
 
@@ -37,8 +37,8 @@ Let's begin this journey to unlock new potentials in your creative practice!
 *   **Chapter 2: [Essential Setup: Accounts & Installations](./02_setup_overview.md)**
     *   [2a. Creating Your GitHub Account](./02_a_github_account.md)
     *   [2b. Installing Git & VS Code](./02_b_install_git_vscode.md)
-    *   [2c. Setting up a Google Cloud API Key for AI](./02_c_gcp_api_key.md)
-    *   [2d. Configuring Roo Code in VS Code](./02_d_roo_code_config.md)
+    *   [2c. Setting Up AI API Keys (2026 Edition)](./02_c_gcp_api_key.md)
+    *   [2d. Configuring AI Coding Assistants in VS Code (2026 Edition)](./02_d_roo_code_config.md)
 *   **Chapter 3: [The Core Git Workflow](./03_core_workflow.md)**
     *   Cloning a Repository
     *   The 7 Essential Commands
@@ -50,18 +50,19 @@ Let's begin this journey to unlock new potentials in your creative practice!
 *   **Chapter 5: [GitHub Pages: Your Free Portfolio Site](./05_github_pages.md)**
     *   Setting up GitHub Pages
     *   Deploying a Simple Site
-*   **Chapter 6: [AI-Powered Workflows with Roo Code](./06_ai_workflows_roo_code.md)**
-    *   What is Roo Code?
-    *   How to Use Roo Code: Chat, Context, and Iteration
+*   **Chapter 6: [AI-Powered Workflows with Claude Code](./06_ai_workflows_roo_code.md)**
+    *   What is Claude Code?
+    *   Getting Started: Your First Session
+    *   Essential Commands and CLAUDE.md Configuration
     *   Prompt Ideas for Creative Tasks
-    *   Understanding AI Costs and Free Tiers
+    *   Context Management and Cost Control
 *   **Chapter 8: [Advanced Typesetting: LaTeX with WSL2, TeXLive, and VS Code](./08_latex_wsl_vscode.md)**
     *   Prerequisites and Overview
     *   Setting up WSL2 and Ubuntu
     *   Installing TeXLive
     *   Connecting VS Code to WSL2
     *   Setting up LaTeX Workshop
-    *   Enhancing with Roo Code
+    *   Enhancing with Claude Code
 *   **Chapter 9: [Context Management & Advanced Agent Workflows](./09_context_management.md)**
 
 ---

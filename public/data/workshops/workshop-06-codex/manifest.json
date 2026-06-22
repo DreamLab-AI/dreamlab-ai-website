@@ -1,13 +1,13 @@
 {
-  "title": "Workshop 06: Mastering AI-Powered Code Generation with Modern AI Coding Tools (2025 Edition)",
+  "title": "Workshop 06: Mastering AI-Powered Coding Agents (2026 Edition)",
   "pages": [
     {
       "slug": "README.md",
-      "title": "Workshop 06: Mastering AI-Powered Code Generation with Modern AI Coding Tools (2025 Edition)"
+      "title": "Workshop 06: Mastering AI-Powered Coding Agents (2026 Edition)"
     },
     {
       "slug": "00_introduction.md",
-      "title": "Chapter 0: Introduction to AI-Powered Software Engineering & OpenAI Codex"
+      "title": "Chapter 0: Introduction to AI-Powered Software Engineering"
     },
     {
       "slug": "01_understanding_the_codex_ecosystem.md",
@@ -15,11 +15,11 @@
     },
     {
       "slug": "02_a_accessing_the_codex_cloud_agent.md",
-      "title": "2.a: Accessing ChatGPT for Code (2025)"
+      "title": "2.a: Web & IDE Tools for AI-Powered Coding"
     },
     {
       "slug": "02_b_setting_up_the_codex_cli.md",
-      "title": "2.b: Setting Up the Codex CLI"
+      "title": "2.b: Setting Up Terminal-Based AI Coding Agents"
     },
     {
       "slug": "02_c_api_keys_and_authentication.md",
@@ -35,11 +35,11 @@
     },
     {
       "slug": "03_b_the_crucial_role_of_agents_md.md",
-      "title": "3.b: The Crucial Role of AGENTS.MD"
+      "title": "3.b: Project Configuration — CLAUDE.md and AGENTS.MD"
     },
     {
       "slug": "03_c_managing_tasks_efficiently.md",
-      "title": "3.c: Managing Tasks Efficiently (Cloud Agent & CLI)"
+      "title": "3.c: Managing Tasks Efficiently"
     },
     {
       "slug": "03_d_advanced_techniques.md",
@@ -47,7 +47,7 @@
     },
     {
       "slug": "03_mastering_codex.md",
-      "title": "Chapter 3: Mastering Codex: From Basic Prompts to Advanced Workflows"
+      "title": "Chapter 3: Mastering AI Coding Agents: From Basic Prompts to Advanced Workflows"
     },
     {
       "slug": "04_a_beginner_tasks.md",
@@ -67,19 +67,19 @@
     },
     {
       "slug": "05_a_codex_vs_general_gpt_models.md",
-      "title": "5.a: Codex vs. General GPT Models (e.g., GPT-4 API) for Coding"
+      "title": "5.a: Agentic Tools vs. Chat Models for Coding"
     },
     {
       "slug": "05_b_understanding_model_choices.md",
-      "title": "5.b: Understanding Model Choices"
+      "title": "5.b: Understanding Model & Tool Choices (June 2026)"
     },
     {
       "slug": "05_c_the_evolving_toolkit.md",
-      "title": "5.c: The Evolving Toolkit: New OpenAI APIs and Agentic Capabilities (Brief Overview)"
+      "title": "5.c: The Evolving Toolkit: MCP, Agent Frameworks, and What Comes Next"
     },
     {
       "slug": "05_the_broader_landscape.md",
-      "title": "Chapter 5: The Broader Landscape: Codex, GPT Models, and the Future of AI in Coding"
+      "title": "Chapter 5: The Broader Landscape: Models, Tools, and the Future of AI Coding"
     },
     {
       "slug": "06_a_limitations_of_codex.md",
@@ -99,11 +99,11 @@
     },
     {
       "slug": "07_best_practices_for_using_ai_agents.md",
-      "title": "Chapter 7: Best Practices for Using AI Agents"
+      "title": "Chapter 7: Best Practices for Using AI Coding Agents (2026)"
     },
     {
       "slug": "08_conclusion.md",
-      "title": "Chapter 8: Conclusion: Embracing Codex as Your Co-Developer"
+      "title": "Chapter 8: Conclusion — AI Coding Agents as Your Co-Developers"
     }
   ]
 }

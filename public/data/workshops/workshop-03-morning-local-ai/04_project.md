@@ -29,7 +29,7 @@ graph TD
     C --> F[Document Handler]
     C --> G[Task Handler]
 
-    D --> H[Ollama: llama3.1:8b]
+    D --> H[Ollama: llama3.3:8b]
     E --> I[Ollama: qwen2.5-coder:7b]
     F --> H
     G --> J[Ollama: phi3:3.8b]
@@ -142,7 +142,7 @@ class Settings(BaseSettings):
 
     # Models for different tasks
     models: Dict[str, str] = {
-        "chat": "llama3.1:8b",
+        "chat": "llama3.3:8b",
         "code": "qwen2.5-coder:7b",
         "fast": "phi3:3.8b",
         "reasoning": "qwen2.5:7b"
@@ -1329,7 +1329,7 @@ cd local-ai-assistant
 ollama serve  # If not already running
 
 # Pull required models
-ollama pull llama3.1:8b
+ollama pull llama3.3:8b
 ollama pull qwen2.5-coder:7b
 ollama pull phi3:3.8b
 

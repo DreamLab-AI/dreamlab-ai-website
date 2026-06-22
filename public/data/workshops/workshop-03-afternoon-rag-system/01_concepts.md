@@ -2,7 +2,7 @@
 
 ## Overview
 
-Retrieval-Augmented Generation (RAG) enhances LLMs by combining them with external knowledge retrieval. Learn modern RAG architecture patterns and best practices for 2025.
+Retrieval-Augmented Generation (RAG) enhances LLMs by combining them with external knowledge retrieval. Learn modern RAG architecture patterns and best practices for 2026.
 
 ---
 
@@ -20,7 +20,7 @@ LLMs have limitations:
 
 ```
 ┌──────────────────────────────────────────────────┐
-│            RAG Pipeline (2025)                   │
+│            RAG Pipeline (2026)                   │
 └──────────────────────────────────────────────────┘
 
 1. User Query
@@ -54,7 +54,7 @@ LLMs have limitations:
 
 Store and search embeddings efficiently.
 
-**Popular Options 2025:**
+**Popular Options 2026:**
 
 **Chroma** (Local, Easy)
 - Perfect for prototyping
@@ -80,21 +80,22 @@ client = QdrantClient(url="http://localhost:6333")
 ```
 
 **Pinecone** (Managed Cloud)
-- Fully managed
+- Fully managed, serverless
 - Scales automatically
 - Pay-as-you-go
 - Enterprise features
 
 ```python
-import pinecone
-pinecone.init(api_key="your-key")
+from pinecone import Pinecone
+pc = Pinecone(api_key="your-key")
+index = pc.Index("my-index")
 ```
 
 **Weaviate** (Hybrid Search)
-- Built-in hybrid search
+- Built-in hybrid search (vector + BM25)
 - GraphQL interface
-- Vector + keyword search
-- Strong typing
+- Native multi-tenancy
+- Strong typing with schema enforcement
 
 **pgvector** (PostgreSQL Extension)
 - Use existing PostgreSQL
@@ -133,15 +134,36 @@ embedding = response.data[0].embedding
 |--------------------------|------------|---------|---------|
 | text-embedding-3-small   | 1536       | Low     | Good    |
 | text-embedding-3-large   | 3072       | Medium  | Better  |
-| Voyage AI                | 1024       | Medium  | Best    |
+| Voyage AI v3             | 1024       | Medium  | Best    |
+| Cohere embed-v4          | 1024       | Medium  | Excellent |
 | sentence-transformers    | 384-768    | Free    | Good    |
+| nomic-embed-text         | 768        | Free    | Very Good |
+
+> **TIP**: Check the provider's console for current embedding pricing -- rates change frequently.
 
 **Local Embeddings (Free)**
 ```python
 from sentence_transformers import SentenceTransformer
 
+# General purpose -- good balance of quality and speed
 model = SentenceTransformer('all-MiniLM-L6-v2')
 embeddings = model.encode(["Text 1", "Text 2"])
+
+# Higher quality -- slower but more accurate
+model = SentenceTransformer('BAAI/bge-base-en-v1.5')
+embeddings = model.encode(["Text 1", "Text 2"])
+```
+
+**Ollama Embeddings (Local, GPU-accelerated)**
+```python
+import ollama
+
+# Use Ollama for local embeddings with GPU support
+response = ollama.embeddings(
+    model='nomic-embed-text',
+    prompt='Your text here'
+)
+embedding = response['embedding']
 ```
 
 ### 3. Document Chunking
@@ -159,7 +181,7 @@ def chunk_text(text, chunk_size=1000, overlap=200):
     return chunks
 ```
 
-**Semantic Chunking**
+**Recursive Character Splitting**
 ```python
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
@@ -171,11 +193,22 @@ splitter = RecursiveCharacterTextSplitter(
 chunks = splitter.split_text(document)
 ```
 
+**Semantic Chunking** (context-aware, splits at meaning boundaries)
+```python
+from langchain_experimental.text_splitter import SemanticChunker
+from langchain_community.embeddings import OllamaEmbeddings
+
+embeddings = OllamaEmbeddings(model="nomic-embed-text")
+chunker = SemanticChunker(embeddings, breakpoint_threshold_type="percentile")
+chunks = chunker.split_text(document)
+```
+
 **Best Practices:**
-- **Chunk size**: 500-1000 tokens
-- **Overlap**: 10-20% of chunk size
-- **Preserve context**: Don't split mid-sentence
-- **Include metadata**: Source, page number, timestamp
+- **Chunk size**: 500-1000 tokens for most use cases
+- **Overlap**: 10-20% of chunk size to preserve context at boundaries
+- **Preserve context**: Don't split mid-sentence or mid-paragraph
+- **Include metadata**: Source, page number, timestamp, section heading
+- **Experiment**: The optimal chunking strategy depends on your documents -- always test with real queries
 
 ---
 
@@ -413,7 +446,7 @@ print(results)
 
 ---
 
-## Best Practices 2025
+## Best Practices 2026
 
 ✅ **Use hybrid search** (vector + keyword) for better recall
 ✅ **Implement re-ranking** to improve precision

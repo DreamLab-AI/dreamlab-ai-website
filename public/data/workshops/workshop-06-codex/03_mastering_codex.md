@@ -1,18 +1,17 @@
-# Chapter 3: Mastering Codex: From Basic Prompts to Advanced Workflows
+# Chapter 3: Mastering AI Coding Agents: From Basic Prompts to Advanced Workflows
 
-Effectively utilising OpenAI Codex involves more than just providing simple commands; it requires understanding how to communicate intentions clearly, guide the AI's behaviour, and manage tasks efficiently. This chapter delves into strategies for crafting effective prompts, leveraging `AGENTS.MD` files, managing workflows, and employing advanced techniques to transition from basic use to true mastery.
+Effectively utilising AI coding agents involves more than providing simple commands; it requires understanding how to communicate intentions clearly, configure project context, and manage tasks efficiently. This chapter covers strategies for crafting effective prompts, leveraging CLAUDE.md and AGENTS.MD configuration files, managing workflows, and employing advanced techniques.
 
-As the workshop discussion highlighted, interacting with these advanced AI agents is a new skill:
-> "it takes a leap of faith the first two times you're like I'm not really sure if this is going to work and it goes off for like 30 minutes right but then you he comes back and it's like wow this this this agent went out wrote a bunch of code wrote scripts to help code mod its own changes right tested this and it really went through the full end to end of thinking about the change it wants to make" - Josh, OpenAI
+The key insight for working with agentic tools is that they are not chat interfaces — they are autonomous systems that read your codebase, plan changes, and execute them. Your role shifts from writing code to directing an agent: providing context, reviewing output, and iterating on results.
 
 This chapter will cover:
 
-*   [Effective Prompting Strategies](./03_a_effective_prompting_strategies.md): Learn how clarity, context, and iteration can significantly improve Codex's output.
-*   [The Crucial Role of AGENTS.MD](./03_b_the_crucial_role_of_agents_md.md): Understand how to use these files to provide persistent, repository-specific instructions to Codex.
-*   [Managing Tasks Efficiently](./03_c_managing_tasks_efficiently.md): Explore techniques for breaking down work, parallel execution, reviewing results, and using CLI approval modes.
-*   [Advanced Techniques](./03_d_advanced_techniques.md): Discover CLI automation, recipes, model selection, multimodal input, and the concept of fine-tuning.
+*   [Effective Prompting Strategies](./03_a_effective_prompting_strategies.md): Learn how clarity, context, and iteration can significantly improve agent output.
+*   [CLAUDE.md and AGENTS.MD Configuration](./03_b_the_crucial_role_of_agents_md.md): Understand how to use project configuration files to provide persistent, repository-specific instructions.
+*   [Managing Tasks Efficiently](./03_c_managing_tasks_efficiently.md): Explore techniques for breaking down work, parallel execution, reviewing results, and using approval modes.
+*   [Advanced Techniques](./03_d_advanced_techniques.md): Discover MCP integration, hooks, subagents, CI/CD automation, and model selection strategies.
 
-Mastering these aspects will transform your interaction with Codex from a simple command-response exchange into a more nuanced and powerful collaboration.
+Mastering these aspects transforms your interaction from a simple command-response exchange into a powerful human-AI collaboration.
 
 ---
 

@@ -237,7 +237,7 @@ export const WorkshopHeader = ({
     [category, workshopId]
   );
 
-  const config = categoryConfigs[resolvedCategory];
+  const config = categoryConfigs[resolvedCategory] || categoryConfigs['foundation'];
   const difficultyStyle = difficulty ? difficultyConfig[difficulty] : null;
 
   const progressPercentage = useMemo(

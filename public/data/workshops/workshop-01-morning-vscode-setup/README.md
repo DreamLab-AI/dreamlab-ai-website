@@ -111,7 +111,8 @@ By completing this module, you will:
 
 ### Software We'll Install:
 - VS Code (free)
-- Docker Desktop (free, optional)
+- Docker Desktop (free, optional — or Podman/Rancher Desktop)
+- Claude Code CLI (free to install, pay-per-use API)
 - Essential extensions (all free)
 - AI connectors (free tiers available)
 

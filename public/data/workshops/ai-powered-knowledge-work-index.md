@@ -130,6 +130,28 @@ Transform from AI consumer to AI commander in this comprehensive 5-day workshop 
 
 ---
 
+### Standalone Deep Dives
+
+#### Docker & Containers for AI Development
+**Location**: [`./workshop-07-docker-containers/`](./workshop-07-docker-containers/)
+- Master Docker fundamentals and containerisation
+- VS Code Dev Containers for reproducible environments
+- Remote Docker development on GPU servers
+- Containerising AI agents and workflows
+
+**Key Outcome**: Reproducible, portable AI development environments
+
+#### Claude Code Mastery
+**Location**: [`./workshop-08-claude-code/`](./workshop-08-claude-code/)
+- Install and configure Claude Code CLI
+- CLAUDE.md project configuration
+- MCP servers for extending capabilities
+- Hooks, subagents, and workflow orchestration
+
+**Key Outcome**: Full mastery of Anthropic's agentic coding tool
+
+---
+
 ## Prerequisites
 
 ### Technical Requirements
@@ -184,4 +206,4 @@ Ready to transform your professional practice with AI?
 
 ---
 
-*Last Updated: 2025-06-22*
+*Last Updated: 2026-06-22*

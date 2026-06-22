@@ -1,37 +1,37 @@
 {
-  "title": "Module 12: Agent Orchestration & Safety",
+  "title": "Workshop 04 - Afternoon Session: Agent Orchestration & Safety",
   "pages": [
     {
       "slug": "README.md",
-      "title": "Module 12: Agent Orchestration & Safety"
+      "title": "Workshop 04 - Afternoon Session: Agent Orchestration & Safety"
     },
     {
       "slug": "00_introduction.md",
-      "title": "00_introduction - Module 12: Agent Orchestration & Safety"
+      "title": "Introduction to Agent Orchestration & Safety"
     },
     {
       "slug": "01_concepts.md",
-      "title": "01_concepts - Module 12: Agent Orchestration & Safety"
+      "title": "Orchestration Concepts & Safety Patterns"
     },
     {
       "slug": "02_hands_on.md",
-      "title": "02_hands_on - Module 12: Agent Orchestration & Safety"
+      "title": "Hands-on: Building Orchestrated Agent Systems"
     },
     {
       "slug": "03_exercises.md",
-      "title": "03_exercises - Module 12: Agent Orchestration & Safety"
+      "title": "Orchestration Exercises"
     },
     {
       "slug": "04_project.md",
-      "title": "04_project - Module 12: Agent Orchestration & Safety"
+      "title": "Final Project: Production Multi-Agent System"
     },
     {
       "slug": "05_assessment.md",
-      "title": "05_assessment - Module 12: Agent Orchestration & Safety"
+      "title": "Assessment: Agent Orchestration & Safety"
     },
     {
       "slug": "06_resources.md",
-      "title": "06_resources - Module 12: Agent Orchestration & Safety"
+      "title": "Resources for Agent Orchestration & Safety"
     },
     {
       "slug": "objectives.md",

@@ -85,4 +85,4 @@ After this workshop, you should be able to:
 
 ---
 
-*These objectives align with industry standards for junior to mid-level full-stack developers in 2025.*
+*These objectives align with industry standards for junior to mid-level full-stack developers in 2026.*

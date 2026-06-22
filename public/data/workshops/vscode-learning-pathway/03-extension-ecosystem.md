@@ -28,7 +28,7 @@ graph TD
     C --> J[DevOps Integration]
 
     E --> K[TypeScript, Python, Rust, Go...]
-    F --> L[Copilot, Cody, Continue...]
+    F --> L[Copilot, Claude Code, Continue...]
     G --> M[One Dark Pro, Material Theme...]
     H --> N[GitLens, Todo Tree, Path Intellisense...]
 
@@ -50,7 +50,7 @@ graph TD
 | **Theme** | Visual customization | One Dark Pro, Dracula |
 | **Icon Theme** | File icon customization | Material Icon Theme, vscode-icons |
 | **Git** | Version control enhancement | GitLens, Git Graph |
-| **AI** | AI-powered assistance | Copilot, Cody, Continue |
+| **AI** | AI-powered assistance | Copilot, Claude Code, Continue |
 | **Remote** | Remote development | Remote-SSH, Dev Containers |
 | **Productivity** | Workflow enhancement | Todo Tree, Bookmarks |
 
@@ -117,18 +117,18 @@ code --install-extension golang.go
 
 ### 2. AI Coding Assistants (Deep Dive)
 
-**Option 1: GitHub Copilot (Cloud, Paid)**
+**Option 1: GitHub Copilot (Cloud, Paid — Industry Standard)**
 ```bash
 code --install-extension GitHub.copilot
 code --install-extension GitHub.copilot-chat
 ```
 
 **Features:**
-- Inline code completion
-- Chat interface
-- Code explanation
-- Test generation
-- Documentation generation
+- Inline code completion with multi-line suggestions
+- Chat sidebar and inline chat (`Ctrl+I`)
+- Workspace-aware context (`@workspace`)
+- Test generation, documentation, and code explanation
+- Copilot Workspace: issue-to-PR workflow on GitHub
 
 **Configuration:**
 ```json
@@ -142,52 +142,69 @@ code --install-extension GitHub.copilot-chat
 }
 ```
 
-**Option 2: Continue (Hybrid, Free/Paid)**
+**Cost:** From $10/month for individuals (free for students and OSS maintainers). Check [github.com/features/copilot](https://github.com/features/copilot) for current plans.
+
+**Option 2: Claude Code (Terminal Agent — Best for Complex Tasks)**
+```bash
+npm install -g @anthropic-ai/claude-code
+```
+
+Claude Code is not a VS Code extension — it is Anthropic's standalone agentic coding tool that runs in your terminal (including VS Code's integrated terminal). It reads your entire codebase, makes multi-file edits, runs commands, and handles complex reasoning tasks.
+
+**Key Features:**
+- Agentic: reads, edits, and creates files across your project
+- Powered by Claude Opus by default; `/fast` mode for quicker responses
+- Project configuration via `CLAUDE.md` files
+- Hooks system, slash commands, MCP server integration
+- Subagent workflows for breaking down complex tasks
+- Also available as a desktop app, web app, and IDE extensions
+
+**Setup:**
+```bash
+npm install -g @anthropic-ai/claude-code
+export ANTHROPIC_API_KEY="your-key"    # from console.anthropic.com
+cd your-project && claude               # start a session
+```
+
+**Cost:** Pay-per-use via the Anthropic API (or included with the Max subscription plan). Check [console.anthropic.com](https://console.anthropic.com) for current rates.
+
+**Option 3: Continue.dev (Open Source, Multi-Model)**
 ```bash
 code --install-extension Continue.continue
 ```
 
 **Features:**
-- Multiple model support (OpenAI, Anthropic, Local)
-- Custom model configuration
-- Full code context awareness
-- Privacy-focused options
+- Free and fully open-source
+- Connect any model: Claude, GPT, Gemini, Ollama (local), and more
+- Tab autocomplete with configurable models
+- Chat with `@file`, `@folder`, `@docs` context references
+- Inline editing (`Ctrl+I`)
+- Customisable system prompts and slash commands
 
 **Configuration (config.json):**
 ```json
 {
   "models": [
     {
-      "title": "GPT-4",
-      "provider": "openai",
-      "model": "gpt-4-turbo-preview",
-      "apiKey": "YOUR_OPENAI_KEY"
+      "title": "Claude Sonnet 4.6",
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-6",
+      "apiKey": "YOUR_ANTHROPIC_KEY"
     },
     {
-      "title": "Claude",
-      "provider": "anthropic",
-      "model": "claude-3-opus-20240229",
-      "apiKey": "YOUR_ANTHROPIC_KEY"
+      "title": "GPT-4o",
+      "provider": "openai",
+      "model": "gpt-4o",
+      "apiKey": "YOUR_OPENAI_KEY"
     },
     {
       "title": "Local Llama",
       "provider": "ollama",
-      "model": "codellama:13b"
+      "model": "llama3:8b"
     }
   ]
 }
 ```
-
-**Option 3: Cody (Sourcegraph)**
-```bash
-code --install-extension sourcegraph.cody-ai
-```
-
-**Features:**
-- Free tier available
-- Enterprise-ready
-- Code search integration
-- Multiple LLM support
 
 ### 3. Git & Version Control Extensions
 
@@ -559,6 +576,7 @@ code --install-extension Orta.vscode-jest
 
 # AI
 code --install-extension GitHub.copilot
+npm install -g @anthropic-ai/claude-code   # Claude Code (terminal)
 ```
 
 ### For Python Developers
@@ -581,6 +599,7 @@ code --install-extension njpwerner.autodocstring
 
 # AI
 code --install-extension Continue.continue
+npm install -g @anthropic-ai/claude-code   # Claude Code (terminal)
 ```
 
 ### For DevOps Engineers

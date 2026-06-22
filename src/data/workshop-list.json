@@ -63,5 +63,15 @@
     "id": "workshop-06-codex",
     "name": "06 - Codex",
     "path": "/workshops/workshop-06-codex"
+  },
+  {
+    "id": "workshop-07-docker-containers",
+    "name": "07 - Docker Containers",
+    "path": "/workshops/workshop-07-docker-containers"
+  },
+  {
+    "id": "workshop-08-claude-code",
+    "name": "08 - Claude Code",
+    "path": "/workshops/workshop-08-claude-code"
   }
 ]

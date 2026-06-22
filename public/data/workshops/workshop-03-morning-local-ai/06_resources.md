@@ -5,9 +5,9 @@ Comprehensive resource guide for mastering local AI.
 ## Official Documentation
 
 ### Ollama
-- **Website**: https://ollama.ai
+- **Website**: https://ollama.com
 - **GitHub**: https://github.com/ollama/ollama
-- **Model Library**: https://ollama.ai/library
+- **Model Library**: https://ollama.com/library
 - **API Reference**: https://github.com/ollama/ollama/blob/main/docs/api.md
 
 ### LM Studio
@@ -29,10 +29,11 @@ Primary hub for downloading models:
 - **TheBloke** (quantized models): https://huggingface.co/TheBloke
 
 **Popular Model Cards:**
-- Llama 3.1: https://huggingface.co/meta-llama/Meta-Llama-3.1-8B
+- Llama 3.3: https://huggingface.co/meta-llama/Llama-3.3-8B-Instruct
 - Qwen 2.5: https://huggingface.co/Qwen/Qwen2.5-7B
-- Mistral: https://huggingface.co/mistralai/Mistral-7B-v0.1
-- Phi-3: https://huggingface.co/microsoft/Phi-3-mini-4k-instruct
+- Mistral: https://huggingface.co/mistralai/Mistral-7B-v0.3
+- Phi-4: https://huggingface.co/microsoft/phi-4
+- DeepSeek-R1: https://huggingface.co/deepseek-ai/DeepSeek-R1
 
 ### Model-Specific Resources
 
@@ -47,8 +48,13 @@ Primary hub for downloading models:
 - Models: https://docs.mistral.ai/guides/models/
 
 **Qwen (Alibaba)**
-- GitHub: https://github.com/QwenLM/Qwen
+- GitHub: https://github.com/QwenLM/Qwen2.5
 - Technical Report: https://arxiv.org/abs/2309.16609
+
+**DeepSeek**
+- Official: https://www.deepseek.com
+- GitHub: https://github.com/deepseek-ai
+- R1 Paper: https://arxiv.org/abs/2501.12948
 
 ## Hardware Guides
 
@@ -93,6 +99,8 @@ Primary hub for downloading models:
 | M2 Pro (16 GB) | 16 GB | 7B-13B Q5 | 22-28 tok/s |
 | M2 Max (64 GB) | 64 GB | 30B-70B Q4 | 30-40 tok/s |
 | M3 Max (128 GB) | 128 GB | 70B+ Q4 | 45-55 tok/s |
+| M4 Max (128 GB) | 128 GB | 70B+ Q4 | 50-60 tok/s |
+| M4 Ultra (192 GB) | 192 GB | 70B+ Q8 | 55-70 tok/s |
 
 **Resource**: [Does it ARM?](https://doesitarm.com/formula/ollama/) - Check M-series compatibility
 
@@ -136,7 +144,7 @@ Total: ~$2,200
 ### Tutorials & Courses
 
 **Beginner:**
-- [Ollama Getting Started](https://ollama.ai/blog/getting-started)
+- [Ollama Getting Started](https://ollama.com/blog/getting-started)
 - [Run Llama Locally](https://www.youtube.com/watch?v=Wjrdr0NU4Sk)
 - [Local AI Basics](https://simonwillison.net/2023/Oct/17/open-llms/)
 
@@ -204,10 +212,11 @@ pip install rich                  # Beautiful terminal output
 ### Development Tools
 
 **Model Management:**
-- **Ollama**: https://ollama.ai
+- **Ollama**: https://ollama.com
 - **LM Studio**: https://lmstudio.ai
 - **Jan**: https://jan.ai (privacy-focused)
 - **GPT4All**: https://gpt4all.io
+- **MLX**: https://github.com/ml-explore/mlx (Apple Silicon native)
 
 **Model Conversion:**
 - **llama.cpp converter**: `convert.py`
@@ -447,7 +456,7 @@ Help improve these resources:
 ## Quick Reference
 
 **Start Here:**
-1. Install Ollama: https://ollama.ai
+1. Install Ollama: https://ollama.com
 2. Join r/LocalLLaMA: https://reddit.com/r/LocalLLaMA
 3. Read "Illustrated Transformer": https://jalammar.github.io/illustrated-transformer/
 

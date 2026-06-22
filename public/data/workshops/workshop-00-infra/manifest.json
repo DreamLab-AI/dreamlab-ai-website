@@ -23,11 +23,11 @@
     },
     {
       "slug": "02_c_gcp_api_key.md",
-      "title": "Chapter 2c: Setting up AI API Keys (2025 Edition)"
+      "title": "Chapter 2c: Setting Up AI API Keys (2026 Edition)"
     },
     {
       "slug": "02_d_roo_code_config.md",
-      "title": "Chapter 2d: Configuring AI Code Assistants in VS Code (2025 Edition)"
+      "title": "Chapter 2d: Configuring AI Coding Assistants in VS Code (2026 Edition)"
     },
     {
       "slug": "02_setup_overview.md",
@@ -47,7 +47,7 @@
     },
     {
       "slug": "06_ai_workflows_roo_code.md",
-      "title": "Chapter 6: AI-Powered Workflows with Roo Code"
+      "title": "Chapter 6: AI-Powered Workflows with Claude Code"
     },
     {
       "slug": "07_cheat_sheet.md",

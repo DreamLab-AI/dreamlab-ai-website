@@ -3,33 +3,41 @@
 ## Official Documentation
 
 ### Anthropic Claude
-- **Tool Use Guide**: https://docs.anthropic.com/claude/docs/tool-use
-- **Best Practices**: https://docs.anthropic.com/claude/docs/tool-use-best-practices
+- **Claude API Tool Use Guide**: https://docs.anthropic.com/en/docs/build-with-claude/tool-use
+- **Agent SDK Documentation**: https://docs.anthropic.com/en/docs/build-with-claude/agent-sdk
+- **Claude Code Documentation**: https://docs.anthropic.com/en/docs/claude-code
 - **Python SDK**: https://github.com/anthropics/anthropic-sdk-python
-- **Cookbook**: https://github.com/anthropics/anthropic-cookbook
+- **TypeScript SDK**: https://github.com/anthropics/anthropic-sdk-node
+- **Anthropic Cookbook**: https://github.com/anthropics/anthropic-cookbook
+
+### Model Context Protocol (MCP)
+- **MCP Specification**: https://modelcontextprotocol.io/
+- **MCP Server Registry**: https://github.com/modelcontextprotocol/servers
+- **Building MCP Servers**: https://modelcontextprotocol.io/docs/concepts/servers
 
 ### OpenAI
-- **Function Calling**: https://platform.openai.com/docs/guides/function-calling
-- **Agents Guide**: https://cookbook.openai.com/examples/how_to_call_functions_with_chat_models
-- **Python SDK**: https://github.com/openai/openai-python
+- **Codex CLI (open-source)**: https://github.com/openai/codex
+- **Function Calling Guide**: https://platform.openai.com/docs/guides/function-calling
+- **Agents Guide**: https://platform.openai.com/docs/guides/agents
 
 ### LangChain
-- **Agents Documentation**: https://python.langchain.com/docs/modules/agents/
-- **Agent Types**: https://python.langchain.com/docs/modules/agents/agent_types/
-- **Tools**: https://python.langchain.com/docs/integrations/tools/
-- **GitHub**: https://github.com/langchain-ai/langchain
+- **Agents Documentation**: https://python.langchain.com/docs/how_to/#agents
+- **LangGraph (workflow orchestration)**: https://github.com/langchain-ai/langgraph
+- **LangSmith (observability)**: https://docs.smith.langchain.com/
 
-## Frameworks and Libraries
+## Agent Tools and Platforms
 
-| Framework | Purpose | Best For | GitHub |
-|-----------|---------|----------|--------|
-| **LangChain** | Agent orchestration | General-purpose agents | [link](https://github.com/langchain-ai/langchain) |
-| **CrewAI** | Multi-agent systems | Collaborative agents | [link](https://github.com/joaomdmoura/crewAI) |
-| **AutoGPT** | Autonomous agents | Long-running tasks | [link](https://github.com/Significant-Gravitas/AutoGPT) |
-| **AutoGen** | Multi-agent conversations | Complex dialogues | [link](https://github.com/microsoft/autogen) |
-| **LlamaIndex** | Data-aware agents | RAG + agents | [link](https://github.com/run-llama/llama_index) |
-| **Semantic Kernel** | Agent SDK | Enterprise agents | [link](https://github.com/microsoft/semantic-kernel) |
-| **Claude Flow** | Agent orchestration | Production swarms | [link](https://github.com/ruvnet/claude-flow) |
+| Tool | Type | Best For | Link |
+|------|------|----------|------|
+| **Claude Code** | Terminal agent | Software development, refactoring, debugging | [docs](https://docs.anthropic.com/en/docs/claude-code) |
+| **OpenAI Codex CLI** | Terminal agent | Open-source coding agent with OpenAI models | [github](https://github.com/openai/codex) |
+| **Aider** | Terminal agent | Open-source pair programming, multi-model | [github](https://github.com/paul-gauthier/aider) |
+| **Cursor** | IDE agent | VS Code fork with deep AI integration | [cursor.com](https://cursor.com) |
+| **Windsurf** | IDE agent | Cascade multi-step agent in IDE | [windsurf.com](https://windsurf.com) |
+| **Continue.dev** | IDE extension | Free, open-source, multi-model | [github](https://github.com/continuedev/continue) |
+| **LangGraph** | Framework | Complex state-machine workflows | [github](https://github.com/langchain-ai/langgraph) |
+| **CrewAI** | Framework | Role-based multi-agent teams | [github](https://github.com/crewAIInc/crewAI) |
+| **AutoGen** | Framework | Multi-agent conversations | [github](https://github.com/microsoft/autogen) |
 
 ## Research Papers
 
@@ -38,315 +46,154 @@
 1. **ReAct: Synergizing Reasoning and Acting in Language Models** (2023)
    - Authors: Yao et al.
    - arXiv: https://arxiv.org/abs/2210.03629
-   - Key contribution: Interleaving reasoning and action
+   - Key contribution: Interleaving reasoning and action in agents
 
 2. **Toolformer: Language Models Can Teach Themselves to Use Tools** (2023)
    - Authors: Schick et al.
    - arXiv: https://arxiv.org/abs/2302.04761
    - Key contribution: Self-supervised tool learning
 
-3. **HuggingGPT: Solving AI Tasks with ChatGPT and its Friends in Hugging Face** (2023)
-   - Authors: Shen et al.
-   - arXiv: https://arxiv.org/abs/2303.17580
-   - Key contribution: LLM as controller for AI models
-
-4. **Generative Agents: Interactive Simulacra of Human Behavior** (2023)
+3. **Generative Agents: Interactive Simulacra of Human Behavior** (2023)
    - Authors: Park et al.
    - arXiv: https://arxiv.org/abs/2304.03442
    - Key contribution: Agent memory architectures
 
-5. **AutoGPT: An Autonomous GPT-4 Experiment** (2023)
-   - Project: https://github.com/Significant-Gravitas/AutoGPT
-   - Key contribution: Fully autonomous agents
+### Recent Advances (2025-2026)
 
-### Recent Advances (2024)
+4. **Model Context Protocol** (2024-2025)
+   - Specification: https://modelcontextprotocol.io/
+   - Key contribution: Standardised tool integration protocol adopted across the industry
 
-6. **Agent-as-a-Judge: Evaluating Multi-Agent Systems** (2024)
-   - Focus: Agent evaluation methodologies
+5. **Multi-Agent Coordination in Production Systems** (2025)
+   - Focus: Patterns for orchestrating multiple AI agents in production
 
-7. **Multi-Agent Collaboration Patterns** (2024)
-   - Focus: Communication protocols
-
-8. **Memory Systems for Long-Running Agents** (2024)
-   - Focus: Persistent memory architectures
+6. **Agent Safety and Alignment** (2025-2026)
+   - Focus: Guardrails, cost control, and safe autonomous execution
 
 ## Code Examples and Tutorials
 
-### Beginner-Friendly
+### Getting Started
 
-1. **LangChain Agents Tutorial**
-   ```
-   https://python.langchain.com/docs/use_cases/tool_use/quickstart
-   ```
-   Complete walkthrough of building your first agent
+1. **Anthropic Tool Use Cookbook**
+   - https://github.com/anthropics/anthropic-cookbook/tree/main/tool_use
+   - Official examples for building tool-using agents
 
-2. **Anthropic Tool Use Examples**
-   ```
-   https://github.com/anthropics/anthropic-cookbook/tree/main/tool_use
-   ```
-   Official examples from Anthropic
+2. **Claude Code Getting Started**
+   - https://docs.anthropic.com/en/docs/claude-code/getting-started
+   - Installation, configuration, and first workflows
 
-3. **OpenAI Function Calling Cookbook**
-   ```
-   https://cookbook.openai.com/examples/how_to_call_functions_with_chat_models
-   ```
-   Step-by-step function calling guide
+3. **MCP Quickstart**
+   - https://modelcontextprotocol.io/quickstart
+   - Build your first MCP server in 15 minutes
 
 ### Intermediate
 
-4. **Building Production Agents**
-   ```
-   https://blog.langchain.dev/building-production-ready-llm-applications/
-   ```
-   Best practices for production deployment
+4. **Building Agents with the Anthropic SDK**
+   - https://docs.anthropic.com/en/docs/build-with-claude/agent-sdk
+   - Production patterns for custom agents
 
-5. **Agent Memory Patterns**
-   ```
-   https://github.com/langchain-ai/langchain/tree/master/templates
-   ```
-   Templates for different memory strategies
+5. **Claude Code Hooks and Workflows**
+   - https://docs.anthropic.com/en/docs/claude-code/hooks
+   - Automate agent behaviour with lifecycle hooks
 
-6. **Multi-Tool Agents**
-   ```
-   https://github.com/anthropics/anthropic-cookbook/blob/main/tool_use/
-customer_service_agent.ipynb
-   ```
-   Customer service agent with multiple tools
+6. **LangGraph Tutorials**
+   - https://github.com/langchain-ai/langgraph/tree/main/docs/docs/tutorials
+   - Graph-based agent workflows
 
 ### Advanced
 
 7. **Multi-Agent Systems with CrewAI**
-   ```
-   https://github.com/joaomdmoura/crewAI-examples
-   ```
-   Complex multi-agent scenarios
+   - https://github.com/crewAIInc/crewAI-examples
+   - Complex multi-agent scenarios
 
-8. **AutoGen Multi-Agent Conversations**
-   ```
-   https://microsoft.github.io/autogen/docs/Examples/
-   ```
-   Agent-to-agent communication patterns
+8. **Claude Code Subagents**
+   - https://docs.anthropic.com/en/docs/claude-code/sub-agents
+   - Delegating tasks to focused child agents
 
-9. **LangGraph for Agent Workflows**
-   ```
-   https://github.com/langchain-ai/langgraph
-   ```
-   Building complex agent workflows with graphs
+## Development Setup
 
-## Tools and Utilities
+### Essential Packages (Python)
 
-### Development Tools
+```bash
+# Core
+pip install anthropic
 
-```python
-# Essential packages
-pip install anthropic openai langchain langchain-anthropic langchain-openai
+# For LangChain-based agents
+pip install langchain langchain-anthropic langchain-community
 
 # Vector stores for memory
-pip install chromadb faiss-cpu pinecone-client
+pip install chromadb
 
 # Search tools
-pip install duckduckgo-search wikipedia
+pip install duckduckgo-search
 
 # Utilities
 pip install python-dotenv pydantic tenacity
 ```
 
-### Testing and Debugging
+### Essential Packages (Node/TypeScript)
 
-1. **LangSmith**: Agent tracing and debugging
-   - https://docs.smith.langchain.com/
+```bash
+# Core
+npm install @anthropic-ai/sdk
 
-2. **Helicone**: LLM observability
-   - https://www.helicone.ai/
+# Claude Code (global)
+npm install -g @anthropic-ai/claude-code
 
-3. **Weights & Biases**: Experiment tracking
-   - https://wandb.ai/
+# MCP servers
+npx @modelcontextprotocol/server-filesystem /path
+npx @modelcontextprotocol/server-github
+```
 
-### Sandboxing and Safety
+### Observability and Debugging
 
-1. **E2B Sandboxes**: Safe code execution
-   - https://e2b.dev/
+| Tool | Purpose | Link |
+|------|---------|------|
+| **LangSmith** | Agent tracing and debugging | https://docs.smith.langchain.com/ |
+| **Helicone** | LLM observability and cost tracking | https://www.helicone.ai/ |
+| **Braintrust** | Evaluation and monitoring | https://www.braintrust.dev/ |
 
-2. **RestrictedPython**: Safe Python execution
-   - https://github.com/zopefoundation/RestrictedPython
+### Code Execution Sandboxes
 
-## Community and Learning
+| Tool | Purpose | Link |
+|------|---------|------|
+| **E2B** | Cloud sandboxes for agent code execution | https://e2b.dev/ |
+| **Modal** | Serverless code execution | https://modal.com/ |
 
-### Discord Communities
-- LangChain Discord: https://discord.gg/langchain
-- Claude AI Community: https://discord.gg/anthropic
-- OpenAI Developer Community: https://community.openai.com/
+## Community
 
-### YouTube Channels
-- **AI Jason**: Practical AI agent tutorials
-- **Sam Witteveen**: LangChain and agent development
-- **Matt Wolfe**: AI news and agent demos
+### Official Channels
+- **Anthropic Discord**: https://discord.gg/anthropic
+- **OpenAI Developer Forum**: https://community.openai.com/
+- **LangChain Discord**: https://discord.gg/langchain
 
-### Blogs and Newsletters
-- **The Batch** (Andrew Ng): https://www.deeplearning.ai/the-batch/
+### Newsletters and Blogs
+- **Anthropic Research Blog**: https://www.anthropic.com/research
 - **LangChain Blog**: https://blog.langchain.dev/
-- **Anthropic Research**: https://www.anthropic.com/research
+- **The Batch** (Andrew Ng): https://www.deeplearning.ai/the-batch/
 
-## Sample Projects
-
-### Open Source Agent Projects
-
-1. **Agent Protocol**: Standardized agent API
-   ```
-   https://github.com/AI-Engineer-Foundation/agent-protocol
-   ```
-
-2. **SuperAGI**: Open-source AGI infrastructure
-   ```
-   https://github.com/TransformerOptimus/SuperAGI
-   ```
-
-3. **BabyAGI**: Task-driven autonomous agent
-   ```
-   https://github.com/yoheinakajima/babyagi
-   ```
-
-4. **GPT Engineer**: AI software engineer
-   ```
-   https://github.com/AntonOsika/gpt-engineer
-   ```
-
-5. **MetaGPT**: Multi-agent meta programming
-   ```
-   https://github.com/geekan/MetaGPT
-   ```
-
-## Best Practices
-
-### Design Patterns
-
-1. **ReAct Agent Pattern**
-   ```python
-   def react_agent(goal):
-       while not goal_achieved():
-           thought = think_about_next_step()
-           action = choose_action(thought)
-           observation = execute_action(action)
-           update_state(observation)
-       return final_answer()
-   ```
-
-2. **Plan-and-Execute Pattern**
-   ```python
-   def plan_execute(goal):
-       plan = create_plan(goal)
-       for step in plan:
-           result = execute_step(step)
-           if should_replan(result):
-               plan = replan(goal, results)
-       return synthesize_results(results)
-   ```
-
-3. **Reflection Pattern**
-   ```python
-   def reflective_agent(task):
-       attempt = execute_task(task)
-       reflection = reflect_on_attempt(attempt)
-       if needs_retry(reflection):
-           improved_attempt = retry_with_reflection(task, reflection)
-           return improved_attempt
-       return attempt
-   ```
+## Safety and Best Practices
 
 ### Safety Guidelines
 
-1. **Input Validation**: Always validate tool parameters
-2. **Sandboxing**: Execute code in isolated environments
-3. **Rate Limiting**: Prevent runaway agents
-4. **Human-in-the-Loop**: Critical actions require approval
-5. **Audit Logging**: Track all agent actions
-6. **Timeout Controls**: Set maximum execution time
-7. **Cost Caps**: Limit API spending
+1. **Input validation**: Always validate tool parameters before execution
+2. **Sandboxing**: Execute untrusted code in isolated environments (E2B, Docker)
+3. **Rate limiting**: Cap iterations and token usage to prevent runaway agents
+4. **Human-in-the-loop**: Require approval for destructive or irreversible actions
+5. **Audit logging**: Log every tool call with timestamps, inputs, and outputs
+6. **Timeout controls**: Set maximum execution time per agent task
+7. **Cost caps**: Monitor and limit API spending per task and per day
 
-### Performance Optimization
+### Model Selection Guide
 
-1. **Caching**: Cache repeated tool calls
-2. **Batching**: Combine multiple operations
-3. **Streaming**: Stream responses for better UX
-4. **Prompt Optimization**: Minimize token usage
-5. **Tool Selection**: Only include relevant tools
-6. **Memory Management**: Clean up old context
+| Task Type | Recommended Model | Reasoning |
+|-----------|------------------|-----------|
+| Complex analysis | Opus 4.8 | Highest reasoning quality |
+| General agent work | Sonnet 4.6 | Best balance of quality, speed, cost |
+| Simple tool routing | Haiku 4.5 | Fastest and cheapest |
+| Subagent subtasks | Haiku 4.5 or Sonnet 4.6 | Cost-effective at scale |
 
-## Production Deployment
-
-### Infrastructure
-
-1. **Hosting Options**:
-   - AWS Lambda (serverless)
-   - Google Cloud Run (containers)
-   - Modal (ML infrastructure)
-   - E2B (agent sandboxes)
-
-2. **Monitoring**:
-   - LangSmith for tracing
-   - Datadog for metrics
-   - Sentry for error tracking
-
-3. **Scaling**:
-   - Redis for distributed state
-   - Queue systems (Celery, RQ)
-   - Load balancing
-
-### Security
-
-1. **API Key Management**:
-   - Use environment variables
-   - Rotate keys regularly
-   - Implement key scoping
-
-2. **Authentication**:
-   - OAuth for user auth
-   - API keys for service auth
-   - JWT tokens
-
-3. **Data Protection**:
-   - Encrypt sensitive data
-   - PII redaction
-   - Audit compliance
-
-## Troubleshooting
-
-### Common Issues
-
-| Problem | Solution |
-|---------|----------|
-| Agent loops indefinitely | Add iteration limits, improve stop conditions |
-| Tool selection errors | Better tool descriptions, few-shot examples |
-| Out of memory | Implement context trimming, use summarization |
-| Slow responses | Cache results, optimize prompts |
-| Hallucinated tool calls | Validate parameters, add error handling |
-| Cost overruns | Set spending limits, optimize tool usage |
-
-### Debugging Techniques
-
-1. **Verbose Logging**: Enable detailed output
-2. **Step-by-Step Execution**: Run agent manually
-3. **Tool Testing**: Test tools independently
-4. **Prompt Analysis**: Review LLM reasoning
-5. **Tracing**: Use LangSmith or similar
-
-## Future Directions
-
-### Emerging Trends (2024-2025)
-
-1. **Multi-Modal Agents**: Vision + text + audio
-2. **Agent-to-Agent Protocols**: Standardized communication
-3. **Specialized Agent Markets**: Pre-built agent templates
-4. **Agent Orchestration Platforms**: Cloud-native agent hosting
-5. **Hybrid Approaches**: Combining symbolic AI + LLMs
-
-### Research Areas
-
-- Long-term memory systems
-- Multi-agent consensus mechanisms
-- Agent evaluation frameworks
-- Safety and alignment
-- Efficient inference
+Check the [Anthropic pricing page](https://www.anthropic.com/pricing) for current rates.
 
 ## Navigation
 - Previous: [Assessment](05_assessment.md)

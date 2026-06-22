@@ -2,11 +2,11 @@
 
 > **Workshop Duration:** 3 hours
 > **Difficulty:** 🟡 Intermediate
-> **Last Updated:** December 2025
+> **Last Updated:** June 2026
 
 ## Welcome to Publishing & Deployment Mastery
 
-In this afternoon session, you'll learn how to take your applications from local development to production-ready deployments on modern cloud platforms. We'll explore automated workflows, continuous deployment, and documentation publishing strategies that professional development teams use in 2025.
+In this afternoon session, you'll learn how to take your applications from local development to production-ready deployments on modern cloud platforms. We'll explore automated workflows, continuous deployment, and documentation publishing strategies that professional development teams use in 2026.
 
 ---
 
@@ -20,7 +20,7 @@ By the end of this session, you will have:
    - Preview deployments for pull requests
 
 2. **Production Deployments**
-   - Deploy React app to Vercel
+   - Deploy React app to Vercel or Cloudflare Pages
    - Deploy API to Railway/Render
    - Configure custom domains and SSL
 
@@ -35,7 +35,7 @@ By the end of this session, you will have:
 
 ### Modern Development Reality
 
-In 2025, deployment is no longer a manual, error-prone process. Professional teams expect:
+In 2026, deployment is no longer a manual, error-prone process. Professional teams expect:
 
 - **Instant Previews**: Every pull request gets its own live preview URL
 - **Automated Testing**: Code is tested before it reaches production
@@ -107,7 +107,7 @@ By the end of today, you'll be able to do all of this **in minutes, not days**.
 Before we begin, ensure you have:
 
 - ✅ GitHub account with a test repository
-- ✅ Node.js 18+ installed (`node --version`)
+- ✅ Node.js 20+ installed (`node --version`)
 - ✅ Git configured locally
 - ✅ Code editor (VS Code recommended)
 - ✅ Free accounts on deployment platforms (we'll create these together)
@@ -127,17 +127,18 @@ This is a **hands-on workshop**. You'll:
 
 ---
 
-## What Makes 2025 Different?
+## What Makes 2026 Different?
 
-If you learned deployment 3-5 years ago, here's what's changed:
+If you learned deployment a few years ago, here's what has changed:
 
-| Old Way (2020) | Modern Way (2025) |
+| Old Way (2020) | Modern Way (2026) |
 |----------------|-------------------|
 | Manual FTP uploads | Git-based deployments |
 | Single production environment | Multi-environment (staging, preview, prod) |
 | Manual SSL certificates | Automatic HTTPS everywhere |
 | Separate CI/CD tools | GitHub Actions built-in |
 | Static docs only | Interactive, searchable docs sites |
+| Manual config | AI-assisted deployment configuration |
 
 ---
 

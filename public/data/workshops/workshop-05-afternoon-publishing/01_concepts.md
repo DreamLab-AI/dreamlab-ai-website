@@ -3,7 +3,7 @@
 > **Section Duration:** 60 minutes
 > **Difficulty:** 🟡 Intermediate
 
-## Understanding the Deployment Landscape (2025)
+## Understanding the Deployment Landscape (2026)
 
 The deployment ecosystem has evolved dramatically. Let's understand the core concepts that power modern application delivery.
 
@@ -72,20 +72,24 @@ Pricing:
 
 ```yaml
 Key Features:
-  - Global edge network (275+ cities)
+  - Global edge network (330+ cities)
   - Unlimited bandwidth (Free tier)
   - Workers for edge computing
   - R2 object storage integration
+  - D1 serverless SQL database
 
 Best For:
   - High-traffic static sites
   - Edge-computed applications
   - Cost-sensitive projects
+  - Full-stack apps with Workers
 
 Pricing:
   - Free: Unlimited requests & bandwidth
   - Workers Paid: $5/month for advanced features
 ```
+
+> **NOTE**: Check each platform's pricing page for current rates -- free tiers and limits change periodically.
 
 ---
 
@@ -102,6 +106,7 @@ Key Features:
   - GitHub integration
   - Environment variables UI
   - Cron jobs support
+  - Private networking between services
 
 Best For:
   - Node.js APIs
@@ -110,8 +115,9 @@ Best For:
   - Scheduled tasks
 
 Pricing:
-  - Free: $5 trial credit
-  - Pay-as-you-go: Based on usage
+  - Hobby: $5/month (includes usage credits)
+  - Pro: $20/month per seat
+  - Check railway.app for current pricing
 ```
 
 **Railway Deployment Example:**
@@ -447,7 +453,7 @@ vercel deploy
 
 ---
 
-## 5. Deployment Best Practices (2025)
+## 5. Deployment Best Practices (2026)
 
 ### ✅ Always Do
 
@@ -498,17 +504,18 @@ Before deploying to production:
 
 Choose the right platform for your project:
 
-| Feature | Vercel | Netlify | Cloudflare Pages | Railway | Render |
-|---------|--------|---------|------------------|---------|--------|
-| **Best For** | Next.js | JAMstack | Edge apps | APIs | Full-stack |
-| **Free Tier** | ✅ Generous | ✅ Good | ✅ Unlimited | ⚠️ Trial | ⚠️ Limited |
-| **Build Minutes** | Unlimited | 300/mo | 500/mo | Unlimited | 400/mo |
-| **Bandwidth** | 100GB | 100GB | Unlimited | 100GB | 100GB |
-| **Edge Locations** | 300+ | Limited | 275+ | N/A | N/A |
-| **Database** | ❌ | ❌ | ❌ | ✅ | ✅ |
-| **Serverless** | ✅ | ✅ | ✅ Workers | ✅ | ✅ |
-| **Preview Deploys** | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **Custom Domains** | ✅ Free | ✅ Free | ✅ Free | ✅ Free | ✅ Free |
+| Feature | Vercel | Netlify | Cloudflare Pages | Railway | Render | GitHub Pages |
+|---------|--------|---------|------------------|---------|--------|--------------|
+| **Best For** | Next.js/React | JAMstack | Edge apps | APIs | Full-stack | Static/docs |
+| **Free Tier** | ✅ Generous | ✅ Good | ✅ Unlimited | ⚠️ Hobby | ⚠️ Limited | ✅ Public repos |
+| **Bandwidth** | 100GB | 100GB | Unlimited | Usage-based | 100GB | 100GB |
+| **Edge Locations** | 300+ | Limited | 330+ | N/A | N/A | CDN |
+| **Database** | ✅ (Postgres) | ❌ | ✅ (D1 SQL) | ✅ | ✅ | ❌ |
+| **Serverless** | ✅ | ✅ | ✅ Workers | ✅ | ✅ | ❌ |
+| **Preview Deploys** | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
+| **Custom Domains** | ✅ Free | ✅ Free | ✅ Free | ✅ Free | ✅ Free | ✅ Free |
+
+> **NOTE**: Free tiers and build limits change frequently. Check each platform's pricing page for current details.
 
 ---
 

@@ -1,9 +1,9 @@
 
-# VS Code Learning Pathway 2025: From Beginner to AI-Powered Master
+# VS Code Learning Pathway 2026: From Beginner to AI-Powered Master
 
 ## Executive Summary
 
-VS Code has evolved from a simple code editor into the **universal platform for modern development**. In 2025, mastering VS Code means wielding the most powerful AI coding assistants, remote development capabilities, and automation tools available. This comprehensive learning pathway takes you from VS Code basics to advanced AI-powered workflows that 10x your productivity.
+VS Code has evolved from a simple code editor into the **universal platform for modern development**. In 2026, mastering VS Code means wielding the most powerful AI coding assistants, remote development capabilities, and automation tools available. This comprehensive learning pathway takes you from VS Code basics to advanced AI-powered workflows that 10x your productivity.
 
 Whether you're a beginner learning your first code editor, an experienced developer optimizing your workflow, or a technical professional integrating AI into your development process—this pathway provides structured, hands-on learning with real-world applications.
 
@@ -177,7 +177,7 @@ This isn't another "prompt engineering" course. Over five transformative days, y
 
 The gap between AI "users" and AI "masters" is widening rapidly. While most people copy-paste from ChatGPT, a small group has discovered how to wield AI with surgical precision. They're writing books in days, not months. Creating comprehensive business documentation in hours, not weeks. Building knowledge systems that make decisions autonomously.
 
-**Three Critical Shifts in 2025:**
+**Three Critical Shifts in 2026:**
 
 1. **The Professional AI Divide**: Consumer AI tools (ChatGPT, Claude.ai) are designed for casual users. Professional-grade control requires direct API access—exactly what VS Code provides. Those with this access operate at 10x the speed and quality.
 
@@ -364,11 +364,11 @@ Leave with a complete portfolio demonstrating advanced AI integration skills, re
 
 ### Next Cohorts
 
-- **March 2025**: 17-21 March (Manchester + Remote) - **3 seats remaining**
-- **May 2025**: 12-16 May (Manchester + Remote) - Early bird pricing available
-- **July 2025**: 14-18 July (Manchester + Remote) - Just announced
+- **September 2026**: 15-19 September (Manchester + Remote) - Booking open
+- **November 2026**: 17-21 November (Manchester + Remote) - Booking open
+- **January 2027**: 18-22 January (Manchester + Remote) - Booking open
 
-*All sessions run 09:30-16:30 BST with breaks*
+*All sessions run 09:30-16:30 GMT/BST with breaks*
 
 ### How to Apply
 1. Complete the online application form
@@ -424,9 +424,9 @@ Join 200+ professionals from academia, business, government, and technology who'
 - "Seems expensive" → Compare 5 days of training to months of inefficiency.
 - "My work is too specialized" → AI adapts to YOU, not vice versa.
 
-**[Apply Now - March Cohort](#)** | **[Download Detailed Syllabus](#)** | **[Schedule a Call](#)**
+**[Apply Now - September Cohort](#)** | **[Download Detailed Syllabus](#)** | **[Schedule a Call](#)**
 
-*Limited to 10 participants per cohort. March cohort is 70% full.*
+*Limited to 10 participants per cohort. September cohort now open for booking.*
 
 ### Next Step: Secure Your Spot
 

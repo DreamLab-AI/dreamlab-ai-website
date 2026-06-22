@@ -1,12 +1,12 @@
-# Chapter 2: Hands-On API Setup - Building Your Multi-Model Command Centre (2025)
+# Chapter 2: Hands-On API Setup - Building Your Multi-Model Command Centre (2026)
 
 ⏱️ **Estimated time**: 90 minutes
 🎯 **Difficulty**: Beginner-friendly
-💡 **What you'll achieve**: Direct access to 5+ leading AI models in VS Code
+💡 **What you'll achieve**: Direct access to 5+ leading AI models via Claude Code and VS Code
 
 ## Your Journey to AI Mastery
 
-Transform from AI consumer to AI commander. We'll set up multiple providers, configure everything in VS Code with Claude Code or Continue, and start saving money immediately.
+Transform from AI consumer to AI commander. We'll set up multiple providers, configure Claude Code and your editor, and start saving money immediately.
 
 ```mermaid
 graph LR
@@ -32,76 +32,77 @@ Before we begin:
 
 💡 **Tip**: You'll spend ~$3-5/month vs £60/month for subscriptions. The ROI is immediate!
 
-## Option A: Claude Code CLI (Recommended for 2025)
+## Option A: Claude Code (Recommended for 2026)
+
+Claude Code is Anthropic's AI coding agent. It runs in your terminal, understands your entire project, and can read, write, and run code on your behalf. It is also available as a desktop app, a web app at claude.ai/code, and as extensions for VS Code and JetBrains.
 
 ### Setting Up Claude Code
 
 ```bash
-# Install Claude Code globally
+# Install Claude Code globally (requires Node.js 18+)
 npm install -g @anthropic-ai/claude-code
 
 # Verify installation
 claude --version
 
-# Initialize configuration
-claude config init
+# Launch Claude Code in your project directory
+cd your-project
+claude
 ```
 
-### Adding Multiple Providers to Claude Code
+On first launch, Claude Code will walk you through authentication with your Anthropic account. It uses Claude Sonnet 4.6 by default — use `/fast` inside a session for quicker responses.
 
-```bash
-# Add Anthropic (Claude models)
-claude config add-api-key anthropic
-# Paste your API key when prompted
+### Key Features to Know
 
-# Add OpenAI
-claude config add-api-key openai
-
-# Add Google (Gemini)
-claude config add-api-key google
-
-# Add Groq (free fast inference)
-claude config add-api-key groq
-```
+- **CLAUDE.md** — drop a `CLAUDE.md` file in your project root to give Claude Code persistent instructions about your codebase
+- **Slash commands** — `/fast` for speed, `/cost` to check spend, `/model` to switch models
+- **MCP servers** — connect external tools (databases, APIs, browsers) via the Model Context Protocol
+- **Hooks** — automate actions before/after tasks (linting, testing, formatting)
+- **Subagents** — Claude Code can spawn background agents for parallel work
 
 ### Test Your Setup
 
 ```bash
-# Test with different models
-claude chat --model claude-sonnet-4-20250514 "Hello!"
-claude chat --model gpt-4o "Explain APIs briefly"
-claude chat --model gemini-2.0-flash "What's 2+2?"
+# Start a session and ask something
+claude
+
+# Inside the session, try:
+> Explain what an API is in two sentences
+> /fast
+> Now explain it again (this response will be faster)
 ```
 
-## Option B: Continue Extension (Classic Method)
+## Option B: Continue Extension (Alternative for VS Code)
+
+Continue is a free, open-source extension that connects VS Code to multiple AI providers. It is a good option if you want a model-switcher inside your editor alongside Claude Code.
 
 ### Opening Continue Settings
 
-1. Click Continue icon in VS Code sidebar (`>>`)
-2. Click gear icon (settings)
+1. Click the Continue icon in the VS Code sidebar (`>>`)
+2. Click the gear icon (settings)
 3. `config.json` opens automatically
 
-### Complete 2025 Configuration
+### Complete 2026 Configuration
 
 ```json
 {
   "models": [
     {
-      "title": "Claude Sonnet 4.5 ⭐",
+      "title": "Claude Sonnet 4.6 ⭐",
       "provider": "anthropic",
-      "model": "claude-sonnet-4-20250514",
+      "model": "claude-sonnet-4-6",
       "apiKey": "YOUR_ANTHROPIC_KEY"
     },
     {
-      "title": "Claude Opus 4.5 (Premium)",
+      "title": "Claude Opus 4.8 (Premium)",
       "provider": "anthropic",
-      "model": "claude-opus-4-20250514",
+      "model": "claude-opus-4-8",
       "apiKey": "YOUR_ANTHROPIC_KEY"
     },
     {
-      "title": "Claude Haiku 3.5 (Fast)",
+      "title": "Claude Haiku 4.5 (Fast)",
       "provider": "anthropic",
-      "model": "claude-3-5-haiku-20241022",
+      "model": "claude-haiku-4-5",
       "apiKey": "YOUR_ANTHROPIC_KEY"
     },
     {
@@ -117,46 +118,34 @@ claude chat --model gemini-2.0-flash "What's 2+2?"
       "apiKey": "YOUR_OPENAI_KEY"
     },
     {
-      "title": "o3-mini (Reasoning)",
+      "title": "o3 (Reasoning)",
       "provider": "openai",
-      "model": "o3-mini",
+      "model": "o3",
       "apiKey": "YOUR_OPENAI_KEY"
     },
     {
-      "title": "Gemini 2.0 Flash ⚡",
+      "title": "Gemini 2.5 Flash ⚡",
       "provider": "gemini",
-      "model": "gemini-2.0-flash-exp",
+      "model": "gemini-2.5-flash",
       "apiKey": "YOUR_GEMINI_KEY"
     },
     {
-      "title": "Gemini 2.0 Flash Thinking",
+      "title": "Gemini 2.5 Pro (2M Context)",
       "provider": "gemini",
-      "model": "gemini-2.0-flash-thinking-exp-1219",
+      "model": "gemini-2.5-pro",
       "apiKey": "YOUR_GEMINI_KEY"
     },
     {
-      "title": "Gemini 2.0 Pro (2M Context)",
-      "provider": "gemini",
-      "model": "gemini-2.0-pro-exp",
-      "apiKey": "YOUR_GEMINI_KEY"
-    },
-    {
-      "title": "Llama 3.3 70B (Free via Groq)",
+      "title": "Llama 4 (Free via Groq)",
       "provider": "groq",
-      "model": "llama-3.3-70b-versatile",
-      "apiKey": "YOUR_GROQ_KEY"
-    },
-    {
-      "title": "DeepSeek R1 (Free Reasoning)",
-      "provider": "groq",
-      "model": "deepseek-r1-distill-llama-70b",
+      "model": "llama-4-70b",
       "apiKey": "YOUR_GROQ_KEY"
     }
   ],
   "tabAutocompleteModel": {
-    "title": "Haiku 3.5 Autocomplete",
+    "title": "Haiku 4.5 Autocomplete",
     "provider": "anthropic",
-    "model": "claude-3-5-haiku-20241022",
+    "model": "claude-haiku-4-5",
     "apiKey": "YOUR_ANTHROPIC_KEY"
   },
   "embeddingsProvider": {
@@ -167,9 +156,11 @@ claude chat --model gemini-2.0-flash "What's 2+2?"
 }
 ```
 
-## Provider Setup Guide (2025 Edition)
+📝 **Note**: Check each provider's documentation for current model IDs — they update regularly.
 
-### 1. OpenAI (GPT-4o, o1, o3-mini)
+## Provider Setup Guide (2026 Edition)
+
+### 1. OpenAI (GPT-4o, o3)
 
 **Why start here?**
 - Industry standard
@@ -209,13 +200,14 @@ claude chat --model gemini-2.0-flash "What's 2+2?"
 
 💡 **Tip**: You'll automatically upgrade as you spend. Start small!
 
-### 2. Anthropic (Claude Opus/Sonnet/Haiku)
+### 2. Anthropic (Claude Fable 5 / Opus 4.8 / Sonnet 4.6 / Haiku 4.5)
 
 **Why add Claude?**
-- Best-in-class writing quality
-- Superior coding assistance
+- Best-in-class writing quality and coding assistance
+- Full model range from Haiku (fast/cheap) to Fable (most capable)
 - 200K context window (all models)
-- More natural conversational style
+- Claude Code — a standalone AI coding agent for your terminal
+- Agent SDK for building custom AI agents
 
 #### Setup Steps
 
@@ -227,7 +219,7 @@ claude chat --model gemini-2.0-flash "What's 2+2?"
 **B. Get API Key**
 1. Navigate to: API Keys section
 2. Click "Create Key"
-3. Name: "VS Code Workshop"
+3. Name: "Workshop 02"
 4. Copy key (starts with `sk-ant-api03-...`)
 
 **C. Add Credits**
@@ -235,29 +227,31 @@ claude chat --model gemini-2.0-flash "What's 2+2?"
 2. Add $10 minimum
 3. Set auto-refill (optional)
 
-**D. Model Pricing (Jan 2025)**
+**D. Current Models**
 
-| Model | Input | Output | Speed | Use Case |
-|-------|--------|---------|-------|----------|
-| Opus 4.5 | $15/1M | $75/1M | Slow | Best quality |
-| Sonnet 4.5 | $3/1M | $15/1M | Fast | **Best value** ⭐ |
-| Haiku 3.5 | $0.25/1M | $1.25/1M | Fastest | High volume |
+| Model | Speed | Use Case |
+|-------|-------|----------|
+| Fable 5 | Standard | Latest and most capable |
+| Opus 4.8 | Standard | Top-tier reasoning |
+| Sonnet 4.6 | Fast | **Best balance of speed/quality/cost** ⭐ |
+| Haiku 4.5 | Fastest | High volume, cheapest |
 
-🎯 **Recommendation**: Start with Sonnet 4.5 for most tasks.
+Check [console.anthropic.com](https://console.anthropic.com) for current pricing.
 
-### 3. Google (Gemini 2.0 Flash/Pro)
+🎯 **Recommendation**: Start with Sonnet 4.6 for most tasks — it offers the best balance of quality, speed, and cost.
+
+### 3. Google (Gemini 2.5 Flash/Pro)
 
 **Why add Gemini?**
 - **Massive 1M-2M context windows**
-- Incredibly cheap ($0.075/1M input!)
-- Free tier available
-- Excellent multimodal capabilities
-- "Thinking" mode for reasoning
+- Very competitive pricing
+- Generous free tier available
+- Excellent multimodal capabilities (text, images, video, audio)
 
 #### Setup Steps
 
 **A. Get Free API Key**
-1. Visit: https://aistudio.google.com/apikey
+1. Visit: https://aistudio.google.dev/apikey
 2. Sign in with Google account
 3. Click "Create API Key"
 4. Select "Create API key in new project"
@@ -265,9 +259,7 @@ claude chat --model gemini-2.0-flash "What's 2+2?"
 
 **B. Free Tier Limits**
 
-- 15 requests per minute
-- 1,500 requests per day
-- 1.5M tokens per day
+Google offers a generous free tier — check [aistudio.google.dev](https://aistudio.google.dev) for current limits (typically 15+ RPM, 1.5M+ tokens/day).
 
 💡 **Tip**: Gemini's free tier is VERY generous. Perfect for experimentation!
 
@@ -279,21 +271,21 @@ claude chat --model gemini-2.0-flash "What's 2+2?"
 
 **D. Model Comparison**
 
-| Model | Context | Input | Output | Special Feature |
-|-------|---------|--------|---------|----------------|
-| 2.0 Flash | 1M | $0.075 | $0.30 | Fastest, cheapest |
-| 2.0 Flash Thinking | 1M | $0.075 | $0.30 | Shows reasoning |
-| 2.0 Pro | **2M** | $1.25 | $5.00 | Entire codebases! |
+| Model | Context | Special Feature |
+|-------|---------|----------------|
+| 2.5 Flash | 1M | Fastest, cheapest |
+| 2.5 Pro | **2M** | Entire codebases! |
 
-🎯 **Use case**: Gemini 2.0 Pro can analyze your ENTIRE project in one prompt!
+Check [aistudio.google.dev](https://aistudio.google.dev) for current pricing.
+
+🎯 **Use case**: Gemini 2.5 Pro can analyse your ENTIRE project in one prompt!
 
 ### 4. Groq (Free Fast Inference)
 
 **Why add Groq?**
 - **Free tier** with generous limits
 - Ultra-fast inference (150+ tokens/sec)
-- Access to Llama 3.3 70B
-- DeepSeek R1 reasoning model
+- Access to Llama 4 and other open models
 - No credit card required
 
 #### Setup Steps
@@ -318,26 +310,7 @@ claude chat --model gemini-2.0-flash "What's 2+2?"
 
 **D. Available Models**
 
-```json
-{
-  "title": "Llama 3.3 70B",
-  "provider": "groq",
-  "model": "llama-3.3-70b-versatile",
-  "apiKey": "YOUR_GROQ_KEY"
-},
-{
-  "title": "DeepSeek R1 70B (Reasoning)",
-  "provider": "groq",
-  "model": "deepseek-r1-distill-llama-70b",
-  "apiKey": "YOUR_GROQ_KEY"
-},
-{
-  "title": "Mixtral 8x7B",
-  "provider": "groq",
-  "model": "mixtral-8x7b-32768",
-  "apiKey": "YOUR_GROQ_KEY"
-}
-```
+Groq's model lineup changes frequently. Check [console.groq.com](https://console.groq.com) for the latest available models. Typical offerings include Llama 4 variants and other popular open-source models.
 
 ### 5. Together AI (Optional - More Open Models)
 
@@ -360,16 +333,16 @@ Create `test-models.md`:
 ## Prompt
 Explain quantum computing in exactly 2 sentences.
 
-### Claude Sonnet 4.5:
+### Claude Sonnet 4.6:
 [Select prompt, Ctrl+I, choose model, test]
 
 ### GPT-4o:
 [Test here]
 
-### Gemini 2.0 Flash:
+### Gemini 2.5 Flash:
 [Test here]
 
-### Llama 3.3 (Groq):
+### Llama 4 (Groq):
 [Test here]
 
 ## Speed Test Results
@@ -405,7 +378,7 @@ Test each model with:
 ### Create Cost Tracking Spreadsheet
 
 ```markdown
-# AI API Cost Tracking - January 2025
+# AI API Cost Tracking - June 2026
 
 | Date | OpenAI | Anthropic | Google | Groq | Total | Notes |
 |------|--------|-----------|--------|------|-------|-------|
@@ -418,14 +391,14 @@ Test each model with:
 - Remaining: $9.59
 
 ## Model Preferences
-- Writing: Claude Sonnet 4.5 (best prose)
-- Coding: Claude Sonnet 4.5 or GPT-4o
-- Research: Gemini 2.0 Pro (massive context)
-- Quick tasks: Haiku 3.5 or GPT-4o-mini
-- Free testing: Llama 3.3 via Groq
+- Writing: Claude Sonnet 4.6 (best prose)
+- Coding: Claude Sonnet 4.6 or GPT-4o
+- Research: Gemini 2.5 Pro (massive context)
+- Quick tasks: Haiku 4.5 or GPT-4o-mini
+- Free testing: Llama 4 via Groq
 ```
 
-## Security Best Practices (2025 Edition)
+## Security Best Practices (2026 Edition)
 
 ### Environment Variables Method
 
@@ -463,7 +436,7 @@ GROQ_API_KEY=gsk_...
     {
       "title": "Claude Sonnet",
       "provider": "anthropic",
-      "model": "claude-sonnet-4-20250514",
+      "model": "claude-sonnet-4-6",
       "apiKey": "${ANTHROPIC_API_KEY}"
     }
   ]
@@ -554,7 +527,7 @@ GROQ_API_KEY=gsk_...
 **Solutions**:
 - ✂️ Trim conversation history
 - 📉 Reduce input text size
-- 🔄 Switch to model with larger context (Gemini 2.0 Pro)
+- 🔄 Switch to model with larger context (Gemini 2.5 Pro)
 - 🧹 Clear old messages
 
 ## Your Achievements Unlocked!

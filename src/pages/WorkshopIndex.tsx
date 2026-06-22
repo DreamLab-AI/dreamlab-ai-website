@@ -196,6 +196,24 @@ const WorkshopIndex = () => {
       icon: <BookOpen className="w-5 h-5" />,
       duration: "6 hours",
       difficulty: "Beginner"
+    },
+    {
+      id: "workshop-07-docker-containers",
+      name: "Docker & Containers",
+      path: "/workshops/workshop-07-docker-containers",
+      description: "Master Docker and containerisation for AI development",
+      icon: <Terminal className="w-5 h-5" />,
+      duration: "6 hours",
+      difficulty: "Intermediate"
+    },
+    {
+      id: "workshop-08-claude-code",
+      name: "Claude Code Mastery",
+      path: "/workshops/workshop-08-claude-code",
+      description: "Master Claude Code CLI for AI-powered development",
+      icon: <Code className="w-5 h-5" />,
+      duration: "6 hours",
+      difficulty: "Intermediate"
     }
   ];
 
@@ -252,8 +270,8 @@ const WorkshopIndex = () => {
               <div className="flex items-center gap-2 px-6 py-3 rounded-xl bg-background/40 backdrop-blur-xl border border-purple-500/20 hover:border-purple-500/40 transition-all duration-300 hover:scale-105">
                 <BookOpen className="w-5 h-5 text-purple-400" />
                 <div className="text-left">
-                  <div className="text-2xl font-bold text-foreground">14 Modules</div>
-                  <div className="text-xs text-muted-foreground">Comprehensive Content</div>
+                  <div className="text-2xl font-bold text-foreground">14+ Modules</div>
+                  <div className="text-xs text-muted-foreground">Plus 5 Deep Dives</div>
                 </div>
               </div>
               <div className="flex items-center gap-2 px-6 py-3 rounded-xl bg-background/40 backdrop-blur-xl border border-purple-500/20 hover:border-purple-500/40 transition-all duration-300 hover:scale-105">
@@ -539,10 +557,10 @@ const WorkshopIndex = () => {
 
         <div className="container relative z-10">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-16 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 text-transparent bg-clip-text">
-            Additional Resources
+            Standalone Deep Dives
           </h2>
 
-          <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-6 max-w-7xl mx-auto">
             {specialWorkshops.map((workshop) => (
               <Link key={workshop.id} to={workshop.path} className="block group">
                 <div className="h-full bg-background/40 backdrop-blur-xl border border-purple-500/20 rounded-xl p-6 hover:border-purple-500/40 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-purple-500/20">
