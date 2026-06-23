@@ -130,7 +130,7 @@ migration completes: **~1,000+ LOC**.
   (`fe70102` + x-only hex) instead of the bespoke `"NostrSchnorrKey2024"`
   string. (The interim `"SchnorrSecp256k1VerificationKey2019"` + `publicKeyHex`
   form is superseded by ADR-125 — no dual-publish.)
-- Set `@context` to `["https://w3id.org/did","https://w3id.org/nostr/context"]`
+- Set `@context` to `["https://www.w3.org/ns/cid/v1","https://w3id.org/nostr/context"]`
   and add top-level `"type": "DIDNostr"`.
 - Cover the fixes in the existing test suite (`tier1_has_required_fields`).
 

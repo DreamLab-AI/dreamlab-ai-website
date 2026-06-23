@@ -14,15 +14,18 @@
 > overlay-observable here. **Blocked on:** upstream adoption (or an explicit
 > overlay-level decision to vendor the RDF stack). Kept Proposed.
 
-> **DID context updated (2026-06-15) for ADR-125 convergence.** The converged
-> did:nostr CG / `create-agent` DID document uses
-> `@context` `["https://w3id.org/did","https://w3id.org/nostr/context"]` (top-level
-> `"type": "DIDNostr"`, `"type": "Multikey"` verification method). The bundled
-> `StaticLoader` below has been re-pinned from the old
-> `https://www.w3.org/ns/did/v1` / `secp256k1-2019` contexts to these two converged
-> contexts so converged DID documents expand offline with `NoLoader`. This is a
-> context-bundling change only; the `did:nostr:<hex>` identifier and the NIP-98
-> auth path are unchanged.
+> **DID context updated (2026-06-15, CID v1.0 migration 2026-06-17) for ADR-125
+> convergence.** The converged did:nostr CG / `create-agent` DID document uses
+> `@context` `["https://www.w3.org/ns/cid/v1","https://w3id.org/nostr/context"]` (top-level
+> `"type": "DIDNostr"`, `"type": "Multikey"` verification method). The first
+> context is **W3C Controlled Identifiers v1.0 (CID)**, which defines the
+> `Multikey` type and `publicKeyMultibase` property (these are CID terms, not
+> DID Core terms — hence `https://www.w3.org/ns/cid/v1` replaces the earlier
+> `https://w3id.org/did`). The bundled `StaticLoader` below has been re-pinned
+> from the old `https://www.w3.org/ns/did/v1` / `secp256k1-2019` contexts to
+> these two converged contexts so converged DID documents expand offline with
+> `NoLoader`. This is a context-bundling change only; the `did:nostr:<hex>`
+> identifier and the NIP-98 auth path are unchanged.
 
 ## Date: 2026-05-06
 
@@ -81,8 +84,8 @@ Create `pod-worker/src/contexts.rs` with all required JSON-LD contexts bundled a
 //! Sources: fetched once from authoritative URLs, reviewed, and pinned.
 //! Re-pin when context versions change (check Context-Type: ETag header).
 
-/// W3C DID context (converged did:nostr CG form, per ADR-125)
-/// Source: https://w3id.org/did
+/// W3C Controlled Identifiers v1.0 context (converged did:nostr CG form, per ADR-125)
+/// Source: https://www.w3.org/ns/cid/v1
 pub static DID_CONTEXT: &str = include_str!("../contexts/did.jsonld");
 
 /// did:nostr CG context — defines `DIDNostr`, `Multikey`, and the Nostr service
@@ -114,7 +117,7 @@ pub static NOSTR_CONTEXT: &str = include_str!("../contexts/nostr-ontology.jsonld
 pub fn bundled_loader() -> json_ld::loader::StaticLoader {
     let mut loader = json_ld::loader::StaticLoader::new();
     loader.insert(
-        iref::IriBuf::new("https://w3id.org/did").unwrap(),
+        iref::IriBuf::new("https://www.w3.org/ns/cid/v1").unwrap(),
         json_ld::RemoteDocument::new(
             None, None,
             serde_json::from_str(DID_CONTEXT).expect("bundled DID context is valid JSON-LD"),

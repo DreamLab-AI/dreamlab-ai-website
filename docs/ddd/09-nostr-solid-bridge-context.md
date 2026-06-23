@@ -11,7 +11,7 @@ This document defines the Nostr-Solid Bridge bounded context for the DreamLab co
 > `SchnorrSecp256k1VerificationKey2019` + `publicKeyHex` verification method, and
 > the `https://www.w3.org/ns/did/v1` / `secp256k1-2019` `@context`) is replaced by
 > the converged did:nostr CG / `create-agent` single canonical form:
-> `@context` `["https://w3id.org/did","https://w3id.org/nostr/context"]`,
+> `@context` `["https://www.w3.org/ns/cid/v1","https://w3id.org/nostr/context"]`,
 > top-level `"type": "DIDNostr"`, one `"type": "Multikey"` verification method with
 > `publicKeyMultibase` = `fe70102` + the same 64-char x-only hex, fragment `#key1`,
 > and `authentication`/`assertionMethod` `["#key1"]`. There is **no Tier-1/Tier-3

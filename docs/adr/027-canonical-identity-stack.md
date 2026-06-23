@@ -4,10 +4,13 @@
 
 > **DID-doc shape superseded (2026-06-15) by ADR-125.** The DID-document
 > examples below have been updated to the converged did:nostr CG / `create-agent`
-> canonical single form: `@context` `["https://w3id.org/did","https://w3id.org/nostr/context"]`,
+> canonical single form: `@context` `["https://www.w3.org/ns/cid/v1","https://w3id.org/nostr/context"]`,
 > top-level `"type": "DIDNostr"`, verification method `"type": "Multikey"` with
 > `publicKeyMultibase` = `fe70102` + x-only hex, fragment `#key1`, and
-> `authentication`/`assertionMethod` `["#key1"]`. The old 2019 suite
+> `authentication`/`assertionMethod` `["#key1"]`. The first context IRI is
+> **W3C Controlled Identifiers v1.0 (CID)**, which defines the `Multikey` type
+> and `publicKeyMultibase` property used by the converged form (previously this
+> was `https://w3id.org/did`, the DID Core 1.0 context). The old 2019 suite
 > (`SchnorrSecp256k1VerificationKey2019` + `publicKeyHex` + `#key-0`) and the
 > Tier-1/Tier-3 document split are **dropped** (no dual-publish). This is a
 > document-shape change only — the `did:nostr:<hex>` identifier string, the
@@ -63,7 +66,7 @@ Add `/.well-known/did/nostr/{pubkey}.json` to pod-worker. The route handler prod
 ```json
 {
   "@context": [
-    "https://w3id.org/did",
+    "https://www.w3.org/ns/cid/v1",
     "https://w3id.org/nostr/context"
   ],
   "id": "did:nostr:79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",

@@ -753,7 +753,7 @@ pub fn to_json_ld(doc: &DidDocument) -> serde_json::Value;
 ```json
 {
   "@context": [
-    "https://w3id.org/did",
+    "https://www.w3.org/ns/cid/v1",
     "https://w3id.org/nostr/context"
   ],
   "id": "did:nostr:<hex-pubkey>",
