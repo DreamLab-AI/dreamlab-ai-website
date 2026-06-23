@@ -27,7 +27,7 @@
     },
     {
       "slug": "02_getting_started.md",
-      "title": "Chapter 2: Getting Started: Setup and Initial Configuration"
+      "title": "Chapter 2: Getting Started — Setup and Initial Configuration"
     },
     {
       "slug": "03_a_effective_prompting_strategies.md",
@@ -47,11 +47,11 @@
     },
     {
       "slug": "03_mastering_codex.md",
-      "title": "Chapter 3: Mastering AI Coding Agents: From Basic Prompts to Advanced Workflows"
+      "title": "Chapter 3: Mastering AI Coding Agents — From Basic Prompts to Advanced Workflows"
     },
     {
       "slug": "04_a_beginner_tasks.md",
-      "title": "4.a: Beginner Tasks"
+      "title": "4.a: Beginner Tasks — Quick Wins with AI Coding Agents"
     },
     {
       "slug": "04_b_intermediate_tasks.md",
@@ -63,7 +63,7 @@
     },
     {
       "slug": "04_practical_codex.md",
-      "title": "Chapter 4: Practical Codex: Real-World Examples and Walkthroughs"
+      "title": "Chapter 4: Practical Applications — Real-World Examples and Walkthroughs"
     },
     {
       "slug": "05_a_codex_vs_general_gpt_models.md",
@@ -79,15 +79,15 @@
     },
     {
       "slug": "05_the_broader_landscape.md",
-      "title": "Chapter 5: The Broader Landscape: Models, Tools, and the Future of AI Coding"
+      "title": "Chapter 5: The Broader Landscape — Models, Tools, and the Future of AI Coding"
     },
     {
       "slug": "06_a_limitations_of_codex.md",
-      "title": "6.a: Limitations of Codex: What It Can't Do (Yet)"
+      "title": "6.a: Limitations of AI Coding Agents — What They Cannot Do (Yet)"
     },
     {
       "slug": "06_b_security_implications.md",
-      "title": "6.b: Security Implications"
+      "title": "6.b: Security Implications of AI-Assisted Development"
     },
     {
       "slug": "06_c_ethical_and_legal_considerations.md",

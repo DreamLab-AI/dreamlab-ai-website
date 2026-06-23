@@ -1,75 +1,218 @@
-# 6.b: Security Implications
+# 6.b: Security Implications of AI-Assisted Development
 
-The integration of AI into code generation introduces both new security safeguards and potential risks. A responsible approach to using Codex involves understanding these implications.
+> **June 2026:** AI coding agents introduce both new security safeguards (sandboxing, automated review) and new attack surfaces (AI-generated vulnerabilities, supply chain risks, prompt injection). A responsible security posture requires understanding both sides.
 
-## Benefits of Sandboxing
+## The Security Landscape
 
-A significant security feature of both the Codex Cloud Agent and the Codex CLI is their use of sandboxed execution environments.
+Every AI coding agent operates with significant access to your development environment: it reads source files, executes shell commands, installs dependencies, and creates commits. This access is what makes these tools powerful — and what makes security considerations non-negotiable. The goal is not to restrict the agent to the point of uselessness, but to create layered defences that catch the categories of mistake that agents are most likely to make.
 
-*   **Codex Cloud Agent:** Tasks run in isolated cloud micro-VMs.
-    > "when the agent's running it doesn't have uh full network access... we still don't fully understand what letting it loose an agent in its own environment is going to do right... for now the safety tests all have come back very stir sturdily like you know it's not susceptible to sorts of certain exfiltration attempts on prop injection but there's still a lot of risk to this category we don't know and um that's why to start we're being more conservative there" - Josh, OpenAI
-*   **Codex CLI:** Supports execution within a sandboxed environment (macOS: Apple Seatbelt `sandbox-exec`; Linux: Docker recommended). This includes network restrictions, especially in `Full Auto` mode.
-    > "enabling things like full auto mode and like when you do that we actually like increase the amount of sandboxing so that's still safe for you" - Alexander, OpenAI
+## Sandboxing: How Agents Isolate Execution
 
-These sandboxing measures help prevent:
-*   Unauthorised access to external systems during code generation or execution.
-*   The unintended installation of malicious dependencies during a task.
-*   The AI agent from making arbitrary changes outside its designated workspace.
+Both leading terminal agents implement sandboxing to limit the blast radius of autonomous execution. Understanding these mechanisms helps you make informed decisions about when to grant more autonomy and when to require manual approval.
 
-## Risks of AI-Generated Code
+### Claude Code Sandboxing
 
-Despite safeguards, AI-generated code can introduce security risks:
+Claude Code runs on your local machine with access to your filesystem and shell. In its default interactive mode, it presents proposed changes and commands for your approval before execution. Security is primarily enforced through:
 
-1.  **Introduction of Vulnerabilities:**
-    *   AI models might unintentionally generate code containing security vulnerabilities. These could include common flaws like those susceptible to Cross-Site Scripting (XSS), SQL injection, insecure direct object references (IDOR), poorly implemented authentication/authorisation mechanisms, or memory safety issues if the AI is not explicitly guided to avoid them.
-    *   Research (e.g., studies from Stanford University mentioned in the [`detailed_overview.md`](../detailed_overview.md)) has indicated that a significant portion of AI-generated code can contain security bugs.
+- **Approval prompts.** Every file modification and shell command is shown to you before execution. You approve or reject each action individually.
+- **CLAUDE.md constraints.** You can explicitly forbid actions: "Never modify files in `src/generated/`", "Never run `rm -rf`", "Never install new npm dependencies without asking."
+- **Hooks for automated checks.** Pre-commit hooks can run security scans, lint checks, or test suites before any commit is created.
 
-2.  **Code Reliability and Subtle Errors:**
-    *   AI-generated code, even if appearing functional, can harbour subtle errors or bugs that might lead to security issues if not caught during review and testing. These might be logic flaws that only manifest under specific conditions.
+### Codex CLI Sandboxing
 
-3.  **Accumulation of Technical Debt:**
-    *   Relying on AI for quick fixes without a deep understanding of the generated code can lead to solutions that are difficult to maintain, scale, or reason about. This can create long-term technical debt that might mask underlying security weaknesses or make them harder to fix later.
+The Codex CLI implements more aggressive sandboxing, particularly in its higher-autonomy modes:
 
-4.  **Outdated Dependencies or Practices:**
-    *   As AI models have knowledge cut-off dates, they might suggest using libraries with known vulnerabilities or implement security practices that are no longer considered best practice.
+- **Suggest mode (default).** Shows proposed changes for manual approval. No automatic execution.
+- **Auto-edit mode.** Applies file changes automatically but does not execute shell commands without approval.
+- **Full-auto mode.** Executes autonomously, but within a hardened sandbox:
+  - **Network disabled** — The agent cannot make outbound network requests, preventing data exfiltration and unauthorised dependency installation
+  - **Directory-scoped** — File access is restricted to the project directory
+  - **macOS:** Uses Apple's Seatbelt (`sandbox-exec`) for kernel-level enforcement
+  - **Linux:** Runs inside a Docker container with restricted capabilities
 
-## Secure Use Practices
+### Sandboxing Comparison
 
-Mitigating these risks requires a proactive and vigilant approach:
+| Aspect | Claude Code | Codex CLI (Full Auto) |
+|--------|-------------|----------------------|
+| **File access** | Full (with approval) | Directory-scoped |
+| **Network access** | Full (with approval) | Disabled |
+| **Command execution** | With approval | Sandboxed |
+| **Isolation mechanism** | Interactive approval | OS-level sandbox |
+| **Override** | User approves each action | Configuration-based |
 
-1.  **Human Oversight is Paramount:**
-    *   **Rigorous Review:** The most critical security practice is rigorous human review and validation of *all* AI-generated code before it is integrated into a production system or executed with elevated privileges.
-    *   **Developer Responsibility:** Developers bear the ultimate responsibility for the code they deploy, regardless of whether it was written by a human or an AI.
+### Recommendations
 
-2.  **Rigorous Testing:**
-    *   Implement comprehensive automated testing suites: unit tests, integration tests, and specifically, security tests (e.g., penetration tests, vulnerability scans).
-    *   Conduct thorough manual code reviews, paying special attention to security-sensitive areas.
+- **Use interactive/suggest mode for sensitive code.** Authentication, payment processing, data handling, and infrastructure code should always require manual approval of every change.
+- **Use full-auto/auto-edit for well-tested, low-risk tasks.** Adding JSDoc comments, formatting code, generating boilerplate, and running linters are safe candidates for higher autonomy.
+- **Never weaken Codex CLI's network sandbox without a specific, documented reason.** The default of network-disabled full-auto mode is a strong security baseline.
 
-3.  **Utilise Security Scanning Tools:**
-    *   Employ Static Application Security Testing (SAST) tools to analyze code for known vulnerability patterns before it's run.
-    *   Use Dynamic Application Security Testing (DAST) tools to test running applications for vulnerabilities.
-    *   Consider tools with capabilities to detect vulnerabilities common in or specific to AI-generated code if available.
+## AI-Generated Vulnerabilities
 
-4.  **Understand Limitations and Avoid Blind Trust:**
-    *   Be aware of Codex's limitations (as discussed in [6.a](./06_a_limitations_of_codex.md)).
-    *   Do not blindly accept its outputs without critical evaluation and understanding *why* the code is written that way.
+AI agents can produce code containing security vulnerabilities. Research consistently shows that AI-generated code has a non-trivial rate of security flaws — not because the models are malicious, but because they optimise for the most likely correct output, and the most common code patterns are not always the most secure.
 
-5.  **`AGENTS.MD` for Security Standards:**
-    *   Incorporate security-related guidelines, checks, or forbidden patterns into `AGENTS.MD` files.
-    *   Example: "Always use parameterized queries for database interactions to prevent SQL injection," or "Ensure all user inputs are sanitized before rendering in HTML."
+### Common Vulnerability Categories
 
-6.  **Keep Dependencies Updated:**
-    *   Regularly update project dependencies and use tools to scan for known vulnerabilities in third-party libraries, as AI might not always use the latest secure versions.
+**SQL Injection.** The agent may construct database queries using string concatenation rather than parameterised queries, especially in languages or frameworks where both approaches are syntactically valid.
 
-7.  **Principle of Least Privilege:**
-    *   Ensure that code, whether AI-generated or human-written, runs with the minimum necessary permissions.
+```python
+# Vulnerable — agent may produce this for simple database tasks
+def get_user(username):
+    query = f"SELECT * FROM users WHERE username = '{username}'"
+    return db.execute(query)
 
-## Malicious Code Prevention
+# Secure — what your CLAUDE.md should mandate
+def get_user(username):
+    query = "SELECT * FROM users WHERE username = %s"
+    return db.execute(query, (username,))
+```
 
-OpenAI has stated that Codex is trained to identify and refuse requests aimed at creating overtly malicious software (e.g., malware, phishing tools), while still attempting to support legitimate advanced tasks that might involve similar low-level techniques (e.g., kernel engineering, security research).
+**Cross-Site Scripting (XSS).** When generating web frontend code, agents may render user input without proper sanitisation, particularly in frameworks that do not escape by default.
 
-The security of AI-assisted software development operates on a **shared responsibility model**. While AI providers like OpenAI build in safeguards, the developer remains the ultimate gatekeeper for ensuring the quality, correctness, and security of the final codebase. A "trust but verify" approach is essential. The rise of AI in coding also introduces new considerations, as AI tools themselves or the code they produce could become targets for novel attack vectors (e.g., "AI jacking," adversarial attacks to manipulate AI outputs). The security landscape must adapt to include tools and practices specifically addressing these nuances.
+```jsx
+// Vulnerable — agent may produce this when asked to "render user content"
+function UserComment({ comment }) {
+  return <div dangerouslySetInnerHTML={{ __html: comment.body }} />;
+}
+
+// Secure — sanitise before rendering
+import DOMPurify from 'dompurify';
+function UserComment({ comment }) {
+  return <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(comment.body) }} />;
+}
+```
+
+**Insecure Authentication.** Agents may implement authentication flows that are functional but insecure: storing passwords in plaintext, using weak hashing algorithms (MD5, SHA-1), omitting rate limiting on login endpoints, or implementing JWT validation that does not check token expiry.
+
+**Insecure Direct Object References (IDOR).** The agent may create an endpoint like `GET /api/users/:id` that returns any user's data without verifying that the requesting user has permission to access it.
+
+**Dependency Vulnerabilities.** Agents suggest libraries based on training data. They may recommend versions with known CVEs, unmaintained packages, or libraries that have been deprecated in favour of more secure alternatives.
+
+**Hardcoded Secrets.** Under time pressure or with insufficiently specific prompts, agents may hardcode API keys, database credentials, or tokens directly in source files.
+
+```typescript
+// The agent may produce this in a quick implementation
+const stripe = new Stripe('sk_live_EXAMPLE_KEY_DO_NOT_USE');
+
+// What should be produced instead
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+```
+
+### CLAUDE.md Security Directives
+
+Encode security requirements directly in your project configuration:
+
+```markdown
+## Security Requirements
+- Always use parameterised queries for database access — never string concatenation
+- Sanitise all user input before rendering in HTML (use DOMPurify)
+- Never hardcode API keys, secrets, or credentials — use environment variables
+- All authentication endpoints must include rate limiting
+- All API endpoints must verify user authorisation, not just authentication
+- Use bcrypt (cost factor 12+) for password hashing — never MD5 or SHA-1
+- All new endpoints must include input validation using Zod schemas
+- Never use eval(), Function(), or dynamic code execution with user input
+```
+
+## Supply Chain Security
+
+AI agents regularly suggest installing npm packages, pip packages, or other dependencies. Not all suggestions are safe.
+
+### Risks
+
+- **Typosquatting.** The agent may suggest a package name that is one character off from the legitimate package (e.g., `loadash` instead of `lodash`). Attackers publish malicious packages with common misspellings.
+- **Unmaintained packages.** The agent may suggest packages that were popular at the time of its training data but have since been abandoned, leaving known vulnerabilities unpatched.
+- **Excessive dependency trees.** The agent may suggest a package that does something trivial (e.g., `is-odd`) that pulls in a deep dependency tree, expanding your attack surface.
+- **Licence incompatibility.** The agent may suggest packages with licences (GPL, AGPL) that are incompatible with your project's licensing requirements.
+
+### Mitigation
+
+- **Review every new dependency.** Check the package on npm/PyPI: when was it last updated? How many weekly downloads? Who maintains it?
+- **Use lockfiles.** `package-lock.json`, `yarn.lock`, and `pip freeze` ensure reproducible builds and prevent silent version changes.
+- **Run vulnerability scanners.** `npm audit`, `pip-audit`, Snyk, or Dependabot catch known CVEs in your dependency tree.
+- **Add dependency rules to CLAUDE.md.** "Do not add new npm dependencies without asking" prevents the agent from pulling in packages without your review.
+
+## Secrets Management
+
+Secrets — API keys, database credentials, tokens, certificates — are the highest-value target in any codebase. AI coding agents interact with your codebase in ways that can expose secrets if you are not careful.
+
+### Risk Scenarios
+
+- **Secrets in CLAUDE.md or AGENTS.MD.** These files are committed to Git. Any secret placed in them is visible to everyone with repository access.
+- **Secrets in generated code.** As shown above, agents may hardcode credentials directly in source files.
+- **Secrets in conversation history.** If you paste a secret into a prompt, it enters the agent's context and may be sent to the model provider's API.
+- **Secrets in commit messages.** The agent may include environment variable values or connection strings in commit messages or PR descriptions.
+
+### Best Practices
+
+1. **Use `.env` files (gitignored) for local secrets.** Reference them via `process.env.SECRET_NAME` in code.
+2. **Never put secrets in CLAUDE.md or AGENTS.MD.** These are committed to Git. Use environment variable references instead: `"The database URL is in the DATABASE_URL environment variable."`
+3. **Add secret patterns to `.gitignore`.** Ensure `.env`, `*.pem`, `credentials.json`, and similar files are never committed.
+4. **Use pre-commit hooks to catch secrets.** Tools like `git-secrets`, `detect-secrets`, or `trufflehog` scan commits for high-entropy strings and known secret patterns.
+5. **Rotate keys immediately if exposed.** If a secret appears in a commit, treat it as compromised even if you force-push to remove it. The key has been transmitted to the model provider and may exist in Git reflog.
+
+## Secure Code Review for AI-Generated Output
+
+AI-generated code deserves the same review rigour as human-written code — and in some areas, more. The agent's output is always confident, never uncertain, and occasionally wrong. Your review process must compensate for this.
+
+### Review Checklist for Security-Sensitive Code
+
+- [ ] **Input validation:** Is all user input validated before processing? Are Zod/Joi schemas or equivalent used at API boundaries?
+- [ ] **Output encoding:** Is user-generated content sanitised before rendering in HTML, SQL, shell commands, or logs?
+- [ ] **Authentication:** Are all protected endpoints checking authentication? Is the authentication mechanism sound (bcrypt, JWT with proper validation)?
+- [ ] **Authorisation:** Does the code verify that the authenticated user has permission to perform the requested action on the requested resource?
+- [ ] **Error handling:** Do error responses avoid leaking internal details (stack traces, database schemas, file paths)?
+- [ ] **Dependencies:** Are all new packages from legitimate sources, actively maintained, and free of known vulnerabilities?
+- [ ] **Secrets:** Are there any hardcoded credentials, API keys, or tokens in the generated code?
+- [ ] **Logging:** Does the code avoid logging sensitive data (passwords, tokens, personal information)?
+
+### Automated Security Scanning
+
+Integrate security scanning tools into your development workflow. These catch vulnerabilities that manual review might miss:
+
+| Tool Category | Examples | What It Catches |
+|---------------|----------|-----------------|
+| **SAST** (Static Analysis) | Semgrep, SonarQube, ESLint security plugins | Code-level vulnerabilities: injection, XSS, insecure patterns |
+| **DAST** (Dynamic Analysis) | OWASP ZAP, Burp Suite | Runtime vulnerabilities in deployed applications |
+| **Dependency scanning** | npm audit, Snyk, Dependabot | Known CVEs in third-party libraries |
+| **Secret detection** | git-secrets, detect-secrets, trufflehog | Credentials and tokens in committed code |
+| **Container scanning** | Trivy, Grype | Vulnerabilities in Docker images |
+
+Configure Claude Code hooks to run SAST tools automatically:
+
+```json
+{
+  "hooks": {
+    "PreCommit": [
+      {
+        "command": "npx eslint --config eslint-security.config.js ${files}",
+        "description": "Run security-focused ESLint rules before commit"
+      }
+    ]
+  }
+}
+```
+
+## The Shared Responsibility Model
+
+Security in AI-assisted development operates on a shared responsibility model, similar to cloud computing:
+
+| Responsibility | Provider (Anthropic, OpenAI) | Developer/Team |
+|---------------|------------------------------|----------------|
+| **Model safety training** | Yes | No |
+| **Refusing malicious requests** | Yes | No |
+| **Sandboxing infrastructure** | Yes (Codex CLI) / Partial (Claude Code) | Configure and maintain |
+| **Code correctness** | Best effort | **Final accountability** |
+| **Security review** | Not their role | **Your responsibility** |
+| **Secrets management** | Not their role | **Your responsibility** |
+| **Dependency vetting** | Not their role | **Your responsibility** |
+| **Production deployment** | Not their role | **Your responsibility** |
+
+The bottom line: AI providers build safeguards into their tools, and those safeguards are meaningful. But the developer who deploys the code is responsible for its security. "The AI wrote it" is not an acceptable response to a security incident.
 
 ---
 
-Next: [6.c: Ethical and Legal Considerations](./06_c_ethical_and_legal_considerations.md)
+**Next:** [6.c: Ethical and Legal Considerations](./06_c_ethical_and_legal_considerations.md)
+
+---
+
+*Last Updated: June 2026 | Security practices for Claude Code, Codex CLI, and AI-assisted development*

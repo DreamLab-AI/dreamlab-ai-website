@@ -1,9 +1,9 @@
 {
-  "title": "Workshop 04 - Morning Session: AI Agents",
+  "title": "Workshop 04 - Morning Session: Specialised AI Agents",
   "pages": [
     {
       "slug": "README.md",
-      "title": "Workshop 04 - Morning Session: AI Agents"
+      "title": "Workshop 04 - Morning Session: Specialised AI Agents"
     },
     {
       "slug": "00_introduction.md",
@@ -35,11 +35,11 @@
     },
     {
       "slug": "objectives.md",
-      "title": "Learning Objectives - AI Agents Workshop"
+      "title": "Learning Objectives - Workshop 04 Morning: Specialised AI Agents"
     },
     {
       "slug": "prerequisites.md",
-      "title": "Prerequisites - Module 11"
+      "title": "Prerequisites - Workshop 04 Morning: Specialised AI Agents"
     }
   ]
 }
