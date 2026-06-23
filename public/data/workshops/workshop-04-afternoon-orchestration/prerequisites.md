@@ -8,7 +8,7 @@ This afternoon session builds directly on the morning AI Agents session. You wil
 
 ### Essential: Morning Session Completion
 
-This session assumes you have completed the **Day 4 Morning Session: AI Agents & Tool Use**. Specifically, you should be comfortable with:
+This session assumes you have completed the **Phase 7 Morning Session: AI Agents & Tool Use**. Specifically, you should be comfortable with:
 
 - **Agent loops**: How an LLM reasons, decides to call a tool, processes the result, and iterates
 - **Tool use**: Defining tools with JSON schemas and handling tool calls via the Anthropic API
@@ -98,7 +98,7 @@ pip install pytest
 
 **4. A code editor**
 
-- **VS Code** (recommended -- configured in Workshop 01)
+- **VS Code** (recommended -- configured in Phase 1)
 - Any editor that can work with Python files
 
 **5. A terminal / command line**
@@ -317,4 +317,4 @@ If you have completed the morning session and all checks above pass, you are rea
 
 ---
 
-[Proceed to Workshop -->](./00_introduction.md) | [Learning Objectives](./objectives.md) | [Back to Module Overview](README.md)
+[Proceed to Workshop -->](./00_introduction.md) | [Learning Objectives](./objectives.md) | [Back to Workshop Overview](README.md)

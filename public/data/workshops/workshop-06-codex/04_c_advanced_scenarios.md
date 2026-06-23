@@ -1,14 +1,14 @@
 # 4.c: Advanced Scenarios
 
-These scenarios showcase Codex's ability to handle more comprehensive or specialised development tasks, often involving multiple files, broader codebase understanding, or specific domain knowledge.
+These scenarios showcase the ability of AI coding agents to handle more comprehensive or specialised development tasks, often involving multiple files, broader codebase understanding, or specific domain knowledge.
 
 ## Project Scaffolding
 
-Codex can help set up the basic structure for new projects, creating directories and initial files.
+AI coding agents can help set up the basic structure for new projects, creating directories and initial files.
 
-**Walkthrough (Cloud Agent):**
+**Walkthrough (Claude Code or Codex CLI):**
 
-1.  **Setup:** Create an empty repository on GitHub (e.g., `my-flask-app`) and connect it to the Codex agent in ChatGPT.
+1.  **Setup:** Create an empty repository on GitHub (e.g., `my-flask-app`) and open it in your terminal agent.
 2.  **Prompt:**
     ```
     Set up a basic Python project for a Flask web application in the current repository (`my-flask-app`).
@@ -23,18 +23,18 @@ Codex can help set up the basic structure for new projects, creating directories
     - A `templates/` folder (empty).
     - A basic `README.md` with instructions on how to set up a virtual environment, install dependencies from `requirements.txt`, and run the app using `flask run`.
     ```
-3.  **Codex Action:** Codex will attempt to create these files and directories within the connected repository. It will populate `requirements.txt`, `__init__.py`, `routes.py`, `run.py`, `.flaskenv`, and `README.md` with appropriate content.
+3.  **Agent Action:** The agent will attempt to create these files and directories within the repository. It will populate `requirements.txt`, `__init__.py`, `routes.py`, `run.py`, `.flaskenv`, and `README.md` with appropriate content.
 4.  **Review:** Carefully review all generated files and the directory structure. Test the setup instructions in the `README.md`.
 
 ## Pull Request Review
 
-Codex can be asked to review code changes submitted as a diff or a pull request URL, providing feedback on quality, potential bugs, and best practices.
+AI coding agents can be asked to review code changes submitted as a diff or a pull request URL, providing feedback on quality, potential bugs, and best practices.
 
-**Walkthrough (Cloud Agent):**
+**Walkthrough (Claude Code or Codex CLI):**
 
 1.  **Scenario:** You have a pull request on GitHub with some Python code changes. You want an AI review.
 2.  **Get PR Diff URL:** Go to the pull request on GitHub, and on the "Files changed" tab, you can often find a way to view the raw diff or get a URL ending in `.diff`. For example: `https://github.com/your-org/your-repo/pull/123.diff`
-3.  **Prompt the Codex Agent:**
+3.  **Prompt the agent:**
     ```
     Please review the changes in this pull request: https://github.com/your-org/your-repo/pull/123.diff
     Focus on:
@@ -45,12 +45,12 @@ Codex can be asked to review code changes submitted as a diff or a pull request 
     - Adherence to PEP 8.
     Provide your feedback as a list of comments, referencing file names and line numbers where possible.
     ```
-4.  **Codex Action:** Codex will load the patch (diff), analyze the changes, and provide textual feedback based on your criteria.
-    *AI Note: Direct PR URL review might require specific integrations or permissions. Using the `.diff` URL is a more general approach.*
+4.  **Agent Action:** The agent will load the patch (diff), analyse the changes, and provide textual feedback based on your criteria.
+    *Note: Direct PR URL review might require specific integrations or permissions. Using the `.diff` URL is a more general approach. Claude Code with a GitHub MCP server can access PRs directly.*
 
 ## Security Audits (Conceptual)
 
-Codex can be tasked with identifying potential security vulnerabilities in a codebase. This is an advanced use case and should always be complemented by human expertise and dedicated security scanning tools.
+AI coding agents can be tasked with identifying potential security vulnerabilities in a codebase. This is an advanced use case and should always be complemented by human expertise and dedicated security scanning tools.
 
 **Walkthrough (CLI - Conceptual):**
 
@@ -66,14 +66,14 @@ Codex can be tasked with identifying potential security vulnerabilities in a cod
     - Use of outdated or vulnerable dependencies (check `package.json`).
     Generate a report in Markdown format detailing potential findings, their locations (file and line), severity (High/Medium/Low), and suggested remediations." --model gpt-4.1
     ```
-3.  **Codex Action:** Codex will attempt to analyze the code based on the patterns described. Its output would be a textual report.
-    **Important:** This is a conceptual example. Real-world security auditing is complex. Codex can *assist* by finding patterns, but it's not a replacement for thorough security reviews by professionals or specialised SAST/DAST tools.
+3.  **Agent Action:** The agent will attempt to analyse the code based on the patterns described. Its output would be a textual report.
+    **Important:** This is a conceptual example. Real-world security auditing is complex. AI agents can *assist* by finding patterns, but they are not a replacement for thorough security reviews by professionals or specialised SAST/DAST tools.
 
 ## Code Transpilation
 
-Codex can translate code from one programming language to another, though the quality and completeness can vary depending on language complexity and feature parity.
+AI coding agents can translate code from one programming language to another, though the quality and completeness can vary depending on language complexity and feature parity.
 
-**Walkthrough (Cloud Agent or CLI):**
+**Walkthrough (Claude Code or Codex CLI):**
 
 1.  **Provide Python Snippet:**
     ```python
@@ -96,7 +96,7 @@ Codex can translate code from one programming language to another, though the qu
         return greeting
     ```
     ```
-3.  **Codex Output (Example):**
+3.  **Agent Output (Example):**
     ```javascript
     const getUserGreeting = (username, isPremiumMember = false) => {
       let greeting = `Hello, ${username}!`;
@@ -109,7 +109,7 @@ Codex can translate code from one programming language to another, though the qu
 
 ## Generating SQL Migrations
 
-The Codex CLI, particularly with its understanding of repository context, can sometimes infer the Object-Relational Mapper (ORM) being used (e.g., SQLAlchemy, Django ORM, Sequelize) and help generate database migration files.
+Terminal-based agents, with their understanding of repository context, can often infer the Object-Relational Mapper (ORM) being used (e.g., SQLAlchemy, Django ORM, Sequelize) and help generate database migration files.
 
 **Walkthrough (CLI - Conceptual with Django):**
 
@@ -118,11 +118,11 @@ The Codex CLI, particularly with its understanding of repository context, can so
     ```bash
     codex "I've added a `last_login_ip` CharField (max_length=45, null=True, blank=True) to the `CustomUser` model in the `users` app of my Django project. Generate the necessary Django migration files for this change. Name the migration `add_last_login_ip_to_customuser`."
     ```
-3.  **Codex Action (Ideal):**
-    *   Codex understands it's a Django project.
-    *   It might conceptually run `python manage.py makemigrations users --name add_last_login_ip_to_customuser` in its sandboxed thought process or directly generate the content of a new migration file (e.g., `users/migrations/000X_add_last_login_ip_to_customuser.py`).
+3.  **Agent Action (Ideal):**
+    *   The agent recognises it is a Django project.
+    *   It might run `python manage.py makemigrations users --name add_last_login_ip_to_customuser` in its sandboxed environment or directly generate the content of a new migration file (e.g., `users/migrations/000X_add_last_login_ip_to_customuser.py`).
     *   The generated file would contain Python code defining the `AddField` operation.
-    *AI Note: Direct execution of `makemigrations` by Codex is complex and depends on its environment setup. More likely, it would generate the *content* of the migration file based on understanding Django's migration structure.*
+    *Note: Direct execution of `makemigrations` depends on the agent's environment setup. Claude Code with access to a Python virtualenv can run this directly; otherwise, the agent generates the migration file content based on its understanding of Django's migration structure.*
 
 These advanced scenarios push the boundaries of what AI can assist with in development, moving towards more autonomous and deeply integrated partnership. However, they also require more careful prompting, context provision, and rigorous review of the outputs.
 

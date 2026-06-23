@@ -1456,4 +1456,4 @@ If the answer is not in the context, say 'Not found in documents.'
 ## Navigation
 - Previous: [Core Concepts](01_concepts.md)
 - Next: [Exercises](03_exercises.md)
-- [Back to Module Overview](README.md)
+- [Back to Workshop Overview](README.md)

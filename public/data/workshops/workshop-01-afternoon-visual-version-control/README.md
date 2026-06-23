@@ -1,16 +1,16 @@
-# Module 06: Visual Tools & Version Control
+# Phase 2: Visual Tools & Version Control
 
 ## Transform Your Documentation with Diagrams and Version Control
 
-Welcome to the afternoon session of Day 1. Over the next 3 hours, you'll master two interconnected skills that will permanently upgrade how you create, manage, and share professional documentation: **Mermaid diagrams** and **Git version control**.
+Welcome to Phase 2 (Visual Documentation & Version Control). Over the next 3 hours, you'll master two interconnected skills that will permanently upgrade how you create, manage, and share professional documentation: **Mermaid diagrams** and **Git version control**.
 
-## Module Overview
+## Workshop Overview
 
-This session builds on the VS Code foundations from this morning. You'll learn to generate stunning visual diagrams from plain text, track every change to your work with Git, and publish your portfolio to GitHub — all from within VS Code using visual tools like GitLens and the Source Control panel. No command-line expertise required.
+This session builds on the VS Code foundations from Phase 1 (Foundations). You'll learn to generate stunning visual diagrams from plain text, track every change to your work with Git, and publish your portfolio to GitHub — all from within VS Code using visual tools like GitLens and the Source Control panel. No command-line expertise required.
 
 ## Learning Outcomes
 
-By completing this module, you will:
+By completing this workshop, you will:
 
 ### Visual Documentation
 - Create flowcharts, Gantt charts, sequence diagrams, and mind maps using Mermaid syntax
@@ -30,7 +30,7 @@ By completing this module, you will:
 - Build a professional portfolio that showcases your projects
 - Establish daily Git habits that protect your work
 
-## Module Structure
+## Workshop Structure
 
 ### Chapter Navigation
 
@@ -76,7 +76,7 @@ By completing this module, you will:
    - Community links and support channels
    - Advanced techniques and references
 
-## Who This Module Is For
+## Who This Workshop Is For
 
 ### Perfect For:
 - **Academics & Researchers**: Visualise methodologies, track paper revisions, manage citations
@@ -86,7 +86,7 @@ By completing this module, you will:
 - **Anyone** who creates documents and wants to never lose work again
 
 ### You'll Succeed If You:
-- Completed this morning's VS Code setup session (or have VS Code configured)
+- Completed the Phase 1 VS Code setup workshop (or have VS Code configured)
 - Can use basic computer applications confidently
 - Have a real project you'd like to visualise or version-control
 - Are open to learning visual tools that replace manual diagramming
@@ -99,7 +99,7 @@ By completing this module, you will:
 
 ## Technical Requirements
 
-### Software (Should Be Ready from This Morning):
+### Software (Should Be Ready from Phase 1):
 - VS Code installed and configured
 - GitLens extension (`eamodio.gitlens`)
 - Markdown All in One (`yzhang.markdown-all-in-one`)
@@ -112,7 +112,7 @@ By completing this module, you will:
 - 8GB RAM recommended
 - Stable internet connection for GitHub
 
-## Module Timing
+## Workshop Timing
 
 | Phase | Duration | Activity |
 |-------|----------|----------|
@@ -126,7 +126,7 @@ By completing this module, you will:
 
 ## Quick Readiness Check
 
-- [ ] VS Code running with extensions from this morning
+- [ ] VS Code running with extensions from Phase 1
 - [ ] GitHub account created (https://github.com/signup)
 - [ ] Real project or document in mind to visualise
 - [ ] 3 hours of focused time available
@@ -146,10 +146,10 @@ Or jump directly to:
 
 - **Questions?** Use the workshop Discord channel
 - **Stuck?** Reference the troubleshooting sections in each chapter
-- **Share Success**: Post your diagrams in #module-06-wins
+- **Share Success**: Post your diagrams in #phase-2-wins
 
 ---
 
-*After this afternoon, you'll create professional diagrams in seconds and never lose work again. Let's begin!*
+*After this session, you'll create professional diagrams in seconds and never lose work again. Let's begin!*
 
-**[Start Module 06: Introduction -->](00_introduction.md)**
+**[Start Phase 2: Introduction -->](00_introduction.md)**

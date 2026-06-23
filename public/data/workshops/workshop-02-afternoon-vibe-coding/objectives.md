@@ -1,12 +1,12 @@
-# Learning Objectives - Module 08: Vibe Coding Mastery
+# Learning Objectives - Phase 3: Vibe Coding Mastery
 
 ## Workshop Overview
 
-Transform your ability to describe ideas into the ability to create them. By the end of this 3-hour afternoon session, you'll have built and deployed real web pages — entirely through conversation with AI, without writing a single line of code by hand.
+Transform your ability to describe ideas into the ability to create them. By the end of this 3-hour session, you'll have built and deployed real web pages — entirely through conversation with AI, without writing a single line of code by hand.
 
 ## Primary Learning Outcomes
 
-By the end of this workshop, you will be able to:
+By the end of this phase, you will be able to:
 
 ### 1. Conversational Creation (Core Skill)
 

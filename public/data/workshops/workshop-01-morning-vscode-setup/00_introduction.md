@@ -2,11 +2,11 @@
 
 ## Welcome to Your Universal Workspace Revolution
 
-Welcome to the first transformative step in your journey from AI consumer to AI commander. Today, you'll discover that VS Code isn't "coding software"—it's the most powerful document creation and automation platform ever built, and it's about to become your personal AI command centre.
+Welcome to the first step in your journey from AI consumer to AI commander. Today, you'll discover that VS Code isn't "coding software" — it's the most powerful document creation and automation platform ever built, and it's about to become your personal AI command centre.
 
 ## The Paradigm Shift: Beyond "Technical" vs "Non-Technical"
 
-In 2025, the boundary between "technical" and "non-technical" work has dissolved. Whether you're:
+The boundary between "technical" and "non-technical" work has dissolved. Whether you're:
 
 - An **academic** writing complex grant proposals
 - A **business owner** creating strategic documents
@@ -43,7 +43,7 @@ Features unavailable in consumer tools:
 
 ## Your Journey Today
 
-By the end of this morning session, you'll have:
+By the end of this Phase 1 workshop, you'll have:
 
 ```mermaid
 graph TD
@@ -83,9 +83,9 @@ graph TD
 > "My entire consultancy runs through VS Code now. Client reports that took days now take hours, with better quality and consistency."
 > — Michael Roberts, Management Consultant
 
-## Module Structure
+## Workshop Structure
 
-This morning's journey is carefully designed for maximum impact:
+This Phase 1 workshop is carefully designed for maximum impact:
 
 1. **Concepts (30 min)**: Understanding the VS Code ecosystem
 2. **Hands-On Setup (90 min)**: Building your command centre
@@ -133,4 +133,4 @@ Let's begin this journey. In the next section, we'll explore the core concepts t
 
 Next: [Chapter 1: Core Concepts - Understanding Your New Universe](./01_concepts.md)
 
-[Back to Module Overview](README.md) | [Skip to Hands-On](./02_hands_on.md)
+[Back to Workshop Overview](README.md) | [Skip to Hands-On](./02_hands_on.md)

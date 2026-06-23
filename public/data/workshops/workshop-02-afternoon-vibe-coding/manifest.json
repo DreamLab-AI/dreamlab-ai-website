@@ -1,9 +1,9 @@
 {
-  "title": "Module 08: Vibe Coding Mastery",
+  "title": "Phase 3: Vibe Coding Mastery",
   "pages": [
     {
       "slug": "README.md",
-      "title": "Module 08: Vibe Coding Mastery"
+      "title": "Phase 3: Vibe Coding Mastery"
     },
     {
       "slug": "00_introduction.md",
@@ -35,11 +35,11 @@
     },
     {
       "slug": "objectives.md",
-      "title": "Learning Objectives - Module 08: Vibe Coding Mastery"
+      "title": "Learning Objectives - Phase 3: Vibe Coding Mastery"
     },
     {
       "slug": "prerequisites.md",
-      "title": "Prerequisites - Module 08: Vibe Coding Mastery"
+      "title": "Prerequisites - Phase 3: Vibe Coding Mastery"
     }
   ]
 }

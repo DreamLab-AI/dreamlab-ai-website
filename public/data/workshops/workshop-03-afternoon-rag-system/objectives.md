@@ -207,4 +207,4 @@ By the end of this workshop, you will be able to:
 
 ---
 
-[Begin Workshop -->](./00_introduction.md) | [Check Prerequisites](./prerequisites.md) | [Back to Overview](README.md)
+[Begin Workshop -->](./00_introduction.md) | [Check Prerequisites](./prerequisites.md) | [Back to Workshop Overview](README.md)

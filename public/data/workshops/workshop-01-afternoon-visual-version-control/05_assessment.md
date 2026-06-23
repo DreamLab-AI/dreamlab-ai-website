@@ -338,7 +338,7 @@ Upon achieving 80% or higher:
 - Daily use of Mermaid diagrams in your documentation
 - Independent Git workflow for all your projects
 - Continued practice with more complex diagrams
-- Tomorrow's workshop sessions
+- The next phase of the programme
 
 **Recommended Actions:**
 1. Repeat exercises 3-5 from Chapter 3 this evening
@@ -402,4 +402,4 @@ Whether you achieved a perfect score or identified areas for growth, you've take
 
 Next: [Chapter 6: Resources & Continued Learning](./06_resources.md)
 
-[Back to Project](./04_project.md) | [Back to Module Overview](README.md)
+[Back to Project](./04_project.md) | [Back to Workshop Overview](README.md)

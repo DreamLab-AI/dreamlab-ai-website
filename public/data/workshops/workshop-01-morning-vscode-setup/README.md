@@ -1,16 +1,16 @@
-# Module 05: VS Code as AI Command Centre
+# VS Code as AI Command Centre
 
 ## 🚀 Transform VS Code into Your Universal AI Workspace
 
-Welcome to the first transformative session of your AI journey. In the next 3 hours, you'll discover that VS Code isn't "coding software"—it's the most powerful document creation and AI interaction platform available today.
+Welcome to Phase 1 (Foundations) of your AI journey. In the next 3 hours, you'll discover that VS Code isn't "coding software" — it's the most powerful document creation and AI interaction platform available today.
 
-## Module Overview
+## Workshop Overview
 
-This morning session transforms you from an AI consumer to an AI commander by establishing your professional command centre. You'll gain direct access to AI models, learn professional workflows, and immediately apply these skills to real work.
+This Phase 1 workshop transforms you from an AI consumer to an AI commander by establishing your professional command centre. You'll gain direct access to AI models, learn professional workflows, and immediately apply these skills to real work.
 
 ## 🎯 Learning Outcomes
 
-By completing this module, you will:
+By completing this workshop, you will:
 
 ### Core Capabilities
 - ✅ Configure VS Code as a universal workspace for any profession
@@ -30,9 +30,9 @@ By completing this module, you will:
 - 💡 Complete a real project from your work in 20 minutes
 - ⚡ Save 5-10 hours per week on document creation
 - 🎯 Achieve professional-grade results consistently
-- 🚀 Join the 1% who wield professional AI tools
+- 🚀 Work with professional-grade AI tools from day one
 
-## 📚 Module Structure
+## 📚 Workshop Structure
 
 ### Chapter Navigation
 
@@ -77,7 +77,7 @@ By completing this module, you will:
    - Community links
    - Advanced techniques
 
-## 👥 Who This Module Is For
+## 👥 Who This Workshop Is For
 
 ### Perfect For:
 - 📚 **Academics**: Grant writers, researchers, professors
@@ -125,7 +125,7 @@ By completing this module, you will:
 - **Immediate Value**: Leave with completed work
 - **No Fluff**: Direct, practical, results-focused
 
-### Module Timing:
+### Workshop Timing:
 - **Total Duration**: 3 hours (half day)
 - **Format**: Self-paced with suggested timings
 - **Breaks**: Take as needed—this is dense material
@@ -172,11 +172,11 @@ Or jump directly to:
 
 - **Questions?** Use the workshop Discord channel
 - **Stuck?** Reference the troubleshooting guide
-- **Share Success**: Post your wins in #module-05-wins
+- **Share Success**: Post your wins in #phase-1-wins
 - **Stay Connected**: Join our alumni network
 
 ---
 
-*Remember: After today, you'll never want to go back to your old way of working. Let's begin! 🚀*
+*Remember: After today, you'll never want to go back to your old way of working. Let's begin!*
 
-**[➡️ Start Module 05: Introduction](00_introduction.md)**
+**[Start Phase 1: Introduction](00_introduction.md)**

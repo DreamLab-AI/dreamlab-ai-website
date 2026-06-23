@@ -2,7 +2,7 @@
 
 ## From Chaos to Clarity: Your Professional Documentation System
 
-Welcome back! This afternoon, you'll discover how to create stunning visual documentation and implement a version control system that ensures you never lose work again. By combining Mermaid diagrams with Git, you'll build a professional documentation workflow that rivals any enterprise system.
+Welcome to Phase 2! In this session, you'll discover how to create stunning visual documentation and implement a version control system that ensures you never lose work again. By combining Mermaid diagrams with Git, you'll build a professional documentation workflow that rivals any enterprise system.
 
 ## The Power of Visual Communication
 
@@ -38,7 +38,7 @@ graph TD
     style B5 fill:#e1f5fe
 ```
 
-## What You'll Master This Afternoon
+## What You'll Master in This Session
 
 ### Visual Documentation Skills
 
@@ -70,14 +70,14 @@ graph TD
 
 ## Real-World Transformations
 
-### Before This Module
+### Before This Workshop
 - Draw diagrams in PowerPoint (tedious)
 - Save multiple file versions manually
 - Email documents back and forth
 - Lose work from crashes
 - No clear change history
 
-### After This Module
+### After This Workshop
 - Generate diagrams from descriptions
 - Automatic version tracking
 - Professional collaboration platform
@@ -95,7 +95,7 @@ graph TD
 > "My project Gantt charts update automatically as I type. What took hours in MS Project now takes minutes."
 > — Sarah Mitchell, Project Manager
 
-## Module Learning Path
+## Workshop Learning Path
 
 ```mermaid
 graph LR
@@ -151,7 +151,7 @@ This isn't about becoming a "technical person." It's about:
 ## Prerequisites Check
 
 Before we begin, ensure you have:
-- [x] Completed Module 05 (VS Code setup)
+- [x] Completed Phase 1 workshop (VS Code setup)
 - [x] VS Code running with AI configured
 - [x] Internet connection for GitHub
 - [x] A project in mind to visualise
@@ -159,7 +159,7 @@ Before we begin, ensure you have:
 
 ## Time Investment & Returns
 
-### This Afternoon: 3 Hours
+### This Session: 3 Hours
 - 30 minutes: Understanding concepts
 - 90 minutes: Hands-on implementation
 - 30 minutes: Practice exercises
@@ -175,7 +175,7 @@ Before we begin, ensure you have:
 
 ## Let's Transform Your Documentation
 
-This afternoon's session will revolutionize how you create, manage, and share professional documentation. You'll leave with:
+This session will transform how you create, manage, and share professional documentation. You'll leave with:
 
 - A complete visual documentation system
 - Version control for all your work
@@ -189,4 +189,4 @@ Ready to make your work visually stunning and professionally managed?
 
 Next: [Chapter 1: Core Concepts - Visual Thinking & Version Control](./01_concepts.md)
 
-[Back to Module Overview](README.md) | [Skip to Hands-On](./02_hands_on.md)
+[Back to Workshop Overview](README.md) | [Skip to Hands-On](./02_hands_on.md)

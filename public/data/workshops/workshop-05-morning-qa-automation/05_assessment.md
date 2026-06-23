@@ -301,4 +301,4 @@ Based on your score:
 ## Navigation
 - Previous: [Project](04_project.md)
 - Next: [Resources](06_resources.md)
-- [Back to Module Overview](README.md)
+- [Back to Workshop Overview](README.md)

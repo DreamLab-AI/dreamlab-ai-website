@@ -5,7 +5,7 @@
 By the end of this module, you will:
 - Master the 20 most important VS Code keyboard shortcuts
 - Understand the keyboard shortcut philosophy and patterns
-- Customize shortcuts for your workflow
+- Customise shortcuts for your workflow
 - Achieve 3-5x faster editing through keyboard mastery
 - Eliminate unnecessary mouse usage
 
@@ -513,7 +513,7 @@ const color5 = 'purple';
 
 ## Customizing Shortcuts
 
-### How to Customize
+### How to Customise
 
 **Method 1: Via UI**
 ```
@@ -741,9 +741,9 @@ Requirements:
 ## Next Steps
 
 Master these shortcuts, and you're ready for:
-- **Module 3**: Extension ecosystem
-- **Module 4**: Advanced settings
-- **Module 9**: AI-powered editing shortcuts
+- **Extension Ecosystem**: Deep dive into the marketplace
+- **Settings & Customisation**: Advanced configuration
+- **AI Integration**: AI-powered editing shortcuts
 
 ## Additional Resources
 

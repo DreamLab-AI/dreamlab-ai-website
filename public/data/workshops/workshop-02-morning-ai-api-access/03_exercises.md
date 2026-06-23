@@ -279,4 +279,4 @@ You can now:
 
 Next: [Chapter 4: Real Project - Multi-Model Magic](./04_project.md)
 
-[Back to Hands-On](./02_hands_on.md) | [Back to Module Overview](README.md)
+[Back to Hands-On](./02_hands_on.md) | [Back to Workshop Overview](README.md)

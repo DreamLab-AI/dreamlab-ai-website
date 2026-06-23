@@ -405,4 +405,4 @@ Plan structure --> Create files with diagrams --> Commit each piece --> Push to 
 
 Next: [Chapter 4: Real Project Application](./04_project.md)
 
-[Back to Hands-On Practice](./02_hands_on.md) | [Back to Module Overview](README.md)
+[Back to Hands-On Practice](./02_hands_on.md) | [Back to Workshop Overview](README.md)

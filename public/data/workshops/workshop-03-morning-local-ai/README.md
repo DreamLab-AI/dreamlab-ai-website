@@ -1,16 +1,16 @@
-# Module 09: Local AI Models
+# Phase 5: Local AI & RAG Systems
 
 ## Run AI on Your Own Machine — Private, Free, and Fully Under Your Control
 
 Welcome to the session that puts real AI power directly into your hands. Over the next 3 hours you will install, run, and compare large language models on your own hardware — no cloud accounts, no API keys, no recurring fees, and no data leaving your machine.
 
-## Module Overview
+## Workshop Overview
 
 This morning session takes you from "AI is a website I visit" to "AI is a tool running on my laptop." You will learn how local inference works, install the industry-standard Ollama runtime, explore models from Meta, Mistral, Microsoft and others, and build a simple AI assistant that works entirely offline.
 
 ## Learning Outcomes
 
-By completing this module, you will:
+By completing this workshop, you will:
 
 ### Core Capabilities
 - Install and configure Ollama on Windows, macOS, or Linux
@@ -32,7 +32,7 @@ By completing this module, you will:
 - Build a working local AI assistant you can keep using after the workshop
 - Make informed purchasing decisions about GPUs and Apple Silicon upgrades
 
-## Module Structure
+## Workshop Structure
 
 ### Chapter Navigation
 
@@ -75,7 +75,7 @@ By completing this module, you will:
    - Hardware buying guides and benchmark data
    - Communities, papers, and advanced topics
 
-## Who This Module Is For
+## Who This Workshop Is For
 
 ### Perfect For:
 - **Privacy-conscious professionals** who cannot send data to cloud services
@@ -124,7 +124,7 @@ By completing this module, you will:
 - **Profession-agnostic:** Whether you are a solicitor, nurse, teacher, or engineer, local AI serves you
 - **No fluff:** Direct, practical, results-focused
 
-### Module Timing
+### Workshop Timing
 - **Total Duration:** 3 hours (morning half-day)
 - **Format:** Self-paced with suggested timings
 - **Breaks:** Coffee break at the midpoint (10:30-11:00)
@@ -151,8 +151,8 @@ Or jump directly to:
 
 - **Questions?** Use the workshop Discord channel
 - **Stuck?** Reference the [troubleshooting section](02_hands_on.md#troubleshooting-guide)
-- **Share success:** Post your benchmark results in #module-09-wins
+- **Share success:** Post your benchmark results in the workshop channel
 
 ---
 
-**[Start Module 09: Introduction →](00_introduction.md)**
+**[Start Phase 5: Introduction →](00_introduction.md)**

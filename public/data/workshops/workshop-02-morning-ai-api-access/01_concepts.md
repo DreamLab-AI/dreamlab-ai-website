@@ -582,7 +582,7 @@ print()  # New line at end
 ✅ **Rate limits exist**—implement exponential backoff
 ✅ **Context windows vary**—choose model based on document size
 ✅ **Different models excel at different tasks**—select strategically
-✅ **Parameters control behavior**—temperature, max_tokens, streaming
+✅ **Parameters control behaviour**—temperature, max_tokens, streaming
 ✅ **2026 brings incredible value**—Gemini 2.5 Flash, Haiku 4.5, and fierce competition across providers
 
 ---

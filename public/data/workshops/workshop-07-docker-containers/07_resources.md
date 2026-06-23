@@ -230,9 +230,9 @@ volumes:
 
 Now that you understand containerisation, you're well prepared for:
 
-- **Workshop 08: Claude Code** -- uses containerised development environments
-- **Workshop 04: AI Agents & Orchestration** -- multi-agent systems often run in containers
-- **Workshop 03: Local AI Models** -- Ollama and other local model runners are best managed via Docker
+- **Phase 4: Claude Code** -- uses containerised development environments
+- **Phase 5: AI Agents & Orchestration** -- multi-agent systems often run in containers
+- **Phase 3: Local AI Models** -- Ollama and other local model runners are best managed via Docker
 
 ---
 

@@ -1,16 +1,16 @@
-# Module 10: RAG System Implementation
+# RAG System Implementation
 
 ## Build an AI That Knows Your Documents
 
-Welcome to the afternoon session of Day 3. Over the next 3 hours, you will build a complete Retrieval-Augmented Generation system -- an AI assistant that answers questions using your own documents, with full source citations.
+Welcome to Phase 5 (Local AI & RAG Systems). Over the next 3 hours, you will build a complete Retrieval-Augmented Generation system -- an AI assistant that answers questions using your own documents, with full source citations.
 
-## Module Overview
+## Workshop Overview
 
 RAG is the most practical technique for making AI useful with your own data. Instead of relying on a model's general training, RAG retrieves relevant passages from your documents and uses them as context for generating accurate, grounded answers. By the end of this session, you will have a working system you can continue to develop.
 
 ## Learning Outcomes
 
-By completing this module, you will:
+By completing this workshop, you will:
 
 - Understand the complete RAG pipeline from document ingestion to answer generation
 - Set up and populate a ChromaDB vector database
@@ -20,7 +20,7 @@ By completing this module, you will:
 - Evaluate retrieval quality and generation accuracy
 - Create a personalised knowledge base for your own work
 
-## Module Structure
+## Workshop Structure
 
 ### Chapter Navigation
 
@@ -111,7 +111,7 @@ Your Documents (PDF, Markdown, Text)
 Accurate answer with source references
 ```
 
-## Who This Module Is For
+## Who This Workshop Is For
 
 ### Ideal Participants
 - **Researchers and Academics** -- index papers, find cross-references, cite sources
@@ -158,4 +158,4 @@ Or begin with the fundamentals:
 
 ---
 
-*This module is part of the DreamLab AI "AI-Powered Knowledge Work" workshop series. Day 3 of 5.*
+*This workshop is part of the DreamLab AI "AI-Powered Knowledge Work" series. Phase 5 of 9.*

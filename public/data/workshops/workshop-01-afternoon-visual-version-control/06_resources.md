@@ -615,4 +615,4 @@ Your transformation from manual documentation to visual, version-controlled work
 
 **Workshop Complete!**
 
-[Back to Assessment](./05_assessment.md) | [Back to Module Overview](README.md)
+[Back to Assessment](./05_assessment.md) | [Back to Workshop Overview](README.md)

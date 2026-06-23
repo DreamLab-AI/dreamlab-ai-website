@@ -6,7 +6,7 @@
 - Organize large monorepos effectively
 - Configure workspace-specific settings
 - Master workspace recommendations
-- Implement advanced project organization
+- Implement advanced project organisation
 
 ## What are Multi-root Workspaces?
 

@@ -10,7 +10,7 @@ In this session you will create a personal portfolio page using nothing but natu
 
 ## Choosing Your Tool
 
-Pick **one** of the following approaches. We recommend Option A if you completed the morning API setup.
+Pick **one** of the following approaches. We recommend Option A if you completed the Phase 2 API setup.
 
 ### Option A: Claude Code (Recommended)
 
@@ -211,4 +211,4 @@ The same approach works for any project — a business landing page, an internal
 
 Next: [Chapter 3: Exercises - Creative Challenges](./03_exercises.md)
 
-[Back to Concepts](./01_concepts.md) | [Back to Module Overview](README.md)
+[Back to Concepts](./01_concepts.md) | [Back to Phase Overview](README.md)

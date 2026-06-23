@@ -1,4 +1,4 @@
-# Settings and Customization
+# Settings and Customisation
 
 ## Learning Objectives
 
@@ -7,7 +7,7 @@ By the end of this module, you will:
 - Configure settings via UI and JSON
 - Create custom snippets for rapid code generation
 - Set up language-specific configurations
-- Optimize editor behavior for your workflow
+- Optimise editor behaviour for your workflow
 - Understand settings sync and portability
 
 ## Core Concepts
@@ -572,7 +572,7 @@ File → Save Workspace As...
 }
 ```
 
-## Advanced Customization
+## Advanced Customisation
 
 ### Custom Color Theme Tweaks
 
@@ -902,8 +902,8 @@ Create a global snippets file:
 ## Next Steps
 
 You've mastered VS Code settings! Next:
-- **Module 5**: Git integration
-- **Module 10**: Profiles for workflow-specific configurations
+- **Git Integration**: Version control in VS Code
+- **Profiles & Sync**: Workflow-specific configurations
 
 ## Additional Resources
 
@@ -915,4 +915,4 @@ You've mastered VS Code settings! Next:
 
 **Estimated Time to Complete**: 3-4 hours
 **Difficulty**: Intermediate
-**Prerequisites**: Modules 1-3
+**Prerequisites**: Introduction, Keyboard Shortcuts, Extension Ecosystem

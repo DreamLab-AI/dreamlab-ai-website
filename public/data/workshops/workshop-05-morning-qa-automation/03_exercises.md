@@ -605,4 +605,4 @@ npx stryker run
 ## Navigation
 - Previous: [Hands-On Setup](02_hands_on.md)
 - Next: [Project](04_project.md)
-- [Back to Module Overview](README.md)
+- [Back to Workshop Overview](README.md)

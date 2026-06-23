@@ -506,4 +506,4 @@ In the hands-on session, you'll:
 ## Navigation
 - Previous: [Introduction](00_introduction.md)
 - Next: [Hands-On Practice](02_hands_on.md)
-- [Back to Module Overview](README.md)
+- [Back to Workshop Overview](README.md)

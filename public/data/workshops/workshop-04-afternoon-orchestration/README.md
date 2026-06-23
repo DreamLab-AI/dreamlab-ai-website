@@ -16,7 +16,7 @@ By the end of this 3-hour session, you will have designed, built, and tested a p
 ## Who This Session Is For
 
 ### Ideal Participants
-- Professionals who completed the morning AI Agents session (Day 4 AM)
+- Professionals who completed the morning AI Agents session (Phase 7)
 - Team leads evaluating multi-agent architectures for their organisation
 - Technical professionals building AI-powered automation workflows
 - Anyone responsible for the cost and safety of AI deployments
@@ -32,7 +32,7 @@ By the end of this 3-hour session, you will have designed, built, and tested a p
 - Prior experience with multi-agent frameworks
 - Knowledge of specific orchestration tools (we cover them from scratch)
 
-## Module Structure
+## Workshop Structure
 
 ### Chapter Navigation
 
@@ -118,7 +118,7 @@ See [objectives.md](objectives.md) for the complete learning outcomes breakdown.
 
 ## Prerequisites at a Glance
 
-- Completion of the morning AI Agents session (Day 4 AM)
+- Completion of the morning AI Agents session (Phase 7)
 - Anthropic API key with credit
 - Python 3.10+ with `anthropic` and `tenacity` packages installed
 - Familiarity with reading Python code

@@ -2,7 +2,7 @@
 
 ## The Philosophy of Conversational Creation
 
-Before we start building amazing things, let's understand the revolutionary concepts that make vibe coding possible. This knowledge will empower you to create anything you can imagine.
+Before we start building, let's understand the core concepts that make vibe coding possible. This knowledge will empower you to create anything you can imagine.
 
 ## 1.1 What Makes Vibe Coding Work?
 
@@ -434,4 +434,4 @@ Remember: You're not learning to code—you're learning to direct AI to bring yo
 
 Next: [Chapter 2: Hands-On - Building Your First Vibe Creation](./02_hands_on.md)
 
-[Back to Introduction](./00_introduction.md) | [Back to Module Overview](README.md)
+[Back to Introduction](./00_introduction.md) | [Back to Phase Overview](README.md)

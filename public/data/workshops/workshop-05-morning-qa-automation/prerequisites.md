@@ -299,6 +299,6 @@ If you see this output, you're ready to go! ✅
 
 ## Ready to Test?
 
-Once you've completed the pre-workshop checklist, you're prepared for the morning QA Automation session. We'll transform you from manual tester to automation expert in 3 hours!
+Once you've completed the pre-workshop checklist, you're prepared for the QA Automation workshop. We'll transform you from manual tester to automation expert in 3 hours!
 
 **See you at the workshop!** 🧪

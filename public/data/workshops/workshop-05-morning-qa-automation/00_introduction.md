@@ -1,8 +1,8 @@
-# Module 13: AI-Powered QA Automation
+# AI-Powered QA Automation
 
 ## Welcome to Quality Assurance Excellence
 
-Quality assurance is the backbone of reliable software. In this module, you'll master automated testing strategies that combine traditional best practices with cutting-edge AI capabilities to ensure your code is production-ready.
+Quality assurance is the backbone of reliable software. In this workshop, you'll master automated testing strategies that combine traditional best practices with cutting-edge AI capabilities to ensure your code is production-ready.
 
 ## What You'll Learn
 
@@ -103,7 +103,7 @@ graph TB
 - **Pre-commit hooks**: Local quality gates
 - **Dependabot / Renovate**: Automated dependency updates
 
-## Module Structure
+## Workshop Structure
 
 ### Morning Session (3 hours)
 1. **Introduction** (30 min) - QA fundamentals and AI testing
@@ -121,7 +121,7 @@ Build a complete testing pipeline for a real-world application:
 
 ## Success Metrics
 
-By the end of this module, you'll have:
+By the end of this workshop, you'll have:
 - ✅ A fully automated testing pipeline
 - ✅ 90%+ code coverage across your projects
 - ✅ Confidence to refactor without fear
@@ -137,10 +137,10 @@ By the end of this module, you'll have:
 
 ## Let's Build Quality In
 
-Quality isn't something you add at the end—it's built into every line of code from day one. Let's learn how to make testing effortless, automatic, and effective.
+Quality is not something you add at the end -- it is built into every line of code from the start. Let's learn how to make testing effortless, automatic, and effective.
 
 Ready to ensure your code works perfectly, every time? Let's dive in!
 
 ## Navigation
 - Next: [Testing Concepts](01_concepts.md)
-- [Back to Module Overview](README.md)
+- [Back to Workshop Overview](README.md)

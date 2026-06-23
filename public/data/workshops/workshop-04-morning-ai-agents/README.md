@@ -83,7 +83,7 @@ Review [prerequisites.md](prerequisites.md) before starting this session to ensu
 ## Who This Session Is For
 
 ### Ideal Participants
-- Professionals who have completed Days 1-3 of the programme (or equivalent experience)
+- Professionals who have completed Phases 1-5 of the programme (or equivalent experience)
 - Anyone building AI-enhanced workflows for research, analysis, content, or operations
 - Team leads evaluating agent tools for their organisations
 - Consultants and freelancers who want to automate specialist tasks

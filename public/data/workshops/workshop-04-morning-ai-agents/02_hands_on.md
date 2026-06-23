@@ -525,4 +525,4 @@ def execute_tool_with_logging(tool_name, tool_input):
 ## Navigation
 - Previous: [Core Concepts](01_concepts.md)
 - Next: [Exercises](03_exercises.md)
-- [Back to Module Overview](README.md)
+- [Back to Workshop Overview](README.md)

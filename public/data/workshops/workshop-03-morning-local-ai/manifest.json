@@ -1,9 +1,9 @@
 {
-  "title": "Module 09: Local AI Models",
+  "title": "Phase 5: Local AI & RAG Systems",
   "pages": [
     {
       "slug": "README.md",
-      "title": "Module 09: Local AI Models"
+      "title": "Phase 5: Local AI & RAG Systems"
     },
     {
       "slug": "00_introduction.md",
@@ -35,11 +35,11 @@
     },
     {
       "slug": "objectives.md",
-      "title": "Learning Objectives — Module 09: Local AI Models"
+      "title": "Learning Objectives — Phase 5: Local AI & RAG Systems"
     },
     {
       "slug": "prerequisites.md",
-      "title": "Prerequisites — Module 09: Local AI Models"
+      "title": "Prerequisites — Phase 5: Local AI & RAG Systems"
     }
   ]
 }

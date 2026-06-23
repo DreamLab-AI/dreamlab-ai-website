@@ -721,4 +721,4 @@ ollama run llama3.3 --verbose
 ## Navigation
 - Previous: [Core Concepts](01_concepts.md)
 - Next: [Exercises](03_exercises.md)
-- [Back to Module Overview](README.md)
+- [Back to Workshop Overview](README.md)

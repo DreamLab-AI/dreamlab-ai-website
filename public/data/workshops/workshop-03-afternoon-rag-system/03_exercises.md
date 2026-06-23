@@ -737,4 +737,4 @@ These are the core techniques used in production RAG systems. The project work i
 ## Navigation
 - Previous: [Hands-On Practice](02_hands_on.md)
 - Next: [Project Work](04_project.md)
-- [Back to Module Overview](README.md)
+- [Back to Workshop Overview](README.md)

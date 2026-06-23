@@ -2,7 +2,7 @@
 
 ## Workshop Overview
 
-Transform how you create, track, and share professional documentation. By the end of this 3-hour afternoon session, you'll generate stunning diagrams from text, track every change with Git, and publish your work to a professional portfolio on GitHub.
+Transform how you create, track, and share professional documentation. By the end of this 3-hour session, you'll generate stunning diagrams from text, track every change with Git, and publish your work to a professional portfolio on GitHub.
 
 ## Primary Learning Outcomes
 
@@ -299,4 +299,4 @@ These objectives represent a fundamental upgrade in how you create and manage pr
 
 ---
 
-[Begin Workshop -->](./00_introduction.md) | [Check Prerequisites](./prerequisites.md) | [Back to Overview](README.md)
+[Begin Workshop -->](./00_introduction.md) | [Check Prerequisites](./prerequisites.md) | [Back to Workshop Overview](README.md)

@@ -481,4 +481,4 @@ This is the difference between an AI consumer and an AI commander.
 
 Next: [Chapter 5: Assessment — Validate Your Skills](./05_assessment.md)
 
-[Back to Exercises](./03_exercises.md) | [Back to Module Overview](README.md)
+[Back to Exercises](./03_exercises.md) | [Back to Workshop Overview](README.md)

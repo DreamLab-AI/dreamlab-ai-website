@@ -387,4 +387,4 @@ For each exercise:
 ## Navigation
 - Previous: [Hands-on Development](02_hands_on.md)
 - Next: [Final Project](04_project.md)
-- [Back to Module Overview](README.md)
+- [Back to Workshop Overview](README.md)

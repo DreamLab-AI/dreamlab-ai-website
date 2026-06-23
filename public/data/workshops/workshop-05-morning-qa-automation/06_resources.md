@@ -380,4 +380,4 @@ jest --updateSnapshot     # Update snapshots
 
 ## Navigation
 - Previous: [Assessment](05_assessment.md)
-- [Back to Module Overview](README.md)
+- [Back to Workshop Overview](README.md)

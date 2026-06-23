@@ -6,7 +6,7 @@
 - Basic Git commands (clone, add, commit, push, pull)
 - Understanding of branches and pull requests
 - Experience with GitHub repositories
-- **Completion of Workshop 04 recommended**
+- **Completion of Phase 2 (Version Control & Collaboration) recommended**
 
 ### Web Development Fundamentals
 - Basic understanding of frontend frameworks (React, Vue, or similar)
@@ -237,7 +237,7 @@ If you encounter setup issues:
    - [GitHub Docs](https://docs.github.com/)
 
 2. **Workshop Discord Channel**
-   - Ask questions in `#workshop-05-help`
+   - Ask questions in `#phase-9-help`
    - Share error messages and screenshots
 
 3. **Office Hours**

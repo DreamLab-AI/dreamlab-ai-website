@@ -1,16 +1,16 @@
-# Module 14: Professional Output Suite
+# Phase 9: QA, Publishing & Capstone
 
 ## Ship Your Work to the World with Modern Publishing & Deployment
 
-Welcome to the afternoon session of Day 5. Over the next 3 hours, you will learn how to take applications from your local machine to production-ready deployments on modern cloud platforms. You will build automated CI/CD pipelines, deploy to multiple environments, and publish professional documentation -- the complete publishing toolkit that professional teams rely on in 2026.
+Welcome to Phase 9 (QA, Publishing & Capstone). Over the next 3 hours, you will learn how to take applications from your local machine to production-ready deployments on modern cloud platforms. You will build automated CI/CD pipelines, deploy to multiple environments, and publish professional documentation -- the complete publishing toolkit that professional teams rely on in 2026.
 
-## Module Overview
+## Workshop Overview
 
-Building software is only half the story. Getting it in front of users -- reliably, securely, and repeatably -- is the other half. This module covers the entire journey from code commit to live production URL, including deployment platforms (Vercel, Railway, Cloudflare Pages), GitHub Actions automation, environment management, and documentation publishing with MkDocs Material, Storybook, and OpenAPI. By the end, you will have live deployments with automated pipelines that update every time you push.
+Building software is only half the story. Getting it in front of users -- reliably, securely, and repeatably -- is the other half. This workshop covers the entire journey from code commit to live production URL, including deployment platforms (Vercel, Railway, Cloudflare Pages), GitHub Actions automation, environment management, and documentation publishing with MkDocs Material, Storybook, and OpenAPI. By the end, you will have live deployments with automated pipelines that update every time you push.
 
 ## Learning Outcomes
 
-By completing this module, you will:
+By completing this workshop, you will:
 
 ### Core Capabilities
 - Deploy a React application to Vercel with automatic HTTPS and global CDN
@@ -37,7 +37,7 @@ By completing this module, you will:
 - Understand the deployment landscape well enough to choose the right platform for any project
 - Deploy confidently, knowing that automated tests and quality gates protect production
 
-## Module Structure
+## Workshop Structure
 
 ### Chapter Navigation
 
@@ -88,7 +88,7 @@ By completing this module, you will:
    - Documentation tool guides (MkDocs Material, Storybook, Docusaurus, OpenAPI)
    - CLI cheat sheets, video tutorials, books, and community links
 
-## Who This Module Is For
+## Who This Workshop Is For
 
 ### Ideal Participants
 - **Web Developers** who build locally but have never deployed to production platforms
@@ -111,7 +111,7 @@ By completing this module, you will:
 
 ## What You Will Build
 
-By the end of this module, you will have:
+By the end of this workshop, you will have:
 
 - **A live React application** deployed to Vercel with automatic HTTPS, CDN, and preview URLs per PR
 - **A live Node.js API** deployed to Railway with environment variables and optional PostgreSQL
@@ -143,7 +143,7 @@ By the end of this module, you will have:
 - MkDocs Material (Python package)
 - Project dependencies (Vite, Express, cors, dotenv)
 
-## Module Timing
+## Workshop Timing
 
 | Section | Duration | Format |
 |---------|----------|--------|
@@ -165,7 +165,7 @@ The project and assessment extend naturally into self-study time. Take breaks as
 - [ ] Code editor open with terminal access
 - [ ] 3 hours of focused time blocked
 
-### Begin the Module
+### Begin the Workshop
 
 **[Start with the Introduction -->](00_introduction.md)**
 
@@ -188,4 +188,4 @@ Or jump directly to:
 
 *Building software is half the job. Shipping it reliably is the other half. Let's get your work live.*
 
-**[Start Module 14: Introduction -->](00_introduction.md)**
+**[Start Phase 9: Introduction -->](00_introduction.md)**

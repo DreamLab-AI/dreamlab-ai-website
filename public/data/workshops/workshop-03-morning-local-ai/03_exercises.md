@@ -545,4 +545,4 @@ You now have all the building blocks. In the next section, you will combine them
 ## Navigation
 - Previous: [Hands-On Practice](02_hands_on.md)
 - Next: [Project: Build a Local AI Assistant](04_project.md)
-- [Back to Module Overview](README.md)
+- [Back to Workshop Overview](README.md)

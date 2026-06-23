@@ -328,7 +328,7 @@ Upon achieving 80% or higher:
 |                                            |
 |   has successfully completed               |
 |   Direct AI API Access Workshop            |
-|   Module 07                                |
+|   Phase 3: AI APIs & Vibe Coding           |
 |                                            |
 |   and demonstrated mastery of:             |
 |   - Multi-provider API configuration       |
@@ -364,7 +364,7 @@ Upon achieving 80% or higher:
 - Daily use of multi-model API access
 - Gradual cancellation of redundant AI subscriptions
 - Sharing your model comparison findings with colleagues
-- The afternoon session
+- The next phase
 
 **Recommended Actions:**
 1. Track your actual API costs for one full week
@@ -453,4 +453,4 @@ You've validated a genuinely valuable professional skill. Direct API access to A
 
 Next: [Chapter 6: Resources & Continued Learning](./06_resources.md)
 
-[Back to Project](./04_project.md) | [Back to Module Overview](README.md)
+[Back to Project](./04_project.md) | [Back to Workshop Overview](README.md)

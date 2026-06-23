@@ -458,7 +458,7 @@ To earn the **Local AI Practitioner Certificate**, you must:
 
 ## Self-Assessment Checklist
 
-After completing this module, you should be able to:
+After completing this workshop, you should be able to:
 
 **Concepts:**
 - [ ] Explain how LLMs work at a high level
@@ -510,7 +510,7 @@ Based on your performance:
 ## Navigation
 - Previous: [Project](04_project.md)
 - Next: [Resources](06_resources.md)
-- [Back to Module Overview](README.md)
+- [Back to Workshop Overview](README.md)
 
 ## Submit Your Work
 

@@ -2,12 +2,12 @@
 
 ## Before You Begin
 
-This afternoon session builds directly on the morning's VS Code setup. Ensure you meet these requirements for the smoothest experience.
+This session builds directly on the Phase 1 (Foundations) VS Code setup. Ensure you meet these requirements for the smoothest experience.
 
 ## Required Knowledge
 
 ### Essential Skills
-- **Morning Session Complete** (or equivalent)
+- **Phase 1 (Foundations) Complete** (or equivalent)
   - VS Code installed and running
   - Comfortable navigating the VS Code interface
   - Know how to install extensions from the marketplace
@@ -21,7 +21,7 @@ This afternoon session builds directly on the morning's VS Code setup. Ensure yo
   - Can follow step-by-step instructions
 
 - **No Programming Experience Required**
-  - This module uses visual tools throughout
+  - This workshop uses visual tools throughout
   - Git commands are demonstrated but optional — VS Code handles everything
   - Mermaid syntax is closer to writing notes than writing code
 
@@ -70,7 +70,7 @@ This afternoon session builds directly on the morning's VS Code setup. Ensure yo
 
 ### Must Be Ready Before This Session
 
-**1. VS Code (from morning session)**
+**1. VS Code (from Phase 1)**
 - Latest stable version installed
 - Basic configuration complete
 - Comfortable opening files and using the command palette
@@ -154,17 +154,17 @@ Have at least one real project in mind for the exercises:
 
 ### Workspace Setup
 
-**If you completed the morning session, you should already have:**
+**If you completed Phase 1, you should already have:**
 ```
 Documents/
   └── AI-Workshop/
-      ├── morning-session/     (from this morning)
-      └── afternoon-session/   (we'll use this today)
+      ├── phase-1-foundations/  (from Phase 1)
+      └── phase-2-visual-vc/   (we'll use this today)
 ```
 
 **If starting fresh, create this structure:**
 1. Open VS Code
-2. Create a new folder: `Documents/AI-Workshop/afternoon-session/`
+2. Create a new folder: `Documents/AI-Workshop/phase-2-visual-vc/`
 3. Open it in VS Code: `File > Open Folder`
 
 ## Git Identity Setup
@@ -281,8 +281,8 @@ git config --global user.email
 
 ## FAQ
 
-### "I missed the morning session. Can I still do this?"
-**Yes**, if you have VS Code installed with the required extensions. Review the morning session's hands-on chapter for basic setup, then proceed here.
+### "I missed Phase 1. Can I still do this?"
+**Yes**, if you have VS Code installed with the required extensions. Review the Phase 1 hands-on chapter for basic setup, then proceed here.
 
 ### "Do I need to know how to code?"
 **No.** Mermaid syntax is descriptive text, not programming. Git operations are handled through VS Code's visual interface. Everything is explained from first principles.
@@ -304,4 +304,4 @@ If you meet these prerequisites, you're prepared for an afternoon that will perm
 
 ---
 
-[Proceed to Workshop -->](./00_introduction.md) | [Back to Module Overview](README.md)
+[Proceed to Workshop -->](./00_introduction.md) | [Back to Workshop Overview](README.md)

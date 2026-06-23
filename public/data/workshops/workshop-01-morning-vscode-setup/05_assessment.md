@@ -290,7 +290,7 @@ Upon achieving 80% or higher:
 1. Create templates for your team
 2. Document your workflows
 3. Explore advanced AI integrations
-4. Consider the afternoon session (Version Control)
+4. Continue to Phase 2 (Version Control)
 
 ### If You Scored 80-89%
 
@@ -298,7 +298,7 @@ Upon achieving 80% or higher:
 - Daily use in your work
 - Continued practice
 - Sharing with colleagues
-- The afternoon session
+- Phase 2 (Version Control)
 
 **Recommended Actions:**
 1. Practice weak areas from assessment
@@ -372,4 +372,4 @@ Whether you aced this assessment or identified areas for growth, you've taken a 
 
 Next: [Chapter 6: Resources & Continued Learning](./06_resources.md)
 
-[Back to Project](./04_project.md) | [Back to Module Overview](README.md)
+[Back to Project](./04_project.md) | [Back to Workshop Overview](README.md)

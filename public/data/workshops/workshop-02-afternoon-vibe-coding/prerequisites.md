@@ -1,21 +1,21 @@
-# Prerequisites - Module 08: Vibe Coding Mastery
+# Prerequisites - Phase 3: Vibe Coding Mastery
 
 ## Before You Begin
 
-This afternoon session builds on the morning's foundation. You'll go from having AI tools configured to using them to build real, deployable web pages through conversation. Ensure you meet these requirements for the best experience.
+This session builds on Phase 2's foundation. You'll go from having AI tools configured to using them to build real, deployable web pages through conversation. Ensure you meet these requirements for the best experience.
 
-## Required: Morning Session Completion
+## Required: Phase 2 Completion
 
-### From Workshop 01 (Morning)
+### From Phase 2 (AI API Access)
 
-This module assumes you have completed the morning session and have:
+This phase assumes you have completed Phase 2 and have:
 
 - **VS Code installed and working** with essential extensions
 - **At least one AI assistant configured** — Claude Code CLI (recommended), Cursor AI, Windsurf, or access to Claude.ai / ChatGPT
 - **An active API key** with credit available (free tier is sufficient for all exercises)
 - **Basic comfort** with opening files, using the terminal panel, and invoking AI assistance
 
-If you missed the morning session, see the [Quick Setup](#quick-setup-for-latecomers) section below.
+If you missed Phase 2, see the [Quick Setup](#quick-setup-for-latecomers) section below.
 
 ### What You Do NOT Need
 
@@ -56,7 +56,7 @@ If you missed the morning session, see the [Quick Setup](#quick-setup-for-lateco
 
 ## Software Prerequisites
 
-### Already Installed (from Morning Session)
+### Already Installed (from Phase 2)
 
 - **VS Code** with extensions:
   - Markdown All in One
@@ -150,7 +150,7 @@ Spend five minutes collecting 2-3 websites you admire:
 
 ## Quick Setup for Latecomers
 
-If you're joining without the morning session, here's the minimum setup to participate:
+If you're joining without Phase 2, here's the minimum setup to participate:
 
 ### 5-Minute Express Setup
 
@@ -238,7 +238,7 @@ If that produces an HTML file, you're ready.
 
 ### The Day Before
 
-- [ ] Verify morning session setup still works
+- [ ] Verify Phase 2 setup still works
 - [ ] Test AI assistant responds to prompts
 - [ ] Create a GitHub account (if you don't have one)
 - [ ] Think about what you want to build
@@ -293,4 +293,4 @@ If you can tick most of the boxes on the pre-session checklist, you're ready. Th
 
 ---
 
-[Proceed to Workshop →](./00_introduction.md) | [Back to Module Overview](README.md)
+[Proceed to Workshop →](./00_introduction.md) | [Back to Phase Overview](README.md)

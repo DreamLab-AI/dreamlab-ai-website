@@ -1,13 +1,13 @@
 {
-  "title": "Module 13: Quality Assurance & Automation",
+  "title": "Quality Assurance & Automation",
   "pages": [
     {
       "slug": "README.md",
-      "title": "Module 13: Quality Assurance & Automation"
+      "title": "Quality Assurance & Automation"
     },
     {
       "slug": "00_introduction.md",
-      "title": "Module 13: AI-Powered QA Automation"
+      "title": "AI-Powered QA Automation"
     },
     {
       "slug": "01_concepts.md",

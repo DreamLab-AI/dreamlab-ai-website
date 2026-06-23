@@ -1,15 +1,15 @@
 # 4.b: Intermediate Tasks
 
-These examples involve more complex interactions and demonstrate Codex's problem-solving abilities, including debugging, refactoring, and test generation.
+These examples involve more complex interactions and demonstrate the problem-solving abilities of AI coding agents, including debugging, refactoring, and test generation.
 
 ## Bug Fixing with Stack Traces
 
-Providing a stack trace allows Codex to pinpoint and often fix bugs. The [`detailed_overview.md`](../detailed_overview.md) mentions that Codex has addressed issues in libraries like Astropy, Matplotlib, and Django.
+Providing a stack trace allows AI coding agents to pinpoint and often fix bugs. These tools have demonstrated the ability to address issues in libraries like Astropy, Matplotlib, and Django.
 
-**Walkthrough (Cloud Agent):**
+**Walkthrough (Codex CLI or Claude Code):**
 
 1.  **Scenario:** A Python application (`data_processor.py`) throws an error, producing a stack trace indicating a `TypeError` when trying to concatenate a string with an integer.
-2.  **Connect Repository:** Connect the application's repository to the Codex agent.
+2.  **Open your project:** Navigate to the application's repository in your terminal.
 3.  **Provide Prompt:**
     ```
     My application is crashing in `data_processor.py`. Find and fix the bug based on the following stack trace. Also, add a unit test using the `unittest` module to cover this specific case and prevent regressions.
@@ -20,8 +20,8 @@ Providing a stack trace allows Codex to pinpoint and often fix bugs. The [`detai
         summary = "Record ID: " + record_id + " Value: " + record_value # record_id is int, record_value is str
     TypeError: can only concatenate str (not "int") to str
     ```
-4.  **Codex Action:**
-    *   Analyzes the trace and identifies the problematic line in `data_processor.py`.
+4.  **Agent Action:**
+    *   Analyses the trace and identifies the problematic line in `data_processor.py`.
     *   Proposes a fix, likely by converting `record_id` to a string: `summary = "Record ID: " + str(record_id) + " Value: " + record_value`.
     *   Generates a relevant test case, for example:
         ```python
@@ -45,14 +45,14 @@ Providing a stack trace allows Codex to pinpoint and often fix bugs. The [`detai
         if __name__ == '__main__':
             unittest.main()
         ```
-        *AI Note: The exact test structure depends on how `process_record` is defined and what it returns. Codex would aim to create a functional test.*
+        *AI Note: The exact test structure depends on how `process_record` is defined and what it returns. The agent would aim to create a functional test.*
 5.  **Review and Iterate:** Review the proposed code changes (diff for `data_processor.py` and the new test file/additions). Check the agent's reasoning. If necessary, provide feedback for refinement (e.g., "Ensure the test uses a mock object for external dependencies if `process_record` has them"). Then, approve the PR.
 
 ## Component Refactoring
 
-Codex can assist in modernising code, applying design principles, or converting between coding styles.
+AI coding agents can assist in modernising code, applying design principles, or converting between coding styles.
 
-**Walkthrough (Cloud Agent or CLI - JavaScript Modernisation):**
+**Walkthrough (Codex CLI or Claude Code — JavaScript Modernisation):**
 
 1.  **Provide Legacy JavaScript Function:**
     ```javascript
@@ -74,7 +74,7 @@ Codex can assist in modernising code, applying design principles, or converting 
     ```
     Refactor the `calculatePrice` function in `legacy_utils.js` to modern ES6+ standards. Use `const`/`let`, arrow functions where appropriate, a `for...of` loop for iterating `items`, and ensure robust calculation of the discounted total. Add basic validation for item prices and the discount value.
     ```
-3.  **Codex Provides Refactored Version (Example):**
+3.  **Agent Provides Refactored Version (Example):**
     ```javascript
     // refactored_utils.js
     const calculatePrice = (items, discount) => {
@@ -103,28 +103,28 @@ Codex can assist in modernising code, applying design principles, or converting 
     - How would it handle non-numeric prices if the check wasn't there?
     - Suggest how to make it even more robust, perhaps by returning an error object or throwing an exception for invalid inputs.
     ```
-5.  **Codex Provides Feedback:** Codex would analyze its previous output and provide suggestions, which can then be used for further refinement or a new refactoring request.
+5.  **Agent Provides Feedback:** The agent would analyse its previous output and provide suggestions, which can then be used for further refinement or a new refactoring request.
 
 ## Adding Unit Tests
 
-Codex can generate unit tests for existing code or newly implemented features. This is a powerful way to improve code quality and maintainability.
+AI coding agents can generate unit tests for existing code or newly implemented features. This is a powerful way to improve code quality and maintainability.
 
 **Walkthrough (CLI - Jest Tests for TypeScript Utility):**
 
 1.  **Identify File:** You have a utility file, for example, `src/utils/dateFormatter.ts`, containing several exported functions for date manipulation.
-2.  **Use Codex CLI Recipe/Prompt:**
+2.  **Prompt the agent:**
     ```bash
     codex "Write unit tests using Jest for all exported functions in `src/utils/dateFormatter.ts`. Ensure both success cases (valid inputs) and failure/edge cases (e.g., invalid date strings, null inputs, leap years if relevant) are covered. Mock any external dependencies like `Date.now()` if used, to ensure deterministic tests. Place the tests in `src/utils/__tests__/dateFormatter.test.ts`."
     ```
-    If using the Cloud Agent, you'd connect the repo and provide a similar prompt, asking it to create the test file.
-3.  **Codex Action:**
-    *   Analyzes `src/utils/dateFormatter.ts` to identify exported functions and their signatures.
+    With Claude Code, you would provide a similar prompt within an interactive session, and it would create the test file directly.
+3.  **Agent Action:**
+    *   Analyses `src/utils/dateFormatter.ts` to identify exported functions and their signatures.
     *   Generates a test file (e.g., `src/utils/__tests__/dateFormatter.test.ts`) with Jest `describe` and `it` blocks.
     *   Writes test cases for various scenarios.
-    *   (Cloud Agent): May offer to run these tests within its sandboxed environment and iterate until they pass, especially if guided by `AGENTS.MD` test commands.
-    *   (CLI): You would typically run `npm test` or `yarn test` locally to execute the generated tests and refine them if needed.
+    *   Claude Code or Codex CLI (full-auto) may run these tests within their sandboxed environment and iterate until they pass, especially if guided by `CLAUDE.md` or `AGENTS.MD` test commands.
+    *   Otherwise, you would typically run `npm test` or `yarn test` locally to execute the generated tests and refine them if needed.
 
-These intermediate tasks show how Codex can become a more active partner in the development process, helping not just to write new code but also to improve and validate existing codebases.
+These intermediate tasks show how AI coding agents can become a more active partner in the development process, helping not just to write new code but also to improve and validate existing codebases.
 
 ---
 

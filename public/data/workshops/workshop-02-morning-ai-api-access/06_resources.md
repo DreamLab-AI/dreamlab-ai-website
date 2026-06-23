@@ -582,4 +582,4 @@ Welcome to professional AI access. The models are waiting.
 
 **Workshop Complete!**
 
-[Back to Assessment](./05_assessment.md) | [Back to Module Overview](README.md) | [Proceed to Afternoon Session -->](../workshop-02-afternoon-content-creation/README.md)
+[Back to Assessment](./05_assessment.md) | [Back to Workshop Overview](README.md) | [Proceed to Next Phase -->](../workshop-02-afternoon-content-creation/README.md)

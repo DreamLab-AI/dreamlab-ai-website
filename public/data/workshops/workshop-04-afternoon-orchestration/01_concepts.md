@@ -564,4 +564,4 @@ def trim_context(messages: list, max_messages: int = 20) -> list:
 ## Navigation
 - Previous: [Introduction](00_introduction.md)
 - Next: [Hands-on Practice](02_hands_on.md)
-- [Back to Module Overview](README.md)
+- [Back to Workshop Overview](README.md)

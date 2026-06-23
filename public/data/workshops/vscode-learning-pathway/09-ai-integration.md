@@ -510,7 +510,7 @@ ollama list
 - ✅ Complete privacy (no data leaves your machine)
 - ✅ Works offline
 - ✅ No usage costs
-- ✅ Customizable models
+- ✅ Customisable models
 
 **Requirements:**
 - 16GB+ RAM
@@ -894,8 +894,8 @@ Good: "How should I handle errors in @file PaymentService.ts following the patte
 ## Next Steps
 
 Master AI integration! Next:
-- **Module 12**: Advanced editing with AI
-- **Module 6**: Remote AI workflows
+- **Advanced Editing**: Advanced editing with AI
+- **Remote Development**: Remote AI workflows
 
 ## Additional Resources
 
@@ -910,4 +910,4 @@ Master AI integration! Next:
 
 **Estimated Time**: 4-5 hours
 **Difficulty**: Intermediate to Advanced
-**Prerequisites**: Modules 1-4, coding experience
+**Prerequisites**: Introduction through Settings & Customisation, coding experience

@@ -597,4 +597,4 @@ In the exercises section, you'll:
 ## Navigation
 - Previous: [Testing Concepts](01_concepts.md)
 - Next: [Exercises](03_exercises.md)
-- [Back to Module Overview](README.md)
+- [Back to Workshop Overview](README.md)

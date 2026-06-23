@@ -1,4 +1,4 @@
-# Prerequisites — Module 09: Local AI Models
+# Prerequisites — Phase 5: Local AI & RAG Systems
 
 ## Before You Begin
 
@@ -16,7 +16,7 @@ This workshop puts real AI models on your own machine. The hardware and software
   - Can type a command and press Enter
   - Can copy and paste commands from instructions
   - Knows how to navigate to a folder (`cd`)
-  - If you completed Module 05 (VS Code Setup), you have more than enough
+  - If you completed the VS Code Setup workshop, you have more than enough
 
 - **No AI or machine-learning experience required**
   - We explain every concept from first principles
@@ -25,7 +25,7 @@ This workshop puts real AI models on your own machine. The hardware and software
 
 ### Helpful (But Not Required)
 - Basic Python knowledge (variables, functions, running a script)
-- Experience with VS Code from earlier workshop modules
+- Experience with VS Code from earlier workshops
 - Familiarity with JSON format
 - Understanding of what an API is
 
@@ -93,7 +93,7 @@ python3 --version
 - We use Python for API integration exercises
 
 **2. A text editor or IDE**
-- VS Code is recommended (especially if you completed Module 05)
+- VS Code is recommended (especially if you completed the VS Code Setup workshop)
 - Any editor that can open `.py` and `.md` files will do
 
 **3. A terminal / command prompt**
@@ -277,4 +277,4 @@ Absolutely. Everything stays on your machine. You can keep using Ollama and your
 
 ---
 
-[Proceed to Workshop →](./00_introduction.md) | [Back to Module Overview](README.md)
+[Proceed to Workshop →](./00_introduction.md) | [Back to Workshop Overview](README.md)

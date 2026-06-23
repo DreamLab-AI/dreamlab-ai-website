@@ -324,7 +324,7 @@ Solution:
 | Activity | Approximate Cost |
 |----------|-----------------|
 | Building a single-page site (30 min session) | $0.50-2.00 |
-| Full workshop afternoon (3 hours) | $2.00-5.00 |
+| Full workshop session (3 hours) | $2.00-5.00 |
 | Complex multi-page project (2-3 hours) | $3.00-8.00 |
 | Quick refinement session (10 minutes) | $0.10-0.50 |
 
@@ -451,4 +451,4 @@ The web is now your canvas. Go create something.
 
 **Workshop Complete!**
 
-[Back to Assessment](./05_assessment.md) | [Back to Module Overview](README.md) | [Return to Workshop Index](../workshop-02-morning-ai-api-access/README.md)
+[Back to Assessment](./05_assessment.md) | [Back to Phase Overview](README.md) | [Return to Phase 2](../workshop-02-morning-ai-api-access/README.md)

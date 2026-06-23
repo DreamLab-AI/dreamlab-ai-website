@@ -294,11 +294,11 @@ Upon achieving a passing score (24/30), you have demonstrated:
 - Knowledge of evaluation and quality assurance techniques
 - Readiness to apply RAG systems to real-world problems
 
-**Congratulations on completing the RAG System Implementation module!**
+**Congratulations on completing the RAG System Implementation workshop!**
 
 ---
 
 ## Navigation
 - Previous: [Project Work](04_project.md)
 - Next: [Resources](06_resources.md)
-- [Back to Module Overview](README.md)
+- [Back to Workshop Overview](README.md)

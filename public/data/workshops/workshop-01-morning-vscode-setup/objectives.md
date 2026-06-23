@@ -290,7 +290,7 @@ By the end of this workshop, you will be able to:
 
 - [ ] Join VS Code community
 - [ ] Explore advanced features
-- [ ] Attend afternoon session (Version Control)
+- [ ] Continue to Phase 2 (Version Control)
 - [ ] Build professional template library
 - [ ] Share knowledge with colleagues
 
@@ -341,5 +341,5 @@ These objectives represent a transformation in how you work. By the end of today
 
 ---
 
-[Begin Workshop →](./00_introduction.md) | [Check Prerequisites](./prerequisites.md) | [Back to Overview](README.md)
+[Begin Workshop →](./00_introduction.md) | [Check Prerequisites](./prerequisites.md) | [Back to Workshop Overview](README.md)
 

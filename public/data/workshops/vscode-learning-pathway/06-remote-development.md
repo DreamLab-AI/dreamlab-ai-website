@@ -732,8 +732,8 @@ Host *
 
 ## Next Steps
 
-- **Module 7**: Debugging in remote environments
-- **Module 8**: Task automation for remote workflows
+- **Debugging**: Debugging in remote environments
+- **Task Automation**: Automation for remote workflows
 
 ## Additional Resources
 
@@ -745,4 +745,4 @@ Host *
 
 **Estimated Time**: 4-5 hours
 **Difficulty**: Intermediate to Advanced
-**Prerequisites**: Modules 1-5, Docker/SSH knowledge helpful
+**Prerequisites**: Introduction through Git Integration, Docker/SSH knowledge helpful

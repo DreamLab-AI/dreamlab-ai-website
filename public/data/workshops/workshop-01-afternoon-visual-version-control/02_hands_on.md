@@ -870,4 +870,4 @@ git push --all
 
 **Next**: [Chapter 3: Practical Exercises](./03_exercises.md)
 
-[Back to Concepts](./01_concepts.md) | [Back to Module Overview](README.md)
+[Back to Concepts](./01_concepts.md) | [Back to Workshop Overview](README.md)

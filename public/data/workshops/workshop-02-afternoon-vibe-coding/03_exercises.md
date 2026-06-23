@@ -375,4 +375,4 @@ You've practised the core vibe coding patterns through structured exercises. In 
 
 Next: [Chapter 4: Capstone Project — Your Live Creation](./04_project.md)
 
-[Back to Hands-On](./02_hands_on.md) | [Back to Module Overview](README.md)
+[Back to Hands-On](./02_hands_on.md) | [Back to Phase Overview](README.md)

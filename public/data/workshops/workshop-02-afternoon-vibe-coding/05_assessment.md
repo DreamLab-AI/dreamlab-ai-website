@@ -400,4 +400,4 @@ Whether you achieved a perfect score or identified areas for growth, you've cros
 
 Next: [Chapter 6: Resources — Continue Creating](./06_resources.md)
 
-[Back to Project](./04_project.md) | [Back to Module Overview](README.md)
+[Back to Project](./04_project.md) | [Back to Phase Overview](README.md)

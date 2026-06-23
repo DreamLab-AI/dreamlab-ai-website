@@ -1,16 +1,16 @@
-# Module 07: Direct AI API Access
+# Phase 3: Direct AI API Access
 
 ## Unlock the Full Power of AI Models — Directly
 
-Welcome to the morning session of Day 2. In the next 3 hours, you'll move beyond consumer AI interfaces and connect directly to the world's most capable AI models. You'll compare providers, understand costs, and build a multi-model command centre that saves you money while delivering superior results.
+Welcome to Phase 3 (AI APIs & Vibe Coding). In the next 3 hours, you'll move beyond consumer AI interfaces and connect directly to the world's most capable AI models. You'll compare providers, understand costs, and build a multi-model command centre that saves you money while delivering superior results.
 
-## Module Overview
+## Workshop Overview
 
-This session transforms you from an AI subscription consumer into a professional who commands multiple AI models through their APIs. You'll set up accounts with Anthropic (Claude), OpenAI (GPT), and Google (Gemini), test each model head-to-head, and learn the token economics that make direct API access 10x cheaper than monthly subscriptions.
+This phase transforms you from an AI subscription consumer into a professional who commands multiple AI models through their APIs. You'll set up accounts with Anthropic (Claude), OpenAI (GPT), and Google (Gemini), test each model head-to-head, and learn the token economics that make direct API access 10x cheaper than monthly subscriptions.
 
 ## Learning Outcomes
 
-By completing this module, you will:
+By completing this phase, you will:
 
 ### Core Capabilities
 - ✅ Connect to AI APIs from Anthropic, OpenAI, and Google
@@ -32,7 +32,7 @@ By completing this module, you will:
 - 🎯 Make informed decisions about which model to use and when
 - 🚀 Professional-grade AI setup ready for daily use
 
-## Module Structure
+## Workshop Structure
 
 ### Chapter Navigation
 
@@ -75,7 +75,7 @@ By completing this module, you will:
    - Python and curl reference for all three providers
    - Cost calculators, community links, and advanced techniques
 
-## Who This Module Is For
+## Who This Workshop Is For
 
 ### Perfect For:
 - 📚 **Researchers**: Who need to process large documents and generate analyses
@@ -85,7 +85,7 @@ By completing this module, you will:
 - 🚀 **Anyone**: Who pays for ChatGPT, Claude Pro, or Gemini Advanced subscriptions
 
 ### You'll Succeed If You:
-- Completed Module 05 (VS Code setup) or have VS Code running
+- Completed the Phase 1 workshop (VS Code setup) or have VS Code running
 - Can create online accounts and enter payment details
 - Want to reduce AI costs dramatically
 - Are curious about comparing different AI models
@@ -99,7 +99,7 @@ By completing this module, you will:
 ## Technical Requirements
 
 ### Minimum Requirements:
-- **VS Code**: Installed and running (from Module 05)
+- **VS Code**: Installed and running (from Phase 1)
 - **Internet**: Stable connection for API calls
 - **Browser**: For creating provider accounts
 - **Email**: For verification codes
@@ -120,8 +120,8 @@ By completing this module, you will:
 - **Immediate Payoff**: Leave with a working multi-model setup you'll use tomorrow
 - **Non-Developer Friendly**: Every step explained; no prior coding knowledge needed
 
-### Module Timing:
-- **Total Duration**: 3 hours (morning session)
+### Workshop Timing:
+- **Total Duration**: 3 hours
 - **Format**: Self-paced with suggested timings
 - **Breaks**: Take as needed between chapters
 - **Practice**: 70% hands-on, 30% concepts
@@ -168,11 +168,11 @@ Or jump directly to:
 
 - **Questions?** Use the workshop Discord channel
 - **Stuck on setup?** Check the troubleshooting section in Chapter 2
-- **Share results**: Post your model comparisons in #module-07-wins
+- **Share results**: Post your model comparisons in the workshop channel
 - **Stay connected**: Join our alumni network for ongoing tips
 
 ---
 
 *After this morning, you'll never overpay for AI access again. Let's connect you directly to the most powerful models on the planet.*
 
-**[Start Module 07: Introduction -->](00_introduction.md)**
+**[Start Phase 3: Introduction -->](00_introduction.md)**

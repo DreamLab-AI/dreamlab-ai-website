@@ -285,4 +285,4 @@ Remember: You're not learning to code—you're learning to command the most powe
 
 Next: [Chapter 2: Hands-On Setup - Building Your Command Centre](./02_hands_on.md)
 
-[Back to Introduction](./00_introduction.md) | [Back to Module Overview](README.md)
+[Back to Introduction](./00_introduction.md) | [Back to Workshop Overview](README.md)

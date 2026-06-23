@@ -3,7 +3,7 @@
 ## Learning Objectives
 
 - Master VS Code's built-in Git interface
-- Use GitLens for advanced Git visualization
+- Use GitLens for advanced Git visualisation
 - Handle merge conflicts visually
 - Implement Git workflows without touching the terminal
 - Understand staging, committing, and branching in VS Code
@@ -714,8 +714,8 @@ With GitLens installed:
 ## Next Steps
 
 Master Git in VS Code, ready for:
-- **Module 6**: Remote development with Git
-- **Module 8**: Task automation with Git hooks
+- **Remote Development**: Remote workflows with Git
+- **Task Automation**: Build systems and Git hooks
 
 ## Additional Resources
 

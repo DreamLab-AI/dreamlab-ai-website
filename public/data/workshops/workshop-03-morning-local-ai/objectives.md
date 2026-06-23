@@ -1,4 +1,4 @@
-# Learning Objectives — Module 09: Local AI Models
+# Learning Objectives — Phase 5: Local AI & RAG Systems
 
 ## Workshop Overview
 
@@ -258,4 +258,4 @@ These objectives represent a fundamental shift in how you interact with AI — f
 
 ---
 
-[Begin Workshop →](./00_introduction.md) | [Check Prerequisites](./prerequisites.md) | [Back to Overview](README.md)
+[Begin Workshop →](./00_introduction.md) | [Check Prerequisites](./prerequisites.md) | [Back to Workshop Overview](README.md)

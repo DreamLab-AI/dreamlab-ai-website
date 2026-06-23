@@ -4,9 +4,9 @@
 
 ## Welcome to Modern Development Infrastructure
 
-Welcome to the cutting edge of creative technology! This comprehensive workshop equips you with a world-class development toolchain that combines traditional version control, modern code editors, and revolutionary AI-powered development tools.
+Welcome! This workshop equips you with a modern development toolchain that combines version control, a powerful code editor, and AI-powered development tools.
 
-In 2025, the landscape of software development has been transformed by AI assistants like **Claude Code**, **GitHub Copilot**, **Cursor**, and **Windsurf**. However, these powerful tools are only as effective as the foundation they're built upon. This workshop establishes that foundation.
+In 2026, the landscape of software development has been transformed by AI assistants like **Claude Code**, **GitHub Copilot**, **Cursor**, and **Windsurf**. However, these powerful tools are only as effective as the foundation they are built upon. This workshop establishes that foundation.
 
 ```mermaid
 graph TD
@@ -31,15 +31,15 @@ By completing this workshop, you'll establish:
 - **Robust Version Control**: Track every change, experiment fearlessly, and collaborate effectively
 - **Seamless Collaboration**: Work with teams using industry-standard workflows
 - **Free Web Hosting**: Showcase projects via GitHub Pages with custom domains
-- **AI-Powered Development**: Leverage cutting-edge AI to generate, explain, and refactor code
+- **AI-Powered Development**: Use AI assistants to generate, explain, and refactor code
 - **Context Management**: Master advanced techniques for working with AI assistants
 - **Professional Presence**: Build a portfolio that demonstrates modern development practices
 
-## The 2025 AI Development Landscape
+## The 2026 AI Development Landscape
 
 ```mermaid
 mindmap
-  root((AI Development<br/>Ecosystem 2025))
+  root((AI Development<br/>Ecosystem 2026))
     Code Assistants
       Claude Code
         Agentic workflows
@@ -127,7 +127,7 @@ mindmap
 
 Modern options include:
 
-| Tool | Best For | Pricing Model | Key Features 2025 |
+| Tool | Best For | Pricing Model | Key Features 2026 |
 |------|----------|---------------|--------------|
 | **Claude Code** | Agentic workflows, complex refactoring | Usage-based (Anthropic) | 200k context, MCP servers, autonomous agents |
 | **GitHub Copilot** | Real-time suggestions, GitHub integration | $10/month or free for students | Copilot Chat, Workspace, inline suggestions |
@@ -168,7 +168,7 @@ Large binary files in Git       →  Use Git LFS or external storage
 Unlike basic Git tutorials, this workshop focuses on:
 
 1. **Modern AI Integration**: Learn to work effectively with Claude Code, Copilot, and other AI assistants
-2. **Real-World Workflows**: Industry-standard practices used by professional teams in 2025
+2. **Real-World Workflows**: Industry-standard practices used by professional teams in 2026
 3. **Context Management**: Advanced techniques for maximizing AI assistant effectiveness
 4. **Professional Practices**: Conventional commits, semantic versioning, automated testing
 5. **Cloud-First Mindset**: Deploy from day one using GitHub Pages and Actions
@@ -214,9 +214,9 @@ Most of what you'll use is **completely free**:
 
 Optional paid tools offer enhanced features but aren't required.
 
-## Looking Ahead: The Future of Development in 2025
+## Looking Ahead: The Future of Development in 2026
 
-As we progress through 2025, several trends are reshaping development:
+As we progress through 2026, several trends are reshaping development:
 
 **🤖 Agentic AI**: Tools like Claude Code that can autonomously complete complex tasks with MCP servers
 
@@ -246,7 +246,7 @@ The journey ahead is challenging but rewarding. Let's build something amazing to
 
 Before moving forward, ensure you understand:
 1. What is the "Modern Development Trinity"?
-2. Name three AI coding assistants available in 2025
+2. Name three AI coding assistants available in 2026
 3. What's the difference between Git and GitHub?
 4. Why is version control important when working with AI?
 

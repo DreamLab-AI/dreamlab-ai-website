@@ -5,7 +5,7 @@
 - Create and manage VS Code profiles for different workflows
 - Sync settings, extensions, and keybindings across devices
 - Share profiles with teams
-- Optimize profile performance
+- Optimise profile performance
 - Troubleshoot sync issues
 
 ## What are Profiles?
@@ -258,7 +258,7 @@ Ctrl+Shift+P:
 
 ### Profile Icons
 
-**Customize profile appearance:**
+**Customise profile appearance:**
 ```
 1. Click profile name
 2. "Edit Icon"

@@ -98,7 +98,7 @@ Docker was released in 2013 and quickly became the industry standard for contain
 
 The AI community has embraced Docker enthusiastically. Most major AI tools provide official Docker images:
 
-- **Ollama** -- local LLM runner (we use this in Workshop 03)
+- **Ollama** -- local LLM runner (we use this in the Phase 3 Local AI workshop)
 - **Open WebUI** -- chat interface for local models
 - **Hugging Face Text Generation Inference** -- production-grade model serving
 - **ChromaDB, Qdrant, Weaviate** -- vector databases for RAG systems

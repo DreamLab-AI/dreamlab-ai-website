@@ -239,4 +239,4 @@ Implement a working orchestrator that:
 ## Navigation
 - Previous: [Final Project](04_project.md)
 - Next: [Resources](06_resources.md)
-- [Back to Module Overview](README.md)
+- [Back to Workshop Overview](README.md)

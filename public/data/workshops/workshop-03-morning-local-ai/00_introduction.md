@@ -313,7 +313,7 @@ By mastering local AI today, you're preparing for a future where intelligence is
 
 ## Navigation
 - Next: [Core Concepts](01_concepts.md)
-- [Back to Module Overview](README.md)
+- [Back to Workshop Overview](README.md)
 
 ## Quick Links
 - [Ollama Installation Guide](02_hands_on.md#installing-ollama)

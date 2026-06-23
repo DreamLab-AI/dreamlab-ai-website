@@ -17,7 +17,7 @@ This session moves quickly from concepts to working code. Arriving with your env
 - Experience with the command line or terminal (we provide exact commands to copy)
 - Familiarity with JSON format (tool schemas use JSON)
 - Previous exposure to VS Code or any code editor
-- Completion of earlier workshop days (Days 1-3 cover foundational AI skills)
+- Completion of earlier workshop phases (Phases 1-5 cover foundational AI skills)
 
 ### Not Required
 
@@ -286,4 +286,4 @@ Once your setup is verified, you are ready to begin. The session starts with the
 
 ---
 
-[Proceed to Workshop -->](00_introduction.md) | [View Objectives](objectives.md) | [Back to Module Overview](README.md)
+[Proceed to Workshop -->](00_introduction.md) | [View Objectives](objectives.md) | [Back to Workshop Overview](README.md)

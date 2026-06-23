@@ -312,7 +312,7 @@ Highlights TODO, FIXME, etc. comments in sidebar tree.
 ```bash
 code --install-extension aaron-bond.better-comments
 ```
-Color-codes comments by type:
+Colour-codes comments by type:
 ```javascript
 // ! Critical issue
 // ? Question or uncertainty
@@ -373,7 +373,7 @@ code --install-extension ms-vscode-remote.remote-containers
 code --install-extension ms-vscode-remote.remote-wsl
 ```
 
-More in Module 6!
+More in the Remote Development workshop!
 
 ## Hands-On Exercises
 
@@ -651,7 +651,7 @@ code --install-extension GitHub.copilot
 ```
 1. Check extension count: Extensions sidebar
 2. Goal: < 20 extensions for most workflows
-3. Use profiles for different project types (Module 10)
+3. Use profiles for different project types (see Profiles & Sync)
 ```
 
 ### Pitfall 2: Conflicting Formatters
@@ -771,9 +771,9 @@ When teammates open the project, VS Code prompts them to install recommended ext
 ## Next Steps
 
 You now have extension mastery! Next:
-- **Module 4**: Settings and customization
-- **Module 6**: Remote development extensions deep dive
-- **Module 9**: Advanced AI integration
+- **Settings & Customisation**: Configure VS Code your way
+- **Remote Development**: Extensions deep dive
+- **AI Integration**: Advanced AI-powered workflows
 
 ## Additional Resources
 
@@ -791,4 +791,4 @@ You now have extension mastery! Next:
 
 **Estimated Time to Complete**: 3-4 hours
 **Difficulty**: Intermediate
-**Prerequisites**: Module 1, Module 2
+**Prerequisites**: Introduction, Keyboard Shortcuts

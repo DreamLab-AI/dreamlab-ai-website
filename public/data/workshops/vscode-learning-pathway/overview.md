@@ -5,7 +5,7 @@
 
 VS Code has evolved from a simple code editor into the **universal platform for modern development**. In 2026, mastering VS Code means wielding the most powerful AI coding assistants, remote development capabilities, and automation tools available. This comprehensive learning pathway takes you from VS Code basics to advanced AI-powered workflows that 10x your productivity.
 
-Whether you're a beginner learning your first code editor, an experienced developer optimizing your workflow, or a technical professional integrating AI into your development process—this pathway provides structured, hands-on learning with real-world applications.
+Whether you're a beginner learning your first code editor, an experienced developer optimising your workflow, or a technical professional integrating AI into your development process—this pathway provides structured, hands-on learning with real-world applications.
 
 **The modern developer's advantage: VS Code + AI assistants + remote development + automation = unstoppable productivity.**
 
@@ -48,120 +48,124 @@ graph TD
 
 ## 1. Programme Map at a Glance
 
-| Day   | Theme                           | Morning (3 h)                                   | Afternoon (3 h)                                        | Your Achievement                               |
-| ----- | ------------------------------- | ----------------------------------------------- | ------------------------------------------------------ | -------------------------------------------------- |
-| **1** | *Universal AI Workspace*           | VS Code as your AI command center + containers for consistency                | Version control + Mermaid for project planning (Gantt charts, flowcharts)                  | Professional workspace with visual project documentation |
-| **2** | *AI as Creative Partner* | Connect OpenAI, Gemini, Claude directly to your workspace | Master "vibe coding" - describe what you want, AI creates it           | Live website + automated content system |
-| **3** | *Your Private AI Brain*            | Run AI models on YOUR computer - total privacy                   | Build a RAG system that remembers everything (PDFs, docs, notes)          | Personal AI that knows your entire knowledge base       |
-| **4** | *AI Teams That Work For You*  | Deploy specialized agents: research, writing, analysis, coding       | Cost control + safety measures | AI team that handles complex multi-step tasks |
-| **5** | *Professional Publishing*        | Automate quality checks and deployment | LaTeX academic papers, business reports, interactive websites          | Complete portfolio: papers, sites, documentation   |
+| Phase | Theme                           | Focus                                   | Your Achievement                               |
+| ----- | ------------------------------- | ----------------------------------------------- | -------------------------------------------------- |
+| **1** | *Foundations*           | VS Code as your AI command centre + containers for consistency                | Professional workspace with visual project documentation |
+| **2** | *Version Control & Visual Thinking* | Git, Mermaid for project planning (Gantt charts, flowcharts)                  | Version-controlled projects with visual documentation |
+| **3** | *AI as Creative Partner* | Connect OpenAI, Gemini, Claude + master "vibe coding"           | Live website + automated content system |
+| **4** | *Claude Code*  | Deep-dive agentic coding with Claude Code       | Multi-file AI-driven development workflow |
+| **5** | *Your Private AI Brain*            | Run local AI models + build a RAG system for your documents          | Personal AI that knows your entire knowledge base       |
+| **6** | *Docker & Dev Containers*  | Containerised development environments       | Reproducible, portable workspaces |
+| **7** | *AI Teams That Work For You*  | Deploy specialised agents + cost control & safety measures | AI team that handles complex multi-step tasks |
+| **8** | *Codex & Ecosystem*  | OpenAI Codex CLI + broader AI tool ecosystem       | Vendor-agnostic AI toolkit |
+| **9** | *Professional Publishing*        | Automate quality checks, LaTeX papers, business reports, interactive websites          | Complete portfolio: papers, sites, documentation   |
 
 ---
 
 ## 2. Detailed Programme Overview: Transform How You Work with AI
 
-This isn't another "prompt engineering" course. Over five transformative days, you'll gain powers that most people don't know exist: direct API access to AI models, granular control over outputs, the ability to process entire document libraries, and AI agents that work while you sleep. Each day builds on the last, taking you from AI consumer to AI conductor.
+This isn't another "prompt engineering" course. Over nine progressive phases, you'll gain powers that most people don't know exist: direct API access to AI models, granular control over outputs, the ability to process entire document libraries, and AI agents that work while you sleep. Each phase builds on the last, taking you from AI consumer to AI conductor.
 
-### Day 1 – Your Universal AI Workspace
+### Phases 1 & 2 – Your Universal AI Workspace
 
-**The Revelation:** VS Code isn't "coding software"—it's the most powerful document creation and automation platform ever built. Today you'll set up a workspace that gives you superpowers whether you're writing grants, creating business plans, or building systems.
+**The Revelation:** VS Code isn't "coding software"—it's the most powerful document creation and automation platform ever built. You'll set up a workspace that gives you superpowers whether you're writing grants, creating business plans, or building systems.
 
-**Morning – VS Code for Everyone (3 hours)**
+**Phase 1 – Foundations: VS Code for Everyone**
 
-* Transform VS Code into your personal AI command center
+* Transform VS Code into your personal AI command centre
 * Install game-changing extensions that work for ANY profession
 * Set up "containers"—think of them as perfect, portable workspaces that never break
 * Learn the interface through practical examples: writing a report, creating a presentation, planning a project
 
-**Afternoon – Visual Thinking & Version Control (3 hours)**
+**Phase 2 – Visual Thinking & Version Control**
 
 * Master Mermaid diagrams: create Gantt charts for project management, flowcharts for processes, mind maps for brainstorming
 * Version control isn't just for code—track changes in business documents, academic papers, creative projects
 * Build your first "repository"—a smart folder that remembers every version of every document forever
 
-**Your Day 1 Win:** A professional workspace with a visual project plan (Gantt chart) for your own real project, all version-controlled and backed up.
+**Your Phases 1 & 2 Win:** A professional workspace with a visual project plan (Gantt chart) for your own real project, all version-controlled and backed up.
 
 ---
 
-### Day 2 – AI as Your Creative Partner
+### Phase 3 – AI as Your Creative Partner
 
 **The Breakthrough:** Stop copying and pasting from ChatGPT. Connect AI directly to your workspace and watch it create entire websites, documents, and systems through natural conversation.
 
-**Morning – Direct AI Access (3 hours)**
+**Direct AI Access**
 
 * Connect the world's best AI models (OpenAI, Google, Anthropic) directly to VS Code
 * Compare their strengths: Claude for writing, GPT-4 for analysis, Gemini for research
 * Real examples: Generate a business plan, create an academic abstract, design a website
 * See your actual API costs (spoiler: it's 10x cheaper than subscriptions)
 
-**Afternoon – "Vibe Coding" Magic (3 hours)**
+**"Vibe Coding" Magic**
 
 * Master the art of "vibe coding"—describe what you want in plain language, AI builds it
 * Create a complete website by chatting with AI (no coding knowledge required!)
-* Build interactive presentations, data visualizations, and documents
+* Build interactive presentations, data visualisations, and documents
 * Deploy your creations live on the internet in minutes
 
-**Your Day 2 Win:** A professional website created entirely through conversation with AI, live on the internet, that you can show clients/colleagues immediately.
+**Your Phase 3 Win:** A professional website created entirely through conversation with AI, live on the internet, that you can show clients/colleagues immediately.
 
 ---
 
-### Day 3 – Your Private AI Brain (No Internet Required!)
+### Phase 5 – Your Private AI Brain (No Internet Required!)
 
 **The Game-Changer:** What if AI could read your entire document library, remember everything, and answer questions using YOUR knowledge? What if it worked completely offline, keeping your sensitive data private?
 
-**Morning – AI on YOUR Computer (3 hours)**
+**AI on YOUR Computer**
 
 * Install AI models that run on your laptop—no internet, no subscriptions, total privacy
 * Perfect for: confidential business documents, proprietary research, sensitive client data
 * Compare local models: which ones excel at writing, analysis, coding, creativity
 * Run multiple models simultaneously—like having a team of specialists
 
-**Afternoon – Build Your Second Brain (3 hours)**
+**Build Your Second Brain**
 
 * Create a RAG (Retrieval-Augmented Generation) system—your personal AI librarian
 * Feed it your documents: PDFs, Word files, spreadsheets, presentations, research papers
 * Ask questions, get answers with exact citations from your own documents
 * Use cases: "What did we decide in the March board meeting?", "Find all mentions of Project X across all proposals"
 
-**Your Day 3 Win:** An AI system that knows everything you've ever written, works offline, and keeps your data 100% private.
+**Your Phase 5 Win:** An AI system that knows everything you've ever written, works offline, and keeps your data 100% private.
 
 ---
 
-### Day 4 – AI Teams That Work While You Sleep
+### Phase 7 – AI Teams That Work While You Sleep
 
-**The Revolution:** Why do everything yourself? Deploy specialized AI agents that research, write, analyze, and create—autonomously. Like hiring a team of tireless experts.
+**The Revolution:** Why do everything yourself? Deploy specialised AI agents that research, write, analyse, and create—autonomously. Like hiring a team of tireless experts.
 
-**Morning – Meet Your AI Workforce (3 hours)**
+**Meet Your AI Workforce**
 
 * **Deep Research Agent**: Autonomously researches topics, fact-checks, and creates comprehensive reports
 * **Document Creator**: Generates complete documents following your templates and style guides
-* **Analysis Expert**: Processes data, creates visualizations, identifies patterns
+* **Analysis Expert**: Processes data, creates visualisations, identifies patterns
 * **Task Automator**: Handles repetitive workflows, updates documents, manages projects
 * Real examples: Literature review for academics, market research for business, content creation for marketing
 
-**Afternoon – Orchestrating Your AI Team (3 hours)**
+**Orchestrating Your AI Team**
 
 * Make agents work together: Researcher → Writer → Editor → Publisher
 * Safety first: Set spending limits, approval workflows, quality checks
 * Cost management: Most tasks cost pennies, not pounds
 * Real scenario: Agents collaborate to create a complete grant proposal or business report
 
-**Your Day 4 Win:** A team of AI agents that can research a topic, write a report, create visuals, and format everything—while you focus on strategy.
+**Your Phase 7 Win:** A team of AI agents that can research a topic, write a report, create visuals, and format everything—while you focus on strategy.
 
 ---
 
-### Day 5 – Professional Output & Automation
+### Phase 9 – Professional Output & Automation
 
 **The Culmination:** Transform your AI experiments into polished, professional deliverables that run on autopilot. Academic papers, business websites, client reports—all generated and maintained by AI.
 
-**Morning – Quality Assurance & Automation (3 hours)**
+**Quality Assurance & Automation**
 
 * Set up automated quality checks: spelling, grammar, fact-checking, formatting
 * Create workflows that run automatically: "Every Monday, generate the weekly report"
 * Build safety nets: review processes, approval gates, version control
 * Connect everything: Your RAG brain → AI agents → Quality checks → Publishing
 
-**Afternoon – Professional Publishing Suite (3 hours)**
+**Professional Publishing Suite**
 
 * **For Academics**: Generate LaTeX papers with proper citations, formatted for journals
 * **For Business**: Create interactive reports with live data, charts, and executive summaries
@@ -169,7 +173,7 @@ This isn't another "prompt engineering" course. Over five transformative days, y
 * **For Everyone**: Mermaid diagrams for processes, GitHub Pages for web presence
 * Launch your complete system: Knowledge base + AI agents + Professional outputs
 
-**Your Day 5 Win:** A complete AI-powered workflow that produces professional documents, websites, and reports—all connected and automated.
+**Your Phase 9 Win:** A complete AI-powered workflow that produces professional documents, websites, and reports—all connected and automated.
 
 ---
 
@@ -181,7 +185,7 @@ The gap between AI "users" and AI "masters" is widening rapidly. While most peop
 
 1. **The Professional AI Divide**: Consumer AI tools (ChatGPT, Claude.ai) are designed for casual users. Professional-grade control requires direct API access—exactly what VS Code provides. Those with this access operate at 10x the speed and quality.
 
-2. **The Privacy Imperative**: Uploading sensitive documents to web services is increasingly risky. Local AI models eliminate this risk while providing comparable quality. Every organization needs someone who can deploy private AI.
+2. **The Privacy Imperative**: Uploading sensitive documents to web services is increasingly risky. Local AI models eliminate this risk while providing comparable quality. Every organisation needs someone who can deploy private AI.
 
 3. **The Vibe Coding Revolution**: Traditional barriers between "technical" and "creative" work have crumbled. Describe what you want, and AI builds it. This workshop teaches you to conduct the orchestra, not play every instrument.
 
@@ -212,8 +216,8 @@ The gap between AI "users" and AI "masters" is widening rapidly. While most peop
 
 * **Learn by Doing:** Every concept is immediately applied to YOUR real projects—not toy examples
 * **Multiple Perspectives:** Work alongside people from different industries—academics learn from business leaders, developers from consultants
-* **Incremental Mastery:** Each day builds on the last—by day 5, you're orchestrating complex systems
-* **Safety First:** Learn cost control and privacy protection from day one—no surprise bills or data leaks
+* **Incremental Mastery:** Each phase builds on the last—by Phase 9, you're orchestrating complex systems
+* **Safety First:** Learn cost control and privacy protection from Phase 1—no surprise bills or data leaks
 * **Lifetime Skills:** Not just tools, but principles that apply as AI evolves
 
 The result is transformation: from someone who uses AI to someone who commands it.
@@ -226,7 +230,7 @@ The result is transformation: from someone who uses AI to someone who commands i
 ### Core Competencies You'll Master
 
 **Universal Skills (For Everyone)**
-- Transform VS Code into your personal AI command center
+- Transform VS Code into your personal AI command centre
 - Direct API access to multiple AI models—no more copy-paste limitations
 - "Vibe coding"—describe what you want, AI creates it
 - Version control for any document type—never lose work again
@@ -239,7 +243,7 @@ The result is transformation: from someone who uses AI to someone who commands i
 - LaTeX document generation with proper citations
 - Literature review automation with source tracking
 - Grant proposal templates with AI assistance
-- Research data analysis and visualization
+- Research data analysis and visualisation
 - Collaborative paper writing with version control
 
 **For Business Leaders:**
@@ -270,7 +274,7 @@ The result is transformation: from someone who uses AI to someone who commands i
 ### Unique Value Proposition
 
 **1. Vendor-Agnostic Architecture**
-Learn to seamlessly switch between cloud providers and local deployments, avoiding vendor lock-in while optimizing for cost and performance.
+Learn to seamlessly switch between cloud providers and local deployments, avoiding vendor lock-in while optimising for cost and performance.
 
 **2. Protocol-First Design**
 Early adoption of Model Context Protocol (MCP) ensures your skills remain relevant as the AI tooling landscape evolves.
@@ -288,7 +292,7 @@ Leave with a complete portfolio demonstrating advanced AI integration skills, re
 
 ### Course Benefits
 
-- **Small Cohort Size**: Maximum 10 participants ensures personalized attention
+- **Small Cohort Size**: Maximum 10 participants ensures personalised attention
 - **Expert Instructors**: Industry practitioners with production AI deployment experience
 - **Lifetime Access**: Course materials, Discord community, and quarterly alumni workshops
 - **Cloud Credits Included**: $200 in API credits across major providers
@@ -336,7 +340,7 @@ Leave with a complete portfolio demonstrating advanced AI integration skills, re
 **Pre-Course Support**: We provide step-by-step setup videos and offer 1-on-1 tech check sessions. No one gets left behind.
 
 ### Schedule & Format
-- **Duration**: 5 consecutive days
+- **Duration**: 9 phases delivered over 5 consecutive days
 - **Hours**: 09:30 - 16:30 BST
 - **Format**: Hybrid (Manchester studio or remote via Google Meet)
 - **Structure**: 3-hour morning session + 3-hour afternoon session
@@ -358,9 +362,9 @@ Leave with a complete portfolio demonstrating advanced AI integration skills, re
 
 **Context**: This investment equals less than 3 days of typical consulting rates, yet provides skills that will transform your entire approach to development. The included £200 in cloud credits alone covers initial project costs.
 
-- **Team Discount**: 15% off for 3+ participants from same organization
+- **Team Discount**: 15% off for 3+ participants from same organisation
 - **Payment Plans**: 3-month interest-free option available
-- **Satisfaction Guarantee**: Full refund if not satisfied after Day 1
+- **Satisfaction Guarantee**: Full refund if not satisfied after Phase 1
 
 ### Next Cohorts
 
@@ -409,8 +413,8 @@ A: Four key differences: (1) Structured progression designed for non-programmers
 **Q: What ongoing support is available?**
 A: Lifetime access to our Discord community, quarterly alumni workshops, and a 30-minute 1-on-1 mentorship session within 3 months of completion.
 
-**Q: Can my company customize this for our team?**
-A: Yes. We offer private cohorts with customized content focusing on your specific use cases and tech stack.
+**Q: Can my company customise this for our team?**
+A: Yes. We offer private cohorts with customised content focusing on your specific use cases and tech stack.
 
 ---
 
@@ -422,7 +426,7 @@ Join 200+ professionals from academia, business, government, and technology who'
 - "I'm not technical" → Perfect. Most attendees aren't. AI does the technical work.
 - "I don't have time" → You don't have time NOT to. Stay limited or leap ahead.
 - "Seems expensive" → Compare 5 days of training to months of inefficiency.
-- "My work is too specialized" → AI adapts to YOU, not vice versa.
+- "My work is too specialised" → AI adapts to YOU, not vice versa.
 
 **[Apply Now - September Cohort](#)** | **[Download Detailed Syllabus](#)** | **[Schedule a Call](#)**
 

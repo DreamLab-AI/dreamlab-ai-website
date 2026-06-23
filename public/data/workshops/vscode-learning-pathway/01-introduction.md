@@ -9,7 +9,7 @@ By the end of this module, you will:
 - Understand how AI extensions transform VS Code into an intelligent coding partner
 - Set up your first AI-enhanced development environment
 
-## Why VS Code in 2025?
+## Why VS Code in 2026?
 
 Visual Studio Code has evolved from a code editor into the **universal platform for knowledge work**. Here's why it dominates:
 
@@ -36,7 +36,7 @@ graph TD
     style L fill:#4fc3f7
 ```
 
-### Market Dominance (2025 Stats)
+### Market Dominance (2026 Stats)
 - **73.7%** of professional developers use VS Code
 - **50+ million** active users globally
 - **2.5+ million** extension downloads daily
@@ -91,9 +91,9 @@ graph LR
 | Component | Purpose | Why It Matters |
 |-----------|---------|----------------|
 | **Editor** | Text editing with IntelliSense | Where you write code |
-| **Explorer** | File/folder navigation | Project organization |
+| **Explorer** | File/folder navigation | Project organisation |
 | **Source Control** | Git integration | Version control without CLI |
-| **Extensions** | Add functionality | Customize everything |
+| **Extensions** | Add functionality | Customise everything |
 | **Terminal** | Command line access | No context switching |
 | **Remote** | Code anywhere | Consistent environment |
 
@@ -281,7 +281,7 @@ code --install-extension ms-vscode-remote.remote-ssh
 | Python | Python support | Essential for Python |
 | Remote - SSH | Remote editing | Code on servers |
 | Path Intellisense | Path autocomplete | Faster file references |
-| Bracket Pair Colorizer | Colorize brackets | Visual nesting |
+| Bracket Pair Colorizer | Colourise brackets | Visual nesting |
 | Error Lens | Inline errors | See issues immediately |
 
 ## AI Integration Basics
@@ -338,7 +338,7 @@ code --install-extension GitHub.copilot-chat
 **Step 2: Authenticate**
 1. Click Copilot icon in status bar
 2. Sign in with GitHub account
-3. Authorize VS Code
+3. Authorise VS Code
 
 **Step 3: Test It**
 
@@ -428,7 +428,7 @@ Sign in with GitHub/Microsoft account
 
 ### Pitfall 3: Installing Too Many Extensions
 **Problem**: Slow startup, conflicts
-**Solution**: Use profiles for different workflows (covered in Module 10)
+**Solution**: Use profiles for different workflows (covered in the Profiles & Sync workshop)
 
 ### Pitfall 4: Not Learning Keyboard Shortcuts
 **Problem**: Inefficient mouse-heavy workflow
@@ -515,11 +515,11 @@ C) In your user profile directory
 
 ## Next Steps
 
-You've completed the foundation! Next modules will cover:
+You've completed the foundation! Next up:
 
-- **Module 2**: Essential keyboard shortcuts for 10x productivity
-- **Module 3**: Extension ecosystem deep dive
-- **Module 4**: Advanced settings and customization
+- **Keyboard Shortcuts**: Essential shortcuts for 10x productivity
+- **Extension Ecosystem**: Deep dive into the marketplace
+- **Settings & Customisation**: Advanced configuration
 
 ## Additional Resources
 

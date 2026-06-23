@@ -270,10 +270,10 @@ jobs:
 5. Advanced monitoring with Datadog/New Relic
 
 **Related Workshops:**
-- Workshop 04: Version Control & Collaboration (Git/GitHub)
-- Workshop 06: Testing & Quality Assurance
-- Workshop 09: Performance Optimization
-- Workshop 11: Security Best Practices
+- Phase 2: Version Control & Collaboration (Git/GitHub)
+- Phase 3: Testing & Quality Assurance
+- Phase 7: Performance Optimisation
+- Phase 8: Security Best Practices
 
 ---
 

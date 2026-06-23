@@ -149,4 +149,4 @@ graph TB
 
 ## Navigation
 - Next: [Core Concepts](01_concepts.md)
-- [Back to Module Overview](README.md)
+- [Back to Workshop Overview](README.md)

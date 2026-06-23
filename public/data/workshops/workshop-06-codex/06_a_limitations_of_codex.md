@@ -129,7 +129,7 @@ AI coding agents have practical limits on the complexity and duration of tasks t
 
 ### Where Complexity Limits Appear
 
-- **Very long tasks.** Tasks that run for more than 15-30 minutes tend to accumulate context, lose coherence, and produce diminishing returns. The Codex CLI cloud agent has a practical ceiling of approximately 30-60 minutes per task.
+- **Very long tasks.** Tasks that run for more than 15-30 minutes tend to accumulate context, lose coherence, and produce diminishing returns. Most agents have a practical ceiling of approximately 30-60 minutes per task.
 - **Deeply interleaved dependencies.** Tasks where every change depends on the result of a previous change — and the chain is long — can exceed the agent's ability to maintain coherence across the full sequence.
 - **Ambiguous requirements.** The vaguer the task, the more likely the agent is to produce something that technically satisfies the prompt but misses the intent. "Make the app better" will produce results; they are unlikely to be the results you wanted.
 - **Cross-system changes.** Tasks that span multiple repositories, services, or deployment environments are beyond what a single agent session can handle coherently.

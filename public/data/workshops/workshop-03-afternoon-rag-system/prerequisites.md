@@ -259,4 +259,4 @@ Nothing. All tools used in the core workshop are free and open source. Cloud emb
 
 ---
 
-[Proceed to Workshop -->](./00_introduction.md) | [Back to Module Overview](README.md)
+[Proceed to Workshop -->](./00_introduction.md) | [Back to Workshop Overview](README.md)

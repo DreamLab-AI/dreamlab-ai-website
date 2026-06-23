@@ -295,4 +295,4 @@ These objectives represent a step-change in how you work with AI. After this mor
 
 ---
 
-[Begin Workshop -->](00_introduction.md) | [Check Prerequisites](prerequisites.md) | [Back to Module Overview](README.md)
+[Begin Workshop -->](00_introduction.md) | [Check Prerequisites](prerequisites.md) | [Back to Workshop Overview](README.md)

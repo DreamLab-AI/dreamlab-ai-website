@@ -48,7 +48,7 @@ graph TD
 1. Run & Debug view (Ctrl+Shift+D)
 2. "create a launch.json file"
 3. Select environment
-4. Customize configuration
+4. Customise configuration
 ```
 
 ### Essential Keyboard Shortcuts
@@ -647,8 +647,8 @@ console.log(calculateAverage([1, 2, 3, 4, 5])); // Should be 3, but returns NaN
 
 ## Next Steps
 
-- **Module 8**: Automate debugging with tasks
-- **Module 12**: Advanced debugging patterns
+- **Task Automation**: Automate debugging with tasks
+- **Advanced Editing**: Advanced debugging patterns
 
 ## Resources
 

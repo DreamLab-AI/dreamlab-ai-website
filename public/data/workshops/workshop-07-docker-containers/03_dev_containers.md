@@ -32,7 +32,7 @@ Your Desktop                    Docker Container
 
 ### Prerequisites
 
-- VS Code installed (see Workshop 01)
+- VS Code installed (see the Phase 1 Foundations workshop)
 - Docker Desktop running (see previous section)
 
 ### Install the Extension
@@ -299,7 +299,7 @@ Claude Code is a terminal-based AI coding agent from Anthropic. Since it's insta
 
 Once the container builds, you can run `claude` from the integrated terminal. Claude Code reads your project's `CLAUDE.md` file for context and can edit files, run commands, and manage your codebase -- all from within the container. This means every team member gets the same AI-assisted development experience, configured identically.
 
-> **API key required:** Claude Code needs an Anthropic API key. Set this via a `.env` file or pass it as a container environment variable (see the Security section in Chapter 5 for best practices on managing secrets in containers).
+> **API key required:** Claude Code needs an Anthropic API key. Set this via a `.env` file or pass it as a container environment variable (see the Security section in the AI Containers chapter for best practices on managing secrets in containers).
 
 ---
 

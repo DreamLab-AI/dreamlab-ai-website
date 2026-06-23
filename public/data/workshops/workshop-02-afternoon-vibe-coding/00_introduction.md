@@ -2,7 +2,7 @@
 
 ## From Describing to Creating: The Magic of Conversational Programming
 
-Welcome to the most transformative session of your journey! This afternoon, you'll discover "vibe coding"—the revolutionary approach where you describe what you want in plain language, and AI creates it. No programming knowledge required, just imagination.
+Welcome to the most transformative session of your journey! In this phase, you'll discover "vibe coding" — the revolutionary approach where you describe what you want in plain language, and AI creates it. No programming knowledge required, just imagination.
 
 ## The Vibe Coding Revolution
 
@@ -49,7 +49,7 @@ For the first time in history, the ability to create digital solutions is limite
 
 You can now build what you envision.
 
-## What You'll Create This Afternoon
+## What You'll Create in This Phase
 
 ### Real, Working Applications
 
@@ -129,7 +129,7 @@ flowchart LR
 > "I thought websites required coding. Now I build them during lunch breaks. My side business launched because of vibe coding."
 > — Maria González, Teacher turned Entrepreneur
 
-## Module Learning Journey
+## Learning Journey
 
 ```mermaid
 graph LR
@@ -187,7 +187,7 @@ graph TD
 ## Prerequisites Check
 
 Before we begin, ensure you have:
-- [x] Completed the morning session (API setup)
+- [x] Completed Phase 2 (API setup)
 - [x] VS Code with AI configured
 - [x] A web browser for testing
 - [x] An idea for what you want to create
@@ -209,7 +209,7 @@ Your imagination and ability to describe it. Seriously.
 
 ## The Transformation Ahead
 
-### By End of This Afternoon
+### By End of This Phase
 
 ✅ **You'll have built** a real website or application  
 ✅ **It will be live** on the internet  
@@ -219,7 +219,7 @@ Your imagination and ability to describe it. Seriously.
 
 ## Your Instructor's Promise
 
-This afternoon will be the moment you realise that the barrier between imagination and creation has fallen. What took teams of developers months to build, you'll create in minutes through conversation.
+This session will be the moment you realise that the barrier between imagination and creation has fallen. What took teams of developers months to build, you'll create in minutes through conversation.
 
 The future isn't about learning to code—it's about learning to communicate your vision clearly. And that's a skill you already have.
 
@@ -243,7 +243,7 @@ graph TD
 
 ## Ready to Vibe?
 
-Forget everything you think you know about creating digital solutions. This afternoon, you'll discover that if you can describe it, you can build it. No exceptions.
+Forget everything you think you know about creating digital solutions. In this phase, you'll discover that if you can describe it, you can build it. No exceptions.
 
 Let's turn your ideas into reality!
 
@@ -251,4 +251,4 @@ Let's turn your ideas into reality!
 
 Next: [Chapter 1: Core Concepts - Understanding Vibe Coding](./01_concepts.md)
 
-[Back to Morning Session](../workshop-02-morning-ai-api-access/README.md) | [Skip to Building](./02_hands_on.md)
+[Back to Phase 2](../workshop-02-morning-ai-api-access/README.md) | [Skip to Building](./02_hands_on.md)

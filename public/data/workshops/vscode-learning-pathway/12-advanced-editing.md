@@ -6,7 +6,7 @@
 - Use Emmet for rapid HTML/CSS generation
 - Leverage IntelliSense and code actions effectively
 - Implement refactoring techniques
-- Utilize advanced selection and text transformation
+- Use advanced selection and text transformation
 - Automate repetitive editing tasks
 
 ## Multi-Cursor Power

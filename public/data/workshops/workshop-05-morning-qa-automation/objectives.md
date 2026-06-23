@@ -85,7 +85,7 @@ After this workshop, you should be able to:
 
 ## Time Investment
 
-- **Workshop Duration:** 3 hours (morning session)
+- **Workshop Duration:** 3 hours
 - **Hands-On Practice:** 2 hours (included)
 - **Final Project:** 1 hour
 - **Post-Workshop Practice:** 3-4 hours recommended

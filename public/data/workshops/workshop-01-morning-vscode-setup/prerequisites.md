@@ -102,7 +102,7 @@ We'll install these together:
   - No credit card needed
 
 **For Version Control:**
-- 🐙 **GitHub Account** (afternoon session)
+- 🐙 **GitHub Account** (Phase 2: Version Control)
   - Visit: https://github.com/signup
   - Free account sufficient
   - Used for backups and collaboration
@@ -290,5 +290,5 @@ If you meet these prerequisites, you're ready for an incredible journey. This wo
 
 ---
 
-[Proceed to Workshop →](./00_introduction.md) | [Back to Module Overview](README.md)
+[Proceed to Workshop →](./00_introduction.md) | [Back to Workshop Overview](README.md)
 

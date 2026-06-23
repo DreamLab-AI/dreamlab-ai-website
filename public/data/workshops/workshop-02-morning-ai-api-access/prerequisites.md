@@ -13,7 +13,7 @@ This workshop connects you directly to AI model APIs. You'll create accounts, ge
   - Can copy and paste text accurately
   - Understands the concept of passwords and account security
 
-- ✅ **VS Code Familiarity (from Module 05)**
+- ✅ **VS Code Familiarity (from the Phase 1 workshop)**
   - VS Code installed and launching correctly
   - Can open files and folders
   - Comfortable with the basic interface layout
@@ -70,10 +70,10 @@ This workshop connects you directly to AI model APIs. You'll create accounts, ge
 
 ### Must Have Before Starting
 
-**1. VS Code (from Module 05)**
+**1. VS Code (from the Phase 1 workshop)**
 - Installed and running
 - Markdown extensions configured
-- If not yet installed, complete Module 05 first or visit [code.visualstudio.com](https://code.visualstudio.com)
+- If not yet installed, complete the Phase 1 workshop first or visit [code.visualstudio.com](https://code.visualstudio.com)
 
 **2. Modern Web Browser**
 - Google Chrome (recommended)
@@ -296,7 +296,7 @@ This structure helps you organise test outputs, comparison notes, and your final
 ### "Can I use my existing ChatGPT/Claude subscriptions instead?"
 **This workshop uses the API, not the chat interface.** Your subscription and your API account are separate. You'll create API-specific credentials. You can cancel subscriptions later once you see the savings.
 
-### "What if I only complete Module 05 partially?"
+### "What if I only complete the Phase 1 workshop partially?"
 **You'll be fine** as long as VS Code is installed and launching. We'll configure everything else during this workshop.
 
 ### "Do I need Python or any programming language?"
@@ -310,4 +310,4 @@ If you meet these prerequisites, you're about to dramatically change how you use
 
 ---
 
-[Proceed to Workshop -->](./00_introduction.md) | [Back to Module Overview](README.md)
+[Proceed to Workshop -->](./00_introduction.md) | [Back to Workshop Overview](README.md)

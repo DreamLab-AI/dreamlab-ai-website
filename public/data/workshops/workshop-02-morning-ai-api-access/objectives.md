@@ -304,7 +304,7 @@ By the end of this workshop, you will be able to:
 - [ ] Monitor provider blogs for new model releases
 - [ ] Experiment with the Python SDK for your preferred provider
 - [ ] Explore prompt caching features (Anthropic, Google)
-- [ ] Attend the afternoon session (Day 2 content creation)
+- [ ] Continue to the next phase (content creation)
 - [ ] Share cost savings data with your team or manager
 
 ## Measuring Success

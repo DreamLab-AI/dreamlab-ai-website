@@ -1,16 +1,16 @@
-# Module 13: Quality Assurance & Automation
+# Quality Assurance & Automation
 
 ## Build Bulletproof Software with AI-Powered Testing
 
-Welcome to the morning session of Day 5. Over the next 3 hours, you will master the testing strategies that separate hobbyist code from production-grade software. You will learn to write comprehensive test suites, harness AI tools to generate and maintain tests, and wire everything into automated pipelines that catch bugs before they ever reach your users.
+Welcome to Phase 9 (QA, Publishing & Capstone). Over the next 3 hours, you will master the testing strategies that separate hobbyist code from production-grade software. You will learn to write comprehensive test suites, harness AI tools to generate and maintain tests, and wire everything into automated pipelines that catch bugs before they ever reach your users.
 
-## Module Overview
+## Workshop Overview
 
-Quality assurance is the backbone of reliable software delivery. This module takes you from manual, ad-hoc testing through to a fully automated QA pipeline with unit tests, integration tests, end-to-end browser tests, and continuous integration. You will use industry-standard frameworks alongside AI assistants to build safety nets that give you the confidence to ship fast without breaking things.
+Quality assurance is the backbone of reliable software delivery. This workshop takes you from manual, ad-hoc testing through to a fully automated QA pipeline with unit tests, integration tests, end-to-end browser tests, and continuous integration. You will use industry-standard frameworks alongside AI assistants to build safety nets that give you the confidence to ship fast without breaking things.
 
 ## Learning Outcomes
 
-By completing this module, you will:
+By completing this workshop, you will:
 
 ### Core Capabilities
 - Understand the testing pyramid and know when to apply each testing level
@@ -32,12 +32,12 @@ By completing this module, you will:
 - Integrate security scanning and code quality checks into your CI/CD pipeline
 
 ### Immediate Benefits
-- Leave with a fully automated testing pipeline you can apply to any project
+- Leave with a fully automated testing pipeline you can apply to any project straight away
 - Achieve 80%+ code coverage as a baseline, with clear paths to 90%+
 - Gain confidence to refactor and iterate without fear of regressions
 - Understand how professional teams maintain quality at scale
 
-## Module Structure
+## Workshop Structure
 
 ### Chapter Navigation
 
@@ -87,7 +87,7 @@ By completing this module, you will:
    - CI/CD platform guides (GitHub Actions, GitLab CI, CircleCI)
    - Books, courses, and community links
 
-## Who This Module Is For
+## Who This Workshop Is For
 
 ### Ideal Participants
 - **Web Developers** building React, Node.js, or Python applications who want automated quality gates
@@ -110,7 +110,7 @@ By completing this module, you will:
 
 ## What You Will Build
 
-By the end of this module, you will have a working project that includes:
+By the end of this workshop, you will have a working project that includes:
 
 - **Unit tests** covering validators, models, and utility functions with 90%+ coverage
 - **Integration tests** verifying full CRUD operations through API endpoints
@@ -138,7 +138,7 @@ By the end of this module, you will have a working project that includes:
 - Supertest, Husky, lint-staged
 - @stryker-mutator/core
 
-## Module Timing
+## Workshop Timing
 
 | Section | Duration | Format |
 |---------|----------|--------|
@@ -159,7 +159,7 @@ Take breaks as needed -- this is dense, practical material. The project and asse
 - [ ] 3 hours of focused time blocked
 - [ ] A project in mind that needs better testing (or use our starter)
 
-### Begin the Module
+### Begin the Workshop
 
 **[Start with the Introduction -->](00_introduction.md)**
 
@@ -180,6 +180,6 @@ Or jump directly to:
 
 ---
 
-*Quality is not something you bolt on at the end -- it is built into every line of code from day one. Let's make testing effortless, automatic, and effective.*
+*Quality is not something you bolt on at the end -- it is built into every line of code from the start. Let's make testing effortless, automatic, and effective.*
 
-**[Start Module 13: Introduction -->](00_introduction.md)**
+**[Start the Introduction -->](00_introduction.md)**

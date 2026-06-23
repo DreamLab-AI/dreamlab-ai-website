@@ -296,10 +296,10 @@ You've just created in 20 minutes what typically takes hours. This isn't about r
 3. **Plan** your next AI-enhanced project
 4. **Calculate** ROI of your new skills
 
-Remember: You're now part of the 1% who can wield professional AI tools. Use this power wisely to create exceptional work faster than ever before.
+Remember: these are professional-grade AI tools. Use them wisely to create exceptional work faster than ever before.
 
 ---
 
 Next: [Chapter 5: Assessment & Mastery Validation](./05_assessment.md)
 
-[Back to Exercises](./03_exercises.md) | [Back to Module Overview](README.md)
+[Back to Exercises](./03_exercises.md) | [Back to Workshop Overview](README.md)

@@ -25,7 +25,7 @@ By completing this workshop, you will:
 Before starting this workshop, you should have:
 
 - **A computer** running Windows 10/11, macOS (Apple Silicon or Intel), or Linux
-- **VS Code** installed (see Workshop 01 if you need help with this)
+- **VS Code** installed (see the Phase 1 Foundations workshop if you need help with this)
 - **Basic terminal comfort** -- you don't need to be an expert, but you should be able to open a terminal and type commands
 - **8 GB of RAM** minimum (16 GB recommended for running AI models in containers)
 - **20 GB of free disk space** for Docker and container images
@@ -93,7 +93,7 @@ Throughout this workshop, you'll work with real tools and build practical things
 
 **Start Here:** [Introduction: Why Containers Matter for AI](00_introduction.md)
 
-**Complete Chapter List:**
+**Complete Section List:**
 
 1. [Introduction: Why Containers Matter for AI](00_introduction.md)
 2. [Core Concepts: Images, Containers, Volumes, Networks](01_concepts.md)
@@ -124,10 +124,10 @@ This is part of the DreamLab AI Self-Guided Workshop series. It builds on the te
 
 | Workshop | Relationship |
 |----------|-------------|
-| **Workshop 01: VS Code Setup** | Prerequisite -- terminal and editor skills |
-| **Workshop 03: Local AI** | Uses containers for Ollama and model runners |
-| **Workshop 04: AI Agents** | Multi-agent systems often run in containers |
-| **Workshop 08: Claude Code** | Can be run inside containers for isolation |
+| **Phase 1: Foundations (VS Code Setup)** | Prerequisite -- terminal and editor skills |
+| **Phase 3: Local AI** | Uses containers for Ollama and model runners |
+| **Phase 4: Claude Code** | Can be run inside containers for isolation |
+| **Phase 5: AI Agents** | Multi-agent systems often run in containers |
 
 ---
 

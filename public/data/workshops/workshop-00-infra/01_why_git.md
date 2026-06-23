@@ -2,7 +2,7 @@
 
 ⏱️ **Time:** 10 minutes | 🎯 **Difficulty:** 🟢 Beginner
 
-Before exploring the practicalities of Git, it's essential to understand its purpose. This chapter introduces [Git](https://git-scm.com/) and [GitHub](https://github.com/), explaining their roles and the specific problems they solve, particularly for creative technologists in 2025.
+Before exploring the practicalities of Git, it's essential to understand its purpose. This chapter introduces [Git](https://git-scm.com/) and [GitHub](https://github.com/), explaining their roles and the specific problems they solve, particularly for creative technologists in 2026.
 
 ## 1.1 Problems Solved by Git
 
@@ -90,7 +90,7 @@ Throughout this tutorial, you will install and use Git locally, but your primary
 
 ## 1.4 Why Version Control Matters for AI-Assisted Development
 
-In 2025, AI coding assistants are commonplace, but they make version control even MORE important:
+In 2026, AI coding assistants are commonplace, but they make version control even more important:
 
 > **⚠️ Warning:** AI tools can generate large amounts of code quickly. Without version control, a single bad AI suggestion could overwrite hours of work with no way to recover.
 
@@ -101,7 +101,7 @@ In 2025, AI coding assistants are commonplace, but they make version control eve
 3. **Audit Trail:** See exactly what the AI changed and when, making debugging easier.
 4. **Collaboration:** Work alongside AI assistants while preserving your ability to review and approve changes.
 
-## 1.5 GitHub's Modern Features (2025)
+## 1.5 GitHub's Modern Features (2026)
 
 GitHub has evolved far beyond simple code hosting:
 

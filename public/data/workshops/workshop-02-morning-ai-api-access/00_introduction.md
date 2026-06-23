@@ -2,7 +2,7 @@
 
 ## Beyond ChatGPT: Unlock the Full Power of AI
 
-Welcome to Day 2! This morning, you'll discover the difference between using AI as a consumer and commanding it as a professional. By connecting directly to AI APIs, you'll gain power, control, and cost savings that web interfaces simply can't match.
+Welcome to Phase 3 (AI APIs & Vibe Coding)! This morning, you'll discover the difference between using AI as a consumer and commanding it as a professional. By connecting directly to AI APIs, you'll gain power, control, and cost savings that web interfaces simply can't match.
 
 ## The Revolution You're About to Join
 
@@ -112,7 +112,7 @@ flowchart TD
 > "The direct integration into my workflow saves me 2 hours daily. No more tab switching and copy-pasting."
 > — Michael Torres, Consultant
 
-## Module Learning Path
+## Learning Path
 
 ```mermaid
 graph LR
@@ -149,10 +149,10 @@ graph LR
 ## Prerequisites Check
 
 Before we begin, ensure you have:
-- [x] VS Code running from Module 05
+- [x] VS Code running from the Phase 1 workshop
 - [x] Continue extension installed
 - [x] Internet connection
-- [x] Excitement for AI superpowers
+- [x] Curiosity about what AI APIs can do
 - [x] A real project to enhance
 
 ## Common Concerns Addressed
@@ -205,7 +205,7 @@ Right now, you're like someone using a smartphone only for calls while it can do
 
 ```mermaid
 graph TD
-    A[Current State] --> B[After This Module]
+    A[Current State] --> B[After This Workshop]
     
     A1["AI User"] --> B1["AI Commander"]
     A2["Limited Access"] --> B2["Unlimited Power"]
@@ -229,4 +229,4 @@ Let's begin your transformation from AI consumer to AI commander!
 
 Next: [Chapter 1: Core Concepts - Understanding AI APIs](./01_concepts.md)
 
-[Back to Course Overview](../README.md) | [Skip to Hands-On](./02_hands_on.md)
+[Back to Workshop Overview](../README.md) | [Skip to Hands-On](./02_hands_on.md)

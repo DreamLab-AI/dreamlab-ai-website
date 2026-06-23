@@ -1,16 +1,16 @@
-# Module 08: Vibe Coding Mastery
+# Phase 3: Vibe Coding Mastery
 
 ## Build Anything You Can Describe — No Programming Required
 
 Welcome to the most transformative session of your workshop journey. In the next 3 hours, you'll discover that the barrier between imagination and creation has fallen. Describe what you want in plain English, and watch AI bring it to life as a real, working web page — deployed live on the internet.
 
-## Module Overview
+## Phase Overview
 
-This afternoon session turns you from an AI-assisted writer into an AI-assisted creator. You'll learn "vibe coding" — the art of building websites, interactive tools, and data visualisations through natural conversation with an AI coding agent. No syntax to memorise, no error messages to decipher, no programming experience required. Just clear descriptions and creative iteration.
+This session turns you from an AI-assisted writer into an AI-assisted creator. You'll learn "vibe coding" — the art of building websites, interactive tools, and data visualisations through natural conversation with an AI coding agent. No syntax to memorise, no error messages to decipher, no programming experience required. Just clear descriptions and creative iteration.
 
 ## Learning Outcomes
 
-By completing this module, you will:
+By completing this phase, you will:
 
 ### Core Capabilities
 - Describe a web page in plain English and have AI generate working HTML, CSS, and JavaScript
@@ -30,13 +30,13 @@ By completing this module, you will:
 - Understand when to use Claude Code, Cursor AI, ChatGPT, or other tools
 - Evaluate and refine AI output with a critical, creative eye
 
-## Module Structure
+## Phase Structure
 
 ### Chapter Navigation
 
 1. **[Introduction](00_introduction.md)** — The Vibe Coding Revolution (10 min)
    - What vibe coding is and why it changes everything
-   - What you'll create this afternoon
+   - What you'll create in this phase
    - Addressing common concerns
 
 2. **[Core Concepts](01_concepts.md)** — Understanding Conversational Creation (30 min)
@@ -71,7 +71,7 @@ By completing this module, you will:
    - Prompt libraries and reference sites
    - Deployment guides and community links
 
-## Who This Module Is For
+## Who This Phase Is For
 
 ### Perfect For:
 - **Business Owners** who want custom websites without hiring developers
@@ -83,7 +83,7 @@ By completing this module, you will:
 
 ### You'll Succeed If You:
 - Can describe what you want clearly in English
-- Completed the morning session (API access configured)
+- Completed Phase 2 (API access configured)
 - Have enthusiasm for experimenting and iterating
 - Are willing to try wild ideas and refine from there
 
@@ -101,7 +101,7 @@ By completing this module, you will:
 - **Internet**: Stable connection for AI APIs and deployment
 - **Browser**: Chrome, Firefox, or Edge (latest)
 
-### From the Morning Session:
+### From Phase 2:
 - VS Code installed with AI extensions configured
 - Claude Code CLI installed (or Cursor / Windsurf / ChatGPT as alternative)
 - API key active with credit (free tiers sufficient)
@@ -116,8 +116,8 @@ By completing this module, you will:
 - **Creative Freedom**: No templates, no limits — build what you imagine
 - **Own Everything**: The code is yours, hosted for free, no subscriptions
 
-### Module Timing:
-- **Total Duration**: 3 hours (afternoon session)
+### Phase Timing:
+- **Total Duration**: 3 hours
 - **Format**: Self-paced with suggested timings
 - **Balance**: 70% hands-on creation, 30% concepts and reflection
 - **Breaks**: Take them — creativity needs breathing room
@@ -136,7 +136,7 @@ By completing this module, you will:
 ## Ready to Create?
 
 ### Quick Readiness Check:
-- [ ] Morning session completed (API access working)
+- [ ] Phase 2 completed (API access working)
 - [ ] VS Code or alternative AI tool open and ready
 - [ ] Web browser available for previewing
 - [ ] An idea — however vague — for what you want to build
@@ -161,6 +161,6 @@ Or jump directly to:
 
 ---
 
-*After today, "I can't build websites" becomes "I just built three." Let's begin!*
+*After this phase, "I can't build websites" becomes "I just built three." Let's begin!*
 
-**[Start Module 08: Introduction →](00_introduction.md)**
+**[Start Phase 3: Introduction →](00_introduction.md)**

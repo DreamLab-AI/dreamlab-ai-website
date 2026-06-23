@@ -293,4 +293,4 @@ Remember: The goal isn't to use AI for everything—it's to use AI where it mult
 
 Next: [Chapter 4: Real Project Application](./04_project.md)
 
-[Back to Hands-On](./02_hands_on.md) | [Back to Module Overview](README.md)
+[Back to Hands-On](./02_hands_on.md) | [Back to Workshop Overview](README.md)

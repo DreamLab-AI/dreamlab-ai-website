@@ -700,10 +700,10 @@ Create `test.js`:
 
 📝 Create keyboard shortcut cheat sheet and pin it near monitor
 
-🚀 **You're now equipped like a professional developer!**
+**You're now equipped like a professional developer.**
 
 ---
 
 **Next**: [Chapter 3: Practical Exercises](./03_exercises.md)
 
-[Back to Concepts](./01_concepts.md) | [Back to Module Overview](README.md)
+[Back to Concepts](./01_concepts.md) | [Back to Workshop Overview](README.md)

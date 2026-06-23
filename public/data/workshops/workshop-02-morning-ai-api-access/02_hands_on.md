@@ -576,4 +576,4 @@ graph LR
 
 **Next**: [Chapter 3: Practical Exercises - Model Mastery](./03_exercises.md)
 
-[← Back to Concepts](./01_concepts.md) | [Module Overview](README.md)
+[← Back to Concepts](./01_concepts.md) | [Workshop Overview](README.md)
