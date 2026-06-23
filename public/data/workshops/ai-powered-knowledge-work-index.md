@@ -1,7 +1,8 @@
 # AI-Powered Knowledge Work - Complete Course Index
 
 ## Course Overview
-Transform from AI consumer to AI commander in this comprehensive 5-day workshop series. Master professional AI tools, automate workflows, and achieve 10× productivity gains.
+
+Master AI tools across 9 structured phases — from first setup to production deployment. This unified curriculum eliminates duplication and follows a single linear progression through every skill a modern knowledge worker needs.
 
 ### Target Audience
 - Academics & Researchers
@@ -11,144 +12,126 @@ Transform from AI consumer to AI commander in this comprehensive 5-day workshop 
 - Anyone working with documents daily
 
 ### Course Structure
-- **Duration**: 5 days (10 half-day modules)
-- **Format**: Hands-on workshops with real projects
+- **Duration**: 51+ hours (self-paced) or 5-day residential intensive
+- **Format**: 9 phases, 15 hands-on workshops
 - **Approach**: 60% practical, 40% theory
-- **Outcome**: Complete AI-powered workflow
+- **Outcome**: Complete AI-powered professional toolkit
 
 ---
 
-## Module Directory
+## Phase Directory
 
-### Day 1: Universal AI Workspace
+### Phase 1: Foundations (8 hours)
 
-#### Module 05: VS Code as AI Command Center (Morning)
-**Location**: [`./workshop-01-morning-vscode-setup/`](./workshop-01-morning-vscode-setup/)
-- Transform VS Code into universal workspace
-- Install AI-focused extensions
-- Master container setup
-- Navigate efficiently
+Set up your AI development environment with VS Code, Git, GitHub, and essential extensions.
 
-**Key Outcome**: Professional AI workspace configured
+| Workshop | Location | Hours |
+|----------|----------|-------|
+| Infrastructure Setup | [`./workshop-00-infra/`](./workshop-00-infra/) | 2 |
+| VS Code as AI Command Centre | [`./workshop-01-morning-vscode-setup/`](./workshop-01-morning-vscode-setup/) | 3 |
+| VS Code Learning Pathway | [`./vscode-learning-pathway/`](./vscode-learning-pathway/) | 3 |
 
-#### Module 06: Visual Tools & Version Control (Afternoon)
-**Location**: [`./workshop-01-afternoon-visual-version-control/`](./workshop-01-afternoon-visual-version-control/)
-- Master Mermaid diagrams
-- Implement version control for any document
-- Create visual documentation
-- Build repositories
-
-**Key Outcome**: Project Gantt chart with version control
+**Key Outcome**: Professional AI workspace configured with Git, GitHub, and VS Code extensions.
 
 ---
 
-### Day 2: AI as Creative Partner
+### Phase 2: Visual Documentation & Version Control (3 hours)
 
-#### Module 07: Direct AI API Access (Morning)
-**Location**: [`./workshop-02-morning-ai-api-access/`](./workshop-02-morning-ai-api-access/)
-- Connect OpenAI, Claude, Gemini
-- Compare model capabilities
-- Understand API costs
-- Generate professional content
+Master Mermaid diagrams and deepen your Git skills with visual tools and branching strategies.
 
-**Key Outcome**: Multi-model AI integration
+| Workshop | Location | Hours |
+|----------|----------|-------|
+| Visual Tools & Version Control | [`./workshop-01-afternoon-visual-version-control/`](./workshop-01-afternoon-visual-version-control/) | 3 |
 
-#### Module 08: Vibe Coding Mastery (Afternoon)
-**Location**: [`./workshop-02-afternoon-vibe-coding/`](./workshop-02-afternoon-vibe-coding/)
-- Master conversational programming
-- Build websites through chat
-- Create interactive visualizations
-- Deploy to internet
-
-**Key Outcome**: Live website created via conversation
+**Key Outcome**: Project Gantt chart with version-controlled documentation.
 
 ---
 
-### Day 3: Private AI Brain
+### Phase 3: AI APIs & Vibe Coding (6 hours)
 
-#### Module 09: Local AI Models (Morning)
-**Location**: [`./workshop-03-morning-local-ai/`](./workshop-03-morning-local-ai/)
-- Install AI on your laptop
-- Work completely offline
-- Compare local models
-- Optimize performance
+Connect directly to AI APIs and master conversational programming — building applications through natural language dialogue.
 
-**Key Outcome**: Private AI running locally
+| Workshop | Location | Hours |
+|----------|----------|-------|
+| Direct AI API Access | [`./workshop-02-morning-ai-api-access/`](./workshop-02-morning-ai-api-access/) | 3 |
+| Vibe Coding Mastery | [`./workshop-02-afternoon-vibe-coding/`](./workshop-02-afternoon-vibe-coding/) | 3 |
 
-#### Module 10: RAG System Implementation (Afternoon)
-**Location**: [`./workshop-03-afternoon-rag-system/`](./workshop-03-afternoon-rag-system/)
-- Build personal knowledge base
-- Index document collections
-- Implement smart search
-- Track citations
-
-**Key Outcome**: AI that knows your documents
+**Key Outcome**: Multi-model AI integration and a live website created via conversation.
 
 ---
 
-### Day 4: AI Teams
+### Phase 4: Claude Code Mastery (6 hours)
 
-#### Module 11: Specialized AI Agents (Morning)
-**Location**: [`./workshop-04-morning-ai-agents/`](./workshop-04-morning-ai-agents/)
-- Deploy research agents
-- Configure writer agents
-- Set up analyst agents
-- Create automator agents
+Master Claude Code CLI from installation through CLAUDE.md project configuration, MCP servers, hooks, subagents, and workflow orchestration.
 
-**Key Outcome**: Specialized AI workforce
+| Workshop | Location | Hours |
+|----------|----------|-------|
+| Claude Code Mastery | [`./workshop-08-claude-code/`](./workshop-08-claude-code/) | 6 |
 
-#### Module 12: Agent Orchestration & Safety (Afternoon)
-**Location**: [`./workshop-04-afternoon-orchestration/`](./workshop-04-afternoon-orchestration/)
-- Orchestrate multi-agent workflows
-- Implement cost controls
-- Set safety measures
-- Create approval chains
-
-**Key Outcome**: Managed AI team workflows
+**Key Outcome**: Full mastery of Anthropic's agentic coding tool.
 
 ---
 
-### Day 5: Professional Publishing
+### Phase 5: Local AI & RAG Systems (6 hours)
 
-#### Module 13: Quality Assurance & Automation (Morning)
-**Location**: [`./workshop-05-morning-qa-automation/`](./workshop-05-morning-qa-automation/)
-- Automated quality checks
-- Recurring workflows
-- Safety nets
-- System integration
+Run AI models locally with Ollama for complete data privacy. Build retrieval-augmented generation systems that make AI an expert on your own documents.
 
-**Key Outcome**: Automated QA pipeline
+| Workshop | Location | Hours |
+|----------|----------|-------|
+| Local AI Models | [`./workshop-03-morning-local-ai/`](./workshop-03-morning-local-ai/) | 3 |
+| RAG System Implementation | [`./workshop-03-afternoon-rag-system/`](./workshop-03-afternoon-rag-system/) | 3 |
 
-#### Module 14: Professional Output Suite (Afternoon)
-**Location**: [`./workshop-05-afternoon-publishing/`](./workshop-05-afternoon-publishing/)
-- LaTeX academic papers
-- Interactive reports
-- Client microsites
-- Complete automation
-
-**Key Outcome**: Professional publishing system
+**Key Outcome**: Private AI running locally with a personal knowledge base.
 
 ---
 
-### Standalone Deep Dives
+### Phase 6: Docker & Containers (6 hours)
 
-#### Docker & Containers for AI Development
-**Location**: [`./workshop-07-docker-containers/`](./workshop-07-docker-containers/)
-- Master Docker fundamentals and containerisation
-- VS Code Dev Containers for reproducible environments
-- Remote Docker development on GPU servers
-- Containerising AI agents and workflows
+Master Docker fundamentals, VS Code Dev Containers for reproducible environments, and remote Docker for GPU-accelerated development.
 
-**Key Outcome**: Reproducible, portable AI development environments
+| Workshop | Location | Hours |
+|----------|----------|-------|
+| Docker & Containers | [`./workshop-07-docker-containers/`](./workshop-07-docker-containers/) | 6 |
 
-#### Claude Code Mastery
-**Location**: [`./workshop-08-claude-code/`](./workshop-08-claude-code/)
-- Install and configure Claude Code CLI
-- CLAUDE.md project configuration
-- MCP servers for extending capabilities
-- Hooks, subagents, and workflow orchestration
+**Key Outcome**: Reproducible, portable AI development environments.
 
-**Key Outcome**: Full mastery of Anthropic's agentic coding tool
+---
+
+### Phase 7: AI Agents & Orchestration (6 hours)
+
+Create specialised AI agents using the ReAct pattern. Coordinate multi-agent workflows with cost controls, safety measures, and approval chains.
+
+| Workshop | Location | Hours |
+|----------|----------|-------|
+| Specialised AI Agents | [`./workshop-04-morning-ai-agents/`](./workshop-04-morning-ai-agents/) | 3 |
+| Agent Orchestration & Safety | [`./workshop-04-afternoon-orchestration/`](./workshop-04-afternoon-orchestration/) | 3 |
+
+**Key Outcome**: Managed AI team workflows with safety controls.
+
+---
+
+### Phase 8: AI Coding Ecosystem (4 hours)
+
+Survey the full AI coding landscape — Claude Code, Codex CLI, GitHub Copilot, Cursor, Windsurf — with security implications, ethical considerations, and professional practice.
+
+| Workshop | Location | Hours |
+|----------|----------|-------|
+| AI Coding Ecosystem | [`./workshop-06-codex/`](./workshop-06-codex/) | 4 |
+
+**Key Outcome**: Informed tool selection and secure professional practice.
+
+---
+
+### Phase 9: QA, Publishing & Capstone (6 hours)
+
+Build automated testing pipelines with AI-powered quality engineering tools including [Agentic QE Fleet](https://github.com/proffesor-for-testing/agentic-qe). Master professional publishing workflows for deployment and documentation.
+
+| Workshop | Location | Hours |
+|----------|----------|-------|
+| QA & Automation | [`./workshop-05-morning-qa-automation/`](./workshop-05-morning-qa-automation/) | 3 |
+| Professional Output Suite | [`./workshop-05-afternoon-publishing/`](./workshop-05-afternoon-publishing/) | 3 |
+
+**Key Outcome**: Automated QA pipeline and professional publishing system.
 
 ---
 
@@ -170,15 +153,16 @@ Transform from AI consumer to AI commander in this comprehensive 5-day workshop 
 ## Learning Path
 
 ### Recommended Progression
-1. **Start Here**: Module 05 (VS Code Setup)
-2. **Foundation**: Complete Day 1 modules before proceeding
-3. **Build Skills**: Progress through days sequentially
-4. **Apply Learning**: Work on your real project throughout
+1. **Start Here**: Phase 1 (Foundations)
+2. **Build Confidence**: Phases 2-3 (Visual Docs, AI APIs)
+3. **Deepen Skills**: Phases 4-6 (Claude Code, Local AI, Docker)
+4. **Go Advanced**: Phases 7-8 (Agents, Ecosystem)
+5. **Ship It**: Phase 9 (QA, Publishing & Capstone)
 
 ### Time Investment
-- Each module: 3-4 hours
-- Full course: 30-40 hours
-- Self-paced option available
+- Each phase: 3-8 hours
+- Full curriculum: 51+ hours self-paced
+- Residential option: 5 days intensive
 
 ---
 
@@ -202,8 +186,8 @@ Transform from AI consumer to AI commander in this comprehensive 5-day workshop 
 
 Ready to transform your professional practice with AI?
 
-**[Begin with Module 05: VS Code Setup →](./workshop-01-morning-vscode-setup/)**
+**[Begin Phase 1: Foundations →](./workshop-00-infra/)**
 
 ---
 
-*Last Updated: 2026-06-22*
+*Last Updated: 2026-06-23*

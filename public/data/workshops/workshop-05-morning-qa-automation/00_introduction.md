@@ -93,6 +93,7 @@ graph TB
 - **Lighthouse CI**: Performance and accessibility testing
 
 ### AI-Assisted QA
+- **[Agentic QE Fleet](https://github.com/proffesor-for-testing/agentic-qe)**: Open-source AI-driven quality engineering platform with 60 specialised agents across 13 QE domains. Integrates with Claude Code via MCP, learns testing patterns across sessions, and includes anti-sycophancy scoring to detect hollow tests
 - **Claude Code**: Generate test suites from the terminal, fix failing tests in a loop
 - **GitHub Copilot**: Inline test suggestions and chat-driven test generation
 - **Cursor AI / Windsurf**: IDE-integrated AI test authoring

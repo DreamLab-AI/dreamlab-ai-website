@@ -452,6 +452,23 @@ export default {
 
 ## AI-Powered Testing
 
+### Agentic QE Fleet
+
+[Agentic QE Fleet](https://github.com/proffesor-for-testing/agentic-qe) is an open-source platform that deploys 60 specialised AI agents across 13 quality engineering domains. It goes beyond simple test generation:
+
+- **Queen Coordinator** orchestrates agents, routing tasks intelligently and synthesising results across the test suite
+- **Pattern Learning** remembers successful testing strategies from previous sessions, improving quality over time
+- **Anti-Sycophancy Scoring** detects hollow tests and tautological assertions that pass without verifying real behaviour
+- **Intelligent Model Routing** assigns simple tasks to fast models and complex reasoning to capable ones, minimising cost
+- **Free Local Model Option** enables cost-free test generation using Ollama with automatic repair loops
+
+```bash
+npm install -g agentic-qe
+cd your-project && aqe init --auto
+```
+
+The platform integrates directly with Claude Code, GitHub Copilot, Cursor, and 8 other coding agents via MCP.
+
 ### AI Test Generation
 
 **Using Claude or ChatGPT for test creation**:

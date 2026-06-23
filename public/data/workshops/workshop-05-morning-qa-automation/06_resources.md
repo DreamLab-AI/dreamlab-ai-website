@@ -1,5 +1,20 @@
 # Resources: QA Automation Tools & Learning
 
+## AI-Powered Quality Engineering
+
+**Agentic QE Fleet** - https://github.com/proffesor-for-testing/agentic-qe
+- 60 specialised AI agents across 13 QE domains
+- Queen Coordinator for intelligent task routing
+- Pattern learning across sessions and projects
+- Anti-sycophancy scoring to catch hollow tests
+- MCP integration with Claude Code, Copilot, Cursor, and 8 more
+- Free local model option via Ollama
+
+```bash
+npm install -g agentic-qe
+cd your-project && aqe init --auto
+```
+
 ## Testing Frameworks
 
 ### JavaScript/TypeScript
