@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BBS // nostr-rust-forum</title>
+    <meta name="description" content="Retro ASCII/BBS terminal interface for the Nostr forum kit." />
+    <meta name="theme-color" content="#0a0a0a" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%230a0a0a'/><text x='1' y='13' font-family='monospace' font-size='12' fill='%23ffb000'>&gt;_</text></svg>" type="image/svg+xml" />
+    <link rel="stylesheet" href="/community/bbs/bbs-a3567a851e80bc2.css" integrity="sha384-ZP6D1vlrrRbQ4BEIL3R33N/DaqY3WNm5eKSqHQ++607++W3bKlKmBQ91tNA77U23"/>
+
+    <!-- Branding is injected by the host site into window.__ENV__ (THEME,
+         NODE_NAME, LOCATION, BANNER_URL, RELAY_URL, ZONE_CONFIG). The defaults
+         below let the BBS render standalone (e.g. `trunk serve`). -->
+    <script>
+      window.__ENV__ = window.__ENV__ || {
+        THEME: "amber",
+        NODE_NAME: "NOSTR-BBS",
+        LOCATION: "the decentralized frontier",
+        RELAY_URL: "",
+        ZONE_CONFIG: ""
+      };
+    </script>
+<link rel="modulepreload" href="/community/bbs/nostr-bbs-bbs-client-bbcca95f32dcd467.js" crossorigin="anonymous" integrity="sha384-JDWmspQPXNcwky+hDaP+7lfrekrj3TNIov4qRdCH4VYo4Ea3LQXgPBiqPJ5I79Tw"><link rel="modulepreload" href="/community/bbs/snippets/nostr-bbs-forum-client-a99ba32fb5c0fbe8/js/webgpu-particles.js" crossorigin="anonymous" integrity="sha384-vn2XAG3blLw95RCJXf9/pLqn+tzLiY8+dOJM/oX+V/PmBwLQOC4YyokhgtC8wQL5"><link rel="modulepreload" href="/community/bbs/snippets/nostr-bbs-forum-client-79f0e0f134a0eaad/js/webgpu-particles.js" crossorigin="anonymous" integrity="sha384-vn2XAG3blLw95RCJXf9/pLqn+tzLiY8+dOJM/oX+V/PmBwLQOC4YyokhgtC8wQL5"><link rel="modulepreload" href="/community/bbs/snippets/nostr-bbs-forum-client-227342e598d13d07/js/webgpu-particles.js" crossorigin="anonymous" integrity="sha384-vn2XAG3blLw95RCJXf9/pLqn+tzLiY8+dOJM/oX+V/PmBwLQOC4YyokhgtC8wQL5"><link rel="modulepreload" href="/community/bbs/snippets/nostr-bbs-forum-client-5c591d6a9917c9f0/js/webgpu-particles.js" crossorigin="anonymous" integrity="sha384-vn2XAG3blLw95RCJXf9/pLqn+tzLiY8+dOJM/oX+V/PmBwLQOC4YyokhgtC8wQL5"><link rel="modulepreload" href="/community/bbs/snippets/nostr-bbs-forum-client-744c243b1845ce55/js/webgpu-particles.js" crossorigin="anonymous" integrity="sha384-vn2XAG3blLw95RCJXf9/pLqn+tzLiY8+dOJM/oX+V/PmBwLQOC4YyokhgtC8wQL5"><link rel="modulepreload" href="/community/bbs/snippets/nostr-bbs-forum-client-7ad7b0d82596c002/js/webgpu-particles.js" crossorigin="anonymous" integrity="sha384-vn2XAG3blLw95RCJXf9/pLqn+tzLiY8+dOJM/oX+V/PmBwLQOC4YyokhgtC8wQL5"><link rel="modulepreload" href="/community/bbs/snippets/nostr-bbs-forum-client-d7773f88541b62b9/js/webgpu-particles.js" crossorigin="anonymous" integrity="sha384-vn2XAG3blLw95RCJXf9/pLqn+tzLiY8+dOJM/oX+V/PmBwLQOC4YyokhgtC8wQL5"><link rel="modulepreload" href="/community/bbs/snippets/nostr-bbs-forum-client-d53b5a6133ca7d4f/js/webgpu-particles.js" crossorigin="anonymous" integrity="sha384-vn2XAG3blLw95RCJXf9/pLqn+tzLiY8+dOJM/oX+V/PmBwLQOC4YyokhgtC8wQL5"><link rel="preload" href="/community/bbs/nostr-bbs-bbs-client-bbcca95f32dcd467_bg.wasm" crossorigin="anonymous" integrity="sha384-YgkYrTTmySgzHdy8WC+W/diHMQ5Iot0fIXrgEZvuaELHTQbfhs3p8Lf+G4koVepy" as="fetch" type="application/wasm"><script>window.__ENV__={THEME:"amber",NODE_NAME:"DREAMLAB BBS",LOCATION:"Lake District, UK",BANNER_URL:"",LOGO_URL:"https://dreamlab-ai.com/assets/logo.svg",FORUM_NAME:"Minimoonoir Forums",RELAY_URL:"wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev",POD_API:"https://dreamlab-pod-api.solitary-paper-764d.workers.dev",PREVIEW_API:"https://dreamlab-link-preview.solitary-paper-764d.workers.dev",VITE_AUTH_API_URL:"https://dreamlab-auth-api.solitary-paper-764d.workers.dev",VITE_SEARCH_API_URL:"https://dreamlab-search-api.solitary-paper-764d.workers.dev",VITE_LINK_PREVIEW_API_URL:"https://dreamlab-link-preview.solitary-paper-764d.workers.dev",BUILD_VERSION:"2026.06.27",BUILD_HASH:"e70431b",ZONE_CONFIG:[{"id":"public","display_name":"Landing","required_cohorts":[],"write_cohorts":["members","friends","agent"],"banner_image_url":"/images/heroes/lake-district-dawn.webp","visibility":"public","encrypted":false},{"id":"minimoonoir","display_name":"Minimoonoir","required_cohorts":["friends"],"banner_image_url":"/images/heroes/minimoonoir-hero.webp","visibility":"locked","encrypted":false},{"id":"family","display_name":"Family","required_cohorts":["family"],"banner_image_url":"/images/heroes/family-hero.webp","visibility":"locked","encrypted":true},{"id":"business","display_name":"DreamLab","required_cohorts":["business"],"banner_image_url":"/images/heroes/business-hero.webp","visibility":"locked","encrypted":false}]};</script></head>
+<body>
+    <noscript>This BBS requires a WebAssembly-capable browser.</noscript>
+
+    <!-- Phosphor persistence: when the terminal text changes, the previous
+         frame lingers as a faint afterglow and fades (see .phosphor-ghost in
+         bbs.css). A pure DOM overlay — a text-only clone of the prior screen
+         body — so it adds nothing to the WASM bundle and degrades gracefully. -->
+    <script>
+      (function () {
+        try {
+          if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        } catch (e) {}
+        var THROTTLE_MS = 90, MAX_GHOSTS = 6, LIFE_MS = 3100;
+        function start(root) {
+          var prev = null, last = 0, live = [];
+          function bodyEls() {
+            var ch = Array.prototype.slice.call(root.children);
+            var b = ch.findIndex(function (c) { return c.classList && c.classList.contains('bbs-banner'); });
+            var f = ch.findIndex(function (c) { return c.classList && c.classList.contains('bbs-footer'); });
+            return ch.slice(b + 1, f === -1 ? ch.length : f);
+          }
+          function snap() {
+            var els = bodyEls(); if (!els.length) return null;
+            var rs = els.map(function (e) { return e.getBoundingClientRect(); });
+            var left = Math.min.apply(null, rs.map(function (r) { return r.left; }));
+            var top = Math.min.apply(null, rs.map(function (r) { return r.top; }));
+            var right = Math.max.apply(null, rs.map(function (r) { return r.right; }));
+            var bottom = Math.max.apply(null, rs.map(function (r) { return r.bottom; }));
+            return { html: els.map(function (e) { return e.outerHTML; }).join(''),
+                     left: left, top: top, w: right - left, h: bottom - top,
+                     font: getComputedStyle(root).font };
+          }
+          function ghost(p) {
+            var g = document.createElement('div');
+            g.className = 'phosphor-ghost';
+            g.style.cssText = 'left:' + p.left + 'px;top:' + p.top + 'px;width:' + p.w + 'px;height:' + p.h + 'px;font:' + p.font;
+            g.innerHTML = p.html;
+            // Text-only afterglow: drop heavy ASCII-image clones so ghosts stay light.
+            var imgs = g.querySelectorAll('.ascii-img-wrap, .ascii-img, .bbs-section-hero');
+            for (var i = 0; i < imgs.length; i++) imgs[i].remove();
+            document.body.appendChild(g);
+            live.push(g);
+            while (live.length > MAX_GHOSTS) { var o = live.shift(); if (o) o.remove(); }
+            requestAnimationFrame(function () { g.style.opacity = '0'; }); // next frame → transition
+            setTimeout(function () { g.remove(); var k = live.indexOf(g); if (k >= 0) live.splice(k, 1); }, LIFE_MS);
+          }
+          function tick() {
+            var cur = snap();
+            if (cur && prev && prev.html !== cur.html) {
+              var now = performance.now();
+              if (now - last > THROTTLE_MS) { ghost(prev); last = now; }
+            }
+            if (cur) prev = cur;
+            requestAnimationFrame(tick);
+          }
+          requestAnimationFrame(tick);
+        }
+        var iv = setInterval(function () {
+          var root = document.querySelector('.bbs-root');
+          if (root) { clearInterval(iv); start(root); }
+        }, 80);
+        setTimeout(function () { clearInterval(iv); }, 20000);
+      })();
+    </script>
+
+    <!-- Touch navigation: slide a finger over the menu/list to move the
+         highlight, lift to select. A thin bridge onto the existing keyboard
+         model — it hit-tests the item under the touch and drives the app's own
+         ArrowUp/ArrowDown/Enter handlers, so every screen behaves identically
+         to the keyboard. No-op without touch (mouse never fires these). -->
+    <script>
+      (function () {
+        function selectable() {
+          return Array.prototype.slice.call(document.querySelectorAll('.bbs-menu-item, .bbs-row'));
+        }
+        function fire(key) { document.dispatchEvent(new KeyboardEvent('keydown', { key: key, bubbles: true })); }
+        function itemAt(x, y) { var el = document.elementFromPoint(x, y); return el ? el.closest('.bbs-menu-item, .bbs-row') : null; }
+        var lastIdx = -1, active = false, over = false;
+        function curIndex(items) {
+          if (lastIdx >= 0) return lastIdx;            // track in JS — the DOM `.selected` lags the re-render
+          var d = items.findIndex(function (e) { return e.classList.contains('selected'); });
+          return d < 0 ? 0 : d;
+        }
+        function moveTo(item) {
+          var items = selectable();
+          var target = items.indexOf(item);
+          if (target < 0) return false;
+          var cur = curIndex(items);
+          if (target !== cur) {
+            var key = target > cur ? 'ArrowDown' : 'ArrowUp';
+            for (var i = 0; i < Math.abs(target - cur); i++) fire(key);
+          }
+          lastIdx = target;
+          item.scrollIntoView({ block: 'nearest' });
+          return true;
+        }
+        document.addEventListener('touchstart', function (e) {
+          var t = e.touches[0]; if (!t) return;
+          lastIdx = -1;
+          var it = itemAt(t.clientX, t.clientY);
+          if (!it) { active = false; return; }
+          active = true; over = true; moveTo(it);
+        }, { passive: true });
+        document.addEventListener('touchmove', function (e) {
+          if (!active) return;
+          var t = e.touches[0]; if (!t) return;
+          var it = itemAt(t.clientX, t.clientY);
+          if (it) { over = true; if (moveTo(it)) e.preventDefault(); } else { over = false; }
+        }, { passive: false });
+        document.addEventListener('touchend', function () {
+          if (active && over) fire('Enter');
+          active = false; lastIdx = -1;
+        }, { passive: true });
+      })();
+    </script>
+
+<script type="module">
+import init, * as bindings from '/community/bbs/nostr-bbs-bbs-client-bbcca95f32dcd467.js';
+const wasm = await init({ module_or_path: '/community/bbs/nostr-bbs-bbs-client-bbcca95f32dcd467_bg.wasm' });
+
+
+window.wasmBindings = bindings;
+
+
+dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
+
+</script></body>
+</html>

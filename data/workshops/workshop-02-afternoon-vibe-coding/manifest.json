@@ -1,0 +1,45 @@
+{
+  "title": "Phase 3: Vibe Coding Mastery",
+  "pages": [
+    {
+      "slug": "README.md",
+      "title": "Phase 3: Vibe Coding Mastery"
+    },
+    {
+      "slug": "00_introduction.md",
+      "title": "Chapter 0: Introduction to Vibe Coding Mastery"
+    },
+    {
+      "slug": "01_concepts.md",
+      "title": "Chapter 1: Core Concepts - Understanding Vibe Coding"
+    },
+    {
+      "slug": "02_hands_on.md",
+      "title": "Chapter 2: Hands-On - Building Your First Vibe Creation"
+    },
+    {
+      "slug": "03_exercises.md",
+      "title": "Chapter 3: Creative Challenges — Progressive Exercises"
+    },
+    {
+      "slug": "04_project.md",
+      "title": "Chapter 4: Capstone Project — Your Live Creation"
+    },
+    {
+      "slug": "05_assessment.md",
+      "title": "Chapter 5: Assessment — Validate Your Mastery"
+    },
+    {
+      "slug": "06_resources.md",
+      "title": "Chapter 6: Resources — Continue Creating"
+    },
+    {
+      "slug": "objectives.md",
+      "title": "Learning Objectives - Phase 3: Vibe Coding Mastery"
+    },
+    {
+      "slug": "prerequisites.md",
+      "title": "Prerequisites - Phase 3: Vibe Coding Mastery"
+    }
+  ]
+}
