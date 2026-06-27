@@ -7,7 +7,7 @@ generic `nostr-bbs-*` kit crates living in the `nostr-rust-forum` repo.
 
 | Path                                | Purpose                                                              |
 |-------------------------------------|----------------------------------------------------------------------|
-| `Cargo.toml`                        | Git-pinned deps on `nostr-bbs-{core,config,mesh,rate-limit}` (NRF rc11, rev `8d31f3a`) |
+| `Cargo.toml`                        | Git-pinned deps on `nostr-bbs-{core,config,mesh,rate-limit}` (NRF, rev `3c16c21`) |
 | `dreamlab.toml`                     | Operator-supplied config consumed by `nostr_bbs_config::load_from_*` |
 | `src/branding.rs`                   | DreamLab `BrandingConfig` populator (theme, logos, copy, zones)      |
 | `src/workers.rs`                    | Per-worker entry shims (kit `dispatch` API not yet available)        |
@@ -174,8 +174,8 @@ agent_pubkeys = [
 
 ## JSS / Solid features
 
-The overlay is pinned to `nostr-rust-forum` commit `a7c9c40`, which includes
-the JSS v0.0.197 Solid surface from `solid-pod-rs` commit `8668792` plus the
+The overlay is pinned to `nostr-rust-forum` commit `3c16c21`, which includes
+the JSS Solid surface from `solid-pod-rs` `0.5.0-alpha.2` (crates.io) plus the
 DreamLab `POD_BASE_URL` integration fix. On Cloudflare Workers the live pieces
 are authenticated pod creation, federated NIP-05, TypeIndex/media provisioning,
 Solid browser headers, and correct public WebID URLs. Native-only export,
@@ -202,7 +202,7 @@ privkey_filename  = "privkey.jsonld"        # reserved filename
 
 ```toml
 [nip05]
-resolver_mode = "federated"                # live as of NRF a7c9c40
+resolver_mode = "federated"                # live as of NRF 3c16c21
 pod_base_url  = "https://pods.dreamlab-ai.com"
 ```
 

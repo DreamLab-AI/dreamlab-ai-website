@@ -122,7 +122,9 @@ export async function checkWhitelist(
   };
   if (!pubkey) return neutral;
   try {
-    const url = `${relayHttpUrl(relayWsUrl)}/api/check-whitelist?pubkey=${pubkey}`;
+    const url = `${relayHttpUrl(relayWsUrl)}/api/check-whitelist?pubkey=${encodeURIComponent(
+      pubkey
+    )}`;
     const res = await fetch(url);
     if (!res.ok) return neutral;
     const data = (await res.json()) as Record<string, unknown>;

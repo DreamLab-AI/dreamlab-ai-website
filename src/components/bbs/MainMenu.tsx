@@ -46,7 +46,7 @@ export function MainMenu({ onSelect }: MainMenuProps) {
                 type="button"
                 onClick={() => onSelect(item.target)}
                 onMouseEnter={() => setIndex(i)}
-                aria-current={selected}
+                aria-current={selected ? "true" : undefined}
                 className={`flex w-full items-baseline gap-2 px-1 text-left ${
                   selected ? "bbs-selected" : ""
                 }`}

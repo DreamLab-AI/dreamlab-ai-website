@@ -13,7 +13,7 @@ publish = false
 path = "src/lib.rs"
 
 [dependencies]
-# Kit crates from nostr-rust-forum @ c5329f6 (1.0.0-beta.2 line, ADR-098 /connect).
+# Kit crates from nostr-rust-forum @ 3c16c21 (1.0.0-beta.2 line, ADR-098 /connect).
 # Carries the wasm-bindgen 0.2.125 family bump (worker-build 0.8.5 / CF panic-abort
 # recovery; unblocks all 5 Worker builds) on top of round-2 QA + zone-banner work.
 # Carries the forum-flow-cartography fixes (static ADMIN_PUBKEYS admin resolution,

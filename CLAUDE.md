@@ -138,11 +138,15 @@ All routes are lazy-loaded via `React.lazy()` in `src/App.tsx`:
 | `/ventures` | Ventures |
 | `/contact` | Contact |
 | `/privacy` | Privacy |
+| `/bbs` | BBS (retro ASCII terminal forum client) |
 | `*` | NotFound |
 
 Legacy redirects: `/residential-training` and `/masterclass` → `/programmes`;
 `/system-design`, `/research-paper`, and `/work` → `/research`.
-The forum is a separate SPA served at `/community/` (not a React route).
+The Leptos forum is a separate SPA served at `/community/` (not a React route).
+`/bbs` is a second, React-native client for the **same** forum backend — a retro
+BBS/ASCII terminal (`src/lib/bbs/`, `src/components/bbs/`) that speaks the Nostr
+relay protocol directly; it is a normal lazy React route.
 
 Keep `public/sitemap.xml` in sync with this table when routes change.
 
@@ -179,7 +183,13 @@ VITE_SUPABASE_ANON_KEY=your-anon-key-here
 VITE_AUTH_API_URL=https://dreamlab-auth-api.solitary-paper-764d.workers.dev
 VITE_POD_API_URL=https://dreamlab-pod-api.solitary-paper-764d.workers.dev
 VITE_SEARCH_API_URL=https://dreamlab-search-api.solitary-paper-764d.workers.dev
+VITE_RELAY_URL=wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev
+VITE_LINK_PREVIEW_API_URL=https://dreamlab-link-preview.solitary-paper-764d.workers.dev
 ```
+
+The `/bbs` client and the `/community/` forum read `VITE_RELAY_URL` (and the
+other API URLs) at runtime from `window.__ENV__`; `src/lib/bbs/env.ts` falls
+back to these defaults. Keep this list in sync with `deploy.yml` `[env]`.
 
 Workers use `forum-config/deploy/*.wrangler.toml` bindings (D1, KV, R2, DO) —
 no `.env` files. The forum client receives runtime config via
@@ -195,12 +205,14 @@ no `.env` files. The forum client receives runtime config via
 
 ### The dual-pin rule (critical)
 
-The kit commit is pinned in **three places that must move together** in one
+The kit commit is pinned in **four places that must move together** in one
 commit, or client/worker/test skew ships:
 
 1. `KIT_REF` in `.github/workflows/deploy.yml`
 2. `KIT_REF` in `.github/workflows/workers-deploy.yml`
-3. The `rev = "..."` pins on every `nostr-bbs-*` dependency in `forum-config/Cargo.toml`
+3. `KIT_REF` in `.github/workflows/rust-ci.yml`
+4. The `rev = "..."` pins on every `nostr-bbs-*` dependency in `forum-config/Cargo.toml`
+   (and the resolved full SHA in `forum-config/Cargo.lock`)
 
 ### Zones
 

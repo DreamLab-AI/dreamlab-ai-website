@@ -10,6 +10,7 @@
  * with backoff, and replays live subscriptions after a reconnect.
  */
 
+import { verifyEvent } from "nostr-tools/pure";
 import type { NostrEvent, RelayFilter, RelayStatus } from "./types";
 import { KIND } from "./types";
 import type { Signer } from "./identity";
@@ -40,6 +41,18 @@ function nextId(prefix: string): string {
 
 function nowSec(): number {
   return Math.floor(Date.now() / 1000);
+}
+
+/**
+ * Validate a relay-supplied event's id + Schnorr signature. The relay is
+ * treated as untrusted: unverifiable events are dropped rather than rendered.
+ */
+function isVerifiedEvent(event: NostrEvent): boolean {
+  try {
+    return verifyEvent(event as Parameters<typeof verifyEvent>[0]);
+  } catch {
+    return false;
+  }
 }
 
 export class RelayClient {
@@ -162,7 +175,9 @@ export class RelayClient {
         const subId = msg[1] as string;
         const event = msg[2] as NostrEvent;
         const sub = this.subs.get(subId);
-        if (sub && event) sub.onEvent(event);
+        // Verify id + Schnorr signature before trusting relay-supplied events
+        // so a hostile/compromised relay cannot spoof authors or content.
+        if (sub && event && isVerifiedEvent(event)) sub.onEvent(event);
         break;
       }
       case "EOSE": {
