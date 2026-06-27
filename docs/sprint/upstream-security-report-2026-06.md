@@ -19,19 +19,29 @@ needs maintainer implementation + CI (we cannot build/test the wasm32 workers he
 
 Verified against the live upstream branches (read via the GitHub REST API).
 
-**Active fix branches**
-- `solid-pod-rs@claude/agentic-qe-global-install-l20lwk` (+2 commits over `main`):
-  **B1, B2 fixed** (server middleware: `nosniff` + `Content-Disposition: attachment`
-  for active content-types; CORS credentials only for an allowlisted origin),
-  **B6.3 fixed** (WebID HTML), with new tests. B3/B4/B5/B6.1/B6.2 left open with
-  recommended fixes. Their own audit (`solid-pod-rs/docs/sprint/security-audit-2026-06.md`)
-  confirms A1–A7 are **N/A** to that tree (they target the forum relay in NRF —
-  matching §A here).
-- `nostr-rust-forum@claude/agentic-qe-global-install-92nfhn`: **AQE bootstrap only**
-  (`aqe init`); the kit's security fixes (the §B1/§B2 **pod-worker** patch below and
-  the §A relay fixes) are **not yet committed to any NRF branch**.
-- The other NRF branches (`fix/nip07-topic-signing`, `chore/solid-pod-rs-0.5.0-alpha.0-pin`)
-  are stale/superseded (0–1 commits ahead, ~90 behind `main`).
+**Active fix branches (re-checked — both have progressed substantially)**
+- `nostr-rust-forum@claude/agentic-qe-global-install-92nfhn` (+3 over `main`):
+  commit `7b9bef45` lands the kit security fixes — **relay A1–A4** (`broadcast.rs`,
+  `nip_handlers.rs` +270/-156: per-viewer zone gate on broadcast, read-path
+  projection, hidden-event suppression, COUNT auth), **pod-worker B1/B2**
+  (`lib.rs`/`content_negotiation.rs`: `nosniff` on every response, wildcard+credentials
+  guard, **`CSP: default-src 'none'; sandbox` on `text/html`**, and an `Accept:
+  text/html` relabel guard), **auth A5/A7**, plus a **preview-worker SSRF** fix and
+  supply-chain (`deny.toml`, CI). ⇒ **patch `0001` below is now SUPERSEDED** by this
+  commit (their CSP-sandbox approach is stronger than the `Content-Disposition` spec).
+- `solid-pod-rs@claude/agentic-qe-global-install-l20lwk` (+9 over `main`): **B1, B2,
+  B3, B4, B5, B6.1, B6.2, B6.3 all fixed** (server middleware + per-child WAC listing
+  + write-path quota + NIP-05/inbox rate-limit + git read-auth opt-in + WebID HTML),
+  with new tests, **plus** JSS v0.0.210 parity (git CORS on WAC denial,
+  `JSS_BODY_LIMIT`, `write_acl` default gating). Their audit confirms A1–A7 **N/A**
+  to that tree (correct — they're the NRF relay, §A here).
+- The other NRF branches (`fix/nip07-topic-signing`, `chore/…alpha.0-pin`) are
+  stale/superseded.
+
+**⚠️ solid-pod-rs version was NOT bumped — still `0.5.0-alpha.2` on the branch.**
+Re-publishing a changed `0.5.0-alpha.2` over the existing crates.io release is a
+collision (cargo serves the cached/old one). The fixes need a **version bump**
+(`0.5.0-alpha.3`) before any downstream can pin them.
 
 **Two distinct pod trees — fixes land in different places.** §B findings exist in
 both, with different root causes/fixes:
@@ -47,24 +57,36 @@ both, with different root causes/fixes:
 > Worker**, not the native server — both findings are real in their respective
 > trees. This report now scopes them per-tree.
 
-**Consumption chain (what must happen for this overlay to ship the fixes):**
-1. **solid-pod-rs** → bump workspace version (e.g. `0.5.0-alpha.3`) + **publish to
-   crates.io**. (Still `0.5.0-alpha.2` on the branch — unpublished, so not yet
-   consumable. Note: the kit consumes `features = ["core"]`; B1/B2 are in the
-   `-server` crate the **agentbox** native pod builds, not the kit — only B6.3
-   touches the core crate.)
-2. **nostr-rust-forum** → apply patch `0001` (pod-worker B1/B2) + the §A relay
-   fixes; bump its `solid-pod-rs` pin to the new alpha; commit to `main`.
-3. **this overlay** → bump the dual-pin (`KIT_REF` ×3 + `forum-config/Cargo.toml`
-   revs + `Cargo.lock`) to the new kit commit. The new `pin-check` CI job and
-   `aqe`/dual-pin docs are already in place for this.
+**Provide/consume verdict (verified in principle, pre-publish):**
 
-**Overlay compatibility: ✅ no breaking change for us.** The relay read-path
-fixes (A1–A3) only make zone enforcement *stricter*; the `/bbs` client already
-treats withheld/locked-zone reads as empty and renders lock state, so stricter
-enforcement is an improvement, not a break. solid-pod-rs B1/B2/B6.3 are middleware
-/ additive-validation (no `core` public-API change the kit calls). Nothing in
-`forum-config/` or `src/lib/bbs/` needs to change ahead of the pin bump.
+✅ **NRF kit branch ↔ this overlay — LINES UP.** Verified:
+- The kit security commit adds **zero new `solid_pod_rs::` calls**, so the kit branch
+  **still builds against the published `solid-pod-rs 0.5.0-alpha.2`** — it does *not*
+  require the unpublished solid-pod-rs branch. The kit is self-contained.
+- The only consume-facing change, `nostr-bbs-config` validation, was checked
+  field-by-field against our `dreamlab.toml` and **passes**: `mesh.peer_relays` empty
+  (ok), `payments.token.ticker="DREAM"` non-empty (ok), zone ids unique (ok),
+  `accent_hex` optional/unset (ok). New `Zone.accent_hex` is additive — our
+  `ZONE_CONFIG`/`env.ts` ignore unknown fields.
+- Relay A1–A4 only make zone enforcement *stricter*; the `/bbs` client treats
+  withheld/locked reads as empty + renders lock state → improvement, not a break.
+
+⚠️ **solid-pod-rs branch ↔ kit — not wired, and not required by the kit.** The kit
+consumes `features = ["core"]` of the published alpha.2; the branch's B1–B5 fixes are
+in `solid-pod-rs-server` (the **agentbox native pod**, built separately), and the
+core-crate changes (B6.3 WebID, `JSS_BODY_LIMIT`) are additive. To consume them
+downstream you must **bump+publish** solid-pod-rs (or add a `[patch.crates-io]
+solid-pod-rs = { git, branch }` in the kit/workspace for a from-source test build).
+
+**Pin-bump chain (when the branches merge):**
+1. **solid-pod-rs** → bump to `0.5.0-alpha.3` + publish (only needed for the native
+   pod / if the kit wants the core hardening).
+2. **nostr-rust-forum** → merge `7b9bef45` to `main` (pod-worker B1/B2 + relay A1–A4
+   already done there; patch `0001` is superseded).
+3. **this overlay** → bump the dual-pin (`KIT_REF` ×3 + `forum-config/Cargo.toml`
+   revs + `Cargo.lock`) to the new kit commit. The `pin-check` CI job already guards it.
+
+**Nothing in `forum-config/` or `src/lib/bbs/` needs to change ahead of the pin bump.**
 
 ---
 
