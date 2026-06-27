@@ -851,8 +851,8 @@ dependencies = [
 
 [[package]]
 name = "nostr-bbs-config"
-version = "1.0.0-beta.2"
-source = "git+https://github.com/DreamLab-AI/nostr-rust-forum.git?rev=6a04e2e#6a04e2e064889ebcf8bf13c0dd1137c84ee6dee2"
+version = "1.0.0-beta.3"
+source = "git+https://github.com/DreamLab-AI/nostr-rust-forum.git?rev=e37a2e0#e37a2e08d4a711f61a414aba1a454c3363355b3d"
 dependencies = [
  "schemars",
  "serde",
@@ -864,8 +864,8 @@ dependencies = [
 
 [[package]]
 name = "nostr-bbs-core"
-version = "1.0.0-beta.2"
-source = "git+https://github.com/DreamLab-AI/nostr-rust-forum.git?rev=6a04e2e#6a04e2e064889ebcf8bf13c0dd1137c84ee6dee2"
+version = "1.0.0-beta.3"
+source = "git+https://github.com/DreamLab-AI/nostr-rust-forum.git?rev=e37a2e0#e37a2e08d4a711f61a414aba1a454c3363355b3d"
 dependencies = [
  "aes",
  "async-trait",
@@ -892,8 +892,8 @@ dependencies = [
 
 [[package]]
 name = "nostr-bbs-mesh"
-version = "1.0.0-beta.2"
-source = "git+https://github.com/DreamLab-AI/nostr-rust-forum.git?rev=6a04e2e#6a04e2e064889ebcf8bf13c0dd1137c84ee6dee2"
+version = "1.0.0-beta.3"
+source = "git+https://github.com/DreamLab-AI/nostr-rust-forum.git?rev=e37a2e0#e37a2e08d4a711f61a414aba1a454c3363355b3d"
 dependencies = [
  "async-trait",
  "nostr-bbs-config",
@@ -905,8 +905,8 @@ dependencies = [
 
 [[package]]
 name = "nostr-bbs-rate-limit"
-version = "1.0.0-beta.2"
-source = "git+https://github.com/DreamLab-AI/nostr-rust-forum.git?rev=6a04e2e#6a04e2e064889ebcf8bf13c0dd1137c84ee6dee2"
+version = "1.0.0-beta.3"
+source = "git+https://github.com/DreamLab-AI/nostr-rust-forum.git?rev=e37a2e0#e37a2e08d4a711f61a414aba1a454c3363355b3d"
 dependencies = [
  "async-trait",
  "hex",
@@ -1383,9 +1383,9 @@ checksum = "8ed6a63f02c8539c91a8685a86f4099661ba3da017932f6ebbea6de3f0fa7c90"
 
 [[package]]
 name = "solid-pod-rs"
-version = "0.5.0-alpha.2"
+version = "0.5.0-alpha.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a6593a9d271a54ece80a32701fbb3cd0052994c2ba99c1d15f9dbc1f70d4fc92"
+checksum = "13cdb0796338f7b2fe73781d488e0536a07aa37cbd17e58e8027ffbe22e09c64"
 dependencies = [
  "async-trait",
  "base64",

@@ -65,7 +65,7 @@ env:
   # in sync with the `rev = "..."` in forum-config/Cargo.lock when bumping the kit.
   # NOTE: tracks nostr-rust-forum PR #63 head (adds nostr-bbs-bbs-client +
   # security fixes). Re-pin to the squash/merge commit on `main` once #63 merges.
-  KIT_REF: '6a04e2e064889ebcf8bf13c0dd1137c84ee6dee2'
+  KIT_REF: 'e37a2e08d4a711f61a414aba1a454c3363355b3d'
 
 jobs:
   gate:
@@ -252,10 +252,11 @@ jobs:
           BUILD_VERSION="$(date -u +%Y.%m.%d)"
           mkdir -p dist/community/bbs
           cp -r kit/dist/community/bbs/* dist/community/bbs/
-          # The BBS reads RELAY_URL/POD_API (not the forum's VITE_* names) plus
-          # THEME/NODE_NAME/LOCATION/BANNER_URL/LOGO_URL/ZONE_CONFIG — the
-          # forum-config/dreamlab.toml [branding] projection.
-          BBS_ENV='<script>window.__ENV__={THEME:"'"$BBS_THEME"'",NODE_NAME:"'"$BBS_NODE_NAME"'",LOCATION:"'"$BBS_LOCATION"'",BANNER_URL:"'"$BBS_BANNER_URL"'",LOGO_URL:"'"$BBS_LOGO_URL"'",FORUM_NAME:"Minimoonoir Forums",RELAY_URL:"'"$VITE_RELAY_URL"'",POD_API:"'"$VITE_POD_API_URL"'",VITE_AUTH_API_URL:"'"$VITE_AUTH_API_URL"'",VITE_SEARCH_API_URL:"'"$VITE_SEARCH_API_URL"'",VITE_LINK_PREVIEW_API_URL:"'"$VITE_LINK_PREVIEW_API_URL"'",BUILD_VERSION:"'"$BUILD_VERSION"'",BUILD_HASH:"'"$BUILD_HASH"'",ZONE_CONFIG:'"$ZONE_CONFIG_JSON"'};</script>'
+          # The BBS reads RELAY_URL/POD_API/PREVIEW_API (not the forum's VITE_*
+          # names) plus THEME/NODE_NAME/LOCATION/BANNER_URL/LOGO_URL/ZONE_CONFIG —
+          # the forum-config/dreamlab.toml [branding] projection. PREVIEW_API is
+          # the preview-worker base for the BBS ASCII image endpoint (/ascii).
+          BBS_ENV='<script>window.__ENV__={THEME:"'"$BBS_THEME"'",NODE_NAME:"'"$BBS_NODE_NAME"'",LOCATION:"'"$BBS_LOCATION"'",BANNER_URL:"'"$BBS_BANNER_URL"'",LOGO_URL:"'"$BBS_LOGO_URL"'",FORUM_NAME:"Minimoonoir Forums",RELAY_URL:"'"$VITE_RELAY_URL"'",POD_API:"'"$VITE_POD_API_URL"'",PREVIEW_API:"'"$VITE_LINK_PREVIEW_API_URL"'",VITE_AUTH_API_URL:"'"$VITE_AUTH_API_URL"'",VITE_SEARCH_API_URL:"'"$VITE_SEARCH_API_URL"'",VITE_LINK_PREVIEW_API_URL:"'"$VITE_LINK_PREVIEW_API_URL"'",BUILD_VERSION:"'"$BUILD_VERSION"'",BUILD_HASH:"'"$BUILD_HASH"'",ZONE_CONFIG:'"$ZONE_CONFIG_JSON"'};</script>'
           sed -i "s|</head>|${BBS_ENV}</head>|" dist/community/bbs/index.html
           # The BBS is a single-screen terminal (no URL sub-routes); a hard load of
           # /community/bbs/ serves this file directly. Provide a 404 fallback too.

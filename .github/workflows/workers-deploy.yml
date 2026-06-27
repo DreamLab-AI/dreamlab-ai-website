@@ -38,7 +38,7 @@ env:
   # worker code while the lockfile stays at this tested revision. Keep this SHA in
   # sync with the `rev = "..."` in forum-config/Cargo.lock when bumping the kit.
   # NOTE: tracks nostr-rust-forum PR #63 head — re-pin to the merge commit on merge.
-  KIT_REF: '6a04e2e064889ebcf8bf13c0dd1137c84ee6dee2'
+  KIT_REF: 'e37a2e08d4a711f61a414aba1a454c3363355b3d'
 
 jobs:
   gate:
