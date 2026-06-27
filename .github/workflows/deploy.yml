@@ -65,7 +65,7 @@ env:
   # in sync with the `rev = "..."` in forum-config/Cargo.lock when bumping the kit.
   # NOTE: tracks nostr-rust-forum PR #63 head (adds nostr-bbs-bbs-client +
   # security fixes). Re-pin to the squash/merge commit on `main` once #63 merges.
-  KIT_REF: '18f686f65d59b6d771528c9152352d9daa0897db'
+  KIT_REF: 'b48e2c744e6ee9642a5b76b5a2ca0458bc28e919'
 
 jobs:
   gate:

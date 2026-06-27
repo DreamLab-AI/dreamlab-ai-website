@@ -13,7 +13,7 @@ publish = false
 path = "src/lib.rs"
 
 [dependencies]
-# Kit crates from nostr-rust-forum @ 18f686f (PR #63 + #64 + #65 + #66, v1.0.0-beta.3): adds
+# Kit crates from nostr-rust-forum @ b48e2c7 (PR #63-#67, v1.0.0-beta.3): adds
 # nostr-bbs-bbs-client + the relay/pod/auth/preview AQE security fixes, on-theme
 # server-side ASCII image rendering (nostr-bbs-ascii + preview/pod /ascii routes),
 # the W3C CID v1.0 did:nostr context migration, adopts solid-pod-rs 0.5.0-alpha.3,
@@ -35,10 +35,10 @@ path = "src/lib.rs"
 # explicit prerelease version alongside the git rev (cargo: "if you are looking
 # for the prerelease package it needs to be specified explicitly"). Keep this
 # version in lockstep with the crate version at `rev` when bumping the kit.
-nostr-bbs-core = { version = "1.0.0-beta.3", git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "18f686f", package = "nostr-bbs-core" }
-nostr-bbs-config = { version = "1.0.0-beta.3", git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "18f686f", package = "nostr-bbs-config" }
-nostr-bbs-mesh = { version = "1.0.0-beta.3", git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "18f686f", package = "nostr-bbs-mesh" }
-nostr-bbs-rate-limit = { version = "1.0.0-beta.3", git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "18f686f", package = "nostr-bbs-rate-limit" }
+nostr-bbs-core = { version = "1.0.0-beta.3", git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "b48e2c7", package = "nostr-bbs-core" }
+nostr-bbs-config = { version = "1.0.0-beta.3", git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "b48e2c7", package = "nostr-bbs-config" }
+nostr-bbs-mesh = { version = "1.0.0-beta.3", git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "b48e2c7", package = "nostr-bbs-mesh" }
+nostr-bbs-rate-limit = { version = "1.0.0-beta.3", git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "b48e2c7", package = "nostr-bbs-rate-limit" }
 
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
