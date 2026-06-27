@@ -19,7 +19,6 @@ const CoCreate = lazy(() => import("./pages/CoCreate"));
 const Research = lazy(() => import("./pages/Research"));
 const Testimonials = lazy(() => import("./pages/Testimonials"));
 const Ventures = lazy(() => import("./pages/Ventures"));
-const BBS = lazy(() => import("./pages/BBS"));
 
 /**
  * The root application component.
@@ -51,9 +50,6 @@ const App = () => (
 
             {/* Venture Lab — unlinked, direct URL only */}
             <Route path="/ventures" element={<Ventures />} />
-
-            {/* Retro ASCII/BBS forum interface — parallel to /community/ */}
-            <Route path="/bbs" element={<BBS />} />
 
             <Route path="/contact" element={<Contact />} />
             <Route path="/privacy" element={<Privacy />} />

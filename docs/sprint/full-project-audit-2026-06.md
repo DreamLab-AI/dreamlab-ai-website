@@ -73,6 +73,11 @@ All three verified: `tsc` clean, 48 BBS tests green, production build green.
 
 ### 4.1 BBS subsystem (new Nostr client)
 
+> **Superseded (2026-06-27):** the React `/bbs` prototype this section audited was
+> **removed** from the overlay in favour of a Rust/Leptos port built upstream in the
+> kit (see `bbs-rust-port-spec.md`). The findings/fixes below are retained as the
+> behavioural reference for the port; they no longer apply to shipped overlay code.
+
 - **[HIGH → FIXED]** Inbound relay events were rendered without signature verification
   (`relay.ts` `handleMessage`). A hostile/compromised relay could spoof any author,
   content, or `✓ nip05` badge. Now every event is `verifyEvent`-checked and dropped if

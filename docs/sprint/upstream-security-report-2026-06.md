@@ -10,8 +10,9 @@ Nostr/HTTP are untrusted; the relay/pod may face hostile peers.
 > turned into PRs against the two upstream repositories. One ready-to-apply patch
 > is included under `docs/sprint/upstream-patches/`.
 
-Status legend: **[PATCH]** = unified diff provided · **[SPEC]** = fix described,
-needs maintainer implementation + CI (we cannot build/test the wasm32 workers here).
+Status legend: **[FIXED]** = implemented on an upstream branch · **[SPEC]** = fix
+described, pending. (An earlier `0001` pod-worker patch was removed from this repo —
+the kit implemented a stronger fix itself in `7b9bef45`; see §0.)
 
 ---
 
@@ -172,7 +173,7 @@ NIP-98 real on the consumed path, strong path-traversal defense in depth, cross-
 write structurally impossible, `.acl` write-escalation blocked, **zero `unsafe`**,
 no panics on untrusted input. Gaps are in **response hardening**.
 
-### B1. [PATCH] Stored content served with attacker `Content-Type`, no `nosniff` — HIGH
+### B1. [FIXED — kit `7b9bef45` + solid-pod-rs branch] Stored content served with attacker `Content-Type`, no `nosniff` — HIGH
 `src/lib.rs:880-946` (GET serve), `:858` (profile card `text/html`),
 `:1518-1542` (`validate_webid_html`). solid-pod-rs `src/ldp.rs` `guess_content_type`
 auto-serves `.html` as `text/html`.
@@ -181,19 +182,19 @@ have the pod serve `text/html`, executing in the **pod origin**.
 *DreamLab mitigation:* pod origins (`dreamlab-pod-api.*.workers.dev`,
 `pods-native.dreamlab-ai.com`) are distinct from the app origin `dreamlab-ai.com`,
 so this is cross-origin (phishing) here, not same-origin XSS against the SPA.
-**Fix (partial PATCH provided — `0001-pod-worker-cors-nosniff-credentials-guard.patch`):**
-adds `X-Content-Type-Options: nosniff` to every response via the shared
-`cors_headers`. **Remaining (SPEC):** add `Content-Disposition: attachment` (or a
-hardcoded safe type) for `text/html` / `application/xhtml+xml` / SVG / unknown types
-on world-readable containers — **excluding** the WebID profile card path
-(`:843-868`), which must remain inline `text/html` for Solid browsers. Mirror in
-solid-pod-rs `ldp.rs` for the native server.
+**Fixed.** Kit CF pod-worker (`7b9bef45`): `nosniff` on every response, a
+wildcard+credentials guard, **`CSP: default-src 'none'; sandbox` on `text/html`**
+(the WebID card still parses as data but cannot execute — neater than the original
+`Content-Disposition` idea), and a content-negotiation guard so `Accept: text/html`
+cannot relabel a stored non-HTML resource. The solid-pod-rs native server is fixed
+equivalently (middleware `nosniff` + `Content-Disposition: attachment` for active
+content types).
 
-### B2. [PATCH] CORS `*` origin + `Allow-Credentials: true` when `EXPECTED_ORIGIN` unset — HIGH
+### B2. [FIXED — kit `7b9bef45` + solid-pod-rs branch] CORS `*` origin + `Allow-Credentials: true` when `EXPECTED_ORIGIN` unset — HIGH
 `src/lib.rs:165-177` (`cors_headers`), core `src/cors.rs:46-55` (`POD_CORS_HEADERS`).
-**Fix (PATCH provided):** the same patch skips `Access-Control-Allow-Credentials`
-whenever the origin resolves to `*`. Recommend additionally requiring
-`EXPECTED_ORIGIN` (fail closed) and matching against an allow-list.
+**Fixed.** The kit drops `Allow-Credentials` when the origin resolves to `*` (and on
+the wildcard NIP-05 endpoint); solid-pod-rs advertises credentials only for an
+allow-listed origin. Still recommend requiring `EXPECTED_ORIGIN` (fail closed).
 
 ### B3. [SPEC] Container listing enumerates child names regardless of child ACL — MEDIUM
 `src/container.rs:16-66`, `src/lib.rs:820-838` (`list_container`)
@@ -229,10 +230,13 @@ inbox/append container size independently of the owner quota.
 
 ## How to consume this
 
-1. **Patch:** `git -C nostr-rust-forum apply
-   path/to/0001-pod-worker-cors-nosniff-credentials-guard.patch` then PR it
-   (covers B1 partial + B2). It is mechanically safe (header-only) but unbuilt
-   here — run the kit's `cargo test` / wasm build in CI.
-2. **Specs:** file A1–A7 and B3–B6 as upstream issues; the relay read-path trio
-   (A1/A2/A3) is the highest priority and should share one zone-projection helper.
-3. The **crypto/auth core needs no changes** — verified strong at this pin.
+1. **Kit fixes already on the NRF branch** (`7b9bef45`): relay A1–A4, pod-worker
+   B1/B2, auth A5/A7, preview SSRF, supply-chain. Merge to `main`; this overlay then
+   bumps the dual-pin (§0). No patch to apply — the kit implemented them directly.
+2. **solid-pod-rs branch** fixes B1–B6 for the native server + core; **bump+publish
+   `0.5.0-alpha.3`** so the native pod (agentbox) / kit can pin them.
+3. **Still open — kit CF pod-worker only** (file as issues): B3 (container listing
+   ACL), B4 (NIP-05 fail-open KV limiter), B5 (owner-keyed quota), B6 (inbox/git).
+   The solid-pod-rs branch fixed these for the **native** server; the **CF Worker
+   variant** in `nostr-bbs-pod-worker` still needs them.
+4. The **crypto/auth core needs no changes** — verified strong at this pin.

@@ -138,15 +138,17 @@ All routes are lazy-loaded via `React.lazy()` in `src/App.tsx`:
 | `/ventures` | Ventures |
 | `/contact` | Contact |
 | `/privacy` | Privacy |
-| `/bbs` | BBS (retro ASCII terminal forum client) |
 | `*` | NotFound |
 
 Legacy redirects: `/residential-training` and `/masterclass` → `/programmes`;
 `/system-design`, `/research-paper`, and `/work` → `/research`.
 The Leptos forum is a separate SPA served at `/community/` (not a React route).
-`/bbs` is a second, React-native client for the **same** forum backend — a retro
-BBS/ASCII terminal (`src/lib/bbs/`, `src/components/bbs/`) that speaks the Nostr
-relay protocol directly; it is a normal lazy React route.
+The retro ASCII/BBS forum client is implemented **upstream** in the
+nostr-rust-forum kit (Rust/Leptos) and served under `/community/`, configured via
+`forum-config/dreamlab.toml` like the rest of the kit — it is **not** a React
+route in this overlay. (A React prototype previously lived at `/bbs`; it was
+removed in favour of the upstream Rust port — see
+`docs/sprint/bbs-rust-port-spec.md`.)
 
 Keep `public/sitemap.xml` in sync with this table when routes change.
 
@@ -187,9 +189,9 @@ VITE_RELAY_URL=wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev
 VITE_LINK_PREVIEW_API_URL=https://dreamlab-link-preview.solitary-paper-764d.workers.dev
 ```
 
-The `/bbs` client and the `/community/` forum read `VITE_RELAY_URL` (and the
-other API URLs) at runtime from `window.__ENV__`; `src/lib/bbs/env.ts` falls
-back to these defaults. Keep this list in sync with `deploy.yml` `[env]`.
+The `/community/` forum and the upstream Rust ASCII BBS read `VITE_RELAY_URL`
+(and the other API URLs) at runtime from `window.__ENV__`. Keep this list in sync
+with `deploy.yml` `[env]`.
 
 Workers use `forum-config/deploy/*.wrangler.toml` bindings (D1, KV, R2, DO) —
 no `.env` files. The forum client receives runtime config via
