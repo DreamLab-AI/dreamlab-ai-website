@@ -174,6 +174,36 @@ jobs:
       - run: cargo test --manifest-path forum-config/Cargo.toml
 
   # ---------------------------------------------------------------------------
+  # Dual-pin check — KIT_REF (deploy/workers-deploy/rust-ci) and the
+  # forum-config Cargo revs must move together, or client/worker/test skew
+  # ships (see the 2026-06-15 incident note in workers-deploy.yml).
+  # ---------------------------------------------------------------------------
+  pin-check:
+    name: Dual-pin check
+    runs-on: ubuntu-latest
+    if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify KIT_REF and Cargo revs are in lockstep
+        run: |
+          set -euo pipefail
+          deploy=$(grep -oP "KIT_REF:\s*'\K[0-9a-f]+" .github/workflows/deploy.yml | head -1)
+          workers=$(grep -oP "KIT_REF:\s*'\K[0-9a-f]+" .github/workflows/workers-deploy.yml | head -1)
+          rustci=$(grep -oP "KIT_REF:\s*'\K[0-9a-f]+" .github/workflows/rust-ci.yml | head -1)
+          echo "deploy=$deploy  workers=$workers  rustci=$rustci"
+          if [[ -z "$deploy" || "$deploy" != "$workers" || "$deploy" != "$rustci" ]]; then
+            echo "::error::KIT_REF differs across deploy/workers-deploy/rust-ci.yml"; exit 1
+          fi
+          mapfile -t revs < <(grep -oP 'rev = "\K[0-9a-f]+' forum-config/Cargo.toml | sort -u)
+          if [[ ${#revs[@]} -eq 0 ]]; then echo "::error::no nostr-bbs rev pins found"; exit 1; fi
+          for r in "${revs[@]}"; do
+            if [[ "$deploy" != "$r"* ]]; then
+              echo "::error::forum-config Cargo rev '$r' is not a prefix of KIT_REF '$deploy'"; exit 1
+            fi
+          done
+          echo "Dual-pin OK — all pinned to $deploy"
+
+  # ---------------------------------------------------------------------------
   # Aggregator — single required status check for branch protection.
   # ---------------------------------------------------------------------------
   ci-pass:
@@ -185,6 +215,7 @@ jobs:
       - node-test
       - node-build
       - node-audit
+      - pin-check
       - rust-fmt
       - rust-clippy
       - rust-test
@@ -195,6 +226,7 @@ jobs:
           echo "node-test:    ${{ needs.node-test.result }}"
           echo "node-build:   ${{ needs.node-build.result }}"
           echo "node-audit:   ${{ needs.node-audit.result }}"
+          echo "pin-check:    ${{ needs.pin-check.result }}"
           echo "rust-fmt:     ${{ needs.rust-fmt.result }}"
           echo "rust-clippy:  ${{ needs.rust-clippy.result }}"
           echo "rust-test:    ${{ needs.rust-test.result }}"
@@ -204,6 +236,7 @@ jobs:
             "${{ needs.node-test.result }}" \
             "${{ needs.node-build.result }}" \
             "${{ needs.node-audit.result }}" \
+            "${{ needs.pin-check.result }}" \
             "${{ needs.rust-fmt.result }}" \
             "${{ needs.rust-clippy.result }}" \
             "${{ needs.rust-test.result }}"; do

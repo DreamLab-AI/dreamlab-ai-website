@@ -141,6 +141,13 @@ export function SettingsScreen({ onExit }: ScreenProps) {
             )}
           </div>
 
+          <p className="mt-2 text-[0.85em] text-[var(--bbs-warn)]">
+            ⚠ A generated/imported key is stored unencrypted in this browser's
+            localStorage — treat it as a throwaway BBS identity, not high-value
+            custody. For a key you care about, use a NIP-07 extension (the
+            extension holds the secret; the BBS never sees it).
+          </p>
+
           {revealed && identity.secretHex && (
             <p className="mt-2 break-all border border-[var(--bbs-warn)] p-2 text-[0.85em] text-[var(--bbs-warn)]">
               ⚠ keep this secret. nsec: {nsecOf(identity.secretHex)}

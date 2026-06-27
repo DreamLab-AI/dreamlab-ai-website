@@ -31,4 +31,8 @@ database_id   = "e3981999-e8f0-4c07-9e4b-2e50859b8524"
 ALLOWED_ORIGIN   = "https://dreamlab-ai.com"
 ALLOWED_ORIGINS  = "https://dreamlab-ai.com,https://thedreamlab.uk,https://dreamlab-ai.github.io"
 RVF_STORE_KEY    = "dreamlab.rvf"
-ADMIN_PUBKEYS    = "6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425a,11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c"
+# Full operator admin set — kept in lockstep with relay-worker.wrangler.toml and
+# dreamlab.toml [admin].static_pubkeys (power-user, operator-jjohare,
+# moderation-bot, calendar-bot, search-indexer). The search-indexer must be admin
+# to administer the worker it feeds (e.g. RVF reindex).
+ADMIN_PUBKEYS    = "11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c,6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425a,5d80b5facd2d746689d7d2e400db6acce5843456967054adcf6956e4c734c54c,be92ccf53d9d535fd21f3388201fd83b49588552fff5a1395fb60b6998df2243,d5194639ee3560204a1b5584a0714a6dd2a6c59953d0869b483e72ee185ada26"
