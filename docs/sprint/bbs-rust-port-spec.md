@@ -87,10 +87,22 @@ Add the few new `[branding]` keys (node_name, location, banner/logo) to
 
 Until then, this overlay simply has no BBS route (the prototype is removed).
 
-## 6. Status
+## 6. Status — IMPLEMENTED & CONSUMED
 
-- Overlay: React prototype **removed** (this PR); `nostr-tools` returned to
-  devDependencies (only the seed scripts use it now).
-- Kit (`nostr-rust-forum`): port to be implemented in the collaboration branch;
-  the relay-side zone enforcement it depends on already landed in `7b9bef45`.
-- This spec + the git-history React reference are the inputs for that work.
+- **Kit** (`nostr-rust-forum` PR #63 @ `6a04e2e`): `nostr-bbs-bbs-client` (Leptos
+  CSR) shipped — 10 screens + live relay/governance wiring; `config.rs` reads
+  `THEME / NODE_NAME / LOCATION / BANNER_URL / LOGO_URL / RELAY_URL / POD_API /
+  ZONE_CONFIG` from `window.__ENV__`; built `trunk build --release --public-url
+  /community/bbs/` (Trunk.toml → `dist/community/bbs`).
+- **Overlay** (this repo): React prototype removed; **now consumes the kit BBS**:
+  - `forum-config/dreamlab.toml` `[branding]` — `node_name`, `location`,
+    `banner_url` added (theme/logo already present).
+  - `deploy.yml` — Trunk-builds the crate, copies to `dist/community/bbs/`, injects
+    the `[branding]`-projected `__ENV__` (note: BBS uses `RELAY_URL`/`POD_API`, not
+    the forum's `VITE_*`); `/bbs` → `/community/bbs/` redirect (404.html); sitemap.
+  - Dual-pin `KIT_REF` ×3 + `forum-config/Cargo.toml` revs + `Cargo.lock` bumped to
+    `6a04e2e` (**tracks PR #63 head — re-pin to the merge commit once #63 merges**);
+    `pin-check` CI guards lockstep. `nostr-tools` back in devDependencies.
+- **Verification:** React build/lint/test green + `pin-check` lockstep verified
+  locally. The kit Trunk/WASM build runs in `deploy.yml` (on merge to `main`); the
+  Rust dep-compile against `6a04e2e` runs in `ci.yml` rust jobs on the PR.

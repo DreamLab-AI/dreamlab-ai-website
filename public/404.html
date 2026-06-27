@@ -8,7 +8,10 @@
       // Handle both main site (/) and community app (/community/)
       var path = location.pathname + location.search + location.hash;
 
-      if (path.startsWith('/community')) {
+      if (location.pathname === '/bbs' || location.pathname.startsWith('/bbs/')) {
+        // Retro ASCII/BBS client is served by the kit at /community/bbs/
+        location.replace('/community/bbs/');
+      } else if (path.startsWith('/community')) {
         // Community SvelteKit app - store path and redirect to community root
         sessionStorage.setItem('redirect', path);
         location.replace('/community/');

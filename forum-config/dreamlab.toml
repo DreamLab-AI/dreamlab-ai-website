@@ -46,8 +46,16 @@ static_pubkeys  = [
 ]
 
 # ─── Branding ────────────────────────────────────────────────────────────────
+# `theme`, `node_name`, `location`, `banner_url`, `logo_url` are consumed by BOTH
+# the Leptos forum client and the retro ASCII/BBS client (nostr-bbs-bbs-client,
+# served at /community/bbs/). The kit projects them into window.__ENV__ as
+# THEME / NODE_NAME / LOCATION / BANNER_URL / LOGO_URL; deploy.yml mirrors that
+# injection. `theme` selects the BBS palette: amber | green | purple | sky.
 [branding]
 theme         = "amber"
+node_name     = "DREAMLAB BBS"          # BBS masthead + status-bar node id
+location      = "Lake District, UK"     # BBS status-bar location string
+banner_url    = ""                       # optional ASCII-art / image banner
 logo_url      = "https://dreamlab-ai.com/assets/logo.svg"
 welcome_copy  = """
 Welcome to the DreamLab AI Community Forum — \

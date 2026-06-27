@@ -144,11 +144,12 @@ Legacy redirects: `/residential-training` and `/masterclass` → `/programmes`;
 `/system-design`, `/research-paper`, and `/work` → `/research`.
 The Leptos forum is a separate SPA served at `/community/` (not a React route).
 The retro ASCII/BBS forum client is implemented **upstream** in the
-nostr-rust-forum kit (Rust/Leptos) and served under `/community/`, configured via
-`forum-config/dreamlab.toml` like the rest of the kit — it is **not** a React
-route in this overlay. (A React prototype previously lived at `/bbs`; it was
-removed in favour of the upstream Rust port — see
-`docs/sprint/bbs-rust-port-spec.md`.)
+nostr-rust-forum kit (`nostr-bbs-bbs-client`, Rust/Leptos) and served at
+**`/community/bbs/`** (deploy.yml Trunk-builds it; `/bbs` 301-redirects there). It
+is configured entirely via `forum-config/dreamlab.toml` `[branding]`
+(theme/node_name/location/banner_url/logo_url → `window.__ENV__`) — **not** a React
+route in this overlay. (A React prototype previously lived at `/bbs`; it was removed
+in favour of the upstream Rust port — see `docs/sprint/bbs-rust-port-spec.md`.)
 
 Keep `public/sitemap.xml` in sync with this table when routes change.
 
