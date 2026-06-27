@@ -142,7 +142,14 @@ All routes are lazy-loaded via `React.lazy()` in `src/App.tsx`:
 
 Legacy redirects: `/residential-training` and `/masterclass` → `/programmes`;
 `/system-design`, `/research-paper`, and `/work` → `/research`.
-The forum is a separate SPA served at `/community/` (not a React route).
+The Leptos forum is a separate SPA served at `/community/` (not a React route).
+The retro ASCII/BBS forum client is implemented **upstream** in the
+nostr-rust-forum kit (`nostr-bbs-bbs-client`, Rust/Leptos) and served at
+**`/community/bbs/`** (deploy.yml Trunk-builds it; `/bbs` 301-redirects there). It
+is configured entirely via `forum-config/dreamlab.toml` `[branding]`
+(theme/node_name/location/banner_url/logo_url → `window.__ENV__`) — **not** a React
+route in this overlay. (A React prototype previously lived at `/bbs`; it was removed
+in favour of the upstream Rust port — see `docs/sprint/bbs-rust-port-spec.md`.)
 
 Keep `public/sitemap.xml` in sync with this table when routes change.
 
@@ -179,7 +186,13 @@ VITE_SUPABASE_ANON_KEY=your-anon-key-here
 VITE_AUTH_API_URL=https://dreamlab-auth-api.solitary-paper-764d.workers.dev
 VITE_POD_API_URL=https://dreamlab-pod-api.solitary-paper-764d.workers.dev
 VITE_SEARCH_API_URL=https://dreamlab-search-api.solitary-paper-764d.workers.dev
+VITE_RELAY_URL=wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev
+VITE_LINK_PREVIEW_API_URL=https://dreamlab-link-preview.solitary-paper-764d.workers.dev
 ```
+
+The `/community/` forum and the upstream Rust ASCII BBS read `VITE_RELAY_URL`
+(and the other API URLs) at runtime from `window.__ENV__`. Keep this list in sync
+with `deploy.yml` `[env]`.
 
 Workers use `forum-config/deploy/*.wrangler.toml` bindings (D1, KV, R2, DO) —
 no `.env` files. The forum client receives runtime config via
@@ -195,12 +208,14 @@ no `.env` files. The forum client receives runtime config via
 
 ### The dual-pin rule (critical)
 
-The kit commit is pinned in **three places that must move together** in one
+The kit commit is pinned in **four places that must move together** in one
 commit, or client/worker/test skew ships:
 
 1. `KIT_REF` in `.github/workflows/deploy.yml`
 2. `KIT_REF` in `.github/workflows/workers-deploy.yml`
-3. The `rev = "..."` pins on every `nostr-bbs-*` dependency in `forum-config/Cargo.toml`
+3. `KIT_REF` in `.github/workflows/rust-ci.yml`
+4. The `rev = "..."` pins on every `nostr-bbs-*` dependency in `forum-config/Cargo.toml`
+   (and the resolved full SHA in `forum-config/Cargo.lock`)
 
 ### Zones
 
@@ -232,3 +247,167 @@ relay's `ZONE_CONFIG` var (server enforcement) and the client's
 - Always validate file paths to prevent directory traversal (see vite.config.ts middleware)
 - The seed/probe scripts read the admin key from the environment and must
   never print or persist secret material
+
+
+## Agentic QE v3
+
+This project uses **Agentic QE v3** - a Domain-Driven Quality Engineering platform with 13 bounded contexts, ReasoningBank learning, HNSW vector search, and Agent Teams coordination (ADR-064).
+
+---
+
+### CRITICAL POLICIES
+
+#### Integrity Rule (ABSOLUTE)
+- NO shortcuts, fake data, or false claims
+- ALWAYS implement properly, verify before claiming success
+- ALWAYS use real database queries for integration tests
+- ALWAYS run actual tests, not assume they pass
+
+**We value the quality we deliver to our users.**
+
+#### Test Execution
+- NEVER run `npm test` without `--run` flag (watch mode risk)
+- Use: `npm test -- --run`, `npm run test:unit`, `npm run test:integration` when available
+
+#### Data Protection
+- NEVER run `rm -f` on `.agentic-qe/` or `*.db` files without confirmation
+- ALWAYS backup before database operations
+
+#### Git Operations
+- NEVER auto-commit/push without explicit user request
+- ALWAYS wait for user confirmation before git operations
+
+---
+
+### Quick Reference
+
+```bash
+# Run tests
+npm test -- --run
+
+# Check quality
+aqe quality assess
+
+# Generate tests
+aqe test generate <file>
+
+# Coverage analysis
+aqe coverage <path>
+```
+
+### Using AQE MCP Tools
+
+AQE exposes tools via MCP with the `mcp__agentic-qe__` prefix. You MUST call `fleet_init` before any other tool.
+
+#### 1. Initialize the Fleet (required first step)
+
+```typescript
+mcp__agentic-qe__fleet_init({
+  topology: "hierarchical",
+  maxAgents: 15,
+  memoryBackend: "hybrid"
+})
+```
+
+#### 2. Generate Tests
+
+```typescript
+mcp__agentic-qe__test_generate_enhanced({
+  targetPath: "src/services/auth.ts",
+  framework: "vitest",
+  strategy: "boundary-value"
+})
+```
+
+#### 3. Analyze Coverage
+
+```typescript
+mcp__agentic-qe__coverage_analyze_sublinear({
+  paths: ["src/"],
+  threshold: 80
+})
+```
+
+#### 4. Assess Quality
+
+```typescript
+mcp__agentic-qe__quality_assess({
+  scope: "full",
+  includeMetrics: true
+})
+```
+
+#### 5. Store and Query Patterns (with learning persistence)
+
+```typescript
+// Store a learned pattern
+mcp__agentic-qe__memory_store({
+  key: "patterns/coverage-gap/{timestamp}",
+  namespace: "learning",
+  value: {
+    pattern: "...",
+    confidence: 0.95,
+    type: "coverage-gap",
+    metadata: { /* domain-specific */ }
+  },
+  persist: true
+})
+
+// Query stored patterns
+mcp__agentic-qe__memory_query({
+  pattern: "patterns/*",
+  namespace: "learning",
+  limit: 10
+})
+```
+
+#### 6. Orchestrate Multi-Agent Tasks
+
+```typescript
+mcp__agentic-qe__task_orchestrate({
+  task: "Full quality assessment of auth module",
+  domains: ["test-generation", "coverage-analysis", "security-compliance"],
+  parallel: true
+})
+```
+
+### MCP Tool Reference
+
+| Tool | Description |
+|------|-------------|
+| `fleet_init` | Initialize QE fleet (MUST call first) |
+| `fleet_status` | Get fleet health and agent status |
+| `agent_spawn` | Spawn specialized QE agent |
+| `test_generate_enhanced` | AI-powered test generation |
+| `test_execute_parallel` | Parallel test execution with retry |
+| `task_orchestrate` | Orchestrate multi-agent QE tasks |
+| `coverage_analyze_sublinear` | O(log n) coverage analysis |
+| `quality_assess` | Quality gate evaluation |
+| `memory_store` | Store patterns with namespace + persist |
+| `memory_query` | Query patterns by namespace/pattern |
+| `security_scan_comprehensive` | SAST/DAST scanning |
+
+### Configuration
+
+- **Enabled Domains**: test-generation, test-execution, coverage-analysis, quality-assessment, defect-intelligence, requirements-validation (+6 more)
+- **Learning**: Enabled (transformer embeddings)
+- **Max Concurrent Agents**: 8
+- **Background Workers**: pattern-consolidator, routing-accuracy-monitor, coverage-gap-scanner
+
+### V3 QE Agents
+
+QE agents are in `.claude/agents/v3/`. Use with Task tool:
+
+```javascript
+Task({ prompt: "Generate tests", subagent_type: "qe-test-architect", run_in_background: true })
+Task({ prompt: "Find coverage gaps", subagent_type: "qe-coverage-specialist", run_in_background: true })
+Task({ prompt: "Security audit", subagent_type: "qe-security-scanner", run_in_background: true })
+```
+
+### Data Storage
+
+- **Memory Backend**: `.agentic-qe/memory.db` (SQLite)
+- **Configuration**: `.agentic-qe/config.yaml`
+
+---
+*Generated by AQE v3 init - 2026-06-27T12:36:59.809Z*

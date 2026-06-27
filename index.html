@@ -56,15 +56,11 @@
     <meta name="format-detection" content="telephone=no" />
 
     <!-- Security Headers -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.gpteng.co; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.workers.dev wss://*.workers.dev; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.workers.dev wss://*.workers.dev https://*.dreamlab-ai.com wss://*.dreamlab-ai.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-Frame-Options" content="DENY">
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
     <meta name="referrer" content="strict-origin-when-cross-origin">
-
-    <!-- Preconnect to improve performance -->
-    <link rel="preconnect" href="https://cdn.gpteng.co" crossorigin />
-    <link rel="dns-prefetch" href="https://cdn.gpteng.co" />
 
     <!-- Structured Data (JSON-LD) -->
     <script type="application/ld+json">
@@ -179,8 +175,6 @@
       Skip to main content
     </a>
     <div id="root" role="main" aria-label="Main content"></div>
-    <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
-    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script type="module" src="/src/main.tsx"></script>
     <noscript>
       <div style="padding: 2rem; text-align: center; font-family: system-ui, -apple-system, sans-serif; background: #0a0a1a; color: #fff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;">

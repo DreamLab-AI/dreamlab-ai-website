@@ -85,6 +85,8 @@ export async function requestDataErasure(
           return { table, deleted: 0, error: countError.message };
         }
 
+        const before = count ?? 0;
+
         // Perform the deletion.
         const { error: deleteError } = await client
           .from(table)
@@ -95,7 +97,28 @@ export async function requestDataErasure(
           return { table, deleted: 0, error: deleteError.message };
         }
 
-        return { table, deleted: count ?? 0, error: null };
+        // Re-count after deleting. A delete that affects 0 rows does not error
+        // under RLS, so we must verify the rows are actually gone rather than
+        // trusting the pre-count (which would report a false success).
+        const { count: remaining, error: verifyError } = await client
+          .from(table)
+          .select("*", { count: "exact", head: true })
+          .eq(emailColumn, normalised);
+
+        if (verifyError) {
+          return { table, deleted: 0, error: verifyError.message };
+        }
+
+        const left = remaining ?? 0;
+        if (left > 0) {
+          return {
+            table,
+            deleted: Math.max(0, before - left),
+            error: `deletion incomplete: ${left} row(s) remain (check RLS delete policy)`,
+          };
+        }
+
+        return { table, deleted: before, error: null };
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
         return { table, deleted: 0, error: message };

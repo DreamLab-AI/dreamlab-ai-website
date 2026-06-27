@@ -20,7 +20,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { requestDataErasure, type ErasureReport } from "@/lib/gdpr-erasure";
-import { EMAIL_REGEX } from "@/lib/utils";
+import { isValidEmail, MAX_EMAIL_LEN } from "@/lib/utils";
 
 export function DataErasureRequest() {
   const [email, setEmail] = useState("");
@@ -33,7 +33,7 @@ export function DataErasureRequest() {
     setError(null);
     setReport(null);
 
-    if (!email.trim() || !EMAIL_REGEX.test(email)) {
+    if (!isValidEmail(email)) {
       setError("Please enter a valid email address.");
       return;
     }
@@ -74,6 +74,7 @@ export function DataErasureRequest() {
           type="email"
           placeholder="Your email address"
           value={email}
+          maxLength={MAX_EMAIL_LEN}
           onChange={(e) => setEmail(e.target.value)}
           disabled={isSubmitting}
           aria-label="Email address for data erasure request"

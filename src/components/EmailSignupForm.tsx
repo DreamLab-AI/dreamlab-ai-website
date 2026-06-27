@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { Checkbox } from "@/components/ui/checkbox";
-import { EMAIL_REGEX } from "@/lib/utils";
+import { isValidEmail, MAX_EMAIL_LEN, MAX_NAME_LEN } from "@/lib/utils";
 
 // --- Constants ---
 const SUCCESS_MESSAGE = "Thanks for signing up! We'll be in touch soon.";
@@ -29,7 +29,7 @@ export const EmailSignupForm = () => {
     e.preventDefault();
 
     // Validate email format
-    if (!email.trim() || !EMAIL_REGEX.test(email)) {
+    if (!isValidEmail(email)) {
       toast.error(ERROR_MESSAGE_INVALID_EMAIL);
       return;
     }
@@ -52,7 +52,7 @@ export const EmailSignupForm = () => {
         .from('email_subscribers')
         .upsert({
           email: email.trim().toLowerCase(), // email is now the primary key
-          name: name.trim() || null,
+          name: name.trim().slice(0, MAX_NAME_LEN) || null,
           has_consent: hasConsent,
           source: 'website_signup_form'
           // subscribed_at will be set automatically by the default value
@@ -60,8 +60,9 @@ export const EmailSignupForm = () => {
           onConflict: 'email'
         });
 
+      // Do not log the raw Supabase error client-side — it can leak schema /
+      // project details (matches the Contact form's policy).
       if (error) {
-        console.error('Supabase error:', error);
         throw error;
       }
 
@@ -69,8 +70,7 @@ export const EmailSignupForm = () => {
       setName("");
       setHasConsent(false);
       toast.success(SUCCESS_MESSAGE);
-    } catch (error) {
-      console.error('Error submitting email:', error);
+    } catch {
       toast.error(ERROR_MESSAGE_SUBMISSION);
     } finally {
       setIsSubmitting(false);
@@ -89,6 +89,7 @@ export const EmailSignupForm = () => {
             type="text"
             placeholder="Your name"
             value={name}
+            maxLength={MAX_NAME_LEN}
             onChange={(e) => setName(e.target.value)}
             className="rounded-lg bg-background/60 backdrop-blur-sm border-purple-500/30 placeholder:text-muted-foreground/50 focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300"
             disabled={isSubmitting}
@@ -104,6 +105,7 @@ export const EmailSignupForm = () => {
             type="email"
             placeholder="Your email address"
             value={email}
+            maxLength={MAX_EMAIL_LEN}
             onChange={(e) => setEmail(e.target.value)}
             className="rounded-lg bg-background/60 backdrop-blur-sm border-purple-500/30 placeholder:text-muted-foreground/50 focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300"
             required

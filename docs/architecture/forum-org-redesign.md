@@ -36,6 +36,13 @@ Orthogonal tags; a person may hold several (you = `admin`; a relative who also v
 | `family` | Family members — read access to **all** calendars |
 | `friends` | The MiniMooNoir circle — music/photos/events/staying over |
 | `business` | In-house training visitors at DreamLab |
+| `members` | General whitelisted membership — may post in the public landing zone |
+| `agent` | Bot/agent identities (welcome, moderation, calendar, search, etc.) |
+
+> The live `public` zone `write_cohorts` is `["members","friends","agent"]`
+> (see `dreamlab.toml`/`deploy.yml`/`src/lib/bbs/env.ts`); `admin` always
+> bypasses. `members`/`agent` are first-class cohorts here, not legacy aliases —
+> keep this table in sync with `[[zones]].write_cohorts`.
 
 ## 3. Zones (sections) & visibility
 

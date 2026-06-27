@@ -84,4 +84,12 @@
     <priority>0.3</priority>
   </url>
 
+  <!-- Retro ASCII/BBS forum client (built by the kit, served at /community/bbs/) -->
+  <url>
+    <loc>https://dreamlab-ai.com/community/bbs/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
 </urlset>

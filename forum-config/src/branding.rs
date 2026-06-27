@@ -18,6 +18,11 @@ pub fn dreamlab_branding() -> Branding {
              a private space for trainers, builders, and the curious."
                 .into(),
         ),
+        // Retro ASCII/BBS interface branding (nostr-bbs-bbs-client status bar).
+        // Mirrors the BBS_* env projected into window.__ENV__ by deploy.yml.
+        node_name: Some("DREAMLAB BBS".into()),
+        location: Some("Lake District, UK".into()),
+        banner_url: None,
     }
 }
 
