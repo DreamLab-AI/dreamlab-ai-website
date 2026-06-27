@@ -15,6 +15,59 @@ needs maintainer implementation + CI (we cannot build/test the wasm32 workers he
 
 ---
 
+## 0. Upstream status & consumption chain (cross-checked 2026-06-27)
+
+Verified against the live upstream branches (read via the GitHub REST API).
+
+**Active fix branches**
+- `solid-pod-rs@claude/agentic-qe-global-install-l20lwk` (+2 commits over `main`):
+  **B1, B2 fixed** (server middleware: `nosniff` + `Content-Disposition: attachment`
+  for active content-types; CORS credentials only for an allowlisted origin),
+  **B6.3 fixed** (WebID HTML), with new tests. B3/B4/B5/B6.1/B6.2 left open with
+  recommended fixes. Their own audit (`solid-pod-rs/docs/sprint/security-audit-2026-06.md`)
+  confirms A1–A7 are **N/A** to that tree (they target the forum relay in NRF —
+  matching §A here).
+- `nostr-rust-forum@claude/agentic-qe-global-install-92nfhn`: **AQE bootstrap only**
+  (`aqe init`); the kit's security fixes (the §B1/§B2 **pod-worker** patch below and
+  the §A relay fixes) are **not yet committed to any NRF branch**.
+- The other NRF branches (`fix/nip07-topic-signing`, `chore/solid-pod-rs-0.5.0-alpha.0-pin`)
+  are stale/superseded (0–1 commits ahead, ~90 behind `main`).
+
+**Two distinct pod trees — fixes land in different places.** §B findings exist in
+both, with different root causes/fixes:
+| | Kit CF pod-worker (`nostr-bbs-pod-worker`) | Native server (`solid-pod-rs-server`, agentbox) |
+|---|---|---|
+| Consumed by | this overlay's CF deploy (primary) | `[native_pod]` = `pods-native.dreamlab-ai.com` |
+| B1/B2 fix | **patch `0001` here** (apply to NRF) | **done** on the solid-pod-rs branch |
+| B4 root cause | fail-open **KV** limiter (real) | **no** limiter wired (real) |
+| B5 root cause | quota keyed by `owner_pubkey` (real) | quota keyed by dir-name, **unenforced** |
+
+> Corrections accepted from the solid-pod-rs audit: the "fails-open on KV" (B4) and
+> "charged to owner_pubkey" (B5) wording in earlier drafts described the **CF
+> Worker**, not the native server — both findings are real in their respective
+> trees. This report now scopes them per-tree.
+
+**Consumption chain (what must happen for this overlay to ship the fixes):**
+1. **solid-pod-rs** → bump workspace version (e.g. `0.5.0-alpha.3`) + **publish to
+   crates.io**. (Still `0.5.0-alpha.2` on the branch — unpublished, so not yet
+   consumable. Note: the kit consumes `features = ["core"]`; B1/B2 are in the
+   `-server` crate the **agentbox** native pod builds, not the kit — only B6.3
+   touches the core crate.)
+2. **nostr-rust-forum** → apply patch `0001` (pod-worker B1/B2) + the §A relay
+   fixes; bump its `solid-pod-rs` pin to the new alpha; commit to `main`.
+3. **this overlay** → bump the dual-pin (`KIT_REF` ×3 + `forum-config/Cargo.toml`
+   revs + `Cargo.lock`) to the new kit commit. The new `pin-check` CI job and
+   `aqe`/dual-pin docs are already in place for this.
+
+**Overlay compatibility: ✅ no breaking change for us.** The relay read-path
+fixes (A1–A3) only make zone enforcement *stricter*; the `/bbs` client already
+treats withheld/locked-zone reads as empty and renders lock state, so stricter
+enforcement is an improvement, not a break. solid-pod-rs B1/B2/B6.3 are middleware
+/ additive-validation (no `core` public-API change the kit calls). Nothing in
+`forum-config/` or `src/lib/bbs/` needs to change ahead of the pin bump.
+
+---
+
 ## A. Relay worker (`nostr-bbs-relay-worker`)
 
 The cryptographic core is strong (event-id recompute + Schnorr verify before any
