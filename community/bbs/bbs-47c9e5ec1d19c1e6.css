@@ -1,0 +1,443 @@
+/* Retro ASCII/BBS terminal styling.
+ *
+ * Theme palettes are CSS custom properties switched by a `theme-*` class on the
+ * root element (see src/theme.rs). Per-zone accent colours are applied inline
+ * via `--accent` from each zone's `accent_hex`.
+ */
+
+:root {
+  --bg: #0a0a0a;
+  --bg-panel: #0f0f0f;
+  --fg: #ffb000;       /* amber default */
+  --fg-bright: #ffd47a;
+  --fg-dim: #8a5e00;
+  --accent: #ffb000;
+  --border: #6b4a00;
+  --select-bg: #ffb000;
+  --select-fg: #0a0a0a;
+  --font: "Cascadia Mono", "JetBrains Mono", "Fira Code", "DejaVu Sans Mono",
+    Menlo, Consolas, monospace;
+}
+
+/* ── Theme palettes ──────────────────────────────────────────────────────── */
+.theme-amber {
+  --fg: #ffb000; --fg-bright: #ffd47a; --fg-dim: #8a5e00;
+  --accent: #ffb000; --border: #6b4a00; --select-bg: #ffb000;
+}
+.theme-green {
+  --fg: #33ff66; --fg-bright: #b6ffc8; --fg-dim: #1f7a3a;
+  --accent: #33ff66; --border: #1f7a3a; --select-bg: #33ff66;
+}
+.theme-purple {
+  --fg: #c792ea; --fg-bright: #e6ccff; --fg-dim: #7a5aa0;
+  --accent: #c792ea; --border: #5a3f80; --select-bg: #c792ea;
+}
+.theme-sky {
+  --fg: #56c2ff; --fg-bright: #b6e6ff; --fg-dim: #2a6f99;
+  --accent: #56c2ff; --border: #2a6f99; --select-bg: #56c2ff;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  /* Phosphor burn in the shadows: the dark areas are never dead black — they
+     carry a faint theme-tinted phosphor residue that lifts toward the centre. */
+  background:
+    radial-gradient(ellipse 120% 100% at 50% 50%,
+      color-mix(in srgb, var(--accent) 5%, var(--bg)) 0%, var(--bg) 70%);
+  background-color: var(--bg);
+  color: var(--fg);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+/* CRT scanlines + subtle flicker + vignette. */
+.bbs-crt::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0px,
+    rgba(0, 0, 0, 0) 2px,
+    rgba(0, 0, 0, 0.28) 3px,
+    rgba(0, 0, 0, 0.28) 4px
+  );
+}
+.bbs-crt::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 49;
+  /* Phosphor burn-in: a broad theme-tinted bloom that lights the screen from
+     within and pools in the shadows, over a darkened-edge vignette. Kept well
+     below text brightness so glyphs stay crisp. */
+  background:
+    radial-gradient(ellipse 95% 80% at 50% 48%,
+      color-mix(in srgb, var(--accent) 14%, transparent) 0%,
+      color-mix(in srgb, var(--accent) 6%, transparent) 40%,
+      rgba(0,0,0,0) 72%),
+    radial-gradient(ellipse at center, rgba(0,0,0,0) 52%, rgba(0,0,0,0.62) 100%);
+}
+
+/* Fill the viewport so the terminal is a full-screen CRT rather than a block
+   floating in a void; the footer then pins to the bottom edge. */
+.bbs-crt { min-height: 100vh; }
+@keyframes crt-flicker { 0%,100% { opacity: 1; } 50% { opacity: 0.97; } }
+
+.bbs-root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  text-shadow: 0 0 4px var(--accent);
+  animation: crt-flicker 6s infinite;
+  padding: 0.5rem 1rem;
+  max-width: 100ch;
+  margin: 0 auto;
+}
+
+/* ── Status bar ──────────────────────────────────────────────────────────── */
+.bbs-statusbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.25rem;
+  color: var(--fg-dim);
+  font-size: 0.85rem;
+  flex-wrap: wrap;
+}
+.bbs-statusbar .ok { color: var(--accent); }
+.bbs-statusbar .bad { color: #ff5555; }
+
+/* ── Banner ──────────────────────────────────────────────────────────────── */
+.bbs-banner {
+  white-space: pre;
+  color: var(--fg-bright);
+  margin: 0.5rem 0;
+  font-size: 0.78rem;
+  line-height: 1.1;
+  overflow-x: auto;
+}
+.bbs-banner .tagline { color: var(--fg-dim); }
+
+/* ── Generic boxed panel ─────────────────────────────────────────────────── */
+.bbs-panel { white-space: pre-wrap; margin: 0.5rem 0; }
+.bbs-panel .title { color: var(--fg-bright); }
+
+/* ── Main menu ───────────────────────────────────────────────────────────── */
+.bbs-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 0 2rem; }
+@media (max-width: 640px) { .bbs-menu { grid-template-columns: 1fr; } }
+.bbs-menu-item {
+  cursor: pointer;
+  padding: 0 0.25rem;
+  white-space: pre;
+}
+.bbs-menu-item .key { color: var(--accent); }
+.bbs-menu-item.selected, .bbs-menu-item:hover {
+  background: var(--select-bg);
+  color: var(--select-fg);
+  text-shadow: none;
+}
+.bbs-menu-item.selected .key { color: var(--select-fg); }
+
+/* ── Lists (boards, files, nodes, users) ─────────────────────────────────── */
+.bbs-list { margin: 0.25rem 0; }
+.bbs-row { white-space: pre; padding: 0 0.25rem; cursor: pointer; }
+.bbs-row.selected, .bbs-row:hover {
+  background: var(--select-bg); color: var(--select-fg); text-shadow: none;
+}
+.bbs-row .accent { color: var(--accent); }
+.bbs-row.selected .accent { color: var(--select-fg); }
+.bbs-dim { color: var(--fg-dim); }
+
+/* ── Command line + footer ───────────────────────────────────────────────── */
+.bbs-footer {
+  margin-top: auto;
+  border-top: 1px solid var(--border);
+  padding-top: 0.25rem;
+  color: var(--fg-dim);
+  font-size: 0.8rem;
+}
+.bbs-fkeys { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.bbs-fkeys .fk { color: var(--accent); }
+.bbs-cmdline {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  border-top: 1px solid var(--border);
+  padding-top: 0.25rem;
+}
+.bbs-cmdline .prompt { color: var(--accent); }
+.bbs-cmdline input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--fg-bright);
+  font: inherit;
+  text-shadow: inherit;
+}
+.bbs-blink { animation: blink 1s step-end infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+/* Motion-sensitivity: silence the full-screen CRT flicker and the cursor blink
+   for users who ask for reduced motion (the phosphor-ghost + sentry already are). */
+@media (prefers-reduced-motion: reduce) {
+  .bbs-root { animation: none; }
+  .bbs-blink { animation: none; }
+}
+
+a, .bbs-link { color: var(--accent); }
+
+/* ── ASCII image rendering ───────────────────────────────────────────────────
+ * Images everywhere in the BBS are converted to ASCII server-side (preview /
+ * pod workers) and injected as <pre class="ascii-img"> fragments whose cells
+ * carry phosphor levels p0..p7. The levels map to a ramp from background to the
+ * active theme's bright phosphor via color-mix on the EXISTING theme vars, so
+ * they auto-recolour across all four themes with no per-theme duplication. */
+.bbs-ascii-row { margin: 0.4rem 0; }
+.bbs-banner-img { margin: 0.5rem 0 0; }
+.ascii-img-wrap { overflow-x: auto; }
+
+/* Content ASCII images (File Base, Message Base posts) read as contained
+   "files" — a subtle phosphor-framed box with a small label. The masthead
+   banner (.bbs-banner-img) is exempt so it stays edge-to-edge. */
+.bbs-ascii-row:not(.bbs-banner-img) {
+  width: max-content;
+  max-width: 100%;
+  border: 1px solid var(--border);
+  padding: 0.4rem 0.6rem;
+  background: color-mix(in srgb, var(--accent) 3%, var(--bg));
+}
+.bbs-ascii-row:not(.bbs-banner-img)::before {
+  content: "▞ IMG ▚";
+  display: block;
+  margin-bottom: 0.2rem;
+  color: var(--fg-dim);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+}
+.ascii-img {
+  margin: 0;
+  font-family: var(--font);
+  font-size: 0.6rem;
+  line-height: 1;
+  letter-spacing: 0;
+  white-space: pre;
+  overflow-x: auto;
+  text-shadow: 0 0 2px currentColor; /* per-cell phosphor glow */
+}
+.ascii-img-status {
+  font-size: 0.8rem;
+  line-height: 1.2;
+  color: var(--fg-dim);
+  text-shadow: 0 0 3px var(--accent);
+}
+
+/* Phosphor ramp: background → bright phosphor, eased so midtones aren't muddy. */
+.ascii-img .p0 { color: color-mix(in srgb, var(--fg-bright)  6%, var(--bg)); }
+.ascii-img .p1 { color: color-mix(in srgb, var(--fg-bright) 12%, var(--bg)); }
+.ascii-img .p2 { color: color-mix(in srgb, var(--fg-bright) 20%, var(--bg)); }
+.ascii-img .p3 { color: color-mix(in srgb, var(--fg-bright) 31%, var(--bg)); }
+.ascii-img .p4 { color: color-mix(in srgb, var(--fg-bright) 45%, var(--bg)); }
+.ascii-img .p5 { color: color-mix(in srgb, var(--fg-bright) 62%, var(--bg)); }
+.ascii-img .p6 { color: color-mix(in srgb, var(--fg-bright) 80%, var(--bg)); }
+.ascii-img .p7 { color: var(--fg-bright); }
+
+/* ── Section heroes ──────────────────────────────────────────────────────────
+ * Each configured zone's banner image rendered as ASCII at the top of the
+ * Message Base, tinted to the zone accent. */
+.bbs-section-hero { margin: 0.3rem 0 0.6rem; }
+.bbs-section-hero .label { color: var(--accent); letter-spacing: 0.08em; }
+
+/* ── Phosphor persistence ─────────────────────────────────────────────────────
+ * When the screen text changes, the previous frame lingers as a faint phosphor
+ * afterglow and fades linearly to nothing — the slow decay of a real tube. The
+ * ghost is a text-only clone of the prior body region injected by the small
+ * script in index.html; here we only define how it looks + decays. */
+.phosphor-ghost {
+  position: fixed;
+  pointer-events: none;
+  z-index: 48;
+  overflow: hidden;
+  white-space: pre;
+  will-change: opacity;
+  opacity: 0.05;                     /* faint */
+  transition: opacity 3s linear;     /* slow, even decay to zero */
+}
+@media (prefers-reduced-motion: reduce) { .phosphor-ghost { display: none; } }
+
+/* ── Mobile / touch ──────────────────────────────────────────────────────────
+ * First-class mobile: a single-column terminal that fills the dynamic viewport
+ * (100dvh dodges the mobile browser-chrome gap), larger touch targets, and a
+ * fitted banner. Touch navigation (slide to move the highlight, release to
+ * select) is driven by the small script in index.html; `touch-action: none` on
+ * the selectable lists hands those gestures to it instead of the browser. */
+.bbs-root, .bbs-crt { min-height: 100vh; min-height: 100dvh; }
+.bbs-menu, .bbs-list { touch-action: none; }
+
+@media (max-width: 640px) {
+  html, body { font-size: 13px; }
+  .bbs-root { padding: 0.3rem 0.5rem; max-width: 100%; }
+
+  /* Single full-screen list, zoomed: the masthead banner is dropped (the
+     status bar already carries the node name) and the active list fills the
+     viewport as large, finger-sized rows — a mobile-app-style menu rather than
+     a compact block floating up top. */
+  .bbs-banner { display: none; }
+  .bbs-statusbar { font-size: 0.78rem; }
+
+  .bbs-menu {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    gap: 0;
+    margin: 0.3rem 0;
+  }
+  .bbs-menu-item {
+    flex: 1 1 0;                       /* rows grow to fill the screen evenly */
+    display: flex;
+    align-items: center;
+    font-size: 1.45rem;               /* zoomed */
+    padding: 0 0.7rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .bbs-menu-item:first-child { border-top: 1px solid var(--border); }
+  .bbs-menu-item .key { margin-right: 0.5rem; }
+
+  /* Dynamic lists fill + scroll, with large rows. */
+  .bbs-list {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    margin: 0.3rem 0;
+  }
+  .bbs-row {
+    display: flex;
+    align-items: center;
+    min-height: 3rem;
+    font-size: 1.15rem;
+    padding: 0.6rem 0.7rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .bbs-panel { flex: 1 1 auto; }
+
+  /* No decorative banners anywhere on mobile — the zone "section hero" banners
+     are dropped too (the masthead already is). Content images survive: posted
+     pictures (.bbs-ascii-row) and link previews still render as ASCII. */
+  .bbs-section-hero { display: none; }
+
+  /* Posted/preview ASCII images stay, sized to the narrow column. */
+  .ascii-img { font-size: 0.4rem; }
+
+  /* Keyboard hints are meaningless without a keyboard — swap them for a touch
+     hint. Slide over rows to move the highlight, lift to select; swipe down
+     from the top to jump back to the full menu (see the script in index.html). */
+  .bbs-fkeys { display: none; }
+  .bbs-footer::before {
+    content: "swipe to move \00B7 tap to select \00B7 \2193 from top = menu";
+    display: block;
+    margin-bottom: 0.15rem;
+    color: var(--fg-dim);
+    font-size: 0.72rem;
+  }
+  .bbs-cmdline input { font-size: 16px; }                /* stop iOS focus-zoom */
+}
+
+/* ── Door game: UA 571-C sentry gun ───────────────────────────────────────────
+ * A faithful Aliens (1986) UA 571-C remote-sentry control deck — but rendered
+ * in OUR phosphor skin: it inherits the active theme's --accent/--fg/--bg via
+ * the theme-* class copied onto the overlay, with our scanlines + glow. Pure
+ * client-side, no auth. Logic in the script in index.html. */
+.sentry {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: none;
+  flex-direction: column;
+  overflow: auto;
+  padding: 1rem;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font);
+  text-shadow: 0 0 4px var(--accent);
+}
+.sentry.open { display: flex; }
+.sentry::before {                                   /* scanlines */
+  content: "";
+  position: fixed; inset: 0; pointer-events: none; z-index: 2;
+  background: repeating-linear-gradient(to bottom,
+    rgba(0,0,0,0) 0, rgba(0,0,0,0) 2px, rgba(0,0,0,0.26) 3px, rgba(0,0,0,0.26) 4px);
+}
+.sentry::after {                                    /* phosphor bloom + vignette */
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 1;
+  background:
+    radial-gradient(ellipse 95% 80% at 50% 45%, color-mix(in srgb, var(--accent) 12%, transparent) 0%, rgba(0,0,0,0) 70%),
+    radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(0,0,0,0.6) 100%);
+}
+.sentry-inner { position: relative; z-index: 3; max-width: 96ch; width: 100%; margin: 0 auto; }
+.sentry-boot { white-space: pre-wrap; color: var(--fg-bright); min-height: 8rem; }
+.sentry-close {
+  position: fixed; top: 0.6rem; right: 1rem; z-index: 4; cursor: pointer;
+  color: var(--fg-bright); border: 1px solid var(--border); padding: 0.1rem 0.5rem;
+}
+.sentry-close:hover { background: var(--accent); color: var(--bg); text-shadow: none; }
+.sentry-title {
+  text-align: center; color: var(--fg-bright); letter-spacing: 0.18em;
+  border: 1px solid var(--border); padding: 0.5rem; margin-bottom: 0.6rem; white-space: pre;
+}
+.sentry-modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-bottom: 0.6rem; }
+.sentry-cell { border: 1px solid var(--border); padding: 0.4rem 0.5rem; }
+.sentry-cell .lab { color: var(--fg-dim); font-size: 0.78rem; letter-spacing: 0.08em; }
+.sentry-opts { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-top: 0.3rem; }
+.sentry-opt { padding: 0.15rem 0.45rem; border: 1px solid var(--border); cursor: pointer; user-select: none; }
+.sentry-opt.sel { background: var(--accent); color: var(--bg); text-shadow: none; }
+.sentry-opt.danger.sel { background: #ff5555; color: #0a0a0a; }
+.sentry-status { display: grid; grid-template-columns: 1.4fr 1fr 0.8fr auto; gap: 0.6rem; align-items: stretch; }
+.sentry-box { border: 1px solid var(--border); padding: 0.4rem 0.5rem; display: flex; flex-direction: column; justify-content: center; }
+.sentry-box .lab { color: var(--fg-dim); font-size: 0.78rem; }
+.sentry-rounds { font-size: 2.4rem; line-height: 1; color: var(--fg-bright); }
+.sentry-time { font-size: 1.6rem; color: var(--fg-bright); }
+.sentry-critical { border: 2px solid #ff5555; color: #ff5555; text-align: center; padding: 0.4rem; opacity: 0.22; letter-spacing: 0.2em; }
+.sentry-critical.on { opacity: 1; animation: sentry-flash 0.5s step-end infinite; }
+@keyframes sentry-flash { 50% { opacity: 0.3; } }
+.sentry-gaugewrap { display: flex; gap: 0.5rem; align-items: flex-end; }
+.sentry-gauge { width: 1.4rem; height: 5rem; border: 1px solid var(--border); position: relative; }
+.sentry-gauge .fill { position: absolute; left: 0; right: 0; bottom: 0; background: var(--accent); transition: height 0.4s linear; }
+.sentry-gauge.hot .fill { background: #ff5555; }
+.sentry-gauge .gl { position: absolute; top: -1rem; left: 0; color: var(--fg-dim); font-size: 0.7rem; }
+.sentry-radar { width: 6rem; height: 6rem; border-radius: 50%; border: 1px solid var(--border); position: relative; overflow: hidden; align-self: center; }
+.sentry-radar::before {
+  content: ""; position: absolute; inset: 0; border-radius: 50%;
+  background: conic-gradient(from 0deg, color-mix(in srgb, var(--accent) 45%, transparent) 0deg, transparent 60deg);
+  animation: sentry-sweep 2.6s linear infinite;
+}
+.sentry-radar.fast::before { animation-duration: 0.9s; }
+.sentry-radar .ring { position: absolute; inset: 22%; border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent); border-radius: 50%; }
+.sentry-radar .ring.r2 { inset: 40%; }
+@keyframes sentry-sweep { to { transform: rotate(360deg); } }
+.sentry-actions { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin: 0.7rem 0; }
+.sentry-btn { border: 1px solid var(--accent); color: var(--accent); padding: 0.45rem 0.9rem; cursor: pointer; letter-spacing: 0.06em; user-select: none; }
+.sentry-btn:hover { background: var(--accent); color: var(--bg); text-shadow: none; }
+.sentry-btn.armed { border-color: #ff5555; color: #ff5555; }
+.sentry-log { border: 1px solid var(--border); padding: 0.4rem 0.5rem; margin-top: 0.4rem; min-height: 3.5rem; max-height: 8rem; overflow-y: auto; color: var(--fg-dim); font-size: 0.85rem; white-space: pre-wrap; }
+.sentry-log .hi { color: var(--fg-bright); }
+.sentry-hint { text-align: center; color: var(--fg-dim); font-size: 0.78rem; margin-top: 0.4rem; }
+@media (max-width: 640px) {
+  .sentry { padding: 0.5rem; }
+  .sentry-modes { grid-template-columns: 1fr; }
+  .sentry-status { grid-template-columns: 1fr; }
+  .sentry-title { letter-spacing: 0.1em; font-size: 0.85rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sentry-critical.on { animation: none; }
+  .sentry-radar::before { animation: none; }
+}
