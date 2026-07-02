@@ -17,7 +17,7 @@ env:
   KIT_REPO: 'https://github.com/DreamLab-AI/nostr-rust-forum.git'
   # Pinned kit SHA — keep in lockstep with workers-deploy.yml/deploy.yml KIT_REF.
   # NOTE: tracks nostr-rust-forum PR #63 head — re-pin to the merge commit on merge.
-  KIT_REF: '9826b0f4283db31f5c7539dc017edf4ddd6ee258'
+  KIT_REF: '348bb6fbbc606c693db79a94d2d442fb76cf44cd'
 
 jobs:
   fmt:
