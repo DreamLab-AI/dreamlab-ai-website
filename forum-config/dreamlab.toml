@@ -76,6 +76,7 @@ write_cohorts     = ["members", "friends", "agent"]
 visibility        = "public"
 banner_image_url  = "/images/heroes/lake-district-dawn.webp"
 encrypted         = false
+accent_hex        = "#22c55e"
 
 [[zones]]
 id                = "minimoonoir"
@@ -84,6 +85,7 @@ required_cohorts  = ["friends"]
 visibility        = "locked"
 banner_image_url  = "/images/heroes/minimoonoir-hero.webp"
 encrypted         = false
+accent_hex        = "#3b82f6"
 
 [[zones]]
 id                = "family"
@@ -92,6 +94,7 @@ required_cohorts  = ["family"]
 visibility        = "locked"
 banner_image_url  = "/images/heroes/family-hero.webp"
 encrypted         = true
+accent_hex        = "#f59e0b"
 
 [[zones]]
 id                = "business"
@@ -100,6 +103,7 @@ required_cohorts  = ["business"]
 visibility        = "locked"
 banner_image_url  = "/images/heroes/business-hero.webp"
 encrypted         = false
+accent_hex        = "#a855f7"
 
 # ─── Trust thresholds ────────────────────────────────────────────────────────
 [trust]
