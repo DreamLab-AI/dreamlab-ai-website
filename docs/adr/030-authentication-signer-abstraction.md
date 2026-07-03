@@ -1,6 +1,14 @@
 # ADR-030: Authentication Signer Abstraction — WebAuthn PRF + NIP-07 + NIP-46
 
-## Status: Proposed — not yet implemented in the deployed overlay
+## Status: Deferred (kit-owned) — the authentication signer surface is kit-internal; not implemented in the deployed overlay
+
+> **Closeout (2026-07-03):** Marked **Deferred (kit-owned)** rather than left
+> Proposed. The `Signer` trait and its implementations target the in-tree
+> `community-forum-rs` port deleted 2026-03-12; the deployed forum uses the
+> upstream kit's `/connect` onboarding (ADR-039) with the device-key path gated
+> off. **Unfreeze criterion:** the overlay needing to assert a signer contract
+> the kit does not already own, or the kit surfacing an overlay-observable signer
+> abstraction.
 
 > **Adjudication (2026-06-11):** This ADR defines a `Signer` trait and three
 > implementations (`PrfSigner`, `Nip07Signer`, `Nip46BunkerSigner`) in

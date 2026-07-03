@@ -1,6 +1,6 @@
 # ADR-027: Canonical Identity Stack — did:nostr + WebID + NIP-05
 
-## Status: Proposed — DID-document shape superseded by ADR-125
+## Status: Deferred (kit-owned) — overlay implementation deferred to the upstream kit; DID-document shape superseded by ADR-125
 
 > **DID-doc shape superseded (2026-06-15) by ADR-125.** The DID-document
 > examples below have been updated to the converged did:nostr CG / `create-agent`
@@ -18,7 +18,14 @@
 > stays). See `docs/adr/ADR-125-did-nostr-multikey-convergence.md` in the
 > backend repo for the binding spec.
 
-## Status: Proposed — not yet implemented in the deployed overlay
+> **Closeout (2026-07-03):** Marked **Deferred (kit-owned)** rather than left
+> perpetually Proposed. The code targets `pod-worker`/`relay-worker` modules of
+> the in-tree `community-forum-rs` port deleted 2026-03-12; the resolvable
+> three-layer identity web is now an upstream-kit concern and is not built in the
+> deployed overlay. **Unfreeze criterion:** a kit-side
+> `/.well-known/did/nostr/{pubkey}.json` endpoint plus the WebID `nostr:pubkey`
+> NIP-98 tag, or an explicit decision to carry the DID-document surface in the
+> overlay pod worker.
 
 > **Adjudication (2026-06-11):** This ADR targets `pod-worker/src/lib.rs`,
 > `pod-worker/src/profile.rs`, and `relay-worker/src/auth.rs` — modules of the

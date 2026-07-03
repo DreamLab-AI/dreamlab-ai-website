@@ -1,6 +1,14 @@
 # ADR-034: Nostr Relay NIP Conformance — NIP-65, Kind-10002, NIP-19 TLV, NIP-11 Update
 
-## Status: Proposed — kit-internal; not overlay-verifiable
+## Status: Deferred (kit-owned) — relay NIP conformance is kit-internal; not overlay-verifiable
+
+> **Closeout (2026-07-03):** Marked **Deferred (kit-owned)** rather than left
+> Proposed. The NIP-11 document, NIP-19 codec, and AUTH-challenge behaviour
+> target the in-tree `community-forum-rs` port deleted 2026-03-12; they are now
+> properties of the upstream kit's relay-worker and client, not of the overlay.
+> **Unfreeze criterion:** a kit-side audit of the pinned kit ref's
+> `supported_nips` set, or an overlay-level decision to assert a specific NIP
+> conformance contract.
 
 > **Adjudication (2026-06-11):** This ADR adds kind-10002 auto-publish, NIP-19
 > TLV encode/decode, an extended NIP-11 document, and a proactive NIP-42 AUTH

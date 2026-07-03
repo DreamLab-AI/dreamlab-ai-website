@@ -36,23 +36,23 @@ This directory contains the Architecture Decision Records (ADRs) for the DreamLa
 | 024 | [Security Hardening Sprint](024-security-hardening-sprint.md) | Accepted | present |
 | 025 | [Solid Pod Infrastructure Upgrade](025-solid-pod-infrastructure-upgrade.md) | Accepted | present |
 | 026 | [Forum Professionalisation](026-forum-professionalisation.md) | Accepted | present |
-| 027 | [Canonical Identity Stack](027-canonical-identity-stack.md) | Proposed (not yet implemented — blocked on kit DID/WebID support) | present |
+| 027 | [Canonical Identity Stack](027-canonical-identity-stack.md) | Deferred (kit-owned — code targets deleted in-tree port; DID-doc shape superseded by ADR-125) | present |
 | 028 | [Solid Pod RS AGPL Boundary](028-solid-pod-rs-agpl-boundary.md) | Accepted | present |
-| 029 | [JSON-LD Processing Strategy](029-json-ld-processing-strategy.md) | Proposed (not yet implemented — kit-internal; RDF stack absent from overlay) | present |
-| 030 | [Authentication Signer Abstraction](030-authentication-signer-abstraction.md) | Proposed (not yet implemented — auth surface is kit-internal) | present |
+| 029 | [JSON-LD Processing Strategy](029-json-ld-processing-strategy.md) | Deferred (kit-owned — RDF/JSON-LD stack is a kit decision; absent from overlay) | present |
+| 030 | [Authentication Signer Abstraction](030-authentication-signer-abstraction.md) | Deferred (kit-owned — signer surface is kit-internal) | present |
 | 031 | [DM Protocol Standardisation](031-dm-protocol-standardisation.md) | Proposed (partial — kind-1059 federated; NIP-04 fix/p_tag index/10050 not overlay-verifiable) | present |
 | 032 | [Agent Job Marketplace (NIP-90)](032-agent-job-marketplace-nip90.md) | Superseded by 036 | present |
 | 033 | [Multi-Admin Moderation Architecture](033-multi-admin-moderation-architecture.md) | Accepted (outcome shipped via kit; §2 d-tag mechanism moot) | present |
-| 034 | [Nostr Relay NIP Conformance](034-nostr-relay-nip-conformance.md) | Proposed (kit-internal — not overlay-verifiable) | present |
+| 034 | [Nostr Relay NIP Conformance](034-nostr-relay-nip-conformance.md) | Deferred (kit-owned — relay NIP conformance is kit-internal; not overlay-verifiable) | present |
 | 035 | [AGPL Combined-Work Licensing Posture](035-agpl-combined-work-licensing.md) | Accepted | present |
 | 036 | [Agent Delegation via Device Keys](036-agent-delegation-via-device-keys.md) | Accepted (supersedes 032) | present |
-| 037 | [Config Single Source of Truth](037-config-single-source-of-truth.md) | Accepted (implementation pending) | present |
+| 037 | [Config Single Source of Truth](037-config-single-source-of-truth.md) | Accepted (partial — O3 fail-closed KV guard shipped; O1/O2 single-source generator deferred) | present |
 | 038 | [Kit-Ref Pin Governance](038-kit-ref-pin-governance.md) | Accepted | present |
 | 039 | [/connect Onboarding Adoption](039-connect-onboarding-adoption.md) | Accepted | present |
 
 > **Note:** ADR-032 (Agent Job Marketplace, NIP-90 DVMs + NIP-26) is **superseded by [ADR-036](036-agent-delegation-via-device-keys.md)** — the kit removed `nip26.rs`+`nip90.rs` upstream, and agent delegation now uses the device-key model (upstream ADR-099). The Agent Control Surface governance feature (kinds 31400-31405, `/governance` route) stands on the deployed kit, not on ADR-032's NIP-90 design. See [forum-config/README.md](../../forum-config/README.md#governance-configuration) for the operator config.
 >
-> **Adjudication note (2026-06-11):** ADRs 027, 029, 030, 031, 034 were written against the in-tree `community-forum-rs` port deleted on 2026-03-12. Their literal code targets no longer exist; the forum now runs the upstream `nostr-rust-forum` kit. Each is held Proposed with a per-file blocked/partial note pending a kit-side audit, rather than blanket-marked Accepted. ADR-033's *outcome* shipped via the kit's relational moderation tables (`moderation_actions`, `is_admin`, `admin_log`, `nip1984_reports`), so it is Accepted with its §2 d-tag mechanism noted moot.
+> **Adjudication note (2026-06-11, closed out 2026-07-03):** ADRs 027, 029, 030, 031, 034 were written against the in-tree `community-forum-rs` port deleted on 2026-03-12. Their literal code targets no longer exist; the forum now runs the upstream `nostr-rust-forum` kit. **Closeout disposition (2026-07-03):** 027/029/030/034 are marked **Deferred (kit-owned)** — the capability is now an upstream-kit concern and each carries an explicit unfreeze criterion in its file, so the register no longer shows them as an open in-overlay backlog. ADR-031 remains **Proposed (partial)** because part of it (kind-1059 federation) is live in the overlay while the remainder is not overlay-verifiable. ADR-033's *outcome* shipped via the kit's relational moderation tables (`moderation_actions`, `is_admin`, `admin_log`, `nip1984_reports`), so it is Accepted with its §2 d-tag mechanism noted moot.
 
 ## Supersession Chain
 
@@ -82,6 +82,9 @@ stateDiagram-v2
     [*] --> Proposed : Author drafts ADR
     Proposed --> Accepted : Team review + consensus
     Proposed --> Rejected : Does not meet criteria
+    Proposed --> Deferred : Parked with unfreeze criteria
+    Deferred --> Accepted : Unfreeze criteria met
+    Deferred --> Superseded : Replaced before unfreeze
     Accepted --> Superseded : New ADR replaces
     Accepted --> Deprecated : No longer relevant
     Superseded --> [*]
@@ -92,7 +95,7 @@ stateDiagram-v2
 ## Conventions
 
 - ADRs use sequential numbering (zero-padded to 3 digits).
-- Status values: `Proposed`, `Accepted`, `Superseded`, `Deprecated`, `Rejected`.
+- Status values: `Proposed`, `Accepted`, `Deferred`, `Superseded`, `Deprecated`, `Rejected`. `Deferred (kit-owned)` marks a decision whose realising code targeted the deleted in-tree port and is now an upstream-kit concern; each carries an explicit unfreeze criterion.
 - Each ADR follows the format: Title, Status, Context, Decision, Consequences.
 - Consequences are categorized as Positive, Negative, and Neutral.
 - ADRs are immutable once accepted; new ADRs supersede old ones rather than editing.

@@ -1,6 +1,13 @@
 # ADR-029: JSON-LD Processing Strategy — json-ld 0.21.4 with NoLoader
 
-## Status: Proposed — not yet implemented in the deployed overlay
+## Status: Deferred (kit-owned) — the RDF/JSON-LD stack is a kit decision; not implemented in the deployed overlay
+
+> **Closeout (2026-07-03):** Marked **Deferred (kit-owned)** rather than left
+> Proposed. The code targets the in-tree `community-forum-rs` port deleted
+> 2026-03-12; typed JSON-LD processing is now an upstream-kit concern (the
+> overlay pins only `nostr-bbs-*` and does not vendor the RDF stack).
+> **Unfreeze criterion:** upstream kit adoption of a typed JSON-LD processor, or
+> an explicit overlay-level decision to vendor the RDF stack.
 
 > **Adjudication (2026-06-11):** This ADR adds `json-ld`, `iref`, `rdf-types`,
 > and `oxigraph` to `pod-worker/Cargo.toml` and the workspace root, and replaces
