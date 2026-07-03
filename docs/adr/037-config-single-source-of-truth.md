@@ -1,6 +1,6 @@
 # ADR-037: Configuration Single Source of Truth — Generate Worker Vars and Client Env from `dreamlab.toml`
 
-## Status: Accepted (implementation pending)
+## Status: Accepted (partial — O3 fail-closed KV guard shipped 2026-06; O1/O2 single-source generator deferred)
 
 ## Date: 2026-06-11
 
@@ -76,13 +76,40 @@ zone configuration and the admin pubkey set, and adopt a generation step
 
 ### Deferred implementation
 
-The generation step itself is **not built in this change**. This ADR records the
-decision and the fail-closed contract. Until the generator lands, the three-way
-hand-sync remains in place and O1-O3 stay open in the anomaly register. The
-implementation work is: a deploy-pipeline generator (run in `workers-deploy.yml`
-and the client build) reading `dreamlab.toml`, emitting `ZONE_CONFIG` /
-`ADMIN_PUBKEYS` / `__ENV__`, and a CI assertion that every `REPLACE_WITH_*`
-placeholder is resolved before deploy proceeds.
+The generator itself is **not built in this change**. This ADR records the
+decision and the fail-closed contract. Until the generator lands, the O1/O2
+three-way hand-sync remains in place. The remaining implementation work is: a
+deploy-pipeline generator (run in `workers-deploy.yml` and the client build)
+reading `dreamlab.toml`, emitting `ZONE_CONFIG` / `ADMIN_PUBKEYS` / `__ENV__` so
+the relay, search-worker, and client derive from one authored source.
+
+### Closeout status (2026-07-03)
+
+**O3 (ADMIN_KV fail-open) is closed.** The fail-closed contract of Decision 4 is
+now realised in code and gated in CI:
+
+- `forum-config/src/deploy_config.rs` implements `validate_deploy_dir` /
+  `scan_manifest_value` — a fail-closed validator that rejects any binding `id`
+  still equal to a `REPLACE_WITH_*` placeholder (any binding array, not just
+  `ADMIN_KV`) and any missing required secret. Its test suite pins the detection
+  against the shipped `deploy/*.wrangler.toml`, and the CI `rust-test` job runs
+  it on every PR, so an unresolved placeholder cannot merge unnoticed.
+- `.github/workflows/workers-deploy.yml` provisions the `ADMIN_KV` /
+  NIP-98-replay KV namespaces at deploy time and `exit 1`s if provisioning
+  fails, then substitutes the real id — the substitution is fail-closed, not the
+  earlier CI-asserts-placeholder-present pattern. The auth-worker secret check
+  (`PRF_SERVER_SECRET`, `ADMIN_PUBKEYS`, `NATIVE_POD_ADMIN_KEY`) is a deploy
+  blocker rather than a request-time 500.
+
+The `REPLACE_WITH_NEW_ADMIN_KV_ID` sentinels remain in the checked-in manifests
+by design (the real id is operator data, resolved at deploy) — they are the
+input the validator and the deploy pipeline both guard against, not open drift.
+
+**Open item (deferred):** O1 (`ZONE_CONFIG`) and O2 (`ADMIN_PUBKEYS`) are still
+authored in more than one place and hand-synchronised; the single-source
+generator in *Deferred implementation* above is the remaining work. Until it
+lands, treat relay/client zone config and the admin pubkey set as drift-prone
+across surfaces.
 
 ## Consequences
 
@@ -96,9 +123,10 @@ placeholder is resolved before deploy proceeds.
 
 ### Negative / Trade-offs
 
-- Until the generator ships, this ADR is aspirational — the hand-sync risk
-  persists and O1-O3 remain open. The Status is explicitly "implementation
-  pending" to avoid implying the defect is fixed.
+- Until the generator ships, the O1/O2 hand-sync risk persists. The Status is
+  explicitly "partial" — O3's fail-closed KV guard has shipped (see *Closeout
+  status*), but O1/O2 single-sourcing remains open to avoid implying the whole
+  defect class is fixed.
 - A generation step adds a deploy-pipeline dependency; a generator bug could
   itself block deploys (acceptable: fail-closed is the intent).
 
