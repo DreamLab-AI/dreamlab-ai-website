@@ -20,7 +20,6 @@ import {
   Beaker,
   Handshake,
   GraduationCap,
-  Play,
   Bot,
   Fingerprint,
   KeyRound,
@@ -114,16 +113,6 @@ const outcomeCards = [
     iconColor: "text-pink-400",
     count: 6,
   },
-];
-
-// Research video demonstrations
-const researchVideos = [
-  { src: "nuclear-robot.mp4", thumb: "nuclear-robot-thumb.webp", caption: "Nuclear decommissioning planning" },
-  { src: "unity-vr.mp4", thumb: "unity-vr-thumb.webp", caption: "Multi-viewpoint VR collaboration" },
-  { src: "hand-interact.mp4", thumb: "hand-interact-thumb.webp", caption: "Natural gesture interfaces" },
-  { src: "bigdata-viz.mp4", thumb: "bigdata-viz-thumb.webp", caption: "Immersive data visualisation" },
-  { src: "robot-arm.mp4", thumb: "robot-arm-thumb.webp", caption: "Robotic control systems" },
-  { src: "motorway-sim.mp4", thumb: "motorway-sim-thumb.webp", caption: "Infrastructure simulation" },
 ];
 
 // Featured team members
@@ -521,52 +510,6 @@ const Index = () => {
           </div>
         </div>
       </section>
-
-      {/* Section 5: Research Evidence — temporarily disabled
-      <section className="py-16 md:py-20 bg-gradient-to-b from-background to-purple-950/10" aria-label="Research evidence">
-        <div className="container max-w-6xl mx-auto px-5 md:px-4">
-          <div className="text-center mb-12 md:mb-16">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
-              Built on 16 Years of Deep Tech Research
-            </h2>
-            <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-              The Octave laboratory (2007-2023) produced world-first collaborative immersive systems. That research heritage now powers applied innovation for industry.
-            </p>
-          </div>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
-            {researchVideos.map((video) => (
-              <div key={video.src} className="bg-background/50 backdrop-blur border border-purple-500/20 rounded-xl overflow-hidden hover:border-purple-500/40 transition-all group">
-                <div className="aspect-video relative">
-                  <video
-                    controls
-                    className="w-full h-full object-cover"
-                    poster={`/images/portfolio/${video.thumb}`}
-                    preload="none"
-                  >
-                    <source src={`/data/media/videos/${video.src}`} type="video/mp4" />
-                  </video>
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none group-hover:opacity-0 transition-opacity">
-                    <div className="w-12 h-12 bg-black/50 backdrop-blur rounded-full flex items-center justify-center">
-                      <Play className="w-5 h-5 text-white ml-0.5" />
-                    </div>
-                  </div>
-                </div>
-                <div className="p-3">
-                  <p className="text-sm text-foreground/80">{video.caption}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="text-center mt-8">
-            <Link to="/research" className="text-purple-400 hover:text-purple-300 text-sm font-medium hover:underline inline-flex items-center gap-1">
-              View full research lineage <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-        </div>
-      </section>
-      */}
 
       {/* Section 6: Facility & Tech Stack */}
       <section className="py-16 md:py-20" aria-label="Facility and technology">
