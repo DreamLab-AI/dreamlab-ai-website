@@ -33,7 +33,18 @@ ingress_policy  = "allowlist"
 [admin]
 mode            = "static"
 static_pubkeys  = [
-  # power-user — primary admin (matches auth-worker ADMIN_PUBKEYS CF secret)
+  # NOTE: this is the visionclaw-server key — the SAME pubkey used below as a
+  # [governance] agent_pubkeys publisher (BrokerActor). It is documented as a
+  # non-admin service identity (forum-config/README.md: "Admin: no"), yet it is
+  # currently listed here as the PRIMARY forum admin and mirrored into the
+  # relay-worker / search-worker ADMIN_PUBKEYS and the auth-worker ADMIN_PUBKEYS
+  # CF secret. Kept in place only to stay in lockstep with those mirrors (the CI
+  # admin-pubkeys-sync check asserts they agree); removing it here alone would
+  # split the admin set and desync from the operator-managed CF secret.
+  # TODO(operator): visionclaw-server should have a distinct non-admin key.
+  # Mint a dedicated operator/admin keypair, replace this pubkey across
+  # dreamlab.toml [admin], relay/search ADMIN_PUBKEYS, and the auth-worker CF
+  # secret in one change, and leave visionclaw-server only in [governance].
   "11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c",
   # operator-jjohare — human admin (Dr John O'Hare)
   "6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425a",

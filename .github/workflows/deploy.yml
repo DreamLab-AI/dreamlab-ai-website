@@ -32,6 +32,12 @@ env:
   RUST_TOOLCHAIN: '1.90.0'
   TRUNK_VERSION: '0.21.12'
   TRUNK_SHA256: 'e5261930aab979dc5d0388fdc71bc32bedf0a15211ef8c8703fa2b7a2016394b'
+  # Pinned tool versions + sha256 of the exact release artifact each step fetches.
+  # A privileged (CF-token-bearing) job must never execute an unverified download.
+  BINARYEN_VERSION: '119'
+  BINARYEN_SHA256: '716bcf9f5f36a6f466239fbb09a925eeaf54c46411ccefac979ec649e7c06d2d'
+  TAILWIND_VERSION: '3.4.17'
+  TAILWIND_SHA256: '7d24f7fa191d2193b78cd5f5a42a6093e14409521908529f42d80b11fde1f1d4'
   # API bases point at the deployed workers.dev hosts. The branded custom
   # domains (relay./api./pods./search./preview.dreamlab-ai.com) are the
   # documented end-state but are NOT provisioned in DNS (verified 2026-06-09:
@@ -112,7 +118,10 @@ jobs:
 
       # ── Rust/WASM forum client ─────────────────────────────────────────
       - name: Install Rust toolchain ${{ env.RUST_TOOLCHAIN }}
-        uses: dtolnay/rust-toolchain@1.90.0
+        # Pinned to the commit the `1.90.0` branch resolves to (that branch's
+        # action.yml hardcodes toolchain 1.90.0). Full SHA, not a mutable tag,
+        # because this job carries CLOUDFLARE_API_TOKEN. Re-pin when bumping Rust.
+        uses: dtolnay/rust-toolchain@0176485ebe2f605bde554dd99f804beeaf7db3e2 # 1.90.0
         with:
           targets: wasm32-unknown-unknown
 
@@ -139,24 +148,26 @@ jobs:
           rm -f "${ARCHIVE}"
           trunk --version
 
-      - name: Install wasm-opt (binaryen 119)
+      - name: Install wasm-opt (binaryen, pinned + SHA256-verified)
         run: |
           set -euo pipefail
-          BINARYEN_VERSION="119"
           ARCHIVE="binaryen-version_${BINARYEN_VERSION}-x86_64-linux.tar.gz"
           URL="https://github.com/WebAssembly/binaryen/releases/download/version_${BINARYEN_VERSION}/${ARCHIVE}"
           curl -fsSL -o "${ARCHIVE}" "${URL}"
+          echo "${BINARYEN_SHA256}  ${ARCHIVE}" | sha256sum -c -
           sudo tar -xzf "${ARCHIVE}" -C /usr/local --strip-components=1
           rm -f "${ARCHIVE}"
           wasm-opt --version
 
-      - name: Install Tailwind CLI (v3.4.17)
+      - name: Install Tailwind CLI (pinned + SHA256-verified)
         run: |
           set -euo pipefail
-          TW_VERSION="3.4.17"
-          URL="https://github.com/tailwindlabs/tailwindcss/releases/download/v${TW_VERSION}/tailwindcss-linux-x64"
-          sudo curl -fsSL -o /usr/local/bin/tailwindcss "${URL}"
-          sudo chmod +x /usr/local/bin/tailwindcss
+          ARCHIVE="tailwindcss-linux-x64"
+          URL="https://github.com/tailwindlabs/tailwindcss/releases/download/v${TAILWIND_VERSION}/${ARCHIVE}"
+          curl -fsSL -o "${ARCHIVE}" "${URL}"
+          echo "${TAILWIND_SHA256}  ${ARCHIVE}" | sha256sum -c -
+          sudo install -m 0755 "${ARCHIVE}" /usr/local/bin/tailwindcss
+          rm -f "${ARCHIVE}"
           tailwindcss --help | head -1
 
       - name: Build Leptos forum with Trunk
@@ -315,8 +326,10 @@ jobs:
       - name: Check mirror token
         id: mirror_token
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        env:
+          DREAMLAB_UK_TOKEN: ${{ secrets.DREAMLAB_UK_TOKEN }}
         run: |
-          if [ -n "${{ secrets.DREAMLAB_UK_TOKEN }}" ]; then
+          if [ -n "${DREAMLAB_UK_TOKEN}" ]; then
             echo "available=true" >> "$GITHUB_OUTPUT"
           else
             echo "available=false" >> "$GITHUB_OUTPUT"

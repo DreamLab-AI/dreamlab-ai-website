@@ -62,7 +62,7 @@ jobs:
       # crates.io as nostr-bbs-* v3.0.0-rc4. The forum-config/ overlay
       # package is the only Rust code that changes going forward.
       - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@1.90.0
+        uses: dtolnay/rust-toolchain@0176485ebe2f605bde554dd99f804beeaf7db3e2 # 1.90.0
         with:
           components: rustfmt, clippy
 

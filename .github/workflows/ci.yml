@@ -125,7 +125,7 @@ jobs:
     if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@1.90.0
+      - uses: dtolnay/rust-toolchain@0176485ebe2f605bde554dd99f804beeaf7db3e2 # 1.90.0
         with:
           components: rustfmt
       - run: cargo fmt --manifest-path forum-config/Cargo.toml --all -- --check
@@ -139,7 +139,7 @@ jobs:
     if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@1.90.0
+      - uses: dtolnay/rust-toolchain@0176485ebe2f605bde554dd99f804beeaf7db3e2 # 1.90.0
         with:
           components: clippy
       - uses: actions/cache@v4
@@ -161,7 +161,7 @@ jobs:
     if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@1.90.0
+      - uses: dtolnay/rust-toolchain@0176485ebe2f605bde554dd99f804beeaf7db3e2 # 1.90.0
       - uses: actions/cache@v4
         with:
           path: |
@@ -203,6 +203,53 @@ jobs:
           echo "Dual-pin OK — all pinned to $deploy"
 
   # ---------------------------------------------------------------------------
+  # Admin pubkey sync — the in-repo admin set must agree across
+  # forum-config/dreamlab.toml [admin].static_pubkeys, relay-worker ADMIN_PUBKEYS,
+  # and search-worker ADMIN_PUBKEYS. These three are hand-maintained mirrors of a
+  # single admin model; drift means a key is admin on one worker but not another.
+  # (The auth-worker's ADMIN_PUBKEYS is an operator-managed CF secret and cannot be
+  # checked in CI — keep it in lockstep with these when rotating the admin set.)
+  # ---------------------------------------------------------------------------
+  admin-pubkeys-sync:
+    name: Admin pubkeys in sync
+    runs-on: ubuntu-latest
+    if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assert ADMIN_PUBKEYS agree across dreamlab.toml + relay + search
+        run: |
+          python3 - <<'PY'
+          import sys, tomllib
+
+          def load(p):
+              with open(p, "rb") as f:
+                  return tomllib.load(f)
+
+          def keyset(csv):
+              return {k.strip().lower() for k in csv.split(",") if k.strip()}
+
+          toml = load("forum-config/dreamlab.toml")
+          admin = {k.strip().lower() for k in toml["admin"]["static_pubkeys"]}
+
+          relay = load("forum-config/deploy/relay-worker.wrangler.toml")
+          search = load("forum-config/deploy/search-worker.wrangler.toml")
+          relay_set = keyset(relay["vars"]["ADMIN_PUBKEYS"])
+          search_set = keyset(search["vars"]["ADMIN_PUBKEYS"])
+
+          ok = True
+          for name, other in (("relay-worker", relay_set), ("search-worker", search_set)):
+              if admin != other:
+                  ok = False
+                  print(f"::error::ADMIN_PUBKEYS mismatch: dreamlab.toml [admin] vs {name}. "
+                        f"only-in-dreamlab.toml={sorted(admin - other)} "
+                        f"only-in-{name}={sorted(other - admin)}")
+          if not ok:
+              sys.exit(1)
+          print(f"admin pubkeys in sync ({len(admin)} keys) across "
+                "dreamlab.toml [admin], relay-worker, search-worker")
+          PY
+
+  # ---------------------------------------------------------------------------
   # Aggregator — single required status check for branch protection.
   # ---------------------------------------------------------------------------
   ci-pass:
@@ -215,6 +262,7 @@ jobs:
       - node-build
       - node-audit
       - pin-check
+      - admin-pubkeys-sync
       - rust-fmt
       - rust-clippy
       - rust-test
@@ -226,6 +274,7 @@ jobs:
           echo "node-build:   ${{ needs.node-build.result }}"
           echo "node-audit:   ${{ needs.node-audit.result }}"
           echo "pin-check:    ${{ needs.pin-check.result }}"
+          echo "admin-sync:   ${{ needs.admin-pubkeys-sync.result }}"
           echo "rust-fmt:     ${{ needs.rust-fmt.result }}"
           echo "rust-clippy:  ${{ needs.rust-clippy.result }}"
           echo "rust-test:    ${{ needs.rust-test.result }}"
@@ -236,6 +285,7 @@ jobs:
             "${{ needs.node-build.result }}" \
             "${{ needs.node-audit.result }}" \
             "${{ needs.pin-check.result }}" \
+            "${{ needs.admin-pubkeys-sync.result }}" \
             "${{ needs.rust-fmt.result }}" \
             "${{ needs.rust-clippy.result }}" \
             "${{ needs.rust-test.result }}"; do
