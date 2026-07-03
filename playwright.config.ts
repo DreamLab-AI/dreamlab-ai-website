@@ -7,7 +7,9 @@ export default defineConfig({
   reporter: [['list'], ['html', { open: 'never', outputFolder: '/tmp/playwright-report' }]],
   use: {
     launchOptions: {
-      executablePath: '/nix/store/68h63fg3qyv62lkvmqpkdk8g8qnldzhp-chromium-147.0.7727.137/bin/chromium',
+      executablePath:
+        process.env.PLAYWRIGHT_CHROMIUM_PATH ||
+        '/nix/store/68h63fg3qyv62lkvmqpkdk8g8qnldzhp-chromium-147.0.7727.137/bin/chromium',
       args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu', '--disable-dev-shm-usage'],
     },
     headless: true,
