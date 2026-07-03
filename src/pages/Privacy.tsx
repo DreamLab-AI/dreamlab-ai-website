@@ -89,9 +89,6 @@ const Privacy = () => {
                 <a href="https://bsky.app/profile/thedreamlab.bsky.social" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
                   Bluesky
                 </a>
-                <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Instagram
-                </a>
                 <a href="https://www.linkedin.com/company/dreamlab-ai-consulting/" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
                   LinkedIn
                 </a>

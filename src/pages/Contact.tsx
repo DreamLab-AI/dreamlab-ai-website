@@ -258,11 +258,6 @@ const Contact = () => {
                     </a>
                   </li>
                   <li>
-                    <a href="#" className="text-muted-foreground hover:text-foreground transition-colors" aria-label="Instagram (coming soon)">
-                      Instagram
-                    </a>
-                  </li>
-                  <li>
                     <a href="https://www.linkedin.com/company/dreamlab-ai-consulting/" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
                       LinkedIn<span className="sr-only"> (opens in new window)</span>
                     </a>
