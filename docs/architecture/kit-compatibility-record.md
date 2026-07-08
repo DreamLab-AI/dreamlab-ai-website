@@ -22,11 +22,11 @@ its own `pin-check` extension.
 
 | Deployment host | Forum-kit SHA | Kit branch/tag at pin | Consumption tier | Canonical for pin-check |
 |---|---|---|---|---|
-| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `6986276bf64a8fed1cd0412e60c57651c69e8522` | `gap-close/2026-07` HEAD | `integrated` | ✔ |
+| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `3df5498cc14503f233eb831c128e7f3f16577af8` | `gap-close/2026-07` HEAD + CI fix | `integrated` | ✔ |
 
 <!-- pin-check:canonical-kit-sha -->
 ```
-CANONICAL_KIT_SHA=6986276bf64a8fed1cd0412e60c57651c69e8522
+CANONICAL_KIT_SHA=3df5498cc14503f233eb831c128e7f3f16577af8
 ```
 
 The `CANONICAL_KIT_SHA` line above is the machine-readable field the `pin-check`
@@ -53,7 +53,7 @@ over `src/` + `forum-config/src/` for kit-owned surface names (returns zero) and
 the `pin-check` lockstep. It does not claim `federation-verified`/`released`: the
 edge carries no cross-substrate decision loop of its own to prove end to end.
 
-## What this SHA contains (gap-close/2026-07 HEAD, `6986276`)
+## What this SHA contains (gap-close/2026-07 HEAD + CI fix, `3df5498`)
 
 Consumed from the forum's gap-close slice:
 
@@ -81,7 +81,8 @@ All render from the pinned kit at deploy time; this repo adds only branding
 
 | SHA | Branch/context | Notes |
 |---|---|---|
-| `6986276` | `gap-close/2026-07` HEAD | Current. COM-13 badge, F8 roster tab, governance surfaces. |
+| `3df5498` | `gap-close/2026-07` HEAD + CI fix | Current. Removes dev-only `[patch.crates-io]` local path. |
+| `6986276` | `gap-close/2026-07` HEAD | Superseded. COM-13 badge, F8 roster tab, governance surfaces. |
 | `a149da4` | PR #63 head (v1.0.0-beta.3) | Superseded. BBS control-plane + live Chat/Code + pod-url clarity. |
 | `3c16c21` | earlier | Superseded (JSS Solid surface, `solid-pod-rs` 0.5.0-alpha.2). |
 | `25ca8a1` | earlier | Superseded. |
