@@ -5,10 +5,10 @@ use nostr_bbs_config::schema::Branding;
 /// Build the DreamLab branding overlay.
 ///
 /// This is what the `forum-client` reads via `option_env!` build-time slots
-/// and what the workers serve at the `/api/config/branding` route. The values
-/// here MUST match the production CSS variables in
-/// `community-forum-rs/crates/forum-client/design-tokens.css` so visual
-/// regression tests stay green during D2 cutover.
+/// and what the workers serve at the `/api/config/branding` route. The theme
+/// selector (`amber`) must match a palette the pinned kit ships in its
+/// `nostr-bbs-forum-client` design tokens; the kit owns the CSS, this overlay
+/// only selects and populates the branding values it consumes.
 pub fn dreamlab_branding() -> Branding {
     Branding {
         theme: Some("amber".into()),

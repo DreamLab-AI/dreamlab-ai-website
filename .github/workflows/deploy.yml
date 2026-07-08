@@ -69,9 +69,11 @@ env:
   # Do NOT float on `main`: a breaking upstream push would silently ship untested
   # worker/WASM code while the lockfile stays at this tested revision. Keep this SHA
   # in sync with the `rev = "..."` in forum-config/Cargo.lock when bumping the kit.
-  # NOTE: tracks nostr-rust-forum PR #63 head (adds nostr-bbs-bbs-client +
-  # security fixes). Re-pin to the squash/merge commit on `main` once #63 merges.
-  KIT_REF: 'a149da43152185d8d4de672480fd0a5512589aa9'
+  # NOTE: tracks nostr-rust-forum gap-close/2026-07 HEAD (COM-13 agent disclosure
+  # badge + /api/agents/disclosure, F8 admin Agents roster tab, F1 member view,
+  # COM-16/COM-17 decision integrity + graduated escalation). Cutover provenance
+  # is in docs/architecture/kit-compatibility-record.md.
+  KIT_REF: '6986276bf64a8fed1cd0412e60c57651c69e8522'
 
 jobs:
   gate:

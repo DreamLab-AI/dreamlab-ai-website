@@ -7,10 +7,10 @@ generic `nostr-bbs-*` kit crates living in the `nostr-rust-forum` repo.
 
 | Path                                | Purpose                                                              |
 |-------------------------------------|----------------------------------------------------------------------|
-| `Cargo.toml`                        | Git-pinned deps on `nostr-bbs-{core,config,mesh,rate-limit}` (NRF, rev `3c16c21`) |
+| `Cargo.toml`                        | Git-pinned deps on `nostr-bbs-{core,config,mesh,rate-limit}` (NRF, rev `6986276`, gap-close/2026-07 HEAD) |
 | `dreamlab.toml`                     | Operator-supplied config consumed by `nostr_bbs_config::load_from_*` |
 | `src/branding.rs`                   | DreamLab `BrandingConfig` populator (theme, logos, copy, zones)      |
-| `src/workers.rs`                    | Per-worker entry shims (kit `dispatch` API not yet available)        |
+| `src/workers.rs`                    | Per-worker entry shims + rate-limit wiring (overlay applied at the wrangler routing level — there is no kit `dispatch` API; see the module doc comment) |
 | `deploy/<worker>.wrangler.toml`     | Preserved CF resource IDs for D2 zero-downtime route handover        |
 
 ## Identity roster
@@ -174,9 +174,9 @@ agent_pubkeys = [
 
 ## JSS / Solid features
 
-The overlay is pinned to `nostr-rust-forum` commit `3c16c21`, which includes
-the JSS Solid surface from `solid-pod-rs` `0.5.0-alpha.2` (crates.io) plus the
-DreamLab `POD_BASE_URL` integration fix. On Cloudflare Workers the live pieces
+The overlay is pinned to `nostr-rust-forum` commit `6986276` (gap-close/2026-07
+HEAD), which includes the JSS Solid surface from `solid-pod-rs` `0.5.0-alpha.4`
+plus the DreamLab `POD_BASE_URL` integration fix. On Cloudflare Workers the live pieces
 are authenticated pod creation, federated NIP-05, TypeIndex/media provisioning,
 Solid browser headers, and correct public WebID URLs. Native-only export,
 pod-stored key provisioning, and git-init remain disabled here.
@@ -202,7 +202,7 @@ privkey_filename  = "privkey.jsonld"        # reserved filename
 
 ```toml
 [nip05]
-resolver_mode = "federated"                # live as of NRF 3c16c21
+resolver_mode = "federated"                # live as of the pinned kit (see kit-compatibility-record.md)
 pod_base_url  = "https://pods.dreamlab-ai.com"
 ```
 
@@ -270,16 +270,27 @@ Three zones with cohort-based access control:
 
 ## Status
 
-**Phase X3** per [PRD-012] — overlay exists; the legacy
-`community-forum-rs/` has been renamed to `community-forum-rs.frozen/` and is
-pending deletion. No D2 cutover yet.
+**Cutover complete (thin consumer).** The legacy `community-forum-rs/` fork was
+deleted at commit `d248550` ("Phase 10 delete community-forum-rs/, deploy from
+kit upstream"). This package is now a pure operator overlay: `src/` totals ~892
+lines of branding, deploy-config validation, and per-worker rate-limit wiring —
+no forum logic. Every forum surface (workers, Leptos client, the disclosure
+badge, the Agents roster tab) is built from the pinned kit at deploy time; see
+`.github/workflows/deploy.yml` (forum client) and `workers-deploy.yml` (workers).
 
-**Phase X4** (Sprint v12+) — D2 cutover happens once the kit's
-`nostr-bbs-*-worker::dispatch` extension API is available. At that point:
+There is no kit `dispatch` extension API and none is pending — the operator
+overlay is applied at the **wrangler routing level** (`deploy/*.wrangler.toml`)
+and through `window.__ENV__` injection, not through a Rust wrapper function. See
+the `src/workers.rs` module doc comment, which supersedes the earlier
+"Sprint v12+ dispatch API" narrative.
 
-1. Switch CF Routes from legacy workers to forum-config/ workers.
-2. Run regression suite + canary.
-3. Delete `community-forum-rs.frozen/` once stable.
+The thin-consumer property is machine-checkable: the `pin-check` job in
+`.github/workflows/ci.yml` enforces the four-place kit pin lockstep, and a
+grep gate over `src/` for kit-owned surface names (`AgentBadge`, `AgentsRoster`,
+`agent_disclosure`, …) returns zero. Cutover decisions and their alternatives are
+recorded in [ADR-040](../docs/adr/040-gap-close-edge-decisions.md) and the
+[gap-close edge PRD](../docs/prd/prd-gap-close-edge-v1.0.md); the SHA production
+runs is recorded in [`docs/architecture/kit-compatibility-record.md`](../docs/architecture/kit-compatibility-record.md).
 
 ## Usage at deploy time
 
@@ -306,16 +317,12 @@ NOSTR_BBS_NIP05_DOMAIN=dreamlab-ai.com \
   trunk build --release --config ../dreamlab-ai-website/forum-config/Trunk.toml
 ```
 
-## Migration plan summary (PRD-012)
+## Migration history
 
-```
-   Phase X3 (now)                    Phase X4 (Sprint v12+)
-   ──────────────                    ──────────────────────
-   community-forum-rs.frozen/        forum-config/
-   (frozen, pending deletion)        (production)
-
-   forum-config/                     [community-forum-rs.frozen/
-   (overlay only; not deployed)      deleted]
-```
-
-[PRD-012]: ../docs/PRD-012.md
+The kit-adoption migration is complete. The legacy `community-forum-rs/` fork
+(previously frozen as `community-forum-rs.frozen/`) was deleted at `d248550`, and
+production now deploys entirely from the pinned kit with this package as the sole
+operator overlay. The superseded planning documents (`PRD-012`, `ADR-084/085`)
+predate the current `013-039` ADR numbering and were never committed to this
+repo; the [gap-close edge PRD](../docs/prd/prd-gap-close-edge-v1.0.md) and
+[ADR-040](../docs/adr/040-gap-close-edge-decisions.md) supersede them.

@@ -200,7 +200,20 @@ jobs:
               echo "::error::forum-config Cargo rev '$r' is not a prefix of KIT_REF '$deploy'"; exit 1
             fi
           done
-          echo "Dual-pin OK — all pinned to $deploy"
+          # Durable compatibility record (gap-close WP-4 / ADR-040 D2): the SHA it
+          # cites must equal the live KIT_REF, so the record cannot silently drift.
+          record='docs/architecture/kit-compatibility-record.md'
+          if [[ ! -f "$record" ]]; then
+            echo "::error::compatibility record missing: $record"; exit 1
+          fi
+          canonical=$(grep -oP 'CANONICAL_KIT_SHA=\K[0-9a-f]+' "$record" | head -1)
+          if [[ -z "$canonical" ]]; then
+            echo "::error::no CANONICAL_KIT_SHA in $record"; exit 1
+          fi
+          if [[ "$canonical" != "$deploy" ]]; then
+            echo "::error::compatibility record CANONICAL_KIT_SHA '$canonical' != KIT_REF '$deploy'"; exit 1
+          fi
+          echo "Dual-pin OK — all pinned to $deploy (record + $((${#revs[@]})) Cargo rev(s) in lockstep)"
 
   # ---------------------------------------------------------------------------
   # Admin pubkey sync — the in-repo admin set must agree across

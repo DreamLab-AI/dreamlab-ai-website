@@ -37,8 +37,10 @@ env:
   # Do NOT float on `main`: a breaking upstream push would silently ship untested
   # worker code while the lockfile stays at this tested revision. Keep this SHA in
   # sync with the `rev = "..."` in forum-config/Cargo.lock when bumping the kit.
-  # NOTE: tracks nostr-rust-forum PR #63 head — re-pin to the merge commit on merge.
-  KIT_REF: 'a149da43152185d8d4de672480fd0a5512589aa9'
+  # NOTE: tracks nostr-rust-forum gap-close/2026-07 HEAD (forum gap-close slice:
+  # COM-13 disclosure badge/endpoint, F8 Agents roster tab, governance surfaces).
+  # Cutover provenance: docs/architecture/kit-compatibility-record.md.
+  KIT_REF: '6986276bf64a8fed1cd0412e60c57651c69e8522'
 
 jobs:
   gate:

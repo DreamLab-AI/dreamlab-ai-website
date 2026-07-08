@@ -33,18 +33,27 @@ ingress_policy  = "allowlist"
 [admin]
 mode            = "static"
 static_pubkeys  = [
-  # NOTE: this is the visionclaw-server key — the SAME pubkey used below as a
-  # [governance] agent_pubkeys publisher (BrokerActor). It is documented as a
+  # ⚠ KEY-SPLIT PENDING (ADR-040 D3 / WP-3 AC2 — blocked-operational) ─────────────
+  # The pubkey below is the visionclaw-server key — the SAME pubkey used under
+  # [governance].agent_pubkeys as a BrokerActor governance publisher. It is a
   # non-admin service identity (forum-config/README.md: "Admin: no"), yet it is
-  # currently listed here as the PRIMARY forum admin and mirrored into the
-  # relay-worker / search-worker ADMIN_PUBKEYS and the auth-worker ADMIN_PUBKEYS
-  # CF secret. Kept in place only to stay in lockstep with those mirrors (the CI
-  # admin-pubkeys-sync check asserts they agree); removing it here alone would
-  # split the admin set and desync from the operator-managed CF secret.
-  # TODO(operator): visionclaw-server should have a distinct non-admin key.
-  # Mint a dedicated operator/admin keypair, replace this pubkey across
-  # dreamlab.toml [admin], relay/search ADMIN_PUBKEYS, and the auth-worker CF
-  # secret in one change, and leave visionclaw-server only in [governance].
+  # still listed here as the PRIMARY forum admin and mirrored into the relay-worker
+  # / search-worker ADMIN_PUBKEYS and the auth-worker ADMIN_PUBKEYS CF secret.
+  #
+  # The fix (mint a distinct operator/admin key; leave visionclaw-server only in
+  # [governance]) is a FOUR-location atomic change that includes the auth-worker
+  # ADMIN_PUBKEYS CF secret, which cannot be rotated from CI or this repo. The
+  # split therefore stays staged, not applied: doing it here alone would desync
+  # the CF secret and lock out admins. It is deliberately held until an operator
+  # runs the rotation. Exact steps + the target ADMIN_PUBKEYS layout for all four
+  # locations are in docs/deployment/admin-key-split-runbook.md.
+  #
+  # Placeholder for the new key the operator will mint (documentation only — NOT a
+  # real key, do NOT deploy as-is): OPERATOR_ADMIN_PUBKEY = "<64-hex minted by operator>".
+  # When the runbook is executed, this visionclaw-server pubkey is REPLACED by that
+  # minted key across [admin] here + relay/search ADMIN_PUBKEYS + the CF secret in
+  # one change, and admin-pubkeys-sync stays green because all mirrors move together.
+  # ────────────────────────────────────────────────────────────────────────────────
   "11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c",
   # operator-jjohare — human admin (Dr John O'Hare)
   "6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425a",
@@ -259,41 +268,58 @@ issuer = ""       # operator sets via DREAMLAB_TOKEN_ISSUER env-override
 # Agent roster for relay whitelist seeding and documentation.
 # Private keys are in .nostr-identities.env (git-ignored).
 # Each agent has a distinct identity per the trust-domain separation model.
+#
+# `authorised_by` (ADR-040 D4 / WP-3 roster legibility) names the principal that
+# authorised each agent, so the roster states authority rather than implying it
+# from cohort or role. Every bot below was provisioned under the human operator
+# `operator-jjohare` (6407eed8…425a). This is the authored source of truth for
+# the datum. NOTE: the kit's F8 Agents tab and COM-13 disclosure badge render the
+# authorising principal from the server-side D1 `agent_registry.registered_by`
+# (set from the registering admin's NIP-98 signature), NOT from this table —
+# `ForumConfig` does not parse `[[agents]]`. Binding this authored datum into the
+# rendered surface needs a forum-side config→registry seed export that does not
+# yet exist; see docs/gap-close-evidence/P2-REC-12.md (named blocker for WP-3 AC3).
 [[agents]]
-label    = "welcome-bot"
-pubkey   = "94f74e9c8938e0eae3223fcd9ce3a799e84cff389fd994aeb9dd336add0adf8f"
-role     = "Welcome Bot — greets new members, issues invite credits"
-cohorts  = ["home", "dreamlab", "minimoonoir", "agent"]
+label         = "welcome-bot"
+pubkey        = "94f74e9c8938e0eae3223fcd9ce3a799e84cff389fd994aeb9dd336add0adf8f"
+role          = "Welcome Bot — greets new members, issues invite credits"
+cohorts       = ["home", "dreamlab", "minimoonoir", "agent"]
+authorised_by = "6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425a"  # operator-jjohare (human admin)
 
 [[agents]]
-label    = "moderation-bot"
-pubkey   = "5d80b5facd2d746689d7d2e400db6acce5843456967054adcf6956e4c734c54c"
-role     = "Moderation Bot — enforces zone rules, auto-hides spam"
-cohorts  = ["home", "dreamlab", "minimoonoir", "agent"]
+label         = "moderation-bot"
+pubkey        = "5d80b5facd2d746689d7d2e400db6acce5843456967054adcf6956e4c734c54c"
+role          = "Moderation Bot — enforces zone rules, auto-hides spam"
+cohorts       = ["home", "dreamlab", "minimoonoir", "agent"]
+authorised_by = "6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425a"  # operator-jjohare (human admin)
 
 [[agents]]
-label    = "calendar-bot"
-pubkey   = "be92ccf53d9d535fd21f3388201fd83b49588552fff5a1395fb60b6998df2243"
-role     = "Calendar Bot — NIP-52 event scheduling and reminders"
-cohorts  = ["home", "dreamlab", "agent"]
+label         = "calendar-bot"
+pubkey        = "be92ccf53d9d535fd21f3388201fd83b49588552fff5a1395fb60b6998df2243"
+role          = "Calendar Bot — NIP-52 event scheduling and reminders"
+cohorts       = ["home", "dreamlab", "agent"]
+authorised_by = "6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425a"  # operator-jjohare (human admin)
 
 [[agents]]
-label    = "search-indexer"
-pubkey   = "d5194639ee3560204a1b5584a0714a6dd2a6c59953d0869b483e72ee185ada26"
-role     = "Search Indexer — indexes relay events for full-text search"
-cohorts  = ["home", "dreamlab", "minimoonoir", "agent"]
+label         = "search-indexer"
+pubkey        = "d5194639ee3560204a1b5584a0714a6dd2a6c59953d0869b483e72ee185ada26"
+role          = "Search Indexer — indexes relay events for full-text search"
+cohorts       = ["home", "dreamlab", "minimoonoir", "agent"]
+authorised_by = "6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425a"  # operator-jjohare (human admin)
 
 [[agents]]
-label    = "marketplace-agent"
-pubkey   = "9305ca45fcdae8652754dea236384002d13edd05e77ffaee63623d129cb9496b"
-role     = "Marketplace Agent — NIP-90 job broker, cost estimation"
-cohorts  = ["dreamlab", "agent"]
+label         = "marketplace-agent"
+pubkey        = "9305ca45fcdae8652754dea236384002d13edd05e77ffaee63623d129cb9496b"
+role          = "Marketplace Agent — NIP-90 job broker, cost estimation"
+cohorts       = ["dreamlab", "agent"]
+authorised_by = "6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425a"  # operator-jjohare (human admin)
 
 [[agents]]
-label    = "knowledge-enrichment-agent"
-pubkey   = "e18f1dc1d0bdf06aa5d9f9834f50077e550770eba8ce4435e83cf016647a0d30"
-role     = "Knowledge Enrichment Agent — proposes KG updates via governance"
-cohorts  = ["dreamlab", "agent"]
+label         = "knowledge-enrichment-agent"
+pubkey        = "e18f1dc1d0bdf06aa5d9f9834f50077e550770eba8ce4435e83cf016647a0d30"
+role          = "Knowledge Enrichment Agent — proposes KG updates via governance"
+cohorts       = ["dreamlab", "agent"]
+authorised_by = "6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425a"  # operator-jjohare (human admin)
 
 # ─── Test users ──────────────────────────────────────────────────────────────
 [[test_users]]
