@@ -13,9 +13,10 @@
 //! 3. `dreamlab.toml` -- the operator-supplied TOML consumed by
 //!    `nostr-bbs-config::load_from_path` at startup.
 //! 4. `deploy/<worker>.wrangler.toml` -- preserved CF resource IDs (D1,
-//!    KV namespaces, R2 buckets, Custom Domain mappings) for D2 zero-
-//!    downtime route handover from the legacy fork at
-//!    `community-forum-rs/`.
+//!    KV namespaces, R2 buckets, Custom Domain mappings). The kit-cutover to a
+//!    thin consumer is complete: the legacy `community-forum-rs/` fork was
+//!    deleted at commit `d248550`, and production now deploys entirely from the
+//!    pinned kit with this crate as the sole operator overlay.
 //!
 //! # Architecture (rc6)
 //!
@@ -26,7 +27,10 @@
 //! wired into the kit workers) and by [`workers::RateLimitConfig`] for any
 //! additional operator-side gating.
 //!
-//! [PRD-012]: https://github.com/DreamLab-AI/dreamlab-ai-website/blob/main/docs/PRD-012.md
+//! Cutover decisions: [ADR-040]; SHA production runs:
+//! `docs/architecture/kit-compatibility-record.md`.
+//!
+//! [ADR-040]: https://github.com/DreamLab-AI/dreamlab-ai-website/blob/main/docs/adr/040-gap-close-edge-decisions.md
 
 #![warn(missing_docs)]
 

@@ -56,7 +56,20 @@
     <meta name="format-detection" content="telephone=no" />
 
     <!-- Security Headers -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.workers.dev wss://*.workers.dev https://*.dreamlab-ai.com wss://*.dreamlab-ai.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <!--
+      CSP notes:
+      - script-src is 'self' only: no 'unsafe-eval' (blocks eval/Function-based
+        injection) and no 'unsafe-inline'. The one inline bootstrap script was
+        moved to /spa-redirect.js. JSON-LD blocks below are type
+        application/ld+json (data, not executable) so CSP does not gate them.
+      - connect-src is scoped to the Cloudflare Workers subdomain actually used
+        by this account (*.solitary-paper-764d.workers.dev: auth / pod / search /
+        link-preview / nostr-relay), NOT the internet-wide *.workers.dev, which
+        previously allowed exfiltration to any attacker-controlled worker.
+      - style-src keeps 'unsafe-inline' because Radix UI + runtime style
+        attributes require it; that is not a script-injection vector.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.solitary-paper-764d.workers.dev wss://*.solitary-paper-764d.workers.dev https://*.dreamlab-ai.com wss://*.dreamlab-ai.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-Frame-Options" content="DENY">
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
@@ -158,15 +171,10 @@
     }
     </script>
 
-    <script>
-      (function() {
-        var redirect = sessionStorage.redirect;
-        delete sessionStorage.redirect;
-        if (redirect && redirect !== location.pathname) {
-          history.replaceState(null, null, redirect);
-        }
-      })();
-    </script>
+    <!-- SPA deep-link restore. External 'self' script (not inline) so CSP
+         script-src can stay 'self' with no 'unsafe-inline'. Classic,
+         render-blocking script: runs before the deferred app module. -->
+    <script src="/spa-redirect.js"></script>
   </head>
 
   <body>

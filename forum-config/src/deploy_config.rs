@@ -63,10 +63,19 @@ pub const REQUIRED_WRANGLER_MANIFESTS: &[&str] = &[
 /// - `NATIVE_POD_ADMIN_KEY` — PSK (`X-Pod-Admin-Key`) the auth-worker sends to
 ///   the native solid-pod-rs server when provisioning a native pod (must match
 ///   the agentbox `SOLID_ADMIN_KEY`). Absent ⇒ `/api/native-pod/provision`
-///   503s "native pod not configured". The paired `NATIVE_POD_URL` is a
-///   `[vars]` value in `auth-worker.wrangler.toml`, not a secret.
-pub const REQUIRED_AUTH_SECRETS: &[&str] =
-    &["PRF_SERVER_SECRET", "ADMIN_PUBKEYS", "NATIVE_POD_ADMIN_KEY"];
+///   503s "native pod not configured".
+/// - `NATIVE_POD_URL` — base URL the auth-worker posts the provision request to
+///   (`POST {NATIVE_POD_URL}/_admin/provision/{pubkey}`). It is a **secret**, not
+///   a `[vars]` plaintext binding: a same-named `[vars]` and secret conflict, so
+///   `wrangler deploy` would re-assert the plaintext var and clobber the secret
+///   every deploy. Gated here so a fresh deploy without it fails fast instead of
+///   503-ing the native pod path at request time.
+pub const REQUIRED_AUTH_SECRETS: &[&str] = &[
+    "PRF_SERVER_SECRET",
+    "ADMIN_PUBKEYS",
+    "NATIVE_POD_ADMIN_KEY",
+    "NATIVE_POD_URL",
+];
 
 /// A single deploy-config defect, located precisely enough for an operator to fix.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -325,6 +334,7 @@ mod tests {
             ("PRF_SERVER_SECRET", "a-real-secret-value"),
             ("ADMIN_PUBKEYS", "6407eed8...,deadbeef..."),
             ("NATIVE_POD_ADMIN_KEY", "a-native-pod-psk"),
+            ("NATIVE_POD_URL", "https://pods-native.dreamlab-ai.com"),
             ("RP_ID", "dreamlab-ai.com"),
         ];
         assert!(validate_required_secrets(configured).is_ok());
@@ -332,8 +342,8 @@ mod tests {
 
     #[test]
     fn required_secret_missing_fails_fast() {
-        // Only ADMIN_PUBKEYS supplied: PRF_SERVER_SECRET and
-        // NATIVE_POD_ADMIN_KEY are both reported missing.
+        // Only ADMIN_PUBKEYS supplied: PRF_SERVER_SECRET,
+        // NATIVE_POD_ADMIN_KEY and NATIVE_POD_URL are all reported missing.
         let configured = vec![("ADMIN_PUBKEYS", "6407eed8...")];
         let errors = validate_required_secrets(configured).unwrap_err();
         let missing: Vec<&str> = errors
@@ -354,6 +364,7 @@ mod tests {
             ("PRF_SERVER_SECRET", "REPLACE_WITH_SECRET"),
             ("ADMIN_PUBKEYS", "6407eed8..."),
             ("NATIVE_POD_ADMIN_KEY", "a-native-pod-psk"),
+            ("NATIVE_POD_URL", "https://pods-native.dreamlab-ai.com"),
         ];
         let errors = validate_required_secrets(configured).unwrap_err();
         assert_eq!(errors.len(), 1);
@@ -371,6 +382,7 @@ mod tests {
             ("PRF_SERVER_SECRET", "   "),
             ("ADMIN_PUBKEYS", "x"),
             ("NATIVE_POD_ADMIN_KEY", "psk"),
+            ("NATIVE_POD_URL", "https://pods-native.dreamlab-ai.com"),
         ];
         let errors = validate_required_secrets(configured).unwrap_err();
         assert_eq!(errors.len(), 1);
@@ -387,12 +399,29 @@ mod tests {
         let configured = vec![
             ("PRF_SERVER_SECRET", "a-real-secret-value"),
             ("ADMIN_PUBKEYS", "6407eed8..."),
+            ("NATIVE_POD_URL", "https://pods-native.dreamlab-ai.com"),
         ];
         let errors = validate_required_secrets(configured).unwrap_err();
         assert_eq!(
             errors,
             vec![DeployConfigError::MissingSecret {
                 name: "NATIVE_POD_ADMIN_KEY".to_string()
+            }]
+        );
+    }
+
+    #[test]
+    fn native_pod_url_is_required() {
+        let configured = vec![
+            ("PRF_SERVER_SECRET", "a-real-secret-value"),
+            ("ADMIN_PUBKEYS", "6407eed8..."),
+            ("NATIVE_POD_ADMIN_KEY", "a-native-pod-psk"),
+        ];
+        let errors = validate_required_secrets(configured).unwrap_err();
+        assert_eq!(
+            errors,
+            vec![DeployConfigError::MissingSecret {
+                name: "NATIVE_POD_URL".to_string()
             }]
         );
     }

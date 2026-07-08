@@ -2,8 +2,9 @@
  * DreamLab Design System — Shared Tokens
  * Used by both React marketing site and Leptos forum
  *
- * Canonical source: src/styles/design-tokens.css
- * Forum copy: community-forum-rs/crates/forum-client/design-tokens.css
+ * Canonical source (React marketing site): src/styles/design-tokens.css
+ * The forum client's design tokens are owned by the pinned kit
+ * (nostr-rust-forum crates/nostr-bbs-forum-client), not copied here.
  * ============================================ */
 
 /* -- Color Tokens --------------------------------- */

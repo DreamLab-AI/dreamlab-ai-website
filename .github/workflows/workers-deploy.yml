@@ -37,8 +37,10 @@ env:
   # Do NOT float on `main`: a breaking upstream push would silently ship untested
   # worker code while the lockfile stays at this tested revision. Keep this SHA in
   # sync with the `rev = "..."` in forum-config/Cargo.lock when bumping the kit.
-  # NOTE: tracks nostr-rust-forum PR #63 head — re-pin to the merge commit on merge.
-  KIT_REF: 'a149da43152185d8d4de672480fd0a5512589aa9'
+  # NOTE: tracks nostr-rust-forum gap-close/2026-07 HEAD (forum gap-close slice:
+  # COM-13 disclosure badge/endpoint, F8 Agents roster tab, governance surfaces).
+  # Cutover provenance: docs/architecture/kit-compatibility-record.md.
+  KIT_REF: '6986276bf64a8fed1cd0412e60c57651c69e8522'
 
 jobs:
   gate:
@@ -48,9 +50,57 @@ jobs:
     permissions:
       contents: read
 
+  # Provision the SINGLE shared admin KV namespace exactly once, before the
+  # per-worker matrix runs. Both the auth-worker (ADMIN_KV, read/write) and the
+  # pod-worker (ADMIN_KV_RO, read-only) must bind the SAME namespace or moderation
+  # state (bans/mutes) written by the auth-worker is invisible to the pod-worker.
+  # Doing this in a dedicated pre-job (not per-matrix) also avoids the create race
+  # two parallel matrix jobs would hit when resolving the same title concurrently.
+  provision-kv:
+    name: Provision shared admin KV
+    needs: [gate]
+    if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      admin_kv_id: ${{ steps.kv.outputs.admin_kv_id }}
+    steps:
+      - name: Resolve or create dreamlab-admin-kv
+        id: kv
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          API_BASE="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/storage/kv/namespaces"
+          AUTH=(-H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" -H "Content-Type: application/json")
+          # Fixed shared title — NOT per-worker/matrix-generated.
+          TITLE="dreamlab-admin-kv"
+          listing=$(curl -fsSL "${API_BASE}?per_page=100" "${AUTH[@]}" || echo '{"result":[]}')
+          id=$(echo "$listing" | jq -r --arg t "$TITLE" \
+            '.result[]? | select(.title == $t) | .id' | head -n 1)
+          if [ -z "$id" ] || [ "$id" = "null" ]; then
+            create_resp=$(curl -fsSL -X POST "${API_BASE}" "${AUTH[@]}" \
+              --data "{\"title\":\"${TITLE}\"}" || echo '{}')
+            id=$(echo "$create_resp" | jq -r '.result.id // empty' | head -n 1)
+            if [ -z "$id" ] || [ "$id" = "null" ]; then
+              listing=$(curl -fsSL "${API_BASE}?per_page=100" "${AUTH[@]}" || echo '{"result":[]}')
+              id=$(echo "$listing" | jq -r --arg t "$TITLE" \
+                '.result[]? | select(.title == $t) | .id' | head -n 1)
+            fi
+          fi
+          if [ -z "$id" ] || [ "$id" = "null" ]; then
+            echo "::error::failed to provision shared KV namespace $TITLE" >&2
+            exit 1
+          fi
+          echo "admin_kv_id=$id" >> "$GITHUB_OUTPUT"
+          echo "[kv] $TITLE -> $id (shared)"
+
   deploy-rust:
     name: Deploy Rust Workers
-    needs: [gate]
+    needs: [gate, provision-kv]
     if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -90,7 +140,10 @@ jobs:
         run: cp forum-config/deploy/${{ matrix.config }}.wrangler.toml kit/crates/${{ matrix.kit_crate }}/wrangler.toml
 
       - name: Setup Rust toolchain ${{ env.RUST_TOOLCHAIN }}
-        uses: dtolnay/rust-toolchain@1.90.0
+        # Pinned to the commit the `1.90.0` branch resolves to (that branch's
+        # action.yml hardcodes toolchain 1.90.0). Full SHA, not a mutable tag,
+        # because this job carries CLOUDFLARE_API_TOKEN. Re-pin when bumping Rust.
+        uses: dtolnay/rust-toolchain@0176485ebe2f605bde554dd99f804beeaf7db3e2 # 1.90.0
         with:
           targets: wasm32-unknown-unknown
 
@@ -133,16 +186,34 @@ jobs:
       - name: Install wrangler ${{ env.WRANGLER_VERSION }}
         run: npm install -g wrangler@${{ env.WRANGLER_VERSION }}
 
-      - name: Provision KV namespaces
+      - name: Bind KV namespaces
         working-directory: kit/crates/${{ matrix.kit_crate }}
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          # Single shared admin KV id, provisioned once in the provision-kv job.
+          ADMIN_KV_ID: ${{ needs.provision-kv.outputs.admin_kv_id }}
         run: |
           set -euo pipefail
           API_BASE="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/storage/kv/namespaces"
           AUTH=(-H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" -H "Content-Type: application/json")
 
+          # Shared admin KV — the auth-worker (ADMIN_KV) and pod-worker (ADMIN_KV_RO)
+          # bind the SAME id so moderation writes propagate. The id comes from the
+          # provision-kv pre-job, never re-created per worker (a per-worker title
+          # would split the namespace and silently drop bans/mutes).
+          if grep -q "REPLACE_WITH_NEW_ADMIN_KV_ID" wrangler.toml; then
+            if [ -z "${ADMIN_KV_ID}" ] || [ "${ADMIN_KV_ID}" = "null" ]; then
+              echo "::error::shared admin KV id missing from provision-kv job output" >&2
+              exit 1
+            fi
+            sed -i "s/REPLACE_WITH_NEW_ADMIN_KV_ID/${ADMIN_KV_ID}/g" wrangler.toml
+            echo "[kv] bound ADMIN_KV(_RO) -> ${ADMIN_KV_ID} (shared dreamlab-admin-kv)" >&2
+          fi
+
+          # Any remaining per-worker KV placeholder (e.g. NIP-98 replay) is
+          # resolved/created per worker by title. Not present in the current
+          # manifests (NIP-98 replay moved to D1) but kept for forward-compat.
           resolve_or_create() {
             local title="$1"
             local listing existing
@@ -167,10 +238,9 @@ jobs:
             echo "[kv] $title -> $id (created)" >&2
             echo "$id"
           }
-          for placeholder in REPLACE_WITH_NEW_ADMIN_KV_ID REPLACE_WITH_NEW_NIP98_REPLAY_KV_ID; do
+          for placeholder in REPLACE_WITH_NEW_NIP98_REPLAY_KV_ID; do
             if grep -q "$placeholder" wrangler.toml; then
               case "$placeholder" in
-                REPLACE_WITH_NEW_ADMIN_KV_ID)         title="${{ matrix.config }}-admin-kv" ;;
                 REPLACE_WITH_NEW_NIP98_REPLAY_KV_ID)  title="${{ matrix.config }}-nip98-replay" ;;
               esac
               real_id=$(resolve_or_create "$title")
@@ -201,10 +271,12 @@ jobs:
           MISSING=()
           # NATIVE_POD_ADMIN_KEY: PSK for the native pod tier (Gap 3). The
           # auth-worker's /api/native-pod/provision sends it as X-Pod-Admin-Key;
-          # absent it 503s. NATIVE_POD_URL is a [vars] value (mirrored from
-          # dreamlab.toml), but the key stays an operator secret (= agentbox
-          # SOLID_ADMIN_KEY) — gated here, never generated by the pipeline.
-          for required in PRF_SERVER_SECRET ADMIN_PUBKEYS NATIVE_POD_ADMIN_KEY; do
+          # absent it 503s. NATIVE_POD_URL is the matching base URL. Both are now
+          # operator secrets (NATIVE_POD_URL is no longer a [vars] plaintext binding
+          # — that duplicate was removed so the secret is the single source of truth
+          # and cannot be clobbered by an empty deploy-time [vars]). NATIVE_POD_ADMIN_KEY
+          # = agentbox SOLID_ADMIN_KEY. Gated here, never generated by the pipeline.
+          for required in PRF_SERVER_SECRET ADMIN_PUBKEYS NATIVE_POD_ADMIN_KEY NATIVE_POD_URL; do
             if ! grep -qxF "$required" <<<"$SET_SECRETS"; then
               MISSING+=("$required")
             fi
@@ -216,7 +288,7 @@ jobs:
                  "operator-provided values — the pipeline never generates them." >&2
             exit 1
           fi
-          echo "[secrets] all required auth-worker secrets present: PRF_SERVER_SECRET, ADMIN_PUBKEYS, NATIVE_POD_ADMIN_KEY"
+          echo "[secrets] all required auth-worker secrets present: PRF_SERVER_SECRET, ADMIN_PUBKEYS, NATIVE_POD_ADMIN_KEY, NATIVE_POD_URL"
 
       - name: Wrangler deploy ${{ matrix.kit_crate }}
         working-directory: kit/crates/${{ matrix.kit_crate }}

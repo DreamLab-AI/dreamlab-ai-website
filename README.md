@@ -329,14 +329,14 @@ graph LR
 
 ### Kit pinning — the dual-pin rule
 
-The kit is pinned at commit `25ca8a1` in **four places that must move together**:
+The kit is pinned at commit `6986276` (nostr-rust-forum `gap-close/2026-07` HEAD) in **four places that must move together**:
 
 1. `KIT_REF` in `.github/workflows/deploy.yml` (forum client build)
 2. `KIT_REF` in `.github/workflows/workers-deploy.yml` (worker builds)
 3. `KIT_REF` in `.github/workflows/rust-ci.yml` (kit-level fmt/clippy/test gates)
-4. The `rev = "25ca8a1"` pins on every `nostr-bbs-*` dependency in `forum-config/Cargo.toml` (overlay tests compile against the same kit)
+4. The `rev = "6986276…"` pins on every `nostr-bbs-*` dependency in `forum-config/Cargo.toml` (overlay tests compile against the same kit)
 
-Bumping one without the others ships a client/worker/test skew. Always update all four in a single commit.
+Bumping one without the others ships a client/worker/test skew. Always update all four in a single commit. This lockstep is machine-enforced by the `pin-check` job in `.github/workflows/ci.yml` (fails the build if the three `KIT_REF`s or any Cargo `rev` diverge), and the SHA production runs is recorded durably in [`docs/architecture/kit-compatibility-record.md`](docs/architecture/kit-compatibility-record.md). Governed by [ADR-038 Kit-Ref Pin Governance](docs/adr/038-kit-ref-pin-governance.md).
 
 ### ZONE_CONFIG flow
 
@@ -347,7 +347,7 @@ Bumping one without the others ships a client/worker/test skew. Always update al
 
 ### Kit Consumer Architecture
 
-The separation follows **PRD-012** (kit adoption) and **ADR-085** (forum-config package):
+The separation follows [ADR-037 Config Single Source of Truth](docs/adr/037-config-single-source-of-truth.md) (operator config in `dreamlab.toml`) and [ADR-038 Kit-Ref Pin Governance](docs/adr/038-kit-ref-pin-governance.md) (the pinned kit-consumer model); the gap-close cutover to a thin consumer is recorded in [ADR-040](docs/adr/040-gap-close-edge-decisions.md) and [the gap-close edge PRD](docs/prd/prd-gap-close-edge-v1.0.md):
 
 | Concern | Location | Owned by |
 |---------|----------|----------|

@@ -18,6 +18,77 @@ const TIER_CONFIG: Record<Tier, { label: string; color: string; dot: string; des
 
 const AI_CHAT_URL = import.meta.env.VITE_AI_CHAT_URL || "";
 
+// Minimal NIP-07 signer surface (nos2x, Alby, etc.).
+interface SignedNostrEvent {
+  id: string;
+  pubkey: string;
+  created_at: number;
+  kind: number;
+  tags: string[][];
+  content: string;
+  sig: string;
+}
+interface Nip07 {
+  getPublicKey: () => Promise<string>;
+  signEvent?: (event: {
+    created_at: number;
+    kind: number;
+    tags: string[][];
+    content: string;
+  }) => Promise<SignedNostrEvent>;
+}
+
+const getNostr = (): Nip07 | undefined =>
+  (window as unknown as { nostr?: Nip07 }).nostr;
+
+// Base64-encode a JSON string in a UTF-8-safe way (payload is ASCII in practice).
+const b64 = (s: string): string =>
+  btoa(String.fromCharCode(...new TextEncoder().encode(s)));
+
+/**
+ * SECURITY — client half of a challenge-response.
+ *
+ * A bare `pubkey` string in the request body proves nothing: any client can
+ * POST any pubkey and any tier. To make identity *verifiable*, we sign a
+ * NIP-98 (kind 27235) HTTP-auth event with the user's NIP-07 key, binding it to
+ * this request's URL, method, a fresh `created_at` timestamp and a random
+ * nonce. Possession of the signature proves control of the private key for the
+ * claimed pubkey. The token is sent as `Authorization: Nostr <base64(event)>`.
+ *
+ * The BACKEND MUST, and this client cannot:
+ *   1. Verify the schnorr signature over the event id for `event.pubkey`.
+ *   2. Reject stale (`created_at` outside a small window, e.g. ±60s) or replayed
+ *      (seen `nonce`) tokens, and confirm the `u`/`method` tags match the route.
+ *   3. Ensure `event.pubkey === body.pubkey`.
+ *   4. Derive the tier from SERVER-SIDE entitlements for that verified pubkey.
+ *      The `tier` field in the body is a UI hint ONLY and MUST NOT be trusted
+ *      for authorization — treating it as authoritative is privilege escalation.
+ *
+ * If no signer is available the token is null; the backend MUST then treat the
+ * request as anonymous (tier 1 / unauthenticated), never honouring a
+ * client-asserted pubkey or tier >= 2.
+ */
+async function buildNostrAuthToken(url: string): Promise<string | null> {
+  const nostr = getNostr();
+  if (!nostr?.signEvent) return null;
+  try {
+    const nonce = `${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+    const signed = await nostr.signEvent({
+      kind: 27235, // NIP-98 HTTP Auth
+      created_at: Math.floor(Date.now() / 1000),
+      tags: [
+        ["u", url],
+        ["method", "POST"],
+        ["nonce", nonce],
+      ],
+      content: "",
+    });
+    return b64(JSON.stringify(signed));
+  } catch {
+    return null;
+  }
+}
+
 export const AIChatFab = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -58,7 +129,7 @@ export const AIChatFab = () => {
   }, [showTierMenu]);
 
   const requestNostrAuth = useCallback(async (): Promise<string | null> => {
-    const nostr = (window as unknown as Record<string, unknown>).nostr as { getPublicKey: () => Promise<string> } | undefined;
+    const nostr = getNostr();
     if (!nostr) return null;
     try {
       const pk = await nostr.getPublicKey();
@@ -136,16 +207,28 @@ export const AIChatFab = () => {
     }
 
     try {
+      // NOTE: `tier` and `pubkey` here are UI hints. They are NOT trusted
+      // credentials — the backend derives the real tier from the *verified*
+      // pubkey (see buildNostrAuthToken doc). We attach a signed NIP-98 token so
+      // the backend CAN verify identity; without it the request is anonymous.
       const body: Record<string, unknown> = {
         message: trimmed,
         session_id: sessionId,
         tier,
       };
-      if (pubkey) body.pubkey = pubkey;
+
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (pubkey) {
+        const authToken = await buildNostrAuthToken(AI_CHAT_URL);
+        if (authToken) headers["Authorization"] = `Nostr ${authToken}`;
+        body.pubkey = pubkey;
+      }
 
       const res = await fetch(AI_CHAT_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify(body),
       });
       if (!res.ok) throw new Error(`${res.status}`);
