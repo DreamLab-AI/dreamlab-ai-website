@@ -852,7 +852,7 @@ dependencies = [
 [[package]]
 name = "nostr-bbs-config"
 version = "1.0.0-beta.3"
-source = "git+https://github.com/DreamLab-AI/nostr-rust-forum.git?rev=a149da43152185d8d4de672480fd0a5512589aa9#a149da43152185d8d4de672480fd0a5512589aa9"
+source = "git+https://github.com/DreamLab-AI/nostr-rust-forum.git?rev=6986276bf64a8fed1cd0412e60c57651c69e8522#6986276bf64a8fed1cd0412e60c57651c69e8522"
 dependencies = [
  "schemars",
  "serde",
@@ -865,7 +865,7 @@ dependencies = [
 [[package]]
 name = "nostr-bbs-core"
 version = "1.0.0-beta.4"
-source = "git+https://github.com/DreamLab-AI/nostr-rust-forum.git?rev=a149da43152185d8d4de672480fd0a5512589aa9#a149da43152185d8d4de672480fd0a5512589aa9"
+source = "git+https://github.com/DreamLab-AI/nostr-rust-forum.git?rev=6986276bf64a8fed1cd0412e60c57651c69e8522#6986276bf64a8fed1cd0412e60c57651c69e8522"
 dependencies = [
  "aes",
  "async-trait",
@@ -893,7 +893,7 @@ dependencies = [
 [[package]]
 name = "nostr-bbs-mesh"
 version = "1.0.0-beta.3"
-source = "git+https://github.com/DreamLab-AI/nostr-rust-forum.git?rev=a149da43152185d8d4de672480fd0a5512589aa9#a149da43152185d8d4de672480fd0a5512589aa9"
+source = "git+https://github.com/DreamLab-AI/nostr-rust-forum.git?rev=6986276bf64a8fed1cd0412e60c57651c69e8522#6986276bf64a8fed1cd0412e60c57651c69e8522"
 dependencies = [
  "async-trait",
  "nostr-bbs-config",
@@ -906,7 +906,7 @@ dependencies = [
 [[package]]
 name = "nostr-bbs-rate-limit"
 version = "1.0.0-beta.3"
-source = "git+https://github.com/DreamLab-AI/nostr-rust-forum.git?rev=a149da43152185d8d4de672480fd0a5512589aa9#a149da43152185d8d4de672480fd0a5512589aa9"
+source = "git+https://github.com/DreamLab-AI/nostr-rust-forum.git?rev=6986276bf64a8fed1cd0412e60c57651c69e8522#6986276bf64a8fed1cd0412e60c57651c69e8522"
 dependencies = [
  "async-trait",
  "hex",
@@ -1383,9 +1383,9 @@ checksum = "8ed6a63f02c8539c91a8685a86f4099661ba3da017932f6ebbea6de3f0fa7c90"
 
 [[package]]
 name = "solid-pod-rs"
-version = "0.5.0-alpha.3"
+version = "0.5.0-alpha.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "13cdb0796338f7b2fe73781d488e0536a07aa37cbd17e58e8027ffbe22e09c64"
+checksum = "68a1516adc6955961413280e164643f0857c32d17b8c66d6940788deb4f416d2"
 dependencies = [
  "async-trait",
  "base64",
