@@ -60,8 +60,15 @@ The `[native_pod]` block in `forum-config/dreamlab.toml` gates this tier. When `
 4. Under **Public Hostname**, add:
    - **Subdomain:** `pods-native`
    - **Domain:** `dreamlab-ai.com`
-   - **Service:** `http://solid-pod-server:8410`
+   - **Service:** `http://agentbox:8484`
 5. Click **Save tunnel**.
+
+> **Origin note.** The service target is the **agentbox container itself**
+> (compose hostname `agentbox`, reachable over the shared
+> `visionclaw_network`) — solid-pod-rs-server runs *inside* it under
+> supervisord on port 8484. Earlier revisions of this runbook said
+> `http://solid-pod-server:8410`; that standalone sidecar was deleted from
+> agentbox in commit `ae7f4ec0` (2026-05-17) and no longer exists.
 
 The tunnel will appear as **Inactive** until the connector container starts in Step 2.
 
@@ -75,23 +82,30 @@ cd /path/to/agentbox
 cp .env.solid-pods.example .env.solid-pods
 ```
 
-Edit `.env.solid-pods` and set the following values:
+Edit `.env.solid-pods` and set the tunnel token (the only variable the
+overlay consumes):
 
 ```dotenv
 CLOUDFLARE_TUNNEL_TOKEN=<token from Step 1>
-SOLID_ADMIN_KEY=$(openssl rand -hex 32)   # keep this secret — also used in Step 3
-SOLID_ALLOWED_ORIGINS=https://dreamlab-ai.com
-SOLID_POD_PUBLIC_URL=https://pods-native.dreamlab-ai.com
 ```
 
-Then bring up the two new services alongside the existing stack:
+The pod server's own settings live on the agentbox side, not in
+`.env.solid-pods`: set `SOLID_ADMIN_KEY` (`openssl rand -hex 32` — also used
+in Step 3) and optionally `SOLID_POD_PUBLIC_URL=https://pods-native.dreamlab-ai.com`
+in agentbox's root `.env` (compose `env_file` passthrough to the container).
+CORS (`allowed_origins`) is baked from `agentbox.toml
+[integrations.solid_pod_rs]` at nix build time.
+
+Then bring up the tunnel connector alongside the existing stack (the pod
+server is already running inside the agentbox container — there is no
+separate pod service to start):
 
 ```bash
 docker compose \
   -f docker-compose.yml \
-  -f docker-compose.override.yml \
   -f docker-compose.solid-pods.yml \
-  up -d solid-pod-server cloudflared-pod
+  --env-file .env.solid-pods \
+  up -d cloudflared-pod
 ```
 
 Verify the tunnel is live:
@@ -154,7 +168,7 @@ Open `forum-config/dreamlab.toml` and verify the `[native_pod]` section is prese
 [native_pod]
 enabled             = true
 base_url            = "https://pods-native.dreamlab-ai.com"
-allowlist_cohorts   = ["members", "trainers", "private", "business"]
+allowlist_cohorts   = ["family", "friends", "business"]
 git_enabled         = true
 admin_provision_url = "https://pods-native.dreamlab-ai.com/_admin/provision"
 ```
@@ -211,9 +225,9 @@ curl -X POST https://api.dreamlab-ai.com/api/native-pod/provision \
 - `SOLID_ADMIN_KEY` and `NATIVE_POD_ADMIN_KEY` must be **identical** across agentbox and CF Worker. A mismatch causes 403 errors on every provisioning call.
 - Treat these keys as secrets. Never commit them, log them, or expose them in error responses.
 - `SOLID_ALLOWED_ORIGINS` restricts CORS to the forum origin. Do **not** set `*` in production — it would allow any website to make credentialed requests to the native server.
-- The Cloudflare Tunnel replaces the need for open inbound ports. The agentbox host firewall should block port 8410 externally; all traffic arrives through the tunnel.
+- The Cloudflare Tunnel replaces the need for open inbound ports. agentbox publishes port 8484 loopback-only (`127.0.0.1:8484`) on the host; all public traffic arrives through the tunnel over the Docker network.
 - NIP-98 is verified independently on the native server for user requests. The PSK (`SOLID_ADMIN_KEY`) is used only for the `/_admin/provision` endpoint — ordinary pod read/write goes through standard NIP-98 Schnorr verification.
-- Rotate both keys together: update the `.env.solid-pods` file, restart `solid-pod-server`, and run `wrangler secret put NATIVE_POD_ADMIN_KEY` with the new value.
+- Rotate both keys together: update `SOLID_ADMIN_KEY` in agentbox's root `.env`, recreate the agentbox container (or restart the `solid-pod` supervisord program), and run `wrangler secret put NATIVE_POD_ADMIN_KEY` with the new value.
 
 ---
 
@@ -225,7 +239,7 @@ curl -X POST https://api.dreamlab-ai.com/api/native-pod/provision \
 | "Native pod not reachable" error in forum | Tunnel connector is down: `docker logs cloudflared-pod`. Also check DNS propagation for `pods-native.dreamlab-ai.com` |
 | 503 from `/api/native-pod/provision` | CF Worker secrets not set: run `wrangler secret list --name dreamlab-auth-api` and verify `NATIVE_POD_URL` and `NATIVE_POD_ADMIN_KEY` are present |
 | 403 from `/_admin/provision` | `SOLID_ADMIN_KEY` in agentbox does not match `NATIVE_POD_ADMIN_KEY` in CF Worker — re-set both to the same value |
-| Git panel shows "Git API not available" on native pod | `solid-pod-rs` was built without `--features git`. Check `docker logs solid-pod-server` for feature flags at startup |
+| Git panel shows "Git API not available" on native pod | `solid-pod-rs` was built without `--features git`. Check `docker exec agentbox tail -50 /var/log/solid-pod.log` for feature flags at startup |
 | Tunnel shows "Inactive" in Zero Trust dashboard | `cloudflared-pod` container not running: `docker ps | grep cloudflared-pod`; check `.env.solid-pods` has a valid `CLOUDFLARE_TUNNEL_TOKEN` |
 | `/.well-known/apps` returns 404 | agentbox version predates the app manifest feature — pull latest `docker-compose.solid-pods.yml` and rebuild |
 
