@@ -17,6 +17,7 @@ const WorkshopIndex = lazy(() => import("./pages/WorkshopIndex"));
 const Programmes = lazy(() => import("./pages/Programmes"));
 const CoCreate = lazy(() => import("./pages/CoCreate"));
 const Research = lazy(() => import("./pages/Research"));
+const Ecosystem = lazy(() => import("./pages/Ecosystem"));
 const Testimonials = lazy(() => import("./pages/Testimonials"));
 const Ventures = lazy(() => import("./pages/Ventures"));
 
@@ -38,6 +39,7 @@ const App = () => (
             <Route path="/programmes" element={<Programmes />} />
             <Route path="/co-create" element={<CoCreate />} />
             <Route path="/research" element={<Research />} />
+            <Route path="/ecosystem" element={<Ecosystem />} />
             <Route path="/team" element={<Team />} />
 
             {/* Workshop Routes */}

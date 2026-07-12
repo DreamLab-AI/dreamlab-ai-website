@@ -22,9 +22,6 @@ import {
   GraduationCap,
   Bot,
   Fingerprint,
-  KeyRound,
-  Download,
-  GitBranch,
 } from "lucide-react";
 import { useOGMeta } from "@/hooks/useOGMeta";
 import { PAGE_OG_CONFIGS } from "@/lib/og-meta";
@@ -168,11 +165,15 @@ const Index = () => {
             className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-6 animate-slide-up max-w-5xl leading-tight"
             style={{ textShadow: '0 0 40px rgba(212, 165, 116, 0.4), 0 0 80px rgba(205, 127, 50, 0.2)' }}
           >
-            <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 text-transparent bg-clip-text">DREAMLAB APPLIED INNOVATION</span>
+            <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 text-transparent bg-clip-text">DREAMLAB AI</span>
           </h1>
 
-          <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-foreground/90 max-w-3xl mb-8 animate-slide-up font-normal tracking-wide leading-relaxed" style={{ animationDelay: '0.1s' }}>
-             Agentics, spatial computing, rapid<br />prototyping & secure distributed systems.
+          <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-foreground/90 max-w-3xl mb-4 animate-slide-up font-normal tracking-wide leading-relaxed" style={{ animationDelay: '0.1s' }}>
+             AI & Agents Residential Training<br />in the Lake District.
+          </p>
+
+          <p className="text-base md:text-lg text-muted-foreground max-w-2xl mb-8 animate-slide-up leading-relaxed" style={{ animationDelay: '0.15s' }}>
+            Agentics, spatial computing, rapid prototyping & secure distributed systems.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 animate-scale-in mb-8 w-full sm:w-auto" style={{ animationDelay: '0.2s' }}>
@@ -249,12 +250,12 @@ const Index = () => {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
             {outcomeCards.map((card) => {
               const Icon = card.icon;
-              // Sovereign-identity card scrolls to the in-page explainer
+              // Sovereign-identity card links to the ecosystem page explainer
               // rather than the programmes route, since it describes a
               // forum capability, not a residential programme cohort.
               const target =
                 card.id === "sovereign-identity"
-                  ? "#sovereign-identity"
+                  ? "/ecosystem#sovereign-identity"
                   : `/programmes#${card.id}`;
               const countLabel =
                 card.id === "sovereign-identity"
@@ -284,171 +285,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Section 3b: VisionFlow Ecosystem
-          Highlights the five-substrate coordination engineering platform:
-          - Cryptographic identity via DID:Nostr
-          - Federated knowledge reasoning via VisionClaw
-          - Sovereign agent autonomy via Agentbox
-          - Immutable provenance and human-in-the-loop governance via Judgment Broker
-      */}
-      <section
-        id="sovereign-identity"
-        className="py-16 md:py-20 bg-gradient-to-b from-background via-cyan-950/10 to-background"
-        aria-labelledby="visionflow-heading"
-      >
-        <div className="container max-w-6xl mx-auto px-5 md:px-4">
-          <div className="grid lg:grid-cols-2 gap-10 md:gap-12 items-start">
-            <div>
-              <p className="text-xs uppercase tracking-widest text-cyan-400 mb-3 font-semibold">
-                VisionFlow Ecosystem
-              </p>
-              <h2
-                id="visionflow-heading"
-                className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4"
-              >
-                Coordination engineering for federated human–AI intelligence
-              </h2>
-              <p className="text-base md:text-lg text-foreground/80 leading-relaxed mb-8">
-                VisionFlow is a five-substrate architecture where autonomous agents and human judgment mesh together through shared cryptographic identity, formal reasoning, and immutable governance. Agents own their data, humans shape their autonomy.
-              </p>
-
-              <ul className="space-y-5">
-                <li className="flex gap-4">
-                  <div className="w-10 h-10 bg-cyan-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Fingerprint className="w-5 h-5 text-cyan-400" aria-hidden="true" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-base mb-1">Cryptographic identity at protocol layer</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      Every actor is identified by secp256k1 <code className="text-xs px-1 py-0.5 rounded bg-background/70 border border-cyan-500/20">did:nostr</code>. Verified at relay, HTTP layer, and embedded in provenance. No shared session store.
-                    </p>
-                  </div>
-                </li>
-
-                <li className="flex gap-4">
-                  <div className="w-10 h-10 bg-purple-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Brain className="w-5 h-5 text-purple-400" aria-hidden="true" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-base mb-1">Formal reasoning with GPU physics</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      OWL 2 EL reasoning across 92 CUDA kernels. <code className="text-xs px-1 py-0.5 rounded bg-background/70 border border-cyan-500/20">subClassOf</code> creates attraction, <code className="text-xs px-1 py-0.5 rounded bg-background/70 border border-cyan-500/20">disjointWith</code> creates repulsion in the semantic graph.
-                    </p>
-                  </div>
-                </li>
-
-                <li className="flex gap-4">
-                  <div className="w-10 h-10 bg-emerald-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Bot className="w-5 h-5 text-emerald-400" aria-hidden="true" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-base mb-1">Sovereign agent autonomy</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      Agents bootstrap with secp256k1 keypairs. 90+ skills, 180+ tools, reproducible Nix runtime. Data owned in Solid pods—agents take it with them when they leave.
-                    </p>
-                  </div>
-                </li>
-
-                <li className="flex gap-4">
-                  <div className="w-10 h-10 bg-amber-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Handshake className="w-5 h-5 text-amber-400" aria-hidden="true" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-base mb-1">Human-in-the-loop governance</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      Judgment Broker surfaces agent decisions for human approval. Each decision is an immutable Nostr event with <code className="text-xs px-1 py-0.5 rounded bg-background/70 border border-cyan-500/20">prior_decision_id</code> chain back to first principles.
-                    </p>
-                  </div>
-                </li>
-              </ul>
-            </div>
-
-            {/* Five substrates diagram */}
-            <div className="lg:sticky lg:top-24">
-              <div className="bg-background/60 backdrop-blur border border-cyan-500/20 rounded-2xl p-6 md:p-8 shadow-xl shadow-cyan-500/5">
-                <h3 className="text-sm font-semibold text-cyan-300 mb-8 text-center uppercase tracking-wider">
-                  Five substrates, one identity
-                </h3>
-                <svg
-                  viewBox="0 0 480 480"
-                  className="w-full h-auto"
-                  role="img"
-                  aria-labelledby="substrates-diagram-title"
-                >
-                  <title id="substrates-diagram-title">VisionFlow five-substrate architecture with DID:Nostr identity spine</title>
-
-                  {/* Defs for subtle glow effects */}
-                  <defs>
-                    <filter id="glow-pink">
-                      <feGaussianBlur stdDeviation="2" result="coloredBlur" />
-                      <feMerge>
-                        <feMergeNode in="coloredBlur" />
-                        <feMergeNode in="SourceGraphic" />
-                      </feMerge>
-                    </filter>
-                  </defs>
-
-                  {/* Connection lines (refined) */}
-                  <line x1="240" y1="140" x2="240" y2="50" stroke="rgb(233,69,96)" strokeWidth="1.5" strokeDasharray="6 4" opacity="0.6" />
-                  <line x1="310" y1="145" x2="370" y2="75" stroke="rgb(233,69,96)" strokeWidth="1.5" strokeDasharray="6 4" opacity="0.6" />
-                  <line x1="310" y1="295" x2="370" y2="365" stroke="rgb(233,69,96)" strokeWidth="1.5" strokeDasharray="6 4" opacity="0.6" />
-                  <line x1="170" y1="295" x2="110" y2="365" stroke="rgb(233,69,96)" strokeWidth="1.5" strokeDasharray="6 4" opacity="0.6" />
-                  <line x1="170" y1="145" x2="110" y2="75" stroke="rgb(233,69,96)" strokeWidth="1.5" strokeDasharray="6 4" opacity="0.6" />
-
-                  {/* Center circle: DID:Nostr - larger and more prominent */}
-                  <circle cx="240" cy="220" r="70" fill="rgba(233,69,96,0.15)" stroke="rgb(233,69,96)" strokeWidth="3" filter="url(#glow-pink)" />
-                  <text x="240" y="210" textAnchor="middle" fill="rgb(244,63,94)" fontWeight="900" fontSize="18" fontFamily="system-ui, sans-serif">DID:Nostr</text>
-                  <text x="240" y="235" textAnchor="middle" fill="rgb(200,100,120)" fontSize="12" fontFamily="system-ui, sans-serif">secp256k1</text>
-
-                  {/* VisionClaw (top) - larger and refined */}
-                  <rect x="140" y="15" width="200" height="85" rx="14" fill="rgba(0,212,255,0.1)" stroke="rgb(0,212,255)" strokeWidth="2.5" />
-                  <text x="240" y="45" textAnchor="middle" fill="rgb(34,211,238)" fontWeight="800" fontSize="15" fontFamily="system-ui, sans-serif">VisionClaw</text>
-                  <text x="240" y="68" textAnchor="middle" fill="rgb(120,200,220)" fontSize="12" fontFamily="system-ui, sans-serif">OWL 2 EL + GPU</text>
-
-                  {/* Agentbox (top-right) */}
-                  <rect x="345" y="40" width="120" height="85" rx="14" fill="rgba(139,92,246,0.1)" stroke="rgb(139,92,246)" strokeWidth="2.5" />
-                  <text x="405" y="70" textAnchor="middle" fill="rgb(196,181,253)" fontWeight="800" fontSize="15" fontFamily="system-ui, sans-serif">Agentbox</text>
-                  <text x="405" y="93" textAnchor="middle" fill="rgb(170,150,200)" fontSize="12" fontFamily="system-ui, sans-serif">90+ Skills</text>
-
-                  {/* DreamLab Edge (bottom-right) */}
-                  <rect x="345" y="375" width="120" height="85" rx="14" fill="rgba(245,158,11,0.1)" stroke="rgb(245,158,11)" strokeWidth="2.5" />
-                  <text x="405" y="405" textAnchor="middle" fill="rgb(253,224,71)" fontWeight="800" fontSize="15" fontFamily="system-ui, sans-serif">DreamLab</text>
-                  <text x="405" y="428" textAnchor="middle" fill="rgb(220,190,100)" fontSize="12" fontFamily="system-ui, sans-serif">Edge</text>
-
-                  {/* nostr-rust-forum (bottom-left) */}
-                  <rect x="15" y="375" width="120" height="85" rx="14" fill="rgba(168,85,247,0.1)" stroke="rgb(168,85,247)" strokeWidth="2.5" />
-                  <text x="75" y="400" textAnchor="middle" fill="rgb(216,180,254)" fontWeight="800" fontSize="14" fontFamily="system-ui, sans-serif">nostr-rust</text>
-                  <text x="75" y="420" textAnchor="middle" fill="rgb(200,170,220)" fontSize="12" fontFamily="system-ui, sans-serif">forum</text>
-
-                  {/* solid-pod-rs (top-left) */}
-                  <rect x="15" y="40" width="120" height="85" rx="14" fill="rgba(16,185,129,0.1)" stroke="rgb(16,185,129)" strokeWidth="2.5" />
-                  <text x="75" y="68" textAnchor="middle" fill="rgb(52,211,153)" fontWeight="800" fontSize="15" fontFamily="system-ui, sans-serif">solid-pod-rs</text>
-                  <text x="75" y="91" textAnchor="middle" fill="rgb(100,180,150)" fontSize="12" fontFamily="system-ui, sans-serif">WAC</text>
-
-                  {/* Bottom label */}
-                  <text x="240" y="470" textAnchor="middle" fill="rgb(120,130,150)" fontSize="12" fontStyle="italic" fontFamily="system-ui, sans-serif" fontWeight="500">
-                    Nostr relay mesh
-                  </text>
-                </svg>
-                <p className="text-xs text-muted-foreground mt-4 text-center">
-                  Identity flows through all five. Coordination via Nostr relay mesh.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="text-center mt-10">
-            <a
-              href="https://github.com/DreamLab-AI/VisionFlow"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center text-cyan-400 hover:text-cyan-300 font-medium text-sm hover:underline gap-1"
-            >
-              Explore VisionFlow on GitHub <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
-            </a>
-          </div>
-        </div>
-      </section>
 
       {/* Section 4: Co-Creation Model */}
       <section className="py-16 md:py-20" aria-label="Co-creation model">

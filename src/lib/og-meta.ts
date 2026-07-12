@@ -53,11 +53,11 @@ const OG_IMAGES = {
  */
 export const PAGE_OG_CONFIGS: Record<string, OGMetaConfig> = {
   home: {
-    title: 'DreamLab Applied Innovation — Agentics, AI, Spatial Computing & Secure Distributed Systems',
-    description: 'Agentics, AI, spatial computing, rapid prototyping & secure distributed systems in the stunning Eskdale Valley. Training, consulting, and bespoke product development with 44+ deep tech specialists.',
+    title: 'DreamLab AI — AI & Agents Residential Training in the Lake District',
+    description: 'Residential AI and agents training in the Lake District. Agentics, spatial computing, rapid prototyping & secure distributed systems — training, consulting, and bespoke product development with 40+ deep tech specialists.',
     url: BASE_URL,
     image: OG_IMAGES.default,
-    imageAlt: 'DreamLab Applied Innovation Lab',
+    imageAlt: 'DreamLab AI residential training facility in the Lake District',
   },
   programmes: {
     title: 'Programmes | DreamLab Applied Innovation Lab',
@@ -80,6 +80,13 @@ export const PAGE_OG_CONFIGS: Record<string, OGMetaConfig> = {
     url: `${BASE_URL}/research`,
     image: OG_IMAGES.research,
     imageAlt: 'DreamLab Research Heritage',
+  },
+  ecosystem: {
+    title: 'VisionFlow Ecosystem | DreamLab AI',
+    description: 'The open software stack behind DreamLab: VisionClaw knowledge reasoning, Agentbox sovereign agent runtime, solid-pod-rs data pods, the nostr-rust-forum community substrate, and the DreamLab edge deployment — one DID:Nostr identity spine.',
+    url: `${BASE_URL}/ecosystem`,
+    image: OG_IMAGES.research,
+    imageAlt: 'VisionFlow five-substrate software ecosystem',
   },
   workshops: {
     title: 'Self-Guided Workshops | DreamLab Applied Innovation Lab',

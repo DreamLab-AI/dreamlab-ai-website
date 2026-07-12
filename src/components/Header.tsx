@@ -69,6 +69,9 @@ export const Header = () => {
                 <DropdownMenuItem asChild>
                   <Link to="/research" className="w-full">Research</Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/ecosystem" className="w-full">Software Ecosystem</Link>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link to="/workshops" className="w-full">Self-Guided Workshops</Link>

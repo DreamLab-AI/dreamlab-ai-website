@@ -131,6 +131,7 @@ All routes are lazy-loaded via `React.lazy()` in `src/App.tsx`:
 | `/programmes` | Programmes |
 | `/co-create` | CoCreate |
 | `/research` | Research |
+| `/ecosystem` | Ecosystem |
 | `/team` | Team |
 | `/workshops` | WorkshopIndex |
 | `/workshops/:workshopId(/:pageSlug)` | WorkshopPage |
