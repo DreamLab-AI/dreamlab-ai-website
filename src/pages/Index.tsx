@@ -168,12 +168,8 @@ const Index = () => {
             <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 text-transparent bg-clip-text">DREAMLAB AI</span>
           </h1>
 
-          <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-foreground/90 max-w-3xl mb-4 animate-slide-up font-normal tracking-wide leading-relaxed" style={{ animationDelay: '0.1s' }}>
+          <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-foreground/90 max-w-3xl mb-8 animate-slide-up font-normal tracking-wide leading-relaxed" style={{ animationDelay: '0.1s' }}>
              AI & Agents Residential Training<br />in the Lake District.
-          </p>
-
-          <p className="text-base md:text-lg text-muted-foreground max-w-2xl mb-8 animate-slide-up leading-relaxed" style={{ animationDelay: '0.15s' }}>
-            Agentics, spatial computing, rapid prototyping & secure distributed systems.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 animate-scale-in mb-8 w-full sm:w-auto" style={{ animationDelay: '0.2s' }}>
@@ -211,6 +207,57 @@ const Index = () => {
         </div>
       </section>
 
+      {/* The Lab: facility visuals & USP — first section below the hero,
+          so the hero chevron's one-viewport scroll lands here. */}
+      <section className="py-16 md:py-20" aria-label="Facility and technology">
+        <div className="container max-w-6xl mx-auto px-5 md:px-4">
+          <div className="grid lg:grid-cols-2 gap-10 md:gap-12 items-center">
+            <div>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6">
+                The Lab: Lake District Innovation Facility
+              </h2>
+              <p className="text-base md:text-lg text-foreground/80 leading-relaxed mb-6">
+                A residential deep tech facility in the Lake District combining focused R&D environments with the clarity that comes from working away from the office. Solar-powered, enterprise-grade, and purpose-built for intensive co-creation.
+              </p>
+              <div className="grid grid-cols-2 gap-4 mb-8">
+                {[
+                  { label: "Solar-Powered", detail: "6.3kW sustainable infrastructure" },
+                  { label: "10G Network", detail: "Enterprise-grade connectivity" },
+                  { label: "GPU Cluster", detail: "8x RTX for ML workloads" },
+                  { label: "LED Volume", detail: "Virtual production stage" },
+                  { label: "Spatial Sound", detail: "24-speaker custom system" },
+                  { label: "2 Bedrooms", detail: "Full-board residential, local rooms for larger groups" },
+                ].map((item) => (
+                  <div key={item.label} className="p-3 bg-background/50 border border-purple-500/15 rounded-lg">
+                    <div className="font-semibold text-sm text-foreground">{item.label}</div>
+                    <div className="text-xs text-muted-foreground">{item.detail}</div>
+                  </div>
+                ))}
+              </div>
+              <Link
+                to="/contact"
+                className="inline-flex items-center text-cyan-400 hover:text-cyan-300 font-medium text-sm hover:underline gap-1"
+              >
+                Schedule a lab visit <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
+            <div className="relative aspect-video rounded-xl overflow-hidden shadow-2xl shadow-purple-500/10">
+              {facilityImages.map((src, index) => (
+                <img
+                  key={src}
+                  src={src}
+                  alt="DreamLab Innovation Facility, Lake District"
+                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${
+                    index === facilityIndex ? "opacity-100" : "opacity-0"
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Section 2: Evidence Strip */}
       <section className="py-8 md:py-10 border-y border-purple-500/15 bg-background/50 backdrop-blur" aria-label="Key statistics">
         <div className="container px-5 md:px-4">
@@ -242,8 +289,11 @@ const Index = () => {
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
               Bespoke learning pathways
             </h2>
+            <p className="text-base md:text-lg text-foreground/80 max-w-2xl mx-auto mb-3">
+              Agentics, spatial computing, rapid prototyping & secure distributed systems.
+            </p>
             <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-              18 residential ideas designed around deep tech Every course is unique.
+              18 residential ideas to spark your own. Every course is unique: we shape each one around your team and your challenge.
             </p>
           </div>
 
@@ -260,7 +310,7 @@ const Index = () => {
               const countLabel =
                 card.id === "sovereign-identity"
                   ? `${card.count} capabilities`
-                  : `${card.count} programmes`;
+                  : `${card.count} ideas`;
               return (
                 <Link
                   key={card.id}
@@ -343,56 +393,6 @@ const Index = () => {
             >
               Design Your Engagement <ArrowRight className="ml-2 w-4 h-4" />
             </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Section 6: Facility & Tech Stack */}
-      <section className="py-16 md:py-20" aria-label="Facility and technology">
-        <div className="container max-w-6xl mx-auto px-5 md:px-4">
-          <div className="grid lg:grid-cols-2 gap-10 md:gap-12 items-center">
-            <div>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6">
-                The Lab: Lake District Innovation Facility
-              </h2>
-              <p className="text-base md:text-lg text-foreground/80 leading-relaxed mb-6">
-                A residential deep tech facility in the Lake District combining focused R&D environments with the clarity that comes from working away from the office. Solar-powered, enterprise-grade, and purpose-built for intensive co-creation.
-              </p>
-              <div className="grid grid-cols-2 gap-4 mb-8">
-                {[
-                  { label: "Solar-Powered", detail: "6.3kW sustainable infrastructure" },
-                  { label: "10G Network", detail: "Enterprise-grade connectivity" },
-                  { label: "GPU Cluster", detail: "8x RTX for ML workloads" },
-                  { label: "LED Volume", detail: "Virtual production stage" },
-                  { label: "Spatial Sound", detail: "24-speaker custom system" },
-                  { label: "2 Bedrooms", detail: "Full-board residential, local rooms for larger groups" },
-                ].map((item) => (
-                  <div key={item.label} className="p-3 bg-background/50 border border-purple-500/15 rounded-lg">
-                    <div className="font-semibold text-sm text-foreground">{item.label}</div>
-                    <div className="text-xs text-muted-foreground">{item.detail}</div>
-                  </div>
-                ))}
-              </div>
-              <Link
-                to="/contact"
-                className="inline-flex items-center text-cyan-400 hover:text-cyan-300 font-medium text-sm hover:underline gap-1"
-              >
-                Schedule a lab visit <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-
-            <div className="relative aspect-video rounded-xl overflow-hidden shadow-2xl shadow-purple-500/10">
-              {facilityImages.map((src, index) => (
-                <img
-                  key={src}
-                  src={src}
-                  alt="DreamLab Innovation Facility, Lake District"
-                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${
-                    index === facilityIndex ? "opacity-100" : "opacity-0"
-                  }`}
-                />
-              ))}
-            </div>
           </div>
         </div>
       </section>
