@@ -64,6 +64,12 @@ env:
   # for it) — extending the split to a five-location atomic change.
   VITE_ADMIN_PUBKEY: '11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c'
   VITE_JARVIS_PUBKEY: '2de44d5622eef79519ac078f6e227a85aecbaefd561e4e50c5f51dfadbf916e9'  # junkiejarvis — dreamlab.toml [[agents]]
+  # Open relays the Talk-to-AI chat listens on for junkiejarvis's reply (ADR-042
+  # amendment): the primary relay's whitelist gate rejects kind-1059 wraps
+  # addressed to the ephemeral session key, so replies are only readable from
+  # the open relays the agent also publishes to. MUST stay a subset of the
+  # agent's NOSTR_RELAYS fan-out (agentbox .env) or replies are never seen.
+  VITE_REPLY_RELAYS: 'wss://relay.damus.io,wss://relay.primal.net'
   # Zone (section) model for the forum client. Mirrors forum-config/dreamlab.toml
   # [[zones]] and the relay's ZONE_CONFIG [vars]. Injected into window.__ENV__ below.
   ZONE_CONFIG_JSON: '[{"id":"public","display_name":"Landing","required_cohorts":[],"write_cohorts":["members","friends","agent"],"banner_image_url":"/images/heroes/lake-district-dawn.webp","visibility":"public","encrypted":false},{"id":"minimoonoir","display_name":"Minimoonoir","required_cohorts":["friends"],"banner_image_url":"/images/heroes/minimoonoir-hero.webp","visibility":"locked","encrypted":false},{"id":"family","display_name":"Family","required_cohorts":["family"],"banner_image_url":"/images/heroes/family-hero.webp","visibility":"locked","encrypted":true},{"id":"business","display_name":"DreamLab","required_cohorts":["business"],"banner_image_url":"/images/heroes/business-hero.webp","visibility":"locked","encrypted":false}]'
@@ -136,6 +142,7 @@ jobs:
           VITE_RELAY_URL: ${{ env.VITE_RELAY_URL }}
           VITE_ADMIN_PUBKEY: ${{ env.VITE_ADMIN_PUBKEY }}
           VITE_JARVIS_PUBKEY: ${{ env.VITE_JARVIS_PUBKEY }}
+          VITE_REPLY_RELAYS: ${{ env.VITE_REPLY_RELAYS }}
 
       # ── Rust/WASM forum client ─────────────────────────────────────────
       - name: Install Rust toolchain ${{ env.RUST_TOOLCHAIN }}

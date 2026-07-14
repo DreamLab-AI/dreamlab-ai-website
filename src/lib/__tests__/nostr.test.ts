@@ -325,3 +325,159 @@ describe("DmSession", () => {
     await expect(session.sendQuestion("hi", identity.pk)).rejects.toThrow(/not connected/i);
   });
 });
+
+// The primary relay's kind-1059 admission gate only admits wraps addressed to
+// whitelisted recipients, so the agent's reply to the ephemeral session key is
+// only ever readable from the open relays the agent also publishes to. These
+// tests cover the best-effort listeners DmSession opens for that inbox.
+describe("DmSession reply relays", () => {
+  const REPLY_A = "wss://reply-a.example.test";
+  const REPLY_B = "wss://reply-b.example.test";
+
+  async function connectWithReplyRelays() {
+    const identity = generateEphemeralIdentity();
+    const { wsFactory, sockets } = trackedFactory();
+    const onReply = vi.fn();
+    const session = new DmSession(RELAY, identity, {
+      wsFactory,
+      onReply,
+      replyRelays: [REPLY_A, REPLY_B],
+    });
+
+    const connectPromise = session.connect();
+    const main = sockets[0];
+    const replyA = sockets.find((s) => s.url === REPLY_A)!;
+    const replyB = sockets.find((s) => s.url === REPLY_B)!;
+    // Note: connect() resolves on the MAIN relay's EOSE alone — the reply
+    // sockets have not even opened yet (best-effort, never gate connect).
+    main.fireOpen();
+    main.emit(["AUTH", "challenge-abc"]);
+    main.emit(["EOSE", "inbox"]);
+    await connectPromise;
+
+    return { session, identity, sockets, main, replyA, replyB, onReply };
+  }
+
+  it("subscribes the session inbox on open, without waiting for AUTH", async () => {
+    const { replyA, identity } = await connectWithReplyRelays();
+    replyA.fireOpen();
+
+    const frames = replyA.frames();
+    expect(frames).toHaveLength(1);
+    const [, subId, filter] = frames[0] as [string, string, { kinds: number[]; "#p": string[] }];
+    expect(frames[0][0]).toBe("REQ");
+    expect(subId).toBe("inbox");
+    expect(filter.kinds).toEqual([1059]);
+    expect(filter["#p"]).toEqual([identity.pk]);
+  });
+
+  it("never opens a duplicate listener for the primary relay", async () => {
+    const identity = generateEphemeralIdentity();
+    const { wsFactory, sockets } = trackedFactory();
+    const session = new DmSession(RELAY, identity, {
+      wsFactory,
+      onReply: vi.fn(),
+      replyRelays: [RELAY, REPLY_A, REPLY_A, ""],
+    });
+    const connectPromise = session.connect();
+    expect(sockets.map((s) => s.url)).toEqual([RELAY, REPLY_A]);
+    session.close();
+    await expect(connectPromise).rejects.toThrow(/closed/i);
+  });
+
+  it("delivers a reply landing on a reply relay and dedups the same wrap across sockets", async () => {
+    const { main, replyA, replyB, identity, onReply } = await connectWithReplyRelays();
+    replyA.fireOpen();
+    replyB.fireOpen();
+
+    const jarvis = generateEphemeralIdentity();
+    const wrap = nip17.wrapEvent(jarvis.sk, { publicKey: identity.pk }, "reply via the open relay");
+
+    // The agent signs one wrap and fans it out — the same event id arrives on
+    // several sockets. First arrival wins; the rest are ignored.
+    replyA.emit(["EVENT", "inbox", wrap]);
+    replyB.emit(["EVENT", "inbox", wrap]);
+    main.emit(["EVENT", "inbox", wrap]);
+    expect(onReply).toHaveBeenCalledTimes(1);
+    expect(onReply).toHaveBeenCalledWith("reply via the open relay");
+
+    // A distinct second reply still comes through.
+    const wrap2 = nip17.wrapEvent(jarvis.sk, { publicKey: identity.pk }, "second reply");
+    replyB.emit(["EVENT", "inbox", wrap2]);
+    expect(onReply).toHaveBeenCalledTimes(2);
+  });
+
+  it("connect() succeeds even when every reply relay fails to construct", async () => {
+    const identity = generateEphemeralIdentity();
+    const { wsFactory, sockets } = trackedFactory();
+    const flakyFactory = (url: string): WebSocket => {
+      if (url !== RELAY) throw new Error("no route to host");
+      return wsFactory(url);
+    };
+    const session = new DmSession(RELAY, identity, {
+      wsFactory: flakyFactory,
+      onReply: vi.fn(),
+      replyRelays: [REPLY_A, REPLY_B],
+    });
+
+    const connectPromise = session.connect();
+    const main = sockets[0];
+    main.fireOpen();
+    main.emit(["AUTH", "c"]);
+    main.emit(["EOSE", "inbox"]);
+    await expect(connectPromise).resolves.toBeUndefined();
+    session.close();
+  });
+
+  it("answers an AUTH challenge on a reply relay and re-issues the REQ", async () => {
+    const { replyA, identity } = await connectWithReplyRelays();
+    replyA.fireOpen();
+    replyA.emit(["AUTH", "open-relay-challenge"]);
+
+    const frames = replyA.frames();
+    // REQ on open, then AUTH answer, then the post-AUTH re-REQ.
+    expect(frames.map((f) => f[0])).toEqual(["REQ", "AUTH", "REQ"]);
+    const authEvent = frames[1][1] as { kind: number; pubkey: string; tags: string[][] };
+    expect(authEvent.kind).toBe(22242);
+    expect(authEvent.pubkey).toBe(identity.pk);
+    expect(authEvent.tags).toContainEqual(["relay", REPLY_A]);
+    expect(authEvent.tags).toContainEqual(["challenge", "open-relay-challenge"]);
+  });
+
+  it("retries a dropped reply listener a bounded number of times", async () => {
+    vi.useFakeTimers();
+    const { sockets, replyA } = await connectWithReplyRelays();
+    const socketsFor = (url: string) => sockets.filter((s) => s.url === url);
+
+    // Drop the listener repeatedly: each close schedules one 2 s retry, capped.
+    replyA.close();
+    await vi.advanceTimersByTimeAsync(2000);
+    expect(socketsFor(REPLY_A)).toHaveLength(2);
+
+    socketsFor(REPLY_A)[1].close();
+    await vi.advanceTimersByTimeAsync(2000);
+    socketsFor(REPLY_A)[2].close();
+    await vi.advanceTimersByTimeAsync(2000);
+    expect(socketsFor(REPLY_A)).toHaveLength(4);
+
+    // Retry budget (3) is spent — a further drop mints no new socket.
+    socketsFor(REPLY_A)[3].close();
+    await vi.advanceTimersByTimeAsync(10000);
+    expect(socketsFor(REPLY_A)).toHaveLength(4);
+  });
+
+  it("close() closes reply listeners and cancels pending retries", async () => {
+    vi.useFakeTimers();
+    const { session, sockets, replyA, replyB } = await connectWithReplyRelays();
+    replyA.fireOpen();
+
+    // Leave one retry pending, then close the session.
+    replyB.close();
+    session.close();
+    expect(replyA.closed).toBe(true);
+
+    const before = sockets.length;
+    await vi.advanceTimersByTimeAsync(10000);
+    expect(sockets.length).toBe(before); // the pending retry was cancelled
+  });
+});

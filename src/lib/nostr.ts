@@ -2,7 +2,10 @@
 //   - Anonymous contact-form ingress (ADR-041): fire-and-forget publish of a
 //     kind-1059 gift wrap to the admin recipient, success gated on the relay OK.
 //   - "Talk to AI" agent chat (ADR-042): a NIP-42-authenticated DM session with
-//     junkiejarvis, subscribe-before-publish with an application-level keepalive.
+//     junkiejarvis, subscribe-before-publish with an application-level keepalive,
+//     plus best-effort reply listeners on open relays (the primary relay's
+//     recipient-whitelist gate can never admit a reply to the ephemeral session
+//     key, so replies are only readable from the agent's open-relay fan-out).
 //
 // Deliberately dependency-light: only nostr-tools primitives plus a raw
 // WebSocket. No NDK (ADR-042 Decision 6). All socket construction flows through
@@ -33,6 +36,15 @@ const DEFAULT_PUBLISH_TIMEOUT_MS = 8000;
 const CONNECT_TIMEOUT_MS = 10000;
 const KEEPALIVE_INTERVAL_MS = 12000;
 const SEND_OK_TIMEOUT_MS = 8000;
+
+// Reply-relay listeners (ADR-042 amendment). The primary relay's kind-1059
+// admission gate only admits wraps whose recipient is whitelisted, and the
+// session's ephemeral pubkey never is — so the agent's reply can never land
+// there. The agent publishes every reply to its full relay set (the primary
+// plus open public relays), so the session listens for its own inbox on those
+// open relays too. Best-effort: a dead reply relay never fails the session.
+const REPLY_RELAY_RETRY_MS = 2000;
+const REPLY_RELAY_MAX_RETRIES = 3;
 
 export type WsFactory = (url: string) => WebSocket;
 
@@ -219,6 +231,12 @@ export interface DmSessionOptions {
   wsFactory?: WsFactory;
   onReply: (plaintext: string) => void;
   onError?: (err: string) => void;
+  /**
+   * Open relays to also watch for the session's kind-1059 inbox. The agent's
+   * reply cannot pass the primary relay's recipient-whitelist gate (the
+   * session key is ephemeral), so it is only ever readable from these.
+   */
+  replyRelays?: string[];
 }
 
 interface PendingSend {
@@ -256,6 +274,15 @@ export class DmSession {
 
   private readonly pendingOk = new Map<string, PendingSend>();
 
+  private readonly replyRelays: string[];
+  private readonly replySockets = new Map<string, WebSocket>();
+  private readonly replyRetryTimers = new Map<string, ReturnType<typeof setTimeout>>();
+  private readonly replyRetries = new Map<string, number>();
+  // The agent signs one wrap and fans it out to every relay it knows, so the
+  // same event id can arrive on several sockets (and again as stored history
+  // after a listener reconnects). First arrival wins.
+  private readonly seenWrapIds = new Set<string>();
+
   constructor(
     private readonly relayUrl: string,
     private readonly identity: EphemeralIdentity,
@@ -264,6 +291,9 @@ export class DmSession {
     this.wsFactory = opts.wsFactory ?? defaultWsFactory;
     this.onReply = opts.onReply;
     this.onError = opts.onError ?? (() => {});
+    this.replyRelays = [...new Set(opts.replyRelays ?? [])].filter(
+      (url) => url && url !== this.relayUrl,
+    );
   }
 
   connect(): Promise<void> {
@@ -280,6 +310,14 @@ export class DmSession {
         return;
       }
       this.ws = ws;
+
+      // Reply listeners are best-effort and never gate connect(): kind-1059 is
+      // a stored kind and the inbox REQ carries no `since`, so even a listener
+      // that connects after the question was answered replays the reply from
+      // the relay's history.
+      for (const url of this.replyRelays) {
+        this.openReplyListener(url);
+      }
 
       this.connectTimer = setTimeout(() => {
         this.settleConnect(false, new Error("Timed out establishing relay subscription."));
@@ -347,6 +385,16 @@ export class DmSession {
       closeQuietly(this.ws);
       this.ws = null;
     }
+    for (const timer of this.replyRetryTimers.values()) {
+      clearTimeout(timer);
+    }
+    this.replyRetryTimers.clear();
+    // closeQuietly triggers each socket's onclose, which mutates replySockets;
+    // iterate a snapshot.
+    for (const socket of Array.from(this.replySockets.values())) {
+      closeQuietly(socket);
+    }
+    this.replySockets.clear();
   }
 
   private handleMessage(data: unknown): void {
@@ -430,6 +478,8 @@ export class DmSession {
   }
 
   private deliverReply(event: Event): void {
+    if (this.seenWrapIds.has(event.id)) return; // duplicate from another relay
+    this.seenWrapIds.add(event.id);
     let rumor: { pubkey: string; content: string };
     try {
       rumor = nip59.unwrapEvent(event, this.identity.sk);
@@ -438,6 +488,88 @@ export class DmSession {
     }
     if (rumor.pubkey === this.identity.pk) return; // ignore self-authored rumors
     this.onReply(rumor.content);
+  }
+
+  /**
+   * Open a best-effort read-only listener on an open relay for the session's
+   * own kind-1059 inbox. Public relays serve this REQ without NIP-42, so we
+   * subscribe on open; if a relay does challenge, we answer with the session
+   * key and re-issue the REQ so it is evaluated post-AUTH. Failures retry a
+   * few times, then give up silently — the session itself stays usable.
+   */
+  private openReplyListener(url: string): void {
+    if (this.closed) return;
+    let ws: WebSocket;
+    try {
+      ws = this.wsFactory(url);
+    } catch {
+      this.scheduleReplyRetry(url);
+      return;
+    }
+    this.replySockets.set(url, ws);
+
+    const subscribe = (): void => {
+      try {
+        ws.send(
+          JSON.stringify(["REQ", this.subId, { kinds: [KIND_GIFT_WRAP], "#p": [this.identity.pk] }]),
+        );
+      } catch {
+        /* send failed — the socket's onclose handles the retry */
+      }
+    };
+
+    ws.onopen = subscribe;
+    ws.onmessage = (evt: MessageEvent) => {
+      let frame: unknown;
+      try {
+        frame = JSON.parse(typeof evt.data === "string" ? evt.data : String(evt.data));
+      } catch {
+        return;
+      }
+      if (!Array.isArray(frame) || frame.length === 0) return;
+      if (frame[0] === "EVENT" && frame[1] === this.subId) {
+        const event = frame[2] as Event | undefined;
+        if (event && event.kind === KIND_GIFT_WRAP) this.deliverReply(event);
+      } else if (frame[0] === "AUTH" && typeof frame[1] === "string") {
+        const authEvent = finalizeEvent(
+          {
+            kind: KIND_NIP42_AUTH,
+            created_at: nowSec(),
+            tags: [
+              ["relay", url],
+              ["challenge", frame[1]],
+            ],
+            content: "",
+          },
+          this.identity.sk,
+        );
+        try {
+          ws.send(JSON.stringify(["AUTH", authEvent]));
+        } catch {
+          return;
+        }
+        subscribe();
+      }
+    };
+    ws.onerror = () => {
+      /* onclose follows a fatal error; retry is handled there */
+    };
+    ws.onclose = () => {
+      this.replySockets.delete(url);
+      this.scheduleReplyRetry(url);
+    };
+  }
+
+  private scheduleReplyRetry(url: string): void {
+    if (this.closed || this.replyRetryTimers.has(url)) return;
+    const attempts = this.replyRetries.get(url) ?? 0;
+    if (attempts >= REPLY_RELAY_MAX_RETRIES) return;
+    this.replyRetries.set(url, attempts + 1);
+    const timer = setTimeout(() => {
+      this.replyRetryTimers.delete(url);
+      this.openReplyListener(url);
+    }, REPLY_RELAY_RETRY_MS);
+    this.replyRetryTimers.set(url, timer);
   }
 
   private startKeepalive(): void {

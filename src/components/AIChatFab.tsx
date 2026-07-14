@@ -26,11 +26,28 @@ const TIER_CONFIG: Record<Tier, { label: string; color: string; dot: string; des
 const RELAY_URL = import.meta.env.VITE_RELAY_URL || "";
 const JARVIS_PUBKEY = import.meta.env.VITE_JARVIS_PUBKEY || "";
 
+// Reply listeners (ADR-042 amendment). The primary relay's whitelist gate
+// rejects any kind-1059 addressed to the session's ephemeral key, so the
+// agent's reply is only readable from the open relays it also publishes to
+// (the agent-side NOSTR_RELAYS fan-out). Must stay a subset of that fan-out.
+const REPLY_RELAYS = (
+  import.meta.env.VITE_REPLY_RELAYS || "wss://relay.damus.io,wss://relay.primal.net"
+)
+  .split(",")
+  .map((url: string) => url.trim())
+  .filter(Boolean);
+
 // DM replies carry no e-tag correlation (junkiejarvis `_sendDm`), so sends are
 // serialised — one in-flight question at a time. The client waits at most 30 s
 // for a reply (above the agent's 25 s fail-open LLM timeout) before showing a
 // friendly fallback and re-enabling input (ADR-042 Decision 5).
 const REPLY_TIMEOUT_MS = 30000;
+
+// Abuse throttles (ADR-042 amendment): the relay rate-limits per IP but not
+// per pubkey, and fresh ephemeral keys are free — so the client enforces a
+// short cooldown after each resolved turn and a hard per-session turn cap.
+const SEND_COOLDOWN_MS = 3000;
+const MAX_TURNS_PER_SESSION = 12;
 
 // User-facing copy (UK English).
 const OFFLINE_MESSAGE =
@@ -44,6 +61,8 @@ const REPLY_TIMEOUT_MESSAGE =
   "Sorry — I could not reach the assistant just now. Please try again in a moment.";
 const SESSION_INTERRUPTED_MESSAGE =
   "Connection to the assistant was interrupted. Send your message again to reconnect.";
+const TURN_LIMIT_MESSAGE =
+  "You've reached this chat's message limit. Please use the contact page for anything more — or close and reopen the chat to start afresh.";
 
 // Minimal NIP-07 signer surface (nos2x, Alby, etc.). Retained purely as a tier
 // 2/3 identity signal (the greeting shows the user's pubkey); DMs always ride
@@ -79,6 +98,11 @@ export const AIChatFab = () => {
   // timeout, or failure). Guards against double resolution of a single turn.
   const pendingRef = useRef(false);
   const replyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Abuse throttles: a short cooldown after each resolved turn, and a hard cap
+  // on transported turns per panel-open session (reset when the panel closes).
+  const [isCoolingDown, setIsCoolingDown] = useState(false);
+  const cooldownTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const turnsRef = useRef(0);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -111,6 +135,23 @@ export const AIChatFab = () => {
     }
   }, []);
 
+  const clearCooldown = useCallback(() => {
+    if (cooldownTimerRef.current) {
+      clearTimeout(cooldownTimerRef.current);
+      cooldownTimerRef.current = null;
+    }
+    setIsCoolingDown(false);
+  }, []);
+
+  const startCooldown = useCallback(() => {
+    if (cooldownTimerRef.current) clearTimeout(cooldownTimerRef.current);
+    setIsCoolingDown(true);
+    cooldownTimerRef.current = setTimeout(() => {
+      cooldownTimerRef.current = null;
+      setIsCoolingDown(false);
+    }, SEND_COOLDOWN_MS);
+  }, []);
+
   // Resolve any in-flight turn without emitting a message and re-enable input.
   const resetPending = useCallback(() => {
     pendingRef.current = false;
@@ -128,16 +169,21 @@ export const AIChatFab = () => {
 
   // Close the warm session and cancel any in-flight turn when the panel closes
   // or the component unmounts (also runs before each re-run of this effect).
+  // The turn budget resets with the panel: a reopened chat starts afresh.
   useEffect(() => {
     if (!isOpen) {
       teardownSession();
       resetPending();
+      clearCooldown();
+      turnsRef.current = 0;
     }
     return () => {
       teardownSession();
       resetPending();
+      clearCooldown();
+      turnsRef.current = 0;
     };
-  }, [isOpen, teardownSession, resetPending]);
+  }, [isOpen, teardownSession, resetPending, clearCooldown]);
 
   const requestNostrAuth = useCallback(async (): Promise<string | null> => {
     const nostr = getNostr();
@@ -171,8 +217,9 @@ export const AIChatFab = () => {
     addAssistantMessage(text);
     if (pendingRef.current) {
       resetPending();
+      startCooldown();
     }
-  }, [addAssistantMessage, resetPending]);
+  }, [addAssistantMessage, resetPending, startCooldown]);
 
   const handleReplyTimeout = useCallback(() => {
     if (!pendingRef.current) return;
@@ -180,7 +227,8 @@ export const AIChatFab = () => {
     replyTimerRef.current = null;
     addAssistantMessage(REPLY_TIMEOUT_MESSAGE);
     setIsLoading(false);
-  }, [addAssistantMessage]);
+    startCooldown();
+  }, [addAssistantMessage, startCooldown]);
 
   // Post-connect transport error (relay CLOSED, socket error, keepalive send
   // failure). Connect-phase failures are surfaced by the sendMessage catch, so
@@ -200,6 +248,7 @@ export const AIChatFab = () => {
     const session = new DmSession(RELAY_URL, identity, {
       onReply: handleReply,
       onError: handleSessionError,
+      replyRelays: REPLY_RELAYS,
     });
     sessionRef.current = session;
     addSystemMessage(CONNECTING_MESSAGE);
@@ -237,7 +286,7 @@ export const AIChatFab = () => {
 
   const sendMessage = useCallback(async () => {
     const trimmed = input.trim();
-    if (!trimmed || isLoading) return;
+    if (!trimmed || isLoading || isCoolingDown) return;
 
     setMessages((prev) => [
       ...prev,
@@ -253,6 +302,13 @@ export const AIChatFab = () => {
       addAssistantMessage(OFFLINE_MESSAGE);
       return;
     }
+
+    // Hard per-session budget on transported turns (tier-0 logging is free).
+    if (turnsRef.current >= MAX_TURNS_PER_SESSION) {
+      addSystemMessage(TURN_LIMIT_MESSAGE);
+      return;
+    }
+    turnsRef.current += 1;
 
     // Open a single in-flight turn: input/send stay disabled until it resolves.
     setIsLoading(true);
@@ -280,10 +336,12 @@ export const AIChatFab = () => {
     } catch {
       if (pendingRef.current) resetPending();
       addAssistantMessage(SEND_FAILURE_MESSAGE);
+      startCooldown();
     }
   }, [
     input,
     isLoading,
+    isCoolingDown,
     tier,
     ensureSession,
     teardownSession,
@@ -292,6 +350,7 @@ export const AIChatFab = () => {
     handleReplyTimeout,
     addAssistantMessage,
     addSystemMessage,
+    startCooldown,
   ]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -446,13 +505,19 @@ export const AIChatFab = () => {
                 maxLength={MAX_MESSAGE_LEN}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder={tier === 0 ? "AI paused — type to log only" : "Type a message..."}
+                placeholder={
+                  tier === 0
+                    ? "AI paused — type to log only"
+                    : isCoolingDown
+                      ? "One moment…"
+                      : "Type a message..."
+                }
                 className="flex-1 bg-background/50 border border-purple-500/20 rounded-xl px-3.5 py-2.5 text-sm placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-purple-500/40 focus:border-purple-500/40"
-                disabled={isLoading}
+                disabled={isLoading || isCoolingDown}
               />
               <button
                 onClick={sendMessage}
-                disabled={!input.trim() || isLoading}
+                disabled={!input.trim() || isLoading || isCoolingDown}
                 className="p-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-cyan-500/30 transition-all disabled:opacity-40 disabled:cursor-not-allowed min-h-[40px] min-w-[40px] flex items-center justify-center"
                 aria-label="Send message"
               >

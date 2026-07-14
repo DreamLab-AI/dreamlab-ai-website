@@ -1,6 +1,7 @@
 # ADR-042: Website Agent Chat Routing — "Talk to AI" as a Nostr DM Conversation with junkiejarvis
 
-## Status: Proposed
+## Status: Accepted — amended (see Amendment 1, 2026-07-14: the reply leg as
+originally specified was undeliverable; reply routing now uses open relays)
 
 ## Date: 2026-07-14
 
@@ -291,3 +292,82 @@ sequenceDiagram
   calendar-fabrication bug; fixed in agentbox commit `5e626c20`
 - `forum-config/dreamlab.toml` `[[agents]]` (282-322) — the roster the new
   entry joins
+
+---
+
+## Amendment 1 (2026-07-14): Reply-leg relay routing
+
+### What the original decision got wrong
+
+The sequence diagram above asserts `J->>R: EVENT kind-1059 (p = session
+pubkey)` followed by `R-->>V: fan-out`. That reply leg is **undeliverable by
+construction** on the primary relay: gift-wrap admission is gated on the
+*recipient* — the first `["p", …]` tag must be a whitelisted pubkey
+(`nip_handlers.rs:441-451`) — and the visitor's per-session ephemeral key can
+never be in the D1 whitelist. The pre-launch verification
+(`publish-foreign-reply.mjs`) only proved the *question* direction (jarvis as
+whitelisted recipient/author); the reply direction was reasoned about but
+never gate-tested. Result: 100 % of anonymous replies were rejected at the
+relay and every Tier-1 turn hit the 30 s timeout. Confirmed by the
+2026-07-14 ecosystem audit (adversarial verification pass).
+
+### Decision
+
+The browser listens for its own kind-1059 inbox on the **open relays the
+agent already publishes to** (junkiejarvis fans every reply out to its full
+`NOSTR_RELAYS` set: the primary relay plus `relay.damus.io` and
+`relay.primal.net`). The primary relay remains the sole publish/AUTH target
+for the question leg — its whitelist admission is the spam gate and is
+unchanged.
+
+Implementation (`src/lib/nostr.ts` `DmSession`, `src/components/AIChatFab.tsx`):
+
+1. **Reply listeners** — `DmSession` accepts `replyRelays` (from
+   `VITE_REPLY_RELAYS`, default `relay.damus.io` + `relay.primal.net`) and
+   opens best-effort read-only sockets subscribing
+   `{kinds:[1059], "#p":[session pk]}`. Open relays serve this without
+   NIP-42; if one does challenge, the session key answers and re-REQs.
+2. **Never gates connect()** — kind-1059 is a *stored* kind and the inbox REQ
+   carries no `since`, so a listener that connects (or reconnects) after the
+   reply was published replays it from stored history. Listener failures
+   retry 3× at 2 s then give up silently; the session stays usable.
+3. **Dedup by event id** — the agent signs one wrap and fans it out, so the
+   same event id can arrive on several sockets; first arrival wins.
+4. **Abuse throttles** (the relay rate-limits per IP, not per pubkey, and
+   ephemeral keys are free): a 3 s client cooldown after each resolved turn
+   and a hard cap of 12 transported turns per panel-open session.
+
+### Trade-offs accepted
+
+- **Metadata exposure on open relays**: the reply ciphertext and the
+  ephemeral session `p`-tag become readable on public relays. Already true
+  before this amendment (the agent has always published there); the content
+  is NIP-44 encrypted and the recipient key is single-session, so
+  linkability is minimal.
+- **Third-party availability**: reply delivery now depends on at least one
+  open relay accepting the agent's publish and serving our REQ. Two relays
+  plus stored-history replay make this acceptable; the primary-relay path
+  still works unchanged for whitelisted (logged-in, Tier-2/3) recipients if
+  they use a whitelisted key.
+
+### Alternative deferred
+
+The "proper" fix is upstream: extend the kit relay's gift-wrap admission to
+also accept kind-1059 *authored by* a whitelisted agent regardless of
+recipient (letting the browser drop the open-relay listen and stop leaking
+ciphertext to public relays). That is a `nostr-rust-forum` change and
+triggers the four-place dual-pin bump — deliberately deferred; this
+amendment is website-repo-only.
+
+### Verification
+
+- Unit: `src/lib/__tests__/nostr.test.ts` — "DmSession reply relays" suite
+  (subscribe-on-open, main-relay dedup exclusion, cross-socket dedup,
+  connect() independence, AUTH-challenge handling, bounded retry, teardown).
+- Unit: `src/components/__tests__/AIChatFab.test.tsx` — cooldown and
+  turn-cap behaviour.
+- Live: `scripts/seed/test-website-chat-roundtrip.mjs` — the previously
+  missing end-to-end probe: throwaway key → question via primary → reply
+  observed on an open relay → decrypt. Requires the agent's bridge
+  subscription keepalive fix to be live in the agentbox (rebuild), else the
+  agent itself is deaf ~20 s after startup.

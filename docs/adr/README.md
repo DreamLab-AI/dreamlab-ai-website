@@ -51,7 +51,7 @@ This directory contains the Architecture Decision Records (ADRs) for the DreamLa
 | 039 | [/connect Onboarding Adoption](039-connect-onboarding-adoption.md) | Accepted | present |
 | 040 | [Gap-Close Edge Decisions](040-gap-close-edge-decisions.md) | Proposed | present |
 | 041 | [Anonymous Contact-DM Ingress (Client-Side Gift-Wrap Publish to the Admin Recipient)](041-anonymous-contact-dm-ingress.md) | Proposed | present |
-| 042 | [Website Agent Chat Routing ("Talk to AI" as a Nostr DM Conversation with junkiejarvis)](042-website-agent-chat-routing.md) | Proposed | present |
+| 042 | [Website Agent Chat Routing ("Talk to AI" as a Nostr DM Conversation with junkiejarvis)](042-website-agent-chat-routing.md) | Accepted (Amendment 1: reply leg via open relays) | present |
 
 > **Note:** ADR-032 (Agent Job Marketplace, NIP-90 DVMs + NIP-26) is **superseded by [ADR-036](036-agent-delegation-via-device-keys.md)** — the kit removed `nip26.rs`+`nip90.rs` upstream, and agent delegation now uses the device-key model (upstream ADR-099). The Agent Control Surface governance feature (kinds 31400-31405, `/governance` route) stands on the deployed kit, not on ADR-032's NIP-90 design. See [forum-config/README.md](../../forum-config/README.md#governance-configuration) for the operator config.
 >
