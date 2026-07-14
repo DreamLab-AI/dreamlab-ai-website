@@ -391,9 +391,12 @@ export const AIChatFab = () => {
                   />
                 </button>
 
-                {/* Tier dropdown */}
+                {/* Tier dropdown. Opens DOWNWARD (top-full) over the message
+                    area: the trigger sits in the panel header and the panel is
+                    overflow-hidden, so an upward (bottom-full) menu renders
+                    above the clip boundary and is invisible. */}
                 {showTierMenu && (
-                  <div className="absolute bottom-full right-0 mb-1 w-52 bg-background/95 backdrop-blur-xl border border-purple-500/30 rounded-xl shadow-xl shadow-purple-500/20 overflow-hidden">
+                  <div className="absolute top-full right-0 mt-1 z-10 w-52 bg-background/95 backdrop-blur-xl border border-purple-500/30 rounded-xl shadow-xl shadow-purple-500/20 overflow-hidden">
                     {([3, 2, 1, 0] as Tier[]).map((t) => {
                       const cfg = TIER_CONFIG[t];
                       const isActive = tier === t;
