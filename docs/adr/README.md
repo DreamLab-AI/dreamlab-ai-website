@@ -1,8 +1,8 @@
 # Architecture Decision Records
 
-**Last updated:** 2026-06-11 | [Back to Documentation Index](../README.md)
+**Last updated:** 2026-07-14 | [Back to Documentation Index](../README.md)
 
-This directory contains the Architecture Decision Records (ADRs) for the DreamLab community forum Rust port. ADRs 001--012 are historical (source files not present in this tree); ADRs 013--023 have full files in this directory.
+This directory contains the Architecture Decision Records (ADRs) for the DreamLab community forum Rust port. ADRs 001--012 are historical (source files not present in this tree); ADRs 013--042 have full files in this directory.
 
 > **Migration Complete (2026-03-12):** All 5 backend workers are Rust, now built from the upstream kit [github.com/DreamLab-AI/nostr-rust-forum](https://github.com/DreamLab-AI/nostr-rust-forum) (pinned in `forum-config/`) plus the `forum-config/` operator overlay. The Leptos forum client is at ~95% parity. SvelteKit `community-forum/` and TypeScript `workers/` directories have been deleted. ADRs written before 2026-03-12 may reference deleted paths — see status update notes on individual ADRs.
 
@@ -49,6 +49,9 @@ This directory contains the Architecture Decision Records (ADRs) for the DreamLa
 | 037 | [Config Single Source of Truth](037-config-single-source-of-truth.md) | Accepted (partial — O3 fail-closed KV guard shipped; O1/O2 single-source generator deferred) | present |
 | 038 | [Kit-Ref Pin Governance](038-kit-ref-pin-governance.md) | Accepted | present |
 | 039 | [/connect Onboarding Adoption](039-connect-onboarding-adoption.md) | Accepted | present |
+| 040 | [Gap-Close Edge Decisions](040-gap-close-edge-decisions.md) | Proposed | present |
+| 041 | [Anonymous Contact-DM Ingress (Client-Side Gift-Wrap Publish to the Admin Recipient)](041-anonymous-contact-dm-ingress.md) | Proposed | present |
+| 042 | [Website Agent Chat Routing ("Talk to AI" as a Nostr DM Conversation with junkiejarvis)](042-website-agent-chat-routing.md) | Proposed | present |
 
 > **Note:** ADR-032 (Agent Job Marketplace, NIP-90 DVMs + NIP-26) is **superseded by [ADR-036](036-agent-delegation-via-device-keys.md)** — the kit removed `nip26.rs`+`nip90.rs` upstream, and agent delegation now uses the device-key model (upstream ADR-099). The Agent Control Surface governance feature (kinds 31400-31405, `/governance` route) stands on the deployed kit, not on ADR-032's NIP-90 design. See [forum-config/README.md](../../forum-config/README.md#governance-configuration) for the operator config.
 >

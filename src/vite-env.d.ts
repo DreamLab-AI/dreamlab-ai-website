@@ -13,9 +13,9 @@ interface ImportMetaEnv {
   readonly VITE_APP_VERSION?: string;
   readonly VITE_NDK_DEBUG?: string;
   readonly VITE_ADMIN_PUBKEY?: string;
+  readonly VITE_JARVIS_PUBKEY?: string;
   readonly VITE_IMAGE_BUCKET?: string;
   readonly VITE_IMAGE_ENCRYPTION_ENABLED?: string;
-  readonly VITE_AI_CHAT_URL?: string;
   readonly DEV: boolean;
   readonly PROD: boolean;
   readonly MODE: string;

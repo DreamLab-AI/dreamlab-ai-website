@@ -189,6 +189,8 @@ VITE_POD_API_URL=https://dreamlab-pod-api.solitary-paper-764d.workers.dev
 VITE_SEARCH_API_URL=https://dreamlab-search-api.solitary-paper-764d.workers.dev
 VITE_RELAY_URL=wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev
 VITE_LINK_PREVIEW_API_URL=https://dreamlab-link-preview.solitary-paper-764d.workers.dev
+VITE_ADMIN_PUBKEY=11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c
+VITE_JARVIS_PUBKEY=2de44d5622eef79519ac078f6e227a85aecbaefd561e4e50c5f51dfadbf916e9
 ```
 
 The `/community/` forum and the upstream Rust ASCII BBS read `VITE_RELAY_URL`

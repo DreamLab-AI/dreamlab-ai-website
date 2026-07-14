@@ -1,6 +1,6 @@
 # Security Overview -- DreamLab Community Forum (Rust Port)
 
-**Last updated:** 2026-03-16 | [Back to Documentation Index](../README.md)
+**Last updated:** 2026-07-14 | [Back to Documentation Index](../README.md)
 
 ---
 
@@ -15,6 +15,7 @@
 - [SSRF Protection](#ssrf-protection)
 - [Dependency Policy](#dependency-policy)
 - [Admin Identity](#admin-identity)
+- [Anonymous Website Ingress (Marketing Site)](#anonymous-website-ingress-marketing-site)
 - [Related Documents](#related-documents)
 
 ---
@@ -261,12 +262,28 @@ Admin status resolves as **static (`ADMIN_PUBKEYS`) ∪ D1** in the deployed kit
 11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c
 ```
 
+This is the visionclaw-server key, staged for an admin-role split per [ADR-040 D3](../adr/040-gap-close-edge-decisions.md) and the [admin-key-split runbook](../deployment/admin-key-split-runbook.md); the human-admin principal is operator-jjohare (`6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425a`). Note: [ADR-041](../adr/041-anonymous-contact-dm-ingress.md)'s contact-DM recipient (`VITE_ADMIN_PUBKEY`) interim-targets the visionclaw-server key (operator decision, 2026-07-14 — the identity the operator currently drives, and already relay-whitelisted); the key split must re-point it in the same atomic change (ADR-041 Decision 5).
+
 Admin status is checked in three layers:
 1. **Static set**: `ADMIN_PUBKEYS` env (mirrors `dreamlab.toml [admin].static_pubkeys`; deploy-gated, checked first)
 2. **D1 path**: `whitelist.is_admin` (relay D1 via `RELAY_DB`), then `members.is_admin` (auth D1)
 3. **Promotion**: `/api/whitelist/set-admin` endpoint for admin promotion/demotion (last-admin demotion is blocked)
 
 Note: the search-worker honours only its own `ADMIN_PUBKEYS` `[vars]` value — D1-promoted admins are not visible to it (known gap; see the forum-flow cartography Gap 2).
+
+---
+
+## Anonymous Website Ingress (Marketing Site)
+
+[ADR-041](../adr/041-anonymous-contact-dm-ingress.md) and [ADR-042](../adr/042-website-agent-chat-routing.md) open a deliberate unauthenticated write path from the React marketing site to the relay: anonymous browsers publish NIP-59 gift-wrapped DMs (kind 1059) from freshly minted ephemeral keys to whitelisted recipients — the configured admin recipient (`VITE_ADMIN_PUBKEY`; interim: the operator's working admin key per [ADR-041](../adr/041-anonymous-contact-dm-ingress.md) Decision 5; contact/signup form) and the junkiejarvis agent ("Talk to AI" chat). Admission is recipient-gated: the first `["p", …]` tag pubkey must be whitelisted while the ephemeral author is deliberately unchecked, and publishing an EVENT requires no NIP-42 AUTH. Reading kind-1059 does require NIP-42 AUTH, with the filter's `#p` force-rewritten to the authed pubkey, so a session can only ever read its own inbox.
+
+| Threat | Attack Surface | Mitigation |
+|--------|---------------|------------|
+| Spam/DoS on gift-wrap ingress | Kind-1059 admission (anonymous authors, recipient-gated only) | The relay enforces only the 10 events/second/IP sliding window plus structural size/tag limits — no PoW, CAPTCHA, or per-recipient throttle, and kind 1059 bypasses content moderation. Client-side validation and size caps; accepted-risk entry in the PRD risk register; relay-side anti-spam is an upstream kit ask ([ADR-041](../adr/041-anonymous-contact-dm-ingress.md)) |
+| PII in DM content | Contact-signup payload (name, email, consent) inside the rumor | NIP-44 end-to-end encryption at seal and wrap layers — the relay operator and any third party see only ciphertext; no queryable PII table for signups. Erasure of a delivered DM is by operator-side D1 purge only: self-service NIP-09 deletion is cryptographically impossible for both sender and recipient because the stored wrap's author is a discarded throwaway key ([ADR-041](../adr/041-anonymous-contact-dm-ingress.md)) |
+| LLM-cost abuse via anonymous chat | junkiejarvis DM surface (unlimited fresh ephemeral keys, each entitled to LLM-triggering DMs) | Serialised sends (one in-flight question per session), a client-side per-session send throttle, and the ops kill-switch `JUNKIEJARVIS_ENABLED=0`; a per-pubkey/per-session cooldown is flagged as an upstream agentbox ask ([ADR-042](../adr/042-website-agent-chat-routing.md)) |
+
+Federation posture for this path: single relay today; federation-ready by construction (kind 1059 is already in `federated_kinds`); the mesh transport is designed, not shipped.
 
 ---
 

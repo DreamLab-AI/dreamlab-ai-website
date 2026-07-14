@@ -1,6 +1,6 @@
 # DreamLab AI -- Documentation Hub
 
-**Last updated:** 2026-06-10 | **Repository:** [DreamLab-AI/dreamlab-ai-website](https://github.com/DreamLab-AI/dreamlab-ai-website) | **Project README:** [../README.md](../README.md)
+**Last updated:** 2026-07-14 | **Repository:** [DreamLab-AI/dreamlab-ai-website](https://github.com/DreamLab-AI/dreamlab-ai-website) | **Project README:** [../README.md](../README.md)
 
 This documentation covers the full DreamLab AI platform: a React marketing site, a Rust/Leptos WASM community forum (including the Agent Control Surface governance dashboard), and five Cloudflare Workers providing authentication, storage, relay, search, and link preview services.
 
@@ -88,12 +88,14 @@ All product requirement documents live in [`prd/`](prd/); sprint plans, snag lis
 | [PRD: Hardening + Solid v6.0](prd/prd-hardening-solid-v6.0.md) | Delivered | Solid pod infrastructure upgrade. |
 | [PRD: Forum Professionalisation v7.0](prd/prd-forum-professionalisation-v7.0.md) | Delivered | Trust, moderation, badges, settings, audit trail. |
 | [PRD: Nostr/Solid Identity Refactor v8.0](prd/prd-nostr-solid-identity-refactor-v8.0.md) | Delivered | Canonical identity stack (did:nostr, WebID, NIP-05). |
+| [PRD: Gap-Close Sprint — DreamLab Edge Slice v1.0](prd/prd-gap-close-edge-v1.0.md) | Proposed | DreamLab Edge's slice of the cross-repo gap-close sprint: kit cutover (REC-12), disclosure-badge/Agents-tab overlay, roster legibility, kit compatibility record. |
+| [PRD: Nostr Contact Ingress & Website Agent Chat v1.0](prd/prd-nostr-contact-and-agent-chat-v1.0.md) | Draft | Contact/signup form → NIP-17 DM to the admin; "Talk to AI" FAB → nostr DM conversation with junkiejarvis. Two phases, whitelist runbook, GDPR posture change. See ADR-041/ADR-042 + DDD 11. |
 | [Sprint plans & audits](sprint/) | Archive | Obelisk-polish sprint, Discourse parity audit, security/UX/user-journey audits, snag lists. |
 | [Forum Config: Governance](../forum-config/README.md#governance-configuration) | Active | Agent Control Surface config -- feature flag, event kinds 31400-31405, agent pubkey allowlist. |
 
 ### Architecture Decision Records
 
-Full index of all 39 ADRs. See [adr/README.md](adr/README.md) for conventions and supersession chains.
+Full index of all 42 ADRs. See [adr/README.md](adr/README.md) for conventions and supersession chains.
 
 | ADR | Title | Status | Link |
 |-----|-------|--------|------|
@@ -121,12 +123,15 @@ Full index of all 39 ADRs. See [adr/README.md](adr/README.md) for conventions an
 | 032 | Agent Job Marketplace (NIP-90) | Superseded by 036 | [adr/032-agent-job-marketplace-nip90.md](adr/032-agent-job-marketplace-nip90.md) |
 | 033-034 | Multi-Admin Moderation, Relay NIP Conformance | Accepted / Proposed | See [adr/README.md](adr/README.md) |
 | 035-039 | AGPL Combined-Work, Device-Key Delegation, Config SSoT, Kit-Ref Pin Governance, /connect Onboarding | Accepted | See [adr/README.md](adr/README.md) |
+| 040 | Gap-Close Edge Decisions | Proposed | [adr/040-gap-close-edge-decisions.md](adr/040-gap-close-edge-decisions.md) |
+| 041 | Anonymous Contact-DM Ingress (Client-Side Gift-Wrap Publish) | Proposed | [adr/041-anonymous-contact-dm-ingress.md](adr/041-anonymous-contact-dm-ingress.md) |
+| 042 | Website Agent Chat Routing ("Talk to AI" → junkiejarvis DM) | Proposed | [adr/042-website-agent-chat-routing.md](adr/042-website-agent-chat-routing.md) |
 
 **Supersession chain:** ADR-003 (GCP) -> ADR-010 (Cloudflare) | ADR-007 (SvelteKit) -> ADR-013 (Rust/Leptos) | ADR-008 (PostgreSQL) -> ADR-010 (D1)
 
 ### Domain-Driven Design
 
-Six documents defining the domain model for the Rust workspace. See [ddd/README.md](ddd/README.md) for the full overview and crate-to-context mapping.
+Eleven documents defining the domain model for the Rust workspace and its bounded contexts. See [ddd/README.md](ddd/README.md) for the full overview and crate-to-context mapping.
 
 | Document | Description |
 |----------|-------------|
@@ -136,6 +141,11 @@ Six documents defining the domain model for the Rust workspace. See [ddd/README.
 | [04 - Domain Events](ddd/04-domain-events.md) | Nostr protocol events vs. application domain events. Event kind registry and flow diagrams. |
 | [05 - Value Objects](ddd/05-value-objects.md) | Immutable types: EventId, PublicKey, Signature, Timestamp, RoleId, Nip44Ciphertext, GiftWrap. |
 | [06 - Ubiquitous Language](ddd/06-ubiquitous-language.md) | 50+ term glossary covering Nostr, DreamLab forum, authentication, and Rust/Leptos concepts. |
+| [07 - Solid Pod Storage Context](ddd/07-solid-pod-bounded-context.md) | Full Solid Protocol bounded context: LDP containers, WAC ACL inheritance, quota enforcement, N3 Patch, WebID profiles, pod provisioning. |
+| [08 - Agent Identity & Messaging Context](ddd/08-agent-identity-messaging-context.md) | AI agent identity (`did:nostr:`), NIP-90 DVM job protocol, NIP-26 delegation, Solid LDP inbox delivery. `agent-worker` remains aspirational design. |
+| [09 - Nostr-Solid Bridge Context](ddd/09-nostr-solid-bridge-context.md) | Translation layer between Nostr events and Solid Linked Data: converged did:nostr DID document (ADR-125), kind-0 → WebID projection, WAC→ACP path. |
+| [10 - Gap-Close Edge Context](ddd/10-gap-close-edge-context.md) | DreamLab Edge's slice of the cross-repo gap-close sprint: kit cutover, overlay posture, roster legibility. Governed by ADR-040. |
+| [11 - Website Nostr Ingress Context](ddd/11-website-nostr-ingress-context.md) | The anonymous website write path onto the relay: contact-signup DMs to the admin and the serialised junkiejarvis chat session. Governed by ADR-041/ADR-042. |
 
 ### API Reference
 
@@ -418,6 +428,8 @@ graph LR
 11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c
 ```
 
+This is the visionclaw-server key, staged for an admin-role split per [ADR-040 D3](adr/040-gap-close-edge-decisions.md) and the [admin-key-split runbook](deployment/admin-key-split-runbook.md); the human-admin principal — and the contact-DM recipient used by [ADR-041](adr/041-anonymous-contact-dm-ingress.md) — is operator-jjohare (`6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425a`).
+
 ### Worker Hosts
 
 Live traffic is served from `*.solitary-paper-764d.workers.dev`. The branded
@@ -446,19 +458,19 @@ subdomains below are the documented end-state but are **not provisioned in DNS**
 
 | Category | Files | Status |
 |----------|-------|--------|
-| Planning (PRDs) | 2 + governance config | v2.0.0 accepted, v2.1.0 in progress, governance active |
-| ADRs (001-039) | 27 files (013-039 present; 001-012 tracked in index) | Current |
-| DDD | 10 (including README) | Aligned to v2.0.0 baseline + governance events |
-| API | 4 | Current for Rust port |
-| Security | 6 | Current for Rust port (2 docs + 3 QE audits + 1 coverage report) |
+| Planning (PRDs) | 11 + governance config | v2.x-v8.0 delivered; gap-close edge (Proposed) + nostr contact/agent chat (Draft) in flight; governance active |
+| ADRs (001-042) | 30 files (013-042 present; 001-012 tracked in index) | Current |
+| DDD | 12 (11 numbered + README) | Aligned to v2.0.0 baseline + governance events + edge/ingress contexts |
+| API | 5 | Current for Rust port |
+| Security | 7 | Current for Rust port (2 docs + 4 QE audits + 1 coverage report) |
 | Deployment | 2 | Current for Rust port + governance feature flags |
 | Developer | 2 | Current for Rust port |
 | Benchmarks | 1 | Baseline established |
 | Tranche 1 | 2 | Historical (migration complete) |
-| **Total** | **51+** | |
+| **Total** | **70+** | |
 
 ---
 
 **Project README:** [../README.md](../README.md) | **ADR Index:** [adr/README.md](adr/README.md) | **DDD Hub:** [ddd/README.md](ddd/README.md)
 
-*Last updated: 2026-06-10*
+*Last updated: 2026-07-14*

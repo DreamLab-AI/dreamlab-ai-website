@@ -97,6 +97,12 @@ jobs:
         env:
           VITE_SUPABASE_URL: 'https://stub.invalid'
           VITE_SUPABASE_ANON_KEY: 'stub'
+          # Nostr transport for the contact form + Talk-to-AI chat (ADR-041/042).
+          # Build-only stubs — the components read these at runtime and degrade
+          # gracefully when unset; the build never contacts the relay.
+          VITE_RELAY_URL: 'wss://stub.invalid'
+          VITE_ADMIN_PUBKEY: '0000000000000000000000000000000000000000000000000000000000000000'
+          VITE_JARVIS_PUBKEY: '1111111111111111111111111111111111111111111111111111111111111111'
 
   # ---------------------------------------------------------------------------
   # Node: npm audit (advisory)

@@ -321,6 +321,13 @@ role          = "Knowledge Enrichment Agent — proposes KG updates via governan
 cohorts       = ["dreamlab", "agent"]
 authorised_by = "6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425a"  # operator-jjohare (human admin)
 
+[[agents]]
+label         = "junkiejarvis"
+pubkey        = "2de44d5622eef79519ac078f6e227a85aecbaefd561e4e50c5f51dfadbf916e9"
+role          = "Conversational Agent — website chat and forum DMs (agentbox bridge)"
+cohorts       = ["dreamlab", "agent"]
+authorised_by = "6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425a"  # operator-jjohare (human admin)
+
 # ─── Test users ──────────────────────────────────────────────────────────────
 [[test_users]]
 label    = "test-trainer-alice"

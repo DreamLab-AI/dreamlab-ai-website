@@ -3,21 +3,39 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { supabase } from "@/lib/supabase";
 import { Checkbox } from "@/components/ui/checkbox";
 import { isValidEmail, MAX_EMAIL_LEN, MAX_NAME_LEN } from "@/lib/utils";
+import {
+  generateEphemeralIdentity,
+  buildContactRumor,
+  wrapDm,
+  publishGiftWrap,
+} from "@/lib/nostr";
 
 // --- Constants ---
 const SUCCESS_MESSAGE = "Thanks for signing up! We'll be in touch soon.";
 const ERROR_MESSAGE_INVALID_EMAIL = "Please enter a valid email address";
 const ERROR_MESSAGE_CONSENT = "Please accept our privacy policy to sign up";
 const ERROR_MESSAGE_SUBMISSION = "Failed to sign up. Please try again later.";
+const ERROR_MESSAGE_UNAVAILABLE = "Service temporarily unavailable. Please try again later.";
 const SUBMITTING_TEXT = "Submitting...";
 const SUBMIT_TEXT = "Sign Up";
 
+// Signup submissions are delivered to the site operator as an anonymous,
+// end-to-end-encrypted NIP-17 gift-wrapped DM (ADR-041). No Supabase row is
+// written. Relay + admin recipient are read from the build env, mirroring the
+// old module-level env pattern; if either is unset the form degrades gracefully.
+const RELAY_URL = import.meta.env.VITE_RELAY_URL || "";
+const ADMIN_PUBKEY = import.meta.env.VITE_ADMIN_PUBKEY || "";
+const SIGNUP_SUBJECT = "DreamLab website signup";
+
 /**
  * Renders an enhanced email signup form with name field and consent checkbox.
- * Handles basic client-side validation and submission to Supabase.
+ * On submit it wraps the details as a client-side, end-to-end-encrypted DM to
+ * the site operator and publishes it to the Nostr relay (ADR-041). Success is
+ * reported only when the relay confirms the event with OK-true; an OK-false
+ * (e.g. recipient not yet whitelisted) or timeout surfaces as a failure rather
+ * than a false positive.
  */
 export const EmailSignupForm = () => {
   const [email, setEmail] = useState("");
@@ -40,30 +58,35 @@ export const EmailSignupForm = () => {
       return;
     }
 
-    if (!supabase) {
-      toast.error("Service temporarily unavailable. Please try again later.");
+    // Degrade gracefully if the ingress isn't configured for this build.
+    if (!RELAY_URL || !ADMIN_PUBKEY) {
+      toast.error(ERROR_MESSAGE_UNAVAILABLE);
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      const { error } = await supabase
-        .from('email_subscribers')
-        .upsert({
-          email: email.trim().toLowerCase(), // email is now the primary key
-          name: name.trim().slice(0, MAX_NAME_LEN) || null,
-          has_consent: hasConsent,
-          source: 'website_signup_form'
-          // subscribed_at will be set automatically by the default value
-        }, {
-          onConflict: 'email'
-        });
+      // One-shot ephemeral sender key: minted, used once, then discarded. The
+      // sender is anonymous and unlinkable across submissions (ADR-041 D2).
+      const identity = generateEphemeralIdentity();
+      const rumor = buildContactRumor({
+        name: name.trim() || undefined,
+        email: email.trim().toLowerCase(),
+        hasConsent,
+        source: "website_signup_form",
+        pageUrl: window.location.href,
+      });
+      const wrap = wrapDm(rumor.content, identity.sk, ADMIN_PUBKEY, SIGNUP_SUBJECT);
+      const result = await publishGiftWrap(RELAY_URL, wrap);
 
-      // Do not log the raw Supabase error client-side — it can leak schema /
-      // project details (matches the Contact form's policy).
-      if (error) {
-        throw error;
+      // Do not log the raw relay message client-side — an OK-false reason can
+      // leak internal relay / whitelist detail (matches the Contact form's
+      // no-raw-error policy). Success is gated strictly on the relay OK-true so
+      // a rejected publish never shows a false success (ADR-041 D4).
+      if (!result.ok) {
+        toast.error(ERROR_MESSAGE_SUBMISSION);
+        return;
       }
 
       setEmail("");
@@ -112,7 +135,7 @@ export const EmailSignupForm = () => {
             disabled={isSubmitting}
           />
         </div>
-        
+
         <div className="flex items-start gap-2 mt-2 animate-scale-in" style={{ animationDelay: '0.3s' }}>
           <Checkbox
             id="consent"
@@ -138,7 +161,7 @@ export const EmailSignupForm = () => {
       >
         {isSubmitting ? SUBMITTING_TEXT : SUBMIT_TEXT}
       </Button>
-      
+
       <p className="text-xs text-muted-foreground text-center">
         Stay updated on our projects & opportunities
       </p>

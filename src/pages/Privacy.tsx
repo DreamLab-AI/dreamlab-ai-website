@@ -17,7 +17,7 @@ const Privacy = () => {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">Data Collection and Processing</h2>
             <p>
-              We collect and process your email address when you subscribe to our updates. This is done on the basis of your explicit consent, which you provide when submitting your email address through our signup form.
+              When you subscribe to our updates through the signup form, your details are delivered to the site operator as an end-to-end-encrypted direct message. Only the operator can decrypt and read it, and it is not stored as a record in our database. This is done on the basis of your explicit consent, which you provide when submitting the form. Separately, when you send us an enquiry through our contact form, that message is stored in our database so that we can respond to you.
             </p>
           </section>
 
@@ -31,7 +31,7 @@ const Privacy = () => {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">Data Storage and Security</h2>
             <p>
-              Your email address is stored securely in our Supabase database. We implement appropriate technical and organizational measures to protect your personal data against unauthorized access, alteration, disclosure, or destruction.
+              Signup-form messages are end-to-end encrypted in transit and at rest and can be read only by the site operator; they are not held as records in our database. Contact-form enquiries are stored securely in our Supabase database. In both cases we implement appropriate technical and organizational measures to protect your personal data against unauthorized access, alteration, disclosure, or destruction.
             </p>
           </section>
 
@@ -59,8 +59,14 @@ const Privacy = () => {
             <h2 className="text-2xl font-semibold mb-4">Delete Your Data</h2>
             <p className="mb-4">
               Under GDPR Article 17, you have the right to request erasure of your personal data.
-              Enter the email address you used when contacting us or subscribing to our updates,
-              and we will permanently delete all associated records from our systems.
+              For enquiries you have sent through our contact form, enter the email address you
+              used below and we will permanently delete the associated records from our database.
+              Signup-form messages are end-to-end-encrypted direct messages that are not stored as
+              database records; to have a signup message erased, email us at{" "}
+              <a href="mailto:info@dreamlab-ai.com" className="text-primary hover:underline">
+                info@dreamlab-ai.com
+              </a>{" "}
+              and the site operator will purge it manually.
             </p>
             <DataErasureRequest />
           </section>

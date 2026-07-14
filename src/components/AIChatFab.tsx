@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { MessageSquare, X, Send, Loader2, ChevronUp } from "lucide-react";
+import { DmSession, generateEphemeralIdentity } from "@/lib/nostr";
+import { MAX_MESSAGE_LEN } from "@/lib/utils";
 
 interface ChatMessage {
   id: string;
@@ -16,78 +18,46 @@ const TIER_CONFIG: Record<Tier, { label: string; color: string; dot: string; des
   3: { label: "Full",   color: "text-amber-400",           dot: "bg-amber-400",           desc: "VisionFlow graph" },
 };
 
-const AI_CHAT_URL = import.meta.env.VITE_AI_CHAT_URL || "";
+// Transport config (ADR-042). The chat rides a client-side Nostr DM conversation
+// with the junkiejarvis agent: the browser gift-wraps kind-14 rumors to
+// VITE_JARVIS_PUBKEY and publishes the kind-1059 wrap directly to VITE_RELAY_URL.
+// If either is unset the panel degrades to an offline message (mirroring the
+// EmailSignupForm `!supabase` guard) rather than silently failing.
+const RELAY_URL = import.meta.env.VITE_RELAY_URL || "";
+const JARVIS_PUBKEY = import.meta.env.VITE_JARVIS_PUBKEY || "";
 
-// Minimal NIP-07 signer surface (nos2x, Alby, etc.).
-interface SignedNostrEvent {
-  id: string;
-  pubkey: string;
-  created_at: number;
-  kind: number;
-  tags: string[][];
-  content: string;
-  sig: string;
-}
+// DM replies carry no e-tag correlation (junkiejarvis `_sendDm`), so sends are
+// serialised — one in-flight question at a time. The client waits at most 30 s
+// for a reply (above the agent's 25 s fail-open LLM timeout) before showing a
+// friendly fallback and re-enabling input (ADR-042 Decision 5).
+const REPLY_TIMEOUT_MS = 30000;
+
+// User-facing copy (UK English).
+const OFFLINE_MESSAGE =
+  "The assistant is temporarily offline. Please reach us via the contact page and we'll get back to you soon.";
+const CONNECTING_MESSAGE = "Connecting to the assistant…";
+const CONNECT_FAILURE_MESSAGE =
+  "Couldn't reach the assistant just now. Please try again in a moment, or use the contact page.";
+const SEND_FAILURE_MESSAGE =
+  "Sorry — your message couldn't be delivered. Please try again in a moment.";
+const REPLY_TIMEOUT_MESSAGE =
+  "Sorry — I could not reach the assistant just now. Please try again in a moment.";
+const SESSION_INTERRUPTED_MESSAGE =
+  "Connection to the assistant was interrupted. Send your message again to reconnect.";
+
+// Minimal NIP-07 signer surface (nos2x, Alby, etc.). Retained purely as a tier
+// 2/3 identity signal (the greeting shows the user's pubkey); DMs always ride
+// the ephemeral session key, never the NIP-07 key (ADR-042 Decision 2).
 interface Nip07 {
   getPublicKey: () => Promise<string>;
-  signEvent?: (event: {
-    created_at: number;
-    kind: number;
-    tags: string[][];
-    content: string;
-  }) => Promise<SignedNostrEvent>;
 }
 
 const getNostr = (): Nip07 | undefined =>
   (window as unknown as { nostr?: Nip07 }).nostr;
 
-// Base64-encode a JSON string in a UTF-8-safe way (payload is ASCII in practice).
-const b64 = (s: string): string =>
-  btoa(String.fromCharCode(...new TextEncoder().encode(s)));
-
-/**
- * SECURITY — client half of a challenge-response.
- *
- * A bare `pubkey` string in the request body proves nothing: any client can
- * POST any pubkey and any tier. To make identity *verifiable*, we sign a
- * NIP-98 (kind 27235) HTTP-auth event with the user's NIP-07 key, binding it to
- * this request's URL, method, a fresh `created_at` timestamp and a random
- * nonce. Possession of the signature proves control of the private key for the
- * claimed pubkey. The token is sent as `Authorization: Nostr <base64(event)>`.
- *
- * The BACKEND MUST, and this client cannot:
- *   1. Verify the schnorr signature over the event id for `event.pubkey`.
- *   2. Reject stale (`created_at` outside a small window, e.g. ±60s) or replayed
- *      (seen `nonce`) tokens, and confirm the `u`/`method` tags match the route.
- *   3. Ensure `event.pubkey === body.pubkey`.
- *   4. Derive the tier from SERVER-SIDE entitlements for that verified pubkey.
- *      The `tier` field in the body is a UI hint ONLY and MUST NOT be trusted
- *      for authorization — treating it as authoritative is privilege escalation.
- *
- * If no signer is available the token is null; the backend MUST then treat the
- * request as anonymous (tier 1 / unauthenticated), never honouring a
- * client-asserted pubkey or tier >= 2.
- */
-async function buildNostrAuthToken(url: string): Promise<string | null> {
-  const nostr = getNostr();
-  if (!nostr?.signEvent) return null;
-  try {
-    const nonce = `${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
-    const signed = await nostr.signEvent({
-      kind: 27235, // NIP-98 HTTP Auth
-      created_at: Math.floor(Date.now() / 1000),
-      tags: [
-        ["u", url],
-        ["method", "POST"],
-        ["nonce", nonce],
-      ],
-      content: "",
-    });
-    return b64(JSON.stringify(signed));
-  } catch {
-    return null;
-  }
-}
+// Monotonic id source so rapidly appended messages never collide on React keys.
+let msgSeq = 0;
+const nextMsgId = (role: string): string => `${role}_${Date.now()}_${msgSeq++}`;
 
 export const AIChatFab = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -97,12 +67,18 @@ export const AIChatFab = () => {
   const [tier, setTier] = useState<Tier>(1);
   const [pubkey, setPubkey] = useState<string | null>(null);
   const [showTierMenu, setShowTierMenu] = useState(false);
-  const [sessionId] = useState(
-    () => `chat_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
-  );
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const tierMenuRef = useRef<HTMLDivElement>(null);
+
+  // Warm DM session for the open panel. Created lazily on first send and reused
+  // until the panel closes or the component unmounts.
+  const sessionRef = useRef<DmSession | null>(null);
+  const connectedRef = useRef(false);
+  // A turn is "pending" between publishing a question and resolving it (reply,
+  // timeout, or failure). Guards against double resolution of a single turn.
+  const pendingRef = useRef(false);
+  const replyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -128,6 +104,41 @@ export const AIChatFab = () => {
     return () => document.removeEventListener("mousedown", handler);
   }, [showTierMenu]);
 
+  const clearReplyTimer = useCallback(() => {
+    if (replyTimerRef.current) {
+      clearTimeout(replyTimerRef.current);
+      replyTimerRef.current = null;
+    }
+  }, []);
+
+  // Resolve any in-flight turn without emitting a message and re-enable input.
+  const resetPending = useCallback(() => {
+    pendingRef.current = false;
+    clearReplyTimer();
+    setIsLoading(false);
+  }, [clearReplyTimer]);
+
+  const teardownSession = useCallback(() => {
+    if (sessionRef.current) {
+      sessionRef.current.close();
+      sessionRef.current = null;
+    }
+    connectedRef.current = false;
+  }, []);
+
+  // Close the warm session and cancel any in-flight turn when the panel closes
+  // or the component unmounts (also runs before each re-run of this effect).
+  useEffect(() => {
+    if (!isOpen) {
+      teardownSession();
+      resetPending();
+    }
+    return () => {
+      teardownSession();
+      resetPending();
+    };
+  }, [isOpen, teardownSession, resetPending]);
+
   const requestNostrAuth = useCallback(async (): Promise<string | null> => {
     const nostr = getNostr();
     if (!nostr) return null;
@@ -143,9 +154,59 @@ export const AIChatFab = () => {
   const addSystemMessage = useCallback((content: string) => {
     setMessages((prev) => [
       ...prev,
-      { id: `sys_${Date.now()}`, role: "system", content },
+      { id: nextMsgId("sys"), role: "system", content },
     ]);
   }, []);
+
+  const addAssistantMessage = useCallback((content: string) => {
+    setMessages((prev) => [
+      ...prev,
+      { id: nextMsgId("ai"), role: "assistant", content },
+    ]);
+  }, []);
+
+  // Any reply always renders (even one that arrives after the 30 s timeout).
+  // Only an outstanding turn is resolved — re-enabling input once, not twice.
+  const handleReply = useCallback((text: string) => {
+    addAssistantMessage(text);
+    if (pendingRef.current) {
+      resetPending();
+    }
+  }, [addAssistantMessage, resetPending]);
+
+  const handleReplyTimeout = useCallback(() => {
+    if (!pendingRef.current) return;
+    pendingRef.current = false;
+    replyTimerRef.current = null;
+    addAssistantMessage(REPLY_TIMEOUT_MESSAGE);
+    setIsLoading(false);
+  }, [addAssistantMessage]);
+
+  // Post-connect transport error (relay CLOSED, socket error, keepalive send
+  // failure). Connect-phase failures are surfaced by the sendMessage catch, so
+  // this is a no-op until the session is established.
+  const handleSessionError = useCallback(() => {
+    if (!connectedRef.current) return;
+    addSystemMessage(SESSION_INTERRUPTED_MESSAGE);
+    teardownSession();
+    if (pendingRef.current) {
+      resetPending();
+    }
+  }, [addSystemMessage, teardownSession, resetPending]);
+
+  const ensureSession = useCallback(async (): Promise<DmSession> => {
+    if (sessionRef.current) return sessionRef.current;
+    const identity = generateEphemeralIdentity();
+    const session = new DmSession(RELAY_URL, identity, {
+      onReply: handleReply,
+      onError: handleSessionError,
+    });
+    sessionRef.current = session;
+    addSystemMessage(CONNECTING_MESSAGE);
+    await session.connect();
+    connectedRef.current = true;
+    return session;
+  }, [handleReply, handleSessionError, addSystemMessage]);
 
   const switchTier = useCallback(async (target: Tier) => {
     setShowTierMenu(false);
@@ -178,86 +239,60 @@ export const AIChatFab = () => {
     const trimmed = input.trim();
     if (!trimmed || isLoading) return;
 
-    const userMsg: ChatMessage = {
-      id: `user_${Date.now()}`,
-      role: "user",
-      content: trimmed,
-    };
-    setMessages((prev) => [...prev, userMsg]);
+    setMessages((prev) => [
+      ...prev,
+      { id: nextMsgId("user"), role: "user", content: trimmed },
+    ]);
     setInput("");
 
+    // Tier 0: log-only, no transport (semantics unchanged).
     if (tier === 0) return;
 
-    setIsLoading(true);
+    // Graceful offline path when transport is not configured.
+    if (!RELAY_URL || !JARVIS_PUBKEY) {
+      addAssistantMessage(OFFLINE_MESSAGE);
+      return;
+    }
 
-    if (!AI_CHAT_URL) {
-      setTimeout(() => {
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: `ai_${Date.now()}`,
-            role: "assistant",
-            content:
-              "I'm not connected yet. Once the AI service is live, I'll be able to help you here. In the meantime, reach out via the contact page.",
-          },
-        ]);
-        setIsLoading(false);
-      }, 600);
+    // Open a single in-flight turn: input/send stay disabled until it resolves.
+    setIsLoading(true);
+    pendingRef.current = true;
+
+    let session: DmSession;
+    try {
+      session = await ensureSession();
+    } catch {
+      teardownSession();
+      if (pendingRef.current) resetPending();
+      addSystemMessage(CONNECT_FAILURE_MESSAGE);
       return;
     }
 
     try {
-      // NOTE: `tier` and `pubkey` here are UI hints. They are NOT trusted
-      // credentials — the backend derives the real tier from the *verified*
-      // pubkey (see buildNostrAuthToken doc). We attach a signed NIP-98 token so
-      // the backend CAN verify identity; without it the request is anonymous.
-      const body: Record<string, unknown> = {
-        message: trimmed,
-        session_id: sessionId,
-        tier,
-      };
-
-      const headers: Record<string, string> = {
-        "Content-Type": "application/json",
-      };
-      if (pubkey) {
-        const authToken = await buildNostrAuthToken(AI_CHAT_URL);
-        if (authToken) headers["Authorization"] = `Nostr ${authToken}`;
-        body.pubkey = pubkey;
+      // Resolves on the relay publish OK, not on the agent reply. Only after the
+      // question is accepted do we arm the reply-wait timer (unless a reply has
+      // already landed during connect/publish, which would clear pendingRef).
+      await session.sendQuestion(trimmed, JARVIS_PUBKEY);
+      if (pendingRef.current) {
+        clearReplyTimer();
+        replyTimerRef.current = setTimeout(handleReplyTimeout, REPLY_TIMEOUT_MS);
       }
-
-      const res = await fetch(AI_CHAT_URL, {
-        method: "POST",
-        headers,
-        body: JSON.stringify(body),
-      });
-      if (!res.ok) throw new Error(`${res.status}`);
-      const data = await res.json();
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: `ai_${Date.now()}`,
-          role: "assistant",
-          content:
-            data.response ||
-            data.message ||
-            "I couldn't generate a response. Please try again.",
-        },
-      ]);
     } catch {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: `ai_${Date.now()}`,
-          role: "assistant",
-          content:
-            "Sorry, I couldn't reach the AI service right now. Please try again in a moment.",
-        },
-      ]);
-    } finally {
-      setIsLoading(false);
+      if (pendingRef.current) resetPending();
+      addAssistantMessage(SEND_FAILURE_MESSAGE);
     }
-  }, [input, isLoading, tier, pubkey, sessionId]);
+  }, [
+    input,
+    isLoading,
+    tier,
+    ensureSession,
+    teardownSession,
+    resetPending,
+    clearReplyTimer,
+    handleReplyTimeout,
+    addAssistantMessage,
+    addSystemMessage,
+  ]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -408,6 +443,7 @@ export const AIChatFab = () => {
                 ref={inputRef}
                 type="text"
                 value={input}
+                maxLength={MAX_MESSAGE_LEN}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder={tier === 0 ? "AI paused — type to log only" : "Type a message..."}

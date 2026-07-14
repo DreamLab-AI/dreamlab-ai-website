@@ -120,9 +120,11 @@ export function DataErasureRequest() {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirm data deletion</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete all personal data associated with{" "}
-              <strong>{email}</strong> from our systems, including contact
-              submissions and email subscriptions. This action cannot be undone.
+              This will permanently delete the personal data associated with{" "}
+              <strong>{email}</strong> held in our database, including contact-form
+              submissions and mailing-list entries. Signup-form messages are sent as
+              encrypted direct messages that are not stored in our database and are
+              erased separately by the operator on request. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

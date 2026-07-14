@@ -51,6 +51,19 @@ env:
   VITE_POD_API_URL: 'https://dreamlab-pod-api.solitary-paper-764d.workers.dev'
   VITE_SEARCH_API_URL: 'https://dreamlab-search-api.solitary-paper-764d.workers.dev'
   VITE_LINK_PREVIEW_API_URL: 'https://dreamlab-link-preview.solitary-paper-764d.workers.dev'
+  # Nostr DM recipients for the React site (contact form → admin, Talk-to-AI →
+  # junkiejarvis). Canonical source is forum-config/dreamlab.toml (admin at :59,
+  # junkiejarvis in [[agents]]). These are HAND-SYNCED mirrors, not generated —
+  # per ADR-037 the O1/O2 single-source generator is deferred, so keep them in
+  # lockstep with dreamlab.toml by hand when rotating (same posture as the
+  # admin-pubkeys-sync mirrors). Injected into the React build env block below.
+  # INTERIM per ADR-041: the operator's current working admin key (visionclaw-server,
+  # dreamlab.toml:57, already relay-whitelisted so signup DMs deliver with no runbook
+  # step). The ADR-040 D3 key-split runbook MUST re-point this to the newly minted
+  # operator key when executed (and run scripts/seed/whitelist-admin-recipient.mjs
+  # for it) — extending the split to a five-location atomic change.
+  VITE_ADMIN_PUBKEY: '11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c'
+  VITE_JARVIS_PUBKEY: '2de44d5622eef79519ac078f6e227a85aecbaefd561e4e50c5f51dfadbf916e9'  # junkiejarvis — dreamlab.toml [[agents]]
   # Zone (section) model for the forum client. Mirrors forum-config/dreamlab.toml
   # [[zones]] and the relay's ZONE_CONFIG [vars]. Injected into window.__ENV__ below.
   ZONE_CONFIG_JSON: '[{"id":"public","display_name":"Landing","required_cohorts":[],"write_cohorts":["members","friends","agent"],"banner_image_url":"/images/heroes/lake-district-dawn.webp","visibility":"public","encrypted":false},{"id":"minimoonoir","display_name":"Minimoonoir","required_cohorts":["friends"],"banner_image_url":"/images/heroes/minimoonoir-hero.webp","visibility":"locked","encrypted":false},{"id":"family","display_name":"Family","required_cohorts":["family"],"banner_image_url":"/images/heroes/family-hero.webp","visibility":"locked","encrypted":true},{"id":"business","display_name":"DreamLab","required_cohorts":["business"],"banner_image_url":"/images/heroes/business-hero.webp","visibility":"locked","encrypted":false}]'
@@ -117,6 +130,12 @@ jobs:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
           VITE_AUTH_API_URL: ${{ env.VITE_AUTH_API_URL }}
+          # Nostr transport for the contact form + Talk-to-AI chat (ADR-041/042).
+          # VITE_RELAY_URL already exists at workflow level; the pubkeys are the
+          # hand-synced dreamlab.toml mirrors declared above.
+          VITE_RELAY_URL: ${{ env.VITE_RELAY_URL }}
+          VITE_ADMIN_PUBKEY: ${{ env.VITE_ADMIN_PUBKEY }}
+          VITE_JARVIS_PUBKEY: ${{ env.VITE_JARVIS_PUBKEY }}
 
       # ── Rust/WASM forum client ─────────────────────────────────────────
       - name: Install Rust toolchain ${{ env.RUST_TOOLCHAIN }}

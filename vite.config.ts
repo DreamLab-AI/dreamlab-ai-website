@@ -60,6 +60,7 @@ export default defineConfig({
         // package.json deps but never bundled.
         manualChunks: {
           'vendor': ['react', 'react-dom', 'react-router-dom'],
+          'nostr': ['nostr-tools'],
           'ui': ['@radix-ui/react-accordion', '@radix-ui/react-alert-dialog',
                  '@radix-ui/react-avatar', '@radix-ui/react-checkbox', '@radix-ui/react-dialog',
                  '@radix-ui/react-dropdown-menu', '@radix-ui/react-popover',
