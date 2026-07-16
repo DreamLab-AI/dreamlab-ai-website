@@ -62,13 +62,18 @@ WORKSPACE_CARGO="${CARGO_HOME:-$REPO_ROOT/../.cargo}"
 export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$WORKSPACE_CARGO/cache}"
 
 # Env vars the forum client reads at compile time (option_env!) and runtime
-# (window.__ENV__). Points at the live deployed workers.
-export VITE_RELAY_URL="${VITE_RELAY_URL:-wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev}"
-export VITE_AUTH_API_URL="${VITE_AUTH_API_URL:-https://dreamlab-auth-api.solitary-paper-764d.workers.dev}"
-export VITE_POD_API_URL="${VITE_POD_API_URL:-https://dreamlab-pod-api.solitary-paper-764d.workers.dev}"
-export VITE_SEARCH_API_URL="${VITE_SEARCH_API_URL:-https://dreamlab-search-api.solitary-paper-764d.workers.dev}"
-export VITE_LINK_PREVIEW_API_URL="${VITE_LINK_PREVIEW_API_URL:-https://dreamlab-link-preview.solitary-paper-764d.workers.dev}"
-export NOSTR_BBS_NIP05_DOMAIN="${NOSTR_BBS_NIP05_DOMAIN:-dreamlab-ai.com}"
+# (window.__ENV__). Default to local agentbox services; override with env vars
+# to test against live Cloudflare workers.
+# Use the agentbox hostname so the browser sidecar (browsercontainer) can
+# reach the relay over the Docker network. 127.0.0.1 would resolve to the
+# browser's own loopback, not the agentbox container.
+RELAY_HOST="${AGENTBOX_RELAY_HOST:-agentbox}"
+export VITE_RELAY_URL="${VITE_RELAY_URL:-ws://${RELAY_HOST}:7777}"
+export VITE_AUTH_API_URL="${VITE_AUTH_API_URL:-http://${RELAY_HOST}:7777}"
+export VITE_POD_API_URL="${VITE_POD_API_URL:-http://${RELAY_HOST}:8484}"
+export VITE_SEARCH_API_URL="${VITE_SEARCH_API_URL:-http://${RELAY_HOST}:7777}"
+export VITE_LINK_PREVIEW_API_URL="${VITE_LINK_PREVIEW_API_URL:-http://${RELAY_HOST}:7777}"
+export NOSTR_BBS_NIP05_DOMAIN="${NOSTR_BBS_NIP05_DOMAIN:-localhost}"
 
 cd "$CLIENT_DIR"
 
@@ -82,15 +87,16 @@ case "${1:-serve}" in
         ;;
     serve|"")
         echo ""
-        echo "Starting forum dev server..."
+        echo "Starting forum dev server (dev-auth enabled)..."
         echo "  Forum:  http://localhost:8080/"
         echo "  Relay:  $VITE_RELAY_URL"
         echo "  Auth:   $VITE_AUTH_API_URL"
         echo ""
-        echo "Live-reload watches src/ and ../nostr-core/src/"
+        echo "Dev identities: Admin, Normal User, Junkie Jarvis"
+        echo "Live-reload watches src/ and ../nostr-bbs-core/src/"
         echo "First build takes ~8-15 min; incremental: ~5-15s"
         echo ""
-        trunk serve --address 0.0.0.0 --port 8080
+        trunk serve --address 0.0.0.0 --port 8080 --features dev-auth
         ;;
     *)
         echo "Usage: $0 [serve|build|update]"
