@@ -60,6 +60,9 @@ vite.config.ts.timestamp-*
 # SQLite databases
 *.db
 
+# Upstream kit checkout (cloned at KIT_REF for local dev)
+kit/
+
 # External reference repos (not part of this project)
 external/
 
