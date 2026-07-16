@@ -13,6 +13,12 @@ set -euo pipefail
 # dependency tree (~8-15 min); incremental rebuilds are 5-15 seconds.
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+
+# Ensure cargo-installed tools (trunk, wasm-bindgen-cli) are on PATH.
+# CARGO_HOME lives on the workspace overlay, not the default ~/.cargo.
+CARGO_BIN="${CARGO_HOME:-$HOME/.cargo}/bin"
+[ -d "$REPO_ROOT/../.cargo/bin" ] && CARGO_BIN="$REPO_ROOT/../.cargo/bin"
+export PATH="$CARGO_BIN:$PATH"
 KIT_DIR="$REPO_ROOT/kit"
 CLIENT_DIR="$KIT_DIR/crates/nostr-bbs-forum-client"
 KIT_REPO="https://github.com/DreamLab-AI/nostr-rust-forum.git"
@@ -44,6 +50,16 @@ if [ "$CURRENT_REF" != "$KIT_REF" ]; then
     echo "WARNING: kit is at ${CURRENT_REF:0:12}, expected ${KIT_REF:0:12}"
     echo "Run: $0 update"
 fi
+
+# NixOS cross-compilation fix: cc-rs picks up host glibc includes which
+# fail on wasm32 ("gnu/stubs-32.h not found"). Override to suppress them.
+export CFLAGS_wasm32_unknown_unknown="${CFLAGS_wasm32_unknown_unknown:--D__STDC_HOSTED__=0}"
+
+# Trunk downloads wasm-bindgen into XDG_CACHE_HOME (~/.cache by default).
+# On NixOS containers ~/.cache is often on a tmpfs with noexec — the binary
+# downloads fine but can't be executed. Redirect to the workspace overlay.
+WORKSPACE_CARGO="${CARGO_HOME:-$REPO_ROOT/../.cargo}"
+export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$WORKSPACE_CARGO/cache}"
 
 # Env vars the forum client reads at compile time (option_env!) and runtime
 # (window.__ENV__). Points at the live deployed workers.
