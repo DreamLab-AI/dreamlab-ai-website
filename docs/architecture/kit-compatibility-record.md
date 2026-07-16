@@ -22,11 +22,11 @@ its own `pin-check` extension.
 
 | Deployment host | Forum-kit SHA | Kit branch/tag at pin | Consumption tier | Canonical for pin-check |
 |---|---|---|---|---|
-| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `5b1e2d86354ac19492160ccbcaa5bceec9921d8a` | `main` (soak-fix sprint + ADR-107) | `integrated` | ✔ |
+| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `3c9fb836707786aa1924e6b2ca574256b6c36641` | `main` (relay pacing + Solid PUT fix) | `integrated` | ✔ |
 
 <!-- pin-check:canonical-kit-sha -->
 ```
-CANONICAL_KIT_SHA=5b1e2d86354ac19492160ccbcaa5bceec9921d8a
+CANONICAL_KIT_SHA=3c9fb836707786aa1924e6b2ca574256b6c36641
 ```
 
 The `CANONICAL_KIT_SHA` line above is the machine-readable field the `pin-check`
@@ -53,21 +53,19 @@ over `src/` + `forum-config/src/` for kit-owned surface names (returns zero) and
 the `pin-check` lockstep. It does not claim `federation-verified`/`released`: the
 edge carries no cross-substrate decision loop of its own to prove end to end.
 
-## What this SHA contains (`main`, soak-fix sprint + ADR-107, `5b1e2d8`)
+## What this SHA contains (`main`, relay pacing + Solid PUT fix, `3c9fb83`)
 
-Everything in `3df5498` (gap-close slice: COM-13/F2 disclosure badge, F8/WP-5
-Agents roster, F1 governance surfaces, COM-16/COM-17, REC-6) plus:
+Everything in `5b1e2d8` (soak-fix sprint + ADR-107, itself atop the `3df5498`
+gap-close slice: COM-13/F2 disclosure badge, F8/WP-5 Agents roster, F1
+governance surfaces, COM-16/COM-17, REC-6) plus:
 
-- **Soak-test fix sprint** — 16 fixes from the 10-persona browser soak
-  (notification baseline/own-join suppression, logout click-through, humanised
-  errors, settings display-name UX, nsec-recovery profile rehydration,
-  governance empty states, admin create-section CTA; see the kit CHANGELOG
-  and `docs/sprint/soak-test-2026-07-16.md` in this repo).
-- **ADR-107 zone-first navigation** — members authorised for exactly one locked
-  zone land at `/forums/{zone}` (zone hero, zone-only topics), zone-labelled
-  nav anchor, zone-rooted breadcrumbs; driven entirely by `ZONE_CONFIG`.
-- **Feature-gated `dev-auth` harness** (never compiled into prod builds) and a
-  brand-neutral empty `window.__ENV__` placeholder in the kit `index.html`.
+- **Relay send pacing** — the client paces REQ/EVENT/CLOSE frames under the
+  relay's per-IP rate limit (boot burst previously dropped the message REQs,
+  rendering "0 messages" site-wide); the relay-worker cap is now the
+  `RATE_LIMIT_MSGS_PER_SEC` var (default 30, was hardcoded 10).
+- **Solid PUT uploads** — pod media uploads use `PUT` (Solid resource
+  semantics), fixing avatar/in-post images against self-hosted
+  `solid-pod-rs` pods; the CF pod-worker accepts both verbs.
 
 All render from the pinned kit at deploy time; this repo adds only branding
 (`window.__ENV__` injection) and operator config (`dreamlab.toml`).
@@ -85,7 +83,8 @@ All render from the pinned kit at deploy time; this repo adds only branding
 
 | SHA | Branch/context | Notes |
 |---|---|---|
-| `5b1e2d8` | `main` (soak-fix sprint + ADR-107) | Current. 16 soak fixes, zone-first navigation, dev-auth harness. |
+| `3c9fb83` | `main` (relay pacing + Solid PUT) | Current. Client send pacing under relay rate limit; PUT media uploads. |
+| `5b1e2d8` | `main` (soak-fix sprint + ADR-107) | Superseded. 16 soak fixes, zone-first navigation, dev-auth harness. |
 | `3df5498` | `gap-close/2026-07` HEAD + CI fix | Superseded. Removes dev-only `[patch.crates-io]` local path. |
 | `6986276` | `gap-close/2026-07` HEAD | Superseded. COM-13 badge, F8 roster tab, governance surfaces. |
 | `a149da4` | PR #63 head (v1.0.0-beta.3) | Superseded. BBS control-plane + live Chat/Code + pod-url clarity. |

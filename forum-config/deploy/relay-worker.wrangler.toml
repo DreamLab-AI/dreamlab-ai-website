@@ -15,6 +15,11 @@ RELAY_NAME       = "DreamLab Nostr Relay"
 ALLOWED_ORIGIN   = "https://dreamlab-ai.com"
 ALLOWED_ORIGINS  = "https://dreamlab-ai.com,https://thedreamlab.uk,https://dreamlab-ai.github.io"
 
+# Per-IP EVENT/REQ/COUNT frame budget per rolling second (relay_do/broadcast.rs).
+# The forum client self-paces to 8/s, but the budget is shared by every user
+# behind one NAT IP — keep comfortably above one boot burst (~10 frames).
+RATE_LIMIT_MSGS_PER_SEC = "30"
+
 # Zone (section) access model — the relay's single source of zone truth.
 # JSON array of nostr_bbs_config::schema::Zone. Mirrors forum-config/dreamlab.toml
 # [[zones]] and the client's window.__ENV__.ZONE_CONFIG. Deny-by-default if absent.
