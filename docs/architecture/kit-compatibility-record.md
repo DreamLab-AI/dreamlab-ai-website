@@ -22,11 +22,11 @@ its own `pin-check` extension.
 
 | Deployment host | Forum-kit SHA | Kit branch/tag at pin | Consumption tier | Canonical for pin-check |
 |---|---|---|---|---|
-| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `d4165f0a8e17d45a2d051020ed701116c594396d` | `main` (per-zone auto-approval) | `integrated` | ✔ |
+| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `959c30d70decf493afc50cd1b456eaec9ff2371c` | `main` (forum→BBS switch sash) | `integrated` | ✔ |
 
 <!-- pin-check:canonical-kit-sha -->
 ```
-CANONICAL_KIT_SHA=d4165f0a8e17d45a2d051020ed701116c594396d
+CANONICAL_KIT_SHA=959c30d70decf493afc50cd1b456eaec9ff2371c
 ```
 
 The `CANONICAL_KIT_SHA` line above is the machine-readable field the `pin-check`
@@ -53,7 +53,13 @@ over `src/` + `forum-config/src/` for kit-owned surface names (returns zero) and
 the `pin-check` lockstep. It does not claim `federation-verified`/`released`: the
 edge carries no cross-substrate decision loop of its own to prove end to end.
 
-## What this SHA contains (`main`, per-zone auto-approval, `d4165f0`)
+## What this SHA contains (`main`, forum→BBS switch sash, `959c30d`)
+
+A thin, glitchy amber terminal sash under the forum's Forums hero switches the
+reader into the retro ASCII BBS (`bbs_enabled()`-gated, default on; a plain
+full-navigation link to `<base>/bbs/`). Everything below is also present.
+
+## What earlier SHAs added (`d4165f0` — per-zone auto-approval)
 
 Per-zone auto-approval of new joiners. Each zone gains an `auto_approve` flag in
 `ZONE_CONFIG`; when set, a new user is additively granted that zone's
@@ -112,7 +118,8 @@ All render from the pinned kit at deploy time; this repo adds only branding
 
 | SHA | Branch/context | Notes |
 |---|---|---|
-| `d4165f0` | `main` (per-zone auto-approval) | Current. Config-driven `auto_approve` per zone at auth-worker username-claim; minimoonoir opted in (new joiners auto-granted `friends`). |
+| `959c30d` | `main` (forum→BBS switch sash) | Current. Glitchy amber "enter the retro BBS" sash under the forums hero. |
+| `d4165f0` | `main` (per-zone auto-approval) | Superseded. Config-driven `auto_approve` per zone at auth-worker username-claim; minimoonoir opted in (new joiners auto-granted `friends`). |
 | `98bdf7b` | `main` (per-zone auto-approval, relay half) | Superseded. Relay-side `auto_approve` (defensive; the functional path is the auth-worker in `d4165f0`). |
 | `5875beb` | `main` (BBS redesign, ADR-108) | Superseded. Mobile-first BBS reimagining (T1–T3): sign-in, onboarding, zones/threads, DMs, passkey, search, notifications; MINIMOONOIR branding. |
 | `b866108` | `main` (admin create-channel panic fix) | Superseded. Admin channel-creation panic fix atop the relay-pacing/Solid-PUT slice. |
