@@ -73,7 +73,8 @@ static_pubkeys  = [
 # injection. `theme` selects the BBS palette: amber | green | purple | sky.
 [branding]
 theme         = "amber"
-node_name     = "DREAMLAB BBS"          # BBS masthead + status-bar node id
+node_name     = "MINIMOONOIR"           # BBS masthead + status-bar node id
+tagline       = "private secure forums"  # strapline under the node name (banner + landing)
 location      = "Lake District, UK"     # BBS status-bar location string
 banner_url    = ""                       # optional ASCII-art / image banner
 logo_url      = "https://dreamlab-ai.com/assets/logo.svg"

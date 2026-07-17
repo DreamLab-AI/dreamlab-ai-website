@@ -22,11 +22,11 @@ its own `pin-check` extension.
 
 | Deployment host | Forum-kit SHA | Kit branch/tag at pin | Consumption tier | Canonical for pin-check |
 |---|---|---|---|---|
-| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `b86610818c20975f1580da16fa6326521b163e27` | `main` (admin panic fix) | `integrated` | ✔ |
+| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `5875beb8f5687a384e58ffb55a8b6946c7d5148a` | `main` (BBS mobile-first redesign, ADR-108) | `integrated` | ✔ |
 
 <!-- pin-check:canonical-kit-sha -->
 ```
-CANONICAL_KIT_SHA=b86610818c20975f1580da16fa6326521b163e27
+CANONICAL_KIT_SHA=5875beb8f5687a384e58ffb55a8b6946c7d5148a
 ```
 
 The `CANONICAL_KIT_SHA` line above is the machine-readable field the `pin-check`
@@ -53,12 +53,28 @@ over `src/` + `forum-config/src/` for kit-owned surface names (returns zero) and
 the `pin-check` lockstep. It does not claim `federation-verified`/`released`: the
 edge carries no cross-substrate decision loop of its own to prove end to end.
 
-## What this SHA contains (`main`, relay pacing + Solid PUT fix, `3c9fb83`)
+## What this SHA contains (`main`, BBS mobile-first redesign / ADR-108, `5875beb`)
+
+The retro BBS client (`nostr-bbs-bbs-client`, served at `/community/bbs/`) is
+reimagined mobile-first per ADR-108 — the phosphor skin, ASCII image rendering,
+numbered menu and keyboard model are kept while the modem-era interaction grammar
+is replaced by the main board's patterns (onboarding landing, ≥44 px vertical
+sign-in with extension-free paths, zones-as-cards drill-down, tappable back +
+breadcrumbs, persistent bottom nav, threaded topics, in-composer image upload,
+a11y prefs, encrypted DMs incl. Jarvis 1:1, native passkey sign-in, global
+search, notifications). Config-driven `NODE_NAME`/`TAGLINE` text masthead
+replaces the box-glyph art (operator branding: MINIMOONOIR / "private secure
+forums"). Everything below is also present.
+
+## What earlier SHAs added (`b866108` and before)
 
 Everything in `5b1e2d8` (soak-fix sprint + ADR-107, itself atop the `3df5498`
 gap-close slice: COM-13/F2 disclosure badge, F8/WP-5 Agents roster, F1
 governance surfaces, COM-16/COM-17, REC-6) plus:
 
+- **Admin create-channel panic fix** — the admin channel-creation flow no
+  longer panics on submit (kit-side fix landing atop the relay-pacing/Solid-PUT
+  slice below).
 - **Relay send pacing** — the client paces REQ/EVENT/CLOSE frames under the
   relay's per-IP rate limit (boot burst previously dropped the message REQs,
   rendering "0 messages" site-wide); the relay-worker cap is now the
@@ -83,7 +99,9 @@ All render from the pinned kit at deploy time; this repo adds only branding
 
 | SHA | Branch/context | Notes |
 |---|---|---|
-| `3c9fb83` | `main` (relay pacing + Solid PUT) | Current. Client send pacing under relay rate limit; PUT media uploads. |
+| `5875beb` | `main` (BBS redesign, ADR-108) | Current. Mobile-first BBS reimagining (T1–T3): sign-in, onboarding, zones/threads, DMs, passkey, search, notifications; MINIMOONOIR branding. |
+| `b866108` | `main` (admin create-channel panic fix) | Superseded. Admin channel-creation panic fix atop the relay-pacing/Solid-PUT slice. |
+| `3c9fb83` | `main` (relay pacing + Solid PUT) | Superseded. Client send pacing under relay rate limit; PUT media uploads. |
 | `5b1e2d8` | `main` (soak-fix sprint + ADR-107) | Superseded. 16 soak fixes, zone-first navigation, dev-auth harness. |
 | `3df5498` | `gap-close/2026-07` HEAD + CI fix | Superseded. Removes dev-only `[patch.crates-io]` local path. |
 | `6986276` | `gap-close/2026-07` HEAD | Superseded. COM-13 badge, F8 roster tab, governance surfaces. |
