@@ -22,11 +22,11 @@ its own `pin-check` extension.
 
 | Deployment host | Forum-kit SHA | Kit branch/tag at pin | Consumption tier | Canonical for pin-check |
 |---|---|---|---|---|
-| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `5875beb8f5687a384e58ffb55a8b6946c7d5148a` | `main` (BBS mobile-first redesign, ADR-108) | `integrated` | ✔ |
+| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `98bdf7b0d8a2f1a49751b3bf182dd8331bb81aa5` | `main` (per-zone auto-approval) | `integrated` | ✔ |
 
 <!-- pin-check:canonical-kit-sha -->
 ```
-CANONICAL_KIT_SHA=5875beb8f5687a384e58ffb55a8b6946c7d5148a
+CANONICAL_KIT_SHA=98bdf7b0d8a2f1a49751b3bf182dd8331bb81aa5
 ```
 
 The `CANONICAL_KIT_SHA` line above is the machine-readable field the `pin-check`
@@ -53,7 +53,17 @@ over `src/` + `forum-config/src/` for kit-owned surface names (returns zero) and
 the `pin-check` lockstep. It does not claim `federation-verified`/`released`: the
 edge carries no cross-substrate decision loop of its own to prove end to end.
 
-## What this SHA contains (`main`, BBS mobile-first redesign / ADR-108, `5875beb`)
+## What this SHA contains (`main`, per-zone auto-approval, `98bdf7b`)
+
+Per-zone auto-approval of new joiners: each zone gains an `auto_approve` flag in
+`ZONE_CONFIG`; when set, a brand-new user (first-kind-0 auto-whitelist) is
+additively granted that zone's `required_cohorts`, landing in it without an admin
+approving them. Opt-in per zone (deny-by-default; the historic `["members"]`
+default is preserved for un-flagged deployments). This deployment opts **minimoonoir**
+in (new joiners auto-granted the `friends` cohort); family/business stay
+manual-grant. Everything below is also present.
+
+## What earlier SHAs added (`5875beb` — BBS mobile-first redesign / ADR-108)
 
 The retro BBS client (`nostr-bbs-bbs-client`, served at `/community/bbs/`) is
 reimagined mobile-first per ADR-108 — the phosphor skin, ASCII image rendering,
@@ -99,7 +109,8 @@ All render from the pinned kit at deploy time; this repo adds only branding
 
 | SHA | Branch/context | Notes |
 |---|---|---|
-| `5875beb` | `main` (BBS redesign, ADR-108) | Current. Mobile-first BBS reimagining (T1–T3): sign-in, onboarding, zones/threads, DMs, passkey, search, notifications; MINIMOONOIR branding. |
+| `98bdf7b` | `main` (per-zone auto-approval) | Current. Config-driven `auto_approve` per zone; minimoonoir opted in (new joiners auto-granted `friends`). |
+| `5875beb` | `main` (BBS redesign, ADR-108) | Superseded. Mobile-first BBS reimagining (T1–T3): sign-in, onboarding, zones/threads, DMs, passkey, search, notifications; MINIMOONOIR branding. |
 | `b866108` | `main` (admin create-channel panic fix) | Superseded. Admin channel-creation panic fix atop the relay-pacing/Solid-PUT slice. |
 | `3c9fb83` | `main` (relay pacing + Solid PUT) | Superseded. Client send pacing under relay rate limit; PUT media uploads. |
 | `5b1e2d8` | `main` (soak-fix sprint + ADR-107) | Superseded. 16 soak fixes, zone-first navigation, dev-auth harness. |

@@ -107,6 +107,7 @@ visibility        = "locked"
 banner_image_url  = "/images/heroes/minimoonoir-hero.webp"
 encrypted         = false
 accent_hex        = "#3b82f6"
+auto_approve      = true                 # new joiners auto-granted the "friends" cohort (open zone)
 
 [[zones]]
 id                = "family"
