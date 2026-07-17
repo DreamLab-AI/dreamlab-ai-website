@@ -22,11 +22,11 @@ its own `pin-check` extension.
 
 | Deployment host | Forum-kit SHA | Kit branch/tag at pin | Consumption tier | Canonical for pin-check |
 |---|---|---|---|---|
-| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `98bdf7b0d8a2f1a49751b3bf182dd8331bb81aa5` | `main` (per-zone auto-approval) | `integrated` | ✔ |
+| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `d4165f0a8e17d45a2d051020ed701116c594396d` | `main` (per-zone auto-approval) | `integrated` | ✔ |
 
 <!-- pin-check:canonical-kit-sha -->
 ```
-CANONICAL_KIT_SHA=98bdf7b0d8a2f1a49751b3bf182dd8331bb81aa5
+CANONICAL_KIT_SHA=d4165f0a8e17d45a2d051020ed701116c594396d
 ```
 
 The `CANONICAL_KIT_SHA` line above is the machine-readable field the `pin-check`
@@ -53,15 +53,18 @@ over `src/` + `forum-config/src/` for kit-owned surface names (returns zero) and
 the `pin-check` lockstep. It does not claim `federation-verified`/`released`: the
 edge carries no cross-substrate decision loop of its own to prove end to end.
 
-## What this SHA contains (`main`, per-zone auto-approval, `98bdf7b`)
+## What this SHA contains (`main`, per-zone auto-approval, `d4165f0`)
 
-Per-zone auto-approval of new joiners: each zone gains an `auto_approve` flag in
-`ZONE_CONFIG`; when set, a brand-new user (first-kind-0 auto-whitelist) is
-additively granted that zone's `required_cohorts`, landing in it without an admin
-approving them. Opt-in per zone (deny-by-default; the historic `["members"]`
-default is preserved for un-flagged deployments). This deployment opts **minimoonoir**
-in (new joiners auto-granted the `friends` cohort); family/business stay
-manual-grant. Everything below is also present.
+Per-zone auto-approval of new joiners. Each zone gains an `auto_approve` flag in
+`ZONE_CONFIG`; when set, a new user is additively granted that zone's
+`required_cohorts` at join time, landing in it without an admin approving them.
+Opt-in per zone (deny-by-default; the historic `["members"]` default is preserved
+for un-flagged deployments). Enforced at the **auth-worker username-claim** — the
+path the signup wizard always calls (the relay's kind-0 auto_whitelist is
+unreachable) — so it needs `ZONE_CONFIG` in the auth-worker `[vars]`; the relay
+carries the same model defensively. This deployment opts **minimoonoir** in (new
+joiners auto-granted the `friends` cohort); family/business stay manual-grant.
+Everything below is also present.
 
 ## What earlier SHAs added (`5875beb` — BBS mobile-first redesign / ADR-108)
 
@@ -109,7 +112,8 @@ All render from the pinned kit at deploy time; this repo adds only branding
 
 | SHA | Branch/context | Notes |
 |---|---|---|
-| `98bdf7b` | `main` (per-zone auto-approval) | Current. Config-driven `auto_approve` per zone; minimoonoir opted in (new joiners auto-granted `friends`). |
+| `d4165f0` | `main` (per-zone auto-approval) | Current. Config-driven `auto_approve` per zone at auth-worker username-claim; minimoonoir opted in (new joiners auto-granted `friends`). |
+| `98bdf7b` | `main` (per-zone auto-approval, relay half) | Superseded. Relay-side `auto_approve` (defensive; the functional path is the auth-worker in `d4165f0`). |
 | `5875beb` | `main` (BBS redesign, ADR-108) | Superseded. Mobile-first BBS reimagining (T1–T3): sign-in, onboarding, zones/threads, DMs, passkey, search, notifications; MINIMOONOIR branding. |
 | `b866108` | `main` (admin create-channel panic fix) | Superseded. Admin channel-creation panic fix atop the relay-pacing/Solid-PUT slice. |
 | `3c9fb83` | `main` (relay pacing + Solid PUT) | Superseded. Client send pacing under relay rate limit; PUT media uploads. |

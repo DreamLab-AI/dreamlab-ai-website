@@ -60,6 +60,14 @@ RP_ID                = "dreamlab-ai.com"
 RP_NAME              = "DreamLab Community"
 EXPECTED_ORIGIN      = "https://dreamlab-ai.com"
 
+# Per-zone auto-approval of new joiners (username-claim path, src/zone_approval.rs).
+# A new user is auto-whitelisted with the base `members` cohort PLUS the
+# `required_cohorts` of every zone flagged `"auto_approve":true` here — so an
+# operator opens a zone to new joiners from config. Mirror of the relay's
+# ZONE_CONFIG (keep in sync with relay-worker.wrangler.toml + dreamlab.toml).
+# minimoonoir is opted in (new joiners auto-granted `friends`); others manual.
+ZONE_CONFIG = '[{"id":"public","display_name":"Landing","required_cohorts":[],"write_cohorts":["members","friends","agent"],"banner_image_url":"/images/heroes/lake-district-dawn.webp","visibility":"public","encrypted":false},{"id":"minimoonoir","display_name":"Minimoonoir","required_cohorts":["friends"],"banner_image_url":"/images/heroes/minimoonoir-hero.webp","visibility":"locked","encrypted":false,"auto_approve":true},{"id":"family","display_name":"Family","required_cohorts":["family"],"banner_image_url":"/images/heroes/family-hero.webp","visibility":"locked","encrypted":true},{"id":"business","display_name":"DreamLab","required_cohorts":["business"],"banner_image_url":"/images/heroes/business-hero.webp","visibility":"locked","encrypted":false}]'
+
 # JSS Phase 1 — federated NIP-05 resolution (ADR-086 §9, NRF commit 1fe95fd).
 # auth-worker reads these to drive the resolve(env, name) D1→pod-HTTP fallback
 # under GET /api/username/resolve. Must mirror dreamlab.toml [nip05].
