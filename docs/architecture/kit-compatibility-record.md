@@ -22,11 +22,11 @@ its own `pin-check` extension.
 
 | Deployment host | Forum-kit SHA | Kit branch/tag at pin | Consumption tier | Canonical for pin-check |
 |---|---|---|---|---|
-| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `1699cce38c0942ba04bcaf9694c05c5820d58a64` | `main` (one-deep message replies) | `integrated` | ✔ |
+| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `c9de76112e25e8d85427dd571ab6c5a44bffbec7` | `main` (photo upload 403 fix) | `integrated` | ✔ |
 
 <!-- pin-check:canonical-kit-sha -->
 ```
-CANONICAL_KIT_SHA=1699cce38c0942ba04bcaf9694c05c5820d58a64
+CANONICAL_KIT_SHA=c9de76112e25e8d85427dd571ab6c5a44bffbec7
 ```
 
 The `CANONICAL_KIT_SHA` line above is the machine-readable field the `pin-check`
@@ -53,7 +53,18 @@ over `src/` + `forum-config/src/` for kit-owned surface names (returns zero) and
 the `pin-check` lockstep. It does not claim `federation-verified`/`released`: the
 edge carries no cross-substrate decision loop of its own to prove end to end.
 
-## What this SHA contains (`main`, one-deep message replies, `1699cce`)
+## What this SHA contains (`main`, photo upload 403 fix, `c9de76`)
+
+Photo/avatar uploads no longer 403. The client provisioned pods at a bare
+`POST /.provision` (the pod-worker 404s that; its endpoint is
+`POST /pods/{pubkey}/.provision`), so the pod was never created and the media
+PUT hit the WAC gate on an unprovisioned pod (deny-by-default 403). Fixed the
+provision endpoint at both call sites, and made `upload_to_pod_signer`
+self-healing: on 403/404 it provisions and retries once, so existing users whose
+pod was never provisioned upload without a manual step. Everything below is also
+present.
+
+## What earlier SHAs added (`1699cce` — one-deep message replies)
 
 Message threading is kept exactly one level deep: a channel message that is
 itself a reply no longer offers a Reply affordance (the ThreadView's Reply
@@ -139,7 +150,8 @@ All render from the pinned kit at deploy time; this repo adds only branding
 
 | SHA | Branch/context | Notes |
 |---|---|---|
-| `1699cce` | `main` (one-deep message replies) | Current. Reply button hidden on messages that are themselves replies (channel threading stays one level). |
+| `c9de76` | `main` (photo upload 403 fix) | Current. Provision at /pods/{pubkey}/.provision + upload self-heals on 403/404. |
+| `1699cce` | `main` (one-deep message replies) | Superseded. Reply button hidden on messages that are themselves replies (channel threading stays one level). |
 | `ee6ffb9` | `main` (new-joiner signup fixes + BBS SW) | Superseded. kind-0 retry + zone-access refresh after claim (name + zone landing); SW leaves /bbs/ to the network (fixes BBS 404). |
 | `cfad1ad` | `main` (forum→BBS switch sash) | Superseded. Glitchy amber "enter the retro BBS" sash under the forums-index AND zone heroes. |
 | `959c30d` | `main` (switch sash, index only) | Superseded. Sash on the /forums index only (missed by single-zone users). |
