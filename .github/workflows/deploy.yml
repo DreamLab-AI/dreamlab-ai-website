@@ -77,8 +77,9 @@ env:
   # BBS branding — projection of forum-config/dreamlab.toml [branding] for the
   # retro ASCII/BBS client (nostr-bbs-bbs-client, served at /community/bbs/).
   # The BBS reads THEME/NODE_NAME/TAGLINE/LOCATION/BANNER_URL/LOGO_URL +
-  # RELAY_URL/POD_API (note: not the forum's VITE_* names) + ZONE_CONFIG from
-  # window.__ENV__.
+  # RELAY_URL/POD_API/PREVIEW_API/SEARCH_API (note: un-prefixed, NOT the forum's
+  # VITE_* names) + JARVIS_PUBKEY (F8 DM "Message Jarvis" quick-start) +
+  # ZONE_CONFIG from window.__ENV__.
   BBS_THEME: 'amber'
   BBS_NODE_NAME: 'MINIMOONOIR'
   BBS_TAGLINE: 'private secure forums'
@@ -297,7 +298,7 @@ jobs:
           # names) plus THEME/NODE_NAME/LOCATION/BANNER_URL/LOGO_URL/ZONE_CONFIG —
           # the forum-config/dreamlab.toml [branding] projection. PREVIEW_API is
           # the preview-worker base for the BBS ASCII image endpoint (/ascii).
-          BBS_ENV='<script>window.__ENV__={THEME:"'"$BBS_THEME"'",NODE_NAME:"'"$BBS_NODE_NAME"'",TAGLINE:"'"$BBS_TAGLINE"'",LOCATION:"'"$BBS_LOCATION"'",BANNER_URL:"'"$BBS_BANNER_URL"'",LOGO_URL:"'"$BBS_LOGO_URL"'",FORUM_NAME:"Minimoonoir Forums",RELAY_URL:"'"$VITE_RELAY_URL"'",POD_API:"'"$VITE_POD_API_URL"'",PREVIEW_API:"'"$VITE_LINK_PREVIEW_API_URL"'",VITE_AUTH_API_URL:"'"$VITE_AUTH_API_URL"'",VITE_SEARCH_API_URL:"'"$VITE_SEARCH_API_URL"'",VITE_LINK_PREVIEW_API_URL:"'"$VITE_LINK_PREVIEW_API_URL"'",BUILD_VERSION:"'"$BUILD_VERSION"'",BUILD_HASH:"'"$BUILD_HASH"'",ZONE_CONFIG:'"$ZONE_CONFIG_JSON"'};</script>'
+          BBS_ENV='<script>window.__ENV__={THEME:"'"$BBS_THEME"'",NODE_NAME:"'"$BBS_NODE_NAME"'",TAGLINE:"'"$BBS_TAGLINE"'",LOCATION:"'"$BBS_LOCATION"'",BANNER_URL:"'"$BBS_BANNER_URL"'",LOGO_URL:"'"$BBS_LOGO_URL"'",FORUM_NAME:"Minimoonoir Forums",RELAY_URL:"'"$VITE_RELAY_URL"'",POD_API:"'"$VITE_POD_API_URL"'",PREVIEW_API:"'"$VITE_LINK_PREVIEW_API_URL"'",SEARCH_API:"'"$VITE_SEARCH_API_URL"'",JARVIS_PUBKEY:"'"$VITE_JARVIS_PUBKEY"'",VITE_AUTH_API_URL:"'"$VITE_AUTH_API_URL"'",VITE_SEARCH_API_URL:"'"$VITE_SEARCH_API_URL"'",VITE_LINK_PREVIEW_API_URL:"'"$VITE_LINK_PREVIEW_API_URL"'",BUILD_VERSION:"'"$BUILD_VERSION"'",BUILD_HASH:"'"$BUILD_HASH"'",ZONE_CONFIG:'"$ZONE_CONFIG_JSON"'};</script>'
           sed -i "s|</head>|${BBS_ENV}</head>|" dist/community/bbs/index.html
           # The BBS is a single-screen terminal (no URL sub-routes); a hard load of
           # /community/bbs/ serves this file directly. Provide a 404 fallback too.
