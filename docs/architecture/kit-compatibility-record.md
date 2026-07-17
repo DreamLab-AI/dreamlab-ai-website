@@ -22,11 +22,11 @@ its own `pin-check` extension.
 
 | Deployment host | Forum-kit SHA | Kit branch/tag at pin | Consumption tier | Canonical for pin-check |
 |---|---|---|---|---|
-| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `cfad1ad9d556393e7692ba2827b3353ea3217b1e` | `main` (forum→BBS switch sash) | `integrated` | ✔ |
+| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `ee6ffb945e846495f28d9331a859b58bfcb1bd3c` | `main` (new-joiner signup fixes + BBS SW) | `integrated` | ✔ |
 
 <!-- pin-check:canonical-kit-sha -->
 ```
-CANONICAL_KIT_SHA=cfad1ad9d556393e7692ba2827b3353ea3217b1e
+CANONICAL_KIT_SHA=ee6ffb945e846495f28d9331a859b58bfcb1bd3c
 ```
 
 The `CANONICAL_KIT_SHA` line above is the machine-readable field the `pin-check`
@@ -53,12 +53,24 @@ over `src/` + `forum-config/src/` for kit-owned surface names (returns zero) and
 the `pin-check` lockstep. It does not claim `federation-verified`/`released`: the
 edge carries no cross-substrate decision loop of its own to prove end to end.
 
-## What this SHA contains (`main`, forum→BBS switch sash, `cfad1ad`)
+## What this SHA contains (`main`, new-joiner signup fixes + BBS SW, `ee6ffb9`)
+
+Fixes an intermittent new-joiner signup race: the client publishes its kind-0
+profile the instant it authenticates, but the whitelist row is created a beat
+later by the auth-worker username-claim, so the relay rejected the kind-0 (author
+not yet whitelisted) and the display name was lost, and the zone-access fetch
+raced the claim so the zone-first landing never fired. Now the kind-0 publish
+retries on rejection until the claim lands, and signup refreshes zone-access after
+a successful claim (`ZoneAccess::refresh()`) so the joiner is landed in their
+auto-approved zone with their name. Also: the forum service worker no longer
+intercepts `<base>/bbs/` navigations (it was caching the BBS index as the forum
+shell → BBS 404 / offline-shell poisoning); the retro-BBS sash now loads reliably.
+Everything below is also present.
+
+## What earlier SHAs added (`cfad1ad` — forum→BBS switch sash)
 
 A thin, glitchy amber terminal sash under the forum hero switches the reader into
-the retro ASCII BBS (`bbs_enabled()`-gated, default on; a plain full-navigation
-link to `<base>/bbs/`). Rendered under BOTH the `/forums` index hero and the zone
-landing hero, so single-locked-zone members (zone-first nav, ADR-107) meet it too.
+the retro ASCII BBS, under BOTH the `/forums` index hero and the zone landing hero.
 Everything below is also present.
 
 ## What earlier SHAs added (`d4165f0` — per-zone auto-approval)
@@ -120,7 +132,8 @@ All render from the pinned kit at deploy time; this repo adds only branding
 
 | SHA | Branch/context | Notes |
 |---|---|---|
-| `cfad1ad` | `main` (forum→BBS switch sash) | Current. Glitchy amber "enter the retro BBS" sash under the forums-index AND zone heroes. |
+| `ee6ffb9` | `main` (new-joiner signup fixes + BBS SW) | Current. kind-0 retry + zone-access refresh after claim (name + zone landing); SW leaves /bbs/ to the network (fixes BBS 404). |
+| `cfad1ad` | `main` (forum→BBS switch sash) | Superseded. Glitchy amber "enter the retro BBS" sash under the forums-index AND zone heroes. |
 | `959c30d` | `main` (switch sash, index only) | Superseded. Sash on the /forums index only (missed by single-zone users). |
 | `d4165f0` | `main` (per-zone auto-approval) | Superseded. Config-driven `auto_approve` per zone at auth-worker username-claim; minimoonoir opted in (new joiners auto-granted `friends`). |
 | `98bdf7b` | `main` (per-zone auto-approval, relay half) | Superseded. Relay-side `auto_approve` (defensive; the functional path is the auth-worker in `d4165f0`). |
