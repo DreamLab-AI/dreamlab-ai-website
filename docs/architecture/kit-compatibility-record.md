@@ -22,11 +22,11 @@ its own `pin-check` extension.
 
 | Deployment host | Forum-kit SHA | Kit branch/tag at pin | Consumption tier | Canonical for pin-check |
 |---|---|---|---|---|
-| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `502b3d34e3462e4922f973111110e98b8da4b7c4` | `main` (zone slugs + accent sweep, issues #43/#45) | `integrated` | ✔ |
+| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `599ee221e927105a660029fa15ace5442e530685` | `main` (media-embed first-view fix) | `integrated` | ✔ |
 
 <!-- pin-check:canonical-kit-sha -->
 ```
-CANONICAL_KIT_SHA=502b3d34e3462e4922f973111110e98b8da4b7c4
+CANONICAL_KIT_SHA=599ee221e927105a660029fa15ace5442e530685
 ```
 
 The `CANONICAL_KIT_SHA` line above is the machine-readable field the `pin-check`
@@ -53,7 +53,7 @@ over `src/` + `forum-config/src/` for kit-owned surface names (returns zero) and
 the `pin-check` lockstep. It does not claim `federation-verified`/`released`: the
 edge carries no cross-substrate decision loop of its own to prove end to end.
 
-## What this SHA contains (`main`, zone slugs + accent sweep on 1.0.0-beta.5, `502b3d3`)
+## What this SHA contains (`main`, media-embed first-view fix on 1.0.0-beta.5, `599ee22`)
 
 Workspace release housekeeping atop the PWA feature: every kit crate changed
 since its last version stamp moves to `1.0.0-beta.5` (ascii, auth-worker,
