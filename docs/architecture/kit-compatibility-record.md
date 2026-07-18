@@ -22,11 +22,11 @@ its own `pin-check` extension.
 
 | Deployment host | Forum-kit SHA | Kit branch/tag at pin | Consumption tier | Canonical for pin-check |
 |---|---|---|---|---|
-| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `6668404bf64e45364d38db42a6fea639eeae21b7` | `main` (avatar/media/BBS-sash fixes) | `integrated` | ✔ |
+| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `03d751563b39d3515b44f98231f579fce39b29d0` | `main` (BBS author nyms) | `integrated` | ✔ |
 
 <!-- pin-check:canonical-kit-sha -->
 ```
-CANONICAL_KIT_SHA=6668404bf64e45364d38db42a6fea639eeae21b7
+CANONICAL_KIT_SHA=03d751563b39d3515b44f98231f579fce39b29d0
 ```
 
 The `CANONICAL_KIT_SHA` line above is the machine-readable field the `pin-check`
@@ -53,7 +53,20 @@ over `src/` + `forum-config/src/` for kit-owned surface names (returns zero) and
 the `pin-check` lockstep. It does not claim `federation-verified`/`released`: the
 edge carries no cross-substrate decision loop of its own to prove end to end.
 
-## What this SHA contains (`main`, avatar/media/BBS-sash fixes, `6668404`)
+## What this SHA contains (`main`, BBS author nyms, `03d7515`)
+
+The retro BBS rendered message authors as raw truncated pubkeys (`<11ed…663c>`)
+even though its store already loads the same kind-0 profiles the main board
+resolves names from. Added `author_label(profiles, pubkey)` (display_name → name
+→ short-id) and wired it into every author surface: board thread messages, the
+chat lobby, the topic list, the code-snippets view, and DM rows (Jarvis-aware).
+Resolving inside the reactive closures means a row shows the short id first, then
+re-renders to the nym the moment that author's kind-0 arrives. (Posted-image
+ASCII rendering was already fixed by the media content-type change below —
+`AsciiImg` fetches `?format=ascii`; it only degraded to "[ image unavailable ]"
+because octet-stream skipped the transform.) Everything below is also present.
+
+## What earlier SHAs added (`6668404` — avatar/media/BBS-sash fixes)
 
 Three production fixes:
 
@@ -174,7 +187,8 @@ All render from the pinned kit at deploy time; this repo adds only branding
 
 | SHA | Branch/context | Notes |
 |---|---|---|
-| `6668404` | `main` (avatar/media/BBS-sash fixes) | Current. kind-0 republish merges (avatar preserved); media served with real MIME (renders + ASCII); BBS sash full-navigates (no 404-on-click). |
+| `03d7515` | `main` (BBS author nyms) | Current. BBS resolves message-author display names from kind-0 (board threads, chat, topic list, snippets, DM rows) instead of raw pubkeys. |
+| `6668404` | `main` (avatar/media/BBS-sash fixes) | Superseded. kind-0 republish merges (avatar preserved); media served with real MIME (renders + ASCII); BBS sash full-navigates (no 404-on-click). |
 | `c9de76` | `main` (photo upload 403 fix) | Superseded. Provision at /pods/{pubkey}/.provision + upload self-heals on 403/404. |
 | `1699cce` | `main` (one-deep message replies) | Superseded. Reply button hidden on messages that are themselves replies (channel threading stays one level). |
 | `ee6ffb9` | `main` (new-joiner signup fixes + BBS SW) | Superseded. kind-0 retry + zone-access refresh after claim (name + zone landing); SW leaves /bbs/ to the network (fixes BBS 404). |
