@@ -22,11 +22,11 @@ its own `pin-check` extension.
 
 | Deployment host | Forum-kit SHA | Kit branch/tag at pin | Consumption tier | Canonical for pin-check |
 |---|---|---|---|---|
-| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `b169dd8ef7df752b2c23afa5539a0d58235a6123` | `main` (quote-and-append topic replies) | `integrated` | ✔ |
+| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `8cea7fdea2c2588c8927094ac9283dcf47c0b8bd` | `main` (quote-and-append topic replies) | `integrated` | ✔ |
 
 <!-- pin-check:canonical-kit-sha -->
 ```
-CANONICAL_KIT_SHA=b169dd8ef7df752b2c23afa5539a0d58235a6123
+CANONICAL_KIT_SHA=8cea7fdea2c2588c8927094ac9283dcf47c0b8bd
 ```
 
 The `CANONICAL_KIT_SHA` line above is the machine-readable field the `pin-check`
@@ -53,7 +53,7 @@ over `src/` + `forum-config/src/` for kit-owned surface names (returns zero) and
 the `pin-check` lockstep. It does not claim `federation-verified`/`released`: the
 edge carries no cross-substrate decision loop of its own to prove end to end.
 
-## What this SHA contains (`main`, quote-and-append topic replies, `b169dd8`)
+## What this SHA contains (`main`, quote-and-append topic replies, `8cea7fd`)
 
 Main-forum topic replies move to a flat quote-and-append model. A topic is a
 linear conversation, but you could previously only reply to the whole topic (one
@@ -61,11 +61,13 @@ bottom composer, no way to answer a specific message). Now every post — the to
 root and each reply — carries a "↩ Reply" button that quotes THAT message and
 focuses the single bottom composer; the reply still appends at the bottom
 (chronological, never nested). The card shows a compact inline quote of what it
-answers (author + snippet, resolved from the NIP-10 `reply` marker), so context
-is visible without indentation, and the quoted author is p-tagged (notified)
-alongside the topic starter. This is the Discourse-style linear model and it
-retires the nesting-depth question for topics; existing kind-1111 replies still
-render. Everything below is also present.
+answers (author + snippet), so context is visible without indentation, and the
+quoted author is p-tagged (notified) alongside the topic starter. Threading is
+kept correct by structure: the NIP-10 `reply` marker always points at the topic
+root (so the topic list folds the reply and the reply list matches it), while the
+quoted sibling is referenced with a separate `quote` marker the card renders
+inline — a quote-reply never orphans out of its topic. Discourse-style linear
+model; existing kind-1111 replies still render. Everything below is also present.
 
 ## What earlier SHAs added (`03d7515` — BBS author nyms)
 
@@ -201,7 +203,7 @@ All render from the pinned kit at deploy time; this repo adds only branding
 
 | SHA | Branch/context | Notes |
 |---|---|---|
-| `b169dd8` | `main` (quote-and-append topic replies) | Current. Main-forum topic replies get a per-post "Reply" that quotes the message and appends at the bottom (flat, inline quote, notifies the quoted author); retires nested/root-only replying for topics. |
+| `8cea7fd` | `main` (quote-and-append topic replies) | Current. Fixes the reply threading so a quote-reply stays in its topic (reply marker → root, quote marker → sibling). Main-forum topic replies get a per-post "Reply" that quotes the message and appends at the bottom (flat, inline quote, notifies the quoted author); retires nested/root-only replying for topics. |
 | `03d7515` | `main` (BBS author nyms) | Superseded. BBS resolves message-author display names from kind-0 (board threads, chat, topic list, snippets, DM rows) instead of raw pubkeys. |
 | `6668404` | `main` (avatar/media/BBS-sash fixes) | Superseded. kind-0 republish merges (avatar preserved); media served with real MIME (renders + ASCII); BBS sash full-navigates (no 404-on-click). |
 | `c9de76` | `main` (photo upload 403 fix) | Superseded. Provision at /pods/{pubkey}/.provision + upload self-heals on 403/404. |
