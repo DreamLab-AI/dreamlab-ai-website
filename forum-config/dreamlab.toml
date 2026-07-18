@@ -91,6 +91,7 @@ a private space for trainers, builders, and the curious.\
 # agent (+ admin via [admin].static_pubkeys). visibility: public|locked|hidden.
 [[zones]]
 id                = "public"
+slug              = "welcome"          # URL segment (id is welded to channels; slug is the address)
 display_name      = "Welcome"
 required_cohorts  = []
 write_cohorts     = ["members", "friends", "agent"]
@@ -119,6 +120,7 @@ accent_hex        = "#f59e0b"
 
 [[zones]]
 id                = "business"
+slug              = "dreamlab"        # URL segment (id is welded to channels; slug is the address)
 display_name      = "DreamLab"
 required_cohorts  = ["business"]
 visibility        = "locked"

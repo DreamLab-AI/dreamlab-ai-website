@@ -72,7 +72,7 @@ env:
   VITE_REPLY_RELAYS: 'wss://relay.damus.io,wss://relay.primal.net'
   # Zone (section) model for the forum client. Mirrors forum-config/dreamlab.toml
   # [[zones]] and the relay's ZONE_CONFIG [vars]. Injected into window.__ENV__ below.
-  ZONE_CONFIG_JSON: '[{"id":"public","accent_hex":"#22c55e","display_name":"Welcome","required_cohorts":[],"write_cohorts":["members","friends","agent"],"banner_image_url":"/images/heroes/lake-district-dawn.webp","visibility":"public","encrypted":false},{"id":"minimoonoir","accent_hex":"#3b82f6","display_name":"Minimoonoir","required_cohorts":["friends"],"banner_image_url":"/images/heroes/minimoonoir-hero.webp","visibility":"locked","encrypted":false},{"id":"family","accent_hex":"#f59e0b","display_name":"Family","required_cohorts":["family"],"banner_image_url":"/images/heroes/family-hero.webp","visibility":"locked","encrypted":true},{"id":"business","accent_hex":"#a855f7","display_name":"DreamLab","required_cohorts":["business"],"banner_image_url":"/images/heroes/business-hero.webp","visibility":"locked","encrypted":false}]'
+  ZONE_CONFIG_JSON: '[{"id":"public","slug":"welcome","accent_hex":"#22c55e","display_name":"Welcome","required_cohorts":[],"write_cohorts":["members","friends","agent"],"banner_image_url":"/images/heroes/lake-district-dawn.webp","visibility":"public","encrypted":false},{"id":"minimoonoir","accent_hex":"#3b82f6","display_name":"Minimoonoir","required_cohorts":["friends"],"banner_image_url":"/images/heroes/minimoonoir-hero.webp","visibility":"locked","encrypted":false},{"id":"family","accent_hex":"#f59e0b","display_name":"Family","required_cohorts":["family"],"banner_image_url":"/images/heroes/family-hero.webp","visibility":"locked","encrypted":true},{"id":"business","slug":"dreamlab","accent_hex":"#a855f7","display_name":"DreamLab","required_cohorts":["business"],"banner_image_url":"/images/heroes/business-hero.webp","visibility":"locked","encrypted":false}]'
   FORUM_BASE: '/community'
   # BBS branding — projection of forum-config/dreamlab.toml [branding] for the
   # retro ASCII/BBS client (nostr-bbs-bbs-client, served at /community/bbs/).
@@ -95,7 +95,7 @@ env:
   # badge + /api/agents/disclosure, F8 admin Agents roster tab, F1 member view,
   # COM-16/COM-17 decision integrity + graduated escalation). Cutover provenance
   # is in docs/architecture/kit-compatibility-record.md.
-  KIT_REF: '59a08c9160d443c67c97cee8546067f98e47b593'
+  KIT_REF: '502b3d34e3462e4922f973111110e98b8da4b7c4'
 
 jobs:
   gate:
