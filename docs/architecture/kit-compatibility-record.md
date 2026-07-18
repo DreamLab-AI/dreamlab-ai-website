@@ -22,11 +22,11 @@ its own `pin-check` extension.
 
 | Deployment host | Forum-kit SHA | Kit branch/tag at pin | Consumption tier | Canonical for pin-check |
 |---|---|---|---|---|
-| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `020b279a618e6890d19191a22a14966b5ed10455` | `main` (hide media URLs) | `integrated` | ✔ |
+| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `0c1dc579574db240ac4336a1e908a01342d03af6` | `main` (zone-bound BBS PWA, ADR-109) | `integrated` | ✔ |
 
 <!-- pin-check:canonical-kit-sha -->
 ```
-CANONICAL_KIT_SHA=020b279a618e6890d19191a22a14966b5ed10455
+CANONICAL_KIT_SHA=0c1dc579574db240ac4336a1e908a01342d03af6
 ```
 
 The `CANONICAL_KIT_SHA` line above is the machine-readable field the `pin-check`
@@ -53,7 +53,28 @@ over `src/` + `forum-config/src/` for kit-owned surface names (returns zero) and
 the `pin-check` lockstep. It does not claim `federation-verified`/`released`: the
 edge carries no cross-substrate decision loop of its own to prove end to end.
 
-## What this SHA contains (`main`, hide media URLs, `020b279`)
+## What this SHA contains (`main`, zone-bound BBS PWA, `0c1dc57`)
+
+ADR-109: a single-locked-zone member can install their zone as a mobile app.
+A gated "Install mobile app" Settings section (shown only when
+`BBS_PWA_ENABLED` is on AND the ADR-107 `home_zone_for` predicate resolves to
+exactly one locked zone AND the session holds a readable local key) takes
+explicit consent with a plain-spoken lost-phone warning, bakes the key
+on-device (non-extractable AES-256-GCM wrap in IndexedDB + a BootProfile), and
+hands off to the BBS, which now ships a manifest (id==scope==`/community/bbs/`,
+`?pwa=1` start_url) + maskable icons + a minimal network-first service worker
+(navigations always bypass HTTP cache and are never cache-written — the
+historic stale-shell class is structurally impossible). Every launch of the
+installed app boots one-shot: baked key adopted, landing pinned to the bound
+zone, other zones hidden (relay cohorts remain the boundary). iOS home-screen
+storage isolation is handled by a one-time first-launch Rebind (passkey PRF
+else paste-once) followed by a local re-bake. Feature default OFF in the kit;
+this deployment enables it and brands the manifest at deploy time. Design trio
+shipped in-kit: `docs/prd/prd-zone-bound-bbs-pwa.md`,
+`docs/adr/ADR-109-zone-bound-bbs-pwa-install.md`,
+`docs/ddd/ddd-zone-bound-bbs-pwa.md`. Everything below is also present.
+
+## What earlier SHAs added (`020b279` — hide media URLs)
 
 Posting an image no longer shows the raw Solid pod URL as text. A posted image
 previously rendered the bare URL as a line of text AND the embedded image;
@@ -214,7 +235,8 @@ All render from the pinned kit at deploy time; this repo adds only branding
 
 | SHA | Branch/context | Notes |
 |---|---|---|
-| `020b279` | `main` (hide media URLs) | Current. Posted images no longer print the raw Solid pod URL as text — the embed carries a hover "open full" expand icon instead (topic view + chat bubble). |
+| `0c1dc57` | `main` (zone-bound BBS PWA, ADR-109) | Current. Install-your-zone-as-an-app: gated Settings bake (consent + warning), BBS manifest/SW/icons, one-shot zone-pinned boot, iOS rebind. |
+| `020b279` | `main` (hide media URLs) | Superseded. Posted images no longer print the raw Solid pod URL as text — the embed carries a hover "open full" expand icon instead (topic view + chat bubble). |
 | `8cea7fd` | `main` (quote-and-append topic replies) | Superseded. Fixes the reply threading so a quote-reply stays in its topic (reply marker → root, quote marker → sibling). Main-forum topic replies get a per-post "Reply" that quotes the message and appends at the bottom (flat, inline quote, notifies the quoted author); retires nested/root-only replying for topics. |
 | `03d7515` | `main` (BBS author nyms) | Superseded. BBS resolves message-author display names from kind-0 (board threads, chat, topic list, snippets, DM rows) instead of raw pubkeys. |
 | `6668404` | `main` (avatar/media/BBS-sash fixes) | Superseded. kind-0 republish merges (avatar preserved); media served with real MIME (renders + ASCII); BBS sash full-navigates (no 404-on-click). |

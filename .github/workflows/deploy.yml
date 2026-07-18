@@ -95,7 +95,7 @@ env:
   # badge + /api/agents/disclosure, F8 admin Agents roster tab, F1 member view,
   # COM-16/COM-17 decision integrity + graduated escalation). Cutover provenance
   # is in docs/architecture/kit-compatibility-record.md.
-  KIT_REF: '020b279a618e6890d19191a22a14966b5ed10455'
+  KIT_REF: '0c1dc579574db240ac4336a1e908a01342d03af6'
 
 jobs:
   gate:
@@ -245,7 +245,7 @@ jobs:
           # operator can tell whether a deployed build contains a given fix.
           BUILD_HASH="${GITHUB_SHA:0:7}"
           BUILD_VERSION="$(date -u +%Y.%m.%d)"
-          ENV_SCRIPT='<script>window.__ENV__={FORUM_NAME:"Minimoonoir Forums",VITE_RELAY_URL:"'"$VITE_RELAY_URL"'",VITE_AUTH_API_URL:"'"$VITE_AUTH_API_URL"'",VITE_POD_API_URL:"'"$VITE_POD_API_URL"'",VITE_SEARCH_API_URL:"'"$VITE_SEARCH_API_URL"'",VITE_LINK_PREVIEW_API_URL:"'"$VITE_LINK_PREVIEW_API_URL"'",BUILD_VERSION:"'"$BUILD_VERSION"'",BUILD_HASH:"'"$BUILD_HASH"'",ZONE_CONFIG:'"$ZONE_CONFIG_JSON"'};</script>'
+          ENV_SCRIPT='<script>window.__ENV__={BBS_PWA_ENABLED:"true",FORUM_NAME:"Minimoonoir Forums",VITE_RELAY_URL:"'"$VITE_RELAY_URL"'",VITE_AUTH_API_URL:"'"$VITE_AUTH_API_URL"'",VITE_POD_API_URL:"'"$VITE_POD_API_URL"'",VITE_SEARCH_API_URL:"'"$VITE_SEARCH_API_URL"'",VITE_LINK_PREVIEW_API_URL:"'"$VITE_LINK_PREVIEW_API_URL"'",BUILD_VERSION:"'"$BUILD_VERSION"'",BUILD_HASH:"'"$BUILD_HASH"'",ZONE_CONFIG:'"$ZONE_CONFIG_JSON"'};</script>'
           sed -i "s|</head>|${ENV_SCRIPT}</head>|" dist/community/index.html
           echo "Injected window.__ENV__ into forum index.html (build $BUILD_VERSION $BUILD_HASH)"
           # SPA deep-link pickup for the forum. A hard load of /community/login
@@ -294,11 +294,21 @@ jobs:
           BUILD_VERSION="$(date -u +%Y.%m.%d)"
           mkdir -p dist/community/bbs
           cp -r kit/dist/community/bbs/* dist/community/bbs/
+          # PWA (ADR-109): stamp the SW cache token per deploy (mirrors the forum
+          # sw.js stamping) and brand the operator-generic kit manifest + iOS
+          # title with this deployment's node name.
+          if [ -f dist/community/bbs/bbs-sw.js ]; then
+            sed -i "s/__SW_BUILD__/${BUILD_HASH}/" dist/community/bbs/bbs-sw.js
+          fi
+          if [ -f dist/community/bbs/manifest.webmanifest ]; then
+            sed -i "s/\"name\": \"BBS\"/\"name\": \"${BBS_NODE_NAME}\"/; s/\"short_name\": \"BBS\"/\"short_name\": \"${BBS_NODE_NAME}\"/" dist/community/bbs/manifest.webmanifest
+          fi
+          sed -i "s|\(apple-mobile-web-app-title\" content=\"\)BBS|\1${BBS_NODE_NAME}|" dist/community/bbs/index.html || true
           # The BBS reads RELAY_URL/POD_API/PREVIEW_API (not the forum's VITE_*
           # names) plus THEME/NODE_NAME/LOCATION/BANNER_URL/LOGO_URL/ZONE_CONFIG —
           # the forum-config/dreamlab.toml [branding] projection. PREVIEW_API is
           # the preview-worker base for the BBS ASCII image endpoint (/ascii).
-          BBS_ENV='<script>window.__ENV__={THEME:"'"$BBS_THEME"'",NODE_NAME:"'"$BBS_NODE_NAME"'",TAGLINE:"'"$BBS_TAGLINE"'",LOCATION:"'"$BBS_LOCATION"'",BANNER_URL:"'"$BBS_BANNER_URL"'",LOGO_URL:"'"$BBS_LOGO_URL"'",FORUM_NAME:"Minimoonoir Forums",RELAY_URL:"'"$VITE_RELAY_URL"'",POD_API:"'"$VITE_POD_API_URL"'",PREVIEW_API:"'"$VITE_LINK_PREVIEW_API_URL"'",SEARCH_API:"'"$VITE_SEARCH_API_URL"'",JARVIS_PUBKEY:"'"$VITE_JARVIS_PUBKEY"'",VITE_AUTH_API_URL:"'"$VITE_AUTH_API_URL"'",VITE_SEARCH_API_URL:"'"$VITE_SEARCH_API_URL"'",VITE_LINK_PREVIEW_API_URL:"'"$VITE_LINK_PREVIEW_API_URL"'",BUILD_VERSION:"'"$BUILD_VERSION"'",BUILD_HASH:"'"$BUILD_HASH"'",ZONE_CONFIG:'"$ZONE_CONFIG_JSON"'};</script>'
+          BBS_ENV='<script>window.__ENV__={BBS_PWA_ENABLED:"true",THEME:"'"$BBS_THEME"'",NODE_NAME:"'"$BBS_NODE_NAME"'",TAGLINE:"'"$BBS_TAGLINE"'",LOCATION:"'"$BBS_LOCATION"'",BANNER_URL:"'"$BBS_BANNER_URL"'",LOGO_URL:"'"$BBS_LOGO_URL"'",FORUM_NAME:"Minimoonoir Forums",RELAY_URL:"'"$VITE_RELAY_URL"'",POD_API:"'"$VITE_POD_API_URL"'",PREVIEW_API:"'"$VITE_LINK_PREVIEW_API_URL"'",SEARCH_API:"'"$VITE_SEARCH_API_URL"'",JARVIS_PUBKEY:"'"$VITE_JARVIS_PUBKEY"'",VITE_AUTH_API_URL:"'"$VITE_AUTH_API_URL"'",VITE_SEARCH_API_URL:"'"$VITE_SEARCH_API_URL"'",VITE_LINK_PREVIEW_API_URL:"'"$VITE_LINK_PREVIEW_API_URL"'",BUILD_VERSION:"'"$BUILD_VERSION"'",BUILD_HASH:"'"$BUILD_HASH"'",ZONE_CONFIG:'"$ZONE_CONFIG_JSON"'};</script>'
           sed -i "s|</head>|${BBS_ENV}</head>|" dist/community/bbs/index.html
           # The BBS is a single-screen terminal (no URL sub-routes); a hard load of
           # /community/bbs/ serves this file directly. Provide a 404 fallback too.
