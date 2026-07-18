@@ -22,11 +22,11 @@ its own `pin-check` extension.
 
 | Deployment host | Forum-kit SHA | Kit branch/tag at pin | Consumption tier | Canonical for pin-check |
 |---|---|---|---|---|
-| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `8cea7fdea2c2588c8927094ac9283dcf47c0b8bd` | `main` (quote-and-append topic replies) | `integrated` | ✔ |
+| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `020b279a618e6890d19191a22a14966b5ed10455` | `main` (hide media URLs) | `integrated` | ✔ |
 
 <!-- pin-check:canonical-kit-sha -->
 ```
-CANONICAL_KIT_SHA=8cea7fdea2c2588c8927094ac9283dcf47c0b8bd
+CANONICAL_KIT_SHA=020b279a618e6890d19191a22a14966b5ed10455
 ```
 
 The `CANONICAL_KIT_SHA` line above is the machine-readable field the `pin-check`
@@ -53,7 +53,18 @@ over `src/` + `forum-config/src/` for kit-owned surface names (returns zero) and
 the `pin-check` lockstep. It does not claim `federation-verified`/`released`: the
 edge carries no cross-substrate decision loop of its own to prove end to end.
 
-## What this SHA contains (`main`, quote-and-append topic replies, `8cea7fd`)
+## What this SHA contains (`main`, hide media URLs, `020b279`)
+
+Posting an image no longer shows the raw Solid pod URL as text. A posted image
+previously rendered the bare URL as a line of text AND the embedded image;
+`strip_media_urls()` now removes any embedded-media URL from the visible body (in
+both the topic view and the chat bubble), so an image-only post is just the
+image and a caption+image post drops the URL. The embed still opens full on
+click and now also shows a small "open full" expand icon in its corner, hidden
+by default and revealed on hover — the source stays one tap away without ever
+printing the URL. Non-media links are untouched. Everything below is also present.
+
+## What earlier SHAs added (`8cea7fd` — quote-and-append topic replies)
 
 Main-forum topic replies move to a flat quote-and-append model. A topic is a
 linear conversation, but you could previously only reply to the whole topic (one
@@ -203,7 +214,8 @@ All render from the pinned kit at deploy time; this repo adds only branding
 
 | SHA | Branch/context | Notes |
 |---|---|---|
-| `8cea7fd` | `main` (quote-and-append topic replies) | Current. Fixes the reply threading so a quote-reply stays in its topic (reply marker → root, quote marker → sibling). Main-forum topic replies get a per-post "Reply" that quotes the message and appends at the bottom (flat, inline quote, notifies the quoted author); retires nested/root-only replying for topics. |
+| `020b279` | `main` (hide media URLs) | Current. Posted images no longer print the raw Solid pod URL as text — the embed carries a hover "open full" expand icon instead (topic view + chat bubble). |
+| `8cea7fd` | `main` (quote-and-append topic replies) | Superseded. Fixes the reply threading so a quote-reply stays in its topic (reply marker → root, quote marker → sibling). Main-forum topic replies get a per-post "Reply" that quotes the message and appends at the bottom (flat, inline quote, notifies the quoted author); retires nested/root-only replying for topics. |
 | `03d7515` | `main` (BBS author nyms) | Superseded. BBS resolves message-author display names from kind-0 (board threads, chat, topic list, snippets, DM rows) instead of raw pubkeys. |
 | `6668404` | `main` (avatar/media/BBS-sash fixes) | Superseded. kind-0 republish merges (avatar preserved); media served with real MIME (renders + ASCII); BBS sash full-navigates (no 404-on-click). |
 | `c9de76` | `main` (photo upload 403 fix) | Superseded. Provision at /pods/{pubkey}/.provision + upload self-heals on 403/404. |
