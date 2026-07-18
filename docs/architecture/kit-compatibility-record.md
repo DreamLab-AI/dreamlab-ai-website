@@ -22,11 +22,11 @@ its own `pin-check` extension.
 
 | Deployment host | Forum-kit SHA | Kit branch/tag at pin | Consumption tier | Canonical for pin-check |
 |---|---|---|---|---|
-| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `0c1dc579574db240ac4336a1e908a01342d03af6` | `main` (zone-bound BBS PWA, ADR-109) | `integrated` | ✔ |
+| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `50a3416ceeeae017ea6bce5393ebd4390a674ff7` | `main` (release 1.0.0-beta.5) | `integrated` | ✔ |
 
 <!-- pin-check:canonical-kit-sha -->
 ```
-CANONICAL_KIT_SHA=0c1dc579574db240ac4336a1e908a01342d03af6
+CANONICAL_KIT_SHA=50a3416ceeeae017ea6bce5393ebd4390a674ff7
 ```
 
 The `CANONICAL_KIT_SHA` line above is the machine-readable field the `pin-check`
@@ -53,7 +53,20 @@ over `src/` + `forum-config/src/` for kit-owned surface names (returns zero) and
 the `pin-check` lockstep. It does not claim `federation-verified`/`released`: the
 edge carries no cross-substrate decision loop of its own to prove end to end.
 
-## What this SHA contains (`main`, zone-bound BBS PWA, `0c1dc57`)
+## What this SHA contains (`main`, release 1.0.0-beta.5, `50a3416`)
+
+Workspace release housekeeping atop the PWA feature: every kit crate changed
+since its last version stamp moves to `1.0.0-beta.5` (ascii, auth-worker,
+bbs-client, config, core, forum-client, mesh, pod-worker, preview-worker,
+relay-worker; rate-limit/search-worker/setup-skill/canary unchanged), the
+workspace dependency table is re-synced, `CHANGELOG.md` gains the consolidated
+`[1.0.0-beta.5]` entry, workspace rustdoc is warning-clean, and a latent
+test-only break is repaired (`nostr-bbs-config` validate.rs test `Zone`
+literals were missing `auto_approve`; its 37 tests compile and pass again).
+This overlay's pins move to `1.0.0-beta.5` for core/config/mesh accordingly.
+Everything below is also present.
+
+## What earlier SHAs added (`0c1dc57` — zone-bound BBS PWA, ADR-109)
 
 ADR-109: a single-locked-zone member can install their zone as a mobile app.
 A gated "Install mobile app" Settings section (shown only when
@@ -235,7 +248,8 @@ All render from the pinned kit at deploy time; this repo adds only branding
 
 | SHA | Branch/context | Notes |
 |---|---|---|
-| `0c1dc57` | `main` (zone-bound BBS PWA, ADR-109) | Current. Install-your-zone-as-an-app: gated Settings bake (consent + warning), BBS manifest/SW/icons, one-shot zone-pinned boot, iOS rebind. |
+| `50a3416` | `main` (release 1.0.0-beta.5) | Current. Workspace version bump (10 crates → beta.5), CHANGELOG entry, rustdoc-clean, config test-literal repair. |
+| `0c1dc57` | `main` (zone-bound BBS PWA, ADR-109) | Superseded. Install-your-zone-as-an-app: gated Settings bake (consent + warning), BBS manifest/SW/icons, one-shot zone-pinned boot, iOS rebind. |
 | `020b279` | `main` (hide media URLs) | Superseded. Posted images no longer print the raw Solid pod URL as text — the embed carries a hover "open full" expand icon instead (topic view + chat bubble). |
 | `8cea7fd` | `main` (quote-and-append topic replies) | Superseded. Fixes the reply threading so a quote-reply stays in its topic (reply marker → root, quote marker → sibling). Main-forum topic replies get a per-post "Reply" that quotes the message and appends at the bottom (flat, inline quote, notifies the quoted author); retires nested/root-only replying for topics. |
 | `03d7515` | `main` (BBS author nyms) | Superseded. BBS resolves message-author display names from kind-0 (board threads, chat, topic list, snippets, DM rows) instead of raw pubkeys. |
