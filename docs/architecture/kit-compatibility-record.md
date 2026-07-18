@@ -22,11 +22,11 @@ its own `pin-check` extension.
 
 | Deployment host | Forum-kit SHA | Kit branch/tag at pin | Consumption tier | Canonical for pin-check |
 |---|---|---|---|---|
-| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `5d56319c7a1157de9e0cd1f841837fbf87b785a8` | `main` (community rebrand, issues #21/#28) | `integrated` | ✔ |
+| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `3453772589596f8674f48bffef95ebfa439a988e` | `main` (feedback sprint 2, issues #42/#43/#44) | `integrated` | ✔ |
 
 <!-- pin-check:canonical-kit-sha -->
 ```
-CANONICAL_KIT_SHA=5d56319c7a1157de9e0cd1f841837fbf87b785a8
+CANONICAL_KIT_SHA=3453772589596f8674f48bffef95ebfa439a988e
 ```
 
 The `CANONICAL_KIT_SHA` line above is the machine-readable field the `pin-check`
@@ -53,7 +53,7 @@ over `src/` + `forum-config/src/` for kit-owned surface names (returns zero) and
 the `pin-check` lockstep. It does not claim `federation-verified`/`released`: the
 edge carries no cross-substrate decision loop of its own to prove end to end.
 
-## What this SHA contains (`main`, community rebrand on 1.0.0-beta.5, `5d56319`)
+## What this SHA contains (`main`, feedback sprint 2 on 1.0.0-beta.5, `3453772`)
 
 Workspace release housekeeping atop the PWA feature: every kit crate changed
 since its last version stamp moves to `1.0.0-beta.5` (ascii, auth-worker,
@@ -248,7 +248,7 @@ All render from the pinned kit at deploy time; this repo adds only branding
 
 | SHA | Branch/context | Notes |
 |---|---|---|
-| `5d56319` | `main` (community rebrand, issues #21/#28) | Current. Operator-brandable header/footer wordmark (`BRAND_LABEL`) linking to the forum home via base_href; forums index h1 uses runtime `FORUM_NAME`; Pod Browser endpoint field moved inside the collapsible Solid explainer. |
+| `5d56319` | `main` (feedback sprint 2, issues #42/#43/#44) | Current. Operator-brandable header/footer wordmark (`BRAND_LABEL`) linking to the forum home via base_href; forums index h1 uses runtime `FORUM_NAME`; Pod Browser endpoint field moved inside the collapsible Solid explainer. |
 | `50a3416` | `main` (release 1.0.0-beta.5) | Superseded. Workspace version bump (10 crates → beta.5), CHANGELOG entry, rustdoc-clean, config test-literal repair. |
 | `0c1dc57` | `main` (zone-bound BBS PWA, ADR-109) | Superseded. Install-your-zone-as-an-app: gated Settings bake (consent + warning), BBS manifest/SW/icons, one-shot zone-pinned boot, iOS rebind. |
 | `020b279` | `main` (hide media URLs) | Superseded. Posted images no longer print the raw Solid pod URL as text — the embed carries a hover "open full" expand icon instead (topic view + chat bubble). |
