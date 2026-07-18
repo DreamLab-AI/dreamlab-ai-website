@@ -91,7 +91,7 @@ a private space for trainers, builders, and the curious.\
 # agent (+ admin via [admin].static_pubkeys). visibility: public|locked|hidden.
 [[zones]]
 id                = "public"
-display_name      = "Landing"
+display_name      = "Welcome"
 required_cohorts  = []
 write_cohorts     = ["members", "friends", "agent"]
 visibility        = "public"

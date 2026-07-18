@@ -72,7 +72,7 @@ env:
   VITE_REPLY_RELAYS: 'wss://relay.damus.io,wss://relay.primal.net'
   # Zone (section) model for the forum client. Mirrors forum-config/dreamlab.toml
   # [[zones]] and the relay's ZONE_CONFIG [vars]. Injected into window.__ENV__ below.
-  ZONE_CONFIG_JSON: '[{"id":"public","display_name":"Landing","required_cohorts":[],"write_cohorts":["members","friends","agent"],"banner_image_url":"/images/heroes/lake-district-dawn.webp","visibility":"public","encrypted":false},{"id":"minimoonoir","display_name":"Minimoonoir","required_cohorts":["friends"],"banner_image_url":"/images/heroes/minimoonoir-hero.webp","visibility":"locked","encrypted":false,"auto_approve":true},{"id":"family","display_name":"Family","required_cohorts":["family"],"banner_image_url":"/images/heroes/family-hero.webp","visibility":"locked","encrypted":true},{"id":"business","display_name":"DreamLab","required_cohorts":["business"],"banner_image_url":"/images/heroes/business-hero.webp","visibility":"locked","encrypted":false}]'
+  ZONE_CONFIG_JSON: '[{"id":"public","display_name":"Welcome","required_cohorts":[],"write_cohorts":["members","friends","agent"],"banner_image_url":"/images/heroes/lake-district-dawn.webp","visibility":"public","encrypted":false},{"id":"minimoonoir","display_name":"Minimoonoir","required_cohorts":["friends"],"banner_image_url":"/images/heroes/minimoonoir-hero.webp","visibility":"locked","encrypted":false,"auto_approve":true},{"id":"family","display_name":"Family","required_cohorts":["family"],"banner_image_url":"/images/heroes/family-hero.webp","visibility":"locked","encrypted":true},{"id":"business","display_name":"DreamLab","required_cohorts":["business"],"banner_image_url":"/images/heroes/business-hero.webp","visibility":"locked","encrypted":false}]'
   FORUM_BASE: '/community'
   # BBS branding — projection of forum-config/dreamlab.toml [branding] for the
   # retro ASCII/BBS client (nostr-bbs-bbs-client, served at /community/bbs/).
@@ -95,7 +95,7 @@ env:
   # badge + /api/agents/disclosure, F8 admin Agents roster tab, F1 member view,
   # COM-16/COM-17 decision integrity + graduated escalation). Cutover provenance
   # is in docs/architecture/kit-compatibility-record.md.
-  KIT_REF: '50a3416ceeeae017ea6bce5393ebd4390a674ff7'
+  KIT_REF: '5d56319c7a1157de9e0cd1f841837fbf87b785a8'
 
 jobs:
   gate:
@@ -245,7 +245,7 @@ jobs:
           # operator can tell whether a deployed build contains a given fix.
           BUILD_HASH="${GITHUB_SHA:0:7}"
           BUILD_VERSION="$(date -u +%Y.%m.%d)"
-          ENV_SCRIPT='<script>window.__ENV__={BBS_PWA_ENABLED:"true",FORUM_NAME:"Minimoonoir Forums",VITE_RELAY_URL:"'"$VITE_RELAY_URL"'",VITE_AUTH_API_URL:"'"$VITE_AUTH_API_URL"'",VITE_POD_API_URL:"'"$VITE_POD_API_URL"'",VITE_SEARCH_API_URL:"'"$VITE_SEARCH_API_URL"'",VITE_LINK_PREVIEW_API_URL:"'"$VITE_LINK_PREVIEW_API_URL"'",BUILD_VERSION:"'"$BUILD_VERSION"'",BUILD_HASH:"'"$BUILD_HASH"'",ZONE_CONFIG:'"$ZONE_CONFIG_JSON"'};</script>'
+          ENV_SCRIPT='<script>window.__ENV__={BBS_PWA_ENABLED:"true",BRAND_LABEL:"Community",FORUM_NAME:"Community Forums",VITE_RELAY_URL:"'"$VITE_RELAY_URL"'",VITE_AUTH_API_URL:"'"$VITE_AUTH_API_URL"'",VITE_POD_API_URL:"'"$VITE_POD_API_URL"'",VITE_SEARCH_API_URL:"'"$VITE_SEARCH_API_URL"'",VITE_LINK_PREVIEW_API_URL:"'"$VITE_LINK_PREVIEW_API_URL"'",BUILD_VERSION:"'"$BUILD_VERSION"'",BUILD_HASH:"'"$BUILD_HASH"'",ZONE_CONFIG:'"$ZONE_CONFIG_JSON"'};</script>'
           sed -i "s|</head>|${ENV_SCRIPT}</head>|" dist/community/index.html
           echo "Injected window.__ENV__ into forum index.html (build $BUILD_VERSION $BUILD_HASH)"
           # SPA deep-link pickup for the forum. A hard load of /community/login
@@ -268,16 +268,17 @@ jobs:
           fi
 
       # Operator rebrand (kept out of the shared kit). The forum is presented as
-      # "Minimoonoir Forums" (encapsulating Minimoonoir / Family / DreamLab). The
-      # printed recovery-sheet PDF takes its filename from document.title, so this
-      # also fixes that name (feedback #12, #17). De-jargons the meta description.
-      - name: Rebrand forum (Minimoonoir Forums)
+      # "Community Forums" (issue #21: umbrella brand "Community", sections
+      # Welcome / Minimoonoir / Family / DreamLab). The printed recovery-sheet
+      # PDF takes its filename from document.title, so this also fixes that
+      # name (feedback #12, #17). De-jargons the meta description.
+      - name: Rebrand forum (Community Forums)
         run: |
           F=dist/community/index.html
-          sed -i 's|<title>[^<]*</title>|<title>Minimoonoir Forums</title>|' "$F"
-          sed -i 's|<meta name="description" content="[^"]*"|<meta name="description" content="Minimoonoir Forums — a private space for our community"|' "$F"
-          sed -i 's|>Nostr BBS<|>Minimoonoir<|g' "$F"
-          echo "Rebranded forum to Minimoonoir Forums (title/meta/loading)"
+          sed -i 's|<title>[^<]*</title>|<title>Community Forums</title>|' "$F"
+          sed -i 's|<meta name="description" content="[^"]*"|<meta name="description" content="Community Forums — a private space for our community"|' "$F"
+          sed -i 's|>Nostr BBS<|>Community<|g' "$F"
+          echo "Rebranded forum to Community Forums (title/meta/loading)"
 
       # ── Retro ASCII/BBS client (nostr-bbs-bbs-client → /community/bbs/) ──────
       # Built AFTER the forum merge so the forum's `cp kit/dist/*` doesn't grab
@@ -308,7 +309,7 @@ jobs:
           # names) plus THEME/NODE_NAME/LOCATION/BANNER_URL/LOGO_URL/ZONE_CONFIG —
           # the forum-config/dreamlab.toml [branding] projection. PREVIEW_API is
           # the preview-worker base for the BBS ASCII image endpoint (/ascii).
-          BBS_ENV='<script>window.__ENV__={BBS_PWA_ENABLED:"true",THEME:"'"$BBS_THEME"'",NODE_NAME:"'"$BBS_NODE_NAME"'",TAGLINE:"'"$BBS_TAGLINE"'",LOCATION:"'"$BBS_LOCATION"'",BANNER_URL:"'"$BBS_BANNER_URL"'",LOGO_URL:"'"$BBS_LOGO_URL"'",FORUM_NAME:"Minimoonoir Forums",RELAY_URL:"'"$VITE_RELAY_URL"'",POD_API:"'"$VITE_POD_API_URL"'",PREVIEW_API:"'"$VITE_LINK_PREVIEW_API_URL"'",SEARCH_API:"'"$VITE_SEARCH_API_URL"'",JARVIS_PUBKEY:"'"$VITE_JARVIS_PUBKEY"'",VITE_AUTH_API_URL:"'"$VITE_AUTH_API_URL"'",VITE_SEARCH_API_URL:"'"$VITE_SEARCH_API_URL"'",VITE_LINK_PREVIEW_API_URL:"'"$VITE_LINK_PREVIEW_API_URL"'",BUILD_VERSION:"'"$BUILD_VERSION"'",BUILD_HASH:"'"$BUILD_HASH"'",ZONE_CONFIG:'"$ZONE_CONFIG_JSON"'};</script>'
+          BBS_ENV='<script>window.__ENV__={BBS_PWA_ENABLED:"true",THEME:"'"$BBS_THEME"'",NODE_NAME:"'"$BBS_NODE_NAME"'",TAGLINE:"'"$BBS_TAGLINE"'",LOCATION:"'"$BBS_LOCATION"'",BANNER_URL:"'"$BBS_BANNER_URL"'",LOGO_URL:"'"$BBS_LOGO_URL"'",FORUM_NAME:"Community Forums",RELAY_URL:"'"$VITE_RELAY_URL"'",POD_API:"'"$VITE_POD_API_URL"'",PREVIEW_API:"'"$VITE_LINK_PREVIEW_API_URL"'",SEARCH_API:"'"$VITE_SEARCH_API_URL"'",JARVIS_PUBKEY:"'"$VITE_JARVIS_PUBKEY"'",VITE_AUTH_API_URL:"'"$VITE_AUTH_API_URL"'",VITE_SEARCH_API_URL:"'"$VITE_SEARCH_API_URL"'",VITE_LINK_PREVIEW_API_URL:"'"$VITE_LINK_PREVIEW_API_URL"'",BUILD_VERSION:"'"$BUILD_VERSION"'",BUILD_HASH:"'"$BUILD_HASH"'",ZONE_CONFIG:'"$ZONE_CONFIG_JSON"'};</script>'
           sed -i "s|</head>|${BBS_ENV}</head>|" dist/community/bbs/index.html
           # The BBS is a single-screen terminal (no URL sub-routes); a hard load of
           # /community/bbs/ serves this file directly. Provide a 404 fallback too.
