@@ -22,11 +22,11 @@ its own `pin-check` extension.
 
 | Deployment host | Forum-kit SHA | Kit branch/tag at pin | Consumption tier | Canonical for pin-check |
 |---|---|---|---|---|
-| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `c9de76112e25e8d85427dd571ab6c5a44bffbec7` | `main` (photo upload 403 fix) | `integrated` | ✔ |
+| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `6668404bf64e45364d38db42a6fea639eeae21b7` | `main` (avatar/media/BBS-sash fixes) | `integrated` | ✔ |
 
 <!-- pin-check:canonical-kit-sha -->
 ```
-CANONICAL_KIT_SHA=c9de76112e25e8d85427dd571ab6c5a44bffbec7
+CANONICAL_KIT_SHA=6668404bf64e45364d38db42a6fea639eeae21b7
 ```
 
 The `CANONICAL_KIT_SHA` line above is the machine-readable field the `pin-check`
@@ -53,15 +53,39 @@ over `src/` + `forum-config/src/` for kit-owned surface names (returns zero) and
 the `pin-check` lockstep. It does not claim `federation-verified`/`released`: the
 edge carries no cross-substrate decision loop of its own to prove end to end.
 
-## What this SHA contains (`main`, photo upload 403 fix, `c9de76`)
+## What this SHA contains (`main`, avatar/media/BBS-sash fixes, `6668404`)
+
+Three production fixes:
+
+- **Avatar preserved across logins.** The app-root auto-whitelist effect
+  republished kind-0 rebuilt from `{display_name, name}` only, clobbering
+  `picture` (and `about`/`birthday`) on every relay connect — kind-0 is
+  replaceable/last-write-wins. It now consults the relay's existing kind-0
+  first: an already-registered identity is left untouched, and when a publish
+  is genuinely needed it merges over the existing profile so the avatar and any
+  claimed `nip05` survive.
+- **Media renders (no more "image unavailable").** The upload client PUT every
+  blob as `application/octet-stream`; the pod-worker stored/served that with
+  `nosniff`, so `<img>` refused it and the BBS image→ASCII transform (gated on
+  `image/*`) was skipped. The client now sends the real MIME (blob type, else
+  extension), and the pod-worker recovers an image type from the path extension
+  for legacy octet-stream objects, so already-stored images render without a
+  re-upload.
+- **Retro-BBS sash navigates.** The plain `<a>` to the separate BBS SPA was
+  captured by the Leptos router (same-origin anchor interception) → route miss
+  → 404 on click (a refresh, a real GET, worked). Now `rel="external"` plus an
+  explicit hard-navigation `on:click` so the click escapes the SPA router.
+
+Everything below is also present.
+
+## What earlier SHAs added (`c9de76` — photo upload 403 fix)
 
 Photo/avatar uploads no longer 403. The client provisioned pods at a bare
 `POST /.provision` (the pod-worker 404s that; its endpoint is
 `POST /pods/{pubkey}/.provision`), so the pod was never created and the media
 PUT hit the WAC gate on an unprovisioned pod (deny-by-default 403). Fixed the
 provision endpoint at both call sites, and made `upload_to_pod_signer`
-self-healing: on 403/404 it provisions and retries once, so existing users whose
-pod was never provisioned upload without a manual step. Everything below is also
+self-healing: on 403/404 it provisions and retries once. Everything below is also
 present.
 
 ## What earlier SHAs added (`1699cce` — one-deep message replies)
@@ -150,7 +174,8 @@ All render from the pinned kit at deploy time; this repo adds only branding
 
 | SHA | Branch/context | Notes |
 |---|---|---|
-| `c9de76` | `main` (photo upload 403 fix) | Current. Provision at /pods/{pubkey}/.provision + upload self-heals on 403/404. |
+| `6668404` | `main` (avatar/media/BBS-sash fixes) | Current. kind-0 republish merges (avatar preserved); media served with real MIME (renders + ASCII); BBS sash full-navigates (no 404-on-click). |
+| `c9de76` | `main` (photo upload 403 fix) | Superseded. Provision at /pods/{pubkey}/.provision + upload self-heals on 403/404. |
 | `1699cce` | `main` (one-deep message replies) | Superseded. Reply button hidden on messages that are themselves replies (channel threading stays one level). |
 | `ee6ffb9` | `main` (new-joiner signup fixes + BBS SW) | Superseded. kind-0 retry + zone-access refresh after claim (name + zone landing); SW leaves /bbs/ to the network (fixes BBS 404). |
 | `cfad1ad` | `main` (forum→BBS switch sash) | Superseded. Glitchy amber "enter the retro BBS" sash under the forums-index AND zone heroes. |
