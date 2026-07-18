@@ -13,7 +13,7 @@ publish = false
 path = "src/lib.rs"
 
 [dependencies]
-# Kit crates from nostr-rust-forum @ 3453772589596f8674f48bffef95ebfa439a988e (gap-close/2026-07 HEAD): the forum
+# Kit crates from nostr-rust-forum @ e488c4846eb1c3f9bdd71858bc276befcc37bf27 (gap-close/2026-07 HEAD): the forum
 # gap-close slice — COM-13/F2 agent disclosure badge + public /api/agents/disclosure endpoint, F8 admin Agents
 # roster tab wired to the nine /api/governance/* endpoints, F1 member read-only view, COM-16/COM-17 decision
 # integrity + graduated escalation, REC-6 escalation-default projection. Consumed by this deployment as a thin
@@ -45,10 +45,10 @@ path = "src/lib.rs"
 # explicit prerelease version alongside the git rev (cargo: "if you are looking
 # for the prerelease package it needs to be specified explicitly"). Keep this
 # version in lockstep with the crate version at `rev` when bumping the kit.
-nostr-bbs-core = { version = "1.0.0-beta.5", git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "3453772589596f8674f48bffef95ebfa439a988e", package = "nostr-bbs-core" }
-nostr-bbs-config = { version = "1.0.0-beta.5", git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "3453772589596f8674f48bffef95ebfa439a988e", package = "nostr-bbs-config" }
-nostr-bbs-mesh = { version = "1.0.0-beta.5", git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "3453772589596f8674f48bffef95ebfa439a988e", package = "nostr-bbs-mesh" }
-nostr-bbs-rate-limit = { version = "1.0.0-beta.3", git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "3453772589596f8674f48bffef95ebfa439a988e", package = "nostr-bbs-rate-limit" }
+nostr-bbs-core = { version = "1.0.0-beta.5", git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "e488c4846eb1c3f9bdd71858bc276befcc37bf27", package = "nostr-bbs-core" }
+nostr-bbs-config = { version = "1.0.0-beta.5", git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "e488c4846eb1c3f9bdd71858bc276befcc37bf27", package = "nostr-bbs-config" }
+nostr-bbs-mesh = { version = "1.0.0-beta.5", git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "e488c4846eb1c3f9bdd71858bc276befcc37bf27", package = "nostr-bbs-mesh" }
+nostr-bbs-rate-limit = { version = "1.0.0-beta.3", git = "https://github.com/DreamLab-AI/nostr-rust-forum.git", rev = "e488c4846eb1c3f9bdd71858bc276befcc37bf27", package = "nostr-bbs-rate-limit" }
 
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
