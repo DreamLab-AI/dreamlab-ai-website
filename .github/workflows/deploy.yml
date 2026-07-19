@@ -95,7 +95,7 @@ env:
   # badge + /api/agents/disclosure, F8 admin Agents roster tab, F1 member view,
   # COM-16/COM-17 decision integrity + graduated escalation). Cutover provenance
   # is in docs/architecture/kit-compatibility-record.md.
-  KIT_REF: '892a6e778a878e1f89f4d51b278e0f9ae0a47447'
+  KIT_REF: 'e974bc72a4a8ee83c4e0b94d3125fa5bc4796435'
 
 jobs:
   gate:
@@ -278,6 +278,14 @@ jobs:
           sed -i 's|<title>[^<]*</title>|<title>Community Forums</title>|' "$F"
           sed -i 's|<meta name="description" content="[^"]*"|<meta name="description" content="Community Forums — a private space for our community"|' "$F"
           sed -i 's|>Nostr BBS<|>Community<|g' "$F"
+          sed -i 's|<meta name="apple-mobile-web-app-title" content="Forum" />|<meta name="apple-mobile-web-app-title" content="Community" />|' "$F"
+          # PWA manifest for the MAIN interface (kit ships operator-generic
+          # "Forum"; the installed app should carry this deployment's brand).
+          M=dist/community/manifest.webmanifest
+          if [ -f "$M" ]; then
+            sed -i 's|"name": "Forum"|"name": "Community Forums"|; s|"short_name": "Forum"|"short_name": "Community"|' "$M"
+            echo "Branded forum PWA manifest (Community)"
+          fi
           echo "Rebranded forum to Community Forums (title/meta/loading)"
 
       # ── Retro ASCII/BBS client (nostr-bbs-bbs-client → /community/bbs/) ──────
