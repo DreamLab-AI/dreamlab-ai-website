@@ -199,13 +199,13 @@ jobs:
           if [[ -z "$deploy" || "$deploy" != "$workers" || "$deploy" != "$rustci" ]]; then
             echo "::error::KIT_REF differs across deploy/workers-deploy/rust-ci.yml"; exit 1
           fi
-          mapfile -t revs < <(grep -oP 'rev = "\K[0-9a-f]+' forum-config/Cargo.toml | sort -u)
-          if [[ ${#revs[@]} -eq 0 ]]; then echo "::error::no nostr-bbs rev pins found"; exit 1; fi
-          for r in "${revs[@]}"; do
-            if [[ "$deploy" != "$r"* ]]; then
-              echo "::error::forum-config Cargo rev '$r' is not a prefix of KIT_REF '$deploy'"; exit 1
-            fi
-          done
+          # Library crates are pulled from crates.io (the git-SHA pin was retired
+          # at 1.0.0-beta.6). Assert the forum-config version deps agree with each
+          # other and with CANONICAL_KIT_VERSION; KIT_REF still pins the source
+          # clone the client/workers build from.
+          mapfile -t vers < <(grep -oP 'nostr-bbs-(core|config|mesh|rate-limit) = "\K[^"]+' forum-config/Cargo.toml | sort -u)
+          if [[ ${#vers[@]} -eq 0 ]]; then echo "::error::no nostr-bbs crates.io version deps found"; exit 1; fi
+          if [[ ${#vers[@]} -ne 1 ]]; then echo "::error::forum-config nostr-bbs deps disagree: ${vers[*]}"; exit 1; fi
           # Durable compatibility record (gap-close WP-4 / ADR-040 D2): the SHA it
           # cites must equal the live KIT_REF, so the record cannot silently drift.
           record='docs/architecture/kit-compatibility-record.md'
@@ -219,7 +219,12 @@ jobs:
           if [[ "$canonical" != "$deploy" ]]; then
             echo "::error::compatibility record CANONICAL_KIT_SHA '$canonical' != KIT_REF '$deploy'"; exit 1
           fi
-          echo "Dual-pin OK — all pinned to $deploy (record + $((${#revs[@]})) Cargo rev(s) in lockstep)"
+          canonical_ver=$(grep -oP 'CANONICAL_KIT_VERSION=\K.+' "$record" | head -1)
+          if [[ -z "$canonical_ver" ]]; then echo "::error::no CANONICAL_KIT_VERSION in $record"; exit 1; fi
+          if [[ "$canonical_ver" != "${vers[0]}" ]]; then
+            echo "::error::CANONICAL_KIT_VERSION '$canonical_ver' != forum-config dep version '${vers[0]}'"; exit 1
+          fi
+          echo "Pin OK — source clone $deploy; library crates ${vers[0]} from crates.io; record in lockstep"
 
   # ---------------------------------------------------------------------------
   # Admin pubkey sync — the in-repo admin set must agree across
