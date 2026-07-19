@@ -22,11 +22,11 @@ its own `pin-check` extension.
 
 | Deployment host | Forum-kit SHA | Kit branch/tag at pin | Consumption tier | Canonical for pin-check |
 |---|---|---|---|---|
-| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `c2c780ef9ff76758c65129eacd6dcb8578e876ef` | `main` (full-stack audit remediation) | `integrated` | ✔ |
+| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `33282206e7662d1ea2ab7b7211a14090b64dfd55` | `main` (full-stack audit remediation) | `integrated` | ✔ |
 
 <!-- pin-check:canonical-kit-sha -->
 ```
-CANONICAL_KIT_SHA=c2c780ef9ff76758c65129eacd6dcb8578e876ef
+CANONICAL_KIT_SHA=33282206e7662d1ea2ab7b7211a14090b64dfd55
 CANONICAL_KIT_VERSION=1.0.0-beta.6
 ```
 
