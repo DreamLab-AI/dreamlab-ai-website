@@ -89,40 +89,45 @@ a private space for trainers, builders, and the curious.\
 # client renders tiles from window.__ENV__.ZONE_CONFIG (injected by deploy.yml).
 # This block is the authored source for both. Cohorts: family, friends, business,
 # agent (+ admin via [admin].static_pubkeys). visibility: public|locked|hidden.
+# ALIGN (2026-07-19): generic zone ids (zone1..zone4) — vanilla nostr-rust-forum
+# shape, branded entirely via slug/display_name/accent_hex/banner. Cohorts match
+# their zone id (zone2..zone4); the public welcome zone (zone1) needs none.
 [[zones]]
-id                = "public"
-slug              = "welcome"          # URL segment (id is welded to channels; slug is the address)
+id                = "zone1"
+slug              = "welcome"
 display_name      = "Welcome"
 required_cohorts  = []
-write_cohorts     = ["members", "friends", "agent"]
+write_cohorts     = ["members", "agent"]
 visibility        = "public"
 banner_image_url  = "/images/heroes/lake-district-dawn.webp"
 encrypted         = false
 accent_hex        = "#22c55e"
 
 [[zones]]
-id                = "minimoonoir"
+id                = "zone2"
+slug              = "minimoonoir"
 display_name      = "Minimoonoir"
-required_cohorts  = ["friends"]
+required_cohorts  = ["zone2"]
 visibility        = "locked"
 banner_image_url  = "/images/heroes/minimoonoir-hero.webp"
 encrypted         = false
 accent_hex        = "#3b82f6"
 
 [[zones]]
-id                = "family"
+id                = "zone3"
+slug              = "family"
 display_name      = "Family"
-required_cohorts  = ["family"]
+required_cohorts  = ["zone3"]
 visibility        = "locked"
 banner_image_url  = "/images/heroes/family-hero.webp"
 encrypted         = true
 accent_hex        = "#f59e0b"
 
 [[zones]]
-id                = "business"
-slug              = "dreamlab"        # URL segment (id is welded to channels; slug is the address)
+id                = "zone4"
+slug              = "dreamlab"
 display_name      = "DreamLab"
-required_cohorts  = ["business"]
+required_cohorts  = ["zone4"]
 visibility        = "locked"
 banner_image_url  = "/images/heroes/business-hero.webp"
 encrypted         = false
@@ -201,7 +206,7 @@ enabled                  = false           # CF tier: native export route unavai
 include_private_default  = false           # owner WAC always required for /private/*
 rate_limit_per_min       = 6                # per-IP; export is bandwidth-heavy
 
-# ─── Git-versioned pods (JSS #471, solid-pod-rs alpha.12) ───────────────────
+# ─── Git-versioned pods (JSS #471, solid-pod-rs =0.5.0-alpha.4) ─────────────
 # When enabled at the pod backend (e.g. agentbox or a non-CF solid-pod-rs
 # deployment), each pod is `git init`'d at creation with main branch and
 # receive.denyCurrentBranch=updateInstead (solid_pod_rs_git::init::GitAutoInit,
@@ -215,7 +220,7 @@ auto_init      = true                   # informational; takes effect when enabl
 default_branch = "main"                 # pinned per JSS #471
 clone_url_base = "https://dreamlab-pod-api.solitary-paper-764d.workers.dev"  # surfaces in forum-client
 
-# ─── Native pod server (agentbox tier, solid-pod-rs alpha.15) ───────────────
+# ─── Native pod server (agentbox tier, solid-pod-rs =0.5.0-alpha.4) ─────────
 # When enabled, the forum pod browser shows a SECOND pod card for the native
 # agentbox server alongside the CF Workers pod. The native server has full git
 # support (GitPanel + AppManifestPanel). Exposed via Cloudflare Tunnel.
@@ -230,7 +235,7 @@ clone_url_base = "https://dreamlab-pod-api.solitary-paper-764d.workers.dev"  # s
 [native_pod]
 enabled              = true
 base_url             = "https://pods-native.dreamlab-ai.com"
-allowlist_cohorts    = ["family", "friends", "business"]
+allowlist_cohorts    = ["zone2", "zone3", "zone4"]
 git_enabled          = true
 admin_provision_url  = "https://pods-native.dreamlab-ai.com/_admin/provision"
 
