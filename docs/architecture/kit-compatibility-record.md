@@ -22,11 +22,11 @@ its own `pin-check` extension.
 
 | Deployment host | Forum-kit SHA | Kit branch/tag at pin | Consumption tier | Canonical for pin-check |
 |---|---|---|---|---|
-| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `e974bc72a4a8ee83c4e0b94d3125fa5bc4796435` | `main` (media-embed first-view fix) | `integrated` | ✔ |
+| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `641832ab64a82609322c2dcb3e0764a3d812daac` | `main` (full-stack audit remediation) | `integrated` | ✔ |
 
 <!-- pin-check:canonical-kit-sha -->
 ```
-CANONICAL_KIT_SHA=e974bc72a4a8ee83c4e0b94d3125fa5bc4796435
+CANONICAL_KIT_SHA=641832ab64a82609322c2dcb3e0764a3d812daac
 ```
 
 The `CANONICAL_KIT_SHA` line above is the machine-readable field the `pin-check`
@@ -248,7 +248,9 @@ All render from the pinned kit at deploy time; this repo adds only branding
 
 | SHA | Branch/context | Notes |
 |---|---|---|
-| `5d56319` | `main` (feedback sprint 2, issues #42/#43/#44) | Current. Operator-brandable header/footer wordmark (`BRAND_LABEL`) linking to the forum home via base_href; forums index h1 uses runtime `FORUM_NAME`; Pod Browser endpoint field moved inside the collapsible Solid explainer. |
+| `641832a` | `main` (full-stack audit remediation) | Current (canonical — matches `CANONICAL_KIT_SHA` above and the `KIT_REF`/Cargo pins). Device-key proof-of-possession, dead-code/publish hygiene, NIP-42 hibernation-AUTH fix, relay ban-gate + new-channel + admin-TTL, systemic client on_cleanup leak sweep, exact solid-pod-rs pin, doc currency. |
+| `e974bc7` | `main` (media-embed first-view fix + main-interface PWA) | Superseded. |
+| `5d56319` | `main` (feedback sprint 2, issues #42/#43/#44) | Superseded. Operator-brandable header/footer wordmark (`BRAND_LABEL`) linking to the forum home via base_href; forums index h1 uses runtime `FORUM_NAME`; Pod Browser endpoint field moved inside the collapsible Solid explainer. |
 | `50a3416` | `main` (release 1.0.0-beta.5) | Superseded. Workspace version bump (10 crates → beta.5), CHANGELOG entry, rustdoc-clean, config test-literal repair. |
 | `0c1dc57` | `main` (zone-bound BBS PWA, ADR-109) | Superseded. Install-your-zone-as-an-app: gated Settings bake (consent + warning), BBS manifest/SW/icons, one-shot zone-pinned boot, iOS rebind. |
 | `020b279` | `main` (hide media URLs) | Superseded. Posted images no longer print the raw Solid pod URL as text — the embed carries a hover "open full" expand icon instead (topic view + chat bubble). |
