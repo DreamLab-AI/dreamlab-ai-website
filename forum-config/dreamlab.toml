@@ -107,7 +107,11 @@ accent_hex        = "#22c55e"
 id                = "zone2"
 slug              = "minimoonoir"
 display_name      = "Minimoonoir"
-required_cohorts  = ["zone2"]
+# Dual-accept: generic id AND legacy slug, so pre-ALIGN grants (whose D1 cohort
+# is the slug, e.g. "minimoonoir") keep matching alongside new zone-id grants.
+# is_member (zones.rs) is a literal cohort match; without both, legacy members
+# collapse to welcome-only (2026-07-20 regression fix).
+required_cohorts  = ["zone2", "minimoonoir"]
 visibility        = "locked"
 banner_image_url  = "/images/heroes/minimoonoir-hero.webp"
 encrypted         = false
@@ -121,7 +125,7 @@ section_order     = ["zone2-rants"]
 id                = "zone3"
 slug              = "family"
 display_name      = "Family"
-required_cohorts  = ["zone3"]
+required_cohorts  = ["zone3", "family"]  # dual-accept id + legacy slug (see zone2)
 visibility        = "locked"
 banner_image_url  = "/images/heroes/family-hero.webp"
 encrypted         = true
@@ -131,7 +135,7 @@ accent_hex        = "#f59e0b"
 id                = "zone4"
 slug              = "dreamlab"
 display_name      = "DreamLab"
-required_cohorts  = ["zone4"]
+required_cohorts  = ["zone4", "dreamlab"]  # dual-accept id + legacy slug (see zone2)
 visibility        = "locked"
 banner_image_url  = "/images/heroes/business-hero.webp"
 encrypted         = false
