@@ -22,11 +22,11 @@ its own `pin-check` extension.
 
 | Deployment host | Forum-kit SHA | Kit branch/tag at pin | Consumption tier | Canonical for pin-check |
 |---|---|---|---|---|
-| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `530ece15fd41a0baf53d54a5156823e1e158aaaf` | `soak-fix-sprint-2026-07` (pod deprovision endpoint + wire into user-delete; DM npub tooltip opens downward) | `integrated` | ✔ |
+| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `06754adddbd29c40d0c91e7ba514025a2b21b38e` | `soak-fix-sprint-2026-07` (pod deprovision + relay-side admin resolution for pod ops; DM npub tooltip opens downward) | `integrated` | ✔ |
 
 <!-- pin-check:canonical-kit-sha -->
 ```
-CANONICAL_KIT_SHA=530ece15fd41a0baf53d54a5156823e1e158aaaf
+CANONICAL_KIT_SHA=06754adddbd29c40d0c91e7ba514025a2b21b38e
 CANONICAL_KIT_VERSION=1.0.0-beta.6
 ```
 
@@ -249,7 +249,8 @@ All render from the pinned kit at deploy time; this repo adds only branding
 
 | SHA | Branch/context | Notes |
 |---|---|---|
-| `530ece1` | `soak-fix-sprint-2026-07` | Current (canonical — matches `CANONICAL_KIT_SHA` above and the `KIT_REF` pins). Two changes: (1) **pod deprovision** — `POST /pods/{pubkey}/.deprovision` (pod-worker, owner-or-admin, pre-WAC) prefix-deletes a pod's R2 + releases quota, wired best-effort into the client `delete_user_signer` after the relay delete; closes the orphaned-pod gap (relay `user/delete` couldn't reach pod R2). Federation-safe: reaps only this server's R2, a federated pod elsewhere is a no-op. (2) **DM npub tooltip** now opens downward (`InfoTerm below` prop) so its "Learn more →" glossary link no longer overlays the DM recipient input and steals the click. Client + pod-worker; library crates unchanged. |
+| `06754ad` | `soak-fix-sprint-2026-07` | Current (canonical — matches `CANONICAL_KIT_SHA` above and the `KIT_REF` pins). Makes pod-worker `is_admin_user` resolve **relay-side admins**: it now checks the relay DB (dreamlab-relay `whitelist.is_admin`, bound as `RELAY_DB` in the overlay wrangler) before its own REPLAY_DB (dreamlab-auth). Without this every admin-gated pod op — the new `/.deprovision` and the pre-existing admin-provision path — 403'd for real admins, since the canonical `is_admin` bit lives only in dreamlab-relay. Pairs with the `RELAY_DB` binding added to `forum-config/deploy/pod-worker.wrangler.toml`. |
+| `530ece1` | `soak-fix-sprint-2026-07` | Superseded. Two changes: (1) **pod deprovision** — `POST /pods/{pubkey}/.deprovision` (pod-worker, owner-or-admin, pre-WAC) prefix-deletes a pod's R2 + releases quota, wired best-effort into the client `delete_user_signer` after the relay delete; closes the orphaned-pod gap (relay `user/delete` couldn't reach pod R2). Federation-safe: reaps only this server's R2, a federated pod elsewhere is a no-op. (2) **DM npub tooltip** now opens downward (`InfoTerm below` prop) so its "Learn more →" glossary link no longer overlays the DM recipient input and steals the click. Client + pod-worker; library crates unchanged. |
 | `7861d0b` | `soak-fix-sprint-2026-07` | Superseded. Image attach on the new-topic (`section.rs`) and channel (`channel.rs`) composers: both now set `enable_image_upload=true` (parity with thread replies) so the composer renders a real image button. Composer icons disambiguated — markdown-preview toggle → eye, image-attach → photo glyph (was a paperclip). Users had been clicking the rectangle-shaped preview toggle expecting image-attach and getting an empty "Nothing to preview". Client-only; library crates unchanged. |
 | `478f163` | `soak-fix-sprint-2026-07` | Superseded. Config-driven section-tile order: a zone's `section_order` (from ZONE_CONFIG) pins primary sections to the top of the zone tile, the rest alphabetical after; Minimoonoir pins `zone2-rants` first (it had sorted last, reading as "vanished"). Client-only `Zone.section_order` + `section_cmp`; relay/auth ignore the field. |
 | `5396652` | `soak-fix-sprint-2026-07` | Superseded. Cross-tab sync sweep: extends the notification fix to four more reactive localStorage stores that shared the same multi-client clobber — `read_position` (channel "N new" chips reverting), `mute`, `bookmarks`, `preferences`. Adds one shared `utils::on_cross_tab_storage_write(key, reload)` primitive wired into each `provide_*`. Client-only; library crates unchanged. |
