@@ -22,11 +22,11 @@ its own `pin-check` extension.
 
 | Deployment host | Forum-kit SHA | Kit branch/tag at pin | Consumption tier | Canonical for pin-check |
 |---|---|---|---|---|
-| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `491b1fbc5217585f252d862349f3962a3d333a29` | `soak-fix-sprint-2026-07` (invite zone-grant race fix) | `integrated` | ✔ |
+| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `186b1b9893bd8960b0adcdd24a06fa463ee50043` | `soak-fix-sprint-2026-07` (cross-tab notification read-state sync) | `integrated` | ✔ |
 
 <!-- pin-check:canonical-kit-sha -->
 ```
-CANONICAL_KIT_SHA=491b1fbc5217585f252d862349f3962a3d333a29
+CANONICAL_KIT_SHA=186b1b9893bd8960b0adcdd24a06fa463ee50043
 CANONICAL_KIT_VERSION=1.0.0-beta.6
 ```
 
@@ -249,7 +249,8 @@ All render from the pinned kit at deploy time; this repo adds only branding
 
 | SHA | Branch/context | Notes |
 |---|---|---|
-| `491b1fb` | `soak-fix-sprint-2026-07` | Current (canonical — matches `CANONICAL_KIT_SHA` above and the `KIT_REF` pins). Invite zone-grant made race-safe: `grant_zone_cohorts` inverted to ensure-then-merge so a concurrent username-claim insert can no longer clobber the zone cohort for a brand-new invitee. Library crates unchanged (still 1.0.0-beta.6). |
+| `186b1b9` | `soak-fix-sprint-2026-07` | Current (canonical — matches `CANONICAL_KIT_SHA` above and the `KIT_REF` pins). Cross-tab notification read-state sync: both notification stores (forum + BBS) add a `storage`-event listener that reloads the visible list from localStorage on another tab's write, closing the multi-client clobber where a stale second tab / PWA reverted "mark all read" back to unread. Adds the `StorageEvent` web-sys feature. Client-only; library crates unchanged (still 1.0.0-beta.6). |
+| `491b1fb` | `soak-fix-sprint-2026-07` | Superseded. Invite zone-grant made race-safe: `grant_zone_cohorts` inverted to ensure-then-merge so a concurrent username-claim insert can no longer clobber the zone cohort for a brand-new invitee. Library crates unchanged (still 1.0.0-beta.6). |
 | `3328220` | `soak-fix-sprint-2026-07` | Superseded. Slug/display zone alias applied across the whole UI (category cards, drill-downs, admin badges) — no raw `zone1..zone4` surfaced; ids/tags/cohorts unchanged. Carries the zone-bound invite feature (mint / `/join` landing / redeem-grants-zone) and the `/join` preview `state=active` validity fix. |
 | `97eb579` | `main` (1.0.0-beta.6 release) | Superseded. Four library crates published to crates.io; overlay pivoted off the git-SHA pin (version deps). Consolidates the full-stack audit remediation + the generic-zone align. |
 | `641832a` | `main` (full-stack audit remediation) | Superseded. Device-key proof-of-possession, dead-code/publish hygiene, NIP-42 hibernation-AUTH fix, relay ban-gate + new-channel + admin-TTL, systemic client on_cleanup leak sweep, exact solid-pod-rs pin, doc currency. |
