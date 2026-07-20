@@ -72,7 +72,7 @@ env:
   VITE_REPLY_RELAYS: 'wss://relay.damus.io,wss://relay.primal.net'
   # Zone (section) model for the forum client. Mirrors forum-config/dreamlab.toml
   # [[zones]] and the relay's ZONE_CONFIG [vars]. Injected into window.__ENV__ below.
-  ZONE_CONFIG_JSON: '[{"id":"zone1","slug":"welcome","display_name":"Welcome","required_cohorts":[],"write_cohorts":["members","agent"],"banner_image_url":"/images/heroes/lake-district-dawn.webp","visibility":"public","encrypted":false,"accent_hex":"#22c55e"},{"id":"zone2","slug":"minimoonoir","display_name":"Minimoonoir","required_cohorts":["zone2"],"banner_image_url":"/images/heroes/minimoonoir-hero.webp","visibility":"locked","encrypted":false,"accent_hex":"#3b82f6"},{"id":"zone3","slug":"family","display_name":"Family","required_cohorts":["zone3"],"banner_image_url":"/images/heroes/family-hero.webp","visibility":"locked","encrypted":true,"accent_hex":"#f59e0b"},{"id":"zone4","slug":"dreamlab","display_name":"DreamLab","required_cohorts":["zone4"],"banner_image_url":"/images/heroes/business-hero.webp","visibility":"locked","encrypted":false,"accent_hex":"#a855f7"}]'
+  ZONE_CONFIG_JSON: '[{"id":"zone1","slug":"welcome","display_name":"Welcome","required_cohorts":[],"write_cohorts":["members","agent"],"banner_image_url":"/images/heroes/lake-district-dawn.webp","visibility":"public","encrypted":false,"accent_hex":"#22c55e"},{"id":"zone2","slug":"minimoonoir","display_name":"Minimoonoir","required_cohorts":["zone2"],"banner_image_url":"/images/heroes/minimoonoir-hero.webp","visibility":"locked","encrypted":false,"accent_hex":"#3b82f6","section_order":["zone2-rants"]},{"id":"zone3","slug":"family","display_name":"Family","required_cohorts":["zone3"],"banner_image_url":"/images/heroes/family-hero.webp","visibility":"locked","encrypted":true,"accent_hex":"#f59e0b"},{"id":"zone4","slug":"dreamlab","display_name":"DreamLab","required_cohorts":["zone4"],"banner_image_url":"/images/heroes/business-hero.webp","visibility":"locked","encrypted":false,"accent_hex":"#a855f7"}]'
   FORUM_BASE: '/community'
   # BBS branding — projection of forum-config/dreamlab.toml [branding] for the
   # retro ASCII/BBS client (nostr-bbs-bbs-client, served at /community/bbs/).
@@ -95,7 +95,7 @@ env:
   # badge + /api/agents/disclosure, F8 admin Agents roster tab, F1 member view,
   # COM-16/COM-17 decision integrity + graduated escalation). Cutover provenance
   # is in docs/architecture/kit-compatibility-record.md.
-  KIT_REF: '53966523d6a76a7f01c5c507ff21ac89cba3ef4b'
+  KIT_REF: '478f163ddb0c23eda687268d91b412540628e8ba'
 
 jobs:
   gate:

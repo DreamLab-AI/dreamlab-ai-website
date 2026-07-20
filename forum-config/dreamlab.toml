@@ -112,6 +112,10 @@ visibility        = "locked"
 banner_image_url  = "/images/heroes/minimoonoir-hero.webp"
 encrypted         = false
 accent_hex        = "#3b82f6"
+# Section-tile order: pin the primary "rants" section to the top of the zone
+# tile (the client honours this; other sections fall to alphabetical after it).
+# Projected into ZONE_CONFIG; ignored by relay/auth workers.
+section_order     = ["zone2-rants"]
 
 [[zones]]
 id                = "zone3"

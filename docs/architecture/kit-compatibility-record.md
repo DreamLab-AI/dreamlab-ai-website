@@ -22,11 +22,11 @@ its own `pin-check` extension.
 
 | Deployment host | Forum-kit SHA | Kit branch/tag at pin | Consumption tier | Canonical for pin-check |
 |---|---|---|---|---|
-| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `53966523d6a76a7f01c5c507ff21ac89cba3ef4b` | `soak-fix-sprint-2026-07` (cross-tab sync sweep: read-positions/mutes/bookmarks/prefs) | `integrated` | ✔ |
+| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `478f163ddb0c23eda687268d91b412540628e8ba` | `soak-fix-sprint-2026-07` (config-driven section-tile order + cross-tab sync sweep) | `integrated` | ✔ |
 
 <!-- pin-check:canonical-kit-sha -->
 ```
-CANONICAL_KIT_SHA=53966523d6a76a7f01c5c507ff21ac89cba3ef4b
+CANONICAL_KIT_SHA=478f163ddb0c23eda687268d91b412540628e8ba
 CANONICAL_KIT_VERSION=1.0.0-beta.6
 ```
 
@@ -249,7 +249,8 @@ All render from the pinned kit at deploy time; this repo adds only branding
 
 | SHA | Branch/context | Notes |
 |---|---|---|
-| `5396652` | `soak-fix-sprint-2026-07` | Current (canonical — matches `CANONICAL_KIT_SHA` above and the `KIT_REF` pins). Cross-tab sync sweep: extends the notification fix to four more reactive localStorage stores that shared the same multi-client clobber — `read_position` (channel "N new" chips reverting), `mute`, `bookmarks`, `preferences`. Adds one shared `utils::on_cross_tab_storage_write(key, reload)` primitive wired into each `provide_*`. Client-only; library crates unchanged (still 1.0.0-beta.6). |
+| `478f163` | `soak-fix-sprint-2026-07` | Current (canonical — matches `CANONICAL_KIT_SHA` above and the `KIT_REF` pins). Config-driven section-tile order: a zone's `section_order` (from ZONE_CONFIG) pins primary sections to the top of the zone tile, the rest alphabetical after; Minimoonoir pins `zone2-rants` first (it had sorted last, reading as "vanished"). Client-only `Zone.section_order` + `section_cmp`; relay/auth ignore the field. |
+| `5396652` | `soak-fix-sprint-2026-07` | Superseded. Cross-tab sync sweep: extends the notification fix to four more reactive localStorage stores that shared the same multi-client clobber — `read_position` (channel "N new" chips reverting), `mute`, `bookmarks`, `preferences`. Adds one shared `utils::on_cross_tab_storage_write(key, reload)` primitive wired into each `provide_*`. Client-only; library crates unchanged. |
 | `186b1b9` | `soak-fix-sprint-2026-07` | Superseded. Cross-tab notification read-state sync: both notification stores (forum + BBS) add a `storage`-event listener that reloads the visible list from localStorage on another tab's write, closing the multi-client clobber where a stale second tab / PWA reverted "mark all read" back to unread. Adds the `StorageEvent` web-sys feature. Client-only; library crates unchanged. |
 | `491b1fb` | `soak-fix-sprint-2026-07` | Superseded. Invite zone-grant made race-safe: `grant_zone_cohorts` inverted to ensure-then-merge so a concurrent username-claim insert can no longer clobber the zone cohort for a brand-new invitee. Library crates unchanged (still 1.0.0-beta.6). |
 | `3328220` | `soak-fix-sprint-2026-07` | Superseded. Slug/display zone alias applied across the whole UI (category cards, drill-downs, admin badges) — no raw `zone1..zone4` surfaced; ids/tags/cohorts unchanged. Carries the zone-bound invite feature (mint / `/join` landing / redeem-grants-zone) and the `/join` preview `state=active` validity fix. |
