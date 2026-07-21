@@ -22,11 +22,11 @@ its own `pin-check` extension.
 
 | Deployment host | Forum-kit SHA | Kit branch/tag at pin | Consumption tier | Canonical for pin-check |
 |---|---|---|---|---|
-| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `6c52878b2579cd65143f3249b90d32e20dd201e5` | `soak-fix-sprint-2026-07` (admin: zone id+slug are one cohort toggle; dedupe badges) | `integrated` | ✔ |
+| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `4b165a0b60626251d3f0da90f727a3da7bc01f28` | `soak-fix-sprint-2026-07` (don't wipe channels on a transient empty EOSE — disappearing panels) | `integrated` | ✔ |
 
 <!-- pin-check:canonical-kit-sha -->
 ```
-CANONICAL_KIT_SHA=6c52878b2579cd65143f3249b90d32e20dd201e5
+CANONICAL_KIT_SHA=4b165a0b60626251d3f0da90f727a3da7bc01f28
 CANONICAL_KIT_VERSION=1.0.0-beta.6
 ```
 
@@ -249,7 +249,8 @@ All render from the pinned kit at deploy time; this repo adds only branding
 
 | SHA | Branch/context | Notes |
 |---|---|---|
-| `6c52878` | `soak-fix-sprint-2026-07` | Current (canonical — matches `CANONICAL_KIT_SHA` above and the `KIT_REF` pins). Follow-up to the editor de-dupe: a user can hold BOTH a zone's generic id and its slug (dual-accept, e.g. `zone4`+`dreamlab`), which showed the zone badge twice and left the hidden generic-id cohort un-removable. `zone_equiv_group` makes the single zone checkbox control the whole group — checked if the user holds any equivalent, unchecking removes all — and read-only badges dedupe by resolved label. Client-only. |
+| `4b165a0` | `soak-fix-sprint-2026-07` | Current (canonical — matches `CANONICAL_KIT_SHA` above and the `KIT_REF` pins). Fixes transient "disappearing panels": the channel store rendered from cache then reconciled on EOSE, and an empty EOSE (cold/reconnecting relay DO that EOSEs before redelivering its kind-40s) wiped every channel. Now an empty EOSE only clears when nothing is displayed to lose; existing channels are kept (deletions still arrive as kind-5 tombstones). Client-only. |
+| `6c52878` | `soak-fix-sprint-2026-07` | Superseded. Follow-up to the editor de-dupe: a user can hold BOTH a zone's generic id and its slug (dual-accept, e.g. `zone4`+`dreamlab`), which showed the zone badge twice and left the hidden generic-id cohort un-removable. `zone_equiv_group` makes the single zone checkbox control the whole group — checked if the user holds any equivalent, unchecking removes all — and read-only badges dedupe by resolved label. Client-only. |
 | `cad1fad` | `soak-fix-sprint-2026-07` | Superseded. Admin cohort editor de-dupe: dual-accept `required_cohorts` list both a zone's generic id (`zone2`) and its slug (`minimoonoir`), so the editor showed both as checkboxes. `available_cohorts` now drops the generic id when the slug cohort is also offered — leaving Members, Agent, Minimoonoir, Family, Dreamlab. Non-destructive (editor seeds from each user's own cohorts; a hidden `zone2` on a user who holds it is preserved on save). Client-only. |
 | `5b90256` | `soak-fix-sprint-2026-07` | Superseded. Extends the "keep me signed in" opt-in to **signup**: a default-OFF checkbox at the Backup/finish step stores the freshly-generated key in localStorage and stays signed in, with an explicit caveat that it is a personal-use convenience and **not** suitable for organisation / agent collaboration (use a passkey or managed keys). `set_remember_me` now re-persists the in-memory key into the chosen scope, so a mid-session opt-in (signup) actually moves the already-saved key. Client-only. |
 | `04e3f37` | `soak-fix-sprint-2026-07` | Superseded. Opt-in **"stay signed in on this device"** for nsec/local-key logins: post-hardening these keys default to sessionStorage (cleared on tab close), forcing chat users to re-paste every visit. Adds `session::set_remember_me` + `AuthStore::set_remember_me` and a default-OFF checkbox with a privacy warning beside both nsec inputs on the login page; checking it upgrades key persistence to durable localStorage (`nostr_bbs_remember=true`). Passkey / NIP-07 unaffected. Client-only. |
