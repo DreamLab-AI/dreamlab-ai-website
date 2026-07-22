@@ -145,32 +145,33 @@ On a user's first successful registration, if enabled, `auth-worker` publishes a
 
 ---
 
-## Admin CLI
+## Driving these endpoints (historical note)
 
-All endpoints above are driven by the `forum-admin` binary (`community-forum-rs/crates/admin-cli/`):
-
-```bash
-forum-admin mod ban <pubkey> --reason "spam"
-forum-admin wot set-referente <pubkey>
-forum-admin wot refresh
-forum-admin invite create --expiry 168 --max-uses 1
-forum-admin mod report-list --json
-```
-
-See `community-forum-rs/crates/admin-cli/AGENT.md` for the full AI-agent cheat sheet.
+> **This section is stale.** It originally described a `forum-admin` CLI binary
+> (`community-forum-rs/crates/admin-cli/`) that shipped in the pre-rewrite
+> SvelteKit-era forum. That crate — and the `community-forum-rs` workspace it
+> lived in — no longer exists; both were removed when the forum was rewritten
+> in Rust/Leptos (`nostr-bbs-*` crates, see the kit's top-level `README.md`).
+> There is **no admin CLI** in the current kit. The endpoints above are driven
+> the same way every other admin action is: a NIP-98-signed HTTP request from
+> an authenticated admin session (in practice, the forum client's admin
+> screens), checked against `members.is_admin = 1` per the Authentication
+> section at the top of this doc. See `crates/nostr-bbs-auth-worker/src/{moderation,wot,invites,admin}.rs`
+> for the handlers.
 
 ---
 
 ## Migration
 
-All schema changes land in a single reversible migration: `community-forum-rs/crates/auth-worker/migrations/002_mod_wot_invites_welcome.sql`.
+All schema changes land in a single reversible migration: `crates/nostr-bbs-auth-worker/migrations/002_mod_wot_invites_welcome.sql`
+(path retained from the original sprint; verify against the current migrations
+directory before relying on the exact filename).
 
 ## Testing
 
-- `cargo test -p nostr-core` — 154 tests (includes moderation event kind validators)
-- `cargo test -p auth-worker` — 70 tests (includes all handlers above)
-- `cargo test -p relay-worker` — 24 tests (includes mod-cache enforcement)
-- `cargo test -p admin-cli` — 80 tests (command parsing + NIP-98 signing + dry-run)
+- `cargo test -p nostr-bbs-core` — includes moderation event kind validators
+- `cargo test -p nostr-bbs-auth-worker` — includes the handlers above
+- `cargo test -p nostr-bbs-relay-worker` — includes mod-cache enforcement
 
 ## Related
 
