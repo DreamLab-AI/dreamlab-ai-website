@@ -11,7 +11,9 @@ The visionclaw-server key
 `11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c` is currently
 listed **both** as the PRIMARY forum admin (`dreamlab.toml [admin].static_pubkeys`)
 and as a `[governance].agent_pubkeys` publisher. It is a non-admin governance
-service identity (the BrokerActor); its admin listing is wrong.
+service identity (the VisionClaw governance publisher — historically labelled
+"the BrokerActor", an actor that never merged to VisionClaw main; corrected
+2026-07-22 per VisionClaw ADR-131/132); its admin listing is wrong.
 
 Removing it from the admin set is a **four-location atomic change**:
 
