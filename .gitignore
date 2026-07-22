@@ -76,3 +76,7 @@ workshop-builder/
 # Seed tooling secrets and probes
 scripts/seed/.test-keys.json
 scripts/seed/probes/
+
+# agentdb RVF init-rot: empty stores touched by agentdb-enabled tooling; ruvector-postgres is the only memory store (agentbox ADR-015)
+agentdb.rvf
+agentdb.rvf.lock
