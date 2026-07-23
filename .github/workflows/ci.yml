@@ -20,6 +20,12 @@ on:
       - 'vite.config.*'
       - 'tsconfig*'
       - '.github/workflows/ci.yml'
+      # Pin sites — a client-only kit re-pin touches ONLY these, so pin-check
+      # must re-run on them or the lockstep gate is silently skipped.
+      - '.github/workflows/deploy.yml'
+      - '.github/workflows/workers-deploy.yml'
+      - '.github/workflows/rust-ci.yml'
+      - 'docs/architecture/kit-compatibility-record.md'
   pull_request:
     branches: [main]
     paths:
@@ -31,6 +37,12 @@ on:
       - 'vite.config.*'
       - 'tsconfig*'
       - '.github/workflows/ci.yml'
+      # Pin sites — a client-only kit re-pin touches ONLY these, so pin-check
+      # must re-run on them or the lockstep gate is silently skipped.
+      - '.github/workflows/deploy.yml'
+      - '.github/workflows/workers-deploy.yml'
+      - '.github/workflows/rust-ci.yml'
+      - 'docs/architecture/kit-compatibility-record.md'
   workflow_dispatch:
 
 concurrency:
