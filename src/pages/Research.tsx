@@ -62,7 +62,7 @@ const Research = () => {
             16 Years of Deep Tech Research
           </h1>
           <p className="text-base sm:text-lg md:text-xl text-blue-200 max-w-4xl mx-auto leading-relaxed px-4">
-            The Octave laboratory (2007-2023) produced world-first collaborative immersive systems worth over £8M in research value. That research heritage now forms the foundation of our Applied Innovation Lab — commercialising deep tech for real-world impact.
+            The Octave laboratory (2007-2023) produced world-first collaborative immersive systems worth over £8M in research value. That research heritage now forms the foundation of our Applied Innovation Lab, commercialising deep tech for real-world impact.
           </p>
         </div>
 
@@ -102,7 +102,7 @@ const Research = () => {
             <Card className="p-8 bg-gradient-to-br from-blue-800/40 to-indigo-800/40 backdrop-blur-md border-blue-500/30">
               <Users className="w-12 h-12 text-cyan-400 mb-4" />
               <h3 className="text-xl font-bold mb-3">Collaborative Immersion</h3>
-              <p className="text-blue-200">Multiple specialists work together in a single immersive space with individual stereoscopic viewpoints — a world first in collaborative VR.</p>
+              <p className="text-blue-200">Multiple specialists work together in a single immersive space with individual stereoscopic viewpoints, a world first in collaborative VR.</p>
             </Card>
             <Card className="p-8 bg-gradient-to-br from-indigo-800/40 to-purple-800/40 backdrop-blur-md border-indigo-500/30">
               <Brain className="w-12 h-12 text-purple-400 mb-4" />
@@ -112,21 +112,21 @@ const Research = () => {
             <Card className="p-8 bg-gradient-to-br from-purple-800/40 to-pink-800/40 backdrop-blur-md border-purple-500/30">
               <Volume2 className="w-12 h-12 text-pink-400 mb-4" />
               <h3 className="text-xl font-bold mb-3">Wave Field Synthesis</h3>
-              <p className="text-pink-200">Spatial audio and volumetric telepresence enable natural, trust-based interaction — critical for multi-disciplinary problem solving.</p>
+              <p className="text-pink-200">Spatial audio and volumetric telepresence enable natural, trust-based interaction, critical for multi-disciplinary problem solving.</p>
             </Card>
           </div>
         </div>
 
         {/* Flow State Advantage */}
         <div className="mb-20 max-w-4xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-cyan-300">The Flow State Advantage</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-cyan-300">Flow State Advantage</h2>
           <div className="space-y-6">
             <Card className="p-6 bg-gradient-to-r from-green-800/40 to-emerald-800/40 backdrop-blur-md border-green-500/30">
               <div className="flex items-start gap-4">
                 <Eye className="w-8 h-8 text-green-400 flex-shrink-0 mt-1" />
                 <div>
                   <h3 className="text-xl font-bold mb-2">Focused Data Presentation</h3>
-                  <p className="text-green-200">Each expert sees only their relevant data — no overload, no context switching. Domain-specific views reduce cognitive load.</p>
+                  <p className="text-green-200">Each expert sees only their relevant data: no overload, no context switching. Domain-specific views reduce cognitive load.</p>
                 </div>
               </div>
             </Card>
@@ -144,7 +144,7 @@ const Research = () => {
                 <TrendingUp className="w-8 h-8 text-teal-400 flex-shrink-0 mt-1" />
                 <div>
                   <h3 className="text-xl font-bold mb-2">AI Learns from the Best</h3>
-                  <p className="text-teal-200">AI captures what each expert sees, says, and does — building a multi-viewpoint knowledge graph richer than any single perspective. It learns from the best, not the confused.</p>
+                  <p className="text-teal-200">AI captures what each expert sees, says, and does, building a multi-viewpoint knowledge graph richer than any single perspective. It learns from the best, not the confused.</p>
                 </div>
               </div>
             </Card>
@@ -163,7 +163,7 @@ const Research = () => {
             </div>
             <div className="border-t border-orange-500/30 pt-8">
               <p className="text-lg text-orange-200">
-                AI learned and propagated emergent protocols — including 3D gesture languages and risk communication systems — across teams and domains. This is the kind of applied innovation that our lab now commercialises for industry.
+                AI learned and propagated emergent protocols (including 3D gesture languages and risk communication systems) across teams and domains. This is the kind of applied innovation that our lab now commercialises for industry.
               </p>
             </div>
           </Card>
@@ -340,7 +340,7 @@ const Research = () => {
               <div className="md:col-span-2">
                 <h3 className="text-2xl font-bold mb-4 text-cyan-300">From Octave to the Applied Innovation Lab</h3>
                 <p className="text-lg text-slate-200 mb-6">
-                  The Octave project represents one of the longest-running collaborative VR research programmes in the UK, continuously evolving from 2007 to 2023. That 16-year body of work — multi-user systems, real-world nuclear applications, and AI-mediated teamwork — now forms the research foundation of the DreamLab Applied Innovation Lab.
+                  The Octave project represents one of the longest-running collaborative VR research programmes in the UK, continuously evolving from 2007 to 2023. That 16-year body of work (multi-user systems, real-world nuclear applications, and AI-mediated teamwork) now forms the research foundation of the DreamLab Applied Innovation Lab.
                 </p>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex items-center gap-3">
@@ -388,12 +388,12 @@ const Research = () => {
               </div>
               <div className="flex items-start gap-4">
                 <Globe className="w-8 h-8 text-pink-400 flex-shrink-0 mt-1" />
-                <p className="text-pink-200 text-lg">Leverages the UK's collaborative culture, world-class AI research, and Responsible Innovation frameworks to set global standards.</p>
+                <p className="text-pink-200 text-lg">Draws on the UK's collaborative culture, world-class AI research, and Responsible Innovation frameworks to set global standards.</p>
               </div>
             </div>
             <div className="mt-8 p-6 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-lg border border-cyan-500/30">
               <p className="text-center text-lg font-bold text-cyan-300">
-                The technology is ready. The need is critical. The potential is transformative.
+                The technology is ready, the need is critical, and the payoff could reshape how safety-critical industries plan and train.
               </p>
             </div>
           </Card>

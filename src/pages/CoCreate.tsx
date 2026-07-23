@@ -65,7 +65,7 @@ const CoCreate = () => {
               Co-Create With Us
             </h1>
             <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-8 max-w-3xl mx-auto px-4">
-              Bring your toughest challenge to our Lake District lab. Your team works alongside 44+ deep tech specialists in an environment designed for focused, intensive co-creation. We do not just advise. We build with you.
+              Bring your toughest challenge to our Lake District lab. Your team works alongside 43+ deep tech specialists in an environment designed for focused, intensive co-creation. We do not just advise. We build with you.
             </p>
             <Button size="lg" asChild className="min-h-[44px]">
               <Link to="/contact">Book a Discovery Call <ArrowRight className="ml-2 w-4 h-4" /></Link>
@@ -195,9 +195,9 @@ const CoCreate = () => {
         <div className="container max-w-6xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-10 md:gap-12 items-center">
             <div className="order-2 lg:order-1">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6">The Lab Environment</h2>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6">Lab Environment</h2>
               <p className="text-foreground/80 leading-relaxed mb-6">
-                Our Lake District facility is purpose-built for intensive co-creation. Teams work in a residential setting with enterprise-grade infrastructure, surrounded by the natural environment that research consistently links to creative problem-solving and sustained focus.
+                Our Lake District facility is purpose-built for intensive co-creation. Teams work in a residential setting with production-grade infrastructure, surrounded by the natural environment that research consistently links to creative problem-solving and sustained focus.
               </p>
               <div className="grid grid-cols-2 gap-4 mb-6">
                 {[
@@ -282,7 +282,7 @@ const CoCreate = () => {
           <div className="bg-background/50 backdrop-blur border border-green-500/20 rounded-2xl p-6 md:p-10">
             <h2 className="text-2xl md:text-3xl font-bold mb-6">UK Innovation Funding</h2>
             <p className="text-foreground/80 leading-relaxed mb-6">
-              We actively support grant applications and help position your engagement within the UK innovation ecosystem. Our programmes target the TRL 4-7 sweet spot where Innovate UK funding has the greatest impact.
+              We actively support grant applications and help position your engagement within the UK innovation landscape. Our programmes target the TRL 4-7 sweet spot where Innovate UK funding has the greatest impact.
             </p>
             <div className="grid sm:grid-cols-2 gap-4 mb-6">
               {[

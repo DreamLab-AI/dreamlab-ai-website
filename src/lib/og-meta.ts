@@ -54,7 +54,7 @@ const OG_IMAGES = {
 export const PAGE_OG_CONFIGS: Record<string, OGMetaConfig> = {
   home: {
     title: 'DreamLab AI — AI & Agents Residential Training in the Lake District',
-    description: 'Residential AI and agents training in the Lake District. Agentics, spatial computing, rapid prototyping & secure distributed systems — training, consulting, and bespoke product development with 40+ deep tech specialists.',
+    description: 'Residential AI and agents training in the Lake District. Agentics, spatial computing, rapid prototyping & secure distributed systems — training, consulting, and bespoke product development with 43+ deep tech specialists.',
     url: BASE_URL,
     image: OG_IMAGES.default,
     imageAlt: 'DreamLab AI residential training facility in the Lake District',
@@ -97,7 +97,7 @@ export const PAGE_OG_CONFIGS: Record<string, OGMetaConfig> = {
   },
   team: {
     title: 'Our Team | DreamLab Applied Innovation Lab',
-    description: 'Meet the DreamLab collective — 44+ specialists including Emmy nominees, PhD researchers, and BAFTA-recognised talent across AI, XR, cyber, audio, and creative technology.',
+    description: 'Meet the DreamLab collective — 43+ specialists including Emmy nominees, PhD researchers, and BAFTA-recognised talent across AI, XR, cyber, audio, and creative technology.',
     url: `${BASE_URL}/team`,
     image: OG_IMAGES.team,
     imageAlt: 'DreamLab Team - Multi-Disciplinary Expertise',

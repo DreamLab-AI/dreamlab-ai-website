@@ -217,12 +217,12 @@ const Index = () => {
                 The Lab: Lake District Innovation Facility
               </h2>
               <p className="text-base md:text-lg text-foreground/80 leading-relaxed mb-6">
-                A residential deep tech facility in the Lake District combining focused R&D environments with the clarity that comes from working away from the office. Solar-powered, enterprise-grade, and purpose-built for intensive co-creation.
+                A residential deep tech facility in the Lake District combining focused R&D environments with the clarity that comes from working away from the office. Solar-powered, production-grade, and purpose-built for intensive co-creation.
               </p>
               <div className="grid grid-cols-2 gap-4 mb-8">
                 {[
                   { label: "Solar-Powered", detail: "6.3kW sustainable infrastructure" },
-                  { label: "10G Network", detail: "Enterprise-grade connectivity" },
+                  { label: "10G Network", detail: "Production-grade connectivity" },
                   { label: "GPU Cluster", detail: "8x RTX for ML workloads" },
                   { label: "LED Volume", detail: "Virtual production stage" },
                   { label: "Spatial Sound", detail: "24-speaker custom system" },
@@ -265,7 +265,7 @@ const Index = () => {
             {[
               { stat: "£8M+", label: "Research Heritage" },
               { stat: "30 Years", label: "Deep Tech R&D" },
-              { stat: "40+", label: "Specialists" },
+              { stat: "44+", label: "Specialists" },
               { stat: "Lake District", label: "Residential Facility" },
             ].map((item) => (
               <div key={item.label} className="text-center px-4 py-2">
@@ -405,7 +405,7 @@ const Index = () => {
               Multi-Disciplinary Expertise
             </h2>
             <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-              44+ specialists spanning AI, XR, cyber, audio, and creative technology. Every programme draws on complementary expertise for comprehensive knowledge transfer.
+              43+ specialists spanning AI, XR, cyber, audio, and creative technology. Every programme draws on complementary expertise, so your team leaves with more than one discipline's worth of knowledge.
             </p>
           </div>
 
