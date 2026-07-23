@@ -1,16 +1,20 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Local forum dev server — clones or updates the upstream kit at KIT_REF,
-# then runs `trunk serve` with live-reload on the forum client.
+# Local forum dev server — builds the forum client from the SHARED master clone
+# of the upstream kit and runs `trunk serve` with live-reload.
 #
 # Usage:
 #   ./scripts/forum-dev.sh          # start dev server (default :8080)
-#   ./scripts/forum-dev.sh build    # one-shot release build to kit/dist/
-#   ./scripts/forum-dev.sh update   # re-fetch kit at current KIT_REF
+#   ./scripts/forum-dev.sh build    # one-shot release build to <kit>/dist/
+#   ./scripts/forum-dev.sh update   # fast-forward the master clone's main to KIT_REF
 #
-# The kit is cloned into ./kit/ (gitignored). First run compiles the full
-# dependency tree (~8-15 min); incremental rebuilds are 5-15 seconds.
+# The kit is NOT cloned into a per-project ./kit/ any more. Kit development
+# happens in the single workspace master clone (a sibling of this repo, default
+# ~/workspace/nostr-rust-forum) so there is one source of truth — edit there,
+# push to main, then bump KIT_REF here. Override the location with
+# NOSTR_RUST_FORUM_DIR. First build compiles the full dependency tree
+# (~8-15 min); incremental rebuilds are 5-15 seconds.
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
@@ -19,36 +23,49 @@ REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 CARGO_BIN="${CARGO_HOME:-$HOME/.cargo}/bin"
 [ -d "$REPO_ROOT/../.cargo/bin" ] && CARGO_BIN="$REPO_ROOT/../.cargo/bin"
 export PATH="$CARGO_BIN:$PATH"
-KIT_DIR="$REPO_ROOT/kit"
+
+# The shared upstream master clone (sibling of this repo by default).
+KIT_DIR="${NOSTR_RUST_FORUM_DIR:-$REPO_ROOT/../nostr-rust-forum}"
 CLIENT_DIR="$KIT_DIR/crates/nostr-bbs-forum-client"
 KIT_REPO="https://github.com/DreamLab-AI/nostr-rust-forum.git"
 
-# Extract KIT_REF from deploy.yml (single source of truth)
+if [ ! -d "$KIT_DIR/.git" ]; then
+    echo "ERROR: upstream master clone not found at $KIT_DIR" >&2
+    echo "Clone it once as a workspace sibling (single source of truth):" >&2
+    echo "  git clone $KIT_REPO $KIT_DIR" >&2
+    echo "Or point NOSTR_RUST_FORUM_DIR at an existing clone." >&2
+    exit 1
+fi
+
+# Extract KIT_REF from deploy.yml (single source of truth for the pinned commit)
 KIT_REF=$(grep -oP "KIT_REF:\s*'\K[a-f0-9]+" "$REPO_ROOT/.github/workflows/deploy.yml" | head -1)
 if [ -z "$KIT_REF" ]; then
     echo "ERROR: Could not extract KIT_REF from deploy.yml" >&2
     exit 1
 fi
-echo "Kit ref: ${KIT_REF:0:12}..."
+echo "Kit ref: ${KIT_REF:0:12}...   (master clone: $KIT_DIR)"
 
-# Clone or update kit
-if [ ! -d "$KIT_DIR/.git" ]; then
-    echo "Cloning upstream kit..."
-    git clone --filter=blob:none --no-checkout "$KIT_REPO" "$KIT_DIR"
-    git -C "$KIT_DIR" checkout --detach "$KIT_REF"
-elif [ "${1:-}" = "update" ]; then
-    echo "Updating kit to $KIT_REF..."
+# `update` fast-forwards the master clone's main to the pinned commit. Never
+# force-mutates a dirty tree — the master is the developer's working copy.
+if [ "${1:-}" = "update" ]; then
+    if [ -n "$(git -C "$KIT_DIR" status --porcelain)" ]; then
+        echo "Master clone has uncommitted changes — resolve them first, then re-run." >&2
+        exit 1
+    fi
+    echo "Fetching + aligning master clone main to $KIT_REF..."
     git -C "$KIT_DIR" fetch origin
-    git -C "$KIT_DIR" checkout --detach "$KIT_REF"
+    git -C "$KIT_DIR" checkout main
+    git -C "$KIT_DIR" pull --ff-only origin main
     echo "Updated. Re-run without 'update' to start the dev server."
     exit 0
 fi
 
-# Verify kit is at expected ref
+# Verify the master clone is at the expected pinned ref (KIT_REF is a commit on
+# main). A mismatch means the master hasn't been aligned to the current pin.
 CURRENT_REF=$(git -C "$KIT_DIR" rev-parse HEAD)
 if [ "$CURRENT_REF" != "$KIT_REF" ]; then
-    echo "WARNING: kit is at ${CURRENT_REF:0:12}, expected ${KIT_REF:0:12}"
-    echo "Run: $0 update"
+    echo "WARNING: master clone is at ${CURRENT_REF:0:12}, KIT_REF is ${KIT_REF:0:12}"
+    echo "Run: $0 update   (aligns the master clone's main to the pin)"
 fi
 
 # NixOS cross-compilation fix: cc-rs picks up host glibc includes which
