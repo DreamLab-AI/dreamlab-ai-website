@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Community Forums</title>
+    <meta name="description" content="Community Forums — a private space for our community" />
+    <meta name="theme-color" content="#111827" />
+
+    <!-- GitHub Pages SPA deep-link restore: picks up redirect from root 404.html -->
+    <script>
+        (function(){
+            var q = new URLSearchParams(window.location.search);
+            var redirect = q.get('__p');
+            if (redirect) {
+                q.delete('__p');
+                var qs = q.toString();
+                var base = '/community';
+                var full = base + redirect + (qs ? '?' + qs : '') + window.location.hash;
+                history.replaceState(null, '', full);
+            }
+        })();
+    </script>
+
+    <!-- Favicon: amber diamond -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%23fbbf24'/><stop offset='100%25' stop-color='%23d97706'/></linearGradient></defs><polygon points='50,5 95,50 50,95 5,50' fill='url(%23g)' rx='8'/></svg>" type="image/svg+xml" />
+
+    <!-- Inter font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+    <!-- Tailwind utilities (tree-shaken at build time by Tailwind CLI v3.4.17,
+         driven by Trunk pre_build hook in Trunk.toml). Replaces the legacy
+         cdn.tailwindcss.com Play CDN — Chrome flags that as dev-only and it
+         shipped ~3MB of unused CSS to every visitor. The pre_build hook scans
+         src/**/*.rs (Leptos view! macros) plus index.html and emits a
+         minified tailwind.dist.css. Config: tailwind.config.js. -->
+    <link rel="stylesheet" href="/community/tailwind.dist-18d133d03af2f023.css" integrity="sha384-qWzkmWVIxpxEI1JZlo3xTz4BLBWgmcNRNcONn5cyTjeaDZr0d6tt8xHtcZqyuwos"/>
+
+    <!-- Shared design tokens (same source as React marketing site) -->
+    <link rel="stylesheet" href="/community/design-tokens-87aa802dc4ac0d31.css" integrity="sha384-LzBEMGY70JF2PjhwLnqgpXmgsHQ2QB7IKQLIWQtXWnstU5ZglNWgBuR/dhmdWBkI"/>
+    <!-- Forum-specific styles (imports design-tokens.css for @import fallback) -->
+    <link rel="stylesheet" href="/community/style-571578f4f2973681.css" integrity="sha384-cGbCskLMOoGv7CEfDqNAUPeBNcACGeNq2MvUjDy5RjQymrc6/DBb4LKNhQZ3EDcj"/>
+
+    <!-- Runtime config placeholder — DO NOT commit real endpoints, admin keys,
+         or branding here.
+         The deploy pipeline REPLACES this entire <script> block with the
+         operator's real `window.__ENV__` (relay/auth/pod/search endpoints,
+         zones, branding, build metadata). It is intentionally empty in the kit
+         so an un-injected build (local Trunk, or CI without the deploy step)
+         falls back to the client's own safe defaults — the production relay,
+         a brand-neutral forum name, the legacy zone list, and "dev"/"local"
+         build strings — rather than shipping any operator- or dev-specific
+         endpoints that are unreachable off the dev box. -->
+    <script>
+    window.__ENV__ = window.__ENV__ || {};
+    </script>
+
+    <!-- Trunk WASM bundle injection (workspace: specify package + binary).
+         data-wasm-opt="0" disables Trunk's bundled wasm-opt 122 which rejects
+         Rust 1.90's bulk-memory ops. We run a manually-installed binaryen 119
+         in a post_build Trunk hook instead — see Trunk.toml. -->
+    
+<script type="module">
+import init, * as bindings from '/community/nostr-bbs-forum-client-e897376ad6157d01.js';
+const wasm = await init({ module_or_path: '/community/nostr-bbs-forum-client-e897376ad6157d01_bg.wasm' });
+
+
+window.wasmBindings = bindings;
+
+
+dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
+
+</script>
+
+    <!-- Service worker copied to dist/community/sw.js so main.rs's
+         navigator.serviceWorker.register('./sw.js') resolves at runtime.
+         Trunk's correct asset-copy directive is rel="copy-file"; the [[copy]]
+         table in Trunk.toml is silently ignored. -->
+    
+
+    <!-- PWA manifest: installs the MAIN forum interface as the home-screen app
+         (scope /community/, one-shot boot via ?pwa=1). Copied verbatim so the
+         relative href resolves at the served base; the deploy re-brands
+         name/short_name. The retro BBS keeps its own nested-scope manifest at
+         /community/bbs/ for those who prefer that interface. -->
+    
+    <link rel="manifest" href="manifest.webmanifest" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Community" />
+<link rel="modulepreload" href="/community/nostr-bbs-forum-client-e897376ad6157d01.js" crossorigin="anonymous" integrity="sha384-TXI9fu0oAtgfO4u5b7nIikXf4m+Idc83KXXFcjpXhL5U2Ytjwtx0GD77gMC2wz0X"><link rel="modulepreload" href="/community/snippets/nostr-bbs-forum-client-a99ba32fb5c0fbe8/js/webgpu-particles.js" crossorigin="anonymous" integrity="sha384-vn2XAG3blLw95RCJXf9/pLqn+tzLiY8+dOJM/oX+V/PmBwLQOC4YyokhgtC8wQL5"><link rel="modulepreload" href="/community/snippets/nostr-bbs-forum-client-79f0e0f134a0eaad/js/webgpu-particles.js" crossorigin="anonymous" integrity="sha384-vn2XAG3blLw95RCJXf9/pLqn+tzLiY8+dOJM/oX+V/PmBwLQOC4YyokhgtC8wQL5"><link rel="modulepreload" href="/community/snippets/nostr-bbs-forum-client-a7c434c1733f11d7/js/webgpu-particles.js" crossorigin="anonymous" integrity="sha384-vn2XAG3blLw95RCJXf9/pLqn+tzLiY8+dOJM/oX+V/PmBwLQOC4YyokhgtC8wQL5"><link rel="modulepreload" href="/community/snippets/nostr-bbs-forum-client-227342e598d13d07/js/webgpu-particles.js" crossorigin="anonymous" integrity="sha384-vn2XAG3blLw95RCJXf9/pLqn+tzLiY8+dOJM/oX+V/PmBwLQOC4YyokhgtC8wQL5"><link rel="modulepreload" href="/community/snippets/nostr-bbs-forum-client-eed96aff506ae55e/js/webgpu-particles.js" crossorigin="anonymous" integrity="sha384-vn2XAG3blLw95RCJXf9/pLqn+tzLiY8+dOJM/oX+V/PmBwLQOC4YyokhgtC8wQL5"><link rel="modulepreload" href="/community/snippets/nostr-bbs-forum-client-5c591d6a9917c9f0/js/webgpu-particles.js" crossorigin="anonymous" integrity="sha384-vn2XAG3blLw95RCJXf9/pLqn+tzLiY8+dOJM/oX+V/PmBwLQOC4YyokhgtC8wQL5"><link rel="modulepreload" href="/community/snippets/nostr-bbs-forum-client-7ad7b0d82596c002/js/webgpu-particles.js" crossorigin="anonymous" integrity="sha384-vn2XAG3blLw95RCJXf9/pLqn+tzLiY8+dOJM/oX+V/PmBwLQOC4YyokhgtC8wQL5"><link rel="modulepreload" href="/community/snippets/nostr-bbs-forum-client-d7773f88541b62b9/js/webgpu-particles.js" crossorigin="anonymous" integrity="sha384-vn2XAG3blLw95RCJXf9/pLqn+tzLiY8+dOJM/oX+V/PmBwLQOC4YyokhgtC8wQL5"><link rel="modulepreload" href="/community/snippets/nostr-bbs-forum-client-d53b5a6133ca7d4f/js/webgpu-particles.js" crossorigin="anonymous" integrity="sha384-vn2XAG3blLw95RCJXf9/pLqn+tzLiY8+dOJM/oX+V/PmBwLQOC4YyokhgtC8wQL5"><link rel="modulepreload" href="/community/snippets/nostr-bbs-forum-client-744c243b1845ce55/js/webgpu-particles.js" crossorigin="anonymous" integrity="sha384-vn2XAG3blLw95RCJXf9/pLqn+tzLiY8+dOJM/oX+V/PmBwLQOC4YyokhgtC8wQL5"><link rel="preload" href="/community/nostr-bbs-forum-client-e897376ad6157d01_bg.wasm" crossorigin="anonymous" integrity="sha384-24GF61HV7DuFoGaLrebdg3s/3AcLQMS2AtLBFnomxNXY9WlWtbsn0Ek0LoWMvcBw" as="fetch" type="application/wasm"><script>window.__ENV__={BBS_PWA_ENABLED:"true",BRAND_LABEL:"Community",FORUM_NAME:"Community Forums",VITE_RELAY_URL:"wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev",VITE_AUTH_API_URL:"https://dreamlab-auth-api.solitary-paper-764d.workers.dev",VITE_POD_API_URL:"https://dreamlab-pod-api.solitary-paper-764d.workers.dev",VITE_SEARCH_API_URL:"https://dreamlab-search-api.solitary-paper-764d.workers.dev",VITE_LINK_PREVIEW_API_URL:"https://dreamlab-link-preview.solitary-paper-764d.workers.dev",BUILD_VERSION:"2026.07.23",BUILD_HASH:"4a7b7cc",ZONE_CONFIG:[{"id":"zone1","slug":"welcome","display_name":"Welcome","required_cohorts":[],"write_cohorts":["members","agent"],"banner_image_url":"/images/heroes/lake-district-dawn.webp","visibility":"public","encrypted":false,"accent_hex":"#22c55e"},{"id":"zone2","slug":"minimoonoir","display_name":"Minimoonoir","required_cohorts":["zone2","minimoonoir"],"banner_image_url":"/images/heroes/minimoonoir-hero.webp","visibility":"locked","encrypted":false,"accent_hex":"#3b82f6","section_order":["zone2-rants"]},{"id":"zone3","slug":"family","display_name":"Family","required_cohorts":["zone3","family"],"banner_image_url":"/images/heroes/family-hero.webp","visibility":"locked","encrypted":true,"accent_hex":"#f59e0b"},{"id":"zone4","slug":"dreamlab","display_name":"DreamLab","required_cohorts":["zone4","dreamlab"],"banner_image_url":"/images/heroes/business-hero.webp","visibility":"locked","encrypted":false,"accent_hex":"#a855f7"}]};</script><script>(function(){var q=new URLSearchParams(window.location.search);var r=q.get("__p");if(r){q.delete("__p");var s=q.toString();history.replaceState(null,"","/community"+r+(s?"?"+s:""));}})();</script></head>
+<body>
+    <!-- Loading screen — replaced by Leptos mount_to_body() -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-ring"></div>
+        <h1 class="loading-logo gradient-text">dreamlab</h1>
+        <p class="loading-status">Initializing&hellip;</p>
+    </div>
+
+    <noscript>This application requires JavaScript and WebAssembly.</noscript>
+</body>
+</html>
