@@ -16,8 +16,8 @@ meta:
       url: "https://agenticalliance.com/"
     - name: "Narrative Goldmine"
       url: "https://www.narrativegoldmine.com"
-    - name: "Visionflow"
-      url: "https://www.visionflow.com"
+    - name: "VisionFlow"
+      url: "https://www.visionflow.info"
 
 navigation:
   menu_items:
@@ -42,7 +42,7 @@ pages:
       trust_badge: "Limited to 15 participants per cohort"
       headline: "Build Production-Grade AI Agents That Outperform Standard Tools by 30%"
       subheadline: "In one day, walk away with a working agent, reusable templates, and frameworks to build the next one yourself."
-      audience_description: "Deep agentic AI training for CTOs, tech leads, and technical founders who want AI doing real work — not just demos."
+      audience_description: "Deep agentic AI training for CTOs, tech leads, and technical founders who want AI doing real work, not just demos."
       cta_primary:
         text: "Get the AI Agent Masterclass →"
         path: "/residential-training"
@@ -164,19 +164,19 @@ pages:
       pull_quote:
         text: "On day three, standing in front of that virtual sunset that finally responded to my camera moves in real-time, I understood why my traditional compositing workflow suddenly felt like archaeology."
         attribution: "Sarah M., Senior Colourist turned VP Supervisor"
-      shift: "The breakthrough came not in a classroom but during a morning walk along Derwentwater. Something about watching fog lift off the water while mentally replaying the volumetric lighting tutorial from the night before. The real and the virtual stopped feeling like opposing forces. By the final session, she wasn't just operating the LED wall—she was choreographing light the way she'd always wanted to, just with tools that hadn't existed when she started her career."
-      result: "Six months later, Sarah leads virtual production integration at a mid-sized commercial house in Manchester. Her first VP job was a car commercial where the \"location\" was generated entirely from HDRI data she captured in the Lake District on that last morning—the same mountains she'd walked past, now wrapped around an LED volume, responding to camera moves she was calling."
+      shift: "The breakthrough came not in a classroom but during a morning walk along Derwentwater. Something about watching fog lift off the water while mentally replaying the volumetric lighting tutorial from the night before. The real and the virtual stopped feeling like opposing forces. By the final session, she wasn't just operating the LED wall. She was choreographing light the way she'd always wanted to, just with tools that hadn't existed when she started her career."
+      result: "Six months later, Sarah leads virtual production integration at a mid-sized commercial house in Manchester. Her first VP job was a car commercial where the \"location\" was generated entirely from HDRI data she captured in the Lake District on that last morning, the same mountains she'd walked past, now wrapped around an LED volume, responding to camera moves she was calling."
     cta:
       link_text: "Explore our residential training programmes"
       path: "/residential-training"
       note: "Limited to 4 participants per cohort for genuine transformation"
 
   residential_training:
-    availability_banner: "Q1 2025 fully booked — Q2 sessions available at reduced rates during facility upgrades"
+    availability_banner: "Q1 2025 fully booked. Q2 sessions available at reduced rates during facility upgrades"
     hero:
       badge: "Residential Training"
       headline: "Deep learning with no distractions"
-      description: "Train with the DreamLab collective — 43+ specialists including Emmy nominees, PhD researchers, and BAFTA-recognised talent. Multi-instructor delivery at our Lake District residential facility."
+      description: "Train with the DreamLab collective: 43+ specialists including Emmy nominees, PhD researchers, and BAFTA-recognised talent. Multi-instructor delivery at our Lake District residential facility."
       cta_primary: "Book Your Training"
       cta_secondary: "Download Brochure"
 
@@ -189,14 +189,14 @@ pages:
         description: "LED volume, motion capture, 8×RTX GPU cluster, Dolby Atmos studio"
       - icon: "award"
         title: "6.3kW Solar + 10G Network"
-        description: "Sustainable infrastructure with enterprise-grade connectivity"
+        description: "Sustainable infrastructure with production-grade connectivity"
       - icon: "home"
         title: "Lake District Residential"
         description: "5-bedroom luxury accommodation with stunning mountain views"
 
     programs_section:
       headline: "Immersive Training Programs"
-      description: "Multi-instructor delivery from our 43+ specialist collective. Each programme combines complementary expertise for comprehensive, hands-on skill transfer."
+      description: "Multi-instructor delivery from our 43+ specialist collective. Each programme combines complementary expertise for thorough, hands-on skill transfer."
       categories:
         - id: "all"
           label: "All"
@@ -329,7 +329,7 @@ pages:
         team_saving: "Save £530"
         capacity: "Up to 4"
         category: "Emerging Tech"
-        description: "Cutting-edge 3D reconstruction from photogrammetry to neural radiance fields. Gaussian splatting capture and real-time neural rendering."
+        description: "Recent 3D reconstruction techniques from photogrammetry to neural radiance fields. Gaussian splatting capture and real-time neural rendering."
         modules:
           - "Gaussian Splatting Capture Pipeline"
           - "NeRF Implementation & Optimisation"
@@ -381,7 +381,7 @@ pages:
         team_saving: "Save £685"
         capacity: "Up to 4"
         category: "Foundation"
-        description: "Comprehensive introduction to creative technology for career changers and newcomers. From version control to AI-assisted workflows."
+        description: "Full introduction to creative technology for career changers and newcomers. From version control to AI-assisted workflows."
         modules:
           - "Development Environment Setup"
           - "Git & Collaborative Workflows"
@@ -408,8 +408,8 @@ pages:
           - "Strategic Roadmap Development"
         instructors: "Pete Woodbridge, Dr John O'Hare, Stephen Moyler"
 
-      - id: "visionflow-power-user"
-        title: "VisionFlow Power User"
+      - id: "visionclaw-power-user"
+        title: "VisionClaw Power User"
         duration: "4 Days"
         price_per_person: "£2,195"
         team_price: "£7,450"
@@ -417,12 +417,12 @@ pages:
         capacity: "Up to 4"
         category: "AI/ML"
         featured: true
-        description: "Master self-sovereign knowledge management with VisionFlow. Deploy autonomous AI agent teams that research, analyse, and visualise your data corpus in stunning 3D—all on your own infrastructure."
+        description: "Master self-sovereign knowledge management with VisionClaw. Deploy autonomous AI agent teams that research, analyse, and visualise your data corpus in stunning 3D, all on your own infrastructure."
         modules:
           - "Self-Sovereign Data Architecture & Privacy"
           - "Multi-Agent Orchestration with MCP Protocol"
           - "GraphRAG & Knowledge Graph Construction"
-          - "3D Visualisation with Three.js & Neo4j"
+          - "3D Visualisation with Three.js, Oxigraph & SQLite"
           - "On-Premise Deployment & Security Hardening"
         instructors: "Pete Woodbridge (CTO), Kriss Dunk, Jing Li"
 

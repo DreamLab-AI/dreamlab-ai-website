@@ -132,13 +132,13 @@ const programmes: Programme[] = [
     sectors: ["defence", "manufacturing"],
   },
   {
-    id: "visionflow",
-    title: "VisionFlow Power User",
+    id: "visionclaw",
+    title: "VisionClaw Power User",
     duration: "1-3 Days",
     format: "Residential, up to 4",
-    description: "Self-sovereign knowledge management with autonomous AI agent teams. GraphRAG construction, 3D data visualisation, and on-premise deployment.",
+    description: "Ontology-grounded 3D knowledge graphs, built and queried by autonomous AI agent teams. OWL 2 EL reasoning, GPU-accelerated graph physics, and immersive XR visualisation, deployed on-premise.",
     instructors: "Pete Woodbridge (CTO), Kriss Dunk, Jing Li",
-    outcomes: ["Deployed knowledge management system", "GraphRAG pipeline", "Self-sovereign data architecture"],
+    outcomes: ["Deployed knowledge graph system", "OWL 2 EL ontology pipeline", "GPU-accelerated 3D visualisation"],
     trl: "3-7",
     categories: ["operationalise-ai", "secure-infrastructure"],
     sectors: ["defence", "manufacturing"],
@@ -210,9 +210,9 @@ const programmes: Programme[] = [
     title: "Decentralised Agent Infrastructure",
     duration: "1-3 Days",
     format: "Residential, up to 4",
-    description: "Bitcoin and Lightning for agent payments, RGB protocol, Nostr-based decentralised identity, private contract negotiation, and agent-first architecture.",
+    description: "Bitcoin and Lightning for agent payments, RGB protocol, did:nostr identity for autonomous agents, private contract negotiation, and sovereign agent-first architecture.",
     instructors: "Pete Woodbridge, Kriss Dunk, Jing Li",
-    outcomes: ["Decentralised agent system", "Sovereign identity implementation", "Cryptographic payment rails"],
+    outcomes: ["Decentralised agent system", "did:nostr identity implementation", "Cryptographic payment rails"],
     trl: "3-6",
     categories: ["secure-infrastructure", "operationalise-ai"],
     sectors: ["defence"],
@@ -413,7 +413,7 @@ const Programmes = () => {
               Co-design your learning path.
             </h1>
             <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-4 max-w-3xl mx-auto px-4">
-              Every course is bespoke, built for you around deep tech modules. {visibleCount} residential programmes delivered by 44+ specialists at our Lake District facility, each mapped to Innovate UK Technology Readiness Levels.
+              Every course is bespoke, built for you around deep tech modules. {visibleCount} residential programmes delivered by 43+ specialists at our Lake District facility, each mapped to Innovate UK Technology Readiness Levels.
             </p>
             <p className="text-sm text-muted-foreground/60 mb-8">
               We're outcome driven, able to combine modules across categories to fit your needs.

@@ -200,34 +200,34 @@ const evidence = [
 const faqItems = [
   {
     question: "What kind of startups are the best fit?",
-    answer: "Companies building products that touch AI, spatial computing, XR, geospatial data, cybersecurity, or creative technology. You don't need to be a deep tech company — you just need to be building something where deep tech can accelerate your product. We work across sectors: defence, construction, media, manufacturing, and more.",
+    answer: "Companies building products that touch AI, spatial computing, XR, geospatial data, cybersecurity, or creative technology. You just need to be building something where deep tech can accelerate your product, not already be a deep tech company. We work across sectors: defence, construction, media, manufacturing, and more.",
   },
   {
     question: "We're pre-revenue. Can we still engage?",
-    answer: "The Discovery Session is free and designed for exactly this stage. For funded pre-revenue startups, the Build Sprint is the most common entry point — it's low commitment and produces something you can show investors. We also help position projects for Innovate UK grants and SEIS/EIS eligibility.",
+    answer: "The Discovery Session is free and designed for exactly this stage. For funded pre-revenue startups, the Build Sprint is the most common entry point. It's low commitment and produces something you can show investors. We also help position projects for Innovate UK grants and SEIS/EIS eligibility.",
   },
   {
     question: "How do VC partnerships work?",
-    answer: "We work with funds to provide structured deep tech support across their portfolio. This typically starts with a briefing for your investment team, followed by discovery sessions offered to portfolio companies. We can tailor the arrangement — some funds provide build sprint credits as part of their value-add programme.",
+    answer: "We work with funds to provide structured deep tech support across their portfolio. This typically starts with a briefing for your investment team, followed by discovery sessions offered to portfolio companies. We can tailor the arrangement: some funds provide build sprint credits as part of their value-add programme.",
   },
   {
     question: "What happens after a Build Sprint?",
-    answer: "You leave with a working prototype and 2 weeks of async support. Most teams then either continue building independently (using the architecture we've set up) or progress to a Venture Residency for deeper work. There's no lock-in — the IP and code are yours.",
+    answer: "You leave with a working prototype and 2 weeks of async support. Most teams then either continue building independently (using the architecture we've set up) or progress to a Venture Residency for deeper work. There's no lock-in. The IP and code are yours.",
   },
   {
     question: "Can you work remotely or do we need to come to the Lake District?",
-    answer: "Build Sprints can be delivered at your location or ours. The Venture Residency is specifically designed for immersive, distraction-free work at our Lake District facility — that's where the magic happens. Discovery Sessions and Venture Partner advisory are typically remote.",
+    answer: "Build Sprints can be delivered at your location or ours. The Venture Residency is specifically designed for immersive, distraction-free work at our Lake District facility, where the momentum builds fastest. Discovery Sessions and Venture Partner advisory are typically remote.",
   },
   {
     question: "What does 'fractional CTO' mean in the Venture Partner tier?",
-    answer: "Access to our senior technical leadership for architecture decisions, hiring strategy, technical due diligence, and investor conversations. Not a replacement for your CTO — a complement. Think of it as having a deep tech bench on call.",
+    answer: "Access to our senior technical leadership for architecture decisions, hiring strategy, technical due diligence, and investor conversations: a complement to your CTO, not a replacement. Think of it as having a deep tech bench on call.",
   },
 ];
 
 const Ventures = () => {
   useOGMeta({
     title: "Venture Lab | DreamLab Applied Innovation",
-    description: "Deep tech accelerator for startups and scaleups. Access 44+ specialists, enterprise infrastructure, and 30 years of R&D heritage through structured build sprints, residencies, and ongoing partnership.",
+    description: "Deep tech accelerator for startups and scaleups. Access 43+ specialists, enterprise infrastructure, and 30 years of R&D heritage through structured build sprints, residencies, and ongoing partnership.",
     url: "https://dreamlab-ai.com/ventures",
   });
 
@@ -276,7 +276,7 @@ const Ventures = () => {
             className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mb-8 animate-slide-up"
             style={{ animationDelay: "0.15s" }}
           >
-            Access 44+ specialists, enterprise infrastructure, and 30 years of R&D heritage — without building it all yourself.
+            Access 43+ specialists, enterprise infrastructure, and 30 years of R&D heritage, without building it all yourself.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 animate-scale-in mb-8 w-full sm:w-auto" style={{ animationDelay: "0.2s" }}>
@@ -580,7 +580,7 @@ const Ventures = () => {
               {
                 step: 2,
                 title: "Scoping & Specialist Matching",
-                description: "We define the build target, success criteria, and match specialists from our network of 44+ experts. You'll know exactly who you're working with and what you'll walk away with.",
+                description: "We define the build target, success criteria, and match specialists from our network of 43+ experts. You'll know exactly who you're working with and what you'll walk away with.",
                 color: "bg-cyan-500",
                 lineColor: "bg-cyan-500/30",
               },
@@ -627,12 +627,12 @@ const Ventures = () => {
               <h2 className="text-2xl md:text-3xl font-bold">Funding & Grant Support</h2>
             </div>
             <p className="text-foreground/80 leading-relaxed mb-6">
-              We help startups navigate the UK innovation funding landscape. Many of our engagements are partially funded through grants, and we actively support applications.
+              We help startups make sense of the UK innovation funding landscape. Many of our engagements are partially funded through grants, and we actively support applications.
             </p>
             <div className="grid sm:grid-cols-2 gap-4">
               {[
                 { title: "Innovate UK Smart Grants", detail: "For disruptive R&D projects with strong commercial potential" },
-                { title: "Knowledge Transfer Partnerships", detail: "Up to 67% funded for SMEs — embed a graduate in your team, co-supervised by our PhDs" },
+                { title: "Knowledge Transfer Partnerships", detail: "Up to 67% funded for SMEs: embed a graduate in your team, co-supervised by our PhDs" },
                 { title: "SEIS/EIS Alignment", detail: "We help structure engagements to maintain EIS/SEIS eligibility for your investors" },
                 { title: "Technology Missions Fund", detail: "Collaborative R&D aligned with UKRI priority areas including AI assurance and net zero" },
               ].map((item) => (

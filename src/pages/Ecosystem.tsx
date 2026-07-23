@@ -36,9 +36,9 @@ const substrates = [
     iconColor: "text-cyan-400",
     borderClass: "border-cyan-500/30 hover:border-cyan-500/50",
     description:
-      "The reasoning core. OWL 2 EL ontologies are evaluated across 92 CUDA kernels, and the semantics drive the physics: subClassOf creates attraction, disjointWith creates repulsion. The result is a live, multi-user semantic graph you can walk through, not a static diagram.",
-    repo: "https://github.com/DreamLab-AI/VisionFlow",
-    repoLabel: "DreamLab-AI/VisionFlow",
+      "The reasoning core: OWL 2 EL ontologies evaluated across 82 CUDA kernels, with the semantics driving the physics directly. subClassOf creates attraction, disjointWith creates repulsion, so what you get is a live, multi-user semantic graph you can walk through, not a static diagram.",
+    repo: "https://github.com/DreamLab-AI/VisionClaw",
+    repoLabel: "DreamLab-AI/VisionClaw",
   },
   {
     id: "agentbox",
@@ -49,9 +49,9 @@ const substrates = [
     iconColor: "text-purple-400",
     borderClass: "border-purple-500/30 hover:border-purple-500/50",
     description:
-      "The agent habitat. Agents bootstrap with their own secp256k1 keypairs and operate a reproducible Nix runtime with 90+ skills and 180+ tools. Their working data lives in Solid pods they own — when an agent leaves, its memory and identity leave with it.",
-    repo: "https://github.com/DreamLab-AI/VisionFlow",
-    repoLabel: "DreamLab-AI/VisionFlow",
+      "Agents here bootstrap with their own secp256k1 keypairs and run a reproducible Nix runtime carrying 116 skills and 180+ tools. Their working data lives in Solid pods they own, so when an agent leaves, its memory and identity leave with it.",
+    repo: "https://github.com/DreamLab-AI/agentbox",
+    repoLabel: "DreamLab-AI/agentbox",
   },
   {
     id: "solid-pod-rs",
@@ -62,7 +62,7 @@ const substrates = [
     iconColor: "text-emerald-400",
     borderClass: "border-emerald-500/30 hover:border-emerald-500/50",
     description:
-      "The data layer. A Rust implementation of the Solid pod specification with Web Access Control (WAC), so every person and every agent holds their own data under their own keys. Pods are git-versioned: history, rollback, and portability are properties of the storage itself.",
+      "A Rust implementation of the Solid pod specification with Web Access Control (WAC), so every person and every agent holds their own data under their own keys. Pods are git-versioned, so history, rollback, and portability are properties of the storage itself, not something bolted on by an application.",
     repo: "https://github.com/DreamLab-AI/solid-pod-rs",
     repoLabel: "DreamLab-AI/solid-pod-rs",
   },
@@ -75,7 +75,7 @@ const substrates = [
     iconColor: "text-violet-400",
     borderClass: "border-violet-500/30 hover:border-violet-500/50",
     description:
-      "The human coordination layer. A Leptos WASM forum backed by five Rust Cloudflare Workers — auth, pod, relay, search, and link preview — with zoned governance enforced server-side at the relay. It also ships a retro ASCII BBS client for the terminally nostalgic.",
+      "A Leptos WASM forum backed by five Rust Cloudflare Workers (auth, pod, relay, search, and link preview) with zoned governance enforced server-side at the relay. It also ships a retro ASCII BBS client for the terminally nostalgic.",
     repo: "https://github.com/DreamLab-AI/nostr-rust-forum",
     repoLabel: "DreamLab-AI/nostr-rust-forum",
     liveUrl: "/community/",
@@ -90,7 +90,7 @@ const substrates = [
     iconColor: "text-amber-400",
     borderClass: "border-amber-500/30 hover:border-amber-500/50",
     description:
-      "The deployment you are reading now. A thin operator overlay pins the upstream kit at an exact commit and supplies DreamLab branding, zones, and Cloudflare resource bindings. Static site on GitHub Pages, workers at the edge — the whole stack rebuilds from two repositories.",
+      "You're looking at it now. A thin operator overlay pins the upstream kit at an exact commit and supplies DreamLab branding, zones, and Cloudflare resource bindings. Static site on GitHub Pages, workers at the edge: the whole stack rebuilds from two repositories.",
     repo: "https://github.com/DreamLab-AI/dreamlab-ai-website",
     repoLabel: "DreamLab-AI/dreamlab-ai-website",
   },
@@ -106,7 +106,7 @@ const principles = [
     title: "Cryptographic identity at the protocol layer",
     body: (
       <>
-        Every actor — human or agent — is identified by a secp256k1{" "}
+        Every actor (human or agent) is identified by a secp256k1{" "}
         <code className="text-xs px-1 py-0.5 rounded bg-background/70 border border-cyan-500/20">
           did:nostr
         </code>
@@ -123,7 +123,7 @@ const principles = [
     title: "Formal reasoning with GPU physics",
     body: (
       <>
-        OWL 2 EL reasoning runs across 92 CUDA kernels.{" "}
+        OWL 2 EL reasoning runs across 82 CUDA kernels.{" "}
         <code className="text-xs px-1 py-0.5 rounded bg-background/70 border border-cyan-500/20">
           subClassOf
         </code>{" "}
@@ -131,7 +131,7 @@ const principles = [
         <code className="text-xs px-1 py-0.5 rounded bg-background/70 border border-cyan-500/20">
           disjointWith
         </code>{" "}
-        creates repulsion — so the shape of the knowledge graph is a direct,
+        creates repulsion, so the shape of the knowledge graph is a direct,
         inspectable consequence of the logic it encodes.
       </>
     ),
@@ -144,9 +144,9 @@ const principles = [
     body: (
       <>
         Agents bootstrap with their own keypairs and a reproducible Nix
-        runtime: 90+ skills, 180+ tools. Their data is owned in Solid pods, not
-        in a platform database — agents take everything with them when they
-        leave.
+        runtime: 116 skills, 180+ tools. Their data is owned in Solid pods,
+        not in a platform database. Agents take everything with them when
+        they leave.
       </>
     ),
   },
@@ -189,7 +189,7 @@ const identityCapabilities = [
   {
     icon: GitBranch,
     title: "Git-versioned pods",
-    body: "Pod contents carry full version history — rollback, audit, and diff are storage-level guarantees rather than application features.",
+    body: "Pod contents carry full version history: rollback, audit, and diff are storage-level guarantees rather than application features.",
   },
 ];
 
@@ -235,7 +235,7 @@ const Ecosystem = () => {
             and human judgment mesh through shared cryptographic identity,
             formal reasoning, and immutable governance. Agents own their data;
             humans shape their autonomy. It is also the stack our residential
-            programmes teach — attendees train on the same systems that run
+            programmes teach: attendees train on the same systems that run
             this site.
           </p>
         </div>
@@ -315,7 +315,7 @@ const Ecosystem = () => {
                   {/* Agentbox (top-right) */}
                   <rect x="345" y="40" width="120" height="85" rx="14" fill="rgba(139,92,246,0.1)" stroke="rgb(139,92,246)" strokeWidth="2.5" />
                   <text x="405" y="70" textAnchor="middle" fill="rgb(196,181,253)" fontWeight="800" fontSize="15" fontFamily="system-ui, sans-serif">Agentbox</text>
-                  <text x="405" y="93" textAnchor="middle" fill="rgb(170,150,200)" fontSize="12" fontFamily="system-ui, sans-serif">90+ Skills</text>
+                  <text x="405" y="93" textAnchor="middle" fill="rgb(170,150,200)" fontSize="12" fontFamily="system-ui, sans-serif">116 Skills</text>
 
                   {/* DreamLab Edge (bottom-right) */}
                   <rect x="345" y="375" width="120" height="85" rx="14" fill="rgba(245,158,11,0.1)" stroke="rgb(245,158,11)" strokeWidth="2.5" />
@@ -351,7 +351,7 @@ const Ecosystem = () => {
         <div className="container max-w-6xl mx-auto px-5 md:px-4">
           <div className="text-center mb-10 md:mb-14">
             <h2 id="substrates-heading" className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
-              The five substrates
+              Five substrates
             </h2>
             <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
               Each layer is an independent open-source project. Together they
@@ -453,17 +453,17 @@ const Ecosystem = () => {
             </h2>
             <p className="text-lg mb-8 max-w-2xl mx-auto opacity-90">
               The whole stack is open source, and our residential programmes
-              train teams on exactly these systems — agentics, sovereign
+              train teams on exactly these systems: agentics, sovereign
               identity, and federated coordination.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
-                href="https://github.com/DreamLab-AI/VisionFlow"
+                href="https://github.com/DreamLab-AI"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center rounded-lg text-base font-semibold bg-white text-purple-700 hover:bg-white/90 hover:scale-105 transition-all min-h-[48px] px-6 py-3"
               >
-                Explore VisionFlow on GitHub <ArrowRight className="ml-2 w-4 h-4" aria-hidden="true" />
+                Explore the ecosystem on GitHub <ArrowRight className="ml-2 w-4 h-4" aria-hidden="true" />
               </a>
               <Link
                 to="/programmes"
