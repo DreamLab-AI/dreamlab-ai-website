@@ -18,8 +18,8 @@ path = "src/lib.rs"
 # roster tab wired to the nine /api/governance/* endpoints, F1 member read-only view, COM-16/COM-17 decision
 # integrity + graduated escalation, REC-6 escalation-default projection. Consumed by this deployment as a thin
 # overlay (D1/D2, ADR-040). Cutover provenance is recorded in docs/architecture/kit-compatibility-record.md.
-# nostr-bbs-core, nostr-bbs-config, and nostr-bbs-mesh are at 1.0.0-beta.5 at this rev;
-# nostr-bbs-rate-limit remains 1.0.0-beta.3 (unchanged since the last bump). Superseded pin history:
+# All four library crates are pinned at 1.0.0-beta.6 (see the CRATES.IO note below);
+# the current client-only KIT_REF bumps do not move these versions. Superseded pin history:
 # a149da4 (v1.0.0-beta.3, BBS control-plane + live Chat/Code + pod-url clarity);
 # overhaul — de-wildcat menu IA (agent control plane -> #1 AGENTS), the BBS write
 # path (signer + relay publish + NIP-42 AUTH, governance ActionResponse signing,

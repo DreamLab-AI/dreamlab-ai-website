@@ -95,7 +95,7 @@ env:
   # badge + /api/agents/disclosure, F8 admin Agents roster tab, F1 member view,
   # COM-16/COM-17 decision integrity + graduated escalation). Cutover provenance
   # is in docs/architecture/kit-compatibility-record.md.
-  KIT_REF: '7dfe8a69dd1034cac5e3892a1ac438da51b94408'
+  KIT_REF: 'c978a239e6523bb009c2ea8e3b8a165f049b3d43'
 
 jobs:
   gate:
