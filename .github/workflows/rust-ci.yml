@@ -18,7 +18,7 @@ env:
   # Pinned kit SHA — keep in lockstep with workers-deploy.yml/deploy.yml KIT_REF.
   # NOTE: tracks nostr-rust-forum gap-close/2026-07 HEAD (forum gap-close slice).
   # Cutover provenance: docs/architecture/kit-compatibility-record.md.
-  KIT_REF: 'c978a239e6523bb009c2ea8e3b8a165f049b3d43'
+  KIT_REF: '672b7c36bcef8a5c9f297523ec8986f7e1d7ffda'
 
 jobs:
   fmt:
