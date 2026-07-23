@@ -22,11 +22,11 @@ its own `pin-check` extension.
 
 | Deployment host | Forum-kit SHA | Kit branch/tag at pin | Consumption tier | Canonical for pin-check |
 |---|---|---|---|---|
-| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `2d693ed2f9c3e50a7f4b0310df436e2a4f449606` | `soak-fix-sprint-2026-07` (render nested reply-to-reply threads — JunkieJarvis answers now visible) | `integrated` | ✔ |
+| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `335bc3f8dcee48cb97bcb959d274489b9a08a42b` | `soak-fix-sprint-2026-07` (auto-redeem zone invites on landing — onboarding via invite link now provisions the zone) | `integrated` | ✔ |
 
 <!-- pin-check:canonical-kit-sha -->
 ```
-CANONICAL_KIT_SHA=2d693ed2f9c3e50a7f4b0310df436e2a4f449606
+CANONICAL_KIT_SHA=335bc3f8dcee48cb97bcb959d274489b9a08a42b
 CANONICAL_KIT_VERSION=1.0.0-beta.6
 ```
 
@@ -249,7 +249,8 @@ All render from the pinned kit at deploy time; this repo adds only branding
 
 | SHA | Branch/context | Notes |
 |---|---|---|
-| `2d693ed` | `soak-fix-sprint-2026-07` | Current (canonical — matches `CANONICAL_KIT_SHA` above and the `KIT_REF` pins). Renders nested (reply-to-reply) thread replies. The thread list kept a reply only if it referenced the topic ROOT directly, so standard NIP-10 nested replies — most visibly JunkieJarvis, which threads under the message that tagged it, not the root — were dropped and never rendered despite being on the relay. Now computes transitive thread membership (fixpoint over the channel's candidate events; sibling topics stay separate). Client-only. |
+| `335bc3f` | `soak-fix-sprint-2026-07` | Current (canonical — matches `CANONICAL_KIT_SHA` above and the `KIT_REF` pins). Auto-redeem zone-bound invites on landing. A `/join/<code>` invite granted its zone cohort only when a returning-from-signup user manually clicked "Join <zone>"; the invite code is never threaded into the signup/registration flow, so a user who didn't return to the join page (or closed the tab after signup) kept only `["members"]` — the reported "minimoonoir/dreamlab invite link doesn't assign the zone" bug. `JoinPage` now fires the redeem automatically the moment an authenticated visitor views a valid, zone-bound invite (the returnTo-from-signup landing, or an already-registered user re-clicking the link); one-shot guarded, idempotent server-side, Join button retained as a manual/retry affordance. Client-only. |
+| `2d693ed` | `soak-fix-sprint-2026-07` | Superseded. Renders nested (reply-to-reply) thread replies. The thread list kept a reply only if it referenced the topic ROOT directly, so standard NIP-10 nested replies — most visibly JunkieJarvis, which threads under the message that tagged it, not the root — were dropped and never rendered despite being on the relay. Now computes transitive thread membership (fixpoint over the channel's candidate events; sibling topics stay separate). Client-only. |
 | `ce6169a` | `soak-fix-sprint-2026-07` | Superseded. Reply-becomes-topic fix: the flat `/chat/:channel_id` composer publishes ROOT-only kind-42s (no NIP-10 "reply" marker), so posting there created new topics; every deep-link (notifications, search, bookmarks, note-view, channel cards) pointed there. `ChannelPage` now redirects (resolving channel→zone+section slug) to the threaded section topic-list, whose per-topic `ThreadPage` composer threads replies correctly; the flat view + composer only mount as a graceful fallback for an unresolvable channel after the store EOSEs. Client-only. |
 | `c5e26ad` | `soak-fix-sprint-2026-07` | Superseded. Self-heal zone access gate: a just-granted member (e.g. immediately after redeeming a zone invite) could read stale cohorts and get a false "Access Restricted"/"Access Denied" until they clicked again. `zone_access_gate` resolves Granted/Checking/Restricted with a one-shot `refresh()` — re-reads cohorts once, shows a neutral "Checking your access…" interstitial until settled, and only shows the restricted card for anonymous or settled non-members. Used by category.rs + section.rs. Client-only. |
 | `4b165a0` | `soak-fix-sprint-2026-07` | Superseded. Fixes transient "disappearing panels": the channel store rendered from cache then reconciled on EOSE, and an empty EOSE (cold/reconnecting relay DO that EOSEs before redelivering its kind-40s) wiped every channel. Now an empty EOSE only clears when nothing is displayed to lose; existing channels are kept (deletions still arrive as kind-5 tombstones). Client-only. |

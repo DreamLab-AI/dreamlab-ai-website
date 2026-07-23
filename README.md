@@ -187,7 +187,7 @@ The branded custom domains (`relay.`/`api.`/`pods.`/`search.`/`preview.dreamlab-
 
 ### Kit pinning
 
-The kit source is pinned at commit `2d693ed2f9c3e50a7f4b0310df436e2a4f449606` (branch `soak-fix-sprint-2026-07`, kit **v1.0.0-beta.6**, re-pinned 2026-07-21). Since beta.6 the git-SHA pin on the library crates was retired: the four `nostr-bbs-*` crates now come from **crates.io by version string** (`1.0.0-beta.6`), and only the source-clone build still pins a SHA. Five pin sites must stay in lockstep, machine-checked by the `pin-check` job in `.github/workflows/ci.yml`:
+The kit source is pinned at commit `335bc3f8dcee48cb97bcb959d274489b9a08a42b` (branch `soak-fix-sprint-2026-07`, kit **v1.0.0-beta.6**, re-pinned 2026-07-23). Since beta.6 the git-SHA pin on the library crates was retired: the four `nostr-bbs-*` crates now come from **crates.io by version string** (`1.0.0-beta.6`), and only the source-clone build still pins a SHA. Five pin sites must stay in lockstep, machine-checked by the `pin-check` job in `.github/workflows/ci.yml`:
 
 1. `KIT_REF` in `.github/workflows/deploy.yml` (forum client build)
 2. `KIT_REF` in `.github/workflows/workers-deploy.yml` (worker builds)
