@@ -36,7 +36,7 @@ const substrates = [
     iconColor: "text-cyan-400",
     borderClass: "border-cyan-500/30 hover:border-cyan-500/50",
     description:
-      "The reasoning core: OWL 2 EL ontologies evaluated across 82 CUDA kernels, with the semantics driving the physics directly. subClassOf creates attraction, disjointWith creates repulsion, so what you get is a live, multi-user semantic graph you can walk through, not a static diagram.",
+      "The reasoning core: OWL 2 EL ontologies evaluated across 82 CUDA kernels, with the semantics driving the physics directly. subClassOf creates attraction, disjointWith creates repulsion, so what you get is a live, multi-user semantic graph you can walk through, not a static diagram. The corpus it reads is published openly as 7,457 pages with the toolchain that builds them: mostly AI-written material produced under human direction, kept as an ontology testbed rather than a reference work.",
     repo: "https://github.com/DreamLab-AI/VisionClaw",
     repoLabel: "DreamLab-AI/VisionClaw",
   },
