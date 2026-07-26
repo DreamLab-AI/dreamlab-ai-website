@@ -39,6 +39,9 @@ const substrates = [
       "The reasoning core: OWL 2 EL ontologies evaluated across 82 CUDA kernels, with the semantics driving the physics directly. subClassOf creates attraction, disjointWith creates repulsion, so what you get is a live, multi-user semantic graph you can walk through, not a static diagram. The corpus it reads is published openly as 7,457 pages with the toolchain that builds them: mostly AI-written material produced under human direction, kept as an ontology testbed rather than a reference work.",
     repo: "https://github.com/DreamLab-AI/VisionClaw",
     repoLabel: "DreamLab-AI/VisionClaw",
+    liveUrl: "https://narrativegoldmine.com",
+    liveLabel: "Corpus at narrativegoldmine.com",
+    liveExternal: true,
   },
   {
     id: "agentbox",
@@ -394,9 +397,12 @@ const Ecosystem = () => {
                     {s.liveUrl && (
                       <a
                         href={s.liveUrl}
+                        target={s.liveExternal ? "_blank" : undefined}
+                        rel={s.liveExternal ? "noopener noreferrer" : undefined}
                         className="text-sm text-muted-foreground hover:text-foreground hover:underline inline-flex items-center gap-1"
                       >
                         {s.liveLabel} <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+                        {s.liveExternal && <span className="sr-only"> (opens in new window)</span>}
                       </a>
                     )}
                   </div>
