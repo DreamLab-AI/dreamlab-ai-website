@@ -478,7 +478,7 @@ export const AIChatFab = () => {
                   </div>
                 ) : (
                   <div
-                    className={`max-w-[85%] rounded-xl px-3.5 py-2.5 text-sm leading-relaxed ${
+                    className={`max-w-[85%] break-words rounded-xl px-3.5 py-2.5 text-sm leading-relaxed ${
                       msg.role === "user"
                         ? "bg-gradient-to-r from-cyan-600 to-cyan-500 text-white"
                         : "bg-purple-500/10 border border-purple-500/20 text-foreground/90"

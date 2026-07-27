@@ -431,7 +431,7 @@ const Programmes = () => {
       </section>
 
       {/* Sector Lenses — sticky filter bar */}
-      <div className="sticky top-16 z-40 bg-background/80 backdrop-blur-xl border-b border-white/10">
+      <div className="sticky top-[var(--header-height,4rem)] z-40 bg-background/80 backdrop-blur-xl border-b border-white/10">
         <div className="container px-4">
           <div className="flex items-center gap-2 overflow-x-auto py-3 scrollbar-none">
             {sectors.map((s) => {
@@ -441,13 +441,13 @@ const Programmes = () => {
                 <button
                   key={s.id}
                   onClick={() => { setActiveSector(s.id); setExpandedCategory(null); }}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
+                  className={`flex shrink-0 items-center gap-2 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
                     isActive
                       ? "bg-gradient-to-r from-purple-500 to-cyan-500 text-white shadow-lg shadow-purple-500/20"
                       : "text-muted-foreground hover:text-foreground hover:bg-white/10"
                   }`}
                 >
-                  <Icon className="w-4 h-4" />
+                  <Icon className="w-4 h-4 shrink-0" />
                   {s.label}
                 </button>
               );
@@ -512,15 +512,15 @@ const Programmes = () => {
               <section
                 key={cat.id}
                 id={cat.id}
-                className="mb-16 scroll-mt-32"
+                className="mb-16 scroll-mt-40"
                 aria-label={cat.title}
               >
                 {/* Category header */}
                 <div className="flex items-center gap-4 mb-8">
-                  <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${cat.gradient} flex items-center justify-center`}>
+                  <div className={`w-14 h-14 shrink-0 rounded-xl bg-gradient-to-br ${cat.gradient} flex items-center justify-center`}>
                     <Icon className="w-7 h-7 text-white" />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <h2 className="text-2xl sm:text-3xl font-bold">{cat.title}</h2>
                     <p className="text-muted-foreground">{cat.value}</p>
                   </div>
@@ -535,12 +535,14 @@ const Programmes = () => {
                         key={prog.id}
                         className={`relative bg-white/5 backdrop-blur border ${cat.borderColor} rounded-xl p-6 hover:bg-white/10 transition-all`}
                       >
-                        {/* TRL badge */}
-                        <div className="absolute top-4 right-4">
+                        {/* TRL badge — in flow on mobile (the badge is wider than
+                            the space pr-40 reserves, so absolute positioning
+                            crushes and overlaps the title on a one-column grid) */}
+                        <div className="mb-2 sm:mb-0 sm:absolute sm:top-4 sm:right-4">
                           <TRLBadge range={prog.trl} />
                         </div>
 
-                        <h3 className="text-lg font-bold mb-1 pr-40">{prog.title}</h3>
+                        <h3 className="text-lg font-bold mb-1 sm:pr-40">{prog.title}</h3>
 
                         {/* Partnership badge */}
                         {prog.partnership && (

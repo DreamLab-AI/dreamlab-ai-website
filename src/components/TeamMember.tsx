@@ -57,7 +57,7 @@ export const TeamMember = memo(({
 
       {/* Team member headline */}
       <div className="p-5">
-        <h3 className="text-lg font-semibold bg-gradient-to-r from-blue-400 to-purple-400 text-transparent bg-clip-text group-hover:from-purple-400 group-hover:to-pink-400 transition-all duration-300">{headline}</h3>
+        <h3 className="text-lg font-semibold break-words hyphens-auto bg-gradient-to-r from-blue-400 to-purple-400 text-transparent bg-clip-text group-hover:from-purple-400 group-hover:to-pink-400 transition-all duration-300">{headline}</h3>
         
         {/* Expandable details */}
         <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
@@ -77,7 +77,8 @@ export const TeamMember = memo(({
             </button>
           </PopoverTrigger>
           <PopoverContent
-            className="w-80 max-h-80 overflow-y-auto p-5 bg-background/95 backdrop-blur-xl border-purple-500/30 shadow-xl shadow-purple-500/10 rounded-xl"
+            collisionPadding={16}
+            className="w-[min(20rem,calc(100vw-2rem))] max-h-80 overflow-y-auto p-5 bg-background/95 backdrop-blur-xl border-purple-500/30 shadow-xl shadow-purple-500/10 rounded-xl"
             onInteractOutside={() => setPopoverOpen(false)}
           >
             <div className="space-y-3 text-sm text-muted-foreground/90 leading-relaxed">

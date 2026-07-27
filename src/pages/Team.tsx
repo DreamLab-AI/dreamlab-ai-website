@@ -140,7 +140,7 @@ const Team = () => {
 
       {/* Team grid */}
       <section className="py-12" aria-label="Team members">
-        <div className="container">
+        <div className="container px-4">
           {loading ? (
             <div className="text-center py-12" role="status" aria-live="polite">Loading team members...</div>
           ) : teamMembers.length === 0 ? (

@@ -318,7 +318,7 @@ export const WorkshopHeader = ({
       />
 
       {/* Content Container */}
-      <div className="relative z-10 container pt-24 pb-8">
+      <div className="relative z-10 container px-4 pt-24 pb-8">
         {/* Breadcrumb Navigation */}
         <div
           className={cn(
@@ -378,7 +378,7 @@ export const WorkshopHeader = ({
         {/* Animated Workshop Title */}
         <h1
           className={cn(
-            'text-4xl md:text-5xl lg:text-6xl font-bold mb-4',
+            'text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 break-words',
             'transition-all duration-700 delay-200 transform',
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
           )}

@@ -306,7 +306,7 @@ const WorkshopPage = () => {
           description={manifest.description}
         />
       )}
-      <main className="container pt-8 pb-8 flex flex-col md:flex-row gap-x-8 min-h-screen">
+      <main className="container px-4 pt-8 pb-8 flex flex-col md:flex-row gap-x-8 min-h-screen">
         {manifest && manifest.pages.length > 0 && (
           <aside className="w-full md:w-64 lg:w-72 md:sticky md:top-20 md:h-[calc(100vh-5rem-2rem)] mb-8 md:mb-0">
             <h2 className="text-xl font-semibold mb-4 break-words">
@@ -337,7 +337,7 @@ const WorkshopPage = () => {
           </aside>
         )}
 
-        <article className={`flex-1 ${manifest && manifest.pages.length > 0 ? 'md:pl-0' : 'w-full'}`}>
+        <article className={`flex-1 min-w-0 ${manifest && manifest.pages.length > 0 ? 'md:pl-0' : 'w-full'}`}>
           {isLoadingContent && <div className="text-center py-10">Loading content...</div>}
           {error && !isLoadingContent && (
             <div className="p-4 my-4 text-red-700 bg-red-100 border border-red-300 rounded-md">
@@ -347,7 +347,7 @@ const WorkshopPage = () => {
           )}
           {/* --- To show real content, use ReactMarkdown below. For debugging, the <p>Test Content.../> is fine --- */}
           {!isLoadingContent && !error && currentPageContent && (
-            <div className="prose max-w-none dark:prose-invert">
+            <div className="prose max-w-none dark:prose-invert break-words [&_table]:block [&_table]:w-full [&_table]:overflow-x-auto">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>
                 {currentPageContent}
               </ReactMarkdown>

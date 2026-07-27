@@ -81,7 +81,7 @@ const Research = () => {
               </div>
             </div>
           </Card>
-          <div className="flex justify-center mt-4 sm:mt-6 space-x-2">
+          <div className="flex flex-wrap justify-center mt-4 sm:mt-6 gap-2">
             {systemImages.map((_, index) => (
               <button
                 key={index}
@@ -157,7 +157,7 @@ const Research = () => {
           <Card className="p-8 md:p-12 bg-gradient-to-br from-orange-800/40 to-red-800/40 backdrop-blur-md border-orange-500/30 max-w-4xl mx-auto">
             <div className="text-center mb-8">
               <Clock className="w-16 h-16 text-orange-400 mx-auto mb-4" />
-              <h3 className="text-2xl md:text-3xl font-bold mb-4">Nuclear Decommissioning Case Study</h3>
+              <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 break-words">Nuclear Decommissioning Case Study</h3>
               <p className="text-xl text-orange-200">Planning time reduced from 8 hours to 2 hours</p>
               <p className="text-lg text-orange-300 mt-2">With improved safety outcomes and reduced specialist fatigue</p>
             </div>
@@ -342,9 +342,9 @@ const Research = () => {
                 <p className="text-lg text-slate-200 mb-6">
                   The Octave project represents one of the longest-running collaborative VR research programmes in the UK, continuously evolving from 2007 to 2023. That 16-year body of work (multi-user systems, real-world nuclear applications, and AI-mediated teamwork) now forms the research foundation of the DreamLab Applied Innovation Lab.
                 </p>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-cyan-500/20 rounded-lg flex items-center justify-center">
+                    <div className="w-8 h-8 shrink-0 bg-cyan-500/20 rounded-lg flex items-center justify-center">
                       <Lightbulb className="w-4 h-4 text-cyan-400" />
                     </div>
                     <div>
@@ -353,7 +353,7 @@ const Research = () => {
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
+                    <div className="w-8 h-8 shrink-0 bg-green-500/20 rounded-lg flex items-center justify-center">
                       <TrendingUp className="w-4 h-4 text-green-400" />
                     </div>
                     <div>
