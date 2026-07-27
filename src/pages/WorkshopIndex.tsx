@@ -237,7 +237,7 @@ const WorkshopIndex = () => {
               <span className="text-sm font-medium text-purple-300">9-Phase Unified Curriculum</span>
             </div>
 
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 animate-slide-up bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 text-transparent bg-clip-text animate-gradient-shift bg-400%" style={{ animationDelay: '0.1s' }}>
+            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold mb-6 animate-slide-up bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 text-transparent bg-clip-text animate-gradient-shift bg-400%" style={{ animationDelay: '0.1s' }}>
               AI-Powered Knowledge Work
             </h1>
 

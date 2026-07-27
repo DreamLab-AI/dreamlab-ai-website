@@ -403,13 +403,13 @@ const Ventures = () => {
                 className={`relative bg-background/60 backdrop-blur-xl rounded-2xl border ${tier.borderColor} ${tier.hoverBorder} p-6 md:p-8 transition-all hover:shadow-xl`}
               >
                 {tier.badge && (
-                  <div className={`absolute top-4 right-4 px-3 py-1 ${tier.accentBg} rounded-full ${tier.accentColor} text-xs font-medium`}>
+                  <div className={`mb-3 inline-block sm:mb-0 sm:absolute sm:top-4 sm:right-4 px-3 py-1 ${tier.accentBg} rounded-full ${tier.accentColor} text-xs font-medium`}>
                     {tier.badge}
                   </div>
                 )}
 
                 <div className="flex items-center gap-3 mb-4">
-                  <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${tier.gradient} flex items-center justify-center`}>
+                  <div className={`w-10 h-10 shrink-0 rounded-lg bg-gradient-to-br ${tier.gradient} flex items-center justify-center`}>
                     {tier.id === "discovery" && <Target className="w-5 h-5 text-white" />}
                     {tier.id === "sprint" && <Zap className="w-5 h-5 text-white" />}
                     {tier.id === "residency" && <MapPin className="w-5 h-5 text-white" />}

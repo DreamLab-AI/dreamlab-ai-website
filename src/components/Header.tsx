@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -21,9 +21,24 @@ const SCROLL_THRESHOLD = 50;
  */
 export const Header = () => {
   const [hasScrolled, setHasScrolled] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
 
   const handleScroll = useCallback(() => {
     setHasScrolled(window.scrollY > SCROLL_THRESHOLD);
+  }, []);
+
+  // Publish the rendered header height so sticky sub-headers can offset by it.
+  // The header has no fixed height (81px on mobile, 73px from md), so a
+  // hard-coded top-16 would leave sticky bars partly hidden behind it.
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+    const publish = () =>
+      document.documentElement.style.setProperty("--header-height", `${el.offsetHeight}px`);
+    publish();
+    const observer = new ResizeObserver(publish);
+    observer.observe(el);
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
@@ -34,6 +49,7 @@ export const Header = () => {
 
   return (
     <header
+      ref={headerRef}
       role="banner"
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-out py-3 ${
         hasScrolled
@@ -45,9 +61,9 @@ export const Header = () => {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="flex items-center gap-2 md:gap-3 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded min-h-[48px] min-w-[48px] px-3 py-2" aria-label="Main navigation menu">
-              <div className="w-10 h-10 md:w-8 md:h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all duration-300 group-hover:scale-110 animate-glow-pulse" aria-hidden="true"></div>
+              <div className="w-10 h-10 md:w-8 md:h-8 shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all duration-300 group-hover:scale-110 animate-glow-pulse" aria-hidden="true"></div>
               <span className="font-bold text-lg md:text-xl tracking-tight group-hover:text-purple-400 transition-colors duration-300">MENU</span>
-              <ChevronDown className="h-5 w-5 md:h-4 md:w-4 text-muted-foreground group-hover:text-purple-400 transition-all duration-300 group-hover:rotate-180" aria-hidden="true" />
+              <ChevronDown className="h-5 w-5 md:h-4 md:w-4 shrink-0 text-muted-foreground group-hover:text-purple-400 transition-all duration-300 group-hover:rotate-180" aria-hidden="true" />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-56 md:w-48">
