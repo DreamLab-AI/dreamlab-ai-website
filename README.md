@@ -38,7 +38,7 @@ Two SPAs, one origin: a React marketing site at `/` and a Rust/Leptos 0.7 CSR WA
 
 ## Ecosystem
 
-DreamLab AI is the commercial front door of the [VisionFlow](https://github.com/DreamLab-AI/VisionFlow) ecosystem — a federated architecture for human–AI intelligence built on `did:nostr` identity, OWL 2 EL reasoning, and Nostr message passing. This website is a deliberately thin, edge-deployed consumer: it draws its community substrate from **nostr-rust-forum** and its identity/data layer, via the kit, from **solid-pod-rs**.
+DreamLab AI is the commercial front door of the [VisionFlow](https://github.com/DreamLab-AI/VisionFlow) ecosystem — a federated architecture for human–AI intelligence built on `did:nostr` identity, OWL 2 EL reasoning (the shared formal semantic layer the industry now calls neurosymbolic), and Nostr message passing. This website is a deliberately thin, edge-deployed consumer: it draws its community substrate from **nostr-rust-forum** and its identity/data layer, via the kit, from **solid-pod-rs**.
 
 | Repository | Role in the ecosystem |
 |---|---|
