@@ -11,8 +11,10 @@ import {
   GitBranch,
   Globe,
   Handshake,
+  History,
   KeyRound,
   MessagesSquare,
+  ShieldCheck,
 } from "lucide-react";
 import { useOGMeta } from "@/hooks/useOGMeta";
 import { PAGE_OG_CONFIGS } from "@/lib/og-meta";
@@ -193,6 +195,32 @@ const identityCapabilities = [
     icon: GitBranch,
     title: "Git-versioned pods",
     body: "Pod contents carry full version history: rollback, audit, and diff are storage-level guarantees rather than application features.",
+  },
+];
+
+// The governed write path: what happens between an agent proposing a change
+// to the shared knowledge graph and that change becoming asserted truth.
+// Every claim here is live behaviour, verified against the running system.
+const writeGates = [
+  {
+    icon: ShieldCheck,
+    title: "Integrity before reasoning",
+    body: "A pre-merge conflict gate checks every proposal for duplicate concepts, subclass cycles, relation contradictions, and type conflicts. Its first run over the live corpus caught 2 subclass cycles and 57 contradictions that structural validation had missed for months. The gate blocks only what a proposal introduces; pre-existing corpus defects are reported as advisory, so one bad legacy triple never freezes the whole write path.",
+  },
+  {
+    icon: Brain,
+    title: "Reasoning before governance",
+    body: "The Whelk OWL 2 EL reasoner classifies each surviving proposal against the full ontology before any human sees it. Consistency is not integrity, and neither is authorisation: three distinct gates, each visible in the receipt. A single response reports conflict: pass, whelk: consistent (with the new subsumptions the reasoner actually derived), and acsp: pending for the human decision.",
+  },
+  {
+    icon: Fingerprint,
+    title: "Attribution you cannot forge",
+    body: "The acting identity comes from the authenticated did:nostr key, never from a field in the request body. Every committed triple gains a content-addressed provenance record in a separate named graph: who asserted it, under which activity, at what time, with validity intervals for time-travel queries. Retraction closes an interval; it never deletes history.",
+  },
+  {
+    icon: History,
+    title: "Decisions as first-class records",
+    body: "Agent decisions are graph nodes with their own URNs, causal links, and bounded ancestry traversal. Replaying an idempotency key returns the prior receipt; replaying it with a different payload is rejected. The audit question regulators actually ask, “why did the agent do that, and what did it depend on?”, is a graph query rather than an archaeology project.",
   },
 ];
 
@@ -446,6 +474,75 @@ const Ecosystem = () => {
                 </div>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      {/* Decision intelligence — the governed semantic write path */}
+      <section
+        id="decision-intelligence"
+        className="py-12 md:py-16 bg-gradient-to-b from-indigo-950/10 via-background to-background scroll-mt-24"
+        aria-labelledby="decision-intelligence-heading"
+      >
+        <div className="container max-w-6xl mx-auto px-5 md:px-4">
+          <div className="text-center mb-10 md:mb-14">
+            <h2 id="decision-intelligence-heading" className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
+              Decision intelligence: a write path you can defend
+            </h2>
+            <p className="text-base md:text-lg text-muted-foreground max-w-3xl mx-auto">
+              Most agent stacks record what happened in a log an administrator
+              can rewrite. VisionFlow makes every change to shared knowledge
+              pass three distinct gates, then signs, attributes, and
+              time-stamps what survives. One write door, no exceptions:
+              connectivity without semantics is just faster error.
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-5 md:gap-6 mb-10">
+            {writeGates.map((gate) => {
+              const Icon = gate.icon;
+              return (
+                <div
+                  key={gate.title}
+                  className="bg-background/50 backdrop-blur border border-cyan-500/20 rounded-xl p-5 md:p-6 hover:border-cyan-500/40 transition-colors"
+                >
+                  <div className="w-10 h-10 bg-cyan-500/10 rounded-lg flex items-center justify-center mb-4">
+                    <Icon className="w-5 h-5 text-cyan-400" aria-hidden="true" />
+                  </div>
+                  <h3 className="font-semibold text-base mb-2">{gate.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{gate.body}</p>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* The live receipt — evidence, not marketing */}
+          <div className="max-w-3xl mx-auto">
+            <div className="bg-background/70 backdrop-blur border border-emerald-500/20 rounded-xl p-5 md:p-6">
+              <h3 className="text-sm font-semibold text-emerald-300 mb-3 uppercase tracking-wider">
+                A real receipt from the running system
+              </h3>
+              <pre className="text-xs md:text-sm text-foreground/80 overflow-x-auto leading-relaxed">
+{`POST /api/ontology-agent/propose        → HTTP 200
+"gates": {
+  "conflict": "pass",        // integrity: nothing introduced or touched
+  "whelk":    "consistent",  // OWL 2 EL: 1 new subsumption derived
+  "acsp":     "pending"      // awaiting human authorisation
+}
+
+POST (deliberate contradiction)          → HTTP 409
+"blockingConflicts": 1,      // exactly the conflict this proposal adds
+"preExisting":       95      // corpus backlog, advisory, never blocking`}
+              </pre>
+              <p className="text-sm text-muted-foreground leading-relaxed mt-4">
+                Consistency is not integrity, and neither is permission. The
+                receipt shows all three verdicts separately, which is what an
+                auditor, a regulator, or a future you actually needs. The same
+                gate that guards agents also found the corpus&apos;s own latent
+                defects: three subclass cycles and 92 duplicate concepts, now
+                an enumerated cleanup backlog instead of silent corruption.
+              </p>
+            </div>
           </div>
         </div>
       </section>
