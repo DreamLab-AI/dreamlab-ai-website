@@ -220,7 +220,7 @@ const writeGates = [
   {
     icon: History,
     title: "Decisions as first-class records",
-    body: "Agent decisions are graph nodes with their own URNs, causal links, and bounded ancestry traversal. Replaying an idempotency key returns the prior receipt; replaying it with a different payload is rejected. The audit question regulators actually ask, “why did the agent do that, and what did it depend on?”, is a graph query rather than an archaeology project.",
+    body: "Agent decisions are graph nodes with their own URNs, causal links, and bounded ancestry traversal. Replaying an idempotency key returns the prior receipt; replaying it with a different payload is rejected. Governed decisions elevate back into the versioned corpus — the inverse of how new concepts are added — so they are re-derived on every sync, durable rather than ephemeral. And because facts carry validity intervals, the graph is time-travellable: you can ask what it knew, and looked like, at any past moment. The audit question regulators actually ask, “why did the agent do that, and what did it depend on?”, is a graph query rather than an archaeology project.",
   },
 ];
 
