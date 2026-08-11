@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Header } from "@/components/Header";
 import {
+  Anchor,
   ArrowRight,
   Bot,
   Brain,
@@ -44,6 +45,19 @@ const substrates = [
     liveUrl: "https://narrativegoldmine.com",
     liveLabel: "Corpus at narrativegoldmine.com",
     liveExternal: true,
+  },
+  {
+    id: "loom",
+    name: "Loom",
+    tagline: "Model-swappable grounding façade",
+    icon: Anchor,
+    iconBg: "bg-sky-500/10",
+    iconColor: "text-sky-400",
+    borderClass: "border-sky-500/30 hover:border-sky-500/50",
+    description:
+      "A portable node that puts the reasoning core behind a stable, OpenAI-compatible façade: the model is just a URL, so a provider swaps without a single consumer changing. It consumes the published ontology generations and serves grounding to the agent runtime, which resolves its shared 'one brain' through Loom. Grounding is the whole point — on our own ontology testbed, handing a model a static ontology scaffold lifts grounded recall from roughly 0.15–0.27 to about 0.94 across two very different models and runs 3–6× faster, while free-form prose context adds nothing. The scaffold, not the model, does the work, which is exactly why the façade can stay model-agnostic: one provider is wired in today, and it earns the word 'platform' when a second lands.",
+    repo: "https://github.com/DreamLab-AI/loom",
+    repoLabel: "DreamLab-AI/loom",
   },
   {
     id: "agentbox",
@@ -262,7 +276,7 @@ const Ecosystem = () => {
           </h1>
           <p className="text-base md:text-lg text-foreground/80 leading-relaxed max-w-3xl mx-auto">
             VisionFlow is the open software stack behind our training and our
-            community: a five-substrate architecture where autonomous agents
+            community: a six-substrate architecture where autonomous agents
             and human judgment mesh through shared cryptographic identity,
             formal reasoning, and immutable governance. Agents own their data;
             humans shape their autonomy. It is also the stack our residential
@@ -305,7 +319,7 @@ const Ecosystem = () => {
             <div className="lg:sticky lg:top-24">
               <div className="bg-background/60 backdrop-blur border border-cyan-500/20 rounded-2xl p-6 md:p-8 shadow-xl shadow-cyan-500/5">
                 <h3 className="text-sm font-semibold text-cyan-300 mb-8 text-center uppercase tracking-wider">
-                  Five substrates, one identity
+                  Six substrates, one identity
                 </h3>
                 <svg
                   viewBox="0 0 480 480"
@@ -313,7 +327,7 @@ const Ecosystem = () => {
                   role="img"
                   aria-labelledby="substrates-diagram-title"
                 >
-                  <title id="substrates-diagram-title">VisionFlow five-substrate architecture with DID:Nostr identity spine</title>
+                  <title id="substrates-diagram-title">VisionFlow six-substrate architecture with DID:Nostr identity spine</title>
 
                   {/* Defs for subtle glow effects */}
                   <defs>
@@ -332,6 +346,7 @@ const Ecosystem = () => {
                   <line x1="310" y1="295" x2="370" y2="365" stroke="rgb(233,69,96)" strokeWidth="1.5" strokeDasharray="6 4" opacity="0.6" />
                   <line x1="170" y1="295" x2="110" y2="365" stroke="rgb(233,69,96)" strokeWidth="1.5" strokeDasharray="6 4" opacity="0.6" />
                   <line x1="170" y1="145" x2="110" y2="75" stroke="rgb(233,69,96)" strokeWidth="1.5" strokeDasharray="6 4" opacity="0.6" />
+                  <line x1="240" y1="290" x2="240" y2="350" stroke="rgb(233,69,96)" strokeWidth="1.5" strokeDasharray="6 4" opacity="0.6" />
 
                   {/* Center circle: DID:Nostr - larger and more prominent */}
                   <circle cx="240" cy="220" r="70" fill="rgba(233,69,96,0.15)" stroke="rgb(233,69,96)" strokeWidth="3" filter="url(#glow-pink)" />
@@ -363,13 +378,18 @@ const Ecosystem = () => {
                   <text x="75" y="68" textAnchor="middle" fill="rgb(52,211,153)" fontWeight="800" fontSize="15" fontFamily="system-ui, sans-serif">solid-pod-rs</text>
                   <text x="75" y="91" textAnchor="middle" fill="rgb(100,180,150)" fontSize="12" fontFamily="system-ui, sans-serif">WAC</text>
 
+                  {/* Loom (bottom-center) — model-swappable grounding façade */}
+                  <rect x="185" y="350" width="110" height="80" rx="14" fill="rgba(56,189,248,0.1)" stroke="rgb(56,189,248)" strokeWidth="2.5" />
+                  <text x="240" y="382" textAnchor="middle" fill="rgb(56,189,248)" fontWeight="800" fontSize="15" fontFamily="system-ui, sans-serif">Loom</text>
+                  <text x="240" y="405" textAnchor="middle" fill="rgb(130,190,225)" fontSize="12" fontFamily="system-ui, sans-serif">Grounding façade</text>
+
                   {/* Bottom label */}
                   <text x="240" y="470" textAnchor="middle" fill="rgb(120,130,150)" fontSize="12" fontStyle="italic" fontFamily="system-ui, sans-serif" fontWeight="500">
                     Nostr relay mesh
                   </text>
                 </svg>
                 <p className="text-xs text-muted-foreground mt-4 text-center">
-                  Identity flows through all five. Coordination via Nostr relay mesh.
+                  Identity flows through all six. Coordination via Nostr relay mesh.
                 </p>
               </div>
             </div>
@@ -382,7 +402,7 @@ const Ecosystem = () => {
         <div className="container max-w-6xl mx-auto px-5 md:px-4">
           <div className="text-center mb-10 md:mb-14">
             <h2 id="substrates-heading" className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
-              Five substrates
+              Six substrates
             </h2>
             <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
               Each layer is an independent open-source project. Together they

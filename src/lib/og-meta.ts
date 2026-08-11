@@ -83,10 +83,10 @@ export const PAGE_OG_CONFIGS: Record<string, OGMetaConfig> = {
   },
   ecosystem: {
     title: 'VisionFlow Ecosystem | DreamLab AI',
-    description: 'The open software stack behind DreamLab: VisionClaw knowledge reasoning, Agentbox sovereign agent runtime, solid-pod-rs data pods, the nostr-rust-forum community substrate, and the DreamLab edge deployment — one DID:Nostr identity spine.',
+    description: 'The open software stack behind DreamLab: VisionClaw knowledge reasoning, the Loom model-swappable grounding façade, Agentbox sovereign agent runtime, solid-pod-rs data pods, the nostr-rust-forum community substrate, and the DreamLab edge deployment — one DID:Nostr identity spine.',
     url: `${BASE_URL}/ecosystem`,
     image: OG_IMAGES.research,
-    imageAlt: 'VisionFlow five-substrate software ecosystem',
+    imageAlt: 'VisionFlow six-substrate software ecosystem',
   },
   workshops: {
     title: 'Self-Guided Workshops | DreamLab Applied Innovation Lab',
