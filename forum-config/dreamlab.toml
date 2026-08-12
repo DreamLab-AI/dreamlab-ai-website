@@ -130,6 +130,7 @@ visibility        = "locked"
 banner_image_url  = "/images/heroes/family-hero.webp"
 encrypted         = true
 accent_hex        = "#f59e0b"
+kanban            = true   # per-zone collaborative task board (kinds 30301/30302)
 
 [[zones]]
 id                = "zone4"
@@ -140,6 +141,7 @@ visibility        = "locked"
 banner_image_url  = "/images/heroes/business-hero.webp"
 encrypted         = false
 accent_hex        = "#a855f7"
+kanban            = true   # per-zone collaborative task board (kinds 30301/30302)
 
 # ─── Trust thresholds ────────────────────────────────────────────────────────
 [trust]
