@@ -178,6 +178,26 @@ jobs:
           fi
           worker-build --version
 
+      # Pre-seed worker-build's wasm-bindgen cache. worker-build downloads the
+      # wasm-bindgen CLI matching the kit lockfile from GitHub releases with a
+      # plain unauthenticated fetch and NO retry; Actions runners get throttled
+      # on that path intermittently (two identical 'Failed to fetch URL'
+      # failures on cold-cache jobs, 2026-08-13, while warm-cache siblings
+      # passed). Seed the exact cache layout worker-build expects
+      # (~/.cache/worker-build/wasm-bindgen-<target>-<ver>/, tarball flattened)
+      # with a retrying curl so the in-build download never runs.
+      - name: Pre-seed wasm-bindgen for worker-build
+        run: |
+          set -euo pipefail
+          WB_VER=$(grep -A1 '^name = "wasm-bindgen"$' kit/Cargo.lock | grep -oP 'version = "\K[^"]+')
+          if [ -z "$WB_VER" ]; then echo "::error::wasm-bindgen version not found in kit/Cargo.lock" >&2; exit 1; fi
+          DEST="$HOME/.cache/worker-build/wasm-bindgen-x86_64-unknown-linux-musl-${WB_VER}"
+          if [ -x "$DEST/wasm-bindgen" ]; then echo "cache warm: $DEST"; exit 0; fi
+          mkdir -p "$DEST"
+          URL="https://github.com/wasm-bindgen/wasm-bindgen/releases/download/${WB_VER}/wasm-bindgen-${WB_VER}-x86_64-unknown-linux-musl.tar.gz"
+          curl -fsSL --retry 6 --retry-all-errors --retry-delay 5 "$URL" | tar xz --strip-components=1 -C "$DEST"
+          test -x "$DEST/wasm-bindgen" && "$DEST/wasm-bindgen" --version
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
