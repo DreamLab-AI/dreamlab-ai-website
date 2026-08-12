@@ -197,8 +197,8 @@ const identityCapabilities = [
   },
   {
     icon: KeyRound,
-    title: "Pod-provisioned signup keys",
-    body: "New members receive keys provisioned through their own pod, so credential custody starts sovereign instead of being migrated later.",
+    title: "Key custody that scales with assurance",
+    body: "Most members start with a sovereign key provisioned through their own pod. Operators running agents, or working under compliance rules, bind that same did:nostr to a FIDO2 passkey via the Podkey extension — hardware-backed, non-exportable, and phishing-resistant — the same identity at a higher assurance tier, no migration.",
   },
   {
     icon: Download,
