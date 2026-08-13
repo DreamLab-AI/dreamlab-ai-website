@@ -100,16 +100,11 @@ export const Header = () => {
             <DropdownMenuItem asChild>
               <Link to="/testimonials" className="w-full">Impact Stories</Link>
             </DropdownMenuItem>
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger>
-                <span>Community</span>
-              </DropdownMenuSubTrigger>
-              <DropdownMenuSubContent>
-                <DropdownMenuItem asChild>
-                  <a href="/community/" className="w-full">Forum</a>
-                </DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuSub>
+            {/* Direct link — the forum is the community surface; the old
+                one-item Community submenu just added a hover step. */}
+            <DropdownMenuItem asChild>
+              <a href="/community/" className="w-full">Community</a>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
               <Link to="/contact" className="w-full">Contact</Link>

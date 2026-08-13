@@ -22,11 +22,11 @@ its own `pin-check` extension.
 
 | Deployment host | Forum-kit SHA | Kit branch/tag at pin | Consumption tier | Canonical for pin-check |
 |---|---|---|---|---|
-| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `78486a1f027164df2fd718dcd915386ff478075d` | `feat/zone-kanban` (on `v1.0.0-beta.8` + per-zone kanban task boards — kinds 30301/30302, decision-broker approval bridge, kind-38000 agent dispatch, per-subscription relay dedup fix; library crates unchanged at `1.0.0-beta.8` — kit release adopting solid-pod-rs `0.5.0-alpha.7` / did:nostr CG spec 0.1.1 three-context `@context`, plus the `nostr 0.44.6` yanked-range escape; six library crates published to crates.io at `1.0.0-beta.8`, `beta.7` yanked) | `integrated` | ✔ |
+| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `7e00eb4248e839e75d5f20a1db960b93d1dd07ac` | `main` (kanban feature merged: per-zone task boards + card edit/multi-assignee/tombstone-delete/bullet lists + advanced-identity onboarding merged upstream — kinds 30301/30302, decision-broker approval bridge, kind-38000 agent dispatch, per-subscription relay dedup fix; library crates unchanged at `1.0.0-beta.8` — kit release adopting solid-pod-rs `0.5.0-alpha.7` / did:nostr CG spec 0.1.1 three-context `@context`, plus the `nostr 0.44.6` yanked-range escape; six library crates published to crates.io at `1.0.0-beta.8`, `beta.7` yanked) | `integrated` | ✔ |
 
 <!-- pin-check:canonical-kit-sha -->
 ```
-CANONICAL_KIT_SHA=78486a1f027164df2fd718dcd915386ff478075d
+CANONICAL_KIT_SHA=7e00eb4248e839e75d5f20a1db960b93d1dd07ac
 CANONICAL_KIT_VERSION=1.0.0-beta.8
 ```
 
