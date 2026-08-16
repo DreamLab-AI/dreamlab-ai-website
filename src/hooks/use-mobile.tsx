@@ -28,10 +28,12 @@ export function useIsMobile() {
 export function useIsMobileSync() {
   const [isMobile, setIsMobile] = React.useState<boolean>(() =>
     typeof window !== "undefined" &&
+    typeof window.matchMedia === "function" &&
     window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`).matches
   )
 
   React.useEffect(() => {
+    if (typeof window === "undefined" || typeof window.matchMedia !== "function") return
     const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
     const onChange = () => setIsMobile(mql.matches)
     mql.addEventListener("change", onChange)
