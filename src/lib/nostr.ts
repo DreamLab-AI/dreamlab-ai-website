@@ -126,6 +126,48 @@ export function buildContactRumor(params: ContactSignupParams): ContactRumor {
   return { kind: 14, created_at: nowSec(), content, tags: [] };
 }
 
+export interface EnquiryParams {
+  name: string;
+  email: string;
+  /** engagement / project type (Enterprise / SME / KTP, or the desktop select value) */
+  engagementType: string;
+  /** pre-filled names from the Team screen's /contact?team= link, if any */
+  teamMembers?: string;
+  message: string;
+  hasConsent: boolean;
+  source: string;
+  pageUrl: string;
+}
+
+/**
+ * Build the unsigned kind-14 rumor body for a contact-form enquiry, mirroring
+ * buildContactRumor. A human-readable header keeps the admin's DM inbox
+ * scannable; the pretty JSON payload carries the full submission. Only `.content`
+ * is consumed by wrapDm (nip17.wrapEvent re-creates the rumor + p-tag/subject),
+ * so this is the single testable place the enquiry payload is shaped.
+ */
+export function buildEnquiryRumor(params: EnquiryParams): ContactRumor {
+  const { name, email, engagementType, teamMembers, message, hasConsent, source, pageUrl } = params;
+  const trimmedName = name.trim();
+  const trimmedTeam = teamMembers?.trim();
+  const payload = {
+    type: "contact_enquiry",
+    name: trimmedName,
+    email: email.trim().toLowerCase(),
+    engagement_type: engagementType,
+    ...(trimmedTeam ? { team_members: trimmedTeam } : {}),
+    message: message.trim(),
+    has_consent: hasConsent,
+    source,
+    page_url: pageUrl,
+    submitted_at: new Date().toISOString(),
+  };
+  const header = `New enquiry from ${trimmedName || email}${engagementType ? ` · ${engagementType}` : ""}`;
+  const content = `${header}\n\n${JSON.stringify(payload, null, 2)}`;
+  assertPlaintextSize(content);
+  return { kind: 14, created_at: nowSec(), content, tags: [] };
+}
+
 /**
  * Wrap plaintext as a signed kind-1059 gift wrap addressed to `recipientPk`,
  * exactly as the kit reads it: kind-14 rumor (with `["p", recipient]` and an

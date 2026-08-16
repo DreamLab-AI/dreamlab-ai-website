@@ -1,8 +1,10 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import * as nip17 from "nostr-tools/nip17";
+import * as nip59 from "nostr-tools/nip59";
 
 import {
   buildContactRumor,
+  buildEnquiryRumor,
   generateEphemeralIdentity,
   publishGiftWrap,
   wrapDm,
@@ -115,6 +117,96 @@ describe("buildContactRumor", () => {
         hasConsent: true,
         source: "website_signup_form",
         pageUrl: "https://dreamlab-ai.com/",
+      }),
+    ).toThrow(/plaintext cap/i);
+  });
+});
+
+describe("buildEnquiryRumor", () => {
+  it("builds the header + JSON payload for a contact enquiry", () => {
+    const rumor = buildEnquiryRumor({
+      name: "  Grace Hopper  ",
+      email: "GRACE@Example.com",
+      engagementType: "enterprise",
+      teamMembers: "  Dr John O'Hare  ",
+      message: "  We need a working prototype for a spatial audio pipeline.  ",
+      hasConsent: true,
+      source: "website_contact_form",
+      pageUrl: "https://dreamlab-ai.com/contact",
+    });
+
+    expect(rumor.kind).toBe(14);
+    expect(rumor.tags).toEqual([]); // ['p'] is added by the wrap helper, not here
+
+    const [header, json] = rumor.content.split("\n\n");
+    expect(header).toBe("New enquiry from Grace Hopper · enterprise");
+
+    const payload = JSON.parse(json);
+    expect(payload).toMatchObject({
+      type: "contact_enquiry",
+      name: "Grace Hopper",
+      email: "grace@example.com", // lower-cased
+      engagement_type: "enterprise",
+      team_members: "Dr John O'Hare",
+      message: "We need a working prototype for a spatial audio pipeline.",
+      has_consent: true,
+      source: "website_contact_form",
+      page_url: "https://dreamlab-ai.com/contact",
+    });
+    expect(typeof payload.submitted_at).toBe("string");
+    expect(Number.isNaN(Date.parse(payload.submitted_at))).toBe(false);
+  });
+
+  it("omits team_members when none are given and falls back to email in the header", () => {
+    const rumor = buildEnquiryRumor({
+      name: "",
+      email: "nobody@example.com",
+      engagementType: "sme",
+      message: "Interested in a sprint.",
+      hasConsent: true,
+      source: "website_contact_form",
+      pageUrl: "https://dreamlab-ai.com/contact",
+    });
+    const [header, json] = rumor.content.split("\n\n");
+    expect(header).toBe("New enquiry from nobody@example.com · sme");
+    const payload = JSON.parse(json);
+    expect(payload.name).toBe("");
+    expect("team_members" in payload).toBe(false);
+  });
+
+  it("wraps into a kind-1059 gift wrap addressed to the recipient", () => {
+    const sender = generateEphemeralIdentity();
+    const recipient = generateEphemeralIdentity();
+    const rumor = buildEnquiryRumor({
+      name: "Ada",
+      email: "ada@example.com",
+      engagementType: "ktp",
+      message: "Knowledge transfer partnership enquiry.",
+      hasConsent: true,
+      source: "website_contact_form",
+      pageUrl: "https://dreamlab-ai.com/contact",
+    });
+    const wrap = wrapDm(rumor.content, sender.sk, recipient.pk, "DreamLab website enquiry");
+    expect(wrap.kind).toBe(1059);
+    // The wrap is addressed to the recipient via a ['p', pk] tag.
+    expect(wrap.tags.some((t) => t[0] === "p" && t[1] === recipient.pk)).toBe(true);
+    // Round-trip: the recipient can unwrap and read the enquiry.
+    const unwrapped = nip59.unwrapEvent(wrap, recipient.sk);
+    expect(unwrapped.content).toContain("contact_enquiry");
+    expect(unwrapped.content).toContain("ada@example.com");
+  });
+
+  it("throws when content exceeds the NIP-44 plaintext cap", () => {
+    const huge = "x".repeat(NIP44_MAX_PLAINTEXT + 1);
+    expect(() =>
+      buildEnquiryRumor({
+        name: "Ada",
+        email: "a@b.com",
+        engagementType: "enterprise",
+        message: huge,
+        hasConsent: true,
+        source: "website_contact_form",
+        pageUrl: "https://dreamlab-ai.com/contact",
       }),
     ).toThrow(/plaintext cap/i);
   });

@@ -16,7 +16,12 @@ import { useForm, type UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { supabase } from "@/lib/supabase";
+import {
+  generateEphemeralIdentity,
+  buildEnquiryRumor,
+  wrapDm,
+  publishGiftWrap,
+} from "@/lib/nostr";
 import { useOGMeta } from "@/hooks/useOGMeta";
 import { PAGE_OG_CONFIGS } from "@/lib/og-meta";
 import { useIsMobileSync } from "@/hooks/use-mobile";
@@ -24,6 +29,15 @@ import { useIsMobileSync } from "@/hooks/use-mobile";
 // --- Constants ---
 const SUCCESS_MESSAGE = "Message sent! We'll get back to you as soon as possible.";
 const ERROR_MESSAGE_SUBMISSION = "There was a problem sending your message. Please try again.";
+const ERROR_MESSAGE_UNAVAILABLE = "Service temporarily unavailable. Please try again later.";
+
+// Enquiries are delivered to the site operator as an anonymous, end-to-end
+// encrypted NIP-17 gift-wrapped DM (ADR-041) — the same ingress the signup form
+// uses. No database row is written; success is gated on the relay OK-true so a
+// rejected publish never shows a false success.
+const RELAY_URL = import.meta.env.VITE_RELAY_URL || "";
+const ADMIN_PUBKEY = import.meta.env.VITE_ADMIN_PUBKEY || "";
+const ENQUIRY_SUBJECT = "DreamLab website enquiry";
 
 // Define form schema with Zod
 const formSchema = z.object({
@@ -45,9 +59,9 @@ interface ContactViewProps {
 
 /* ============================================================
    MOBILE ENQUIRE (≤767px) — SCREENS.md §10
-   Presentation only. Submission is the existing Supabase path,
-   unchanged — so the reassurance copy stays truthful (this form
-   stores to Supabase; it is not the NIP-17 e2e path).
+   Submits over the NIP-17 end-to-end-encrypted gift-wrap ingress
+   (shared onSubmit), so the "end-to-end encrypted" reassurance
+   line below is now literally true.
    ============================================================ */
 
 const ENGAGEMENTS = [
@@ -165,8 +179,7 @@ const ContactMobile = ({ form, onSubmit, isSubmitting, selectedTeam }: ContactVi
           </button>
 
           <p className="text-[13px] leading-[1.5] text-white/[0.42]">
-            We'll only use your details to reply about your enquiry. See our privacy policy for how
-            we handle your data.
+            Sent end-to-end encrypted. Only we can read it, and we don't store it anywhere else.
           </p>
         </div>
       </form>
@@ -365,46 +378,42 @@ const Contact = () => {
   }, [selectedTeam, form]);
 
   const onSubmit = async (data: FormValues) => {
-    if (!supabase) {
-      toast.error("Service temporarily unavailable. Please try again later.", {
-        duration: 5000,
-      });
+    // Degrade gracefully if the ingress isn't configured for this build.
+    if (!RELAY_URL || !ADMIN_PUBKEY) {
+      toast.error(ERROR_MESSAGE_UNAVAILABLE, { duration: 5000 });
       return;
     }
 
     setIsSubmitting(true);
 
-    // Sprint v9 D4: do NOT log submitted form data (PII) or Supabase error
-    // bodies (which can leak schema hints / project IDs). Show a generic
-    // toast on failure; rely on Supabase server-side logs for diagnosis.
+    // Do NOT log submitted form data (PII) or the raw relay message (an OK-false
+    // reason can leak internal relay/whitelist detail). Success is gated strictly
+    // on the relay OK-true, mirroring EmailSignupForm (ADR-041 D4).
     try {
-      const { error } = await supabase
-        .from('contact_submissions')
-        .insert([{
-          name: data.name,
-          email: data.email,
-          project_type: data.projectType,
-          team_members: data.teamMembers || null,
-          message: data.message,
-          submitted_at: new Date().toISOString()
-        }]);
+      // One-shot ephemeral sender key: minted, used once, then discarded — the
+      // sender is anonymous and unlinkable across submissions.
+      const identity = generateEphemeralIdentity();
+      const rumor = buildEnquiryRumor({
+        name: data.name,
+        email: data.email,
+        engagementType: data.projectType,
+        teamMembers: data.teamMembers,
+        // Submitting the form is the consent action (mobile gates on an explicit
+        // checkbox; the desktop form's submit is the implicit agreement).
+        hasConsent: true,
+        message: data.message,
+        source: "website_contact_form",
+        pageUrl: window.location.href,
+      });
+      const wrap = wrapDm(rumor.content, identity.sk, ADMIN_PUBKEY, ENQUIRY_SUBJECT);
+      const result = await publishGiftWrap(RELAY_URL, wrap);
 
-      if (error) {
-        throw error;
+      if (!result.ok) {
+        toast.error(ERROR_MESSAGE_SUBMISSION, { duration: 5000 });
+        return;
       }
 
-      // Also add email to subscribers list if not already there
-      await supabase
-        .from('email_subscribers')
-        .upsert([{ email: data.email }], {
-          onConflict: 'email',
-          ignoreDuplicates: true
-        });
-
-      // Show success message
       toast.success(SUCCESS_MESSAGE, { duration: 5000 });
-
-      // Reset form
       form.reset();
     } catch {
       toast.error(ERROR_MESSAGE_SUBMISSION, { duration: 5000 });
