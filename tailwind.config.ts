@@ -87,6 +87,19 @@ export default {
 		        }
 		    }), // typography theme function's return object closes
 			colors: {
+				// Mobile surface palette (≤767px). Desktop uses the shipped
+				// --primary / --dl-accent-* tokens; these are mobile-only and explicit.
+				dlm: {
+					base:      '#0E0E11',
+					sunken:    '#0B0B0E',
+					raised:    '#17171C',
+					action:    '#06B6D4',
+					ink:       '#04202A',
+					bright:    '#22D3EE',
+					hairline:  'rgba(255,255,255,0.08)',
+					hairline2: 'rgba(255,255,255,0.12)',
+					field:     'rgba(255,255,255,0.03)',
+				},
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
@@ -476,6 +489,22 @@ export default {
 			backgroundSize: {
 				'300%': '300%',
 				'400%': '400%',
+			},
+			// Mobile type scale (≤767px). Names are m-* so they never collide
+			// with the default scale desktop uses.
+			fontSize: {
+				'm-h1':    ['2rem',      { lineHeight: '1.15', letterSpacing: '-0.02em', fontWeight: '600' }],
+				'm-h1s':   ['1.875rem',  { lineHeight: '1.18', letterSpacing: '-0.02em', fontWeight: '600' }],
+				'm-h2':    ['1.375rem',  { lineHeight: '1.3',  letterSpacing: '-0.01em', fontWeight: '600' }],
+				'm-quote': ['1.1875rem', { lineHeight: '1.55' }],
+				'm-title': ['1.0625rem', { lineHeight: '1.65', fontWeight: '600' }],
+				'm-read':  ['1.0625rem', { lineHeight: '1.7' }],
+				'm-body':  ['1rem',      { lineHeight: '1.65' }],
+				'm-sub':   ['0.875rem',  { lineHeight: '1.55' }],
+				'm-meta':  ['0.6875rem', { lineHeight: '1', letterSpacing: '0.16em', fontWeight: '500' }],
+			},
+			spacing: {
+				'safe-bar': '7.5rem',  // 120px bottom clearance for the sticky action bar
 			}
 		}
 	},

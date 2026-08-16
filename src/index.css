@@ -41,6 +41,26 @@
   }
 }
 
+/* ============================================
+   MOBILE SURFACE (≤767px) — mobile redesign
+   Scoped so desktop (md: and up) is byte-identical.
+   See design_handoff_mobile_redesign / TOKENS.md §11.
+   ============================================ */
+@layer base {
+  @media (max-width: 767px) {
+    :root {
+      --background: 240 10% 6%;      /* #0E0E11 — hero anthracite, warmer than the desktop void */
+      --radius: 0.625rem;            /* 10px controls */
+    }
+    body {
+      font-size: 1.0625rem;          /* 17px reading default */
+      line-height: 1.65;
+    }
+    /* Hard floor: below 16px iOS zooms the viewport on field focus. */
+    input, textarea, select { font-size: 16px; }
+  }
+}
+
 @layer base {
   * {
     @apply border-border;

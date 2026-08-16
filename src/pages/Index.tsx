@@ -7,8 +7,15 @@ const HyperdimensionalHeroBackground = lazy(
 );
 import { Header } from "@/components/Header";
 import {
+  MobileActionBar,
+  BarPrimary,
+  BarIconButton,
+} from "@/components/MobileActionBar";
+import {
   ChevronDown,
+  ChevronRight,
   ArrowRight,
+  Mail,
   Brain,
   Glasses,
   ShieldCheck,
@@ -25,6 +32,7 @@ import {
 } from "lucide-react";
 import { useOGMeta } from "@/hooks/useOGMeta";
 import { PAGE_OG_CONFIGS } from "@/lib/og-meta";
+import { useIsMobileSync } from "@/hooks/use-mobile";
 
 const EmailSignupForm = lazy(() => import("@/components/EmailSignupForm").then(m => ({ default: m.EmailSignupForm })));
 
@@ -119,7 +127,7 @@ const featuredTeam = [
   { name: "Steve Moyler", domain: "Chief Creative Officer, DREAMLAB", role: "Creative Lead", image: "/images/team/03.webp" },
 ];
 
-// Facility images for carousel
+// Facility images for the desktop carousel
 const facilityImages = [
   "/images/venue/aerial.webp",
   "/images/venue/fairfield-front.webp",
@@ -130,8 +138,186 @@ const facilityImages = [
   "/images/venue/remarkable2.webp",
 ];
 
-const Index = () => {
-  useOGMeta(PAGE_OG_CONFIGS.home);
+/* ============================================================
+   MOBILE HOME (≤767px) — mobile redesign, SCREENS.md §01
+   ============================================================ */
+
+const MobileTrackRow = ({ to, title, count }: { to: string; title: string; count: string }) => (
+  <Link
+    to={to}
+    className="flex items-center gap-[14px] min-h-[60px] py-[14px] border-t border-dlm-hairline"
+  >
+    <span className="w-1.5 h-1.5 rounded-full bg-dlm-bright shrink-0" aria-hidden="true" />
+    <span className="flex-1 text-[16px] text-[#FAFAFA]">{title}</span>
+    <span className="text-[13px] text-white/45">{count}</span>
+    <ChevronRight className="w-[15px] h-[15px] text-white/35 shrink-0" aria-hidden="true" />
+  </Link>
+);
+
+const engagementRows = [
+  { title: "Enterprise training + retainer", duration: "1–3 DAYS", outcome: "Working prototype at TRL 4–6." },
+  { title: "SME innovation sprint", duration: "1–3 DAYS", outcome: "A deployable MVP and an upskilled team." },
+  { title: "KTP partnership", duration: "12–36 MTHS", outcome: "Long-term capability transfer, grant-funded." },
+];
+
+const labChips = [
+  "10G network",
+  "8× RTX GPU cluster",
+  "LED volume stage",
+  "24-speaker spatial sound",
+  "Full-board residential",
+];
+
+const statQuad = [
+  { fig: "£8M+", label: "research heritage" },
+  { fig: "30 yrs", label: "deep tech R&D" },
+  { fig: "44+", label: "specialists" },
+  { fig: "6.3kW", label: "solar powered" },
+];
+
+const IndexMobile = () => (
+  <>
+    {/* Hero */}
+    <section id="main-content" className="pt-11 px-6 pb-9" aria-label="Hero">
+      <p className="text-m-meta font-mono uppercase text-dlm-bright mb-5">
+        Residential AI training · Cumbria
+      </p>
+      <h1 className="text-m-h1 text-[#FAFAFA] [text-wrap:pretty]">
+        Bring your team to the Lake District. Leave with a working prototype.
+      </h1>
+      <p className="text-[17px] leading-[1.6] text-white/[0.62] mt-4 mb-7">
+        One to three days in a solar-powered deep-tech lab, shaped around your challenge.
+      </p>
+      <Link
+        to="/contact"
+        className="flex items-center justify-center h-[52px] rounded-[10px] bg-dlm-action text-dlm-ink text-[16px] font-semibold transition-colors active:bg-[#0891B2]"
+      >
+        Schedule a lab visit
+      </Link>
+      <Link
+        to="/programmes"
+        className="inline-flex items-center gap-1 min-h-[44px] mt-2 text-[15px] text-dlm-bright"
+      >
+        See the 38 programme ideas <ArrowRight className="w-4 h-4" aria-hidden="true" />
+      </Link>
+    </section>
+
+    {/* Facility photo — one static image, full-bleed */}
+    <img
+      src="/images/venue/aerial.webp"
+      alt="DreamLab Innovation Facility, Lake District"
+      className="w-full h-[200px] object-cover"
+      loading="lazy"
+    />
+
+    {/* Stat quad */}
+    <section className="grid grid-cols-2" aria-label="Key facts">
+      {statQuad.map((s, i) => (
+        <div
+          key={s.label}
+          className={`px-6 py-[22px] ${i % 2 === 0 ? "border-r border-dlm-hairline" : ""} ${i < 2 ? "border-b border-dlm-hairline" : ""}`}
+        >
+          <div className="text-[24px] font-semibold text-[#FAFAFA] leading-none">{s.fig}</div>
+          <div className="text-[13px] text-white/50 mt-1.5">{s.label}</div>
+        </div>
+      ))}
+    </section>
+
+    {/* What we train */}
+    <section className="py-11 px-6" aria-label="What we train">
+      <h2 className="text-m-h2 text-[#FAFAFA]">What we train</h2>
+      <p className="text-[15px] leading-[1.5] text-white/60 mt-2 mb-3">
+        Eight tracks, 38 course ideas — every one shaped around your team.
+      </p>
+      <div>
+        {outcomeCards.map((card) => {
+          const target =
+            card.id === "sovereign-identity"
+              ? "/ecosystem#sovereign-identity"
+              : `/programmes#${card.id}`;
+          const count =
+            card.id === "sovereign-identity" ? `${card.count} capabilities` : `${card.count} ideas`;
+          return <MobileTrackRow key={card.id} to={target} title={card.title} count={count} />;
+        })}
+      </div>
+    </section>
+
+    {/* Three ways in */}
+    <section className="py-11 px-6" aria-label="Three ways in">
+      <h2 className="text-m-h2 text-[#FAFAFA] mb-2">Three ways in</h2>
+      <div>
+        {engagementRows.map((row) => (
+          <Link
+            key={row.title}
+            to="/co-create"
+            className="block py-[18px] border-t border-dlm-hairline"
+          >
+            <div className="flex items-baseline justify-between gap-3">
+              <span className="text-[17px] font-semibold text-[#FAFAFA]">{row.title}</span>
+              <span className="text-[11px] font-mono tracking-[0.12em] text-dlm-bright shrink-0">
+                {row.duration}
+              </span>
+            </div>
+            <p className="text-[14px] leading-[1.55] text-white/55 mt-1">{row.outcome}</p>
+          </Link>
+        ))}
+      </div>
+    </section>
+
+    {/* The lab */}
+    <section className="px-6 pb-11" aria-label="The lab">
+      <h2 className="text-m-h2 text-[#FAFAFA] mb-4">The lab</h2>
+      <div className="flex flex-wrap gap-2">
+        {labChips.map((chip) => (
+          <span
+            key={chip}
+            className="inline-flex items-center min-h-[40px] px-[14px] py-[9px] rounded-full border border-dlm-hairline2 text-[14px] text-white/70"
+          >
+            {chip}
+          </span>
+        ))}
+      </div>
+      <p className="text-[15px] leading-[1.6] text-white/60 mt-5">
+        A 44-strong team of Emmy nominees, PhD researchers and BAFTA-recognised talent shares the
+        lab with you.
+      </p>
+      <Link
+        to="/team"
+        className="inline-flex items-center gap-1 min-h-[44px] text-[15px] text-dlm-bright"
+      >
+        Meet the team <ArrowRight className="w-4 h-4" aria-hidden="true" />
+      </Link>
+    </section>
+
+    {/* Footer */}
+    <footer className="bg-dlm-sunken pt-7 px-6 pb-[130px]" role="contentinfo">
+      <div className="flex flex-wrap gap-x-5 gap-y-3 text-[14px] text-white/60">
+        <a href="/community/">Community</a>
+        <Link to="/testimonials">Impact stories</Link>
+        <Link to="/privacy">Privacy</Link>
+        <a href="https://www.linkedin.com/company/dreamlab-ai-consulting/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        <a href="https://bsky.app/profile/thedreamlab.bsky.social" target="_blank" rel="noopener noreferrer">Bluesky</a>
+      </div>
+      <p className="text-[12px] text-white/35 mt-6">
+        © {new Date().getFullYear()} DreamLab AI Consulting Ltd. All rights reserved.
+      </p>
+    </footer>
+
+    {/* Sticky action bar */}
+    <MobileActionBar>
+      <BarPrimary label="Schedule a lab visit" to="/contact" />
+      <BarIconButton label="Email us" to="/contact">
+        <Mail className="w-5 h-5" aria-hidden="true" />
+      </BarIconButton>
+    </MobileActionBar>
+  </>
+);
+
+/* ============================================================
+   DESKTOP HOME (md and up) — unchanged from the shipped site
+   ============================================================ */
+
+const IndexDesktop = () => {
   const heroRef = useRef<HTMLDivElement>(null);
   const [facilityIndex, setFacilityIndex] = useState(0);
 
@@ -143,12 +329,7 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background text-foreground overflow-hidden">
-      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-primary focus:text-primary-foreground">
-        Skip to main content
-      </a>
-      <Header />
-
+    <>
       {/* Section 1: Hero */}
       <section
         id="main-content"
@@ -545,6 +726,21 @@ const Index = () => {
           </div>
         </div>
       </footer>
+    </>
+  );
+};
+
+const Index = () => {
+  useOGMeta(PAGE_OG_CONFIGS.home);
+  const isMobile = useIsMobileSync();
+
+  return (
+    <div className="min-h-screen bg-background text-foreground overflow-hidden pt-14 md:pt-0">
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-primary focus:text-primary-foreground">
+        Skip to main content
+      </a>
+      <Header />
+      {isMobile ? <IndexMobile /> : <IndexDesktop />}
     </div>
   );
 };

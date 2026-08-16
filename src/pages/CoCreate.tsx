@@ -20,6 +20,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { useOGMeta } from "@/hooks/useOGMeta";
+import { useIsMobileSync } from "@/hooks/use-mobile";
 
 const processSteps = [
   { icon: Search, title: "Discovery", description: "We map your challenge, assess technology readiness, and identify the right combination of expertise. No commitment required." },
@@ -38,13 +39,95 @@ const facilityImages = [
   "/images/venue/view3.webp",
 ];
 
-const CoCreate = () => {
-  useOGMeta({
-    title: "Co-Create With Us | DreamLab Applied Innovation Lab",
-    description: "Embed your team in our Lake District innovation lab. Enterprise residencies, SME innovation sprints, and Innovate UK KTP partnerships for deep tech co-creation.",
-    url: "https://dreamlab-ai.com/co-create",
-  });
+// Mobile-only engagement blocks — same three routes, full descriptions.
+const engagementBlocks = [
+  {
+    title: "Enterprise Residency",
+    duration: "1–3 DAYS",
+    description:
+      "Your team embeds in the lab for intensive R&D sprints. We assign a dedicated multi-disciplinary team from our specialist collective, matched to your domain and challenge.",
+    outcome: "OUTCOME · VALIDATED PROTOTYPE AT TRL 4–6",
+    linkLabel: "Scope an engagement",
+  },
+  {
+    title: "SME Innovation Sprint",
+    duration: "1–3 DAYS",
+    description:
+      "Structured programmes for smaller companies ready to apply deep tech. You arrive with a challenge and leave with a working solution and the skills to maintain it.",
+    outcome: "OUTCOME · DEPLOYABLE MVP AND TEAM UPSKILLING",
+    linkLabel: "Enquire about a sprint",
+  },
+  {
+    title: "KTP Partnership",
+    duration: "12–36 MTHS",
+    description:
+      "Knowledge Transfer Partnerships place a graduate associate in your organisation, co-supervised by our research team. Innovate UK funds up to 67% of the cost for SMEs, making this the most cost-effective route to long-term capability transfer.",
+    outcome: "OUTCOME · EMBEDDED CAPABILITY, GRANT-FUNDED",
+    linkLabel: "Check eligibility",
+  },
+];
 
+const CoCreateMobile = () => (
+  <>
+    {/* Header */}
+    <section id="main-content" className="pt-11 px-6 pb-2" aria-label="Co-create">
+      <h1 className="text-m-h1s text-[#FAFAFA] [text-wrap:pretty]">Embed in our lab.</h1>
+      <p className="text-[16px] leading-[1.6] text-white/[0.62] mt-4">
+        Bring your toughest challenge to our Lake District lab. Your team works alongside 43+ deep
+        tech specialists in an environment designed for focused, intensive co-creation. We do not
+        just advise. We build with you.
+      </p>
+    </section>
+
+    {/* Three engagement routes */}
+    <section className="px-6" aria-label="Engagement models">
+      {engagementBlocks.map((b) => (
+        <div key={b.title} className="border-t border-dlm-hairline py-[24px]">
+          <div className="flex items-baseline justify-between gap-3">
+            <h2 className="text-[20px] font-semibold text-[#FAFAFA]">{b.title}</h2>
+            <span className="text-[11px] font-mono tracking-[0.12em] text-dlm-bright shrink-0">
+              {b.duration}
+            </span>
+          </div>
+          <p className="text-[15px] leading-[1.65] text-white/[0.62] mt-2">{b.description}</p>
+          <p className="text-[11px] font-mono tracking-[0.12em] text-white/45 mt-3">{b.outcome}</p>
+          <Link
+            to="/contact"
+            className="inline-flex items-center gap-1 min-h-[44px] mt-1 text-[15px] text-dlm-bright"
+          >
+            {b.linkLabel} <ArrowRight className="w-4 h-4" aria-hidden="true" />
+          </Link>
+        </div>
+      ))}
+    </section>
+
+    {/* Primary CTA */}
+    <section className="px-6 py-11" aria-label="Design your engagement">
+      <Link
+        to="/contact"
+        className="flex items-center justify-center h-[52px] rounded-[10px] bg-dlm-action text-dlm-ink text-[16px] font-semibold transition-colors active:bg-[#0891B2]"
+      >
+        Design your engagement
+      </Link>
+    </section>
+
+    {/* Footer */}
+    <footer className="bg-dlm-sunken pt-7 px-6 pb-[130px]" role="contentinfo">
+      <div className="flex flex-wrap gap-x-5 gap-y-3 text-[14px] text-white/60">
+        <a href="/community/">Community</a>
+        <Link to="/testimonials">Impact stories</Link>
+        <Link to="/privacy">Privacy</Link>
+        <a href="https://www.linkedin.com/company/dreamlab-ai-consulting/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        <a href="https://bsky.app/profile/thedreamlab.bsky.social" target="_blank" rel="noopener noreferrer">Bluesky</a>
+      </div>
+      <p className="text-[12px] text-white/35 mt-6">
+        © {new Date().getFullYear()} DreamLab AI Consulting Ltd. All rights reserved.
+      </p>
+    </footer>
+  </>
+);
+
+const CoCreateDesktop = () => {
   const [imgIndex, setImgIndex] = useState(0);
 
   useEffect(() => {
@@ -53,9 +136,7 @@ const CoCreate = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <Header />
-
+    <>
       {/* Hero */}
       <section className="relative pt-24 sm:pt-28 pb-12 sm:pb-16 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-cyan-950/20 to-purple-950/20" />
@@ -340,6 +421,23 @@ const CoCreate = () => {
           </div>
         </div>
       </footer>
+    </>
+  );
+};
+
+const CoCreate = () => {
+  useOGMeta({
+    title: "Co-Create With Us | DreamLab Applied Innovation Lab",
+    description: "Embed your team in our Lake District innovation lab. Enterprise residencies, SME innovation sprints, and Innovate UK KTP partnerships for deep tech co-creation.",
+    url: "https://dreamlab-ai.com/co-create",
+  });
+
+  const isMobile = useIsMobileSync();
+
+  return (
+    <div className="min-h-screen bg-background text-foreground pt-14 md:pt-0">
+      <Header />
+      {isMobile ? <CoCreateMobile /> : <CoCreateDesktop />}
     </div>
   );
 };

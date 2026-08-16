@@ -22,6 +22,8 @@ import {
   Landmark,
 } from "lucide-react";
 import { useOGMeta } from "@/hooks/useOGMeta";
+import { useIsMobileSync } from "@/hooks/use-mobile";
+import { MobileActionBar, BarPrimary } from "@/components/MobileActionBar";
 
 // ──────────────────────────────────────────────────────────────
 // Flat programme catalogue — single source of truth
@@ -361,16 +363,136 @@ const TRLBadge = ({ range }: { range: string }) => {
 };
 
 // ──────────────────────────────────────────────────────────────
-// Page component
+// Mobile surface (≤767px) — mobile redesign, SCREENS.md §03/§04
+// Desktop stays byte-identical below; this branch never mounts on md+.
 // ──────────────────────────────────────────────────────────────
 
-const Programmes = () => {
-  useOGMeta({
-    title: "Programmes | DreamLab Applied Innovation Lab",
-    description: "Outcome-based residential programmes spanning enterprise innovation, AI deployment, geospatial intelligence, immersive experiences, cyber infrastructure, and creative production. TRL 2-8, Lake District facility.",
-    url: "https://dreamlab-ai.com/programmes",
-  });
+// Course ideas for a track = the programmes tagged with that outcome category.
+// No sector filtering on mobile (eight items don't need it — SCREENS.md §03).
+const coursesForTrack = (categoryId: string) =>
+  programmes.filter((p) => p.categories.includes(categoryId));
 
+/* §03 · Programmes list — pushed intro + one detail row per track. */
+const ProgrammesListMobile = () => (
+  <>
+    {/* Intro */}
+    <section id="main-content" className="pt-11 px-6 pb-6" aria-label="Programmes intro">
+      <h1 className="text-m-h1s text-[#FAFAFA] [text-wrap:pretty]">
+        38 residential ideas to spark your own.
+      </h1>
+      <p className="text-m-body text-white/[0.62] mt-4">
+        Agentics, spatial computing, rapid prototyping and distributed systems — every course
+        is unique, shaped around the team and the problem you bring.
+      </p>
+    </section>
+
+    {/* Detail rows → track detail */}
+    <section className="px-6" aria-label="Tracks">
+      {outcomeCategories.map((cat) => {
+        const count = coursesForTrack(cat.id).length;
+        if (count === 0) return null;
+        return (
+          <Link
+            key={cat.id}
+            to={`/programmes#${cat.id}`}
+            className="block py-[18px] border-t border-dlm-hairline"
+          >
+            <div className="flex items-baseline justify-between gap-3">
+              <span className="text-[18px] font-semibold text-[#FAFAFA] leading-snug">
+                {cat.title}
+              </span>
+              <span className="text-[13px] font-mono tabular-nums text-white/45 shrink-0">
+                {count}
+              </span>
+            </div>
+            <p className="text-[14px] leading-[1.55] text-white/55 mt-1">{cat.value}</p>
+          </Link>
+        );
+      })}
+    </section>
+
+    {/* Not sure which? */}
+    <section className="px-6 pt-11 pb-11" aria-label="Not sure which">
+      <h2 className="text-[18px] font-semibold text-[#FAFAFA]">Not sure which?</h2>
+      <p className="text-[15px] leading-[1.6] text-white/60 mt-2 mb-5">
+        Skip the catalogue. Tell us the problem you are bringing and we will shape the right
+        residential around it.
+      </p>
+      <Link
+        to="/contact"
+        className="flex items-center justify-center h-[52px] rounded-[10px] border border-white/[0.16] text-[#FAFAFA] text-[16px] transition-colors active:bg-white/[0.05]"
+      >
+        Describe your challenge
+      </Link>
+    </section>
+  </>
+);
+
+/* §04 · Track detail — single track keyed by the #<track-id> hash. */
+const TrackDetailMobile = ({ track }: { track: (typeof outcomeCategories)[number] }) => {
+  const courses = coursesForTrack(track.id);
+  const nn = String(outcomeCategories.findIndex((c) => c.id === track.id) + 1).padStart(2, "0");
+
+  return (
+    <div className="pb-safe-bar">
+      {/* Header */}
+      <section id="main-content" className="pt-11 px-6 pb-7" aria-label={track.title}>
+        <p className="text-m-meta font-mono uppercase text-dlm-bright mb-4">
+          Track {nn} · {courses.length} course idea{courses.length !== 1 ? "s" : ""}
+        </p>
+        <h1 className="text-m-h1s text-[#FAFAFA] [text-wrap:pretty]">{track.value}</h1>
+        <p className="text-[16px] leading-[1.6] text-white/[0.62] mt-4">
+          These are starting points, not a catalogue. Every course is shaped around your team
+          and the problem you bring.
+        </p>
+      </section>
+
+      {/* Course detail rows — real programme data */}
+      <section className="px-6" aria-label="Course ideas">
+        {courses.map((prog) => (
+          <div key={prog.id} className="py-[18px] border-t border-dlm-hairline">
+            <h2 className="text-[17px] font-semibold text-[#FAFAFA] leading-snug">
+              {prog.title}
+            </h2>
+            <p className="text-[14px] leading-[1.55] text-white/55 mt-1">{prog.description}</p>
+            <p className="text-[11px] font-mono uppercase tracking-[0.12em] text-white/40 mt-2">
+              {prog.duration} · {prog.format}
+            </p>
+          </div>
+        ))}
+      </section>
+
+      {/* Who teaches it */}
+      <section className="px-6 pt-11" aria-label="Who teaches it">
+        <h2 className="text-[18px] font-semibold text-[#FAFAFA]">Who teaches it</h2>
+        <p className="text-[15px] leading-[1.6] text-white/60 mt-2">
+          Every residential is led in person by our resident specialists — Emmy nominees, PhD
+          researchers and industry practitioners who build this work daily.{" "}
+          <Link to="/team" className="inline-flex items-center gap-1 text-dlm-bright">
+            Meet the team <ArrowRight className="w-4 h-4" aria-hidden="true" />
+          </Link>
+        </p>
+      </section>
+
+      {/* Sticky action bar */}
+      <MobileActionBar>
+        <BarPrimary label="Enquire about this track" to="/contact" />
+      </MobileActionBar>
+    </div>
+  );
+};
+
+const ProgrammesMobile = () => {
+  const { hash } = useLocation();
+  const track = hash ? outcomeCategories.find((c) => c.id === hash.slice(1)) : undefined;
+  return track ? <TrackDetailMobile track={track} /> : <ProgrammesListMobile />;
+};
+
+// ──────────────────────────────────────────────────────────────
+// Desktop surface (md and up) — unchanged from the shipped site
+// ──────────────────────────────────────────────────────────────
+
+const ProgrammesDesktop = () => {
   const { hash } = useLocation();
   const [activeSector, setActiveSector] = useState("all");
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
@@ -401,9 +523,7 @@ const Programmes = () => {
   const visibleCount = filteredProgrammes.length;
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <Header />
-
+    <>
       {/* Hero */}
       <section className="relative pt-24 sm:pt-28 pb-12 sm:pb-16 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-transparent to-cyan-500/10" />
@@ -716,6 +836,27 @@ const Programmes = () => {
           </div>
         </div>
       </footer>
+    </>
+  );
+};
+
+// ──────────────────────────────────────────────────────────────
+// Page component — shared shell, gates the mobile/desktop surface
+// ──────────────────────────────────────────────────────────────
+
+const Programmes = () => {
+  useOGMeta({
+    title: "Programmes | DreamLab Applied Innovation Lab",
+    description: "Outcome-based residential programmes spanning enterprise innovation, AI deployment, geospatial intelligence, immersive experiences, cyber infrastructure, and creative production. TRL 2-8, Lake District facility.",
+    url: "https://dreamlab-ai.com/programmes",
+  });
+
+  const isMobile = useIsMobileSync();
+
+  return (
+    <div className="min-h-screen bg-background text-foreground pt-14 md:pt-0">
+      <Header />
+      {isMobile ? <ProgrammesMobile /> : <ProgrammesDesktop />}
     </div>
   );
 };

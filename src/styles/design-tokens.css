@@ -348,3 +348,53 @@
     background: #1f2937;
   }
 }
+
+/* ============================================
+ * MOBILE SURFACE TOKENS (≤767px) — mobile redesign
+ * Appended, never modifying the blocks above. Desktop and data
+ * visualisations keep the --dl-accent-* palette unchanged.
+ * See design_handoff_mobile_redesign / TOKENS.md §11.
+ * ============================================ */
+
+:root {
+  /* Surfaces — base moves to the hero's warmer anthracite */
+  --dl-m-base:        #0E0E11;   /* page background */
+  --dl-m-sunken:      #0B0B0E;   /* footer, sticky action bar, code blocks */
+  --dl-m-raised:      #17171C;   /* selectable cards, media wells */
+  --dl-m-hairline:    rgba(255,255,255,.08);   /* list rules between items */
+  --dl-m-hairline-2:  rgba(255,255,255,.12);   /* chip / outline-button borders */
+  --dl-m-field:       rgba(255,255,255,.03);   /* input fill */
+
+  /* Text — never below .35 alpha */
+  --dl-m-fg:          #FAFAFA;                  /* headings, list titles, quotes */
+  --dl-m-body:        rgba(250,250,250,.62);    /* paragraphs */
+  --dl-m-muted:       rgba(250,250,250,.45);    /* meta, mono labels, counts */
+  --dl-m-faint:       rgba(250,250,250,.35);    /* chevrons, copyright, done-state */
+
+  /* Action — one accent per screen; solid cyan, not the desktop gradient */
+  --dl-m-action:      #06B6D4;                  /* primary button fill */
+  --dl-m-action-ink:  #04202A;                  /* label on cyan fill (≈8.9:1) */
+  --dl-m-action-br:   #22D3EE;                  /* links, eyebrows, dots, active tab */
+  --dl-m-action-tint: rgba(34,211,238,.12);     /* selected chip / card fill */
+}
+
+@media (max-width: 767px) {
+  /* Glass cards collapse to hairline-separated rows on mobile.
+     This single block reflows every outcome / co-create card
+     without touching a .tsx file. */
+  .glass-card,
+  .glass-card-interactive {
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 0;
+    border-top: 1px solid var(--dl-m-hairline);
+    border-radius: 0;
+  }
+  .glass-card-interactive:hover { transform: none; box-shadow: none; }
+
+  /* No ambient motion below md — a touch device has no hover and
+     these animations are pure paint cost. */
+  .ambient-orb,
+  .aurora-shimmer::after { display: none; }
+}

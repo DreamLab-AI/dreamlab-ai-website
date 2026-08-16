@@ -12,6 +12,11 @@ import { WorkshopHeader, WorkshopCategory, DifficultyLevel } from '@/components/
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useOGMeta } from "@/hooks/useOGMeta";
 import { getWorkshopOGConfig } from "@/lib/og-meta";
+import { useIsMobileSync } from "@/hooks/use-mobile";
+import { useWorkshopProgress } from "@/hooks/useWorkshopProgress";
+import { WORKSHOP_META, workshopEyebrow } from "@/data/workshop-meta";
+import { MobileActionBar, BarPrimary, BarIconButton } from "@/components/MobileActionBar";
+import { ChevronLeft } from "lucide-react";
 
 interface WorkshopPageItem {
   slug: string; // e.g., 00_introduction.md
@@ -30,6 +35,8 @@ interface WorkshopManifest {
 const WorkshopPage = () => {
   const { workshopId, pageSlug } = useParams<{ workshopId: string; pageSlug?: string }>();
   const navigate = useNavigate();
+  const isMobile = useIsMobileSync();
+  const { isCompleted, toggleComplete } = useWorkshopProgress();
   const [manifest, setManifest] = useState<WorkshopManifest | null>(null);
   const [currentPageContent, setCurrentPageContent] = useState<string>('');
   const [isLoadingManifest, setIsLoadingManifest] = useState(true);
@@ -287,6 +294,156 @@ const WorkshopPage = () => {
   }
 
   const isEffectivelyEmptyWorkshop = manifest && manifest.pages.length === 0;
+
+  /* ============================================================
+     MOBILE MODULE (≤767px) — mobile redesign, SCREENS.md §06
+     ============================================================ */
+  if (isMobile && manifest && workshopId) {
+    const meta = WORKSHOP_META[workshopId];
+    const pages = manifest.pages;
+    const totalChapters = pages.length || 1;
+    const stepPct = Math.round((currentChapterIndex / totalChapters) * 100);
+    const label = meta?.title ?? currentChapterTitle ?? manifest.title;
+
+    // currentChapterIndex is 1-based; the next/prev pages are 0-based neighbours.
+    const nextSlug = pages[currentChapterIndex]?.slug;
+    const prevSlug = pages[currentChapterIndex - 2]?.slug;
+    const prevTo = prevSlug ? `/workshops/${workshopId}/${prevSlug}` : '/workshops';
+
+    // "Mark done · next step": mark the whole workshop complete (idempotent —
+    // toggle only when not already done, so repeated presses never un-mark) via
+    // the existing progress handlers, then advance to the next step.
+    const handleMarkDoneNext = () => {
+      if (!isCompleted(workshopId)) toggleComplete(workshopId);
+      navigate(nextSlug ? `/workshops/${workshopId}/${nextSlug}` : '/workshops');
+    };
+
+    return (
+      <>
+        <Header />
+
+        {/* Module context sub-header + 2px full-bleed progress bar, docked under
+            the fixed global nav (56px). */}
+        <div className="md:hidden fixed top-14 inset-x-0 z-40 bg-dlm-base">
+          <div className="flex items-center gap-2 h-12 px-4 border-b border-dlm-hairline">
+            <Link
+              to={prevTo}
+              aria-label="Previous step"
+              className="w-9 h-9 -ml-1 shrink-0 flex items-center justify-center text-[#FAFAFA] rounded active:bg-white/[0.05]"
+            >
+              <ChevronLeft className="w-5 h-5" aria-hidden="true" />
+            </Link>
+            <span className="flex-1 min-w-0 truncate text-[14px] text-[#FAFAFA]">
+              {meta?.module ? (
+                <span className="font-mono text-white/45 mr-1.5">{meta.module}</span>
+              ) : null}
+              {label}
+            </span>
+            <span className="font-mono text-[12px] text-white/45 tabular-nums shrink-0">
+              {currentChapterIndex}/{totalChapters}
+            </span>
+          </div>
+          <div className="h-0.5 bg-white/[0.08]">
+            <div
+              className="h-full bg-dlm-bright transition-all duration-300"
+              style={{ width: `${stepPct}%` }}
+              role="progressbar"
+              aria-valuenow={currentChapterIndex}
+              aria-valuemin={0}
+              aria-valuemax={totalChapters}
+            />
+          </div>
+        </div>
+
+        <main className="bg-dlm-base min-h-screen pt-[106px] pb-safe-bar">
+          {/* Eyebrow + module title */}
+          <div className="px-6 pt-8">
+            {meta ? (
+              <p className="text-m-meta font-mono uppercase text-white/45 mb-3">
+                {workshopEyebrow(meta)}
+              </p>
+            ) : null}
+            <h1 className="text-[28px] font-semibold leading-[1.15] text-[#FAFAFA] [text-wrap:pretty]">
+              {meta?.title ?? manifest.title}
+            </h1>
+          </div>
+
+          {/* Prose — full gutter width, no max-width games at 390px. */}
+          <div className="px-6 mt-6">
+            {isLoadingContent && (
+              <p className="text-[15px] text-white/45">Loading content…</p>
+            )}
+            {error && !isLoadingContent && (
+              <p className="text-[15px] text-red-400">{error}</p>
+            )}
+            {!isLoadingContent && !error && currentPageContent && (
+              <div
+                className={[
+                  'text-m-read text-white/75 break-words',
+                  '[&_p]:my-4',
+                  '[&_h1]:text-[24px] [&_h1]:font-semibold [&_h1]:text-[#FAFAFA] [&_h1]:mt-8 [&_h1]:mb-3 [&_h1]:leading-tight',
+                  '[&_h2]:text-[20px] [&_h2]:font-semibold [&_h2]:text-[#FAFAFA] [&_h2]:mt-7 [&_h2]:mb-2',
+                  '[&_h3]:text-[17px] [&_h3]:font-semibold [&_h3]:text-[#FAFAFA] [&_h3]:mt-6 [&_h3]:mb-2',
+                  '[&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-4 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:my-4 [&_li]:my-1.5',
+                  '[&_a]:text-dlm-bright [&_a]:underline [&_a]:underline-offset-2',
+                  '[&_strong]:text-[#FAFAFA] [&_strong]:font-semibold',
+                  '[&_blockquote]:border-l-2 [&_blockquote]:border-dlm-bright [&_blockquote]:pl-4 [&_blockquote]:text-white/60 [&_blockquote]:my-4',
+                  '[&_hr]:border-dlm-hairline [&_hr]:my-8',
+                  '[&_img]:rounded-[10px] [&_img]:my-4',
+                  '[&_table]:block [&_table]:w-full [&_table]:overflow-x-auto',
+                ].join(' ')}
+              >
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  components={{
+                    pre: ({ children }) => (
+                      <pre className="bg-[#08080A] border border-white/[0.08] rounded-[10px] p-4 text-[13px] leading-[1.7] font-mono text-[#C9D1D9] overflow-x-auto my-4">
+                        {children}
+                      </pre>
+                    ),
+                    code: ({ className, children, ...props }) => {
+                      const isBlock =
+                        (typeof className === 'string' && className.startsWith('language-')) ||
+                        String(children).includes('\n');
+                      if (isBlock) {
+                        // Preserve className (e.g. language-mermaid) so the shared
+                        // Mermaid effect can still find and render it.
+                        return (
+                          <code className={className} {...props}>
+                            {children}
+                          </code>
+                        );
+                      }
+                      return (
+                        <code className="font-mono text-[14px] text-[#FAFAFA]" {...props}>
+                          {children}
+                        </code>
+                      );
+                    },
+                  }}
+                >
+                  {currentPageContent}
+                </ReactMarkdown>
+              </div>
+            )}
+            {!isLoadingContent && !error && !currentPageContent && (
+              <p className="text-[15px] text-white/45">
+                No content to display for this page.
+              </p>
+            )}
+          </div>
+        </main>
+
+        {/* Sticky action bar: back + mark-done/next */}
+        <MobileActionBar>
+          <BarIconButton label="Previous step" to={prevTo}>
+            <ChevronLeft className="w-5 h-5" aria-hidden="true" />
+          </BarIconButton>
+          <BarPrimary label="Mark done · next step" onClick={handleMarkDoneNext} />
+        </MobileActionBar>
+      </>
+    );
+  }
 
   return (
     <>

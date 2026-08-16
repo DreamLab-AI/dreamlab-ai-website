@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Check, ArrowRight } from 'lucide-react';
+import { Check, ArrowRight, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useIsMobileSync } from '@/hooks/use-mobile';
 
 interface WorkshopCardProps {
   id: string;
@@ -49,12 +50,42 @@ export function WorkshopCard({
 }: WorkshopCardProps) {
   const difficultyStyle = difficultyConfig[difficulty];
   const progressPercent = Math.min(100, Math.max(0, progress));
+  const isMobile = useIsMobileSync();
 
   const getButtonText = () => {
     if (isCompleted) return 'Review Module';
     if (progressPercent > 0) return 'Continue';
     return 'Start Module';
   };
+
+  // Mobile (≤767px): the compact list row — no icon tile, tag pills, percentage
+  // bar or gradient CTA. COMPONENTS.md §3 / §10.
+  if (isMobile) {
+    return (
+      <Link
+        to={href}
+        className="flex items-center gap-[14px] min-h-[64px] py-[14px] border-t border-dlm-hairline"
+        aria-label={`${title} — ${difficultyStyle.label}${isCompleted ? ', completed' : ''}`}
+      >
+        <span className="w-[30px] shrink-0 font-mono text-[22px] leading-none text-white/35 tabular-nums">
+          {moduleNumber}
+        </span>
+        <span className="flex-1 min-w-0">
+          <span className="block text-[16px] text-[#FAFAFA] leading-tight">{title}</span>
+          <span className="block mt-[3px] text-[13px] text-white/45">
+            {difficultyStyle.label} · {duration}
+          </span>
+        </span>
+        {isCompleted ? (
+          <span className="font-mono text-[11px] tracking-[0.12em] text-white/35 shrink-0">
+            DONE
+          </span>
+        ) : (
+          <ChevronRight className="w-[15px] h-[15px] text-white/35 shrink-0" aria-hidden="true" />
+        )}
+      </Link>
+    );
+  }
 
   return (
     <Link

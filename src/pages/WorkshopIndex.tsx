@@ -3,7 +3,10 @@ import { Header } from '@/components/Header';
 import { LearningPathDiagram } from '@/components/LearningPathDiagram';
 import { useOGMeta } from '@/hooks/useOGMeta';
 import { useWorkshopProgress } from '@/hooks/useWorkshopProgress';
+import { useIsMobileSync } from '@/hooks/use-mobile';
 import { PAGE_OG_CONFIGS } from '@/lib/og-meta';
+import workshopList from '@/data/workshop-list.json';
+import { WORKSHOP_META, workshopRowMeta } from '@/data/workshop-meta';
 import {
   BookOpen, Code, Terminal, Users, FileText, Clock, CheckCircle2,
   PlayCircle, ChevronDown, Zap, Target, ArrowRight,
@@ -206,8 +209,7 @@ const DIFFICULTY_STYLES: Record<string, string> = {
   Advanced: 'bg-red-500/20 text-red-400 border-red-500/30',
 };
 
-const WorkshopIndex = () => {
-  useOGMeta(PAGE_OG_CONFIGS.workshops);
+const WorkshopIndexDesktop = () => {
   const { isCompleted, toggleComplete, phaseProgress, reset, completedWorkshops } = useWorkshopProgress();
 
   const overallDone = completedWorkshops.length;
@@ -519,6 +521,113 @@ const WorkshopIndex = () => {
       </footer>
     </>
   );
+};
+
+/* ============================================================
+   MOBILE WORKSHOPS (≤767px) — mobile redesign, SCREENS.md §05
+   ============================================================ */
+
+// Ordered rows sourced from the generated workshop-list.json (ids + paths),
+// enriched with curated display metadata. Sentence-casing is never done at
+// render — the clean titles / period / difficulty come from WORKSHOP_META.
+const MOBILE_WORKSHOP_ROWS = (workshopList as { id: string; name: string; path: string }[])
+  .map((w) => ({ id: w.id, path: w.path, meta: WORKSHOP_META[w.id] }))
+  .filter((w): w is { id: string; path: string; meta: NonNullable<typeof w.meta> } => Boolean(w.meta))
+  .sort((a, b) => a.meta.order - b.meta.order);
+
+const WorkshopIndexMobile = () => {
+  const { completedWorkshops } = useWorkshopProgress();
+
+  const total = MOBILE_WORKSHOP_ROWS.length;
+  const done = MOBILE_WORKSHOP_ROWS.filter((w) => completedWorkshops.includes(w.id)).length;
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  const firstIncompleteId = MOBILE_WORKSHOP_ROWS.find(
+    (w) => !completedWorkshops.includes(w.id)
+  )?.id;
+
+  return (
+    <>
+      <Header />
+      <main className="bg-dlm-base min-h-screen pb-16 pt-14">
+        {/* Header */}
+        <header className="pt-11 px-6">
+          <p className="text-m-meta font-mono uppercase text-white/45 mb-5">
+            Free · No account needed
+          </p>
+          <h1 className="text-m-h1s text-[#FAFAFA] [text-wrap:pretty]">
+            The VS Code learning pathway.
+          </h1>
+          <p className="text-[16px] leading-[1.6] text-white/[0.62] mt-4">
+            Fifteen modules, roughly a morning or an afternoon each.
+          </p>
+        </header>
+
+        {/* Progress summary */}
+        <section className="px-6 pt-8" aria-label="Your progress">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[13px] text-white/55">Your progress</span>
+            <span className="font-mono text-[11px] text-[#FAFAFA] tabular-nums">
+              {done} / {total}
+            </span>
+          </div>
+          <div
+            className="h-1 rounded-full bg-white/[0.08] overflow-hidden"
+            role="progressbar"
+            aria-valuenow={done}
+            aria-valuemin={0}
+            aria-valuemax={total}
+          >
+            <div
+              className="h-full rounded-full bg-dlm-bright transition-all duration-300"
+              style={{ width: `${pct}%` }}
+            />
+          </div>
+        </section>
+
+        {/* Module rows */}
+        <section className="px-6 pt-6" aria-label="Modules">
+          {MOBILE_WORKSHOP_ROWS.map((w) => {
+            const isDone = completedWorkshops.includes(w.id);
+            const isResume = !isDone && w.id === firstIncompleteId;
+            return (
+              <Link
+                key={w.id}
+                to={w.path}
+                className="flex items-center gap-[14px] min-h-[64px] py-[14px] border-t border-dlm-hairline"
+              >
+                <span className="w-[30px] shrink-0 font-mono text-[22px] leading-none text-white/35 tabular-nums">
+                  {w.meta.module}
+                </span>
+                <span className="flex-1 min-w-0">
+                  <span className="block text-[16px] text-[#FAFAFA] leading-tight">
+                    {w.meta.title}
+                  </span>
+                  <span className="block mt-[3px] text-[13px] text-white/45">
+                    {workshopRowMeta(w.meta)}
+                  </span>
+                </span>
+                {isDone ? (
+                  <span className="font-mono text-[11px] tracking-[0.12em] text-white/35 shrink-0">
+                    DONE
+                  </span>
+                ) : isResume ? (
+                  <span className="font-mono text-[11px] tracking-[0.12em] text-dlm-bright shrink-0">
+                    RESUME
+                  </span>
+                ) : null}
+              </Link>
+            );
+          })}
+        </section>
+      </main>
+    </>
+  );
+};
+
+const WorkshopIndex = () => {
+  useOGMeta(PAGE_OG_CONFIGS.workshops);
+  const isMobile = useIsMobileSync();
+  return isMobile ? <WorkshopIndexMobile /> : <WorkshopIndexDesktop />;
 };
 
 export default WorkshopIndex;
