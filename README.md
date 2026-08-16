@@ -52,6 +52,8 @@ DreamLab AI is the commercial front door of the [VisionFlow](https://github.com/
 
 **Industry convergence.** In July 2026 Block (Jack Dorsey) launched [Buzz](https://github.com/block/buzz), a self-hosted, Nostr-native team-chat + AI-agent + git platform in Rust. It independently arrives at the same substrate this ecosystem has run since 2022 — Nostr events as source of truth, agents as first-class signed participants, NIP-42/98 auth, kind-based extensibility. This deployment's differentiation is the Solid-pod identity/data layer and the ontology-grounded sibling repos (VisionClaw) that Buzz does not have. Buzz is ahead on its end-to-end NIP-42 relay gate; this repo's relay currently uses a pubkey allowlist rather than enforced NIP-42 challenge/response.
 
+**Self-improvement.** Behind the front door, the whole estate improves itself nightly — a [dream cycle](https://github.com/DreamLab-AI/dream-engine) per repo, evidence-gated, human-merged.
+
 ---
 
 ## Architecture
