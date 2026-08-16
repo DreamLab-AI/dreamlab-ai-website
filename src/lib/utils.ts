@@ -11,7 +11,7 @@ export function cn(...inputs: ClassValue[]) {
 /**
  * Email format regex for lightweight client-side validation. Disallows
  * whitespace and stray `@` (the previous `\S+@\S+\.\S+` accepted multiple `@`).
- * Shared by non-RHF forms (EmailSignupForm, DataErasureRequest).
+ * Shared by non-RHF forms (e.g. EmailSignupForm).
  * Forms using React Hook Form should prefer `z.string().email()` instead.
  */
 export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

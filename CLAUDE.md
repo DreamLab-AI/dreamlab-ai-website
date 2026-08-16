@@ -27,7 +27,7 @@ supplies DreamLab branding, zones, and Cloudflare resource IDs.
 | State/Data | TanStack React Query 5 |
 | Forms | React Hook Form 7 + Zod 3 |
 | Hero scenes | Canvas-based Voronoi/golden-ratio rendering (no Three.js) |
-| Database | Supabase (PostgreSQL + Auth) |
+| Form ingress | NIP-17 gift-wrapped Nostr DMs (client-side E2E, no database) |
 | Sanitization | DOMPurify + react-markdown/remark-gfm |
 | Forum | Upstream nostr-rust-forum kit (Leptos 0.7 CSR, WASM) + `forum-config/` overlay |
 | Workers | 5 Rust Cloudflare Workers (auth, pod, relay, search, preview) — source upstream |
@@ -182,8 +182,6 @@ Keep `public/sitemap.xml` in sync with this table when routes change.
 Main site `.env` (never commit; see `.env.example`):
 
 ```
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key-here
 VITE_AUTH_API_URL=https://dreamlab-auth-api.solitary-paper-764d.workers.dev
 VITE_POD_API_URL=https://dreamlab-pod-api.solitary-paper-764d.workers.dev
 VITE_SEARCH_API_URL=https://dreamlab-search-api.solitary-paper-764d.workers.dev
