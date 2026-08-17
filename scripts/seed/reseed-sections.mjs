@@ -78,10 +78,10 @@ const SECTIONS = [
   { zone: 'minimoonoir', slug: 'minimoonoir-rants',           name: 'Rants',            about: 'Vent, debate, and hot takes' },
   { zone: 'minimoonoir', slug: 'minimoonoir-photos',          name: 'Photos',           about: 'Share photos and moments' },
   { zone: 'minimoonoir', slug: 'minimoonoir-music',           name: 'Music',            about: 'Records, gigs, and recommendations' },
-  { zone: 'minimoonoir', slug: 'minimoonoir-fairfield-events', name: 'Fairfield Events', about: 'Events and nights out at Fairfield' },
+  { zone: 'minimoonoir', slug: 'minimoonoir-events', name: 'Events', about: 'Events and nights out at Fairfield' },
   // family
   { zone: 'family', slug: 'family-chat',              name: 'Family Chat',      about: 'Family catch-up and chat' },
-  { zone: 'family', slug: 'family-fairfield-events',  name: 'Fairfield Events', about: 'Family events at Fairfield' },
+  { zone: 'family', slug: 'family-events',  name: 'Events', about: 'Family events at Fairfield' },
   // business / dreamlab (lowercase display per operator direction)
   { zone: 'business', slug: 'business-dream-team-chat',   name: 'dream team chat',   about: 'team chat' },
   { zone: 'business', slug: 'business-training-and-lab',  name: 'training and lab',  about: 'training and lab work' },
