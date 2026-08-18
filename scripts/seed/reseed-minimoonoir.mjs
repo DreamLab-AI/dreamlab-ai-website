@@ -25,7 +25,7 @@ const NEW = [
   { slug: 'minimoonoir-rants', name: 'Rants', about: 'Vent, debate, and hot takes' },
   { slug: 'minimoonoir-photos', name: 'Photos', about: 'Share photos and moments' },
   { slug: 'minimoonoir-music', name: 'Music', about: 'Records, gigs, and recommendations' },
-  { slug: 'minimoonoir-events', name: 'Events', about: 'Events and nights out at Fairfield' },
+  { slug: 'minimoonoir-events', name: 'Events', about: 'Events, festivals, gigs, birthdays etc' },
 ];
 
 // Single authed socket: collect kind-40, then delete orphans + publish new.
