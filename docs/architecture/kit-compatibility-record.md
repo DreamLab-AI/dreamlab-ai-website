@@ -23,11 +23,11 @@ its own `pin-check` extension.
 
 | Deployment host | Forum-kit SHA | Kit branch/tag at pin | Consumption tier | Canonical for pin-check |
 |---|---|---|---|---|
-| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `2f01e33995a9ce193b7c9ed08aedd716d038f639` | `main` (PWA gate removal atop kanban + beta.8; library crates unchanged at `1.0.0-beta.8`) | `integrated` | ✔ |
+| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `1fa99dbbb9005c2b11b108fa5403a3345ca22671` | `main` (NIP-25 reactions + profile popover + DM button fix; library crates unchanged at `1.0.0-beta.8`) | `integrated` | ✔ |
 
 <!-- pin-check:canonical-kit-sha -->
 ```
-CANONICAL_KIT_SHA=2f01e33995a9ce193b7c9ed08aedd716d038f639
+CANONICAL_KIT_SHA=1fa99dbbb9005c2b11b108fa5403a3345ca22671
 CANONICAL_KIT_VERSION=1.0.0-beta.8
 ```
 
@@ -55,7 +55,31 @@ over `src/` + `forum-config/src/` for kit-owned surface names (returns zero) and
 the `pin-check` lockstep. It does not claim `federation-verified`/`released`: the
 edge carries no cross-substrate decision loop of its own to prove end to end.
 
-## What this SHA contains (`main`, post-beta.8 PWA gate removal)
+## What this SHA contains (`1fa99db` — NIP-25 reactions, profile popover, DM button fix)
+
+Three community-requested features from zone1-support feedback:
+
+1. **NIP-25 emoji reactions (kind-7).** A `ReactionStore` handles aggregation,
+   out-of-order kind-5 deletion tombstones, and reactive per-event counts.
+   `ReactionBar` now reads from the store (no prop signal needed) and emits
+   correct NIP-25 `p`-tags (reacted-to author, not reactor). Mounted on channel
+   messages, root posts, and replies.
+
+2. **Profile popover on avatar/name click.** An anchored card with XL avatar,
+   display name, NIP-05, bio (line-clamp-3), copyable pubkey, and a Send DM
+   button that navigates to `/dm/{pubkey}`. Replaces the full-screen
+   `ProfileModal` trigger path in message bubbles with a lightweight, locally
+   scoped signal. A reusable `UserDisplay` component is ready for future call
+   sites.
+
+3. **DM list mobile alignment.** DM heading + "New Message" button no longer
+   overlap on narrow viewports: `items-start` anchor, responsive
+   `text-2xl`/`sm:text-3xl`, `whitespace-nowrap` on the button.
+
+Also adds the `about` (bio) field to `ProfileEntry` with a reactive accessor.
+Library crates unchanged at `1.0.0-beta.8`. Everything below is also present.
+
+## What earlier SHAs added (`2f01e33` — PWA gate removal)
 
 Opens PWA installation to all authenticated users with at least one accessible
 locked zone — admins, multi-zone members, and single-zone members alike
@@ -247,7 +271,8 @@ All render from the pinned kit at deploy time; this repo adds only branding
 
 | SHA | Branch/context | Notes |
 |---|---|---|
-| `2f01e33` | `main` (post-beta.8 PWA gate removal) | Current (canonical — matches `CANONICAL_KIT_SHA` above and the `KIT_REF` pins). Removes the PWA install gate from the BBS client, making zone-bound PWA installation available without the feature flag. Library crates unchanged at `1.0.0-beta.8`. |
+| `1fa99db` | `main` (NIP-25 reactions + profile popover + DM fix) | Current (canonical — matches `CANONICAL_KIT_SHA` above and the `KIT_REF` pins). Three community-requested features: NIP-25 emoji reactions with a reactive ReactionStore, profile popover with Send DM on avatar/name click, and DM list mobile alignment. Library crates unchanged at `1.0.0-beta.8`. |
+| `2f01e33` | `main` (post-beta.8 PWA gate removal) | Superseded. Removes the PWA install gate from the BBS client, making zone-bound PWA installation available without the feature flag. Library crates unchanged at `1.0.0-beta.8`. |
 | `83511bb` | `main` (tag `v1.0.0-beta.8`) | Superseded. **Kit release `1.0.0-beta.8`**: adopts solid-pod-rs `0.5.0-alpha.7`, whose DID documents carry the did:nostr CG spec 0.1.1 three-context `@context` (`[did/v1, cid/v1, nostr/context]`, DID Core first) — assertion-layer changes only, production DID rendering fully delegates upstream and both context forms expand identically under JSON-LD. Also escapes the yanked `nostr 0.44.0–0.44.4` range (lock was `0.44.2`): moves to `0.44.6` and maps the two new upstream error variants (`nip04 InvalidIVLen`, `nip44 PayloadTooShort`). All 14 kit crates in lockstep; six library crates published to crates.io, restoring the registry == git-HEAD invariant. |
 | `61672d6` | `main` (tag `v1.0.0-beta.7`, **yanked on crates.io**) | Superseded same-day, never deployed. Carried the solid-pod-rs `0.5.0-alpha.7` adoption but published crates that only compile against the yanked `nostr ≤0.44.4` range (fresh resolves select `0.44.6`, whose added error-enum variants break two non-exhaustive matches). Folded into `83511bb`. |
 | `672b7c3` | `main` (tag `soak-fix-2026-07-23`) | Superseded (was canonical — matches `CANONICAL_KIT_SHA` above and the `KIT_REF` pins). **Release reconciliation**: the long-lived `soak-fix-sprint-2026-07` branch (19 app-layer commits — zone invites, nested replies, @mention roster, NIP-44 DM banner, etc.) merged back to `main`, which had diverged by 2 docs-only commits. Tree content is identical to the previously-deployed `c978a23`, so this is a provenance move, not a behaviour change: production now pins a released commit on trunk instead of a feature-branch tip. Also aligned the crates — the seven application crates (`forum-client`, `bbs-client`, five `*-worker`) are now `publish = false` (deployables built from source at `KIT_REF`, not crates.io dependencies); the six library crates stay publishable at `1.0.0-beta.6`, **unchanged** (byte-identical to the `v1.0.0-beta.6` tag), so no republish and `CANONICAL_KIT_VERSION` stays `1.0.0-beta.6`. |
