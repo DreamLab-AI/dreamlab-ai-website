@@ -8,8 +8,9 @@ kit?"* — moved out of the transient deploy-summary comment
 
 The single global `KIT_REF` pin (one production target today) is enforced in
 lockstep by the `pin-check` job in `.github/workflows/ci.yml`: the three workflow
-`KIT_REF`s, the four `forum-config/Cargo.toml` `rev=` pins, and **the SHA cited in
-this record** must all resolve to the same commit, or the build fails. This record
+`KIT_REF`s, the `forum-config/Cargo.toml` crate versions (checked against
+`CANONICAL_KIT_VERSION`), and **the SHA cited in this record** must all agree, or
+the build fails. This record
 is therefore not documentation that can silently drift — CI ties it to the live pin.
 
 ## Deployments
@@ -22,11 +23,11 @@ its own `pin-check` extension.
 
 | Deployment host | Forum-kit SHA | Kit branch/tag at pin | Consumption tier | Canonical for pin-check |
 |---|---|---|---|---|
-| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `9cec2222afefecde2bfe69f110b7bb16ea7c6571` | `main` (kanban feature merged: per-zone task boards + card edit/multi-assignee/tombstone-delete/bullet lists + advanced-identity onboarding merged upstream — kinds 30301/30302, decision-broker approval bridge, kind-38000 agent dispatch, per-subscription relay dedup fix; library crates unchanged at `1.0.0-beta.8` — kit release adopting solid-pod-rs `0.5.0-alpha.7` / did:nostr CG spec 0.1.1 three-context `@context`, plus the `nostr 0.44.6` yanked-range escape; six library crates published to crates.io at `1.0.0-beta.8`, `beta.7` yanked) | `integrated` | ✔ |
+| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `2f01e33995a9ce193b7c9ed08aedd716d038f639` | `main` (PWA gate removal atop kanban + beta.8; library crates unchanged at `1.0.0-beta.8`) | `integrated` | ✔ |
 
 <!-- pin-check:canonical-kit-sha -->
 ```
-CANONICAL_KIT_SHA=9cec2222afefecde2bfe69f110b7bb16ea7c6571
+CANONICAL_KIT_SHA=2f01e33995a9ce193b7c9ed08aedd716d038f639
 CANONICAL_KIT_VERSION=1.0.0-beta.8
 ```
 
@@ -41,7 +42,7 @@ byte-identical to `KIT_REF` when bumping the kit.
 | `KIT_REF` | `.github/workflows/deploy.yml` | Forum-client (Leptos WASM) build |
 | `KIT_REF` | `.github/workflows/workers-deploy.yml` | Five CF worker builds |
 | `KIT_REF` | `.github/workflows/rust-ci.yml` | Kit-level fmt/clippy/test gates |
-| `rev =` ×4 | `forum-config/Cargo.toml` | Overlay compiles/tests against the same kit |
+| `nostr-bbs-*` version ×4 | `forum-config/Cargo.toml` | Overlay compiles/tests against the matching crates.io release |
 | `CANONICAL_KIT_SHA` | this file | The citable provenance record |
 
 ## What tier `integrated` means here
@@ -54,18 +55,15 @@ over `src/` + `forum-config/src/` for kit-owned surface names (returns zero) and
 the `pin-check` lockstep. It does not claim `federation-verified`/`released`: the
 edge carries no cross-substrate decision loop of its own to prove end to end.
 
-## What this SHA contains (`main`, slug channel-list fix on 1.0.0-beta.5, ``)
+## What this SHA contains (`main`, post-beta.8 PWA gate removal)
 
-Workspace release housekeeping atop the PWA feature: every kit crate changed
-since its last version stamp moves to `1.0.0-beta.5` (ascii, auth-worker,
-bbs-client, config, core, forum-client, mesh, pod-worker, preview-worker,
-relay-worker; rate-limit/search-worker/setup-skill/canary unchanged), the
-workspace dependency table is re-synced, `CHANGELOG.md` gains the consolidated
-`[1.0.0-beta.5]` entry, workspace rustdoc is warning-clean, and a latent
-test-only break is repaired (`nostr-bbs-config` validate.rs test `Zone`
-literals were missing `auto_approve`; its 37 tests compile and pass again).
-This overlay's pins move to `1.0.0-beta.5` for core/config/mesh accordingly.
-Everything below is also present.
+Opens PWA installation to all authenticated users with at least one accessible
+locked zone — admins, multi-zone members, and single-zone members alike
+(ADR-109 amendment). `install_option_visible` now uses `first_accessible_zone_for`
+instead of `home_zone_for` and drops the `!is_admin` gate; the standalone
+auto-rebake falls back to `first_accessible_zone()` when `home_zone()` returns
+`None`. Library crates unchanged at `1.0.0-beta.8`. Everything below is also
+present.
 
 ## What earlier SHAs added (`0c1dc57` — zone-bound BBS PWA, ADR-109)
 
@@ -249,7 +247,8 @@ All render from the pinned kit at deploy time; this repo adds only branding
 
 | SHA | Branch/context | Notes |
 |---|---|---|
-| `83511bb` | `main` (tag `v1.0.0-beta.8`) | Current (canonical — matches `CANONICAL_KIT_SHA` above and the `KIT_REF` pins). **Kit release `1.0.0-beta.8`**: adopts solid-pod-rs `0.5.0-alpha.7`, whose DID documents carry the did:nostr CG spec 0.1.1 three-context `@context` (`[did/v1, cid/v1, nostr/context]`, DID Core first) — assertion-layer changes only, production DID rendering fully delegates upstream and both context forms expand identically under JSON-LD. Also escapes the yanked `nostr 0.44.0–0.44.4` range (lock was `0.44.2`): moves to `0.44.6` and maps the two new upstream error variants (`nip04 InvalidIVLen`, `nip44 PayloadTooShort`). All 14 kit crates in lockstep; six library crates published to crates.io, restoring the registry == git-HEAD invariant. |
+| `2f01e33` | `main` (post-beta.8 PWA gate removal) | Current (canonical — matches `CANONICAL_KIT_SHA` above and the `KIT_REF` pins). Removes the PWA install gate from the BBS client, making zone-bound PWA installation available without the feature flag. Library crates unchanged at `1.0.0-beta.8`. |
+| `83511bb` | `main` (tag `v1.0.0-beta.8`) | Superseded. **Kit release `1.0.0-beta.8`**: adopts solid-pod-rs `0.5.0-alpha.7`, whose DID documents carry the did:nostr CG spec 0.1.1 three-context `@context` (`[did/v1, cid/v1, nostr/context]`, DID Core first) — assertion-layer changes only, production DID rendering fully delegates upstream and both context forms expand identically under JSON-LD. Also escapes the yanked `nostr 0.44.0–0.44.4` range (lock was `0.44.2`): moves to `0.44.6` and maps the two new upstream error variants (`nip04 InvalidIVLen`, `nip44 PayloadTooShort`). All 14 kit crates in lockstep; six library crates published to crates.io, restoring the registry == git-HEAD invariant. |
 | `61672d6` | `main` (tag `v1.0.0-beta.7`, **yanked on crates.io**) | Superseded same-day, never deployed. Carried the solid-pod-rs `0.5.0-alpha.7` adoption but published crates that only compile against the yanked `nostr ≤0.44.4` range (fresh resolves select `0.44.6`, whose added error-enum variants break two non-exhaustive matches). Folded into `83511bb`. |
 | `672b7c3` | `main` (tag `soak-fix-2026-07-23`) | Superseded (was canonical — matches `CANONICAL_KIT_SHA` above and the `KIT_REF` pins). **Release reconciliation**: the long-lived `soak-fix-sprint-2026-07` branch (19 app-layer commits — zone invites, nested replies, @mention roster, NIP-44 DM banner, etc.) merged back to `main`, which had diverged by 2 docs-only commits. Tree content is identical to the previously-deployed `c978a23`, so this is a provenance move, not a behaviour change: production now pins a released commit on trunk instead of a feature-branch tip. Also aligned the crates — the seven application crates (`forum-client`, `bbs-client`, five `*-worker`) are now `publish = false` (deployables built from source at `KIT_REF`, not crates.io dependencies); the six library crates stay publishable at `1.0.0-beta.6`, **unchanged** (byte-identical to the `v1.0.0-beta.6` tag), so no republish and `CANONICAL_KIT_VERSION` stays `1.0.0-beta.6`. |
 | `c978a23` | `soak-fix-sprint-2026-07` | Superseded (folded into `672b7c3` via the main merge). Proactive NIP-44 capability banner on the DM page. A NIP-07 extension without a usable `window.nostr.nip44` can never decrypt gift-wrapped DMs; the old warning only fired after an unwrap failed, so when the relay AUTH never completed (or the inbox was empty) the user saw a blank DM list with no explanation. `nip07_has_nip44()` synchronously probes `window.nostr.nip44.{encrypt,decrypt}` and a persistent banner is gated on `is_nip07 && !has_nip44`, telling the user to sign in with a key or use a NIP-44-capable extension. Defensive only — Podkey and other NIP-44 extensions pass the probe and never see it. Client-only (`nostr-bbs-forum-client`); no lib-crate or worker change, lib pins stay `1.0.0-beta.6`. |

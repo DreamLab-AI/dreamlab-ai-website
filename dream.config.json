@@ -1,0 +1,49 @@
+{
+  "repo": "DreamLab-AI/dreamlab-ai-website",
+  "cron": "0 3 * * *",
+  "slots": [
+    {
+      "deep": "kit-pin-integrity",
+      "scan": ["dual-pin-drift", "cargo-lock"]
+    },
+    {
+      "deep": "site-build-content",
+      "scan": ["vite-build", "content-generators"]
+    },
+    {
+      "deep": "operator-overlay",
+      "scan": ["branding", "deploy-config"]
+    },
+    {
+      "deep": "ci-workflows",
+      "scan": ["deploy-pipeline", "secrets-hygiene"]
+    }
+  ],
+  "bonusModuli": {
+    "25": "security-adversarial",
+    "50": "accessibility-review"
+  },
+  "controlPlaneProbes": [
+    "node --version && npm --version",
+    "ls .github/workflows/ forum-config/ src/ 2>&1 | head -20"
+  ],
+  "buildStep": {
+    "cmd": "npm ci 2>&1 | tail -3 && npm run build 2>&1 | tail -10",
+    "degradeOnWasmFailure": false
+  },
+  "evaluatorEntrypoints": {
+    "bench": "npx vitest run 2>&1 | tail -25",
+    "lint": "npx eslint . 2>&1 | tail -15",
+    "pin-parity": "deploy=$(grep -oP \"KIT_REF:\\s*'\\K[0-9a-f]+\" .github/workflows/deploy.yml | head -1); workers=$(grep -oP \"KIT_REF:\\s*'\\K[0-9a-f]+\" .github/workflows/workers-deploy.yml | head -1); rustci=$(grep -oP \"KIT_REF:\\s*'\\K[0-9a-f]+\" .github/workflows/rust-ci.yml | head -1); echo \"KIT_REF deploy=$deploy workers=$workers rustci=$rustci\"; if [ -z \"$deploy\" ] || [ \"$deploy\" != \"$workers\" ] || [ \"$deploy\" != \"$rustci\" ]; then echo PIN-DRIFT-KITREF; exit 0; fi; vers=$(grep -oP 'nostr-bbs-(core|config|mesh|rate-limit) = \"\\K[^\"]+' forum-config/Cargo.toml | sort -u); echo \"crates.io versions: $vers\"; nvers=$(echo \"$vers\" | wc -l); if [ \"$nvers\" -ne 1 ]; then echo PIN-DRIFT-CRATE-VERSIONS; exit 0; fi; record='docs/architecture/kit-compatibility-record.md'; canonical=$(grep -oP 'CANONICAL_KIT_SHA=\\K[0-9a-f]+' \"$record\" 2>/dev/null | head -1); canonical_ver=$(grep -oP 'CANONICAL_KIT_VERSION=\\K.+' \"$record\" 2>/dev/null | head -1); echo \"record SHA=$canonical ver=$canonical_ver\"; if [ \"$canonical\" != \"$deploy\" ]; then echo PIN-DRIFT-RECORD-SHA; elif [ \"$canonical_ver\" != \"$vers\" ]; then echo PIN-DRIFT-RECORD-VER; else echo PIN-PARITY-OK; fi"
+  },
+  "competitors": [],
+  "adrConvention": "4-digit",
+  "extraDisciplines": [
+    "upstream-kit-out-of-scope: the nostr-rust-forum kit and every nostr-bbs-* crate are ANOTHER DREAMER'S territory. Never evaluate, patch, or hypothesise about kit internals here. Record kit-level observations as lines beginning 'HANDOFF (kit):' in the report and reference them in the ledger prior-fates column so the kit's own dream cycle picks them up",
+    "operator-overlay-first: this repo owns branding, kit pinning, deploy config, CI workflows, and site content — every hypothesis and candidate change must land in THIS repo's files"
+  ],
+  "ledgerPath": "docs/dream-cycle/LEDGER.md",
+  "branchPrefix": "dream/",
+  "labels": ["dream-cycle", "research"],
+  "autoMerge": false
+}
