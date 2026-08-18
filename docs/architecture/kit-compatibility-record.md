@@ -23,11 +23,11 @@ its own `pin-check` extension.
 
 | Deployment host | Forum-kit SHA | Kit branch/tag at pin | Consumption tier | Canonical for pin-check |
 |---|---|---|---|---|
-| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `1fa99dbbb9005c2b11b108fa5403a3345ca22671` | `main` (NIP-25 reactions + profile popover + DM button fix; library crates unchanged at `1.0.0-beta.8`) | `integrated` | ✔ |
+| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `9de950a6cc4ae52688db5585e53a57cb84c6b569` | `main` (admin tab consolidation + onboarding fixes; library crates unchanged at `1.0.0-beta.8`) | `integrated` | ✔ |
 
 <!-- pin-check:canonical-kit-sha -->
 ```
-CANONICAL_KIT_SHA=1fa99dbbb9005c2b11b108fa5403a3345ca22671
+CANONICAL_KIT_SHA=9de950a6cc4ae52688db5585e53a57cb84c6b569
 CANONICAL_KIT_VERSION=1.0.0-beta.8
 ```
 
@@ -55,7 +55,28 @@ over `src/` + `forum-config/src/` for kit-owned surface names (returns zero) and
 the `pin-check` lockstep. It does not claim `federation-verified`/`released`: the
 edge carries no cross-substrate decision loop of its own to prove end to end.
 
-## What this SHA contains (`1fa99db` — NIP-25 reactions, profile popover, DM button fix)
+## What this SHA contains (`9de950a` — admin tab consolidation, onboarding fixes)
+
+Two UX improvements:
+
+1. **Admin panel consolidation (12 → 8 tabs).** Users/Pending/Invites/Sections
+   merged into a unified "Members" tab with internal sub-view navigation
+   (Active/Pending/Invites/Access). Settings renamed to "Configuration" to
+   avoid the per-user `/settings` naming collision. NativePods folded into
+   Configuration. Dead `stats.rs` module removed. Backwards-compatible
+   query-param aliases preserved (`?tab=users` → Members, `?tab=settings` →
+   Configuration, etc.).
+
+2. **Onboarding flow deduplication.** Admin bootstrap CTA no longer redirects
+   to `/setup` (which re-asked for a nickname after already capturing display
+   name); navigates directly to `/forums` with `complete_signup()`. Recovery
+   sheet changed from `window.print()` to Blob download (prompts download
+   permission once on Android, saves immediately as self-contained HTML with
+   inline SVG QR codes).
+
+Library crates unchanged at `1.0.0-beta.8`. Everything below is also present.
+
+## What earlier SHAs added (`1fa99db` — NIP-25 reactions, profile popover, DM button fix)
 
 Three community-requested features from zone1-support feedback:
 
@@ -271,7 +292,8 @@ All render from the pinned kit at deploy time; this repo adds only branding
 
 | SHA | Branch/context | Notes |
 |---|---|---|
-| `1fa99db` | `main` (NIP-25 reactions + profile popover + DM fix) | Current (canonical — matches `CANONICAL_KIT_SHA` above and the `KIT_REF` pins). Three community-requested features: NIP-25 emoji reactions with a reactive ReactionStore, profile popover with Send DM on avatar/name click, and DM list mobile alignment. Library crates unchanged at `1.0.0-beta.8`. |
+| `9de950a` | `main` (admin consolidation + onboarding fixes) | Current (canonical — matches `CANONICAL_KIT_SHA` above and the `KIT_REF` pins). Admin panel consolidated from 12 to 8 tabs (Members unified, Settings→Configuration, NativePods folded in, dead stats.rs removed). Onboarding deduplication (skip /setup redirect) + recovery sheet Blob download. Library crates unchanged at `1.0.0-beta.8`. |
+| `1fa99db` | `main` (NIP-25 reactions + profile popover + DM fix) | Superseded. Three community-requested features: NIP-25 emoji reactions with a reactive ReactionStore, profile popover with Send DM on avatar/name click, and DM list mobile alignment. Library crates unchanged at `1.0.0-beta.8`. |
 | `2f01e33` | `main` (post-beta.8 PWA gate removal) | Superseded. Removes the PWA install gate from the BBS client, making zone-bound PWA installation available without the feature flag. Library crates unchanged at `1.0.0-beta.8`. |
 | `83511bb` | `main` (tag `v1.0.0-beta.8`) | Superseded. **Kit release `1.0.0-beta.8`**: adopts solid-pod-rs `0.5.0-alpha.7`, whose DID documents carry the did:nostr CG spec 0.1.1 three-context `@context` (`[did/v1, cid/v1, nostr/context]`, DID Core first) — assertion-layer changes only, production DID rendering fully delegates upstream and both context forms expand identically under JSON-LD. Also escapes the yanked `nostr 0.44.0–0.44.4` range (lock was `0.44.2`): moves to `0.44.6` and maps the two new upstream error variants (`nip04 InvalidIVLen`, `nip44 PayloadTooShort`). All 14 kit crates in lockstep; six library crates published to crates.io, restoring the registry == git-HEAD invariant. |
 | `61672d6` | `main` (tag `v1.0.0-beta.7`, **yanked on crates.io**) | Superseded same-day, never deployed. Carried the solid-pod-rs `0.5.0-alpha.7` adoption but published crates that only compile against the yanked `nostr ≤0.44.4` range (fresh resolves select `0.44.6`, whose added error-enum variants break two non-exhaustive matches). Folded into `83511bb`. |

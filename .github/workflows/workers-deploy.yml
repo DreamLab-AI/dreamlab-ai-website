@@ -40,7 +40,7 @@ env:
   # NOTE: tracks nostr-rust-forum gap-close/2026-07 HEAD (forum gap-close slice:
   # COM-13 disclosure badge/endpoint, F8 Agents roster tab, governance surfaces).
   # Cutover provenance: docs/architecture/kit-compatibility-record.md.
-  KIT_REF: '1fa99dbbb9005c2b11b108fa5403a3345ca22671'
+  KIT_REF: '9de950a6cc4ae52688db5585e53a57cb84c6b569'
 
 jobs:
   gate:
