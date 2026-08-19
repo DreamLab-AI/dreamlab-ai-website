@@ -135,6 +135,38 @@ Build automated testing pipelines with AI-powered quality engineering tools incl
 
 ---
 
+## Concept Map (ontology-grounded)
+
+How the curriculum's concepts formally relate, drawn from the DreamLab knowledge
+graph (Ontology Loom, 8,100+ classes):
+
+- **AI Agent** *requires* Tool Use + Large Language Models + Memory Management;
+  *implements* the **ReAct pattern**; *uses* Retrieval-Augmented Generation,
+  Function Calling and Chain of Thought; *enables* Automated Planning, Task
+  Automation and Multi-Agent Systems. Agents *contrast with* chatbots and
+  rule-based systems: they run iterative observe–think–act loops rather than
+  single-shot inference. → Phases 3, 4 and 7.
+- **Claude** (Anthropic's LLM family) *implements* the **Model Context
+  Protocol** and *enables* Tool Use, Conversational AI and Function Calling —
+  the foundation Claude Code builds on. → Phases 3–4.
+- **Model Context Protocol (MCP)** is an open JSON-RPC 2.0 client–server
+  standard connecting LLM hosts to external capability providers (tools,
+  resources, prompts); it *enables* agent tool use, context injection and
+  multi-agent orchestration. → Phases 4 and 7.
+- **Retrieval-Augmented Generation** grounds model output in your own
+  documents via vector retrieval — the privacy-preserving pairing with local
+  models. → Phase 5.
+- **Tool Use** is the load-bearing capability throughout: models invoking
+  external functions, APIs and services at inference time. Every phase from 3
+  onward exercises it, and Phase 9's agentic QA (test generation, coverage
+  analysis, quality gates) is tool use applied to quality engineering.
+
+Watch for **Prompt Injection** (formally *related to* AI Agents in the graph):
+any agent that reads untrusted content while holding tool access needs the
+safety controls taught in Phase 7.
+
+---
+
 ## Prerequisites
 
 ### Technical Requirements
@@ -190,4 +222,4 @@ Ready to transform your professional practice with AI?
 
 ---
 
-*Last Updated: 2026-06-23*
+*Last Updated: 2026-08-19 — concept map grounded via the DreamLab Ontology Loom*

@@ -187,13 +187,31 @@
     <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
       Skip to main content
     </a>
-    <div id="root" role="main" aria-label="Main content"></div>
+    <div id="root" role="main" aria-label="Main content">
+      <!-- Static pre-hydration content: gives crawlers, AI assistants and
+           first-paint users a recognizable call-to-action. React replaces
+           this entire subtree on mount (createRoot().render()). -->
+      <header style="padding:3rem 1.5rem;max-width:64rem;margin:0 auto;font-family:system-ui,-apple-system,sans-serif;color:#e2e8f0;background:#0a0a1a">
+        <h1 style="font-size:2rem;margin-bottom:0.75rem">DreamLab — Applied Innovation Lab</h1>
+        <p style="color:#94a3b8;margin-bottom:1.5rem;max-width:40rem">
+          Co-create with 44+ deep tech specialists across AI, immersive XR, cyber trust and
+          creative technology at our Lake District facility. Residential programmes for
+          enterprise and SME teams.
+        </p>
+        <nav aria-label="Primary calls to action" style="display:flex;gap:0.75rem;flex-wrap:wrap">
+          <a href="/programmes" style="display:inline-block;padding:0.75rem 1.5rem;background:#3b82f6;color:#fff;border-radius:0.5rem;text-decoration:none;font-weight:600">Explore programmes</a>
+          <a href="/contact" style="display:inline-block;padding:0.75rem 1.5rem;border:1px solid #3b82f6;color:#3b82f6;border-radius:0.5rem;text-decoration:none;font-weight:600">Book a discovery call</a>
+          <a href="/workshops" style="display:inline-block;padding:0.75rem 1.5rem;border:1px solid #475569;color:#94a3b8;border-radius:0.5rem;text-decoration:none;font-weight:600">Free self-guided courses</a>
+        </nav>
+      </header>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
     <noscript>
       <div style="padding: 2rem; text-align: center; font-family: system-ui, -apple-system, sans-serif; background: #0a0a1a; color: #fff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;">
         <h1 style="font-size: 2rem; margin-bottom: 1rem;">DreamLab</h1>
         <p style="margin-bottom: 1rem; color: #94a3b8;">Please enable JavaScript to experience our interactive website.</p>
         <p style="color: #64748b;">Contact: <a href="mailto:info@dreamlab-ai.com" style="color: #3b82f6;">info@dreamlab-ai.com</a></p>
+        <p style="margin-top: 1rem;"><a href="/programmes" style="color: #3b82f6;">Explore programmes</a> · <a href="/contact" style="color: #3b82f6;">Book a discovery call</a></p>
       </div>
     </noscript>
   </body>

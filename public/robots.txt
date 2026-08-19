@@ -21,3 +21,6 @@ Crawl-delay: 1
 
 # Sitemap
 Sitemap: https://dreamlab-ai.com/sitemap.xml
+
+# AI assistant guide
+# llms.txt: https://dreamlab-ai.com/llms.txt
