@@ -16,6 +16,15 @@ export default defineConfig({
   plugins: [
     react(),
     {
+      // ADR-043 W4: freshness signal. Replaces every __BUILD_DATE__ token in
+      // index.html (JSON-LD dateModified + visible <time>) with the build
+      // date, so deploys carry an honest, automatic dateModified.
+      name: 'inject-build-date',
+      transformIndexHtml(html) {
+        return html.replaceAll('__BUILD_DATE__', new Date().toISOString().slice(0, 10));
+      }
+    },
+    {
       name: 'configure-server',
       configureServer(server) {
         server.middlewares.use('/data/team', (req, res, next) => {
