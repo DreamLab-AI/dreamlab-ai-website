@@ -356,11 +356,10 @@ jobs:
           touch dist/.nojekyll
           echo "SPA routing files created"
 
-      - name: Inject React SPA redirect pickup
-        run: |
-          PICKUP='<script>(function(){var q=new URLSearchParams(window.location.search);var r=q.get("__p");if(r){q.delete("__p");var s=q.toString();history.replaceState(null,"",r+(s?"?"+s:""));}})();</script>'
-          sed -i "s|</head>|${PICKUP}</head>|" dist/index.html
-          echo "Injected SPA redirect pickup into React index.html"
+      # The React __p deep-link pickup lives in public/spa-redirect.js (an
+      # external 'self' script): an inline <script> injected here would be
+      # blocked by index.html's CSP (script-src 'self', no 'unsafe-inline'),
+      # which is exactly the bug that broke /workshops deep links.
 
       # ── Deploy ─────────────────────────────────────────────────────────
       - name: Deploy to gh-pages
