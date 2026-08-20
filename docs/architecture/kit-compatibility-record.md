@@ -23,11 +23,11 @@ its own `pin-check` extension.
 
 | Deployment host | Forum-kit SHA | Kit branch/tag at pin | Consumption tier | Canonical for pin-check |
 |---|---|---|---|---|
-| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `9de950a6cc4ae52688db5585e53a57cb84c6b569` | `main` (admin tab consolidation + onboarding fixes; library crates unchanged at `1.0.0-beta.8`) | `integrated` | ✔ |
+| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `90ffe74cdc21d43638ce538c27ddb3f28b68b75f` | `main` (tag `v1.0.0-beta.9` — NIP-98 query-string verification fix, nip44 error mapping, pod ACL owner-control invariant; kit crates versioned `1.0.0-beta.9` at this SHA but the overlay stays on the published `1.0.0-beta.8` until the beta.9 crates land on crates.io) | `integrated` | ✔ |
 
 <!-- pin-check:canonical-kit-sha -->
 ```
-CANONICAL_KIT_SHA=9de950a6cc4ae52688db5585e53a57cb84c6b569
+CANONICAL_KIT_SHA=90ffe74cdc21d43638ce538c27ddb3f28b68b75f
 CANONICAL_KIT_VERSION=1.0.0-beta.8
 ```
 
@@ -55,7 +55,30 @@ over `src/` + `forum-config/src/` for kit-owned surface names (returns zero) and
 the `pin-check` lockstep. It does not claim `federation-verified`/`released`: the
 edge carries no cross-substrate decision loop of its own to prove end to end.
 
-## What this SHA contains (`9de950a` — admin tab consolidation, onboarding fixes)
+## What this SHA contains (`90ffe74` — kit release `v1.0.0-beta.9`)
+
+The feature-parity release. Substantive changes over `9de950a`:
+
+1. **NIP-98 query-string verification fix (auth/relay/search/preview workers).**
+   `canonical_url` now returns the full request URL verbatim (query string
+   preserved) when handed one, falling back to origin+path only for a bare
+   origin — query-bearing admin routes (`?limit=`, `?before=`) verify correctly.
+2. **nip44 error mapping.** Upstream `MessageTooLong`/`ErrorV2::MessageTooLong`
+   map to `Nip44Error::PlaintextTooLong`; `nostr` pinned `0.44.7` exact.
+3. **Pod ACL owner-control invariant.** An ACL `PUT` can no longer strip the
+   owner's `acl:Control`; dead `pod_git_anchor.rs` removed (654 lines).
+4. **CI hardening.** clippy and the full workspace test suite promoted to hard
+   gates, measured-coverage gate added, `cargo audit` moved to
+   `scripts/security-audit.sh` with documented advisory exceptions, new
+   `validate-forum-config` tooling.
+
+All 14 kit crates versioned `1.0.0-beta.9` in lockstep at this SHA. The four
+library crates await their crates.io publish (operator step); until then the
+overlay pins the published `1.0.0-beta.8` and `CANONICAL_KIT_VERSION` stays
+`1.0.0-beta.8` — the same source-ahead-of-registry split the `9de950a`/`1fa99db`/
+`2f01e33` client-only bumps carried.
+
+## What earlier SHAs added (`9de950a` — admin tab consolidation, onboarding fixes)
 
 Two UX improvements:
 
@@ -292,7 +315,8 @@ All render from the pinned kit at deploy time; this repo adds only branding
 
 | SHA | Branch/context | Notes |
 |---|---|---|
-| `9de950a` | `main` (admin consolidation + onboarding fixes) | Current (canonical — matches `CANONICAL_KIT_SHA` above and the `KIT_REF` pins). Admin panel consolidated from 12 to 8 tabs (Members unified, Settings→Configuration, NativePods folded in, dead stats.rs removed). Onboarding deduplication (skip /setup redirect) + recovery sheet Blob download. Library crates unchanged at `1.0.0-beta.8`. |
+| `90ffe74` | `main` (tag `v1.0.0-beta.9`) | Current (canonical — matches `CANONICAL_KIT_SHA` above and the `KIT_REF` pins). **Kit release `1.0.0-beta.9`**: NIP-98 canonical_url preserves query strings (fixes admin-route verification across auth/relay/search/preview), nip44 `PlaintextTooLong` mapping + `nostr 0.44.7` exact pin, pod ACL `preserves_owner_control` invariant + dead `pod_git_anchor.rs` removed, CI hardening (clippy/test/coverage hard gates, security-audit.sh, validate-forum-config). All 14 crates versioned `1.0.0-beta.9`; the four library crates' crates.io publish is pending, so the overlay stays on published `1.0.0-beta.8`. |
+| `9de950a` | `main` (admin consolidation + onboarding fixes) | Superseded. Admin panel consolidated from 12 to 8 tabs (Members unified, Settings→Configuration, NativePods folded in, dead stats.rs removed). Onboarding deduplication (skip /setup redirect) + recovery sheet Blob download. Library crates unchanged at `1.0.0-beta.8`. |
 | `1fa99db` | `main` (NIP-25 reactions + profile popover + DM fix) | Superseded. Three community-requested features: NIP-25 emoji reactions with a reactive ReactionStore, profile popover with Send DM on avatar/name click, and DM list mobile alignment. Library crates unchanged at `1.0.0-beta.8`. |
 | `2f01e33` | `main` (post-beta.8 PWA gate removal) | Superseded. Removes the PWA install gate from the BBS client, making zone-bound PWA installation available without the feature flag. Library crates unchanged at `1.0.0-beta.8`. |
 | `83511bb` | `main` (tag `v1.0.0-beta.8`) | Superseded. **Kit release `1.0.0-beta.8`**: adopts solid-pod-rs `0.5.0-alpha.7`, whose DID documents carry the did:nostr CG spec 0.1.1 three-context `@context` (`[did/v1, cid/v1, nostr/context]`, DID Core first) — assertion-layer changes only, production DID rendering fully delegates upstream and both context forms expand identically under JSON-LD. Also escapes the yanked `nostr 0.44.0–0.44.4` range (lock was `0.44.2`): moves to `0.44.6` and maps the two new upstream error variants (`nip04 InvalidIVLen`, `nip44 PayloadTooShort`). All 14 kit crates in lockstep; six library crates published to crates.io, restoring the registry == git-HEAD invariant. |
