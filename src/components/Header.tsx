@@ -167,8 +167,15 @@ export const Header = () => {
   const headerRef = useRef<HTMLElement>(null);
   const location = useLocation();
 
+  // rAF-coalesced so the scrollY read happens in the frame callback (after
+  // any pending style writes), never forcing a synchronous layout mid-scroll.
+  const scrollRafId = useRef(0);
   const handleScroll = useCallback(() => {
-    setHasScrolled(window.scrollY > SCROLL_THRESHOLD);
+    if (scrollRafId.current) return;
+    scrollRafId.current = requestAnimationFrame(() => {
+      scrollRafId.current = 0;
+      setHasScrolled(window.scrollY > SCROLL_THRESHOLD);
+    });
   }, []);
 
   // Close the overlay whenever the route changes (covers link taps and back/forward).
@@ -182,10 +189,14 @@ export const Header = () => {
   useEffect(() => {
     const el = headerRef.current;
     if (!el) return;
-    const publish = () =>
-      document.documentElement.style.setProperty("--header-height", `${el.offsetHeight}px`);
-    publish();
-    const observer = new ResizeObserver(publish);
+    // No eager publish() call: ResizeObserver always delivers an initial
+    // notification on observe(), and its callback runs after layout, so
+    // reading offsetHeight there never forces a synchronous reflow (the
+    // mount-time read was the main forced-reflow cost in this component).
+    const observer = new ResizeObserver((entries) => {
+      const height = entries[0]?.borderBoxSize?.[0]?.blockSize ?? el.offsetHeight;
+      document.documentElement.style.setProperty("--header-height", `${height}px`);
+    });
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
@@ -193,7 +204,10 @@ export const Header = () => {
   useEffect(() => {
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (scrollRafId.current) cancelAnimationFrame(scrollRafId.current);
+    };
   }, [handleScroll]);
 
   return (

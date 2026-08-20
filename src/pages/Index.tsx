@@ -204,7 +204,11 @@ const IndexMobile = () => (
 
     {/* Facility photo — one static image, full-bleed */}
     <img
-      src="/images/venue/aerial.webp"
+      src="/images/venue/aerial-640.webp"
+      srcSet="/images/venue/aerial-640.webp 640w, /images/venue/aerial.webp 1024w"
+      sizes="100vw"
+      width="640"
+      height="360"
       alt="DreamLab Innovation Facility, Lake District"
       className="w-full h-[200px] object-cover"
       loading="lazy"
