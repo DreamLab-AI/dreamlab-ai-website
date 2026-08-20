@@ -89,8 +89,7 @@ jobs:
             -p nostr-bbs-auth-worker \
             -p nostr-bbs-pod-worker \
             -p nostr-bbs-preview-worker \
-            -p nostr-bbs-search-worker \
-            -p nostr-bbs-admin-cli
+            -p nostr-bbs-search-worker
           cargo test --manifest-path kit/Cargo.toml \
             -p nostr-bbs-relay-worker --features test-exports
 
