@@ -23,12 +23,12 @@ its own `pin-check` extension.
 
 | Deployment host | Forum-kit SHA | Kit branch/tag at pin | Consumption tier | Canonical for pin-check |
 |---|---|---|---|---|
-| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `90ffe74cdc21d43638ce538c27ddb3f28b68b75f` | `main` (tag `v1.0.0-beta.9` — NIP-98 query-string verification fix, nip44 error mapping, pod ACL owner-control invariant; kit crates versioned `1.0.0-beta.9` at this SHA but the overlay stays on the published `1.0.0-beta.8` until the beta.9 crates land on crates.io) | `integrated` | ✔ |
+| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `90ffe74cdc21d43638ce538c27ddb3f28b68b75f` | `main` (tag `v1.0.0-beta.9` — NIP-98 query-string verification fix, nip44 error mapping, pod ACL owner-control invariant; four library crates published to crates.io at `1.0.0-beta.9`, registry == git-HEAD invariant restored) | `integrated` | ✔ |
 
 <!-- pin-check:canonical-kit-sha -->
 ```
 CANONICAL_KIT_SHA=90ffe74cdc21d43638ce538c27ddb3f28b68b75f
-CANONICAL_KIT_VERSION=1.0.0-beta.8
+CANONICAL_KIT_VERSION=1.0.0-beta.9
 ```
 
 The `CANONICAL_KIT_SHA` line above is the machine-readable field the `pin-check`
@@ -73,10 +73,9 @@ The feature-parity release. Substantive changes over `9de950a`:
    `validate-forum-config` tooling.
 
 All 14 kit crates versioned `1.0.0-beta.9` in lockstep at this SHA. The four
-library crates await their crates.io publish (operator step); until then the
-overlay pins the published `1.0.0-beta.8` and `CANONICAL_KIT_VERSION` stays
-`1.0.0-beta.8` — the same source-ahead-of-registry split the `9de950a`/`1fa99db`/
-`2f01e33` client-only bumps carried.
+library crates are published to crates.io at `1.0.0-beta.9` and the overlay
+pins them by that version — registry == git-HEAD, no source-ahead-of-registry
+split.
 
 ## What earlier SHAs added (`9de950a` — admin tab consolidation, onboarding fixes)
 
@@ -315,7 +314,7 @@ All render from the pinned kit at deploy time; this repo adds only branding
 
 | SHA | Branch/context | Notes |
 |---|---|---|
-| `90ffe74` | `main` (tag `v1.0.0-beta.9`) | Current (canonical — matches `CANONICAL_KIT_SHA` above and the `KIT_REF` pins). **Kit release `1.0.0-beta.9`**: NIP-98 canonical_url preserves query strings (fixes admin-route verification across auth/relay/search/preview), nip44 `PlaintextTooLong` mapping + `nostr 0.44.7` exact pin, pod ACL `preserves_owner_control` invariant + dead `pod_git_anchor.rs` removed, CI hardening (clippy/test/coverage hard gates, security-audit.sh, validate-forum-config). All 14 crates versioned `1.0.0-beta.9`; the four library crates' crates.io publish is pending, so the overlay stays on published `1.0.0-beta.8`. |
+| `90ffe74` | `main` (tag `v1.0.0-beta.9`) | Current (canonical — matches `CANONICAL_KIT_SHA` above and the `KIT_REF` pins). **Kit release `1.0.0-beta.9`**: NIP-98 canonical_url preserves query strings (fixes admin-route verification across auth/relay/search/preview), nip44 `PlaintextTooLong` mapping + `nostr 0.44.7` exact pin, pod ACL `preserves_owner_control` invariant + dead `pod_git_anchor.rs` removed, CI hardening (clippy/test/coverage hard gates, security-audit.sh, validate-forum-config). All 14 crates versioned `1.0.0-beta.9`; the four library crates published to crates.io at `1.0.0-beta.9` (superseded `beta.8` yanked once this pin deployed). |
 | `9de950a` | `main` (admin consolidation + onboarding fixes) | Superseded. Admin panel consolidated from 12 to 8 tabs (Members unified, Settings→Configuration, NativePods folded in, dead stats.rs removed). Onboarding deduplication (skip /setup redirect) + recovery sheet Blob download. Library crates unchanged at `1.0.0-beta.8`. |
 | `1fa99db` | `main` (NIP-25 reactions + profile popover + DM fix) | Superseded. Three community-requested features: NIP-25 emoji reactions with a reactive ReactionStore, profile popover with Send DM on avatar/name click, and DM list mobile alignment. Library crates unchanged at `1.0.0-beta.8`. |
 | `2f01e33` | `main` (post-beta.8 PWA gate removal) | Superseded. Removes the PWA install gate from the BBS client, making zone-bound PWA installation available without the feature flag. Library crates unchanged at `1.0.0-beta.8`. |

@@ -812,9 +812,9 @@ dependencies = [
 
 [[package]]
 name = "nostr"
-version = "0.44.6"
+version = "0.44.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e826dd648489de2c5b293920e20b92932ef820302007c1987c758d4d06eeb2cf"
+checksum = "40ff7b77ef428b40aa2834a6acbae38a0e104c98b306208ca4b87a420d579a4b"
 dependencies = [
  "aes",
  "base64",
@@ -837,9 +837,9 @@ dependencies = [
 
 [[package]]
 name = "nostr-bbs-config"
-version = "1.0.0-beta.8"
+version = "1.0.0-beta.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4d96c1911b2abf3b5984227d74b8ad0a06958f02faeeddcb9cbd42591b549310"
+checksum = "8b5ebf238281d2ea39aa664bab539566d336f4e5b0f83391d66db857c861ba4f"
 dependencies = [
  "schemars",
  "serde",
@@ -851,9 +851,9 @@ dependencies = [
 
 [[package]]
 name = "nostr-bbs-core"
-version = "1.0.0-beta.8"
+version = "1.0.0-beta.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6adea5dc55b533cb5f8e8bc52578c6fca7e581ac744cfaf35fa931f202d7b3e8"
+checksum = "e082e46e9e29875485589b9a018f9643e23dfcc73c2f87edf63207a5f326fb70"
 dependencies = [
  "aes",
  "async-trait",
@@ -880,23 +880,26 @@ dependencies = [
 
 [[package]]
 name = "nostr-bbs-mesh"
-version = "1.0.0-beta.8"
+version = "1.0.0-beta.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "88d183cd73024a315a35d497b71443b4fa1f2cb058bceb67cbc3045467b6ed52"
+checksum = "d3d3beab1d89bc6c54ac71408c683413fb572fce4d0a187c1dbd79a6eef7d8f8"
 dependencies = [
  "async-trait",
+ "hex",
  "nostr-bbs-config",
  "nostr-bbs-core",
  "serde",
  "serde_json",
+ "sha2",
  "thiserror 2.0.19",
+ "toml",
 ]
 
 [[package]]
 name = "nostr-bbs-rate-limit"
-version = "1.0.0-beta.8"
+version = "1.0.0-beta.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "23c936d0d6bce736c65627aba92a40839dd4e59cc69486b96c4668cd093de657"
+checksum = "b65d8eed8b6e4a26a96cd36caa9b2a370a7b4f65931d75e5e8d3ffef8c2163e2"
 dependencies = [
  "async-trait",
  "hex",
