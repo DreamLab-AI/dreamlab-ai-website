@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 448" role="img" aria-labelledby="dg-title dg-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="dg-title">Routing a task to the right tool</title>
+  <desc id="dg-desc">Quick questions go to a chat model and the answer is copied into the project; multi-file changes go to a terminal agent; in-flow typing uses IDE autocomplete. Agent and IDE output is reviewed and committed.</desc>
+
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <rect x="8" y="8" width="944" height="432" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">WHICH TOOL FOR THE TASK?</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <g text-anchor="middle">
+    <rect x="48" y="220" width="144" height="64" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="120" y="248" font-size="15" font-weight="600" fill="#F5F5F5">Task</text>
+    <text x="120" y="270" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">arrives</text>
+
+    <path d="M296,200 L348,252 L296,304 L244,252 Z" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)" stroke-linejoin="round"/>
+    <text x="296" y="256" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">complexity?</text>
+
+    <rect x="432" y="104" width="240" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="552" y="136" font-size="14" font-weight="600" fill="#F5F5F5">Chat Model</text>
+    <text x="552" y="158" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">ChatGPT · Claude.ai</text>
+
+    <rect x="432" y="216" width="240" height="72" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="552" y="248" font-size="14" font-weight="600" fill="#F5F5F5">Terminal Agent</text>
+    <text x="552" y="270" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">Claude Code · Codex CLI</text>
+
+    <rect x="432" y="328" width="240" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="552" y="360" font-size="14" font-weight="600" fill="#F5F5F5">IDE Autocomplete</text>
+    <text x="552" y="382" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">Copilot · Cursor</text>
+
+    <rect x="736" y="112" width="176" height="56" rx="8" fill="none" stroke="rgba(255,255,255,0.20)" stroke-dasharray="4 3"/>
+    <text x="824" y="146" font-size="13" font-weight="600" fill="#9CA3AF">Copy to project</text>
+
+    <rect x="736" y="280" width="176" height="56" rx="8" fill="none" stroke="rgba(255,255,255,0.20)" stroke-dasharray="4 3"/>
+    <text x="824" y="314" font-size="13" font-weight="600" fill="#9CA3AF">Review + commit</text>
+  </g>
+
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2">
+    <path d="M192,252 C212,252 220,252 236,252" marker-end="url(#arr)"/>
+    <path d="M320,224 C368,168 384,152 424,144" marker-end="url(#arr)"/>
+    <path d="M348,252 C376,252 396,252 424,252" marker-end="url(#arr)"/>
+    <path d="M320,280 C368,336 384,352 424,360" marker-end="url(#arr)"/>
+    <path d="M672,140 C696,140 712,140 728,140" marker-end="url(#arr)"/>
+    <path d="M672,252 C704,252 712,280 728,292" marker-end="url(#arr)"/>
+    <path d="M672,364 C704,364 712,336 728,324" marker-end="url(#arr)"/>
+  </g>
+  <g font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">
+    <text x="352" y="184">quick question</text>
+    <text x="356" y="244">multi-file change</text>
+    <text x="352" y="332">as you type</text>
+  </g>
+</svg>

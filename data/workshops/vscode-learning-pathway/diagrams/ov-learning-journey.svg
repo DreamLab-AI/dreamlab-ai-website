@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 264" role="img" aria-labelledby="dg-title dg-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="dg-title">Five-day learning journey</title>
+  <desc id="dg-desc">Five days build on each other: universal workspace, AI partners, private AI, AI teams, then a full-stack finale producing professional outputs.</desc>
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect x="8" y="8" width="944" height="248" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">LEARNING JOURNEY</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <g text-anchor="middle">
+    <rect x="48" y="112" width="160" height="96" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="128" y="140" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#6B7280">DAY 1</text>
+    <text x="128" y="164" font-size="14" font-weight="600" fill="#F5F5F5">Universal Workspace</text>
+    <text x="128" y="188" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">master VS Code</text>
+
+    <rect x="224" y="112" width="160" height="96" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="304" y="140" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#6B7280">DAY 2</text>
+    <text x="304" y="164" font-size="14" font-weight="600" fill="#F5F5F5">AI Partners</text>
+    <text x="304" y="188" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">sites · docs · diagrams</text>
+
+    <rect x="400" y="112" width="160" height="96" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="480" y="140" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#6B7280">DAY 3</text>
+    <text x="480" y="164" font-size="14" font-weight="600" fill="#F5F5F5">Private AI</text>
+    <text x="480" y="188" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">your private AI brain</text>
+
+    <rect x="576" y="112" width="160" height="96" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="656" y="140" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#6B7280">DAY 4</text>
+    <text x="656" y="164" font-size="14" font-weight="600" fill="#F5F5F5">AI Teams</text>
+    <text x="656" y="188" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">automated workflows</text>
+
+    <rect x="752" y="112" width="160" height="96" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="832" y="140" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#6B7280">DAY 5</text>
+    <text x="832" y="164" font-size="14" font-weight="600" fill="#F5F5F5">Full Stack</text>
+    <text x="832" y="188" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#F59E0B">professional outputs</text>
+  </g>
+
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2">
+    <path d="M208,160 C214,160 216,160 220,160" marker-end="url(#arr)"/>
+    <path d="M384,160 C390,160 392,160 396,160" marker-end="url(#arr)"/>
+    <path d="M560,160 C566,160 568,160 572,160" marker-end="url(#arr)"/>
+    <path d="M736,160 C742,160 744,160 748,160" marker-end="url(#arr)"/>
+  </g>
+</svg>

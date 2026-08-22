@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 240" role="img" aria-labelledby="dg-title dg-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="dg-title">Workshop flow</title>
+  <desc id="dg-desc">Six stages in sequence: introduction, core concepts, hands-on setup, exercises, build project, and assessment.</desc>
+
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- container -->
+  <rect x="8" y="8" width="944" height="224" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">WORKSHOP FLOW</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <!-- stages -->
+  <g text-anchor="middle" font-size="13" font-weight="600" fill="#F5F5F5">
+    <rect x="48" y="112" width="120" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="108" y="152">Introduction</text>
+
+    <rect x="192" y="112" width="120" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="252" y="146">Core</text>
+    <text x="252" y="164">Concepts</text>
+
+    <rect x="336" y="112" width="120" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="396" y="146">Hands-On</text>
+    <text x="396" y="164">Setup</text>
+
+    <rect x="480" y="112" width="120" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="540" y="152">Exercises</text>
+
+    <rect x="624" y="112" width="120" height="72" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="684" y="146">Build</text>
+    <text x="684" y="164">Project</text>
+
+    <rect x="768" y="112" width="120" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="828" y="152">Assessment</text>
+  </g>
+
+  <!-- arrows -->
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2">
+    <path d="M168,148 L186,148" marker-end="url(#arr)"/>
+    <path d="M312,148 L330,148" marker-end="url(#arr)"/>
+    <path d="M456,148 L474,148" marker-end="url(#arr)"/>
+    <path d="M600,148 L618,148" marker-end="url(#arr)"/>
+    <path d="M744,148 L762,148" marker-end="url(#arr)"/>
+  </g>
+</svg>
