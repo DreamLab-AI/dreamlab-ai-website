@@ -3,6 +3,8 @@ import { useEffect, useState, useMemo, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
+import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 // Dynamic import for mermaid to reduce initial bundle size (679KB → loaded on demand)
 import type mermaidAPI from 'mermaid';
 import DOMPurify from 'dompurify';
@@ -31,6 +33,21 @@ interface WorkshopManifest {
   estimatedTime?: string;
   difficulty?: DifficultyLevel;
 }
+
+// Allow the collapsible <details>/<summary> blocks used by workshop markdown,
+// while keeping everything else within rehype-sanitize's default safe schema.
+const markdownSanitizeSchema = {
+  ...defaultSchema,
+  tagNames: [...(defaultSchema.tagNames ?? []), 'details', 'summary'],
+  attributes: {
+    ...defaultSchema.attributes,
+    code: [...(defaultSchema.attributes?.code ?? []), ['className', /^language-./]],
+  },
+};
+const markdownRehypePlugins: import('react-markdown').Options['rehypePlugins'] = [
+  rehypeRaw,
+  [rehypeSanitize, markdownSanitizeSchema],
+];
 
 const WorkshopPage = () => {
   const { workshopId, pageSlug } = useParams<{ workshopId: string; pageSlug?: string }>();
@@ -391,10 +408,13 @@ const WorkshopPage = () => {
                   '[&_hr]:border-dlm-hairline [&_hr]:my-8',
                   '[&_img]:rounded-[10px] [&_img]:my-4',
                   '[&_table]:block [&_table]:w-full [&_table]:overflow-x-auto',
+                  '[&_details]:my-4 [&_details]:rounded-[10px] [&_details]:border [&_details]:border-white/[0.08] [&_details]:bg-white/[0.02] [&_details]:p-4',
+                  '[&_summary]:cursor-pointer [&_summary]:text-[#FAFAFA]',
                 ].join(' ')}
               >
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
+                  rehypePlugins={markdownRehypePlugins}
                   components={{
                     pre: ({ children }) => (
                       <pre className="bg-[#08080A] border border-white/[0.08] rounded-[10px] p-4 text-[13px] leading-[1.7] font-mono text-[#C9D1D9] overflow-x-auto my-4">
@@ -505,7 +525,7 @@ const WorkshopPage = () => {
           {/* --- To show real content, use ReactMarkdown below. For debugging, the <p>Test Content.../> is fine --- */}
           {!isLoadingContent && !error && currentPageContent && (
             <div className="prose max-w-none dark:prose-invert break-words [&_table]:block [&_table]:w-full [&_table]:overflow-x-auto">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={markdownRehypePlugins}>
                 {currentPageContent}
               </ReactMarkdown>
             </div>
