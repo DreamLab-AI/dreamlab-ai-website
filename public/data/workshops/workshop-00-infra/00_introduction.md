@@ -8,21 +8,7 @@ Welcome! This workshop equips you with a modern development toolchain that combi
 
 In 2026, the landscape of software development has been transformed by AI assistants like **Claude Code**, **GitHub Copilot**, **Cursor**, and **Windsurf**. However, these powerful tools are only as effective as the foundation they are built upon. This workshop establishes that foundation.
 
-```mermaid
-graph TD
-    A[Modern Developer Toolkit] --> B[Version Control<br/>Git & GitHub]
-    A --> C[Code Editor<br/>VS Code]
-    A --> D[AI Assistants<br/>Claude/Copilot/Cursor]
-    A --> E[Cloud Infrastructure<br/>GitHub Pages/Actions]
-
-    B --> F[Professional<br/>Portfolio]
-    C --> F
-    D --> F
-    E --> F
-
-    style A fill:#4a90e2,stroke:#2e5c8a,color:#fff
-    style F fill:#50c878,stroke:#2d7a4a,color:#fff
-```
+![The modern developer toolkit: version control, code editor, AI assistants and cloud infrastructure converge into a professional portfolio](/data/workshops/workshop-00-infra/diagrams/00-toolkit.svg)
 
 ## What You'll Build
 
