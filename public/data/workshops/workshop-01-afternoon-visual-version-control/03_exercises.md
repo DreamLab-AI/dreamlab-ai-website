@@ -49,23 +49,7 @@ A complete flowchart with at least 8 nodes, 2 decision diamonds, and clear paths
 <details>
 <summary><strong>Hint: Complete Solution</strong></summary>
 
-```mermaid
-flowchart TD
-    A([Client Enquiry]) --> B[Review Application]
-    B --> C{Qualifies?}
-    C -->|No| D[Send Decline Email]
-    C -->|Yes| E[Schedule Discovery Call]
-    E --> F[Create Proposal]
-    F --> G{Client Accepts?}
-    G -->|Request Changes| H[Revise Proposal]
-    H --> F
-    G -->|Yes| I[Assign Project Lead]
-    I --> J[Send Welcome Pack]
-    J --> K([Onboarding Complete])
-
-    style K fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-    style D fill:#ffcdd2
-```
+![Client onboarding flowchart: enquiry is reviewed, qualified clients get a discovery call and proposal that loops through revisions until acceptance completes onboarding; unqualified enquiries receive a decline email](/data/workshops/workshop-01-afternoon-visual-version-control/diagrams/03-onboarding-flow.svg)
 
 </details>
 
@@ -119,24 +103,7 @@ A complete Gantt chart showing all 8 tasks across 4 sections with proper depende
 <details>
 <summary><strong>Hint: Complete Solution</strong></summary>
 
-```mermaid
-gantt
-    title Website Redesign Project
-    dateFormat YYYY-MM-DD
-    section Discovery
-    Research & Analysis    :done, d1, 2026-07-01, 7d
-    User Interviews        :active, d2, 2026-07-03, 5d
-    section Design
-    Wireframes             :d3, after d1, 7d
-    Visual Design          :d4, after d3, 14d
-    section Content
-    Content Writing        :d5, after d3, 14d
-    section Development
-    Build & Integration    :crit, d6, after d4, 14d
-    Testing & QA           :d7, after d6, 7d
-    section Launch
-    Go Live                :milestone, after d7, 1d
-```
+![Website redesign Gantt chart across eight weeks: research and interviews first, wireframes then parallel visual design and content writing, development on the critical path, testing, and a go-live milestone](/data/workshops/workshop-01-afternoon-visual-version-control/diagrams/03-redesign-gantt.svg)
 
 </details>
 
@@ -248,35 +215,7 @@ An employee submits an expense claim through a web portal. The system validates 
 <details>
 <summary><strong>Hint: Option A Complete Solution</strong></summary>
 
-```mermaid
-sequenceDiagram
-    participant Author
-    participant Reviewer
-    participant Head as Dept Head
-    
-    Author->>Reviewer: Submit document
-    
-    loop Until approved
-        Reviewer->>Reviewer: Review document
-        alt Approved
-            Reviewer-->>Author: Approval notification
-        else Changes needed
-            Reviewer-->>Author: Comments & feedback
-            Author->>Author: Revise document
-            Author->>Reviewer: Resubmit
-        end
-    end
-    
-    Reviewer->>Head: Forward for final sign-off
-    Head->>Head: Review
-    
-    alt Approved
-        Head-->>Author: Final approval
-        Note over Author,Head: Document published
-    else Rejected
-        Head-->>Reviewer: Return with concerns
-    end
-```
+![Document approval sequence diagram: the author submits to the reviewer, comments and resubmission loop until approved, then the reviewer forwards to the department head for final approval and publication](/data/workshops/workshop-01-afternoon-visual-version-control/diagrams/03-approval-sequence.svg)
 
 </details>
 

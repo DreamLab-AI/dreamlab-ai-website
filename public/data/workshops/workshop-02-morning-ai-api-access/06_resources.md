@@ -541,22 +541,7 @@ AI APIs evolve fast. Here is what to watch for:
 
 ## Your Ongoing Journey
 
-```mermaid
-graph TD
-    A[Complete Workshop] --> B[Daily API Usage]
-    B --> C[Cancel Subscriptions]
-    C --> D[Optimise Costs]
-    D --> E[Automate Workflows]
-    E --> F[Teach Others]
-
-    B -.-> G[Week 1: Comfortable]
-    C -.-> H[Week 2: Saving Money]
-    D -.-> I[Month 1: Optimised]
-    E -.-> J[Month 2: Automated]
-    F -.-> K[Month 3: Expert]
-
-    style K fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-```
+![Mastery path after the workshop: daily API usage, cancel subscriptions, optimise costs, automate workflows, then teach others by month three](/data/workshops/workshop-02-morning-ai-api-access/diagrams/06-mastery-path.svg)
 
 ## Conclusion
 

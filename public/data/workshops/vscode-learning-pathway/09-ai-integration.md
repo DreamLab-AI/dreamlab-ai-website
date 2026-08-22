@@ -11,35 +11,7 @@
 
 ## The AI Landscape in VS Code (2026)
 
-```mermaid
-graph TD
-    A[AI in VS Code] --> B[Inline Completion]
-    A --> C[Agentic / Terminal]
-    A --> D[Hybrid / Multi-Model]
-    A --> E[Local / Private]
-
-    B --> F[GitHub Copilot]
-    B --> G[Windsurf]
-
-    C --> H[Claude Code]
-    C --> I[OpenAI Codex CLI]
-
-    D --> J[Continue.dev]
-
-    E --> K[Ollama + Continue]
-    E --> L[LM Studio + Continue]
-
-    F --> M[From $10/month, Best for: Inline flow]
-    H --> N[Pay-per-use API, Best for: Complex reasoning]
-    J --> O[Free & open-source, Best for: Flexibility]
-    K --> P[Free, Best for: Privacy]
-
-    style A fill:#007acc,color:#fff
-    style F fill:#4fc3f7
-    style H fill:#66bb6a
-    style J fill:#ffa726
-    style K fill:#ef5350,color:#fff
-```
+![Four AI approaches in VS Code: inline completion, agentic terminal tools, hybrid multi-model tools and local private models, with leading tools and pricing](/data/workshops/vscode-learning-pathway/diagrams/09-ai-landscape.svg)
 
 ## GitHub Copilot (Inline Completion Standard)
 
@@ -578,18 +550,7 @@ There is no single "best" tool — the strongest approach combines complementary
 
 ### Workflow 1: Feature Development
 
-```mermaid
-graph LR
-    A[Write Comment] --> B[Copilot Suggests Implementation]
-    B --> C[Review & Refine]
-    C --> D[Generate Tests]
-    D --> E[Add Documentation]
-    E --> F[Commit]
-
-    style A fill:#42a5f5
-    style D fill:#66bb6a
-    style F fill:#ffa726
-```
+![AI-assisted workflow: write a comment, AI suggests an implementation, review and refine, generate tests, document, commit](/data/workshops/vscode-learning-pathway/diagrams/09-ai-workflow.svg)
 
 **Steps:**
 ```

@@ -33,6 +33,8 @@ Every interaction follows the same pattern:
 5. Claude executes and shows you the results
 ```
 
+![The Claude Code agent loop: you describe a task, Claude analyses the project and proposes actions, you approve at the permission gate, then Claude executes and shows results, feeding into the next request](/data/workshops/workshop-08-claude-code/diagrams/00-agent-loop.svg)
+
 This approval step is crucial. Claude Code is designed around a **permission model** — it will never silently modify your files or run destructive commands without your say-so.
 
 ### Available Everywhere

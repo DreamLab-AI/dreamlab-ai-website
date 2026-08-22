@@ -19,6 +19,8 @@ Your Desktop                    Docker Container
      Your laptop                   Runs in Docker
 ```
 
+![VS Code on your desktop connecting over docker exec to a headless VS Code Server inside the Docker container, with your code bind-mounted in and server ports forwarded back to localhost](/data/workshops/workshop-07-docker-containers/diagrams/03-devcontainer-arch.svg)
+
 ### Why This Matters
 
 - **Everyone gets the same environment.** Share a `.devcontainer` folder with your team and everyone has identical tooling -- no more "it works on my machine."

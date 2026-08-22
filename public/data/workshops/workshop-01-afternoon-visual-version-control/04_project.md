@@ -61,23 +61,9 @@ interviews with quantitative survey data.
 
 ## Methodology Flow
 
-```mermaid
-flowchart TD
-    A([Research Question]) --> B[Literature Review]
-    B --> C{Mixed Methods}
-    C --> D[Qualitative Strand]
-    C --> E[Quantitative Strand]
-    D --> D1[Semi-structured Interviews]
-    D1 --> D2[Thematic Analysis]
-    E --> E1[Online Survey]
-    E1 --> E2[Statistical Analysis]
-    D2 --> F[Integration & Triangulation]
-    E2 --> F
-    F --> G[Findings & Discussion]
-    G --> H([Conclusions])
-
-    style F fill:#4fc3f7,stroke:#01579b,stroke-width:3px
 ```
+
+![Mixed-methods research methodology flowchart: research question and literature review split into qualitative and quantitative strands that converge at integration and triangulation, leading to conclusions](/data/workshops/workshop-01-afternoon-visual-version-control/diagrams/04-research-methodology.svg)
 
 **Commit**: `docs: add research methodology flowchart`
 
@@ -87,27 +73,7 @@ flowchart TD
 
 Create a Gantt chart for your research schedule:
 
-```mermaid
-gantt
-    title Research Project Timeline
-    dateFormat YYYY-MM-DD
-    section Preparation
-    Ethics Approval        :done, p1, 2026-07-01, 14d
-    Literature Review      :active, p2, 2026-07-01, 28d
-    section Data Collection
-    Recruit Participants   :d1, after p2, 14d
-    Conduct Interviews     :d2, after d1, 21d
-    Distribute Survey      :d3, after d1, 14d
-    section Analysis
-    Transcription          :a1, after d2, 14d
-    Thematic Analysis      :a2, after a1, 21d
-    Statistical Analysis   :a3, after d3, 14d
-    Integration            :crit, a4, after a2, 14d
-    section Writing
-    Draft Chapters         :w1, after a4, 28d
-    Revision               :w2, after w1, 14d
-    Submission             :milestone, after w2, 1d
-```
+![Research project Gantt timeline: ethics and literature review, participant recruitment, interviews and survey, transcription, analysis, integration on the critical path, then drafting, revision and a submission milestone](/data/workshops/workshop-01-afternoon-visual-version-control/diagrams/04-research-gantt.svg)
 
 **Commit**: `docs: add research project Gantt timeline`
 
@@ -117,25 +83,7 @@ gantt
 
 Create a sequence diagram showing data collection and analysis:
 
-```mermaid
-sequenceDiagram
-    participant R as Researcher
-    participant P as Participants
-    participant DB as Data Store
-    participant T as Analysis Tools
-
-    R->>P: Recruit & consent
-    P->>R: Signed consent forms
-    R->>P: Conduct interviews
-    P-->>R: Audio recordings
-    R->>DB: Store anonymised transcripts
-    R->>P: Distribute survey
-    P-->>DB: Survey responses
-    R->>T: Import qualitative data
-    R->>T: Import quantitative data
-    T-->>R: Analysis outputs
-    R->>R: Integrate findings
-```
+![Data collection sequence diagram: the researcher recruits and consents participants, gathers recordings and survey responses, stores anonymised data, imports it into analysis tools and integrates the outputs](/data/workshops/workshop-01-afternoon-visual-version-control/diagrams/04-data-collection-sequence.svg)
 
 **Commit**: `docs: add data collection sequence diagram`
 
@@ -179,28 +127,9 @@ Initialise Git and commit the structure.
 
 ## End-to-End Process
 
-```mermaid
-flowchart TD
-    A([Lead Generation]) --> B[Initial Contact]
-    B --> C{Qualified?}
-    C -->|No| D[Nurture Campaign]
-    D --> B
-    C -->|Yes| E[Discovery Meeting]
-    E --> F[Proposal Creation]
-    F --> G{Accepted?}
-    G -->|Revise| F
-    G -->|Yes| H[Contract Signing]
-    H --> I[Onboarding]
-    I --> J[Project Delivery]
-    J --> K[Review & Feedback]
-    K --> L{Repeat Business?}
-    L -->|Yes| M[Account Management]
-    L -->|No| N[Exit Survey]
-    M --> E
-
-    style H fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-    style J fill:#4fc3f7,stroke:#01579b,stroke-width:3px
 ```
+
+![Client journey flowchart: leads are contacted and qualified with a nurture loop for those not ready, then move through discovery, proposal with revision loops, contract signing and onboarding, delivery and review](/data/workshops/workshop-01-afternoon-visual-version-control/diagrams/04-client-journey.svg)
 
 **Commit**: `docs: add client journey flowchart`
 
@@ -252,20 +181,7 @@ system-docs/
 
 Document a system you work with using a Mermaid graph:
 
-```mermaid
-graph TD
-    Users[End Users] --> LB[Load Balancer]
-    LB --> Web[Web Application]
-    Web --> API[API Gateway]
-    API --> Auth[Auth Service]
-    API --> Data[Data Service]
-    API --> Search[Search Service]
-    Data --> DB[(PostgreSQL)]
-    Search --> ES[(Search Index)]
-    Auth --> Cache[(Redis Cache)]
-
-    style API fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-```
+![System architecture diagram: end users reach the web application through a load balancer; the API gateway routes to auth, data and search services backed by Redis, PostgreSQL and a search index](/data/workshops/workshop-01-afternoon-visual-version-control/diagrams/04-system-architecture.svg)
 
 **Commit**: `docs: add system architecture overview diagram`
 
@@ -317,20 +233,7 @@ portfolio-case/
 
 Document a creative process (e.g., brand design, campaign development, content creation):
 
-```mermaid
-flowchart LR
-    A[Brief] --> B[Research]
-    B --> C[Ideation]
-    C --> D[Concept Development]
-    D --> E{Client Review}
-    E -->|Approved| F[Production]
-    E -->|Revisions| C
-    F --> G[Quality Check]
-    G --> H[Delivery]
-    H --> I[Post-Launch Review]
-
-    style F fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-```
+![Creative workflow flowchart: brief, research and ideation, concept development, client review looping revisions back to ideation, then production, quality check and delivery, and post-launch review](/data/workshops/workshop-01-afternoon-visual-version-control/diagrams/04-creative-workflow.svg)
 
 **Commit**: `docs: add creative workflow diagram`
 
@@ -348,22 +251,7 @@ Create a Gantt chart showing a real or example project timeline with creative ph
 
 Use a mind map to visualise the outcomes and impact of the project:
 
-```mermaid
-mindmap
-  root((Project Impact))
-    Metrics
-      40% engagement increase
-      2x social sharing
-      15% conversion uplift
-    Qualitative
-      Positive client feedback
-      Industry recognition
-      Team skill growth
-    Lessons Learned
-      Tighter brief needed
-      Earlier stakeholder review
-      Better asset management
-```
+![Project impact mind map with three groups: metrics such as engagement, sharing and conversion gains; qualitative outcomes including client feedback and recognition; and lessons learned about briefs, reviews and asset management](/data/workshops/workshop-01-afternoon-visual-version-control/diagrams/04-impact-mindmap.svg)
 
 **Commit**: `docs: add project impact mind map`
 

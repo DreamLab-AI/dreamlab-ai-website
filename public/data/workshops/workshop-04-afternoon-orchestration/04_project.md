@@ -23,41 +23,7 @@ Build a complete, production-ready multi-agent system that orchestrates speciali
 
 ## Architecture
 
-```mermaid
-graph TB
-    User[User Task] --> Orch[Orchestrator]
-
-    subgraph "Safety Layer"
-        Budget[Token Budget<br/>Controller]
-        Limiter[Iteration<br/>Limiter]
-        Audit[Audit<br/>Logger]
-    end
-
-    Orch --> Budget
-    Budget --> Classify[Complexity<br/>Classifier]
-
-    Classify --> |simple| Haiku[Haiku 4.5<br/>Subagent]
-    Classify --> |moderate| Sonnet[Sonnet 4.6<br/>Subagent]
-    Classify --> |complex| Opus[Opus 4.8<br/>Subagent]
-
-    Haiku --> Collect[Result<br/>Collector]
-    Sonnet --> Collect
-    Opus --> Collect
-
-    Collect --> Synth[Synthesis<br/>Agent]
-    Synth --> Audit
-    Audit --> Output[Final Output<br/>+ Cost Report]
-
-    Limiter -.->|enforces| Haiku
-    Limiter -.->|enforces| Sonnet
-    Limiter -.->|enforces| Opus
-
-    style Orch fill:#ff9999
-    style Budget fill:#ffff99
-    style Limiter fill:#ffff99
-    style Audit fill:#ffff99
-    style Output fill:#99ff99
-```
+![Cost-aware model routing: the orchestrator, guarded by token budget, iteration limiter and audit logger, classifies task complexity and routes work to Haiku, Sonnet or Opus subagents before synthesis into a final output with cost report](/data/workshops/workshop-04-afternoon-orchestration/diagrams/04-model-routing.svg)
 
 ## Implementation Guide
 

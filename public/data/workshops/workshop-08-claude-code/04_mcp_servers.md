@@ -22,6 +22,8 @@ You ──> Claude Code ──> MCP Server ──> External Service
 4. When relevant, Claude calls those tools during your conversation
 5. The MCP server handles the request and returns results
 
+![MCP client-server architecture: Claude Code as the MCP host opens one client connection per configured server — GitHub, Postgres, Slack — each bridging over the network to its external service](/data/workshops/workshop-08-claude-code/diagrams/04-mcp-architecture.svg)
+
 Claude decides when to use MCP tools based on your request. If you ask "show me open bugs assigned to me", and a GitHub MCP server is connected, Claude will use it automatically.
 
 ## Built-In MCP Support

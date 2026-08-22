@@ -215,20 +215,7 @@ AI models operate within a "context window" -- a limit on the amount of informat
 
 A sustainable workflow for complex tasks follows this pattern:
 
-```mermaid
-sequenceDiagram
-    participant User
-    participant Claude Code
-    User->>Claude Code: Start session (CLAUDE.md loaded automatically)
-    User->>Claude Code: Specific task or question
-    Claude Code-->>User: Generates code / explanation / files
-    User->>User: Review changes, commit with Git
-    User->>User: Check context usage
-    alt Context getting large
-        User->>Claude Code: /compact (summarise) or /clear (fresh start)
-    end
-    User->>Claude Code: Next task
-```
+![The core interaction loop: send a task to Claude Code, review and commit the result, compact or clear when context grows, repeat](/data/workshops/workshop-00-infra/diagrams/06-session-loop.svg)
 
 ### Choosing the Right Tool for the Job
 

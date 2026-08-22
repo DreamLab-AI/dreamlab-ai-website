@@ -423,6 +423,8 @@ This starts three instances of the embedding service. You would add a load balan
 
 When running AI models that need GPU acceleration, use the NVIDIA Container Toolkit (covered in the Remote Docker section) to pass GPUs through to containers.
 
+![Layered GPU container stack: the AI container holds PyTorch and CUDA runtime libraries, the NVIDIA Container Toolkit injects the host driver at start, and only the NVIDIA driver lives on the host above the GPU hardware](/data/workshops/workshop-07-docker-containers/diagrams/05-gpu-ai-stack.svg)
+
 ### Compose with GPU
 
 ```yaml

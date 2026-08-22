@@ -44,15 +44,7 @@ This comprehensive resource collection supports your ongoing journey from docume
 ### Mermaid Cheat Sheet
 
 **Flowchart Quick Reference:**
-```mermaid
-graph TD
-    A[Rectangle] --> B(Rounded)
-    B --> C{Diamond / Decision}
-    C -->|Yes| D([Stadium / Start-End])
-    C -->|No| E[[Subroutine]]
-    D --> F[(Database)]
-    E --> G((Circle))
-```
+![Mermaid node shape gallery showing rectangle, rounded, decision diamond, stadium start-end, subroutine, database cylinder and circle shapes alongside their Mermaid syntax](/data/workshops/workshop-01-afternoon-visual-version-control/diagrams/06-node-shapes.svg)
 
 **Styling Quick Reference:**
 ```
@@ -561,21 +553,7 @@ End of day:
 
 ## Your Learning Journey
 
-```mermaid
-graph TD
-    A[Complete Workshop] --> B[Daily Practice]
-    B --> C[Build Template Library]
-    C --> D[Share with Colleagues]
-    D --> E[Advanced Workflows]
-    E --> F[Team Adoption]
-
-    B -.-> G[7 Days: Confident]
-    C -.-> H[30 Days: Proficient]
-    D -.-> I[60 Days: Advocate]
-    E -.-> J[90 Days: Expert]
-
-    style J fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-```
+![Learning journey timeline: complete the workshop, practise daily to be confident at 7 days, build a template library by 30 days, share with colleagues by 60 days, and reach team adoption and expert level at 90 days](/data/workshops/workshop-01-afternoon-visual-version-control/diagrams/06-learning-journey.svg)
 
 ## Next Steps
 

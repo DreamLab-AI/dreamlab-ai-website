@@ -13,26 +13,7 @@ A single agent with a few tools works well for focused tasks. But real-world pro
 - **Scale**: Large codebases, multi-document research, and complex workflows exceed what one agent context can handle
 - **Safety**: Autonomous agents need guardrails -- cost limits, approval gates, and sandboxing
 
-```mermaid
-graph LR
-    subgraph "Morning: Single Agent"
-        A[One Agent] --> T1[Tool 1]
-        A --> T2[Tool 2]
-        A --> T3[Tool 3]
-    end
-
-    subgraph "Afternoon: Orchestrated System"
-        O[Orchestrator] --> S1[Research Agent]
-        O --> S2[Code Agent]
-        O --> S3[Review Agent]
-        S1 --> T4[Search MCP]
-        S2 --> T5[Filesystem MCP]
-        S3 --> T6[GitHub MCP]
-    end
-
-    style O fill:#ff9999
-    style A fill:#99ccff
-```
+![Comparison of the morning's single agent calling tools directly with the afternoon's orchestrator delegating to research, code and review agents, each with its own MCP server](/data/workshops/workshop-04-afternoon-orchestration/diagrams/00-single-vs-orchestrated.svg)
 
 ### The 2026 Orchestration Landscape
 
@@ -84,57 +65,13 @@ When agents operate autonomously, things can go wrong:
 - Scaling patterns
 - Testing multi-agent systems
 
-```mermaid
-graph TD
-    A[Orchestration Patterns] --> E[Production System]
-    B[Safety & Guardrails] --> E
-    C[Cost Management] --> E
-    D[Deployment Patterns] --> E
-
-    E --> F[Reliable Multi-Agent<br/>Application]
-
-    style E fill:#99ff99
-    style F fill:#99ff99
-```
+![Orchestration patterns, safety, cost management and deployment converge into a reliable multi-agent production system](/data/workshops/workshop-04-afternoon-orchestration/diagrams/00-module-convergence.svg)
 
 ## Architecture Overview
 
 A production multi-agent system typically looks like this:
 
-```mermaid
-graph TB
-    User[User Request] --> Orch[Orchestrator Agent]
-
-    subgraph "Safety Layer"
-        Budget[Cost Controller]
-        Approval[Approval Gate]
-        Audit[Audit Logger]
-    end
-
-    Orch --> Budget
-    Budget --> Dispatch[Task Dispatcher]
-
-    Dispatch --> Agent1[Agent 1: Research<br/>Model: Sonnet 4.6]
-    Dispatch --> Agent2[Agent 2: Code<br/>Model: Sonnet 4.6]
-    Dispatch --> Agent3[Agent 3: Review<br/>Model: Haiku 4.5]
-
-    Agent1 --> MCP1[Search MCP]
-    Agent2 --> MCP2[Filesystem MCP]
-    Agent3 --> MCP3[GitHub MCP]
-
-    Agent1 --> Collect[Result Collector]
-    Agent2 --> Collect
-    Agent3 --> Collect
-
-    Collect --> Approval
-    Approval --> Audit
-    Audit --> Output[Final Output]
-
-    style Orch fill:#ff9999
-    style Budget fill:#ffff99
-    style Approval fill:#ffff99
-    style Audit fill:#ffff99
-```
+![Production system: a user request passes through the orchestrator and safety layer, is dispatched to research, code and review agents, and their results are collected, approved, audited and output](/data/workshops/workshop-04-afternoon-orchestration/diagrams/00-production-system.svg)
 
 ## The Afternoon's Flow
 

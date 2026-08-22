@@ -24,25 +24,7 @@ This workshop transcends traditional boundaries. You'll sit alongside:
 
 ## Your Transformation Journey
 
-```mermaid
-graph TD
-    A[Day 1: Universal Workspace] -->|Amplify with| B[Day 2: AI Partners]
-    B -->|Secure with| C[Day 3: Private AI]
-    C -->|Automate via| D[Day 4: AI Teams]
-    D -->|Publish through| E[Day 5: Full Stack]
-
-    A -.->|Master| F[📝 VS Code for Everyone]
-    B -.->|Create| G[🎨 Websites, Docs, Diagrams]
-    C -.->|Build| H[🔒 Your Private AI Brain]
-    D -.->|Deploy| I[🤖 Automated Workflows]
-    E -.->|Launch| J[🌍 Professional Outputs]
-
-    style J fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-    style F fill:#e1f5fe
-    style G fill:#e1f5fe
-    style H fill:#e1f5fe
-    style I fill:#e1f5fe
-```
+![Five-day learning journey: universal workspace, AI partners, private AI, AI teams, then full-stack professional outputs](/data/workshops/vscode-learning-pathway/diagrams/ov-learning-journey.svg)
 
 ---
 

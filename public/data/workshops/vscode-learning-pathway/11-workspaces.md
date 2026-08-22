@@ -22,18 +22,7 @@ Each with independent settings
 Share extensions and terminal
 ```
 
-```mermaid
-graph TD
-    A[Workspace: my-app] --> B[Folder: frontend/]
-    A --> C[Folder: backend/]
-    A --> D[Folder: shared/]
-
-    B --> E[React app]
-    C --> F[Node.js API]
-    D --> G[TypeScript types]
-
-    style A fill:#007acc,color:#fff
-```
+![Multi-root workspace grouping a React frontend, a Node.js backend API and a shared TypeScript types folder](/data/workshops/vscode-learning-pathway/diagrams/11-multi-root.svg)
 
 ## Creating Workspaces
 

@@ -44,6 +44,10 @@ LLMs have limitations:
 7. Generate Response
 ```
 
+In production the pipeline splits into two paths: an offline indexing path that prepares your documents, and an online query path that runs on every question.
+
+![Modern RAG pipeline: an offline indexing path (documents, chunk, embed, vector store) feeding an online query path (user query, hybrid retrieval, re-ranking, generation)](/data/workshops/workshop-03-afternoon-rag-system/diagrams/01-rag-pipeline.svg)
+
 **Key Insight**: Retrieve relevant information BEFORE generating response.
 
 ---
@@ -115,6 +119,8 @@ CREATE TABLE embeddings (
 ### 2. Embedding Models
 
 Convert text to vector representations.
+
+![Embedding space: a work-from-home query lands close to remote-working policy chunks and far from expense-policy chunks; closer points mean higher cosine similarity](/data/workshops/workshop-03-afternoon-rag-system/diagrams/01-embedding-space.svg)
 
 **OpenAI Embeddings**
 ```python

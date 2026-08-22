@@ -13,22 +13,7 @@
 
 ### The VS Code Debugger Architecture
 
-```mermaid
-graph TD
-    A[Debug View] --> B[Debug Toolbar]
-    A --> C[Variables View]
-    A --> D[Watch View]
-    A --> E[Call Stack]
-    A --> F[Breakpoints]
-
-    G[Debug Adapter] --> H[Node.js]
-    G --> I[Python]
-    G --> J[Chrome/Edge]
-    G --> K[C++/Rust]
-
-    style A fill:#007acc,color:#fff
-    style G fill:#ff6b35,color:#fff
-```
+![Debugging in VS Code: the debug view groups toolbar, variables, watch, call stack and breakpoints; debug adapters connect it to Node.js, Python, browsers and native code](/data/workshops/vscode-learning-pathway/diagrams/07-debugging.svg)
 
 ## Quick Start: Debugging Basics
 

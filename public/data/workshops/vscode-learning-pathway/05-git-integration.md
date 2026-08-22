@@ -13,24 +13,7 @@
 
 ### VS Code Git Architecture
 
-```mermaid
-graph TD
-    A[Source Control View] --> B[Changes]
-    A --> C[Staged Changes]
-    A --> D[Commits]
-    A --> E[Branches]
-
-    F[GitLens Extension] --> G[Blame Annotations]
-    F --> H[File History]
-    F --> I[Compare Views]
-    F --> J[Repository Insights]
-
-    K[Git Graph] --> L[Visual History]
-    K --> M[Branch Management]
-
-    style A fill:#007acc,color:#fff
-    style F fill:#ff6b35,color:#fff
-```
+![Git tooling in VS Code: the built-in Source Control view, the GitLens extension and Git Graph for visual history](/data/workshops/vscode-learning-pathway/diagrams/05-git-tooling.svg)
 
 ## Built-in Git Features
 
@@ -381,20 +364,7 @@ Side-by-side view:
 
 ### Feature Branch Workflow
 
-```mermaid
-graph LR
-    A[main] --> B[Create feature branch]
-    B --> C[Make changes]
-    C --> D[Commit often]
-    D --> E[Push to remote]
-    E --> F[Open PR]
-    F --> G[Review]
-    G --> H[Merge to main]
-
-    style A fill:#66bb6a
-    style B fill:#42a5f5
-    style H fill:#66bb6a
-```
+![Feature-branch workflow: branch from main, commit often, push, open a pull request, review, then merge back to main](/data/workshops/vscode-learning-pathway/diagrams/05-branch-flow.svg)
 
 **In VS Code:**
 ```

@@ -24,6 +24,8 @@ Your Question
 Accurate, sourced answer
 ```
 
+![RAG flow: a question passes through retrieval of your documents, prompt augmentation with that context, and LLM generation to produce a grounded answer with citations](/data/workshops/workshop-03-afternoon-rag-system/diagrams/00-rag-loop.svg)
+
 ### The Problem Without RAG
 
 Imagine asking a language model about your organisation's remote working policy. Without RAG:

@@ -11,19 +11,7 @@ By the end of this module, you will:
 
 ## Why Keyboard Shortcuts Matter
 
-```mermaid
-graph LR
-    A[Mouse Workflow] -->|Slow| B[Find Menu]
-    B --> C[Click Option]
-    C --> D[Execute]
-
-    E[Keyboard Workflow] -->|Fast| F[Press Shortcut]
-    F --> D
-
-    style E fill:#66bb6a,color:#fff
-    style F fill:#66bb6a,color:#fff
-    style A fill:#ef5350,color:#fff
-```
+![Mouse workflow takes three steps to execute a command; a keyboard shortcut does it in one](/data/workshops/vscode-learning-pathway/diagrams/02-shortcut-speed.svg)
 
 **Time Savings Example:**
 - Mouse: Find → Click → Execute = **~5 seconds**

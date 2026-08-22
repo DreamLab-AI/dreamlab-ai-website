@@ -21,24 +21,7 @@ Build a production-ready research agent that autonomously researches topics, eva
 
 ## Architecture
 
-```mermaid
-graph TD
-    User[User Query] --> Coordinator[Research Coordinator]
-
-    Coordinator --> PlanStep[Step 1: Plan Research]
-    PlanStep --> SearchStep[Step 2: Search Sources]
-    SearchStep --> ReadStep[Step 3: Read Key Sources]
-    ReadStep --> SynthStep[Step 4: Synthesise Report]
-
-    SearchStep --> Web[Web Search Tool]
-    ReadStep --> Reader[URL Reader Tool]
-    SynthStep --> Formatter[Report Formatter]
-
-    Formatter --> Output[Final Markdown Report]
-
-    style Coordinator fill:#ff9999
-    style Output fill:#99ff99
-```
+![Research agent pipeline: a user query drives the coordinator through plan, search, read and synthesise steps to produce a final markdown report](/data/workshops/workshop-04-morning-ai-agents/diagrams/04-research-agent.svg)
 
 ## Implementation Guide
 

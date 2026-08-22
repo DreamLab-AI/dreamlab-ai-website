@@ -8,15 +8,7 @@
 
 By the end of this hands-on session, you'll have a production-ready development environment with AI coding assistants, modern tooling, and professional workflows.
 
-```mermaid
-graph LR
-    A[Fresh VS Code] --> B[Essential Extensions]
-    B --> C[AI Assistants]
-    C --> D[Settings & Config]
-    D --> E[Pro Environment]
-
-    style E fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-```
+![Setup flow: fresh VS Code gains extensions, AI assistants and settings to become a pro environment](/data/workshops/workshop-01-morning-vscode-setup/diagrams/02-setup-flow.svg)
 
 ---
 
@@ -432,18 +424,7 @@ Setup:
 
 ### Understanding the Hierarchy
 
-```mermaid
-graph TD
-    A[Settings Hierarchy] --> B[Default Settings]
-    B --> C[User Settings]
-    C --> D[Workspace Settings]
-    D --> E[Folder Settings]
-
-    F[Most General] --> B
-    G[Most Specific] --> E
-
-    style E fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-```
+![Settings cascade from general defaults through user and workspace to specific folder settings, which win](/data/workshops/workshop-01-morning-vscode-setup/diagrams/02-settings-hierarchy.svg)
 
 ### When to Use Each
 

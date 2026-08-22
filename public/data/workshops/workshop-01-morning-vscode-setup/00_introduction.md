@@ -45,21 +45,7 @@ Features unavailable in consumer tools:
 
 By the end of this Phase 1 workshop, you'll have:
 
-```mermaid
-graph TD
-    A[Current State] -->|3 Hours| B[Transformed Workspace]
-    
-    A1[Scattered Tools] --> B1[Unified Command Centre]
-    A2[Manual Processes] --> B2[AI-Enhanced Workflows]
-    A3[Limited AI Access] --> B3[Professional AI Control]
-    A4[File Chaos] --> B4[Organised Project Structure]
-    
-    style B fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-    style B1 fill:#e1f5fe
-    style B2 fill:#e1f5fe
-    style B3 fill:#e1f5fe
-    style B4 fill:#e1f5fe
-```
+![Three-hour transformation from scattered tools and manual processes to a unified, AI-enhanced workspace](/data/workshops/workshop-01-morning-vscode-setup/diagrams/00-transformation.svg)
 
 ## What Makes This Different
 

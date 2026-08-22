@@ -49,6 +49,8 @@ Virtual Machine                    Container
 +---------------------------+      +---------------------------+
 ```
 
+![Side-by-side stacks comparing virtual machines, which run a full guest OS per app above a hypervisor, with containers, which share one host kernel through a lightweight runtime](/data/workshops/workshop-07-docker-containers/diagrams/00-vm-vs-container.svg)
+
 ## Why AI Work Especially Needs Containers
 
 ### 1. Dependency Hell Is Real

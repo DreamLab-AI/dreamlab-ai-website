@@ -8,29 +8,7 @@ Software development is experiencing its most significant transformation since t
 
 ### The Evolution Timeline
 
-```mermaid
-timeline
-    title AI Coding Tools Evolution
-    2021 : GitHub Copilot Launch
-         : Original OpenAI Codex API
-         : Tab completion era
-    2022 : ChatGPT for Code
-         : First chat-based coding
-         : Prompt engineering emerges
-    2023 : GPT-4 Code Interpreter
-         : Claude 2 (100K context)
-         : Multi-file editing begins
-         : Original Codex API deprecated
-    2024 : Claude Code CLI launches
-         : Cursor AI goes mainstream
-         : Agentic coding era begins
-    2025 : OpenAI Codex CLI (open-source)
-         : Claude Code desktop & web apps
-         : MCP protocol adopted widely
-    2026 : Claude Fable 5 / Opus 4.8
-         : Mature agent ecosystems
-         : AI pair programming standard practice
-```
+![Timeline of AI coding tools from Copilot and the Codex API in 2021 to mature agent ecosystems and standard AI pair programming in 2026](/data/workshops/workshop-06-codex/diagrams/00-evolution-timeline.svg)
 
 ## The 2026 Landscape: Four Categories of AI Coding Tools
 
@@ -70,34 +48,7 @@ These are standalone tools that operate directly in your terminal, reading your 
 
 ### The Modern AI Coding Ecosystem (2026)
 
-```mermaid
-graph TD
-    A[AI Coding Tools 2026] --> B[Terminal Agents]
-    A --> C[IDE-Integrated]
-    A --> D[Chat-Based]
-    A --> E[API/SDK]
-
-    B --> F[Claude Code]
-    B --> G[OpenAI Codex CLI]
-    B --> H[Aider]
-
-    C --> I[Cursor AI]
-    C --> J[GitHub Copilot]
-    C --> K[Windsurf]
-    C --> L[Continue.dev]
-
-    D --> M[ChatGPT + Canvas]
-    D --> N[Claude.ai + Artifacts]
-
-    E --> O[Anthropic SDK]
-    E --> P[OpenAI API]
-
-    style A fill:#ff6b6b
-    style B fill:#45b7d1
-    style C fill:#96ceb4
-    style D fill:#4ecdc4
-    style E fill:#f39c12
-```
+![The 2026 AI coding tool landscape: terminal agents, IDE-integrated tools, chat-based tools, and APIs/SDKs](/data/workshops/workshop-06-codex/diagrams/00-tool-landscape.svg)
 
 ### From Autocomplete to Agentic Coding
 
@@ -152,27 +103,7 @@ The transformation from simple autocomplete to autonomous agents represents a fu
 
 ### Architecture Patterns
 
-```mermaid
-graph LR
-    A[Developer Intent] --> B{AI Coding Tool}
-
-    B --> C[Autocomplete]
-    B --> D[Chat Interface]
-    B --> E[Agentic System]
-
-    C --> F[Single-line suggestions]
-    D --> G[Code blocks on request]
-    E --> H[Autonomous multi-step execution]
-
-    H --> I[Read codebase]
-    H --> J[Plan changes]
-    H --> K[Execute edits]
-    H --> L[Test & verify]
-    H --> M[Create PR]
-
-    style E fill:#ff6b6b
-    style H fill:#ffa07a
-```
+![Three interaction models: autocomplete for single-line suggestions, chat for code blocks on request, and agentic systems that read, plan, edit, test and raise a PR](/data/workshops/workshop-06-codex/diagrams/00-interaction-models.svg)
 
 ## Who Should Use This Guide?
 
@@ -196,30 +127,7 @@ graph LR
 
 ### What You Will Master
 
-```mermaid
-mindmap
-  root((AI Agent Mastery))
-    Fundamentals
-      Tool landscape
-      Claude Code & Codex CLI
-      IDE tools
-      Authentication
-    Practical Skills
-      Effective Prompting
-      CLAUDE.md / AGENTS.MD
-      Task Management
-      Multi-file Editing
-    Advanced Techniques
-      MCP Servers
-      Hooks & Subagents
-      CI/CD Integration
-      Custom Agents
-    Strategic Knowledge
-      Tool Selection
-      Cost Optimisation
-      Security & Privacy
-      Team Adoption
-```
+![The four pillars of AI agent mastery: fundamentals, practical skills, advanced techniques and strategic knowledge](/data/workshops/workshop-06-codex/diagrams/00-mastery-map.svg)
 
 ### Learning Outcomes
 
@@ -262,20 +170,7 @@ Think of AI coding agents as highly capable but contextually limited team member
 
 ### Productivity Gains (Industry Data, 2025-2026)
 
-```mermaid
-graph TD
-    A[Developer Productivity with AI Agents] --> B[Code Writing: 55-70% faster]
-    A --> C[Bug Fixing: 60-75% faster]
-    A --> D[Test Writing: 70-85% faster]
-    A --> E[Documentation: 80-90% faster]
-
-    F[Code Quality Metrics] --> G[Test Coverage: +25-35%]
-    F --> H[Bug Density: -15-25%]
-    F --> I[Code Review Time: -40-50%]
-
-    style A fill:#4ecdc4
-    style F fill:#ff6b6b
-```
+![Reported productivity gains: coding tasks 55 to 90 percent faster, with higher test coverage, lower bug density and faster reviews](/data/workshops/workshop-06-codex/diagrams/00-productivity-gains.svg)
 
 ## What This Guide Covers
 

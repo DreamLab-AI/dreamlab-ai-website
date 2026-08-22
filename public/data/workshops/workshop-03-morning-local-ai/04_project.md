@@ -20,30 +20,7 @@ Build a fully-featured AI assistant that runs entirely on your local machine. Th
 
 ## Architecture
 
-```mermaid
-graph TD
-    A[User Interface] --> B[FastAPI Server]
-    B --> C[Router Module]
-    C --> D[Chat Handler]
-    C --> E[Code Handler]
-    C --> F[Document Handler]
-    C --> G[Task Handler]
-
-    D --> H[Ollama: llama3.3:8b]
-    E --> I[Ollama: qwen2.5-coder:7b]
-    F --> H
-    G --> J[Ollama: phi3:3.8b]
-
-    B --> K[Session Manager]
-    K --> L[(SQLite DB)]
-
-    style A fill:#e1f5ff
-    style B fill:#fff4e1
-    style C fill:#e8f5e9
-    style H fill:#ffe0e0
-    style I fill:#ffe0e0
-    style J fill:#ffe0e0
-```
+![Assistant architecture: a user interface calls a FastAPI server with a SQLite session manager; a router directs requests to three local Ollama models — llama3.3 for chat and documents, qwen2.5-coder for code, phi3 for quick tasks](/data/workshops/workshop-03-morning-local-ai/diagrams/04-assistant-architecture.svg)
 
 ## Part 1: Project Setup
 

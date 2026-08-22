@@ -10,29 +10,7 @@ Before diving into buttons and menus, let's establish the conceptual framework t
 
 Think of VS Code not as "coding software" but as:
 
-```mermaid
-graph TD
-    VSCode[VS Code: Universal Document Platform]
-    
-    VSCode --> A[Text Editor<br/>on Steroids]
-    VSCode --> B[AI Integration<br/>Hub]
-    VSCode --> C[Automation<br/>Engine]
-    VSCode --> D[Collaboration<br/>Centre]
-    
-    A --> A1["Write anything: code, docs, notes"]
-    A --> A2["Smart editing with AI assistance"]
-    
-    B --> B1["Connect to any AI model"]
-    B --> B2["Context-aware suggestions"]
-    
-    C --> C1["Automate repetitive tasks"]
-    C --> C2["Build custom workflows"]
-    
-    D --> D1["Version control built-in"]
-    D --> D2["Real-time collaboration"]
-    
-    style VSCode fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-```
+![VS Code as a universal document platform: text editor, AI integration hub, automation engine and collaboration centre](/data/workshops/workshop-01-morning-vscode-setup/diagrams/01-vscode-platform.svg)
 
 ### The Power of Extensions
 
@@ -55,20 +33,7 @@ Imagine having a perfect workspace that:
 
 That's a Dev Container—your workspace in a box.
 
-```mermaid
-graph LR
-    A[Your Messy Computer] -->|Dev Container| B[Perfect Workspace]
-    
-    A1[Random Software] -.->|Isolated| B
-    A2[Conflicting Versions] -.->|Isolated| B
-    A3[Missing Tools] -.->|Isolated| B
-    
-    B --> C[Consistent Environment]
-    B --> D[All Tools Included]
-    B --> E[Share with Anyone]
-    
-    style B fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-```
+![A dev container isolates your messy computer behind a perfect, consistent, shareable workspace](/data/workshops/workshop-01-morning-vscode-setup/diagrams/01-dev-container.svg)
 
 ### Why Containers Matter for Non-Developers
 
@@ -81,37 +46,11 @@ graph LR
 
 ### Traditional AI Usage
 
-```mermaid
-sequenceDiagram
-    participant You
-    participant Browser
-    participant AI
-    participant YourWork
-    
-    You->>Browser: Navigate to ChatGPT
-    You->>Browser: Type question
-    Browser->>AI: Send prompt
-    AI->>Browser: Return response
-    You->>Browser: Copy response
-    You->>YourWork: Paste & edit
-    Note over You,YourWork: Context lost, manual process
-```
+![Traditional browser AI workflow: type, send, copy and paste by hand — context lost](/data/workshops/workshop-01-morning-vscode-setup/diagrams/01-browser-workflow.svg)
 
 ### VS Code AI Integration
 
-```mermaid
-sequenceDiagram
-    participant You
-    participant VSCode
-    participant AI
-    participant YourWork
-    
-    You->>VSCode: Type in document
-    VSCode->>AI: Send context + prompt
-    AI->>VSCode: Return response
-    VSCode->>YourWork: Direct integration
-    Note over You,YourWork: Context preserved, automated
-```
+![VS Code AI workflow: context plus prompt sent automatically, response integrated directly — context preserved](/data/workshops/workshop-01-morning-vscode-setup/diagrams/01-integrated-workflow.svg)
 
 ## 1.4 Key Concepts to Master
 
@@ -178,24 +117,7 @@ my-project/
 
 AI models have a "context window"—how much they can "see" at once:
 
-```mermaid
-graph TD
-    A[Your Project] --> B{AI Context Window}
-    
-    B --> C[Current File]
-    B --> D[Related Files]
-    B --> E[Project Structure]
-    B --> F[Recent Changes]
-    
-    G[AI Understanding] --> H[Better Suggestions]
-    
-    C --> G
-    D --> G
-    E --> G
-    F --> G
-    
-    style B fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-```
+![Current file, related files, project structure and recent changes feed the AI context window, producing better suggestions](/data/workshops/workshop-01-morning-vscode-setup/diagrams/01-context-window.svg)
 
 ### Managing Context Effectively
 
@@ -216,16 +138,7 @@ Unlike web-based AI tools:
 
 ### Cost Transparency
 
-```mermaid
-graph LR
-    A[Traditional] --> B[Fixed Subscription]
-    A --> C[£20-40/month]
-    
-    D[VS Code + APIs] --> E[Pay Per Use]
-    D --> F[£2-5/month typical]
-    
-    style F fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-```
+![Fixed £20–40 monthly subscription versus pay-per-use APIs at £2–5 a month typical](/data/workshops/workshop-01-morning-vscode-setup/diagrams/01-cost-model.svg)
 
 ## 1.8 The Mindset Shift
 
@@ -243,20 +156,7 @@ graph LR
 
 ### The Learning Curve Reality
 
-```mermaid
-graph TD
-    A[Day 1: Confusion] -->|Practice| B[Day 2: Recognition]
-    B -->|Practice| C[Day 3: Comfort]
-    C -->|Practice| D[Week 2: Fluency]
-    D -->|Practice| E[Month 1: Mastery]
-    
-    F[Effort] -.-> G[10x Productivity]
-    
-    A --> F
-    E --> G
-    
-    style G fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-```
+![Learning timeline from day-one confusion to month-one mastery, compounding into tenfold productivity](/data/workshops/workshop-01-morning-vscode-setup/diagrams/01-learning-curve.svg)
 
 ## Key Takeaways
 

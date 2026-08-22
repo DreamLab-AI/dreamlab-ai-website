@@ -19,18 +19,7 @@ Each profile contains:
 - UI state
 - Snippets
 
-```mermaid
-graph TD
-    A[Default Profile] --> B[All-purpose]
-    C[Web Dev Profile] --> D[React + ESLint + Prettier]
-    E[Python Profile] --> F[Pylance + Jupyter + Black]
-    G[Writing Profile] --> H[Markdown + Grammarly + Minimal UI]
-
-    style A fill:#007acc,color:#fff
-    style C fill:#66bb6a
-    style E fill:#ffa726
-    style G fill:#42a5f5
-```
+![Profiles for different work: an all-purpose default plus tailored web development, Python and writing profiles](/data/workshops/vscode-learning-pathway/diagrams/10-profiles.svg)
 
 ## Creating Profiles
 

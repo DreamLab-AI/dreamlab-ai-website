@@ -36,24 +36,9 @@ Below are the fundamental Git concepts explained clearly:
 | **Remote**     | A cloud-hosted copy of your repository, typically on platforms like [GitHub](https://github.com/), used for sharing and backup. | Your project in the cloud |
 | **Staging Area** | A preparatory space where you select which changes to include in your next commit. | A packing area before shipping |
 
-The following Mermaid diagram illustrates the typical Git workflow clearly:
+The following diagram illustrates the typical Git workflow:
 
-```mermaid
-graph LR
-    A[Working Directory] -- git add --> B[Staging Area]
-    B -- git commit --> C[Local Repository]
-    C -- git push --> D[Remote Repository GitHub]
-    D -- git pull/clone --> A
-    C -- git branch --> E[Feature Branch]
-    E -- git checkout --> C
-    E -- git merge --> C
-
-    style A fill:#f9f9f9,stroke:#333
-    style B fill:#fff4e6,stroke:#fb8c00
-    style C fill:#e8f5e9,stroke:#43a047
-    style D fill:#e3f2fd,stroke:#1e88e5
-    style E fill:#f3e5f5,stroke:#8e24aa
-```
+![The Git workflow: working directory, staging area, local repository and GitHub remote, with branch and merge](/data/workshops/workshop-00-infra/diagrams/01-git-workflow.svg)
 
 ## 1.3 Git vs. GitHub: Clarifying the Difference
 
@@ -145,19 +130,7 @@ GitHub has evolved far beyond simple code hosting:
 
 Think of Git as a time machine for your project. Every commit is a snapshot you can return to:
 
-```mermaid
-gitGraph
-    commit id: "Initial setup"
-    commit id: "Add basic features"
-    branch experiment
-    checkout experiment
-    commit id: "Try new approach"
-    commit id: "Refine experimental feature"
-    checkout main
-    commit id: "Fix bug in main"
-    merge experiment
-    commit id: "Release v1.0"
-```
+![Commit timeline showing an experiment branch splitting from main and merging back before the v1.0 release](/data/workshops/workshop-00-infra/diagrams/01-branch-timeline.svg)
 
 This becomes incredibly powerful when combined with AI assistants:
 - Let AI refactor your code on a branch

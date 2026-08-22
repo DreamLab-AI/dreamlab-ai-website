@@ -255,16 +255,7 @@ Savings: £___ (___%)
 - Result: 70%+ cost savings
 
 ### The Context Ladder
-```mermaid
-graph TD
-    A[Task Size] --> B{Choose Model}
-    B -->|< 2 pages| C[Any Model]
-    B -->|2-50 pages| D[GPT-4o/Claude 4]
-    B -->|50-500 pages| E[Gemini 2.0 Pro]
-    B -->|500-1500 pages| F[Gemini 2.0 Pro Only]
-    
-    style F fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-```
+![Model choice by document size: any model under 2 pages, GPT-4o or Claude to 50 pages, Gemini 2.5 Pro to 500 pages, and Gemini 2.5 Pro only for 500 to 1,500 pages](/data/workshops/workshop-02-morning-ai-api-access/diagrams/03-model-by-size.svg)
 
 ## Your New Superpower
 

@@ -15,18 +15,7 @@ When you send data to cloud-based AI services, you're trusting third parties wit
 
 Local AI keeps your data on your machines. No network transmission, no third-party storage, no data collection.
 
-```mermaid
-graph LR
-    A[Your Data] -->|Cloud AI| B[External Servers]
-    B --> C[Third-Party Storage]
-    B --> D[Data Collection]
-    B --> E[Compliance Risks]
-
-    A -->|Local AI| F[Your Hardware]
-    F --> G[Complete Control]
-    F --> H[Zero Data Leakage]
-    F --> I[Offline Operation]
-```
+![Data flow comparison: cloud AI sends your data to external servers with storage, collection and compliance risks; local AI keeps it on your hardware with complete control, zero leakage and offline operation](/data/workshops/workshop-03-morning-local-ai/diagrams/00-cloud-vs-local.svg)
 
 ### Cost Economics
 
@@ -227,21 +216,7 @@ By the end of this morning session, you will:
 
 ## Workshop Structure
 
-```mermaid
-graph TD
-    A[Introduction] --> B[Core Concepts]
-    B --> C[Hands-On Setup]
-    C --> D[Practical Exercises]
-    D --> E[Build Project]
-    E --> F[Assessment]
-
-    style A fill:#e1f5ff
-    style B fill:#fff4e1
-    style C fill:#e8f5e9
-    style D fill:#f3e5f5
-    style E fill:#ffe0e0
-    style F fill:#fff9c4
-```
+![Workshop flow: introduction, core concepts, hands-on setup, exercises, build project, assessment](/data/workshops/workshop-03-morning-local-ai/diagrams/00-workshop-flow.svg)
 
 **Morning Schedule (3 hours):**
 - 9:00-9:30: Introduction and concepts

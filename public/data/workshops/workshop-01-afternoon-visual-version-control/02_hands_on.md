@@ -8,15 +8,7 @@
 
 Transform from manual file saving chaos to professional version control workflows using modern visual tools.
 
-```mermaid
-graph LR
-    A[File Chaos] --> B[Git Basics]
-    B --> C[GitLens Mastery]
-    C --> D[GitHub Flow]
-    D --> E[Pro Workflows]
-
-    style E fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-```
+![Git mastery journey: from file chaos through Git basics, GitLens and GitHub Flow to professional workflows](/data/workshops/workshop-01-afternoon-visual-version-control/diagrams/02-git-journey.svg)
 
 ---
 
@@ -28,26 +20,7 @@ GitLens transforms Git from command-line intimidation to visual clarity.
 
 #### Key Features Overview
 
-```mermaid
-mindmap
-  root((GitLens))
-    Inline Blame
-      See who changed what
-      When it changed
-      Why it changed
-    File History
-      Visual timeline
-      Compare versions
-      Restore old code
-    Commit Graph
-      Branch visualization
-      Merge tracking
-      Release timeline
-    Code Lens
-      Recent changes
-      Authors
-      Quick navigation
-```
+![GitLens features: inline blame, file history, the visual commit graph and code lens annotations](/data/workshops/workshop-01-afternoon-visual-version-control/diagrams/02-gitlens-features.svg)
 
 ### 2.1.1 Inline Blame - Know Who Changed What
 
@@ -184,21 +157,7 @@ function calculateTotal(items) {  // John Doe, 3 days ago - Add tax calculation
 
 ### 2.2.1 The Three-Stage Workflow
 
-```mermaid
-flowchart LR
-    A[Working<br/>Directory] -->|Stage| B[Staging<br/>Area]
-    B -->|Commit| C[Repository]
-    C -->|Push| D[GitHub]
-
-    A1[Modified Files] --> A
-    B1[Files to Commit] --> B
-    C1[Saved Snapshots] --> C
-    D1[Cloud Backup] --> D
-
-    style B fill:#fff3cd
-    style C fill:#d4edda
-    style D fill:#4fc3f7
-```
+![Three-stage Git workflow: working directory, staging area, repository, then push to GitHub for cloud backup](/data/workshops/workshop-01-afternoon-visual-version-control/diagrams/02-three-stage-workflow.svg)
 
 **Visual Indicators:**
 - **M** (Modified): Changed file
@@ -313,20 +272,7 @@ npm install -g cz-conventional-changelog
 
 ### Why GitHub Desktop?
 
-```mermaid
-graph TD
-    A[GitHub Desktop] --> B[Visual Diffs]
-    A --> C[Drag & Drop]
-    A --> D[Undo Commits]
-    A --> E[Cherry Pick]
-    A --> F[Stash Manager]
-
-    B --> B1[Side-by-side changes]
-    C --> C1[Reorder commits]
-    D --> D1[Safe rollback]
-    E --> E1[Pick specific commits]
-    F --> F1[Save work-in-progress]
-```
+![GitHub Desktop value: see changes with visual diffs, fix mistakes with undo, cherry-pick and stash, and collaborate through pull requests and visual conflict resolution](/data/workshops/workshop-01-afternoon-visual-version-control/diagrams/02-github-desktop.svg)
 
 ### Key Features
 
@@ -412,19 +358,7 @@ graph TD
 
 ### GitHub Flow (Recommended for Teams)
 
-```mermaid
-flowchart TD
-    A[main branch] -->|1. Create branch| B[feature-branch]
-    B -->|2. Make commits| C[Push to GitHub]
-    C -->|3. Open Pull Request| D[Code Review]
-    D -->|4. Tests pass| E[Merge to main]
-    E -->|5. Deploy| F[Production]
-    E --> A
-
-    style A fill:#28a745
-    style D fill:#ffc107
-    style F fill:#4fc3f7
-```
+![GitHub Flow: branch from an always-deployable main, commit and push, open a pull request for review and tests, merge when they pass, deploy, and the merge lands back in main](/data/workshops/workshop-01-afternoon-visual-version-control/diagrams/02-github-flow.svg)
 
 **Rules:**
 1. `main` is always deployable

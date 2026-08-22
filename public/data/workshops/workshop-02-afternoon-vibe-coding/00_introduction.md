@@ -10,16 +10,7 @@ Welcome to the most transformative session of your journey! In this phase, you'l
 
 Vibe coding is the art of creating software, websites, and digital solutions through natural conversation with AI. Instead of learning syntax and programming languages, you simply:
 
-```mermaid
-graph TD
-    A[Describe Your Vision] --> B[AI Understands Intent]
-    B --> C[AI Generates Code]
-    C --> D[You See Results]
-    D --> E[Refine Through Chat]
-    E --> B
-    
-    style D fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-```
+![The vibe coding loop: describe your vision, the AI understands intent and generates code, you see results, then refine through chat](/data/workshops/workshop-02-afternoon-vibe-coding/diagrams/00-vibe-loop.svg)
 
 ### The Paradigm Shift
 
@@ -73,43 +64,13 @@ By the end of this session, you'll have built:
 
 ### All Through Conversation!
 
-```mermaid
-mindmap
-  root((Vibe Coding))
-    What You Say
-      "Make it blue"
-      "Add a contact form"
-      "Include animations"
-      "Make it mobile-friendly"
-    What AI Creates
-      Complete HTML
-      Styled CSS
-      Interactive JavaScript
-      Responsive Design
-    Your Control
-      Instant preview
-      Easy refinements
-      No coding required
-      Professional results
-```
+![Building through conversation: what you say in plain language, what the AI creates in code, and the control you keep](/data/workshops/workshop-02-afternoon-vibe-coding/diagrams/00-conversation-pillars.svg)
 
 ## The Science Behind the Magic
 
 ### How AI Understands Your Intent
 
-```mermaid
-flowchart LR
-    A[Your Description] --> B[Natural Language Processing]
-    B --> C[Intent Recognition]
-    C --> D[Code Generation]
-    D --> E[Optimisation]
-    E --> F[Working Code]
-    
-    G["I want a blue button that sparkles"] --> B
-    F --> H[✨ Actual Sparkling Button]
-    
-    style F fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-```
+![From description to working code: your description passes through intent recognition and code generation to become optimised working code](/data/workshops/workshop-02-afternoon-vibe-coding/diagrams/00-intent-pipeline.svg)
 
 ### Why It Works So Well
 
@@ -131,23 +92,7 @@ flowchart LR
 
 ## Learning Journey
 
-```mermaid
-graph LR
-    A[Concepts<br/>30 min] --> B[First Website<br/>45 min]
-    B --> C[Advanced Features<br/>45 min]
-    C --> D[Exercises<br/>30 min]
-    D --> E[Project<br/>20 min]
-    E --> F[Assessment<br/>10 min]
-    
-    A -.-> A1[How vibe coding works]
-    B -.-> B1[Build & deploy]
-    C -.-> C1[Interactions & data]
-    D -.-> D1[Practice techniques]
-    E -.-> E1[Your creation]
-    F -.-> F1[Showcase results]
-    
-    style F fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-```
+![Session timeline: concepts (30 min), first website (45 min), advanced features (45 min), exercises (30 min), project (20 min) and showcase (10 min)](/data/workshops/workshop-02-afternoon-vibe-coding/diagrams/00-learning-journey.svg)
 
 ## What Makes Vibe Coding Different
 
@@ -167,22 +112,7 @@ graph LR
 
 ### The Creative Freedom
 
-```mermaid
-graph TD
-    subgraph "Traditional No-Code"
-        T1[Choose Template] --> T2[Modify Slightly]
-        T2 --> T3[Hit Limitations]
-        T3 --> T4[Compromise Vision]
-    end
-    
-    subgraph "Vibe Coding"
-        V1[Describe Vision] --> V2[See It Created]
-        V2 --> V3[Refine Perfectly]
-        V3 --> V4[Achieve Vision]
-    end
-    
-    style V4 fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-```
+![Traditional no-code moves from template to compromised vision; vibe coding moves from described vision to achieved vision](/data/workshops/workshop-02-afternoon-vibe-coding/diagrams/00-nocode-vs-vibe.svg)
 
 ## Prerequisites Check
 
@@ -225,21 +155,7 @@ The future isn't about learning to code—it's about learning to communicate you
 
 ## The Magic Moment Awaits
 
-```mermaid
-graph TD
-    A[Right Now] --> B[In 3 Hours]
-    
-    A1["I can't build websites"] --> B1["I just built three!"]
-    A2["Coding is too hard"] --> B2["I didn't code at all"]
-    A3["This takes experts"] --> B3["I am the expert now"]
-    A4["It's too expensive"] --> B4["It cost me nothing"]
-    
-    style B fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-    style B1 fill:#4fc3f7
-    style B2 fill:#4fc3f7  
-    style B3 fill:#4fc3f7
-    style B4 fill:#4fc3f7
-```
+![The transformation from right now to three hours from now: doubts about building websites become confidence in having built three without coding](/data/workshops/workshop-02-afternoon-vibe-coding/diagrams/00-transformation.svg)
 
 ## Ready to Vibe?
 

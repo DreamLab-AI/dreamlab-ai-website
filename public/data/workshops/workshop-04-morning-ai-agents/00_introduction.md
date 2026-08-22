@@ -6,24 +6,7 @@ We are in the midst of a fundamental shift in how AI systems operate. Rather tha
 
 ### What Makes 2025-2026 Different?
 
-```mermaid
-timeline
-    title Evolution of AI Systems
-    2020-2022 : Static Models
-              : GPT-3, BERT
-              : Fixed responses
-    2023 : Chat Interfaces
-         : ChatGPT, Claude
-         : Conversational AI
-    2024 : Early Agents
-         : Tool use, Planning
-         : Multi-step reasoning
-    2025-2026 : Production Agents
-              : MCP protocol standard
-              : Claude Code & Codex CLI
-              : Subagent orchestration
-              : Agent SDKs & workflows
-```
+![Timeline of AI systems: static models 2020-2022, chat interfaces 2023, early agents 2024, production agents with MCP and subagent orchestration 2025-2026](/data/workshops/workshop-04-morning-ai-agents/diagrams/00-evolution-timeline.svg)
 
 ### The Agent Revolution
 
@@ -53,67 +36,13 @@ timeline
 
 ### Key Agent Capabilities
 
-```mermaid
-mindmap
-  root((AI Agent))
-    Reasoning
-      Chain-of-Thought
-      Planning
-      Self-reflection
-    Tool Use
-      MCP servers
-      Function calling
-      Code execution
-    Memory
-      Short-term context
-      CLAUDE.md project config
-      Vector store retrieval
-    Autonomy
-      Subagent delegation
-      Error recovery
-      Goal pursuit
-```
+![Four capabilities of an AI agent: reasoning, tool use, memory and autonomy](/data/workshops/workshop-04-morning-ai-agents/diagrams/00-agent-capabilities.svg)
 
 ## The Agent Architecture Stack
 
 Modern AI agents combine multiple components:
 
-```mermaid
-graph TB
-    subgraph "Agent Core"
-        LLM[Large Language Model<br/>Fable 5 / Opus 4.8 / Sonnet 4.6]
-        LLM --> |reasoning| Planner[Planning Module]
-        LLM --> |execution| Executor[Execution Engine]
-    end
-
-    subgraph "Memory & Config"
-        Config[Project Config<br/>CLAUDE.md]
-        STM[Short-term Memory]
-        LTM[Long-term Memory]
-    end
-
-    subgraph "Tool Layer via MCP"
-        Search[Web Search]
-        Code[Code Execution]
-        APIs[External APIs]
-        Files[File System]
-        Git[Git & GitHub]
-    end
-
-    Planner --> STM
-    Executor --> Tools[MCP Tool Router]
-    Tools --> Search
-    Tools --> Code
-    Tools --> APIs
-    Tools --> Files
-    Tools --> Git
-
-    Config --> Planner
-    STM --> LTM
-
-    style LLM fill:#f9f,stroke:#333,stroke-width:4px
-    style Tools fill:#bbf,stroke:#333,stroke-width:2px
-```
+![Agent architecture: project config and memory feed the LLM core, which acts through an MCP tool router connected to search, code execution, APIs, files and git](/data/workshops/workshop-04-morning-ai-agents/diagrams/00-agent-architecture.svg)
 
 ## Why Agents Matter Now
 
@@ -154,24 +83,7 @@ Organisations are deploying agents at scale:
 
 The foundational pattern that powers modern agents:
 
-```mermaid
-sequenceDiagram
-    participant User
-    participant Agent
-    participant MCP Tools
-
-    User->>Agent: Complex task/goal
-
-    loop Until goal achieved
-        Agent->>Agent: Thought: Reason about next step
-        Agent->>Agent: Action: Decide which tool to use
-        Agent->>MCP Tools: Execute action via MCP
-        MCP Tools-->>Agent: Observation: Result
-        Agent->>Agent: Thought: Interpret result
-    end
-
-    Agent-->>User: Final answer
-```
+![The ReAct loop: the agent repeatedly thinks, acts via MCP tools and interprets observations until the goal is met, then returns a final answer](/data/workshops/workshop-04-morning-ai-agents/diagrams/00-react-loop.svg)
 
 **Example: "Find the latest AI research on agents and summarise"**
 
@@ -229,21 +141,7 @@ This morning focuses on **individual agents**. This afternoon, we will explore:
 - Safety, cost control, and guardrails
 - Production deployment patterns
 
-```mermaid
-graph LR
-    A[Morning:<br/>Single Agents] --> B[Afternoon:<br/>Orchestration]
-
-    A --> A1[Tool Use & MCP]
-    A --> A2[Memory & Config]
-    A --> A3[Agent Patterns]
-
-    B --> B1[Subagent Delegation]
-    B --> B2[Workflow Design]
-    B --> B3[Safety & Cost Control]
-
-    style A fill:#e1f5ff
-    style B fill:#ffe1e1
-```
+![Structure of the day: morning on single agents flows into the afternoon on orchestration](/data/workshops/workshop-04-morning-ai-agents/diagrams/00-day-structure.svg)
 
 ## Navigation
 - Next: [Core Concepts](01_concepts.md)

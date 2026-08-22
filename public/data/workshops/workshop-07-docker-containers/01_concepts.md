@@ -63,6 +63,8 @@ Image: python:3.11
 
 Containers are ephemeral by default. When you stop and remove a container, any changes made inside it are lost. This is a feature, not a bug -- it means you always start from a clean, known state. If you need to keep data, you use volumes (explained below).
 
+![Flow from a registry such as Docker Hub, via docker pull, to a read-only layered image, via docker run, to three independent running containers](/data/workshops/workshop-07-docker-containers/diagrams/01-image-container-registry.svg)
+
 ### Container Lifecycle
 
 ```

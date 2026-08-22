@@ -14,25 +14,7 @@ By the end of this module, you will:
 
 ### The Three-Tier Settings System
 
-```mermaid
-graph TD
-    A[Settings Hierarchy] --> B[User Settings]
-    A --> C[Workspace Settings]
-    A --> D[Folder Settings]
-
-    B --> E[Global, all projects]
-    C --> F[Specific workspace only]
-    D --> G[Specific folder in multi-root]
-
-    E --> H[~/.config/Code/User/settings.json]
-    F --> I[.vscode/settings.json]
-    G --> J[.vscode/settings.json]
-
-    style A fill:#007acc,color:#fff
-    style B fill:#66bb6a
-    style C fill:#ffa726
-    style D fill:#ef5350,color:#fff
-```
+![Settings hierarchy: user settings apply globally, workspace settings override them per project, folder settings win in multi-root workspaces](/data/workshops/vscode-learning-pathway/diagrams/04-settings-hierarchy.svg)
 
 **Priority Order** (last wins):
 1. Default Settings (VS Code built-in)

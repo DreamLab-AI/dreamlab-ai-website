@@ -8,16 +8,7 @@
 
 Transform from AI consumer to AI commander. We'll set up multiple providers, configure Claude Code and your editor, and start saving money immediately.
 
-```mermaid
-graph LR
-    A[Start] --> B[OpenAI Setup]
-    B --> C[Anthropic Claude]
-    C --> D[Google Gemini]
-    D --> E[Free Models]
-    E --> F[Multi-Model Master!]
-
-    style F fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-```
+![Setup path through OpenAI, Anthropic, Google Gemini and free models, finishing as a multi-model user](/data/workshops/workshop-02-morning-ai-api-access/diagrams/02-setup-path.svg)
 
 ## Preparation Checklist
 
@@ -543,20 +534,7 @@ GROQ_API_KEY=gsk_...
 
 ### Before vs After
 
-```mermaid
-graph LR
-    subgraph Before
-        A1[1 model] --> A2[£20/month] --> A3[Web interface]
-    end
-
-    subgraph After
-        B1[8+ models] --> B2[£3-5/month] --> B3[IDE integration]
-    end
-
-    A3 -.Upgrade.-> B1
-
-    style B3 fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-```
+![Before: one model at 20 pounds a month via a web interface. After: eight or more models for 3 to 5 pounds a month, integrated in your IDE](/data/workshops/workshop-02-morning-ai-api-access/diagrams/02-before-after.svg)
 
 ## Next Steps
 

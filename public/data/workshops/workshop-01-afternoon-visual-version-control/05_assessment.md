@@ -94,21 +94,7 @@ D) Mind map
 <details>
 <summary><strong>Reference Solution</strong></summary>
 
-```mermaid
-flowchart TD
-    A([Customer Places Order]) --> B[Check Stock]
-    B --> C{In Stock?}
-    C -->|Yes| D[Confirm Order]
-    D --> E[Send to Warehouse]
-    E --> F[Pack Order]
-    F --> G[Dispatch]
-    G --> H[Send Tracking Notification]
-    H --> I([Order Complete])
-    C -->|No| J[Notify Customer]
-    J --> K[Offer Alternatives]
-
-    style I fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-```
+![Order fulfilment flowchart: an order is placed and stock checked; in-stock orders are confirmed, packed, dispatched with tracking and completed, while out-of-stock orders trigger a customer notification with alternatives](/data/workshops/workshop-01-afternoon-visual-version-control/diagrams/05-order-flow.svg)
 
 </details>
 
@@ -164,28 +150,7 @@ flowchart TD
 <details>
 <summary><strong>Hint: Mind Map Structure</strong></summary>
 
-```mermaid
-mindmap
-  root((Today's Workshop))
-    Mermaid Diagrams
-      Flowcharts
-      Gantt Charts
-      Sequence Diagrams
-      Mind Maps
-    Git Version Control
-      Commits
-      Branches
-      Merging
-      History
-    Visual Tools
-      GitLens
-      Source Control Panel
-      Commit Graph
-    GitHub
-      Cloud Backup
-      Collaboration
-      Portfolio
-```
+![Workshop topics mind map with four groups: Mermaid diagram types, Git version control concepts, visual tools in VS Code, and GitHub for backup, collaboration and portfolio](/data/workshops/workshop-01-afternoon-visual-version-control/diagrams/05-workshop-mindmap.svg)
 
 </details>
 

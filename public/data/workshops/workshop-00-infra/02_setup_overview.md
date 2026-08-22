@@ -38,33 +38,7 @@ The setup process is divided into four sub-chapters, each covering a distinct pi
 
 The following diagram summarises the setup path from start to finish:
 
-```mermaid
-graph TD
-    A[Start Setup] --> B[2a: Create GitHub Account]
-    B --> C[2b: Install Git]
-    C --> D[2b: Install VS Code]
-    D --> E[2b: Add Key Extensions]
-    E --> F[2c: Set Up AI Access]
-    F --> G[2d: Configure Claude Code]
-    G --> H[2d: Optional Additional Tools]
-    H --> I[Setup Complete — Ready to Code!]
-
-    subgraph Cloud Accounts
-        B
-        F
-    end
-
-    subgraph Local Software
-        C
-        D
-        E
-        G
-        H
-    end
-
-    style A fill:#4a90e2,stroke:#2e5c8a,color:#fff
-    style I fill:#50c878,stroke:#2d7a4a,color:#fff
-```
+![Setup path: GitHub account, Git, VS Code and extensions, AI access, Claude Code, then ready to code](/data/workshops/workshop-00-infra/diagrams/02-setup-path.svg)
 
 ## Pre-Flight Checklist
 

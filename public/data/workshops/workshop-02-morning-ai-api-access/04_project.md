@@ -8,17 +8,7 @@ You've set up your API connections, tested each model, and compared their streng
 
 The key insight from this morning: no single model is best at everything. Professional AI users route tasks to the model that excels at each stage.
 
-```mermaid
-graph LR
-    A[Research<br/>Gemini 2.5 Pro] --> B[Structure<br/>GPT-4o]
-    B --> C[Draft<br/>Claude Sonnet 4.6]
-    C --> D[Edit<br/>Haiku 4.5 or<br/>GPT-4o-mini]
-
-    style A fill:#4285f4,color:#fff
-    style B fill:#10a37f,color:#fff
-    style C fill:#cc785c,color:#fff
-    style D fill:#4fc3f7
-```
+![Multi-model writing pipeline: research with Gemini 2.5 Pro, structure with GPT-4o, draft with Claude Sonnet, edit with a cheap fast model](/data/workshops/workshop-02-morning-ai-api-access/diagrams/04-pipeline.svg)
 
 ## Choose Your Project Path
 

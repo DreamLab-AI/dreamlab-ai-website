@@ -8,23 +8,7 @@
 
 The AI agent ecosystem has matured from experimental frameworks into production-grade tools. Here is your decision tree:
 
-```mermaid
-graph TD
-    Start[Choose Your Approach] --> Q1{Building a<br/>coding agent?}
-    Q1 -->|Yes| Q1a{Custom or<br/>off-the-shelf?}
-    Q1a -->|Off-the-shelf| ClaudeCode[Claude Code /<br/>Codex CLI / Aider]
-    Q1a -->|Custom| AgentSDK[Anthropic Agent SDK]
-    Q1 -->|No| Q2{Need tool<br/>integration?}
-    Q2 -->|Yes| MCP[MCP Servers +<br/>Claude API]
-    Q2 -->|No| Q3{Multi-agent<br/>orchestration?}
-    Q3 -->|Yes| Orch[Claude Code Workflows /<br/>LangGraph / CrewAI]
-    Q3 -->|No| Direct[Direct API<br/>with tool use]
-
-    style ClaudeCode fill:#ff9999
-    style AgentSDK fill:#ff9999
-    style MCP fill:#99ccff
-    style Orch fill:#99ff99
-```
+![Decision tree for choosing an agent approach: coding agents use Claude Code or the Agent SDK; tool integration uses MCP with the Claude API; multi-agent work uses orchestration frameworks; otherwise use the direct API with tool use](/data/workshops/workshop-04-morning-ai-agents/diagrams/01-approach-decision.svg)
 
 ### 1. Claude Code: The Production Coding Agent
 
@@ -131,15 +115,7 @@ while True:
 MCP is the standardised protocol for connecting AI agents to tools. Think of it as USB for AI -- one plug, any device.
 
 **How it works**:
-```mermaid
-graph LR
-    Agent[AI Agent] --> |MCP Protocol| Server1[Filesystem Server]
-    Agent --> |MCP Protocol| Server2[GitHub Server]
-    Agent --> |MCP Protocol| Server3[Database Server]
-    Agent --> |MCP Protocol| Server4[Search Server]
-
-    style Agent fill:#f9f,stroke:#333,stroke-width:2px
-```
+![One AI agent connecting over the MCP protocol to filesystem, GitHub, database and web search servers](/data/workshops/workshop-04-morning-ai-agents/diagrams/01-mcp-servers.svg)
 
 **Popular MCP Servers** (2026):
 - **@modelcontextprotocol/server-filesystem** -- File read/write operations

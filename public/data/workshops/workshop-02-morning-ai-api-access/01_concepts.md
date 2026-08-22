@@ -6,28 +6,7 @@ The AI API ecosystem has matured dramatically. Understanding these fundamentals 
 
 💡 **Tip**: Think of APIs as your direct line to the world's most powerful AI models—no intermediaries, no limitations.
 
-```mermaid
-graph TD
-    A[AI API Ecosystem 2026] --> B[Enterprise Leaders]
-    A --> C[Open Source Champions]
-    A --> D[Speed Specialists]
-
-    B --> B1[OpenAI - GPT-4o/o3]
-    B --> B2[Anthropic - Claude Fable 5/Opus 4.8/Sonnet 4.6]
-    B --> B3[Google - Gemini 2.5 Pro/Flash]
-
-    C --> C1[Meta - Llama 4]
-    C --> C2[Mistral - Large 2]
-    C --> C3[Qwen - 2.5 72B]
-
-    D --> D1[Groq - Ultra-fast Inference]
-    D --> D2[Together AI - Hosted OSS]
-    D --> D3[Fireworks AI - Production Scale]
-
-    style B1 fill:#10a37f
-    style B2 fill:#cc785c
-    style B3 fill:#4285f4
-```
+![The 2026 AI API ecosystem: enterprise leaders OpenAI, Anthropic and Google; open-source champions Meta, Mistral and Qwen; speed specialists Groq, Together AI and Fireworks AI](/data/workshops/workshop-02-morning-ai-api-access/diagrams/01-ecosystem.svg)
 
 ## What Is an API? (The Simple Truth)
 
@@ -45,20 +24,7 @@ You don't need to know how the kitchen works—just order what you want and rece
 
 An **API (Application Programming Interface)** allows software to communicate. For AI services:
 
-```mermaid
-sequenceDiagram
-    participant You as Your Application
-    participant API as AI Provider API
-    participant Model as AI Model
-
-    You->>API: HTTP Request + Prompt
-    Note over You,API: Authorization: Bearer YOUR_API_KEY
-    API->>Model: Process request
-    Model->>Model: Generate response
-    Model->>API: Return completion
-    API->>You: HTTP Response + Text
-    Note over You,API: Usage: 1,247 tokens • Cost: $0.003
-```
+![Sequence of an API call: your application sends an HTTP request with a bearer API key to the provider API, the model generates a completion, and the response returns with usage and cost](/data/workshops/workshop-02-morning-ai-api-access/diagrams/01-request-lifecycle.svg)
 
 ⚠️ **Warning**: Never share your API keys publicly—treat them like passwords!
 
@@ -113,15 +79,7 @@ Your API key is your unique identifier—like a password that:
 - Enables billing
 - Sets rate limits
 
-```mermaid
-graph LR
-    A[Your Request] --> B{API Key Valid?}
-    B -->|Yes ✅| C[Process Request]
-    B -->|No ❌| D[401 Unauthorized]
-    C --> E[Return Response]
-    C --> F[Log Usage]
-    F --> G[Update Billing]
-```
+![Authentication flow: a request with a valid API key is processed and returns a response with usage logged to billing; an invalid key gets 401 Unauthorized](/data/workshops/workshop-02-morning-ai-api-access/diagrams/01-auth-flow.svg)
 
 ### API Key Security Best Practices (2026 Edition)
 
@@ -254,27 +212,7 @@ justify it for tasks where reasoning quality matters.
 
 ### Cost Optimization Strategies
 
-```mermaid
-graph TD
-    A[Optimize Costs] --> B[Choose Right Model]
-    A --> C[Manage Context]
-    A --> D[Cache Responses]
-    A --> E[Batch Processing]
-
-    B --> B1[Use Haiku/mini for simple tasks]
-    B --> B2[Reserve Fable/Opus/o3 for complex reasoning]
-    B --> B3[Try open-source for experimentation]
-
-    C --> C1[Trim unnecessary context]
-    C --> C2[Use concise system prompts]
-    C --> C3[Clear conversation history]
-
-    D --> D1[Store common responses locally]
-    D --> D2[Use prompt caching features]
-
-    E --> E1[Combine multiple prompts]
-    E --> E2[Process files in batches]
-```
+![Four cost-optimisation levers: choose the right model, manage context, cache responses, and batch processing](/data/workshops/workshop-02-morning-ai-api-access/diagrams/01-cost-levers.svg)
 
 💡 **Tip**: Start with cheaper models, upgrade only when needed. Most tasks don't require Fable 5 or Claude Opus!
 
@@ -365,22 +303,7 @@ async function callWithRetry(
 
 The maximum text an AI can "remember" in one conversation:
 
-```mermaid
-graph LR
-    A[Context Window] --> B[Input Tokens]
-    A --> C[Output Tokens]
-
-    B --> B1[System Prompt]
-    B --> B2[Conversation History]
-    B --> B3[Your Current Message]
-    B --> B4[Attached Documents]
-
-    C --> C1[AI Response]
-
-    D[Total ≤ Window Size] --> A
-
-    style D fill:#ff6b6b
-```
+![Context window budget: input tokens (system prompt, history, your message, documents) plus output tokens must stay within the window size](/data/workshops/workshop-02-morning-ai-api-access/diagrams/01-context-window.svg)
 
 ### 2026 Context Window Comparison
 
@@ -450,26 +373,7 @@ class ConversationManager:
 
 ### Choosing the Right Model
 
-```mermaid
-graph TD
-    A[What's Your Task?] --> B{Complexity Level?}
-
-    B -->|Simple| C{Speed Critical?}
-    B -->|Medium| D{Budget?}
-    B -->|Complex| E{Need Best?}
-
-    C -->|Yes| F[GPT-4o-mini<br/>Haiku 4.5<br/>Gemini Flash]
-    C -->|No| G[GPT-4o<br/>Sonnet 4.6]
-
-    D -->|Tight| H[GPT-4o<br/>Sonnet 4.6<br/>Gemini 2.5 Pro]
-    D -->|Flexible| I[Claude Opus 4.8]
-
-    E -->|Reasoning| J[o3<br/>Opus 4.8<br/>Fable 5]
-    E -->|Quality| K[Claude Fable 5]
-
-    style F fill:#4fc3f7
-    style J fill:#ff6b6b
-```
+![Model selection by task: simple fast tasks go to mini and Haiku models, everyday work to GPT-4o, Sonnet or Gemini Pro, complex reasoning to o3, Opus and Fable 5](/data/workshops/workshop-02-morning-ai-api-access/diagrams/01-model-selection.svg)
 
 ### Model Strengths (2026 Edition)
 

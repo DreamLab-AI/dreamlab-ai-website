@@ -18,38 +18,7 @@ By completing this workshop, you will:
 
 ### Workshop Structure
 
-```mermaid
-graph TD
-    A[00: Introduction] --> B[01: AI Coding Ecosystem]
-    B --> C[02: Getting Started]
-    C --> D[02a: Web & IDE Tools]
-    C --> E[02b: Terminal Agents Setup]
-    C --> F[02c: Authentication]
-
-    B --> G[03: Mastering AI Agents]
-    G --> H[03a: Prompting]
-    G --> I[03b: CLAUDE.md & AGENTS.MD]
-    G --> J[03c: Task Management]
-    G --> K[03d: Advanced Techniques]
-
-    G --> L[04: Practical Applications]
-    L --> M[04a: Beginner Tasks]
-    L --> N[04b: Intermediate]
-    L --> O[04c: Advanced Scenarios]
-
-    B --> P[05: Broader Landscape]
-    P --> Q[05a: Agent vs Chat Models]
-    P --> R[05b: Model & Tool Choices]
-    P --> S[05c: Future Trends]
-
-    P --> T[06: Challenges]
-    T --> U[06a: Limitations]
-    T --> V[06b: Security]
-    T --> W[06c: Ethics]
-
-    T --> X[07: Best Practices]
-    X --> Y[08: Conclusion]
-```
+![Workshop learning path through nine modules, from introduction and ecosystem to best practices and conclusion](/data/workshops/workshop-06-codex/diagrams/readme-curriculum-map.svg)
 
 ### Target Audience
 
@@ -91,23 +60,7 @@ graph TD
 
 ### Key Metrics & Benchmarks (2026)
 
-```mermaid
-graph LR
-    A[Agentic Coding Benchmarks] --> B[Claude Code: SWE-bench leader]
-    A --> C[Codex CLI: Strong multi-file]
-    A --> D[Cursor: Fast IDE integration]
-    A --> E[Copilot: Broad language support]
-
-    F[Multi-File Editing] --> G[Claude Code: Excellent]
-    F --> H[Codex CLI: Excellent]
-    F --> I[Cursor Composer: Good]
-    F --> J[Copilot Workspace: Good]
-
-    K[Unique Strengths] --> L[Claude Code: CLAUDE.md + MCP + hooks]
-    K --> M[Codex CLI: Open source + sandboxed]
-    K --> N[Cursor: Native IDE feel]
-    K --> O[Copilot: GitHub ecosystem]
-```
+![Capability snapshot comparing Claude Code, Codex CLI, Cursor and Copilot](/data/workshops/workshop-06-codex/diagrams/readme-capability-compare.svg)
 
 > **Note on benchmarks:** AI coding benchmarks evolve rapidly and published numbers can vary by evaluation methodology. Rather than citing specific percentages that date quickly, we recommend consulting each vendor's latest benchmark disclosures and running your own evaluations on tasks representative of your codebase.
 

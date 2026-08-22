@@ -71,29 +71,7 @@ Most developers benefit from using tools at multiple levels simultaneously: Copi
 
 The most productive developers use a combination of tools:
 
-```mermaid
-graph TD
-    A[Task Arrives] --> B{Complexity?}
-
-    B -->|Quick question| C[Chat Model]
-    B -->|Multi-file change| D[Terminal Agent]
-    B -->|While typing| E[IDE Autocomplete]
-
-    C --> F[ChatGPT / Claude.ai]
-    D --> G{Preference?}
-    E --> H[Copilot / Cursor]
-
-    G -->|Feature-rich| I[Claude Code]
-    G -->|Open source| J[Codex CLI]
-
-    I --> K[Review + Commit]
-    J --> K
-    F --> L[Copy to Project]
-    H --> K
-
-    style I fill:#45b7d1
-    style J fill:#4ecdc4
-```
+![Task routing: quick questions to a chat model then copy to project; multi-file changes to a terminal agent and typing-time help to IDE autocomplete, both reviewed and committed](/data/workshops/workshop-06-codex/diagrams/05-a-task-routing.svg)
 
 ### Practical Example
 

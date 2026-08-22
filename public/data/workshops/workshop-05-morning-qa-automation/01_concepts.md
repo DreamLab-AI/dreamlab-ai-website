@@ -4,27 +4,7 @@
 
 ### Types of Tests
 
-```mermaid
-graph LR
-    A[Types of Tests] --> B[Unit Tests]
-    A --> C[Integration Tests]
-    A --> D[E2E Tests]
-    A --> E[Visual Tests]
-    A --> F[Performance Tests]
-    A --> G[Security Tests]
-
-    B --> B1[Fast Execution]
-    B --> B2[Isolated]
-    B --> B3[High Volume]
-
-    C --> C1[Medium Speed]
-    C --> C2[Multiple Components]
-    C --> C3[Moderate Volume]
-
-    D --> D1[Slow Execution]
-    D --> D2[Full System]
-    D --> D3[Low Volume]
-```
+![Types of tests: fast, isolated unit tests; medium-speed integration tests; slow, full-system E2E tests; plus visual, performance and security tests](/data/workshops/workshop-05-morning-qa-automation/diagrams/01-test-types.svg)
 
 ### 1. Unit Tests
 
@@ -368,18 +348,7 @@ test('updates user', async () => {
 
 ### Understanding Coverage Metrics
 
-```mermaid
-graph TD
-    A[Code Coverage Metrics] --> B[Line Coverage]
-    A --> C[Branch Coverage]
-    A --> D[Function Coverage]
-    A --> E[Statement Coverage]
-
-    B --> B1[% of lines executed]
-    C --> C1[% of if/else paths tested]
-    D --> D1[% of functions called]
-    E --> E1[% of statements run]
-```
+![Code coverage metrics: line, branch, function and statement coverage](/data/workshops/workshop-05-morning-qa-automation/diagrams/01-coverage-metrics.svg)
 
 **Coverage Report Example**:
 ```bash
@@ -543,16 +512,7 @@ AI coding tools can significantly accelerate test maintenance:
 
 ### Red-Green-Refactor Cycle
 
-```mermaid
-graph LR
-    A[Write Failing Test<br/>RED] --> B[Write Minimal Code<br/>GREEN]
-    B --> C[Refactor<br/>CLEAN]
-    C --> A
-
-    style A fill:#f44336
-    style B fill:#4CAF50
-    style C fill:#2196F3
-```
+![The TDD cycle: write a failing test (red), write minimal code to pass (green), then refactor and repeat](/data/workshops/workshop-05-morning-qa-automation/diagrams/01-tdd-cycle.svg)
 
 **Example TDD Session**:
 

@@ -8,23 +8,7 @@ Welcome to Phase 3 (AI APIs & Vibe Coding)! This morning, you'll discover the di
 
 Imagine having direct access to the world's most powerful AI models:
 
-```mermaid
-graph TD
-    A[Consumer AI Experience] --> B[Professional AI Control]
-    
-    A1[Fixed interfaces] --> B1[Complete customisation]
-    A2[Subscription costs] --> B2[Pay only what you use]
-    A3[Limited models] --> B3[Access ALL models]
-    A4[Copy-paste workflow] --> B4[Direct integration]
-    A5[No automation] --> B5[Full automation]
-    
-    style B fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-    style B1 fill:#e1f5fe
-    style B2 fill:#e1f5fe
-    style B3 fill:#e1f5fe
-    style B4 fill:#e1f5fe
-    style B5 fill:#e1f5fe
-```
+![Consumer AI limitations mapped to professional API capabilities: customisation, pay-per-use pricing, access to every model, and direct automated integration](/data/workshops/workshop-02-morning-ai-api-access/diagrams/00-consumer-to-professional.svg)
 
 ## Why Direct API Access Changes Everything
 
@@ -44,24 +28,7 @@ graph TD
 
 ### The Power Difference
 
-```mermaid
-graph LR
-    subgraph "Web Interface"
-        W1[Type prompt] --> W2[Get response]
-        W2 --> W3[Copy text]
-        W3 --> W4[Paste elsewhere]
-        W4 --> W5[Lose context]
-    end
-    
-    subgraph "API Integration"
-        A1[Work in VS Code] --> A2[AI sees context]
-        A2 --> A3[Direct insertion]
-        A3 --> A4[Maintains flow]
-        A4 --> A5[Automation ready]
-    end
-    
-    style A5 fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-```
+![Web interface workflow loses context via copy and paste, while API integration keeps the AI inside your editor with context and automation](/data/workshops/workshop-02-morning-ai-api-access/diagrams/00-web-vs-api.svg)
 
 ## What You'll Master This Morning
 
@@ -76,16 +43,7 @@ Connect and compare the giants:
 
 ### 2. API Fundamentals (No Coding Required!)
 
-```mermaid
-flowchart TD
-    You[You in VS Code] --> Extension[AI Extension]
-    Extension --> API[API Key]
-    API --> Model[AI Model]
-    Model --> Response[Instant Response]
-    Response --> Document[Your Document]
-    
-    style Document fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-```
+![Flow from you in VS Code through an AI extension and API key to the AI model, with the response landing in your document](/data/workshops/workshop-02-morning-ai-api-access/diagrams/00-api-flow.svg)
 
 ### 3. Cost Control & Management
 
@@ -114,23 +72,7 @@ flowchart TD
 
 ## Learning Path
 
-```mermaid
-graph LR
-    A[Concepts<br/>30 min] --> B[API Setup<br/>45 min]
-    B --> C[Model Testing<br/>45 min]
-    C --> D[Exercises<br/>30 min]
-    D --> E[Project<br/>20 min]
-    E --> F[Assessment<br/>10 min]
-    
-    A -.-> A1[How APIs work]
-    B -.-> B1[Get API keys]
-    C -.-> C1[Compare models]
-    D -.-> D1[Practice prompts]
-    E -.-> E1[Real application]
-    F -.-> F1[Validate skills]
-    
-    style F fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-```
+![Workshop roadmap: concepts, API setup, model testing, exercises, project and assessment, with timings](/data/workshops/workshop-02-morning-ai-api-access/diagrams/00-roadmap.svg)
 
 ## What Makes This Different
 
@@ -203,21 +145,7 @@ By the end of this morning session, you will:
 
 Right now, you're like someone using a smartphone only for calls while it can do so much more. This morning, we unlock the full potential.
 
-```mermaid
-graph TD
-    A[Current State] --> B[After This Workshop]
-    
-    A1["AI User"] --> B1["AI Commander"]
-    A2["Limited Access"] --> B2["Unlimited Power"]
-    A3["High Costs"] --> B3["Smart Spending"]
-    A4["Single Model"] --> B4["Model Orchestra"]
-    
-    style B fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-    style B1 fill:#4fc3f7
-    style B2 fill:#4fc3f7
-    style B3 fill:#4fc3f7
-    style B4 fill:#4fc3f7
-```
+![Before and after the workshop: AI user to AI commander, limited access to every major model, high costs to smart spending, single model to model orchestra](/data/workshops/workshop-02-morning-ai-api-access/diagrams/00-transformation.svg)
 
 ## Ready to Command AI Like a Pro?
 

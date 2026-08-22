@@ -171,18 +171,7 @@ This fetches the latest changes from the remote and merges them into your curren
 
 ### The Git Workflow Diagram
 
-```mermaid
-graph LR
-    A[Working Directory] -- "git add" --> B[Staging Area]
-    B -- "git commit" --> C[Local Repository]
-    C -- "git push" --> D[Remote Repository<br/>GitHub]
-    D -- "git pull" --> A
-
-    style A fill:#f9f9f9,stroke:#333
-    style B fill:#fff4e6,stroke:#fb8c00
-    style C fill:#e8f5e9,stroke:#43a047
-    style D fill:#e3f2fd,stroke:#1e88e5
-```
+![The core Git workflow: add, commit, push and pull between working directory, staging area, local repository and GitHub](/data/workshops/workshop-00-infra/diagrams/03-git-workflow.svg)
 
 ## 3.4 Branching Basics
 
@@ -232,19 +221,7 @@ git branch
    git branch -d add-contact-page
    ```
 
-```mermaid
-gitGraph
-    commit id: "Initial setup"
-    commit id: "Add home page"
-    branch add-contact-page
-    checkout add-contact-page
-    commit id: "Create contact.html"
-    commit id: "Add contact form styles"
-    checkout main
-    commit id: "Fix typo on home page"
-    merge add-contact-page
-    commit id: "Update navigation links"
-```
+![Branch workflow timeline: the add-contact-page branch splits from main, gains two commits and merges back](/data/workshops/workshop-00-infra/diagrams/03-branch-merge.svg)
 
 > **💡 Tip:** For collaborative projects, merging is usually done via a Pull Request on GitHub rather than a local `git merge`. This allows others to review your changes before they are incorporated. See [Chapter 4](./04_collaboration_recovery.md) for details.
 

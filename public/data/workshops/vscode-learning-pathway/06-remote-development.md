@@ -21,24 +21,7 @@ Code locally → Deploy to server → Test → Debug → Repeat
 Code directly on server/container → Live testing → Instant feedback
 ```
 
-```mermaid
-graph LR
-    A[VS Code UI] --> B[Local Window]
-    A --> C[Remote Window]
-
-    C --> D[Remote-SSH]
-    C --> E[Dev Containers]
-    C --> F[WSL]
-    C --> G[Tunnels]
-
-    D --> H[Linux Server]
-    E --> I[Docker Container]
-    F --> J[WSL Ubuntu]
-    G --> K[Any Machine via Internet]
-
-    style A fill:#007acc,color:#fff
-    style C fill:#ff6b35,color:#fff
-```
+![The local VS Code UI opens a remote window backed by SSH servers, dev containers, WSL or secure tunnels](/data/workshops/vscode-learning-pathway/diagrams/06-remote-targets.svg)
 
 ## Remote - SSH
 
@@ -458,14 +441,7 @@ git config --global credential.helper "/mnt/c/Program\ Files/Git/mingw64/bin/git
 
 Access your machine from anywhere without SSH setup:
 
-```mermaid
-graph LR
-    A[Your Machine] -->|Creates Tunnel| B[VS Code Relay]
-    C[Remote Browser/VS Code] -->|Connects via| B
-    B -->|Secure Connection| A
-
-    style B fill:#007acc,color:#fff
-```
+![VS Code tunnels: your machine creates a tunnel to the VS Code relay and a remote client connects through it over a secure channel](/data/workshops/vscode-learning-pathway/diagrams/06-tunnels.svg)
 
 ### Setup Tunnel
 

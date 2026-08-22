@@ -502,21 +502,7 @@ ping api.openai.com
 
 ## Your Learning Journey
 
-```mermaid
-graph TD
-    A[Complete Workshop] --> B[Daily Practice]
-    B --> C[Build Templates]
-    C --> D[Share Knowledge]
-    D --> E[Advanced Features]
-    E --> F[Community Contribution]
-
-    B -.-> G[30 Days: Competent]
-    C -.-> H[60 Days: Proficient]
-    D -.-> I[90 Days: Expert]
-    E -.-> J[6 Months: Master]
-
-    style J fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-```
+![Learning journey: daily practice, templates, sharing and advanced use lead to community contribution over six months](/data/workshops/workshop-01-morning-vscode-setup/diagrams/06-learning-journey.svg)
 
 ## Conclusion
 

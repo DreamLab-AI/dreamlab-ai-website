@@ -8,30 +8,7 @@
 
 This is the pattern used by Claude Code internally. A parent agent breaks a complex task into focused subtasks and delegates each to a child agent (subagent).
 
-```mermaid
-sequenceDiagram
-    participant User
-    participant Parent as Parent Agent
-    participant Sub1 as Subagent 1
-    participant Sub2 as Subagent 2
-    participant Sub3 as Subagent 3
-
-    User->>Parent: Complex task
-    Parent->>Parent: Decompose into subtasks
-
-    par Parallel execution
-        Parent->>Sub1: Subtask A
-        Parent->>Sub2: Subtask B
-        Parent->>Sub3: Subtask C
-    end
-
-    Sub1-->>Parent: Result A
-    Sub2-->>Parent: Result B
-    Sub3-->>Parent: Result C
-
-    Parent->>Parent: Synthesise results
-    Parent-->>User: Final answer
-```
+![Subagent delegation sequence: the parent agent decomposes a complex task, dispatches subtasks to three subagents in parallel, and synthesises their results into the final answer](/data/workshops/workshop-04-afternoon-orchestration/diagrams/01-subagent-delegation.svg)
 
 ### Implementation with Claude Code
 
@@ -130,18 +107,7 @@ if __name__ == "__main__":
 
 Tasks flow through a sequence of specialised stages:
 
-```mermaid
-graph LR
-    Input[Input] --> S1[Stage 1:<br/>Extract]
-    S1 --> S2[Stage 2:<br/>Transform]
-    S2 --> S3[Stage 3:<br/>Validate]
-    S3 --> S4[Stage 4:<br/>Output]
-
-    style S1 fill:#ffcccc
-    style S2 fill:#ccffcc
-    style S3 fill:#ccccff
-    style S4 fill:#ffffcc
-```
+![Pipeline pattern: input flows through extract, transform, validate and output stages in sequence](/data/workshops/workshop-04-afternoon-orchestration/diagrams/01-pipeline-pattern.svg)
 
 ```python
 def pipeline(input_data: str) -> str:
@@ -182,20 +148,7 @@ def pipeline(input_data: str) -> str:
 
 Search multiple sources in parallel, then synthesise:
 
-```mermaid
-graph TD
-    Query[Research Query] --> FanOut[Fan-Out]
-
-    FanOut --> S1[Search: Academic]
-    FanOut --> S2[Search: News]
-    FanOut --> S3[Search: Technical]
-
-    S1 --> FanIn[Fan-In: Synthesise]
-    S2 --> FanIn
-    S3 --> FanIn
-
-    FanIn --> Report[Final Report]
-```
+![Fan-out fan-in pattern: a research query fans out to parallel academic, news and technical searches whose results are synthesised into a final report](/data/workshops/workshop-04-afternoon-orchestration/diagrams/01-fan-out-fan-in.svg)
 
 ```python
 import concurrent.futures

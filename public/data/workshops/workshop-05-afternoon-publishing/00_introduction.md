@@ -59,14 +59,7 @@ The tools and practices you'll learn today are used by companies like:
 
 Learn the top deployment platforms and when to use each:
 
-```mermaid
-graph LR
-    A[Your Code] --> B{Platform Choice}
-    B -->|Frontend| C[Vercel/Netlify]
-    B -->|Fullstack| D[Railway/Render]
-    B -->|Edge| E[Cloudflare Pages]
-    B -->|Docs| F[GitHub Pages]
-```
+![Platform choice: frontends to Vercel or Netlify, full-stack apps to Railway or Render, edge to Cloudflare Pages, docs and static sites to GitHub Pages](/data/workshops/workshop-05-afternoon-publishing/diagrams/00-platform-choice.svg)
 
 ### Part 2: GitHub Actions CI/CD (60 minutes)
 

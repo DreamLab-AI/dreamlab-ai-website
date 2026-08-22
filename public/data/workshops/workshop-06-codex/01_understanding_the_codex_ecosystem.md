@@ -4,42 +4,7 @@
 
 ## The 2026 AI Coding Landscape
 
-```mermaid
-graph TB
-    subgraph "Terminal-Based Agents"
-        A[Developer] --> B{Choose Your Agent}
-
-        B --> C[Claude Code]
-        B --> D[OpenAI Codex CLI]
-        B --> E[Aider]
-
-        C --> F[Fable 5 - Latest & most capable]
-        C --> G[Opus 4.8 - Top-tier reasoning]
-        C --> H[Sonnet 4.6 - Best speed/quality balance]
-
-        D --> I[codex-mini-latest - Fast]
-        D --> J[o4-mini - Reasoning]
-        D --> K[GPT-4o - Flagship]
-    end
-
-    subgraph "IDE-Integrated"
-        L[Cursor AI - VS Code fork]
-        M[GitHub Copilot - Extensions]
-        N[Windsurf - Flow state]
-        O[Continue.dev - OSS]
-    end
-
-    subgraph "Chat & API"
-        P[ChatGPT - GPT-4o / o3]
-        Q[Claude.ai - Artifacts]
-        R[Anthropic SDK]
-        S[OpenAI API]
-    end
-
-    style C fill:#45b7d1
-    style D fill:#4ecdc4
-    style L fill:#96ceb4
-```
+![The agent ecosystem: terminal agents Claude Code, Codex CLI and Aider with their model options, alongside IDE-integrated and chat/API tools](/data/workshops/workshop-06-codex/diagrams/01-agent-ecosystem.svg)
 
 ## A. Claude Code — Anthropic's Agentic Coding Tool
 
@@ -86,22 +51,7 @@ claude
 
 ### Claude Code Workflow Example
 
-```mermaid
-sequenceDiagram
-    participant Dev as Developer
-    participant CC as Claude Code
-    participant FS as File System
-    participant Git as Git
-
-    Dev->>CC: "Refactor user service to use dependency injection"
-    CC->>FS: Read CLAUDE.md for project context
-    CC->>FS: Analyse codebase structure
-    CC->>CC: Plan refactoring approach
-    CC->>FS: Edit files across the project
-    CC->>CC: Run tests via hooks
-    CC->>Git: Create commit with changes
-    CC->>Dev: Present results and diff
-```
+![Sequence of an agentic session: the developer asks Claude Code to refactor, it reads context, plans, edits files, runs tests, commits and presents the diff](/data/workshops/workshop-06-codex/diagrams/01-agent-workflow.svg)
 
 ### What Makes Claude Code Unique
 
@@ -245,28 +195,7 @@ Free, open-source extension for VS Code and JetBrains. Connects to any model pro
 
 ### Decision Framework
 
-```mermaid
-graph TD
-    A[Choose Your AI Coding Setup] --> B{Primary Workflow}
-
-    B -->|Terminal-first| C{Open source needed?}
-    B -->|IDE-native| D{Budget?}
-    B -->|Chat/exploration| E[ChatGPT or Claude.ai]
-
-    C -->|Yes| F[OpenAI Codex CLI]
-    C -->|No| G[Claude Code]
-
-    D -->|Premium| H[Cursor AI]
-    D -->|Budget/free| I{Existing IDE?}
-
-    I -->|VS Code/JetBrains| J[GitHub Copilot]
-    I -->|Want OSS| K[Continue.dev]
-
-    style G fill:#45b7d1
-    style F fill:#4ecdc4
-    style H fill:#96ceb4
-    style J fill:#90EE90
-```
+![Choosing a setup by workflow: terminal-first leads to Claude Code or Codex CLI, IDE-native to Cursor, Copilot or Continue, chat and exploration to ChatGPT or Claude.ai](/data/workshops/workshop-06-codex/diagrams/01-choosing-setup.svg)
 
 ### Recommended Combinations
 

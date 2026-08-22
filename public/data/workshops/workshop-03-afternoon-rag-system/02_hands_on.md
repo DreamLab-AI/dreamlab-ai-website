@@ -10,6 +10,8 @@ This is the main practical session of the afternoon. Over the next 90 minutes, y
 - A query pipeline that retrieves relevant context and generates grounded answers
 - Citation tracking that tells you exactly where each answer came from
 
+![Architecture of today's build: documents are loaded, chunked, embedded with all-MiniLM-L6-v2 and stored in ChromaDB; your question retrieves context from ChromaDB and a local Ollama model generates a cited answer](/data/workshops/workshop-03-afternoon-rag-system/diagrams/02-build-architecture.svg)
+
 ---
 
 ## Part 1: Environment Setup (15 minutes)

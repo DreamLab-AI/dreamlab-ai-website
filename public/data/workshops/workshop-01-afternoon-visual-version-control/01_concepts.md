@@ -10,16 +10,7 @@ Before we dive into creating stunning diagrams and tracking every change, let's 
 
 Mermaid is a game-changing tool that converts text descriptions into professional diagrams. Think of it as:
 
-```mermaid
-graph TD
-    A[Your Ideas in Text] -->|Mermaid Magic| B[Professional Diagrams]
-    
-    C[Write: "User logs in"] -->|Becomes| D[Flow Chart]
-    E[Type: "Project timeline"] -->|Transforms to| F[Gantt Chart]
-    G[Describe: "System parts"] -->|Renders as| H[Architecture Diagram]
-    
-    style B fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-```
+![Ideas written in plain text are rendered by Mermaid into professional diagrams instantly](/data/workshops/workshop-01-afternoon-visual-version-control/diagrams/01-mermaid-magic.svg)
 
 ### Why Text-Based Diagrams Win
 
@@ -39,26 +30,7 @@ graph TD
 
 ### The Mental Model Shift
 
-```mermaid
-mindmap
-  root((Visual Thinking))
-    Diagrams as Code
-      Editable
-      Versionable
-      Searchable
-      AI-Enhanced
-    Types Available
-      Flowcharts
-      Gantt Charts
-      Sequence Diagrams
-      Mind Maps
-      Entity Relations
-    Benefits
-      Speed (10x faster)
-      Consistency
-      Collaboration
-      Automation
-```
+![Visual thinking mind map: diagrams as code (editable, versionable, AI-enhanced), diagram types available, and the benefits of speed, consistency and collaboration](/data/workshops/workshop-01-afternoon-visual-version-control/diagrams/01-visual-thinking.svg)
 
 ## 1.2 Mermaid Diagram Types
 
@@ -66,80 +38,25 @@ mindmap
 
 Perfect for showing decision flows, processes, and algorithms:
 
-```mermaid
-flowchart TD
-    Start([Start Process]) --> Input[Gather Requirements]
-    Input --> Decision{Requirements Clear?}
-    Decision -->|Yes| Design[Create Design]
-    Decision -->|No| Clarify[Clarify with Stakeholder]
-    Clarify --> Input
-    Design --> Review{Design Approved?}
-    Review -->|Yes| Build[Build Solution]
-    Review -->|No| Design
-    Build --> End([Deploy])
-```
+![Process flowchart: gather requirements, check they are clear (clarify if not), design, seek approval (rework if refused), then deploy](/data/workshops/workshop-01-afternoon-visual-version-control/diagrams/01-flowchart-decisions.svg)
 
 ### 2. Gantt Charts - Project Planning
 
 Transform project timelines into visual roadmaps:
 
-```mermaid
-gantt
-    title Project Development Timeline
-    dateFormat  YYYY-MM-DD
-    section Research
-    Literature Review     :done,    des1, 2026-06-01, 2026-06-15
-    User Interviews      :active,  des2, 2026-06-10, 10d
-    
-    section Design
-    Wireframes          :         des3, after des2, 5d
-    Prototypes          :         des4, after des3, 7d
-    
-    section Development
-    Frontend            :         dev1, after des4, 14d
-    Backend             :         dev2, after des4, 14d
-    Testing             :         test, after dev1, 7d
-```
+![Gantt chart over a ten-week axis: literature review done, user interviews active, then wireframes and prototypes, build, and testing](/data/workshops/workshop-01-afternoon-visual-version-control/diagrams/01-gantt-timeline.svg)
 
 ### 3. Sequence Diagrams - Interaction Flows
 
 Show how different parts of a system communicate:
 
-```mermaid
-sequenceDiagram
-    participant User
-    participant App
-    participant API
-    participant Database
-    
-    User->>App: Login Request
-    App->>API: Validate Credentials
-    API->>Database: Check User
-    Database-->>API: User Found
-    API-->>App: Token Generated
-    App-->>User: Login Success
-```
+![Sequence diagram of a login flow across user, app, API and database lifelines, ending in login success](/data/workshops/workshop-01-afternoon-visual-version-control/diagrams/01-sequence-login.svg)
 
 ### 4. Mind Maps - Brainstorming
 
 Organise thoughts and ideas visually:
 
-```mermaid
-mindmap
-  root((New Product))
-    Features
-      Core Functions
-      Nice to Have
-      Future Ideas
-    Market
-      Target Users
-      Competitors
-      Pricing
-    Development
-      Timeline
-      Resources
-      Technology
-```
+![New-product mind map with three pillars: features, market and development](/data/workshops/workshop-01-afternoon-visual-version-control/diagrams/01-mindmap-product.svg)
 
 ## 1.3 Version Control: Your Time Machine
 
@@ -147,18 +64,7 @@ mindmap
 
 Git is a system that tracks changes to your files over time. Imagine:
 
-```mermaid
-graph LR
-    A[Monday<br/>Draft v1] --> B[Tuesday<br/>Added intro]
-    B --> C[Wednesday<br/>Fixed typos]
-    C --> D[Thursday<br/>Major rewrite]
-    D --> E[Friday<br/>Final version]
-    
-    D -.->|"Oops, need Tuesday's intro"| B
-    B -.->|Restore| F[Friday<br/>Mix of versions]
-    
-    style F fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-```
+![Git as a time machine: a week of commits from Monday's draft to Friday, with Tuesday's intro restored into the final version](/data/workshops/workshop-01-afternoon-visual-version-control/diagrams/01-git-time-machine.svg)
 
 ### Core Concepts Simplified
 
@@ -184,18 +90,7 @@ graph LR
 
 ### The Version Control Workflow
 
-```mermaid
-flowchart LR
-    A[Work on Files] --> B[Stage Changes]
-    B --> C[Commit with Message]
-    C --> D[Push to GitHub]
-    
-    D --> E[Automatic Backup]
-    D --> F[Visible Portfolio]
-    D --> G[Team Access]
-    
-    style D fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-```
+![Version control workflow: work on files, stage changes, commit a snapshot, then push to GitHub for backup, portfolio and team access](/data/workshops/workshop-01-afternoon-visual-version-control/diagrams/01-git-workflow.svg)
 
 ## 1.4 GitHub: Your Professional Platform
 
@@ -203,22 +98,7 @@ flowchart LR
 
 GitHub transforms Git into a complete professional platform:
 
-```mermaid
-graph TD
-    GitHub[GitHub Platform]
-    
-    GitHub --> A[Cloud Backup]
-    GitHub --> B[Portfolio]
-    GitHub --> C[Collaboration]
-    GitHub --> D[Free Hosting]
-    GitHub --> E[Project Management]
-    
-    A --> A1[Never lose work]
-    B --> B1[Showcase projects]
-    C --> C1[Work with others]
-    D --> D1[GitHub Pages]
-    E --> E1[Issues & boards]
-```
+![The GitHub platform provides cloud backup, a public portfolio, collaboration via issues and reviews, and free hosting through GitHub Pages](/data/workshops/workshop-01-afternoon-visual-version-control/diagrams/01-github-platform.svg)
 
 ### Key Benefits for Non-Developers
 
@@ -248,20 +128,7 @@ graph TD
 
 When combined, these tools create a documentation system that:
 
-```mermaid
-graph TD
-    A[Write Documentation] --> B[Add Mermaid Diagrams]
-    B --> C[Commit to Git]
-    C --> D[Push to GitHub]
-    D --> E[Automatic Website]
-    
-    F[Need Changes?] --> G[Edit Text/Diagrams]
-    G --> H[Git Tracks Changes]
-    H --> I[GitHub Updates Site]
-    
-    style E fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-    style I fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-```
+![The full loop: write documentation with Mermaid diagrams, commit, push to GitHub, the site updates automatically, and edits repeat the loop](/data/workshops/workshop-01-afternoon-visual-version-control/diagrams/01-integration-loop.svg)
 
 ### Real-World Workflow
 
@@ -275,18 +142,7 @@ graph TD
 
 ### Your Control Panel
 
-```mermaid
-graph LR
-    A[Your Work] --> B{Privacy Choice}
-    
-    B -->|Private| C[Only You See It]
-    B -->|Team| D[Selected People]
-    B -->|Public| E[Portfolio Piece]
-    
-    C --> F[Full Control]
-    D --> G[Collaboration]
-    E --> H[Showcase]
-```
+![Repository visibility choice: private (only you), team (selected people) or public (a portfolio piece)](/data/workshops/workshop-01-afternoon-visual-version-control/diagrams/01-privacy-choice.svg)
 
 ### Best Practices
 
@@ -309,16 +165,7 @@ graph LR
 
 ### Today's Journey
 
-```mermaid
-graph LR
-    A[Concepts<br/>(You are here)] --> B[Setup Tools]
-    B --> C[Create Diagrams]
-    C --> D[Version Control]
-    D --> E[GitHub Portfolio]
-    E --> F[Real Project]
-    
-    style A fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-```
+![Today's journey: concepts (you are here), tool setup, creating diagrams, version control, a GitHub portfolio, then a real project](/data/workshops/workshop-01-afternoon-visual-version-control/diagrams/01-learning-journey.svg)
 
 ### Skills You'll Master
 

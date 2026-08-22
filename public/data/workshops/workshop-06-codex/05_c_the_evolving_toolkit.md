@@ -10,17 +10,7 @@ MCP is arguably the most important emerging standard in AI tooling. Created by A
 
 Before MCP, every tool integration was bespoke — each AI tool had its own way of connecting to databases, APIs, and services. MCP standardises this into a single protocol, similar to how HTTP standardised web communication.
 
-```mermaid
-graph LR
-    A[AI Coding Agent] --> B[MCP Protocol]
-    B --> C[Database Server]
-    B --> D[GitHub Server]
-    B --> E[Browser Server]
-    B --> F[Slack Server]
-    B --> G[Custom Server]
-
-    style B fill:#45b7d1
-```
+![MCP connects an AI coding agent to database, GitHub, browser, Slack and custom servers through one protocol](/data/workshops/workshop-06-codex/diagrams/05-c-mcp-hub.svg)
 
 ### Current MCP Adoption
 

@@ -162,18 +162,7 @@ Pricing:
 
 GitHub Actions is the modern standard for CI/CD, integrated directly into your repositories.
 
-```mermaid
-graph TD
-    A[Push to GitHub] --> B{Workflow Triggered}
-    B --> C[Run Tests]
-    C --> D{Tests Pass?}
-    D -->|Yes| E[Build Application]
-    D -->|No| F[Notify Failure]
-    E --> G[Deploy to Staging]
-    G --> H{On Main Branch?}
-    H -->|Yes| I[Deploy to Production]
-    H -->|No| J[Create Preview URL]
-```
+![CI/CD deployment workflow: push triggers tests, passing builds deploy to staging, main branch goes to production while other branches get a preview URL](/data/workshops/workshop-05-afternoon-publishing/diagrams/01-cicd-flow.svg)
 
 ### Core GitHub Actions Concepts
 
@@ -246,11 +235,7 @@ jobs:
 
 ### The Three-Environment Strategy
 
-```mermaid
-graph LR
-    A[Development] -->|PR| B[Preview/Staging]
-    B -->|Merge| C[Production]
-```
+![Environment flow: development, then preview/staging via pull request, then production on merge](/data/workshops/workshop-05-afternoon-publishing/diagrams/01-environments.svg)
 
 #### **Development**
 

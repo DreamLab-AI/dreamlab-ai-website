@@ -26,6 +26,8 @@ Claude Code fires hooks on these events:
 | `Stop` | When Claude finishes a response | Quality checks, notifications |
 | `SessionEnd` | When a Claude Code session ends | Cleanup, summary notifications |
 
+![Hook lifecycle timeline: SessionStart, then per turn UserPromptSubmit followed by a repeating tool loop of PreToolUse (which can block), the tool run and PostToolUse, then Stop and finally SessionEnd](/data/workshops/workshop-08-claude-code/diagrams/05-hooks-lifecycle.svg)
+
 ## Configuring Hooks
 
 Hooks are defined in `.claude/settings.json` (project-level) or `~/.claude/settings.json` (global).

@@ -14,28 +14,7 @@ By the end of this module, you will:
 
 VS Code's power comes from its extension ecosystem:
 
-```mermaid
-graph TD
-    A[VS Code Core 20MB] --> B{Extension Marketplace}
-    B --> C[70,000+ Extensions]
-    B --> D[1 Billion+ Downloads]
-
-    C --> E[Language Support]
-    C --> F[AI Assistants]
-    C --> G[Themes & Icons]
-    C --> H[Productivity Tools]
-    C --> I[Debugging Tools]
-    C --> J[DevOps Integration]
-
-    E --> K[TypeScript, Python, Rust, Go...]
-    F --> L[Copilot, Claude Code, Continue...]
-    G --> M[One Dark Pro, Material Theme...]
-    H --> N[GitLens, Todo Tree, Path Intellisense...]
-
-    style A fill:#007acc,color:#fff
-    style B fill:#ff6b35,color:#fff
-    style F fill:#4fc3f7
-```
+![A 20 MB VS Code core connects to a marketplace of over 70,000 extensions across languages, AI assistants, themes and productivity tools](/data/workshops/vscode-learning-pathway/diagrams/03-marketplace.svg)
 
 ## Core Concepts
 
@@ -56,25 +35,7 @@ graph TD
 
 ### Extension Architecture
 
-```mermaid
-graph LR
-    A[Your Code] --> B[VS Code Editor]
-    B --> C[Extension Host]
-    C --> D[Extension API]
-
-    D --> E[Language Server Protocol]
-    D --> F[Debug Adapter Protocol]
-    D --> G[Webview API]
-    D --> H[Terminal API]
-
-    E --> I[IntelliSense]
-    F --> J[Debugging]
-    G --> K[Custom UI]
-    H --> L[Terminal Integration]
-
-    style C fill:#007acc,color:#fff
-    style D fill:#ff6b35,color:#fff
-```
+![The editor hands work to the extension host, whose APIs deliver IntelliSense, debugging, custom UI and terminal integration](/data/workshops/vscode-learning-pathway/diagrams/03-extension-api.svg)
 
 ## Essential Extension Categories
 
@@ -214,22 +175,7 @@ code --install-extension eamodio.gitlens
 ```
 
 **Key Features:**
-```mermaid
-graph TD
-    A[GitLens Features] --> B[Blame Annotations]
-    A --> C[Git History]
-    A --> D[File History]
-    A --> E[Branch Comparison]
-    A --> F[Commit Search]
-
-    B --> G[Inline blame]
-    B --> H[Hover details]
-
-    C --> I[Visual history]
-    C --> J[Commit details]
-
-    style A fill:#007acc,color:#fff
-```
+![GitLens features: blame annotations, commit history, file history and branch comparison](/data/workshops/vscode-learning-pathway/diagrams/03-gitlens.svg)
 
 **Configuration:**
 ```json

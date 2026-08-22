@@ -6,39 +6,7 @@ Build a production-ready testing pipeline for a real-world application with comp
 
 ## Project Requirements
 
-```mermaid
-graph TD
-    A[Code Commit] --> B{Pre-commit Hooks}
-    B -->|Pass| C[Push to GitHub]
-    B -->|Fail| A
-
-    C --> D[GitHub Actions CI]
-    D --> E[Unit Tests]
-    D --> F[Integration Tests]
-    D --> G[E2E Tests]
-    D --> H[Security Scan]
-    D --> I[Lint Check]
-
-    E --> J{Coverage > 90%?}
-    F --> J
-    G --> J
-    H --> J
-    I --> J
-
-    J -->|Yes| K[Build Application]
-    J -->|No| L[Fail Build]
-
-    K --> M[Deploy to Staging]
-    M --> N[Visual Regression Tests]
-    N --> O{All Tests Pass?}
-
-    O -->|Yes| P[Deploy to Production]
-    O -->|No| L
-
-    style A fill:#2196F3
-    style P fill:#4CAF50
-    style L fill:#f44336
-```
+![CI/CD quality pipeline: commit passes pre-commit hooks and CI checks, a coverage gate allows build and staging deploy, visual tests gate production; failures fail the build](/data/workshops/workshop-05-morning-qa-automation/diagrams/04-ci-pipeline.svg)
 
 ## Phase 1: Test Suite (60 points)
 

@@ -20,23 +20,7 @@ Visual tools transform walls of text into instantly understandable insights.
 
 Imagine if you could:
 
-```mermaid
-graph TD
-    A[Current Reality] --> B[With Version Control]
-    
-    A1[Lost work from crashes] --> B1[Every change saved forever]
-    A2[Conflicting document versions] --> B2[Clear history of all changes]
-    A3[No backup strategy] --> B3[Automatic cloud backup]
-    A4[Email attachment chaos] --> B4[Professional collaboration]
-    A5["Final_Final_v3.doc"] --> B5[Meaningful version names]
-    
-    style B fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-    style B1 fill:#e1f5fe
-    style B2 fill:#e1f5fe
-    style B3 fill:#e1f5fe
-    style B4 fill:#e1f5fe
-    style B5 fill:#e1f5fe
-```
+![Working without version control — lost work, Final_Final_v3.doc, email chaos — versus with version control: every change kept, meaningful names, automatic backup](/data/workshops/workshop-01-afternoon-visual-version-control/diagrams/00-version-control-shift.svg)
 
 ## What You'll Master in This Session
 
@@ -97,22 +81,7 @@ graph TD
 
 ## Workshop Learning Path
 
-```mermaid
-graph LR
-    A[Concepts<br/>30 min] --> B[Hands-On<br/>90 min]
-    B --> C[Exercises<br/>30 min]
-    C --> D[Project<br/>20 min]
-    D --> E[Mastery<br/>10 min]
-    
-    A -.-> A1[Visual thinking]
-    B -.-> B1[Create diagrams]
-    B -.-> B2[Version control]
-    C -.-> C1[Practice skills]
-    D -.-> D1[Real application]
-    E -.-> E1[Validation]
-    
-    style E fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-```
+![Workshop learning path: concepts (30 min), hands-on (90 min), exercises (30 min), project (20 min), mastery (10 min)](/data/workshops/workshop-01-afternoon-visual-version-control/diagrams/00-learning-path.svg)
 
 ## Your Instructor's Promise
 

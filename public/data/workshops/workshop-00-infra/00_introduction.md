@@ -23,42 +23,7 @@ By completing this workshop, you'll establish:
 
 ## The 2026 AI Development Landscape
 
-```mermaid
-mindmap
-  root((AI Development<br/>Ecosystem 2026))
-    Code Assistants
-      Claude Code
-        Agentic workflows
-        MCP integration
-        Long context (200k+)
-      GitHub Copilot
-        Native integration
-        Copilot Chat
-        Copilot Workspace
-      Cursor
-        AI-first editor
-        Composer mode
-        Tab autocomplete
-      Windsurf
-        Cascade UI
-        Deep codebase understanding
-        Multi-file coordination
-    Version Control
-      Git Local
-      GitHub Remote
-      GitHub Actions
-      GitHub Codespaces
-    Development Environment
-      VS Code
-      WSL2 for Windows
-      Dev Containers
-      Extensions Ecosystem
-    Cloud Services
-      GitHub Pages
-      Vercel/Netlify
-      Cloudflare Pages
-      Custom Domains
-```
+![The 2026 AI development ecosystem: AI assistants, version control, development environment and cloud services](/data/workshops/workshop-00-infra/diagrams/00-ecosystem.svg)
 
 ## Workshop Structure
 
@@ -78,22 +43,7 @@ mindmap
 
 ### The Modern Development Trinity
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                                                         │
-│  ┌──────────┐      ┌──────────┐      ┌──────────┐     │
-│  │          │      │          │      │          │     │
-│  │   Git    │◄────►│ VS Code  │◄────►│    AI    │     │
-│  │  GitHub  │      │   WSL2   │      │ Assistants│     │
-│  │          │      │          │      │          │     │
-│  └──────────┘      └──────────┘      └──────────┘     │
-│       ▲                  ▲                  ▲          │
-│       │                  │                  │          │
-│       └──────────────────┴──────────────────┘          │
-│              All Working Together                      │
-│                                                         │
-└─────────────────────────────────────────────────────────┘
-```
+![The modern development trinity: Git and GitHub, VS Code with WSL2, and AI assistants all working together](/data/workshops/workshop-00-infra/diagrams/00-trinity.svg)
 
 **1. Git & GitHub: Your Safety Net and Portfolio**
 - Create unlimited public and private repositories
@@ -176,20 +126,7 @@ Yes, this initial configuration requires effort:
 
 ## The Free (or Nearly Free) Ecosystem
 
-```mermaid
-graph LR
-    A[Free Tools] --> B[GitHub<br/>Free Plan]
-    A --> C[VS Code<br/>100% Free]
-    A --> D[Git<br/>Open Source]
-    A --> E[GitHub Pages<br/>Free Hosting]
-
-    F[Paid Options] --> G[GitHub Copilot<br/>$10/mo]
-    F --> H[Claude API<br/>Pay-as-you-go]
-    F --> I[Cursor<br/>$20/mo]
-
-    style A fill:#50c878,stroke:#2d7a4a,color:#fff
-    style F fill:#4a90e2,stroke:#2e5c8a,color:#fff
-```
+![The free core toolkit (GitHub, VS Code, Git, GitHub Pages) alongside optional paid tools (Copilot, Claude API, Cursor)](/data/workshops/workshop-00-infra/diagrams/00-free-vs-paid.svg)
 
 Most of what you'll use is **completely free**:
 - GitHub Free Plan: Unlimited repos, Actions minutes, Pages hosting

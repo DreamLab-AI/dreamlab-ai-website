@@ -10,37 +10,7 @@ Before we start building, let's understand the core concepts that make vibe codi
 
 Vibe coding works because modern AI has become fluent in translating human intent into computer instructions. You describe what you want in plain English — the AI writes the code.
 
-```mermaid
-graph TD
-    subgraph "Your World"
-        A[Natural Language]
-        B[Visual Descriptions]
-        C[Analogies & Examples]
-    end
-    
-    subgraph "AI Translation Layer"
-        D[Intent Recognition]
-        E[Pattern Matching]
-        F[Code Synthesis]
-    end
-    
-    subgraph "Computer World"
-        G[HTML Structure]
-        H[CSS Styling]
-        I[JavaScript Behaviour]
-    end
-    
-    A --> D
-    B --> D
-    C --> D
-    D --> E
-    E --> F
-    F --> G
-    F --> H
-    F --> I
-    
-    style F fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-```
+![The communication bridge: your world of natural language flows through the AI translation layer into the computer world of HTML, CSS and JavaScript](/data/workshops/workshop-02-afternoon-vibe-coding/diagrams/01-translation-bridge.svg)
 
 ### The Three Pillars of Vibe Coding
 
@@ -132,30 +102,7 @@ Instead of technical terms, use descriptive language:
 
 ### Visual Descriptions That Work
 
-```mermaid
-mindmap
-  root((Describing UI))
-    Colours
-      "Sky blue background"
-      "Sunset gradient"
-      "Corporate navy"
-      "Soft pastels"
-    Layout
-      "Magazine style"
-      "Like Amazon's layout"  
-      "Centered like Medium"
-      "Pinterest grid"
-    Feel
-      "Professional"
-      "Playful"
-      "Minimalist"
-      "Luxurious"
-    Behaviour
-      "Smooth scrolling"
-      "Hover effects"
-      "Click to expand"
-      "Fade on scroll"
-```
+![Four vocabularies for describing a UI — colours, layout, feel and behaviour — each with example phrases](/data/workshops/workshop-02-afternoon-vibe-coding/diagrams/01-describing-ui.svg)
 
 ## 1.4 The Anatomy of a Vibe Coding Session
 
@@ -206,34 +153,7 @@ Add smooth transitions between all interactions."
 
 When you vibe code, AI generates three types of code:
 
-```mermaid
-graph LR
-    subgraph "What AI Creates"
-        A[HTML]
-        B[CSS]
-        C[JavaScript]
-    end
-    
-    subgraph "What It Does"
-        D[Structure & Content]
-        E[Visual Design]
-        F[Interactivity]
-    end
-    
-    subgraph "What You See"
-        G[Text, Images, Forms]
-        H[Colours, Layouts, Animations]
-        I[Clicks, Hovers, Movement]
-    end
-    
-    A --> D --> G
-    B --> E --> H
-    C --> F --> I
-    
-    style A fill:#e1f5fe
-    style B fill:#e1f5fe
-    style C fill:#e1f5fe
-```
+![The three languages of the web: HTML gives structure and content, CSS gives visual design, JavaScript gives interactivity](/data/workshops/workshop-02-afternoon-vibe-coding/diagrams/01-web-languages.svg)
 
 You don't need to understand this code—just know it exists and works together.
 
@@ -256,32 +176,13 @@ but for a yoga studio. Use calming colours and imagery."
 
 ### Combining Inspirations
 
-```mermaid
-graph TD
-    A[Reference 1: Airbnb's Layout] --> D[AI Synthesis]
-    B[Reference 2: Medium's Typography] --> D
-    C[Reference 3: Apple's Minimalism] --> D
-    D --> E[Your Unique Creation]
-    
-    style E fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-```
+![Three references — Airbnb's layout, Medium's typography and Apple's minimalism — are synthesised by AI into your unique creation](/data/workshops/workshop-02-afternoon-vibe-coding/diagrams/01-combining-references.svg)
 
 ## 1.7 Common Vibe Coding Patterns
 
 ### The Enhancement Loop
 
-```mermaid
-flowchart LR
-    A[Basic Version] --> B[Add Feature]
-    B --> C[Test & Review]
-    C --> D{Happy?}
-    D -->|No| E[Describe Changes]
-    E --> B
-    D -->|Yes| F[Move to Next Feature]
-    F --> B
-    
-    style F fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-```
+![The enhancement loop: add a feature, test and review, and if unhappy describe changes and loop back; if happy, move to the next feature](/data/workshops/workshop-02-afternoon-vibe-coding/diagrams/01-enhancement-loop.svg)
 
 ### Progressive Enhancement Strategy
 
@@ -318,16 +219,7 @@ Instead of technical debugging, use natural language:
 
 When AI misunderstands:
 
-```mermaid
-graph TD
-    A[Unexpected Result] --> B[Clarify Intent]
-    B --> C[Provide Specific Example]
-    C --> D[Show What's Wrong]
-    D --> E[Describe Desired Outcome]
-    E --> F[AI Adjusts]
-    
-    style F fill:#4fc3f7,stroke:#01579b,stroke-width:3px
-```
+![The clarification technique: after an unexpected result, clarify intent with a specific example, describe the desired outcome, and the AI adjusts](/data/workshops/workshop-02-afternoon-vibe-coding/diagrams/01-clarification.svg)
 
 ## 1.9 Advanced Vibe Coding Concepts
 
@@ -350,25 +242,7 @@ When clicked, expand to show more details."
 
 ### Think Like a Director, Not a Developer
 
-```mermaid
-mindmap
-  root((Director Mindset))
-    Vision
-      Overall feeling
-      User journey
-      Emotional impact
-      Brand alignment
-    Direction
-      "Make it more energetic"
-      "Tone down the colours"
-      "Speed up transitions"
-      "Add breathing room"
-    Feedback
-      "This works great"
-      "Let's try something else"
-      "Almost there"
-      "Perfect!"
-```
+![The director mindset: hold the vision, give direction in plain language, and offer feedback as the work evolves](/data/workshops/workshop-02-afternoon-vibe-coding/diagrams/01-director-mindset.svg)
 
 ### Embrace Experimentation
 

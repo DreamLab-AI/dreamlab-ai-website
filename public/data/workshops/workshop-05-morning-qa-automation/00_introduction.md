@@ -26,19 +26,7 @@ Quality assurance is the backbone of reliable software. In this workshop, you'll
 
 ## Why QA Automation Matters
 
-```mermaid
-graph TD
-    A[Manual Testing] -->|Time Consuming| B[Limited Coverage]
-    A -->|Error Prone| C[Inconsistent Results]
-    A -->|Expensive| D[Doesn't Scale]
-
-    E[Automated Testing] -->|Fast| F[Comprehensive Coverage]
-    E -->|Reliable| G[Consistent Results]
-    E -->|Cost Effective| H[Scales Infinitely]
-
-    style E fill:#4CAF50
-    style A fill:#f44336
-```
+![Manual testing is slow, error-prone and unscalable; automated testing is fast, reliable and scales infinitely](/data/workshops/workshop-05-morning-qa-automation/diagrams/00-manual-vs-automated.svg)
 
 ### Real-World Impact
 
@@ -58,21 +46,7 @@ graph TD
 
 ## The Testing Pyramid
 
-```mermaid
-graph TB
-    subgraph "Testing Pyramid"
-        A[E2E Tests<br/>10%<br/>Slow, Expensive]
-        B[Integration Tests<br/>30%<br/>Medium Speed]
-        C[Unit Tests<br/>60%<br/>Fast, Cheap]
-    end
-
-    A --> B
-    B --> C
-
-    style A fill:#FF5252
-    style B fill:#FFC107
-    style C fill:#4CAF50
-```
+![The testing pyramid: a small top layer of E2E tests, a middle layer of integration tests, and a broad base of unit tests](/data/workshops/workshop-05-morning-qa-automation/diagrams/00-testing-pyramid.svg)
 
 **The Principle**: More unit tests (fast, cheap), fewer E2E tests (slow, expensive).
 

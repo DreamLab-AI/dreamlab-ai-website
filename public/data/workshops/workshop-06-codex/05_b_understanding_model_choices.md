@@ -34,23 +34,7 @@ claude --model claude-sonnet-4-6
 
 ### Claude Model Selection Strategy
 
-```mermaid
-graph TD
-    A[Coding Task] --> B{Complexity?}
-
-    B -->|Novel architecture, creative design| C[Fable 5]
-    B -->|Complex multi-file refactor| D[Opus 4.8]
-    B -->|Standard feature, routine fix| E[Sonnet 4.6]
-    B -->|Simple rename, quick lookup| F[Haiku 4.5]
-
-    C --> G[Highest quality, highest cost]
-    D --> H[Default — excellent for most tasks]
-    E --> I[Fast, cost-effective — /fast mode]
-    F --> J[Cheapest, fastest — bulk operations]
-
-    style D fill:#45b7d1
-    style E fill:#96ceb4
-```
+![Matching model to complexity: Fable 5 for novel design, Opus 4.8 as the default, Sonnet 4.6 for routine work, Haiku 4.5 for simple bulk operations](/data/workshops/workshop-06-codex/diagrams/05-b-model-ladder.svg)
 
 **Practical guidance:**
 - Start a session with **Opus 4.8** (the default) for any non-trivial task
@@ -156,26 +140,7 @@ The 200K context window across all Claude models is a significant advantage for 
 
 ### Decision Matrix
 
-```mermaid
-graph TD
-    A[Choose Model] --> B{What tool?}
-
-    B -->|Claude Code| C{Task type?}
-    B -->|Codex CLI| D{Task type?}
-    B -->|IDE tool| E[Model selected by tool]
-
-    C -->|Complex, novel| F[Fable 5 or Opus 4.8]
-    C -->|Routine, fast| G[Sonnet 4.6 via /fast]
-    C -->|Bulk, simple| H[Haiku 4.5]
-
-    D -->|Complex reasoning| I[o3 or GPT-4o]
-    D -->|Interactive, fast| J[codex-mini or o4-mini]
-    D -->|Cost-sensitive| K[o4-mini]
-
-    style F fill:#45b7d1
-    style G fill:#96ceb4
-    style I fill:#ff6b6b
-```
+![Model choice by tool: Claude Code and Codex CLI model options per task type; IDE tools select the model for you](/data/workshops/workshop-06-codex/diagrams/05-b-model-by-tool.svg)
 
 ### Cost Optimisation Tips
 

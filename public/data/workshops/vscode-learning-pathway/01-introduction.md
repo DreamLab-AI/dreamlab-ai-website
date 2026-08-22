@@ -13,28 +13,7 @@ By the end of this module, you will:
 
 Visual Studio Code has evolved from a code editor into the **universal platform for knowledge work**. Here's why it dominates:
 
-```mermaid
-graph TD
-    A[VS Code Core] --> B[Lightweight & Fast]
-    A --> C[Open Source]
-    A --> D[Cross-Platform]
-    A --> E[Extension API]
-
-    E --> F[70,000+ Extensions]
-    E --> G[AI Integration]
-    E --> H[Remote Development]
-    E --> I[Custom Tools]
-
-    G --> J[GitHub Copilot]
-    G --> K[Claude/ChatGPT]
-    G --> L[Local Models]
-
-    style A fill:#007acc,color:#fff
-    style G fill:#ff6b35,color:#fff
-    style J fill:#4fc3f7
-    style K fill:#4fc3f7
-    style L fill:#4fc3f7
-```
+![VS Code as a platform: a fast open-source core whose extension API powers AI integration, remote development and custom tools](/data/workshops/vscode-learning-pathway/diagrams/01-vscode-platform.svg)
 
 ### Market Dominance (2026 Stats)
 - **73.7%** of professional developers use VS Code
@@ -62,29 +41,7 @@ Modern VS Code is built for AI collaboration, not just text editing.
 
 ### 2. Architecture Overview
 
-```mermaid
-graph LR
-    A[User Interface] --> B[Editor Core]
-    B --> C[Extension Host]
-    C --> D[Language Servers]
-    C --> E[AI Services]
-    C --> F[Remote Connections]
-
-    D --> G[TypeScript]
-    D --> H[Python]
-    D --> I[Rust, Go, etc.]
-
-    E --> J[Copilot]
-    E --> K[Cody/Continue]
-    E --> L[Local Models]
-
-    F --> M[SSH]
-    F --> N[Containers]
-    F --> O[WSL]
-
-    style B fill:#007acc,color:#fff
-    style E fill:#ff6b35,color:#fff
-```
+![VS Code architecture: the user interface drives the editor core; an isolated extension host runs language servers, AI services and remote connections](/data/workshops/vscode-learning-pathway/diagrams/01-architecture.svg)
 
 ### 3. Key Components
 
@@ -290,27 +247,7 @@ code --install-extension ms-vscode-remote.remote-ssh
 
 Modern VS Code supports three types of AI integration:
 
-```mermaid
-graph TD
-    A[AI Integration Types] --> B[Cloud-Based]
-    A --> C[Hybrid]
-    A --> D[Local]
-
-    B --> E[GitHub Copilot]
-    B --> F[Codeium]
-    B --> G[Tabnine Cloud]
-
-    C --> H[Continue]
-    C --> I[Cody]
-
-    D --> J[Ollama + Continue]
-    D --> K[Local Models]
-
-    style A fill:#007acc,color:#fff
-    style B fill:#4fc3f7
-    style C fill:#66bb6a
-    style D fill:#ffa726
-```
+![Three AI integration types: cloud-based services, hybrid tools and fully local private models](/data/workshops/vscode-learning-pathway/diagrams/01-ai-approaches.svg)
 
 **Cloud-Based AI:**
 - **Pros**: Most powerful models, always up-to-date, no local resources
