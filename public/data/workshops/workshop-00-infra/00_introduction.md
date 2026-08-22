@@ -87,17 +87,15 @@ Modern options include:
 
 ## Common Pitfalls to Avoid
 
-```
-❌ AVOID                          ✅ DO INSTEAD
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Committing without messages    →  Write descriptive commit messages
-Ignoring .gitignore             →  Exclude node_modules, .env files
-Pushing directly to main        →  Use feature branches & PRs
-Trusting AI blindly             →  Review and test all generated code
-Working without backups         →  Push to GitHub regularly
-Hardcoding secrets              →  Use environment variables
-Large binary files in Git       →  Use Git LFS or external storage
-```
+| ❌ Avoid | ✅ Do instead |
+|---|---|
+| Committing without messages | Write descriptive commit messages |
+| Ignoring `.gitignore` | Exclude `node_modules`, `.env` files |
+| Pushing directly to main | Use feature branches & PRs |
+| Trusting AI blindly | Review and test all generated code |
+| Working without backups | Push to GitHub regularly |
+| Hardcoding secrets | Use environment variables |
+| Large binary files in Git | Use Git LFS or external storage |
 
 ## What Makes This Workshop Different
 

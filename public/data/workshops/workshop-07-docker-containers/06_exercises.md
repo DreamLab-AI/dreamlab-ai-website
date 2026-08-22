@@ -309,12 +309,7 @@ Build a three-service Docker Compose stack that simulates an AI processing pipel
 
 ### Architecture
 
-```
-User Request --> API Gateway (:8080) --> Processor (:8001) --> Ingester (:8002)
-                     |                       |
-                     +-- health check        +-- transforms text
-                     +-- routes requests     +-- returns results
-```
+![A user request hits the API gateway on 8080, which routes to the processor on 8001, which calls the ingester on 8002 to transform text and return results](/data/workshops/workshop-07-docker-containers/diagrams/06-ai-pipeline.svg)
 
 ### Your Task
 

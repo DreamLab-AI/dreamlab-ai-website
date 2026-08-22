@@ -21,21 +21,7 @@ Each time you send a message to Claude Code, the model receives:
 
 The total of all these is the **input token count**. The model's response adds **output tokens**. Both contribute to cost and to filling the context window.
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│                  CONTEXT WINDOW (~200k tokens)               │
-│                                                              │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
-│  │  System       │  │ Conversation │  │  Files Read  │      │
-│  │  Context      │  │  History     │  │  This Session│      │
-│  │  (CLAUDE.md,  │  │  (grows with │  │  (grows as   │      │
-│  │   tools)      │  │   each turn) │  │   you work)  │      │
-│  └──────────────┘  └──────────────┘  └──────────────┘      │
-│                                                              │
-│  ◄──────── all of this is sent with EVERY message ────────► │
-│                                                              │
-└──────────────────────────────────────────────────────────────┘
-```
+![The context window: system context, conversation history and files read this session all accumulate and are sent with every single message](/data/workshops/workshop-00-infra/diagrams/10-context-window.svg)
 
 **The key insight:** context is not just your latest message. It is the entire accumulated session. A conversation that has been running for an hour may be sending 50,000+ tokens with every single message — even if your latest prompt is a single sentence.
 

@@ -8,22 +8,6 @@ Large Language Models are powerful, but they have fundamental limitations: their
 
 Instead of relying solely on what a model "knows" from training, RAG retrieves relevant information from your own documents and feeds it to the model as context. The model then generates an answer grounded in your actual data.
 
-```
-Your Question
-     |
-     v
-[Retrieve relevant documents from your knowledge base]
-     |
-     v
-[Combine documents + question into a prompt]
-     |
-     v
-[LLM generates answer grounded in retrieved context]
-     |
-     v
-Accurate, sourced answer
-```
-
 ![RAG flow: a question passes through retrieval of your documents, prompt augmentation with that context, and LLM generation to produce a grounded answer with citations](/data/workshops/workshop-03-afternoon-rag-system/diagrams/00-rag-loop.svg)
 
 ### The Problem Without RAG

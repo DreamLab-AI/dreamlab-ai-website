@@ -12,17 +12,7 @@ A Docker **image** is a read-only template that contains everything needed to ru
 
 Images are built in layers. Each instruction in a Dockerfile adds a new layer on top of the previous one:
 
-```
-+---------------------------+
-|  Your Python script       |  <- Layer 4 (your code)
-+---------------------------+
-|  pip install torch        |  <- Layer 3 (Python packages)
-+---------------------------+
-|  apt install python3      |  <- Layer 2 (system packages)
-+---------------------------+
-|  Ubuntu 24.04 base        |  <- Layer 1 (base image)
-+---------------------------+
-```
+![Docker image built as stacked layers: Ubuntu base, system packages, Python packages, then application code on top](/data/workshops/workshop-07-docker-containers/diagrams/01-image-layers.svg)
 
 This layering system is clever. If two images both start from Ubuntu 24.04, Docker stores that base layer only once on disk. Layers are shared and cached, which saves both space and download time.
 
@@ -53,13 +43,7 @@ Common tag conventions:
 
 A **container** is a running instance of an image. If an image is the blueprint, a container is the house built from that blueprint. You can run multiple containers from the same image, and each one is independent.
 
-```
-Image: python:3.11
-  |
-  +-- Container 1 (running your analysis script)
-  +-- Container 2 (running a Jupyter notebook)
-  +-- Container 3 (running tests)
-```
+![One image, python:3.11, spawning three independent running containers: an analysis script, a Jupyter notebook, and a test run](/data/workshops/workshop-07-docker-containers/diagrams/01-image-container-relationship.svg)
 
 Containers are ephemeral by default. When you stop and remove a container, any changes made inside it are lost. This is a feature, not a bug -- it means you always start from a clean, known state. If you need to keep data, you use volumes (explained below).
 
@@ -67,13 +51,7 @@ Containers are ephemeral by default. When you stop and remove a container, any c
 
 ### Container Lifecycle
 
-```
-Image  -->  Created  -->  Running  -->  Stopped  -->  Removed
-              |                           |
-              +-- docker create           +-- docker stop
-              +-- docker run              +-- docker start (restart)
-                                          +-- docker rm (delete)
-```
+![Container lifecycle: image to created to running to stopped to removed, driven by docker create, run, stop, start and rm](/data/workshops/workshop-07-docker-containers/diagrams/01-container-lifecycle.svg)
 
 Key points:
 
@@ -164,14 +142,7 @@ These map a specific directory on your host machine into the container. They're 
 docker run -v $(pwd):/app python:3.11 python /app/script.py
 ```
 
-```
-Host Machine                Container
-+------------------+        +------------------+
-|  ~/projects/ai/  | <----> |  /app/           |
-|    script.py     |        |    script.py     |
-|    data/         |        |    data/         |
-+------------------+        +------------------+
-```
+![Bind mount mapping the host directory ~/projects/ai/ directly into /app/ inside the container](/data/workshops/workshop-07-docker-containers/diagrams/01-bind-mount.svg)
 
 > **When to use which:** Named volumes for data that should persist (databases, models). Bind mounts for source code during development.
 
@@ -192,18 +163,7 @@ docker run --network ai-network --name webui open-webui/open-webui
 
 On a shared network, containers can reach each other by name. In the example above, the `webui` container can connect to `ollama` using the hostname `ollama` -- no IP addresses needed.
 
-```
-+-- ai-network ----------------------------------+
-|                                                 |
-|  +----------+          +----------+             |
-|  |  ollama  | <------> |  webui   |             |
-|  | :11434   |          | :3000    |             |
-|  +----------+          +----------+             |
-|                                                 |
-+-------------------------------------------------+
-         |
-     Port 3000 published to host
-```
+![Ollama and webui containers on a shared ai-network reaching each other by name, with webui's port 3000 published to the host](/data/workshops/workshop-07-docker-containers/diagrams/01-network-topology.svg)
 
 ---
 

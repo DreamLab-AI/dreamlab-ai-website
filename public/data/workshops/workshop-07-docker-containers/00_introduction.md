@@ -32,23 +32,6 @@ You might have heard of virtual machines (VMs). Both VMs and containers provide 
 
 A VM runs an entire operating system inside your operating system. A container shares the host's operating system kernel and only packages the application layer. This makes containers dramatically lighter and faster.
 
-```
-Virtual Machine                    Container
-+---------------------------+      +---------------------------+
-|  App A    |   App B       |      |  App A    |   App B       |
-+-----------+---------------+      +-----------+---------------+
-|  Bins/Libs|  Bins/Libs    |      |  Bins/Libs|  Bins/Libs    |
-+-----------+---------------+      +---------------------------+
-|  Guest OS |  Guest OS     |      |       Container Runtime   |
-+-----------+---------------+      +---------------------------+
-|       Hypervisor          |      |        Host OS Kernel     |
-+---------------------------+      +---------------------------+
-|       Host OS             |
-+---------------------------+
-|       Hardware             |      |        Hardware           |
-+---------------------------+      +---------------------------+
-```
-
 ![Side-by-side stacks comparing virtual machines, which run a full guest OS per app above a hypervisor, with containers, which share one host kernel through a lightweight runtime](/data/workshops/workshop-07-docker-containers/diagrams/00-vm-vs-container.svg)
 
 ## Why AI Work Especially Needs Containers

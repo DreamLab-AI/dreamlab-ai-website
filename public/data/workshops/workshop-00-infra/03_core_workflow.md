@@ -39,20 +39,7 @@ Cloning creates a local copy of an existing repository on your machine, includin
 
 This is the heart of everyday Git usage. Think of it as a four-step rhythm:
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│                                                              │
-│   1. EDIT         2. STAGE        3. COMMIT      4. PUSH    │
-│   ─────────       ──────────      ──────────     ─────────  │
-│   Change your     Select which    Record a       Upload to  │
-│   files           changes to      snapshot       GitHub     │
-│                   include         with a                    │
-│                                   message                   │
-│                                                              │
-│   (your editor)   git add         git commit     git push   │
-│                                                              │
-└──────────────────────────────────────────────────────────────┘
-```
+![The core Git cycle: edit files in your editor, stage them with git add, commit them with git commit, then push them to GitHub](/data/workshops/workshop-00-infra/diagrams/03-edit-stage-commit-push.svg)
 
 ### Step 1: Edit Your Files
 

@@ -6,17 +6,7 @@ AI work is computationally demanding. Training models, running inference on larg
 
 The solution: edit code on your comfortable, portable laptop, but execute it on a powerful remote machine. Docker and VS Code make this surprisingly straightforward.
 
-```
-Your Laptop                      Remote GPU Server
-(lightweight, portable)          (powerful, always-on)
-+------------------+             +---------------------------+
-|                  |   SSH /     |  64 GB RAM                |
-|  VS Code         | ---------> |  NVIDIA RTX 4090          |
-|  (editor only)   |   tunnel   |  2 TB SSD                 |
-|                  |             |  Docker + containers      |
-+------------------+             +---------------------------+
-   Edit here                       Run here
-```
+![A lightweight laptop running only VS Code connects over SSH or a tunnel to a powerful, always-on remote GPU server](/data/workshops/workshop-07-docker-containers/diagrams/04-remote-gpu-server.svg)
 
 ---
 
@@ -327,15 +317,7 @@ Create your embedding script, run it from the integrated terminal, and it execut
 
 ### The Full Stack
 
-```
-Your Laptop          VS Code SSH          Remote Server
-+----------+         +----------+         +-------------------+
-|          | ------> |          | ------> | Dev Container     |
-| VS Code  |  SSH    | VS Code  |  Docker | Python 3.11       |
-| (editor) |         | Server   |         | PyTorch + CUDA    |
-|          |         |          |         | GPU access         |
-+----------+         +----------+         +-------------------+
-```
+![Your laptop's VS Code connects over SSH to a VS Code Server, which reaches a Dev Container running Python, PyTorch and CUDA with GPU access via Docker](/data/workshops/workshop-07-docker-containers/diagrams/04-full-stack.svg)
 
 ---
 

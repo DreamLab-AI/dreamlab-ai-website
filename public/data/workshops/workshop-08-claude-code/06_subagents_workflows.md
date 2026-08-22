@@ -19,15 +19,6 @@ The Agent tool spawns a child agent that runs a specific task and reports back. 
 
 ### How Subagents Work
 
-```
-Main Session
-  ├─> Subagent A: "Review the authentication module"
-  ├─> Subagent B: "Review the payment module"
-  └─> Subagent C: "Review the user management module"
-      │
-      └─ All three run in parallel, report back to main session
-```
-
 ![Subagent fan-out: the main session delegates to three isolated subagents running in parallel, whose reports flow back and are synthesised into one unified report](/data/workshops/workshop-08-claude-code/diagrams/06-subagent-fanout.svg)
 
 When you ask Claude Code to perform a task that would benefit from parallelism, it can spawn subagents automatically. You can also request it explicitly:

@@ -270,32 +270,7 @@ make
 
 ## Architecture Comparison
 
-```
-┌─────────────────────────────────────────────────────┐
-│               Local AI Architecture                  │
-└─────────────────────────────────────────────────────┘
-
-Option 1: Ollama (Simplest)
-┌──────────┐    ┌─────────┐    ┌───────────┐
-│   User   │───▶│ Ollama  │───▶│  Model    │
-│  Script  │    │   API   │    │  (GGUF)   │
-└──────────┘    └─────────┘    └───────────┘
-                Port 11434
-
-Option 2: LM Studio (GUI)
-┌──────────┐    ┌─────────┐    ┌───────────┐
-│   User   │───▶│   GUI   │───▶│  Model    │
-│  Browser │    │ Server  │    │  (GGUF)   │
-└──────────┘    └─────────┘    └───────────┘
-                Port 1234
-
-Option 3: LocalAI (Production)
-┌──────────┐    ┌─────────┐    ┌───────────┐
-│  OpenAI  │───▶│ LocalAI │───▶│  Multiple │
-│   SDK    │    │ Server  │    │  Backends │
-└──────────┘    └─────────┘    └───────────┘
-                Port 8080
-```
+![Three local inference tool architectures: Ollama (user script to Ollama API on port 11434 to a GGUF model), LM Studio (user browser to GUI server on port 1234 to a GGUF model), and LocalAI (OpenAI SDK to LocalAI server on port 8080 to multiple backends)](/data/workshops/workshop-03-morning-local-ai/diagrams/01-inference-tool-architectures.svg)
 
 ---
 

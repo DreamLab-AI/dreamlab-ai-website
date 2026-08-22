@@ -279,22 +279,19 @@ npm install -g cspell
 - 🖨️ [Linux Shortcuts PDF](https://code.visualstudio.com/shortcuts/keyboard-shortcuts-linux.pdf)
 
 **Quick Reference:**
-```ascii
-┌─────────────────────────────────────────┐
-│        ESSENTIAL SHORTCUTS              │
-├─────────────────────────────────────────┤
-│ Command Palette    Ctrl+Shift+P         │
-│ Quick Open         Ctrl+P               │
-│ Find in Files      Ctrl+Shift+F         │
-│ Terminal           Ctrl+`               │
-│ AI Assistant       Ctrl+I               │
-│ Save All           Ctrl+K S             │
-│ Split Editor       Ctrl+\               │
-│ Close File         Ctrl+W               │
-│ Format Document    Shift+Alt+F          │
-│ Multi-Cursor       Alt+Click            │
-└─────────────────────────────────────────┘
-```
+
+| Action | Shortcut |
+|--------|----------|
+| Command Palette | `Ctrl+Shift+P` |
+| Quick Open | `Ctrl+P` |
+| Find in Files | `Ctrl+Shift+F` |
+| Terminal | `` Ctrl+` `` |
+| AI Assistant | `Ctrl+I` |
+| Save All | `Ctrl+K S` |
+| Split Editor | `Ctrl+\` |
+| Close File | `Ctrl+W` |
+| Format Document | `Shift+Alt+F` |
+| Multi-Cursor | `Alt+Click` |
 
 ### Markdown Reference
 

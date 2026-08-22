@@ -47,27 +47,7 @@ A common source of confusion is the distinction between Git and GitHub:
 - **Git:** The underlying version control software, originally developed by Linus Torvalds for managing Linux kernel development. Git operates locally on your computer and can function entirely offline.
 - **GitHub:** A web-based platform that hosts Git repositories, providing additional features such as a graphical interface, collaboration tools (e.g., pull requests, issue tracking), user management, and services like [GitHub Pages](./05_github_pages.md).
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                                                         │
-│  GIT (Local)              GITHUB (Cloud)                │
-│  ┌──────────────┐        ┌──────────────┐              │
-│  │              │        │              │              │
-│  │  Version     │  push  │  Remote      │              │
-│  │  Control     │───────>│  Hosting     │              │
-│  │  System      │  pull  │  + Features  │              │
-│  │              │<───────│              │              │
-│  └──────────────┘        └──────────────┘              │
-│                                                         │
-│  Runs on your             Runs in cloud                │
-│  computer                 Provides:                     │
-│                           • Collaboration               │
-│                           • GitHub Pages                │
-│                           • Actions (CI/CD)             │
-│                           • Issue tracking              │
-│                                                         │
-└─────────────────────────────────────────────────────────┘
-```
+![Git versus GitHub: Git is local version-control software, GitHub is a cloud platform built on Git adding collaboration, Pages, Actions and issue tracking, linked by push and pull](/data/workshops/workshop-00-infra/diagrams/01-git-vs-github.svg)
 
 > **📝 Note:** In simple terms, Git is the core technology, while GitHub is one popular platform built upon Git. Although alternatives like GitLab and Bitbucket exist, GitHub remains the most widely used, particularly within the open-source community.
 

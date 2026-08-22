@@ -18,32 +18,6 @@ LLMs have limitations:
 
 ### The Solution: RAG
 
-```
-┌──────────────────────────────────────────────────┐
-│            RAG Pipeline (2026)                   │
-└──────────────────────────────────────────────────┘
-
-1. User Query
-   │
-   ▼
-2. Convert to Embedding ───┐
-   │                       │
-   ▼                       ▼
-3. Vector Search      Keyword Search
-   │                       │
-   ▼                       ▼
-4. Hybrid Results ────────┘
-   │
-   ▼
-5. Re-rank for Relevance
-   │
-   ▼
-6. Augment LLM Prompt
-   │
-   ▼
-7. Generate Response
-```
-
 In production the pipeline splits into two paths: an offline indexing path that prepares your documents, and an online query path that runs on every question.
 
 ![Modern RAG pipeline: an offline indexing path (documents, chunk, embed, vector store) feeding an online query path (user query, hybrid retrieval, re-ranking, generation)](/data/workshops/workshop-03-afternoon-rag-system/diagrams/01-rag-pipeline.svg)

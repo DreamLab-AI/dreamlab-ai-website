@@ -286,13 +286,11 @@ Hooks run in order. If an earlier hook fails (non-zero exit), subsequent hooks s
 
 ## Hook Design Patterns
 
+![Three hook design patterns: the Gatekeeper pattern where PreToolUse validates then allows or blocks; the Cleanup pattern where PostToolUse formats, lints, then logs; and the Observer pattern where SessionStart, Stop and SessionEnd each log then notify](/data/workshops/workshop-08-claude-code/diagrams/05-hook-design-patterns.svg)
+
 ### The Gatekeeper Pattern
 
 Use `PreToolUse` hooks to enforce project rules before Claude makes changes:
-
-```
-PreToolUse → Validate → Allow or Block
-```
 
 Examples:
 - Block edits to generated files
@@ -303,10 +301,6 @@ Examples:
 
 Use `PostToolUse` hooks to normalise changes after they are made:
 
-```
-PostToolUse → Format → Lint → Log
-```
-
 Examples:
 - Auto-format all edited files
 - Sort imports
@@ -316,12 +310,6 @@ Examples:
 ### The Observer Pattern
 
 Use `SessionStart`, `Stop`, and `SessionEnd` for monitoring without interference:
-
-```
-SessionStart → Log → Notify
-Stop         → Log → Notify
-SessionEnd   → Summarise → Notify
-```
 
 Examples:
 - Activity logging for compliance

@@ -6,19 +6,6 @@ Imagine clicking a single button and getting a fully configured development envi
 
 A Dev Container is a Docker container specifically configured as a development environment. VS Code connects to the container and runs your editor inside it. Your code, your terminal, your debugging tools -- everything runs in the container. But the VS Code window itself still appears on your desktop, feeling completely native.
 
-```
-Your Desktop                    Docker Container
-+------------------+            +---------------------------+
-|                  |            |  Ubuntu 24.04             |
-|  VS Code Window  | --------> |  Python 3.11              |
-|  (looks normal)  |  remote   |  Node 20                  |
-|                  |  connect  |  Git, curl, jq             |
-|                  |            |  VS Code Server            |
-|                  |            |  Your extensions           |
-+------------------+            +---------------------------+
-     Your laptop                   Runs in Docker
-```
-
 ![VS Code on your desktop connecting over docker exec to a headless VS Code Server inside the Docker container, with your code bind-mounted in and server ports forwarded back to localhost](/data/workshops/workshop-07-docker-containers/diagrams/03-devcontainer-arch.svg)
 
 ### Why This Matters

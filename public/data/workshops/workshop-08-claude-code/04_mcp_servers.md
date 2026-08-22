@@ -10,12 +10,6 @@ Without MCP, Claude Code can only work with what is on your local filesystem and
 
 ### How It Works
 
-```
-You ──> Claude Code ──> MCP Server ──> External Service
-                                         (GitHub, Postgres,
-                                          Slack, filesystem, etc.)
-```
-
 1. You configure MCP servers in `.mcp.json`
 2. Claude Code connects to them at session start
 3. Claude discovers the available tools from each server

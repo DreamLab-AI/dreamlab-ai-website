@@ -108,26 +108,7 @@ code .
 
 **Interface Layout:**
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│ Menu Bar                                           [- □ ×]  │
-├──┬──────────────────────────────────────────────────────────┤
-│  │ Tab Bar                                                  │
-│A │──────────────────────────────────────────────────────────│
-│c │                                                          │
-│t │                                                          │
-│i │             Editor Area                                  │
-│v │           (Your code here)                              │
-│i │                                                          │
-│t │                                                          │
-│y │                                                          │
-│  │──────────────────────────────────────────────────────────│
-│B │             Panel (Terminal/Output/Debug)               │
-│a │                                                          │
-│r │──────────────────────────────────────────────────────────│
-│  │ Status Bar                                              │
-└──┴──────────────────────────────────────────────────────────┘
-```
+![VS Code interface layout: a menu and tab bar on top, an Activity Bar and Side Bar on the left, a central Editor Area, a Panel below it, and a Status Bar along the bottom](/data/workshops/vscode-learning-pathway/diagrams/01-interface-layout.svg)
 
 **Key UI Elements:**
 
