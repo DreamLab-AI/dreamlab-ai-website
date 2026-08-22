@@ -95,7 +95,7 @@ env:
   # fix, nip44 PlaintextTooLong mapping, pod ACL owner-control invariant, CI
   # hardening). Cutover provenance
   # is in docs/architecture/kit-compatibility-record.md.
-  KIT_REF: '90ffe74cdc21d43638ce538c27ddb3f28b68b75f'
+  KIT_REF: '93dcf0553cf5311297c29bf70d2f5f3148e9bb10'
 
 jobs:
   gate:
