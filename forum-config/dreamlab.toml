@@ -77,7 +77,7 @@ node_name     = "MINIMOONOIR"           # BBS masthead + status-bar node id
 tagline       = "private secure forums"  # strapline under the node name (banner + landing)
 location      = "Lake District, UK"     # BBS status-bar location string
 banner_url    = ""                       # optional ASCII-art / image banner
-logo_url      = "https://dreamlab-ai.com/assets/logo.svg"
+logo_url      = ""                       # optional; no SVG logo exists yet (/assets/logo.svg was a 404)
 welcome_copy  = """
 Welcome to the DreamLab AI Community Forum — \
 a private space for trainers, builders, and the curious.\

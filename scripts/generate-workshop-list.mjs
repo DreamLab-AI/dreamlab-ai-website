@@ -32,7 +32,7 @@ async function generateWorkshopData() {
     const workshopDirs = await fs.readdir(workshopsBaseDir, { withFileTypes: true });
 
     for (const dirEntry of workshopDirs) {
-      if (dirEntry.isDirectory()) {
+      if (dirEntry.isDirectory() && !dirEntry.name.startsWith('.')) {
         const workshopId = dirEntry.name;
         const workshopDirPath = path.join(workshopsBaseDir, workshopId);
         

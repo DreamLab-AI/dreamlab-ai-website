@@ -8,3 +8,10 @@
 | 2026-08-18 | operator-overlay | Given `pin-parity` reports `PIN-DRIFT-RECORD-SHA` with workflows uniformly at `K | NONE | NONE | yes | INCONCLUSIVE |  | 37a2cc7ec37e |  |
 | 2026-08-18 | operator-overlay | Given workflows uniformly pin KIT_REF `2f01e339…` while `docs/architecture/kit-c | NONE | NONE | yes | ACCEPT |  | c50c22db8170 |  |
 | 2026-08-18 | operator-overlay | Given workflows uniformly pin KIT_REF `2f01e33995a9ce193b7c9ed08aedd716d038f639` | NONE | NONE | yes | ACCEPT |  | 70cc0803f3b2 |  |
+| 2026-08-19 | ci-workflows | Given the prior-night ACCEPTs that repinned all three workflows and the compatib | NONE | NONE | yes | ACCEPT |  | 0ae8d68dbac3 |  |
+| 2026-08-20 | kit-pin-integrity | Given the workflows and compatibility record were repinned on 2026-08-18/19, whe | NONE | NONE | yes | REJECT |  | a21a5296d4f6 |  |
+| 2026-08-21 | site-build-content | Given the production build emits un-gzipped JS chunks of 690.56 kB (cynefin) and | NONE | NONE | yes | INCONCLUSIVE |  | b624c230e321 |  |
+| 2026-08-21 | site-build-content | Given the annexe checkout at `~/dream-annexe/2026-08-21-dreamlab-ai-website/drea | NONE | NONE | yes | INCONCLUSIVE |  | 26a5e1047fdd |  |
+| 2026-08-22 | operator-overlay | A REJECT verdict can be a healthy result — the drift hypothesis was the right fa | NONE | NONE | yes | REJECT |  | f1f748bf996c |  |
+| 2026-08-22 | operator-overlay | Given the KIT_REF was repinned from `2f01e339…` to `90ffe74c…` across workflows  | NONE | NONE | yes | REJECT |  | d4f24a45f8e1 |  |
+| 2026-08-23 | ci-workflows | Given the three workflows pin KIT_REF `93dcf055…` while `kit-compatibility-recor | NONE | NONE | yes | ACCEPT |  | e1a4957f1a19 |  |
