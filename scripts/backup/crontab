@@ -1,0 +1,6 @@
+# Forum backup schedule (issue #48) — consumed by the agentbox
+# [program:forum-backup-cron] supercronic service. Editable live: supercronic
+# re-reads this file from the workspace mount; no image rebuild needed.
+# 03:10 UTC nightly — after the CF Workers' own quiet period, before the 04:00
+# dream-cycle window.
+10 3 * * * /home/devuser/workspace/dreamlab-ai-website/scripts/backup/forum-backup.sh
