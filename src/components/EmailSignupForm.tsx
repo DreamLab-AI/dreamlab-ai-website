@@ -78,7 +78,7 @@ export const EmailSignupForm = () => {
         pageUrl: window.location.href,
       });
       const wrap = wrapDm(rumor.content, identity.sk, ADMIN_PUBKEY, SIGNUP_SUBJECT);
-      const result = await publishGiftWrap(RELAY_URL, wrap);
+      const result = await publishGiftWrap(RELAY_URL, wrap, { authSk: identity.sk });
 
       // Do not log the raw relay message client-side — an OK-false reason can
       // leak internal relay / whitelist detail (matches the Contact form's

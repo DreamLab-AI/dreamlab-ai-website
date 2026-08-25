@@ -163,7 +163,9 @@ describe("Contact page", () => {
       "DreamLab website enquiry"
     );
     // The wrap is published to the configured relay.
-    expect(publishGiftWrapMock).toHaveBeenCalledWith(RELAY, WRAP);
+    expect(publishGiftWrapMock).toHaveBeenCalledWith(RELAY, WRAP, {
+      authSk: new Uint8Array([1, 2, 3]),
+    });
     // Success is reported only on the relay OK-true.
     await waitFor(() => expect(toastSuccessMock).toHaveBeenCalled());
     expect(toastErrorMock).not.toHaveBeenCalled();

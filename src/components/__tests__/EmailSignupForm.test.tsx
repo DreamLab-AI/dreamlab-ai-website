@@ -200,7 +200,9 @@ describe("EmailSignupForm", () => {
     expect(wrapArgs[3]).toBe("DreamLab website signup");
 
     // publishGiftWrap uses the configured relay and the produced wrap.
-    expect(publishGiftWrapMock).toHaveBeenCalledWith(RELAY, WRAP);
+    expect(publishGiftWrapMock).toHaveBeenCalledWith(RELAY, WRAP, {
+      authSk: new Uint8Array([1, 2, 3]),
+    });
 
     await waitFor(() =>
       expect(toastSuccessMock).toHaveBeenCalledWith(

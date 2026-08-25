@@ -406,7 +406,7 @@ const Contact = () => {
         pageUrl: window.location.href,
       });
       const wrap = wrapDm(rumor.content, identity.sk, ADMIN_PUBKEY, ENQUIRY_SUBJECT);
-      const result = await publishGiftWrap(RELAY_URL, wrap);
+      const result = await publishGiftWrap(RELAY_URL, wrap, { authSk: identity.sk });
 
       if (!result.ok) {
         toast.error(ERROR_MESSAGE_SUBMISSION, { duration: 5000 });

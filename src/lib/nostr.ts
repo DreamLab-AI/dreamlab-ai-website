@@ -193,14 +193,24 @@ export interface PublishResult {
 export interface PublishOptions {
   timeoutMs?: number;
   wsFactory?: WsFactory;
+  /**
+   * Secret key used to answer the relay's NIP-42 AUTH challenge. Since the kit
+   * made AUTH the universal write gate (PRD-010 G4), an unauthenticated EVENT
+   * is rejected with `auth-required`; passing the sender's ephemeral key lets
+   * the publish complete the round-trip. Anonymity is preserved — the key is
+   * minted per submission and discarded, exactly as for the wrap signature.
+   */
+  authSk?: Uint8Array;
 }
 
 /**
  * Publish a gift wrap over a one-shot WebSocket and resolve on the matching
  * relay OK frame. Never rejects: transport failures, OK-false, and timeout all
  * resolve `{ ok: false, message }` so the caller shows a user-visible failure
- * (ADR-041 Decision 4 — success only on relay OK-true). AUTH frames are ignored;
- * publishing an EVENT needs no NIP-42 AUTH. The socket is always closed.
+ * (ADR-041 Decision 4 — success only on relay OK-true). If the relay issues a
+ * NIP-42 AUTH challenge and `opts.authSk` is provided, the challenge is
+ * answered and the EVENT retried once; without `authSk` AUTH frames are
+ * ignored (legacy allowlist-mode behaviour). The socket is always closed.
  */
 export function publishGiftWrap(
   relayUrl: string,
@@ -236,13 +246,46 @@ export function publishGiftWrap(
       timeoutMs,
     );
 
-    ws.onopen = () => {
+    // NIP-42 state: the relay's challenge arrives on its own schedule (usually
+    // straight after open), and the write gate rejects an unauthenticated EVENT
+    // with `auth-required`. We answer the challenge lazily — only after a
+    // rejection — so allowlist-mode relays keep the zero-round-trip fast path.
+    let challenge: string | null = null;
+    let retried = false;
+    let awaitingChallenge = false;
+
+    const sendEvent = (): void => {
       try {
         ws.send(JSON.stringify(["EVENT", wrap]));
       } catch (err) {
         finish({ ok: false, message: `Failed to send event: ${errMsg(err)}` });
       }
     };
+
+    const authAndRetry = (): void => {
+      retried = true;
+      try {
+        const authEvent = finalizeEvent(
+          {
+            kind: KIND_NIP42_AUTH,
+            created_at: nowSec(),
+            tags: [
+              ["relay", relayUrl],
+              ["challenge", challenge as string],
+            ],
+            content: "",
+          },
+          opts.authSk as Uint8Array,
+        );
+        ws.send(JSON.stringify(["AUTH", authEvent]));
+      } catch (err) {
+        finish({ ok: false, message: `Failed to authenticate: ${errMsg(err)}` });
+        return;
+      }
+      sendEvent();
+    };
+
+    ws.onopen = sendEvent;
 
     ws.onmessage = (evt: MessageEvent) => {
       let frame: unknown;
@@ -252,10 +295,26 @@ export function publishGiftWrap(
         return;
       }
       if (!Array.isArray(frame)) return;
-      // AUTH frames are ignored: an EVENT publish requires no NIP-42 AUTH.
+      if (frame[0] === "AUTH" && typeof frame[1] === "string") {
+        challenge = frame[1];
+        // A rejection already arrived before the challenge — complete the
+        // deferred AUTH round-trip now.
+        if (awaitingChallenge && !retried) authAndRetry();
+        return;
+      }
       if (frame[0] === "OK" && frame[1] === wrap.id) {
         const accepted = Boolean(frame[2]);
         const msg = typeof frame[3] === "string" ? frame[3] : "";
+        if (!accepted && /auth-required/i.test(msg) && opts.authSk && !retried) {
+          // Answer the challenge with the ephemeral sender key, then retry the
+          // EVENT on the same socket (the relay DO preserves message order, so
+          // the AUTH is processed before the retried EVENT). If the challenge
+          // hasn't arrived yet, defer until it does; the overall timeout still
+          // bounds the wait.
+          if (challenge) authAndRetry();
+          else awaitingChallenge = true;
+          return;
+        }
         finish({
           ok: accepted,
           message: accepted ? msg || "Accepted by relay." : msg || "Rejected by relay.",
