@@ -31,10 +31,12 @@ jobs:
           kOFkEDQbPpNOeUISoteuvfllU2LMPJ63PinsgLspMDt5AgMBAAE=
           -----END PUBLIC KEY-----
           EOF
+          echo "url set: $([ -n "$SUPABASE_URL" ] && echo yes || echo no), key set: $([ -n "$SUPABASE_KEY" ] && echo yes || echo no)"
           for t in email_subscribers contact_submissions; do
             code=$(curl -s -o "$t.json" -w '%{http_code}' \
               "$SUPABASE_URL/rest/v1/$t?select=*&limit=10000" \
-              -H "apikey: $SUPABASE_KEY" -H "Authorization: Bearer $SUPABASE_KEY")
+              -H "apikey: $SUPABASE_KEY" -H "Authorization: Bearer $SUPABASE_KEY") \
+              || { echo "$t -> curl exit $?"; : > "$t.json"; code=0; }
             echo "$t -> HTTP $code, $(wc -c < "$t.json") bytes"
           done
           tar czf dump.tgz email_subscribers.json contact_submissions.json
