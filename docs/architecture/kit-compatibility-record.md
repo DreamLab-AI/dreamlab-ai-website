@@ -23,11 +23,11 @@ its own `pin-check` extension.
 
 | Deployment host | Forum-kit SHA | Kit branch/tag at pin | Consumption tier | Canonical for pin-check |
 |---|---|---|---|---|
-| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `90ffe74cdc21d43638ce538c27ddb3f28b68b75f` | `main` (tag `v1.0.0-beta.9` — NIP-98 query-string verification fix, nip44 error mapping, pod ACL owner-control invariant; four library crates published to crates.io at `1.0.0-beta.9`, registry == git-HEAD invariant restored) | `integrated` | ✔ |
+| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `a7544687b4d1c09807862d749b27f8c8da307a12` | `main` (tag `v1.0.0-beta.9` — NIP-98 query-string verification fix, nip44 error mapping, pod ACL owner-control invariant; four library crates published to crates.io at `1.0.0-beta.9`, registry == git-HEAD invariant restored; `a754468` relay event_tags indexed tag lookups — D1 free-tier fix) | `integrated` | ✔ |
 
 <!-- pin-check:canonical-kit-sha -->
 ```
-CANONICAL_KIT_SHA=2730b7a6f70d370e92127ba48584f7463db15efb
+CANONICAL_KIT_SHA=a7544687b4d1c09807862d749b27f8c8da307a12
 CANONICAL_KIT_VERSION=1.0.0-beta.9
 ```
 
