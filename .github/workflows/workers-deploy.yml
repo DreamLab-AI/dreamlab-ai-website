@@ -38,9 +38,10 @@ env:
   # worker code while the lockfile stays at this tested revision. Keep this SHA in
   # sync with the `rev = "..."` in forum-config/Cargo.lock when bumping the kit.
   # NOTE: tracks nostr-rust-forum v1.0.0-beta.9 (NIP-98 query-string verification
-  # fix across the workers, nip44 error mapping, pod ACL owner-control invariant).
+  # fix across the workers, nip44 error mapping, pod ACL owner-control invariant;
+  # a754468 event_tags indexed tag lookups — D1 free-tier fix).
   # Cutover provenance: docs/architecture/kit-compatibility-record.md.
-  KIT_REF: '2730b7a6f70d370e92127ba48584f7463db15efb'
+  KIT_REF: 'a7544687b4d1c09807862d749b27f8c8da307a12'
 
 jobs:
   gate:
