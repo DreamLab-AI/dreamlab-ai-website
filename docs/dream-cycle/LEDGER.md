@@ -15,3 +15,6 @@
 | 2026-08-22 | operator-overlay | A REJECT verdict can be a healthy result — the drift hypothesis was the right fa | NONE | NONE | yes | REJECT |  | f1f748bf996c |  |
 | 2026-08-22 | operator-overlay | Given the KIT_REF was repinned from `2f01e339…` to `90ffe74c…` across workflows  | NONE | NONE | yes | REJECT |  | d4f24a45f8e1 |  |
 | 2026-08-23 | ci-workflows | Given the three workflows pin KIT_REF `93dcf055…` while `kit-compatibility-recor | NONE | NONE | yes | ACCEPT |  | e1a4957f1a19 |  |
+| 2026-08-24 | kit-pin-integrity | Given the three workflows pin KIT_REF `93dcf055…` while `kit-compatibility-recor | NONE | NONE | yes | ACCEPT |  | b05011e91bfb |  |
+| 2026-08-25 | site-build-content | Given the production build emits a single lazy cynefin chunk of 690.56 kB (gzip  | NONE | NONE | yes | INCONCLUSIVE |  | 6dc27f6e38df |  |
+| 2026-08-26 | operator-overlay | Given the KIT_REF was repinned from `93dcf055…` to `a7544687…` across the three  | NONE | NONE | yes | REJECT |  | 7d48d6f146a0 |  |
