@@ -1,0 +1,49 @@
+{
+  "repo": "DreamLab-AI/dreamlab-ai-website",
+  "cron": "0 3 * * *",
+  "slots": [
+    {
+      "deep": "kit-pin-integrity",
+      "scan": ["dual-pin-drift", "cargo-lock"]
+    },
+    {
+      "deep": "site-build-content",
+      "scan": ["vite-build", "content-generators"]
+    },
+    {
+      "deep": "operator-overlay",
+      "scan": ["branding", "deploy-config"]
+    },
+    {
+      "deep": "ci-workflows",
+      "scan": ["deploy-pipeline", "secrets-hygiene"]
+    }
+  ],
+  "bonusModuli": {
+    "25": "security-adversarial",
+    "50": "accessibility-review"
+  },
+  "controlPlaneProbes": [
+    "node --version && npm --version",
+    "ls .github/workflows/ forum-config/ src/ 2>&1 | head -20"
+  ],
+  "buildStep": {
+    "cmd": "npm ci 2>&1 | tail -3 && npm run build 2>&1 | tail -10",
+    "degradeOnWasmFailure": false
+  },
+  "evaluatorEntrypoints": {
+    "bench": "npx vitest run 2>&1 | tail -25",
+    "lint": "npx eslint . 2>&1 | tail -15",
+    "pin-parity": "bash scripts/pin-parity-check.sh"
+  },
+  "competitors": [],
+  "adrConvention": "4-digit",
+  "extraDisciplines": [
+    "upstream-kit-out-of-scope: the nostr-rust-forum kit and every nostr-bbs-* crate are ANOTHER DREAMER'S territory. Never evaluate, patch, or hypothesise about kit internals here. Record kit-level observations as lines beginning 'HANDOFF (kit):' in the report and reference them in the ledger prior-fates column so the kit's own dream cycle picks them up",
+    "operator-overlay-first: this repo owns branding, kit pinning, deploy config, CI workflows, and site content — every hypothesis and candidate change must land in THIS repo's files"
+  ],
+  "ledgerPath": "docs/dream-cycle/LEDGER.md",
+  "branchPrefix": "dream/",
+  "labels": ["dream-cycle", "research"],
+  "autoMerge": false
+}
