@@ -7,6 +7,7 @@ interface ChatMessage {
   id: string;
   role: "user" | "assistant" | "system";
   content: string;
+  ontologyQuery?: string;
 }
 
 type Tier = 0 | 1 | 2 | 3;
@@ -48,6 +49,17 @@ const REPLY_TIMEOUT_MS = 30000;
 // short cooldown after each resolved turn and a hard per-session turn cap.
 const SEND_COOLDOWN_MS = 3000;
 const MAX_TURNS_PER_SESSION = 12;
+const ONTOLOGY_LOOKUP_PREFIX =
+  "Ontology lookup — deterministic public record. No model generation.";
+
+const isOntologyLookup = (text: string): boolean =>
+  text.startsWith(ONTOLOGY_LOOKUP_PREFIX);
+
+const interpretationPrompt = (question: string): string => {
+  const prefix =
+    "Interpret with AI using the public ontology as grounded context. Answer the original question rather than returning another definition: ";
+  return `${prefix}${question}`.slice(0, MAX_MESSAGE_LEN);
+};
 
 // User-facing copy (UK English).
 const OFFLINE_MESSAGE =
@@ -103,6 +115,9 @@ export const AIChatFab = () => {
   const [isCoolingDown, setIsCoolingDown] = useState(false);
   const cooldownTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const turnsRef = useRef(0);
+  // Sends are serialised, so the most recently transported question is the one
+  // an ontology lookup reply belongs to.
+  const lastQuestionRef = useRef("");
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -204,17 +219,20 @@ export const AIChatFab = () => {
     ]);
   }, []);
 
-  const addAssistantMessage = useCallback((content: string) => {
+  const addAssistantMessage = useCallback((content: string, ontologyQuery?: string) => {
     setMessages((prev) => [
       ...prev,
-      { id: nextMsgId("ai"), role: "assistant", content },
+      { id: nextMsgId("ai"), role: "assistant", content, ontologyQuery },
     ]);
   }, []);
 
   // Any reply always renders (even one that arrives after the 30 s timeout).
   // Only an outstanding turn is resolved — re-enabling input once, not twice.
   const handleReply = useCallback((text: string) => {
-    addAssistantMessage(text);
+    addAssistantMessage(
+      text,
+      isOntologyLookup(text) ? lastQuestionRef.current : undefined
+    );
     if (pendingRef.current) {
       resetPending();
       startCooldown();
@@ -288,8 +306,8 @@ export const AIChatFab = () => {
     addSystemMessage(`Switched to ${cfg.label} — ${cfg.desc}`);
   }, [pubkey, requestNostrAuth, addSystemMessage]);
 
-  const sendMessage = useCallback(async () => {
-    const trimmed = input.trim();
+  const sendMessage = useCallback(async (messageOverride?: string) => {
+    const trimmed = (messageOverride ?? input).trim();
     if (!trimmed || isLoading || isCoolingDown) return;
 
     setMessages((prev) => [
@@ -313,6 +331,7 @@ export const AIChatFab = () => {
       return;
     }
     turnsRef.current += 1;
+    lastQuestionRef.current = trimmed;
 
     // Open a single in-flight turn: input/send stay disabled until it resolves.
     setIsLoading(true);
@@ -360,7 +379,7 @@ export const AIChatFab = () => {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      sendMessage();
+      void sendMessage();
     }
   };
 
@@ -488,7 +507,18 @@ export const AIChatFab = () => {
                         : "bg-purple-500/10 border border-purple-500/20 text-foreground/90"
                     }`}
                   >
-                    {msg.content}
+                    <div className="whitespace-pre-wrap">{msg.content}</div>
+                    {msg.role === "assistant" && msg.ontologyQuery && (
+                      <button
+                        type="button"
+                        onClick={() => void sendMessage(interpretationPrompt(msg.ontologyQuery!))}
+                        disabled={isLoading || isCoolingDown || tier === 0}
+                        className="mt-3 rounded-lg border border-cyan-400/30 bg-cyan-400/10 px-2.5 py-1.5 text-xs font-medium text-cyan-300 transition-colors hover:bg-cyan-400/20 disabled:cursor-not-allowed disabled:opacity-40"
+                        aria-label="Interpret with AI"
+                      >
+                        Interpret with AI
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
@@ -523,7 +553,7 @@ export const AIChatFab = () => {
                 disabled={isLoading || isCoolingDown}
               />
               <button
-                onClick={sendMessage}
+                onClick={() => void sendMessage()}
                 disabled={!input.trim() || isLoading || isCoolingDown}
                 className="p-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-cyan-500/30 transition-all disabled:opacity-40 disabled:cursor-not-allowed min-h-[40px] min-w-[40px] flex items-center justify-center"
                 aria-label="Send message"

@@ -60,6 +60,8 @@ const JARVIS = "2de44d5622eef79519ac078f6e227a85aecbaefd561e4e50c5f51dfadbf916e9
 const REPLY_TIMEOUT_MS = 30000;
 const SEND_COOLDOWN_MS = 3000;
 const MAX_TURNS_PER_SESSION = 12;
+const ONTOLOGY_LOOKUP_PREFIX =
+  "Ontology lookup — deterministic public record. No model generation.";
 
 // The component reads VITE_RELAY_URL / VITE_JARVIS_PUBKEY into module-level
 // constants at import time, so env is stubbed and the module re-imported per
@@ -195,6 +197,42 @@ describe("AIChatFab", () => {
       await vi.advanceTimersByTimeAsync(SEND_COOLDOWN_MS);
     });
     expect(getInput()).not.toBeDisabled();
+  });
+
+  it("offers an explicit AI interpretation action for ontology lookup replies", async () => {
+    const Fab = await loadFab({ relay: RELAY, jarvis: JARVIS });
+    vi.useFakeTimers();
+    render(<Fab />);
+    openPanel();
+
+    typeAndSend("what is AI governance?");
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(0);
+    });
+
+    act(() => {
+      h.state.onReply?.(
+        `${ONTOLOGY_LOOKUP_PREFIX}\n\nSource: urn:ngm:class:ai-governance\n\nAI Governance is the oversight of AI systems.`
+      );
+    });
+
+    const interpret = screen.getByRole("button", { name: /interpret with ai/i });
+    expect(interpret).toBeDisabled(); // post-reply cooldown still applies
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(SEND_COOLDOWN_MS);
+    });
+    expect(interpret).not.toBeDisabled();
+
+    fireEvent.click(interpret);
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(0);
+    });
+
+    expect(h.sendQuestionMock).toHaveBeenCalledTimes(2);
+    expect(h.sendQuestionMock.mock.calls[1][0]).toContain("Interpret with AI");
+    expect(h.sendQuestionMock.mock.calls[1][0]).toContain("what is AI governance?");
+    expect(h.sendQuestionMock.mock.calls[1][1]).toBe(JARVIS);
   });
 
   it("shows a delivery-failure message and re-enables input after the cooldown when the send is rejected", async () => {
