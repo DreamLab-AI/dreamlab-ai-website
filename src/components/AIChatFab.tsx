@@ -249,6 +249,10 @@ export const AIChatFab = () => {
       onReply: handleReply,
       onError: handleSessionError,
       replyRelays: REPLY_RELAYS,
+      // Only render replies whose signed seal is authored by the agent —
+      // open reply relays accept wraps from anyone, so without this pin a
+      // third party could plant phishing text as an "assistant" message.
+      expectedSenderPk: JARVIS_PUBKEY,
     });
     sessionRef.current = session;
     addSystemMessage(CONNECTING_MESSAGE);

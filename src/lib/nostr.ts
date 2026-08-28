@@ -16,9 +16,15 @@
 //   scripts/seed/probes/probe-agent-bridge-dm.mjs (round-trip unwrap)
 //   scripts/seed/test-junkiejarvis.mjs            (AUTH → REQ → EVENT ordering)
 
-import { finalizeEvent, generateSecretKey, getPublicKey, type Event } from "nostr-tools/pure";
+import {
+  finalizeEvent,
+  generateSecretKey,
+  getPublicKey,
+  verifyEvent,
+  type Event,
+} from "nostr-tools/pure";
 import * as nip17 from "nostr-tools/nip17";
-import * as nip59 from "nostr-tools/nip59";
+import * as nip44 from "nostr-tools/nip44";
 
 // Kind numbers used on the wire.
 const KIND_GIFT_WRAP = 1059;
@@ -45,6 +51,11 @@ const SEND_OK_TIMEOUT_MS = 8000;
 // open relays too. Best-effort: a dead reply relay never fails the session.
 const REPLY_RELAY_RETRY_MS = 2000;
 const REPLY_RELAY_MAX_RETRIES = 3;
+
+// Reply-freshness window. The NIP-59 wrap timestamp is randomised (up to two
+// days in the past), but the inner rumor carries the sender's real clock, so
+// we can reject replays of old wraps while tolerating modest clock skew.
+const REPLY_MAX_SKEW_SEC = 300;
 
 export type WsFactory = (url: string) => WebSocket;
 
@@ -328,6 +339,46 @@ export function publishGiftWrap(
   });
 }
 
+interface UnwrappedRumor {
+  pubkey: string;
+  content: string;
+  created_at: number;
+}
+
+/**
+ * Unwrap a kind-1059 gift wrap with full sender verification. nostr-tools'
+ * nip59.unwrapEvent performs NO signature check and never binds the (unsigned)
+ * rumor pubkey to the (signed) seal, so a forged wrap can impersonate any
+ * sender. This helper enforces the NIP-59 trust chain:
+ *   1. decrypt the wrap → kind-13 seal
+ *   2. verify the seal's Schnorr signature (the only signed layer)
+ *   3. optionally pin the seal signer to `expectedSenderPk`
+ *   4. decrypt the seal → rumor, and require rumor.pubkey === seal.pubkey
+ * Throws on any violation; callers treat a throw as "not a genuine reply".
+ */
+export function unwrapVerifiedDm(
+  wrap: Event,
+  recipientSk: Uint8Array,
+  expectedSenderPk?: string,
+): UnwrappedRumor {
+  const seal = JSON.parse(
+    nip44.decrypt(wrap.content, nip44.getConversationKey(recipientSk, wrap.pubkey)),
+  ) as Event;
+  if (seal.kind !== 13) throw new Error("Inner event is not a kind-13 seal.");
+  if (expectedSenderPk && seal.pubkey !== expectedSenderPk) {
+    throw new Error("Seal is not signed by the expected sender.");
+  }
+  if (!verifyEvent(seal)) throw new Error("Seal signature is invalid.");
+  const rumor = JSON.parse(
+    nip44.decrypt(seal.content, nip44.getConversationKey(recipientSk, seal.pubkey)),
+  ) as UnwrappedRumor;
+  if (rumor.pubkey !== seal.pubkey) {
+    throw new Error("Rumor author does not match the seal signer.");
+  }
+  if (typeof rumor.content !== "string") throw new Error("Rumor has no content.");
+  return rumor;
+}
+
 export interface DmSessionOptions {
   wsFactory?: WsFactory;
   onReply: (plaintext: string) => void;
@@ -338,6 +389,14 @@ export interface DmSessionOptions {
    * session key is ephemeral), so it is only ever readable from these.
    */
   replyRelays?: string[];
+  /**
+   * Pin replies to a single sender pubkey (the agent). When set, a delivered
+   * reply must arrive in a wrap whose signed kind-13 seal was authored by this
+   * key — anything else (forged rumor pubkey, third-party wrap addressed to
+   * the session key on an open relay) is silently dropped. Strongly
+   * recommended: the open reply relays accept wraps from anyone.
+   */
+  expectedSenderPk?: string;
 }
 
 interface PendingSend {
@@ -384,6 +443,11 @@ export class DmSession {
   // after a listener reconnects). First arrival wins.
   private readonly seenWrapIds = new Set<string>();
 
+  private readonly expectedSenderPk?: string;
+  // Freshness floor for replies: rumors authored before the session existed
+  // (minus skew tolerance) are replays of old traffic, not answers to us.
+  private readonly startedAtSec = nowSec();
+
   constructor(
     private readonly relayUrl: string,
     private readonly identity: EphemeralIdentity,
@@ -395,6 +459,7 @@ export class DmSession {
     this.replyRelays = [...new Set(opts.replyRelays ?? [])].filter(
       (url) => url && url !== this.relayUrl,
     );
+    this.expectedSenderPk = opts.expectedSenderPk;
   }
 
   connect(): Promise<void> {
@@ -581,13 +646,19 @@ export class DmSession {
   private deliverReply(event: Event): void {
     if (this.seenWrapIds.has(event.id)) return; // duplicate from another relay
     this.seenWrapIds.add(event.id);
-    let rumor: { pubkey: string; content: string };
+    let rumor: UnwrappedRumor;
     try {
-      rumor = nip59.unwrapEvent(event, this.identity.sk);
+      // Verified unwrap: signed seal, sender pin (when configured), and
+      // seal↔rumor author binding. A wrap that fails any check is not a
+      // genuine agent reply and is dropped silently.
+      rumor = unwrapVerifiedDm(event, this.identity.sk, this.expectedSenderPk);
     } catch {
-      return; // not addressed to us, or undecryptable — ignore
+      return; // not addressed to us, undecryptable, or forged — ignore
     }
     if (rumor.pubkey === this.identity.pk) return; // ignore self-authored rumors
+    // Replay guard: the session key is fresh per session, but open reply
+    // relays serve history to anyone — reject rumors older than the session.
+    if (rumor.created_at < this.startedAtSec - REPLY_MAX_SKEW_SEC) return;
     this.onReply(rumor.content);
   }
 

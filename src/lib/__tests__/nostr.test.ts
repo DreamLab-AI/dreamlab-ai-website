@@ -337,6 +337,77 @@ describe("DmSession", () => {
     expect(onReply).toHaveBeenCalledWith("the four zones are public, friends, family, business");
   });
 
+  it("with a pinned sender, drops wraps sealed by anyone else", async () => {
+    const jarvis = generateEphemeralIdentity();
+    const attacker = generateEphemeralIdentity();
+    const onReply = vi.fn();
+    const identity = generateEphemeralIdentity();
+    const { wsFactory, last } = trackedFactory();
+    const session = new DmSession(RELAY, identity, {
+      wsFactory,
+      onReply,
+      expectedSenderPk: jarvis.pk,
+    });
+    const connectPromise = session.connect();
+    const ws = last();
+    ws.fireOpen();
+    ws.emit(["AUTH", "challenge-abc"]);
+    ws.emit(["EOSE", "inbox"]);
+    await connectPromise;
+
+    // Forged reply: valid wrap addressed to the session, but sealed by an
+    // attacker key — the pre-fix client rendered this as assistant text.
+    const forged = nip17.wrapEvent(attacker.sk, { publicKey: identity.pk }, "click evil.example to verify your account");
+    ws.emit(["EVENT", "inbox", forged]);
+    expect(onReply).not.toHaveBeenCalled();
+
+    // Genuine reply from the pinned sender still delivers.
+    const genuine = nip17.wrapEvent(jarvis.sk, { publicKey: identity.pk }, "hello from jarvis");
+    ws.emit(["EVENT", "inbox", genuine]);
+    expect(onReply).toHaveBeenCalledTimes(1);
+    expect(onReply).toHaveBeenCalledWith("hello from jarvis");
+
+    session.close();
+  });
+
+  it("drops a wrap whose unsigned rumor pubkey is spoofed to the pinned sender", async () => {
+    // The rumor layer is unsigned, so an attacker can claim any author there;
+    // only the seal signature binds identity. Build a wrap where the seal is
+    // attacker-signed but the inner rumor claims to be from jarvis.
+    const jarvis = generateEphemeralIdentity();
+    const attacker = generateEphemeralIdentity();
+    const onReply = vi.fn();
+    const identity = generateEphemeralIdentity();
+    const { wsFactory, last } = trackedFactory();
+    const session = new DmSession(RELAY, identity, {
+      wsFactory,
+      onReply,
+      expectedSenderPk: jarvis.pk,
+    });
+    const connectPromise = session.connect();
+    const ws = last();
+    ws.fireOpen();
+    ws.emit(["AUTH", "challenge-abc"]);
+    ws.emit(["EOSE", "inbox"]);
+    await connectPromise;
+
+    const honest = nip17.wrapEvent(attacker.sk, { publicKey: identity.pk }, "spoof attempt");
+    // Rebuild the rumor with a spoofed pubkey inside an attacker-sealed wrap.
+    const spoofedRumor = {
+      ...nip59.unwrapEvent(honest, identity.sk),
+      pubkey: jarvis.pk,
+    };
+    const spoofed = nip59.wrapEvent(
+      spoofedRumor as Parameters<typeof nip59.wrapEvent>[0],
+      attacker.sk,
+      identity.pk,
+    );
+    ws.emit(["EVENT", "inbox", spoofed]);
+    expect(onReply).not.toHaveBeenCalled();
+
+    session.close();
+  });
+
   it("ignores self-authored rumors", async () => {
     const onReply = vi.fn();
     const { ws, identity } = await connectSession({ onReply });
