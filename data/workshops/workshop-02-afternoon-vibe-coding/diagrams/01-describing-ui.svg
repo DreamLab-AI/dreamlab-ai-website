@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 320" role="img" aria-labelledby="du-title du-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="du-title">Visual descriptions that work</title>
+  <desc id="du-desc">Four vocabularies for describing a UI: colours, layout, feel and behaviour, each with example phrases.</desc>
+  <rect x="8" y="8" width="944" height="304" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">DESCRIBING UI — WORDS THAT WORK</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+  <g text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11">
+    <rect x="48" y="104" width="204" height="176" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="150" y="140" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="15" font-weight="600" fill="#F5F5F5">Colours</text>
+    <text x="150" y="172" fill="#9CA3AF">"sky blue background"</text>
+    <text x="150" y="200" fill="#9CA3AF">"sunset gradient"</text>
+    <text x="150" y="228" fill="#9CA3AF">"soft pastels"</text>
+
+    <rect x="268" y="104" width="204" height="176" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="370" y="140" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="15" font-weight="600" fill="#F5F5F5">Layout</text>
+    <text x="370" y="172" fill="#9CA3AF">"magazine style"</text>
+    <text x="370" y="200" fill="#9CA3AF">"centred like Medium"</text>
+    <text x="370" y="228" fill="#9CA3AF">"Pinterest grid"</text>
+
+    <rect x="488" y="104" width="204" height="176" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="590" y="140" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="15" font-weight="600" fill="#F5F5F5">Feel</text>
+    <text x="590" y="172" fill="#9CA3AF">"professional"</text>
+    <text x="590" y="200" fill="#9CA3AF">"minimalist"</text>
+    <text x="590" y="228" fill="#9CA3AF">"luxurious"</text>
+
+    <rect x="708" y="104" width="204" height="176" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="810" y="140" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="15" font-weight="600" fill="#F5F5F5">Behaviour</text>
+    <text x="810" y="172" fill="#9CA3AF">"smooth scrolling"</text>
+    <text x="810" y="200" fill="#9CA3AF">"click to expand"</text>
+    <text x="810" y="228" fill="#9CA3AF">"fade on scroll"</text>
+  </g>
+</svg>

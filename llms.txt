@@ -1,0 +1,31 @@
+# DreamLab
+
+> DreamLab is an Applied Innovation Lab in the UK Lake District. Teams co-create
+> with 44+ deep tech specialists across AI, immersive XR, cyber trust and
+> creative technology through residential programmes, embedded R&D residencies
+> and free self-guided courses. Primary calls to action: explore programmes at
+> /programmes or book a discovery call via /contact (info@dreamlab-ai.com).
+
+DreamLab serves enterprise and SME teams. The site is a React single-page
+application; a Nostr-based community forum lives at /community/ and a retro
+BBS client at /community/bbs/.
+
+## Core pages
+
+- [Programmes](https://dreamlab-ai.com/programmes): Residential deep tech training programmes for enterprise and SME teams
+- [Co-Create](https://dreamlab-ai.com/co-create): Embedded R&D sprints and co-creation residencies at the Lake District facility
+- [Research](https://dreamlab-ai.com/research): Research output, system design work and demonstration videos
+- [Ecosystem](https://dreamlab-ai.com/ecosystem): The open-source VisionFlow ecosystem DreamLab builds and operates
+- [Team](https://dreamlab-ai.com/team): The 44+ specialist network with biographies
+- [Contact](https://dreamlab-ai.com/contact): Enquiries and discovery-call booking (E2E-encrypted form)
+
+## Self-guided courses
+
+- [Workshop index](https://dreamlab-ai.com/workshops): Free 9-phase, 51+ hour AI-powered knowledge work curriculum — foundations, AI APIs, Claude Code, local AI and RAG, Docker, AI agents and orchestration, QA and publishing
+- [Testimonials](https://dreamlab-ai.com/testimonials): Client and participant feedback
+
+## Optional
+
+- [Ventures](https://dreamlab-ai.com/ventures): Venture-building activity
+- [Privacy](https://dreamlab-ai.com/privacy): Privacy policy (no-database, E2E-encrypted contact ingress)
+- [Community forum](https://dreamlab-ai.com/community/): Nostr-based community forum
