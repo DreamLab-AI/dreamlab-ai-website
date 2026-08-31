@@ -24,8 +24,15 @@ corpus 013–044, frozen precisely because it drifted from the code).
 governing document **in the same change**, and regenerate this index
 (`node scripts/adr-index-gen.cjs docs/adr` — it fails CI on invalid frontmatter).
 
-_1 record(s). Regenerate with_ `node scripts/adr-index-gen.cjs docs/adr`.
+_8 record(s). Regenerate with_ `node scripts/adr-index-gen.cjs docs/adr`.
 
 | ID | Title | Date | Decision | Impl | Activation | Supersedes | Superseded by | Owner | Repo |
 |----|-------|------|----------|------|------------|------------|---------------|-------|------|
 | [ADR-2001](ADR-2001-corpus-consolidation.md) | Consolidate the ADR corpus into living ground-truth docs | 2026-08-31 | accepted | complete | live | — | — | jjohare | dreamlab-ai-website |
+| [ADR-2002](ADR-2002-split-hosting-pages-workers.md) | Serve the origin from GitHub Pages and the backend from Cloudflare Workers | 2026-08-31 | accepted | complete | live | — | — | jjohare | dreamlab-ai-website |
+| [ADR-2003](ADR-2003-three-frontends-one-origin.md) | Ship three polyglot frontends merged under one origin | 2026-08-31 | accepted | complete | live | — | — | jjohare | dreamlab-ai-website |
+| [ADR-2004](ADR-2004-kit-pin-version-and-sha-lockstep.md) | Pin the upstream kit by crates.io version and git SHA moved in lockstep | 2026-08-31 | accepted | complete | live | — | — | jjohare | dreamlab-ai-website |
+| [ADR-2005](ADR-2005-config-hand-synced-mirrors.md) | Accept hand-synced config mirrors; defer the single-source generator | 2026-08-31 | accepted | partial | live | — | — | jjohare | dreamlab-ai-website |
+| [ADR-2006](ADR-2006-raw-schnorr-nip42-identity.md) | Identify principals by raw-hex Schnorr pubkey over NIP-42; defer DID/Multikey to the kit | 2026-08-31 | accepted | complete | live | — | — | jjohare | dreamlab-ai-website |
+| [ADR-2007](ADR-2007-four-zone-dual-accept-cohorts.md) | Gate access with four zones on dual-accept cohorts and a single encrypted zone | 2026-08-31 | accepted | complete | live | — | — | jjohare | dreamlab-ai-website |
+| [ADR-2008](ADR-2008-talk-to-ai-nostr-dm-routing.md) | Route Talk-to-AI over Nostr gift-wrap and read replies from open relays | 2026-08-31 | accepted | complete | live | — | — | jjohare | dreamlab-ai-website |
