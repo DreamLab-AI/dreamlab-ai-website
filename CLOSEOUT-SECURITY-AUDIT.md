@@ -141,7 +141,7 @@
 ### (stubs-adrs-quality) ADR-037 O1/O2 single-source generator deferred: ZONE_CONFIG and ADMIN_PUBKEYS hand-synced across 3-4 surfaces with no generator — *plausible*
 - **Category:** gap
 - **Detail:** ADR-037 (Status: 'Accepted (partial — O1/O2 single-source generator deferred)') declares dreamlab.toml the authored source but the generator that derives downstream copies was never built. ZONE_CONFIG exists as three hand-maintained copies (dreamlab.toml [[zones]], relay-worker.wrangler.toml ZONE_CONFIG [vars] JSON, deploy.yml ZONE_CONFIG_JSON injected into window.__ENV__). ADMIN_PUBKEYS exists as
-- **Evidence:** docs/adr/037-config-single-source-of-truth.md:108-112 (O1/O2 open); forum-config/dreamlab.toml:71-106 ([[zones]]) & 35-46 ([admin].static_pubkeys); forum-config/deploy/relay-worker.wrangler.toml:21 (ZONE_CONFIG) & 29 (ADMIN_PUBKEYS); forum-config/deploy/search-worker.wrangler.tom
+- **Evidence:** docs/archive/adr/037-config-single-source-of-truth.md:108-112 (O1/O2 open); forum-config/dreamlab.toml:71-106 ([[zones]]) & 35-46 ([admin].static_pubkeys); forum-config/deploy/relay-worker.wrangler.toml:21 (ZONE_CONFIG) & 29 (ADMIN_PUBKEYS); forum-config/deploy/search-worker.wrangler.tom
 - **Decision:** Build the deferred generator: a small step (in forum-config, run in deploy.yml + workers-deploy.yml) that reads dreamlab.toml and emits the relay ZONE_CONFIG var, the search/relay ADMIN_PUBKEYS vars, and the client __ENV__.ZONE_CONFIG, failing closed on empty.
 
 ### (stubs-adrs-quality) forum-config deploy-config validator is test-only and never gates a real deploy; ADR-037 closeout overstates it — *plausible*
@@ -270,7 +270,7 @@
 ### (stubs-adrs-quality) Stale config comments/flags contradict ADR-036: marketplace/NIP-90 kept enabled, governance 'placeholder keys' misleading — *plausible*
 - **Category:** stub-or-unfinished
 - **Detail:** ADR-036 (Accepted) supersedes ADR-032 and explicitly abandons the NIP-90 DVM marketplace and the /community/marketplace page. Yet dreamlab.toml still sets [features] marketplace = true and describes the marketplace-agent role as 'NIP-90 job broker, cost estimation', which can surface a dangling/abandoned feature and misdocuments the agent. Separately, the [governance] block comment says 'Replace p
-- **Evidence:** docs/adr/036-agent-delegation-via-device-keys.md:42-53 (NIP-90/marketplace abandoned); forum-config/dreamlab.toml:145 (marketplace=true), :276-278 (marketplace-agent 'NIP-90 job broker'), :215-217 (stale 'placeholder keys' comment over real keys :229-234), :131 ('post-Sprint-v12'
+- **Evidence:** docs/archive/adr/036-agent-delegation-via-device-keys.md:42-53 (NIP-90/marketplace abandoned); forum-config/dreamlab.toml:145 (marketplace=true), :276-278 (marketplace-agent 'NIP-90 job broker'), :215-217 (stale 'placeholder keys' comment over real keys :229-234), :131 ('post-Sprint-v12'
 - **Decision:** Reconcile marketplace flag/role text with ADR-036 (disable or re-describe as device-key capability record); fix the governance comment to say the keys are live and note the DREAMLAB_GOVERNANCE_AGENT_PUBKEYS override is optional; resolve or delete the Sprint-v1
 
 ### (stubs-adrs-quality) branding.rs dreamlab_zone_names() is stale and dead: returns a legacy 3-zone model contradicting the shipped 4-zone config — *plausible*

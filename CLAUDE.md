@@ -16,6 +16,19 @@ supplies DreamLab branding, zones, and Cloudflare resource IDs.
 - **Ecosystem:** part of [VisionFlow](https://github.com/DreamLab-AI/VisionFlow)
   (VisionClaw, agentbox, solid-pod-rs, nostr-rust-forum)
 
+## Architecture ground truth (consolidated 2026-08-31)
+
+The ADR pack is now **living docs in `docs/` + the thin ledger in `docs/adr/`**;
+the legacy corpus (013–044) is frozen under `docs/archive/adr/` as evidence, not
+authority. Governing docs: [`docs/BASELINE-architecture.md`](docs/BASELINE-architecture.md)
+(deploy topology, three frontends, kit pin, workers, supply-chain) and
+[`docs/IDENTITY-zones.md`](docs/IDENTITY-zones.md) (raw-pubkey identity vs the
+unrealised DID/Multikey convergence, four-zone model, admin/agent roster, DM
+routing). **Lookup order:** governing doc → its `file:line` citations into code/CI/
+`forum-config/` → `docs/adr/` ledger → archive (history only). New decisions:
+copy `docs/adr/TEMPLATE.md`, update the governing doc in the same change, and run
+`node scripts/adr-index-gen.cjs docs/adr`.
+
 ## Tech Stack
 
 | Layer | Technology |

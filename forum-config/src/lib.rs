@@ -30,7 +30,7 @@
 //! Cutover decisions: [ADR-040]; SHA production runs:
 //! `docs/architecture/kit-compatibility-record.md`.
 //!
-//! [ADR-040]: https://github.com/DreamLab-AI/dreamlab-ai-website/blob/main/docs/adr/040-gap-close-edge-decisions.md
+//! [ADR-040]: https://github.com/DreamLab-AI/dreamlab-ai-website/blob/main/docs/archive/adr/040-gap-close-edge-decisions.md
 
 #![warn(missing_docs)]
 

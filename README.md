@@ -259,7 +259,7 @@ The kit source is pinned at commit `672b7c36bcef8a5c9f297523ec8986f7e1d7ffda` (b
 4. `CANONICAL_KIT_SHA` / `CANONICAL_KIT_VERSION` in [`docs/architecture/kit-compatibility-record.md`](docs/architecture/kit-compatibility-record.md)
 5. The `nostr-bbs-*` crates.io version strings in [`forum-config/Cargo.toml`](forum-config/Cargo.toml)
 
-The compatibility record is the living source of truth for the current pin — consult it rather than this README, which does not need a manual bump on each kit move. Governed by [ADR-038 Kit-Ref Pin Governance](docs/adr/038-kit-ref-pin-governance.md); the thin-consumer cutover is [ADR-040](docs/adr/040-gap-close-edge-decisions.md) and operator/kit separation is [ADR-037](docs/adr/037-config-single-source-of-truth.md).
+The compatibility record is the living source of truth for the current pin — consult it rather than this README, which does not need a manual bump on each kit move. Governed by [ADR-038 Kit-Ref Pin Governance](docs/archive/adr/038-kit-ref-pin-governance.md); the thin-consumer cutover is [ADR-040](docs/archive/adr/040-gap-close-edge-decisions.md) and operator/kit separation is [ADR-037](docs/archive/adr/037-config-single-source-of-truth.md).
 
 ### Federation transports
 

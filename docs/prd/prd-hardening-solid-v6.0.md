@@ -1656,7 +1656,7 @@ Coordinator (Queen)
 | PRD v5.0 (Hardening Sprint) | `docs/prd/prd-forum-hardening-v5.0.md` |
 | PRD v5.0-UX (Onboarding) | `docs/prd/prd-ux-onboarding-v5.0.md` |
 | ADR-011 (Images to Solid Pods) | `docs/adr/011-images-to-solid-pods.md` |
-| ADR-023 (Forum Relay Hardening) | `docs/adr/023-forum-relay-hardening.md` |
+| ADR-023 (Forum Relay Hardening) | `docs/archive/adr/023-forum-relay-hardening.md` |
 | Solid Protocol Specification | https://solidproject.org/TR/protocol |
 | Solid WAC Specification | https://solidproject.org/TR/wac |
 | LDP Specification | https://www.w3.org/TR/ldp/ |

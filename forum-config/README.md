@@ -288,7 +288,7 @@ The thin-consumer property is machine-checkable: the `pin-check` job in
 `.github/workflows/ci.yml` enforces the four-place kit pin lockstep, and a
 grep gate over `src/` for kit-owned surface names (`AgentBadge`, `AgentsRoster`,
 `agent_disclosure`, …) returns zero. Cutover decisions and their alternatives are
-recorded in [ADR-040](../docs/adr/040-gap-close-edge-decisions.md) and the
+recorded in [ADR-040](../docs/archive/adr/040-gap-close-edge-decisions.md) and the
 [gap-close edge PRD](../docs/prd/prd-gap-close-edge-v1.0.md); the SHA production
 runs is recorded in [`docs/architecture/kit-compatibility-record.md`](../docs/architecture/kit-compatibility-record.md).
 
@@ -325,4 +325,4 @@ production now deploys entirely from the pinned kit with this package as the sol
 operator overlay. The superseded planning documents (`PRD-012`, `ADR-084/085`)
 predate the current `013-039` ADR numbering and were never committed to this
 repo; the [gap-close edge PRD](../docs/prd/prd-gap-close-edge-v1.0.md) and
-[ADR-040](../docs/adr/040-gap-close-edge-decisions.md) supersede them.
+[ADR-040](../docs/archive/adr/040-gap-close-edge-decisions.md) supersede them.
