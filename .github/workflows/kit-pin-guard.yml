@@ -1,0 +1,30 @@
+name: kit-pin-guard
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pin-parity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Kit pin parity guard
+        run: |
+          set -euo pipefail
+          out=$(bash scripts/dream-kit-pin-guard.sh)
+          echo "$out"
+          if printf '%s\n' "$out" | grep -q 'PIN-DRIFT'; then
+            echo "::error::Kit pin drift detected - align KIT_REF in deploy.yml/workers-deploy.yml/rust-ci.yml, crate versions in forum-config/Cargo.toml, and CANONICAL_* in docs/architecture/kit-compatibility-record.md"
+            exit 1
+          fi
+          if ! printf '%s\n' "$out" | grep -q 'PIN-PARITY-OK'; then
+            echo "::error::pin-parity emitted no verdict token"
+            exit 1
+          fi
