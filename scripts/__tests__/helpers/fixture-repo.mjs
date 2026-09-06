@@ -21,6 +21,7 @@ const FIXTURE_FILES = [
   ".github/workflows/rust-ci.yml",
   ".github/workflows/test-and-lint.yml",
   ".github/workflows/docs-update.yml",
+  ".github/workflows/kit-pin-guard.yml",
   ".github/workflows/set-worker-secrets.yml",
   "forum-config/Cargo.toml",
   "forum-config/Cargo.lock",

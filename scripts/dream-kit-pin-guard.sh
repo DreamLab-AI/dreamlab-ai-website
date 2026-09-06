@@ -1,33 +1,29 @@
 #!/usr/bin/env bash
 # dream-kit-pin-guard: CI-side twin of the nightly `pin-parity` dream evaluator.
-# Verbatim transcription of the evaluator entrypoint (dream cycle 2026-09-02).
-# Contract preserved: prints PIN-PARITY-OK or a PIN-DRIFT-* token, always exits 0.
+#
+# THIN WRAPPER, not a second implementation. The invariant lives in
+# scripts/pin-parity.mjs (and scripts/lib/pin-parity.mjs); the `pin-check` job in
+# .github/workflows/ci.yml and the dream-cycle entrypoint scripts/pin-parity-check.sh
+# run the very same script. Keep this file free of any check logic.
+#
+# Why (2026-09-06): until this commit the file was a verbatim shell transcription
+# of the evaluator, and it rotted exactly the way ADR-2004's closeout predicted a
+# second copy would. When the manifest moved from floating requirements to exact
+# `=` pins, the transcription kept reading the whole requirement string —
+# `=1.0.0-beta.9` — and compared it against the record's `CANONICAL_KIT_VERSION`
+# (`1.0.0-beta.9`), so it reported PIN-DRIFT-RECORD-VER against a repository whose
+# pins were, and are, correct. The transcription was also strictly weaker than the
+# gate it stood in for: it compared requirement STRINGS and never opened
+# forum-config/Cargo.lock, so it could not see a resolved version or a registry
+# checksum, and it never swept the workflows for tag-pinned actions.
+#
+# Contract preserved: prints PIN-PARITY-OK or PIN-DRIFT, and ALWAYS exits 0.
 # Enforcement (fail on PIN-DRIFT) lives in .github/workflows/kit-pin-guard.yml;
 # do not change exit codes here without updating that workflow.
+#
+# Arguments are forwarded to the gate, so `--root DIR` checks another tree.
+set -uo pipefail
 
-deploy=$(grep -oP "KIT_REF:\s*'\K[0-9a-f]+" .github/workflows/deploy.yml | head -1)
-workers=$(grep -oP "KIT_REF:\s*'\K[0-9a-f]+" .github/workflows/workers-deploy.yml | head -1)
-rustci=$(grep -oP "KIT_REF:\s*'\K[0-9a-f]+" .github/workflows/rust-ci.yml | head -1)
-echo "KIT_REF deploy=$deploy workers=$workers rustci=$rustci"
-if [ -z "$deploy" ] || [ "$deploy" != "$workers" ] || [ "$deploy" != "$rustci" ]; then
-  echo PIN-DRIFT-KITREF
-  exit 0
-fi
-vers=$(grep -oP 'nostr-bbs-(core|config|mesh|rate-limit) = "\K[^"]+' forum-config/Cargo.toml | sort -u)
-echo "crates.io versions: $vers"
-nvers=$(echo "$vers" | wc -l)
-if [ "$nvers" -ne 1 ]; then
-  echo PIN-DRIFT-CRATE-VERSIONS
-  exit 0
-fi
-record='docs/architecture/kit-compatibility-record.md'
-canonical=$(grep -oP 'CANONICAL_KIT_SHA=\K[0-9a-f]+' "$record" 2>/dev/null | head -1)
-canonical_ver=$(grep -oP 'CANONICAL_KIT_VERSION=\K.+' "$record" 2>/dev/null | head -1)
-echo "record SHA=$canonical ver=$canonical_ver"
-if [ "$canonical" != "$deploy" ]; then
-  echo PIN-DRIFT-RECORD-SHA
-elif [ "$canonical_ver" != "$vers" ]; then
-  echo PIN-DRIFT-RECORD-VER
-else
-  echo PIN-PARITY-OK
-fi
+cd "$(dirname "$0")/.." || { echo PIN-DRIFT; exit 0; }
+node scripts/pin-parity.mjs "$@"
+exit 0

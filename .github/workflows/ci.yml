@@ -19,20 +19,18 @@ on:
       - 'package-lock.json'
       - 'vite.config.*'
       - 'tsconfig*'
-      - '.github/workflows/ci.yml'
-      # Pin sites — a client-only kit re-pin touches ONLY these, so pin-check
-      # must re-run on them or the lockstep gate is silently skipped.
-      - '.github/workflows/deploy.yml'
-      - '.github/workflows/workers-deploy.yml'
-      - '.github/workflows/rust-ci.yml'
+      # Every workflow, not just the three KIT_REF pin sites: pin-check sweeps
+      # ALL of .github/workflows for tag-pinned actions, so any workflow edit can
+      # break it. Enumerating pin sites here is what let kit-pin-guard.yml carry
+      # an unpinned actions/checkout@v4 without re-running the gate that rejects
+      # it (2026-09-06).
+      - '.github/workflows/**'
       - 'docs/architecture/kit-compatibility-record.md'
-      # The gate scripts and the reusable gate itself — a change to the checks
-      # must re-run the checks.
-      - 'scripts/pin-parity.mjs'
-      - 'scripts/check-effective-endpoints.mjs'
-      - 'scripts/check-config-mirrors.mjs'
-      - 'scripts/lib/**'
-      - '.github/workflows/test-and-lint.yml'
+      # The gate scripts, their libraries and their tests — a change to the
+      # checks must re-run the checks. Enumerating individual scripts had the
+      # same drift trap as enumerating workflows.
+      - 'scripts/**'
+      - 'dream.config.json'
   pull_request:
     branches: [main]
     paths:
@@ -43,20 +41,18 @@ on:
       - 'package-lock.json'
       - 'vite.config.*'
       - 'tsconfig*'
-      - '.github/workflows/ci.yml'
-      # Pin sites — a client-only kit re-pin touches ONLY these, so pin-check
-      # must re-run on them or the lockstep gate is silently skipped.
-      - '.github/workflows/deploy.yml'
-      - '.github/workflows/workers-deploy.yml'
-      - '.github/workflows/rust-ci.yml'
+      # Every workflow, not just the three KIT_REF pin sites: pin-check sweeps
+      # ALL of .github/workflows for tag-pinned actions, so any workflow edit can
+      # break it. Enumerating pin sites here is what let kit-pin-guard.yml carry
+      # an unpinned actions/checkout@v4 without re-running the gate that rejects
+      # it (2026-09-06).
+      - '.github/workflows/**'
       - 'docs/architecture/kit-compatibility-record.md'
-      # The gate scripts and the reusable gate itself — a change to the checks
-      # must re-run the checks.
-      - 'scripts/pin-parity.mjs'
-      - 'scripts/check-effective-endpoints.mjs'
-      - 'scripts/check-config-mirrors.mjs'
-      - 'scripts/lib/**'
-      - '.github/workflows/test-and-lint.yml'
+      # The gate scripts, their libraries and their tests — a change to the
+      # checks must re-run the checks. Enumerating individual scripts had the
+      # same drift trap as enumerating workflows.
+      - 'scripts/**'
+      - 'dream.config.json'
   workflow_dispatch:
 
 concurrency:
