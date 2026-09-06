@@ -23,12 +23,12 @@ its own `pin-check` extension.
 
 | Deployment host | Forum-kit SHA | Kit branch/tag at pin | Consumption tier | Canonical for pin-check |
 |---|---|---|---|---|
-| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `a7544687b4d1c09807862d749b27f8c8da307a12` | `main` (tag `v1.0.0-beta.9` — NIP-98 query-string verification fix, nip44 error mapping, pod ACL owner-control invariant; four library crates published to crates.io at `1.0.0-beta.9`, registry == git-HEAD invariant restored; `a754468` relay event_tags indexed tag lookups — D1 free-tier fix) | `integrated` | ✔ |
+| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `931898a3d82da5dbf573b6b6dccdc76513046875` | `main` (tag `v1.0.0-beta.10` — governance receipts D1 table applied idempotently by the relay at startup, feature gate, identity subkey vectors, client bootstrap/freshness/reconcile, trust sweep, `a754468` event_tags indexed lookups; six registry crates published to crates.io at `1.0.0-beta.10`, registry == git-tag invariant holds) | `integrated` | ✔ |
 
 <!-- pin-check:canonical-kit-sha -->
 ```
-CANONICAL_KIT_SHA=a7544687b4d1c09807862d749b27f8c8da307a12
-CANONICAL_KIT_VERSION=1.0.0-beta.9
+CANONICAL_KIT_SHA=931898a3d82da5dbf573b6b6dccdc76513046875
+CANONICAL_KIT_VERSION=1.0.0-beta.10
 ```
 
 The `CANONICAL_KIT_SHA` line above is the machine-readable field the `pin-check`
@@ -51,10 +51,10 @@ here byte-for-byte.
 
 <!-- pin-check:resolved-packages -->
 ```
-RESOLVED nostr-bbs-core 1.0.0-beta.9 e082e46e9e29875485589b9a018f9643e23dfcc73c2f87edf63207a5f326fb70
-RESOLVED nostr-bbs-config 1.0.0-beta.9 8b5ebf238281d2ea39aa664bab539566d336f4e5b0f83391d66db857c861ba4f
-RESOLVED nostr-bbs-mesh 1.0.0-beta.9 d3d3beab1d89bc6c54ac71408c683413fb572fce4d0a187c1dbd79a6eef7d8f8
-RESOLVED nostr-bbs-rate-limit 1.0.0-beta.9 b65d8eed8b6e4a26a96cd36caa9b2a370a7b4f65931d75e5e8d3ffef8c2163e2
+RESOLVED nostr-bbs-core 1.0.0-beta.10 93c1065a917cbafcfbb131b3699e387b5f19e5a288e5715444a6900c3f75b3bf
+RESOLVED nostr-bbs-config 1.0.0-beta.10 793ecca7556af628393e1133bb3013c48c0ef48155f984a706db206bb5e97360
+RESOLVED nostr-bbs-mesh 1.0.0-beta.10 e9259dd482d1e79e00da400029bf26807336d6dc270c47c19c993635a723e41e
+RESOLVED nostr-bbs-rate-limit 1.0.0-beta.10 ba4c5f5d86c4444ddee7ebad3c20eb1f78ca8a9aea917fa5e874c3a47d7b68bd
 ```
 
 Regenerate after any kit bump with:
@@ -344,7 +344,8 @@ All render from the pinned kit at deploy time; this repo adds only branding
 
 | SHA | Branch/context | Notes |
 |---|---|---|
-| `90ffe74` | `main` (tag `v1.0.0-beta.9`) | Current (canonical — matches `CANONICAL_KIT_SHA` above and the `KIT_REF` pins). **Kit release `1.0.0-beta.9`**: NIP-98 canonical_url preserves query strings (fixes admin-route verification across auth/relay/search/preview), nip44 `PlaintextTooLong` mapping + `nostr 0.44.7` exact pin, pod ACL `preserves_owner_control` invariant + dead `pod_git_anchor.rs` removed, CI hardening (clippy/test/coverage hard gates, security-audit.sh, validate-forum-config). All 14 crates versioned `1.0.0-beta.9`; the four library crates published to crates.io at `1.0.0-beta.9` (superseded `beta.8` yanked once this pin deployed). |
+| `931898a` | `main` (tag `v1.0.0-beta.10`) | Current (canonical — matches `CANONICAL_KIT_SHA` above and the `KIT_REF` pins). **Kit release `1.0.0-beta.10`** (2026-09-06): governance receipts — every accepted kind-3140x event is recorded in a new `governance_receipts` D1 table with stage, projection outcome and replay count (`migrations/0005`; the relay worker applies the schema idempotently at startup through its `CREATE TABLE IF NOT EXISTS` migration path, so this deploy needs no manual `wrangler d1 migrations apply`); typed feature gate; identity subkey derivation vectors; forum-client bootstrap, per-channel freshness and reconcile; relay trust sweep; the `a754468` event_tags indexed lookups this deployment previously pinned three commits past `beta.9`; rustfmt, clippy and rustdoc hygiene on the landing. All 14 crates versioned `1.0.0-beta.10`; the six registry crates (`core`, `config`, `mesh`, `rate-limit`, `ascii`, `setup-skill`) published to crates.io at `1.0.0-beta.10` (superseded `beta.9` yanked once this pin deployed). |
+| `90ffe74` | `main` (tag `v1.0.0-beta.9`) | Superseded (was canonical, with `KIT_REF` held three commits ahead at `a754468` for the event_tags fix). **Kit release `1.0.0-beta.9`**: NIP-98 canonical_url preserves query strings (fixes admin-route verification across auth/relay/search/preview), nip44 `PlaintextTooLong` mapping + `nostr 0.44.7` exact pin, pod ACL `preserves_owner_control` invariant + dead `pod_git_anchor.rs` removed, CI hardening (clippy/test/coverage hard gates, security-audit.sh, validate-forum-config). All 14 crates versioned `1.0.0-beta.9`; the four library crates published to crates.io at `1.0.0-beta.9` (superseded `beta.8` yanked once this pin deployed). |
 | `9de950a` | `main` (admin consolidation + onboarding fixes) | Superseded. Admin panel consolidated from 12 to 8 tabs (Members unified, Settings→Configuration, NativePods folded in, dead stats.rs removed). Onboarding deduplication (skip /setup redirect) + recovery sheet Blob download. Library crates unchanged at `1.0.0-beta.8`. |
 | `1fa99db` | `main` (NIP-25 reactions + profile popover + DM fix) | Superseded. Three community-requested features: NIP-25 emoji reactions with a reactive ReactionStore, profile popover with Send DM on avatar/name click, and DM list mobile alignment. Library crates unchanged at `1.0.0-beta.8`. |
 | `2f01e33` | `main` (post-beta.8 PWA gate removal) | Superseded. Removes the PWA install gate from the BBS client, making zone-bound PWA installation available without the feature flag. Library crates unchanged at `1.0.0-beta.8`. |

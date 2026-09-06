@@ -35,17 +35,17 @@ describe("parsers", () => {
 
   it("reads exact and floating crate requirements verbatim", () => {
     const reqs = parseManifestRequirements(
-      ['nostr-bbs-core = "=1.0.0-beta.9"', 'nostr-bbs-mesh = "1.0.0-beta.9"'].join("\n"),
+      ['nostr-bbs-core = "=1.0.0-beta.10"', 'nostr-bbs-mesh = "1.0.0-beta.10"'].join("\n"),
     );
-    expect(reqs.get("nostr-bbs-core")).toBe("=1.0.0-beta.9");
-    expect(reqs.get("nostr-bbs-mesh")).toBe("1.0.0-beta.9");
+    expect(reqs.get("nostr-bbs-core")).toBe("=1.0.0-beta.10");
+    expect(reqs.get("nostr-bbs-mesh")).toBe("1.0.0-beta.10");
   });
 
   it("reads resolved version, checksum and source per package block", () => {
     const lock = parseLockfileResolved(`
 [[package]]
 name = "nostr-bbs-core"
-version = "1.0.0-beta.9"
+version = "1.0.0-beta.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "${"a".repeat(64)}"
 dependencies = [
@@ -53,7 +53,7 @@ dependencies = [
 ]
 `);
     expect(lock.get("nostr-bbs-core")).toEqual({
-      version: "1.0.0-beta.9",
+      version: "1.0.0-beta.10",
       checksum: "a".repeat(64),
       source: "registry+https://github.com/rust-lang/crates.io-index",
     });
@@ -111,8 +111,8 @@ describe("deliberately inconsistent pins are rejected", () => {
     const root = makeFixtureRepo((r) => {
       r.replaceOnce(
         "forum-config/Cargo.toml",
-        'nostr-bbs-core = "=1.0.0-beta.9"',
-        'nostr-bbs-core = "1.0.0-beta.9"',
+        'nostr-bbs-core = "=1.0.0-beta.10"',
+        'nostr-bbs-core = "1.0.0-beta.10"',
       );
     });
     const result = checkKitPins(root);
@@ -124,8 +124,8 @@ describe("deliberately inconsistent pins are rejected", () => {
     const root = makeFixtureRepo((r) => {
       r.replaceOnce(
         "forum-config/Cargo.toml",
-        'nostr-bbs-mesh = "=1.0.0-beta.9"',
-        'nostr-bbs-mesh = "^1.0.0-beta.9"',
+        'nostr-bbs-mesh = "=1.0.0-beta.10"',
+        'nostr-bbs-mesh = "^1.0.0-beta.10"',
       );
     });
     expectDrift(checkKitPins(root), "floating requirement range");
@@ -137,7 +137,7 @@ describe("deliberately inconsistent pins are rejected", () => {
     const root = makeFixtureRepo((r) => {
       r.replaceOnce(
         "forum-config/Cargo.toml",
-        'nostr-bbs-core = "=1.0.0-beta.9"',
+        'nostr-bbs-core = "=1.0.0-beta.10"',
         'nostr-bbs-core = "=1.0.0-beta.8"',
       );
     });
@@ -148,7 +148,7 @@ describe("deliberately inconsistent pins are rejected", () => {
     const root = makeFixtureRepo((r) => {
       r.edit("forum-config/Cargo.lock", (t) =>
         t.replace(
-          "e082e46e9e29875485589b9a018f9643e23dfcc73c2f87edf63207a5f326fb70",
+          "93c1065a917cbafcfbb131b3699e387b5f19e5a288e5715444a6900c3f75b3bf",
           "f".repeat(64),
         ),
       );
@@ -159,7 +159,7 @@ describe("deliberately inconsistent pins are rejected", () => {
   it("rejects a resolved version that disagrees with CANONICAL_KIT_VERSION", () => {
     const root = makeFixtureRepo((r) => {
       r.edit("docs/architecture/kit-compatibility-record.md", (t) =>
-        t.replace("CANONICAL_KIT_VERSION=1.0.0-beta.9", "CANONICAL_KIT_VERSION=1.0.0-beta.8"),
+        t.replace("CANONICAL_KIT_VERSION=1.0.0-beta.10", "CANONICAL_KIT_VERSION=1.0.0-beta.8"),
       );
     });
     expectDrift(checkKitPins(root), "CANONICAL_KIT_VERSION is 1.0.0-beta.8");
@@ -169,8 +169,8 @@ describe("deliberately inconsistent pins are rejected", () => {
     const root = makeFixtureRepo((r) => {
       r.edit("forum-config/Cargo.lock", (t) =>
         t.replace(
-          `name = "nostr-bbs-mesh"\nversion = "1.0.0-beta.9"\nsource = "registry+https://github.com/rust-lang/crates.io-index"\nchecksum = "d3d3beab1d89bc6c54ac71408c683413fb572fce4d0a187c1dbd79a6eef7d8f8"`,
-          `name = "nostr-bbs-mesh"\nversion = "1.0.0-beta.9"\nsource = "git+https://example.invalid/kit#0123456789abcdef"`,
+          `name = "nostr-bbs-mesh"\nversion = "1.0.0-beta.10"\nsource = "registry+https://github.com/rust-lang/crates.io-index"\nchecksum = "e9259dd482d1e79e00da400029bf26807336d6dc270c47c19c993635a723e41e"`,
+          `name = "nostr-bbs-mesh"\nversion = "1.0.0-beta.10"\nsource = "git+https://example.invalid/kit#0123456789abcdef"`,
         ),
       );
     });

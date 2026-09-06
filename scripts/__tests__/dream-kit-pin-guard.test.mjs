@@ -86,7 +86,7 @@ describe("drift is reported through the wrapper", () => {
   it("reports drift when the record's canonical version disagrees", () => {
     const root = makeFixtureRepo((r) => {
       r.edit("docs/architecture/kit-compatibility-record.md", (t) =>
-        t.replace("CANONICAL_KIT_VERSION=1.0.0-beta.9", "CANONICAL_KIT_VERSION=1.0.0-beta.8"),
+        t.replace("CANONICAL_KIT_VERSION=1.0.0-beta.10", "CANONICAL_KIT_VERSION=1.0.0-beta.8"),
       );
     });
     expectDriftVerdict(runGuard(root), "CANONICAL_KIT_VERSION is 1.0.0-beta.8");
@@ -98,8 +98,8 @@ describe("drift is reported through the wrapper", () => {
     const root = makeFixtureRepo((r) => {
       r.replaceOnce(
         "forum-config/Cargo.toml",
-        'nostr-bbs-core = "=1.0.0-beta.9"',
-        'nostr-bbs-core = "1.0.0-beta.9"',
+        'nostr-bbs-core = "=1.0.0-beta.10"',
+        'nostr-bbs-core = "1.0.0-beta.10"',
       );
     });
     expectDriftVerdict(runGuard(root), "is a floating requirement range");
@@ -111,7 +111,7 @@ describe("drift is reported through the wrapper", () => {
     const root = makeFixtureRepo((r) => {
       r.edit("forum-config/Cargo.lock", (t) =>
         t.replace(
-          "e082e46e9e29875485589b9a018f9643e23dfcc73c2f87edf63207a5f326fb70",
+          "93c1065a917cbafcfbb131b3699e387b5f19e5a288e5715444a6900c3f75b3bf",
           "f".repeat(64),
         ),
       );
