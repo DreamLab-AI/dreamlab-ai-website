@@ -26,6 +26,13 @@ on:
       - '.github/workflows/workers-deploy.yml'
       - '.github/workflows/rust-ci.yml'
       - 'docs/architecture/kit-compatibility-record.md'
+      # The gate scripts and the reusable gate itself — a change to the checks
+      # must re-run the checks.
+      - 'scripts/pin-parity.mjs'
+      - 'scripts/check-effective-endpoints.mjs'
+      - 'scripts/check-config-mirrors.mjs'
+      - 'scripts/lib/**'
+      - '.github/workflows/test-and-lint.yml'
   pull_request:
     branches: [main]
     paths:
@@ -43,6 +50,13 @@ on:
       - '.github/workflows/workers-deploy.yml'
       - '.github/workflows/rust-ci.yml'
       - 'docs/architecture/kit-compatibility-record.md'
+      # The gate scripts and the reusable gate itself — a change to the checks
+      # must re-run the checks.
+      - 'scripts/pin-parity.mjs'
+      - 'scripts/check-effective-endpoints.mjs'
+      - 'scripts/check-config-mirrors.mjs'
+      - 'scripts/lib/**'
+      - '.github/workflows/test-and-lint.yml'
   workflow_dispatch:
 
 concurrency:
@@ -65,8 +79,8 @@ jobs:
     runs-on: ubuntu-latest
     if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: '20'
           cache: 'npm'
@@ -81,8 +95,8 @@ jobs:
     runs-on: ubuntu-latest
     if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: '20'
           cache: 'npm'
@@ -98,8 +112,8 @@ jobs:
     runs-on: ubuntu-latest
     if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: '20'
           cache: 'npm'
@@ -124,8 +138,8 @@ jobs:
     runs-on: ubuntu-latest
     if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: '20'
           cache: 'npm'
@@ -142,7 +156,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       - uses: dtolnay/rust-toolchain@0176485ebe2f605bde554dd99f804beeaf7db3e2 # 1.90.0
         with:
           components: rustfmt
@@ -156,11 +170,11 @@ jobs:
     runs-on: ubuntu-latest
     if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       - uses: dtolnay/rust-toolchain@0176485ebe2f605bde554dd99f804beeaf7db3e2 # 1.90.0
         with:
           components: clippy
-      - uses: actions/cache@v4
+      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: |
             ~/.cargo/registry
@@ -178,9 +192,9 @@ jobs:
     runs-on: ubuntu-latest
     if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       - uses: dtolnay/rust-toolchain@0176485ebe2f605bde554dd99f804beeaf7db3e2 # 1.90.0
-      - uses: actions/cache@v4
+      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: |
             ~/.cargo/registry
@@ -191,99 +205,59 @@ jobs:
       - run: cargo test --manifest-path forum-config/Cargo.toml
 
   # ---------------------------------------------------------------------------
-  # Dual-pin check — KIT_REF (deploy/workers-deploy/rust-ci) and the
-  # forum-config Cargo revs must move together, or client/worker/test skew
-  # ships (see the 2026-06-15 incident note in workers-deploy.yml).
+  # Supply-chain pins — KIT_REF lockstep, EXACT crate pins verified against the
+  # resolved lockfile + registry checksums, and full-SHA pinning of every
+  # GitHub Action. The logic lives in scripts/pin-parity.mjs, which is the same
+  # script scripts/pin-parity-check.sh runs locally: before 2026-09-05 this job
+  # inlined a second copy of the check, and the two copies drifted apart.
   # ---------------------------------------------------------------------------
   pin-check:
-    name: Dual-pin check
+    name: Pin parity
     runs-on: ubuntu-latest
     if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
     steps:
-      - uses: actions/checkout@v4
-      - name: Verify KIT_REF and Cargo revs are in lockstep
-        run: |
-          set -euo pipefail
-          deploy=$(grep -oP "KIT_REF:\s*'\K[0-9a-f]+" .github/workflows/deploy.yml | head -1)
-          workers=$(grep -oP "KIT_REF:\s*'\K[0-9a-f]+" .github/workflows/workers-deploy.yml | head -1)
-          rustci=$(grep -oP "KIT_REF:\s*'\K[0-9a-f]+" .github/workflows/rust-ci.yml | head -1)
-          echo "deploy=$deploy  workers=$workers  rustci=$rustci"
-          if [[ -z "$deploy" || "$deploy" != "$workers" || "$deploy" != "$rustci" ]]; then
-            echo "::error::KIT_REF differs across deploy/workers-deploy/rust-ci.yml"; exit 1
-          fi
-          # Library crates are pulled from crates.io (the git-SHA pin was retired
-          # at 1.0.0-beta.6). Assert the forum-config version deps agree with each
-          # other and with CANONICAL_KIT_VERSION; KIT_REF still pins the source
-          # clone the client/workers build from.
-          mapfile -t vers < <(grep -oP 'nostr-bbs-(core|config|mesh|rate-limit) = "\K[^"]+' forum-config/Cargo.toml | sort -u)
-          if [[ ${#vers[@]} -eq 0 ]]; then echo "::error::no nostr-bbs crates.io version deps found"; exit 1; fi
-          if [[ ${#vers[@]} -ne 1 ]]; then echo "::error::forum-config nostr-bbs deps disagree: ${vers[*]}"; exit 1; fi
-          # Durable compatibility record (gap-close WP-4 / ADR-040 D2): the SHA it
-          # cites must equal the live KIT_REF, so the record cannot silently drift.
-          record='docs/architecture/kit-compatibility-record.md'
-          if [[ ! -f "$record" ]]; then
-            echo "::error::compatibility record missing: $record"; exit 1
-          fi
-          canonical=$(grep -oP 'CANONICAL_KIT_SHA=\K[0-9a-f]+' "$record" | head -1)
-          if [[ -z "$canonical" ]]; then
-            echo "::error::no CANONICAL_KIT_SHA in $record"; exit 1
-          fi
-          if [[ "$canonical" != "$deploy" ]]; then
-            echo "::error::compatibility record CANONICAL_KIT_SHA '$canonical' != KIT_REF '$deploy'"; exit 1
-          fi
-          canonical_ver=$(grep -oP 'CANONICAL_KIT_VERSION=\K.+' "$record" | head -1)
-          if [[ -z "$canonical_ver" ]]; then echo "::error::no CANONICAL_KIT_VERSION in $record"; exit 1; fi
-          if [[ "$canonical_ver" != "${vers[0]}" ]]; then
-            echo "::error::CANONICAL_KIT_VERSION '$canonical_ver' != forum-config dep version '${vers[0]}'"; exit 1
-          fi
-          echo "Pin OK — source clone $deploy; library crates ${vers[0]} from crates.io; record in lockstep"
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '20'
+      - name: Verify kit pins and Action SHA pinning
+        run: node scripts/pin-parity.mjs --github
 
   # ---------------------------------------------------------------------------
-  # Admin pubkey sync — the in-repo admin set must agree across
-  # forum-config/dreamlab.toml [admin].static_pubkeys, relay-worker ADMIN_PUBKEYS,
-  # and search-worker ADMIN_PUBKEYS. These three are hand-maintained mirrors of a
-  # single admin model; drift means a key is admin on one worker but not another.
-  # (The auth-worker's ADMIN_PUBKEYS is an operator-managed CF secret and cannot be
-  # checked in CI — keep it in lockstep with these when rotating the admin set.)
+  # Effective endpoints — every frontend surface must actually receive the
+  # endpoints its source reads, across BOTH config dialects (Vite build
+  # variables for React, window.__ENV__ injection for the forum and BBS).
   # ---------------------------------------------------------------------------
-  admin-pubkeys-sync:
-    name: Admin pubkeys in sync
+  endpoint-check:
+    name: Effective endpoints
     runs-on: ubuntu-latest
     if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
     steps:
-      - uses: actions/checkout@v4
-      - name: Assert ADMIN_PUBKEYS agree across dreamlab.toml + relay + search
-        run: |
-          python3 - <<'PY'
-          import sys, tomllib
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '20'
+      - name: Validate effective endpoints for React + forum + BBS
+        run: node scripts/check-effective-endpoints.mjs --github
 
-          def load(p):
-              with open(p, "rb") as f:
-                  return tomllib.load(f)
-
-          def keyset(csv):
-              return {k.strip().lower() for k in csv.split(",") if k.strip()}
-
-          toml = load("forum-config/dreamlab.toml")
-          admin = {k.strip().lower() for k in toml["admin"]["static_pubkeys"]}
-
-          relay = load("forum-config/deploy/relay-worker.wrangler.toml")
-          search = load("forum-config/deploy/search-worker.wrangler.toml")
-          relay_set = keyset(relay["vars"]["ADMIN_PUBKEYS"])
-          search_set = keyset(search["vars"]["ADMIN_PUBKEYS"])
-
-          ok = True
-          for name, other in (("relay-worker", relay_set), ("search-worker", search_set)):
-              if admin != other:
-                  ok = False
-                  print(f"::error::ADMIN_PUBKEYS mismatch: dreamlab.toml [admin] vs {name}. "
-                        f"only-in-dreamlab.toml={sorted(admin - other)} "
-                        f"only-in-{name}={sorted(other - admin)}")
-          if not ok:
-              sys.exit(1)
-          print(f"admin pubkeys in sync ({len(admin)} keys) across "
-                "dreamlab.toml [admin], relay-worker, search-worker")
-          PY
+  # ---------------------------------------------------------------------------
+  # Config mirrors — ADR-2005 accepts hand-synced mirrors instead of a
+  # generator, which is only safe while every mirror is enumerated and compared.
+  # This replaces the previous job, which compared the admin pubkey set alone
+  # and left the client pubkey mirrors, all three ZONE_CONFIG copies and the
+  # service-endpoint mirrors unchecked.
+  # ---------------------------------------------------------------------------
+  config-mirrors:
+    name: Config mirrors in sync
+    runs-on: ubuntu-latest
+    if: github.repository == 'DreamLab-AI/dreamlab-ai-website'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '20'
+      - name: Enumerate and compare every config mirror
+        run: node scripts/check-config-mirrors.mjs --github
 
   # ---------------------------------------------------------------------------
   # Aggregator — single required status check for branch protection.
@@ -298,7 +272,8 @@ jobs:
       - node-build
       - node-audit
       - pin-check
-      - admin-pubkeys-sync
+      - endpoint-check
+      - config-mirrors
       - rust-fmt
       - rust-clippy
       - rust-test
@@ -310,7 +285,8 @@ jobs:
           echo "node-build:   ${{ needs.node-build.result }}"
           echo "node-audit:   ${{ needs.node-audit.result }}"
           echo "pin-check:    ${{ needs.pin-check.result }}"
-          echo "admin-sync:   ${{ needs.admin-pubkeys-sync.result }}"
+          echo "endpoints:    ${{ needs.endpoint-check.result }}"
+          echo "mirrors:      ${{ needs.config-mirrors.result }}"
           echo "rust-fmt:     ${{ needs.rust-fmt.result }}"
           echo "rust-clippy:  ${{ needs.rust-clippy.result }}"
           echo "rust-test:    ${{ needs.rust-test.result }}"
@@ -321,7 +297,8 @@ jobs:
             "${{ needs.node-build.result }}" \
             "${{ needs.node-audit.result }}" \
             "${{ needs.pin-check.result }}" \
-            "${{ needs.admin-pubkeys-sync.result }}" \
+            "${{ needs.endpoint-check.result }}" \
+            "${{ needs.config-mirrors.result }}" \
             "${{ needs.rust-fmt.result }}" \
             "${{ needs.rust-clippy.result }}" \
             "${{ needs.rust-test.result }}"; do

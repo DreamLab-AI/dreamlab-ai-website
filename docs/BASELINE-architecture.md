@@ -51,8 +51,9 @@ despite the README's "two SPAs" framing:
 | `/community/` | Rust/Leptos 0.7 CSR-WASM forum client (Trunk) | kit crate `nostr-bbs-forum-client` | `deploy.yml:204` "Build Leptos forum with Trunk" |
 | `/community/bbs/` | Retro ASCII/BBS terminal client (Trunk) | kit crate `nostr-bbs-bbs-client` | `deploy.yml:295` "Build retro ASCII/BBS client with Trunk" |
 
-All three are static assets after build; each has its own `window.__ENV__`
-runtime-config block injected by `sed` at deploy time
+All three are static assets after build. React receives Vite build variables;
+the forum and BBS receive `window.__ENV__` runtime-config blocks injected by
+`sed` at deploy time
 (`deploy.yml:241` "Inject runtime env config into forum", `deploy.yml:299`
 "Merge + configure BBS at /community/bbs/").
 
@@ -91,7 +92,7 @@ comment and CI assertion rather than the handler code.
 
 Two pin mechanisms coexist:
 
-- **Config crates** are consumed from crates.io at a **fixed version**, not a git
+- **Config crates** are consumed from crates.io with a **version requirement**, not a git
   rev: `nostr-bbs-{core,config,mesh,rate-limit} = "1.0.0-beta.9"`
   (`forum-config/Cargo.toml`, `forum-config/Cargo.lock`).
 - **Client + workers** are built by cloning the kit repo at a pinned **git SHA**
@@ -109,7 +110,7 @@ client/worker skew that "wiped the forum on 2026-06-15" (legacy ADR-038;
 Every tool the deploy job downloads (Trunk, binaryen/`wasm-opt`, Tailwind CLI)
 is pinned to an exact version **and** SHA256-verified before use
 (`deploy.yml:32-40`, install steps), because that job carries the Cloudflare API
-token. GitHub Actions are pinned to full commit SHAs, not tags.
+token. Deployment publishers use full commit SHAs; checkout, Node setup and cache Actions still use tags.
 
 ## Known divergences & open items
 
@@ -147,9 +148,10 @@ token. GitHub Actions are pinned to full commit SHAs, not tags.
    failure mode.
 2. The privileged deploy job must download **no unverified artefact**: every
    external tool stays version-pinned and SHA256-checked (`deploy.yml` install
-   steps). Actions stay pinned to commit SHAs.
-3. Runtime API bases are injected via `window.__ENV__`, never baked as compile
-   constants where a DNS-unprovisioned domain would sever calls (`deploy.yml:41-52`).
+   steps). Full commit-SHA pinning remains required by this invariant but is not yet universal.
+3. Forum/BBS API bases use `window.__ENV__`; React transport uses Vite build
+   variables. Validate every effective endpoint before release so an unavailable
+   domain cannot silently sever one surface (`deploy.yml` build/injection steps).
 4. GitHub Pages is the origin of record for `dreamlab-ai.com` until DNS is
    re-cut; the Cloudflare Pages step stays gated behind an explicit repo
    variable.
@@ -163,3 +165,9 @@ will fire; (3) update this doc's affected section with the new `file:line` and
 re-record `verified_commit`; (4) add a thin ADR under `docs/adr/` recording the
 decision. Legacy ADR prose (013–044) is citable evidence, never authority — the
 archive is frozen at 2026-08-31.
+
+## Estate closeout qualification — 2026-09-04
+
+The [commercial review](../../VisionFlow/docs/estate-review/commercial-surfaces.md) and [source/test receipt](../../VisionFlow/docs/estate-review/evidence/commercial-snapshot.json) extend the operative ADRs with remaining acceptance conditions. Existing live declarations are historical and were not re-certified by this local pass.
+
+The kit requirements are Cargo version requirements; the lockfile records resolved versions. Three workflow SHAs participate in parity, including `rust-ci.yml`. CI has a Vitest/pin/admin aggregator, while deployment uses a separate reusable gate without Vitest; its unconditional success summary is not an acceptance receipt. Some Actions still use tags (`checkout@v4`, `setup-node@v4`, `cache@v4`), so the earlier blanket full-SHA claim overstates enforcement. React receives Vite build variables; forum/BBS runtime injection does not describe every frontend. Closeout requires a common revision/check/deployment receipt, deliberate failure rejection and rollback evidence.

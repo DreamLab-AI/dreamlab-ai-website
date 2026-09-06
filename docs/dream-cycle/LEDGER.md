@@ -20,3 +20,8 @@
 | 2026-08-26 | operator-overlay | Given the KIT_REF was repinned from `93dcf055…` to `a7544687…` across the three  | NONE | NONE | yes | REJECT |  | 7d48d6f146a0 |  |
 | 2026-08-28 | operator-handoff | OPERATOR FIX: evaluatorEntrypoints with nested double quotes were mangled by the annexe ssh dispatch (bash -lc consumes one escaping level); affected evaluators converted to checked-in scripts (scripts/dream-*.sh) invoked quote-free. Verified passing locally. Dream cycle: trust the script form; never inline double-quoted logic in dream.config.json. RuVector key: dream-evaluator-ssh-quoting-bug-class (patterns ns) | NONE | NONE | n/a | OPERATOR |  | session-018aCYi4 |  |
 | 2026-09-01 | site-build-content | INCONCLUSIVE — see report | NONE | NONE | yes | INCONCLUSIVE |  | 2cd6fe24ca32 |  |
+| 2026-09-02 | operator-overlay | Given kit pins sit at parity on HEAD (all three workflows `a7544687…`, crates `1 | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/49 | yes | ACCEPT |  | 558df079ca29 |  |
+| 2026-09-03 | ci-workflows | Given kit-pin-guard (PR #49) compares only KIT_REF SHAs against the record's CAN | NONE | NONE | yes | ACCEPT |  | ab575703a85a |  |
+| 2026-09-04 | kit-pin-integrity | Given HEAD's kit-pin parity logic lives in two independent copies (the GitHub gu | NONE | NONE | yes | ACCEPT |  | 5782b8777649 |  |
+| 2026-09-05 | site-build-content | Given HEAD `7e243741`'s bench run emits both React Router v7 future-flag warning | NONE | NONE | yes | ACCEPT |  | 67497bc79bb8 |  |
+| 2026-09-06 | operator-overlay | Given tonight's pin-parity entrypoint is an inline command containing nested dou | NONE | NONE | yes | INCONCLUSIVE |  | c638ed372d40 |  |

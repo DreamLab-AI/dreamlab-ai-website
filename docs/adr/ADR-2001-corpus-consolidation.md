@@ -62,3 +62,15 @@ doc → code/CI/config citations → this ledger → archive (history only).
   `docs/adr/README.md`.
 - Drift claims spot-checked against `deploy.yml`, `forum-config/dreamlab.toml`,
   `src/lib/nostr.ts`, and `src/components/AIChatFab.tsx` at commit `d852f61`.
+
+## Closeout extension — 2026-09-04
+
+Work package: **CP-01**. Accountable owner remains `jjohare`; estate acceptance requires the release and identity maintainers where the boundary crosses repositories. This extends closeout criteria without changing the accepted architectural choice.
+
+The eight-record operative ledger validates locally. Consolidation is present; archive disposition and complete-system acceptance remain open.
+
+**Acceptance condition:** Map each frozen legacy record to an operative successor, explicit deferred decision or historical-only disposition; validate inbound links and agree the governing-document owner.
+
+Dependency: the estate release identity (CP-01), plus the upstream kit revision and affected identity/grounding contracts. Reopen on the existing review trigger or a failing acceptance probe. Preserve the historical `verified_commit` and activation declaration: this annex is source/test evidence at `7e243741c8eaf61506ef86a70b8dd44d80722c11`, not a new live-service certification.
+
+See the [commercial review](../../../VisionFlow/docs/estate-review/commercial-surfaces.md) and [receipt](../../../VisionFlow/docs/estate-review/evidence/commercial-snapshot.json).

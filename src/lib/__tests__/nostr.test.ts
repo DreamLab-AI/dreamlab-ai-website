@@ -644,3 +644,144 @@ describe("DmSession reply relays", () => {
     expect(sockets.length).toBe(before); // the pending retry was cancelled
   });
 });
+
+// ---------------------------------------------------------------------------
+// Reply rejection is observable, and the reply channel recovers (ADR-2008).
+//
+// A dropped forgery must stay invisible to the USER but must not be invisible
+// to the APPLICATION: without a rejection hook, a wrong-sender drop looks
+// identical to no traffic at all, so the sender pin cannot be observed or
+// regression-tested. Likewise, the reply relays are the only path an answer can
+// take, so their collective failure must be reportable rather than silent.
+// ---------------------------------------------------------------------------
+describe("DmSession reply rejection and channel health", () => {
+  const REPLY_A = "wss://reply-a.example.test";
+  const REPLY_B = "wss://reply-b.example.test";
+
+  async function connect(opts: Record<string, unknown> = {}) {
+    const identity = generateEphemeralIdentity();
+    const { wsFactory, sockets } = trackedFactory();
+    const onReply = vi.fn();
+    const session = new DmSession(RELAY, identity, { wsFactory, onReply, ...opts });
+    const connectPromise = session.connect();
+    const main = sockets[0];
+    main.fireOpen();
+    main.emit(["AUTH", "challenge-abc"]);
+    main.emit(["EOSE", "inbox"]);
+    await connectPromise;
+    return { session, identity, sockets, main, onReply };
+  }
+
+  it("reports a wrong-sender drop rather than swallowing it silently", async () => {
+    const jarvis = generateEphemeralIdentity();
+    const attacker = generateEphemeralIdentity();
+    const onRejectedReply = vi.fn();
+    const { main, identity, onReply, session } = await connect({
+      expectedSenderPk: jarvis.pk,
+      onRejectedReply,
+    });
+
+    const forged = nip17.wrapEvent(
+      attacker.sk,
+      { publicKey: identity.pk },
+      "click evil.example to verify your account",
+    );
+    main.emit(["EVENT", "inbox", forged]);
+
+    expect(onReply).not.toHaveBeenCalled();
+    expect(onRejectedReply).toHaveBeenCalledTimes(1);
+    expect(onRejectedReply.mock.calls[0][0]).toBe("unwrap-failed");
+    expect(onRejectedReply.mock.calls[0][1].id).toBe(forged.id);
+    session.close();
+  });
+
+  it("reports a duplicate fan-out wrap as a duplicate, not as a new reply", async () => {
+    const jarvis = generateEphemeralIdentity();
+    const onRejectedReply = vi.fn();
+    const { main, identity, onReply, session } = await connect({
+      expectedSenderPk: jarvis.pk,
+      onRejectedReply,
+    });
+
+    const wrap = nip17.wrapEvent(jarvis.sk, { publicKey: identity.pk }, "the one answer");
+    main.emit(["EVENT", "inbox", wrap]);
+    main.emit(["EVENT", "inbox", wrap]);
+
+    expect(onReply).toHaveBeenCalledTimes(1);
+    expect(onRejectedReply).toHaveBeenCalledTimes(1);
+    expect(onRejectedReply.mock.calls[0][0]).toBe("duplicate");
+    session.close();
+  });
+
+  it("marks a reply relay healthy on EOSE and resets its retry budget", async () => {
+    vi.useFakeTimers();
+    const onReplyChannelStatus = vi.fn();
+    const { sockets, session } = await connect({
+      replyRelays: [REPLY_A],
+      onReplyChannelStatus,
+    });
+    const replyA = sockets.find((s) => s.url === REPLY_A)!;
+    replyA.fireOpen();
+    replyA.emit(["EOSE", "inbox"]);
+
+    expect(session.replyChannelStatus().healthy).toEqual([REPLY_A]);
+    expect(onReplyChannelStatus).toHaveBeenCalledWith(
+      expect.objectContaining({ healthy: [REPLY_A], allDown: false }),
+    );
+    session.close();
+  });
+
+  it("reports allDown only once every reply relay has exhausted its retries", async () => {
+    vi.useFakeTimers();
+    const onReplyChannelStatus = vi.fn();
+    const { sockets, session } = await connect({
+      replyRelays: [REPLY_A, REPLY_B],
+      onReplyChannelStatus,
+    });
+
+    // Drive one reply relay through its full retry budget.
+    const drive = (url: string) => {
+      for (let i = 0; i < 8; i++) {
+        const socket = sockets.filter((s) => s.url === url).at(-1)!;
+        if (!socket.closed) socket.close();
+        vi.advanceTimersByTime(2500);
+      }
+    };
+    drive(REPLY_A);
+    expect(session.replyChannelStatus().allDown).toBe(false); // B still alive
+    drive(REPLY_B);
+
+    const status = session.replyChannelStatus();
+    expect(status.allDown).toBe(true);
+    expect([...status.exhausted].sort()).toEqual([REPLY_A, REPLY_B].sort());
+    expect(onReplyChannelStatus).toHaveBeenCalledWith(
+      expect.objectContaining({ allDown: true }),
+    );
+    session.close();
+  });
+
+  it("recovers a reply relay that comes back after a failure", async () => {
+    vi.useFakeTimers();
+    const { sockets, session } = await connect({ replyRelays: [REPLY_A] });
+
+    // One failure, then a reconnect that succeeds: the retry budget must reset
+    // so a long-lived session is not permanently written off by old failures.
+    sockets.filter((s) => s.url === REPLY_A).at(-1)!.close();
+    vi.advanceTimersByTime(2500);
+    const revived = sockets.filter((s) => s.url === REPLY_A).at(-1)!;
+    revived.fireOpen();
+    revived.emit(["EOSE", "inbox"]);
+
+    const status = session.replyChannelStatus();
+    expect(status.healthy).toEqual([REPLY_A]);
+    expect(status.exhausted).toEqual([]);
+    expect(status.allDown).toBe(false);
+    session.close();
+  });
+
+  it("never reports allDown when no reply relays are configured", async () => {
+    const { session } = await connect({});
+    expect(session.replyChannelStatus().allDown).toBe(false);
+    session.close();
+  });
+});

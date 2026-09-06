@@ -35,6 +35,34 @@ The `CANONICAL_KIT_SHA` line above is the machine-readable field the `pin-check`
 job extracts and compares against the workflow `KIT_REF`s and Cargo revs. Keep it
 byte-identical to `KIT_REF` when bumping the kit.
 
+## Resolved kit packages (release receipt)
+
+`CANONICAL_KIT_VERSION` states the version the operator *intends*; the block below
+states what the build actually resolves. Each line records the **exact resolved
+version and the crates.io registry checksum** of a kit crate as they appear in
+`forum-config/Cargo.lock`, which is the only artefact that describes the bytes the
+overlay compiles against. The pre-2026-09-05 check compared requirement *strings*
+in `Cargo.toml` and never opened the lockfile, so a floating requirement could
+resolve a different published crate while every declared pin still looked green
+(ADR-2004 closeout). `scripts/pin-parity.mjs` now fails the build unless, for every
+crate: the manifest carries an exact `=` pin, the lockfile resolves that same
+version from the crates.io registry, and the registry checksum matches the line
+here byte-for-byte.
+
+<!-- pin-check:resolved-packages -->
+```
+RESOLVED nostr-bbs-core 1.0.0-beta.9 e082e46e9e29875485589b9a018f9643e23dfcc73c2f87edf63207a5f326fb70
+RESOLVED nostr-bbs-config 1.0.0-beta.9 8b5ebf238281d2ea39aa664bab539566d336f4e5b0f83391d66db857c861ba4f
+RESOLVED nostr-bbs-mesh 1.0.0-beta.9 d3d3beab1d89bc6c54ac71408c683413fb572fce4d0a187c1dbd79a6eef7d8f8
+RESOLVED nostr-bbs-rate-limit 1.0.0-beta.9 b65d8eed8b6e4a26a96cd36caa9b2a370a7b4f65931d75e5e8d3ffef8c2163e2
+```
+
+Regenerate after any kit bump with:
+
+```bash
+node scripts/pin-parity.mjs --print-resolved
+```
+
 ## Pin sites (all must equal `CANONICAL_KIT_SHA`)
 
 | Site | File | What it drives |
@@ -42,8 +70,10 @@ byte-identical to `KIT_REF` when bumping the kit.
 | `KIT_REF` | `.github/workflows/deploy.yml` | Forum-client (Leptos WASM) build |
 | `KIT_REF` | `.github/workflows/workers-deploy.yml` | Five CF worker builds |
 | `KIT_REF` | `.github/workflows/rust-ci.yml` | Kit-level fmt/clippy/test gates |
-| `nostr-bbs-*` version ×4 | `forum-config/Cargo.toml` | Overlay compiles/tests against the matching crates.io release |
+| `nostr-bbs-*` exact `=` pin ×4 | `forum-config/Cargo.toml` | The requirement the resolver is allowed to satisfy |
+| `nostr-bbs-*` resolved version + checksum ×4 | `forum-config/Cargo.lock` | The bytes actually compiled |
 | `CANONICAL_KIT_SHA` | this file | The citable provenance record |
+| `RESOLVED` lines ×4 | this file | The release receipt the lockfile is checked against |
 
 ## What tier `integrated` means here
 

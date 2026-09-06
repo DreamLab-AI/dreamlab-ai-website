@@ -161,3 +161,9 @@ CI cannot rotate it; (3) update this doc's affected section with the new
 `file:line` and re-record `verified_commit`; (4) add a thin ADR under
 `docs/adr/`. Legacy identity ADRs (027–036, 040–042) are evidence, not
 authority — the archive is frozen at 2026-08-31.
+
+## Estate closeout qualification — 2026-09-04
+
+The [commercial review](../../VisionFlow/docs/estate-review/commercial-surfaces.md) and [source/test receipt](../../VisionFlow/docs/estate-review/evidence/commercial-snapshot.json) extend the operative ADRs with remaining acceptance conditions. Existing live declarations are historical and were not re-certified by this local pass.
+
+Admin-set CI coverage compares TOML with relay/search wrangler files; it does not certify all client/zone mirrors or the auth-worker secret. Chat uses an ephemeral signer at every tier. Reading an extension public key is a UI identity signal, with no signed visitor proof or selected tier sent through `sendQuestion`. Preserve sender verification while adding request/reply correlation and verifying real agent fan-out. Zone encryption and cohort configuration require deployed deny/revoke/recovery evidence before complete-system acceptance.

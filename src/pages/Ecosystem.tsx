@@ -68,7 +68,7 @@ const substrates = [
     iconColor: "text-purple-400",
     borderClass: "border-purple-500/30 hover:border-purple-500/50",
     description:
-      "Agents here bootstrap with their own secp256k1 keypairs and run a reproducible Nix runtime carrying 116 skills and 180+ tools. Their working data lives in Solid pods they own, so when an agent leaves, its memory and identity leave with it.",
+      "Agents here bootstrap with their own secp256k1 keypairs and run a reproducible Nix runtime carrying 124 skills and 180+ tools; two of its Rust workspaces, prose-sanitiser and diagram-ir, are published on crates.io. Their working data lives in Solid pods they own, so when an agent leaves, its memory and identity leave with it.",
     repo: "https://github.com/DreamLab-AI/agentbox",
     repoLabel: "DreamLab-AI/agentbox",
   },
@@ -163,7 +163,7 @@ const principles = [
     body: (
       <>
         Agents bootstrap with their own keypairs and a reproducible Nix
-        runtime: 116 skills, 180+ tools. Their data is owned in Solid pods,
+        runtime: 124 skills, 180+ tools. Their data is owned in Solid pods,
         not in a platform database. Agents take everything with them when
         they leave.
       </>
@@ -361,7 +361,7 @@ const Ecosystem = () => {
                   {/* Agentbox (top-right) */}
                   <rect x="345" y="40" width="120" height="85" rx="14" fill="rgba(139,92,246,0.1)" stroke="rgb(139,92,246)" strokeWidth="2.5" />
                   <text x="405" y="70" textAnchor="middle" fill="rgb(196,181,253)" fontWeight="800" fontSize="15" fontFamily="system-ui, sans-serif">Agentbox</text>
-                  <text x="405" y="93" textAnchor="middle" fill="rgb(170,150,200)" fontSize="12" fontFamily="system-ui, sans-serif">116 Skills</text>
+                  <text x="405" y="93" textAnchor="middle" fill="rgb(170,150,200)" fontSize="12" fontFamily="system-ui, sans-serif">124 Skills</text>
 
                   {/* DreamLab Edge (bottom-right) */}
                   <rect x="345" y="375" width="120" height="85" rx="14" fill="rgba(245,158,11,0.1)" stroke="rgb(245,158,11)" strokeWidth="2.5" />

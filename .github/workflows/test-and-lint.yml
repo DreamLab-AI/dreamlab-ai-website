@@ -1,7 +1,21 @@
 name: Test and Lint (Reusable)
 
 # Reusable pre-deploy gating workflow.
-# Runs npm lint + build, cargo fmt/clippy/test on all workspace crates.
+#
+# This is the ONLY gate between a push to main and publication of the origin, so
+# it must actually decide. Two defects were closed on 2026-09-05 (ADR-2002/2003
+# closeout):
+#
+#   1. It ran no unit tests at all. Vitest lived only in ci.yml, which is a
+#      SEPARATE workflow that deploy.yml does not depend on — so a red test
+#      suite never blocked a deploy.
+#   2. The final step wrote `passed=true` unconditionally under `if: always()`,
+#      so the `passed` output was true even when a step above it had failed.
+#      Any consumer branching on it was reading a constant.
+#
+# Every gate step now records its outcome under `if: always()`, and the summary
+# aggregates those recorded outcomes into a real verdict.
+#
 # Called via `workflow_call` from deploy.yml and workers-deploy.yml.
 # Also runs on PRs to main as an independent quality gate.
 
@@ -35,11 +49,11 @@ jobs:
       passed: ${{ steps.summary.outputs.passed }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       # ── Node / React gates ──────────────────────────────────────────────
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: '20'
           cache: 'npm'
@@ -51,7 +65,35 @@ jobs:
         run: npm run lint
         continue-on-error: true
 
+      # ── Supply-chain + config gates ─────────────────────────────────────
+      # These run BEFORE the build so a pin or mirror defect fails fast, and
+      # they are required: publication must not proceed past any of them.
+      - name: Pin parity (kit pins + Action SHA pinning)
+        id: pins
+        if: always()
+        run: node scripts/pin-parity.mjs --github
+
+      - name: Effective endpoint validation (all three surfaces)
+        id: endpoints
+        if: always()
+        run: node scripts/check-effective-endpoints.mjs --github
+
+      - name: Config mirror parity
+        id: mirrors
+        if: always()
+        run: node scripts/check-config-mirrors.mjs --github
+
+      # ── Unit tests ──────────────────────────────────────────────────────
+      # Previously absent from this gate entirely: a failing suite could not
+      # block a deploy because Vitest only ran in the separate ci.yml workflow.
+      - name: Unit tests (Vitest)
+        id: vitest
+        if: always()
+        run: npx vitest run --reporter=verbose
+
       - name: Build React site (verifies type/build correctness)
+        id: react_build
+        if: always()
         run: npm run build
         env:
           VITE_SUPABASE_URL: 'https://stub.invalid'
@@ -73,7 +115,7 @@ jobs:
           components: rustfmt, clippy
 
       - name: Cache Cargo registry + build
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: |
             ~/.cargo/registry
@@ -84,6 +126,8 @@ jobs:
             rust-gate-${{ runner.os }}-forum-config-
 
       - name: cargo fmt --check (forum-config)
+        id: rust_fmt
+        if: always()
         run: cargo fmt --manifest-path forum-config/Cargo.toml --all -- --check
 
       - name: cargo clippy (forum-config)
@@ -91,12 +135,46 @@ jobs:
         continue-on-error: true
 
       - name: cargo test (forum-config)
+        id: rust_test
+        if: always()
         run: cargo test --manifest-path forum-config/Cargo.toml
 
+      # Real aggregation. Each required step's recorded outcome is checked; the
+      # `passed` output is the AND of them, not a literal. A failure here is what
+      # denies publication in deploy.yml / workers-deploy.yml.
       - name: Summary
         id: summary
         if: always()
+        env:
+          PINS: ${{ steps.pins.outcome }}
+          ENDPOINTS: ${{ steps.endpoints.outcome }}
+          MIRRORS: ${{ steps.mirrors.outcome }}
+          VITEST: ${{ steps.vitest.outcome }}
+          REACT_BUILD: ${{ steps.react_build.outcome }}
+          RUST_FMT: ${{ steps.rust_fmt.outcome }}
+          RUST_TEST: ${{ steps.rust_test.outcome }}
         run: |
+          set -uo pipefail
+          FAILED=()
+          {
+            echo "## Pre-deploy Gate"
+            echo ""
+            echo "| Gate | Outcome |"
+            echo "|---|---|"
+          } >> "$GITHUB_STEP_SUMMARY"
+          for gate in PINS ENDPOINTS MIRRORS VITEST REACT_BUILD RUST_FMT RUST_TEST; do
+            outcome="${!gate:-skipped}"
+            echo "| \`${gate}\` | ${outcome} |" >> "$GITHUB_STEP_SUMMARY"
+            if [ "$outcome" != "success" ]; then
+              FAILED+=("${gate}=${outcome}")
+            fi
+          done
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          if [ "${#FAILED[@]}" -gt 0 ]; then
+            echo "passed=false" >> "$GITHUB_OUTPUT"
+            echo "**GATE FAILED** for \`${{ github.sha }}\`: ${FAILED[*]}" >> "$GITHUB_STEP_SUMMARY"
+            echo "::error::Pre-deploy gate failed: ${FAILED[*]}. Publication is blocked."
+            exit 1
+          fi
           echo "passed=true" >> "$GITHUB_OUTPUT"
-          echo "## Pre-deploy Gate" >> "$GITHUB_STEP_SUMMARY"
-          echo "All lint/test/build checks passed for commit ${{ github.sha }}." >> "$GITHUB_STEP_SUMMARY"
+          echo "All required gates passed for \`${{ github.sha }}\`." >> "$GITHUB_STEP_SUMMARY"

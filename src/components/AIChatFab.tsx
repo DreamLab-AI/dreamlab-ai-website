@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { MessageSquare, X, Send, Loader2, ChevronUp } from "lucide-react";
+import type { ReplyChannelStatus } from "@/lib/nostr";
 import { DmSession, generateEphemeralIdentity } from "@/lib/nostr";
+import { TurnRegistry, encodeQuestion, parseReplyEnvelope } from "@/lib/chat-turns";
 import { MAX_MESSAGE_LEN } from "@/lib/utils";
 
 interface ChatMessage {
@@ -8,6 +10,13 @@ interface ChatMessage {
   role: "user" | "assistant" | "system";
   content: string;
   ontologyQuery?: string;
+  /**
+   * Set when this reply answers a question the user asked earlier but which had
+   * already been closed out (timed out, or superseded). Without the note the
+   * late answer reads as the answer to whatever was asked most recently — the
+   * mis-attribution ADR-2008's closeout calls out.
+   */
+  lateForQuestion?: string;
 }
 
 type Tier = 0 | 1 | 2 | 3;
@@ -38,10 +47,14 @@ const REPLY_RELAYS = (
   .map((url: string) => url.trim())
   .filter(Boolean);
 
-// DM replies carry no e-tag correlation (junkiejarvis `_sendDm`), so sends are
-// serialised — one in-flight question at a time. The client waits at most 30 s
-// for a reply (above the agent's 25 s fail-open LLM timeout) before showing a
-// friendly fallback and re-enabling input (ADR-042 Decision 5).
+// The DM transport carries no protocol-level correlation (junkiejarvis
+// `_sendDm` emits a fresh rumor with no `e` tag), so the client mints its own
+// request id per question and binds replies to it (src/lib/chat-turns.ts).
+// Sends stay serialised — one in-flight question at a time — but correlation no
+// longer *depends* on that: a late or out-of-order reply resolves the turn it
+// names, or none at all. The client waits at most 30 s for a reply (above the
+// agent's 25 s fail-open LLM timeout) before showing a friendly fallback and
+// re-enabling input (ADR-042 Decision 5).
 const REPLY_TIMEOUT_MS = 30000;
 
 // Abuse throttles (ADR-042 amendment): the relay rate-limits per IP but not
@@ -73,6 +86,11 @@ const REPLY_TIMEOUT_MESSAGE =
   "Sorry — I could not reach the assistant just now. Please try again in a moment.";
 const SESSION_INTERRUPTED_MESSAGE =
   "Connection to the assistant was interrupted. Send your message again to reconnect.";
+// Every reply relay gave up. Replies reach this session ONLY over those relays
+// (the primary relay's allowlist can never admit a wrap addressed to the
+// ephemeral session key), so this is a structural dead end, not slowness.
+const REPLY_CHANNEL_DOWN_MESSAGE =
+  "We can't currently listen for the assistant's replies. Your message may still have been sent, but no answer will arrive here — please use the contact page.";
 const TURN_LIMIT_MESSAGE =
   "You've reached this chat's message limit. Please use the contact page for anything more — or close and reopen the chat to start afresh.";
 
@@ -106,18 +124,18 @@ export const AIChatFab = () => {
   // until the panel closes or the component unmounts.
   const sessionRef = useRef<DmSession | null>(null);
   const connectedRef = useRef(false);
-  // A turn is "pending" between publishing a question and resolving it (reply,
-  // timeout, or failure). Guards against double resolution of a single turn.
-  const pendingRef = useRef(false);
-  const replyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Every question opened this panel session, keyed by its request id. A reply
+  // resolves the turn it names — never merely "the pending one".
+  const turnsRef = useRef(new TurnRegistry());
+  // Reply-wait timers, one per outstanding request id.
+  const replyTimersRef = useRef(new Map<string, ReturnType<typeof setTimeout>>());
   // Abuse throttles: a short cooldown after each resolved turn, and a hard cap
   // on transported turns per panel-open session (reset when the panel closes).
   const [isCoolingDown, setIsCoolingDown] = useState(false);
   const cooldownTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const turnsRef = useRef(0);
-  // Sends are serialised, so the most recently transported question is the one
-  // an ontology lookup reply belongs to.
-  const lastQuestionRef = useRef("");
+  // Set once the reply channel is structurally down, so the warning is shown
+  // once per session rather than on every status change.
+  const replyChannelWarnedRef = useRef(false);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -143,10 +161,17 @@ export const AIChatFab = () => {
     return () => document.removeEventListener("mousedown", handler);
   }, [showTierMenu]);
 
-  const clearReplyTimer = useCallback(() => {
-    if (replyTimerRef.current) {
-      clearTimeout(replyTimerRef.current);
-      replyTimerRef.current = null;
+  const clearReplyTimer = useCallback((requestId?: string) => {
+    const timers = replyTimersRef.current;
+    if (requestId === undefined) {
+      for (const timer of timers.values()) clearTimeout(timer);
+      timers.clear();
+      return;
+    }
+    const timer = timers.get(requestId);
+    if (timer) {
+      clearTimeout(timer);
+      timers.delete(requestId);
     }
   }, []);
 
@@ -167,9 +192,10 @@ export const AIChatFab = () => {
     }, SEND_COOLDOWN_MS);
   }, []);
 
-  // Resolve any in-flight turn without emitting a message and re-enable input.
+  // Abandon every in-flight turn without emitting a message, and re-enable
+  // input. Used when the session dies or the panel closes.
   const resetPending = useCallback(() => {
-    pendingRef.current = false;
+    turnsRef.current.abandonAll();
     clearReplyTimer();
     setIsLoading(false);
   }, [clearReplyTimer]);
@@ -186,18 +212,15 @@ export const AIChatFab = () => {
   // or the component unmounts (also runs before each re-run of this effect).
   // The turn budget resets with the panel: a reopened chat starts afresh.
   useEffect(() => {
-    if (!isOpen) {
+    const reset = () => {
       teardownSession();
       resetPending();
       clearCooldown();
-      turnsRef.current = 0;
-    }
-    return () => {
-      teardownSession();
-      resetPending();
-      clearCooldown();
-      turnsRef.current = 0;
+      turnsRef.current.reset();
+      replyChannelWarnedRef.current = false;
     };
+    if (!isOpen) reset();
+    return reset;
   }, [isOpen, teardownSession, resetPending, clearCooldown]);
 
   const requestNostrAuth = useCallback(async (): Promise<string | null> => {
@@ -219,34 +242,86 @@ export const AIChatFab = () => {
     ]);
   }, []);
 
-  const addAssistantMessage = useCallback((content: string, ontologyQuery?: string) => {
-    setMessages((prev) => [
-      ...prev,
-      { id: nextMsgId("ai"), role: "assistant", content, ontologyQuery },
-    ]);
-  }, []);
+  const addAssistantMessage = useCallback(
+    (content: string, ontologyQuery?: string, lateForQuestion?: string) => {
+      setMessages((prev) => [
+        ...prev,
+        { id: nextMsgId("ai"), role: "assistant", content, ontologyQuery, lateForQuestion },
+      ]);
+    },
+    [],
+  );
 
-  // Any reply always renders (even one that arrives after the 30 s timeout).
-  // Only an outstanding turn is resolved — re-enabling input once, not twice.
-  const handleReply = useCallback((text: string) => {
-    addAssistantMessage(
-      text,
-      isOntologyLookup(text) ? lastQuestionRef.current : undefined
-    );
-    if (pendingRef.current) {
-      resetPending();
+  /**
+   * Route an inbound reply to the turn it actually answers.
+   *
+   * - A reply echoing a request id we issued resolves THAT turn. If that turn
+   *   already closed (timed out, or the session dropped it), the answer still
+   *   renders, but flagged as a late answer to the earlier question — it never
+   *   resolves whatever happens to be pending now.
+   * - A reply echoing an id we never issued is dropped entirely: it is not ours.
+   * - A reply with no id at all (today's agent does not echo the header) can
+   *   only resolve the oldest still-pending turn, and resolves nothing when
+   *   none is outstanding.
+   */
+  const handleReply = useCallback(
+    (text: string) => {
+      const { requestId, body } = parseReplyEnvelope(text);
+      const registry = turnsRef.current;
+      const settle = requestId ? registry.settleById(requestId) : registry.settleUncorrelated();
+
+      if (settle.outcome === "unknown-request") {
+        // Correlated to a request this session never made — not our traffic.
+        return;
+      }
+
+      const answeredTurn = "turn" in settle ? settle.turn : null;
+      const ontologyQuery = isOntologyLookup(body)
+        ? (answeredTurn?.question ?? undefined)
+        : undefined;
+
+      if (settle.outcome === "already-settled") {
+        addAssistantMessage(body, ontologyQuery, settle.turn.question);
+        return; // a closed turn stays closed; nothing pending is touched
+      }
+      if (settle.outcome === "no-pending") {
+        addAssistantMessage(body, ontologyQuery);
+        return;
+      }
+
+      // outcome === "resolved"
+      addAssistantMessage(body, ontologyQuery);
+      clearReplyTimer(settle.turn.id);
+      setIsLoading(registry.pendingCount > 0);
       startCooldown();
-    }
-  }, [addAssistantMessage, resetPending, startCooldown]);
+    },
+    [addAssistantMessage, clearReplyTimer, startCooldown],
+  );
 
-  const handleReplyTimeout = useCallback(() => {
-    if (!pendingRef.current) return;
-    pendingRef.current = false;
-    replyTimerRef.current = null;
-    addAssistantMessage(REPLY_TIMEOUT_MESSAGE);
-    setIsLoading(false);
-    startCooldown();
-  }, [addAssistantMessage, startCooldown]);
+  const handleReplyTimeout = useCallback(
+    (requestId: string) => {
+      const registry = turnsRef.current;
+      // No-op unless this specific turn is still pending: a turn already
+      // answered must not be timed out by its own stale timer.
+      if (!registry.timeout(requestId)) return;
+      replyTimersRef.current.delete(requestId);
+      addAssistantMessage(REPLY_TIMEOUT_MESSAGE);
+      setIsLoading(registry.pendingCount > 0);
+      startCooldown();
+    },
+    [addAssistantMessage, startCooldown],
+  );
+
+  // The reply relays are the only path an answer can take. When all of them
+  // exhaust their retry budget, say so once rather than spinning to timeout.
+  const handleReplyChannelStatus = useCallback(
+    (status: ReplyChannelStatus) => {
+      if (!status.allDown || replyChannelWarnedRef.current) return;
+      replyChannelWarnedRef.current = true;
+      addSystemMessage(REPLY_CHANNEL_DOWN_MESSAGE);
+    },
+    [addSystemMessage],
+  );
 
   // Post-connect transport error (relay CLOSED, socket error, keepalive send
   // failure). Connect-phase failures are surfaced by the sendMessage catch, so
@@ -255,7 +330,7 @@ export const AIChatFab = () => {
     if (!connectedRef.current) return;
     addSystemMessage(SESSION_INTERRUPTED_MESSAGE);
     teardownSession();
-    if (pendingRef.current) {
+    if (turnsRef.current.pendingCount > 0) {
       resetPending();
     }
   }, [addSystemMessage, teardownSession, resetPending]);
@@ -271,13 +346,14 @@ export const AIChatFab = () => {
       // open reply relays accept wraps from anyone, so without this pin a
       // third party could plant phishing text as an "assistant" message.
       expectedSenderPk: JARVIS_PUBKEY,
+      onReplyChannelStatus: handleReplyChannelStatus,
     });
     sessionRef.current = session;
     addSystemMessage(CONNECTING_MESSAGE);
     await session.connect();
     connectedRef.current = true;
     return session;
-  }, [handleReply, handleSessionError, addSystemMessage]);
+  }, [handleReply, handleSessionError, handleReplyChannelStatus, addSystemMessage]);
 
   const switchTier = useCallback(async (target: Tier) => {
     setShowTierMenu(false);
@@ -325,39 +401,57 @@ export const AIChatFab = () => {
       return;
     }
 
+    const registry = turnsRef.current;
     // Hard per-session budget on transported turns (tier-0 logging is free).
-    if (turnsRef.current >= MAX_TURNS_PER_SESSION) {
+    if (registry.turnsUsed >= MAX_TURNS_PER_SESSION) {
       addSystemMessage(TURN_LIMIT_MESSAGE);
       return;
     }
-    turnsRef.current += 1;
-    lastQuestionRef.current = trimmed;
 
-    // Open a single in-flight turn: input/send stay disabled until it resolves.
+    // Open the turn: this mints the request id the reply must echo to resolve it.
+    const turn = registry.open(trimmed);
     setIsLoading(true);
-    pendingRef.current = true;
 
     let session: DmSession;
     try {
       session = await ensureSession();
     } catch {
       teardownSession();
-      if (pendingRef.current) resetPending();
+      registry.fail(turn.id);
+      clearReplyTimer(turn.id);
+      setIsLoading(registry.pendingCount > 0);
       addSystemMessage(CONNECT_FAILURE_MESSAGE);
       return;
     }
 
     try {
+      // The wire payload carries the request id, plus the selected tier and any
+      // NIP-07 pubkey as EXPLICITLY UNVERIFIED hints. The browser holds no proof
+      // of possession for that pubkey (DMs ride the ephemeral session key), so
+      // the header states the hint is not an entitlement rather than presenting
+      // it as authority the agent could act on.
+      const payload = encodeQuestion({
+        requestId: turn.id,
+        question: trimmed,
+        tier,
+        identityHint: pubkey,
+        maxLength: MAX_MESSAGE_LEN,
+      });
       // Resolves on the relay publish OK, not on the agent reply. Only after the
-      // question is accepted do we arm the reply-wait timer (unless a reply has
-      // already landed during connect/publish, which would clear pendingRef).
-      await session.sendQuestion(trimmed, JARVIS_PUBKEY);
-      if (pendingRef.current) {
-        clearReplyTimer();
-        replyTimerRef.current = setTimeout(handleReplyTimeout, REPLY_TIMEOUT_MS);
+      // question is accepted do we arm this turn's reply-wait timer — and only
+      // if a reply has not already landed during connect/publish.
+      await session.sendQuestion(payload, JARVIS_PUBKEY);
+      if (registry.get(turn.id)?.state === "pending") {
+        clearReplyTimer(turn.id);
+        replyTimersRef.current.set(
+          turn.id,
+          setTimeout(() => handleReplyTimeout(turn.id), REPLY_TIMEOUT_MS),
+        );
       }
     } catch {
-      if (pendingRef.current) resetPending();
+      registry.fail(turn.id);
+      clearReplyTimer(turn.id);
+      setIsLoading(registry.pendingCount > 0);
       addAssistantMessage(SEND_FAILURE_MESSAGE);
       startCooldown();
     }
@@ -366,9 +460,9 @@ export const AIChatFab = () => {
     isLoading,
     isCoolingDown,
     tier,
+    pubkey,
     ensureSession,
     teardownSession,
-    resetPending,
     clearReplyTimer,
     handleReplyTimeout,
     addAssistantMessage,
@@ -507,6 +601,15 @@ export const AIChatFab = () => {
                         : "bg-purple-500/10 border border-purple-500/20 text-foreground/90"
                     }`}
                   >
+                    {msg.lateForQuestion && (
+                      <div className="mb-2 rounded-md border border-amber-400/30 bg-amber-400/10 px-2 py-1 text-[10px] leading-tight text-amber-200/90">
+                        Late answer to your earlier question: “
+                        {msg.lateForQuestion.length > 80
+                          ? `${msg.lateForQuestion.slice(0, 80)}…`
+                          : msg.lateForQuestion}
+                        ”
+                      </div>
+                    )}
                     <div className="whitespace-pre-wrap">{msg.content}</div>
                     {msg.role === "assistant" && msg.ontologyQuery && (
                       <button

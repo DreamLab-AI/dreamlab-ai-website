@@ -23,7 +23,15 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./src/test/setup.ts"],
     css: false,
-    include: ["src/**/__tests__/**/*.{test,spec}.{ts,tsx}"],
+    // Two suites live here: the React/TS unit tests under src/, and the CI
+    // gate scripts under scripts/ (pin parity, effective endpoints, config
+    // mirrors). The gate scripts are plain ESM and are exercised against
+    // fixture repository trees, so they run in the same runner rather than
+    // needing a second test harness.
+    include: [
+      "src/**/__tests__/**/*.{test,spec}.{ts,tsx}",
+      "scripts/__tests__/**/*.test.mjs",
+    ],
     exclude: ["node_modules", "dist", "community-forum-rs", ".git"],
     server: {
       deps: {

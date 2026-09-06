@@ -13,21 +13,42 @@ const h = vi.hoisted(() => {
   const closeMock = vi.fn<() => void>();
   const generateEphemeralIdentityMock = vi.fn();
 
+  interface ReplyChannelStatus {
+    healthy: string[];
+    exhausted: string[];
+    allDown: boolean;
+  }
+
   const state: {
     onReply: ((text: string) => void) | null;
     onError: (() => void) | null;
+    onReplyChannelStatus: ((status: ReplyChannelStatus) => void) | null;
+    expectedSenderPk: string | null;
     instances: number;
-  } = { onReply: null, onError: null, instances: 0 };
+  } = {
+    onReply: null,
+    onError: null,
+    onReplyChannelStatus: null,
+    expectedSenderPk: null,
+    instances: 0,
+  };
 
   class FakeDmSession {
     constructor(
       _relayUrl: string,
       _identity: unknown,
-      opts: { onReply: (text: string) => void; onError?: () => void }
+      opts: {
+        onReply: (text: string) => void;
+        onError?: () => void;
+        onReplyChannelStatus?: (status: ReplyChannelStatus) => void;
+        expectedSenderPk?: string;
+      }
     ) {
       state.instances += 1;
       state.onReply = opts.onReply;
       state.onError = opts.onError ?? null;
+      state.onReplyChannelStatus = opts.onReplyChannelStatus ?? null;
+      state.expectedSenderPk = opts.expectedSenderPk ?? null;
     }
     connect(): Promise<void> {
       return connectMock();
@@ -96,6 +117,8 @@ describe("AIChatFab", () => {
     h.generateEphemeralIdentityMock.mockReset();
     h.state.onReply = null;
     h.state.onError = null;
+    h.state.onReplyChannelStatus = null;
+    h.state.expectedSenderPk = null;
     h.state.instances = 0;
 
     // Happy-path defaults: connect and publish both succeed.
@@ -149,12 +172,168 @@ describe("AIChatFab", () => {
     await waitFor(() => expect(h.sendQuestionMock).toHaveBeenCalledTimes(1));
     expect(h.state.instances).toBe(1);
     expect(h.connectMock).toHaveBeenCalledTimes(1);
-    expect(h.sendQuestionMock).toHaveBeenCalledWith(
-      "What workshops do you run?",
-      JARVIS
-    );
+
+    // The payload is the correlation envelope (ADR-2008): a request-id header
+    // the reply must echo, the tier as an explicitly UNVERIFIED hint, then the
+    // question verbatim.
+    const [payload, recipient] = h.sendQuestionMock.mock.calls[0];
+    expect(recipient).toBe(JARVIS);
+    expect(payload).toMatch(/^X-DreamLab-Request: [0-9a-f]{16}$/m);
+    expect(payload).toContain("X-DreamLab-Tier-Hint: 1 (client-asserted, UNVERIFIED");
+    expect(payload.endsWith("What workshops do you run?")).toBe(true);
+    // No NIP-07 key is connected, so no identity hint is transmitted.
+    expect(payload).not.toContain("X-DreamLab-Identity-Hint");
+
     // A subtle "connecting" system message is shown on first send.
     expect(screen.getByText(/connecting to the assistant/i)).toBeInTheDocument();
+  });
+
+  /** The request id the component minted for the Nth send. */
+  const requestIdOf = (call = 0): string => {
+    const payload = h.sendQuestionMock.mock.calls[call][0] as string;
+    const id = payload.match(/^X-DreamLab-Request: ([0-9a-f]{16})$/m)?.[1];
+    if (!id) throw new Error(`no request id in payload: ${payload}`);
+    return id;
+  };
+
+  /** A reply that echoes a request id, as a correlating agent would send. */
+  const correlatedReply = (requestId: string, body: string) =>
+    `X-DreamLab-Request: ${requestId}\n\n${body}`;
+
+  it("resolves the turn a correlated reply names", async () => {
+    const Fab = await loadFab({ relay: RELAY, jarvis: JARVIS });
+    render(<Fab />);
+    openPanel();
+    typeAndSend("What is a pod?");
+    await waitFor(() => expect(h.sendQuestionMock).toHaveBeenCalledTimes(1));
+
+    await act(async () => {
+      h.state.onReply?.(correlatedReply(requestIdOf(0), "A pod is your own storage."));
+    });
+
+    // The body renders; the wire header never reaches the user.
+    expect(screen.getByText("A pod is your own storage.")).toBeInTheDocument();
+    expect(screen.queryByText(/X-DreamLab-Request/)).not.toBeInTheDocument();
+  });
+
+  it("drops a reply correlated to a request this session never made", async () => {
+    const Fab = await loadFab({ relay: RELAY, jarvis: JARVIS });
+    render(<Fab />);
+    openPanel();
+    typeAndSend("Anyone home?");
+    await waitFor(() => expect(h.sendQuestionMock).toHaveBeenCalledTimes(1));
+
+    await act(async () => {
+      // A wrap replayed from an open relay's history, addressed to a request id
+      // from some other session. It must not render and must not resolve.
+      h.state.onReply?.(correlatedReply("00000000deadbeef", "Buy cheap crypto now"));
+    });
+
+    expect(screen.queryByText(/buy cheap crypto/i)).not.toBeInTheDocument();
+    expect(getInput()).toBeDisabled(); // the real turn is still outstanding
+  });
+
+  it("does not let a late reply resolve a newer question", async () => {
+    const Fab = await loadFab({ relay: RELAY, jarvis: JARVIS });
+    vi.useFakeTimers();
+    render(<Fab />);
+    openPanel();
+
+    // Turn A is sent and allowed to time out.
+    typeAndSend("Question A");
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(0);
+    });
+    const idA = requestIdOf(0);
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(REPLY_TIMEOUT_MS);
+    });
+    expect(screen.getByText(/could not reach the assistant/i)).toBeInTheDocument();
+
+    // Cooldown elapses; the user asks B.
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(SEND_COOLDOWN_MS);
+    });
+    typeAndSend("Question B");
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(0);
+    });
+    expect(h.sendQuestionMock).toHaveBeenCalledTimes(2);
+
+    // A's answer finally arrives. It must render as a LATE answer to A, and
+    // must leave B outstanding rather than closing it.
+    await act(async () => {
+      h.state.onReply?.(correlatedReply(idA, "The answer to A."));
+    });
+
+    expect(screen.getByText("The answer to A.")).toBeInTheDocument();
+    expect(screen.getByText(/late answer to your earlier question/i)).toBeInTheDocument();
+    expect(getInput()).toBeDisabled(); // B is still pending
+
+    // B's own answer resolves B.
+    await act(async () => {
+      h.state.onReply?.(correlatedReply(requestIdOf(1), "The answer to B."));
+    });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(SEND_COOLDOWN_MS);
+    });
+    expect(getInput()).not.toBeDisabled();
+  });
+
+  it("transmits a connected NIP-07 pubkey as an unverified hint, not authority", async () => {
+    const pk = "a".repeat(64);
+    (window as unknown as { nostr?: unknown }).nostr = {
+      getPublicKey: () => Promise.resolve(pk),
+    };
+    try {
+      const Fab = await loadFab({ relay: RELAY, jarvis: JARVIS });
+      render(<Fab />);
+      openPanel();
+
+      // Raise the tier, which prompts for the NIP-07 identity.
+      fireEvent.click(screen.getByRole("button", { name: /change ai tier/i }));
+      fireEvent.click(screen.getByText("Tier 2"));
+      await screen.findByText(/signed in as/i);
+
+      typeAndSend("What can you see?");
+      await waitFor(() => expect(h.sendQuestionMock).toHaveBeenCalledTimes(1));
+
+      const payload = h.sendQuestionMock.mock.calls[0][0] as string;
+      expect(payload).toContain(`X-DreamLab-Identity-Hint: ${pk}`);
+      expect(payload).toContain("no proof of possession");
+      expect(payload).toContain("X-DreamLab-Tier-Hint: 2 (client-asserted, UNVERIFIED");
+      // The client never claims the tier is granted or verified.
+      expect(payload).not.toMatch(/authoris|entitled|granted/i);
+    } finally {
+      delete (window as unknown as { nostr?: unknown }).nostr;
+    }
+  });
+
+  it("warns once when every reply relay has given up", async () => {
+    const Fab = await loadFab({ relay: RELAY, jarvis: JARVIS });
+    render(<Fab />);
+    openPanel();
+    typeAndSend("Hello?");
+    await waitFor(() => expect(h.sendQuestionMock).toHaveBeenCalled());
+
+    await act(async () => {
+      h.state.onReplyChannelStatus?.({
+        healthy: [],
+        exhausted: ["wss://a.test", "wss://b.test"],
+        allDown: true,
+      });
+    });
+    expect(await screen.findByText(/no answer will arrive here/i)).toBeInTheDocument();
+
+    // A repeated status must not spam the transcript.
+    await act(async () => {
+      h.state.onReplyChannelStatus?.({
+        healthy: [],
+        exhausted: ["wss://a.test", "wss://b.test"],
+        allDown: true,
+      });
+    });
+    expect(screen.getAllByText(/no answer will arrive here/i)).toHaveLength(1);
   });
 
   it("keeps the input disabled while a reply is outstanding", async () => {

@@ -397,6 +397,41 @@ export interface DmSessionOptions {
    * recommended: the open reply relays accept wraps from anyone.
    */
   expectedSenderPk?: string;
+  /**
+   * Called when an inbound wrap is REJECTED rather than delivered, with the
+   * reason. Rejection is intentionally silent to the user (a dropped forgery
+   * must not become a visible message), but it is not silent to the
+   * application: without this hook a wrong-sender drop is indistinguishable
+   * from no traffic at all, and the sender pin cannot be tested or observed.
+   */
+  onRejectedReply?: (reason: ReplyRejection, event: Event) => void;
+  /**
+   * Called as the reply-relay channel's health changes. The reply relays are
+   * the ONLY path by which an answer can reach this session (ADR-2008), so
+   * their collective failure means replies are structurally unreachable — a
+   * fact the UI must be able to tell the user rather than showing a spinner
+   * until the timeout.
+   */
+  onReplyChannelStatus?: (status: ReplyChannelStatus) => void;
+}
+
+/** Why an inbound wrap was not delivered as a reply. */
+export type ReplyRejection =
+  | "duplicate"
+  | "unwrap-failed"
+  | "self-authored"
+  | "stale";
+
+export interface ReplyChannelStatus {
+  /** Reply relays currently subscribed and serving. */
+  healthy: string[];
+  /** Reply relays that exhausted their retry budget and were given up on. */
+  exhausted: string[];
+  /**
+   * True when every configured reply relay is exhausted: no path remains for
+   * an answer to arrive, so a pending turn will only ever time out.
+   */
+  allDown: boolean;
 }
 
 interface PendingSend {
@@ -438,12 +473,18 @@ export class DmSession {
   private readonly replySockets = new Map<string, WebSocket>();
   private readonly replyRetryTimers = new Map<string, ReturnType<typeof setTimeout>>();
   private readonly replyRetries = new Map<string, number>();
+  // Health of the reply channel. A relay enters `healthy` on EOSE (its
+  // subscription is live) and `exhausted` when it burns its retry budget.
+  private readonly replyHealthy = new Set<string>();
+  private readonly replyExhausted = new Set<string>();
   // The agent signs one wrap and fans it out to every relay it knows, so the
   // same event id can arrive on several sockets (and again as stored history
   // after a listener reconnects). First arrival wins.
   private readonly seenWrapIds = new Set<string>();
 
   private readonly expectedSenderPk?: string;
+  private readonly onRejectedReply: (reason: ReplyRejection, event: Event) => void;
+  private readonly onReplyChannelStatus: (status: ReplyChannelStatus) => void;
   // Freshness floor for replies: rumors authored before the session existed
   // (minus skew tolerance) are replays of old traffic, not answers to us.
   private readonly startedAtSec = nowSec();
@@ -460,6 +501,22 @@ export class DmSession {
       (url) => url && url !== this.relayUrl,
     );
     this.expectedSenderPk = opts.expectedSenderPk;
+    this.onRejectedReply = opts.onRejectedReply ?? (() => {});
+    this.onReplyChannelStatus = opts.onReplyChannelStatus ?? (() => {});
+  }
+
+  /** Current reply-channel health (see ReplyChannelStatus). */
+  replyChannelStatus(): ReplyChannelStatus {
+    return {
+      healthy: [...this.replyHealthy],
+      exhausted: [...this.replyExhausted],
+      allDown:
+        this.replyRelays.length > 0 && this.replyExhausted.size === this.replyRelays.length,
+    };
+  }
+
+  private emitReplyChannelStatus(): void {
+    this.onReplyChannelStatus(this.replyChannelStatus());
   }
 
   connect(): Promise<void> {
@@ -644,21 +701,32 @@ export class DmSession {
   }
 
   private deliverReply(event: Event): void {
-    if (this.seenWrapIds.has(event.id)) return; // duplicate from another relay
+    if (this.seenWrapIds.has(event.id)) {
+      this.onRejectedReply("duplicate", event); // same wrap from another relay
+      return;
+    }
     this.seenWrapIds.add(event.id);
     let rumor: UnwrappedRumor;
     try {
       // Verified unwrap: signed seal, sender pin (when configured), and
       // seal↔rumor author binding. A wrap that fails any check is not a
-      // genuine agent reply and is dropped silently.
+      // genuine agent reply and is dropped without ever reaching the UI —
+      // but the drop is reported so a spoofing attempt is observable.
       rumor = unwrapVerifiedDm(event, this.identity.sk, this.expectedSenderPk);
     } catch {
-      return; // not addressed to us, undecryptable, or forged — ignore
+      this.onRejectedReply("unwrap-failed", event);
+      return; // not addressed to us, undecryptable, wrong sender, or forged
     }
-    if (rumor.pubkey === this.identity.pk) return; // ignore self-authored rumors
+    if (rumor.pubkey === this.identity.pk) {
+      this.onRejectedReply("self-authored", event);
+      return;
+    }
     // Replay guard: the session key is fresh per session, but open reply
     // relays serve history to anyone — reject rumors older than the session.
-    if (rumor.created_at < this.startedAtSec - REPLY_MAX_SKEW_SEC) return;
+    if (rumor.created_at < this.startedAtSec - REPLY_MAX_SKEW_SEC) {
+      this.onRejectedReply("stale", event);
+      return;
+    }
     this.onReply(rumor.content);
   }
 
@@ -702,6 +770,17 @@ export class DmSession {
       if (frame[0] === "EVENT" && frame[1] === this.subId) {
         const event = frame[2] as Event | undefined;
         if (event && event.kind === KIND_GIFT_WRAP) this.deliverReply(event);
+      } else if (frame[0] === "EOSE" && frame[1] === this.subId) {
+        // The subscription is live on this relay. Mark it healthy and RESET its
+        // retry budget: a long session may flap several times, and a relay that
+        // recovers must not stay permanently written off because of failures
+        // that happened minutes ago.
+        this.replyRetries.set(url, 0);
+        this.replyExhausted.delete(url);
+        if (!this.replyHealthy.has(url)) {
+          this.replyHealthy.add(url);
+          this.emitReplyChannelStatus();
+        }
       } else if (frame[0] === "AUTH" && typeof frame[1] === "string") {
         const authEvent = finalizeEvent(
           {
@@ -728,6 +807,7 @@ export class DmSession {
     };
     ws.onclose = () => {
       this.replySockets.delete(url);
+      if (this.replyHealthy.delete(url)) this.emitReplyChannelStatus();
       this.scheduleReplyRetry(url);
     };
   }
@@ -735,7 +815,16 @@ export class DmSession {
   private scheduleReplyRetry(url: string): void {
     if (this.closed || this.replyRetryTimers.has(url)) return;
     const attempts = this.replyRetries.get(url) ?? 0;
-    if (attempts >= REPLY_RELAY_MAX_RETRIES) return;
+    if (attempts >= REPLY_RELAY_MAX_RETRIES) {
+      // Budget spent. Record it rather than giving up silently: if every reply
+      // relay lands here, no answer can reach this session at all and the
+      // caller needs to say so instead of spinning until the timeout.
+      if (!this.replyExhausted.has(url)) {
+        this.replyExhausted.add(url);
+        this.emitReplyChannelStatus();
+      }
+      return;
+    }
     this.replyRetries.set(url, attempts + 1);
     const timer = setTimeout(() => {
       this.replyRetryTimers.delete(url);

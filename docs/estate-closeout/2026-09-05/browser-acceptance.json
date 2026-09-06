@@ -1,0 +1,391 @@
+{
+  "schema": "dreamlab.estate-closeout.browser-acceptance/1",
+  "generated_at": "2026-09-05T18:09:58.282Z",
+  "repo": "DreamLab-AI/dreamlab-ai-website",
+  "git": {
+    "head": "7e243741c8eaf61506ef86a70b8dd44d80722c11",
+    "short": "7e24374",
+    "branch": "main",
+    "working_tree": "dirty (closeout work in progress; nothing committed)"
+  },
+  "adrs": [
+    "ADR-2002",
+    "ADR-2003",
+    "ADR-2008"
+  ],
+  "scope": {
+    "claim": "Local build + browser acceptance of the three-frontend origin. NOT a live-service certification: nothing was deployed, and no live DNS, Cloudflare Worker or GitHub Pages target was exercised.",
+    "not_covered": [
+      "live DNS for the branded worker domains",
+      "deployed Cloudflare Workers",
+      "GitHub Pages publication",
+      "authenticated forum/BBS journeys"
+    ]
+  },
+  "build": {
+    "react": {
+      "toolchain": "vite 5.4 (npm run build)",
+      "output": "dist/"
+    },
+    "forum": {
+      "toolchain": "trunk --release --public-url /community/",
+      "crate": "nostr-bbs-forum-client",
+      "kit_ref": "a7544687b4d1c09807862d749b27f8c8da307a12",
+      "output": "dist/community/"
+    },
+    "bbs": {
+      "toolchain": "trunk --release",
+      "crate": "nostr-bbs-bbs-client",
+      "kit_ref": "a7544687b4d1c09807862d749b27f8c8da307a12",
+      "output": "dist/community/bbs/"
+    },
+    "note": "All three built from the SAME pinned kit revision the deploy workflow uses; window.__ENV__ was injected with the same payloads deploy.yml injects, so the served build carries the effective configuration a deploy would ship."
+  },
+  "harness": {
+    "server": "python3 static server on 0.0.0.0:8181 with a GitHub-Pages-equivalent 404.html fallback",
+    "origin": "http://agentbox:8181 (reached from the browsercontainer sidecar)",
+    "browser": "Chrome/151.0.7922.47",
+    "driver": "raw CDP over WebSocket",
+    "deliberate_stubs": [
+      {
+        "stub": "navigator.serviceWorker",
+        "why": "The lab origin is plain HTTP and non-localhost, so Chrome withholds this secure-context API. Both Leptos clients call register() during boot and abort on the TypeError. The stub records the URL each client would register (evidenced in probe.sw_registered) so the surface can be observed. The real origin is HTTPS and unaffected."
+      },
+      {
+        "stub": "WebSocket (check 07 only)",
+        "why": "The build carries the PRODUCTION relay URL and agent pubkey. Blocking the socket exercises the Talk-to-AI disconnected path without sending any DM to the live agent."
+      }
+    ]
+  },
+  "checks": [
+    {
+      "id": "01-react-root",
+      "surface": "react",
+      "url": "http://agentbox:8181/",
+      "load_ms": 8711,
+      "probe": {
+        "title": "DreamLab AI — AI & Agents Residential Training in the Lake District",
+        "h1": "DREAMLAB AI",
+        "root_mounted": true,
+        "body_text_len": 4163,
+        "talk_to_ai_fab": true,
+        "path": "/"
+      },
+      "screenshot": "screenshots/01-react-root.png",
+      "console_errors": [
+        {
+          "kind": "log.security",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element.",
+          "class": "pre-existing",
+          "note": "CSP frame-ancestors / X-Frame-Options are ignored in <meta> and require HTTP headers; GitHub Pages cannot set response headers. Present on the live origin too."
+        },
+        {
+          "kind": "log.security",
+          "text": "X-Frame-Options may only be set via an HTTP header sent along with a document. It may not be set inside <meta>.",
+          "class": "pre-existing",
+          "note": "CSP frame-ancestors / X-Frame-Options are ignored in <meta> and require HTTP headers; GitHub Pages cannot set response headers. Present on the live origin too."
+        },
+        {
+          "kind": "log.security",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element.",
+          "class": "pre-existing",
+          "note": "CSP frame-ancestors / X-Frame-Options are ignored in <meta> and require HTTP headers; GitHub Pages cannot set response headers. Present on the live origin too."
+        }
+      ]
+    },
+    {
+      "id": "02-react-programmes-deeplink",
+      "surface": "react",
+      "url": "http://agentbox:8181/programmes",
+      "load_ms": 4056,
+      "probe": {
+        "title": "Programmes | DreamLab Applied Innovation Lab",
+        "h1": "Co-design your learning path.",
+        "root_mounted": true,
+        "body_text_len": 2215,
+        "talk_to_ai_fab": true,
+        "path": "/programmes"
+      },
+      "screenshot": "screenshots/02-react-programmes-deeplink.png",
+      "console_errors": [
+        {
+          "kind": "log.network",
+          "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "class": "expected",
+          "note": "GitHub Pages SPA shim: a deep link 404s on the document, 404.html redirects via ?__p=, and the app restores the path. The probe confirms the path was restored."
+        },
+        {
+          "kind": "log.security",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element.",
+          "class": "pre-existing",
+          "note": "CSP frame-ancestors / X-Frame-Options are ignored in <meta> and require HTTP headers; GitHub Pages cannot set response headers. Present on the live origin too."
+        },
+        {
+          "kind": "log.security",
+          "text": "X-Frame-Options may only be set via an HTTP header sent along with a document. It may not be set inside <meta>.",
+          "class": "pre-existing",
+          "note": "CSP frame-ancestors / X-Frame-Options are ignored in <meta> and require HTTP headers; GitHub Pages cannot set response headers. Present on the live origin too."
+        }
+      ]
+    },
+    {
+      "id": "03-react-contact-deeplink",
+      "surface": "react",
+      "url": "http://agentbox:8181/contact",
+      "load_ms": 3918,
+      "probe": {
+        "title": "Contact Us | DreamLab Applied Innovation Lab",
+        "h1": "Contact Us",
+        "root_mounted": true,
+        "body_text_len": 408,
+        "talk_to_ai_fab": true,
+        "path": "/contact"
+      },
+      "screenshot": "screenshots/03-react-contact-deeplink.png",
+      "console_errors": [
+        {
+          "kind": "log.network",
+          "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "class": "expected",
+          "note": "GitHub Pages SPA shim: a deep link 404s on the document, 404.html redirects via ?__p=, and the app restores the path. The probe confirms the path was restored."
+        },
+        {
+          "kind": "log.security",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element.",
+          "class": "pre-existing",
+          "note": "CSP frame-ancestors / X-Frame-Options are ignored in <meta> and require HTTP headers; GitHub Pages cannot set response headers. Present on the live origin too."
+        },
+        {
+          "kind": "log.security",
+          "text": "X-Frame-Options may only be set via an HTTP header sent along with a document. It may not be set inside <meta>.",
+          "class": "pre-existing",
+          "note": "CSP frame-ancestors / X-Frame-Options are ignored in <meta> and require HTTP headers; GitHub Pages cannot set response headers. Present on the live origin too."
+        },
+        {
+          "kind": "log.security",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element.",
+          "class": "pre-existing",
+          "note": "CSP frame-ancestors / X-Frame-Options are ignored in <meta> and require HTTP headers; GitHub Pages cannot set response headers. Present on the live origin too."
+        }
+      ]
+    },
+    {
+      "id": "04-forum-community",
+      "surface": "forum",
+      "url": "http://agentbox:8181/community/",
+      "load_ms": 9182,
+      "probe": {
+        "title": "Community Forums",
+        "wasm_booted": true,
+        "body_text_len": 511,
+        "env_keys": [
+          "BBS_PWA_ENABLED",
+          "BRAND_LABEL",
+          "BUILD_HASH",
+          "BUILD_VERSION",
+          "FORUM_NAME",
+          "VITE_AUTH_API_URL",
+          "VITE_LINK_PREVIEW_API_URL",
+          "VITE_POD_API_URL",
+          "VITE_RELAY_URL",
+          "VITE_SEARCH_API_URL",
+          "ZONE_CONFIG"
+        ],
+        "relay": "wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev",
+        "auth_api": "https://dreamlab-auth-api.solitary-paper-764d.workers.dev",
+        "zone_count": 4,
+        "zone_slugs": [
+          "welcome",
+          "minimoonoir",
+          "family",
+          "dreamlab"
+        ],
+        "sw_registered": [
+          "/sw.js"
+        ]
+      },
+      "screenshot": "screenshots/04-forum-community.png",
+      "console_errors": [
+        {
+          "kind": "log.javascript",
+          "text": "Access to fetch at 'https://dreamlab-nostr-relay.solitary-paper-764d.workers.dev/api/agents/disclosure' from origin 'http://agentbox:8181' has been blocked by CORS policy: The 'Access-Control-Allow-Origin' header has a value 'https://dreamlab-ai.com' that is not equal to the supplied origin. Have the server send the header with a valid value.",
+          "class": "harness",
+          "note": "Worker CORS is scoped to https://dreamlab-ai.com; the lab origin is http://agentbox:8181, so the cross-origin fetch is refused. This evidences scoped CORS rather than contradicting it."
+        },
+        {
+          "kind": "log.network",
+          "text": "Failed to load resource: net::ERR_FAILED",
+          "class": "harness",
+          "note": "Worker CORS is scoped to https://dreamlab-ai.com; the lab origin is http://agentbox:8181, so the cross-origin fetch is refused. This evidences scoped CORS rather than contradicting it."
+        }
+      ]
+    },
+    {
+      "id": "05-forum-deeplink-login",
+      "surface": "forum",
+      "url": "http://agentbox:8181/community/login",
+      "load_ms": 11043,
+      "probe": {
+        "title": "Community Forums",
+        "wasm_booted": true,
+        "body_text_len": 511,
+        "env_keys": [
+          "BBS_PWA_ENABLED",
+          "BRAND_LABEL",
+          "BUILD_HASH",
+          "BUILD_VERSION",
+          "FORUM_NAME",
+          "VITE_AUTH_API_URL",
+          "VITE_LINK_PREVIEW_API_URL",
+          "VITE_POD_API_URL",
+          "VITE_RELAY_URL",
+          "VITE_SEARCH_API_URL",
+          "ZONE_CONFIG"
+        ],
+        "relay": "wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev",
+        "auth_api": "https://dreamlab-auth-api.solitary-paper-764d.workers.dev",
+        "zone_count": 4,
+        "zone_slugs": [
+          "welcome",
+          "minimoonoir",
+          "family",
+          "dreamlab"
+        ],
+        "sw_registered": [
+          "/sw.js"
+        ]
+      },
+      "screenshot": "screenshots/05-forum-deeplink-login.png",
+      "console_errors": [
+        {
+          "kind": "log.network",
+          "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "class": "expected",
+          "note": "GitHub Pages SPA shim: a deep link 404s on the document, 404.html redirects via ?__p=, and the app restores the path. The probe confirms the path was restored."
+        },
+        {
+          "kind": "log.javascript",
+          "text": "Access to fetch at 'https://dreamlab-nostr-relay.solitary-paper-764d.workers.dev/api/agents/disclosure' from origin 'http://agentbox:8181' has been blocked by CORS policy: The 'Access-Control-Allow-Origin' header has a value 'https://dreamlab-ai.com' that is not equal to the supplied origin. Have the server send the header with a valid value.",
+          "class": "harness",
+          "note": "Worker CORS is scoped to https://dreamlab-ai.com; the lab origin is http://agentbox:8181, so the cross-origin fetch is refused. This evidences scoped CORS rather than contradicting it."
+        },
+        {
+          "kind": "log.network",
+          "text": "Failed to load resource: net::ERR_FAILED",
+          "class": "harness",
+          "note": "Worker CORS is scoped to https://dreamlab-ai.com; the lab origin is http://agentbox:8181, so the cross-origin fetch is refused. This evidences scoped CORS rather than contradicting it."
+        }
+      ]
+    },
+    {
+      "id": "06-bbs",
+      "surface": "bbs",
+      "url": "http://agentbox:8181/community/bbs/",
+      "load_ms": 9587,
+      "probe": {
+        "title": "BBS // nostr-rust-forum",
+        "wasm_booted": true,
+        "body_text_len": 525,
+        "env_keys": [
+          "BANNER_URL",
+          "BBS_PWA_ENABLED",
+          "BUILD_HASH",
+          "BUILD_VERSION",
+          "FORUM_NAME",
+          "JARVIS_PUBKEY",
+          "LOCATION",
+          "LOGO_URL",
+          "NODE_NAME",
+          "POD_API",
+          "PREVIEW_API",
+          "RELAY_URL",
+          "SEARCH_API",
+          "TAGLINE",
+          "THEME",
+          "VITE_AUTH_API_URL",
+          "VITE_LINK_PREVIEW_API_URL",
+          "VITE_SEARCH_API_URL",
+          "ZONE_CONFIG"
+        ],
+        "node_name": "MINIMOONOIR",
+        "theme": "amber",
+        "relay": "wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev",
+        "pod_api": "https://dreamlab-pod-api.solitary-paper-764d.workers.dev",
+        "jarvis": "2de44d5622eef79519ac078f6e227a85aecbaefd561e4e50c5f51dfadbf916e9",
+        "zone_count": 4,
+        "sw_registered": [
+          "bbs-sw.js"
+        ],
+        "screen_text": [
+          "◐ SIGN IN TO READ │ MINIMOONOIR",
+          "Lake District, UK │ NIP-01/42",
+          "MINIMOONOIR",
+          "private secure forums",
+          "press a number, or / for a command (tap works too)",
+          "MINIMOONOIR",
+          "private secure forums",
+          "▸ agent control plane",
+          "▸ zone-gated boards",
+          "▸ your own Solid pod",
+          "[ ▸ Sign in ]",
+          "[ ▸ Create account ↗ ]"
+        ]
+      },
+      "screenshot": "screenshots/06-bbs.png",
+      "console_errors": []
+    },
+    {
+      "id": "07-talk-to-ai-disconnected",
+      "surface": "react",
+      "url": "http://agentbox:8181/",
+      "load_ms": 7859,
+      "probe": {
+        "opened": true,
+        "panel": true,
+        "blocked_sockets": [
+          "wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev"
+        ],
+        "transcript": [
+          "Talk to AI",
+          "Basic",
+          "Are you there?",
+          "Connecting to the assistant…",
+          "Couldn't reach the assistant just now. Please try again in a moment, or use the contact page."
+        ],
+        "input_reenabled": true
+      },
+      "screenshot": "screenshots/07-talk-to-ai-disconnected.png",
+      "console_errors": [
+        {
+          "kind": "log.security",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element.",
+          "class": "pre-existing",
+          "note": "CSP frame-ancestors / X-Frame-Options are ignored in <meta> and require HTTP headers; GitHub Pages cannot set response headers. Present on the live origin too."
+        },
+        {
+          "kind": "log.security",
+          "text": "X-Frame-Options may only be set via an HTTP header sent along with a document. It may not be set inside <meta>.",
+          "class": "pre-existing",
+          "note": "CSP frame-ancestors / X-Frame-Options are ignored in <meta> and require HTTP headers; GitHub Pages cannot set response headers. Present on the live origin too."
+        },
+        {
+          "kind": "log.security",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element.",
+          "class": "pre-existing",
+          "note": "CSP frame-ancestors / X-Frame-Options are ignored in <meta> and require HTTP headers; GitHub Pages cannot set response headers. Present on the live origin too."
+        }
+      ]
+    }
+  ],
+  "verdicts": {
+    "react_direct_load": "pass",
+    "react_deeplink_spa_shim": "pass",
+    "forum_direct_load": "pass",
+    "forum_deeplink": "pass",
+    "bbs_direct_load": "pass",
+    "effective_endpoints_reach_each_surface": "pass",
+    "zone_model_projected_identically": "pass",
+    "talk_to_ai_disconnected_degrades_gracefully": "pass"
+  },
+  "unclassified_console_errors": []
+}
