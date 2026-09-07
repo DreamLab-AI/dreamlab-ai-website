@@ -34,7 +34,12 @@
   "evaluatorEntrypoints": {
     "bench": "npx vitest run 2>&1 | tail -60",
     "lint": "npx eslint . 2>&1 | tail -15",
-    "pin-parity": "bash scripts/pin-parity-check.sh 2>&1 | tail -20"
+    "pin-parity": "bash scripts/pin-parity-check.sh 2>&1 | tail -20",
+    "content-generators": {
+      "cmd": "bash scripts/dream-content-generators.sh",
+      "required": false,
+      "deeps": ["site-build-content"]
+    }
   },
   "competitors": [],
   "adrConvention": "4-digit",
