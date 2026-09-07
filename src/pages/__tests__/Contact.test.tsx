@@ -76,7 +76,13 @@ async function mountContact(opts: { relay?: string; admin?: string } = {}) {
   const Contact = (await import("../Contact")).default;
 
   rtl.render(
-    React.createElement(BrowserRouter, null, React.createElement(Contact))
+    // Same v7 opt-in as src/App.tsx, so the harness exercises the router
+    // semantics the app actually ships (and stops emitting the warnings).
+    React.createElement(
+      BrowserRouter,
+      { future: { v7_startTransition: true, v7_relativeSplatPath: true } },
+      React.createElement(Contact)
+    )
   );
   activeCleanup = rtl.cleanup;
   return { screen: rtl.screen, fireEvent: rtl.fireEvent, waitFor: rtl.waitFor };

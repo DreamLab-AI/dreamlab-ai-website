@@ -29,7 +29,16 @@ const Ventures = lazy(() => import("./pages/Ventures"));
 const App = () => (
   <TooltipProvider>
     <Sonner />
-    <BrowserRouter>
+    {/* React Router v7 future flags (dream-cycle 2026-09-05 finding). Opting in
+        early converts a future breaking change into one we control today and
+        clears the two warnings every bench trace has carried since 09-01.
+        Audited before landing: the sole splat route (`path="*"` -> NotFound) is a
+        leaf whose links are all absolute, so v7_relativeSplatPath is a no-op here;
+        v7_startTransition only means a navigation to a not-yet-loaded lazy chunk
+        holds the outgoing page instead of flashing the Suspense RouteLoader. */}
+    <BrowserRouter
+      future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+    >
       {/* Sprint v9 D3: RouteErrorBoundary contains route-level crashes so a
           single failed lazy chunk does not white-screen the entire SPA. */}
       <RouteErrorBoundary>
