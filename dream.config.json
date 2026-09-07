@@ -32,7 +32,7 @@
     "degradeOnWasmFailure": false
   },
   "evaluatorEntrypoints": {
-    "bench": "npx vitest run 2>&1 | tail -25",
+    "bench": "npx vitest run 2>&1 | tail -60",
     "lint": "npx eslint . 2>&1 | tail -15",
     "pin-parity": "bash scripts/pin-parity-check.sh 2>&1 | tail -20"
   },
