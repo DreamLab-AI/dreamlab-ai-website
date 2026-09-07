@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" role="img" aria-labelledby="tg dg" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="tg">Anatomy of an API call</title>
+  <desc id="dg">Your application sends an HTTP request with a prompt and bearer API key to the provider API, which passes it to the model; the generated completion returns as an HTTP response with usage and cost.</desc>
+  <defs>
+    <marker id="arrg" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="arrsg" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#38BDF8" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect x="8" y="8" width="944" height="384" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">ANATOMY OF AN API CALL</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+  <rect x="96" y="96" width="192" height="44" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+  <text x="192" y="123" text-anchor="middle" font-size="14" font-weight="600" fill="#F5F5F5">Your Application</text>
+  <line x1="192" y1="140" x2="192" y2="360" stroke="rgba(255,255,255,0.20)" stroke-dasharray="4 3"/>
+  <rect x="384" y="96" width="192" height="44" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+  <text x="480" y="123" text-anchor="middle" font-size="14" font-weight="600" fill="#F5F5F5">Provider API</text>
+  <line x1="480" y1="140" x2="480" y2="360" stroke="rgba(255,255,255,0.20)" stroke-dasharray="4 3"/>
+  <rect x="672" y="96" width="192" height="44" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+  <text x="768" y="123" text-anchor="middle" font-size="14" font-weight="600" fill="#F5F5F5">AI Model</text>
+  <line x1="768" y1="140" x2="768" y2="360" stroke="rgba(255,255,255,0.20)" stroke-dasharray="4 3"/>
+  <path d="M192,184 L480,184" fill="none" stroke="#38BDF8" stroke-width="1.2" marker-end="url(#arrsg)"/>
+  <text x="336" y="176" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">POST prompt · Bearer API_KEY</text>
+  <path d="M480,224 L768,224" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arrg)"/>
+  <text x="624" y="216" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">process request</text>
+  <path d="M768,248 C808,248 808,272 768,272" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arrg)"/>
+  <text x="816" y="264" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">generate</text>
+  <path d="M768,304 L480,304" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arrg)"/>
+  <text x="624" y="296" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">completion</text>
+  <path d="M480,344 L192,344" fill="none" stroke="#38BDF8" stroke-width="1.2" marker-end="url(#arrsg)"/>
+  <text x="336" y="336" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">HTTP 200 · text</text>
+  <text x="336" y="376" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#F59E0B">usage: 1,247 tokens · cost: $0.003</text>
+</svg>

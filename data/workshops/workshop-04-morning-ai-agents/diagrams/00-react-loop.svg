@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 424" role="img" aria-labelledby="dg-title dg-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="dg-title">The ReAct loop</title>
+  <desc id="dg-desc">Sequence: the user gives the agent a task; the agent loops — reasoning, choosing a tool, executing it via MCP and interpreting the observation — until the goal is met, then returns the final answer.</desc>
+
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="arr-sky" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#38BDF8" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- container -->
+  <rect x="8" y="8" width="944" height="408" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">THE ReAct LOOP</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <!-- actor chips -->
+  <g text-anchor="middle" font-size="14" font-weight="600" fill="#F5F5F5">
+    <rect x="112" y="96" width="128" height="48" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="176" y="126">User</text>
+    <rect x="416" y="96" width="128" height="48" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="480" y="126">Agent</text>
+    <rect x="720" y="96" width="128" height="48" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="784" y="126">MCP Tools</text>
+  </g>
+
+  <!-- lifelines -->
+  <g stroke="rgba(255,255,255,0.15)" stroke-dasharray="4 4">
+    <line x1="176" y1="144" x2="176" y2="392"/>
+    <line x1="480" y1="144" x2="480" y2="392"/>
+    <line x1="784" y1="144" x2="784" y2="392"/>
+  </g>
+
+  <!-- task -->
+  <path d="M176,176 L476,176" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arr)"/>
+  <text x="328" y="168" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF" text-anchor="middle">complex task / goal</text>
+
+  <!-- loop frame -->
+  <rect x="392" y="200" width="488" height="144" rx="8" fill="none" stroke="rgba(255,255,255,0.20)" stroke-dasharray="4 3"/>
+  <text x="408" y="220" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" letter-spacing="0.12em" fill="#9CA3AF">LOOP · UNTIL GOAL MET</text>
+
+  <!-- self message: think -->
+  <path d="M480,240 h48 v20 h-44" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arr)"/>
+  <text x="540" y="244" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">think · choose tool</text>
+
+  <!-- execute -->
+  <path d="M480,288 L780,288" fill="none" stroke="#38BDF8" stroke-width="1.2" marker-end="url(#arr-sky)"/>
+  <text x="632" y="280" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#38BDF8" text-anchor="middle">act · execute via MCP</text>
+
+  <!-- observation -->
+  <path d="M784,324 L484,324" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+  <text x="632" y="316" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF" text-anchor="middle">observation · result</text>
+
+  <!-- final answer -->
+  <path d="M480,376 L180,376" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+  <text x="328" y="368" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF" text-anchor="middle">final answer</text>
+</svg>

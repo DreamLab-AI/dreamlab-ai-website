@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 320" role="img" aria-labelledby="cl-title cl-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="cl-title">Container lifecycle</title>
+  <desc id="cl-desc">A container moves from image, through created and running, to stopped and removed, driven by docker create, run, stop, start and rm commands.</desc>
+
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <rect x="8" y="8" width="944" height="304" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">CONTAINER LIFECYCLE</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <g text-anchor="middle">
+    <rect x="40"  y="112" width="164" height="56" rx="8" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.35)"/>
+    <text x="122" y="146" font-size="14" font-weight="600" fill="#F5F5F5">Image</text>
+
+    <rect x="244" y="112" width="164" height="56" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="326" y="146" font-size="14" font-weight="600" fill="#F5F5F5">Created</text>
+
+    <rect x="448" y="112" width="164" height="56" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="530" y="146" font-size="14" font-weight="600" fill="#F5F5F5">Running</text>
+
+    <rect x="652" y="112" width="140" height="56" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="722" y="146" font-size="14" font-weight="600" fill="#F5F5F5">Stopped</text>
+
+    <rect x="828" y="112" width="92" height="56" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="874" y="146" font-size="13" font-weight="600" fill="#F5F5F5">Removed</text>
+  </g>
+
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2">
+    <path d="M204,140 C220,140 228,140 244,140" marker-end="url(#arr)"/>
+    <path d="M408,140 C424,140 432,140 448,140" marker-end="url(#arr)"/>
+    <path d="M612,140 C628,140 636,140 652,140" marker-end="url(#arr)"/>
+    <path d="M792,140 C806,140 814,140 828,140" marker-end="url(#arr)"/>
+  </g>
+
+  <g text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">
+    <text x="326" y="200">docker create / run</text>
+    <text x="722" y="200">docker stop</text>
+    <text x="874" y="200">docker rm</text>
+    <text x="530" y="224">docker start restarts a stopped container</text>
+  </g>
+</svg>

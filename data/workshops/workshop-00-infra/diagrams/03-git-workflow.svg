@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 320" role="img" aria-labelledby="cw-title cw-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="cw-title">The core Git workflow</title>
+  <desc id="cw-desc">git add moves changes from the working directory to the staging area, git commit records them in the local repository, git push uploads them to GitHub, and git pull brings remote changes back.</desc>
+
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="arr-sky" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#38BDF8" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- container -->
+  <rect x="8" y="8" width="944" height="304" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">THE CORE GIT WORKFLOW</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <!-- nodes -->
+  <g text-anchor="middle">
+    <rect x="48" y="128" width="180" height="80" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="138" y="162" font-size="15" font-weight="600" fill="#F5F5F5">Working Directory</text>
+    <text x="138" y="186" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">edit your files</text>
+
+    <rect x="276" y="128" width="164" height="80" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="358" y="162" font-size="15" font-weight="600" fill="#F5F5F5">Staging Area</text>
+    <text x="358" y="186" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">what ships next</text>
+
+    <rect x="488" y="128" width="180" height="80" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="578" y="162" font-size="15" font-weight="600" fill="#F5F5F5">Local Repository</text>
+    <text x="578" y="186" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">commit history</text>
+
+    <rect x="716" y="128" width="196" height="80" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="814" y="162" font-size="15" font-weight="600" fill="#F5F5F5">Remote (GitHub)</text>
+    <text x="814" y="186" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">shared &amp; backed up</text>
+  </g>
+
+  <!-- forward arrows -->
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2">
+    <path d="M228,168 L268,168" marker-end="url(#arr)"/>
+    <path d="M440,168 L480,168" marker-end="url(#arr)"/>
+  </g>
+  <path d="M668,168 L708,168" fill="none" stroke="#38BDF8" stroke-width="1.2" marker-end="url(#arr-sky)"/>
+  <g font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF" text-anchor="middle">
+    <text x="248" y="156">git add</text>
+    <text x="460" y="156">git commit</text>
+    <text x="688" y="156" fill="#38BDF8">git push</text>
+  </g>
+
+  <!-- pull back -->
+  <path d="M814,208 C814,276 300,276 148,220" fill="none" stroke="#38BDF8" stroke-width="1.2" marker-end="url(#arr-sky)"/>
+  <text x="480" y="268" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#38BDF8" text-anchor="middle">git pull</text>
+</svg>

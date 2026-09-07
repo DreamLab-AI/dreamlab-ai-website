@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 320" role="img" aria-labelledby="il-title il-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="il-title">Docker image layers</title>
+  <desc id="il-desc">A Docker image is built as stacked read-only layers: base image, system packages, Python packages, then application code on top, each cached and shared between images.</desc>
+
+  <rect x="8" y="8" width="944" height="304" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">DOCKER IMAGE LAYERS</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <g text-anchor="middle">
+    <rect x="284" y="96" width="392" height="44" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="480" y="123" font-size="14" font-weight="600" fill="#F5F5F5">Ubuntu 24.04 base — layer 1</text>
+
+    <rect x="284" y="148" width="392" height="44" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="480" y="175" font-size="14" font-weight="600" fill="#F5F5F5">apt install python3 — layer 2</text>
+
+    <rect x="284" y="200" width="392" height="44" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="480" y="227" font-size="14" font-weight="600" fill="#F5F5F5">pip install torch — layer 3</text>
+
+    <rect x="284" y="252" width="392" height="44" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="480" y="279" font-size="14" font-weight="600" fill="#F5F5F5">Your Python script — layer 4</text>
+  </g>
+</svg>

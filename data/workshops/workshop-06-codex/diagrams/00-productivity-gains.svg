@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" role="img" aria-labelledby="dg-title dg-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="dg-title">Reported productivity gains with AI agents</title>
+  <desc id="dg-desc">Speed gains: code writing 55 to 70 percent faster, bug fixing 60 to 75, test writing 70 to 85, documentation 80 to 90. Quality shifts: test coverage up 25 to 35 percent, bug density down 15 to 25, review time down 40 to 50.</desc>
+
+  <rect x="8" y="8" width="944" height="384" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">PRODUCTIVITY WITH AI AGENTS</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <text x="48" y="104" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" font-weight="500" letter-spacing="0.14em" fill="#6B7280">FASTER BY</text>
+
+  <g font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11">
+    <text x="48" y="136" fill="#9CA3AF">code writing</text>
+    <rect x="224" y="124" width="392" height="16" rx="4" fill="rgba(255,255,255,0.12)"/>
+    <text x="632" y="136" fill="#9CA3AF">55–70%</text>
+
+    <text x="48" y="172" fill="#9CA3AF">bug fixing</text>
+    <rect x="224" y="160" width="424" height="16" rx="4" fill="rgba(255,255,255,0.12)"/>
+    <text x="664" y="172" fill="#9CA3AF">60–75%</text>
+
+    <text x="48" y="208" fill="#9CA3AF">test writing</text>
+    <rect x="224" y="196" width="488" height="16" rx="4" fill="rgba(255,255,255,0.12)"/>
+    <text x="728" y="208" fill="#9CA3AF">70–85%</text>
+
+    <text x="48" y="244" fill="#9CA3AF">documentation</text>
+    <rect x="224" y="232" width="536" height="16" rx="4" fill="rgba(245,158,11,0.55)"/>
+    <text x="776" y="244" fill="#F59E0B">80–90%</text>
+  </g>
+
+  <text x="48" y="300" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" font-weight="500" letter-spacing="0.14em" fill="#6B7280">QUALITY SHIFT</text>
+  <g font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">
+    <text x="48" y="332">test coverage  +25–35%</text>
+    <text x="368" y="332">bug density  −15–25%</text>
+    <text x="656" y="332">review time  −40–50%</text>
+  </g>
+</svg>

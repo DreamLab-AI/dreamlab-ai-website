@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 344" role="img" aria-labelledby="dg-title dg-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="dg-title">One agent, many MCP servers</title>
+  <desc id="dg-desc">A single AI agent connects over the MCP protocol to filesystem, GitHub, database and web search servers.</desc>
+
+  <defs>
+    <marker id="arr-sky" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#38BDF8" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- container -->
+  <rect x="8" y="8" width="944" height="328" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">MCP — ONE PROTOCOL, MANY TOOLS</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <!-- agent (focal) -->
+  <g text-anchor="middle">
+    <rect x="384" y="104" width="192" height="80" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="480" y="140" font-size="15" font-weight="600" fill="#F5F5F5">AI Agent</text>
+    <text x="480" y="164" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">one MCP client</text>
+  </g>
+
+  <!-- arrows -->
+  <g fill="none" stroke="#38BDF8" stroke-width="1.2">
+    <path d="M424,184 C360,216 200,212 152,236" marker-end="url(#arr-sky)"/>
+    <path d="M456,184 C432,212 392,216 376,236" marker-end="url(#arr-sky)"/>
+    <path d="M504,184 C528,212 568,216 584,236" marker-end="url(#arr-sky)"/>
+    <path d="M536,184 C600,216 760,212 808,236" marker-end="url(#arr-sky)"/>
+  </g>
+  <text x="480" y="220" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#38BDF8" text-anchor="middle">MCP protocol</text>
+
+  <!-- servers -->
+  <g text-anchor="middle">
+    <rect x="48" y="240" width="192" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="144" y="272" font-size="14" font-weight="600" fill="#F5F5F5">Filesystem</text>
+    <text x="144" y="294" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">read · write files</text>
+
+    <rect x="272" y="240" width="192" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="368" y="272" font-size="14" font-weight="600" fill="#F5F5F5">GitHub</text>
+    <text x="368" y="294" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">repos · PRs · issues</text>
+
+    <rect x="496" y="240" width="192" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="592" y="272" font-size="14" font-weight="600" fill="#F5F5F5">Database</text>
+    <text x="592" y="294" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">queries</text>
+
+    <rect x="720" y="240" width="192" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="816" y="272" font-size="14" font-weight="600" fill="#F5F5F5">Web Search</text>
+    <text x="816" y="294" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">live results</text>
+  </g>
+</svg>

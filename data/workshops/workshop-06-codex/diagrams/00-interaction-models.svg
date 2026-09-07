@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 408" role="img" aria-labelledby="dg-title dg-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="dg-title">Three ways of working with AI coding tools</title>
+  <desc id="dg-desc">Developer intent flows into one of three interaction models: autocomplete gives single-line suggestions, chat returns code blocks on request, and agentic systems autonomously read the codebase, plan, edit, test and raise a PR.</desc>
+
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="arr-accent" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#F59E0B" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <rect x="8" y="8" width="944" height="392" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">INTERACTION MODELS</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <g text-anchor="middle">
+    <rect x="384" y="96" width="192" height="64" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="480" y="124" font-size="15" font-weight="600" fill="#F5F5F5">Developer Intent</text>
+    <text x="480" y="146" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">what you want built</text>
+
+    <rect x="48" y="216" width="256" height="88" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="176" y="252" font-size="15" font-weight="600" fill="#F5F5F5">Autocomplete</text>
+    <text x="176" y="276" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">single-line suggestions</text>
+
+    <rect x="352" y="216" width="256" height="88" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="480" y="252" font-size="15" font-weight="600" fill="#F5F5F5">Chat Interface</text>
+    <text x="480" y="276" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">code blocks on request</text>
+
+    <rect x="656" y="216" width="256" height="88" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="784" y="252" font-size="15" font-weight="600" fill="#F5F5F5">Agentic System</text>
+    <text x="784" y="276" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">autonomous multi-step</text>
+
+    <rect x="544" y="344" width="368" height="44" rx="8" fill="none" stroke="rgba(255,255,255,0.20)" stroke-dasharray="4 3"/>
+    <text x="728" y="371" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">read → plan → edit → test → PR</text>
+  </g>
+
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2">
+    <path d="M384,128 C260,140 200,168 180,208" marker-end="url(#arr)"/>
+    <path d="M480,160 C480,180 480,192 480,208" marker-end="url(#arr)"/>
+    <path d="M576,128 C700,140 760,168 780,208" marker-end="url(#arr)"/>
+    <path d="M784,304 C784,320 760,328 740,338" stroke="#F59E0B" marker-end="url(#arr-accent)"/>
+  </g>
+</svg>

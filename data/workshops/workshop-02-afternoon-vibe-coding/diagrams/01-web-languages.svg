@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 340" role="img" aria-labelledby="wl-title wl-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="wl-title">The three languages of the web</title>
+  <desc id="wl-desc">HTML gives structure and content, CSS gives visual design, JavaScript gives interactivity — mapping to what you see on the page.</desc>
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect x="8" y="8" width="944" height="324" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">THE THREE LANGUAGES OF THE WEB</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <g text-anchor="middle">
+    <rect x="48" y="104" width="144" height="56" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="120" y="138" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="14" font-weight="600" fill="#F5F5F5">HTML</text>
+    <rect x="288" y="104" width="256" height="56" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="416" y="138" font-size="14" font-weight="600" fill="#F5F5F5">Structure &amp; content</text>
+    <rect x="640" y="104" width="272" height="56" rx="8" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.35)"/>
+    <text x="776" y="138" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">text · images · forms</text>
+
+    <rect x="48" y="184" width="144" height="56" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="120" y="218" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="14" font-weight="600" fill="#F5F5F5">CSS</text>
+    <rect x="288" y="184" width="256" height="56" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="416" y="218" font-size="14" font-weight="600" fill="#F5F5F5">Visual design</text>
+    <rect x="640" y="184" width="272" height="56" rx="8" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.35)"/>
+    <text x="776" y="218" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">colours · layout · animation</text>
+
+    <rect x="48" y="264" width="144" height="56" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="120" y="298" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="14" font-weight="600" fill="#F5F5F5">JS</text>
+    <rect x="288" y="264" width="256" height="56" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="416" y="298" font-size="14" font-weight="600" fill="#F5F5F5">Interactivity</text>
+    <rect x="640" y="264" width="272" height="56" rx="8" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.35)"/>
+    <text x="776" y="298" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">clicks · hovers · movement</text>
+  </g>
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2">
+    <path d="M192,132 L280,132" marker-end="url(#arr)"/>
+    <path d="M544,132 L632,132" marker-end="url(#arr)"/>
+    <path d="M192,212 L280,212" marker-end="url(#arr)"/>
+    <path d="M544,212 L632,212" marker-end="url(#arr)"/>
+    <path d="M192,292 L280,292" marker-end="url(#arr)"/>
+    <path d="M544,292 L632,292" marker-end="url(#arr)"/>
+  </g>
+</svg>

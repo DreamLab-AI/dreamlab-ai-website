@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 296" role="img" aria-labelledby="dg-title dg-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="dg-title">The AI coding tool landscape in 2026</title>
+  <desc id="dg-desc">Four categories: terminal agents (Claude Code, Codex CLI, Aider), IDE-integrated tools (Cursor, Copilot, Windsurf, Continue.dev), chat-based tools (ChatGPT, Claude.ai) and APIs/SDKs.</desc>
+
+  <rect x="8" y="8" width="944" height="280" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">AI CODING TOOLS · 2026</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <g text-anchor="middle">
+    <rect x="48" y="104" width="192" height="144" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="144" y="140" font-size="14" font-weight="600" fill="#F5F5F5">Terminal Agents</text>
+    <g font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">
+      <text x="144" y="172">Claude Code</text>
+      <text x="144" y="196">Codex CLI</text>
+      <text x="144" y="220">Aider</text>
+    </g>
+
+    <rect x="272" y="104" width="192" height="144" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="368" y="140" font-size="14" font-weight="600" fill="#F5F5F5">IDE-Integrated</text>
+    <g font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">
+      <text x="368" y="172">Cursor · Copilot</text>
+      <text x="368" y="196">Windsurf</text>
+      <text x="368" y="220">Continue.dev</text>
+    </g>
+
+    <rect x="496" y="104" width="192" height="144" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="592" y="140" font-size="14" font-weight="600" fill="#F5F5F5">Chat-Based</text>
+    <g font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">
+      <text x="592" y="172">ChatGPT + Canvas</text>
+      <text x="592" y="196">Claude.ai + Artifacts</text>
+    </g>
+
+    <rect x="720" y="104" width="192" height="144" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="816" y="140" font-size="14" font-weight="600" fill="#F5F5F5">API / SDK</text>
+    <g font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">
+      <text x="816" y="172">Anthropic SDK</text>
+      <text x="816" y="196">OpenAI API</text>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 440" role="img" aria-labelledby="vc-title vc-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="vc-title">Virtual machines versus containers</title>
+  <desc id="vc-desc">Side-by-side stacks: virtual machines run a full guest OS per app above a hypervisor, while containers share one host kernel through a lightweight runtime, making them boot in seconds and weigh megabytes.</desc>
+
+  <rect x="8" y="8" width="944" height="424" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">VIRTUAL MACHINES VS CONTAINERS</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <!-- column headers -->
+  <g text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#6B7280">
+    <text x="244" y="104">VIRTUAL MACHINE</text>
+    <text x="684" y="104">CONTAINER</text>
+  </g>
+
+  <!-- VM stack -->
+  <g text-anchor="middle">
+    <rect x="48" y="116" width="192" height="56" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="144" y="150" font-size="14" font-weight="600" fill="#F5F5F5">App A + libs</text>
+    <rect x="248" y="116" width="192" height="56" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="344" y="150" font-size="14" font-weight="600" fill="#F5F5F5">App B + libs</text>
+
+    <rect x="48" y="180" width="192" height="48" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="144" y="210" font-size="14" font-weight="600" fill="#F5F5F5">Guest OS</text>
+    <rect x="248" y="180" width="192" height="48" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="344" y="210" font-size="14" font-weight="600" fill="#F5F5F5">Guest OS</text>
+
+    <rect x="48" y="236" width="392" height="48" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="244" y="266" font-size="14" font-weight="600" fill="#F5F5F5">Hypervisor</text>
+
+    <rect x="48" y="292" width="392" height="48" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="244" y="322" font-size="14" font-weight="600" fill="#F5F5F5">Host OS</text>
+
+    <rect x="48" y="348" width="392" height="48" rx="8" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.35)"/>
+    <text x="244" y="378" font-size="14" font-weight="600" fill="#F5F5F5">Hardware</text>
+  </g>
+
+  <!-- Container stack -->
+  <g text-anchor="middle">
+    <rect x="488" y="116" width="192" height="56" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="584" y="150" font-size="14" font-weight="600" fill="#F5F5F5">App A + libs</text>
+    <rect x="688" y="116" width="192" height="56" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="784" y="150" font-size="14" font-weight="600" fill="#F5F5F5">App B + libs</text>
+
+    <rect x="488" y="180" width="392" height="48" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="684" y="210" font-size="14" font-weight="600" fill="#F5F5F5">Container runtime</text>
+
+    <rect x="488" y="236" width="392" height="64" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="684" y="264" font-size="15" font-weight="600" fill="#F5F5F5">Shared host kernel</text>
+    <text x="684" y="288" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">one OS, isolated processes</text>
+
+    <rect x="488" y="308" width="392" height="48" rx="8" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.35)"/>
+    <text x="684" y="338" font-size="14" font-weight="600" fill="#F5F5F5">Hardware</text>
+
+    <text x="684" y="388" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">boots in seconds &#183; megabytes, not gigabytes</text>
+  </g>
+</svg>

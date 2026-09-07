@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 320" role="img" aria-labelledby="dg-title dg-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="dg-title">Manual versus automated testing</title>
+  <desc id="dg-desc">Manual testing is time-consuming, error-prone and expensive; automated testing is fast, reliable and cost-effective, giving comprehensive coverage that scales.</desc>
+
+  <rect x="8" y="8" width="944" height="304" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">MANUAL VS AUTOMATED TESTING</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <g text-anchor="middle">
+    <rect x="48" y="104" width="416" height="168" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="256" y="144" font-size="16" font-weight="600" fill="#F5F5F5">Manual Testing</text>
+    <g font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">
+      <text x="256" y="180">time-consuming → limited coverage</text>
+      <text x="256" y="204">error-prone → inconsistent results</text>
+      <text x="256" y="228">expensive → doesn't scale</text>
+    </g>
+
+    <rect x="496" y="104" width="416" height="168" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="704" y="144" font-size="16" font-weight="600" fill="#F5F5F5">Automated Testing</text>
+    <g font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">
+      <text x="704" y="180">fast → comprehensive coverage</text>
+      <text x="704" y="204">reliable → consistent results</text>
+      <text x="704" y="228">cost-effective → scales infinitely</text>
+    </g>
+  </g>
+</svg>

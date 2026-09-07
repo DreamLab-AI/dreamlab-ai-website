@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 312" role="img" aria-labelledby="01-integration-loop-t 01-integration-loop-d" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="01-integration-loop-t">Mermaid, Git and GitHub combined</title>
+  <desc id="01-integration-loop-d">Write documentation with Mermaid diagrams, commit, push to GitHub and the site updates automatically; edits repeat the same loop.</desc>
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="arr-accent" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#F59E0B" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="arr-sky" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#38BDF8" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect x="8" y="8" width="944" height="296" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">INTEGRATION · THE FULL LOOP</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+    <rect x="48" y="112" width="200" height="80" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="148" y="146" text-anchor="middle" font-size="15" font-weight="600" fill="#F5F5F5">Write + diagram</text>
+    <text x="148" y="168" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">markdown + mermaid</text>
+    <rect x="296" y="112" width="176" height="80" rx="8" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.35)"/>
+    <text x="384" y="146" text-anchor="middle" font-size="15" font-weight="600" fill="#F5F5F5">Commit</text>
+    <text x="384" y="168" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">git tracks changes</text>
+    <rect x="520" y="112" width="176" height="80" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="608" y="146" text-anchor="middle" font-size="15" font-weight="600" fill="#F5F5F5">Push</text>
+    <text x="608" y="168" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">to GitHub</text>
+    <rect x="744" y="112" width="184" height="80" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="836" y="146" text-anchor="middle" font-size="15" font-weight="600" fill="#F5F5F5">Site updates</text>
+    <text x="836" y="168" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">published automatically</text>
+    <path d="M248,152 L290,152" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arr)"/>
+    <path d="M472,152 L514,152" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arr)"/>
+    <path d="M696,152 L738,152" fill="none" stroke="#F59E0B" stroke-width="1.2" marker-end="url(#arr-accent)"/>
+    <path d="M836,192 C836,260 148,260 148,198" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+    <text x="492" y="252" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">edit again — the loop repeats</text>
+
+</svg>

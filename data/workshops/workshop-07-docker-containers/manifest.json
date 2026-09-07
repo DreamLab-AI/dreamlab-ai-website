@@ -1,0 +1,41 @@
+{
+  "title": "Docker & Containers for AI Development",
+  "pages": [
+    {
+      "slug": "README.md",
+      "title": "Docker & Containers for AI Development"
+    },
+    {
+      "slug": "00_introduction.md",
+      "title": "Introduction: Why Containers Matter for AI"
+    },
+    {
+      "slug": "01_concepts.md",
+      "title": "Core Concepts: Images, Containers, Volumes, Networks"
+    },
+    {
+      "slug": "02_hands_on.md",
+      "title": "Hands-On: Your First Containers"
+    },
+    {
+      "slug": "03_dev_containers.md",
+      "title": "VS Code Dev Containers: Reproducible Environments"
+    },
+    {
+      "slug": "04_remote_docker.md",
+      "title": "Remote Docker: Developing on Powerful Machines"
+    },
+    {
+      "slug": "05_ai_containers.md",
+      "title": "Containerising AI Agents and Workflows"
+    },
+    {
+      "slug": "06_exercises.md",
+      "title": "Practical Exercises"
+    },
+    {
+      "slug": "07_resources.md",
+      "title": "Resources & Next Steps"
+    }
+  ]
+}

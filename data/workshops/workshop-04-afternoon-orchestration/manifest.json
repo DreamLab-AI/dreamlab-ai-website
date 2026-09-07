@@ -1,0 +1,45 @@
+{
+  "title": "Workshop 04 - Afternoon Session: Agent Orchestration & Safety",
+  "pages": [
+    {
+      "slug": "README.md",
+      "title": "Workshop 04 - Afternoon Session: Agent Orchestration & Safety"
+    },
+    {
+      "slug": "00_introduction.md",
+      "title": "Introduction to Agent Orchestration & Safety"
+    },
+    {
+      "slug": "01_concepts.md",
+      "title": "Orchestration Concepts & Safety Patterns"
+    },
+    {
+      "slug": "02_hands_on.md",
+      "title": "Hands-on: Building Orchestrated Agent Systems"
+    },
+    {
+      "slug": "03_exercises.md",
+      "title": "Orchestration Exercises"
+    },
+    {
+      "slug": "04_project.md",
+      "title": "Final Project: Production Multi-Agent System"
+    },
+    {
+      "slug": "05_assessment.md",
+      "title": "Assessment: Agent Orchestration & Safety"
+    },
+    {
+      "slug": "06_resources.md",
+      "title": "Resources for Agent Orchestration & Safety"
+    },
+    {
+      "slug": "objectives.md",
+      "title": "Learning Objectives - Workshop 04 Afternoon: Agent Orchestration & Safety"
+    },
+    {
+      "slug": "prerequisites.md",
+      "title": "Prerequisites - Workshop 04 Afternoon: Agent Orchestration & Safety"
+    }
+  ]
+}

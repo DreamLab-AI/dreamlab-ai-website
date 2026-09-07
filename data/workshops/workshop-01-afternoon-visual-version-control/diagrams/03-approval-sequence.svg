@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 440" role="img" aria-labelledby="d3c-title d3c-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="d3c-title">Document approval sequence</title>
+  <desc id="d3c-desc">Author submits a document to the reviewer; comments and resubmission loop until approved, then the reviewer forwards it to the department head who gives final approval.</desc>
+  <defs>
+    <marker id="arr3c" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="arr3c-acc" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#F59E0B" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect x="8" y="8" width="944" height="424" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">DOCUMENT APPROVAL SEQUENCE</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <!-- actor chips -->
+  <g text-anchor="middle">
+    <rect x="112" y="96" width="160" height="48" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="192" y="126" font-size="15" font-weight="600" fill="#F5F5F5">Author</text>
+    <rect x="400" y="96" width="160" height="48" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="480" y="126" font-size="15" font-weight="600" fill="#F5F5F5">Reviewer</text>
+    <rect x="688" y="96" width="160" height="48" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="768" y="126" font-size="15" font-weight="600" fill="#F5F5F5">Dept Head</text>
+  </g>
+
+  <!-- lifelines -->
+  <g stroke="rgba(255,255,255,0.20)" stroke-dasharray="4 3">
+    <line x1="192" y1="144" x2="192" y2="408"/>
+    <line x1="480" y1="144" x2="480" y2="408"/>
+    <line x1="768" y1="144" x2="768" y2="408"/>
+  </g>
+
+  <!-- messages -->
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2">
+    <path d="M192,184 L472,184" marker-end="url(#arr3c)"/>
+    <path d="M480,232 L200,232" stroke-dasharray="4 3" marker-end="url(#arr3c)"/>
+    <path d="M192,280 L472,280" marker-end="url(#arr3c)"/>
+    <path d="M480,328 L760,328" marker-end="url(#arr3c)"/>
+  </g>
+  <path d="M768,376 L200,376" fill="none" stroke="#F59E0B" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#arr3c-acc)"/>
+
+  <g font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF" text-anchor="middle">
+    <text x="336" y="176">submit document</text>
+    <text x="336" y="224">comments &amp; feedback</text>
+    <text x="336" y="272">revise · resubmit ⟲ until approved</text>
+    <text x="624" y="320">forward for sign-off</text>
+    <text x="484" y="368" fill="#F59E0B">final approval — document published</text>
+  </g>
+</svg>

@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 320" role="img" aria-labelledby="dg-title dg-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="dg-title">Choosing a deployment platform</title>
+  <desc id="dg-desc">Depending on what you are shipping, your code goes to Vercel or Netlify for frontends, Railway or Render for full-stack apps, Cloudflare Pages for edge, or GitHub Pages for docs and static sites.</desc>
+
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <rect x="8" y="8" width="944" height="304" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">WHERE DOES YOUR CODE GO?</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <g text-anchor="middle">
+    <rect x="48" y="164" width="160" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="128" y="196" font-size="15" font-weight="600" fill="#F5F5F5">Your Code</text>
+    <text x="128" y="218" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">ready to ship</text>
+
+    <path d="M320,148 L372,200 L320,252 L268,200 Z" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)" stroke-linejoin="round"/>
+    <text x="320" y="196" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">what</text>
+    <text x="320" y="210" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">ships?</text>
+
+    <rect x="448" y="96" width="224" height="64" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="560" y="124" font-size="14" font-weight="600" fill="#F5F5F5">Vercel / Netlify</text>
+    <text x="560" y="146" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">frontend</text>
+
+    <rect x="688" y="96" width="224" height="64" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="800" y="124" font-size="14" font-weight="600" fill="#F5F5F5">Railway / Render</text>
+    <text x="800" y="146" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">full-stack</text>
+
+    <rect x="448" y="240" width="224" height="64" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="560" y="268" font-size="14" font-weight="600" fill="#F5F5F5">Cloudflare Pages</text>
+    <text x="560" y="290" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">edge</text>
+
+    <rect x="688" y="240" width="224" height="64" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="800" y="268" font-size="14" font-weight="600" fill="#F5F5F5">GitHub Pages</text>
+    <text x="800" y="290" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">docs · static · free</text>
+  </g>
+
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2">
+    <path d="M208,200 C228,200 244,200 260,200" marker-end="url(#arr)"/>
+    <path d="M372,200 C412,180 408,140 440,130" marker-end="url(#arr)"/>
+    <path d="M372,200 C480,168 588,140 680,130" marker-end="url(#arr)"/>
+    <path d="M372,200 C412,220 408,260 440,270" marker-end="url(#arr)"/>
+    <path d="M372,200 C480,232 588,260 680,270" marker-end="url(#arr)"/>
+  </g>
+</svg>

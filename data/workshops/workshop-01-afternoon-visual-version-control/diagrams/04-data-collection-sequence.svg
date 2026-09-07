@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 424" role="img" aria-labelledby="d4c-title d4c-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="d4c-title">Data collection and analysis sequence</title>
+  <desc id="d4c-desc">The researcher recruits and consents participants, gathers recordings and survey responses, stores anonymised data, imports it into analysis tools and receives analysis outputs to integrate.</desc>
+  <defs>
+    <marker id="arr4c" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect x="8" y="8" width="944" height="408" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">DATA COLLECTION SEQUENCE</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <g text-anchor="middle">
+    <rect x="88" y="96" width="160" height="48" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="168" y="126" font-size="15" font-weight="600" fill="#F5F5F5">Researcher</text>
+    <rect x="320" y="96" width="160" height="48" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="400" y="126" font-size="15" font-weight="600" fill="#F5F5F5">Participants</text>
+    <rect x="552" y="96" width="160" height="48" rx="8" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.35)"/>
+    <text x="632" y="126" font-size="15" font-weight="600" fill="#F5F5F5">Data Store</text>
+    <rect x="768" y="96" width="160" height="48" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="848" y="126" font-size="15" font-weight="600" fill="#F5F5F5">Analysis Tools</text>
+  </g>
+
+  <g stroke="rgba(255,255,255,0.20)" stroke-dasharray="4 3">
+    <line x1="168" y1="144" x2="168" y2="392"/>
+    <line x1="400" y1="144" x2="400" y2="392"/>
+    <line x1="632" y1="144" x2="632" y2="392"/>
+    <line x1="848" y1="144" x2="848" y2="392"/>
+  </g>
+
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2">
+    <path d="M168,184 L392,184" marker-end="url(#arr4c)"/>
+    <path d="M400,232 L176,232" stroke-dasharray="4 3" marker-end="url(#arr4c)"/>
+    <path d="M168,280 L624,280" marker-end="url(#arr4c)"/>
+    <path d="M168,328 L840,328" marker-end="url(#arr4c)"/>
+    <path d="M848,376 L176,376" stroke-dasharray="4 3" marker-end="url(#arr4c)"/>
+  </g>
+
+  <g font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF" text-anchor="middle">
+    <text x="284" y="176">recruit · consent · interview · survey</text>
+    <text x="284" y="224">recordings &amp; responses</text>
+    <text x="396" y="272">store anonymised transcripts &amp; data</text>
+    <text x="508" y="320">import qual &amp; quant data</text>
+    <text x="512" y="368">analysis outputs → integrate findings</text>
+  </g>
+</svg>

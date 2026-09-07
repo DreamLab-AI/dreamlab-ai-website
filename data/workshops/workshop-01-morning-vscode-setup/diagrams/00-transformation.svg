@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 300" role="img" aria-labelledby="d00t-title d00t-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="d00t-title">Three-hour workspace transformation</title>
+  <desc id="d00t-desc">Scattered tools, manual processes and file chaos become a unified, AI-enhanced, organised workspace over the three-hour workshop.</desc>
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect x="8" y="8" width="944" height="284" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">YOUR JOURNEY TODAY</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <g text-anchor="middle">
+    <rect x="80" y="112" width="304" height="120" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="232" y="152" font-size="15" font-weight="600" fill="#F5F5F5">Current State</text>
+    <text x="232" y="180" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">scattered tools · manual work</text>
+    <text x="232" y="200" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">limited AI access · file chaos</text>
+  </g>
+
+  <path d="M384,172 C440,172 520,172 572,172" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arr)"/>
+  <text x="480" y="156" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">3 hours</text>
+
+  <g text-anchor="middle">
+    <rect x="576" y="112" width="304" height="120" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="728" y="152" font-size="15" font-weight="600" fill="#F5F5F5">Transformed Workspace</text>
+    <text x="728" y="180" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">unified · AI-enhanced workflows</text>
+    <text x="728" y="200" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">AI control · organised projects</text>
+  </g>
+</svg>
