@@ -25,3 +25,8 @@
 | 2026-09-04 | kit-pin-integrity | Given HEAD's kit-pin parity logic lives in two independent copies (the GitHub gu | NONE | NONE | yes | ACCEPT |  | 5782b8777649 |  |
 | 2026-09-05 | site-build-content | Given HEAD `7e243741`'s bench run emits both React Router v7 future-flag warning | NONE | NONE | yes | ACCEPT |  | 67497bc79bb8 |  |
 | 2026-09-06 | operator-overlay | Given tonight's pin-parity entrypoint is an inline command containing nested dou | NONE | NONE | yes | INCONCLUSIVE |  | c638ed372d40 |  |
+| 2026-09-07 | ci-workflows | VETOED: Given the 09-06 dispatch layer mangled the inline pin-parity entrypoint  | NONE | NONE | yes | BLOCKED-ENV |  | 11a09998ce64 |  |
+| 2026-09-07 | operator-handoff | 09-01 ran no dream: report.md is an Ontology Loom scaffold dump, receipts green | NONE | NONE | n/a | OPERATOR |  | operator | 2026-09-01 |
+| 2026-09-07 | operator-handoff | 09-07 gate was green on parent f3ee5405: 201/201, 0e/10w, PIN-PARITY-OK | NONE | NONE | n/a | OPERATOR |  | operator | 2026-09-07 |
+| 2026-09-07 | operator-handoff | No 09-03 or 09-04 draft branches or PRs ever existed; phantom-PR thread shut | NONE | NONE | n/a | OPERATOR |  | operator | 2026-09-03, 2026-09-04 |
+| 2026-09-07 | operator-handoff | React Router v7 future flags landed by operator from the 09-05 finding | NONE | NONE | n/a | OPERATOR |  | operator | 2026-09-05 |
