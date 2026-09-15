@@ -16,6 +16,11 @@ import {
   parseRecord,
 } from "../lib/pin-parity.mjs";
 import { REPO_ROOT, cleanupFixtureRepos, makeFixtureRepo } from "./helpers/fixture-repo.mjs";
+import { readFileSync } from "node:fs";
+import { join as __join } from "node:path";
+const __record = readFileSync(__join(REPO_ROOT, "docs/architecture/kit-compatibility-record.md"), "utf8");
+const LIVE_VERSION = /CANONICAL_KIT_VERSION=(\S+)/.exec(__record)[1];
+const LIVE_MESH_CHECKSUM = /RESOLVED nostr-bbs-mesh \S+ ([0-9a-f]{64})/.exec(__record)[1];
 
 afterAll(cleanupFixtureRepos);
 
@@ -111,8 +116,8 @@ describe("deliberately inconsistent pins are rejected", () => {
     const root = makeFixtureRepo((r) => {
       r.replaceOnce(
         "forum-config/Cargo.toml",
-        'nostr-bbs-core = "=1.0.0-beta.10"',
-        'nostr-bbs-core = "1.0.0-beta.10"',
+        `nostr-bbs-core = "=${LIVE_VERSION}"`,
+        `nostr-bbs-core = "${LIVE_VERSION}"`,
       );
     });
     const result = checkKitPins(root);
@@ -124,8 +129,8 @@ describe("deliberately inconsistent pins are rejected", () => {
     const root = makeFixtureRepo((r) => {
       r.replaceOnce(
         "forum-config/Cargo.toml",
-        'nostr-bbs-mesh = "=1.0.0-beta.10"',
-        'nostr-bbs-mesh = "^1.0.0-beta.10"',
+        `nostr-bbs-mesh = "=${LIVE_VERSION}"`,
+        `nostr-bbs-mesh = "^${LIVE_VERSION}"`,
       );
     });
     expectDrift(checkKitPins(root), "floating requirement range");
@@ -137,7 +142,7 @@ describe("deliberately inconsistent pins are rejected", () => {
     const root = makeFixtureRepo((r) => {
       r.replaceOnce(
         "forum-config/Cargo.toml",
-        'nostr-bbs-core = "=1.0.0-beta.10"',
+        `nostr-bbs-core = "=${LIVE_VERSION}"`,
         'nostr-bbs-core = "=1.0.0-beta.8"',
       );
     });
@@ -159,7 +164,7 @@ describe("deliberately inconsistent pins are rejected", () => {
   it("rejects a resolved version that disagrees with CANONICAL_KIT_VERSION", () => {
     const root = makeFixtureRepo((r) => {
       r.edit("docs/architecture/kit-compatibility-record.md", (t) =>
-        t.replace("CANONICAL_KIT_VERSION=1.0.0-beta.10", "CANONICAL_KIT_VERSION=1.0.0-beta.8"),
+        t.replace(`CANONICAL_KIT_VERSION=${LIVE_VERSION}`, "CANONICAL_KIT_VERSION=1.0.0-beta.8"),
       );
     });
     expectDrift(checkKitPins(root), "CANONICAL_KIT_VERSION is 1.0.0-beta.8");
@@ -169,8 +174,8 @@ describe("deliberately inconsistent pins are rejected", () => {
     const root = makeFixtureRepo((r) => {
       r.edit("forum-config/Cargo.lock", (t) =>
         t.replace(
-          `name = "nostr-bbs-mesh"\nversion = "1.0.0-beta.10"\nsource = "registry+https://github.com/rust-lang/crates.io-index"\nchecksum = "e9259dd482d1e79e00da400029bf26807336d6dc270c47c19c993635a723e41e"`,
-          `name = "nostr-bbs-mesh"\nversion = "1.0.0-beta.10"\nsource = "git+https://example.invalid/kit#0123456789abcdef"`,
+          `name = "nostr-bbs-mesh"\nversion = "${LIVE_VERSION}"\nsource = "registry+https://github.com/rust-lang/crates.io-index"\nchecksum = "${LIVE_MESH_CHECKSUM}"`,
+          `name = "nostr-bbs-mesh"\nversion = "${LIVE_VERSION}"\nsource = "git+https://example.invalid/kit#0123456789abcdef"`,
         ),
       );
     });
