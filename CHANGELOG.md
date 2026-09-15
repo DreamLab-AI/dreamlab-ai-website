@@ -1,9 +1,9 @@
 # Changelog
 
-## 2026-09-15 — kit pin 6dc7001 (nostr-bbs-core/mesh 1.0.0-beta.11)
+## 2026-09-15 — kit pin 64b15d5 (nostr-bbs-core/mesh 1.0.0-beta.11)
 
-- `KIT_REF` in `deploy.yml`, `workers-deploy.yml`, `rust-ci.yml` and the kit compatibility record moved from `931898a3` (beta.10 release) to forum `main` `6dc7001`.
-- `forum-config` pins `nostr-bbs-core` and `nostr-bbs-mesh` at `=1.0.0-beta.11`; `nostr-bbs-config` and `nostr-bbs-rate-limit` unchanged at beta.10.
+- `KIT_REF` in `deploy.yml`, `workers-deploy.yml`, `rust-ci.yml` and the kit compatibility record moved from `931898a3` (beta.10 release) to forum `main` `64b15d5`.
+- `forum-config` pins `nostr-bbs-core` and `nostr-bbs-mesh` at `=1.0.0-beta.11`; `nostr-bbs-config` and `nostr-bbs-rate-limit` republished at beta.11 (version-only) so the set is coherent.
 - Brings the augmentation-conditions governance changes (VisionFlow ADR-2010/2011; forum ADR-2011) and the 2026-09 user-feedback fixes to the edge on the next deploy.
 - **Operator action before deploy:** `wrangler secret put CALIBRATION_SELECTION_KEY --name dreamlab-nostr-relay` (HMAC key for calibration sampling); without it the relay refuses to mark calibration samples.
 

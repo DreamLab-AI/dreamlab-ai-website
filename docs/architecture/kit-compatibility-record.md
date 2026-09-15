@@ -23,11 +23,11 @@ its own `pin-check` extension.
 
 | Deployment host | Forum-kit SHA | Kit branch/tag at pin | Consumption tier | Canonical for pin-check |
 |---|---|---|---|---|
-| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `6dc70012c071a268d0c905baa4fd947722abeaea` | `main` at 6dc7001 (kit crates `nostr-bbs-core`/`nostr-bbs-mesh` 1.0.0-beta.11 on crates.io; augmentation-conditions governance — task-property triple, effective tier, application receipts, reviewer telemetry, HMAC-keyed calibration sampling which REQUIRES the relay secret `CALIBRATION_SELECTION_KEY`; user-feedback fixes — DM history, search, mobile thread layout, PWA icons, custom emoji, mentions, unread ingress) | `integrated` | ✔ |
+| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `64b15d5b574608c68a527c78b75a548b91f4c6e8` | `main` at 64b15d5 (all four kit crates `nostr-bbs-core`/`config`/`mesh`/`rate-limit` 1.0.0-beta.11 on crates.io; augmentation-conditions governance — task-property triple, effective tier, application receipts, reviewer telemetry, HMAC-keyed calibration sampling which REQUIRES the relay secret `CALIBRATION_SELECTION_KEY`; user-feedback fixes — DM history, search, mobile thread layout, PWA icons, custom emoji, mentions, unread ingress) | `integrated` | ✔ |
 
 <!-- pin-check:canonical-kit-sha -->
 ```
-CANONICAL_KIT_SHA=6dc70012c071a268d0c905baa4fd947722abeaea
+CANONICAL_KIT_SHA=64b15d5b574608c68a527c78b75a548b91f4c6e8
 CANONICAL_KIT_VERSION=1.0.0-beta.11
 ```
 
@@ -51,10 +51,10 @@ here byte-for-byte.
 
 <!-- pin-check:resolved-packages -->
 ```
-RESOLVED nostr-bbs-core 1.0.0-beta.10 93c1065a917cbafcfbb131b3699e387b5f19e5a288e5715444a6900c3f75b3bf
-RESOLVED nostr-bbs-config 1.0.0-beta.10 793ecca7556af628393e1133bb3013c48c0ef48155f984a706db206bb5e97360
-RESOLVED nostr-bbs-mesh 1.0.0-beta.10 e9259dd482d1e79e00da400029bf26807336d6dc270c47c19c993635a723e41e
-RESOLVED nostr-bbs-rate-limit 1.0.0-beta.10 ba4c5f5d86c4444ddee7ebad3c20eb1f78ca8a9aea917fa5e874c3a47d7b68bd
+RESOLVED nostr-bbs-core 1.0.0-beta.11 1dd4b0239cc6645ecb3acb16cbe18d1e39268c79727561019ca473cd9cb351c5
+RESOLVED nostr-bbs-config 1.0.0-beta.11 d3df087a0b105aeb8fd1093621ff27bc7856b469add247d7cbd5cceeb1deff62
+RESOLVED nostr-bbs-mesh 1.0.0-beta.11 8add982ebc13d40cbc0e69d56b5f1cdd6f4c61ca134307170c318a87034c1156
+RESOLVED nostr-bbs-rate-limit 1.0.0-beta.11 2a131b0680a724be3b1bf5e796232e52511a3d6828b569a8d2569cc76fb55f00
 ```
 
 Regenerate after any kit bump with:
