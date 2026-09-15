@@ -851,9 +851,9 @@ dependencies = [
 
 [[package]]
 name = "nostr-bbs-core"
-version = "1.0.0-beta.10"
+version = "1.0.0-beta.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "93c1065a917cbafcfbb131b3699e387b5f19e5a288e5715444a6900c3f75b3bf"
+checksum = "1dd4b0239cc6645ecb3acb16cbe18d1e39268c79727561019ca473cd9cb351c5"
 dependencies = [
  "aes",
  "async-trait",
@@ -880,9 +880,9 @@ dependencies = [
 
 [[package]]
 name = "nostr-bbs-mesh"
-version = "1.0.0-beta.10"
+version = "1.0.0-beta.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e9259dd482d1e79e00da400029bf26807336d6dc270c47c19c993635a723e41e"
+checksum = "8add982ebc13d40cbc0e69d56b5f1cdd6f4c61ca134307170c318a87034c1156"
 dependencies = [
  "async-trait",
  "hex",

@@ -23,12 +23,12 @@ its own `pin-check` extension.
 
 | Deployment host | Forum-kit SHA | Kit branch/tag at pin | Consumption tier | Canonical for pin-check |
 |---|---|---|---|---|
-| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `931898a3d82da5dbf573b6b6dccdc76513046875` | `main` (tag `v1.0.0-beta.10` — governance receipts D1 table applied idempotently by the relay at startup, feature gate, identity subkey vectors, client bootstrap/freshness/reconcile, trust sweep, `a754468` event_tags indexed lookups; six registry crates published to crates.io at `1.0.0-beta.10`, registry == git-tag invariant holds) | `integrated` | ✔ |
+| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `6dc70012c071a268d0c905baa4fd947722abeaea` | `main` at 6dc7001 (kit crates `nostr-bbs-core`/`nostr-bbs-mesh` 1.0.0-beta.11 on crates.io; augmentation-conditions governance — task-property triple, effective tier, application receipts, reviewer telemetry, HMAC-keyed calibration sampling which REQUIRES the relay secret `CALIBRATION_SELECTION_KEY`; user-feedback fixes — DM history, search, mobile thread layout, PWA icons, custom emoji, mentions, unread ingress) | `integrated` | ✔ |
 
 <!-- pin-check:canonical-kit-sha -->
 ```
-CANONICAL_KIT_SHA=931898a3d82da5dbf573b6b6dccdc76513046875
-CANONICAL_KIT_VERSION=1.0.0-beta.10
+CANONICAL_KIT_SHA=6dc70012c071a268d0c905baa4fd947722abeaea
+CANONICAL_KIT_VERSION=1.0.0-beta.11
 ```
 
 The `CANONICAL_KIT_SHA` line above is the machine-readable field the `pin-check`
