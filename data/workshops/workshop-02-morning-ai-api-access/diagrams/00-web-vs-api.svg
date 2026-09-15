@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 344" role="img" aria-labelledby="tb db" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="tb">Web interface versus API integration</title>
+  <desc id="db">Web interface workflow loses context through copy and paste, while API integration keeps the AI inside your editor with context, direct insertion and automation.</desc>
+  <defs>
+    <marker id="arrb" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="arrsb" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#38BDF8" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect x="8" y="8" width="944" height="328" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">TWO WAYS OF WORKING WITH AI</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+  <text x="48" y="112" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" letter-spacing="0.12em" fill="#6B7280">WEB INTERFACE</text>
+  <rect x="48" y="128" width="148" height="44" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+  <text x="122" y="155" text-anchor="middle" font-size="13" font-weight="600" fill="#F5F5F5">Type prompt</text>
+  <path d="M196,150 C208,150 212,150 224,150" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arrb)"/>
+  <rect x="228" y="128" width="148" height="44" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+  <text x="302" y="155" text-anchor="middle" font-size="13" font-weight="600" fill="#F5F5F5">Copy response</text>
+  <path d="M376,150 C388,150 392,150 404,150" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arrb)"/>
+  <rect x="408" y="128" width="148" height="44" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+  <text x="482" y="155" text-anchor="middle" font-size="13" font-weight="600" fill="#F5F5F5">Paste elsewhere</text>
+  <text x="620" y="196" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">context lost each round trip</text>
+  <path d="M588,150 C640,150 660,164 668,184" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arrb)"/>
+  <text x="48" y="228" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" letter-spacing="0.12em" fill="#F59E0B">API INTEGRATION</text>
+  <rect x="48" y="244" width="180" height="44" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+  <text x="138" y="271" text-anchor="middle" font-size="13" font-weight="600" fill="#F5F5F5">Work in VS Code</text>
+  <path d="M228,266 C240,266 244,266 272,266" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arrb)"/>
+  <rect x="276" y="244" width="180" height="44" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+  <text x="366" y="271" text-anchor="middle" font-size="13" font-weight="600" fill="#F5F5F5">AI sees context</text>
+  <path d="M456,266 C468,266 472,266 500,266" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arrb)"/>
+  <rect x="504" y="244" width="180" height="44" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+  <text x="594" y="271" text-anchor="middle" font-size="13" font-weight="600" fill="#F5F5F5">Direct insertion</text>
+  <path d="M684,266 C696,266 700,266 728,266" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arrb)"/>
+  <rect x="732" y="244" width="180" height="44" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+  <text x="822" y="271" text-anchor="middle" font-size="13" font-weight="600" fill="#F5F5F5">Automation ready</text>
+</svg>

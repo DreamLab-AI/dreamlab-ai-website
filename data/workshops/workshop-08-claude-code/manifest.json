@@ -1,0 +1,49 @@
+{
+  "title": "Claude Code Mastery: From First Command to Autonomous Agents",
+  "pages": [
+    {
+      "slug": "README.md",
+      "title": "Claude Code Mastery: From First Command to Autonomous Agents"
+    },
+    {
+      "slug": "00_introduction.md",
+      "title": "Chapter 0: Introduction — What Is Claude Code?"
+    },
+    {
+      "slug": "01_getting_started.md",
+      "title": "Chapter 1: Getting Started — Installation and First Run"
+    },
+    {
+      "slug": "02_core_features.md",
+      "title": "Chapter 2: Core Features — Commands, Slash Commands, and Tools"
+    },
+    {
+      "slug": "03_claude_md.md",
+      "title": "Chapter 3: CLAUDE.md — Teaching Claude About Your Project"
+    },
+    {
+      "slug": "04_mcp_servers.md",
+      "title": "Chapter 4: MCP Servers — Extending Claude's Capabilities"
+    },
+    {
+      "slug": "05_hooks_automation.md",
+      "title": "Chapter 5: Hooks and Automation — Event-Driven Workflows"
+    },
+    {
+      "slug": "06_subagents_workflows.md",
+      "title": "Chapter 6: Subagents and Workflows — Multi-Agent Orchestration"
+    },
+    {
+      "slug": "07_practical_patterns.md",
+      "title": "Chapter 7: Practical Patterns — Real-World Use Cases"
+    },
+    {
+      "slug": "08_exercises.md",
+      "title": "Chapter 8: Hands-On Exercises"
+    },
+    {
+      "slug": "09_resources.md",
+      "title": "Chapter 9: Resources & Community"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 280" role="img" aria-labelledby="d01c-title d01c-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="d01c-title">Dev containers isolate a perfect workspace</title>
+  <desc id="d01c-desc">A messy computer with conflicting software is isolated behind a dev container, giving a consistent workspace with every tool included that can be shared with anyone.</desc>
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect x="8" y="8" width="944" height="264" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">YOUR WORKSPACE IN A BOX</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <g text-anchor="middle">
+    <rect x="48" y="112" width="256" height="104" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.20)" stroke-dasharray="4 3"/>
+    <text x="176" y="152" font-size="15" font-weight="600" fill="#F5F5F5">Your Messy Computer</text>
+    <text x="176" y="180" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">clashing versions · gaps</text>
+  </g>
+
+  <path d="M304,164 C332,164 344,164 372,164" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arr)"/>
+  <text x="338" y="148" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">isolated</text>
+
+  <g text-anchor="middle">
+    <rect x="376" y="112" width="256" height="104" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="504" y="152" font-size="15" font-weight="600" fill="#F5F5F5">Dev Container</text>
+    <text x="504" y="180" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">perfect workspace, boxed</text>
+  </g>
+
+  <path d="M632,164 C660,164 672,164 700,164" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arr)"/>
+
+  <g text-anchor="middle">
+    <rect x="704" y="112" width="208" height="104" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="808" y="146" font-size="15" font-weight="600" fill="#F5F5F5">Consistent</text>
+    <text x="808" y="170" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">all tools included</text>
+    <text x="808" y="188" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">share with anyone</text>
+  </g>
+</svg>

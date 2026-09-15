@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 320" role="img" aria-labelledby="tq dq" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="tq">Model choice by document size</title>
+  <desc id="dq">Under two pages any model works; up to 50 pages use GPT-4o or Claude; up to 500 pages use Gemini Pro; and 500 to 1,500 pages only fit Gemini Pro's long context.</desc>
+  <defs>
+    <marker id="arrq" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="arrsq" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#38BDF8" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect x="8" y="8" width="944" height="304" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">PICK A MODEL BY DOCUMENT SIZE</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+  <rect x="48" y="140" width="200" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+  <text x="148" y="171" text-anchor="middle" font-size="14" font-weight="600" fill="#F5F5F5">Any model</text>
+  <text x="148" y="193" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">&lt; 2 pages</text>
+  <rect x="268" y="140" width="200" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+  <text x="368" y="171" text-anchor="middle" font-size="14" font-weight="600" fill="#F5F5F5">GPT-4o · Claude</text>
+  <text x="368" y="193" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">2–50 pages</text>
+  <rect x="488" y="140" width="200" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+  <text x="588" y="171" text-anchor="middle" font-size="14" font-weight="600" fill="#F5F5F5">Gemini 2.5 Pro</text>
+  <text x="588" y="193" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">50–500 pages</text>
+  <rect x="708" y="140" width="200" height="72" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+  <text x="808" y="171" text-anchor="middle" font-size="14" font-weight="600" fill="#F5F5F5">Gemini 2.5 Pro only</text>
+  <text x="808" y="193" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">500–1,500 pages</text>
+  <path d="M248,176 C256,176 260,176 264,176" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arrq)"/>
+  <path d="M468,176 C476,176 480,176 484,176" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arrq)"/>
+  <path d="M688,176 C696,176 700,176 704,176" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arrq)"/>
+  <text x="480" y="252" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#6B7280">context window is the constraint — bigger documents need longer windows</text>
+</svg>
