@@ -19,6 +19,9 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterAll, describe, expect, it } from "vitest";
 import { REPO_ROOT, cleanupFixtureRepos, makeFixtureRepo } from "./helpers/fixture-repo.mjs";
+const __record = readFileSync(join(REPO_ROOT, "docs/architecture/kit-compatibility-record.md"), "utf8");
+const LIVE_VERSION = /CANONICAL_KIT_VERSION=(\S+)/.exec(__record)[1];
+const LIVE_CORE_CHECKSUM = /RESOLVED nostr-bbs-core \S+ ([0-9a-f]{64})/.exec(__record)[1];
 
 afterAll(cleanupFixtureRepos);
 
@@ -86,7 +89,7 @@ describe("drift is reported through the wrapper", () => {
   it("reports drift when the record's canonical version disagrees", () => {
     const root = makeFixtureRepo((r) => {
       r.edit("docs/architecture/kit-compatibility-record.md", (t) =>
-        t.replace("CANONICAL_KIT_VERSION=1.0.0-beta.10", "CANONICAL_KIT_VERSION=1.0.0-beta.8"),
+        t.replace(`CANONICAL_KIT_VERSION=${LIVE_VERSION}`, "CANONICAL_KIT_VERSION=1.0.0-beta.8"),
       );
     });
     expectDriftVerdict(runGuard(root), "CANONICAL_KIT_VERSION is 1.0.0-beta.8");
@@ -98,8 +101,8 @@ describe("drift is reported through the wrapper", () => {
     const root = makeFixtureRepo((r) => {
       r.replaceOnce(
         "forum-config/Cargo.toml",
-        'nostr-bbs-core = "=1.0.0-beta.10"',
-        'nostr-bbs-core = "1.0.0-beta.10"',
+        `nostr-bbs-core = "=${LIVE_VERSION}"`,
+        `nostr-bbs-core = "${LIVE_VERSION}"`,
       );
     });
     expectDriftVerdict(runGuard(root), "is a floating requirement range");
@@ -111,7 +114,7 @@ describe("drift is reported through the wrapper", () => {
     const root = makeFixtureRepo((r) => {
       r.edit("forum-config/Cargo.lock", (t) =>
         t.replace(
-          "93c1065a917cbafcfbb131b3699e387b5f19e5a288e5715444a6900c3f75b3bf",
+          LIVE_CORE_CHECKSUM,
           "f".repeat(64),
         ),
       );

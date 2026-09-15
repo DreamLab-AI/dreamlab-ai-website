@@ -21,6 +21,7 @@ import { join as __join } from "node:path";
 const __record = readFileSync(__join(REPO_ROOT, "docs/architecture/kit-compatibility-record.md"), "utf8");
 const LIVE_VERSION = /CANONICAL_KIT_VERSION=(\S+)/.exec(__record)[1];
 const LIVE_MESH_CHECKSUM = /RESOLVED nostr-bbs-mesh \S+ ([0-9a-f]{64})/.exec(__record)[1];
+const LIVE_CORE_CHECKSUM = /RESOLVED nostr-bbs-core \S+ ([0-9a-f]{64})/.exec(__record)[1];
 
 afterAll(cleanupFixtureRepos);
 
@@ -153,7 +154,7 @@ describe("deliberately inconsistent pins are rejected", () => {
     const root = makeFixtureRepo((r) => {
       r.edit("forum-config/Cargo.lock", (t) =>
         t.replace(
-          "93c1065a917cbafcfbb131b3699e387b5f19e5a288e5715444a6900c3f75b3bf",
+          LIVE_CORE_CHECKSUM,
           "f".repeat(64),
         ),
       );
