@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-09-23 — kit pin 411352b: ontology governance live (nostr-bbs-core/mesh 1.0.0-beta.11, unchanged)
+
+- `KIT_REF` moved from `c076992` to forum `411352b`: ontology governance goes live — Promote is activated, Demote is added, and pending ontology proposals expire via the relay's existing five-minute cron sweep. D1 migration `0007_ontology_governance.sql` is additive and nullable (`broker_cases.stale_after` plus a partial index); the relay applies it at start-up through `ensure_schema()`, so no manual migration step. Crate versions unchanged.
+
 ## 2026-09-23 — kit pin c076992 (nostr-bbs-core/mesh 1.0.0-beta.11, unchanged)
 
 - `KIT_REF` in `deploy.yml`, `workers-deploy.yml`, `rust-ci.yml` and the kit compatibility record moved from `64b15d5` to forum `c076992` (the head of nostr-rust-forum PR #70, merged): members' posts are found by text search again (the relay's NIP-50 search replaces the admin-only vector index for plain queries), long-press or hover on a reaction shows who reacted, plus the relay 31403 admission build fix, rustls 0.23.45 (RUSTSEC-2026-0285) and colloquy knowledge kinds 38410-38412. Crate versions unchanged, so no Cargo edit. Forum `5a3fea6` (Promote/Demote governance) is deliberately not in this pin.
