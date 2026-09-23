@@ -23,11 +23,11 @@ its own `pin-check` extension.
 
 | Deployment host | Forum-kit SHA | Kit branch/tag at pin | Consumption tier | Canonical for pin-check |
 |---|---|---|---|---|
-| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `64b15d5b574608c68a527c78b75a548b91f4c6e8` | `main` at 64b15d5 (all four kit crates `nostr-bbs-core`/`config`/`mesh`/`rate-limit` 1.0.0-beta.11 on crates.io; augmentation-conditions governance — task-property triple, effective tier, application receipts, reviewer telemetry, HMAC-keyed calibration sampling which REQUIRES the relay secret `CALIBRATION_SELECTION_KEY`; user-feedback fixes — DM history, search, mobile thread layout, PWA icons, custom emoji, mentions, unread ingress) | `integrated` | ✔ |
+| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `c076992ba9542d8e8e27311403fd98ea68d3202e` | `main` at c076992 (all four kit crates `nostr-bbs-core`/`config`/`mesh`/`rate-limit` 1.0.0-beta.11 on crates.io; augmentation-conditions governance — task-property triple, effective tier, application receipts, reviewer telemetry, HMAC-keyed calibration sampling which REQUIRES the relay secret `CALIBRATION_SELECTION_KEY`; user-feedback fixes — DM history, search, mobile thread layout, PWA icons, custom emoji, mentions, unread ingress; at c076992: search by text via the relay (NIP-50) rather than the admin-fed vector index, a who-reacted popover per emoji, relay 31403 admission build fix, rustls 0.23.45 for RUSTSEC-2026-0285, colloquy knowledge kinds 38410-38412. Deliberately excludes forum 5a3fea6, Promote/Demote governance, until that lands green) | `integrated` | ✔ |
 
 <!-- pin-check:canonical-kit-sha -->
 ```
-CANONICAL_KIT_SHA=64b15d5b574608c68a527c78b75a548b91f4c6e8
+CANONICAL_KIT_SHA=c076992ba9542d8e8e27311403fd98ea68d3202e
 CANONICAL_KIT_VERSION=1.0.0-beta.11
 ```
 
