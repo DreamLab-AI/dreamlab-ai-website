@@ -50,6 +50,7 @@ DreamLab AI is the commercial front door of the [VisionFlow](https://github.com/
 | [VisionClaw](https://github.com/DreamLab-AI/VisionClaw) | Flagship engine — ontology-grounded immersive 3D knowledge-graph platform, GPU physics, XR |
 | [agentbox](https://github.com/DreamLab-AI/agentbox) | Sovereign agent runtime — Nix container, `did:nostr` agent identities, skills, RuVector memory, mesh peer |
 | [solid-pod-rs](https://github.com/DreamLab-AI/solid-pod-rs) | Personal-data-sovereignty layer — Rust Solid pod server (LDP, WAC, DID:Nostr) |
+| [sidestr-rs](https://github.com/DreamLab-AI/sidestr-rs) | Rust port of Melvin Carvalho's sidestr sidechains, AGPL-3.0-only: the economic engine for `did:nostr` agents. A `did:nostr` key is a sidechain wallet. |
 | [nostr-rust-forum](https://github.com/DreamLab-AI/nostr-rust-forum) | Human+agent communication substrate — Nostr-native forum + relay in Rust (the kit this repo consumes) |
 | [knowledgeGraph](https://github.com/DreamLab-AI/knowledgeGraph) | narrativegoldmine.com — the public knowledge graph VisionClaw renders in 3D; `main` also holds the open release: 7,457 pages, pipeline, WASM explorer |
 | **[dreamlab-ai-website](https://github.com/DreamLab-AI/dreamlab-ai-website)** | **This repo — the commercial face; Cloudflare-deployed with a workers Nostr relay + D1 identity whitelist** |
@@ -93,6 +94,14 @@ Each sibling in its own words:
 <br/>
 
 > **Your data's exit right should sit in the floor, not be granted at the door — solid-pod-rs gives every human and agent a self-owned RDF pod under their own key.** A Rust-native Solid Protocol server with WAC access control and `did:nostr` identity; every write is a git-mark commit and high-value writes anchor to Bitcoin. Standards-based sovereignty: leave at any time, and take everything with you.
+
+</details>
+
+<details>
+<summary><b>sidestr-rs</b> — <em>economic engine for did:nostr agents — a did:nostr key is a sidechain wallet</em></summary>
+<br/>
+
+> **Rust port of Melvin Carvalho's sidestr sidechains, AGPL-3.0-only: the economic engine for `did:nostr` agents. A `did:nostr` key is a sidechain wallet.**
 
 </details>
 
