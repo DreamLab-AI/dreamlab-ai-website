@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-09-24 — kit pin 21562c6: spend through a browser signer (nostr-bbs-core/mesh 1.0.0-beta.11, unchanged)
+
+- `KIT_REF` moved from `aabfb85` to forum `21562c6`. Members signed in with Podkey (0.0.9 or later) spend from the Wallet page and tip without pasting an nsec: the forum builds the spend unsigned and Podkey, which reads and validates `sidestr:dreamlab` itself, shows it and signs it (`window.nostr.sidestr.signTransaction`, sidestr spec proposal `browser-signer`; forum ADR-2015 D8). Transaction events now come from a throwaway key, so a member is asked once. Members with an older extension still see the unlock box. Client-only; no worker, secret or D1 change.
+
 ## 2026-09-24 — member wallets and DREAM tips switched on
 
 - `SIDESTR_WALLET` set to `'on'` in `deploy.yml` (`0c6161b`): members get the Wallet page (DREAM balance, give, starter packs for members and agents, receive, faucet), a DREAM tip control on every post's reaction row, and "Send DREAM" on profiles (forum ADR-2015, kit `aabfb85`). Client-only; no worker, secret or D1 change.

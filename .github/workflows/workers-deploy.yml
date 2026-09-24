@@ -41,7 +41,7 @@ env:
   # fix across the workers, nip44 error mapping, pod ACL owner-control invariant;
   # a754468 event_tags indexed tag lookups — D1 free-tier fix).
   # Cutover provenance: docs/architecture/kit-compatibility-record.md.
-  KIT_REF: 'aabfb8543af363f9db1f9a08846a5d873a275304'
+  KIT_REF: '21562c6e9cf8e65363e920ea1b196258165b0b03'
 
 jobs:
   gate:
