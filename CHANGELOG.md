@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-09-24 — member wallets and DREAM tips switched on
+
+- `SIDESTR_WALLET` set to `'on'` in `deploy.yml` (`0c6161b`): members get the Wallet page (DREAM balance, give, starter packs for members and agents, receive, faucet), a DREAM tip control on every post's reaction row, and "Send DREAM" on profiles (forum ADR-2015, kit `aabfb85`). Client-only; no worker, secret or D1 change.
+- Opening distribution on `sidestr:dreamlab`: 100 DREAM to each named member and the JunkieJarvis and Jezbot agents (blocks 406–407); the treasury faucet grants 100 DREAM and 1,000 sats per member per 24 hours.
+
 ## 2026-09-24 — kit pin aabfb85: member wallets and DREAM tips (staged off), Pending fix (nostr-bbs-core/mesh 1.0.0-beta.11, unchanged)
 
 - `KIT_REF` moved from `411352b` to forum `aabfb85`. The admin Pending tab no longer shows approved members as pending: the client read only the relay whitelist's first page of 20, so every older member appeared pending and approving them could not clear it. Every page is now read, which also fixes the Members table and new-joiner alerts (forum ADR-2014, phase 0).
