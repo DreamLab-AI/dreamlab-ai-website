@@ -70,6 +70,10 @@ env:
   # the open relays the agent also publishes to. MUST stay a subset of the
   # agent's NOSTR_RELAYS fan-out (agentbox .env) or replies are never seen.
   VITE_REPLY_RELAYS: 'wss://relay.damus.io,wss://relay.primal.net'
+  # Member wallets on sidestr:dreamlab (testnet4) and DREAM tips (forum ADR-2015).
+  # 'on' shows the Wallet nav item, the tip control on posts and "Send DREAM" on
+  # profiles; anything else renders the forum exactly as before.
+  SIDESTR_WALLET: 'off'
   # Zone (section) model for the forum client. Mirrors forum-config/dreamlab.toml
   # [[zones]] and the relay's ZONE_CONFIG [vars]. Injected into window.__ENV__ below.
   ZONE_CONFIG_JSON: '[{"id":"zone1","slug":"welcome","display_name":"Welcome","required_cohorts":[],"write_cohorts":["members","agent"],"banner_image_url":"/images/heroes/lake-district-dawn.webp","visibility":"public","encrypted":false,"accent_hex":"#22c55e"},{"id":"zone2","slug":"minimoonoir","display_name":"Minimoonoir","required_cohorts":["zone2","minimoonoir"],"banner_image_url":"/images/heroes/minimoonoir-hero.webp","visibility":"locked","encrypted":false,"accent_hex":"#3b82f6","section_order":["zone2-rants"]},{"id":"zone3","kanban":true,"slug":"family","display_name":"Family","required_cohorts":["zone3","family"],"banner_image_url":"/images/heroes/family-hero.webp","visibility":"locked","encrypted":true,"accent_hex":"#f59e0b"},{"id":"zone4","kanban":true,"slug":"dreamlab","display_name":"DreamLab","required_cohorts":["zone4","dreamlab"],"banner_image_url":"/images/heroes/business-hero.webp","visibility":"locked","encrypted":false,"accent_hex":"#a855f7"}]'
@@ -95,7 +99,7 @@ env:
   # fix, nip44 PlaintextTooLong mapping, pod ACL owner-control invariant, CI
   # hardening; a754468 event_tags indexed tag lookups — D1 free-tier fix). Cutover provenance
   # is in docs/architecture/kit-compatibility-record.md.
-  KIT_REF: '411352b840445061f7071b5da7383c80cc852bf5'
+  KIT_REF: 'aabfb8543af363f9db1f9a08846a5d873a275304'
 
 jobs:
   gate:
@@ -251,7 +255,7 @@ jobs:
           # operator can tell whether a deployed build contains a given fix.
           BUILD_HASH="${GITHUB_SHA:0:7}"
           BUILD_VERSION="$(date -u +%Y.%m.%d)"
-          ENV_SCRIPT='<script>window.__ENV__={BBS_PWA_ENABLED:"true",BRAND_LABEL:"Community",FORUM_NAME:"Community Forums",VITE_RELAY_URL:"'"$VITE_RELAY_URL"'",VITE_AUTH_API_URL:"'"$VITE_AUTH_API_URL"'",VITE_POD_API_URL:"'"$VITE_POD_API_URL"'",VITE_SEARCH_API_URL:"'"$VITE_SEARCH_API_URL"'",VITE_LINK_PREVIEW_API_URL:"'"$VITE_LINK_PREVIEW_API_URL"'",BUILD_VERSION:"'"$BUILD_VERSION"'",BUILD_HASH:"'"$BUILD_HASH"'",ZONE_CONFIG:'"$ZONE_CONFIG_JSON"'};</script>'
+          ENV_SCRIPT='<script>window.__ENV__={BBS_PWA_ENABLED:"true",BRAND_LABEL:"Community",FORUM_NAME:"Community Forums",VITE_RELAY_URL:"'"$VITE_RELAY_URL"'",VITE_AUTH_API_URL:"'"$VITE_AUTH_API_URL"'",VITE_POD_API_URL:"'"$VITE_POD_API_URL"'",VITE_SEARCH_API_URL:"'"$VITE_SEARCH_API_URL"'",VITE_LINK_PREVIEW_API_URL:"'"$VITE_LINK_PREVIEW_API_URL"'",SIDESTR_WALLET:"'"$SIDESTR_WALLET"'",BUILD_VERSION:"'"$BUILD_VERSION"'",BUILD_HASH:"'"$BUILD_HASH"'",ZONE_CONFIG:'"$ZONE_CONFIG_JSON"'};</script>'
           sed -i "s|</head>|${ENV_SCRIPT}</head>|" dist/community/index.html
           echo "Injected window.__ENV__ into forum index.html (build $BUILD_VERSION $BUILD_HASH)"
           # SPA deep-link pickup for the forum. A hard load of /community/login

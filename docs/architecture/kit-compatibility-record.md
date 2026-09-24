@@ -23,11 +23,11 @@ its own `pin-check` extension.
 
 | Deployment host | Forum-kit SHA | Kit branch/tag at pin | Consumption tier | Canonical for pin-check |
 |---|---|---|---|---|
-| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `411352b840445061f7071b5da7383c80cc852bf5` | `main` at 411352b (all four kit crates `nostr-bbs-core`/`config`/`mesh`/`rate-limit` 1.0.0-beta.11 on crates.io; augmentation-conditions governance — task-property triple, effective tier, application receipts, reviewer telemetry, HMAC-keyed calibration sampling which REQUIRES the relay secret `CALIBRATION_SELECTION_KEY`; user-feedback fixes — DM history, search, mobile thread layout, PWA icons, custom emoji, mentions, unread ingress; at c076992: search by text via the relay (NIP-50) rather than the admin-fed vector index, a who-reacted popover per emoji, relay 31403 admission build fix, rustls 0.23.45 for RUSTSEC-2026-0285, colloquy knowledge kinds 38410-38412.; at 411352b: ontology governance — Promote activated, Demote added, pending proposals expire via the relay's five-minute cron sweep; D1 migration 0007 (additive, nullable `broker_cases.stale_after` + partial index) applied at relay start-up by `ensure_schema()`) | `integrated` | ✔ |
+| `dreamlab-ai.com` (+ mirror `thedreamlab.uk`) | `aabfb8543af363f9db1f9a08846a5d873a275304` | `main` at 411352b (all four kit crates `nostr-bbs-core`/`config`/`mesh`/`rate-limit` 1.0.0-beta.11 on crates.io; augmentation-conditions governance — task-property triple, effective tier, application receipts, reviewer telemetry, HMAC-keyed calibration sampling which REQUIRES the relay secret `CALIBRATION_SELECTION_KEY`; user-feedback fixes — DM history, search, mobile thread layout, PWA icons, custom emoji, mentions, unread ingress; at c076992: search by text via the relay (NIP-50) rather than the admin-fed vector index, a who-reacted popover per emoji, relay 31403 admission build fix, rustls 0.23.45 for RUSTSEC-2026-0285, colloquy knowledge kinds 38410-38412.; at 411352b: ontology governance — Promote activated, Demote added, pending proposals expire via the relay's five-minute cron sweep; D1 migration 0007 (additive, nullable `broker_cases.stale_after` + partial index) applied at relay start-up by `ensure_schema()`; at aabfb85: member wallets on sidestr:dreamlab (testnet4) and DREAM tips, gated on `window.__ENV__.SIDESTR_WALLET` (ADR-2015; client-only, no worker or D1 change), and the admin Pending tab reads every whitelist page so approved members leave Pending (ADR-2014 phase 0)) | `integrated` | ✔ |
 
 <!-- pin-check:canonical-kit-sha -->
 ```
-CANONICAL_KIT_SHA=411352b840445061f7071b5da7383c80cc852bf5
+CANONICAL_KIT_SHA=aabfb8543af363f9db1f9a08846a5d873a275304
 CANONICAL_KIT_VERSION=1.0.0-beta.11
 ```
 

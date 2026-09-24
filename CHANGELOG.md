@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-09-24 — kit pin aabfb85: member wallets and DREAM tips (staged off), Pending fix (nostr-bbs-core/mesh 1.0.0-beta.11, unchanged)
+
+- `KIT_REF` moved from `411352b` to forum `aabfb85`. The admin Pending tab no longer shows approved members as pending: the client read only the relay whitelist's first page of 20, so every older member appeared pending and approving them could not clear it. Every page is now read, which also fixes the Members table and new-joiner alerts (forum ADR-2014, phase 0).
+- Member wallets on `sidestr:dreamlab` (testnet4) and DREAM tips (forum ADR-2015) ship in the bundle but stay off: `SIDESTR_WALLET` is `'off'` in `deploy.yml` and injected into `window.__ENV__`, so members see no change until it is set to `'on'`. Client-only; no worker, secret or D1 change.
+
 ## 2026-09-23 — kit pin 411352b: ontology governance live (nostr-bbs-core/mesh 1.0.0-beta.11, unchanged)
 
 - `KIT_REF` moved from `c076992` to forum `411352b`: ontology governance goes live — Promote is activated, Demote is added, and pending ontology proposals expire via the relay's existing five-minute cron sweep. D1 migration `0007_ontology_governance.sql` is additive and nullable (`broker_cases.stale_after` plus a partial index); the relay applies it at start-up through `ensure_schema()`, so no manual migration step. Crate versions unchanged.
