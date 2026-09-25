@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-09-25 — kit pin d79ae26: wording for Podkey's opt-in (nostr-bbs-core/mesh 1.0.0-beta.11, unchanged)
+
+- `KIT_REF` moved from `21562c6` to forum `d79ae26`. Podkey 0.0.10 keeps sidechain spends off until a member turns them on, and asks in its own window the first time the forum requests one. The Wallet and tip hints now say so ("Podkey will ask you to turn on sidechain spends, then show you this spend"), reading `window.nostr.sidestr.enabled`, and an `unsupported` refusal explains how to turn spends on. Client-only; no worker, secret or D1 change.
+
 ## 2026-09-24 — kit pin 21562c6: spend through a browser signer (nostr-bbs-core/mesh 1.0.0-beta.11, unchanged)
 
 - `KIT_REF` moved from `aabfb85` to forum `21562c6`. Members signed in with Podkey (0.0.9 or later) spend from the Wallet page and tip without pasting an nsec: the forum builds the spend unsigned and Podkey, which reads and validates `sidestr:dreamlab` itself, shows it and signs it (`window.nostr.sidestr.signTransaction`, sidestr spec proposal `browser-signer`; forum ADR-2015 D8). Transaction events now come from a throwaway key, so a member is asked once. Members with an older extension still see the unlock box. Client-only; no worker, secret or D1 change.
