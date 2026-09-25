@@ -99,7 +99,7 @@ env:
   # fix, nip44 PlaintextTooLong mapping, pod ACL owner-control invariant, CI
   # hardening; a754468 event_tags indexed tag lookups — D1 free-tier fix). Cutover provenance
   # is in docs/architecture/kit-compatibility-record.md.
-  KIT_REF: 'c3f147fd22092fb0d684adbce7e84c225daa804e'
+  KIT_REF: '87c580c3668b52736b2b2350cea18ae72340b8a1'
 
 jobs:
   gate:

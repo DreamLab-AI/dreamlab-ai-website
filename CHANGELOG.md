@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-25 — kit pin 87c580c: user cards, identity links, thread landing, search deep links (nostr-bbs-core/mesh 1.0.0-beta.11, unchanged)
+
+- `KIT_REF` moved from `c3f147f` to forum `87c580c`.
+- **User cards.** Clicking a member's avatar or name shows when they started posting, how many posts they have, where they are most active and a link to their full profile. The profile page gets the same section. The counts come from the relay's new `GET /api/profile-stats`, which only counts posts in zones the viewer can read.
+- **Linked identities.** An admin alias (`pubkey_aliases`) now marks a key as replaced. The relay publishes the map (`GET /api/profiles/successors`) and leaves replaced keys out of profile search. The forum shows a replaced key's posts under the successor's name and avatar, drops it from the @mention and DM pickers, and redirects `/dm/<old>` to the successor.
+- **Threads and search.** Opening a topic lands on its newest post. Search results open at the matching message (`/go/:event_id` finds the topic and highlights the post) instead of the channel above it. User results open the profile.
+- Needs both `deploy.yml` (client) and `workers-deploy.yml` (relay). No D1 migration, secret or `dreamlab.toml` change.
+
 ## 2026-09-25 — kit pin c3f147f: sidestr-core 0.3.2 (nostr-bbs-core/mesh 1.0.0-beta.11, unchanged)
 
 - `KIT_REF` moved from `d79ae26` to forum `c3f147f`: the forum client takes sidestr-core 0.3.2, which builds without its `std` feature again. No behaviour change; client-only.
