@@ -63,21 +63,26 @@ FAIL=0
 
 # ── D1: server-side export → download SQL dump ──────────────────────────────
 # poll_bookmark: the export API is async; POST returns a bookmark to re-poll
-# with until signed_url appears.
+# with until status=complete, when the URL appears at .result.result.signed_url
+# (shape checked against the live API 2026-09-25; the older top-level
+# .result.signed_url is still accepted).
 d1_export() {
-  local name="$1" id="$2" out="$DEST/d1/${name}.sql"
+  # One assignment per `local`: under `set -u`, a later word that expands an
+  # earlier one in the same declaration can see it unset.
+  local name="$1" id="$2"
+  local out="$DEST/d1/${name}.sql"
   local body='{"output_format":"polling"}' resp bookmark url
   resp=$(curl -sf "${AUTH[@]}" -H 'content-type: application/json' \
     -d "$body" "$API/d1/database/$id/export") || { log "D1 $name: export request failed"; return 1; }
   bookmark=$(echo "$resp" | jq -r '.result.at_bookmark // empty')
-  url=$(echo "$resp" | jq -r '.result.signed_url // empty')
+  url=$(echo "$resp" | jq -r '.result.result.signed_url // .result.signed_url // empty')
   local tries=0
   while [ -z "$url" ] && [ $tries -lt 60 ]; do
     sleep 5; tries=$((tries+1))
     resp=$(curl -sf "${AUTH[@]}" -H 'content-type: application/json' \
       -d "{\"output_format\":\"polling\",\"current_bookmark\":\"$bookmark\"}" \
       "$API/d1/database/$id/export") || continue
-    url=$(echo "$resp" | jq -r '.result.signed_url // empty')
+    url=$(echo "$resp" | jq -r '.result.result.signed_url // .result.signed_url // empty')
   done
   [ -n "$url" ] || { log "D1 $name: export never produced a signed_url"; return 1; }
   curl -sf -o "$out" "$url" || { log "D1 $name: dump download failed"; return 1; }
@@ -88,7 +93,8 @@ for name in "${!D1[@]}"; do d1_export "$name" "${D1[$name]}" || FAIL=1; done
 
 # ── R2: list objects via REST, download each ────────────────────────────────
 r2_backup() {
-  local bucket="$1" dir="$DEST/r2/$bucket" cursor="" n=0
+  local bucket="$1"
+  local dir="$DEST/r2/$bucket" cursor="" n=0
   mkdir -p "$dir"
   while :; do
     local page keys
@@ -111,7 +117,8 @@ for b in "${R2_BUCKETS[@]}"; do r2_backup "$b" || FAIL=1; done
 
 # ── KV: list keys, bulk-get values into one JSON per namespace ──────────────
 kv_backup() {
-  local label="$1" nsid="$2" out="$DEST/kv/${label}.json" cursor="" tmp
+  local label="$1" nsid="$2"
+  local out="$DEST/kv/${label}.json" cursor="" tmp
   tmp=$(mktemp)
   echo '{}' > "$tmp"
   while :; do
@@ -134,7 +141,10 @@ kv_backup() {
 for label in "${!KV[@]}"; do kv_backup "$label" "${KV[$label]}" || FAIL=1; done
 
 # ── Manifest + retention ────────────────────────────────────────────────────
-( cd "$DEST" && find . -type f -exec sha256sum {} + > MANIFEST.sha256 )
+# Hash into a temp file outside the tree, then move it in: writing the manifest
+# inside the tree while find walks it made it hash its own half-written self.
+( cd "$DEST" && find . -type f ! -name MANIFEST.sha256 -exec sha256sum {} + > "$DEST.manifest.tmp" ) \
+  && mv "$DEST.manifest.tmp" "$DEST/MANIFEST.sha256"
 log "manifest: $(wc -l < "$DEST/MANIFEST.sha256") files, total $(du -sh "$DEST" | cut -f1)"
 
 ls -1d "$DEST_ROOT"/20* 2>/dev/null | sort | head -n -"$KEEP_NIGHTS" | while read -r old; do
