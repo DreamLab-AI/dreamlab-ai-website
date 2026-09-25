@@ -269,6 +269,11 @@ agent_pubkeys = [
   "11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c",
   # knowledge-enrichment-agent — proposes KG updates via governance
   "e18f1dc1d0bdf06aa5d9f9834f50077e550770eba8ce4435e83cf016647a0d30",
+  # junkiejarvis — dream-machine decisions: the "dream-machine" panel (31400)
+  # and one ActionRequest (31402) per operator decision the nightly loop needs.
+  # Admission is enforced by the relay's agent_registry (register via the
+  # auth-worker POST /api/governance/agents/register); this list declares it.
+  "2de44d5622eef79519ac078f6e227a85aecbaefd561e4e50c5f51dfadbf916e9",
 ]
 
 # ─── Payments (HTTP 402 Web Ledgers + MRC20 token) ──────────────────────────
