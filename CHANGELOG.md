@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-09-25 — kit pin c3f147f: sidestr-core 0.3.2 (nostr-bbs-core/mesh 1.0.0-beta.11, unchanged)
+
+- `KIT_REF` moved from `d79ae26` to forum `c3f147f`: the forum client takes sidestr-core 0.3.2, which builds without its `std` feature again. No behaviour change; client-only.
+
 ## 2026-09-25 — kit pin d79ae26: wording for Podkey's opt-in (nostr-bbs-core/mesh 1.0.0-beta.11, unchanged)
 
 - `KIT_REF` moved from `21562c6` to forum `d79ae26`. Podkey 0.0.10 keeps sidechain spends off until a member turns them on, and asks in its own window the first time the forum requests one. The Wallet and tip hints now say so ("Podkey will ask you to turn on sidechain spends, then show you this spend"), reading `window.nostr.sidestr.enabled`, and an `unsupported` refusal explains how to turn spends on. Client-only; no worker, secret or D1 change.
