@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 280" role="img" aria-labelledby="rl-title rl-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="rl-title">How RAG answers a question</title>
+  <desc id="rl-desc">A question flows through retrieval of relevant documents, augmentation of the prompt with that context, and LLM generation to produce a grounded, cited answer.</desc>
+
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- container -->
+  <rect x="8" y="8" width="944" height="264" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">RETRIEVAL-AUGMENTED GENERATION</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <g text-anchor="middle">
+    <rect x="48" y="120" width="152" height="80" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="124" y="156" font-size="15" font-weight="600" fill="#F5F5F5">Question</text>
+    <text x="124" y="180" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">in your own words</text>
+
+    <rect x="228" y="120" width="152" height="80" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="304" y="156" font-size="15" font-weight="600" fill="#F5F5F5">Retrieve</text>
+    <text x="304" y="180" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">search your docs</text>
+
+    <rect x="408" y="120" width="152" height="80" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="484" y="156" font-size="15" font-weight="600" fill="#F5F5F5">Augment</text>
+    <text x="484" y="180" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">context + question</text>
+
+    <rect x="588" y="120" width="152" height="80" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="664" y="156" font-size="15" font-weight="600" fill="#F5F5F5">Generate</text>
+    <text x="664" y="180" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">LLM reads evidence</text>
+
+    <rect x="768" y="120" width="152" height="80" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="844" y="156" font-size="15" font-weight="600" fill="#F5F5F5">Grounded Answer</text>
+    <text x="844" y="180" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">with citations</text>
+  </g>
+
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2">
+    <path d="M200,160 C210,160 214,160 224,160" marker-end="url(#arr)"/>
+    <path d="M380,160 C390,160 394,160 404,160" marker-end="url(#arr)"/>
+    <path d="M560,160 C570,160 574,160 584,160" marker-end="url(#arr)"/>
+    <path d="M740,160 C750,160 754,160 764,160" marker-end="url(#arr)"/>
+  </g>
+</svg>

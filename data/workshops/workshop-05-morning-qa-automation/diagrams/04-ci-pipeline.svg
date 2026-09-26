@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 464" role="img" aria-labelledby="dg-title dg-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="dg-title">The CI/CD quality pipeline</title>
+  <desc id="dg-desc">A commit passes pre-commit hooks, then CI checks (unit, integration, e2e, lint, security). A coverage gate above 90 percent allows a build and staging deploy; visual regression tests must pass before production. Any failure fails the build.</desc>
+
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <rect x="8" y="8" width="944" height="448" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">CI/CD QUALITY PIPELINE</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <g text-anchor="middle">
+    <rect x="48" y="112" width="160" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="128" y="144" font-size="15" font-weight="600" fill="#F5F5F5">Commit</text>
+    <text x="128" y="166" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">git push</text>
+
+    <path d="M288,100 L336,148 L288,196 L240,148 Z" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)" stroke-linejoin="round"/>
+    <text x="288" y="144" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">hooks</text>
+    <text x="288" y="158" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">pass?</text>
+
+    <rect x="392" y="104" width="240" height="88" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="512" y="136" font-size="15" font-weight="600" fill="#F5F5F5">CI Checks</text>
+    <text x="512" y="158" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">unit · integration · e2e</text>
+    <text x="512" y="176" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">lint · security scan</text>
+
+    <path d="M736,100 L784,148 L736,196 L688,148 Z" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)" stroke-linejoin="round"/>
+    <text x="736" y="144" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">coverage</text>
+    <text x="736" y="158" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">&gt; 90%?</text>
+
+    <rect x="656" y="280" width="160" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="736" y="310" font-size="15" font-weight="600" fill="#F5F5F5">Build + Stage</text>
+    <text x="736" y="332" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">deploy to staging</text>
+
+    <rect x="416" y="280" width="192" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="512" y="310" font-size="15" font-weight="600" fill="#F5F5F5">Visual Tests</text>
+    <text x="512" y="332" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">visual regression</text>
+
+    <path d="M288,268 L336,316 L288,364 L240,316 Z" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)" stroke-linejoin="round"/>
+    <text x="288" y="312" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">all</text>
+    <text x="288" y="326" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">green?</text>
+
+    <rect x="48" y="280" width="160" height="72" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="128" y="310" font-size="15" font-weight="600" fill="#F5F5F5">Production</text>
+    <text x="128" y="332" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">ship it</text>
+
+    <rect x="416" y="392" width="192" height="44" rx="8" fill="none" stroke="rgba(255,255,255,0.20)" stroke-dasharray="4 3"/>
+    <text x="512" y="419" font-size="13" font-weight="600" fill="#9CA3AF">Build fails</text>
+  </g>
+
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2">
+    <path d="M208,148 C220,148 228,148 232,148" marker-end="url(#arr)"/>
+    <path d="M336,148 C356,148 368,148 384,148" marker-end="url(#arr)"/>
+    <path d="M632,148 C652,148 664,148 680,148" marker-end="url(#arr)"/>
+    <path d="M736,196 C736,228 736,248 736,272" marker-end="url(#arr)"/>
+    <path d="M656,316 C640,316 632,316 616,316" marker-end="url(#arr)"/>
+    <path d="M416,316 C400,316 360,316 344,316" marker-end="url(#arr)"/>
+    <path d="M240,316 C224,316 224,316 216,316" marker-end="url(#arr)"/>
+    <path d="M288,364 C288,400 372,414 408,414" stroke="rgba(255,255,255,0.20)" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+    <path d="M688,148 C560,180 560,392 616,410" stroke="rgba(255,255,255,0.20)" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+  </g>
+  <g font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">
+    <text x="356" y="140">pass</text>
+    <text x="744" y="232">yes</text>
+    <text x="222" y="308">yes</text>
+    <text x="304" y="392" fill="#6B7280">no</text>
+  </g>
+</svg>

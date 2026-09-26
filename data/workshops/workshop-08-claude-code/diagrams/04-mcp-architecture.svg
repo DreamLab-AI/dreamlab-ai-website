@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 360" role="img" aria-labelledby="mcp-title mcp-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="mcp-title">MCP client–server architecture</title>
+  <desc id="mcp-desc">Claude Code acts as an MCP host, opening one client connection per configured MCP server; each server exposes tools that bridge to an external service such as GitHub, Postgres or Slack.</desc>
+
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="arr-net" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#38BDF8" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <rect x="8" y="8" width="944" height="344" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">MODEL CONTEXT PROTOCOL</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <g text-anchor="middle">
+    <rect x="48" y="152" width="152" height="80" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="124" y="188" font-size="15" font-weight="600" fill="#F5F5F5">You</text>
+    <text x="124" y="210" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">conversation</text>
+
+    <rect x="264" y="152" width="184" height="80" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="356" y="188" font-size="15" font-weight="600" fill="#F5F5F5">Claude Code</text>
+    <text x="356" y="210" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">host · one client/server</text>
+
+    <rect x="536" y="96" width="176" height="64" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="624" y="124" font-size="15" font-weight="600" fill="#F5F5F5">GitHub server</text>
+    <text x="624" y="146" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">issues · PRs</text>
+
+    <rect x="536" y="176" width="176" height="64" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="624" y="204" font-size="15" font-weight="600" fill="#F5F5F5">Postgres server</text>
+    <text x="624" y="226" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">schema · queries</text>
+
+    <rect x="536" y="256" width="176" height="64" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="624" y="284" font-size="15" font-weight="600" fill="#F5F5F5">Slack server</text>
+    <text x="624" y="306" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">messages</text>
+
+    <rect x="776" y="152" width="136" height="80" rx="8" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.35)"/>
+    <text x="844" y="188" font-size="15" font-weight="600" fill="#F5F5F5">Services</text>
+    <text x="844" y="210" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">APIs · data</text>
+  </g>
+
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2">
+    <path d="M200,192 C220,192 240,192 260,192" marker-end="url(#arr)"/>
+    <path d="M448,180 C480,164 500,148 532,136" marker-end="url(#arr)"/>
+    <path d="M448,192 C476,196 504,200 532,204" marker-end="url(#arr)"/>
+    <path d="M448,204 C480,224 500,264 532,280" marker-end="url(#arr)"/>
+  </g>
+  <g fill="none" stroke="#38BDF8" stroke-width="1.2" stroke-dasharray="4 3">
+    <path d="M712,132 C740,144 748,164 772,176" marker-end="url(#arr-net)"/>
+    <path d="M712,208 C732,206 752,202 772,198" marker-end="url(#arr-net)"/>
+    <path d="M712,284 C740,272 748,232 772,212" marker-end="url(#arr-net)"/>
+  </g>
+  <text x="460" y="256" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">.mcp.json · tool calls</text>
+  <text x="716" y="332" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#38BDF8">network / API</text>
+</svg>

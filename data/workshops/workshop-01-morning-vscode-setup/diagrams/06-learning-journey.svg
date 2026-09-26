@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 260" role="img" aria-labelledby="d06j-title d06j-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="d06j-title">Your learning journey after the workshop</title>
+  <desc id="d06j-desc">Daily practice builds competence in thirty days, templates bring proficiency by sixty, sharing knowledge brings expertise by ninety, advanced features bring mastery in six months, culminating in community contribution.</desc>
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect x="8" y="8" width="944" height="244" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">AFTER THE WORKSHOP — YOUR LEARNING JOURNEY</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <g text-anchor="middle">
+    <rect x="32" y="104" width="152" height="84" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="108" y="138" font-size="13" font-weight="600" fill="#F5F5F5">Daily practice</text>
+    <text x="108" y="164" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">30d · competent</text>
+
+    <rect x="224" y="104" width="152" height="84" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="300" y="138" font-size="13" font-weight="600" fill="#F5F5F5">Build templates</text>
+    <text x="300" y="164" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">60d · proficient</text>
+
+    <rect x="416" y="104" width="152" height="84" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="492" y="138" font-size="13" font-weight="600" fill="#F5F5F5">Share knowledge</text>
+    <text x="492" y="164" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">90d · expert</text>
+
+    <rect x="608" y="104" width="152" height="84" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="684" y="138" font-size="13" font-weight="600" fill="#F5F5F5">Advanced use</text>
+    <text x="684" y="164" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">6mo · master</text>
+
+    <rect x="800" y="104" width="136" height="84" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="868" y="134" font-size="13" font-weight="600" fill="#F5F5F5">Community</text>
+    <text x="868" y="152" font-size="13" font-weight="600" fill="#F5F5F5">contribution</text>
+    <text x="868" y="172" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#F59E0B">give back</text>
+  </g>
+
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2">
+    <line x1="184" y1="146" x2="216" y2="146" marker-end="url(#arr)"/>
+    <line x1="376" y1="146" x2="408" y2="146" marker-end="url(#arr)"/>
+    <line x1="568" y1="146" x2="600" y2="146" marker-end="url(#arr)"/>
+    <line x1="760" y1="146" x2="792" y2="146" marker-end="url(#arr)"/>
+  </g>
+</svg>

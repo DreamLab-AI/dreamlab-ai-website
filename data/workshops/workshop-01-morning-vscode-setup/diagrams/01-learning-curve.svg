@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 280" role="img" aria-labelledby="d01l-title d01l-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="d01l-title">The learning curve reality</title>
+  <desc id="d01l-desc">Timeline from day-one confusion through recognition, comfort and fluency to month-one mastery — sustained practice pays off in a tenfold productivity gain.</desc>
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect x="8" y="8" width="944" height="264" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">THE LEARNING CURVE — PRACTICE DAILY</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <!-- spine -->
+  <line x1="80" y1="156" x2="656" y2="156" stroke="#9CA3AF" stroke-width="1.2"/>
+  <g fill="#9CA3AF">
+    <circle cx="96" cy="156" r="4"/>
+    <circle cx="232" cy="156" r="4"/>
+    <circle cx="368" cy="156" r="4"/>
+    <circle cx="504" cy="156" r="4"/>
+    <circle cx="640" cy="156" r="4"/>
+  </g>
+  <g text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#6B7280">
+    <text x="96" y="132">DAY 1</text>
+    <text x="232" y="132">DAY 2</text>
+    <text x="368" y="132">DAY 3</text>
+    <text x="504" y="132">WEEK 2</text>
+    <text x="640" y="132">MONTH 1</text>
+  </g>
+  <g text-anchor="middle" font-size="13" font-weight="600" fill="#F5F5F5">
+    <text x="96" y="188">Confusion</text>
+    <text x="232" y="188">Recognition</text>
+    <text x="368" y="188">Comfort</text>
+    <text x="504" y="188">Fluency</text>
+    <text x="640" y="188">Mastery</text>
+  </g>
+
+  <path d="M656,156 C688,156 700,156 728,156" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arr)"/>
+
+  <g text-anchor="middle">
+    <rect x="732" y="120" width="184" height="76" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="824" y="152" font-size="15" font-weight="600" fill="#F5F5F5">10× productivity</text>
+    <text x="824" y="176" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">effort compounds</text>
+  </g>
+</svg>

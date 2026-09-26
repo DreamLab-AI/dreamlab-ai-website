@@ -1,0 +1,45 @@
+{
+  "title": "RAG System Implementation",
+  "pages": [
+    {
+      "slug": "README.md",
+      "title": "RAG System Implementation"
+    },
+    {
+      "slug": "00_introduction.md",
+      "title": "Introduction to RAG Systems"
+    },
+    {
+      "slug": "01_concepts.md",
+      "title": "Core Concepts: RAG Systems"
+    },
+    {
+      "slug": "02_hands_on.md",
+      "title": "Hands-On Practice: Building Your RAG System"
+    },
+    {
+      "slug": "03_exercises.md",
+      "title": "Practical Exercises: RAG System Implementation"
+    },
+    {
+      "slug": "04_project.md",
+      "title": "Project Work: Build a Personal Knowledge Base"
+    },
+    {
+      "slug": "05_assessment.md",
+      "title": "Assessment: RAG System Implementation"
+    },
+    {
+      "slug": "06_resources.md",
+      "title": "Resources: RAG System Implementation"
+    },
+    {
+      "slug": "objectives.md",
+      "title": "Learning Objectives -- RAG System Implementation"
+    },
+    {
+      "slug": "prerequisites.md",
+      "title": "Prerequisites -- RAG System Implementation"
+    }
+  ]
+}
