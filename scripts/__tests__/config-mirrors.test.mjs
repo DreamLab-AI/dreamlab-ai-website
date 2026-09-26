@@ -242,19 +242,21 @@ describe("a rotation that misses a mirror is rejected", () => {
 });
 
 describe("the encryption gate cannot be switched on in one place only", () => {
-  it("catches the TOML enabled without the relay var", () => {
+  it("catches the TOML gate flipped without the relay var", () => {
     const root = makeFixtureRepo((r) => {
-      r.replaceOnce("forum-config/dreamlab.toml", "enabled = false", "enabled = true");
+      // Flip whichever state the repo is in, so the test holds with the gate on or off.
+      r.edit("forum-config/dreamlab.toml", (t) =>
+        t.replace(/^enabled = (true|false)$/m, (_, v) => `enabled = ${v === "true" ? "false" : "true"}`),
+      );
     });
     expectDrift(root, "encryption-enabled");
   });
 
-  it("catches a relay var enabled without the client gate", () => {
+  it("catches the relay var flipped without the client gate", () => {
     const root = makeFixtureRepo((r) => {
-      r.replaceOnce(
-        "forum-config/deploy/relay-worker.wrangler.toml",
-        'ENCRYPTION_ENABLED = "false"',
-        'ENCRYPTION_ENABLED = "true"',
+      r.edit("forum-config/deploy/relay-worker.wrangler.toml", (t) =>
+        t.replace(/^ENCRYPTION_ENABLED = "(true|false)"$/m, (_, v) =>
+          `ENCRYPTION_ENABLED = "${v === "true" ? "false" : "true"}"`),
       );
     });
     expectDrift(root, "encryption-enabled");
