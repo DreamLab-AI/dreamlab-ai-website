@@ -44,6 +44,7 @@ const MIRROR_BEARING_KEYS = new Set([
   "POD_BASE_URL",
   "RELAY_URL",
   "JARVIS_PUBKEY",
+  "ENCRYPTION_ENABLED",
 ]);
 
 const readText = (root, rel) => {
@@ -91,6 +92,7 @@ function tomlZones(toml) {
       "accent_hex",
       "section_order",
       "kanban",
+      "agent_keys",
     ]) {
       if (z[key] !== undefined) out[key] = z[key];
     }
@@ -253,6 +255,35 @@ export function checkConfigMirrors(root) {
     }
   });
   compare("zone-model", "Four-zone access model projected to client + relay + auth", zoneSites);
+
+  // 4b. Zone E2EE master gate (ADR-2016) - authored bool vs the relay var and the
+  //     client __ENV__ string. Only the exact string "true" enables it anywhere.
+  const gateToml = toml.encryption?.enabled;
+  compare("encryption-enabled", "Zone end-to-end encryption master gate", [
+    {
+      where: `${TOML_PATH} [encryption].enabled`,
+      value: typeof gateToml === "boolean" ? String(gateToml) : null,
+    },
+    {
+      where: `${DEPLOY_PATH} env.ENCRYPTION_ENABLED`,
+      value: deployEnv.get("ENCRYPTION_ENABLED") ?? null,
+    },
+    {
+      where: `${WRANGLER.relay} [vars].ENCRYPTION_ENABLED`,
+      value: wrangler.relay?.doc.vars?.ENCRYPTION_ENABLED ?? null,
+    },
+  ]);
+  for (const [label, needle] of [
+    ["forum", "window.__ENV__={BBS_PWA_ENABLED:\"true\",BRAND_LABEL"],
+    ["BBS", "window.__ENV__={BBS_PWA_ENABLED:\"true\",THEME"],
+  ]) {
+    const line = deployText.split("\n").find((l) => l.includes(needle));
+    if (!line || !line.includes('ENCRYPTION_ENABLED:"\'"$ENCRYPTION_ENABLED"\'"')) {
+      errors.push(
+        `encryption-enabled: ${DEPLOY_PATH} ${label} __ENV__ does not project ENCRYPTION_ENABLED`,
+      );
+    }
+  }
 
   // 5. Service endpoints - authored TOML vs the client build variables and the
   //    worker-side base URLs that must address the same deployment.

@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-26 — kit pin 3a7f329: end-to-end encrypted zones, shipped switched off (nostr-bbs-core/mesh 1.0.0-beta.11, unchanged)
+
+- `KIT_REF` moved from `87c580c` to forum `3a7f329` (kit ADR-2016).
+- **Encrypted zones.** Each encrypted zone gets a key. Admins give it to members as a gift-wrapped DM, and replace it with a new key when someone leaves. Channel messages in that zone are NIP-44 encrypted to the key, and the relay refuses plaintext posts into encrypted channels that are bound to a zone. Only the text of each message is encrypted: who posted, when, and replies stay visible. Public zones can never be encrypted.
+- **Off for now.** `[encryption].enabled = false` in `dreamlab.toml`, and it's mirrored as `ENCRYPTION_ENABLED = "false"` in the relay's `[vars]` and in the forum and BBS `window.__ENV__`. The config-mirror check now covers all three. With the switch off, nothing changes for members.
+- **Zones staged for encryption:** zone2, zone3 and zone4. zone4 has `agent_keys = true`, so JunkieJarvis can hold its key.
+- Needs both `deploy.yml` (client) and `workers-deploy.yml` (relay). No D1 migration or secret.
+
 ## 2026-09-25 — kit pin 87c580c: user cards, identity links, thread landing, search deep links (nostr-bbs-core/mesh 1.0.0-beta.11, unchanged)
 
 - `KIT_REF` moved from `c3f147f` to forum `87c580c`.

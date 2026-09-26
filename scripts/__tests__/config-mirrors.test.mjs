@@ -100,6 +100,7 @@ describe("the live repository", () => {
         "zone-model",
         "relay-url",
         "pod-base-url",
+        "encryption-enabled",
       ]),
     );
   });
@@ -108,6 +109,12 @@ describe("the live repository", () => {
     const zones = result.mirrors.find((m) => m.id === "zone-model");
     expect(zones.sites).toHaveLength(4);
     expect(zones.agreed).toBe(true);
+  });
+
+  it("compares the encryption gate across TOML, deploy env and relay var", () => {
+    const gate = result.mirrors.find((m) => m.id === "encryption-enabled");
+    expect(gate.sites).toHaveLength(3);
+    expect(gate.agreed).toBe(true);
   });
 
   it("records the auth-worker admin secret as enumerated but unverifiable", () => {
@@ -231,5 +238,32 @@ describe("a rotation that misses a mirror is rejected", () => {
   it("rejects removal of the auth-worker secret push path", () => {
     const root = makeFixtureRepo((r) => r.remove(".github/workflows/set-worker-secrets.yml"));
     expectDrift(root, "has no push path");
+  });
+});
+
+describe("the encryption gate cannot be switched on in one place only", () => {
+  it("catches the TOML enabled without the relay var", () => {
+    const root = makeFixtureRepo((r) => {
+      r.replaceOnce("forum-config/dreamlab.toml", "enabled = false", "enabled = true");
+    });
+    expectDrift(root, "encryption-enabled");
+  });
+
+  it("catches a relay var enabled without the client gate", () => {
+    const root = makeFixtureRepo((r) => {
+      r.replaceOnce(
+        "forum-config/deploy/relay-worker.wrangler.toml",
+        'ENCRYPTION_ENABLED = "false"',
+        'ENCRYPTION_ENABLED = "true"',
+      );
+    });
+    expectDrift(root, "encryption-enabled");
+  });
+
+  it("catches a zone's agent_keys drifting between TOML and relay", () => {
+    const root = makeFixtureRepo((r) => {
+      r.replaceOnce("forum-config/dreamlab.toml", "agent_keys        = true", "agent_keys        = false");
+    });
+    expectDrift(root, "zone-model");
   });
 });

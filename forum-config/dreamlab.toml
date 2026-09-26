@@ -30,6 +30,12 @@ ingress_policy  = "allowlist"
 # ─── Admin pubkey resolution ─────────────────────────────────────────────────
 # Static mode — admin pubkeys baked into config rather than resolved from D1.
 # Switch to mode = "d1" when the admins-table backfill ships.
+[encryption]
+# Zone E2EE master gate (ADR-2016). Off: no zone is encrypted whatever its flag;
+# keys already held still decrypt. Mirrors: relay ENCRYPTION_ENABLED var and
+# deploy.yml ENCRYPTION_ENABLED (window.__ENV__).
+enabled = false
+
 [admin]
 mode            = "static"
 static_pubkeys  = [
@@ -114,7 +120,7 @@ display_name      = "Minimoonoir"
 required_cohorts  = ["zone2", "minimoonoir"]
 visibility        = "locked"
 banner_image_url  = "/images/heroes/minimoonoir-hero.webp"
-encrypted         = false
+encrypted         = true
 accent_hex        = "#3b82f6"
 # Section-tile order: pin the primary "rants" section to the top of the zone
 # tile (the client honours this; other sections fall to alphabetical after it).
@@ -139,7 +145,8 @@ display_name      = "DreamLab"
 required_cohorts  = ["zone4", "dreamlab"]  # dual-accept id + legacy slug (see zone2)
 visibility        = "locked"
 banner_image_url  = "/images/heroes/business-hero.webp"
-encrypted         = false
+encrypted         = true
+agent_keys        = true   # JunkieJarvis holds the zone4 key (ADR-2016)
 accent_hex        = "#a855f7"
 kanban            = true   # per-zone collaborative task board (kinds 30301/30302)
 
