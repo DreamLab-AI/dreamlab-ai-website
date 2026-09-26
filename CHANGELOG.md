@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-09-26 — kit pin 49e70de: encrypted-zone fixes from the browser run, still switched off (nostr-bbs-core/mesh 1.0.0-beta.11, unchanged)
+
+- `KIT_REF` moved from `3a7f329` to forum `49e70de`. Encryption stays off (`ENCRYPTION_ENABLED = "false"`).
+- **Zone keys are kept.** A received key is now saved in the browser, and a grant is only marked handled once its key is stored, so a brief network failure can no longer lose it.
+- **Live events after idle.** When the relay woke from idle, members whose tabs had been open a while stopped receiving live events (key grants included). Fixed.
+- **CORS.** The relay now answers each allowed origin rather than always the first.
+- **Keys for new members.** Granting a zone key to members who are missing it can also send the earlier keys, so someone who joins after a rotation can read older messages. On by default in Admin › Encryption; untick it to send only the current key.
+- Found by a local browser run of the whole encryption flow. Needs `deploy.yml` and `workers-deploy.yml`; no D1 migration or secret.
+
 ## 2026-09-26 — kit pin 3a7f329: end-to-end encrypted zones, shipped switched off (nostr-bbs-core/mesh 1.0.0-beta.11, unchanged)
 
 - `KIT_REF` moved from `87c580c` to forum `3a7f329` (kit ADR-2016).

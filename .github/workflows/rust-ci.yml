@@ -18,7 +18,7 @@ env:
   # Pinned kit SHA — keep in lockstep with workers-deploy.yml/deploy.yml KIT_REF.
   # NOTE: tracks nostr-rust-forum v1.0.0-beta.9 (feature-parity release).
   # Cutover provenance: docs/architecture/kit-compatibility-record.md.
-  KIT_REF: '3a7f32900e6733ccd66ca19ff21a6ffc7885435d'
+  KIT_REF: '49e70de557b31d4c6d98fc1f3d0d15ce2623a4dc'
 
 jobs:
   fmt:
