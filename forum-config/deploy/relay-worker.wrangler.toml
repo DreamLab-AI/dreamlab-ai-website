@@ -13,7 +13,7 @@ command = "worker-build --release"
 [vars]
 # Zone E2EE master gate (ADR-2016). Only the exact string "true" enables it; mirrors
 # dreamlab.toml [encryption].enabled and window.__ENV__.ENCRYPTION_ENABLED in deploy.yml.
-ENCRYPTION_ENABLED = "false"
+ENCRYPTION_ENABLED = "true"
 RELAY_NAME       = "DreamLab Nostr Relay"
 ALLOWED_ORIGIN   = "https://dreamlab-ai.com"
 ALLOWED_ORIGINS  = "https://dreamlab-ai.com,https://thedreamlab.uk,https://dreamlab-ai.github.io"

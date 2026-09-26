@@ -34,7 +34,7 @@ ingress_policy  = "allowlist"
 # Zone E2EE master gate (ADR-2016). Off: no zone is encrypted whatever its flag;
 # keys already held still decrypt. Mirrors: relay ENCRYPTION_ENABLED var and
 # deploy.yml ENCRYPTION_ENABLED (window.__ENV__).
-enabled = false
+enabled = true
 
 [admin]
 mode            = "static"

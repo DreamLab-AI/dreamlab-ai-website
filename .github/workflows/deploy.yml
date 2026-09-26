@@ -77,7 +77,7 @@ env:
   # Zone (section) model for the forum client. Mirrors forum-config/dreamlab.toml
   # [[zones]] and the relay's ZONE_CONFIG [vars]. Injected into window.__ENV__ below.
   # Zone E2EE master gate (ADR-2016); mirrors dreamlab.toml [encryption].enabled.
-  ENCRYPTION_ENABLED: 'false'
+  ENCRYPTION_ENABLED: 'true'
   ZONE_CONFIG_JSON: '[{"id":"zone1","slug":"welcome","display_name":"Welcome","required_cohorts":[],"write_cohorts":["members","agent"],"banner_image_url":"/images/heroes/lake-district-dawn.webp","visibility":"public","encrypted":false,"accent_hex":"#22c55e"},{"id":"zone2","slug":"minimoonoir","display_name":"Minimoonoir","required_cohorts":["zone2","minimoonoir"],"banner_image_url":"/images/heroes/minimoonoir-hero.webp","visibility":"locked","encrypted":true,"accent_hex":"#3b82f6","section_order":["zone2-rants"]},{"id":"zone3","kanban":true,"slug":"family","display_name":"Family","required_cohorts":["zone3","family"],"banner_image_url":"/images/heroes/family-hero.webp","visibility":"locked","encrypted":true,"accent_hex":"#f59e0b"},{"id":"zone4","kanban":true,"slug":"dreamlab","display_name":"DreamLab","required_cohorts":["zone4","dreamlab"],"banner_image_url":"/images/heroes/business-hero.webp","visibility":"locked","encrypted":true,"accent_hex":"#a855f7","agent_keys":true}]'
   FORUM_BASE: '/community'
   # BBS branding — projection of forum-config/dreamlab.toml [branding] for the
