@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-27 — kit pin 2f437bc: sealed-original history migration, ADR-2017 (nostr-bbs-core/mesh 1.0.0-beta.11, unchanged)
+
+- `KIT_REF` moved from `dd97fce` to forum `2f437bc`. Relay and client; the workers rebuild from the same source.
+- **Old messages in encrypted zones can now be encrypted in place.** An admin runs the kit's `nostr-bbs-zone-migrate` tool, which re-publishes each plaintext message as an encrypted envelope containing the original signed message, checks every envelope reads back correctly, and only then deletes the plaintext. Members see the same messages, from the same people, at the same times, with replies and reactions intact; the relay, Cloudflare and backups taken afterwards see only ciphertext.
+- **Relay:** sealed envelopes are accepted only from admins and only into encrypted zones, and keep their original timestamps. New admin endpoint `POST /api/admin/events/delete` (NIP-98) deletes events without a public deletion notice, so restored messages are never hidden by their own tombstone. Audited.
+- **Forum client:** restores sealed originals in place, dedupes against any cached plaintext copy, and still honours the author's own deletions. The retro BBS client shows a placeholder.
+- Needs `deploy.yml` and `workers-deploy.yml`; no D1 migration or secret. Nothing changes for members until the operator runs the migration.
+
 ## 2026-09-27 — kit pin dd97fce: grant record fix and PWA updates on resume (nostr-bbs-core/mesh 1.0.0-beta.11, unchanged)
 
 - `KIT_REF` moved from `49e70de` to forum `dd97fce`. Client-only; the workers rebuild from the same source.
