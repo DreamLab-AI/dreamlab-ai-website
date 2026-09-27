@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-27 — kit pin dd97fce: grant record fix and PWA updates on resume (nostr-bbs-core/mesh 1.0.0-beta.11, unchanged)
+
+- `KIT_REF` moved from `49e70de` to forum `dd97fce`. Client-only; the workers rebuild from the same source.
+- **Admin › Encryption shows the right people as missing.** When a batch of grants was accepted at once, the panel's record of who had been granted lost a random few, so members who had the key (RedDread, Ben and others) kept showing as missing. Every accepted grant is now kept.
+- **Installed apps update when reopened.** A phone resumes the forum app instead of relaunching it, so it could run an old build for days. The app now checks for a new version whenever it comes back on screen and reloads once onto it.
+- Needs `deploy.yml`; no D1 migration or secret.
+
 ## 2026-09-26 — kit pin 49e70de: encrypted-zone fixes from the browser run, still switched off (nostr-bbs-core/mesh 1.0.0-beta.11, unchanged)
 
 - `KIT_REF` moved from `3a7f329` to forum `49e70de`. Encryption stays off (`ENCRYPTION_ENABLED = "false"`).
