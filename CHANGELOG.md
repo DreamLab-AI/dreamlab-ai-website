@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-28 — kit pin 36d3850: fresh roster before grant/rotate (nostr-bbs-core/mesh 1.0.0-beta.11, unchanged)
+
+- `KIT_REF` moved from `2f437bc` to forum `36d3850`. Client only; the workers rebuild from the same source unchanged.
+- **Admin › Encryption re-reads the whitelist right before "Grant to members missing it" and "Rotate key".** The panel used the roster loaded when the tab opened; in production a tab left open across a cohort change rotated the Minimoonoir and Family keys to the house key after it had been re-marked `agent`. Now the buttons refresh first and refuse if the refresh fails.
+- Needs `deploy.yml` only; no D1 migration or secret.
+
 ## 2026-09-28 — encrypted-zone history migration run (no pin change)
 
 - All 430 pre-encryption messages in zones 2–4 are now sealed originals: zone4 236, zone2 + zone3 194; every envelope verified by the migrator and by an independent reader before the plaintext was purged. Logged-out readers get nothing from those channels; D1 holds no plaintext kind-42 in private zones. Backups from before 2026-09-28 (and `dreamlab-forum-prepurge/2026-09-27`) still contain plaintext.
