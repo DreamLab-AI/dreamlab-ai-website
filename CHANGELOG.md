@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-09-28 — encrypted-zone history migration run (no pin change)
+
+- All 430 pre-encryption messages in zones 2–4 are now sealed originals: zone4 236, zone2 + zone3 194; every envelope verified by the migrator and by an independent reader before the plaintext was purged. Logged-out readers get nothing from those channels; D1 holds no plaintext kind-42 in private zones. Backups from before 2026-09-28 (and `dreamlab-forum-prepurge/2026-09-27`) still contain plaintext.
+- The house admin key ran the migration and keeps its zone2/zone3 epoch-1 grants; see the kit runbook (`docs/security/encrypted-zone-history-migration.md`) on why rotation alone does not revoke that.
+
 ## 2026-09-27 — kit pin 2f437bc: sealed-original history migration, ADR-2017 (nostr-bbs-core/mesh 1.0.0-beta.11, unchanged)
 
 - `KIT_REF` moved from `dd97fce` to forum `2f437bc`. Relay and client; the workers rebuild from the same source.
