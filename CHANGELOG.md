@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-29 — kit pin 7def3e4: relay read cost no longer scales with delivered events (nostr-bbs-core/mesh 1.0.0-beta.11, unchanged)
+
+- `KIT_REF` moved from `36d3850` to forum `7def3e4`. Relay worker only; the client rebuilds from the same source unchanged.
+- **Why:** the relay database read 3.3–3.6 M rows a day with no humans present and 5.2 M on 28 Sep, against D1's 5 M free-tier cap, after which D1 returned error 7500 and the forum served nothing to anyone until midnight UTC. The relay ran two D1 queries per delivered channel event and wrote the trust ledger on every REQ.
+- **What changed (ADR-2018):** the Durable Object memoises channel → zone, viewer cohorts and device owner for 60 s, decides zone membership from the cached cohorts, and flushes `posts_read` / `last_active_at` / promotion once per pubkey per five minutes. Cohort and zone changes now take up to a minute to apply on reads.
+- Needs `workers-deploy.yml` only; no D1 migration or secret. The nightly backup was not a factor (the export API does not count as row reads) and stays nightly.
+
 ## 2026-09-28 — kit pin 36d3850: fresh roster before grant/rotate (nostr-bbs-core/mesh 1.0.0-beta.11, unchanged)
 
 - `KIT_REF` moved from `2f437bc` to forum `36d3850`. Client only; the workers rebuild from the same source unchanged.
