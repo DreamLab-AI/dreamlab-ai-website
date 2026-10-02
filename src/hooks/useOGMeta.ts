@@ -20,20 +20,12 @@ import { updateOGMetaTags, OGMetaConfig } from '@/lib/og-meta';
  * ```
  */
 export function useOGMeta(config: Partial<OGMetaConfig>): void {
+  // Callers pass inline object literals, so the effect keys on the serialised
+  // config: it re-runs when any field changes, not on every render.
+  const serialised = JSON.stringify(config);
   useEffect(() => {
-    updateOGMetaTags(config);
-
-    // Cleanup: restore original title on unmount (optional)
-    return () => {
-      // Could restore original meta tags here if needed
-    };
-  }, [
-    config.title,
-    config.description,
-    config.url,
-    config.image,
-    config.type,
-  ]);
+    updateOGMetaTags(JSON.parse(serialised) as Partial<OGMetaConfig>);
+  }, [serialised]);
 }
 
 export default useOGMeta;
