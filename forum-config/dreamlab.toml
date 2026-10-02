@@ -191,6 +191,7 @@ marketplace  = true
 calendar     = true
 dms          = true
 governance   = true
+poker        = true   # poker tables; parameters in [poker] below
 
 # ─── Key provisioning (JSS Phase 1) ─────────────────────────────────────────
 # DreamLab's CF tier provisions the Solid pod itself through the Worker-native
@@ -293,6 +294,20 @@ ticker = "DREAM"
 rate   = 10       # 10 DREAM per sat
 supply = 1000000  # 1M total supply
 issuer = ""       # operator sets via DREAMLAB_TOKEN_ISSUER env-override
+
+# ─── Poker tables ────────────────────────────────────────────────────────────
+# Stakes and buy-in in BIG BLINDS, so one table list serves both assets.
+# `citizen_pubkey` (the house agent, 64-char lowercase hex) is omitted until
+# provisioned; the client then reads it as null.
+# HAND-SYNCED MIRROR (ADR-2005): deploy.yml POKER_CONFIG_JSON carries this block
+# as JSON for window.__ENV__.POKER_CONFIG — edit both together. The pinned
+# nostr-bbs-config (beta.11) predates `[poker]` / `features.poker` and ignores
+# them (the schema is not deny_unknown_fields); the next kit pin types them.
+[poker]
+stakes_bb   = [2, 10, 20, 100, 200]
+buyin_bb    = 100
+assets      = ["sats", "dream"]
+bot_profile = "tag"
 
 # ─── Registered agents ───────────────────────────────────────────────────────
 # Agent roster for relay whitelist seeding and documentation.

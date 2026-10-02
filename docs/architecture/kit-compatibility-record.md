@@ -27,7 +27,7 @@ its own `pin-check` extension.
 
 <!-- pin-check:canonical-kit-sha -->
 ```
-CANONICAL_KIT_SHA=7a40fcf6c98f84a085c7d6b7ba726201743d74d6
+CANONICAL_KIT_SHA=457cb8e39032f02f6864886cdf6ca7517f18f693
 CANONICAL_KIT_VERSION=1.0.0-beta.11
 ```
 
