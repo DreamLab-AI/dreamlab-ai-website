@@ -12,7 +12,10 @@ use nostr_bbs_config::schema::Branding;
 pub fn dreamlab_branding() -> Branding {
     Branding {
         theme: Some("amber".into()),
-        logo_url: Some("https://dreamlab-ai.com/assets/logo.svg".into()),
+        // dreamlab.toml [branding].logo_url is empty: no SVG logo exists yet
+        // (that file's comment records /assets/logo.svg as a 404). Do not
+        // point the overlay at a dead asset.
+        logo_url: None,
         welcome_copy: Some(
             "Welcome to the DreamLab AI Community Forum — \
              a private space for trainers, builders, and the curious."
@@ -20,7 +23,10 @@ pub fn dreamlab_branding() -> Branding {
         ),
         // Retro ASCII/BBS interface branding (nostr-bbs-bbs-client status bar).
         // Mirrors the BBS_* env projected into window.__ENV__ by deploy.yml.
-        node_name: Some("DREAMLAB BBS".into()),
+        // dreamlab.toml [branding].node_name ("MINIMOONOIR") is the authored
+        // source of truth (src/lib.rs item 3); a self-declared mirror must
+        // not diverge from the value it claims to mirror.
+        node_name: Some("MINIMOONOIR".into()),
         location: Some("Lake District, UK".into()),
         banner_url: None,
     }
@@ -44,6 +50,17 @@ mod tests {
     fn dreamlab_branding_theme_is_amber() {
         let b = dreamlab_branding();
         assert_eq!(b.theme.as_deref(), Some("amber"));
+    }
+
+    #[test]
+    fn dreamlab_branding_matches_authored_toml() {
+        // forum-config/dreamlab.toml [branding] is the authored source of
+        // truth (src/lib.rs item 3). Guard the 2026-10-02 drift fix so the
+        // programmatic overlay cannot silently contradict it again.
+        let b = dreamlab_branding();
+        assert_eq!(b.node_name.as_deref(), Some("MINIMOONOIR"));
+        assert_eq!(b.logo_url, None); // no SVG logo exists yet
+        assert_eq!(b.location.as_deref(), Some("Lake District, UK"));
     }
 
     #[test]
