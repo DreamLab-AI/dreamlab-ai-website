@@ -30,3 +30,14 @@
 | 2026-09-07 | operator-handoff | 09-07 gate was green on parent f3ee5405: 201/201, 0e/10w, PIN-PARITY-OK | NONE | NONE | n/a | OPERATOR |  | operator | 2026-09-07 |
 | 2026-09-07 | operator-handoff | No 09-03 or 09-04 draft branches or PRs ever existed; phantom-PR thread shut | NONE | NONE | n/a | OPERATOR |  | operator | 2026-09-03, 2026-09-04 |
 | 2026-09-07 | operator-handoff | React Router v7 future flags landed by operator from the 09-05 finding | NONE | NONE | n/a | OPERATOR |  | operator | 2026-09-05 |
+| 2026-09-09 | site-build-content | VETOED: Bench test now guards prebuild↔generate-*.mjs parity + non-empty src/dat | NONE | VETOED | yes | REJECT |  | 6cee8ae3737b |  |
+| 2026-09-10 | operator-overlay | Given the parent at `9a3dd883` shows 10 static lint warnings, of which 6 are `re | NONE | NONE | yes | INCONCLUSIVE |  | af1cdf448646 |  |
+| 2026-09-11 | ci-workflows | No tree (2nd night): lint carry-over unexecutable; kit repin b9->b10 unledgered | NONE | NONE | yes | INCONCLUSIVE |  | 14f572f938b8 |  |
+| 2026-09-12 | kit-pin-integrity | Kit pins verified clean at 1.0.0-beta.10; b10 repin stable`. | NONE | NONE | yes | INCONCLUSIVE |  | b2a3ba05b10c |  |
+| 2026-09-13 | site-build-content | Lint-refactor unexecutable 3rd night; capture lacks source text, not tree | NONE | NONE | yes | INCONCLUSIVE |  | c67abc8deaa1 |  |
+| 2026-09-27 | ci-workflows | Given the pin-parity receipt verifies the kit crates resolve at 1.0.0-beta.11 ag | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/50 | yes | ACCEPT |  | 71beb121e36c |  |  |  |
+| 2026-09-28 | kit-pin-integrity | VETOED: Given the shipped manifest comment in `forum-config/Cargo.toml` restates | NONE | NONE | yes | INCONCLUSIVE |  | 2e776f0b4d24 |  |  |  |
+| 2026-09-29 | site-build-content | VETOED: Given tonight's pin-parity receipt verifies all four kit crates pinned a | NONE | VETOED | yes | REJECT |  | 0c593404d42e |  |  |  |
+| 2026-09-30 | operator-overlay | Given the uncertainty of the schema, and the fact that the required evaluators d | NONE | NONE | yes | INCONCLUSIVE |  | 5b96ed1de3b7 |  |  |  |
+| 2026-10-01 | site-build-content | VETOED: Given `fetchMarkdown` (src/lib/markdown.ts:40-49) never inspects `respon | NONE | NONE | yes | BLOCKED-ENV |  | a0868fbbcbc1 |  |  |  |
+| 2026-10-02 | operator-overlay | Given `forum-config/dreamlab.toml [branding]` (the authored source of truth per  | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/51 | yes | ACCEPT |  | 90134885d896 |  |  |  |
