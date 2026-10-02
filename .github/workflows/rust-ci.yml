@@ -16,7 +16,7 @@ env:
   RUST_TOOLCHAIN: '1.90.0'
   KIT_REPO: 'https://github.com/DreamLab-AI/nostr-rust-forum.git'
   # Pinned kit SHA — keep in lockstep with workers-deploy.yml/deploy.yml KIT_REF.
-  # NOTE: tracks nostr-rust-forum v1.0.0-beta.9 (feature-parity release).
+  # NOTE: the kit crates resolve at nostr-rust-forum v1.0.0-beta.11.
   # Cutover provenance: docs/architecture/kit-compatibility-record.md.
   KIT_REF: '7def3e4e74e92fdf2f29416ce08ae6dadc878c8d'
 

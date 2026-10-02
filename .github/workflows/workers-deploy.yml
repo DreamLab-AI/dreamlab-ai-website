@@ -33,14 +33,15 @@ env:
   WRANGLER_VERSION: '3.114.17'
   CF_SUBDOMAIN: 'solitary-paper-764d'
   KIT_REPO: 'https://github.com/DreamLab-AI/nostr-rust-forum.git'
-  # Pinned to the exact commit resolved in forum-config/Cargo.lock (nostr-bbs-* rc11).
+  # Pinned to the exact commit resolved in forum-config/Cargo.lock.
   # Do NOT float on `main`: a breaking upstream push would silently ship untested
   # worker code while the lockfile stays at this tested revision. Keep this SHA in
   # sync with the `rev = "..."` in forum-config/Cargo.lock when bumping the kit.
-  # NOTE: tracks nostr-rust-forum v1.0.0-beta.9 (NIP-98 query-string verification
-  # fix across the workers, nip44 error mapping, pod ACL owner-control invariant;
-  # a754468 event_tags indexed tag lookups — D1 free-tier fix).
-  # Cutover provenance: docs/architecture/kit-compatibility-record.md.
+  # NOTE: the kit crates resolve at nostr-rust-forum v1.0.0-beta.11; cutover
+  # provenance (release notes, crate versions, registry checksums) lives in
+  # docs/architecture/kit-compatibility-record.md, which pin-parity verifies
+  # against this exact SHA. Do not restate release notes here: they went stale
+  # (beta.9 / rc11) across the beta.10 and beta.11 repins.
   KIT_REF: '7def3e4e74e92fdf2f29416ce08ae6dadc878c8d'
 
 jobs:
