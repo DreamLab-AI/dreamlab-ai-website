@@ -70,7 +70,7 @@ function listen(url, authed) {
     if (d[0] === 'EVENT') {
       try {
         const r = unwrapEvent(d[2], sk);
-        if (process.env.LOG_ALL === '1') log(`UNWRAP OK via ${url} from ${r.pubkey.slice(0, 8)} kind ${r.kind} (rumor ${new Date(r.created_at * 1000).toISOString().slice(11, 19)}): ${JSON.stringify(String(r.content).slice(0, 80))}`);
+        if (process.env.LOG_ALL === '1') log(`UNWRAP OK via ${url} from ${r.pubkey.slice(0, 8)} kind ${r.kind} id ${r.id ? String(r.id).slice(0, 8) : 'NONE'} (rumor ${new Date(r.created_at * 1000).toISOString().slice(11, 19)}, wrap ${new Date(d[2].created_at * 1000).toISOString().slice(5, 16)}): ${JSON.stringify(String(r.content).slice(0, 70))}`);
         if (r.pubkey === JARVIS) { log(`REPLY via ${url} (rumor ${new Date(r.created_at * 1000).toISOString().slice(11, 19)}): ${JSON.stringify(r.content.slice(0, 120))}`); setTimeout(() => finish(0), 8000); }
       } catch (e) { if (process.env.LOG_ALL === '1') log(`UNWRAP FAILED via ${url} wrap ${String(d[2] && d[2].id).slice(0, 8)} outer ${new Date((d[2] && d[2].created_at) * 1000).toISOString().slice(0, 16)}: ${e && e.message}`); }
     }
