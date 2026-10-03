@@ -86,7 +86,7 @@ env:
   # ZONE_CONFIG_JSON below) in the exact shape of the kit's Poker::to_env_json —
   # edit both together. Injected unquoted as window.__ENV__.POKER_CONFIG below.
   POKER: 'on'
-  POKER_CONFIG_JSON: '{"stakes_bb":[2,10,20,100,200],"buyin_bb":100,"assets":["sats","dream"],"bot_profile":"tag","citizen_pubkey":"d4bda43addb1419ad2930401322403c774bc30a141a6eb8fdba0314ee4086df9","citizens":{"sidestr:dreamlab":"d4bda43addb1419ad2930401322403c774bc30a141a6eb8fdba0314ee4086df9","sidestr:dreamlab-txbt4":"bc86ce5f26997fa57d8cadae14fc438082ab01375eae8c02a21fc4d8a7c2a17f"}}'
+  POKER_CONFIG_JSON: '{"stakes_bb":[2,10,20,100,200],"buyin_bb":100,"assets":["sats","dream"],"bot_profile":"tag","citizen_pubkey":"d4bda43addb1419ad2930401322403c774bc30a141a6eb8fdba0314ee4086df9","citizens":{"sidestr:dreamlab":"d4bda43addb1419ad2930401322403c774bc30a141a6eb8fdba0314ee4086df9","sidestr:dreamlab-txbt4":"bc86ce5f26997fa57d8cadae14fc438082ab01375eae8c02a21fc4d8a7c2a17f"},"coach_pubkey":"2de44d5622eef79519ac078f6e227a85aecbaefd561e4e50c5f51dfadbf916e9"}'
   # Zone (section) model for the forum client. Mirrors forum-config/dreamlab.toml
   # [[zones]] and the relay's ZONE_CONFIG [vars]. Injected into window.__ENV__ below.
   # Zone E2EE master gate (ADR-2016); mirrors dreamlab.toml [encryption].enabled.
@@ -115,7 +115,7 @@ env:
   # docs/architecture/kit-compatibility-record.md, which pin-parity verifies
   # against this exact SHA. Do not restate release notes here: they went stale
   # (beta.9 / rc11) across the beta.10 and beta.11 repins.
-  KIT_REF: 'fb23bf3cf6cde06afa7f2774c966f8fb317a1e96'
+  KIT_REF: '7f7d3c9459d9126209fb7637174e1475d9a65d0e'
 
 jobs:
   gate:

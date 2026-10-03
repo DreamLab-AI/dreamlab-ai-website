@@ -313,6 +313,8 @@ assets         = ["sats", "dream"]
 bot_profile    = "tag"
 citizen_pubkey = "d4bda43addb1419ad2930401322403c774bc30a141a6eb8fdba0314ee4086df9"
 # One house seat per sidestr chain (kit ADR-2021). `citizen_pubkey` above is
+# Practice-table coach (kit coach.rs): the agent the client DMs for advice.
+coach_pubkey   = "2de44d5622eef79519ac078f6e227a85aecbaefd561e4e50c5f51dfadbf916e9"  # junkiejarvis — [[agents]]
 # the sidestr:dreamlab seat; `citizens` names every chain's seat explicitly.
 # Mirror any change into deploy.yml POKER_CONFIG_JSON.
 citizens       = { "sidestr:dreamlab" = "d4bda43addb1419ad2930401322403c774bc30a141a6eb8fdba0314ee4086df9", "sidestr:dreamlab-txbt4" = "bc86ce5f26997fa57d8cadae14fc438082ab01375eae8c02a21fc4d8a7c2a17f" }
