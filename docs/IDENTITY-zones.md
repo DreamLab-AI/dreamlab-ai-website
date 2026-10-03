@@ -94,6 +94,19 @@ atomic change that includes the auth-worker `ADMIN_PUBKEYS` Cloudflare secret,
 which cannot be rotated from this repo or CI, so it is deliberately held
 (`dreamlab.toml:36-56` comment; legacy ADR-040 D3).
 
+### Poker table ↔ house seat (`poker-citizen`)
+
+The poker table's house seat (ADR-2009; kit ADR-2020) is the registered agent
+`poker-citizen` (`dreamlab.toml` `[[agents]]`, pubkey `d4bda43a…86df9`, cohorts
+`dreamlab` + `agent`), a `nostr-bbs-poker-citizen` service in the agentbox
+holding its own key. Members' browsers and the house exchange NIP-59 gift
+wraps whose rumor kind is 20779 (not 14), so DM inboxes never show a hand; the
+relay admits them because the house is whitelisted. Every settled hand is one
+DREAM transfer on `sidestr:dreamlab` carrying `hand:<root>`; the forum keeps no
+ledger (kit ADR-2012). Scheduled games are kind-31923 calendar events tagged
+`poker` with invited players as `p` participants, created by admins or
+moderators like any calendar event, plus a NIP-17 DM per invitee.
+
 ### Website → agent DM routing (`junkiejarvis`)
 
 The marketing "Talk to AI" FAB routes over Nostr, not an HTTP chat endpoint. The

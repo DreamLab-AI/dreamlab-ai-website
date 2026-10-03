@@ -51,6 +51,13 @@ despite the README's "two SPAs" framing:
 | `/community/` | Rust/Leptos 0.7 CSR-WASM forum client (Trunk) | kit crate `nostr-bbs-forum-client` | `deploy.yml:204` "Build Leptos forum with Trunk" |
 | `/community/bbs/` | Retro ASCII/BBS terminal client (Trunk) | kit crate `nostr-bbs-bbs-client` | `deploy.yml:295` "Build retro ASCII/BBS client with Trunk" |
 
+The forum client also carries the **poker table** at `/community/table`
+(ADR-2009; kit ADR-2020): a practice table in the browser and, because
+`forum-config/dreamlab.toml` `[poker].citizen_pubkey` names a house seat, a
+DREAM table whose hands are dealt by the `nostr-bbs-poker-citizen` service in
+the agentbox and settled on `sidestr:dreamlab`. The house service is built
+from the same `KIT_REF` as the client; moving the pin moves both.
+
 All three are static assets after build. React receives Vite build variables;
 the forum and BBS receive `window.__ENV__` runtime-config blocks injected by
 `sed` at deploy time

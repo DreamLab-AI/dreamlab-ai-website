@@ -24,7 +24,7 @@ corpus 013–044, frozen precisely because it drifted from the code).
 governing document **in the same change**, and regenerate this index
 (`node scripts/adr-index-gen.cjs docs/adr` — it fails CI on invalid frontmatter).
 
-_8 record(s). Regenerate with_ `node scripts/adr-index-gen.cjs docs/adr`.
+_9 record(s). Regenerate with_ `node scripts/adr-index-gen.cjs docs/adr`.
 
 | ID | Title | Date | Decision | Impl | Activation | Supersedes | Superseded by | Owner | Repo |
 |----|-------|------|----------|------|------------|------------|---------------|-------|------|
@@ -36,3 +36,4 @@ _8 record(s). Regenerate with_ `node scripts/adr-index-gen.cjs docs/adr`.
 | [ADR-2006](ADR-2006-raw-schnorr-nip42-identity.md) | Identify principals by raw-hex Schnorr pubkey over NIP-42; defer DID/Multikey to the kit | 2026-08-31 | accepted | complete | live | — | — | jjohare | dreamlab-ai-website |
 | [ADR-2007](ADR-2007-four-zone-dual-accept-cohorts.md) | Gate access with four zones on dual-accept cohorts and a single encrypted zone | 2026-08-31 | accepted | complete | live | — | — | jjohare | dreamlab-ai-website |
 | [ADR-2008](ADR-2008-talk-to-ai-nostr-dm-routing.md) | Route Talk-to-AI over Nostr gift-wrap and read replies from open relays | 2026-08-31 | accepted | complete | live | — | — | jjohare | dreamlab-ai-website |
+| [ADR-2009](ADR-2009-dream-poker-table-house-seat.md) | Run the poker table's house seat as a DreamLab agent, settle hands in DREAM on sidestr:dreamlab, and schedule games on the calendar | 2026-10-03 | accepted | complete | live | — | — | jjohare | dreamlab-ai-website |

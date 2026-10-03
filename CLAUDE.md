@@ -165,6 +165,12 @@ is configured entirely via `forum-config/dreamlab.toml` `[branding]`
 route in this overlay. (A React prototype previously lived at `/bbs`; it was removed
 in favour of the upstream Rust port — see `docs/sprint/bbs-rust-port-spec.md`.)
 
+The forum's poker table is at `/community/table` (kit crate, not a React
+route): a practice table, and a DREAM table dealt by the `poker-citizen` house
+seat running in the agentbox (`forum-config/dreamlab.toml` `[poker]`, mirrored
+into `deploy.yml` `POKER_CONFIG_JSON`; ADR-2009). Game times are calendar
+events tagged `poker`, scheduled from the table by admins/moderators.
+
 Keep `public/sitemap.xml` in sync with this table when routes change.
 
 ## Path Aliases

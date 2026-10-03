@@ -1,5 +1,13 @@
 # LibrePoker in the DreamLab forum — scope
 
+> **2026-10-03 update.** Rail 2 (the home table on `sidestr:dreamlab`, DREAM)
+> is built and live: kit ADR-2020 (`nostr-bbs-poker`, `nostr-bbs-poker-citizen`)
+> and website ADR-2009 (the `poker-citizen` agent, its funding, the pins). It
+> goes further than §5.2's v1b: the house deals hands between two members too,
+> and games are scheduled on the calendar with DM invitations. Rail 1 (txbt4
+> through LibrePoker's teller) and the LibrePoker document federation (§5.5)
+> remain open.
+
 **Status:** scoped and **decided by the owner on 2026-10-02**: build in the
 kit; the money rail is **BLAKE2b testnet4 (txbt4) read from the Dell node,
 held and spent by the existing forum wallet**; `sidestr:dreamlab` sats/DREAM
