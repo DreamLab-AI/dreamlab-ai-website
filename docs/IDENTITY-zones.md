@@ -103,7 +103,10 @@ holding its own key. Members' browsers and the house exchange NIP-59 gift
 wraps whose rumor kind is 20779 (not 14), so DM inboxes never show a hand; the
 relay admits them because the house is whitelisted. Every settled hand is one
 DREAM transfer on `sidestr:dreamlab` carrying `hand:<root>`; the forum keeps no
-ledger (kit ADR-2012). Scheduled games are kind-31923 calendar events tagged
+ledger (kit ADR-2012). A second seat, `poker-citizen-blakes7` (pubkey
+`bc86ce5f…2a17f`, same cohorts), deals the BLAKES7 table and settles on
+`sidestr:dreamlab-txbt4`; `[poker].citizens` maps each chain to its seat
+(kit ADR-2021). Scheduled games are kind-31923 calendar events tagged
 `poker` with invited players as `p` participants, created by admins or
 moderators like any calendar event, plus a NIP-17 DM per invitee.
 

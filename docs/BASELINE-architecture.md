@@ -55,8 +55,15 @@ The forum client also carries the **poker table** at `/community/table`
 (ADR-2009; kit ADR-2020): a practice table in the browser and, because
 `forum-config/dreamlab.toml` `[poker].citizen_pubkey` names a house seat, a
 DREAM table whose hands are dealt by the `nostr-bbs-poker-citizen` service in
-the agentbox and settled on `sidestr:dreamlab`. The house service is built
-from the same `KIT_REF` as the client; moving the pin moves both.
+the agentbox and settled on `sidestr:dreamlab`. Since kit ADR-2021 the forum
+offers two sidestr chains at once: `deploy.yml` `SIDESTR_CHAINS_JSON` lists
+`sidestr:dreamlab` (DREAM, parent testnet4) and `sidestr:dreamlab-txbt4`
+(BLAKES7, parent BLAKE2b testnet4 fork, mirror
+`dreamlab-ai.github.io/sidestr-dreamlab-txbt4`); the wallet has a chain
+switcher, tips may be paid in either asset, and `[poker].citizens` names one
+house seat per chain, each a separate `nostr-bbs-poker-citizen` instance
+(`--chain-id`). The house service is built from the same `KIT_REF` as the
+client; moving the pin moves both.
 
 All three are static assets after build. React receives Vite build variables;
 the forum and BBS receive `window.__ENV__` runtime-config blocks injected by

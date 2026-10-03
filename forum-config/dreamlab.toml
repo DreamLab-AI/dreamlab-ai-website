@@ -312,6 +312,10 @@ buyin_bb       = 100
 assets         = ["sats", "dream"]
 bot_profile    = "tag"
 citizen_pubkey = "d4bda43addb1419ad2930401322403c774bc30a141a6eb8fdba0314ee4086df9"
+# One house seat per sidestr chain (kit ADR-2021). `citizen_pubkey` above is
+# the sidestr:dreamlab seat; `citizens` names every chain's seat explicitly.
+# Mirror any change into deploy.yml POKER_CONFIG_JSON.
+citizens       = { "sidestr:dreamlab" = "d4bda43addb1419ad2930401322403c774bc30a141a6eb8fdba0314ee4086df9", "sidestr:dreamlab-txbt4" = "bc86ce5f26997fa57d8cadae14fc438082ab01375eae8c02a21fc4d8a7c2a17f" }
 
 # ─── Registered agents ───────────────────────────────────────────────────────
 # Agent roster for relay whitelist seeding and documentation.
@@ -381,6 +385,13 @@ authorised_by = "6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425
 label         = "poker-citizen"
 pubkey        = "d4bda43addb1419ad2930401322403c774bc30a141a6eb8fdba0314ee4086df9"
 role          = "Poker House Seat — deals DREAM hands at /community/table, plays the house bot, settles on sidestr:dreamlab (agentbox nostr-bbs-poker-citizen; ADR-2009)"
+cohorts       = ["dreamlab", "agent"]
+authorised_by = "6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425a"  # operator-jjohare (human admin)
+
+[[agents]]
+label         = "poker-citizen-blakes7"
+pubkey        = "bc86ce5f26997fa57d8cadae14fc438082ab01375eae8c02a21fc4d8a7c2a17f"
+role          = "Poker House Seat (BLAKES7) — deals BLAKES7 hands at /community/table, settles on sidestr:dreamlab-txbt4 beside the BLAKE2b testnet4 fork (agentbox nostr-bbs-poker-citizen --chain-id sidestr:dreamlab-txbt4; ADR-2009, kit ADR-2021)"
 cohorts       = ["dreamlab", "agent"]
 authorised_by = "6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425a"  # operator-jjohare (human admin)
 

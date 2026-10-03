@@ -75,13 +75,18 @@ env:
   # 'on' shows the Wallet nav item, the tip control on posts and "Send DREAM" on
   # profiles; anything else renders the forum exactly as before.
   SIDESTR_WALLET: 'on'
+  # The sidestr chains the wallet, tips and poker tables offer (kit ADR-2021):
+  # sidestr:dreamlab (DREAM, parent testnet4) and sidestr:dreamlab-txbt4
+  # (BLAKES7, parent BLAKE2b testnet4 fork). asset_id is the BLAKES7 issue
+  # txid; until it is set the chain shows sats only.
+  SIDESTR_CHAINS_JSON: '[{"id":"sidestr:dreamlab"},{"id":"sidestr:dreamlab-txbt4","ticker":"BLAKES7","label":"BLAKES7","mirror":"https://dreamlab-ai.github.io/sidestr-dreamlab-txbt4"}]'
   # Poker tables. 'on' shows the poker route (mirrors dreamlab.toml
   # [features].poker); anything else hides it. POKER_CONFIG_JSON mirrors
   # dreamlab.toml [poker] BY HAND (ADR-2005 hand-synced mirror, like
   # ZONE_CONFIG_JSON below) in the exact shape of the kit's Poker::to_env_json —
   # edit both together. Injected unquoted as window.__ENV__.POKER_CONFIG below.
   POKER: 'on'
-  POKER_CONFIG_JSON: '{"stakes_bb":[2,10,20,100,200],"buyin_bb":100,"assets":["sats","dream"],"bot_profile":"tag","citizen_pubkey":"d4bda43addb1419ad2930401322403c774bc30a141a6eb8fdba0314ee4086df9"}'
+  POKER_CONFIG_JSON: '{"stakes_bb":[2,10,20,100,200],"buyin_bb":100,"assets":["sats","dream"],"bot_profile":"tag","citizen_pubkey":"d4bda43addb1419ad2930401322403c774bc30a141a6eb8fdba0314ee4086df9","citizens":{"sidestr:dreamlab":"d4bda43addb1419ad2930401322403c774bc30a141a6eb8fdba0314ee4086df9","sidestr:dreamlab-txbt4":"bc86ce5f26997fa57d8cadae14fc438082ab01375eae8c02a21fc4d8a7c2a17f"}}'
   # Zone (section) model for the forum client. Mirrors forum-config/dreamlab.toml
   # [[zones]] and the relay's ZONE_CONFIG [vars]. Injected into window.__ENV__ below.
   # Zone E2EE master gate (ADR-2016); mirrors dreamlab.toml [encryption].enabled.
@@ -110,7 +115,7 @@ env:
   # docs/architecture/kit-compatibility-record.md, which pin-parity verifies
   # against this exact SHA. Do not restate release notes here: they went stale
   # (beta.9 / rc11) across the beta.10 and beta.11 repins.
-  KIT_REF: '594bfe2c1aa0d2ffa79aec3de98fa84a1c3a641f'
+  KIT_REF: '7fe04b69bc75b20f19560da7e80cfea425022051'
 
 jobs:
   gate:
@@ -266,7 +271,7 @@ jobs:
           # operator can tell whether a deployed build contains a given fix.
           BUILD_HASH="${GITHUB_SHA:0:7}"
           BUILD_VERSION="$(date -u +%Y.%m.%d)"
-          ENV_SCRIPT='<script>window.__ENV__={BBS_PWA_ENABLED:"true",BRAND_LABEL:"Community",FORUM_NAME:"Community Forums",VITE_RELAY_URL:"'"$VITE_RELAY_URL"'",VITE_AUTH_API_URL:"'"$VITE_AUTH_API_URL"'",VITE_POD_API_URL:"'"$VITE_POD_API_URL"'",VITE_SEARCH_API_URL:"'"$VITE_SEARCH_API_URL"'",VITE_LINK_PREVIEW_API_URL:"'"$VITE_LINK_PREVIEW_API_URL"'",SIDESTR_WALLET:"'"$SIDESTR_WALLET"'",BUILD_VERSION:"'"$BUILD_VERSION"'",BUILD_HASH:"'"$BUILD_HASH"'",ENCRYPTION_ENABLED:"'"$ENCRYPTION_ENABLED"'",ZONE_CONFIG:'"$ZONE_CONFIG_JSON"',POKER:"'"$POKER"'",POKER_CONFIG:'"$POKER_CONFIG_JSON"'};</script>'
+          ENV_SCRIPT='<script>window.__ENV__={BBS_PWA_ENABLED:"true",BRAND_LABEL:"Community",FORUM_NAME:"Community Forums",VITE_RELAY_URL:"'"$VITE_RELAY_URL"'",VITE_AUTH_API_URL:"'"$VITE_AUTH_API_URL"'",VITE_POD_API_URL:"'"$VITE_POD_API_URL"'",VITE_SEARCH_API_URL:"'"$VITE_SEARCH_API_URL"'",VITE_LINK_PREVIEW_API_URL:"'"$VITE_LINK_PREVIEW_API_URL"'",SIDESTR_WALLET:"'"$SIDESTR_WALLET"'",SIDESTR_CHAINS:'"$SIDESTR_CHAINS_JSON"',BUILD_VERSION:"'"$BUILD_VERSION"'",BUILD_HASH:"'"$BUILD_HASH"'",ENCRYPTION_ENABLED:"'"$ENCRYPTION_ENABLED"'",ZONE_CONFIG:'"$ZONE_CONFIG_JSON"',POKER:"'"$POKER"'",POKER_CONFIG:'"$POKER_CONFIG_JSON"'};</script>'
           sed -i "s|</head>|${ENV_SCRIPT}</head>|" dist/community/index.html
           echo "Injected window.__ENV__ into forum index.html (build $BUILD_VERSION $BUILD_HASH)"
           # SPA deep-link pickup for the forum. A hard load of /community/login

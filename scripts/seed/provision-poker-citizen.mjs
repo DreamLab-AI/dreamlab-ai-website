@@ -44,9 +44,9 @@ const kind0 = finalizeEvent({
   created_at: now(),
   tags: [],
   content: JSON.stringify({
-    name: 'poker-citizen',
-    display_name: 'The House (poker)',
-    about: 'The forum poker table’s house seat. Deals DREAM hands, plays the house bot, settles every hand on sidestr:dreamlab. Testnet: no value. Do not DM; sit at /community/table.',
+    name: process.env.POKER_CITIZEN_NAME || 'poker-citizen',
+    display_name: process.env.POKER_CITIZEN_DISPLAY_NAME || 'The House (poker)',
+    about: process.env.POKER_CITIZEN_ABOUT || 'The forum poker table’s house seat. Deals DREAM hands, plays the house bot, settles every hand on sidestr:dreamlab. Testnet: no value. Do not DM; sit at /community/table.',
     bot: true,
   }),
 }, sk);
