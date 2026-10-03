@@ -7,7 +7,7 @@ implementation_status: complete
 activation_status: live
 supersedes: []
 superseded_by: []
-verified_commit: 34a4bd6
+verified_commit: 2ef7ead
 owner: jjohare
 review_trigger: the kit's protocol VERSION moving (house service and client must repin together); a chain with value behind the table; the daily cap or stakes changing; a relay reseed (the house key's whitelist row is dropped); a second house seat or operator
 repo: dreamlab-ai-website
@@ -22,7 +22,7 @@ lineage: builds on ADR-2008 (gift-wrap transport), kit ADR-2015 (member wallets,
 The kit's practice table (pin 457cb8e) played chips worth nothing; its money phase waited for a
 house that holds its own key, since a browser-driven bot's cards and key are the member's to read.
 The operator asked for DREAM play, game times on the calendar, and invitations to real players. The
-kit now provides all three (kit ADR-2020 at 34a4bd6): a house service, hands between members with
+kit now provides all three (kit ADR-2020 at 2ef7ead): a house service, hands between members with
 the house dealing, and NIP-52 poker events with invitations. This record is the operator's overlay:
 which key is the house, where it runs, how it is funded, and what the pins carry.
 
@@ -59,7 +59,7 @@ from a release build in a tmux session (`poker-citizen`); a rebuild bakes it.
 
 ## Verification
 
-- Kit pins: `KIT_REF = 34a4bd668d6e936950c2e3ae64d56e0e1a41b906` in `deploy.yml`,
+- Kit pins: `KIT_REF = 2ef7ead627e14668503eb286c6fdc23b5a8d7581` in `deploy.yml`,
   `workers-deploy.yml`, `rust-ci.yml`; `CANONICAL_KIT_SHA` in
   `docs/architecture/kit-compatibility-record.md`.
 - `forum-config/dreamlab.toml` `[poker].citizen_pubkey` equals `deploy.yml` `POKER_CONFIG_JSON`'s.
