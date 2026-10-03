@@ -42,7 +42,7 @@ env:
   # docs/architecture/kit-compatibility-record.md, which pin-parity verifies
   # against this exact SHA. Do not restate release notes here: they went stale
   # (beta.9 / rc11) across the beta.10 and beta.11 repins.
-  KIT_REF: 'b73ec8c7c3620d1feda6377d1dd53ec7451f125d'
+  KIT_REF: '80448719dd6f777c47e50c515ccc3d6052dd4cee'
 
 jobs:
   gate:
