@@ -98,12 +98,24 @@ async function spend(subcmd) {
   }
 }
 
+// PROVISION_CLI: an alternative spender with the same subcommand shapes
+// (nostr-bbs-sidestr-admin, which replays BLAKE2b-parent chains the crates.io
+// sidestr-agent cannot); PROVISION_CHAIN_ID is its pinned chain id.
+const CLI = process.env.PROVISION_CLI || 'sidestr-agent';
+const CHAIN_ARGS = process.env.PROVISION_CHAIN_ID ? ['--chain-id', process.env.PROVISION_CHAIN_ID] : [];
 function agent(subcmd) {
-  const out = execFileSync('sidestr-agent', ['--url', PRODUCER, '--key-file', TREASURY_KEY, ...subcmd], {
+  const out = execFileSync(CLI, ['--url', PRODUCER, ...CHAIN_ARGS, '--key-file', TREASURY_KEY, ...subcmd], {
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe'],
   });
   const line = out.trim().split('\n').pop();
+  if (CLI !== 'sidestr-agent') {
+    // nostr-bbs-sidestr-admin prints a text table; the posted txid is on the
+    // "posted <txid>" line (or "txid <txid>" when not posted).
+    const posted = out.match(/^posted\s+([0-9a-f]{64})/m) || out.match(/^txid\s+([0-9a-f]{64})/m);
+    if (!posted) throw new Error(`no txid in spender output: ${out.slice(0, 120)}`);
+    return { txid: posted[1] };
+  }
   return JSON.parse(line);
 }
 

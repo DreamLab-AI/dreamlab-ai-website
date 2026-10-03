@@ -314,7 +314,7 @@ bot_profile    = "tag"
 citizen_pubkey = "d4bda43addb1419ad2930401322403c774bc30a141a6eb8fdba0314ee4086df9"
 # One house seat per sidestr chain (kit ADR-2021). `citizen_pubkey` above is
 # Practice-table coach (kit coach.rs): the agent the client DMs for advice.
-coach_pubkey   = "2de44d5622eef79519ac078f6e227a85aecbaefd561e4e50c5f51dfadbf916e9"  # junkiejarvis — [[agents]]
+coach_pubkey   = "032f0527f308f4b3336f3335a8a106277799af864dd0b0122f26ed4a06f0ea50"  # poker-coach — [[agents]]; its own key, never junkiejarvis (every DM to it is routed through the agentbox)
 # the sidestr:dreamlab seat; `citizens` names every chain's seat explicitly.
 # Mirror any change into deploy.yml POKER_CONFIG_JSON.
 citizens       = { "sidestr:dreamlab" = "d4bda43addb1419ad2930401322403c774bc30a141a6eb8fdba0314ee4086df9", "sidestr:dreamlab-txbt4" = "bc86ce5f26997fa57d8cadae14fc438082ab01375eae8c02a21fc4d8a7c2a17f" }
@@ -387,6 +387,13 @@ authorised_by = "6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425
 label         = "poker-citizen"
 pubkey        = "d4bda43addb1419ad2930401322403c774bc30a141a6eb8fdba0314ee4086df9"
 role          = "Poker House Seat — deals DREAM hands at /community/table, plays the house bot, settles on sidestr:dreamlab (agentbox nostr-bbs-poker-citizen; ADR-2009)"
+cohorts       = ["dreamlab", "agent"]
+authorised_by = "6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425a"  # operator-jjohare (human admin)
+
+[[agents]]
+label         = "poker-coach"
+pubkey        = "032f0527f308f4b3336f3335a8a106277799af864dd0b0122f26ed4a06f0ea50"
+role          = "Poker Coach — answers the practice table's [poker-coach] DMs at /community/table from an OpenAI-compatible model (agentbox nostr-bbs-poker-coach, [poker_coach]); holds no funds, deals nothing"
 cohorts       = ["dreamlab", "agent"]
 authorised_by = "6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425a"  # operator-jjohare (human admin)
 
