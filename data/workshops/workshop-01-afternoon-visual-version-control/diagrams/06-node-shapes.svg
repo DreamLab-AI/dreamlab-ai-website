@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 408" role="img" aria-labelledby="d6a-title d6a-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="d6a-title">Mermaid flowchart node shapes</title>
+  <desc id="d6a-desc">Gallery of Mermaid flowchart node shapes with their syntax: rectangle, rounded, decision diamond, stadium start-end, subroutine, database cylinder and circle.</desc>
+  <rect x="8" y="8" width="944" height="392" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">FLOWCHART NODE SHAPES — QUICK REFERENCE</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <g text-anchor="middle">
+    <!-- row 1 -->
+    <rect x="72" y="112" width="144" height="56" rx="0" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="144" y="144" font-size="13" font-weight="600" fill="#F5F5F5">Rectangle</text>
+    <text x="144" y="196" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">A[text]</text>
+
+    <rect x="296" y="112" width="144" height="56" rx="12" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="368" y="144" font-size="13" font-weight="600" fill="#F5F5F5">Rounded</text>
+    <text x="368" y="196" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">A(text)</text>
+
+    <rect x="560" y="108" width="64" height="64" rx="4" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2" transform="rotate(45 592 140)"/>
+    <text x="592" y="144" font-size="11" font-weight="600" fill="#F5F5F5">Decision</text>
+    <text x="592" y="200" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">A{text}</text>
+
+    <rect x="744" y="112" width="144" height="56" rx="28" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="816" y="144" font-size="13" font-weight="600" fill="#F5F5F5">Start / End</text>
+    <text x="816" y="196" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">A([text])</text>
+
+    <!-- row 2 -->
+    <rect x="72" y="240" width="144" height="56" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <line x1="84" y1="240" x2="84" y2="296" stroke="rgba(255,255,255,0.28)"/>
+    <line x1="204" y1="240" x2="204" y2="296" stroke="rgba(255,255,255,0.28)"/>
+    <text x="144" y="272" font-size="13" font-weight="600" fill="#F5F5F5">Subroutine</text>
+    <text x="144" y="324" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">A[[text]]</text>
+
+    <path d="M296,252 C296,238 440,238 440,252 L440,292 C440,306 296,306 296,292 Z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.35)"/>
+    <path d="M296,252 C296,264 440,264 440,252" fill="none" stroke="rgba(255,255,255,0.35)"/>
+    <text x="368" y="288" font-size="13" font-weight="600" fill="#F5F5F5">Database</text>
+    <text x="368" y="324" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">A[(text)]</text>
+
+    <circle cx="592" cy="268" r="36" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="592" y="272" font-size="12" font-weight="600" fill="#F5F5F5">Circle</text>
+    <text x="592" y="324" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">A((text))</text>
+
+    <text x="816" y="256" font-size="13" font-weight="600" fill="#F5F5F5">Links</text>
+    <text x="816" y="280" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">A --&gt; B · A -.-&gt; B</text>
+    <text x="816" y="300" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">A ==&gt; B · A --&gt;|txt| B</text>
+  </g>
+</svg>

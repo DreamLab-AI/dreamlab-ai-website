@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 240" role="img" aria-labelledby="d02s-title d02s-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="d02s-title">Environment setup flow</title>
+  <desc id="d02s-desc">A fresh VS Code install gains essential extensions, AI assistants and tuned settings, ending in a production-ready professional environment.</desc>
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect x="8" y="8" width="944" height="224" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">TRANSFORMATION JOURNEY</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <g text-anchor="middle" font-size="14" font-weight="600" fill="#F5F5F5">
+    <rect x="32" y="112" width="152" height="64" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="108" y="150">Fresh VS Code</text>
+    <rect x="224" y="112" width="152" height="64" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="300" y="150">Extensions</text>
+    <rect x="416" y="112" width="152" height="64" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="492" y="150">AI Assistants</text>
+    <rect x="608" y="112" width="152" height="64" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="684" y="150">Settings</text>
+    <rect x="800" y="112" width="136" height="64" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="868" y="144">Pro</text>
+    <text x="868" y="164">Environment</text>
+  </g>
+
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2">
+    <line x1="184" y1="144" x2="216" y2="144" marker-end="url(#arr)"/>
+    <line x1="376" y1="144" x2="408" y2="144" marker-end="url(#arr)"/>
+    <line x1="568" y1="144" x2="600" y2="144" marker-end="url(#arr)"/>
+    <line x1="760" y1="144" x2="792" y2="144" marker-end="url(#arr)"/>
+  </g>
+</svg>

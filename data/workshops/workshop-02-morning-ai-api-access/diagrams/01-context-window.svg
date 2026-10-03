@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 312" role="img" aria-labelledby="tk dk" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="tk">What fills a context window</title>
+  <desc id="dk">Input tokens — system prompt, conversation history, your message and attached documents — plus output tokens must together stay within the model's context window.</desc>
+  <defs>
+    <marker id="arrk" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="arrsk" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#38BDF8" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect x="8" y="8" width="944" height="296" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">THE CONTEXT WINDOW BUDGET</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+  <rect x="48" y="104" width="864" height="120" rx="8" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.10)"/>
+  <text x="64" y="130" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" letter-spacing="0.12em" fill="#9CA3AF">INPUT TOKENS</text>
+  <rect x="64" y="144" width="176" height="56" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+  <text x="152" y="177" text-anchor="middle" font-size="13" font-weight="600" fill="#F5F5F5">System prompt</text>
+  <rect x="280" y="144" width="160" height="56" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+  <text x="360" y="177" text-anchor="middle" font-size="13" font-weight="600" fill="#F5F5F5">History</text>
+  <rect x="464" y="144" width="176" height="56" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+  <text x="552" y="177" text-anchor="middle" font-size="13" font-weight="600" fill="#F5F5F5">Your message</text>
+  <rect x="648" y="144" width="176" height="56" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.20)" stroke-dasharray="4 3"/>
+  <text x="736" y="177" text-anchor="middle" font-size="13" font-weight="600" fill="#F5F5F5">Documents</text>
+  <rect x="48" y="248" width="280" height="48" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+  <text x="188" y="267" text-anchor="middle" font-size="14" font-weight="600" fill="#F5F5F5">Output tokens</text>
+  <text x="188" y="289" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">the AI response</text>
+  <rect x="568" y="248" width="344" height="48" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+  <text x="740" y="277" text-anchor="middle" font-size="14" font-weight="600" fill="#F5F5F5">Input + output ≤ window size</text>
+  <path d="M328,272 C408,272 480,272 564,272" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arrk)"/>
+  <path d="M480,224 C480,232 560,240 592,248" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arrk)"/>
+</svg>

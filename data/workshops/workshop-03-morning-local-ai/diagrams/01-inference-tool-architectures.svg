@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" role="img" aria-labelledby="dg-title dg-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="dg-title">Local inference tool architectures</title>
+  <desc id="dg-desc">Three ways to serve a local GGUF model: Ollama, LM Studio and LocalAI each place a server between the caller and the model, on different ports.</desc>
+
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="arr-accent" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#F59E0B" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- container -->
+  <rect x="8" y="8" width="944" height="384" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">LOCAL INFERENCE TOOL ARCHITECTURES</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <!-- row 1: Ollama (focal / simplest) -->
+  <g text-anchor="middle">
+    <rect x="48" y="100" width="176" height="72" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="136" y="132" font-size="15" font-weight="600" fill="#F5F5F5">User Script</text>
+    <text x="136" y="153" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">simplest path</text>
+
+    <rect x="392" y="100" width="176" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="480" y="132" font-size="15" font-weight="600" fill="#F5F5F5">Ollama API</text>
+    <text x="480" y="153" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">port 11434</text>
+
+    <rect x="736" y="100" width="176" height="72" rx="8" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.35)"/>
+    <text x="824" y="132" font-size="15" font-weight="600" fill="#F5F5F5">Model</text>
+    <text x="824" y="153" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">GGUF</text>
+
+    <path d="M224,136 C280,136 336,136 392,136" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arr)"/>
+    <path d="M568,136 C624,136 680,136 736,136" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arr)"/>
+  </g>
+
+  <!-- row 2: LM Studio -->
+  <g text-anchor="middle">
+    <rect x="48" y="200" width="176" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="136" y="232" font-size="15" font-weight="600" fill="#F5F5F5">User Browser</text>
+    <text x="136" y="253" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">GUI</text>
+
+    <rect x="392" y="200" width="176" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="480" y="232" font-size="15" font-weight="600" fill="#F5F5F5">LM Studio</text>
+    <text x="480" y="253" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">port 1234</text>
+
+    <rect x="736" y="200" width="176" height="72" rx="8" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.35)"/>
+    <text x="824" y="232" font-size="15" font-weight="600" fill="#F5F5F5">Model</text>
+    <text x="824" y="253" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">GGUF</text>
+
+    <path d="M224,236 C280,236 336,236 392,236" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arr)"/>
+    <path d="M568,236 C624,236 680,236 736,236" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arr)"/>
+  </g>
+
+  <!-- row 3: LocalAI -->
+  <g text-anchor="middle">
+    <rect x="48" y="300" width="176" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="136" y="332" font-size="15" font-weight="600" fill="#F5F5F5">OpenAI SDK</text>
+    <text x="136" y="353" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">drop-in client</text>
+
+    <rect x="392" y="300" width="176" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="480" y="332" font-size="15" font-weight="600" fill="#F5F5F5">LocalAI</text>
+    <text x="480" y="353" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">port 8080</text>
+
+    <rect x="736" y="300" width="176" height="72" rx="8" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.35)"/>
+    <text x="824" y="332" font-size="15" font-weight="600" fill="#F5F5F5">Multiple Backends</text>
+    <text x="824" y="353" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">production</text>
+
+    <path d="M224,336 C280,336 336,336 392,336" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arr)"/>
+    <path d="M568,336 C624,336 680,336 736,336" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arr)"/>
+  </g>
+</svg>

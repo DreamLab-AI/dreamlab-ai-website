@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 376" role="img" aria-labelledby="tf df" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="tf">The AI API ecosystem in 2026</title>
+  <desc id="df">Three groups of providers: enterprise leaders OpenAI, Anthropic and Google; open-source champions Meta, Mistral and Qwen; and speed specialists Groq, Together AI and Fireworks AI.</desc>
+  <defs>
+    <marker id="arrf" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="arrsf" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#38BDF8" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect x="8" y="8" width="944" height="360" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">AI API ECOSYSTEM · 2026</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+  <rect x="48" y="96" width="272" height="248" rx="8" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.10)"/>
+  <text x="64" y="124" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" letter-spacing="0.12em" fill="#F59E0B">ENTERPRISE LEADERS</text>
+  <rect x="64" y="140" width="240" height="56" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+  <text x="184" y="163" text-anchor="middle" font-size="14" font-weight="600" fill="#F5F5F5">OpenAI</text>
+  <text x="184" y="185" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">GPT-4o · o3</text>
+  <rect x="64" y="204" width="240" height="56" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+  <text x="184" y="227" text-anchor="middle" font-size="14" font-weight="600" fill="#F5F5F5">Anthropic</text>
+  <text x="184" y="249" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">Fable 5 · Opus · Sonnet</text>
+  <rect x="64" y="268" width="240" height="56" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+  <text x="184" y="291" text-anchor="middle" font-size="14" font-weight="600" fill="#F5F5F5">Google</text>
+  <text x="184" y="313" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">Gemini 2.5 Pro · Flash</text>
+  <rect x="352" y="96" width="272" height="248" rx="8" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.10)"/>
+  <text x="368" y="124" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" letter-spacing="0.12em" fill="#9CA3AF">OPEN-SOURCE CHAMPIONS</text>
+  <rect x="368" y="140" width="240" height="56" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+  <text x="488" y="163" text-anchor="middle" font-size="14" font-weight="600" fill="#F5F5F5">Meta</text>
+  <text x="488" y="185" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">Llama 4</text>
+  <rect x="368" y="204" width="240" height="56" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+  <text x="488" y="227" text-anchor="middle" font-size="14" font-weight="600" fill="#F5F5F5">Mistral</text>
+  <text x="488" y="249" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">Large 2</text>
+  <rect x="368" y="268" width="240" height="56" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+  <text x="488" y="291" text-anchor="middle" font-size="14" font-weight="600" fill="#F5F5F5">Qwen</text>
+  <text x="488" y="313" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">2.5 72B</text>
+  <rect x="656" y="96" width="272" height="248" rx="8" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.10)"/>
+  <text x="672" y="124" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" letter-spacing="0.12em" fill="#9CA3AF">SPEED SPECIALISTS</text>
+  <rect x="672" y="140" width="240" height="56" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+  <text x="792" y="163" text-anchor="middle" font-size="14" font-weight="600" fill="#F5F5F5">Groq</text>
+  <text x="792" y="185" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">ultra-fast inference</text>
+  <rect x="672" y="204" width="240" height="56" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+  <text x="792" y="227" text-anchor="middle" font-size="14" font-weight="600" fill="#F5F5F5">Together AI</text>
+  <text x="792" y="249" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">hosted OSS</text>
+  <rect x="672" y="268" width="240" height="56" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+  <text x="792" y="291" text-anchor="middle" font-size="14" font-weight="600" fill="#F5F5F5">Fireworks AI</text>
+  <text x="792" y="313" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">production scale</text>
+</svg>

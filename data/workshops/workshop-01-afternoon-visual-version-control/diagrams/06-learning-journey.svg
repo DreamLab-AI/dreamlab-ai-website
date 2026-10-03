@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 296" role="img" aria-labelledby="d6b-title d6b-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="d6b-title">Your learning journey</title>
+  <desc id="d6b-desc">Timeline from completing the workshop through daily practice, building a template library, sharing with colleagues, to advanced workflows and team adoption — from confident at 7 days to expert at 90 days.</desc>
+  <defs>
+    <marker id="arr6b" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect x="8" y="8" width="944" height="280" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">YOUR LEARNING JOURNEY</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <g text-anchor="middle">
+    <rect x="48" y="120" width="152" height="88" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="124" y="156" font-size="14" font-weight="600" fill="#F5F5F5">Workshop</text>
+    <text x="124" y="180" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">day 0 · complete</text>
+
+    <rect x="232" y="120" width="152" height="88" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="308" y="156" font-size="14" font-weight="600" fill="#F5F5F5">Daily Practice</text>
+    <text x="308" y="180" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">7d · confident</text>
+
+    <rect x="416" y="120" width="152" height="88" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="492" y="150" font-size="14" font-weight="600" fill="#F5F5F5">Template</text>
+    <text x="492" y="168" font-size="14" font-weight="600" fill="#F5F5F5">Library</text>
+    <text x="492" y="190" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">30d · proficient</text>
+
+    <rect x="600" y="120" width="152" height="88" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="676" y="150" font-size="14" font-weight="600" fill="#F5F5F5">Share with</text>
+    <text x="676" y="168" font-size="14" font-weight="600" fill="#F5F5F5">Colleagues</text>
+    <text x="676" y="190" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">60d · advocate</text>
+
+    <rect x="784" y="120" width="128" height="88" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="848" y="150" font-size="14" font-weight="600" fill="#F5F5F5">Team</text>
+    <text x="848" y="168" font-size="14" font-weight="600" fill="#F5F5F5">Adoption</text>
+    <text x="848" y="190" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">90d · expert</text>
+  </g>
+
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2">
+    <path d="M200,164 L228,164" marker-end="url(#arr6b)"/>
+    <path d="M384,164 L412,164" marker-end="url(#arr6b)"/>
+    <path d="M568,164 L596,164" marker-end="url(#arr6b)"/>
+    <path d="M752,164 L780,164" marker-end="url(#arr6b)"/>
+  </g>
+</svg>

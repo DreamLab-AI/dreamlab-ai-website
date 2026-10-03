@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 240" role="img" aria-labelledby="dg-title dg-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="dg-title">Feature-branch workflow</title>
+  <desc id="dg-desc">Branch from main, commit often, push, open a pull request, get a review, then merge back to main.</desc>
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect x="8" y="8" width="944" height="224" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">FEATURE-BRANCH WORKFLOW</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <g text-anchor="middle">
+    <rect x="48" y="112" width="128" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="112" y="144" font-size="14" font-weight="600" fill="#F5F5F5">Branch</text>
+    <text x="112" y="168" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">from main</text>
+
+    <rect x="192" y="112" width="128" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="256" y="144" font-size="14" font-weight="600" fill="#F5F5F5">Commit</text>
+    <text x="256" y="168" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">small · often</text>
+
+    <rect x="336" y="112" width="128" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="400" y="144" font-size="14" font-weight="600" fill="#F5F5F5">Push</text>
+    <text x="400" y="168" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">to remote</text>
+
+    <rect x="480" y="112" width="128" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="544" y="144" font-size="14" font-weight="600" fill="#F5F5F5">Open PR</text>
+    <text x="544" y="168" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">describe change</text>
+
+    <rect x="624" y="112" width="128" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="688" y="144" font-size="14" font-weight="600" fill="#F5F5F5">Review</text>
+    <text x="688" y="168" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">act on feedback</text>
+
+    <rect x="768" y="112" width="144" height="72" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="840" y="144" font-size="14" font-weight="600" fill="#F5F5F5">Merge</text>
+    <text x="840" y="168" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#F59E0B">back to main</text>
+  </g>
+
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2">
+    <path d="M176,148 C180,148 184,148 188,148" marker-end="url(#arr)"/>
+    <path d="M320,148 C324,148 328,148 332,148" marker-end="url(#arr)"/>
+    <path d="M464,148 C468,148 472,148 476,148" marker-end="url(#arr)"/>
+    <path d="M608,148 C612,148 616,148 620,148" marker-end="url(#arr)"/>
+    <path d="M752,148 C756,148 760,148 764,148" marker-end="url(#arr)"/>
+  </g>
+</svg>

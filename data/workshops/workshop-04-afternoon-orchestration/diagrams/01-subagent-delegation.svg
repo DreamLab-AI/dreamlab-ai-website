@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 448" role="img" aria-labelledby="dg-title dg-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="dg-title">Subagent delegation</title>
+  <desc id="dg-desc">Sequence: the user gives the parent agent a complex task; the parent decomposes it and dispatches subtasks A, B and C to three subagents in parallel, gathers their results, and returns a synthesised answer.</desc>
+
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- container -->
+  <rect x="8" y="8" width="944" height="432" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">SUBAGENT DELEGATION</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <!-- actor chips -->
+  <g text-anchor="middle" font-size="13" font-weight="600" fill="#F5F5F5">
+    <rect x="72" y="96" width="112" height="44" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="128" y="123">User</text>
+    <rect x="280" y="96" width="112" height="44" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="336" y="123">Parent</text>
+    <rect x="520" y="96" width="112" height="44" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="576" y="123">Subagent A</text>
+    <rect x="664" y="96" width="112" height="44" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="720" y="123">Subagent B</text>
+    <rect x="808" y="96" width="112" height="44" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="864" y="123">Subagent C</text>
+  </g>
+
+  <!-- lifelines -->
+  <g stroke="rgba(255,255,255,0.15)" stroke-dasharray="4 4">
+    <line x1="128" y1="140" x2="128" y2="416"/>
+    <line x1="336" y1="140" x2="336" y2="416"/>
+    <line x1="576" y1="140" x2="576" y2="416"/>
+    <line x1="720" y1="140" x2="720" y2="416"/>
+    <line x1="864" y1="140" x2="864" y2="416"/>
+  </g>
+
+  <!-- task in -->
+  <path d="M128,172 L332,172" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arr)"/>
+  <text x="232" y="164" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF" text-anchor="middle">complex task</text>
+
+  <!-- par frame -->
+  <rect x="304" y="196" width="592" height="104" rx="8" fill="none" stroke="rgba(255,255,255,0.20)" stroke-dasharray="4 3"/>
+  <text x="320" y="216" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" letter-spacing="0.12em" fill="#9CA3AF">PAR · PARALLEL DISPATCH</text>
+
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2">
+    <path d="M336,236 L572,236" marker-end="url(#arr)"/>
+    <path d="M336,260 L716,260" marker-end="url(#arr)"/>
+    <path d="M336,284 L860,284" marker-end="url(#arr)"/>
+  </g>
+  <g font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">
+    <text x="448" y="230">subtask A</text>
+    <text x="448" y="254">subtask B</text>
+    <text x="448" y="278">subtask C</text>
+  </g>
+
+  <!-- results back -->
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-dasharray="4 3">
+    <path d="M576,324 L340,324" marker-end="url(#arr)"/>
+    <path d="M720,344 L340,344" marker-end="url(#arr)"/>
+    <path d="M864,364 L340,364" marker-end="url(#arr)"/>
+  </g>
+  <text x="448" y="318" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">results A · B · C</text>
+
+  <!-- final -->
+  <path d="M336,400 L132,400" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+  <text x="232" y="392" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF" text-anchor="middle">synthesised answer</text>
+</svg>

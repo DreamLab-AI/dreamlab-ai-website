@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 376" role="img" aria-labelledby="d4e-title d4e-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="d4e-title">System architecture overview</title>
+  <desc id="d4e-desc">End users reach the web application through a load balancer; the API gateway routes requests to auth, data and search services backed by Redis, PostgreSQL and a search index.</desc>
+  <defs>
+    <marker id="arr4e" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="arr4e-net" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#38BDF8" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect x="8" y="8" width="944" height="360" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">SYSTEM ARCHITECTURE</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <g text-anchor="middle">
+    <rect x="48" y="104" width="160" height="64" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="128" y="132" font-size="14" font-weight="600" fill="#F5F5F5">End Users</text>
+    <text x="128" y="152" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">browser clients</text>
+
+    <rect x="304" y="104" width="192" height="64" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="400" y="132" font-size="14" font-weight="600" fill="#F5F5F5">Web Application</text>
+    <text x="400" y="152" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">behind load balancer</text>
+
+    <rect x="592" y="104" width="192" height="64" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="688" y="132" font-size="15" font-weight="600" fill="#F5F5F5">API Gateway</text>
+    <text x="688" y="152" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">routes all requests</text>
+
+    <rect x="144" y="248" width="208" height="72" rx="8" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.35)"/>
+    <text x="248" y="278" font-size="14" font-weight="600" fill="#F5F5F5">Auth Service</text>
+    <text x="248" y="300" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">Redis cache</text>
+
+    <rect x="384" y="248" width="208" height="72" rx="8" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.35)"/>
+    <text x="488" y="278" font-size="14" font-weight="600" fill="#F5F5F5">Data Service</text>
+    <text x="488" y="300" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">PostgreSQL</text>
+
+    <rect x="624" y="248" width="208" height="72" rx="8" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.35)"/>
+    <text x="728" y="278" font-size="14" font-weight="600" fill="#F5F5F5">Search Service</text>
+    <text x="728" y="300" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">search index</text>
+  </g>
+
+  <g fill="none" stroke="#38BDF8" stroke-width="1.2">
+    <path d="M208,136 L300,136" marker-end="url(#arr4e-net)"/>
+    <path d="M496,136 L588,136" marker-end="url(#arr4e-net)"/>
+  </g>
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2">
+    <path d="M640,168 C560,208 380,208 292,244" marker-end="url(#arr4e)"/>
+    <path d="M672,168 C640,204 540,212 500,244" marker-end="url(#arr4e)"/>
+    <path d="M704,168 C712,196 720,216 724,244" marker-end="url(#arr4e)"/>
+  </g>
+  <g font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#38BDF8" text-anchor="middle">
+    <text x="254" y="128">https</text>
+    <text x="542" y="128">api calls</text>
+  </g>
+</svg>
