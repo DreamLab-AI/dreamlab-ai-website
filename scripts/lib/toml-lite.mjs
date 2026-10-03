@@ -54,7 +54,64 @@ function parseScalar(raw, context) {
   if (v === "false") return false;
   if (/^[+-]?\d+$/.test(v)) return Number.parseInt(v, 10);
   if (/^[+-]?\d*\.\d+$/.test(v)) return Number.parseFloat(v);
+  if (v.startsWith("{")) return parseInlineTable(v, context);
   throw new Error(`unsupported TOML value in ${context}: ${raw}`);
+}
+
+/**
+ * An inline table `{ k = v, "quoted key" = v }` on one line. Values are the
+ * scalars `parseScalar` accepts (strings, numbers, booleans, nested inline
+ * tables); keys may be bare or quoted, and a quoted key keeps any dots.
+ */
+function parseInlineTable(raw, context) {
+  const v = raw.trim();
+  if (!v.endsWith("}")) throw new Error(`unterminated inline table in ${context}: ${raw}`);
+  const out = {};
+  let body = v.slice(1, -1).trim();
+  while (body.length > 0) {
+    const key = readKey(body, context);
+    body = body.slice(key.length_).trimStart();
+    if (!body.startsWith("=")) throw new Error(`expected '=' in inline table in ${context}: ${raw}`);
+    body = body.slice(1).trimStart();
+    const valEnd = findValueEnd(body);
+    const val = body.slice(0, valEnd);
+    out[key.name] = parseScalar(val, `${context}.${key.name}`);
+    body = body.slice(valEnd).trimStart();
+    if (body.startsWith(",")) body = body.slice(1).trimStart();
+    else if (body.length > 0) throw new Error(`expected ',' in inline table in ${context}: ${raw}`);
+  }
+  return out;
+}
+
+/** A bare or quoted key at the start of `s`: its name and consumed length. */
+function readKey(s, context) {
+  if (s.startsWith('"')) {
+    const end = findStringEnd(s, '"');
+    if (end === -1) throw new Error(`unterminated quoted key in ${context}`);
+    return { name: JSON.parse(s.slice(0, end + 1)), length_: end + 1 };
+  }
+  if (s.startsWith("'")) {
+    const end = s.indexOf("'", 1);
+    if (end === -1) throw new Error(`unterminated quoted key in ${context}`);
+    return { name: s.slice(1, end), length_: end + 1 };
+  }
+  const m = s.match(/^[A-Za-z0-9_.-]+/);
+  if (!m) throw new Error(`bad key in ${context}: ${s.slice(0, 20)}`);
+  return { name: m[0], length_: m[0].length };
+}
+
+/** Length of the value at the start of `s`, stopping at a top-level comma. */
+function findValueEnd(s) {
+  if (s.startsWith('"')) return findStringEnd(s, '"') + 1;
+  if (s.startsWith("'")) return s.indexOf("'", 1) + 1;
+  let depth = 0;
+  for (let i = 0; i < s.length; i++) {
+    const c = s[i];
+    if (c === "{" || c === "[") depth++;
+    else if (c === "}" || c === "]") depth--;
+    else if (c === "," && depth === 0) return i;
+  }
+  return s.length;
 }
 
 /** Index of the closing quote of a basic string starting at position 0. */
@@ -165,9 +222,12 @@ export function parseToml(text) {
       continue;
     }
 
-    const kv = line.match(/^([A-Za-z0-9_.-]+)\s*=\s*(.*)$/);
+    const kv = line.match(/^([A-Za-z0-9_.-]+|"(?:[^"\\]|\\.)*"|'[^']*')\s*=\s*(.*)$/);
     if (!kv) throw new Error(`unparsable TOML line ${i + 1}: ${lines[i]}`);
-    const key = kv[1];
+    // A quoted key is one segment, dots and all; a bare key splits on dots.
+    const quoted = kv[1].startsWith('"') || kv[1].startsWith("'");
+    const key = quoted ? readKey(kv[1], `line ${i + 1}`).name : kv[1];
+    const keyPath = quoted ? [key] : key.split(".");
     let value = kv[2].trim();
 
     // Multi-line basic string.
@@ -180,7 +240,7 @@ export function parseToml(text) {
       }
       const body = buf.slice(0, buf.indexOf('"""'));
       // TOML line-continuation: a trailing backslash swallows the newline.
-      setPath(current, key.split("."), body.replace(/\\\n\s*/g, "").replace(/^\n/, ""));
+      setPath(current, keyPath, body.replace(/\\\n\s*/g, "").replace(/^\n/, ""));
       continue;
     }
 
@@ -197,9 +257,9 @@ export function parseToml(text) {
     }
 
     if (value.startsWith("[")) {
-      setPath(current, key.split("."), parseArray(value, `key ${key}`));
+      setPath(current, keyPath, parseArray(value, `key ${key}`));
     } else {
-      setPath(current, key.split("."), parseScalar(value, `key ${key}`));
+      setPath(current, keyPath, parseScalar(value, `key ${key}`));
     }
   }
   return root;
