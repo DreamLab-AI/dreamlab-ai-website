@@ -42,3 +42,4 @@
 | 2026-10-01 | site-build-content | VETOED: Given `fetchMarkdown` (src/lib/markdown.ts:40-49) never inspects `respon | NONE | NONE | yes | BLOCKED-ENV |  | a0868fbbcbc1 |  |  |  |
 | 2026-10-02 | operator-overlay | Given `forum-config/dreamlab.toml [branding]` (the authored source of truth per  | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/51 | yes | ACCEPT |  | 90134885d896 |  |  |  |
 | 2026-10-03 | ci-workflows | Given deploy.yml's push trigger includes `index.html` but ci.yml's push and pull | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/52 | yes | ACCEPT |  | a7bfb9c88f66 |  |  |  |
+| 2026-10-04 | kit-pin-integrity | Given the manifest `forum-config/Cargo.toml` restates the kit pin in prose ("All | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/53 | yes | ACCEPT |  | 8a9e594aae43 |  |  |  |
