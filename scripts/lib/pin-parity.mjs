@@ -186,6 +186,26 @@ export function checkKitPins(root) {
     );
   }
 
+  // ── 3b. Prose restating the pin must not contradict the record ────────────
+  // A comment like "pinned at 1.0.0-beta.11" is a claim about the CURRENT pin,
+  // and it rots silently through a repin: the manifest moves, the prose does
+  // not, and every fact compared above still agrees (the 2026-09-28 defect,
+  // hand-fixed in e4c22c7). Historical mentions — "(from 1.0.0-beta.6)" or
+  // "a149da4 (v1.0.0-beta.3, ...)" — are not claims about the current pin and
+  // are deliberately not matched by the "pinned at" pattern.
+  if (manifestText !== null && record.version) {
+    const prose = /pinned at =?([^\s;)"',]+)/g;
+    let match;
+    while ((match = prose.exec(manifestText)) !== null) {
+      if (match[1] !== record.version) {
+        errors.push(
+          `${MANIFEST_PATH}: comment claims "pinned at ${match[1]}" but ` +
+            `CANONICAL_KIT_VERSION is ${record.version} — stale provenance prose`,
+        );
+      }
+    }
+  }
+
   // ── 4/5/6. Lockfile is the authority on what is actually built ─────────────
   const lockText = read(root, LOCKFILE_PATH);
   if (lockText === null) errors.push(`lockfile missing: ${LOCKFILE_PATH}`);

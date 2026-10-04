@@ -137,6 +137,31 @@ describe("deliberately inconsistent pins are rejected", () => {
     expectDrift(checkKitPins(root), "floating requirement range");
   });
 
+  // Prose rot — the 2026-09-28 defect class (hand-fixed in e4c22c7): the
+  // manifest comment restates the pin and must move with it through a repin,
+  // or the gate fails naming the stale claim.
+  it("rejects manifest prose that restates a stale kit version", () => {
+    const root = makeFixtureRepo((r) => {
+      r.replaceOnce(
+        "forum-config/Cargo.toml",
+        `pinned at ${LIVE_VERSION}`,
+        "pinned at 1.0.0-beta.8",
+      );
+    });
+    expectDrift(checkKitPins(root), 'claims "pinned at 1.0.0-beta.8"');
+  });
+
+  it("leaves historical version mentions alone", () => {
+    const root = makeFixtureRepo((r) => {
+      r.replaceOnce(
+        "forum-config/Cargo.toml",
+        `pinned at ${LIVE_VERSION} (see the CRATES.IO note below)`,
+        `pinned at ${LIVE_VERSION} (previously from 1.0.0-beta.6; see the CRATES.IO note)`,
+      );
+    });
+    expect(checkKitPins(root).ok).toBe(true);
+  });
+
   // The other half of that defect: parity never inspected the lockfile, so the
   // manifest could claim one version while the build resolved another.
   it("rejects a manifest pin that disagrees with the resolved lockfile version", () => {
