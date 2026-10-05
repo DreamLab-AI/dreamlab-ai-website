@@ -110,12 +110,12 @@ env:
   # Do NOT float on `main`: a breaking upstream push would silently ship untested
   # worker/WASM code while the lockfile stays at this tested revision. Keep this SHA
   # in sync with the `rev = "..."` in forum-config/Cargo.lock when bumping the kit.
-  # NOTE: the kit crates resolve at nostr-rust-forum v1.0.0-beta.11; cutover
+  # NOTE: the kit crates resolve at nostr-rust-forum v1.0.0-beta.14; cutover
   # provenance (release notes, crate versions, registry checksums) lives in
   # docs/architecture/kit-compatibility-record.md, which pin-parity verifies
   # against this exact SHA. Do not restate release notes here: they went stale
   # (beta.9 / rc11) across the beta.10 and beta.11 repins.
-  KIT_REF: 'd383e428f7c2fa09c22b00ec695c19cd92d5291e'
+  KIT_REF: 'faba9b71ff4c4379ff9952d717c21066b4607f00'
 
 jobs:
   gate:
