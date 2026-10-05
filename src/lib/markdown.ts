@@ -41,6 +41,10 @@ export async function fetchMarkdown(path: string) {
   try {
     const adjustedPath = getDataPath(path);
     const response = await fetch(adjustedPath);
+    if (!response.ok) {
+      console.error("Error fetching markdown: HTTP", response.status, "Path attempted:", adjustedPath);
+      return "";
+    }
     const text = await response.text();
     return text;
   } catch (error) {
