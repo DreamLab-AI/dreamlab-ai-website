@@ -14,6 +14,10 @@ on:
     paths:
       - 'src/**'
       - 'public/**'
+      # index.html is deploy-triggering (deploy.yml push paths) and carries the
+      # production CSP - keep it inside the CI gate set so nothing ships to
+      # Pages without a ci-pass verdict.
+      - 'index.html'
       - 'forum-config/**'
       - 'package.json'
       - 'package-lock.json'
@@ -36,6 +40,9 @@ on:
     paths:
       - 'src/**'
       - 'public/**'
+      # Mirror of the push filter above: an index.html-only PR must not bypass
+      # the required ci-pass check.
+      - 'index.html'
       - 'forum-config/**'
       - 'package.json'
       - 'package-lock.json'
