@@ -59,22 +59,26 @@ Multikey DID document; the convergence is a paper decision deferred to the kit
 
 Zones are authored in `forum-config/dreamlab.toml` `[[zones]]` and projected
 into both the relay's `ZONE_CONFIG` and the client's `window.__ENV__.ZONE_CONFIG`
-(hand-mirrored in `deploy.yml:73-75`). The four zones (`dreamlab.toml:95-143`):
+(hand-mirrored in `deploy.yml:73-75`). The four zones (`dreamlab.toml:101-149`):
 
 | id | slug | display_name | visibility | encrypted | cohorts |
 |----|------|-------------|-----------|-----------|---------|
 | `zone1` | `welcome` | Welcome | **public** | no | none |
-| `zone2` | `minimoonoir` | Minimoonoir | locked | no | `zone2`, `minimoonoir` |
+| `zone2` | `minimoonoir` | Minimoonoir | locked | **yes** | `zone2`, `minimoonoir` |
 | `zone3` | `family` | Family | locked | **yes** | `zone3`, `family` |
-| `zone4` | `dreamlab` | DreamLab | locked | no | `zone4`, `dreamlab` |
+| `zone4` | `dreamlab` | DreamLab | locked | **yes** (agents hold the key) | `zone4`, `dreamlab` |
 
 Only `zone1` (Welcome) is public; the other three are locked tiles.
 Required-cohort lists are **dual-accept** (generic zone id *and* legacy slug) so
 pre-2026-07 grants keyed on the slug still match — dropping either arm collapses
 legacy members to welcome-only (`dreamlab.toml:110-113` comment, 2026-07-20
 regression fix). `zone3`/`zone4` carry `kanban = true` (kinds 30301/30302);
-`zone3` is the only end-to-end-encrypted zone (`encrypted = true`,
-`dreamlab.toml:131`). WebAuthn RP is pinned to `dreamlab-ai.com`
+`zone2`, `zone3` and `zone4` are end-to-end encrypted (`encrypted = true`,
+`dreamlab.toml:123,137,148`; master gate `[encryption] enabled`,
+`dreamlab.toml:37`), and only `zone4` gives agents its key (`agent_keys = true`,
+`dreamlab.toml:149`). Keys are granted from an admin's browser: on allocation
+of a cohort, at an admin's sign-in to every eligible member not yet granted, or
+from Admin → Encryption (kit ADR-2016). WebAuthn RP is pinned to `dreamlab-ai.com`
 (`dreamlab.toml:15-16`).
 
 ### Admin & agent roster — trust-domain separation, one unsplit key
