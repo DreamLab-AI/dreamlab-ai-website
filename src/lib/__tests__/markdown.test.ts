@@ -59,11 +59,27 @@ describe("markdown :: fetchMarkdown", () => {
 
   it("returns the response text on success", async () => {
     global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
       text: () => Promise.resolve("# Hello\n\nWorld"),
     }) as unknown as typeof fetch;
 
     const out = await fetchMarkdown("/data/team/x.md");
     expect(out).toBe("# Hello\n\nWorld");
+  });
+
+  it("returns empty string and logs the HTTP status on a non-OK response", async () => {
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 404,
+      statusText: "Not Found",
+      text: () => Promise.resolve("<html>Not Found</html>"),
+    }) as unknown as typeof fetch;
+
+    const out = await fetchMarkdown("/data/team/x.md");
+    expect(out).toBe("");
+    expect(errSpy).toHaveBeenCalled();
   });
 
   it("returns empty string and logs on fetch failure", async () => {
