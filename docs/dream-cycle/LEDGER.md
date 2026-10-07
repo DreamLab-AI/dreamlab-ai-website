@@ -46,3 +46,4 @@
 | 2026-10-04 | kit-pin-integrity | Given the pin-parity gate requires full 40-hex commit SHAs for workflow `uses:`  | NONE | PERSIST-LOCAL | yes | ACCEPT |  | 27dad02c42a1 |  |  |  |
 | 2026-10-05 | site-build-content | Given `fetchMarkdown` (src/lib/markdown.ts:40-49) returns `response.text()` with | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/54 | yes | ACCEPT |  | aa63e80a062b |  |  |  |
 | 2026-10-06 | operator-overlay | Given forum-config/dreamlab.toml [branding] (the authored source of truth per .. | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/55 | yes | ACCEPT |  | 794f3a1f8887 |  |  |  |
+| 2026-10-07 | ci-workflows | Workflow KIT_REF comments restated beta.14 (canonical beta.15); prose removed | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/56 | yes | ACCEPT |  | ed8fe02af35d |  |  |  |
