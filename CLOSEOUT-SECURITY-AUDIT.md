@@ -113,6 +113,7 @@
 - **Detail:** scripts/seed-forum.mjs, scripts/seed-semantic.mjs and scripts/assign-cohorts.mjs import nostr-tools (getPublicKey/finalizeEvent), @noble/hashes and ws from the absolute path /home/devuser/workspace/project2/community-forum/node_modules/... — a different project's install tree that this repo's package-lock.json does not control or pin. These scripts then SIGN Nostr events and PUBLISH them to the pr
 - **Evidence:** scripts/seed-forum.mjs:12-15; scripts/seed-semantic.mjs:10-13; scripts/assign-cohorts.mjs:12-14 (import ... from '/home/devuser/workspace/project2/community-forum/node_modules/nostr-tools/lib/esm/pure.js' and .../@noble/hashes/... and .../ws/wrapper.mjs); each script targets RELA
 - **Decision:** Rewrite the imports to bare specifiers (import { getPublicKey } from 'nostr-tools/pure') so they resolve against this repo's pinned, audited node_modules. These are manual operator scripts (not in the build/deploy path), so severity is P2 not P0, but the signi
+- **Resolved 2026-10-07:** the three scripts were dead operator code and are deleted. The owner judges the embedded key unused or already replaced, so no rotation follows; the key remains in history from `c0bcece`. Live seeding uses `scripts/seed/`, which reads `ADMIN_PRIVKEY_HEX` from the environment.
 
 ### (deps-supplychain) Prod forum (Workers + WASM client) is deployed from an unmerged PR-head commit, not a merged/tagged release — *CONFIRMED*
 - **Category:** deploy-misconfig
@@ -297,6 +298,7 @@
 - [nostr-auth-api] No NEW material vulnerability found; the analyst's dimension is well-covered. Surfaces I independently cleared: (a) ruvector.db — the task's 'committed 1.5MB ruvector.db' premise is FALSE; it is gitignored (.gitignore:87
 - [nostr-auth-api] Severity-calibration note the analyst omitted and should be recorded: Finding 1's fetch is dead code because VITE_AI_CHAT_URL is unset in both .env and .env.example — the AI chat currently only returns a canned 'not conn
 - [deps-supplychain] [P1 — MATERIAL, in-scope secret leak] Hardcoded, git-committed Nostr private key. scripts/seed-forum.mjs:20, scripts/seed-semantic.mjs:17 and scripts/assign-cohorts.mjs:18 all contain `const ADMIN_PRIVKEY_HEX = [REDACTED]
+  - Resolved 2026-10-07: scripts deleted as dead code; owner judges the key unused or replaced (see the consumption-boundary entry above).
 - [deps-supplychain] [Note, not a new finding] scripts/seed/.test-keys.json contains three privkey/pubkey pairs (family-dave/friends-carol/business-bob) but is UNTRACKED (git ls-files --error-unmatch fails) — confirmed NOT committed, so thos
 - [stubs-adrs-quality] Secret-leak surfaces flagged in the task are all clean (strengthens the 'no committed secrets' claim): .env.example is the only tracked env file and holds placeholders + explicit 'never commit real credentials' notes; ru
 - [stubs-adrs-quality] Minor ADR-vs-code drift the analyst did not call out explicitly (subsumed by F2): ADR-037 O2 (line 24) still describes search-worker.wrangler.toml ADMIN_PUBKEYS as 'a 2-key plaintext [vars] value', but search-worker:38 n
