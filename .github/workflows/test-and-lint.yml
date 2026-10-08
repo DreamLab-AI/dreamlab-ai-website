@@ -17,7 +17,8 @@ name: Test and Lint (Reusable)
 # aggregates those recorded outcomes into a real verdict.
 #
 # Called via `workflow_call` from deploy.yml and workers-deploy.yml.
-# Also runs on PRs to main as an independent quality gate.
+# Also runs on PRs to main as an independent quality gate. Main-branch deploys
+# call it directly, so a separate push run would repeat the same work.
 
 on:
   workflow_call:
@@ -26,8 +27,6 @@ on:
         description: "True if all gates passed"
         value: ${{ jobs.gate.outputs.passed }}
   pull_request:
-    branches: [main]
-  push:
     branches: [main]
 
 # Default-restrictive permissions; jobs opt in if needed.
