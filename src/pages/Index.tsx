@@ -354,7 +354,7 @@ const IndexDesktop = () => {
           </h1>
 
           <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-foreground/90 max-w-3xl mb-8 animate-slide-up font-normal tracking-wide leading-relaxed" style={{ animationDelay: '0.1s' }}>
-             AI & Agents Residential Training<br />in the Lake District.
+             AI & Agents Residential Training<br />in the Lake District
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 animate-scale-in mb-8 w-full sm:w-auto" style={{ animationDelay: '0.2s' }}>
