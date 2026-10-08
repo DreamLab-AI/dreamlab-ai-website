@@ -79,7 +79,7 @@ env:
   # sidestr:dreamlab (DREAM, parent testnet4) and sidestr:dreamlab-txbt4
   # (BLAKES7, parent BLAKE2b testnet4 fork). asset_id is the BLAKES7 issue
   # txid; until it is set the chain shows sats only.
-  SIDESTR_CHAINS_JSON: '[{"id":"sidestr:dreamlab"},{"id":"sidestr:dreamlab-txbt4","asset_id":"10f8c355f7bbdafb80101146a5973d554a27dd2ee9475f191c2b0b483b43ee5b","ticker":"BLAKES7","label":"BLAKES7","mirror":"https://dreamlab-ai.github.io/sidestr-dreamlab-txbt4"}]'
+  SIDESTR_CHAINS_JSON: '[{"id":"sidestr:dreamlab","mirror":"https://raw.githubusercontent.com/DreamLab-AI/sidestr-dreamlab/main"},{"id":"sidestr:dreamlab-txbt4","asset_id":"10f8c355f7bbdafb80101146a5973d554a27dd2ee9475f191c2b0b483b43ee5b","ticker":"BLAKES7","label":"BLAKES7","mirror":"https://raw.githubusercontent.com/DreamLab-AI/sidestr-dreamlab-txbt4/main"}]'
   # Poker tables. 'on' shows the poker route (mirrors dreamlab.toml
   # [features].poker); anything else hides it. POKER_CONFIG_JSON mirrors
   # dreamlab.toml [poker] BY HAND (ADR-2005 hand-synced mirror, like
