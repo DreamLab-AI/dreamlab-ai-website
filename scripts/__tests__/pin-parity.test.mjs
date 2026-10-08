@@ -9,6 +9,7 @@ import { afterAll, describe, expect, it } from "vitest";
 import {
   checkActionPins,
   checkKitPins,
+  countKitPackageBlocks,
   findTagPinnedUses,
   parseKitRef,
   parseLockfileResolved,
@@ -66,6 +67,30 @@ dependencies = [
     // A crate named only inside another package's `dependencies` list must not
     // be mistaken for a resolved package of its own.
     expect(lock.has("nostr-bbs-mesh")).toBe(false);
+  });
+
+  it("counts duplicate kit package blocks the resolved map collapses", () => {
+    const lock = [
+      "[[package]]",
+      'name = "nostr-bbs-core"',
+      'version = "1.0.0-beta.15"',
+      "",
+      "[[package]]",
+      'name = "nostr-bbs-core"',
+      'version = "1.0.0-beta.8"',
+      "",
+      "[[package]]",
+      'name = "serde"',
+      'version = "1.0.219"',
+    ].join("\n");
+    const counts = countKitPackageBlocks(lock);
+    expect(counts.get("nostr-bbs-core")).toBe(2);
+    expect(counts.has("nostr-bbs-mesh")).toBe(false);
+    // Non-kit crates are not the gate's concern.
+    expect(counts.has("serde")).toBe(false);
+    // The resolved map keeps only the LAST block — the fact that makes the
+    // duplicate count necessary rather than redundant.
+    expect(parseLockfileResolved(lock).get("nostr-bbs-core").version).toBe("1.0.0-beta.8");
   });
 
   it("reads the record's canonical fields and RESOLVED lines", () => {
@@ -185,6 +210,22 @@ describe("deliberately inconsistent pins are rejected", () => {
       );
     });
     expectDrift(checkKitPins(root), "record checksum");
+  });
+
+  // Cargo may resolve two semver-incompatible pre-releases of one crate side
+  // by side (the live lock's `syn` 2.0.119 and 3.0.3 dependency entries), and
+  // pre-release kit versions are mutually incompatible — a stale transitive
+  // requirement can therefore pull an older beta alongside the pinned one.
+  // The parser kept only the LAST block per name, so that second copy was
+  // invisible to the gate until now.
+  it("rejects a kit crate resolved twice in the lockfile", () => {
+    const root = makeFixtureRepo((r) => {
+      r.edit("forum-config/Cargo.lock", (t) =>
+        t +
+        `\n[[package]]\nname = "nostr-bbs-core"\nversion = "1.0.0-beta.8"\nsource = "registry+https://github.com/rust-lang/crates.io-index"\nchecksum = "${"c".repeat(64)}"\n`,
+      );
+    });
+    expectDrift(checkKitPins(root), "nostr-bbs-core is resolved 2 times");
   });
 
   it("rejects a resolved version that disagrees with CANONICAL_KIT_VERSION", () => {
