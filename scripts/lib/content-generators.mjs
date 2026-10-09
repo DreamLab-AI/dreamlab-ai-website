@@ -42,6 +42,19 @@ for (const g of declared) {
   check(existsSync(at("scripts", g)), `generator present`, `scripts/${g}`);
 }
 
+// Dev/build parity: `predev` restates the same generator list so `npm run
+// dev` serves the artefacts `prebuild` produces. A generator added to
+// prebuild but not predev (or dropped from predev) leaves the dev server
+// silently serving stale generated content while every receipt stays green —
+// derive predev's list the same way and require the two sets to be equal.
+const predev = pkg.scripts?.predev ?? "";
+const declaredDev = [...predev.matchAll(/scripts\/([\w.-]+\.mjs)/g)].map((m) => m[1]);
+check(
+  declaredDev.length === declared.length && declared.every((g) => declaredDev.includes(g)),
+  "predev mirrors prebuild generators",
+  `prebuild=[${declared.join(", ")}] predev=[${declaredDev.join(", ")}]`,
+);
+
 // --- generate-workshop-list.mjs -------------------------------------------
 // One list entry and one manifest.json per non-dot directory; each manifest's
 // `pages` enumerate that directory's *.md files.
