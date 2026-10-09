@@ -48,3 +48,4 @@
 | 2026-10-06 | operator-overlay | Given forum-config/dreamlab.toml [branding] (the authored source of truth per .. | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/55 | yes | ACCEPT |  | 794f3a1f8887 |  |  |  |
 | 2026-10-07 | ci-workflows | Workflow KIT_REF comments restated beta.14 (canonical beta.15); prose removed | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/56 | yes | ACCEPT |  | ed8fe02af35d |  |  |  |
 | 2026-10-08 | kit-pin-integrity | Cargo.lock: kit crate resolved twice is now PIN-DRIFT (last-wins parser hid it) | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/57 | yes | ACCEPT |  | 24015ee35b0b |  |  |  |
+| 2026-10-09 | site-build-content | ACCEPT vetoed → BLOCKED-ENV: candidate: candidate patch did not apply to the… | NONE | NONE | yes | BLOCKED-ENV |  | dfbb4a24cca9 |  |  |  |
