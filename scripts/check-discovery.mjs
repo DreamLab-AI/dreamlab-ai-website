@@ -14,12 +14,12 @@ let lessons = 0;
 for (const workshop of list) {
   const manifest = JSON.parse(await fs.readFile(`public/data/workshops/${workshop.id}/manifest.json`, 'utf8'));
   for (const page of manifest.pages) {
-    assert(urls.includes(`${origin}${workshop.path}/${page.slug}`), `Lesson missing from sitemap: ${page.slug}`);
+    assert(urls.includes(`${origin}${workshop.path}/${page.slug}/`), `Lesson missing from sitemap: ${page.slug}`);
     lessons++;
   }
 }
 for (const url of urls) {
-  const route = new URL(url).pathname;
+  const route = new URL(url).pathname.replace(/(.)\/$/, '$1');
   const html = await fs.readFile(path.join('dist', route, 'index.html'), 'utf8');
   const dom = new JSDOM(html);
   const doc = dom.window.document;

@@ -137,11 +137,24 @@ export function getWorkshopOGConfig(workshopId: string, workshopTitle: string, w
  * Merges custom config with defaults
  */
 export function mergeOGConfig(config: Partial<OGMetaConfig>): OGMetaConfig {
-  return {
+  const merged = {
     ...DEFAULT_CONFIG,
     ...config,
     image: config.image || OG_IMAGES.default,
   } as OGMetaConfig;
+  return merged.url ? { ...merged, url: canonicalUrl(merged.url) } : merged;
+}
+
+/**
+ * Prerendered routes are served from `<route>/index.html`, and GitHub Pages
+ * 301-redirects `/route` to `/route/`. Canonical URLs therefore carry the
+ * trailing slash so they name the 200 response, not the redirect.
+ */
+export function canonicalUrl(url: string): string {
+  const parsed = new URL(url, BASE_URL);
+  if (parsed.origin !== BASE_URL || parsed.pathname === '/' || parsed.pathname.endsWith('/')) return url;
+  parsed.pathname += '/';
+  return parsed.toString();
 }
 
 /**
@@ -244,11 +257,11 @@ export function updateOGMetaTags(config: Partial<OGMetaConfig>): void {
   schema.textContent = generateStructuredData(mergedConfig);
   document.querySelector('link[rel="alternate"][type="text/markdown"]')?.remove();
   const lessonPath = new URL(mergedConfig.url || window.location.href).pathname;
-  if (/^\/workshops\/[^/]+\/[^/]+\.md$/.test(lessonPath)) {
+  if (/^\/workshops\/[^/]+\/[^/]+\.md\/?$/.test(lessonPath)) {
     const alternate = document.createElement('link');
     alternate.rel = 'alternate';
     alternate.type = 'text/markdown';
-    alternate.href = lessonPath.replace('/workshops/', '/data/workshops/');
+    alternate.href = lessonPath.replace('/workshops/', '/data/workshops/').replace(/\/$/, '');
     document.head.appendChild(alternate);
   }
 }
@@ -259,7 +272,7 @@ export function updateOGMetaTags(config: Partial<OGMetaConfig>): void {
 export function generateStructuredData(config: OGMetaConfig, additionalData?: Record<string, unknown>): string {
   const baseData = {
     '@context': 'https://schema.org',
-    '@type': config.url?.includes('/workshops/') ? 'LearningResource' : 'WebPage',
+    '@type': /\/workshops\/[^/]+/.test(config.url || '') ? 'LearningResource' : 'WebPage',
     '@id': `${config.url}#page`,
     name: config.title,
     description: config.description,
@@ -269,7 +282,7 @@ export function generateStructuredData(config: OGMetaConfig, additionalData?: Re
       '@id': `${BASE_URL}/#organisation`,
     },
     inLanguage: 'en-GB',
-    ...(config.url?.includes('/workshops/') ? { isAccessibleForFree: true } : {}),
+    ...(/\/workshops\/[^/]+/.test(config.url || '') ? { isAccessibleForFree: true } : {}),
     ...additionalData,
   };
 

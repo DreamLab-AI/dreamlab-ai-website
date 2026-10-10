@@ -24,13 +24,17 @@ try {
     curriculum.push(`## ${manifest.title}`, '');
     for (const lesson of manifest.pages) {
       routes.push(`${workshop.path}/${lesson.slug}`);
-      curriculum.push(`- [${lesson.title}](${origin}/data/workshops/${workshop.id}/${lesson.slug}): [Read online](${origin}${workshop.path}/${lesson.slug})`);
+      curriculum.push(`- [${lesson.title}](${origin}/data/workshops/${workshop.id}/${lesson.slug}): [Read online](${origin}${workshop.path}/${lesson.slug}/)`);
     }
     curriculum.push('');
   }
   const outputs = new Map();
+  // Pages serves each route from <route>/index.html and 301s the bare path,
+  // so canonical URLs name the trailing-slash form that answers 200.
+  const pageUrl = route => `${origin}${route}${route === '/' ? '' : '/'}`;
   for (const route of routes) {
     const { body, meta } = renderPage(route);
+    const url = pageUrl(route);
     const dom = new JSDOM(template);
     const doc = dom.window.document;
     doc.querySelector('#root').innerHTML = body;
@@ -42,10 +46,10 @@ try {
     for (const [key, value] of Object.entries({
       title: meta.title, description: meta.description,
       'og:title': meta.title, 'og:description': meta.description,
-      'og:url': `${origin}${route}`, 'og:image': meta.image,
+      'og:url': url, 'og:image': meta.image,
       'og:image:alt': meta.imageAlt || meta.title, 'og:type': meta.type,
       'twitter:title': meta.title, 'twitter:description': meta.description,
-      'twitter:url': `${origin}${route}`, 'twitter:image': meta.image,
+      'twitter:url': url, 'twitter:image': meta.image,
       'twitter:image:alt': meta.imageAlt || meta.title,
     })) {
       const attr = key.startsWith('og:') ? 'property' : 'name';
@@ -53,14 +57,14 @@ try {
       if (!tag) { tag = doc.createElement('meta'); tag.setAttribute(attr, key); doc.head.append(tag); }
       tag.setAttribute('content', value || '');
     }
-    doc.querySelector('link[rel="canonical"]').href = `${origin}${route}`;
+    doc.querySelector('link[rel="canonical"]').href = url;
     const schema = doc.createElement('script');
     schema.type = 'application/ld+json';
     schema.id = 'route-structured-data';
     schema.textContent = JSON.stringify({
       '@context': 'https://schema.org',
       '@type': route.startsWith('/workshops/') ? 'LearningResource' : 'WebPage',
-      '@id': `${origin}${route}#page`, url: `${origin}${route}`,
+      '@id': `${url}#page`, url,
       name: meta.title, description: meta.description, inLanguage: 'en-GB',
       publisher: { '@id': `${origin}/#organisation` },
       ...(route.startsWith('/workshops/') ? { isAccessibleForFree: true } : {}),
@@ -87,7 +91,7 @@ try {
     await fs.writeFile(path.join(directory, 'index.html'), html);
   }
   // No deployment-time lastmod: a rebuild is not a content revision.
-  await fs.writeFile('dist/sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${routes.map(route => `  <url><loc>${origin}${route}</loc></url>`).join('\n')}\n</urlset>\n`);
+  await fs.writeFile('dist/sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${routes.map(route => `  <url><loc>${pageUrl(route)}</loc></url>`).join('\n')}\n</urlset>\n`);
   await fs.writeFile('dist/workshops/llms.txt', curriculum.join('\n'));
   console.log(`Prerendered ${routes.length} canonical pages and ${aliases.length} workshop entry points.`);
 } finally {
