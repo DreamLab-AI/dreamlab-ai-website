@@ -46,7 +46,7 @@ Linking to primary sources makes your page more trustworthy to human readers, an
 
 ## A Visible FAQ — Done Properly
 
-A short FAQ answering the questions people actually ask is one of the most practical additions you can make. The DreamLab homepage added six question-and-answer pairs to its pre-rendered HTML, mirrored word-for-word in `FAQPage` JSON-LD (ADR-043). The word-for-word part matters: structured data must match visible content (Chapter 3).
+A short FAQ answering the questions people actually ask is one of the most practical additions you can make. The DreamLab homepage carries a short set of question-and-answer pairs in its pre-rendered HTML, mirrored word-for-word in `FAQPage` JSON-LD (ADR-043). One answers the query the site most wants to be found for — "AI and agentic training in the Lake District" — in a single quotable paragraph. The word-for-word part matters: structured data must match visible content (Chapter 3).
 
 Good FAQ questions come from real sources: sales enquiries, support emails, the "People also ask" box, and the questions you hear on calls.
 

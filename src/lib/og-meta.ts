@@ -53,8 +53,8 @@ const OG_IMAGES = {
  */
 export const PAGE_OG_CONFIGS: Record<string, OGMetaConfig> = {
   home: {
-    title: 'DreamLab — Applied Innovation Lab, Lake District UK',
-    description: 'Applied Innovation Lab in the UK Lake District. Residential programmes and R&D residencies with specialists in AI, immersive XR, cyber trust and creative technology.',
+    title: 'AI & Agents Residential Training in the Lake District | DreamLab',
+    description: 'Residential AI and agentic training in the Lake District, Cumbria. DreamLab is an Applied Innovation Lab: teams build with 44+ specialists in AI, XR, cyber trust and creative technology. Free self-guided AI curriculum.',
     url: `${BASE_URL}/`,
     image: OG_IMAGES.default,
     imageAlt: 'DreamLab AI residential training facility in the Lake District',
