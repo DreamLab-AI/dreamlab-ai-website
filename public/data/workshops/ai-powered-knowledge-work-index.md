@@ -2,7 +2,7 @@
 
 ## Course Overview
 
-Master AI tools across 9 structured phases — from first setup to production deployment. This unified curriculum eliminates duplication and follows a single linear progression through every skill a modern knowledge worker needs.
+Master AI tools across 10 structured phases — from first setup to production deployment and being found online. This unified curriculum eliminates duplication and follows a single linear progression through every skill a modern knowledge worker needs.
 
 ### Target Audience
 - Academics & Researchers
@@ -12,8 +12,8 @@ Master AI tools across 9 structured phases — from first setup to production de
 - Anyone working with documents daily
 
 ### Course Structure
-- **Duration**: 51+ hours (self-paced) or 5-day residential intensive
-- **Format**: 9 phases, 15 hands-on workshops
+- **Duration**: 57+ hours (self-paced) or 5-day residential intensive
+- **Format**: 10 phases, 16 hands-on workshops
 - **Approach**: 60% practical, 40% theory
 - **Outcome**: Complete AI-powered professional toolkit
 
@@ -133,6 +133,16 @@ Build automated testing pipelines with AI-powered quality engineering tools incl
 
 **Key Outcome**: Automated QA pipeline and professional publishing system.
 
+### Phase 10: SEO & AI Discoverability (6 hours)
+
+Make what you publish findable and citable by search engines and AI answer engines. Audit crawling and JavaScript rendering, write valid JSON-LD structured data, set a deliberate policy for AI crawlers (training, search and user-initiated fetches), and structure content so assistants quote it accurately.
+
+| Workshop | Location | Hours |
+|----------|----------|-------|
+| SEO & AI Discoverability | [`./workshop-10-seo-ai-discoverability/`](./workshop-10-seo-ai-discoverability/) | 6 |
+
+**Key Outcome**: A one-page discoverability audit of your own site, with a crawler policy, validated structured data and a prompt-panel baseline.
+
 ---
 
 ## Concept Map (ontology-grounded)
@@ -190,10 +200,11 @@ safety controls taught in Phase 7.
 3. **Deepen Skills**: Phases 4-6 (Claude Code, Local AI, Docker)
 4. **Go Advanced**: Phases 7-8 (Agents, Ecosystem)
 5. **Ship It**: Phase 9 (QA, Publishing & Capstone)
+6. **Get Found**: Phase 10 (SEO & AI Discoverability)
 
 ### Time Investment
 - Each phase: 3-8 hours
-- Full curriculum: 51+ hours self-paced
+- Full curriculum: 57+ hours self-paced
 - Residential option: 5 days intensive
 
 ---
@@ -222,4 +233,4 @@ Ready to transform your professional practice with AI?
 
 ---
 
-*Last Updated: 2026-08-19 — concept map grounded via the DreamLab Ontology Loom*
+*Last Updated: 2026-10-10 — Phase 10 (SEO & AI Discoverability) added; concept map grounded via the DreamLab Ontology Loom*

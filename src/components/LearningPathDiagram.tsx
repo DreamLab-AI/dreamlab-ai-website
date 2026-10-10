@@ -23,6 +23,7 @@ const PHASE_NODES: PhaseNode[] = [
   { id: 'agents',           number: 7, title: 'AI Agents',      desktop: { x: 150, y: 470 }, mobile: { x: 200, y: 920 } },
   { id: 'coding-ecosystem', number: 8, title: 'Ecosystem',      desktop: { x: 500, y: 470 }, mobile: { x: 200, y: 1060 } },
   { id: 'qa-publishing',    number: 9, title: 'QA & Deploy',    desktop: { x: 850, y: 470 }, mobile: { x: 200, y: 1200 } },
+  { id: 'discoverability',  number: 10, title: 'Discoverability', desktop: { x: 850, y: 650 }, mobile: { x: 200, y: 1340 } },
 ];
 
 const DESKTOP_CONNECTIONS = [
@@ -34,6 +35,7 @@ const DESKTOP_CONNECTIONS = [
   { from: 5, to: 6, path: 'M 150 335 C 125 380, 125 425, 150 425' },
   { from: 6, to: 7, path: 'M 195 470 C 300 445, 400 445, 455 470' },
   { from: 7, to: 8, path: 'M 545 470 C 650 445, 750 445, 805 470' },
+  { from: 8, to: 9, path: 'M 850 515 C 875 560, 875 605, 850 605' },
 ];
 
 const MOBILE_CONNECTIONS = PHASE_NODES.slice(0, -1).map((_, i) => ({
@@ -72,7 +74,7 @@ export const LearningPathDiagram: React.FC<LearningPathDiagramProps> = ({
   }, [isMobile]);
 
   const connections = isMobile ? MOBILE_CONNECTIONS : DESKTOP_CONNECTIONS;
-  const viewBox = isMobile ? '0 0 400 1340' : '0 0 1000 580';
+  const viewBox = isMobile ? '0 0 400 1480' : '0 0 1000 760';
   const isComplete = (id: string) => completedPhaseIds.includes(id);
 
   return (
@@ -91,7 +93,7 @@ export const LearningPathDiagram: React.FC<LearningPathDiagramProps> = ({
       <svg
         viewBox={viewBox}
         className="h-auto w-full"
-        style={{ minHeight: isMobile ? '600px' : '400px', maxHeight: isMobile ? '800px' : '550px' }}
+        style={{ minHeight: isMobile ? '600px' : '400px', maxHeight: isMobile ? '880px' : '720px' }}
       >
         <defs>
           <linearGradient id="lpd-completed" x1="0%" y1="0%" x2="100%" y2="100%">

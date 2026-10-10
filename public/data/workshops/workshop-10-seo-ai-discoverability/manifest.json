@@ -1,0 +1,49 @@
+{
+  "title": "SEO & AI Discoverability: Being Found by Search Engines and Answer Engines",
+  "pages": [
+    {
+      "slug": "README.md",
+      "title": "SEO & AI Discoverability: Being Found by Search Engines and Answer Engines"
+    },
+    {
+      "slug": "00_introduction.md",
+      "title": "Chapter 0: Introduction — How Discovery Works in 2026"
+    },
+    {
+      "slug": "01_crawling_indexing.md",
+      "title": "Chapter 1: Crawling and Indexing"
+    },
+    {
+      "slug": "02_rendering_javascript.md",
+      "title": "Chapter 2: Rendering JavaScript Sites"
+    },
+    {
+      "slug": "03_structured_data.md",
+      "title": "Chapter 3: Structured Data with JSON-LD"
+    },
+    {
+      "slug": "04_metadata_social.md",
+      "title": "Chapter 4: Metadata and Social Previews"
+    },
+    {
+      "slug": "05_ai_crawlers.md",
+      "title": "Chapter 5: AI Crawlers and Access Controls"
+    },
+    {
+      "slug": "06_answer_engine_content.md",
+      "title": "Chapter 6: Writing for Answer Engines"
+    },
+    {
+      "slug": "07_measurement.md",
+      "title": "Chapter 7: Measuring Discoverability"
+    },
+    {
+      "slug": "08_exercises.md",
+      "title": "Chapter 8: Hands-On Exercises"
+    },
+    {
+      "slug": "09_resources.md",
+      "title": "Chapter 9: Resources"
+    }
+  ]
+}
