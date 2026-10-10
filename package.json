@@ -27,7 +27,8 @@
     "preview": "vite preview",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "postbuild": "node scripts/prerender.mjs && node scripts/check-discovery.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

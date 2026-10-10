@@ -18,6 +18,8 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - 'vite.config.*'
+      - 'scripts/prerender.mjs'
+      - 'scripts/check-discovery.mjs'
       - '.github/workflows/deploy.yml'
   workflow_dispatch:
 

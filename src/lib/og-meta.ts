@@ -53,9 +53,9 @@ const OG_IMAGES = {
  */
 export const PAGE_OG_CONFIGS: Record<string, OGMetaConfig> = {
   home: {
-    title: 'DreamLab AI — AI & Agents Residential Training in the Lake District',
-    description: 'Residential AI and agents training in the Lake District. Agentics, spatial computing, rapid prototyping & secure distributed systems — training, consulting, and bespoke product development with 43+ deep tech specialists.',
-    url: BASE_URL,
+    title: 'DreamLab — Applied Innovation Lab, Lake District UK',
+    description: 'Applied Innovation Lab in the UK Lake District. Residential programmes and R&D residencies with specialists in AI, immersive XR, cyber trust and creative technology.',
+    url: `${BASE_URL}/`,
     image: OG_IMAGES.default,
     imageAlt: 'DreamLab AI residential training facility in the Lake District',
   },
@@ -65,7 +65,7 @@ export const PAGE_OG_CONFIGS: Record<string, OGMetaConfig> = {
     url: `${BASE_URL}/programmes`,
     image: OG_IMAGES.programmes,
     imageAlt: 'DreamLab Programme Tracks',
-    type: 'product',
+    type: 'website',
   },
   coCreate: {
     title: 'Co-Create With Us | DreamLab Applied Innovation Lab',
@@ -90,14 +90,14 @@ export const PAGE_OG_CONFIGS: Record<string, OGMetaConfig> = {
   },
   workshops: {
     title: 'Self-Guided Workshops | DreamLab Applied Innovation Lab',
-    description: 'Self-paced AI-powered knowledge work workshops. 14 comprehensive modules covering AI integration, agentic workflows, RAG systems, and professional automation.',
+    description: 'Free self-guided AI curriculum covering AI APIs, Claude Code, Codex, local AI, RAG, agents, testing, publishing and AI search discovery. No registration required.',
     url: `${BASE_URL}/workshops`,
     image: OG_IMAGES.workshops,
     imageAlt: 'DreamLab Workshops - AI-Powered Knowledge Work',
   },
   team: {
     title: 'Our Team | DreamLab Applied Innovation Lab',
-    description: 'Meet the DreamLab collective — 43+ specialists including Emmy nominees, PhD researchers, and BAFTA-recognised talent across AI, XR, cyber, audio, and creative technology.',
+    description: 'Meet the DreamLab specialist network across AI, XR, cyber trust, audio and creative technology. Read biographies and choose expertise for your project.',
     url: `${BASE_URL}/team`,
     image: OG_IMAGES.team,
     imageAlt: 'DreamLab Team - Multi-Disciplinary Expertise',
@@ -121,11 +121,11 @@ export const PAGE_OG_CONFIGS: Record<string, OGMetaConfig> = {
 /**
  * Generates workshop-specific OG config
  */
-export function getWorkshopOGConfig(workshopId: string, workshopTitle: string, workshopDescription: string): OGMetaConfig {
+export function getWorkshopOGConfig(workshopId: string, workshopTitle: string, workshopDescription: string, pageSlug?: string): OGMetaConfig {
   return {
     title: `${workshopTitle} | DreamLab AI Workshops`,
     description: workshopDescription,
-    url: `${BASE_URL}/workshops/${workshopId}`,
+    url: `${BASE_URL}/workshops/${workshopId}${pageSlug ? `/${pageSlug}` : ''}`,
     image: OG_IMAGES.workshops,
     imageAlt: `DreamLab AI Workshop - ${workshopTitle}`,
     type: 'article',
@@ -231,6 +231,26 @@ export function updateOGMetaTags(config: Partial<OGMetaConfig>): void {
     document.head.appendChild(canonicalLink);
   }
   canonicalLink.setAttribute('href', mergedConfig.url || window.location.href);
+
+  // A client-side navigation must not retain the previous route's schema or
+  // Markdown alternate. The organisation graph is shared across the site.
+  let schema = document.getElementById('route-structured-data');
+  if (!schema) {
+    schema = document.createElement('script');
+    schema.setAttribute('type', 'application/ld+json');
+    schema.id = 'route-structured-data';
+    document.head.appendChild(schema);
+  }
+  schema.textContent = generateStructuredData(mergedConfig);
+  document.querySelector('link[rel="alternate"][type="text/markdown"]')?.remove();
+  const lessonPath = new URL(mergedConfig.url || window.location.href).pathname;
+  if (/^\/workshops\/[^/]+\/[^/]+\.md$/.test(lessonPath)) {
+    const alternate = document.createElement('link');
+    alternate.rel = 'alternate';
+    alternate.type = 'text/markdown';
+    alternate.href = lessonPath.replace('/workshops/', '/data/workshops/');
+    document.head.appendChild(alternate);
+  }
 }
 
 /**
@@ -239,19 +259,17 @@ export function updateOGMetaTags(config: Partial<OGMetaConfig>): void {
 export function generateStructuredData(config: OGMetaConfig, additionalData?: Record<string, unknown>): string {
   const baseData = {
     '@context': 'https://schema.org',
-    '@type': config.type === 'article' ? 'Article' : config.type === 'product' ? 'Product' : 'WebPage',
+    '@type': config.url?.includes('/workshops/') ? 'LearningResource' : 'WebPage',
+    '@id': `${config.url}#page`,
     name: config.title,
     description: config.description,
     url: config.url,
     image: config.image,
     publisher: {
-      '@type': 'Organization',
-      name: 'DreamLab AI Consulting Ltd.',
-      logo: {
-        '@type': 'ImageObject',
-        url: `${BASE_URL}/favicon.ico`,
-      },
+      '@id': `${BASE_URL}/#organisation`,
     },
+    inLanguage: 'en-GB',
+    ...(config.url?.includes('/workshops/') ? { isAccessibleForFree: true } : {}),
     ...additionalData,
   };
 
