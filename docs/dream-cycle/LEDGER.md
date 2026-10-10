@@ -49,3 +49,4 @@
 | 2026-10-07 | ci-workflows | Workflow KIT_REF comments restated beta.14 (canonical beta.15); prose removed | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/56 | yes | ACCEPT |  | ed8fe02af35d |  |  |  |
 | 2026-10-08 | kit-pin-integrity | Cargo.lock: kit crate resolved twice is now PIN-DRIFT (last-wins parser hid it) | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/57 | yes | ACCEPT |  | 24015ee35b0b |  |  |  |
 | 2026-10-09 | site-build-content | predev/prebuild generator parity check + bench smoke test for inventory | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/58 | yes | ACCEPT |  | 6f0b0a79ae4e |  |  |  |
+| 2026-10-10 | operator-overlay | webauthn+mesh TOML-to-wrangler mirrors unenumerated; bench test now enforces | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/59 | yes | ACCEPT |  | 919165feba7e |  |  |  |
