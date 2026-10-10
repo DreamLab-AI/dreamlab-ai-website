@@ -1,0 +1,616 @@
+<!DOCTYPE html><html lang="en" class="dark"><head>
+    <meta charset="UTF-8">
+
+    <!-- Primary Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <title>Core Concepts: Modern Deployment &amp; Publishing | DreamLab AI Workshops</title>
+    <meta name="title" content="Core Concepts: Modern Deployment &amp; Publishing | DreamLab AI Workshops">
+    <meta name="description" content="Core Concepts: Modern Deployment &amp; Publishing — free DreamLab AI curriculum.">
+    <meta name="keywords" content="applied innovation lab, AI consulting, enterprise innovation, immersive XR, cyber trust, creative technology, residential programmes, knowledge transfer, deep tech, Lake District">
+    <meta name="author" content="DreamLab">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    <meta name="rating" content="General">
+
+    <link rel="describedby" href="/llms.txt" type="text/plain">
+    <script type="application/ld+json" id="organisation-structured-data">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://dreamlab-ai.com/#organisation","name":"DreamLab","url":"https://dreamlab-ai.com/","logo":"https://dreamlab-ai.com/images/heroes/dreamlab-hero.webp","email":"info@dreamlab-ai.com","founder":{"@id":"https://dreamlab-ai.com/team#john-ohare"},"sameAs":["https://github.com/DreamLab-AI","https://www.linkedin.com/company/dreamlab-ai-consulting"]},{"@type":"Person","@id":"https://dreamlab-ai.com/team#john-ohare","name":"John O'Hare","honorificPrefix":"Dr","jobTitle":"Founder","worksFor":{"@id":"https://dreamlab-ai.com/#organisation"},"url":"https://dreamlab-ai.com/team#john-ohare"}]}</script>
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dreamlab-ai.com/workshops/workshop-05-afternoon-publishing/01_concepts.md/">
+
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="msapplication-TileColor" content="#1a1a2e">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://dreamlab-ai.com/workshops/workshop-05-afternoon-publishing/01_concepts.md/">
+    <meta property="og:title" content="Core Concepts: Modern Deployment &amp; Publishing | DreamLab AI Workshops">
+    <meta property="og:description" content="Core Concepts: Modern Deployment &amp; Publishing — free DreamLab AI curriculum.">
+    <meta property="og:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="DreamLab AI Workshop - Core Concepts: Modern Deployment &amp; Publishing">
+    <meta property="og:site_name" content="DreamLab">
+    <meta property="og:locale" content="en_GB">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://dreamlab-ai.com/workshops/workshop-05-afternoon-publishing/01_concepts.md/">
+    <meta name="twitter:title" content="Core Concepts: Modern Deployment &amp; Publishing | DreamLab AI Workshops">
+    <meta name="twitter:description" content="Core Concepts: Modern Deployment &amp; Publishing — free DreamLab AI curriculum.">
+    <meta name="twitter:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta name="twitter:image:alt" content="DreamLab AI Workshop - Core Concepts: Modern Deployment &amp; Publishing">
+    <meta name="twitter:site" content="@thedreamlab">
+    <meta name="twitter:creator" content="@thedreamlab">
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="geo.region" content="GB">
+    <meta name="geo.placename" content="United Kingdom">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DreamLab AI">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Security Headers -->
+    <!--
+      CSP notes:
+      - script-src is 'self' only: no 'unsafe-eval' (blocks eval/Function-based
+        injection) and no 'unsafe-inline'. The one inline bootstrap script was
+        moved to /spa-redirect.js. JSON-LD blocks below are type
+        application/ld+json (data, not executable) so CSP does not gate them.
+      - connect-src is scoped to the Cloudflare Workers subdomain actually used
+        by this account (*.solitary-paper-764d.workers.dev: auth / pod / search /
+        link-preview / nostr-relay), NOT the internet-wide *.workers.dev, which
+        previously allowed exfiltration to any attacker-controlled worker.
+      - The two open Nostr relays (relay.damus.io, relay.primal.net) are
+        explicitly allow-listed: the Talk-to-AI chat listens there for
+        junkiejarvis's reply (the primary relay's whitelist gate rejects the
+        gift-wrap addressed to the ephemeral session key — ADR-042 Amendment 1).
+        Must stay in sync with VITE_REPLY_RELAYS. Named exactly, not a wildcard.
+      - style-src keeps 'unsafe-inline' because Radix UI + runtime style
+        attributes require it; that is not a script-injection vector.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.solitary-paper-764d.workers.dev wss://*.solitary-paper-764d.workers.dev https://*.dreamlab-ai.com wss://*.dreamlab-ai.com wss://relay.damus.io wss://relay.primal.net; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <!-- SPA deep-link restore. External 'self' script (not inline) so CSP
+         script-src can stay 'self' with no 'unsafe-inline'. Classic,
+         render-blocking script: runs before the deferred app module. -->
+    <script src="/spa-redirect.js"></script>
+    <script type="module" crossorigin="" src="/assets/index-Crc86LXg.js"></script>
+    <link rel="modulepreload" crossorigin="" href="/assets/ui-C2dH1upk.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/vendor-uw6h6E0d.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/nostr-BpuBsPg-.js">
+    <link rel="stylesheet" crossorigin="" href="/assets/index-CeEdk6WL.css">
+  <script type="application/ld+json" id="route-structured-data">{"@context":"https://schema.org","@type":"LearningResource","@id":"https://dreamlab-ai.com/workshops/workshop-05-afternoon-publishing/01_concepts.md/#page","url":"https://dreamlab-ai.com/workshops/workshop-05-afternoon-publishing/01_concepts.md/","name":"Core Concepts: Modern Deployment & Publishing | DreamLab AI Workshops","description":"Core Concepts: Modern Deployment & Publishing — free DreamLab AI curriculum.","inLanguage":"en-GB","publisher":{"@id":"https://dreamlab-ai.com/#organisation"},"isAccessibleForFree":true}</script><link rel="alternate" type="text/markdown" href="/data/workshops/workshop-05-afternoon-publishing/01_concepts.md"></head>
+
+  <body>
+    <!-- Skip Navigation Link for Accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
+      Skip to main content
+    </a>
+    <div id="root"><header role="banner" class="fixed top-0 left-0 right-0 z-50"><div class="md:hidden flex items-center justify-between h-14 px-6 bg-[rgba(14,14,17,0.92)] backdrop-blur-[14px] border-b border-dlm-hairline"><a aria-label="DreamLab home" class="flex items-center gap-2" href="/"><span class="w-[9px] h-[9px] rounded-full bg-dlm-bright shrink-0" aria-hidden="true"></span><span class="text-[14px] font-semibold tracking-[0.14em] text-[#FAFAFA]">DREAMLAB</span></a><button type="button" aria-label="Open menu" aria-expanded="false" class="w-11 h-11 -mr-2 flex flex-col items-end justify-center gap-[5px] focus:outline-none focus-visible:ring-2 focus-visible:ring-dlm-bright rounded"><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span></button></div><div class="hidden md:block transition-all duration-300 ease-out py-3 bg-background/60 backdrop-blur-md"><div class="container flex items-center justify-between px-4"><button class="flex items-center gap-2 md:gap-3 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded min-h-[48px] min-w-[48px] px-3 py-2" aria-label="Main navigation menu" type="button" id="radix-:Rp:" aria-haspopup="menu" aria-expanded="false" data-state="closed"><div class="w-10 h-10 md:w-8 md:h-8 shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all duration-300 group-hover:scale-110 animate-glow-pulse" aria-hidden="true"></div><span class="font-bold text-lg md:text-xl tracking-tight group-hover:text-purple-400 transition-colors duration-300">MENU</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down h-5 w-5 md:h-4 md:w-4 shrink-0 text-muted-foreground group-hover:text-purple-400 transition-all duration-300 group-hover:rotate-180" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button><div class="flex items-center gap-2"><a class="items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-10 py-2 hover:bg-purple-500/10 hover:text-purple-400 transition-all duration-300 hover:scale-105 min-h-[48px] px-4 text-base md:text-sm hidden sm:inline-flex" href="/contact">Contact</a><a class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary hover:bg-primary/90 h-10 py-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transition-all duration-300 min-h-[48px] px-4 text-base md:text-sm" href="/co-create">Partner With Us</a></div></div></div></header><header class="relative overflow-hidden" style="min-height:320px"><div class="absolute inset-0 bg-gradient-to-br from-blue-500/30 via-purple-500/30 to-violet-500/30" style="transform:translateY(0px);opacity:1"><div class="absolute top-0 -left-20 w-96 h-96 rounded-full blur-3xl opacity-40 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600"></div><div class="absolute bottom-0 -right-20 w-[32rem] h-[32rem] rounded-full blur-3xl opacity-30 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600" style="animation-delay:1s"></div><div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full blur-3xl opacity-20 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600" style="animation-delay:2s"></div></div><div class="absolute inset-0 opacity-5" style="background-image:linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);background-size:50px 50px;transform:translateY(0px)"></div><div class="relative z-10 container px-4 pt-24 pb-8"><div class="mb-6 transition-all duration-500 transform opacity-0 translate-y-4"><nav aria-label="breadcrumb"><ol class="flex flex-wrap items-center gap-1.5 break-words text-sm sm:gap-2.5 text-white/70"><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/">Home</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/workshops">Workshops</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><span role="link" aria-disabled="true" aria-current="page" class="text-white font-medium">Phase 9: QA, Publishing &amp; Capstone</span></li></ol></nav></div><div class="mb-4 transition-all duration-500 delay-100 transform opacity-0 translate-y-4"><div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20"><span class="text-purple-400"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cpu w-5 h-5" aria-hidden="true"><path d="M12 20v2"></path><path d="M12 2v2"></path><path d="M17 20v2"></path><path d="M17 2v2"></path><path d="M2 12h2"></path><path d="M2 17h2"></path><path d="M2 7h2"></path><path d="M20 12h2"></path><path d="M20 17h2"></path><path d="M20 7h2"></path><path d="M7 20v2"></path><path d="M7 2v2"></path><rect x="4" y="4" width="16" height="16" rx="2"></rect><rect x="8" y="8" width="8" height="8" rx="1"></rect></svg></span><span class="text-sm font-medium text-white/90">AI / Machine Learning</span></div></div><h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 break-words transition-all duration-700 delay-200 transform opacity-0 translate-y-6"><span class="bg-gradient-to-r bg-clip-text text-transparent animate-gradient-shift bg-400% from-blue-400 via-purple-400 to-violet-400">Phase 9: QA, Publishing &amp; Capstone</span></h1><div class="flex flex-wrap items-center gap-3 mb-6 transition-all duration-700 delay-400 transform opacity-0 translate-y-4"><div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-white/10 border-white/20 text-white backdrop-blur-sm hover:bg-white/20"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-3.5 h-3.5 mr-1.5" aria-hidden="true"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>10<!-- --> <!-- -->Modules</div></div><div class="max-w-md transition-all duration-700 delay-500 transform opacity-0 translate-y-4"><div class="flex items-center justify-between text-sm text-white/70 mb-2"><span class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code w-4 h-4" aria-hidden="true"><path d="m16 18 6-6-6-6"></path><path d="m8 6-6 6 6 6"></path></svg><span>Chapter <!-- -->3<!-- -->: <!-- -->Core Concepts: Modern Deployment &amp; Publishing</span></span><span class="font-medium text-white">30<!-- -->%</span></div><div class="relative"><div aria-valuemax="100" aria-valuemin="0" role="progressbar" data-state="indeterminate" data-max="100" class="relative w-full overflow-hidden rounded-full h-2 bg-white/20"><div data-state="indeterminate" data-max="100" class="h-full w-full flex-1 bg-primary transition-all" style="transform:translateX(-70%)"></div></div><div class="absolute top-0 left-0 h-2 rounded-full blur-sm bg-gradient-to-r from-blue-600 via-purple-600 to-violet-600" style="width:30%"></div></div><div class="relative mt-1 h-1"><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:10%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:20%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:30%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:40%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:50%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:60%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:70%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:80%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:90%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:100%"></div></div></div></div><div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent"></div></header><main class="container px-4 pt-8 pb-8 flex flex-col md:flex-row gap-x-8 min-h-screen" id="main-content"><aside class="w-full md:w-64 lg:w-72 md:sticky md:top-20 md:h-[calc(100vh-5rem-2rem)] mb-8 md:mb-0"><h2 class="text-xl font-semibold mb-4 break-words">Phase 9: QA, Publishing &amp; Capstone</h2><div dir="ltr" class="relative overflow-hidden h-auto md:h-full pr-4 border-r md:border-r-0" style="position:relative;--radix-scroll-area-corner-width:0px;--radix-scroll-area-corner-height:0px"><style>[data-radix-scroll-area-viewport]{scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;}[data-radix-scroll-area-viewport]::-webkit-scrollbar{display:none}</style><div data-radix-scroll-area-viewport="" class="h-full w-full rounded-[inherit]" style="overflow-x:hidden;overflow-y:hidden"><div style="min-width:100%;display:table"><nav><ul><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-05-afternoon-publishing/README.md"><span class="mr-2 text-xs opacity-60">1<!-- -->.</span>Phase 9: QA, Publishing &amp; Capstone</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-05-afternoon-publishing/00_introduction.md"><span class="mr-2 text-xs opacity-60">2<!-- -->.</span>Introduction to Modern Publishing &amp; Deployment</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors bg-primary text-primary-foreground font-semibold" href="/workshops/workshop-05-afternoon-publishing/01_concepts.md"><span class="mr-2 text-xs opacity-60">3<!-- -->.</span>Core Concepts: Modern Deployment &amp; Publishing</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-05-afternoon-publishing/02_hands_on.md"><span class="mr-2 text-xs opacity-60">4<!-- -->.</span>Hands-On: Deploy to Production</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-05-afternoon-publishing/03_exercises.md"><span class="mr-2 text-xs opacity-60">5<!-- -->.</span>Advanced Deployment Exercises</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-05-afternoon-publishing/04_project.md"><span class="mr-2 text-xs opacity-60">6<!-- -->.</span>Final Project: Full-Stack Deployment Pipeline</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-05-afternoon-publishing/05_assessment.md"><span class="mr-2 text-xs opacity-60">7<!-- -->.</span>Assessment: Publishing &amp; Deployment Mastery</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-05-afternoon-publishing/06_resources.md"><span class="mr-2 text-xs opacity-60">8<!-- -->.</span>Additional Resources: Publishing &amp; Deployment</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-05-afternoon-publishing/objectives.md"><span class="mr-2 text-xs opacity-60">9<!-- -->.</span>Learning Objectives - Publishing &amp; Deployment</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-05-afternoon-publishing/prerequisites.md"><span class="mr-2 text-xs opacity-60">10<!-- -->.</span>Prerequisites - Publishing &amp; Deployment</a></li></ul></nav></div></div></div></aside><article class="flex-1 min-w-0 md:pl-0"><div class="prose max-w-none dark:prose-invert break-words [&amp;_table]:block [&amp;_table]:w-full [&amp;_table]:overflow-x-auto"><h1>Core Concepts: Modern Deployment &amp; Publishing</h1>
+<blockquote>
+<p><strong>Section Duration:</strong> 60 minutes
+<strong>Difficulty:</strong> 🟡 Intermediate</p>
+</blockquote>
+<h2>Understanding the Deployment Landscape (2026)</h2>
+<p>The deployment ecosystem has evolved dramatically. Let's understand the core concepts that power modern application delivery.</p>
+<hr>
+<h2>1. Deployment Platform Types</h2>
+<h3>Frontend-First Platforms</h3>
+<p>Perfect for React, Vue, and Next.js applications with automatic optimizations.</p>
+<h4><strong>Vercel</strong> (Recommended for React/Next.js)</h4>
+<pre><code class="language-yaml">Key Features:
+  - Zero-config deployments
+  - Automatic HTTPS &amp; CDN
+  - Edge functions at 300+ locations
+  - Preview deployments per PR
+  - Web Analytics built-in
+
+Best For:
+  - Next.js applications (built by Vercel)
+  - React SPAs with API routes
+  - Static sites with dynamic capabilities
+
+Pricing:
+  - Free: Hobby projects, unlimited deployments
+  - Pro: $20/month per user, team features
+</code></pre>
+<p><strong>Example Deployment Flow:</strong></p>
+<pre><code class="language-bash"># Install Vercel CLI
+npm i -g vercel
+
+# Deploy from any directory
+vercel
+
+# Production deployment
+vercel --prod
+</code></pre>
+<h4><strong>Netlify</strong> (Best for JAMstack)</h4>
+<pre><code class="language-yaml">Key Features:
+  - Instant rollbacks
+  - Split testing (A/B)
+  - Form handling without backend
+  - Serverless functions
+  - Build plugins ecosystem
+
+Best For:
+  - Static site generators (Hugo, Jekyll)
+  - JAMstack architectures
+  - Sites with form submissions
+
+Pricing:
+  - Free: 100GB bandwidth/month
+  - Pro: $19/month, 1TB bandwidth
+</code></pre>
+<h4><strong>Cloudflare Pages</strong> (Edge-First)</h4>
+<pre><code class="language-yaml">Key Features:
+  - Global edge network (330+ cities)
+  - Unlimited bandwidth (Free tier)
+  - Workers for edge computing
+  - R2 object storage integration
+  - D1 serverless SQL database
+
+Best For:
+  - High-traffic static sites
+  - Edge-computed applications
+  - Cost-sensitive projects
+  - Full-stack apps with Workers
+
+Pricing:
+  - Free: Unlimited requests &amp; bandwidth
+  - Workers Paid: $5/month for advanced features
+</code></pre>
+<blockquote>
+<p><strong>NOTE</strong>: Check each platform's pricing page for current rates -- free tiers and limits change periodically.</p>
+</blockquote>
+<hr>
+<h3>Backend &amp; Fullstack Platforms</h3>
+<p>For APIs, databases, and complete applications.</p>
+<h4><strong>Railway</strong> (Modern PaaS)</h4>
+<pre><code class="language-yaml">Key Features:
+  - One-click database provisioning
+  - Auto-scaling based on load
+  - GitHub integration
+  - Environment variables UI
+  - Cron jobs support
+  - Private networking between services
+
+Best For:
+  - Node.js APIs
+  - Python backends (FastAPI, Django)
+  - Full-stack applications
+  - Scheduled tasks
+
+Pricing:
+  - Hobby: $5/month (includes usage credits)
+  - Pro: $20/month per seat
+  - Check railway.app for current pricing
+</code></pre>
+<p><strong>Railway Deployment Example:</strong></p>
+<pre><code class="language-bash"># Install Railway CLI
+npm i -g @railway/cli
+
+# Login and initialize
+railway login
+railway init
+
+# Deploy
+railway up
+</code></pre>
+<h4><strong>Render</strong> (All-in-One)</h4>
+<pre><code class="language-yaml">Key Features:
+  - Free PostgreSQL databases
+  - Auto-deploy from Git
+  - Private services (no public access)
+  - Background workers
+  - Redis support
+
+Best For:
+  - Production APIs
+  - Services needing databases
+  - Background job processing
+
+Pricing:
+  - Free: Static sites, limited services
+  - Starter: $7/month per service
+</code></pre>
+<hr>
+<h2>2. Continuous Integration/Deployment (CI/CD)</h2>
+<h3>GitHub Actions Architecture</h3>
+<p>GitHub Actions is the modern standard for CI/CD, integrated directly into your repositories.</p>
+<p><img src="/data/workshops/workshop-05-afternoon-publishing/diagrams/01-cicd-flow.svg" alt="CI/CD deployment workflow: push triggers tests, passing builds deploy to staging, main branch goes to production while other branches get a preview URL"></p>
+<h3>Core GitHub Actions Concepts</h3>
+<h4><strong>Workflows</strong></h4>
+<p>YAML files in <code>.github/workflows/</code> that define automation.</p>
+<pre><code class="language-yaml"># .github/workflows/deploy.yml
+name: Deploy to Production
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+</code></pre>
+<h4><strong>Events</strong> (Workflow Triggers)</h4>
+<pre><code class="language-yaml"># Common triggers
+on:
+  push:                    # Any push
+    branches: [main]       # Only main branch
+  pull_request:            # PRs opened/updated
+  schedule:                # Cron jobs
+    - cron: '0 0 * * *'   # Daily at midnight
+  workflow_dispatch:       # Manual trigger
+  release:                 # New releases
+    types: [published]
+</code></pre>
+<h4><strong>Jobs &amp; Steps</strong></h4>
+<pre><code class="language-yaml">jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run tests
+        run: npm test
+
+  deploy:
+    needs: test              # Run after test job
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Vercel
+        run: vercel --prod --token=${{ secrets.VERCEL_TOKEN }}
+</code></pre>
+<hr>
+<h2>3. Environment Management</h2>
+<h3>The Three-Environment Strategy</h3>
+<p><img src="/data/workshops/workshop-05-afternoon-publishing/diagrams/01-environments.svg" alt="Environment flow: development, then preview/staging via pull request, then production on merge"></p>
+<h4><strong>Development</strong></h4>
+<ul>
+<li><strong>Location</strong>: Your local machine</li>
+<li><strong>Purpose</strong>: Rapid iteration and debugging</li>
+<li><strong>Database</strong>: Local SQLite or Docker containers</li>
+<li><strong>API Keys</strong>: Development/sandbox keys</li>
+</ul>
+<h4><strong>Preview/Staging</strong></h4>
+<ul>
+<li><strong>Location</strong>: Auto-deployed from PRs</li>
+<li><strong>Purpose</strong>: Test changes before production</li>
+<li><strong>Database</strong>: Staging database (copy of prod structure)</li>
+<li><strong>API Keys</strong>: Test mode keys</li>
+<li><strong>URL</strong>: Unique per PR (e.g., <code>pr-123.vercel.app</code>)</li>
+</ul>
+<h4><strong>Production</strong></h4>
+<ul>
+<li><strong>Location</strong>: Main branch deployment</li>
+<li><strong>Purpose</strong>: Live application for users</li>
+<li><strong>Database</strong>: Production database with backups</li>
+<li><strong>API Keys</strong>: Live mode keys</li>
+<li><strong>URL</strong>: Your custom domain</li>
+</ul>
+<h3>Managing Environment Variables</h3>
+<p>Never commit secrets to Git. Use platform-specific variable management.</p>
+<h4><strong>Vercel Environment Variables</strong></h4>
+<pre><code class="language-bash"># Via CLI
+vercel env add DATABASE_URL production
+
+# Via Dashboard
+# Project Settings &gt; Environment Variables
+# Separate values for Production, Preview, Development
+</code></pre>
+<h4><strong>Railway Environment Variables</strong></h4>
+<pre><code class="language-bash"># Via CLI
+railway variables set DATABASE_URL="postgresql://..."
+
+# Via Dashboard
+# Service &gt; Variables tab
+# Variables are encrypted at rest
+</code></pre>
+<h4><strong>GitHub Actions Secrets</strong></h4>
+<pre><code class="language-yaml"># .github/workflows/deploy.yml
+jobs:
+  deploy:
+    steps:
+      - name: Deploy
+        env:
+          API_KEY: ${{ secrets.API_KEY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: npm run deploy
+</code></pre>
+<p>Add secrets: Repository Settings &gt; Secrets and variables &gt; Actions</p>
+<hr>
+<h2>4. Documentation Publishing Strategies</h2>
+<h3>Component Documentation (Storybook)</h3>
+<p>Visual documentation for UI components with interactive examples.</p>
+<pre><code class="language-javascript">// Button.stories.js
+import Button from './Button';
+
+export default {
+  title: 'Components/Button',
+  component: Button,
+  parameters: {
+    docs: {
+      description: {
+        component: 'A versatile button component with multiple variants.'
+      }
+    }
+  }
+};
+
+export const Primary = {
+  args: {
+    variant: 'primary',
+    children: 'Click me'
+  }
+};
+
+export const Secondary = {
+  args: {
+    variant: 'secondary',
+    children: 'Click me'
+  }
+};
+</code></pre>
+<p><strong>Deployment Options:</strong></p>
+<ul>
+<li><strong>Chromatic</strong>: Automated visual testing + hosting</li>
+<li><strong>Netlify/Vercel</strong>: Static Storybook build</li>
+<li><strong>GitHub Pages</strong>: Free hosting for docs</li>
+</ul>
+<hr>
+<h3>API Documentation (OpenAPI/Swagger)</h3>
+<p>Interactive API documentation with try-it-out capabilities.</p>
+<pre><code class="language-yaml"># openapi.yaml
+openapi: 3.0.0
+info:
+  title: Task Manager API
+  version: 1.0.0
+  description: REST API for task management
+
+paths:
+  /api/tasks:
+    get:
+      summary: List all tasks
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+
+components:
+  schemas:
+    Task:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        completed:
+          type: boolean
+</code></pre>
+<p><strong>Tools:</strong></p>
+<ul>
+<li><strong>Swagger UI</strong>: Interactive API explorer</li>
+<li><strong>Redoc</strong>: Beautiful API documentation</li>
+<li><strong>Stoplight</strong>: API design and docs platform</li>
+</ul>
+<hr>
+<h3>User Documentation (MkDocs Material)</h3>
+<p>Comprehensive guides, tutorials, and references.</p>
+<pre><code class="language-yaml"># mkdocs.yml
+site_name: My Application Docs
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - search.suggest
+    - content.code.copy
+  palette:
+    scheme: slate
+    primary: indigo
+
+plugins:
+  - search
+  - awesome-pages
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+</code></pre>
+<p><strong>Deployment:</strong></p>
+<pre><code class="language-bash"># Build and deploy to GitHub Pages
+mkdocs gh-deploy
+
+# Or deploy to Vercel/Netlify
+mkdocs build
+vercel deploy
+</code></pre>
+<hr>
+<h2>5. Deployment Best Practices (2026)</h2>
+<h3>✅ Always Do</h3>
+<ol>
+<li><strong>Use Preview Deployments</strong>: Test every PR before merging</li>
+<li><strong>Automate Testing</strong>: Run tests in CI before deployment</li>
+<li><strong>Environment Parity</strong>: Keep staging similar to production</li>
+<li><strong>Monitor Deployments</strong>: Set up error tracking (Sentry, LogRocket)</li>
+<li><strong>Version Your APIs</strong>: Use <code>/v1/</code>, <code>/v2/</code> in API paths</li>
+<li><strong>Enable Rollbacks</strong>: Keep previous deployments accessible</li>
+</ol>
+<h3>❌ Never Do</h3>
+<ol>
+<li><strong>Commit Secrets</strong>: Use environment variables instead</li>
+<li><strong>Skip Testing</strong>: Always run tests before production</li>
+<li><strong>Manual Deployments</strong>: Automate with CI/CD</li>
+<li><strong>Ignore Build Warnings</strong>: They often indicate future problems</li>
+<li><strong>Deploy on Fridays</strong>: Leave time to fix issues before weekends</li>
+<li><strong>Use Default Secrets</strong>: Rotate and customize all keys</li>
+</ol>
+<hr>
+<h2>6. Deployment Checklist</h2>
+<p>Before deploying to production:</p>
+<pre><code class="language-markdown">### Pre-Deployment
+- [ ] All tests passing locally
+- [ ] Environment variables configured
+- [ ] Database migrations tested
+- [ ] Build completes without errors
+- [ ] Static assets optimized
+- [ ] API rate limits configured
+
+### Post-Deployment
+- [ ] Health check endpoint responding
+- [ ] Critical user flows tested
+- [ ] Error tracking configured
+- [ ] Analytics/monitoring active
+- [ ] DNS configured correctly
+- [ ] HTTPS certificate valid
+- [ ] Performance metrics acceptable
+</code></pre>
+<hr>
+<h2>Platform Comparison Matrix</h2>
+<p>Choose the right platform for your project:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Feature</th><th>Vercel</th><th>Netlify</th><th>Cloudflare Pages</th><th>Railway</th><th>Render</th><th>GitHub Pages</th></tr></thead><tbody><tr><td><strong>Best For</strong></td><td>Next.js/React</td><td>JAMstack</td><td>Edge apps</td><td>APIs</td><td>Full-stack</td><td>Static/docs</td></tr><tr><td><strong>Free Tier</strong></td><td>✅ Generous</td><td>✅ Good</td><td>✅ Unlimited</td><td>⚠️ Hobby</td><td>⚠️ Limited</td><td>✅ Public repos</td></tr><tr><td><strong>Bandwidth</strong></td><td>100GB</td><td>100GB</td><td>Unlimited</td><td>Usage-based</td><td>100GB</td><td>100GB</td></tr><tr><td><strong>Edge Locations</strong></td><td>300+</td><td>Limited</td><td>330+</td><td>N/A</td><td>N/A</td><td>CDN</td></tr><tr><td><strong>Database</strong></td><td>✅ (Postgres)</td><td>❌</td><td>✅ (D1 SQL)</td><td>✅</td><td>✅</td><td>❌</td></tr><tr><td><strong>Serverless</strong></td><td>✅</td><td>✅</td><td>✅ Workers</td><td>✅</td><td>✅</td><td>❌</td></tr><tr><td><strong>Preview Deploys</strong></td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>❌</td></tr><tr><td><strong>Custom Domains</strong></td><td>✅ Free</td><td>✅ Free</td><td>✅ Free</td><td>✅ Free</td><td>✅ Free</td><td>✅ Free</td></tr></tbody></table>
+<blockquote>
+<p><strong>NOTE</strong>: Free tiers and build limits change frequently. Check each platform's pricing page for current details.</p>
+</blockquote>
+<hr>
+<h2>Key Takeaways</h2>
+<ol>
+<li><strong>Choose the Right Platform</strong>: Match platform strengths to your project needs</li>
+<li><strong>Automate Everything</strong>: Use CI/CD for consistent, reliable deployments</li>
+<li><strong>Environment Separation</strong>: Development → Preview → Production</li>
+<li><strong>Documentation Matters</strong>: Good docs reduce support burden</li>
+<li><strong>Monitor Continuously</strong>: Know when things break before users complain</li>
+</ol>
+<hr>
+<p><strong>Next:</strong> <a href="02_hands_on.md">02_hands_on.md</a> - Deploying Your First Application</p>
+<hr>
+<h2>Additional Resources</h2>
+<ul>
+<li><a href="https://vercel.com/docs">Vercel Documentation</a></li>
+<li><a href="https://docs.github.com/en/actions">GitHub Actions Documentation</a></li>
+<li><a href="https://docs.railway.app">Railway Docs</a></li>
+<li><a href="https://squidfunk.github.io/mkdocs-material/">MkDocs Material</a></li>
+<li><a href="https://swagger.io/specification/">OpenAPI Specification</a></li>
+</ul></div></article></main></div>
+    <noscript><p>Interactive forms require JavaScript. You can also email <a href="mailto:info@dreamlab-ai.com">info@dreamlab-ai.com</a>.</p></noscript>
+  
+
+</body></html>

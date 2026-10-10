@@ -1,0 +1,528 @@
+<!DOCTYPE html><html lang="en" class="dark"><head>
+    <meta charset="UTF-8">
+
+    <!-- Primary Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <title>Chapter 3: Practical Exercises — Sharpen Your Visual Version Control Skills | DreamLab AI Workshops</title>
+    <meta name="title" content="Chapter 3: Practical Exercises — Sharpen Your Visual Version Control Skills | DreamLab AI Workshops">
+    <meta name="description" content="Chapter 3: Practical Exercises — Sharpen Your Visual Version Control Skills — free DreamLab AI curriculum.">
+    <meta name="keywords" content="applied innovation lab, AI consulting, enterprise innovation, immersive XR, cyber trust, creative technology, residential programmes, knowledge transfer, deep tech, Lake District">
+    <meta name="author" content="DreamLab">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    <meta name="rating" content="General">
+
+    <link rel="describedby" href="/llms.txt" type="text/plain">
+    <script type="application/ld+json" id="organisation-structured-data">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://dreamlab-ai.com/#organisation","name":"DreamLab","url":"https://dreamlab-ai.com/","logo":"https://dreamlab-ai.com/images/heroes/dreamlab-hero.webp","email":"info@dreamlab-ai.com","founder":{"@id":"https://dreamlab-ai.com/team#john-ohare"},"sameAs":["https://github.com/DreamLab-AI","https://www.linkedin.com/company/dreamlab-ai-consulting"]},{"@type":"Person","@id":"https://dreamlab-ai.com/team#john-ohare","name":"John O'Hare","honorificPrefix":"Dr","jobTitle":"Founder","worksFor":{"@id":"https://dreamlab-ai.com/#organisation"},"url":"https://dreamlab-ai.com/team#john-ohare"}]}</script>
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dreamlab-ai.com/workshops/workshop-01-afternoon-visual-version-control/03_exercises.md/">
+
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="msapplication-TileColor" content="#1a1a2e">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://dreamlab-ai.com/workshops/workshop-01-afternoon-visual-version-control/03_exercises.md/">
+    <meta property="og:title" content="Chapter 3: Practical Exercises — Sharpen Your Visual Version Control Skills | DreamLab AI Workshops">
+    <meta property="og:description" content="Chapter 3: Practical Exercises — Sharpen Your Visual Version Control Skills — free DreamLab AI curriculum.">
+    <meta property="og:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="DreamLab AI Workshop - Chapter 3: Practical Exercises — Sharpen Your Visual Version Control Skills">
+    <meta property="og:site_name" content="DreamLab">
+    <meta property="og:locale" content="en_GB">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://dreamlab-ai.com/workshops/workshop-01-afternoon-visual-version-control/03_exercises.md/">
+    <meta name="twitter:title" content="Chapter 3: Practical Exercises — Sharpen Your Visual Version Control Skills | DreamLab AI Workshops">
+    <meta name="twitter:description" content="Chapter 3: Practical Exercises — Sharpen Your Visual Version Control Skills — free DreamLab AI curriculum.">
+    <meta name="twitter:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta name="twitter:image:alt" content="DreamLab AI Workshop - Chapter 3: Practical Exercises — Sharpen Your Visual Version Control Skills">
+    <meta name="twitter:site" content="@thedreamlab">
+    <meta name="twitter:creator" content="@thedreamlab">
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="geo.region" content="GB">
+    <meta name="geo.placename" content="United Kingdom">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DreamLab AI">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Security Headers -->
+    <!--
+      CSP notes:
+      - script-src is 'self' only: no 'unsafe-eval' (blocks eval/Function-based
+        injection) and no 'unsafe-inline'. The one inline bootstrap script was
+        moved to /spa-redirect.js. JSON-LD blocks below are type
+        application/ld+json (data, not executable) so CSP does not gate them.
+      - connect-src is scoped to the Cloudflare Workers subdomain actually used
+        by this account (*.solitary-paper-764d.workers.dev: auth / pod / search /
+        link-preview / nostr-relay), NOT the internet-wide *.workers.dev, which
+        previously allowed exfiltration to any attacker-controlled worker.
+      - The two open Nostr relays (relay.damus.io, relay.primal.net) are
+        explicitly allow-listed: the Talk-to-AI chat listens there for
+        junkiejarvis's reply (the primary relay's whitelist gate rejects the
+        gift-wrap addressed to the ephemeral session key — ADR-042 Amendment 1).
+        Must stay in sync with VITE_REPLY_RELAYS. Named exactly, not a wildcard.
+      - style-src keeps 'unsafe-inline' because Radix UI + runtime style
+        attributes require it; that is not a script-injection vector.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.solitary-paper-764d.workers.dev wss://*.solitary-paper-764d.workers.dev https://*.dreamlab-ai.com wss://*.dreamlab-ai.com wss://relay.damus.io wss://relay.primal.net; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <!-- SPA deep-link restore. External 'self' script (not inline) so CSP
+         script-src can stay 'self' with no 'unsafe-inline'. Classic,
+         render-blocking script: runs before the deferred app module. -->
+    <script src="/spa-redirect.js"></script>
+    <script type="module" crossorigin="" src="/assets/index-Crc86LXg.js"></script>
+    <link rel="modulepreload" crossorigin="" href="/assets/ui-C2dH1upk.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/vendor-uw6h6E0d.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/nostr-BpuBsPg-.js">
+    <link rel="stylesheet" crossorigin="" href="/assets/index-CeEdk6WL.css">
+  <script type="application/ld+json" id="route-structured-data">{"@context":"https://schema.org","@type":"LearningResource","@id":"https://dreamlab-ai.com/workshops/workshop-01-afternoon-visual-version-control/03_exercises.md/#page","url":"https://dreamlab-ai.com/workshops/workshop-01-afternoon-visual-version-control/03_exercises.md/","name":"Chapter 3: Practical Exercises — Sharpen Your Visual Version Control Skills | DreamLab AI Workshops","description":"Chapter 3: Practical Exercises — Sharpen Your Visual Version Control Skills — free DreamLab AI curriculum.","inLanguage":"en-GB","publisher":{"@id":"https://dreamlab-ai.com/#organisation"},"isAccessibleForFree":true}</script><link rel="alternate" type="text/markdown" href="/data/workshops/workshop-01-afternoon-visual-version-control/03_exercises.md"></head>
+
+  <body>
+    <!-- Skip Navigation Link for Accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
+      Skip to main content
+    </a>
+    <div id="root"><header role="banner" class="fixed top-0 left-0 right-0 z-50"><div class="md:hidden flex items-center justify-between h-14 px-6 bg-[rgba(14,14,17,0.92)] backdrop-blur-[14px] border-b border-dlm-hairline"><a aria-label="DreamLab home" class="flex items-center gap-2" href="/"><span class="w-[9px] h-[9px] rounded-full bg-dlm-bright shrink-0" aria-hidden="true"></span><span class="text-[14px] font-semibold tracking-[0.14em] text-[#FAFAFA]">DREAMLAB</span></a><button type="button" aria-label="Open menu" aria-expanded="false" class="w-11 h-11 -mr-2 flex flex-col items-end justify-center gap-[5px] focus:outline-none focus-visible:ring-2 focus-visible:ring-dlm-bright rounded"><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span></button></div><div class="hidden md:block transition-all duration-300 ease-out py-3 bg-background/60 backdrop-blur-md"><div class="container flex items-center justify-between px-4"><button class="flex items-center gap-2 md:gap-3 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded min-h-[48px] min-w-[48px] px-3 py-2" aria-label="Main navigation menu" type="button" id="radix-:Rp:" aria-haspopup="menu" aria-expanded="false" data-state="closed"><div class="w-10 h-10 md:w-8 md:h-8 shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all duration-300 group-hover:scale-110 animate-glow-pulse" aria-hidden="true"></div><span class="font-bold text-lg md:text-xl tracking-tight group-hover:text-purple-400 transition-colors duration-300">MENU</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down h-5 w-5 md:h-4 md:w-4 shrink-0 text-muted-foreground group-hover:text-purple-400 transition-all duration-300 group-hover:rotate-180" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button><div class="flex items-center gap-2"><a class="items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-10 py-2 hover:bg-purple-500/10 hover:text-purple-400 transition-all duration-300 hover:scale-105 min-h-[48px] px-4 text-base md:text-sm hidden sm:inline-flex" href="/contact">Contact</a><a class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary hover:bg-primary/90 h-10 py-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transition-all duration-300 min-h-[48px] px-4 text-base md:text-sm" href="/co-create">Partner With Us</a></div></div></div></header><header class="relative overflow-hidden" style="min-height:320px"><div class="absolute inset-0 bg-gradient-to-br from-pink-500/30 via-rose-500/30 to-orange-500/30" style="transform:translateY(0px);opacity:1"><div class="absolute top-0 -left-20 w-96 h-96 rounded-full blur-3xl opacity-40 animate-float bg-gradient-to-br from-pink-600 via-rose-500 to-orange-500"></div><div class="absolute bottom-0 -right-20 w-[32rem] h-[32rem] rounded-full blur-3xl opacity-30 animate-float bg-gradient-to-br from-pink-600 via-rose-500 to-orange-500" style="animation-delay:1s"></div><div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full blur-3xl opacity-20 animate-float bg-gradient-to-br from-pink-600 via-rose-500 to-orange-500" style="animation-delay:2s"></div></div><div class="absolute inset-0 opacity-5" style="background-image:linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);background-size:50px 50px;transform:translateY(0px)"></div><div class="relative z-10 container px-4 pt-24 pb-8"><div class="mb-6 transition-all duration-500 transform opacity-0 translate-y-4"><nav aria-label="breadcrumb"><ol class="flex flex-wrap items-center gap-1.5 break-words text-sm sm:gap-2.5 text-white/70"><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/">Home</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/workshops">Workshops</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><span role="link" aria-disabled="true" aria-current="page" class="text-white font-medium">Phase 2: Visual Tools &amp; Version Control</span></li></ol></nav></div><div class="mb-4 transition-all duration-500 delay-100 transform opacity-0 translate-y-4"><div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20"><span class="text-pink-400"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-palette w-5 h-5" aria-hidden="true"><path d="M12 22a1 1 0 0 1 0-20 10 9 0 0 1 10 9 5 5 0 0 1-5 5h-2.25a1.75 1.75 0 0 0-1.4 2.8l.3.4a1.75 1.75 0 0 1-1.4 2.8z"></path><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"></circle><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"></circle><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"></circle><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"></circle></svg></span><span class="text-sm font-medium text-white/90">Creative Technology</span></div></div><h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 break-words transition-all duration-700 delay-200 transform opacity-0 translate-y-6"><span class="bg-gradient-to-r bg-clip-text text-transparent animate-gradient-shift bg-400% from-pink-400 via-rose-400 to-orange-400">Phase 2: Visual Tools &amp; Version Control</span></h1><div class="flex flex-wrap items-center gap-3 mb-6 transition-all duration-700 delay-400 transform opacity-0 translate-y-4"><div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-white/10 border-white/20 text-white backdrop-blur-sm hover:bg-white/20"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-3.5 h-3.5 mr-1.5" aria-hidden="true"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>10<!-- --> <!-- -->Modules</div></div><div class="max-w-md transition-all duration-700 delay-500 transform opacity-0 translate-y-4"><div class="flex items-center justify-between text-sm text-white/70 mb-2"><span class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code w-4 h-4" aria-hidden="true"><path d="m16 18 6-6-6-6"></path><path d="m8 6-6 6 6 6"></path></svg><span>Chapter <!-- -->5<!-- -->: <!-- -->Chapter 3: Practical Exercises — Sharpen Your Visual Version Control Skills</span></span><span class="font-medium text-white">50<!-- -->%</span></div><div class="relative"><div aria-valuemax="100" aria-valuemin="0" role="progressbar" data-state="indeterminate" data-max="100" class="relative w-full overflow-hidden rounded-full h-2 bg-white/20"><div data-state="indeterminate" data-max="100" class="h-full w-full flex-1 bg-primary transition-all" style="transform:translateX(-50%)"></div></div><div class="absolute top-0 left-0 h-2 rounded-full blur-sm bg-gradient-to-r from-pink-600 via-rose-500 to-orange-500" style="width:50%"></div></div><div class="relative mt-1 h-1"><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:10%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:20%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:30%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:40%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:50%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:60%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:70%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:80%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:90%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:100%"></div></div></div></div><div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent"></div></header><main class="container px-4 pt-8 pb-8 flex flex-col md:flex-row gap-x-8 min-h-screen" id="main-content"><aside class="w-full md:w-64 lg:w-72 md:sticky md:top-20 md:h-[calc(100vh-5rem-2rem)] mb-8 md:mb-0"><h2 class="text-xl font-semibold mb-4 break-words">Phase 2: Visual Tools &amp; Version Control</h2><div dir="ltr" class="relative overflow-hidden h-auto md:h-full pr-4 border-r md:border-r-0" style="position:relative;--radix-scroll-area-corner-width:0px;--radix-scroll-area-corner-height:0px"><style>[data-radix-scroll-area-viewport]{scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;}[data-radix-scroll-area-viewport]::-webkit-scrollbar{display:none}</style><div data-radix-scroll-area-viewport="" class="h-full w-full rounded-[inherit]" style="overflow-x:hidden;overflow-y:hidden"><div style="min-width:100%;display:table"><nav><ul><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-01-afternoon-visual-version-control/README.md"><span class="mr-2 text-xs opacity-60">1<!-- -->.</span>Phase 2: Visual Tools &amp; Version Control</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-01-afternoon-visual-version-control/00_introduction.md"><span class="mr-2 text-xs opacity-60">2<!-- -->.</span>Chapter 0: Introduction to Visual Tools &amp; Version Control</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-01-afternoon-visual-version-control/01_concepts.md"><span class="mr-2 text-xs opacity-60">3<!-- -->.</span>Chapter 1: Core Concepts - Visual Thinking &amp; Version Control</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-01-afternoon-visual-version-control/02_hands_on.md"><span class="mr-2 text-xs opacity-60">4<!-- -->.</span>Chapter 2: Hands-On Visual Version Control - Mastering Git the Modern Way</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors bg-primary text-primary-foreground font-semibold" href="/workshops/workshop-01-afternoon-visual-version-control/03_exercises.md"><span class="mr-2 text-xs opacity-60">5<!-- -->.</span>Chapter 3: Practical Exercises — Sharpen Your Visual Version Control Skills</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-01-afternoon-visual-version-control/04_project.md"><span class="mr-2 text-xs opacity-60">6<!-- -->.</span>Chapter 4: Real Project Application — Your First Visual, Version-Controlled Deliverable</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-01-afternoon-visual-version-control/05_assessment.md"><span class="mr-2 text-xs opacity-60">7<!-- -->.</span>Chapter 5: Assessment — Validating Your Visual Version Control Mastery</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-01-afternoon-visual-version-control/06_resources.md"><span class="mr-2 text-xs opacity-60">8<!-- -->.</span>Chapter 6: Resources &amp; Continued Learning</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-01-afternoon-visual-version-control/objectives.md"><span class="mr-2 text-xs opacity-60">9<!-- -->.</span>Learning Objectives - Workshop 01 Afternoon: Visual Tools &amp; Version Control</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-01-afternoon-visual-version-control/prerequisites.md"><span class="mr-2 text-xs opacity-60">10<!-- -->.</span>Prerequisites - Workshop 01 Afternoon: Visual Tools &amp; Version Control</a></li></ul></nav></div></div></div></aside><article class="flex-1 min-w-0 md:pl-0"><div class="prose max-w-none dark:prose-invert break-words [&amp;_table]:block [&amp;_table]:w-full [&amp;_table]:overflow-x-auto"><h1>Chapter 3: Practical Exercises — Sharpen Your Visual Version Control Skills</h1>
+<h2>30 Minutes to Cement Your New Skills</h2>
+<p>These exercises progress from basic to advanced, reinforcing the Mermaid diagramming and Git version control skills from the hands-on session. Complete them in order for maximum learning.</p>
+<hr>
+<h2>Exercise 1: Mermaid Flowchart from Description (5 minutes)</h2>
+<h3>Objective</h3>
+<p>Translate a written process into a professional flowchart without any diagramming software.</p>
+<h3>Difficulty: Beginner</h3>
+<h3>Scenario</h3>
+<p>Your manager sends you this email:</p>
+<blockquote>
+<p>"We need to document our client onboarding process. New clients fill in an enquiry form. We review it within 24 hours. If they qualify, we schedule a discovery call. If not, we send a polite decline email. After the discovery call, we create a proposal. The client either accepts (we begin onboarding) or requests changes (we revise and resubmit). Once accepted, we assign a project lead and send a welcome pack."</p>
+</blockquote>
+<h3>Steps</h3>
+<ol>
+<li>
+<p><strong>Create a new file</strong>: <code>exercises/onboarding-flow.md</code></p>
+</li>
+<li>
+<p><strong>Write the Mermaid flowchart</strong> based on the description above. Start with:</p>
+<pre><code class="language-mermaid">flowchart TD
+    A([Client Enquiry]) --&gt; B[Review Application]
+    B --&gt; C{Qualifies?}
+</code></pre>
+</li>
+<li>
+<p><strong>Complete the diagram</strong> by adding all remaining steps, decisions, and connections</p>
+</li>
+<li>
+<p><strong>Preview</strong> your diagram: right-click the file and select "Open Preview" (or <code>Ctrl+Shift+V</code>)</p>
+</li>
+<li>
+<p><strong>Refine</strong>: Add styling to highlight the happy path:</p>
+<pre><code>style G fill:#4fc3f7,stroke:#01579b,stroke-width:3px
+</code></pre>
+</li>
+</ol>
+<h3>Expected Result</h3>
+<p>A complete flowchart with at least 8 nodes, 2 decision diamonds, and clear paths for all outcomes.</p>
+<h3>Reflection</h3>
+<ul>
+<li>How long would this take in PowerPoint or Visio?</li>
+<li>What happens when the process changes — how easy is it to update?</li>
+</ul>
+<details>
+<summary><strong>Hint: Complete Solution</strong></summary>
+<p><img src="/data/workshops/workshop-01-afternoon-visual-version-control/diagrams/03-onboarding-flow.svg" alt="Client onboarding flowchart: enquiry is reviewed, qualified clients get a discovery call and proposal that loops through revisions until acceptance completes onboarding; unqualified enquiries receive a decline email"></p>
+</details>
+<hr>
+<h2>Exercise 2: Project Gantt Chart (5 minutes)</h2>
+<h3>Objective</h3>
+<p>Create a realistic project timeline using Mermaid Gantt chart syntax.</p>
+<h3>Difficulty: Beginner to Intermediate</h3>
+<h3>Scenario</h3>
+<p>You're managing a 6-week website redesign project with these phases:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Phase</th><th>Duration</th><th>Dependencies</th></tr></thead><tbody><tr><td>Discovery &amp; Research</td><td>1 week</td><td>None (starts immediately)</td></tr><tr><td>User Interviews</td><td>5 days</td><td>Starts during week 1</td></tr><tr><td>Wireframes</td><td>1 week</td><td>After research complete</td></tr><tr><td>Visual Design</td><td>2 weeks</td><td>After wireframes</td></tr><tr><td>Content Writing</td><td>2 weeks</td><td>Starts with visual design</td></tr><tr><td>Development</td><td>2 weeks</td><td>After visual design</td></tr><tr><td>Testing</td><td>1 week</td><td>After development</td></tr><tr><td>Launch</td><td>1 day</td><td>After testing</td></tr></tbody></table>
+<h3>Steps</h3>
+<ol>
+<li>
+<p><strong>Create file</strong>: <code>exercises/project-timeline.md</code></p>
+</li>
+<li>
+<p><strong>Build the Gantt chart</strong>:</p>
+<pre><code class="language-mermaid">gantt
+    title Website Redesign Project
+    dateFormat YYYY-MM-DD
+    section Discovery
+    Research &amp; Analysis    :done, d1, 2026-07-01, 7d
+    User Interviews        :active, d2, 2026-07-03, 5d
+</code></pre>
+</li>
+<li>
+<p><strong>Add remaining sections</strong>: Design, Content, Development, and Launch</p>
+</li>
+<li>
+<p><strong>Use status markers</strong>: <code>done</code>, <code>active</code>, <code>crit</code> (critical path), or leave blank for future tasks</p>
+</li>
+<li>
+<p><strong>Preview</strong> and verify the timeline makes sense</p>
+</li>
+</ol>
+<h3>Expected Result</h3>
+<p>A complete Gantt chart showing all 8 tasks across 4 sections with proper dependencies.</p>
+<details>
+<summary><strong>Hint: Complete Solution</strong></summary>
+<p><img src="/data/workshops/workshop-01-afternoon-visual-version-control/diagrams/03-redesign-gantt.svg" alt="Website redesign Gantt chart across eight weeks: research and interviews first, wireframes then parallel visual design and content writing, development on the critical path, testing, and a go-live milestone"></p>
+</details>
+<h3>Reflection</h3>
+<ul>
+<li>How would you update this when timelines shift?</li>
+<li>What advantage does text-based diagramming have over drag-and-drop tools?</li>
+</ul>
+<hr>
+<h2>Exercise 3: Git Workflow Practice (7 minutes)</h2>
+<h3>Objective</h3>
+<p>Execute a complete Git workflow using VS Code's visual tools — from initial commit through branching and merging.</p>
+<h3>Difficulty: Intermediate</h3>
+<h3>Steps</h3>
+<ol>
+<li>
+<p><strong>Initialise a new repository</strong>:</p>
+<ul>
+<li>Create a folder: <code>exercises/my-documentation-project/</code></li>
+<li>Open it in VS Code</li>
+<li>Open Source Control panel (<code>Ctrl+Shift+G</code>)</li>
+<li>Click "Initialize Repository"</li>
+</ul>
+</li>
+<li>
+<p><strong>Create your first file and commit</strong>:</p>
+<ul>
+<li>Create <code>README.md</code> with:
+<pre><code class="language-markdown"># My Documentation Project
+
+A version-controlled documentation repository.
+
+## Contents
+- Project overview (this file)
+</code></pre>
+</li>
+<li>In Source Control panel, click <code>+</code> to stage the file</li>
+<li>Type commit message: <code>docs: initial project setup with README</code></li>
+<li>Click the tick icon (or press <code>Ctrl+Enter</code>) to commit</li>
+</ul>
+</li>
+<li>
+<p><strong>Create a feature branch</strong>:</p>
+<ul>
+<li>Click the branch name in the bottom-left status bar (it says <code>main</code>)</li>
+<li>Select "Create new branch..."</li>
+<li>Name it: <code>feature/add-process-diagram</code></li>
+<li>Confirm you're now on the new branch</li>
+</ul>
+</li>
+<li>
+<p><strong>Add content on the branch</strong>:</p>
+<ul>
+<li>Create <code>process-diagram.md</code> with a Mermaid flowchart of any process you choose</li>
+<li>Stage and commit: <code>feat: add process workflow diagram</code></li>
+</ul>
+</li>
+<li>
+<p><strong>Switch back to main and merge</strong>:</p>
+<ul>
+<li>Click the branch name again, switch to <code>main</code></li>
+<li>Open terminal (<code>Ctrl+``): </code>git merge feature/add-process-diagram`</li>
+<li>Verify the merge succeeded — your diagram file should now be on <code>main</code></li>
+</ul>
+</li>
+<li>
+<p><strong>View your history in GitLens</strong>:</p>
+<ul>
+<li>Open the GitLens Commit Graph (<code>Ctrl+Shift+P</code> &gt; "GitLens: Show Commit Graph")</li>
+<li>See both commits and the branch/merge structure</li>
+</ul>
+</li>
+</ol>
+<h3>Success Criteria</h3>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled=""> Repository initialised with at least 2 commits</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Feature branch created and merged</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Commit graph shows the branch structure</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> All commit messages follow conventional format</li>
+</ul>
+<h3>Reflection</h3>
+<ul>
+<li>How does this compare to saving files as "v1", "v2", "v3"?</li>
+<li>When would you create a branch in your real work?</li>
+</ul>
+<hr>
+<h2>Exercise 4: Sequence Diagram for a Real Workflow (6 minutes)</h2>
+<h3>Objective</h3>
+<p>Document a real interaction or approval process from your work using a Mermaid sequence diagram.</p>
+<h3>Difficulty: Intermediate</h3>
+<h3>Scenario</h3>
+<p>Choose ONE of these scenarios (or use your own):</p>
+<p><strong>Option A — Document Approval:</strong>
+An author submits a document to a reviewer. The reviewer either approves it or sends comments. If comments are sent, the author revises and resubmits. Once approved, the document goes to the department head for final sign-off.</p>
+<p><strong>Option B — Expense Claim:</strong>
+An employee submits an expense claim through a web portal. The system validates the amount. Claims under 100 pounds are auto-approved. Claims over 100 pounds go to a manager. The manager approves or rejects. Approved claims are sent to finance for payment.</p>
+<h3>Steps</h3>
+<ol>
+<li>
+<p><strong>Create file</strong>: <code>exercises/workflow-sequence.md</code></p>
+</li>
+<li>
+<p><strong>Write the sequence diagram</strong>. Here's a starter for Option A:</p>
+<pre><code class="language-mermaid">sequenceDiagram
+    participant Author
+    participant Reviewer
+    participant Head as Dept Head
+    
+    Author-&gt;&gt;Reviewer: Submit document
+</code></pre>
+</li>
+<li>
+<p><strong>Add all interactions</strong> including:</p>
+<ul>
+<li>Alternative paths (use <code>alt</code> / <code>else</code> blocks)</li>
+<li>Loop for revision cycles (use <code>loop</code>)</li>
+<li>Notes for important details (use <code>Note over</code>)</li>
+</ul>
+</li>
+<li>
+<p><strong>Preview</strong> and verify the flow matches the scenario</p>
+</li>
+<li>
+<p><strong>Commit your work</strong>: Stage and commit with message <code>feat: add workflow sequence diagram</code></p>
+</li>
+</ol>
+<details>
+<summary><strong>Hint: Option A Complete Solution</strong></summary>
+<p><img src="/data/workshops/workshop-01-afternoon-visual-version-control/diagrams/03-approval-sequence.svg" alt="Document approval sequence diagram: the author submits to the reviewer, comments and resubmission loop until approved, then the reviewer forwards to the department head for final approval and publication"></p>
+</details>
+<h3>Reflection</h3>
+<ul>
+<li>How many people in your organisation could benefit from seeing this diagram?</li>
+<li>What processes in your work would be clearer as sequence diagrams?</li>
+</ul>
+<hr>
+<h2>Exercise 5: Full Documentation Mini-Project (7 minutes)</h2>
+<h3>Objective</h3>
+<p>Combine everything: create a multi-file, diagram-rich, version-controlled documentation project.</p>
+<h3>Difficulty: Advanced</h3>
+<h3>Steps</h3>
+<ol>
+<li>
+<p><strong>Create project structure</strong>:</p>
+<pre><code>exercises/team-handbook/
+├── README.md
+├── onboarding/
+│   └── process.md
+├── workflows/
+│   └── project-lifecycle.md
+└── tools/
+    └── recommended-stack.md
+</code></pre>
+</li>
+<li>
+<p><strong>README.md</strong> — Write a brief handbook introduction with a Mermaid mind map showing the handbook sections:</p>
+<pre><code class="language-mermaid">mindmap
+  root((Team Handbook))
+    Onboarding
+      New starter process
+      First week checklist
+    Workflows
+      Project lifecycle
+      Approval gates
+    Tools
+      Recommended stack
+      Setup guides
+</code></pre>
+</li>
+<li>
+<p><strong>onboarding/process.md</strong> — Create a flowchart showing the new starter journey (first day through to first month)</p>
+</li>
+<li>
+<p><strong>workflows/project-lifecycle.md</strong> — Create a Gantt chart showing a typical project lifecycle for your team</p>
+</li>
+<li>
+<p><strong>tools/recommended-stack.md</strong> — List recommended tools with a Mermaid graph showing how they connect</p>
+</li>
+<li>
+<p><strong>Version-control the entire project</strong>:</p>
+<ul>
+<li>Initialise a Git repo (if not already in one)</li>
+<li>Commit each file separately with meaningful messages:
+<ul>
+<li><code>docs: add team handbook structure and README</code></li>
+<li><code>docs: add onboarding process flowchart</code></li>
+<li><code>docs: add project lifecycle Gantt chart</code></li>
+<li><code>docs: add recommended tools overview</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Push to GitHub</strong> (optional but recommended):</p>
+<ul>
+<li>Create a new repository on GitHub</li>
+<li>Push your local repository:
+<pre><code class="language-bash">git remote add origin https://github.com/YOUR-USERNAME/team-handbook.git
+git push -u origin main
+</code></pre>
+</li>
+</ul>
+</li>
+</ol>
+<h3>Success Criteria</h3>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled=""> 4 files created, each containing at least one Mermaid diagram</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> 4 separate commits with conventional commit messages</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Diagrams render correctly in preview</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Project structure is logical and navigable</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> (Stretch) Pushed to GitHub and visible on your profile</li>
+</ul>
+<h3>Reflection</h3>
+<ul>
+<li>How long did this take compared to creating the same content in Word/PowerPoint?</li>
+<li>Could you hand this to a colleague and have them continue your work?</li>
+<li>What would you add to make this a real team resource?</li>
+</ul>
+<hr>
+<h2>Exercise Summary</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Exercise</th><th>Skill Practised</th><th>Difficulty</th><th>Time</th></tr></thead><tbody><tr><td>1. Onboarding Flowchart</td><td>Mermaid flowcharts</td><td>Beginner</td><td>5 min</td></tr><tr><td>2. Project Gantt Chart</td><td>Mermaid Gantt charts</td><td>Beginner–Intermediate</td><td>5 min</td></tr><tr><td>3. Git Workflow</td><td>Branching, merging, committing</td><td>Intermediate</td><td>7 min</td></tr><tr><td>4. Sequence Diagram</td><td>Mermaid sequences, real scenarios</td><td>Intermediate</td><td>6 min</td></tr><tr><td>5. Full Mini-Project</td><td>All skills combined</td><td>Advanced</td><td>7 min</td></tr></tbody></table>
+<h2>Patterns You've Practised</h2>
+<h3>The Diagram-from-Description Pattern</h3>
+<pre><code>Written description --&gt; Identify actors &amp; steps --&gt; Mermaid syntax --&gt; Preview &amp; refine
+</code></pre>
+<h3>The Feature Branch Pattern</h3>
+<pre><code>Create branch --&gt; Make changes --&gt; Commit --&gt; Merge back to main
+</code></pre>
+<h3>The Documentation Project Pattern</h3>
+<pre><code>Plan structure --&gt; Create files with diagrams --&gt; Commit each piece --&gt; Push to GitHub
+</code></pre>
+<h2>Common Mistakes to Avoid</h2>
+<ol>
+<li><strong>Mermaid syntax errors</strong>: Check for missing arrows (<code>--&gt;</code> not <code>-&gt;</code>) and proper node IDs (no spaces in IDs)</li>
+<li><strong>Forgetting to stage</strong>: Files must be staged before committing — look for the <code>+</code> icon</li>
+<li><strong>Vague commit messages</strong>: "update" tells you nothing in 6 months; "docs: add onboarding flowchart" tells the whole story</li>
+<li><strong>Not previewing diagrams</strong>: Always check the rendered output before committing</li>
+<li><strong>One massive commit</strong>: Commit logical units separately for clean history</li>
+</ol>
+<h2>Pro Tips from the Exercises</h2>
+<ol>
+<li><strong>Start simple, then refine</strong> — get the basic diagram working before adding styling</li>
+<li><strong>Use the Mermaid Live Editor</strong> (<a href="https://mermaid.live/">https://mermaid.live/</a>) for complex diagrams — it gives instant feedback</li>
+<li><strong>Commit early and often</strong> — small commits are easier to understand and revert</li>
+<li><strong>Read your Git history</strong> — use GitLens to review what you've built; it reinforces the workflow</li>
+<li><strong>Ask Claude Code to generate Mermaid</strong> — describe what you want in plain English and let AI draft the syntax</li>
+</ol>
+<hr>
+<p>Next: <a href="./04_project.md">Chapter 4: Real Project Application</a></p>
+<p><a href="./02_hands_on.md">Back to Hands-On Practice</a> | <a href="README.md">Back to Workshop Overview</a></p></div></article></main></div>
+    <noscript><p>Interactive forms require JavaScript. You can also email <a href="mailto:info@dreamlab-ai.com">info@dreamlab-ai.com</a>.</p></noscript>
+  
+
+</body></html>

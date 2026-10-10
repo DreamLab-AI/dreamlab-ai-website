@@ -1,0 +1,663 @@
+<!DOCTYPE html><html lang="en" class="dark"><head>
+    <meta charset="UTF-8">
+
+    <!-- Primary Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <title>Hands-On: Setting Up Your Testing Environment | DreamLab AI Workshops</title>
+    <meta name="title" content="Hands-On: Setting Up Your Testing Environment | DreamLab AI Workshops">
+    <meta name="description" content="Hands-On: Setting Up Your Testing Environment — free DreamLab AI curriculum.">
+    <meta name="keywords" content="applied innovation lab, AI consulting, enterprise innovation, immersive XR, cyber trust, creative technology, residential programmes, knowledge transfer, deep tech, Lake District">
+    <meta name="author" content="DreamLab">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    <meta name="rating" content="General">
+
+    <link rel="describedby" href="/llms.txt" type="text/plain">
+    <script type="application/ld+json" id="organisation-structured-data">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://dreamlab-ai.com/#organisation","name":"DreamLab","url":"https://dreamlab-ai.com/","logo":"https://dreamlab-ai.com/images/heroes/dreamlab-hero.webp","email":"info@dreamlab-ai.com","founder":{"@id":"https://dreamlab-ai.com/team#john-ohare"},"sameAs":["https://github.com/DreamLab-AI","https://www.linkedin.com/company/dreamlab-ai-consulting"]},{"@type":"Person","@id":"https://dreamlab-ai.com/team#john-ohare","name":"John O'Hare","honorificPrefix":"Dr","jobTitle":"Founder","worksFor":{"@id":"https://dreamlab-ai.com/#organisation"},"url":"https://dreamlab-ai.com/team#john-ohare"}]}</script>
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dreamlab-ai.com/workshops/workshop-05-morning-qa-automation/02_hands_on.md/">
+
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="msapplication-TileColor" content="#1a1a2e">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://dreamlab-ai.com/workshops/workshop-05-morning-qa-automation/02_hands_on.md/">
+    <meta property="og:title" content="Hands-On: Setting Up Your Testing Environment | DreamLab AI Workshops">
+    <meta property="og:description" content="Hands-On: Setting Up Your Testing Environment — free DreamLab AI curriculum.">
+    <meta property="og:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="DreamLab AI Workshop - Hands-On: Setting Up Your Testing Environment">
+    <meta property="og:site_name" content="DreamLab">
+    <meta property="og:locale" content="en_GB">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://dreamlab-ai.com/workshops/workshop-05-morning-qa-automation/02_hands_on.md/">
+    <meta name="twitter:title" content="Hands-On: Setting Up Your Testing Environment | DreamLab AI Workshops">
+    <meta name="twitter:description" content="Hands-On: Setting Up Your Testing Environment — free DreamLab AI curriculum.">
+    <meta name="twitter:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta name="twitter:image:alt" content="DreamLab AI Workshop - Hands-On: Setting Up Your Testing Environment">
+    <meta name="twitter:site" content="@thedreamlab">
+    <meta name="twitter:creator" content="@thedreamlab">
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="geo.region" content="GB">
+    <meta name="geo.placename" content="United Kingdom">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DreamLab AI">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Security Headers -->
+    <!--
+      CSP notes:
+      - script-src is 'self' only: no 'unsafe-eval' (blocks eval/Function-based
+        injection) and no 'unsafe-inline'. The one inline bootstrap script was
+        moved to /spa-redirect.js. JSON-LD blocks below are type
+        application/ld+json (data, not executable) so CSP does not gate them.
+      - connect-src is scoped to the Cloudflare Workers subdomain actually used
+        by this account (*.solitary-paper-764d.workers.dev: auth / pod / search /
+        link-preview / nostr-relay), NOT the internet-wide *.workers.dev, which
+        previously allowed exfiltration to any attacker-controlled worker.
+      - The two open Nostr relays (relay.damus.io, relay.primal.net) are
+        explicitly allow-listed: the Talk-to-AI chat listens there for
+        junkiejarvis's reply (the primary relay's whitelist gate rejects the
+        gift-wrap addressed to the ephemeral session key — ADR-042 Amendment 1).
+        Must stay in sync with VITE_REPLY_RELAYS. Named exactly, not a wildcard.
+      - style-src keeps 'unsafe-inline' because Radix UI + runtime style
+        attributes require it; that is not a script-injection vector.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.solitary-paper-764d.workers.dev wss://*.solitary-paper-764d.workers.dev https://*.dreamlab-ai.com wss://*.dreamlab-ai.com wss://relay.damus.io wss://relay.primal.net; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <!-- SPA deep-link restore. External 'self' script (not inline) so CSP
+         script-src can stay 'self' with no 'unsafe-inline'. Classic,
+         render-blocking script: runs before the deferred app module. -->
+    <script src="/spa-redirect.js"></script>
+    <script type="module" crossorigin="" src="/assets/index-Crc86LXg.js"></script>
+    <link rel="modulepreload" crossorigin="" href="/assets/ui-C2dH1upk.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/vendor-uw6h6E0d.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/nostr-BpuBsPg-.js">
+    <link rel="stylesheet" crossorigin="" href="/assets/index-CeEdk6WL.css">
+  <script type="application/ld+json" id="route-structured-data">{"@context":"https://schema.org","@type":"LearningResource","@id":"https://dreamlab-ai.com/workshops/workshop-05-morning-qa-automation/02_hands_on.md/#page","url":"https://dreamlab-ai.com/workshops/workshop-05-morning-qa-automation/02_hands_on.md/","name":"Hands-On: Setting Up Your Testing Environment | DreamLab AI Workshops","description":"Hands-On: Setting Up Your Testing Environment — free DreamLab AI curriculum.","inLanguage":"en-GB","publisher":{"@id":"https://dreamlab-ai.com/#organisation"},"isAccessibleForFree":true}</script><link rel="alternate" type="text/markdown" href="/data/workshops/workshop-05-morning-qa-automation/02_hands_on.md"></head>
+
+  <body>
+    <!-- Skip Navigation Link for Accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
+      Skip to main content
+    </a>
+    <div id="root"><header role="banner" class="fixed top-0 left-0 right-0 z-50"><div class="md:hidden flex items-center justify-between h-14 px-6 bg-[rgba(14,14,17,0.92)] backdrop-blur-[14px] border-b border-dlm-hairline"><a aria-label="DreamLab home" class="flex items-center gap-2" href="/"><span class="w-[9px] h-[9px] rounded-full bg-dlm-bright shrink-0" aria-hidden="true"></span><span class="text-[14px] font-semibold tracking-[0.14em] text-[#FAFAFA]">DREAMLAB</span></a><button type="button" aria-label="Open menu" aria-expanded="false" class="w-11 h-11 -mr-2 flex flex-col items-end justify-center gap-[5px] focus:outline-none focus-visible:ring-2 focus-visible:ring-dlm-bright rounded"><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span></button></div><div class="hidden md:block transition-all duration-300 ease-out py-3 bg-background/60 backdrop-blur-md"><div class="container flex items-center justify-between px-4"><button class="flex items-center gap-2 md:gap-3 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded min-h-[48px] min-w-[48px] px-3 py-2" aria-label="Main navigation menu" type="button" id="radix-:Rp:" aria-haspopup="menu" aria-expanded="false" data-state="closed"><div class="w-10 h-10 md:w-8 md:h-8 shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all duration-300 group-hover:scale-110 animate-glow-pulse" aria-hidden="true"></div><span class="font-bold text-lg md:text-xl tracking-tight group-hover:text-purple-400 transition-colors duration-300">MENU</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down h-5 w-5 md:h-4 md:w-4 shrink-0 text-muted-foreground group-hover:text-purple-400 transition-all duration-300 group-hover:rotate-180" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button><div class="flex items-center gap-2"><a class="items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-10 py-2 hover:bg-purple-500/10 hover:text-purple-400 transition-all duration-300 hover:scale-105 min-h-[48px] px-4 text-base md:text-sm hidden sm:inline-flex" href="/contact">Contact</a><a class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary hover:bg-primary/90 h-10 py-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transition-all duration-300 min-h-[48px] px-4 text-base md:text-sm" href="/co-create">Partner With Us</a></div></div></div></header><header class="relative overflow-hidden" style="min-height:320px"><div class="absolute inset-0 bg-gradient-to-br from-amber-500/30 via-orange-500/30 to-red-500/30" style="transform:translateY(0px);opacity:1"><div class="absolute top-0 -left-20 w-96 h-96 rounded-full blur-3xl opacity-40 animate-float bg-gradient-to-br from-amber-500 via-orange-500 to-red-500"></div><div class="absolute bottom-0 -right-20 w-[32rem] h-[32rem] rounded-full blur-3xl opacity-30 animate-float bg-gradient-to-br from-amber-500 via-orange-500 to-red-500" style="animation-delay:1s"></div><div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full blur-3xl opacity-20 animate-float bg-gradient-to-br from-amber-500 via-orange-500 to-red-500" style="animation-delay:2s"></div></div><div class="absolute inset-0 opacity-5" style="background-image:linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);background-size:50px 50px;transform:translateY(0px)"></div><div class="relative z-10 container px-4 pt-24 pb-8"><div class="mb-6 transition-all duration-500 transform opacity-0 translate-y-4"><nav aria-label="breadcrumb"><ol class="flex flex-wrap items-center gap-1.5 break-words text-sm sm:gap-2.5 text-white/70"><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/">Home</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/workshops">Workshops</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><span role="link" aria-disabled="true" aria-current="page" class="text-white font-medium">Quality Assurance &amp; Automation</span></li></ol></nav></div><div class="mb-4 transition-all duration-500 delay-100 transform opacity-0 translate-y-4"><div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20"><span class="text-orange-400"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings w-5 h-5" aria-hidden="true"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"></path><circle cx="12" cy="12" r="3"></circle></svg></span><span class="text-sm font-medium text-white/90">Software Engineering</span></div></div><h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 break-words transition-all duration-700 delay-200 transform opacity-0 translate-y-6"><span class="bg-gradient-to-r bg-clip-text text-transparent animate-gradient-shift bg-400% from-amber-400 via-orange-400 to-red-400">Quality Assurance &amp; Automation</span></h1><div class="flex flex-wrap items-center gap-3 mb-6 transition-all duration-700 delay-400 transform opacity-0 translate-y-4"><div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-white/10 border-white/20 text-white backdrop-blur-sm hover:bg-white/20"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-3.5 h-3.5 mr-1.5" aria-hidden="true"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>10<!-- --> <!-- -->Modules</div></div><div class="max-w-md transition-all duration-700 delay-500 transform opacity-0 translate-y-4"><div class="flex items-center justify-between text-sm text-white/70 mb-2"><span class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code w-4 h-4" aria-hidden="true"><path d="m16 18 6-6-6-6"></path><path d="m8 6-6 6 6 6"></path></svg><span>Chapter <!-- -->4<!-- -->: <!-- -->Hands-On: Setting Up Your Testing Environment</span></span><span class="font-medium text-white">40<!-- -->%</span></div><div class="relative"><div aria-valuemax="100" aria-valuemin="0" role="progressbar" data-state="indeterminate" data-max="100" class="relative w-full overflow-hidden rounded-full h-2 bg-white/20"><div data-state="indeterminate" data-max="100" class="h-full w-full flex-1 bg-primary transition-all" style="transform:translateX(-60%)"></div></div><div class="absolute top-0 left-0 h-2 rounded-full blur-sm bg-gradient-to-r from-amber-500 via-orange-500 to-red-500" style="width:40%"></div></div><div class="relative mt-1 h-1"><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:10%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:20%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:30%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:40%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:50%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:60%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:70%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:80%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:90%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:100%"></div></div></div></div><div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent"></div></header><main class="container px-4 pt-8 pb-8 flex flex-col md:flex-row gap-x-8 min-h-screen" id="main-content"><aside class="w-full md:w-64 lg:w-72 md:sticky md:top-20 md:h-[calc(100vh-5rem-2rem)] mb-8 md:mb-0"><h2 class="text-xl font-semibold mb-4 break-words">Quality Assurance &amp; Automation</h2><div dir="ltr" class="relative overflow-hidden h-auto md:h-full pr-4 border-r md:border-r-0" style="position:relative;--radix-scroll-area-corner-width:0px;--radix-scroll-area-corner-height:0px"><style>[data-radix-scroll-area-viewport]{scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;}[data-radix-scroll-area-viewport]::-webkit-scrollbar{display:none}</style><div data-radix-scroll-area-viewport="" class="h-full w-full rounded-[inherit]" style="overflow-x:hidden;overflow-y:hidden"><div style="min-width:100%;display:table"><nav><ul><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-05-morning-qa-automation/README.md"><span class="mr-2 text-xs opacity-60">1<!-- -->.</span>Quality Assurance &amp; Automation</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-05-morning-qa-automation/00_introduction.md"><span class="mr-2 text-xs opacity-60">2<!-- -->.</span>AI-Powered QA Automation</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-05-morning-qa-automation/01_concepts.md"><span class="mr-2 text-xs opacity-60">3<!-- -->.</span>Testing Concepts &amp; Best Practices</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors bg-primary text-primary-foreground font-semibold" href="/workshops/workshop-05-morning-qa-automation/02_hands_on.md"><span class="mr-2 text-xs opacity-60">4<!-- -->.</span>Hands-On: Setting Up Your Testing Environment</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-05-morning-qa-automation/03_exercises.md"><span class="mr-2 text-xs opacity-60">5<!-- -->.</span>Exercises: Build Your Testing Pipeline</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-05-morning-qa-automation/04_project.md"><span class="mr-2 text-xs opacity-60">6<!-- -->.</span>Project: Complete QA Automation Pipeline</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-05-morning-qa-automation/05_assessment.md"><span class="mr-2 text-xs opacity-60">7<!-- -->.</span>Assessment: QA Automation Knowledge Check</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-05-morning-qa-automation/06_resources.md"><span class="mr-2 text-xs opacity-60">8<!-- -->.</span>Resources: QA Automation Tools &amp; Learning</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-05-morning-qa-automation/objectives.md"><span class="mr-2 text-xs opacity-60">9<!-- -->.</span>Learning Objectives - AI-Powered QA Automation</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-05-morning-qa-automation/prerequisites.md"><span class="mr-2 text-xs opacity-60">10<!-- -->.</span>Prerequisites - AI-Powered QA Automation</a></li></ul></nav></div></div></div></aside><article class="flex-1 min-w-0 md:pl-0"><div class="prose max-w-none dark:prose-invert break-words [&amp;_table]:block [&amp;_table]:w-full [&amp;_table]:overflow-x-auto"><h1>Hands-On: Setting Up Your Testing Environment</h1>
+<h2>Project Setup</h2>
+<p>We'll build a comprehensive testing pipeline for a task management API. By the end, you'll have:</p>
+<ul>
+<li>Unit tests with Vitest</li>
+<li>Integration tests with Supertest</li>
+<li>E2E tests with Playwright</li>
+<li>CI/CD with GitHub Actions</li>
+</ul>
+<h3>Initial Project Structure</h3>
+<pre><code class="language-bash">task-manager/
+├── src/
+│   ├── server.js
+│   ├── routes/
+│   │   └── tasks.js
+│   ├── models/
+│   │   └── Task.js
+│   └── utils/
+│       └── validators.js
+├── tests/
+│   ├── unit/
+│   │   ├── validators.test.js
+│   │   └── Task.test.js
+│   ├── integration/
+│   │   └── api.test.js
+│   └── e2e/
+│       └── tasks.spec.js
+├── .github/
+│   └── workflows/
+│       └── ci.yml
+├── package.json
+├── vitest.config.js
+└── playwright.config.js
+</code></pre>
+<h2>Step 1: Initialize the Project</h2>
+<pre><code class="language-bash"># Create project directory
+mkdir task-manager
+cd task-manager
+
+# Initialize npm project
+npm init -y
+
+# Install production dependencies
+npm install express cors body-parser
+
+# Install development dependencies
+npm install -D vitest @vitest/coverage-v8 supertest @playwright/test
+</code></pre>
+<h3>Configure package.json</h3>
+<pre><code class="language-json">{
+  "name": "task-manager",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "test:integration": "vitest --run tests/integration",
+    "test:e2e": "playwright test",
+    "test:all": "npm run test:coverage &amp;&amp; npm run test:e2e"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "@vitest/coverage-v8": "^1.0.0",
+    "@vitest/ui": "^1.0.0",
+    "supertest": "^6.3.3",
+    "vitest": "^1.0.0"
+  },
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "express": "^4.18.2"
+  }
+}
+</code></pre>
+<h2>Step 2: Vitest Configuration</h2>
+<p>Create <code>vitest.config.js</code>:</p>
+<pre><code class="language-javascript">import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+  test: {
+    // Test environment
+    environment: 'node',
+
+    // Coverage configuration
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html', 'lcov'],
+      exclude: [
+        'node_modules/',
+        'tests/',
+        '**/*.config.js',
+        '**/types.ts',
+        'dist/'
+      ],
+      thresholds: {
+        lines: 80,
+        functions: 80,
+        branches: 75,
+        statements: 80
+      }
+    },
+
+    // Test file patterns
+    include: ['tests/**/*.test.js'],
+
+    // Global test timeout
+    testTimeout: 10000,
+
+    // Setup files
+    setupFiles: ['./tests/setup.js'],
+
+    // Reporters
+    reporters: ['verbose', 'html'],
+
+    // Parallel execution
+    threads: true,
+    maxThreads: 4,
+
+    // Mock reset
+    mockReset: true,
+    clearMocks: true,
+    restoreMocks: true
+  }
+});
+</code></pre>
+<h2>Step 3: Build the Application</h2>
+<h3>Create src/utils/validators.js</h3>
+<pre><code class="language-javascript">export function validateTask(task) {
+  const errors = [];
+
+  if (!task.title || task.title.trim().length === 0) {
+    errors.push('Title is required');
+  }
+
+  if (task.title &amp;&amp; task.title.length &gt; 100) {
+    errors.push('Title must be less than 100 characters');
+  }
+
+  if (task.priority &amp;&amp; !['low', 'medium', 'high'].includes(task.priority)) {
+    errors.push('Priority must be low, medium, or high');
+  }
+
+  if (task.dueDate &amp;&amp; isNaN(Date.parse(task.dueDate))) {
+    errors.push('Invalid due date format');
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
+export function sanitizeTask(task) {
+  return {
+    title: task.title?.trim(),
+    description: task.description?.trim() || '',
+    priority: task.priority || 'medium',
+    dueDate: task.dueDate || null,
+    completed: task.completed || false
+  };
+}
+</code></pre>
+<h3>Create src/models/Task.js</h3>
+<pre><code class="language-javascript">let tasks = [];
+let nextId = 1;
+
+export class Task {
+  constructor(data) {
+    this.id = nextId++;
+    this.title = data.title;
+    this.description = data.description || '';
+    this.priority = data.priority || 'medium';
+    this.dueDate = data.dueDate || null;
+    this.completed = data.completed || false;
+    this.createdAt = new Date().toISOString();
+    this.updatedAt = new Date().toISOString();
+  }
+
+  static getAll() {
+    return tasks;
+  }
+
+  static getById(id) {
+    return tasks.find(task =&gt; task.id === parseInt(id));
+  }
+
+  static create(data) {
+    const task = new Task(data);
+    tasks.push(task);
+    return task;
+  }
+
+  static update(id, data) {
+    const index = tasks.findIndex(task =&gt; task.id === parseInt(id));
+    if (index === -1) return null;
+
+    tasks[index] = {
+      ...tasks[index],
+      ...data,
+      id: tasks[index].id,
+      createdAt: tasks[index].createdAt,
+      updatedAt: new Date().toISOString()
+    };
+
+    return tasks[index];
+  }
+
+  static delete(id) {
+    const index = tasks.findIndex(task =&gt; task.id === parseInt(id));
+    if (index === -1) return false;
+
+    tasks.splice(index, 1);
+    return true;
+  }
+
+  static reset() {
+    tasks = [];
+    nextId = 1;
+  }
+}
+</code></pre>
+<h3>Create src/routes/tasks.js</h3>
+<pre><code class="language-javascript">import express from 'express';
+import { Task } from '../models/Task.js';
+import { validateTask, sanitizeTask } from '../utils/validators.js';
+
+const router = express.Router();
+
+// Get all tasks
+router.get('/', (req, res) =&gt; {
+  const tasks = Task.getAll();
+  res.json(tasks);
+});
+
+// Get single task
+router.get('/:id', (req, res) =&gt; {
+  const task = Task.getById(req.params.id);
+  if (!task) {
+    return res.status(404).json({ error: 'Task not found' });
+  }
+  res.json(task);
+});
+
+// Create task
+router.post('/', (req, res) =&gt; {
+  const sanitized = sanitizeTask(req.body);
+  const validation = validateTask(sanitized);
+
+  if (!validation.valid) {
+    return res.status(400).json({ errors: validation.errors });
+  }
+
+  const task = Task.create(sanitized);
+  res.status(201).json(task);
+});
+
+// Update task
+router.put('/:id', (req, res) =&gt; {
+  const sanitized = sanitizeTask(req.body);
+  const validation = validateTask(sanitized);
+
+  if (!validation.valid) {
+    return res.status(400).json({ errors: validation.errors });
+  }
+
+  const task = Task.update(req.params.id, sanitized);
+  if (!task) {
+    return res.status(404).json({ error: 'Task not found' });
+  }
+
+  res.json(task);
+});
+
+// Delete task
+router.delete('/:id', (req, res) =&gt; {
+  const deleted = Task.delete(req.params.id);
+  if (!deleted) {
+    return res.status(404).json({ error: 'Task not found' });
+  }
+
+  res.status(204).send();
+});
+
+export default router;
+</code></pre>
+<h3>Create src/server.js</h3>
+<pre><code class="language-javascript">import express from 'express';
+import cors from 'cors';
+import bodyParser from 'body-parser';
+import taskRoutes from './routes/tasks.js';
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Middleware
+app.use(cors());
+app.use(bodyParser.json());
+
+// Routes
+app.use('/api/tasks', taskRoutes);
+
+// Health check
+app.get('/health', (req, res) =&gt; {
+  res.json({ status: 'healthy' });
+});
+
+// Error handling
+app.use((err, req, res, next) =&gt; {
+  console.error(err.stack);
+  res.status(500).json({ error: 'Something went wrong!' });
+});
+
+// Start server only if not in test mode
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () =&gt; {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
+
+export { app };
+</code></pre>
+<h2>Step 4: Write Unit Tests</h2>
+<h3>Create tests/setup.js</h3>
+<pre><code class="language-javascript">import { beforeEach } from 'vitest';
+import { Task } from '../src/models/Task.js';
+
+// Reset tasks before each test
+beforeEach(() =&gt; {
+  Task.reset();
+});
+</code></pre>
+<h3>Create tests/unit/validators.test.js</h3>
+<pre><code class="language-javascript">import { describe, it, expect } from 'vitest';
+import { validateTask, sanitizeTask } from '../../src/utils/validators.js';
+
+describe('validateTask', () =&gt; {
+  it('should accept valid task', () =&gt; {
+    const task = {
+      title: 'Buy groceries',
+      priority: 'high',
+      dueDate: '2024-12-31'
+    };
+
+    const result = validateTask(task);
+    expect(result.valid).toBe(true);
+    expect(result.errors).toHaveLength(0);
+  });
+
+  it('should reject task without title', () =&gt; {
+    const task = { title: '' };
+    const result = validateTask(task);
+
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContain('Title is required');
+  });
+
+  it('should reject task with long title', () =&gt; {
+    const task = { title: 'a'.repeat(101) };
+    const result = validateTask(task);
+
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContain('Title must be less than 100 characters');
+  });
+
+  it('should reject invalid priority', () =&gt; {
+    const task = { title: 'Task', priority: 'urgent' };
+    const result = validateTask(task);
+
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContain('Priority must be low, medium, or high');
+  });
+
+  it('should reject invalid date format', () =&gt; {
+    const task = { title: 'Task', dueDate: 'not-a-date' };
+    const result = validateTask(task);
+
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContain('Invalid due date format');
+  });
+});
+
+describe('sanitizeTask', () =&gt; {
+  it('should trim whitespace from title', () =&gt; {
+    const task = { title: '  Clean room  ' };
+    const result = sanitizeTask(task);
+
+    expect(result.title).toBe('Clean room');
+  });
+
+  it('should set default priority', () =&gt; {
+    const task = { title: 'Task' };
+    const result = sanitizeTask(task);
+
+    expect(result.priority).toBe('medium');
+  });
+
+  it('should set default completed to false', () =&gt; {
+    const task = { title: 'Task' };
+    const result = sanitizeTask(task);
+
+    expect(result.completed).toBe(false);
+  });
+});
+</code></pre>
+<h3>Create tests/unit/Task.test.js</h3>
+<pre><code class="language-javascript">import { describe, it, expect, beforeEach } from 'vitest';
+import { Task } from '../../src/models/Task.js';
+
+describe('Task Model', () =&gt; {
+  beforeEach(() =&gt; {
+    Task.reset();
+  });
+
+  describe('create', () =&gt; {
+    it('should create task with all fields', () =&gt; {
+      const taskData = {
+        title: 'Learn testing',
+        description: 'Master Vitest and Playwright',
+        priority: 'high',
+        dueDate: '2024-12-31'
+      };
+
+      const task = Task.create(taskData);
+
+      expect(task.id).toBe(1);
+      expect(task.title).toBe(taskData.title);
+      expect(task.description).toBe(taskData.description);
+      expect(task.priority).toBe(taskData.priority);
+      expect(task.completed).toBe(false);
+      expect(task.createdAt).toBeDefined();
+      expect(task.updatedAt).toBeDefined();
+    });
+
+    it('should auto-increment IDs', () =&gt; {
+      const task1 = Task.create({ title: 'Task 1' });
+      const task2 = Task.create({ title: 'Task 2' });
+
+      expect(task1.id).toBe(1);
+      expect(task2.id).toBe(2);
+    });
+  });
+
+  describe('getAll', () =&gt; {
+    it('should return all tasks', () =&gt; {
+      Task.create({ title: 'Task 1' });
+      Task.create({ title: 'Task 2' });
+
+      const tasks = Task.getAll();
+      expect(tasks).toHaveLength(2);
+    });
+
+    it('should return empty array when no tasks', () =&gt; {
+      const tasks = Task.getAll();
+      expect(tasks).toEqual([]);
+    });
+  });
+
+  describe('getById', () =&gt; {
+    it('should return task by ID', () =&gt; {
+      const created = Task.create({ title: 'Find me' });
+      const found = Task.getById(created.id);
+
+      expect(found).toEqual(created);
+    });
+
+    it('should return undefined for non-existent ID', () =&gt; {
+      const task = Task.getById(999);
+      expect(task).toBeUndefined();
+    });
+  });
+
+  describe('update', () =&gt; {
+    it('should update task fields', () =&gt; {
+      const task = Task.create({ title: 'Original', priority: 'low' });
+      const updated = Task.update(task.id, { title: 'Updated', priority: 'high' });
+
+      expect(updated.title).toBe('Updated');
+      expect(updated.priority).toBe('high');
+      expect(updated.updatedAt).not.toBe(task.updatedAt);
+    });
+
+    it('should preserve ID and createdAt', () =&gt; {
+      const task = Task.create({ title: 'Task' });
+      const updated = Task.update(task.id, { title: 'Updated' });
+
+      expect(updated.id).toBe(task.id);
+      expect(updated.createdAt).toBe(task.createdAt);
+    });
+
+    it('should return null for non-existent task', () =&gt; {
+      const result = Task.update(999, { title: 'Updated' });
+      expect(result).toBeNull();
+    });
+  });
+
+  describe('delete', () =&gt; {
+    it('should delete task', () =&gt; {
+      const task = Task.create({ title: 'Delete me' });
+      const deleted = Task.delete(task.id);
+
+      expect(deleted).toBe(true);
+      expect(Task.getById(task.id)).toBeUndefined();
+    });
+
+    it('should return false for non-existent task', () =&gt; {
+      const result = Task.delete(999);
+      expect(result).toBe(false);
+    });
+  });
+});
+</code></pre>
+<h2>Step 5: Run Unit Tests</h2>
+<pre><code class="language-bash"># Run all tests
+npm test
+
+# Run with coverage
+npm run test:coverage
+
+# Run with UI
+npm run test:ui
+
+# Watch mode
+npm test -- --watch
+</code></pre>
+<p><strong>Expected Output</strong>:</p>
+<pre><code>✓ tests/unit/validators.test.js (8 tests)
+✓ tests/unit/Task.test.js (11 tests)
+
+Test Files  2 passed (2)
+     Tests  19 passed (19)
+  Start at  12:00:00
+  Duration  234ms
+
+----------------------|---------|----------|---------|---------|
+File                  | % Stmts | % Branch | % Funcs | % Lines |
+----------------------|---------|----------|---------|---------|
+All files             |   95.2  |   90.1   |   100   |   95.0  |
+ src/utils/           |   100   |   100    |   100   |   100   |
+  validators.js       |   100   |   100    |   100   |   100   |
+ src/models/          |   92.5  |   85.0   |   100   |   92.3  |
+  Task.js             |   92.5  |   85.0   |   100   |   92.3  |
+----------------------|---------|----------|---------|---------|
+</code></pre>
+<h2>Next Steps</h2>
+<p>In the exercises section, you'll:</p>
+<ol>
+<li>Write integration tests for the API</li>
+<li>Set up E2E tests with Playwright</li>
+<li>Configure GitHub Actions CI/CD</li>
+<li>Add visual regression testing</li>
+<li>Implement mutation testing</li>
+</ol>
+<h2>Navigation</h2>
+<ul>
+<li>Previous: <a href="01_concepts.md">Testing Concepts</a></li>
+<li>Next: <a href="03_exercises.md">Exercises</a></li>
+<li><a href="README.md">Back to Workshop Overview</a></li>
+</ul></div></article></main></div>
+    <noscript><p>Interactive forms require JavaScript. You can also email <a href="mailto:info@dreamlab-ai.com">info@dreamlab-ai.com</a>.</p></noscript>
+  
+
+</body></html>

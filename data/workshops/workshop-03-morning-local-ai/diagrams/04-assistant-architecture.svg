@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 472" role="img" aria-labelledby="dg-title dg-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="dg-title">Local AI assistant architecture</title>
+  <desc id="dg-desc">A user interface talks to a FastAPI server, which keeps sessions in SQLite and routes requests to three local Ollama models: llama3.3 for chat and documents, qwen2.5-coder for code, and phi3 for quick tasks.</desc>
+
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- container -->
+  <rect x="8" y="8" width="944" height="456" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">PERSONAL AI ASSISTANT — ARCHITECTURE</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <!-- top row -->
+  <g text-anchor="middle">
+    <rect x="48" y="104" width="192" height="80" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="144" y="140" font-size="15" font-weight="600" fill="#F5F5F5">User Interface</text>
+    <text x="144" y="164" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">web chat</text>
+
+    <rect x="320" y="104" width="224" height="80" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="432" y="140" font-size="15" font-weight="600" fill="#F5F5F5">FastAPI Server</text>
+    <text x="432" y="164" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">routes every request</text>
+
+    <rect x="640" y="104" width="224" height="80" rx="8" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.35)"/>
+    <text x="752" y="140" font-size="15" font-weight="600" fill="#F5F5F5">Session Manager</text>
+    <text x="752" y="164" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">SQLite</text>
+  </g>
+
+  <!-- router -->
+  <g text-anchor="middle">
+    <rect x="352" y="232" width="160" height="64" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="432" y="260" font-size="14" font-weight="600" fill="#F5F5F5">Router</text>
+    <text x="432" y="280" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">by task type</text>
+  </g>
+
+  <!-- model row -->
+  <g text-anchor="middle">
+    <rect x="96" y="344" width="224" height="80" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="208" y="380" font-size="15" font-weight="600" fill="#F5F5F5">Chat &amp; Documents</text>
+    <text x="208" y="404" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">ollama · llama3.3:8b</text>
+
+    <rect x="368" y="344" width="224" height="80" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="480" y="380" font-size="15" font-weight="600" fill="#F5F5F5">Code Assistant</text>
+    <text x="480" y="404" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">ollama · qwen2.5-coder:7b</text>
+
+    <rect x="640" y="344" width="224" height="80" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="752" y="380" font-size="15" font-weight="600" fill="#F5F5F5">Quick Tasks</text>
+    <text x="752" y="404" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">ollama · phi3:3.8b</text>
+  </g>
+
+  <!-- arrows -->
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2">
+    <path d="M240,144 L316,144" marker-end="url(#arr)"/>
+    <path d="M544,144 L636,144" marker-end="url(#arr)"/>
+    <path d="M432,184 L432,228" marker-end="url(#arr)"/>
+    <path d="M400,296 C368,320 256,316 216,340" marker-end="url(#arr)"/>
+    <path d="M432,296 C432,316 464,324 476,340" marker-end="url(#arr)"/>
+    <path d="M464,296 C496,320 704,316 740,340" marker-end="url(#arr)"/>
+  </g>
+</svg>

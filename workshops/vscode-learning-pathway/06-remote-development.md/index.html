@@ -1,0 +1,718 @@
+<!DOCTYPE html><html lang="en" class="dark"><head>
+    <meta charset="UTF-8">
+
+    <!-- Primary Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <title>Remote Development (SSH, Containers, WSL) | DreamLab AI Workshops</title>
+    <meta name="title" content="Remote Development (SSH, Containers, WSL) | DreamLab AI Workshops">
+    <meta name="description" content="Remote Development (SSH, Containers, WSL) — free DreamLab AI curriculum.">
+    <meta name="keywords" content="applied innovation lab, AI consulting, enterprise innovation, immersive XR, cyber trust, creative technology, residential programmes, knowledge transfer, deep tech, Lake District">
+    <meta name="author" content="DreamLab">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    <meta name="rating" content="General">
+
+    <link rel="describedby" href="/llms.txt" type="text/plain">
+    <script type="application/ld+json" id="organisation-structured-data">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://dreamlab-ai.com/#organisation","name":"DreamLab","url":"https://dreamlab-ai.com/","logo":"https://dreamlab-ai.com/images/heroes/dreamlab-hero.webp","email":"info@dreamlab-ai.com","founder":{"@id":"https://dreamlab-ai.com/team#john-ohare"},"sameAs":["https://github.com/DreamLab-AI","https://www.linkedin.com/company/dreamlab-ai-consulting"]},{"@type":"Person","@id":"https://dreamlab-ai.com/team#john-ohare","name":"John O'Hare","honorificPrefix":"Dr","jobTitle":"Founder","worksFor":{"@id":"https://dreamlab-ai.com/#organisation"},"url":"https://dreamlab-ai.com/team#john-ohare"}]}</script>
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dreamlab-ai.com/workshops/vscode-learning-pathway/06-remote-development.md/">
+
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="msapplication-TileColor" content="#1a1a2e">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://dreamlab-ai.com/workshops/vscode-learning-pathway/06-remote-development.md/">
+    <meta property="og:title" content="Remote Development (SSH, Containers, WSL) | DreamLab AI Workshops">
+    <meta property="og:description" content="Remote Development (SSH, Containers, WSL) — free DreamLab AI curriculum.">
+    <meta property="og:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="DreamLab AI Workshop - Remote Development (SSH, Containers, WSL)">
+    <meta property="og:site_name" content="DreamLab">
+    <meta property="og:locale" content="en_GB">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://dreamlab-ai.com/workshops/vscode-learning-pathway/06-remote-development.md/">
+    <meta name="twitter:title" content="Remote Development (SSH, Containers, WSL) | DreamLab AI Workshops">
+    <meta name="twitter:description" content="Remote Development (SSH, Containers, WSL) — free DreamLab AI curriculum.">
+    <meta name="twitter:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta name="twitter:image:alt" content="DreamLab AI Workshop - Remote Development (SSH, Containers, WSL)">
+    <meta name="twitter:site" content="@thedreamlab">
+    <meta name="twitter:creator" content="@thedreamlab">
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="geo.region" content="GB">
+    <meta name="geo.placename" content="United Kingdom">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DreamLab AI">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Security Headers -->
+    <!--
+      CSP notes:
+      - script-src is 'self' only: no 'unsafe-eval' (blocks eval/Function-based
+        injection) and no 'unsafe-inline'. The one inline bootstrap script was
+        moved to /spa-redirect.js. JSON-LD blocks below are type
+        application/ld+json (data, not executable) so CSP does not gate them.
+      - connect-src is scoped to the Cloudflare Workers subdomain actually used
+        by this account (*.solitary-paper-764d.workers.dev: auth / pod / search /
+        link-preview / nostr-relay), NOT the internet-wide *.workers.dev, which
+        previously allowed exfiltration to any attacker-controlled worker.
+      - The two open Nostr relays (relay.damus.io, relay.primal.net) are
+        explicitly allow-listed: the Talk-to-AI chat listens there for
+        junkiejarvis's reply (the primary relay's whitelist gate rejects the
+        gift-wrap addressed to the ephemeral session key — ADR-042 Amendment 1).
+        Must stay in sync with VITE_REPLY_RELAYS. Named exactly, not a wildcard.
+      - style-src keeps 'unsafe-inline' because Radix UI + runtime style
+        attributes require it; that is not a script-injection vector.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.solitary-paper-764d.workers.dev wss://*.solitary-paper-764d.workers.dev https://*.dreamlab-ai.com wss://*.dreamlab-ai.com wss://relay.damus.io wss://relay.primal.net; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <!-- SPA deep-link restore. External 'self' script (not inline) so CSP
+         script-src can stay 'self' with no 'unsafe-inline'. Classic,
+         render-blocking script: runs before the deferred app module. -->
+    <script src="/spa-redirect.js"></script>
+    <script type="module" crossorigin="" src="/assets/index-Crc86LXg.js"></script>
+    <link rel="modulepreload" crossorigin="" href="/assets/ui-C2dH1upk.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/vendor-uw6h6E0d.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/nostr-BpuBsPg-.js">
+    <link rel="stylesheet" crossorigin="" href="/assets/index-CeEdk6WL.css">
+  <script type="application/ld+json" id="route-structured-data">{"@context":"https://schema.org","@type":"LearningResource","@id":"https://dreamlab-ai.com/workshops/vscode-learning-pathway/06-remote-development.md/#page","url":"https://dreamlab-ai.com/workshops/vscode-learning-pathway/06-remote-development.md/","name":"Remote Development (SSH, Containers, WSL) | DreamLab AI Workshops","description":"Remote Development (SSH, Containers, WSL) — free DreamLab AI curriculum.","inLanguage":"en-GB","publisher":{"@id":"https://dreamlab-ai.com/#organisation"},"isAccessibleForFree":true}</script><link rel="alternate" type="text/markdown" href="/data/workshops/vscode-learning-pathway/06-remote-development.md"></head>
+
+  <body>
+    <!-- Skip Navigation Link for Accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
+      Skip to main content
+    </a>
+    <div id="root"><header role="banner" class="fixed top-0 left-0 right-0 z-50"><div class="md:hidden flex items-center justify-between h-14 px-6 bg-[rgba(14,14,17,0.92)] backdrop-blur-[14px] border-b border-dlm-hairline"><a aria-label="DreamLab home" class="flex items-center gap-2" href="/"><span class="w-[9px] h-[9px] rounded-full bg-dlm-bright shrink-0" aria-hidden="true"></span><span class="text-[14px] font-semibold tracking-[0.14em] text-[#FAFAFA]">DREAMLAB</span></a><button type="button" aria-label="Open menu" aria-expanded="false" class="w-11 h-11 -mr-2 flex flex-col items-end justify-center gap-[5px] focus:outline-none focus-visible:ring-2 focus-visible:ring-dlm-bright rounded"><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span></button></div><div class="hidden md:block transition-all duration-300 ease-out py-3 bg-background/60 backdrop-blur-md"><div class="container flex items-center justify-between px-4"><button class="flex items-center gap-2 md:gap-3 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded min-h-[48px] min-w-[48px] px-3 py-2" aria-label="Main navigation menu" type="button" id="radix-:Rp:" aria-haspopup="menu" aria-expanded="false" data-state="closed"><div class="w-10 h-10 md:w-8 md:h-8 shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all duration-300 group-hover:scale-110 animate-glow-pulse" aria-hidden="true"></div><span class="font-bold text-lg md:text-xl tracking-tight group-hover:text-purple-400 transition-colors duration-300">MENU</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down h-5 w-5 md:h-4 md:w-4 shrink-0 text-muted-foreground group-hover:text-purple-400 transition-all duration-300 group-hover:rotate-180" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button><div class="flex items-center gap-2"><a class="items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-10 py-2 hover:bg-purple-500/10 hover:text-purple-400 transition-all duration-300 hover:scale-105 min-h-[48px] px-4 text-base md:text-sm hidden sm:inline-flex" href="/contact">Contact</a><a class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary hover:bg-primary/90 h-10 py-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transition-all duration-300 min-h-[48px] px-4 text-base md:text-sm" href="/co-create">Partner With Us</a></div></div></div></header><header class="relative overflow-hidden" style="min-height:320px"><div class="absolute inset-0 bg-gradient-to-br from-cyan-500/30 via-teal-500/30 to-emerald-500/30" style="transform:translateY(0px);opacity:1"><div class="absolute top-0 -left-20 w-96 h-96 rounded-full blur-3xl opacity-40 animate-float bg-gradient-to-br from-cyan-500 via-teal-500 to-emerald-500"></div><div class="absolute bottom-0 -right-20 w-[32rem] h-[32rem] rounded-full blur-3xl opacity-30 animate-float bg-gradient-to-br from-cyan-500 via-teal-500 to-emerald-500" style="animation-delay:1s"></div><div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full blur-3xl opacity-20 animate-float bg-gradient-to-br from-cyan-500 via-teal-500 to-emerald-500" style="animation-delay:2s"></div></div><div class="absolute inset-0 opacity-5" style="background-image:linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);background-size:50px 50px;transform:translateY(0px)"></div><div class="relative z-10 container px-4 pt-24 pb-8"><div class="mb-6 transition-all duration-500 transform opacity-0 translate-y-4"><nav aria-label="breadcrumb"><ol class="flex flex-wrap items-center gap-1.5 break-words text-sm sm:gap-2.5 text-white/70"><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/">Home</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/workshops">Workshops</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><span role="link" aria-disabled="true" aria-current="page" class="text-white font-medium">Vscode Learning Pathway</span></li></ol></nav></div><div class="mb-4 transition-all duration-500 delay-100 transform opacity-0 translate-y-4"><div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20"><span class="text-teal-400"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layers w-5 h-5" aria-hidden="true"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"></path><path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"></path><path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"></path></svg></span><span class="text-sm font-medium text-white/90">XR / Virtual Reality</span></div></div><h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 break-words transition-all duration-700 delay-200 transform opacity-0 translate-y-6"><span class="bg-gradient-to-r bg-clip-text text-transparent animate-gradient-shift bg-400% from-cyan-400 via-teal-400 to-emerald-400">Vscode Learning Pathway</span></h1><div class="flex flex-wrap items-center gap-3 mb-6 transition-all duration-700 delay-400 transform opacity-0 translate-y-4"><div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-white/10 border-white/20 text-white backdrop-blur-sm hover:bg-white/20"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-3.5 h-3.5 mr-1.5" aria-hidden="true"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>13<!-- --> <!-- -->Modules</div></div><div class="max-w-md transition-all duration-700 delay-500 transform opacity-0 translate-y-4"><div class="flex items-center justify-between text-sm text-white/70 mb-2"><span class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code w-4 h-4" aria-hidden="true"><path d="m16 18 6-6-6-6"></path><path d="m8 6-6 6 6 6"></path></svg><span>Chapter <!-- -->6<!-- -->: <!-- -->Remote Development (SSH, Containers, WSL)</span></span><span class="font-medium text-white">46<!-- -->%</span></div><div class="relative"><div aria-valuemax="100" aria-valuemin="0" role="progressbar" data-state="indeterminate" data-max="100" class="relative w-full overflow-hidden rounded-full h-2 bg-white/20"><div data-state="indeterminate" data-max="100" class="h-full w-full flex-1 bg-primary transition-all" style="transform:translateX(-54%)"></div></div><div class="absolute top-0 left-0 h-2 rounded-full blur-sm bg-gradient-to-r from-cyan-500 via-teal-500 to-emerald-500" style="width:46%"></div></div><div class="relative mt-1 h-1"><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:7.6923076923076925%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:15.384615384615385%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:23.076923076923077%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:30.76923076923077%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:38.46153846153847%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:46.15384615384615%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:53.84615384615385%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:61.53846153846154%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:69.23076923076923%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:76.92307692307693%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:84.61538461538461%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:92.3076923076923%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:100%"></div></div></div></div><div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent"></div></header><main class="container px-4 pt-8 pb-8 flex flex-col md:flex-row gap-x-8 min-h-screen" id="main-content"><aside class="w-full md:w-64 lg:w-72 md:sticky md:top-20 md:h-[calc(100vh-5rem-2rem)] mb-8 md:mb-0"><h2 class="text-xl font-semibold mb-4 break-words">Vscode Learning Pathway</h2><div dir="ltr" class="relative overflow-hidden h-auto md:h-full pr-4 border-r md:border-r-0" style="position:relative;--radix-scroll-area-corner-width:0px;--radix-scroll-area-corner-height:0px"><style>[data-radix-scroll-area-viewport]{scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;}[data-radix-scroll-area-viewport]::-webkit-scrollbar{display:none}</style><div data-radix-scroll-area-viewport="" class="h-full w-full rounded-[inherit]" style="overflow-x:hidden;overflow-y:hidden"><div style="min-width:100%;display:table"><nav><ul><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/01-introduction.md"><span class="mr-2 text-xs opacity-60">1<!-- -->.</span>Introduction to VS Code as an AI-Powered IDE</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/02-keyboard-shortcuts.md"><span class="mr-2 text-xs opacity-60">2<!-- -->.</span>Essential Keyboard Shortcuts and Productivity</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/03-extension-ecosystem.md"><span class="mr-2 text-xs opacity-60">3<!-- -->.</span>Extension Ecosystem Mastery</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/04-settings-customization.md"><span class="mr-2 text-xs opacity-60">4<!-- -->.</span>Settings and Customisation</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/05-git-integration.md"><span class="mr-2 text-xs opacity-60">5<!-- -->.</span>Git Integration Deep Dive</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors bg-primary text-primary-foreground font-semibold" href="/workshops/vscode-learning-pathway/06-remote-development.md"><span class="mr-2 text-xs opacity-60">6<!-- -->.</span>Remote Development (SSH, Containers, WSL)</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/07-debugging.md"><span class="mr-2 text-xs opacity-60">7<!-- -->.</span>Debugging Mastery</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/08-task-automation.md"><span class="mr-2 text-xs opacity-60">8<!-- -->.</span>Task Automation and Build Systems</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/09-ai-integration.md"><span class="mr-2 text-xs opacity-60">9<!-- -->.</span>AI Coding Assistants Integration</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/10-profiles-sync.md"><span class="mr-2 text-xs opacity-60">10<!-- -->.</span>Profile Management and Settings Sync</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/11-workspaces.md"><span class="mr-2 text-xs opacity-60">11<!-- -->.</span>Multi-root Workspaces and Advanced Organization</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/12-advanced-editing.md"><span class="mr-2 text-xs opacity-60">12<!-- -->.</span>Advanced Editing Features</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/overview.md"><span class="mr-2 text-xs opacity-60">13<!-- -->.</span>VS Code Learning Pathway 2026: From Beginner to AI-Powered Master</a></li></ul></nav></div></div></div></aside><article class="flex-1 min-w-0 md:pl-0"><div class="prose max-w-none dark:prose-invert break-words [&amp;_table]:block [&amp;_table]:w-full [&amp;_table]:overflow-x-auto"><h1>Remote Development (SSH, Containers, WSL)</h1>
+<h2>Learning Objectives</h2>
+<ul>
+<li>Connect to remote servers via SSH and edit code seamlessly</li>
+<li>Develop inside Docker containers for consistent environments</li>
+<li>Use Windows Subsystem for Linux (WSL) from VS Code</li>
+<li>Understand Remote-Tunnels for accessing your machine from anywhere</li>
+<li>Configure remote development workflows</li>
+<li>Troubleshoot common remote development issues</li>
+</ul>
+<h2>The Remote Development Revolution</h2>
+<p><strong>Traditional Development:</strong></p>
+<pre><code>Code locally → Deploy to server → Test → Debug → Repeat
+</code></pre>
+<p><strong>Remote Development:</strong></p>
+<pre><code>Code directly on server/container → Live testing → Instant feedback
+</code></pre>
+<p><img src="/data/workshops/vscode-learning-pathway/diagrams/06-remote-targets.svg" alt="The local VS Code UI opens a remote window backed by SSH servers, dev containers, WSL or secure tunnels"></p>
+<h2>Remote - SSH</h2>
+<h3>Installation</h3>
+<pre><code class="language-bash">code --install-extension ms-vscode-remote.remote-ssh
+code --install-extension ms-vscode-remote.remote-ssh-edit
+</code></pre>
+<h3>Setup SSH Connection</h3>
+<p><strong>Step 1: Configure SSH Config File</strong></p>
+<pre><code class="language-bash"># Create/edit SSH config
+code ~/.ssh/config
+</code></pre>
+<p><strong>Add server configuration:</strong></p>
+<pre><code>Host production-server
+    HostName 192.168.1.100
+    User ubuntu
+    Port 22
+    IdentityFile ~/.ssh/id_rsa
+
+Host aws-dev
+    HostName ec2-xxx.compute.amazonaws.com
+    User ec2-user
+    IdentityFile ~/.ssh/aws-key.pem
+
+Host github-codespace
+    HostName your-codespace.github.dev
+    User codespace
+    ForwardAgent yes
+</code></pre>
+<p><strong>Step 2: Connect</strong></p>
+<pre><code>1. Ctrl+Shift+P → "Remote-SSH: Connect to Host"
+2. Select server from list (or type new)
+3. Select platform (Linux/macOS/Windows)
+4. VS Code opens new window connected to server
+</code></pre>
+<p><strong>Status Bar Indicator:</strong></p>
+<pre><code>Bottom left shows: "&gt;&lt;" SSH: production-server
+</code></pre>
+<h3>Working Remotely</h3>
+<p><strong>Once Connected:</strong></p>
+<pre><code>- File Explorer shows remote filesystem
+- Terminal runs on remote server
+- Extensions run remotely
+- Editing happens on remote files
+</code></pre>
+<p><strong>Open Folder on Remote:</strong></p>
+<pre><code>File → Open Folder → Navigate remote filesystem
+Or: Ctrl+K Ctrl+O
+</code></pre>
+<p><strong>Best Practices:</strong></p>
+<pre><code>1. Install extensions on remote (they don't auto-sync)
+2. Use absolute paths in settings
+3. Configure remote git credentials
+4. Set up port forwarding for web apps
+</code></pre>
+<h3>Port Forwarding</h3>
+<p><strong>Access remote web servers locally:</strong></p>
+<pre><code>1. App runs on remote: http://localhost:3000
+2. VS Code detects port
+3. Notification: "Forward Port 3000"
+4. Click "Forward"
+5. Access locally: http://localhost:3000
+</code></pre>
+<p><strong>Manual Port Forwarding:</strong></p>
+<pre><code>1. Ports view (beside Terminal)
+2. Click "Forward a Port"
+3. Enter port number
+4. Access via localhost
+</code></pre>
+<p><strong>Configuration:</strong></p>
+<pre><code class="language-json">// .vscode/settings.json on remote
+{
+  "remote.autoForwardPorts": true,
+  "remote.portsAttributes": {
+    "3000": {
+      "label": "Frontend Dev Server",
+      "onAutoForward": "notify"
+    },
+    "5000": {
+      "label": "Backend API",
+      "onAutoForward": "openBrowser"
+    }
+  }
+}
+</code></pre>
+<h3>SSH Configuration</h3>
+<p><strong>Advanced SSH Config:</strong></p>
+<pre><code>Host jump-box
+    HostName bastion.example.com
+    User admin
+    IdentityFile ~/.ssh/id_rsa
+
+Host internal-server
+    HostName 10.0.1.50
+    User developer
+    ProxyJump jump-box
+    IdentityFile ~/.ssh/internal-key
+    ServerAliveInterval 60
+    ServerAliveCountMax 3
+</code></pre>
+<p><strong>VS Code Remote Settings:</strong></p>
+<pre><code class="language-json">{
+  "remote.SSH.remotePlatform": {
+    "production-server": "linux",
+    "aws-dev": "linux"
+  },
+  "remote.SSH.showLoginTerminal": true,
+  "remote.SSH.connectTimeout": 60,
+  "remote.SSH.enableAgentForwarding": true
+}
+</code></pre>
+<h2>Dev Containers</h2>
+<h3>Installation</h3>
+<pre><code class="language-bash">code --install-extension ms-vscode-remote.remote-containers
+</code></pre>
+<p><strong>Prerequisites:</strong></p>
+<ul>
+<li>A container runtime installed and running (see options below)</li>
+</ul>
+<h3>Container Runtime Options</h3>
+<p><strong>Docker Desktop</strong> remains the most common choice, but several alternatives have matured:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Runtime</th><th>Platform</th><th>Cost</th><th>Notes</th></tr></thead><tbody><tr><td><strong>Docker Desktop</strong></td><td>Windows, macOS, Linux</td><td>Free for personal/small business, paid for enterprise</td><td>Most widely used, easiest setup</td></tr><tr><td><strong>Podman Desktop</strong></td><td>Windows, macOS, Linux</td><td>Free (open-source)</td><td>Daemonless, rootless by default, Docker-compatible CLI</td></tr><tr><td><strong>Rancher Desktop</strong></td><td>Windows, macOS, Linux</td><td>Free (open-source)</td><td>Includes both containerd and dockerd, built-in Kubernetes</td></tr><tr><td><strong>Colima</strong></td><td>macOS, Linux</td><td>Free (open-source)</td><td>Lightweight, CLI-only, uses Lima VMs on macOS</td></tr></tbody></table>
+<p><strong>For Dev Containers specifically</strong>, Docker Desktop or Podman Desktop are the most straightforward choices. VS Code's Dev Containers extension works with any Docker-API-compatible runtime.</p>
+<h3>Creating a Dev Container</h3>
+<p><strong>Method 1: From Template</strong></p>
+<pre><code>1. Ctrl+Shift+P → "Dev Containers: Add Dev Container Configuration Files"
+2. Select template (Node, Python, Go, etc.)
+3. Select options (Node version, etc.)
+4. Reopen in container
+</code></pre>
+<p><strong>Method 2: Custom Dockerfile</strong></p>
+<p><strong>Create <code>.devcontainer/devcontainer.json</code>:</strong></p>
+<pre><code class="language-json">{
+  "name": "My Full-Stack App",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "eamodio.gitlens",
+        "github.copilot"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "editor.formatOnSave": true
+      }
+    }
+  },
+
+  "forwardPorts": [3000, 5000],
+  "postCreateCommand": "npm install",
+  "remoteUser": "node"
+}
+</code></pre>
+<p><strong>Create <code>.devcontainer/Dockerfile</code>:</strong></p>
+<pre><code class="language-dockerfile">FROM node:22-bookworm
+
+# Install additional tools
+RUN apt-get update &amp;&amp; apt-get install -y \
+    git \
+    curl \
+    vim \
+    &amp;&amp; rm -rf /var/lib/apt/lists/*
+
+# Install global npm packages
+RUN npm install -g typescript tsx nodemon
+
+# Set up user
+ARG USERNAME=node
+RUN usermod -s /bin/bash $USERNAME
+
+# Set working directory
+WORKDIR /workspace
+</code></pre>
+<p><strong>Create <code>.devcontainer/docker-compose.yml</code>:</strong></p>
+<pre><code class="language-yaml">version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ../..:/workspace:cached
+    command: sleep infinity
+    network_mode: service:db
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@localhost:5432/myapp
+
+  db:
+    image: postgres:15
+    restart: unless-stopped
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: myapp
+
+volumes:
+  postgres-data:
+</code></pre>
+<h3>Opening in Container</h3>
+<p><strong>Method 1: Reopen</strong></p>
+<pre><code>Ctrl+Shift+P → "Dev Containers: Reopen in Container"
+</code></pre>
+<p><strong>Method 2: Open Folder</strong></p>
+<pre><code>File → Open Folder → Select folder with .devcontainer
+VS Code prompts: "Reopen in Container"
+</code></pre>
+<p><strong>Status Indicator:</strong></p>
+<pre><code>Bottom left: "&gt;&lt;" Dev Container: My Full-Stack App
+</code></pre>
+<h3>Container Features</h3>
+<p><strong>Access Running Services:</strong></p>
+<pre><code>- PostgreSQL on localhost:5432 (inside container)
+- Web app on localhost:3000 (forwarded)
+</code></pre>
+<p><strong>Terminal in Container:</strong></p>
+<pre><code>Ctrl+` → Opens bash in container
+All commands run in container environment
+</code></pre>
+<p><strong>Install Extensions:</strong></p>
+<pre><code>Extensions installed in container persist
+Synced via devcontainer.json
+</code></pre>
+<h3>Dev Container Templates</h3>
+<p><strong>Node.js Full-Stack:</strong></p>
+<pre><code class="language-json">{
+  "name": "Node.js &amp; PostgreSQL",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
+  "forwardPorts": [3000, 5432],
+  "postCreateCommand": "npm install &amp;&amp; npm install -g @anthropic-ai/claude-code",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "eamodio.gitlens",
+        "GitHub.copilot",
+        "ms-azuretools.vscode-docker"
+      ]
+    }
+  }
+}
+</code></pre>
+<p><strong>Python Data Science:</strong></p>
+<pre><code class="language-json">{
+  "name": "Python 3 &amp; Jupyter",
+  "image": "mcr.microsoft.com/vscode/devcontainers/python:3.12",
+  "postCreateCommand": "pip install -r requirements.txt",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-toolsai.jupyter",
+        "ms-python.vscode-pylance",
+        "Continue.continue"
+      ]
+    }
+  }
+}
+</code></pre>
+<h2>Windows Subsystem for Linux (WSL)</h2>
+<h3>Installation</h3>
+<pre><code class="language-bash">code --install-extension ms-vscode-remote.remote-wsl
+</code></pre>
+<p><strong>Setup WSL (Windows):</strong></p>
+<pre><code class="language-powershell"># Install WSL 2
+wsl --install
+
+# Or install specific distro
+wsl --install -d Ubuntu-24.04
+
+# Set default version
+wsl --set-default-version 2
+</code></pre>
+<h3>Opening WSL Folder</h3>
+<p><strong>Method 1: From Windows</strong></p>
+<pre><code>1. Ctrl+Shift+P → "WSL: Open Folder in WSL"
+2. Select distro
+3. Navigate to folder
+</code></pre>
+<p><strong>Method 2: From WSL Terminal</strong></p>
+<pre><code class="language-bash"># In WSL terminal
+cd ~/projects/myapp
+code .
+</code></pre>
+<p><strong>Status Indicator:</strong></p>
+<pre><code>Bottom left: "&gt;&lt;" WSL: Ubuntu-24.04
+</code></pre>
+<h3>WSL Best Practices</h3>
+<p><strong>File Performance:</strong></p>
+<pre><code>✅ Store files in WSL filesystem (/home/user/projects)
+❌ Access Windows files from WSL (/mnt/c/Users/...)
+
+Why: WSL filesystem is 10-100x faster
+</code></pre>
+<p><strong>Git Configuration:</strong></p>
+<pre><code class="language-bash"># Configure Git in WSL separately
+git config --global user.name "Your Name"
+git config --global user.email "you@example.com"
+
+# Use credential helper
+git config --global credential.helper "/mnt/c/Program\ Files/Git/mingw64/bin/git-credential-manager-core.exe"
+</code></pre>
+<p><strong>VS Code Settings for WSL:</strong></p>
+<pre><code class="language-json">{
+  "remote.WSL.fileWatcher.polling": false,
+  "remote.WSL.debug": false
+}
+</code></pre>
+<h2>Remote Tunnels</h2>
+<h3>What are Tunnels?</h3>
+<p>Access your machine from anywhere without SSH setup:</p>
+<p><img src="/data/workshops/vscode-learning-pathway/diagrams/06-tunnels.svg" alt="VS Code tunnels: your machine creates a tunnel to the VS Code relay and a remote client connects through it over a secure channel"></p>
+<h3>Setup Tunnel</h3>
+<p><strong>On Your Machine:</strong></p>
+<pre><code class="language-bash"># Install VS Code CLI
+code --version  # Verify installed
+
+# Create tunnel
+code tunnel
+
+# First time: Sign in with GitHub/Microsoft
+# Choose name for this machine: "my-desktop"
+</code></pre>
+<p><strong>Access from Anywhere:</strong></p>
+<pre><code>1. Open vscode.dev
+2. Sign in with same account
+3. See "my-desktop" in Remote Explorer
+4. Click to connect
+</code></pre>
+<p><strong>Or use desktop VS Code:</strong></p>
+<pre><code>1. Install Remote - Tunnels extension
+2. Ctrl+Shift+P → "Remote-Tunnels: Connect to Tunnel"
+3. Select your machine
+</code></pre>
+<h3>Tunnel Use Cases</h3>
+<p><strong>Perfect for:</strong></p>
+<ul>
+<li>Accessing home dev machine from anywhere</li>
+<li>No port forwarding/firewall config needed</li>
+<li>Working on iPad/Chromebook via browser</li>
+<li>Collaborative debugging</li>
+</ul>
+<p><strong>Not ideal for:</strong></p>
+<ul>
+<li>Servers (use SSH)</li>
+<li>Production environments</li>
+<li>High-security scenarios</li>
+</ul>
+<h2>Troubleshooting</h2>
+<h3>SSH Connection Issues</h3>
+<p><strong>Problem: "Could not establish connection"</strong></p>
+<pre><code class="language-bash"># Test SSH manually
+ssh production-server
+
+# Check SSH config
+cat ~/.ssh/config
+
+# Verbose SSH
+ssh -v production-server
+</code></pre>
+<p><strong>Problem: "Permission denied (publickey)"</strong></p>
+<pre><code class="language-bash"># Generate new key
+ssh-keygen -t ed25519 -C "your_email@example.com"
+
+# Copy to server
+ssh-copy-id user@server
+
+# Or manually
+cat ~/.ssh/id_ed25519.pub
+# Paste into server's ~/.ssh/authorized_keys
+</code></pre>
+<p><strong>Problem: Extensions not working remotely</strong></p>
+<pre><code>1. Check VS Code version matches locally and remotely
+2. Install extensions on remote: Extensions view → Filter: "@local" → Install on SSH
+3. Reload window: Ctrl+Shift+P → "Developer: Reload Window"
+</code></pre>
+<h3>Container Issues</h3>
+<p><strong>Problem: Container fails to build</strong></p>
+<pre><code class="language-bash"># Check Docker
+docker ps
+
+# View build logs
+docker logs &lt;container-id&gt;
+
+# Rebuild without cache
+Ctrl+Shift+P → "Dev Containers: Rebuild Container"
+</code></pre>
+<p><strong>Problem: Slow performance</strong></p>
+<pre><code class="language-json">// Use named volumes instead of bind mounts
+{
+  "mounts": [
+    "source=node_modules,target=${containerWorkspaceFolder}/node_modules,type=volume"
+  ]
+}
+</code></pre>
+<h3>WSL Issues</h3>
+<p><strong>Problem: Slow file operations</strong></p>
+<pre><code>✅ Move files to WSL filesystem:
+   /home/user/projects (fast)
+
+❌ Avoid:
+   /mnt/c/Users/... (very slow)
+</code></pre>
+<p><strong>Problem: "Cannot connect to WSL"</strong></p>
+<pre><code class="language-powershell"># Restart WSL
+wsl --shutdown
+wsl
+
+# Update WSL
+wsl --update
+</code></pre>
+<h2>Pro Tips</h2>
+<h3>Tip 1: Multi-Root Remote Workspaces</h3>
+<pre><code class="language-json">// myproject.code-workspace
+{
+  "folders": [
+    {
+      "name": "Frontend (Local)",
+      "path": "./frontend"
+    },
+    {
+      "name": "Backend (Remote)",
+      "uri": "vscode-remote://ssh-remote+production-server/home/user/backend"
+    }
+  ]
+}
+</code></pre>
+<h3>Tip 2: Dotfiles Sync</h3>
+<p><strong>Sync your shell config across remotes:</strong></p>
+<pre><code class="language-json">{
+  "dotfiles.repository": "yourusername/dotfiles",
+  "dotfiles.targetPath": "~/dotfiles",
+  "dotfiles.installCommand": "~/dotfiles/install.sh"
+}
+</code></pre>
+<h3>Tip 3: Remote Extension Recommendations</h3>
+<p><strong>In devcontainer.json:</strong></p>
+<pre><code class="language-json">{
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "GitHub.copilot",
+        "eamodio.gitlens"
+      ]
+    }
+  }
+}
+</code></pre>
+<h3>Tip 4: Custom Container Images</h3>
+<p><strong>Use Dev Container images and features:</strong></p>
+<pre><code class="language-json">{
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:22",
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/node:1": {}
+  }
+}
+</code></pre>
+<p>Browse the full feature catalogue at <a href="https://containers.dev/features">containers.dev/features</a>.</p>
+<h3>Tip 5: SSH Keep-Alive</h3>
+<p><strong>Prevent SSH timeout:</strong></p>
+<pre><code># ~/.ssh/config
+Host *
+    ServerAliveInterval 60
+    ServerAliveCountMax 3
+</code></pre>
+<h2>Assessment</h2>
+<h3>Knowledge Check</h3>
+<p><strong>Question 1</strong>: What's the difference between Remote-SSH and Dev Containers?</p>
+<details>
+<summary>Answer</summary>
+- **Remote-SSH**: Connect to existing remote machine (server, VM, etc.). You control the environment.
+- **Dev Containers**: Create isolated, reproducible development environment using Docker. Same environment for all team members.
+</details>
+<p><strong>Question 2</strong>: Why is WSL file performance better in /home vs /mnt/c?</p>
+<details>
+<summary>Answer</summary>
+- **/home**: Native Linux filesystem (ext4), full speed
+- **/mnt/c**: Windows filesystem accessed via translation layer, significant overhead (10-100x slower)
+</details>
+<p><strong>Question 3</strong>: When should you use Remote Tunnels instead of SSH?</p>
+<details>
+<summary>Answer</summary>
+**Use Tunnels when:**
+- No SSH access/port forwarding available
+- Behind firewall/NAT
+- Need browser access (iPad, Chromebook)
+<p><strong>Use SSH when:</strong></p>
+<ul>
+<li>You have SSH access</li>
+<li>Server/production environment</li>
+<li>Need full control</li>
+</ul>
+</details>
+<h3>Practical Exercise</h3>
+<p><strong>Setup Remote Development Environment:</strong></p>
+<ol>
+<li>
+<p><strong>Choose One:</strong></p>
+<ul>
+<li>SSH to cloud VM</li>
+<li>Dev Container for local project</li>
+<li>WSL for Windows development</li>
+</ul>
+</li>
+<li>
+<p><strong>Configure:</strong></p>
+<ul>
+<li>Install required extensions remotely</li>
+<li>Set up port forwarding</li>
+<li>Configure git</li>
+</ul>
+</li>
+<li>
+<p><strong>Develop:</strong></p>
+<ul>
+<li>Clone a project</li>
+<li>Run development server</li>
+<li>Access via forwarded port</li>
+<li>Make changes, commit</li>
+</ul>
+</li>
+<li>
+<p><strong>Document:</strong></p>
+<ul>
+<li>Create setup instructions</li>
+<li>Share devcontainer.json (if applicable)</li>
+</ul>
+</li>
+</ol>
+<p><strong>Success Criteria:</strong></p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled=""> Connected to remote environment</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Extensions work correctly</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Web app accessible via port forwarding</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Git configured and working</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Team can replicate setup</li>
+</ul>
+<h2>Next Steps</h2>
+<ul>
+<li><strong>Debugging</strong>: Debugging in remote environments</li>
+<li><strong>Task Automation</strong>: Automation for remote workflows</li>
+</ul>
+<h2>Additional Resources</h2>
+<ul>
+<li><a href="https://code.visualstudio.com/docs/remote/remote-overview">Remote Development Docs</a></li>
+<li><a href="https://containers.dev/">Dev Containers</a></li>
+<li><a href="https://learn.microsoft.com/en-us/windows/wsl/">WSL Documentation</a></li>
+</ul>
+<hr>
+<p><strong>Estimated Time</strong>: 4-5 hours
+<strong>Difficulty</strong>: Intermediate to Advanced
+<strong>Prerequisites</strong>: Introduction through Git Integration, Docker/SSH knowledge helpful</p></div></article></main></div>
+    <noscript><p>Interactive forms require JavaScript. You can also email <a href="mailto:info@dreamlab-ai.com">info@dreamlab-ai.com</a>.</p></noscript>
+  
+
+</body></html>

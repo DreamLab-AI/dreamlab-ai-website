@@ -1,0 +1,45 @@
+{
+  "title": "Workshop 04 - Morning Session: Specialised AI Agents",
+  "pages": [
+    {
+      "slug": "README.md",
+      "title": "Workshop 04 - Morning Session: Specialised AI Agents"
+    },
+    {
+      "slug": "00_introduction.md",
+      "title": "Introduction to AI Agents"
+    },
+    {
+      "slug": "01_concepts.md",
+      "title": "Core Agent Concepts (2026)"
+    },
+    {
+      "slug": "02_hands_on.md",
+      "title": "Hands-on Agent Development"
+    },
+    {
+      "slug": "03_exercises.md",
+      "title": "Practical Exercises"
+    },
+    {
+      "slug": "04_project.md",
+      "title": "Final Project: Production Research Agent"
+    },
+    {
+      "slug": "05_assessment.md",
+      "title": "Assessment: AI Agents Knowledge Check"
+    },
+    {
+      "slug": "06_resources.md",
+      "title": "Resources for AI Agents"
+    },
+    {
+      "slug": "objectives.md",
+      "title": "Learning Objectives - Workshop 04 Morning: Specialised AI Agents"
+    },
+    {
+      "slug": "prerequisites.md",
+      "title": "Prerequisites - Workshop 04 Morning: Specialised AI Agents"
+    }
+  ]
+}

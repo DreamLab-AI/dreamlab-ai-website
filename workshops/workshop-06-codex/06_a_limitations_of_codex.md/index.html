@@ -1,0 +1,376 @@
+<!DOCTYPE html><html lang="en" class="dark"><head>
+    <meta charset="UTF-8">
+
+    <!-- Primary Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <title>6.a: Limitations of AI Coding Agents — What They Cannot Do (Yet) | DreamLab AI Workshops</title>
+    <meta name="title" content="6.a: Limitations of AI Coding Agents — What They Cannot Do (Yet) | DreamLab AI Workshops">
+    <meta name="description" content="6.a: Limitations of AI Coding Agents — What They Cannot Do (Yet) — free DreamLab AI curriculum.">
+    <meta name="keywords" content="applied innovation lab, AI consulting, enterprise innovation, immersive XR, cyber trust, creative technology, residential programmes, knowledge transfer, deep tech, Lake District">
+    <meta name="author" content="DreamLab">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    <meta name="rating" content="General">
+
+    <link rel="describedby" href="/llms.txt" type="text/plain">
+    <script type="application/ld+json" id="organisation-structured-data">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://dreamlab-ai.com/#organisation","name":"DreamLab","url":"https://dreamlab-ai.com/","logo":"https://dreamlab-ai.com/images/heroes/dreamlab-hero.webp","email":"info@dreamlab-ai.com","founder":{"@id":"https://dreamlab-ai.com/team#john-ohare"},"sameAs":["https://github.com/DreamLab-AI","https://www.linkedin.com/company/dreamlab-ai-consulting"]},{"@type":"Person","@id":"https://dreamlab-ai.com/team#john-ohare","name":"John O'Hare","honorificPrefix":"Dr","jobTitle":"Founder","worksFor":{"@id":"https://dreamlab-ai.com/#organisation"},"url":"https://dreamlab-ai.com/team#john-ohare"}]}</script>
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dreamlab-ai.com/workshops/workshop-06-codex/06_a_limitations_of_codex.md/">
+
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="msapplication-TileColor" content="#1a1a2e">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://dreamlab-ai.com/workshops/workshop-06-codex/06_a_limitations_of_codex.md/">
+    <meta property="og:title" content="6.a: Limitations of AI Coding Agents — What They Cannot Do (Yet) | DreamLab AI Workshops">
+    <meta property="og:description" content="6.a: Limitations of AI Coding Agents — What They Cannot Do (Yet) — free DreamLab AI curriculum.">
+    <meta property="og:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="DreamLab AI Workshop - 6.a: Limitations of AI Coding Agents — What They Cannot Do (Yet)">
+    <meta property="og:site_name" content="DreamLab">
+    <meta property="og:locale" content="en_GB">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://dreamlab-ai.com/workshops/workshop-06-codex/06_a_limitations_of_codex.md/">
+    <meta name="twitter:title" content="6.a: Limitations of AI Coding Agents — What They Cannot Do (Yet) | DreamLab AI Workshops">
+    <meta name="twitter:description" content="6.a: Limitations of AI Coding Agents — What They Cannot Do (Yet) — free DreamLab AI curriculum.">
+    <meta name="twitter:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta name="twitter:image:alt" content="DreamLab AI Workshop - 6.a: Limitations of AI Coding Agents — What They Cannot Do (Yet)">
+    <meta name="twitter:site" content="@thedreamlab">
+    <meta name="twitter:creator" content="@thedreamlab">
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="geo.region" content="GB">
+    <meta name="geo.placename" content="United Kingdom">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DreamLab AI">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Security Headers -->
+    <!--
+      CSP notes:
+      - script-src is 'self' only: no 'unsafe-eval' (blocks eval/Function-based
+        injection) and no 'unsafe-inline'. The one inline bootstrap script was
+        moved to /spa-redirect.js. JSON-LD blocks below are type
+        application/ld+json (data, not executable) so CSP does not gate them.
+      - connect-src is scoped to the Cloudflare Workers subdomain actually used
+        by this account (*.solitary-paper-764d.workers.dev: auth / pod / search /
+        link-preview / nostr-relay), NOT the internet-wide *.workers.dev, which
+        previously allowed exfiltration to any attacker-controlled worker.
+      - The two open Nostr relays (relay.damus.io, relay.primal.net) are
+        explicitly allow-listed: the Talk-to-AI chat listens there for
+        junkiejarvis's reply (the primary relay's whitelist gate rejects the
+        gift-wrap addressed to the ephemeral session key — ADR-042 Amendment 1).
+        Must stay in sync with VITE_REPLY_RELAYS. Named exactly, not a wildcard.
+      - style-src keeps 'unsafe-inline' because Radix UI + runtime style
+        attributes require it; that is not a script-injection vector.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.solitary-paper-764d.workers.dev wss://*.solitary-paper-764d.workers.dev https://*.dreamlab-ai.com wss://*.dreamlab-ai.com wss://relay.damus.io wss://relay.primal.net; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <!-- SPA deep-link restore. External 'self' script (not inline) so CSP
+         script-src can stay 'self' with no 'unsafe-inline'. Classic,
+         render-blocking script: runs before the deferred app module. -->
+    <script src="/spa-redirect.js"></script>
+    <script type="module" crossorigin="" src="/assets/index-Crc86LXg.js"></script>
+    <link rel="modulepreload" crossorigin="" href="/assets/ui-C2dH1upk.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/vendor-uw6h6E0d.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/nostr-BpuBsPg-.js">
+    <link rel="stylesheet" crossorigin="" href="/assets/index-CeEdk6WL.css">
+  <script type="application/ld+json" id="route-structured-data">{"@context":"https://schema.org","@type":"LearningResource","@id":"https://dreamlab-ai.com/workshops/workshop-06-codex/06_a_limitations_of_codex.md/#page","url":"https://dreamlab-ai.com/workshops/workshop-06-codex/06_a_limitations_of_codex.md/","name":"6.a: Limitations of AI Coding Agents — What They Cannot Do (Yet) | DreamLab AI Workshops","description":"6.a: Limitations of AI Coding Agents — What They Cannot Do (Yet) — free DreamLab AI curriculum.","inLanguage":"en-GB","publisher":{"@id":"https://dreamlab-ai.com/#organisation"},"isAccessibleForFree":true}</script><link rel="alternate" type="text/markdown" href="/data/workshops/workshop-06-codex/06_a_limitations_of_codex.md"></head>
+
+  <body>
+    <!-- Skip Navigation Link for Accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
+      Skip to main content
+    </a>
+    <div id="root"><header role="banner" class="fixed top-0 left-0 right-0 z-50"><div class="md:hidden flex items-center justify-between h-14 px-6 bg-[rgba(14,14,17,0.92)] backdrop-blur-[14px] border-b border-dlm-hairline"><a aria-label="DreamLab home" class="flex items-center gap-2" href="/"><span class="w-[9px] h-[9px] rounded-full bg-dlm-bright shrink-0" aria-hidden="true"></span><span class="text-[14px] font-semibold tracking-[0.14em] text-[#FAFAFA]">DREAMLAB</span></a><button type="button" aria-label="Open menu" aria-expanded="false" class="w-11 h-11 -mr-2 flex flex-col items-end justify-center gap-[5px] focus:outline-none focus-visible:ring-2 focus-visible:ring-dlm-bright rounded"><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span></button></div><div class="hidden md:block transition-all duration-300 ease-out py-3 bg-background/60 backdrop-blur-md"><div class="container flex items-center justify-between px-4"><button class="flex items-center gap-2 md:gap-3 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded min-h-[48px] min-w-[48px] px-3 py-2" aria-label="Main navigation menu" type="button" id="radix-:Rp:" aria-haspopup="menu" aria-expanded="false" data-state="closed"><div class="w-10 h-10 md:w-8 md:h-8 shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all duration-300 group-hover:scale-110 animate-glow-pulse" aria-hidden="true"></div><span class="font-bold text-lg md:text-xl tracking-tight group-hover:text-purple-400 transition-colors duration-300">MENU</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down h-5 w-5 md:h-4 md:w-4 shrink-0 text-muted-foreground group-hover:text-purple-400 transition-all duration-300 group-hover:rotate-180" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button><div class="flex items-center gap-2"><a class="items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-10 py-2 hover:bg-purple-500/10 hover:text-purple-400 transition-all duration-300 hover:scale-105 min-h-[48px] px-4 text-base md:text-sm hidden sm:inline-flex" href="/contact">Contact</a><a class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary hover:bg-primary/90 h-10 py-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transition-all duration-300 min-h-[48px] px-4 text-base md:text-sm" href="/co-create">Partner With Us</a></div></div></div></header><header class="relative overflow-hidden" style="min-height:320px"><div class="absolute inset-0 bg-gradient-to-br from-amber-500/30 via-orange-500/30 to-red-500/30" style="transform:translateY(0px);opacity:1"><div class="absolute top-0 -left-20 w-96 h-96 rounded-full blur-3xl opacity-40 animate-float bg-gradient-to-br from-amber-500 via-orange-500 to-red-500"></div><div class="absolute bottom-0 -right-20 w-[32rem] h-[32rem] rounded-full blur-3xl opacity-30 animate-float bg-gradient-to-br from-amber-500 via-orange-500 to-red-500" style="animation-delay:1s"></div><div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full blur-3xl opacity-20 animate-float bg-gradient-to-br from-amber-500 via-orange-500 to-red-500" style="animation-delay:2s"></div></div><div class="absolute inset-0 opacity-5" style="background-image:linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);background-size:50px 50px;transform:translateY(0px)"></div><div class="relative z-10 container px-4 pt-24 pb-8"><div class="mb-6 transition-all duration-500 transform opacity-0 translate-y-4"><nav aria-label="breadcrumb"><ol class="flex flex-wrap items-center gap-1.5 break-words text-sm sm:gap-2.5 text-white/70"><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/">Home</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/workshops">Workshops</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><span role="link" aria-disabled="true" aria-current="page" class="text-white font-medium">Workshop 06: Mastering AI-Powered Coding Agents (2026 Edition)</span></li></ol></nav></div><div class="mb-4 transition-all duration-500 delay-100 transform opacity-0 translate-y-4"><div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20"><span class="text-orange-400"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings w-5 h-5" aria-hidden="true"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"></path><circle cx="12" cy="12" r="3"></circle></svg></span><span class="text-sm font-medium text-white/90">Software Engineering</span></div></div><h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 break-words transition-all duration-700 delay-200 transform opacity-0 translate-y-6"><span class="bg-gradient-to-r bg-clip-text text-transparent animate-gradient-shift bg-400% from-amber-400 via-orange-400 to-red-400">Workshop 06: Mastering AI-Powered Coding Agents (2026 Edition)</span></h1><div class="flex flex-wrap items-center gap-3 mb-6 transition-all duration-700 delay-400 transform opacity-0 translate-y-4"><div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-white/10 border-white/20 text-white backdrop-blur-sm hover:bg-white/20"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-3.5 h-3.5 mr-1.5" aria-hidden="true"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>26<!-- --> <!-- -->Modules</div></div><div class="max-w-md transition-all duration-700 delay-500 transform opacity-0 translate-y-4"><div class="flex items-center justify-between text-sm text-white/70 mb-2"><span class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code w-4 h-4" aria-hidden="true"><path d="m16 18 6-6-6-6"></path><path d="m8 6-6 6 6 6"></path></svg><span>Chapter <!-- -->21<!-- -->: <!-- -->6.a: Limitations of AI Coding Agents — What They Cannot Do (Yet)</span></span><span class="font-medium text-white">81<!-- -->%</span></div><div class="relative"><div aria-valuemax="100" aria-valuemin="0" role="progressbar" data-state="indeterminate" data-max="100" class="relative w-full overflow-hidden rounded-full h-2 bg-white/20"><div data-state="indeterminate" data-max="100" class="h-full w-full flex-1 bg-primary transition-all" style="transform:translateX(-19%)"></div></div><div class="absolute top-0 left-0 h-2 rounded-full blur-sm bg-gradient-to-r from-amber-500 via-orange-500 to-red-500" style="width:81%"></div></div><div class="relative mt-1 h-1"><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:3.8461538461538463%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:7.6923076923076925%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:11.538461538461538%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:15.384615384615385%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:19.230769230769234%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:23.076923076923077%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:26.923076923076923%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:30.76923076923077%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:34.61538461538461%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:38.46153846153847%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:42.30769230769231%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:46.15384615384615%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:50%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:53.84615384615385%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:57.692307692307686%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:61.53846153846154%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:65.38461538461539%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:69.23076923076923%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:73.07692307692307%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:76.92307692307693%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:80.76923076923077%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:84.61538461538461%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:88.46153846153845%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:92.3076923076923%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:96.15384615384616%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:100%"></div></div></div></div><div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent"></div></header><main class="container px-4 pt-8 pb-8 flex flex-col md:flex-row gap-x-8 min-h-screen" id="main-content"><aside class="w-full md:w-64 lg:w-72 md:sticky md:top-20 md:h-[calc(100vh-5rem-2rem)] mb-8 md:mb-0"><h2 class="text-xl font-semibold mb-4 break-words">Workshop 06: Mastering AI-Powered Coding Agents (2026 Edition)</h2><div dir="ltr" class="relative overflow-hidden h-auto md:h-full pr-4 border-r md:border-r-0" style="position:relative;--radix-scroll-area-corner-width:0px;--radix-scroll-area-corner-height:0px"><style>[data-radix-scroll-area-viewport]{scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;}[data-radix-scroll-area-viewport]::-webkit-scrollbar{display:none}</style><div data-radix-scroll-area-viewport="" class="h-full w-full rounded-[inherit]" style="overflow-x:hidden;overflow-y:hidden"><div style="min-width:100%;display:table"><nav><ul><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/README.md"><span class="mr-2 text-xs opacity-60">1<!-- -->.</span>Workshop 06: Mastering AI-Powered Coding Agents (2026 Edition)</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/00_introduction.md"><span class="mr-2 text-xs opacity-60">2<!-- -->.</span>Chapter 0: Introduction to AI-Powered Software Engineering</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/01_understanding_the_codex_ecosystem.md"><span class="mr-2 text-xs opacity-60">3<!-- -->.</span>Chapter 1: Understanding the Modern AI Coding Ecosystem</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/02_a_accessing_the_codex_cloud_agent.md"><span class="mr-2 text-xs opacity-60">4<!-- -->.</span>2.a: Web &amp; IDE Tools for AI-Powered Coding</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/02_b_setting_up_the_codex_cli.md"><span class="mr-2 text-xs opacity-60">5<!-- -->.</span>2.b: Setting Up Terminal-Based AI Coding Agents</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/02_c_api_keys_and_authentication.md"><span class="mr-2 text-xs opacity-60">6<!-- -->.</span>2.c: API Keys and Authentication</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/02_getting_started.md"><span class="mr-2 text-xs opacity-60">7<!-- -->.</span>Chapter 2: Getting Started — Setup and Initial Configuration</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/03_a_effective_prompting_strategies.md"><span class="mr-2 text-xs opacity-60">8<!-- -->.</span>3.a: Effective Prompting Strategies</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/03_b_the_crucial_role_of_agents_md.md"><span class="mr-2 text-xs opacity-60">9<!-- -->.</span>3.b: Project Configuration — CLAUDE.md and AGENTS.MD</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/03_c_managing_tasks_efficiently.md"><span class="mr-2 text-xs opacity-60">10<!-- -->.</span>3.c: Managing Tasks Efficiently</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/03_d_advanced_techniques.md"><span class="mr-2 text-xs opacity-60">11<!-- -->.</span>3.d: Advanced Techniques</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/03_mastering_codex.md"><span class="mr-2 text-xs opacity-60">12<!-- -->.</span>Chapter 3: Mastering AI Coding Agents — From Basic Prompts to Advanced Workflows</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/04_a_beginner_tasks.md"><span class="mr-2 text-xs opacity-60">13<!-- -->.</span>4.a: Beginner Tasks — Quick Wins with AI Coding Agents</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/04_b_intermediate_tasks.md"><span class="mr-2 text-xs opacity-60">14<!-- -->.</span>4.b: Intermediate Tasks</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/04_c_advanced_scenarios.md"><span class="mr-2 text-xs opacity-60">15<!-- -->.</span>4.c: Advanced Scenarios</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/04_practical_codex.md"><span class="mr-2 text-xs opacity-60">16<!-- -->.</span>Chapter 4: Practical Applications — Real-World Examples and Walkthroughs</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/05_a_codex_vs_general_gpt_models.md"><span class="mr-2 text-xs opacity-60">17<!-- -->.</span>5.a: Agentic Tools vs. Chat Models for Coding</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/05_b_understanding_model_choices.md"><span class="mr-2 text-xs opacity-60">18<!-- -->.</span>5.b: Understanding Model &amp; Tool Choices (June 2026)</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/05_c_the_evolving_toolkit.md"><span class="mr-2 text-xs opacity-60">19<!-- -->.</span>5.c: The Evolving Toolkit: MCP, Agent Frameworks, and What Comes Next</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/05_the_broader_landscape.md"><span class="mr-2 text-xs opacity-60">20<!-- -->.</span>Chapter 5: The Broader Landscape — Models, Tools, and the Future of AI Coding</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors bg-primary text-primary-foreground font-semibold" href="/workshops/workshop-06-codex/06_a_limitations_of_codex.md"><span class="mr-2 text-xs opacity-60">21<!-- -->.</span>6.a: Limitations of AI Coding Agents — What They Cannot Do (Yet)</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/06_b_security_implications.md"><span class="mr-2 text-xs opacity-60">22<!-- -->.</span>6.b: Security Implications of AI-Assisted Development</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/06_c_ethical_and_legal_considerations.md"><span class="mr-2 text-xs opacity-60">23<!-- -->.</span>6.c: Ethical and Legal Considerations</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/06_navigating_challenges.md"><span class="mr-2 text-xs opacity-60">24<!-- -->.</span>Chapter 6: Navigating Challenges and Considerations</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/07_best_practices_for_using_ai_agents.md"><span class="mr-2 text-xs opacity-60">25<!-- -->.</span>Chapter 7: Best Practices for Using AI Coding Agents (2026)</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/08_conclusion.md"><span class="mr-2 text-xs opacity-60">26<!-- -->.</span>Chapter 8: Conclusion — AI Coding Agents as Your Co-Developers</a></li></ul></nav></div></div></div></aside><article class="flex-1 min-w-0 md:pl-0"><div class="prose max-w-none dark:prose-invert break-words [&amp;_table]:block [&amp;_table]:w-full [&amp;_table]:overflow-x-auto"><h1>6.a: Limitations of AI Coding Agents — What They Cannot Do (Yet)</h1>
+<blockquote>
+<p><strong>June 2026:</strong> AI coding agents are remarkably capable, but they are not omniscient. Understanding their limitations is essential for setting realistic expectations, focusing your review effort where it matters most, and avoiding the costly over-reliance that comes from treating probabilistic systems as deterministic ones.</p>
+</blockquote>
+<h2>Context Window Constraints</h2>
+<p>Every AI coding agent operates within a finite context window — the total amount of text (code, conversation history, file contents, tool output) the model can process at once. While context windows have grown dramatically (Claude models offer 200K tokens; some models approach 1M tokens), they are not infinite, and their practical limits are tighter than their theoretical maximums.</p>
+<h3>How Context Limits Manifest</h3>
+<ul>
+<li><strong>Long sessions degrade.</strong> As a conversation accumulates history — prompts, responses, file reads, command outputs — the model's effective attention on any single piece of information diminishes. A task that works perfectly at the start of a session may produce weaker results after an hour of accumulated context.</li>
+<li><strong>Large codebases exceed capacity.</strong> A monorepo with hundreds of thousands of lines cannot be loaded entirely into context. The agent navigates by reading specific files on demand, but it cannot hold the entire codebase in working memory simultaneously.</li>
+<li><strong>Context eviction is silent.</strong> When context fills up, older information is silently dropped or compressed. The agent does not warn you that it has forgotten your earlier instructions.</li>
+</ul>
+<h3>Mitigation Strategies</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Strategy</th><th>Tool</th><th>Effect</th></tr></thead><tbody><tr><td>Use <code>/compact</code> regularly</td><td>Claude Code</td><td>Summarises conversation history, freeing context for new work</td></tr><tr><td>Start fresh sessions for new tasks</td><td>All tools</td><td>Prevents context pollution from unrelated prior work</td></tr><tr><td>Point the agent to specific files</td><td>All tools</td><td>Reduces unnecessary file scanning that consumes context</td></tr><tr><td>Use CLAUDE.md / AGENTS.MD</td><td>Claude Code, Codex CLI</td><td>Persistent instructions that do not need to be repeated in every prompt</td></tr><tr><td>Break large tasks into subtasks</td><td>All tools</td><td>Each subtask operates within a manageable context budget</td></tr></tbody></table>
+<pre><code class="language-bash"># Claude Code: compact a long session
+/compact
+
+# Codex CLI: start fresh for a new task
+codex "New task: add rate limiting to the /api/users endpoint"
+
+# Both: scope your prompts to specific files
+claude "Read src/services/auth.ts and add token refresh logic"
+</code></pre>
+<h2>Domain-Specific Blindness</h2>
+<p>AI coding agents are trained on vast corpora of publicly available code, documentation, and technical writing. They excel at tasks that resemble patterns in that training data — standard web frameworks, common design patterns, popular libraries, well-documented APIs. They struggle with the bespoke.</p>
+<h3>Where Domain Blindness Appears</h3>
+<ul>
+<li>
+<p><strong>Proprietary business logic.</strong> If your application implements a complex pricing algorithm, regulatory compliance workflow, or domain-specific calculation that exists only in your codebase, the agent has no external reference for correctness. It will generate code that looks plausible but may be semantically wrong.</p>
+</li>
+<li>
+<p><strong>Industry-specific conventions.</strong> Financial services, healthcare, aerospace, and other regulated industries have coding standards and safety requirements that are not well-represented in general-purpose training data. An agent may produce code that compiles and passes basic tests but violates industry-specific regulations.</p>
+</li>
+<li>
+<p><strong>Proprietary frameworks and internal libraries.</strong> If your team uses an in-house ORM, a custom build system, or a proprietary testing framework, the agent will not know its API. It will fall back on the nearest public equivalent, producing code that looks right but uses the wrong function signatures.</p>
+</li>
+<li>
+<p><strong>Novel algorithmic problems.</strong> Tasks that require genuinely novel algorithms — not implementations of known algorithms, but new approaches to unsolved problems — are beyond the agent's capability. It can implement a known sorting algorithm flawlessly but cannot invent a new one.</p>
+</li>
+</ul>
+<h3>Mitigation Strategies</h3>
+<ul>
+<li><strong>Invest heavily in CLAUDE.md / AGENTS.MD for domain-specific projects.</strong> Document your proprietary APIs, conventions, and constraints in the configuration file. The agent reads this on every task.</li>
+<li><strong>Provide examples of correct implementations.</strong> "Follow the pattern in <code>src/services/billing.ts</code> when implementing the new discount calculation" is far more effective than describing the pattern from scratch.</li>
+<li><strong>Use the agent for the mechanical parts.</strong> Let the agent handle boilerplate, test scaffolding, and structural changes while you handle the domain-specific logic.</li>
+<li><strong>Review domain logic with extra scrutiny.</strong> Apply your deepest review effort to the areas where the agent is least likely to be correct.</li>
+</ul>
+<h2>Hallucination and Confabulation</h2>
+<p>AI models can generate confident, syntactically correct, entirely wrong code. This is not a bug — it is a fundamental property of how large language models work. They predict the most likely next token based on patterns in training data, and sometimes the most likely continuation is incorrect.</p>
+<h3>Common Hallucination Patterns</h3>
+<p><strong>Invented APIs.</strong> The agent generates a function call to a library method that does not exist. The code looks correct, the method name is plausible, but the library has no such function.</p>
+<pre><code class="language-python"># Hallucinated API — requests.get does not have a 'retry_count' parameter
+response = requests.get(url, retry_count=3, timeout=30)
+</code></pre>
+<p><strong>Incorrect edge-case handling.</strong> The happy path works; the boundary conditions do not. The agent handles the common case correctly but makes assumptions about error states, null values, or concurrent access that are wrong.</p>
+<pre><code class="language-typescript">// Looks correct, but fails when items is undefined (not just empty)
+function calculateTotal(items: CartItem[]): number {
+  return items.reduce((sum, item) =&gt; sum + item.price * item.quantity, 0);
+}
+// Agent assumed items is always an array — but the API can return undefined
+</code></pre>
+<p><strong>Fabricated configuration options.</strong> The agent suggests a configuration flag, environment variable, or command-line option that does not exist in the tool it is configuring.</p>
+<p><strong>Outdated information presented as current.</strong> The agent uses a deprecated API, references a library version that has been superseded, or applies a security practice that is no longer recommended — all without indicating uncertainty.</p>
+<h3>Mitigation Strategies</h3>
+<ul>
+<li><strong>Run the tests.</strong> Automated testing catches most hallucinated APIs and incorrect logic. If a hallucinated method does not exist, the test will fail with a clear error.</li>
+<li><strong>Use static type checking.</strong> TypeScript, Rust, and other statically-typed languages catch many hallucinated APIs at compile time.</li>
+<li><strong>Enable linters and hooks.</strong> Claude Code hooks that run ESLint, mypy, or clippy after every edit catch a significant class of hallucination immediately.</li>
+<li><strong>Verify against documentation.</strong> When the agent suggests using a library function you have not seen before, check the library's docs before accepting.</li>
+<li><strong>Be sceptical of confidence.</strong> The agent never hedges. It presents every suggestion with the same level of assurance, whether it is certain or guessing. Your review process must compensate for this.</li>
+</ul>
+<h2>Consistency and Reproducibility</h2>
+<p>The same prompt given to the same model can produce different outputs across runs. This is by design — language models use sampling with a temperature parameter that introduces controlled randomness — but it can be surprising and frustrating when you need deterministic results.</p>
+<h3>How Inconsistency Manifests</h3>
+<ul>
+<li><strong>Style variation.</strong> One run uses <code>async/await</code>; another uses <code>.then()</code> chains. One uses early returns; another uses nested conditionals. The code is functionally equivalent but structurally different.</li>
+<li><strong>Architectural variation.</strong> Asked to "add error handling to the API," the agent might add try-catch blocks in one run, a global error middleware in another, and a custom error class hierarchy in a third.</li>
+<li><strong>Naming variation.</strong> Variable names, function names, and file names may differ between runs for the same task.</li>
+</ul>
+<h3>Mitigation Strategies</h3>
+<ul>
+<li><strong>Use CLAUDE.md / AGENTS.MD to enforce conventions.</strong> Specifying "use async/await, never .then() chains" and "use early returns instead of nested conditionals" eliminates style-level inconsistency.</li>
+<li><strong>Provide examples.</strong> "Follow the error handling pattern in <code>src/middleware/errors.ts</code>" constrains architectural variation.</li>
+<li><strong>Use lower temperature when available.</strong> Some tools and API configurations allow reducing the temperature parameter for more deterministic output.</li>
+<li><strong>Accept reasonable variation.</strong> Not all inconsistency is problematic. If the code is correct and follows your conventions, minor structural differences between runs are acceptable.</li>
+</ul>
+<h2>Knowledge Cutoff and Outdated Information</h2>
+<p>AI models are trained on data with a specific cutoff date. While both Anthropic and OpenAI regularly update their models with newer training data, there is always a gap between the latest real-world developments and the model's knowledge.</p>
+<h3>Practical Consequences</h3>
+<ul>
+<li><strong>Deprecated APIs.</strong> The agent may suggest using <code>componentWillMount</code> in React (deprecated since React 16.3) or <code>new Buffer()</code> in Node.js (deprecated since Node 10).</li>
+<li><strong>Outdated library versions.</strong> The agent may reference library APIs from older versions that have changed in the current release.</li>
+<li><strong>Superseded security practices.</strong> Security recommendations evolve. The agent may suggest MD5 for hashing (broken for security purposes since the early 2000s) or recommend against practices that are now standard.</li>
+<li><strong>Missing awareness of new tools.</strong> A tool or library released after the training cutoff will be unknown to the agent.</li>
+</ul>
+<h3>Mitigation Strategies</h3>
+<ul>
+<li><strong>Document current versions in CLAUDE.md.</strong> Specifying "React 18.3, Node 22, TypeScript 5.9" helps the agent target the right API versions.</li>
+<li><strong>Use dependency management tools.</strong> <code>npm outdated</code>, <code>pip list --outdated</code>, and similar tools catch outdated suggestions.</li>
+<li><strong>Verify security recommendations independently.</strong> Do not rely on the agent for security best practices without cross-referencing current guidance (OWASP, vendor advisories, CVE databases).</li>
+</ul>
+<h2>Task Complexity Ceiling</h2>
+<p>AI coding agents have practical limits on the complexity and duration of tasks they can handle effectively.</p>
+<h3>Where Complexity Limits Appear</h3>
+<ul>
+<li><strong>Very long tasks.</strong> Tasks that run for more than 15-30 minutes tend to accumulate context, lose coherence, and produce diminishing returns. Most agents have a practical ceiling of approximately 30-60 minutes per task.</li>
+<li><strong>Deeply interleaved dependencies.</strong> Tasks where every change depends on the result of a previous change — and the chain is long — can exceed the agent's ability to maintain coherence across the full sequence.</li>
+<li><strong>Ambiguous requirements.</strong> The vaguer the task, the more likely the agent is to produce something that technically satisfies the prompt but misses the intent. "Make the app better" will produce results; they are unlikely to be the results you wanted.</li>
+<li><strong>Cross-system changes.</strong> Tasks that span multiple repositories, services, or deployment environments are beyond what a single agent session can handle coherently.</li>
+</ul>
+<h3>Mitigation Strategies</h3>
+<ul>
+<li><strong>Decompose aggressively.</strong> Break large features into independent, testable subtasks. Each subtask should be completable in a single, focused session.</li>
+<li><strong>Use clear acceptance criteria.</strong> "Add a POST /api/orders endpoint that validates the request body with Zod, creates a record in the orders table, and returns 201 with the order ID" is better than "add the order creation feature."</li>
+<li><strong>Iterate rather than specify exhaustively.</strong> It is often faster to give a reasonable instruction, review the output, and ask for corrections than to write a perfect specification upfront.</li>
+</ul>
+<h2>Concurrency and State Management</h2>
+<p>AI coding agents are notably weak at reasoning about concurrent systems. Code that involves shared mutable state, race conditions, deadlocks, or distributed coordination is among the hardest for agents to get right.</p>
+<h3>Why Concurrency Is Hard for Agents</h3>
+<p>Concurrency bugs are inherently non-local — they arise from the interaction of multiple components over time, not from the logic of any single function. Agents reason about code one function at a time and struggle to model the temporal interactions that cause race conditions.</p>
+<p><strong>Common failure modes:</strong></p>
+<ul>
+<li><strong>Missing locks or synchronisation.</strong> The agent generates code that reads and writes shared state without proper locking, producing intermittent bugs that pass simple tests.</li>
+<li><strong>Incorrect async patterns.</strong> In JavaScript/TypeScript, the agent may produce code that looks correct but has subtle async issues — missing <code>await</code> on a promise, incorrect error propagation in <code>Promise.all</code>, or race conditions in state updates.</li>
+<li><strong>Database transaction boundaries.</strong> The agent may place operations outside a transaction that should be atomic, or use an incorrect isolation level.</li>
+</ul>
+<h3>Mitigation</h3>
+<ul>
+<li>Review all concurrent and async code with particular attention to shared state.</li>
+<li>Use established concurrency primitives from your language's standard library or well-tested libraries — do not let the agent invent its own synchronisation mechanisms.</li>
+<li>Write integration tests that exercise concurrent access patterns, not just unit tests that test functions in isolation.</li>
+</ul>
+<h2>Tool-Specific Limitations</h2>
+<p>Different tools have different limitations worth noting:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Tool</th><th>Specific Limitation</th></tr></thead><tbody><tr><td><strong>Claude Code</strong></td><td>No inline completion — use alongside Copilot/Cursor for typing assistance</td></tr><tr><td><strong>Claude Code</strong></td><td>Requires internet connectivity; no fully offline mode</td></tr><tr><td><strong>Codex CLI</strong></td><td>No built-in MCP server support; tool integration is more limited</td></tr><tr><td><strong>Codex CLI</strong></td><td>Subagents not supported; cannot parallelise subtasks natively</td></tr><tr><td><strong>Cursor</strong></td><td>Agent mode is less mature than Claude Code for complex multi-step workflows</td></tr><tr><td><strong>Copilot</strong></td><td>Copilot Workspace is less capable than terminal agents for large refactors</td></tr><tr><td><strong>All tools</strong></td><td>Performance degrades on very large files (5,000+ lines)</td></tr><tr><td><strong>All tools</strong></td><td>Binary files, images, and non-text assets are not handled well</td></tr></tbody></table>
+<h2>What the Agent Is Not</h2>
+<p>It is worth stating explicitly what AI coding agents are not, to prevent misunderstandings that lead to misuse:</p>
+<ul>
+<li><strong>Not a replacement for software engineers.</strong> Agents handle implementation; humans handle architecture, judgement, domain expertise, and quality assurance.</li>
+<li><strong>Not a reasoning engine.</strong> Agents do not reason from first principles. They predict likely outputs based on training data patterns. This distinction matters for novel problems.</li>
+<li><strong>Not deterministic.</strong> The same input does not always produce the same output. Build your workflow around this reality.</li>
+<li><strong>Not infallible.</strong> Agents make mistakes. Some of those mistakes are subtle and hard to catch. Review is not optional.</li>
+<li><strong>Not omniscient.</strong> Agents know what was in their training data. They do not know your business, your users, or your specific production environment.</li>
+</ul>
+<p>Acknowledging these realities is not pessimism — it is the foundation of effective tool use. The developers who get the most from AI coding agents are those who understand exactly where human judgement is needed and apply it there.</p>
+<h2>Summary: Where to Focus Your Review Effort</h2>
+<p>Based on the limitations described above, here is a practical guide to where your review effort should be highest:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Area</th><th>Review Intensity</th><th>Why</th></tr></thead><tbody><tr><td><strong>Domain-specific business logic</strong></td><td>Highest</td><td>Agent has no external reference for correctness</td></tr><tr><td><strong>Security-sensitive code</strong></td><td>Highest</td><td>Hallucinated patterns may introduce vulnerabilities</td></tr><tr><td><strong>Concurrency and state management</strong></td><td>High</td><td>Agent struggles with temporal reasoning</td></tr><tr><td><strong>Edge cases and error handling</strong></td><td>High</td><td>Happy path is usually correct; boundaries are not</td></tr><tr><td><strong>API and library usage</strong></td><td>Medium</td><td>Check for hallucinated or deprecated APIs</td></tr><tr><td><strong>Boilerplate and scaffolding</strong></td><td>Low</td><td>Well-represented in training data; rarely wrong</td></tr><tr><td><strong>Formatting and style</strong></td><td>Lowest</td><td>Handled by linters and formatters</td></tr></tbody></table>
+<hr>
+<p><strong>Next:</strong> <a href="./06_b_security_implications.md">6.b: Security Implications</a></p>
+<hr>
+<p><em>Last Updated: June 2026 | Limitations of Claude Code, Codex CLI, and the broader AI coding agent category</em></p></div></article></main></div>
+    <noscript><p>Interactive forms require JavaScript. You can also email <a href="mailto:info@dreamlab-ai.com">info@dreamlab-ai.com</a>.</p></noscript>
+  
+
+</body></html>

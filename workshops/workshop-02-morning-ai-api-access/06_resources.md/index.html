@@ -1,0 +1,675 @@
+<!DOCTYPE html><html lang="en" class="dark"><head>
+    <meta charset="UTF-8">
+
+    <!-- Primary Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <title>Chapter 6: Resources &amp; Continued Learning | DreamLab AI Workshops</title>
+    <meta name="title" content="Chapter 6: Resources &amp; Continued Learning | DreamLab AI Workshops">
+    <meta name="description" content="Chapter 6: Resources &amp; Continued Learning — free DreamLab AI curriculum.">
+    <meta name="keywords" content="applied innovation lab, AI consulting, enterprise innovation, immersive XR, cyber trust, creative technology, residential programmes, knowledge transfer, deep tech, Lake District">
+    <meta name="author" content="DreamLab">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    <meta name="rating" content="General">
+
+    <link rel="describedby" href="/llms.txt" type="text/plain">
+    <script type="application/ld+json" id="organisation-structured-data">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://dreamlab-ai.com/#organisation","name":"DreamLab","url":"https://dreamlab-ai.com/","logo":"https://dreamlab-ai.com/images/heroes/dreamlab-hero.webp","email":"info@dreamlab-ai.com","founder":{"@id":"https://dreamlab-ai.com/team#john-ohare"},"sameAs":["https://github.com/DreamLab-AI","https://www.linkedin.com/company/dreamlab-ai-consulting"]},{"@type":"Person","@id":"https://dreamlab-ai.com/team#john-ohare","name":"John O'Hare","honorificPrefix":"Dr","jobTitle":"Founder","worksFor":{"@id":"https://dreamlab-ai.com/#organisation"},"url":"https://dreamlab-ai.com/team#john-ohare"}]}</script>
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dreamlab-ai.com/workshops/workshop-02-morning-ai-api-access/06_resources.md/">
+
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="msapplication-TileColor" content="#1a1a2e">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://dreamlab-ai.com/workshops/workshop-02-morning-ai-api-access/06_resources.md/">
+    <meta property="og:title" content="Chapter 6: Resources &amp; Continued Learning | DreamLab AI Workshops">
+    <meta property="og:description" content="Chapter 6: Resources &amp; Continued Learning — free DreamLab AI curriculum.">
+    <meta property="og:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="DreamLab AI Workshop - Chapter 6: Resources &amp; Continued Learning">
+    <meta property="og:site_name" content="DreamLab">
+    <meta property="og:locale" content="en_GB">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://dreamlab-ai.com/workshops/workshop-02-morning-ai-api-access/06_resources.md/">
+    <meta name="twitter:title" content="Chapter 6: Resources &amp; Continued Learning | DreamLab AI Workshops">
+    <meta name="twitter:description" content="Chapter 6: Resources &amp; Continued Learning — free DreamLab AI curriculum.">
+    <meta name="twitter:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta name="twitter:image:alt" content="DreamLab AI Workshop - Chapter 6: Resources &amp; Continued Learning">
+    <meta name="twitter:site" content="@thedreamlab">
+    <meta name="twitter:creator" content="@thedreamlab">
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="geo.region" content="GB">
+    <meta name="geo.placename" content="United Kingdom">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DreamLab AI">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Security Headers -->
+    <!--
+      CSP notes:
+      - script-src is 'self' only: no 'unsafe-eval' (blocks eval/Function-based
+        injection) and no 'unsafe-inline'. The one inline bootstrap script was
+        moved to /spa-redirect.js. JSON-LD blocks below are type
+        application/ld+json (data, not executable) so CSP does not gate them.
+      - connect-src is scoped to the Cloudflare Workers subdomain actually used
+        by this account (*.solitary-paper-764d.workers.dev: auth / pod / search /
+        link-preview / nostr-relay), NOT the internet-wide *.workers.dev, which
+        previously allowed exfiltration to any attacker-controlled worker.
+      - The two open Nostr relays (relay.damus.io, relay.primal.net) are
+        explicitly allow-listed: the Talk-to-AI chat listens there for
+        junkiejarvis's reply (the primary relay's whitelist gate rejects the
+        gift-wrap addressed to the ephemeral session key — ADR-042 Amendment 1).
+        Must stay in sync with VITE_REPLY_RELAYS. Named exactly, not a wildcard.
+      - style-src keeps 'unsafe-inline' because Radix UI + runtime style
+        attributes require it; that is not a script-injection vector.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.solitary-paper-764d.workers.dev wss://*.solitary-paper-764d.workers.dev https://*.dreamlab-ai.com wss://*.dreamlab-ai.com wss://relay.damus.io wss://relay.primal.net; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <!-- SPA deep-link restore. External 'self' script (not inline) so CSP
+         script-src can stay 'self' with no 'unsafe-inline'. Classic,
+         render-blocking script: runs before the deferred app module. -->
+    <script src="/spa-redirect.js"></script>
+    <script type="module" crossorigin="" src="/assets/index-Crc86LXg.js"></script>
+    <link rel="modulepreload" crossorigin="" href="/assets/ui-C2dH1upk.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/vendor-uw6h6E0d.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/nostr-BpuBsPg-.js">
+    <link rel="stylesheet" crossorigin="" href="/assets/index-CeEdk6WL.css">
+  <script type="application/ld+json" id="route-structured-data">{"@context":"https://schema.org","@type":"LearningResource","@id":"https://dreamlab-ai.com/workshops/workshop-02-morning-ai-api-access/06_resources.md/#page","url":"https://dreamlab-ai.com/workshops/workshop-02-morning-ai-api-access/06_resources.md/","name":"Chapter 6: Resources & Continued Learning | DreamLab AI Workshops","description":"Chapter 6: Resources & Continued Learning — free DreamLab AI curriculum.","inLanguage":"en-GB","publisher":{"@id":"https://dreamlab-ai.com/#organisation"},"isAccessibleForFree":true}</script><link rel="alternate" type="text/markdown" href="/data/workshops/workshop-02-morning-ai-api-access/06_resources.md"></head>
+
+  <body>
+    <!-- Skip Navigation Link for Accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
+      Skip to main content
+    </a>
+    <div id="root"><header role="banner" class="fixed top-0 left-0 right-0 z-50"><div class="md:hidden flex items-center justify-between h-14 px-6 bg-[rgba(14,14,17,0.92)] backdrop-blur-[14px] border-b border-dlm-hairline"><a aria-label="DreamLab home" class="flex items-center gap-2" href="/"><span class="w-[9px] h-[9px] rounded-full bg-dlm-bright shrink-0" aria-hidden="true"></span><span class="text-[14px] font-semibold tracking-[0.14em] text-[#FAFAFA]">DREAMLAB</span></a><button type="button" aria-label="Open menu" aria-expanded="false" class="w-11 h-11 -mr-2 flex flex-col items-end justify-center gap-[5px] focus:outline-none focus-visible:ring-2 focus-visible:ring-dlm-bright rounded"><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span></button></div><div class="hidden md:block transition-all duration-300 ease-out py-3 bg-background/60 backdrop-blur-md"><div class="container flex items-center justify-between px-4"><button class="flex items-center gap-2 md:gap-3 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded min-h-[48px] min-w-[48px] px-3 py-2" aria-label="Main navigation menu" type="button" id="radix-:Rp:" aria-haspopup="menu" aria-expanded="false" data-state="closed"><div class="w-10 h-10 md:w-8 md:h-8 shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all duration-300 group-hover:scale-110 animate-glow-pulse" aria-hidden="true"></div><span class="font-bold text-lg md:text-xl tracking-tight group-hover:text-purple-400 transition-colors duration-300">MENU</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down h-5 w-5 md:h-4 md:w-4 shrink-0 text-muted-foreground group-hover:text-purple-400 transition-all duration-300 group-hover:rotate-180" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button><div class="flex items-center gap-2"><a class="items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-10 py-2 hover:bg-purple-500/10 hover:text-purple-400 transition-all duration-300 hover:scale-105 min-h-[48px] px-4 text-base md:text-sm hidden sm:inline-flex" href="/contact">Contact</a><a class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary hover:bg-primary/90 h-10 py-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transition-all duration-300 min-h-[48px] px-4 text-base md:text-sm" href="/co-create">Partner With Us</a></div></div></div></header><header class="relative overflow-hidden" style="min-height:320px"><div class="absolute inset-0 bg-gradient-to-br from-blue-500/30 via-purple-500/30 to-violet-500/30" style="transform:translateY(0px);opacity:1"><div class="absolute top-0 -left-20 w-96 h-96 rounded-full blur-3xl opacity-40 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600"></div><div class="absolute bottom-0 -right-20 w-[32rem] h-[32rem] rounded-full blur-3xl opacity-30 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600" style="animation-delay:1s"></div><div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full blur-3xl opacity-20 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600" style="animation-delay:2s"></div></div><div class="absolute inset-0 opacity-5" style="background-image:linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);background-size:50px 50px;transform:translateY(0px)"></div><div class="relative z-10 container px-4 pt-24 pb-8"><div class="mb-6 transition-all duration-500 transform opacity-0 translate-y-4"><nav aria-label="breadcrumb"><ol class="flex flex-wrap items-center gap-1.5 break-words text-sm sm:gap-2.5 text-white/70"><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/">Home</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/workshops">Workshops</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><span role="link" aria-disabled="true" aria-current="page" class="text-white font-medium">Phase 3: Direct AI API Access</span></li></ol></nav></div><div class="mb-4 transition-all duration-500 delay-100 transform opacity-0 translate-y-4"><div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20"><span class="text-purple-400"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cpu w-5 h-5" aria-hidden="true"><path d="M12 20v2"></path><path d="M12 2v2"></path><path d="M17 20v2"></path><path d="M17 2v2"></path><path d="M2 12h2"></path><path d="M2 17h2"></path><path d="M2 7h2"></path><path d="M20 12h2"></path><path d="M20 17h2"></path><path d="M20 7h2"></path><path d="M7 20v2"></path><path d="M7 2v2"></path><rect x="4" y="4" width="16" height="16" rx="2"></rect><rect x="8" y="8" width="8" height="8" rx="1"></rect></svg></span><span class="text-sm font-medium text-white/90">AI / Machine Learning</span></div></div><h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 break-words transition-all duration-700 delay-200 transform opacity-0 translate-y-6"><span class="bg-gradient-to-r bg-clip-text text-transparent animate-gradient-shift bg-400% from-blue-400 via-purple-400 to-violet-400">Phase 3: Direct AI API Access</span></h1><div class="flex flex-wrap items-center gap-3 mb-6 transition-all duration-700 delay-400 transform opacity-0 translate-y-4"><div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-white/10 border-white/20 text-white backdrop-blur-sm hover:bg-white/20"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-3.5 h-3.5 mr-1.5" aria-hidden="true"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>10<!-- --> <!-- -->Modules</div></div><div class="max-w-md transition-all duration-700 delay-500 transform opacity-0 translate-y-4"><div class="flex items-center justify-between text-sm text-white/70 mb-2"><span class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code w-4 h-4" aria-hidden="true"><path d="m16 18 6-6-6-6"></path><path d="m8 6-6 6 6 6"></path></svg><span>Chapter <!-- -->8<!-- -->: <!-- -->Chapter 6: Resources &amp; Continued Learning</span></span><span class="font-medium text-white">80<!-- -->%</span></div><div class="relative"><div aria-valuemax="100" aria-valuemin="0" role="progressbar" data-state="indeterminate" data-max="100" class="relative w-full overflow-hidden rounded-full h-2 bg-white/20"><div data-state="indeterminate" data-max="100" class="h-full w-full flex-1 bg-primary transition-all" style="transform:translateX(-20%)"></div></div><div class="absolute top-0 left-0 h-2 rounded-full blur-sm bg-gradient-to-r from-blue-600 via-purple-600 to-violet-600" style="width:80%"></div></div><div class="relative mt-1 h-1"><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:10%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:20%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:30%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:40%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:50%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:60%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:70%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:80%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:90%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:100%"></div></div></div></div><div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent"></div></header><main class="container px-4 pt-8 pb-8 flex flex-col md:flex-row gap-x-8 min-h-screen" id="main-content"><aside class="w-full md:w-64 lg:w-72 md:sticky md:top-20 md:h-[calc(100vh-5rem-2rem)] mb-8 md:mb-0"><h2 class="text-xl font-semibold mb-4 break-words">Phase 3: Direct AI API Access</h2><div dir="ltr" class="relative overflow-hidden h-auto md:h-full pr-4 border-r md:border-r-0" style="position:relative;--radix-scroll-area-corner-width:0px;--radix-scroll-area-corner-height:0px"><style>[data-radix-scroll-area-viewport]{scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;}[data-radix-scroll-area-viewport]::-webkit-scrollbar{display:none}</style><div data-radix-scroll-area-viewport="" class="h-full w-full rounded-[inherit]" style="overflow-x:hidden;overflow-y:hidden"><div style="min-width:100%;display:table"><nav><ul><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-02-morning-ai-api-access/README.md"><span class="mr-2 text-xs opacity-60">1<!-- -->.</span>Phase 3: Direct AI API Access</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-02-morning-ai-api-access/00_introduction.md"><span class="mr-2 text-xs opacity-60">2<!-- -->.</span>Chapter 0: Introduction to Direct AI API Access</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-02-morning-ai-api-access/01_concepts.md"><span class="mr-2 text-xs opacity-60">3<!-- -->.</span>Chapter 1: Core Concepts - Understanding AI APIs in 2026</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-02-morning-ai-api-access/02_hands_on.md"><span class="mr-2 text-xs opacity-60">4<!-- -->.</span>Chapter 2: Hands-On API Setup - Building Your Multi-Model Command Centre (2026)</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-02-morning-ai-api-access/03_exercises.md"><span class="mr-2 text-xs opacity-60">5<!-- -->.</span>Chapter 3: Practical Exercises - Model Mastery</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-02-morning-ai-api-access/04_project.md"><span class="mr-2 text-xs opacity-60">6<!-- -->.</span>Chapter 4: Real Project — Multi-Model Content Pipeline</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-02-morning-ai-api-access/05_assessment.md"><span class="mr-2 text-xs opacity-60">7<!-- -->.</span>Chapter 5: Assessment — Validating Your AI API Mastery</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors bg-primary text-primary-foreground font-semibold" href="/workshops/workshop-02-morning-ai-api-access/06_resources.md"><span class="mr-2 text-xs opacity-60">8<!-- -->.</span>Chapter 6: Resources &amp; Continued Learning</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-02-morning-ai-api-access/objectives.md"><span class="mr-2 text-xs opacity-60">9<!-- -->.</span>Learning Objectives - Workshop 02 Morning: Direct AI API Access</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-02-morning-ai-api-access/prerequisites.md"><span class="mr-2 text-xs opacity-60">10<!-- -->.</span>Prerequisites - Workshop 02 Morning: Direct AI API Access</a></li></ul></nav></div></div></div></aside><article class="flex-1 min-w-0 md:pl-0"><div class="prose max-w-none dark:prose-invert break-words [&amp;_table]:block [&amp;_table]:w-full [&amp;_table]:overflow-x-auto"><h1>Chapter 6: Resources &amp; Continued Learning</h1>
+<h2>Introduction: Your AI API Reference Library</h2>
+<p>This resource collection supports your ongoing journey with direct AI API access. Bookmark this page — you'll return to it whenever you need a provider console link, a code snippet, a pricing update, or guidance on a new model.</p>
+<h2>Provider Consoles &amp; Documentation</h2>
+<h3>Anthropic (Claude Models)</h3>
+<p><strong>Consoles &amp; Dashboards:</strong></p>
+<ul>
+<li>🏠 <a href="https://console.anthropic.com">Anthropic Console</a> — API keys, billing, usage</li>
+<li>📊 <a href="https://console.anthropic.com/settings/billing">Usage Dashboard</a> — Real-time spend tracking</li>
+<li>🔑 <a href="https://console.anthropic.com/settings/keys">API Keys</a> — Create and manage keys</li>
+</ul>
+<p><strong>Documentation:</strong></p>
+<ul>
+<li>📖 <a href="https://docs.anthropic.com/en/api">API Reference</a> — Complete endpoint documentation</li>
+<li>📝 <a href="https://docs.anthropic.com/en/docs/build-with-claude/messages">Messages API Guide</a> — How to send requests</li>
+<li>🧪 <a href="https://docs.anthropic.com/en/docs/about-claude/models">Model Overview</a> — Current models, context windows, pricing</li>
+<li>💡 <a href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering">Prompt Engineering Guide</a> — Official best practices</li>
+<li>🔒 <a href="https://docs.anthropic.com/en/docs/initial-setup">API Key Security</a> — Setup and security guidance</li>
+</ul>
+<p><strong>Tools:</strong></p>
+<ul>
+<li>🖥️ <a href="https://docs.anthropic.com/en/docs/claude-code">Claude Code</a> — Terminal-based AI coding agent</li>
+<li>🧰 <a href="https://github.com/anthropics/anthropic-sdk-python">Anthropic SDK (Python)</a> — Official Python library</li>
+<li>🧰 <a href="https://github.com/anthropics/anthropic-sdk-typescript">Anthropic SDK (TypeScript)</a> — Official Node.js library</li>
+</ul>
+<p><strong>Current Models (mid-2026):</strong></p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Model</th><th>ID</th><th>Context</th><th>Best For</th></tr></thead><tbody><tr><td>Fable 5</td><td><code>claude-fable-5</code></td><td>200K</td><td>Latest and most capable</td></tr><tr><td>Opus 4.8</td><td><code>claude-opus-4-8</code></td><td>200K</td><td>Top-tier reasoning</td></tr><tr><td>Sonnet 4.6</td><td><code>claude-sonnet-4-6</code></td><td>200K</td><td>Best balance of quality/speed/cost</td></tr><tr><td>Haiku 4.5</td><td><code>claude-haiku-4-5</code></td><td>200K</td><td>Speed champion, lowest cost</td></tr></tbody></table>
+<p>Check <a href="https://console.anthropic.com">console.anthropic.com</a> for current pricing — it changes as new models launch.</p>
+<h3>OpenAI (GPT Models)</h3>
+<p><strong>Consoles &amp; Dashboards:</strong></p>
+<ul>
+<li>🏠 <a href="https://platform.openai.com">OpenAI Platform</a> — Main dashboard</li>
+<li>📊 <a href="https://platform.openai.com/usage">Usage Dashboard</a> — Cost tracking</li>
+<li>🔑 <a href="https://platform.openai.com/api-keys">API Keys</a> — Key management</li>
+<li>💳 <a href="https://platform.openai.com/settings/organization/billing">Billing Settings</a> — Limits and alerts</li>
+</ul>
+<p><strong>Documentation:</strong></p>
+<ul>
+<li>📖 <a href="https://platform.openai.com/docs/api-reference">API Reference</a> — Complete endpoint docs</li>
+<li>📝 <a href="https://platform.openai.com/docs/guides/text-generation">Chat Completions Guide</a> — Core API usage</li>
+<li>🧪 <a href="https://platform.openai.com/docs/models">Models Overview</a> — Available models and pricing</li>
+<li>💡 <a href="https://platform.openai.com/docs/guides/prompt-engineering">Best Practices</a> — Prompt engineering</li>
+<li>🔢 <a href="https://platform.openai.com/tokenizer">Tokenizer Tool</a> — Count tokens interactively</li>
+</ul>
+<p><strong>Tools:</strong></p>
+<ul>
+<li>🧰 <a href="https://github.com/openai/openai-python">OpenAI SDK (Python)</a> — Official Python library</li>
+<li>🧰 <a href="https://github.com/openai/openai-node">OpenAI SDK (Node.js)</a> — Official JavaScript library</li>
+<li>🎮 <a href="https://platform.openai.com/playground">Playground</a> — Test prompts in the browser</li>
+</ul>
+<p><strong>Current Models (mid-2026):</strong></p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Model</th><th>ID</th><th>Context</th><th>Best For</th></tr></thead><tbody><tr><td>GPT-4o</td><td><code>gpt-4o</code></td><td>128K</td><td>Reliable general purpose</td></tr><tr><td>GPT-4o-mini</td><td><code>gpt-4o-mini</code></td><td>128K</td><td>High volume, very cheap</td></tr><tr><td>o3</td><td><code>o3</code></td><td>200K</td><td>Complex reasoning, maths</td></tr></tbody></table>
+<p>Check <a href="https://platform.openai.com/docs/models">platform.openai.com/docs/models</a> for current pricing.</p>
+<h3>Google (Gemini Models)</h3>
+<p><strong>Consoles &amp; Dashboards:</strong></p>
+<ul>
+<li>🏠 <a href="https://aistudio.google.dev">Google AI Studio</a> — API keys, playground, docs</li>
+<li>🔑 <a href="https://aistudio.google.dev/apikey">API Keys</a> — Create and manage keys</li>
+<li>📊 <a href="https://console.cloud.google.com">Google Cloud Console</a> — Billing (if using paid tier)</li>
+</ul>
+<p><strong>Documentation:</strong></p>
+<ul>
+<li>📖 <a href="https://ai.google.dev/gemini-api/docs">Gemini API Reference</a> — Complete docs</li>
+<li>📝 <a href="https://ai.google.dev/gemini-api/docs/quickstart">Quickstart Guide</a> — Get started fast</li>
+<li>🧪 <a href="https://ai.google.dev/gemini-api/docs/models/gemini">Models Overview</a> — Available models</li>
+<li>💡 <a href="https://ai.google.dev/gemini-api/docs/prompting-intro">Prompt Design Guide</a> — Google's prompt engineering</li>
+</ul>
+<p><strong>Tools:</strong></p>
+<ul>
+<li>🧰 <a href="https://github.com/google-gemini/generative-ai-python">Google Generative AI SDK (Python)</a> — Official Python library</li>
+<li>🧰 <a href="https://github.com/google-gemini/generative-ai-js">Google Generative AI SDK (JavaScript)</a> — Official JS library</li>
+<li>🎮 <a href="https://aistudio.google.dev">AI Studio Playground</a> — Test in browser with free tier</li>
+</ul>
+<p><strong>Current Models (mid-2026):</strong></p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Model</th><th>ID</th><th>Context</th><th>Best For</th></tr></thead><tbody><tr><td>Gemini 2.5 Pro</td><td><code>gemini-2.5-pro</code></td><td>2M</td><td>Massive context, code analysis</td></tr><tr><td>Gemini 2.5 Flash</td><td><code>gemini-2.5-flash</code></td><td>1M</td><td>Fast, cheap, generous free tier</td></tr></tbody></table>
+<p>Check <a href="https://aistudio.google.dev">aistudio.google.dev</a> for current free-tier limits and pricing.</p>
+<h3>Groq (Open-Source Models, Free Tier)</h3>
+<p><strong>Consoles &amp; Dashboards:</strong></p>
+<ul>
+<li>🏠 <a href="https://console.groq.com">Groq Console</a> — Dashboard and API keys</li>
+<li>🔑 <a href="https://console.groq.com/keys">API Keys</a> — Key management</li>
+<li>📊 <a href="https://console.groq.com/settings/usage">Usage</a> — Track free-tier usage</li>
+</ul>
+<p><strong>Documentation:</strong></p>
+<ul>
+<li>📖 <a href="https://console.groq.com/docs">Groq API Docs</a> — API reference</li>
+<li>📝 <a href="https://console.groq.com/docs/quickstart">Quickstart</a> — Get started</li>
+<li>🧪 <a href="https://console.groq.com/docs/models">Supported Models</a> — Available models</li>
+</ul>
+<p><strong>Key Advantage:</strong> Ultra-fast inference, free tier, no credit card required. Models available change frequently — check the console for the latest offerings including Llama 4 variants.</p>
+<h2>Quick Reference: API Calls</h2>
+<h3>Anthropic Claude (curl)</h3>
+<pre><code class="language-bash">curl https://api.anthropic.com/v1/messages \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: $ANTHROPIC_API_KEY" \
+  -H "anthropic-version: 2023-06-01" \
+  -d '{
+    "model": "claude-sonnet-4-6",
+    "max_tokens": 1024,
+    "messages": [
+      {
+        "role": "user",
+        "content": "Explain API access in plain English, under 50 words."
+      }
+    ]
+  }'
+</code></pre>
+<h3>Anthropic Claude (Python)</h3>
+<pre><code class="language-python">from anthropic import Anthropic
+
+client = Anthropic()  # reads ANTHROPIC_API_KEY from environment
+
+message = client.messages.create(
+    model="claude-sonnet-4-6",
+    max_tokens=1024,
+    messages=[
+        {"role": "user", "content": "Explain API access in plain English, under 50 words."}
+    ]
+)
+
+print(message.content[0].text)
+print(f"Tokens used: {message.usage.input_tokens} in, {message.usage.output_tokens} out")
+</code></pre>
+<h3>OpenAI GPT (curl)</h3>
+<pre><code class="language-bash">curl https://api.openai.com/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $OPENAI_API_KEY" \
+  -d '{
+    "model": "gpt-4o",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Explain API access in plain English, under 50 words."
+      }
+    ],
+    "max_tokens": 200
+  }'
+</code></pre>
+<h3>OpenAI GPT (Python)</h3>
+<pre><code class="language-python">from openai import OpenAI
+
+client = OpenAI()  # reads OPENAI_API_KEY from environment
+
+response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[
+        {"role": "user", "content": "Explain API access in plain English, under 50 words."}
+    ],
+    max_tokens=200
+)
+
+print(response.choices[0].message.content)
+print(f"Tokens used: {response.usage.prompt_tokens} in, {response.usage.completion_tokens} out")
+</code></pre>
+<h3>Google Gemini (curl)</h3>
+<pre><code class="language-bash">curl "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=$GEMINI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "contents": [
+      {
+        "parts": [
+          {"text": "Explain API access in plain English, under 50 words."}
+        ]
+      }
+    ]
+  }'
+</code></pre>
+<h3>Google Gemini (Python)</h3>
+<pre><code class="language-python">import google.generativeai as genai
+import os
+
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+
+model = genai.GenerativeModel("gemini-2.5-flash")
+response = model.generate_content("Explain API access in plain English, under 50 words.")
+
+print(response.text)
+print(f"Tokens used: {response.usage_metadata.prompt_token_count} in, "
+      f"{response.usage_metadata.candidates_token_count} out")
+</code></pre>
+<h2>Environment Setup Reference</h2>
+<h3>The <code>.env</code> File</h3>
+<pre><code class="language-bash"># .env — NEVER commit this file to version control
+ANTHROPIC_API_KEY=sk-ant-api03-your-key-here
+OPENAI_API_KEY=sk-proj-your-key-here
+GEMINI_API_KEY=AIzaSy-your-key-here
+GROQ_API_KEY=gsk_your-key-here
+</code></pre>
+<h3>The <code>.gitignore</code> Entry</h3>
+<pre><code class="language-bash"># Add to .gitignore
+.env
+.env.local
+.env.*.local
+</code></pre>
+<h3>Loading Keys in Python</h3>
+<pre><code class="language-python">import os
+from dotenv import load_dotenv
+
+load_dotenv()  # reads .env file
+
+anthropic_key = os.getenv("ANTHROPIC_API_KEY")
+openai_key = os.getenv("OPENAI_API_KEY")
+gemini_key = os.getenv("GEMINI_API_KEY")
+
+# Verify keys are loaded
+for name, key in [("Anthropic", anthropic_key), ("OpenAI", openai_key), ("Gemini", gemini_key)]:
+    if key:
+        print(f"{name}: configured ({key[:8]}...)")
+    else:
+        print(f"{name}: NOT CONFIGURED")
+</code></pre>
+<h3>Installing Python SDKs</h3>
+<pre><code class="language-bash"># Create a virtual environment (optional but recommended)
+python3 -m venv ai-env
+source ai-env/bin/activate  # Linux/Mac
+# ai-env\Scripts\activate   # Windows
+
+# Install all provider SDKs
+pip install anthropic openai google-generativeai python-dotenv groq
+</code></pre>
+<h2>Cost Calculators &amp; Tracking</h2>
+<h3>Quick Cost Estimation Formula</h3>
+<pre><code>Cost = (input_tokens / 1,000,000) x input_price + (output_tokens / 1,000,000) x output_price
+</code></pre>
+<p><strong>Token estimation rules of thumb:</strong></p>
+<ul>
+<li>1 token is roughly 4 characters or 0.75 words in English</li>
+<li>A typical A4 page of text is approximately 500-600 tokens</li>
+<li>A 1,500-word blog post is approximately 2,000 tokens</li>
+</ul>
+<h3>Monthly Cost Tracking Template</h3>
+<pre><code class="language-markdown"># AI API Cost Tracker — [Month] 2026
+
+## Weekly Breakdown
+
+| Week | Anthropic | OpenAI | Google | Groq | Total |
+|------|-----------|--------|--------|------|-------|
+| 1 | $ | $ | Free | Free | $ |
+| 2 | $ | $ | Free | Free | $ |
+| 3 | $ | $ | Free | Free | $ |
+| 4 | $ | $ | Free | Free | $ |
+| **Total** | **$** | **$** | **Free** | **Free** | **$** |
+
+## vs Subscriptions
+- ChatGPT Plus: £20/month
+- Claude Pro: £18/month
+- Gemini Advanced: £19/month
+- **Subscription total: £57/month**
+- **API total: £___/month**
+- **Saving: £___/month (____%)**
+
+## Model Usage Log
+| Date | Task | Model | ~Tokens | ~Cost | Quality (1-5) |
+|------|------|-------|---------|-------|---------------|
+| | | | | | |
+</code></pre>
+<h3>Provider Billing Pages (Bookmark These)</h3>
+<ul>
+<li><strong>Anthropic</strong>: <a href="https://console.anthropic.com/settings/billing">https://console.anthropic.com/settings/billing</a></li>
+<li><strong>OpenAI</strong>: <a href="https://platform.openai.com/usage">https://platform.openai.com/usage</a></li>
+<li><strong>Google Cloud</strong>: <a href="https://console.cloud.google.com/billing">https://console.cloud.google.com/billing</a> (if using paid tier)</li>
+<li><strong>Groq</strong>: <a href="https://console.groq.com/settings/usage">https://console.groq.com/settings/usage</a></li>
+</ul>
+<h2>Model Selection Decision Tree</h2>
+<h3>Quick Reference Card</h3>
+<pre><code>TASK: Quick email, summary, simple question
+  --&gt; GPT-4o-mini or Haiku 4.5 (cheapest, fastest)
+
+TASK: Professional writing, blog post, creative content
+  --&gt; Claude Sonnet 4.6 (best prose, natural voice)
+
+TASK: Long document analysis (50+ pages)
+  --&gt; Gemini 2.5 Pro (2M context) or Gemini 2.5 Flash (1M, cheaper)
+
+TASK: Complex reasoning, strategy, maths
+  --&gt; o3, Claude Opus 4.8, or Claude Fable 5
+
+TASK: Rapid experimentation, prototyping
+  --&gt; Llama 4 via Groq (free, ultra-fast)
+
+TASK: Code generation and review
+  --&gt; Claude Sonnet 4.6 or GPT-4o
+
+TASK: Proofreading, formatting, simple edits
+  --&gt; Haiku 4.5 or GPT-4o-mini (no need for premium)
+</code></pre>
+<h3>Context Window Guide</h3>
+<pre><code>Under 50 pages:    Any model works
+50-300 pages:      Claude models (200K) or GPT-4o (128K)
+300-2,500 pages:   Gemini 2.5 Flash (1M context)
+2,500-5,000 pages: Gemini 2.5 Pro (2M context) — only option
+</code></pre>
+<h2>Learning Paths</h2>
+<h3>Week 1-2: Foundation</h3>
+<p><strong>Focus:</strong> Daily API usage, model preference formation</p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled=""> Use API access instead of web interfaces for all AI tasks</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Track costs daily (use the template above)</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Test each model on 3 different task types from your work</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Identify your go-to model for each task category</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Cancel or pause one AI subscription</li>
+</ul>
+<p><strong>Resources:</strong></p>
+<ul>
+<li>📖 <a href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering">Anthropic Prompt Engineering Guide</a></li>
+<li>📖 <a href="https://platform.openai.com/docs/guides/prompt-engineering">OpenAI Prompt Engineering</a></li>
+<li>📺 <a href="https://www.youtube.com/results?search_query=prompt+engineering+basics+2026">Prompt Engineering Basics (YouTube)</a></li>
+</ul>
+<h3>Week 3-4: Optimisation</h3>
+<p><strong>Focus:</strong> Cost reduction, workflow automation</p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled=""> Refine model routing based on 2 weeks of data</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Explore prompt caching (Anthropic, Google) for repeated tasks</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Build 5 reusable prompt templates for your common tasks</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Try the Python or TypeScript SDK for one provider</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Experiment with temperature and max_tokens settings</li>
+</ul>
+<p><strong>Resources:</strong></p>
+<ul>
+<li>📖 <a href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching">Anthropic Prompt Caching</a></li>
+<li>📖 <a href="https://platform.openai.com/docs/guides/function-calling">OpenAI Function Calling</a></li>
+<li>📖 <a href="https://ai.google.dev/gemini-api/docs/caching">Gemini Context Caching</a></li>
+</ul>
+<h3>Month 2+: Advanced Techniques</h3>
+<p><strong>Focus:</strong> Automation, integration, teaching others</p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled=""> Build a multi-model script that routes tasks automatically</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Explore structured output (JSON mode) for data extraction</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Investigate tool use / function calling for AI agents</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Set up automated batch processing for recurring tasks</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Help a colleague set up their own multi-model access</li>
+</ul>
+<p><strong>Resources:</strong></p>
+<ul>
+<li>📖 <a href="https://docs.anthropic.com/en/docs/build-with-claude/tool-use">Claude Tool Use</a></li>
+<li>📖 <a href="https://platform.openai.com/docs/guides/structured-outputs">OpenAI Structured Outputs</a></li>
+<li>📖 <a href="https://ai.google.dev/gemini-api/docs/function-calling">Gemini Function Calling</a></li>
+<li>📖 <a href="https://docs.anthropic.com/en/docs/claude-code">Claude Code Documentation</a></li>
+</ul>
+<h2>Community &amp; Support</h2>
+<h3>Provider Communities</h3>
+<p><strong>Anthropic:</strong></p>
+<ul>
+<li>💬 <a href="https://discord.gg/anthropic">Anthropic Discord</a></li>
+<li>📧 <a href="https://www.anthropic.com/newsletter">Developer Newsletter</a></li>
+<li>🐦 <a href="https://x.com/AnthropicAI">Anthropic on X</a></li>
+</ul>
+<p><strong>OpenAI:</strong></p>
+<ul>
+<li>💬 <a href="https://community.openai.com">OpenAI Community Forum</a></li>
+<li>📧 <a href="https://openai.com/blog">OpenAI Blog</a></li>
+<li>🐦 <a href="https://x.com/OpenAI">OpenAI on X</a></li>
+</ul>
+<p><strong>Google AI:</strong></p>
+<ul>
+<li>💬 <a href="https://discord.gg/google-dev-community">Google AI Discord</a></li>
+<li>📧 <a href="https://blog.google/technology/ai/">Google AI Blog</a></li>
+<li>🐦 <a href="https://x.com/GoogleAI">Google AI on X</a></li>
+</ul>
+<h3>General AI Communities</h3>
+<ul>
+<li>🌐 <a href="https://reddit.com/r/ClaudeAI">Reddit r/ClaudeAI</a> — Claude-specific discussions</li>
+<li>🌐 <a href="https://reddit.com/r/OpenAI">Reddit r/OpenAI</a> — GPT discussions</li>
+<li>🌐 <a href="https://reddit.com/r/LocalLLaMA">Reddit r/LocalLLaMA</a> — Open-source models</li>
+<li>🌐 <a href="https://news.ycombinator.com">Hacker News</a> — AI industry news</li>
+<li>💬 <a href="https://discord.gg/">AI Discord Servers</a> — Search for "AI" communities</li>
+</ul>
+<h3>DreamLab Workshop Support</h3>
+<ul>
+<li>📧 Email: <a href="mailto:workshop@dreamlab.ai">workshop@dreamlab.ai</a></li>
+<li>💬 Discord: Workshop Channel</li>
+<li>📅 Office Hours: Fridays 2-3pm GMT</li>
+<li>📖 Documentation: This workshop and all linked resources</li>
+</ul>
+<h2>Troubleshooting Reference</h2>
+<h3>Common Errors and Solutions</h3>
+<p><strong>401 Unauthorized / Invalid API Key</strong></p>
+<pre><code>Cause: Key is wrong, expired, or has leading/trailing whitespace
+Fix:
+  1. Regenerate key from provider console
+  2. Check for spaces when copying
+  3. Verify key is in .env file (not hardcoded)
+  4. Restart your editor after changing .env
+</code></pre>
+<p><strong>429 Rate Limited</strong></p>
+<pre><code>Cause: Too many requests in a short time window
+Fix:
+  1. Wait 60 seconds and retry
+  2. Switch to a different provider temporarily
+  3. Check your tier level — higher tiers have higher limits
+  4. Implement exponential backoff in scripts
+</code></pre>
+<p><strong>400 Bad Request / Context Length Exceeded</strong></p>
+<pre><code>Cause: Input + expected output exceeds model's context window
+Fix:
+  1. Trim your input (remove unnecessary context)
+  2. Reduce max_tokens in the request
+  3. Switch to a model with a larger context window
+  4. Split the task across multiple smaller requests
+</code></pre>
+<p><strong>402 Payment Required / Insufficient Credits</strong></p>
+<pre><code>Cause: Account balance is zero or card declined
+Fix:
+  1. Top up credits on the provider console
+  2. Check payment method is valid
+  3. Switch to a free-tier provider (Google, Groq) temporarily
+</code></pre>
+<p><strong>500/503 Server Error</strong></p>
+<pre><code>Cause: Provider is experiencing issues (rare but happens)
+Fix:
+  1. Wait 2-3 minutes and retry
+  2. Check provider status page
+  3. Switch to a different provider
+  4. These are transient — don't change your setup
+</code></pre>
+<h3>Provider Status Pages</h3>
+<p>Bookmark these to check during outages:</p>
+<ul>
+<li><strong>Anthropic</strong>: <a href="https://status.anthropic.com">https://status.anthropic.com</a></li>
+<li><strong>OpenAI</strong>: <a href="https://status.openai.com">https://status.openai.com</a></li>
+<li><strong>Google Cloud</strong>: <a href="https://status.cloud.google.com">https://status.cloud.google.com</a></li>
+<li><strong>Groq</strong>: <a href="https://status.groq.com">https://status.groq.com</a></li>
+</ul>
+<h2>Security Checklist</h2>
+<h3>Monthly Review</h3>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled=""> Rotate API keys (every 90 days minimum)</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Review spending across all providers</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Check for any unusual usage patterns</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Verify <code>.env</code> is still in <code>.gitignore</code></li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Confirm MFA is enabled on all provider accounts</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Review which keys are active — revoke any unused ones</li>
+</ul>
+<h3>Key Rotation Procedure</h3>
+<ol>
+<li>Log into the provider console</li>
+<li>Create a new API key</li>
+<li>Update your <code>.env</code> file with the new key</li>
+<li>Restart your editor / Claude Code session</li>
+<li>Verify the new key works with a test prompt</li>
+<li>Revoke the old key from the provider console</li>
+</ol>
+<p><strong>Calendar Reminder:</strong> Set a recurring event every 90 days: "Rotate AI API keys"</p>
+<h2>Staying Current</h2>
+<h3>What Changes Frequently</h3>
+<p>AI APIs evolve fast. Here is what to watch for:</p>
+<ul>
+<li><strong>New models</strong> — Providers launch new models every few months. Check the model overview pages quarterly.</li>
+<li><strong>Pricing changes</strong> — Competition drives prices down. Recheck pricing before budgeting.</li>
+<li><strong>New features</strong> — Tool use, caching, structured outputs, and batch APIs emerge regularly.</li>
+<li><strong>Rate limit changes</strong> — Tiers and limits adjust as providers scale.</li>
+<li><strong>Context window increases</strong> — These tend to grow over time, expanding what's possible.</li>
+</ul>
+<h3>How to Stay Informed</h3>
+<ul>
+<li>📧 Subscribe to provider newsletters (Anthropic, OpenAI, Google AI)</li>
+<li>🐦 Follow provider accounts on X</li>
+<li>🌐 Check r/ClaudeAI and r/OpenAI weekly</li>
+<li>📖 Read release notes when you see "new model available" in your console</li>
+<li>📅 Set a monthly calendar reminder: "Check AI model updates"</li>
+</ul>
+<h2>Your Ongoing Journey</h2>
+<p><img src="/data/workshops/workshop-02-morning-ai-api-access/diagrams/06-mastery-path.svg" alt="Mastery path after the workshop: daily API usage, cancel subscriptions, optimise costs, automate workflows, then teach others by month three"></p>
+<h2>Conclusion</h2>
+<p>Direct AI API access is a professional skill that compounds over time. The setup effort is one morning. The savings, flexibility, and capability improvements last indefinitely.</p>
+<p><strong>What you've gained today:</strong></p>
+<ul>
+<li>Access to the world's best AI models at wholesale prices</li>
+<li>The knowledge to choose the right model for any task</li>
+<li>Secure, professional API key management</li>
+<li>A multi-model workflow that outperforms any single subscription</li>
+<li>A foundation for automation and advanced AI integration</li>
+</ul>
+<p><strong>What to do next:</strong></p>
+<ol>
+<li>Use API access for every AI task this week</li>
+<li>Track your costs and compare to your old subscriptions</li>
+<li>Refine your model preferences based on real work</li>
+<li>Share this knowledge with a colleague</li>
+<li>Return to this resource page whenever you need a reference</li>
+</ol>
+<p>Welcome to professional AI access. The models are waiting.</p>
+<hr>
+<p><strong>Workshop Complete!</strong></p>
+<p><a href="./05_assessment.md">Back to Assessment</a> | <a href="README.md">Back to Workshop Overview</a> | <a href="../workshop-02-afternoon-content-creation/README.md">Proceed to Next Phase --&gt;</a></p></div></article></main></div>
+    <noscript><p>Interactive forms require JavaScript. You can also email <a href="mailto:info@dreamlab-ai.com">info@dreamlab-ai.com</a>.</p></noscript>
+  
+
+</body></html>

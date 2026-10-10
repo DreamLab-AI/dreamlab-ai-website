@@ -1,0 +1,36 @@
+{
+  "name": "DreamLab AI Consulting Ltd.",
+  "short_name": "DreamLab AI",
+  "description": "Applied Innovation Lab in the Lake District. Deep tech training, consulting, and co-creation.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#1a1a2e",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    }
+  ],
+  "categories": [
+    "business",
+    "education",
+    "productivity"
+  ],
+  "shortcuts": [
+    {
+      "name": "Programmes",
+      "short_name": "Programmes",
+      "description": "View our residential programme tracks",
+      "url": "/programmes"
+    },
+    {
+      "name": "Contact Us",
+      "short_name": "Contact",
+      "description": "Get in touch with DreamLab AI",
+      "url": "/contact"
+    }
+  ]
+}

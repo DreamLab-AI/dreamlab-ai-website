@@ -1,0 +1,340 @@
+<!DOCTYPE html><html lang="en" class="dark"><head>
+    <meta charset="UTF-8">
+
+    <!-- Primary Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <title>Chapter 7: Practical Patterns — Real-World Use Cases | DreamLab AI Workshops</title>
+    <meta name="title" content="Chapter 7: Practical Patterns — Real-World Use Cases | DreamLab AI Workshops">
+    <meta name="description" content="Chapter 7: Practical Patterns — Real-World Use Cases — free DreamLab AI curriculum.">
+    <meta name="keywords" content="applied innovation lab, AI consulting, enterprise innovation, immersive XR, cyber trust, creative technology, residential programmes, knowledge transfer, deep tech, Lake District">
+    <meta name="author" content="DreamLab">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    <meta name="rating" content="General">
+
+    <link rel="describedby" href="/llms.txt" type="text/plain">
+    <script type="application/ld+json" id="organisation-structured-data">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://dreamlab-ai.com/#organisation","name":"DreamLab","url":"https://dreamlab-ai.com/","logo":"https://dreamlab-ai.com/images/heroes/dreamlab-hero.webp","email":"info@dreamlab-ai.com","founder":{"@id":"https://dreamlab-ai.com/team#john-ohare"},"sameAs":["https://github.com/DreamLab-AI","https://www.linkedin.com/company/dreamlab-ai-consulting"]},{"@type":"Person","@id":"https://dreamlab-ai.com/team#john-ohare","name":"John O'Hare","honorificPrefix":"Dr","jobTitle":"Founder","worksFor":{"@id":"https://dreamlab-ai.com/#organisation"},"url":"https://dreamlab-ai.com/team#john-ohare"}]}</script>
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dreamlab-ai.com/workshops/workshop-08-claude-code/07_practical_patterns.md/">
+
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="msapplication-TileColor" content="#1a1a2e">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://dreamlab-ai.com/workshops/workshop-08-claude-code/07_practical_patterns.md/">
+    <meta property="og:title" content="Chapter 7: Practical Patterns — Real-World Use Cases | DreamLab AI Workshops">
+    <meta property="og:description" content="Chapter 7: Practical Patterns — Real-World Use Cases — free DreamLab AI curriculum.">
+    <meta property="og:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="DreamLab AI Workshop - Chapter 7: Practical Patterns — Real-World Use Cases">
+    <meta property="og:site_name" content="DreamLab">
+    <meta property="og:locale" content="en_GB">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://dreamlab-ai.com/workshops/workshop-08-claude-code/07_practical_patterns.md/">
+    <meta name="twitter:title" content="Chapter 7: Practical Patterns — Real-World Use Cases | DreamLab AI Workshops">
+    <meta name="twitter:description" content="Chapter 7: Practical Patterns — Real-World Use Cases — free DreamLab AI curriculum.">
+    <meta name="twitter:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta name="twitter:image:alt" content="DreamLab AI Workshop - Chapter 7: Practical Patterns — Real-World Use Cases">
+    <meta name="twitter:site" content="@thedreamlab">
+    <meta name="twitter:creator" content="@thedreamlab">
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="geo.region" content="GB">
+    <meta name="geo.placename" content="United Kingdom">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DreamLab AI">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Security Headers -->
+    <!--
+      CSP notes:
+      - script-src is 'self' only: no 'unsafe-eval' (blocks eval/Function-based
+        injection) and no 'unsafe-inline'. The one inline bootstrap script was
+        moved to /spa-redirect.js. JSON-LD blocks below are type
+        application/ld+json (data, not executable) so CSP does not gate them.
+      - connect-src is scoped to the Cloudflare Workers subdomain actually used
+        by this account (*.solitary-paper-764d.workers.dev: auth / pod / search /
+        link-preview / nostr-relay), NOT the internet-wide *.workers.dev, which
+        previously allowed exfiltration to any attacker-controlled worker.
+      - The two open Nostr relays (relay.damus.io, relay.primal.net) are
+        explicitly allow-listed: the Talk-to-AI chat listens there for
+        junkiejarvis's reply (the primary relay's whitelist gate rejects the
+        gift-wrap addressed to the ephemeral session key — ADR-042 Amendment 1).
+        Must stay in sync with VITE_REPLY_RELAYS. Named exactly, not a wildcard.
+      - style-src keeps 'unsafe-inline' because Radix UI + runtime style
+        attributes require it; that is not a script-injection vector.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.solitary-paper-764d.workers.dev wss://*.solitary-paper-764d.workers.dev https://*.dreamlab-ai.com wss://*.dreamlab-ai.com wss://relay.damus.io wss://relay.primal.net; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <!-- SPA deep-link restore. External 'self' script (not inline) so CSP
+         script-src can stay 'self' with no 'unsafe-inline'. Classic,
+         render-blocking script: runs before the deferred app module. -->
+    <script src="/spa-redirect.js"></script>
+    <script type="module" crossorigin="" src="/assets/index-Crc86LXg.js"></script>
+    <link rel="modulepreload" crossorigin="" href="/assets/ui-C2dH1upk.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/vendor-uw6h6E0d.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/nostr-BpuBsPg-.js">
+    <link rel="stylesheet" crossorigin="" href="/assets/index-CeEdk6WL.css">
+  <script type="application/ld+json" id="route-structured-data">{"@context":"https://schema.org","@type":"LearningResource","@id":"https://dreamlab-ai.com/workshops/workshop-08-claude-code/07_practical_patterns.md/#page","url":"https://dreamlab-ai.com/workshops/workshop-08-claude-code/07_practical_patterns.md/","name":"Chapter 7: Practical Patterns — Real-World Use Cases | DreamLab AI Workshops","description":"Chapter 7: Practical Patterns — Real-World Use Cases — free DreamLab AI curriculum.","inLanguage":"en-GB","publisher":{"@id":"https://dreamlab-ai.com/#organisation"},"isAccessibleForFree":true}</script><link rel="alternate" type="text/markdown" href="/data/workshops/workshop-08-claude-code/07_practical_patterns.md"></head>
+
+  <body>
+    <!-- Skip Navigation Link for Accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
+      Skip to main content
+    </a>
+    <div id="root"><header role="banner" class="fixed top-0 left-0 right-0 z-50"><div class="md:hidden flex items-center justify-between h-14 px-6 bg-[rgba(14,14,17,0.92)] backdrop-blur-[14px] border-b border-dlm-hairline"><a aria-label="DreamLab home" class="flex items-center gap-2" href="/"><span class="w-[9px] h-[9px] rounded-full bg-dlm-bright shrink-0" aria-hidden="true"></span><span class="text-[14px] font-semibold tracking-[0.14em] text-[#FAFAFA]">DREAMLAB</span></a><button type="button" aria-label="Open menu" aria-expanded="false" class="w-11 h-11 -mr-2 flex flex-col items-end justify-center gap-[5px] focus:outline-none focus-visible:ring-2 focus-visible:ring-dlm-bright rounded"><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span></button></div><div class="hidden md:block transition-all duration-300 ease-out py-3 bg-background/60 backdrop-blur-md"><div class="container flex items-center justify-between px-4"><button class="flex items-center gap-2 md:gap-3 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded min-h-[48px] min-w-[48px] px-3 py-2" aria-label="Main navigation menu" type="button" id="radix-:Rp:" aria-haspopup="menu" aria-expanded="false" data-state="closed"><div class="w-10 h-10 md:w-8 md:h-8 shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all duration-300 group-hover:scale-110 animate-glow-pulse" aria-hidden="true"></div><span class="font-bold text-lg md:text-xl tracking-tight group-hover:text-purple-400 transition-colors duration-300">MENU</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down h-5 w-5 md:h-4 md:w-4 shrink-0 text-muted-foreground group-hover:text-purple-400 transition-all duration-300 group-hover:rotate-180" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button><div class="flex items-center gap-2"><a class="items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-10 py-2 hover:bg-purple-500/10 hover:text-purple-400 transition-all duration-300 hover:scale-105 min-h-[48px] px-4 text-base md:text-sm hidden sm:inline-flex" href="/contact">Contact</a><a class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary hover:bg-primary/90 h-10 py-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transition-all duration-300 min-h-[48px] px-4 text-base md:text-sm" href="/co-create">Partner With Us</a></div></div></div></header><header class="relative overflow-hidden" style="min-height:320px"><div class="absolute inset-0 bg-gradient-to-br from-amber-500/30 via-orange-500/30 to-red-500/30" style="transform:translateY(0px);opacity:1"><div class="absolute top-0 -left-20 w-96 h-96 rounded-full blur-3xl opacity-40 animate-float bg-gradient-to-br from-amber-500 via-orange-500 to-red-500"></div><div class="absolute bottom-0 -right-20 w-[32rem] h-[32rem] rounded-full blur-3xl opacity-30 animate-float bg-gradient-to-br from-amber-500 via-orange-500 to-red-500" style="animation-delay:1s"></div><div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full blur-3xl opacity-20 animate-float bg-gradient-to-br from-amber-500 via-orange-500 to-red-500" style="animation-delay:2s"></div></div><div class="absolute inset-0 opacity-5" style="background-image:linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);background-size:50px 50px;transform:translateY(0px)"></div><div class="relative z-10 container px-4 pt-24 pb-8"><div class="mb-6 transition-all duration-500 transform opacity-0 translate-y-4"><nav aria-label="breadcrumb"><ol class="flex flex-wrap items-center gap-1.5 break-words text-sm sm:gap-2.5 text-white/70"><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/">Home</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/workshops">Workshops</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><span role="link" aria-disabled="true" aria-current="page" class="text-white font-medium">Claude Code Mastery: From First Command to Autonomous Agents</span></li></ol></nav></div><div class="mb-4 transition-all duration-500 delay-100 transform opacity-0 translate-y-4"><div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20"><span class="text-orange-400"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings w-5 h-5" aria-hidden="true"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"></path><circle cx="12" cy="12" r="3"></circle></svg></span><span class="text-sm font-medium text-white/90">Software Engineering</span></div></div><h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 break-words transition-all duration-700 delay-200 transform opacity-0 translate-y-6"><span class="bg-gradient-to-r bg-clip-text text-transparent animate-gradient-shift bg-400% from-amber-400 via-orange-400 to-red-400">Claude Code Mastery: From First Command to Autonomous Agents</span></h1><div class="flex flex-wrap items-center gap-3 mb-6 transition-all duration-700 delay-400 transform opacity-0 translate-y-4"><div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-white/10 border-white/20 text-white backdrop-blur-sm hover:bg-white/20"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-3.5 h-3.5 mr-1.5" aria-hidden="true"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>11<!-- --> <!-- -->Modules</div></div><div class="max-w-md transition-all duration-700 delay-500 transform opacity-0 translate-y-4"><div class="flex items-center justify-between text-sm text-white/70 mb-2"><span class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code w-4 h-4" aria-hidden="true"><path d="m16 18 6-6-6-6"></path><path d="m8 6-6 6 6 6"></path></svg><span>Chapter <!-- -->9<!-- -->: <!-- -->Chapter 7: Practical Patterns — Real-World Use Cases</span></span><span class="font-medium text-white">82<!-- -->%</span></div><div class="relative"><div aria-valuemax="100" aria-valuemin="0" role="progressbar" data-state="indeterminate" data-max="100" class="relative w-full overflow-hidden rounded-full h-2 bg-white/20"><div data-state="indeterminate" data-max="100" class="h-full w-full flex-1 bg-primary transition-all" style="transform:translateX(-18%)"></div></div><div class="absolute top-0 left-0 h-2 rounded-full blur-sm bg-gradient-to-r from-amber-500 via-orange-500 to-red-500" style="width:82%"></div></div><div class="relative mt-1 h-1"><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:9.090909090909092%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:18.181818181818183%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:27.27272727272727%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:36.36363636363637%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:45.45454545454545%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:54.54545454545454%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:63.63636363636363%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:72.72727272727273%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:81.81818181818183%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:90.9090909090909%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:100%"></div></div></div></div><div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent"></div></header><main class="container px-4 pt-8 pb-8 flex flex-col md:flex-row gap-x-8 min-h-screen" id="main-content"><aside class="w-full md:w-64 lg:w-72 md:sticky md:top-20 md:h-[calc(100vh-5rem-2rem)] mb-8 md:mb-0"><h2 class="text-xl font-semibold mb-4 break-words">Claude Code Mastery: From First Command to Autonomous Agents</h2><div dir="ltr" class="relative overflow-hidden h-auto md:h-full pr-4 border-r md:border-r-0" style="position:relative;--radix-scroll-area-corner-width:0px;--radix-scroll-area-corner-height:0px"><style>[data-radix-scroll-area-viewport]{scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;}[data-radix-scroll-area-viewport]::-webkit-scrollbar{display:none}</style><div data-radix-scroll-area-viewport="" class="h-full w-full rounded-[inherit]" style="overflow-x:hidden;overflow-y:hidden"><div style="min-width:100%;display:table"><nav><ul><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-08-claude-code/README.md"><span class="mr-2 text-xs opacity-60">1<!-- -->.</span>Claude Code Mastery: From First Command to Autonomous Agents</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-08-claude-code/00_introduction.md"><span class="mr-2 text-xs opacity-60">2<!-- -->.</span>Chapter 0: Introduction — What Is Claude Code?</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-08-claude-code/01_getting_started.md"><span class="mr-2 text-xs opacity-60">3<!-- -->.</span>Chapter 1: Getting Started — Installation and First Run</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-08-claude-code/02_core_features.md"><span class="mr-2 text-xs opacity-60">4<!-- -->.</span>Chapter 2: Core Features — Commands, Slash Commands, and Tools</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-08-claude-code/03_claude_md.md"><span class="mr-2 text-xs opacity-60">5<!-- -->.</span>Chapter 3: CLAUDE.md — Teaching Claude About Your Project</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-08-claude-code/04_mcp_servers.md"><span class="mr-2 text-xs opacity-60">6<!-- -->.</span>Chapter 4: MCP Servers — Extending Claude's Capabilities</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-08-claude-code/05_hooks_automation.md"><span class="mr-2 text-xs opacity-60">7<!-- -->.</span>Chapter 5: Hooks and Automation — Event-Driven Workflows</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-08-claude-code/06_subagents_workflows.md"><span class="mr-2 text-xs opacity-60">8<!-- -->.</span>Chapter 6: Subagents and Workflows — Multi-Agent Orchestration</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors bg-primary text-primary-foreground font-semibold" href="/workshops/workshop-08-claude-code/07_practical_patterns.md"><span class="mr-2 text-xs opacity-60">9<!-- -->.</span>Chapter 7: Practical Patterns — Real-World Use Cases</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-08-claude-code/08_exercises.md"><span class="mr-2 text-xs opacity-60">10<!-- -->.</span>Chapter 8: Hands-On Exercises</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-08-claude-code/09_resources.md"><span class="mr-2 text-xs opacity-60">11<!-- -->.</span>Chapter 9: Resources &amp; Community</a></li></ul></nav></div></div></div></aside><article class="flex-1 min-w-0 md:pl-0"><div class="prose max-w-none dark:prose-invert break-words [&amp;_table]:block [&amp;_table]:w-full [&amp;_table]:overflow-x-auto"><h1>Chapter 7: Practical Patterns — Real-World Use Cases</h1>
+<blockquote>
+<p>Tested patterns for the tasks developers and professionals encounter every day. Each pattern includes the prompts, tools, and configuration needed to get results.</p>
+</blockquote>
+<h2>Pattern 1: Codebase Onboarding</h2>
+<p><strong>Situation:</strong> You have just joined a team or need to understand an unfamiliar repository.</p>
+<p><strong>Approach:</strong></p>
+<pre><code>&gt; Explain this project. What does it do, how is it structured,
+  what technologies does it use, and how do I build and run it?
+</code></pre>
+<p>Claude reads your project's key files — <code>README.md</code>, <code>package.json</code> (or <code>Cargo.toml</code>, <code>pyproject.toml</code>, etc.), directory structure, configuration files — and produces a comprehensive overview.</p>
+<p><strong>Follow-up questions that work well:</strong></p>
+<pre><code>&gt; Walk me through the request lifecycle. What happens when a user
+  hits the /api/orders endpoint?
+</code></pre>
+<pre><code>&gt; What are the most important files in this project? Which ones
+  should I read first?
+</code></pre>
+<pre><code>&gt; Show me the data model. What are the main entities and how
+  do they relate to each other?
+</code></pre>
+<p><strong>Pro tip:</strong> After the onboarding session, ask Claude to generate a CLAUDE.md:</p>
+<pre><code>&gt; Based on what you've learned about this project, generate a
+  CLAUDE.md file with build commands, architecture notes, and
+  code conventions.
+</code></pre>
+<h2>Pattern 2: Bug Investigation</h2>
+<p><strong>Situation:</strong> A test is failing, a user reported an error, or something is not working as expected.</p>
+<p><strong>Approach:</strong></p>
+<p>Start by giving Claude the error:</p>
+<pre><code>&gt; This test is failing. Here's the error output:
+
+  FAIL src/services/__tests__/order.service.test.ts
+  ● OrderService › createOrder › should apply discount for VIP customers
+
+  Expected: 90.00
+  Received: 100.00
+</code></pre>
+<p>Claude reads the test file, the service under test, and any related modules. It traces the logic, identifies the bug, and proposes a fix.</p>
+<p><strong>For production errors, pipe the log:</strong></p>
+<pre><code class="language-bash">cat error.log | claude "Explain this error and suggest a fix"
+</code></pre>
+<p><strong>For intermittent bugs:</strong></p>
+<pre><code>&gt; The checkout process sometimes fails with a "duplicate key" error
+  on the orders table. It happens roughly 1 in 50 times. Here's the
+  relevant code in src/services/order.service.ts. What could cause this?
+</code></pre>
+<p>Claude examines the code for race conditions, missing transactions, and other intermittent failure modes.</p>
+<p><strong>Key advantage:</strong> Claude reads the actual code and the actual error. It does not guess based on a description — it traces the execution path through your specific codebase.</p>
+<h2>Pattern 3: Feature Implementation</h2>
+<p><strong>Situation:</strong> You need to add a new feature, and you know the requirements.</p>
+<p><strong>Approach:</strong></p>
+<p>Be specific about what you want, where it goes, and what constraints apply:</p>
+<pre><code>&gt; Add pagination to the GET /api/products endpoint.
+  Requirements:
+  - Query parameters: page (default 1), limit (default 20, max 100)
+  - Response includes: items, totalCount, page, totalPages
+  - Use the existing Prisma client for database queries
+  - Add Zod validation for the query parameters
+  - Add tests covering: default values, custom values, max limit enforcement
+</code></pre>
+<p>Claude implements the feature across all relevant files — route handler, validation schema, service layer, tests — and shows you each change.</p>
+<p><strong>Iterative refinement works well:</strong></p>
+<pre><code>You: Add cursor-based pagination as an alternative to offset pagination.
+Claude: [proposes implementation using cursor-based approach]
+You: Good, but the cursor should be opaque — encode it as base64.
+Claude: [revises to use base64-encoded cursor]
+You: Now update the API documentation in docs/api.md to cover both
+     pagination styles.
+Claude: [updates documentation]
+</code></pre>
+<h2>Pattern 4: Documentation</h2>
+<p><strong>Situation:</strong> You need API documentation, inline comments, README updates, or architectural documentation.</p>
+<p><strong>Approach:</strong></p>
+<pre><code>&gt; Write API documentation for all endpoints in src/routes/.
+  For each endpoint, include: method, path, description,
+  request parameters, request body schema, response schema,
+  error responses, and an example curl command.
+</code></pre>
+<p>Claude reads every route file, analyses the handlers, extracts parameter types, and generates comprehensive documentation.</p>
+<p><strong>For inline documentation:</strong></p>
+<pre><code>&gt; Add JSDoc comments to all exported functions in src/lib/.
+  Include parameter descriptions, return type descriptions,
+  and example usage where it would be helpful.
+</code></pre>
+<p><strong>For architectural documentation:</strong></p>
+<pre><code>&gt; Create an architecture document explaining how the authentication
+  system works in this project. Include a sequence diagram (in Mermaid
+  syntax) showing the login flow from the client to the database.
+</code></pre>
+<h2>Pattern 5: Refactoring</h2>
+<p><strong>Situation:</strong> Code works but needs structural improvement.</p>
+<p><strong>Approach:</strong></p>
+<pre><code>&gt; The OrderService class at src/services/order.service.ts is 450 lines
+  long and handles too many concerns. Refactor it:
+  - Extract discount calculation into a DiscountService
+  - Extract notification logic into a NotificationService
+  - Keep the OrderService focused on order CRUD
+  - Update all imports and tests
+</code></pre>
+<p>Claude reads the file, identifies the extraction boundaries, creates new files, updates the original, and adjusts all imports and tests.</p>
+<p><strong>For cross-cutting refactors:</strong></p>
+<pre><code>&gt; We're migrating from callbacks to async/await across the codebase.
+  Refactor all files in src/services/ that still use callback patterns.
+</code></pre>
+<pre><code>&gt; Extract the shared validation logic from the route handlers into
+  reusable middleware. I see the same Zod validation pattern repeated
+  in at least 8 route files.
+</code></pre>
+<h2>Pattern 6: Code Review</h2>
+<p><strong>Situation:</strong> You want a thorough review of changes before committing or merging.</p>
+<p><strong>Approach — Quick review:</strong></p>
+<pre><code>&gt; /review
+</code></pre>
+<p>This examines uncommitted changes and provides feedback.</p>
+<p><strong>Approach — Deep review with the slash command:</strong></p>
+<pre><code>&gt; /code-review
+</code></pre>
+<p>This performs a thorough analysis at configurable effort levels. Use <code>--comment</code> to post findings as inline PR comments, or <code>--fix</code> to apply the findings directly.</p>
+<p><strong>Approach — Custom review criteria:</strong></p>
+<pre><code>&gt; Review the changes in this branch against main. Focus specifically on:
+  1. SQL injection vulnerabilities
+  2. Proper error handling (no swallowed errors)
+  3. Missing input validation
+  4. Performance issues (N+1 queries, unnecessary re-renders)
+</code></pre>
+<p>Claude examines each changed file and reports findings categorised by severity.</p>
+<h2>Pattern 7: Writing and Content (Non-Developers)</h2>
+<p>Claude Code is not just for coding. Because it can read files, search the web, and create documents, it is a powerful tool for any professional who works with text and data.</p>
+<h3>Data Analysis</h3>
+<pre><code class="language-bash">claude "Read the CSV file at data/quarterly-results.csv and summarise
+        the key trends. Which regions grew fastest? Which product lines
+        declined?"
+</code></pre>
+<h3>Document Creation</h3>
+<pre><code>&gt; Create a project proposal document at docs/proposal.md.
+  The project is a customer feedback analysis system. Include:
+  executive summary, problem statement, proposed solution,
+  timeline, budget estimate, and risk assessment.
+  Base the technical details on what you can see in our current codebase.
+</code></pre>
+<h3>Report Generation</h3>
+<pre><code>&gt; Read all the markdown files in reports/weekly/ and create a
+  monthly summary report at reports/monthly/june-2026.md.
+  Highlight the most important updates and flag any blockers
+  that appeared in more than one weekly report.
+</code></pre>
+<h3>Email and Communication</h3>
+<pre><code>&gt; Draft a technical update email for stakeholders about the
+  v3.0 release. Read the CHANGELOG.md and the git log since
+  v2.9.0 to get the details right. Keep it concise — five
+  paragraphs maximum.
+</code></pre>
+<h2>Pattern 8: Test Generation</h2>
+<p><strong>Situation:</strong> You have code that lacks tests.</p>
+<p><strong>Approach:</strong></p>
+<pre><code>&gt; Write comprehensive tests for src/services/payment.service.ts.
+  Cover:
+  - Successful payment processing
+  - Insufficient funds
+  - Network timeout
+  - Invalid card details
+  - Refund flow
+  Use Vitest and mock the Stripe client.
+</code></pre>
+<p>Claude reads the service, understands its dependencies, and generates tests that cover the scenarios you specified.</p>
+<p><strong>For test-driven development:</strong></p>
+<pre><code>&gt; I want to implement a rate limiter middleware. Start by writing
+  the tests first (TDD style), then implement the middleware to
+  pass the tests. Tests should cover: basic rate limiting, sliding
+  window, per-IP tracking, and bypass for whitelisted IPs.
+</code></pre>
+<h2>Pattern 9: Git Operations</h2>
+<p>Claude Code integrates deeply with git:</p>
+<pre><code>&gt; Create a new branch for the session-timeout fix, make the changes,
+  commit with a descriptive message, and push.
+</code></pre>
+<pre><code>&gt; Squash the last 3 commits into one with a clean commit message.
+</code></pre>
+<pre><code>&gt; Show me what changed in the last 5 commits, summarised by area
+  of the codebase.
+</code></pre>
+<pre><code>&gt; Resolve the merge conflicts in the current branch. The main branch
+  changes should take priority for the configuration files, and our
+  branch changes should take priority for the feature code.
+</code></pre>
+<h2>Combining Patterns</h2>
+<p>The real power emerges when you combine patterns within a single session:</p>
+<pre><code>You: Explain how the notification system works.                    [Onboarding]
+Claude: [reads code, explains the architecture]
+
+You: I see the email notifications are sent synchronously.         [Bug/Perf]
+     That's probably why the API is slow on order creation.
+Claude: [confirms, traces the code path, identifies the bottleneck]
+
+You: Refactor it to use a message queue. We have Redis already.    [Refactoring]
+Claude: [proposes async notification via Redis queue]
+
+You: Good. Add tests for the queue consumer.                       [Testing]
+Claude: [generates tests with mock Redis]
+
+You: Write a brief ADR explaining why we moved to async            [Documentation]
+     notifications.
+Claude: [creates docs/adr/async-notifications.md]
+
+You: /review                                                       [Code Review]
+Claude: [reviews all uncommitted changes, suggests improvements]
+
+You: Commit everything with a descriptive message.                 [Git]
+Claude: [creates commit: "refactor: async notification delivery via Redis queue"]
+</code></pre>
+<p>One session, six patterns, a complete feature delivered.</p>
+<h2>Tips for Maximum Effectiveness</h2>
+<ol>
+<li>
+<p><strong>Start broad, then narrow.</strong> Understand the context before diving into changes.</p>
+</li>
+<li>
+<p><strong>State your constraints.</strong> "Use the existing Redis client" prevents Claude from adding new dependencies. "Follow the patterns in the existing services" ensures consistency.</p>
+</li>
+<li>
+<p><strong>Ask for tests alongside code.</strong> Claude writes better implementations when it knows tests will validate them.</p>
+</li>
+<li>
+<p><strong>Use <code>/review</code> before committing.</strong> A two-second command that catches issues before they reach your repository.</p>
+</li>
+<li>
+<p><strong>Iterate rather than restart.</strong> Claude remembers context within a session. Build on previous exchanges instead of repeating yourself.</p>
+</li>
+<li>
+<p><strong>Leverage your CLAUDE.md.</strong> Every pattern works better when Claude knows your project's conventions.</p>
+</li>
+</ol>
+<hr>
+<p><strong>Next:</strong> <a href="./08_exercises.md">Chapter 8: Hands-On Exercises</a></p>
+<hr>
+<p><em>DreamLab AI Self-Guided Workshop | June 2026</em></p></div></article></main></div>
+    <noscript><p>Interactive forms require JavaScript. You can also email <a href="mailto:info@dreamlab-ai.com">info@dreamlab-ai.com</a>.</p></noscript>
+  
+
+</body></html>

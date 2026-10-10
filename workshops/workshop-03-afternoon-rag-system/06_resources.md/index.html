@@ -1,0 +1,524 @@
+<!DOCTYPE html><html lang="en" class="dark"><head>
+    <meta charset="UTF-8">
+
+    <!-- Primary Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <title>Resources: RAG System Implementation | DreamLab AI Workshops</title>
+    <meta name="title" content="Resources: RAG System Implementation | DreamLab AI Workshops">
+    <meta name="description" content="Resources: RAG System Implementation — free DreamLab AI curriculum.">
+    <meta name="keywords" content="applied innovation lab, AI consulting, enterprise innovation, immersive XR, cyber trust, creative technology, residential programmes, knowledge transfer, deep tech, Lake District">
+    <meta name="author" content="DreamLab">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    <meta name="rating" content="General">
+
+    <link rel="describedby" href="/llms.txt" type="text/plain">
+    <script type="application/ld+json" id="organisation-structured-data">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://dreamlab-ai.com/#organisation","name":"DreamLab","url":"https://dreamlab-ai.com/","logo":"https://dreamlab-ai.com/images/heroes/dreamlab-hero.webp","email":"info@dreamlab-ai.com","founder":{"@id":"https://dreamlab-ai.com/team#john-ohare"},"sameAs":["https://github.com/DreamLab-AI","https://www.linkedin.com/company/dreamlab-ai-consulting"]},{"@type":"Person","@id":"https://dreamlab-ai.com/team#john-ohare","name":"John O'Hare","honorificPrefix":"Dr","jobTitle":"Founder","worksFor":{"@id":"https://dreamlab-ai.com/#organisation"},"url":"https://dreamlab-ai.com/team#john-ohare"}]}</script>
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dreamlab-ai.com/workshops/workshop-03-afternoon-rag-system/06_resources.md/">
+
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="msapplication-TileColor" content="#1a1a2e">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://dreamlab-ai.com/workshops/workshop-03-afternoon-rag-system/06_resources.md/">
+    <meta property="og:title" content="Resources: RAG System Implementation | DreamLab AI Workshops">
+    <meta property="og:description" content="Resources: RAG System Implementation — free DreamLab AI curriculum.">
+    <meta property="og:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="DreamLab AI Workshop - Resources: RAG System Implementation">
+    <meta property="og:site_name" content="DreamLab">
+    <meta property="og:locale" content="en_GB">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://dreamlab-ai.com/workshops/workshop-03-afternoon-rag-system/06_resources.md/">
+    <meta name="twitter:title" content="Resources: RAG System Implementation | DreamLab AI Workshops">
+    <meta name="twitter:description" content="Resources: RAG System Implementation — free DreamLab AI curriculum.">
+    <meta name="twitter:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta name="twitter:image:alt" content="DreamLab AI Workshop - Resources: RAG System Implementation">
+    <meta name="twitter:site" content="@thedreamlab">
+    <meta name="twitter:creator" content="@thedreamlab">
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="geo.region" content="GB">
+    <meta name="geo.placename" content="United Kingdom">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DreamLab AI">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Security Headers -->
+    <!--
+      CSP notes:
+      - script-src is 'self' only: no 'unsafe-eval' (blocks eval/Function-based
+        injection) and no 'unsafe-inline'. The one inline bootstrap script was
+        moved to /spa-redirect.js. JSON-LD blocks below are type
+        application/ld+json (data, not executable) so CSP does not gate them.
+      - connect-src is scoped to the Cloudflare Workers subdomain actually used
+        by this account (*.solitary-paper-764d.workers.dev: auth / pod / search /
+        link-preview / nostr-relay), NOT the internet-wide *.workers.dev, which
+        previously allowed exfiltration to any attacker-controlled worker.
+      - The two open Nostr relays (relay.damus.io, relay.primal.net) are
+        explicitly allow-listed: the Talk-to-AI chat listens there for
+        junkiejarvis's reply (the primary relay's whitelist gate rejects the
+        gift-wrap addressed to the ephemeral session key — ADR-042 Amendment 1).
+        Must stay in sync with VITE_REPLY_RELAYS. Named exactly, not a wildcard.
+      - style-src keeps 'unsafe-inline' because Radix UI + runtime style
+        attributes require it; that is not a script-injection vector.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.solitary-paper-764d.workers.dev wss://*.solitary-paper-764d.workers.dev https://*.dreamlab-ai.com wss://*.dreamlab-ai.com wss://relay.damus.io wss://relay.primal.net; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <!-- SPA deep-link restore. External 'self' script (not inline) so CSP
+         script-src can stay 'self' with no 'unsafe-inline'. Classic,
+         render-blocking script: runs before the deferred app module. -->
+    <script src="/spa-redirect.js"></script>
+    <script type="module" crossorigin="" src="/assets/index-Crc86LXg.js"></script>
+    <link rel="modulepreload" crossorigin="" href="/assets/ui-C2dH1upk.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/vendor-uw6h6E0d.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/nostr-BpuBsPg-.js">
+    <link rel="stylesheet" crossorigin="" href="/assets/index-CeEdk6WL.css">
+  <script type="application/ld+json" id="route-structured-data">{"@context":"https://schema.org","@type":"LearningResource","@id":"https://dreamlab-ai.com/workshops/workshop-03-afternoon-rag-system/06_resources.md/#page","url":"https://dreamlab-ai.com/workshops/workshop-03-afternoon-rag-system/06_resources.md/","name":"Resources: RAG System Implementation | DreamLab AI Workshops","description":"Resources: RAG System Implementation — free DreamLab AI curriculum.","inLanguage":"en-GB","publisher":{"@id":"https://dreamlab-ai.com/#organisation"},"isAccessibleForFree":true}</script><link rel="alternate" type="text/markdown" href="/data/workshops/workshop-03-afternoon-rag-system/06_resources.md"></head>
+
+  <body>
+    <!-- Skip Navigation Link for Accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
+      Skip to main content
+    </a>
+    <div id="root"><header role="banner" class="fixed top-0 left-0 right-0 z-50"><div class="md:hidden flex items-center justify-between h-14 px-6 bg-[rgba(14,14,17,0.92)] backdrop-blur-[14px] border-b border-dlm-hairline"><a aria-label="DreamLab home" class="flex items-center gap-2" href="/"><span class="w-[9px] h-[9px] rounded-full bg-dlm-bright shrink-0" aria-hidden="true"></span><span class="text-[14px] font-semibold tracking-[0.14em] text-[#FAFAFA]">DREAMLAB</span></a><button type="button" aria-label="Open menu" aria-expanded="false" class="w-11 h-11 -mr-2 flex flex-col items-end justify-center gap-[5px] focus:outline-none focus-visible:ring-2 focus-visible:ring-dlm-bright rounded"><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span></button></div><div class="hidden md:block transition-all duration-300 ease-out py-3 bg-background/60 backdrop-blur-md"><div class="container flex items-center justify-between px-4"><button class="flex items-center gap-2 md:gap-3 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded min-h-[48px] min-w-[48px] px-3 py-2" aria-label="Main navigation menu" type="button" id="radix-:Rp:" aria-haspopup="menu" aria-expanded="false" data-state="closed"><div class="w-10 h-10 md:w-8 md:h-8 shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all duration-300 group-hover:scale-110 animate-glow-pulse" aria-hidden="true"></div><span class="font-bold text-lg md:text-xl tracking-tight group-hover:text-purple-400 transition-colors duration-300">MENU</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down h-5 w-5 md:h-4 md:w-4 shrink-0 text-muted-foreground group-hover:text-purple-400 transition-all duration-300 group-hover:rotate-180" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button><div class="flex items-center gap-2"><a class="items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-10 py-2 hover:bg-purple-500/10 hover:text-purple-400 transition-all duration-300 hover:scale-105 min-h-[48px] px-4 text-base md:text-sm hidden sm:inline-flex" href="/contact">Contact</a><a class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary hover:bg-primary/90 h-10 py-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transition-all duration-300 min-h-[48px] px-4 text-base md:text-sm" href="/co-create">Partner With Us</a></div></div></div></header><header class="relative overflow-hidden" style="min-height:320px"><div class="absolute inset-0 bg-gradient-to-br from-blue-500/30 via-purple-500/30 to-violet-500/30" style="transform:translateY(0px);opacity:1"><div class="absolute top-0 -left-20 w-96 h-96 rounded-full blur-3xl opacity-40 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600"></div><div class="absolute bottom-0 -right-20 w-[32rem] h-[32rem] rounded-full blur-3xl opacity-30 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600" style="animation-delay:1s"></div><div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full blur-3xl opacity-20 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600" style="animation-delay:2s"></div></div><div class="absolute inset-0 opacity-5" style="background-image:linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);background-size:50px 50px;transform:translateY(0px)"></div><div class="relative z-10 container px-4 pt-24 pb-8"><div class="mb-6 transition-all duration-500 transform opacity-0 translate-y-4"><nav aria-label="breadcrumb"><ol class="flex flex-wrap items-center gap-1.5 break-words text-sm sm:gap-2.5 text-white/70"><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/">Home</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/workshops">Workshops</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><span role="link" aria-disabled="true" aria-current="page" class="text-white font-medium">RAG System Implementation</span></li></ol></nav></div><div class="mb-4 transition-all duration-500 delay-100 transform opacity-0 translate-y-4"><div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20"><span class="text-purple-400"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cpu w-5 h-5" aria-hidden="true"><path d="M12 20v2"></path><path d="M12 2v2"></path><path d="M17 20v2"></path><path d="M17 2v2"></path><path d="M2 12h2"></path><path d="M2 17h2"></path><path d="M2 7h2"></path><path d="M20 12h2"></path><path d="M20 17h2"></path><path d="M20 7h2"></path><path d="M7 20v2"></path><path d="M7 2v2"></path><rect x="4" y="4" width="16" height="16" rx="2"></rect><rect x="8" y="8" width="8" height="8" rx="1"></rect></svg></span><span class="text-sm font-medium text-white/90">AI / Machine Learning</span></div></div><h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 break-words transition-all duration-700 delay-200 transform opacity-0 translate-y-6"><span class="bg-gradient-to-r bg-clip-text text-transparent animate-gradient-shift bg-400% from-blue-400 via-purple-400 to-violet-400">RAG System Implementation</span></h1><div class="flex flex-wrap items-center gap-3 mb-6 transition-all duration-700 delay-400 transform opacity-0 translate-y-4"><div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-white/10 border-white/20 text-white backdrop-blur-sm hover:bg-white/20"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-3.5 h-3.5 mr-1.5" aria-hidden="true"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>10<!-- --> <!-- -->Modules</div></div><div class="max-w-md transition-all duration-700 delay-500 transform opacity-0 translate-y-4"><div class="flex items-center justify-between text-sm text-white/70 mb-2"><span class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code w-4 h-4" aria-hidden="true"><path d="m16 18 6-6-6-6"></path><path d="m8 6-6 6 6 6"></path></svg><span>Chapter <!-- -->8<!-- -->: <!-- -->Resources: RAG System Implementation</span></span><span class="font-medium text-white">80<!-- -->%</span></div><div class="relative"><div aria-valuemax="100" aria-valuemin="0" role="progressbar" data-state="indeterminate" data-max="100" class="relative w-full overflow-hidden rounded-full h-2 bg-white/20"><div data-state="indeterminate" data-max="100" class="h-full w-full flex-1 bg-primary transition-all" style="transform:translateX(-20%)"></div></div><div class="absolute top-0 left-0 h-2 rounded-full blur-sm bg-gradient-to-r from-blue-600 via-purple-600 to-violet-600" style="width:80%"></div></div><div class="relative mt-1 h-1"><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:10%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:20%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:30%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:40%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:50%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:60%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:70%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:80%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:90%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:100%"></div></div></div></div><div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent"></div></header><main class="container px-4 pt-8 pb-8 flex flex-col md:flex-row gap-x-8 min-h-screen" id="main-content"><aside class="w-full md:w-64 lg:w-72 md:sticky md:top-20 md:h-[calc(100vh-5rem-2rem)] mb-8 md:mb-0"><h2 class="text-xl font-semibold mb-4 break-words">RAG System Implementation</h2><div dir="ltr" class="relative overflow-hidden h-auto md:h-full pr-4 border-r md:border-r-0" style="position:relative;--radix-scroll-area-corner-width:0px;--radix-scroll-area-corner-height:0px"><style>[data-radix-scroll-area-viewport]{scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;}[data-radix-scroll-area-viewport]::-webkit-scrollbar{display:none}</style><div data-radix-scroll-area-viewport="" class="h-full w-full rounded-[inherit]" style="overflow-x:hidden;overflow-y:hidden"><div style="min-width:100%;display:table"><nav><ul><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-03-afternoon-rag-system/README.md"><span class="mr-2 text-xs opacity-60">1<!-- -->.</span>RAG System Implementation</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-03-afternoon-rag-system/00_introduction.md"><span class="mr-2 text-xs opacity-60">2<!-- -->.</span>Introduction to RAG Systems</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-03-afternoon-rag-system/01_concepts.md"><span class="mr-2 text-xs opacity-60">3<!-- -->.</span>Core Concepts: RAG Systems</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-03-afternoon-rag-system/02_hands_on.md"><span class="mr-2 text-xs opacity-60">4<!-- -->.</span>Hands-On Practice: Building Your RAG System</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-03-afternoon-rag-system/03_exercises.md"><span class="mr-2 text-xs opacity-60">5<!-- -->.</span>Practical Exercises: RAG System Implementation</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-03-afternoon-rag-system/04_project.md"><span class="mr-2 text-xs opacity-60">6<!-- -->.</span>Project Work: Build a Personal Knowledge Base</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-03-afternoon-rag-system/05_assessment.md"><span class="mr-2 text-xs opacity-60">7<!-- -->.</span>Assessment: RAG System Implementation</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors bg-primary text-primary-foreground font-semibold" href="/workshops/workshop-03-afternoon-rag-system/06_resources.md"><span class="mr-2 text-xs opacity-60">8<!-- -->.</span>Resources: RAG System Implementation</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-03-afternoon-rag-system/objectives.md"><span class="mr-2 text-xs opacity-60">9<!-- -->.</span>Learning Objectives -- RAG System Implementation</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-03-afternoon-rag-system/prerequisites.md"><span class="mr-2 text-xs opacity-60">10<!-- -->.</span>Prerequisites -- RAG System Implementation</a></li></ul></nav></div></div></div></aside><article class="flex-1 min-w-0 md:pl-0"><div class="prose max-w-none dark:prose-invert break-words [&amp;_table]:block [&amp;_table]:w-full [&amp;_table]:overflow-x-auto"><h1>Resources: RAG System Implementation</h1>
+<h2>Introduction</h2>
+<p>This resource collection supports your ongoing RAG development journey. It covers official documentation, community tools, production deployment guides, and further reading -- organised by topic and skill level.</p>
+<hr>
+<h2>Core Libraries and Documentation</h2>
+<h3>Vector Databases</h3>
+<p><strong>ChromaDB (Local-First)</strong></p>
+<ul>
+<li>Documentation: <a href="https://docs.trychroma.com">docs.trychroma.com</a></li>
+<li>GitHub: <a href="https://github.com/chroma-core/chroma">github.com/chroma-core/chroma</a></li>
+<li>Getting Started: <a href="https://docs.trychroma.com/getting-started">docs.trychroma.com/getting-started</a></li>
+<li>Embedding Functions: <a href="https://docs.trychroma.com/integrations">docs.trychroma.com/integrations</a></li>
+<li>Best for: Learning, prototyping, small-to-medium datasets</li>
+</ul>
+<p><strong>Qdrant (Production-Grade)</strong></p>
+<ul>
+<li>Documentation: <a href="https://qdrant.tech/documentation/">qdrant.tech/documentation</a></li>
+<li>GitHub: <a href="https://github.com/qdrant/qdrant">github.com/qdrant/qdrant</a></li>
+<li>Cloud Console: <a href="https://cloud.qdrant.io">cloud.qdrant.io</a></li>
+<li>Python Client: <a href="https://python-client.qdrant.tech">python-client.qdrant.tech</a></li>
+<li>Best for: Production deployments, advanced filtering, hybrid search</li>
+</ul>
+<p><strong>Pinecone (Managed Cloud)</strong></p>
+<ul>
+<li>Documentation: <a href="https://docs.pinecone.io">docs.pinecone.io</a></li>
+<li>Getting Started: <a href="https://docs.pinecone.io/docs/quickstart">docs.pinecone.io/docs/quickstart</a></li>
+<li>Best for: Fully managed service, serverless scaling, enterprise</li>
+</ul>
+<p><strong>Weaviate (Hybrid + GraphQL)</strong></p>
+<ul>
+<li>Documentation: <a href="https://weaviate.io/developers/weaviate">weaviate.io/developers/weaviate</a></li>
+<li>GitHub: <a href="https://github.com/weaviate/weaviate">github.com/weaviate/weaviate</a></li>
+<li>Best for: Built-in hybrid search, GraphQL interface, multi-tenancy</li>
+</ul>
+<p><strong>pgvector (PostgreSQL Extension)</strong></p>
+<ul>
+<li>GitHub: <a href="https://github.com/pgvector/pgvector">github.com/pgvector/pgvector</a></li>
+<li>Tutorial: <a href="https://supabase.com/docs/guides/ai/vector-columns">supabase.com/docs/guides/ai/vector-columns</a></li>
+<li>Best for: Existing PostgreSQL users, ACID compliance, SQL-native</li>
+</ul>
+<h3>RAG Frameworks</h3>
+<p><strong>LangChain</strong></p>
+<ul>
+<li>Documentation: <a href="https://python.langchain.com/docs/introduction/">python.langchain.com/docs</a></li>
+<li>GitHub: <a href="https://github.com/langchain-ai/langchain">github.com/langchain-ai/langchain</a></li>
+<li>RAG Tutorial: <a href="https://python.langchain.com/docs/tutorials/rag/">python.langchain.com/docs/tutorials/rag</a></li>
+<li>LangSmith (observability): <a href="https://smith.langchain.com">smith.langchain.com</a></li>
+</ul>
+<p><strong>LlamaIndex</strong></p>
+<ul>
+<li>Documentation: <a href="https://docs.llamaindex.ai/en/stable/">docs.llamaindex.ai</a></li>
+<li>GitHub: <a href="https://github.com/run-llama/llama_index">github.com/run-llama/llama_index</a></li>
+<li>Starter Tutorial: <a href="https://docs.llamaindex.ai/en/stable/getting_started/">docs.llamaindex.ai/en/stable/getting_started</a></li>
+<li>Best for: Data-centric RAG, document agents, structured data</li>
+</ul>
+<p><strong>Haystack (by deepset)</strong></p>
+<ul>
+<li>Documentation: <a href="https://docs.haystack.deepset.ai/docs/intro">docs.haystack.deepset.ai</a></li>
+<li>GitHub: <a href="https://github.com/deepset-ai/haystack">github.com/deepset-ai/haystack</a></li>
+<li>Best for: Production NLP pipelines, evaluation built in</li>
+</ul>
+<h3>Embedding Models</h3>
+<p><strong>OpenAI Embeddings</strong></p>
+<ul>
+<li>API Reference: <a href="https://platform.openai.com/docs/guides/embeddings">platform.openai.com/docs/guides/embeddings</a></li>
+<li>Models: <code>text-embedding-3-small</code> (1536d), <code>text-embedding-3-large</code> (3072d)</li>
+<li>Pricing: Check the OpenAI pricing page for current rates</li>
+</ul>
+<p><strong>Sentence Transformers (Local, Free)</strong></p>
+<ul>
+<li>Documentation: <a href="https://www.sbert.net">sbert.net</a></li>
+<li>GitHub: <a href="https://github.com/UKPLab/sentence-transformers">github.com/UKPLab/sentence-transformers</a></li>
+<li>Model Hub: <a href="https://huggingface.co/sentence-transformers">huggingface.co/sentence-transformers</a></li>
+<li>Recommended models:
+<ul>
+<li><code>all-MiniLM-L6-v2</code> -- Fast, good quality, 384 dimensions</li>
+<li><code>BAAI/bge-base-en-v1.5</code> -- Higher quality, 768 dimensions</li>
+<li><code>BAAI/bge-large-en-v1.5</code> -- Best quality, 1024 dimensions</li>
+</ul>
+</li>
+</ul>
+<p><strong>Ollama Embeddings (Local, GPU-Accelerated)</strong></p>
+<ul>
+<li>Embedding models: <code>nomic-embed-text</code>, <code>mxbai-embed-large</code></li>
+<li>Documentation: <a href="https://ollama.com/blog/embedding-models">ollama.com/blog/embedding-models</a></li>
+<li>Usage: <code>ollama pull nomic-embed-text</code></li>
+</ul>
+<p><strong>Cohere Embed</strong></p>
+<ul>
+<li>Documentation: <a href="https://docs.cohere.com/docs/embeddings">docs.cohere.com/docs/embeddings</a></li>
+<li>Models: <code>embed-english-v3.0</code>, <code>embed-multilingual-v3.0</code></li>
+<li>Free tier: 100 API calls/minute</li>
+</ul>
+<p><strong>Voyage AI</strong></p>
+<ul>
+<li>Documentation: <a href="https://docs.voyageai.com">docs.voyageai.com</a></li>
+<li>Models: <code>voyage-3</code>, <code>voyage-code-3</code></li>
+<li>Strong performance on retrieval benchmarks</li>
+</ul>
+<hr>
+<h2>Evaluation and Quality</h2>
+<h3>RAGAS (RAG Assessment)</h3>
+<p>The standard framework for evaluating RAG pipeline quality.</p>
+<ul>
+<li>Documentation: <a href="https://docs.ragas.io">docs.ragas.io</a></li>
+<li>GitHub: <a href="https://github.com/explodinggradients/ragas">github.com/explodinggradients/ragas</a></li>
+<li>Metrics: faithfulness, answer relevancy, context recall, context precision</li>
+<li>Installation: <code>pip install ragas</code></li>
+</ul>
+<pre><code class="language-python"># Quick RAGAS evaluation example
+from ragas import evaluate
+from ragas.metrics import faithfulness, answer_relevancy, context_precision
+
+result = evaluate(
+    dataset=your_test_dataset,
+    metrics=[faithfulness, answer_relevancy, context_precision],
+)
+print(result)
+</code></pre>
+<h3>DeepEval</h3>
+<ul>
+<li>Documentation: <a href="https://docs.confident-ai.com">docs.confident-ai.com</a></li>
+<li>GitHub: <a href="https://github.com/confident-ai/deepeval">github.com/confident-ai/deepeval</a></li>
+<li>Metrics: hallucination, answer relevancy, contextual recall</li>
+<li>Installation: <code>pip install deepeval</code></li>
+</ul>
+<h3>TruLens</h3>
+<ul>
+<li>Documentation: <a href="https://www.trulens.org">trulens.org</a></li>
+<li>GitHub: <a href="https://github.com/truera/trulens">github.com/truera/trulens</a></li>
+<li>Focus: Feedback functions for groundedness, relevance, and harmlessness</li>
+</ul>
+<hr>
+<h2>Re-ranking Models</h2>
+<h3>Cross-Encoders</h3>
+<ul>
+<li><code>cross-encoder/ms-marco-MiniLM-L-6-v2</code> -- Fast, good quality</li>
+<li><code>cross-encoder/ms-marco-MiniLM-L-12-v2</code> -- Better quality, slightly slower</li>
+<li><code>BAAI/bge-reranker-base</code> -- Strong retrieval-focused reranker</li>
+<li><code>BAAI/bge-reranker-large</code> -- Best quality reranker</li>
+</ul>
+<pre><code class="language-bash"># Install
+pip install sentence-transformers
+</code></pre>
+<h3>Cohere Rerank</h3>
+<ul>
+<li>API: <a href="https://docs.cohere.com/docs/reranking">docs.cohere.com/docs/reranking</a></li>
+<li>Model: <code>rerank-english-v3.0</code></li>
+<li>Free tier available for development</li>
+</ul>
+<hr>
+<h2>Document Processing</h2>
+<h3>PDF Extraction</h3>
+<ul>
+<li><strong>PyPDF</strong>: <a href="https://github.com/py-pdf/pypdf">github.com/py-pdf/pypdf</a> -- Lightweight, pure Python</li>
+<li><strong>pdfplumber</strong>: <a href="https://github.com/jsvine/pdfplumber">github.com/jsvine/pdfplumber</a> -- Better table extraction</li>
+<li><strong>Unstructured</strong>: <a href="https://github.com/Unstructured-IO/unstructured">github.com/Unstructured-IO/unstructured</a> -- Multi-format document parsing (PDF, DOCX, HTML, images)</li>
+</ul>
+<h3>OCR (Scanned Documents)</h3>
+<ul>
+<li><strong>Tesseract</strong>: <a href="https://github.com/tesseract-ocr/tesseract">github.com/tesseract-ocr/tesseract</a></li>
+<li><strong>PaddleOCR</strong>: <a href="https://github.com/PaddlePaddle/PaddleOCR">github.com/PaddlePaddle/PaddleOCR</a> -- ML-based, multilingual</li>
+<li><strong>DocTR</strong>: <a href="https://github.com/mindee/doctr">github.com/mindee/doctr</a> -- Deep learning OCR</li>
+</ul>
+<h3>Structured Data</h3>
+<ul>
+<li><strong>LlamaIndex</strong> supports CSV, JSON, SQL, and API data sources</li>
+<li><strong>Pandas + LangChain</strong> for tabular data integration</li>
+<li><strong>SQLAlchemy</strong> for database-backed RAG systems</li>
+</ul>
+<hr>
+<h2>Local AI Infrastructure</h2>
+<h3>Ollama</h3>
+<ul>
+<li>Website: <a href="https://ollama.com">ollama.com</a></li>
+<li>Model Library: <a href="https://ollama.com/library">ollama.com/library</a></li>
+<li>Recommended models for RAG:
+<ul>
+<li><strong>Generation</strong>: <code>llama3.3:8b</code>, <code>mistral</code>, <code>qwen2.5:7b</code></li>
+<li><strong>Embeddings</strong>: <code>nomic-embed-text</code>, <code>mxbai-embed-large</code></li>
+<li><strong>Code understanding</strong>: <code>qwen2.5-coder:7b</code></li>
+</ul>
+</li>
+</ul>
+<h3>LM Studio</h3>
+<ul>
+<li>Website: <a href="https://lmstudio.ai">lmstudio.ai</a></li>
+<li>GUI-based model management and inference</li>
+<li>OpenAI-compatible local server</li>
+<li>Good for experimentation and non-technical users</li>
+</ul>
+<h3>vLLM (Production Serving)</h3>
+<ul>
+<li>Documentation: <a href="https://docs.vllm.ai/en/latest/">docs.vllm.ai</a></li>
+<li>GitHub: <a href="https://github.com/vllm-project/vllm">github.com/vllm-project/vllm</a></li>
+<li>High-throughput LLM serving with PagedAttention</li>
+<li>Best for: Production deployments serving multiple users</li>
+</ul>
+<hr>
+<h2>Advanced RAG Patterns</h2>
+<h3>Agentic RAG</h3>
+<p>Combine RAG with tool-using agents for multi-step reasoning:</p>
+<ul>
+<li>LangChain Agents: <a href="https://python.langchain.com/docs/how_to/#agents">python.langchain.com/docs/how_to/#agents</a></li>
+<li>LlamaIndex Agents: <a href="https://docs.llamaindex.ai/en/stable/module_guides/deploying/agents/">docs.llamaindex.ai/en/stable/module_guides/deploying/agents/</a></li>
+</ul>
+<h3>Multi-Modal RAG</h3>
+<p>Retrieve and reason over images, tables, and text together:</p>
+<ul>
+<li>LlamaIndex Multi-Modal: <a href="https://docs.llamaindex.ai/en/stable/examples/multi_modal/">docs.llamaindex.ai/en/stable/examples/multi_modal/</a></li>
+<li>ColPali: Visual document retrieval using vision models</li>
+</ul>
+<h3>Graph RAG</h3>
+<p>Combine knowledge graphs with vector retrieval:</p>
+<ul>
+<li>Microsoft GraphRAG: <a href="https://github.com/microsoft/graphrag">github.com/microsoft/graphrag</a></li>
+<li>Neo4j + LangChain: <a href="https://python.langchain.com/docs/integrations/graphs/neo4j_cypher">python.langchain.com/docs/integrations/graphs/neo4j_cypher</a></li>
+</ul>
+<h3>Corrective RAG (CRAG)</h3>
+<p>Self-correcting retrieval that validates and re-fetches when results are poor:</p>
+<ul>
+<li>Paper: "Corrective Retrieval Augmented Generation" (Yan et al., 2024)</li>
+<li>Combines retrieval evaluation with web search fallback</li>
+</ul>
+<hr>
+<h2>Deployment and Production</h2>
+<h3>Web Interfaces</h3>
+<p><strong>Streamlit</strong> (Quick prototyping)</p>
+<ul>
+<li>Documentation: <a href="https://docs.streamlit.io">docs.streamlit.io</a></li>
+<li>Installation: <code>pip install streamlit</code></li>
+<li>RAG template: <a href="https://github.com/streamlit/llm-examples">github.com/streamlit/llm-examples</a></li>
+</ul>
+<p><strong>Gradio</strong> (ML-focused UI)</p>
+<ul>
+<li>Documentation: <a href="https://www.gradio.app/docs/">gradio.app/docs</a></li>
+<li>Installation: <code>pip install gradio</code></li>
+<li>Chatbot component for conversational RAG</li>
+</ul>
+<p><strong>Chainlit</strong> (Chat-first UI for LLM apps)</p>
+<ul>
+<li>Documentation: <a href="https://docs.chainlit.io">docs.chainlit.io</a></li>
+<li>Built specifically for conversational AI applications</li>
+</ul>
+<h3>API Deployment</h3>
+<p><strong>FastAPI</strong></p>
+<ul>
+<li>Documentation: <a href="https://fastapi.tiangolo.com">fastapi.tiangolo.com</a></li>
+<li>Ideal for building RAG-as-a-service APIs</li>
+<li>Async support for high concurrency</li>
+</ul>
+<pre><code class="language-python"># Minimal FastAPI RAG endpoint
+from fastapi import FastAPI
+from rag_pipeline import ask
+
+app = FastAPI()
+
+@app.post("/ask")
+async def ask_question(query: str):
+    result = ask(query)
+    return result
+</code></pre>
+<h3>Docker Deployment</h3>
+<pre><code class="language-dockerfile"># Dockerfile for RAG service
+FROM python:3.11-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY scripts/ scripts/
+COPY data/ data/
+CMD ["uvicorn", "scripts.api:app", "--host", "0.0.0.0", "--port", "8000"]
+</code></pre>
+<hr>
+<h2>Recommended Reading</h2>
+<h3>Foundational Papers</h3>
+<ol>
+<li>
+<p><strong>"Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks"</strong> (Lewis et al., 2020)
+The original RAG paper from Meta AI. Essential reading for understanding the paradigm.</p>
+</li>
+<li>
+<p><strong>"Dense Passage Retrieval for Open-Domain Question Answering"</strong> (Karpukhin et al., 2020)
+Foundational work on using dense embeddings for document retrieval.</p>
+</li>
+<li>
+<p><strong>"Attention Is All You Need"</strong> (Vaswani et al., 2017)
+The Transformer paper -- understanding this helps you grasp how embeddings and LLMs work.</p>
+</li>
+<li>
+<p><strong>"REALM: Retrieval-Augmented Language Model Pre-Training"</strong> (Guu et al., 2020)
+Integrating retrieval directly into the pre-training process.</p>
+</li>
+</ol>
+<h3>Practical Guides</h3>
+<ol start="5">
+<li>
+<p><strong>"Building RAG-based LLM Applications for Production"</strong> -- Anyscale Blog
+Comprehensive guide to moving from prototype to production.</p>
+</li>
+<li>
+<p><strong>"A Survey on Retrieval-Augmented Generation"</strong> (Gao et al., 2024)
+Thorough survey of RAG techniques, evaluation, and future directions.</p>
+</li>
+<li>
+<p><strong>"Chunking Strategies for LLM Applications"</strong> -- Pinecone Learning Centre
+Detailed comparison of chunking approaches with benchmarks.</p>
+</li>
+</ol>
+<h3>Books</h3>
+<ol start="8">
+<li>
+<p><strong>"Building LLM Apps"</strong> by Valentina Alto (O'Reilly, 2024)
+Practical guide covering RAG, agents, and deployment.</p>
+</li>
+<li>
+<p><strong>"Designing Machine Learning Systems"</strong> by Chip Huyen (O'Reilly, 2022)
+Production ML systems design -- relevant to RAG infrastructure.</p>
+</li>
+</ol>
+<hr>
+<h2>Community and Support</h2>
+<h3>Forums and Communities</h3>
+<ul>
+<li><strong>LangChain Discord</strong>: Active community for LangChain + RAG questions</li>
+<li><strong>LlamaIndex Discord</strong>: Data framework discussions and support</li>
+<li><strong>Chroma Discord</strong>: ChromaDB-specific help and feature discussions</li>
+<li><strong>r/LocalLLaMA</strong> (Reddit): Local model running and RAG discussions</li>
+<li><strong>Hugging Face Forums</strong>: Model selection and embedding questions</li>
+</ul>
+<h3>Newsletters and Blogs</h3>
+<ul>
+<li><strong>The Batch</strong> (deeplearning.ai): Weekly AI news including RAG developments</li>
+<li><strong>LangChain Blog</strong>: <a href="https://blog.langchain.dev">blog.langchain.dev</a> -- Tutorials and patterns</li>
+<li><strong>Pinecone Learning Centre</strong>: <a href="https://www.pinecone.io/learn/">pinecone.io/learn</a> -- Vector search education</li>
+<li><strong>Weaviate Blog</strong>: <a href="https://weaviate.io/blog">weaviate.io/blog</a> -- Hybrid search and RAG patterns</li>
+</ul>
+<h3>Video Courses</h3>
+<ul>
+<li><strong>"LangChain for LLM Application Development"</strong> -- DeepLearning.AI (short course, free)</li>
+<li><strong>"Building and Evaluating Advanced RAG Applications"</strong> -- DeepLearning.AI (short course, free)</li>
+<li><strong>"Vector Databases: from Embeddings to Applications"</strong> -- DeepLearning.AI (short course, free)</li>
+</ul>
+<hr>
+<h2>Quick Reference Card</h2>
+<h3>Essential Commands</h3>
+<pre><code class="language-bash"># Environment setup
+python -m venv venv &amp;&amp; source venv/bin/activate
+pip install chromadb langchain sentence-transformers ollama
+
+# Ollama model management
+ollama pull llama3.3:8b          # Download generation model
+ollama pull nomic-embed-text     # Download embedding model
+ollama list                      # List installed models
+ollama serve                     # Start server
+
+# Project scripts (from ~/rag-workshop)
+python scripts/verify_setup.py         # Check installation
+python scripts/build_index.py          # Build vector store
+python scripts/rag_pipeline.py --chat  # Interactive Q&amp;A
+python scripts/add_document.py &lt;file&gt;  # Add new document
+python scripts/evaluate_rag.py         # Run quality tests
+</code></pre>
+<h3>Key Python Imports</h3>
+<pre><code class="language-python"># Vector store
+import chromadb
+from chromadb.utils import embedding_functions
+
+# Document processing
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain.docstore.document import Document
+
+# Local embeddings
+from sentence_transformers import SentenceTransformer
+
+# Re-ranking
+from sentence_transformers import CrossEncoder
+
+# Local LLM
+import ollama
+
+# Cloud embeddings (optional)
+from openai import OpenAI
+</code></pre>
+<h3>Embedding Model Quick Selection</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Use Case</th><th>Model</th><th>Command</th></tr></thead><tbody><tr><td>Learning / Prototyping</td><td>all-MiniLM-L6-v2</td><td><code>pip install sentence-transformers</code></td></tr><tr><td>Local Production</td><td>nomic-embed-text</td><td><code>ollama pull nomic-embed-text</code></td></tr><tr><td>Cloud (Best Quality)</td><td>text-embedding-3-small</td><td>OpenAI API key required</td></tr><tr><td>Multilingual</td><td>BAAI/bge-m3</td><td><code>pip install sentence-transformers</code></td></tr></tbody></table>
+<hr>
+<h2>Navigation</h2>
+<ul>
+<li>Previous: <a href="05_assessment.md">Assessment</a></li>
+<li><a href="README.md">Back to Workshop Overview</a></li>
+</ul></div></article></main></div>
+    <noscript><p>Interactive forms require JavaScript. You can also email <a href="mailto:info@dreamlab-ai.com">info@dreamlab-ai.com</a>.</p></noscript>
+  
+
+</body></html>

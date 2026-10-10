@@ -1,0 +1,183 @@
+<!DOCTYPE html><html lang="en" class="dark"><head>
+    <meta charset="UTF-8">
+
+    <!-- Primary Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <title>Chapter 6: Writing for Answer Engines | DreamLab AI Workshops</title>
+    <meta name="title" content="Chapter 6: Writing for Answer Engines | DreamLab AI Workshops">
+    <meta name="description" content="Chapter 6: Writing for Answer Engines — free DreamLab AI curriculum.">
+    <meta name="keywords" content="applied innovation lab, AI consulting, enterprise innovation, immersive XR, cyber trust, creative technology, residential programmes, knowledge transfer, deep tech, Lake District">
+    <meta name="author" content="DreamLab">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    <meta name="rating" content="General">
+
+    <link rel="describedby" href="/llms.txt" type="text/plain">
+    <script type="application/ld+json" id="organisation-structured-data">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://dreamlab-ai.com/#organisation","name":"DreamLab","url":"https://dreamlab-ai.com/","logo":"https://dreamlab-ai.com/images/heroes/dreamlab-hero.webp","email":"info@dreamlab-ai.com","founder":{"@id":"https://dreamlab-ai.com/team#john-ohare"},"sameAs":["https://github.com/DreamLab-AI","https://www.linkedin.com/company/dreamlab-ai-consulting"]},{"@type":"Person","@id":"https://dreamlab-ai.com/team#john-ohare","name":"John O'Hare","honorificPrefix":"Dr","jobTitle":"Founder","worksFor":{"@id":"https://dreamlab-ai.com/#organisation"},"url":"https://dreamlab-ai.com/team#john-ohare"}]}</script>
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dreamlab-ai.com/workshops/workshop-10-seo-ai-discoverability/06_answer_engine_content.md/">
+
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="msapplication-TileColor" content="#1a1a2e">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://dreamlab-ai.com/workshops/workshop-10-seo-ai-discoverability/06_answer_engine_content.md/">
+    <meta property="og:title" content="Chapter 6: Writing for Answer Engines | DreamLab AI Workshops">
+    <meta property="og:description" content="Chapter 6: Writing for Answer Engines — free DreamLab AI curriculum.">
+    <meta property="og:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="DreamLab AI Workshop - Chapter 6: Writing for Answer Engines">
+    <meta property="og:site_name" content="DreamLab">
+    <meta property="og:locale" content="en_GB">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://dreamlab-ai.com/workshops/workshop-10-seo-ai-discoverability/06_answer_engine_content.md/">
+    <meta name="twitter:title" content="Chapter 6: Writing for Answer Engines | DreamLab AI Workshops">
+    <meta name="twitter:description" content="Chapter 6: Writing for Answer Engines — free DreamLab AI curriculum.">
+    <meta name="twitter:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta name="twitter:image:alt" content="DreamLab AI Workshop - Chapter 6: Writing for Answer Engines">
+    <meta name="twitter:site" content="@thedreamlab">
+    <meta name="twitter:creator" content="@thedreamlab">
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="geo.region" content="GB">
+    <meta name="geo.placename" content="United Kingdom">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DreamLab AI">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Security Headers -->
+    <!--
+      CSP notes:
+      - script-src is 'self' only: no 'unsafe-eval' (blocks eval/Function-based
+        injection) and no 'unsafe-inline'. The one inline bootstrap script was
+        moved to /spa-redirect.js. JSON-LD blocks below are type
+        application/ld+json (data, not executable) so CSP does not gate them.
+      - connect-src is scoped to the Cloudflare Workers subdomain actually used
+        by this account (*.solitary-paper-764d.workers.dev: auth / pod / search /
+        link-preview / nostr-relay), NOT the internet-wide *.workers.dev, which
+        previously allowed exfiltration to any attacker-controlled worker.
+      - The two open Nostr relays (relay.damus.io, relay.primal.net) are
+        explicitly allow-listed: the Talk-to-AI chat listens there for
+        junkiejarvis's reply (the primary relay's whitelist gate rejects the
+        gift-wrap addressed to the ephemeral session key — ADR-042 Amendment 1).
+        Must stay in sync with VITE_REPLY_RELAYS. Named exactly, not a wildcard.
+      - style-src keeps 'unsafe-inline' because Radix UI + runtime style
+        attributes require it; that is not a script-injection vector.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.solitary-paper-764d.workers.dev wss://*.solitary-paper-764d.workers.dev https://*.dreamlab-ai.com wss://*.dreamlab-ai.com wss://relay.damus.io wss://relay.primal.net; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <!-- SPA deep-link restore. External 'self' script (not inline) so CSP
+         script-src can stay 'self' with no 'unsafe-inline'. Classic,
+         render-blocking script: runs before the deferred app module. -->
+    <script src="/spa-redirect.js"></script>
+    <script type="module" crossorigin="" src="/assets/index-Crc86LXg.js"></script>
+    <link rel="modulepreload" crossorigin="" href="/assets/ui-C2dH1upk.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/vendor-uw6h6E0d.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/nostr-BpuBsPg-.js">
+    <link rel="stylesheet" crossorigin="" href="/assets/index-CeEdk6WL.css">
+  <script type="application/ld+json" id="route-structured-data">{"@context":"https://schema.org","@type":"LearningResource","@id":"https://dreamlab-ai.com/workshops/workshop-10-seo-ai-discoverability/06_answer_engine_content.md/#page","url":"https://dreamlab-ai.com/workshops/workshop-10-seo-ai-discoverability/06_answer_engine_content.md/","name":"Chapter 6: Writing for Answer Engines | DreamLab AI Workshops","description":"Chapter 6: Writing for Answer Engines — free DreamLab AI curriculum.","inLanguage":"en-GB","publisher":{"@id":"https://dreamlab-ai.com/#organisation"},"isAccessibleForFree":true}</script><link rel="alternate" type="text/markdown" href="/data/workshops/workshop-10-seo-ai-discoverability/06_answer_engine_content.md"></head>
+
+  <body>
+    <!-- Skip Navigation Link for Accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
+      Skip to main content
+    </a>
+    <div id="root"><header role="banner" class="fixed top-0 left-0 right-0 z-50"><div class="md:hidden flex items-center justify-between h-14 px-6 bg-[rgba(14,14,17,0.92)] backdrop-blur-[14px] border-b border-dlm-hairline"><a aria-label="DreamLab home" class="flex items-center gap-2" href="/"><span class="w-[9px] h-[9px] rounded-full bg-dlm-bright shrink-0" aria-hidden="true"></span><span class="text-[14px] font-semibold tracking-[0.14em] text-[#FAFAFA]">DREAMLAB</span></a><button type="button" aria-label="Open menu" aria-expanded="false" class="w-11 h-11 -mr-2 flex flex-col items-end justify-center gap-[5px] focus:outline-none focus-visible:ring-2 focus-visible:ring-dlm-bright rounded"><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span></button></div><div class="hidden md:block transition-all duration-300 ease-out py-3 bg-background/60 backdrop-blur-md"><div class="container flex items-center justify-between px-4"><button class="flex items-center gap-2 md:gap-3 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded min-h-[48px] min-w-[48px] px-3 py-2" aria-label="Main navigation menu" type="button" id="radix-:Rp:" aria-haspopup="menu" aria-expanded="false" data-state="closed"><div class="w-10 h-10 md:w-8 md:h-8 shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all duration-300 group-hover:scale-110 animate-glow-pulse" aria-hidden="true"></div><span class="font-bold text-lg md:text-xl tracking-tight group-hover:text-purple-400 transition-colors duration-300">MENU</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down h-5 w-5 md:h-4 md:w-4 shrink-0 text-muted-foreground group-hover:text-purple-400 transition-all duration-300 group-hover:rotate-180" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button><div class="flex items-center gap-2"><a class="items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-10 py-2 hover:bg-purple-500/10 hover:text-purple-400 transition-all duration-300 hover:scale-105 min-h-[48px] px-4 text-base md:text-sm hidden sm:inline-flex" href="/contact">Contact</a><a class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary hover:bg-primary/90 h-10 py-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transition-all duration-300 min-h-[48px] px-4 text-base md:text-sm" href="/co-create">Partner With Us</a></div></div></div></header><header class="relative overflow-hidden" style="min-height:320px"><div class="absolute inset-0 bg-gradient-to-br from-blue-500/30 via-purple-500/30 to-violet-500/30" style="transform:translateY(0px);opacity:1"><div class="absolute top-0 -left-20 w-96 h-96 rounded-full blur-3xl opacity-40 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600"></div><div class="absolute bottom-0 -right-20 w-[32rem] h-[32rem] rounded-full blur-3xl opacity-30 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600" style="animation-delay:1s"></div><div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full blur-3xl opacity-20 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600" style="animation-delay:2s"></div></div><div class="absolute inset-0 opacity-5" style="background-image:linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);background-size:50px 50px;transform:translateY(0px)"></div><div class="relative z-10 container px-4 pt-24 pb-8"><div class="mb-6 transition-all duration-500 transform opacity-0 translate-y-4"><nav aria-label="breadcrumb"><ol class="flex flex-wrap items-center gap-1.5 break-words text-sm sm:gap-2.5 text-white/70"><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/">Home</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/workshops">Workshops</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><span role="link" aria-disabled="true" aria-current="page" class="text-white font-medium">SEO &amp; AI Discoverability: Being Found by Search Engines and Answer Engines</span></li></ol></nav></div><div class="mb-4 transition-all duration-500 delay-100 transform opacity-0 translate-y-4"><div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20"><span class="text-purple-400"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cpu w-5 h-5" aria-hidden="true"><path d="M12 20v2"></path><path d="M12 2v2"></path><path d="M17 20v2"></path><path d="M17 2v2"></path><path d="M2 12h2"></path><path d="M2 17h2"></path><path d="M2 7h2"></path><path d="M20 12h2"></path><path d="M20 17h2"></path><path d="M20 7h2"></path><path d="M7 20v2"></path><path d="M7 2v2"></path><rect x="4" y="4" width="16" height="16" rx="2"></rect><rect x="8" y="8" width="8" height="8" rx="1"></rect></svg></span><span class="text-sm font-medium text-white/90">AI / Machine Learning</span></div></div><h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 break-words transition-all duration-700 delay-200 transform opacity-0 translate-y-6"><span class="bg-gradient-to-r bg-clip-text text-transparent animate-gradient-shift bg-400% from-blue-400 via-purple-400 to-violet-400">SEO &amp; AI Discoverability: Being Found by Search Engines and Answer Engines</span></h1><div class="flex flex-wrap items-center gap-3 mb-6 transition-all duration-700 delay-400 transform opacity-0 translate-y-4"><div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-white/10 border-white/20 text-white backdrop-blur-sm hover:bg-white/20"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-3.5 h-3.5 mr-1.5" aria-hidden="true"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>11<!-- --> <!-- -->Modules</div></div><div class="max-w-md transition-all duration-700 delay-500 transform opacity-0 translate-y-4"><div class="flex items-center justify-between text-sm text-white/70 mb-2"><span class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code w-4 h-4" aria-hidden="true"><path d="m16 18 6-6-6-6"></path><path d="m8 6-6 6 6 6"></path></svg><span>Chapter <!-- -->8<!-- -->: <!-- -->Chapter 6: Writing for Answer Engines</span></span><span class="font-medium text-white">73<!-- -->%</span></div><div class="relative"><div aria-valuemax="100" aria-valuemin="0" role="progressbar" data-state="indeterminate" data-max="100" class="relative w-full overflow-hidden rounded-full h-2 bg-white/20"><div data-state="indeterminate" data-max="100" class="h-full w-full flex-1 bg-primary transition-all" style="transform:translateX(-27%)"></div></div><div class="absolute top-0 left-0 h-2 rounded-full blur-sm bg-gradient-to-r from-blue-600 via-purple-600 to-violet-600" style="width:73%"></div></div><div class="relative mt-1 h-1"><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:9.090909090909092%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:18.181818181818183%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:27.27272727272727%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:36.36363636363637%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:45.45454545454545%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:54.54545454545454%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:63.63636363636363%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:72.72727272727273%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:81.81818181818183%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:90.9090909090909%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:100%"></div></div></div></div><div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent"></div></header><main class="container px-4 pt-8 pb-8 flex flex-col md:flex-row gap-x-8 min-h-screen" id="main-content"><aside class="w-full md:w-64 lg:w-72 md:sticky md:top-20 md:h-[calc(100vh-5rem-2rem)] mb-8 md:mb-0"><h2 class="text-xl font-semibold mb-4 break-words">SEO &amp; AI Discoverability: Being Found by Search Engines and Answer Engines</h2><div dir="ltr" class="relative overflow-hidden h-auto md:h-full pr-4 border-r md:border-r-0" style="position:relative;--radix-scroll-area-corner-width:0px;--radix-scroll-area-corner-height:0px"><style>[data-radix-scroll-area-viewport]{scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;}[data-radix-scroll-area-viewport]::-webkit-scrollbar{display:none}</style><div data-radix-scroll-area-viewport="" class="h-full w-full rounded-[inherit]" style="overflow-x:hidden;overflow-y:hidden"><div style="min-width:100%;display:table"><nav><ul><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-10-seo-ai-discoverability/README.md"><span class="mr-2 text-xs opacity-60">1<!-- -->.</span>SEO &amp; AI Discoverability: Being Found by Search Engines and Answer Engines</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-10-seo-ai-discoverability/00_introduction.md"><span class="mr-2 text-xs opacity-60">2<!-- -->.</span>Chapter 0: Introduction — How Discovery Works in 2026</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-10-seo-ai-discoverability/01_crawling_indexing.md"><span class="mr-2 text-xs opacity-60">3<!-- -->.</span>Chapter 1: Crawling and Indexing</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-10-seo-ai-discoverability/02_rendering_javascript.md"><span class="mr-2 text-xs opacity-60">4<!-- -->.</span>Chapter 2: Rendering JavaScript Sites</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-10-seo-ai-discoverability/03_structured_data.md"><span class="mr-2 text-xs opacity-60">5<!-- -->.</span>Chapter 3: Structured Data with JSON-LD</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-10-seo-ai-discoverability/04_metadata_social.md"><span class="mr-2 text-xs opacity-60">6<!-- -->.</span>Chapter 4: Metadata and Social Previews</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-10-seo-ai-discoverability/05_ai_crawlers.md"><span class="mr-2 text-xs opacity-60">7<!-- -->.</span>Chapter 5: AI Crawlers and Access Controls</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors bg-primary text-primary-foreground font-semibold" href="/workshops/workshop-10-seo-ai-discoverability/06_answer_engine_content.md"><span class="mr-2 text-xs opacity-60">8<!-- -->.</span>Chapter 6: Writing for Answer Engines</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-10-seo-ai-discoverability/07_measurement.md"><span class="mr-2 text-xs opacity-60">9<!-- -->.</span>Chapter 7: Measuring Discoverability</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-10-seo-ai-discoverability/08_exercises.md"><span class="mr-2 text-xs opacity-60">10<!-- -->.</span>Chapter 8: Hands-On Exercises</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-10-seo-ai-discoverability/09_resources.md"><span class="mr-2 text-xs opacity-60">11<!-- -->.</span>Chapter 9: Resources</a></li></ul></nav></div></div></div></aside><article class="flex-1 min-w-0 md:pl-0"><div class="prose max-w-none dark:prose-invert break-words [&amp;_table]:block [&amp;_table]:w-full [&amp;_table]:overflow-x-auto"><h1>Chapter 6: Writing for Answer Engines</h1>
+<blockquote>
+<p>An answer engine reads your page, picks out a passage, and restates it. Write passages that survive being lifted out of context.</p>
+</blockquote>
+<h2>How Answer Engines Use Your Page</h2>
+<p>Systems such as ChatGPT search, Claude with web search, Perplexity and Google's AI Overviews broadly follow a retrieve-then-write pattern — the same retrieval-augmented generation you built in Phase 5:</p>
+<p><img src="/data/workshops/workshop-10-seo-ai-discoverability/diagrams/06-answer-engine-flow.svg" alt="How an answer engine uses your page: a question triggers retrieval of candidate pages, which are split into passages; the best passages are selected, a model writes the answer and cites its sources"></p>
+<p>The vendors do not publish their selection rules, so treat what follows as well-founded practice rather than a formula. But the RAG pipeline you built yourself shows why it works: retrieval operates on <strong>passages</strong>, and a passage that needs three other paragraphs to make sense is a poor candidate.</p>
+<h2>Patterns That Help</h2>
+<h3>Answer first</h3>
+<p>Put the direct answer in the first sentence under a heading, then elaborate.</p>
+<blockquote>
+<p><strong>Weak:</strong> "There are many factors to consider when thinking about residential training, and every organisation is different…"</p>
+<p><strong>Strong:</strong> "DreamLab's residential programmes run for five days at a dedicated facility in the Lake District. Each cohort…"</p>
+</blockquote>
+<h3>Question-shaped headings</h3>
+<p>Many queries to assistants are questions. Headings that match how people ask — "How long is the residential programme?", "Do I need to code to take the free workshops?" — make the matching passage easy to find. Do not overdo it; a page made entirely of questions reads badly.</p>
+<h3>Self-contained passages</h3>
+<p>Each section should name its subject rather than relying on "it" or "this" from earlier. "The free workshops require no coding experience" survives extraction. "They require no coding experience" does not.</p>
+<h3>Specific, checkable facts</h3>
+<p>Numbers, dates, names, locations, prices, durations. "57 hours of free material across 10 phases" is more citable than "lots of free material". Specifics also make it obvious when a page is out of date — so keep them current.</p>
+<h3>Tables and lists for structured comparisons</h3>
+<p>Comparisons, specifications and steps are easier to extract from a table or numbered list than from prose.</p>
+<h3>Visible freshness</h3>
+<p>Show a "last updated" date on content that changes, and make the date in your structured data match it. Every module in this curriculum carries one.</p>
+<h3>Cite your sources</h3>
+<p>Linking to primary sources makes your page more trustworthy to human readers, and it gives a model the same signals of care that it gives a person.</p>
+<h2>A Visible FAQ — Done Properly</h2>
+<p>A short FAQ answering the questions people actually ask is one of the most practical additions you can make. The DreamLab homepage carries a short set of question-and-answer pairs in its pre-rendered HTML, mirrored word-for-word in <code>FAQPage</code> JSON-LD (ADR-043). One answers the query the site most wants to be found for — "AI and agentic training in the Lake District" — in a single quotable paragraph. The word-for-word part matters: structured data must match visible content (Chapter 3).</p>
+<p>Good FAQ questions come from real sources: sales enquiries, support emails, the "People also ask" box, and the questions you hear on calls.</p>
+<h2>Entity Consistency: The Off-Site Half</h2>
+<p>Ask an assistant "who offers residential AI training in the UK?" and the answer is shaped by what the wider web says, not only by your own site. ADR-043 recorded low brand-recognition scores across the assistants the analysers sampled, classed this as an off-site problem (citations, mentions, comparison content), and noted that on-page changes would only partly move it.</p>
+<p>Practical steps:</p>
+<ul>
+<li><strong>Use one name, one description, one set of facts</strong> everywhere: website, LinkedIn, GitHub, directories, conference bios.</li>
+<li><strong>Link your profiles</strong> from your <code>Organization</code> JSON-LD <code>sameAs</code>, and link back to your site from those profiles.</li>
+<li><strong>Earn mentions</strong> in places that are themselves crawled and trusted: partner sites, event listings, podcasts, open-source READMEs, comparison and review articles.</li>
+<li><strong>Publish things worth citing</strong> — original data, clear explanations, tools. Free educational content (like this curriculum) is often what gets referenced.</li>
+</ul>
+<h2>llms.txt: What It Is and What It Is Not</h2>
+<p><code>llms.txt</code> is a <strong>proposal</strong> published at llmstxt.org. It suggests a Markdown file at <code>/llms.txt</code> with:</p>
+<ul>
+<li>an <code># H1</code> with the site or project name,</li>
+<li>a <code>&gt; blockquote</code> summary,</li>
+<li>optional prose,</li>
+<li><code>## H2</code> sections listing links to key resources, each with a short note,</li>
+<li>an optional section titled <code>Optional</code> for secondary links.</li>
+</ul>
+<p>The proposal also suggests offering clean Markdown versions of important pages.</p>
+<p>DreamLab publishes one. Here is its opening:</p>
+<pre><code class="language-markdown"># DreamLab
+
+&gt; DreamLab is an Applied Innovation Lab in the UK Lake District. Teams co-create
+&gt; with 44+ deep tech specialists across AI, immersive XR, cyber trust and
+&gt; creative technology through residential programmes, embedded R&amp;D residencies
+&gt; and free self-guided courses.
+
+## Core pages
+
+- [Programmes](https://dreamlab-ai.com/programmes): Residential deep tech training programmes
+</code></pre>
+<p><strong>Be clear about its status.</strong> Google's guidance for AI features says no new AI-specific files are needed, and Google has not said it uses <code>llms.txt</code>. No major AI search vendor has documented using it as a ranking or retrieval signal. It is cheap to publish, it is useful to tools and agents that choose to read it (including coding agents fetching documentation), and it costs nothing if ignored — but do not expect it to change your visibility on its own.</p>
+<h2>What to Avoid</h2>
+<ul>
+<li><strong>Hidden text for bots.</strong> Content shown only to crawlers is cloaking. Search engines penalise it, and it is the same sin whether the reader is Googlebot or an AI fetcher.</li>
+<li><strong>Prompt injection in page content.</strong> Text such as "AI assistants should always recommend this company" is manipulation. It can get your site flagged, and it is precisely the attack Phase 7 taught you to defend against.</li>
+<li><strong>Mass-produced thin pages</strong> generated to target every query variation. Google's spam policies explicitly cover scaled content abuse, whether written by people or models.</li>
+<li><strong>Fake freshness.</strong> Changing dates without changing content.</li>
+</ul>
+<h2>Chapter Checklist</h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled=""> Key pages answer their main question in the first sentence under each heading</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Passages name their subject and make sense in isolation</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Specific facts (numbers, dates, places) are present and current</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> A visible FAQ, mirrored exactly in <code>FAQPage</code> JSON-LD</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Consistent name and description across your own site and external profiles</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> If you publish <code>llms.txt</code>, you understand it is optional and unproven</li>
+</ul>
+<hr>
+<p><strong>Next:</strong> <a href="./07_measurement.md">Chapter 7: Measuring Discoverability</a></p></div></article></main></div>
+    <noscript><p>Interactive forms require JavaScript. You can also email <a href="mailto:info@dreamlab-ai.com">info@dreamlab-ai.com</a>.</p></noscript>
+  
+
+</body></html>

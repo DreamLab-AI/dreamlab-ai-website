@@ -1,0 +1,662 @@
+<!DOCTYPE html><html lang="en" class="dark"><head>
+    <meta charset="UTF-8">
+
+    <!-- Primary Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <title>Git Integration Deep Dive | DreamLab AI Workshops</title>
+    <meta name="title" content="Git Integration Deep Dive | DreamLab AI Workshops">
+    <meta name="description" content="Git Integration Deep Dive — free DreamLab AI curriculum.">
+    <meta name="keywords" content="applied innovation lab, AI consulting, enterprise innovation, immersive XR, cyber trust, creative technology, residential programmes, knowledge transfer, deep tech, Lake District">
+    <meta name="author" content="DreamLab">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    <meta name="rating" content="General">
+
+    <link rel="describedby" href="/llms.txt" type="text/plain">
+    <script type="application/ld+json" id="organisation-structured-data">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://dreamlab-ai.com/#organisation","name":"DreamLab","url":"https://dreamlab-ai.com/","logo":"https://dreamlab-ai.com/images/heroes/dreamlab-hero.webp","email":"info@dreamlab-ai.com","founder":{"@id":"https://dreamlab-ai.com/team#john-ohare"},"sameAs":["https://github.com/DreamLab-AI","https://www.linkedin.com/company/dreamlab-ai-consulting"]},{"@type":"Person","@id":"https://dreamlab-ai.com/team#john-ohare","name":"John O'Hare","honorificPrefix":"Dr","jobTitle":"Founder","worksFor":{"@id":"https://dreamlab-ai.com/#organisation"},"url":"https://dreamlab-ai.com/team#john-ohare"}]}</script>
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dreamlab-ai.com/workshops/vscode-learning-pathway/05-git-integration.md/">
+
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="msapplication-TileColor" content="#1a1a2e">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://dreamlab-ai.com/workshops/vscode-learning-pathway/05-git-integration.md/">
+    <meta property="og:title" content="Git Integration Deep Dive | DreamLab AI Workshops">
+    <meta property="og:description" content="Git Integration Deep Dive — free DreamLab AI curriculum.">
+    <meta property="og:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="DreamLab AI Workshop - Git Integration Deep Dive">
+    <meta property="og:site_name" content="DreamLab">
+    <meta property="og:locale" content="en_GB">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://dreamlab-ai.com/workshops/vscode-learning-pathway/05-git-integration.md/">
+    <meta name="twitter:title" content="Git Integration Deep Dive | DreamLab AI Workshops">
+    <meta name="twitter:description" content="Git Integration Deep Dive — free DreamLab AI curriculum.">
+    <meta name="twitter:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta name="twitter:image:alt" content="DreamLab AI Workshop - Git Integration Deep Dive">
+    <meta name="twitter:site" content="@thedreamlab">
+    <meta name="twitter:creator" content="@thedreamlab">
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="geo.region" content="GB">
+    <meta name="geo.placename" content="United Kingdom">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DreamLab AI">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Security Headers -->
+    <!--
+      CSP notes:
+      - script-src is 'self' only: no 'unsafe-eval' (blocks eval/Function-based
+        injection) and no 'unsafe-inline'. The one inline bootstrap script was
+        moved to /spa-redirect.js. JSON-LD blocks below are type
+        application/ld+json (data, not executable) so CSP does not gate them.
+      - connect-src is scoped to the Cloudflare Workers subdomain actually used
+        by this account (*.solitary-paper-764d.workers.dev: auth / pod / search /
+        link-preview / nostr-relay), NOT the internet-wide *.workers.dev, which
+        previously allowed exfiltration to any attacker-controlled worker.
+      - The two open Nostr relays (relay.damus.io, relay.primal.net) are
+        explicitly allow-listed: the Talk-to-AI chat listens there for
+        junkiejarvis's reply (the primary relay's whitelist gate rejects the
+        gift-wrap addressed to the ephemeral session key — ADR-042 Amendment 1).
+        Must stay in sync with VITE_REPLY_RELAYS. Named exactly, not a wildcard.
+      - style-src keeps 'unsafe-inline' because Radix UI + runtime style
+        attributes require it; that is not a script-injection vector.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.solitary-paper-764d.workers.dev wss://*.solitary-paper-764d.workers.dev https://*.dreamlab-ai.com wss://*.dreamlab-ai.com wss://relay.damus.io wss://relay.primal.net; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <!-- SPA deep-link restore. External 'self' script (not inline) so CSP
+         script-src can stay 'self' with no 'unsafe-inline'. Classic,
+         render-blocking script: runs before the deferred app module. -->
+    <script src="/spa-redirect.js"></script>
+    <script type="module" crossorigin="" src="/assets/index-Crc86LXg.js"></script>
+    <link rel="modulepreload" crossorigin="" href="/assets/ui-C2dH1upk.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/vendor-uw6h6E0d.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/nostr-BpuBsPg-.js">
+    <link rel="stylesheet" crossorigin="" href="/assets/index-CeEdk6WL.css">
+  <script type="application/ld+json" id="route-structured-data">{"@context":"https://schema.org","@type":"LearningResource","@id":"https://dreamlab-ai.com/workshops/vscode-learning-pathway/05-git-integration.md/#page","url":"https://dreamlab-ai.com/workshops/vscode-learning-pathway/05-git-integration.md/","name":"Git Integration Deep Dive | DreamLab AI Workshops","description":"Git Integration Deep Dive — free DreamLab AI curriculum.","inLanguage":"en-GB","publisher":{"@id":"https://dreamlab-ai.com/#organisation"},"isAccessibleForFree":true}</script><link rel="alternate" type="text/markdown" href="/data/workshops/vscode-learning-pathway/05-git-integration.md"></head>
+
+  <body>
+    <!-- Skip Navigation Link for Accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
+      Skip to main content
+    </a>
+    <div id="root"><header role="banner" class="fixed top-0 left-0 right-0 z-50"><div class="md:hidden flex items-center justify-between h-14 px-6 bg-[rgba(14,14,17,0.92)] backdrop-blur-[14px] border-b border-dlm-hairline"><a aria-label="DreamLab home" class="flex items-center gap-2" href="/"><span class="w-[9px] h-[9px] rounded-full bg-dlm-bright shrink-0" aria-hidden="true"></span><span class="text-[14px] font-semibold tracking-[0.14em] text-[#FAFAFA]">DREAMLAB</span></a><button type="button" aria-label="Open menu" aria-expanded="false" class="w-11 h-11 -mr-2 flex flex-col items-end justify-center gap-[5px] focus:outline-none focus-visible:ring-2 focus-visible:ring-dlm-bright rounded"><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span></button></div><div class="hidden md:block transition-all duration-300 ease-out py-3 bg-background/60 backdrop-blur-md"><div class="container flex items-center justify-between px-4"><button class="flex items-center gap-2 md:gap-3 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded min-h-[48px] min-w-[48px] px-3 py-2" aria-label="Main navigation menu" type="button" id="radix-:Rp:" aria-haspopup="menu" aria-expanded="false" data-state="closed"><div class="w-10 h-10 md:w-8 md:h-8 shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all duration-300 group-hover:scale-110 animate-glow-pulse" aria-hidden="true"></div><span class="font-bold text-lg md:text-xl tracking-tight group-hover:text-purple-400 transition-colors duration-300">MENU</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down h-5 w-5 md:h-4 md:w-4 shrink-0 text-muted-foreground group-hover:text-purple-400 transition-all duration-300 group-hover:rotate-180" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button><div class="flex items-center gap-2"><a class="items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-10 py-2 hover:bg-purple-500/10 hover:text-purple-400 transition-all duration-300 hover:scale-105 min-h-[48px] px-4 text-base md:text-sm hidden sm:inline-flex" href="/contact">Contact</a><a class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary hover:bg-primary/90 h-10 py-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transition-all duration-300 min-h-[48px] px-4 text-base md:text-sm" href="/co-create">Partner With Us</a></div></div></div></header><header class="relative overflow-hidden" style="min-height:320px"><div class="absolute inset-0 bg-gradient-to-br from-cyan-500/30 via-teal-500/30 to-emerald-500/30" style="transform:translateY(0px);opacity:1"><div class="absolute top-0 -left-20 w-96 h-96 rounded-full blur-3xl opacity-40 animate-float bg-gradient-to-br from-cyan-500 via-teal-500 to-emerald-500"></div><div class="absolute bottom-0 -right-20 w-[32rem] h-[32rem] rounded-full blur-3xl opacity-30 animate-float bg-gradient-to-br from-cyan-500 via-teal-500 to-emerald-500" style="animation-delay:1s"></div><div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full blur-3xl opacity-20 animate-float bg-gradient-to-br from-cyan-500 via-teal-500 to-emerald-500" style="animation-delay:2s"></div></div><div class="absolute inset-0 opacity-5" style="background-image:linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);background-size:50px 50px;transform:translateY(0px)"></div><div class="relative z-10 container px-4 pt-24 pb-8"><div class="mb-6 transition-all duration-500 transform opacity-0 translate-y-4"><nav aria-label="breadcrumb"><ol class="flex flex-wrap items-center gap-1.5 break-words text-sm sm:gap-2.5 text-white/70"><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/">Home</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/workshops">Workshops</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><span role="link" aria-disabled="true" aria-current="page" class="text-white font-medium">Vscode Learning Pathway</span></li></ol></nav></div><div class="mb-4 transition-all duration-500 delay-100 transform opacity-0 translate-y-4"><div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20"><span class="text-teal-400"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layers w-5 h-5" aria-hidden="true"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"></path><path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"></path><path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"></path></svg></span><span class="text-sm font-medium text-white/90">XR / Virtual Reality</span></div></div><h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 break-words transition-all duration-700 delay-200 transform opacity-0 translate-y-6"><span class="bg-gradient-to-r bg-clip-text text-transparent animate-gradient-shift bg-400% from-cyan-400 via-teal-400 to-emerald-400">Vscode Learning Pathway</span></h1><div class="flex flex-wrap items-center gap-3 mb-6 transition-all duration-700 delay-400 transform opacity-0 translate-y-4"><div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-white/10 border-white/20 text-white backdrop-blur-sm hover:bg-white/20"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-3.5 h-3.5 mr-1.5" aria-hidden="true"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>13<!-- --> <!-- -->Modules</div></div><div class="max-w-md transition-all duration-700 delay-500 transform opacity-0 translate-y-4"><div class="flex items-center justify-between text-sm text-white/70 mb-2"><span class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code w-4 h-4" aria-hidden="true"><path d="m16 18 6-6-6-6"></path><path d="m8 6-6 6 6 6"></path></svg><span>Chapter <!-- -->5<!-- -->: <!-- -->Git Integration Deep Dive</span></span><span class="font-medium text-white">38<!-- -->%</span></div><div class="relative"><div aria-valuemax="100" aria-valuemin="0" role="progressbar" data-state="indeterminate" data-max="100" class="relative w-full overflow-hidden rounded-full h-2 bg-white/20"><div data-state="indeterminate" data-max="100" class="h-full w-full flex-1 bg-primary transition-all" style="transform:translateX(-62%)"></div></div><div class="absolute top-0 left-0 h-2 rounded-full blur-sm bg-gradient-to-r from-cyan-500 via-teal-500 to-emerald-500" style="width:38%"></div></div><div class="relative mt-1 h-1"><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:7.6923076923076925%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:15.384615384615385%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:23.076923076923077%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:30.76923076923077%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:38.46153846153847%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:46.15384615384615%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:53.84615384615385%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:61.53846153846154%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:69.23076923076923%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:76.92307692307693%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:84.61538461538461%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:92.3076923076923%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:100%"></div></div></div></div><div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent"></div></header><main class="container px-4 pt-8 pb-8 flex flex-col md:flex-row gap-x-8 min-h-screen" id="main-content"><aside class="w-full md:w-64 lg:w-72 md:sticky md:top-20 md:h-[calc(100vh-5rem-2rem)] mb-8 md:mb-0"><h2 class="text-xl font-semibold mb-4 break-words">Vscode Learning Pathway</h2><div dir="ltr" class="relative overflow-hidden h-auto md:h-full pr-4 border-r md:border-r-0" style="position:relative;--radix-scroll-area-corner-width:0px;--radix-scroll-area-corner-height:0px"><style>[data-radix-scroll-area-viewport]{scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;}[data-radix-scroll-area-viewport]::-webkit-scrollbar{display:none}</style><div data-radix-scroll-area-viewport="" class="h-full w-full rounded-[inherit]" style="overflow-x:hidden;overflow-y:hidden"><div style="min-width:100%;display:table"><nav><ul><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/01-introduction.md"><span class="mr-2 text-xs opacity-60">1<!-- -->.</span>Introduction to VS Code as an AI-Powered IDE</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/02-keyboard-shortcuts.md"><span class="mr-2 text-xs opacity-60">2<!-- -->.</span>Essential Keyboard Shortcuts and Productivity</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/03-extension-ecosystem.md"><span class="mr-2 text-xs opacity-60">3<!-- -->.</span>Extension Ecosystem Mastery</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/04-settings-customization.md"><span class="mr-2 text-xs opacity-60">4<!-- -->.</span>Settings and Customisation</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors bg-primary text-primary-foreground font-semibold" href="/workshops/vscode-learning-pathway/05-git-integration.md"><span class="mr-2 text-xs opacity-60">5<!-- -->.</span>Git Integration Deep Dive</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/06-remote-development.md"><span class="mr-2 text-xs opacity-60">6<!-- -->.</span>Remote Development (SSH, Containers, WSL)</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/07-debugging.md"><span class="mr-2 text-xs opacity-60">7<!-- -->.</span>Debugging Mastery</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/08-task-automation.md"><span class="mr-2 text-xs opacity-60">8<!-- -->.</span>Task Automation and Build Systems</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/09-ai-integration.md"><span class="mr-2 text-xs opacity-60">9<!-- -->.</span>AI Coding Assistants Integration</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/10-profiles-sync.md"><span class="mr-2 text-xs opacity-60">10<!-- -->.</span>Profile Management and Settings Sync</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/11-workspaces.md"><span class="mr-2 text-xs opacity-60">11<!-- -->.</span>Multi-root Workspaces and Advanced Organization</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/12-advanced-editing.md"><span class="mr-2 text-xs opacity-60">12<!-- -->.</span>Advanced Editing Features</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/overview.md"><span class="mr-2 text-xs opacity-60">13<!-- -->.</span>VS Code Learning Pathway 2026: From Beginner to AI-Powered Master</a></li></ul></nav></div></div></div></aside><article class="flex-1 min-w-0 md:pl-0"><div class="prose max-w-none dark:prose-invert break-words [&amp;_table]:block [&amp;_table]:w-full [&amp;_table]:overflow-x-auto"><h1>Git Integration Deep Dive</h1>
+<h2>Learning Objectives</h2>
+<ul>
+<li>Master VS Code's built-in Git interface</li>
+<li>Use GitLens for advanced Git visualisation</li>
+<li>Handle merge conflicts visually</li>
+<li>Implement Git workflows without touching the terminal</li>
+<li>Understand staging, committing, and branching in VS Code</li>
+<li>Configure Git for optimal VS Code experience</li>
+</ul>
+<h2>Core Concepts</h2>
+<h3>VS Code Git Architecture</h3>
+<p><img src="/data/workshops/vscode-learning-pathway/diagrams/05-git-tooling.svg" alt="Git tooling in VS Code: the built-in Source Control view, the GitLens extension and Git Graph for visual history"></p>
+<h2>Built-in Git Features</h2>
+<h3>Source Control View</h3>
+<p><strong>Access:</strong></p>
+<pre><code>Ctrl+Shift+G (Cmd+Shift+G on Mac)
+</code></pre>
+<p><strong>Interface Components:</strong></p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Section</th><th>Purpose</th><th>Actions</th></tr></thead><tbody><tr><td><strong>Changes</strong></td><td>Unstaged modifications</td><td>Stage, discard, view diff</td></tr><tr><td><strong>Staged Changes</strong></td><td>Ready to commit</td><td>Unstage, view diff</td></tr><tr><td><strong>Commit Message</strong></td><td>Commit description</td><td>Write message, commit</td></tr><tr><td><strong>Branches</strong></td><td>Branch management</td><td>Switch, create, merge</td></tr></tbody></table>
+<h3>Basic Git Operations</h3>
+<h4>1. Viewing Changes</h4>
+<p><strong>File Status Indicators:</strong></p>
+<pre><code>M  = Modified (orange bar)
+U  = Untracked (green bar)
+D  = Deleted (red bar)
+C  = Conflict (red exclamation)
+</code></pre>
+<p><strong>View Diff:</strong></p>
+<pre><code>- Click file in Changes → Side-by-side diff opens
+- Ctrl+Shift+P → "Git: Open Changes"
+</code></pre>
+<p><strong>Inline Diff:</strong></p>
+<pre><code class="language-json">{
+  "scm.diffDecor​ations": "all", // Shows change indicators in gutter
+  "scm.diffDecorationsGutterWidth": 4
+}
+</code></pre>
+<h4>2. Staging Files</h4>
+<p><strong>Methods:</strong></p>
+<pre><code>1. Click + next to file → Stage individual file
+2. Click + next to "Changes" → Stage all
+3. Right-click file → "Stage Changes"
+4. Ctrl+Enter → Stage current file
+</code></pre>
+<p><strong>Stage Hunks (Partial Staging):</strong></p>
+<pre><code>1. Open file diff view
+2. Hover over changed section
+3. Click "Stage This Change" (+ icon)
+4. Now only that section is staged
+</code></pre>
+<p><strong>Example Use Case:</strong></p>
+<pre><code class="language-javascript">// You changed two things in one file:
+// 1. Fixed a bug (want to commit)
+// 2. Added debug console.logs (don't want to commit)
+
+// Stage only the bug fix hunk!
+</code></pre>
+<h4>3. Committing</h4>
+<p><strong>Quick Commit:</strong></p>
+<pre><code>1. Type commit message in box
+2. Ctrl+Enter → Commit staged changes
+3. Or click ✓ (checkmark) button
+</code></pre>
+<p><strong>Commit Options:</strong></p>
+<pre><code>Click ✓ dropdown:
+- Commit (commits staged)
+- Commit All (stages and commits all)
+- Commit Staged (commits only staged)
+- Commit Staged (Amend) → Amend last commit
+</code></pre>
+<p><strong>Good Commit Message Template:</strong></p>
+<pre><code>&lt;type&gt;: &lt;subject&gt;
+
+&lt;body&gt;
+
+&lt;footer&gt;
+</code></pre>
+<p><strong>Example:</strong></p>
+<pre><code>feat: add user authentication
+
+- Implement JWT token generation
+- Add login/logout endpoints
+- Create auth middleware
+
+Closes #123
+</code></pre>
+<p><strong>Settings for Better Commits:</strong></p>
+<pre><code class="language-json">{
+  "git.enableCommitSigning": true,
+  "git.confirmSync": false,
+  "git.autofetch": true,
+  "git.enableSmartCommit": true, // Commit all when no staged changes
+  "git.postCommitCommand": "none"
+}
+</code></pre>
+<h4>4. Branch Management</h4>
+<p><strong>Create Branch:</strong></p>
+<pre><code>1. Bottom left: Click branch name
+2. Select "Create new branch"
+3. Type branch name
+4. Press Enter
+</code></pre>
+<p><strong>Switch Branch:</strong></p>
+<pre><code>1. Bottom left: Click branch name
+2. Select branch to switch to
+</code></pre>
+<p><strong>Branch from VS Code:</strong></p>
+<pre><code>Ctrl+Shift+P:
+- "Git: Create Branch"
+- "Git: Checkout to..."
+- "Git: Merge Branch"
+- "Git: Rebase Branch"
+- "Git: Delete Branch"
+</code></pre>
+<h4>5. Push/Pull/Sync</h4>
+<p><strong>Status Bar Git Actions:</strong></p>
+<pre><code>Bottom left corner shows:
+- Current branch
+- ↑ Number of commits to push
+- ↓ Number of commits to pull
+</code></pre>
+<p><strong>Sync:</strong></p>
+<pre><code>- Click ↻ (sync icon) → Pull then push
+- Or: Ctrl+Shift+P → "Git: Sync"
+</code></pre>
+<p><strong>Push/Pull Separately:</strong></p>
+<pre><code>Ctrl+Shift+P:
+- "Git: Push"
+- "Git: Pull"
+- "Git: Pull (Rebase)"
+</code></pre>
+<h2>GitLens - Supercharged Git</h2>
+<h3>Installation</h3>
+<pre><code class="language-bash">code --install-extension eamodio.gitlens
+</code></pre>
+<h3>Key Features</h3>
+<h4>1. Inline Blame Annotations</h4>
+<p><strong>See who changed each line:</strong></p>
+<pre><code>Automatically appears at end of current line:
+John Doe, 3 days ago • feat: add login feature
+</code></pre>
+<p><strong>Configuration:</strong></p>
+<pre><code class="language-json">{
+  "gitlens.currentLine.enabled": true,
+  "gitlens.currentLine.pullRequests.enabled": true,
+  "gitlens.hovers.currentLine.over": "line",
+  "gitlens.hovers.currentLine.details": true
+}
+</code></pre>
+<p><strong>Hover for Details:</strong></p>
+<ul>
+<li>Hover over blame annotation → Full commit details</li>
+<li>Shows: Author, date, commit message, files changed</li>
+</ul>
+<h4>2. File History</h4>
+<p><strong>View File History:</strong></p>
+<pre><code>1. Right-click file
+2. "Open File History"
+3. See all commits that touched this file
+</code></pre>
+<p><strong>Or:</strong></p>
+<pre><code>Click GitLens icon in sidebar → File History view
+</code></pre>
+<h4>3. Line History</h4>
+<p><strong>View specific line's history:</strong></p>
+<pre><code>1. Place cursor on line
+2. Right-click → "Open Line History"
+3. See all commits that changed this line
+</code></pre>
+<h4>4. Compare Views</h4>
+<p><strong>Compare with:</strong></p>
+<pre><code>Right-click file:
+- Compare with HEAD
+- Compare with Working Tree
+- Compare with Previous Revision
+- Compare with Branch/Tag/Ref
+</code></pre>
+<p><strong>Compare Branches:</strong></p>
+<pre><code>1. Click GitLens sidebar icon
+2. "Compare" section
+3. Choose two branches
+4. See all differences
+</code></pre>
+<h4>5. Repository Insights</h4>
+<p><strong>Commit Graph:</strong></p>
+<pre><code>GitLens → Commits view
+Visual commit history with branches
+</code></pre>
+<p><strong>Contributors:</strong></p>
+<pre><code>GitLens → Contributors view
+See who contributes most
+</code></pre>
+<p><strong>File Blame:</strong></p>
+<pre><code>Right-click file → "Toggle File Blame"
+See blame for every line in gutter
+</code></pre>
+<h2>Git Graph Extension</h2>
+<h3>Installation</h3>
+<pre><code class="language-bash">code --install-extension mhutchie.git-graph
+</code></pre>
+<h3>Features</h3>
+<p><strong>Visual Commit History:</strong></p>
+<pre><code>1. Source Control view → Click "Git Graph" button
+2. See interactive graph of all commits and branches
+</code></pre>
+<p><strong>Actions in Git Graph:</strong></p>
+<ul>
+<li>Click commit → View details</li>
+<li>Right-click commit → Cherry-pick, revert, reset</li>
+<li>Right-click branch → Merge, rebase, delete</li>
+<li>Drag branch to another → Merge/rebase visually</li>
+</ul>
+<p><strong>Configuration:</strong></p>
+<pre><code class="language-json">{
+  "git-graph.showStatusBarItem": true,
+  "git-graph.date.format": "ISO Date &amp; Time",
+  "git-graph.showCommitsOnlyReferencedByTags": false
+}
+</code></pre>
+<h2>Merge Conflict Resolution</h2>
+<h3>Handling Conflicts Visually</h3>
+<p>When merge conflicts occur:</p>
+<pre><code>1. VS Code detects conflicts
+2. Files marked with "C" in Source Control
+3. Open conflicted file
+4. VS Code shows visual conflict resolution
+</code></pre>
+<p><strong>Conflict Markers:</strong></p>
+<pre><code class="language-javascript">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD (Current Change)
+const greeting = "Hello World";
+=======
+const greeting = "Hi Universe";
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature-branch (Incoming Change)
+</code></pre>
+<p><strong>Resolution Options:</strong></p>
+<pre><code>Above each conflict, VS Code shows buttons:
+- Accept Current Change
+- Accept Incoming Change
+- Accept Both Changes
+- Compare Changes
+</code></pre>
+<p><strong>Steps:</strong></p>
+<pre><code>1. Click "Accept Current Change" (or other option)
+2. Conflict markers removed automatically
+3. Repeat for all conflicts in file
+4. Save file
+5. Stage file (conflict resolved)
+6. Commit the merge
+</code></pre>
+<p><strong>Compare Changes View:</strong></p>
+<pre><code>Click "Compare Changes" →
+Side-by-side view:
+- Left: Current (HEAD)
+- Right: Incoming (branch)
+- Bottom: Result (edit manually)
+</code></pre>
+<h2>Advanced Git Workflows</h2>
+<h3>Feature Branch Workflow</h3>
+<p><img src="/data/workshops/vscode-learning-pathway/diagrams/05-branch-flow.svg" alt="Feature-branch workflow: branch from main, commit often, push, open a pull request, review, then merge back to main"></p>
+<p><strong>In VS Code:</strong></p>
+<pre><code>1. Create branch: main → feature/new-feature
+2. Make changes, commit frequently
+3. Push: Click sync icon
+4. Open PR: GitLens → "Create Pull Request"
+5. Merge via GitHub (or GitLens extension)
+</code></pre>
+<h3>Git Stash</h3>
+<p><strong>Stash Changes:</strong></p>
+<pre><code>Ctrl+Shift+P → "Git: Stash"
+Or: Source Control view → "..." → "Stash"
+</code></pre>
+<p><strong>Why Stash?</strong></p>
+<pre><code>You're working on feature A
+Urgent bug fix needed on main
+Stash changes, switch to main, fix bug
+Switch back to feature, apply stash
+</code></pre>
+<p><strong>Apply Stash:</strong></p>
+<pre><code>Ctrl+Shift+P → "Git: Apply Stash"
+Choose stash from list
+</code></pre>
+<p><strong>Stash with Message:</strong></p>
+<pre><code>Ctrl+Shift+P → "Git: Stash (Include Untracked)"
+Type message: "WIP: feature A half done"
+</code></pre>
+<h3>Interactive Rebase</h3>
+<p><strong>Rewrite Commit History:</strong></p>
+<pre><code>1. GitLens → Commits view
+2. Right-click commit → "Rebase to Here (Interactive)"
+3. Choose action for each commit:
+   - Pick (keep)
+   - Squash (combine with previous)
+   - Reword (change message)
+   - Drop (remove)
+</code></pre>
+<p><strong>Use Case:</strong></p>
+<pre><code>Before PR, clean up messy commits:
+- "WIP"
+- "fix typo"
+- "fix again"
+- "actually fix it"
+
+Squash into one clean commit:
+- "feat: add user authentication"
+</code></pre>
+<h2>Git Configuration for VS Code</h2>
+<h3>Global Git Config</h3>
+<pre><code class="language-bash"># Set name and email
+git config --global user.name "Your Name"
+git config --global user.email "your.email@example.com"
+
+# Better diff algorithm
+git config --global diff.algorithm histogram
+
+# Reuse recorded conflict resolutions
+git config --global rerere.enabled true
+
+# Default branch name
+git config --global init.defaultBranch main
+
+# Auto-stash before rebase
+git config --global rebase.autoStash true
+</code></pre>
+<h3>VS Code Git Settings</h3>
+<pre><code class="language-json">{
+  // Auto-fetch from remote
+  "git.autofetch": true,
+  "git.autofetchPeriod": 180, // seconds
+
+  // Confirmations
+  "git.confirmSync": false,
+  "git.confirmForcePush": true,
+  "git.allowForcePush": false,
+
+  // Smart commit
+  "git.enableSmartCommit": true,
+  "git.smartCommitChanges": "all",
+
+  // Branch protection
+  "git.branchProtection": ["main", "master", "production"],
+
+  // Diff editor
+  "diffEditor.ignoreTrimWhitespace": false,
+  "diffEditor.renderSideBySide": true,
+
+  // Merge editor
+  "merge-conflict.autoNavigateNextConflict.enabled": true
+}
+</code></pre>
+<h3>.gitignore in VS Code</h3>
+<p><strong>Create .gitignore:</strong></p>
+<pre><code>1. Create .gitignore file
+2. Add patterns
+3. VS Code respects it immediately
+</code></pre>
+<p><strong>Common .gitignore for Node.js:</strong></p>
+<pre><code>node_modules/
+dist/
+build/
+.env
+.env.local
+*.log
+.DS_Store
+.vscode/settings.json  # If you don't want to share
+</code></pre>
+<p><strong>GitIgnore Extension:</strong></p>
+<pre><code class="language-bash">code --install-extension codezombiech.gitignore
+</code></pre>
+<p><strong>Usage:</strong></p>
+<pre><code>Ctrl+Shift+P → "Add gitignore"
+Choose template (Node, Python, etc.)
+</code></pre>
+<h2>Pro Tips</h2>
+<h3>Tip 1: Commit from Anywhere</h3>
+<pre><code>No need to open Source Control view:
+Ctrl+Shift+P → "Git: Commit All"
+Type message → Enter → Done!
+</code></pre>
+<h3>Tip 2: Quick Branch Switching</h3>
+<pre><code>Ctrl+Shift+P → Type branch name → Enter
+No need to navigate through menus
+</code></pre>
+<h3>Tip 3: View File on Remote</h3>
+<pre><code>GitLens → Right-click file → "Open File on Remote"
+Opens file on GitHub/GitLab in browser
+</code></pre>
+<h3>Tip 4: Keyboard Shortcuts for Git</h3>
+<pre><code class="language-json">// keybindings.json
+[
+  {
+    "key": "ctrl+g ctrl+c",
+    "command": "git.commit"
+  },
+  {
+    "key": "ctrl+g ctrl+p",
+    "command": "git.push"
+  },
+  {
+    "key": "ctrl+g ctrl+f",
+    "command": "git.fetch"
+  }
+]
+</code></pre>
+<h3>Tip 5: Timeline View</h3>
+<p><strong>See file history inline:</strong></p>
+<pre><code>1. Open file
+2. Click "Timeline" in Explorer (bottom)
+3. See all commits for this file
+4. Click commit → View that version
+</code></pre>
+<h2>Common Pitfalls</h2>
+<h3>Pitfall 1: Committing Too Much</h3>
+<p><strong>Problem</strong>: Staging <code>node_modules</code> or <code>.env</code>
+<strong>Solution</strong>: Use .gitignore</p>
+<pre><code>1. Create .gitignore
+2. Add: node_modules/
+3. VS Code excludes from changes
+</code></pre>
+<h3>Pitfall 2: Merge Conflicts Confusion</h3>
+<p><strong>Problem</strong>: Don't understand conflict markers
+<strong>Solution</strong>: Use visual conflict resolution</p>
+<pre><code>Don't manually edit &lt;&lt;&lt;&lt; ==== &gt;&gt;&gt;&gt;
+Use VS Code's "Accept Current/Incoming/Both" buttons
+</code></pre>
+<h3>Pitfall 3: Lost Work After Reset</h3>
+<p><strong>Problem</strong>: <code>git reset --hard</code> loses changes
+<strong>Solution</strong>: Stash instead</p>
+<pre><code>Never: Reset to discard changes
+Always: Stash or commit to temp branch
+</code></pre>
+<h3>Pitfall 4: Force Push to Protected Branch</h3>
+<p><strong>Problem</strong>: Accidentally force push to main
+<strong>Solution</strong>: Enable branch protection</p>
+<pre><code class="language-json">{
+  "git.branchProtection": ["main", "master"],
+  "git.allowForcePush": false
+}
+</code></pre>
+<h3>Pitfall 5: Not Using GitLens Features</h3>
+<p><strong>Problem</strong>: Missing powerful history tools
+<strong>Solution</strong>: Learn GitLens shortcuts</p>
+<pre><code>- Hover any line → See last change
+- Right-click file → File History
+- GitLens sidebar → Explore repository
+</code></pre>
+<h2>Assessment</h2>
+<h3>Knowledge Check</h3>
+<p><strong>Question 1</strong>: How do you stage only part of a file's changes?</p>
+<details>
+<summary>Answer</summary>
+1. Open file in diff view
+2. Hover over changed section (hunk)
+3. Click "Stage This Change" (+ icon)
+4. Only that hunk is staged
+</details>
+<p><strong>Question 2</strong>: What's the difference between "Commit" and "Commit All"?</p>
+<details>
+<summary>Answer</summary>
+- **Commit**: Commits only staged changes
+- **Commit All**: Stages ALL changes, then commits them (if smartCommit is enabled)
+</details>
+<p><strong>Question 3</strong>: How do you view who last modified a specific line?</p>
+<details>
+<summary>Answer</summary>
+With GitLens installed:
+- Inline blame appears at end of line
+- Or: Right-click line → "Open Line History"
+- Or: Hover over line → Blame annotation shows
+</details>
+<h3>Practical Exercise</h3>
+<p><strong>Complete Git Workflow:</strong></p>
+<ol>
+<li>
+<p><strong>Create Feature Branch:</strong></p>
+<ul>
+<li>From main, create branch: feature/user-profile</li>
+<li>Make 3 commits with good messages</li>
+</ul>
+</li>
+<li>
+<p><strong>Handle Conflict:</strong></p>
+<ul>
+<li>Switch to main, make overlapping change</li>
+<li>Switch back to feature, merge main</li>
+<li>Resolve conflict visually</li>
+<li>Complete merge</li>
+</ul>
+</li>
+<li>
+<p><strong>Clean History:</strong></p>
+<ul>
+<li>Interactive rebase to squash commits</li>
+<li>Create single clean commit</li>
+<li>Push to remote</li>
+</ul>
+</li>
+<li>
+<p><strong>Create PR:</strong></p>
+<ul>
+<li>Use GitLens to create PR</li>
+<li>Review diff before submitting</li>
+</ul>
+</li>
+</ol>
+<p><strong>Success Criteria:</strong></p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled=""> Clean commit history (1-3 commits max)</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> All conflicts resolved</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Good commit messages</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> PR created successfully</li>
+</ul>
+<h2>Next Steps</h2>
+<p>Master Git in VS Code, ready for:</p>
+<ul>
+<li><strong>Remote Development</strong>: Remote workflows with Git</li>
+<li><strong>Task Automation</strong>: Build systems and Git hooks</li>
+</ul>
+<h2>Additional Resources</h2>
+<ul>
+<li><a href="https://code.visualstudio.com/docs/sourcecontrol/overview">VS Code Git Documentation</a></li>
+<li><a href="https://help.gitkraken.com/gitlens/">GitLens Documentation</a></li>
+<li><a href="https://github.com/mhutchie/vscode-git-graph">Git Graph Extension</a></li>
+<li><a href="https://ohmygit.org/">Oh My Git! (Game to Learn Git)</a></li>
+</ul>
+<hr>
+<p><strong>Estimated Time</strong>: 4 hours
+<strong>Difficulty</strong>: Intermediate
+<strong>Prerequisites</strong>: Basic Git knowledge</p></div></article></main></div>
+    <noscript><p>Interactive forms require JavaScript. You can also email <a href="mailto:info@dreamlab-ai.com">info@dreamlab-ai.com</a>.</p></noscript>
+  
+
+</body></html>

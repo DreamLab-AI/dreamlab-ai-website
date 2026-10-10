@@ -1,0 +1,412 @@
+<!DOCTYPE html><html lang="en" class="dark"><head>
+    <meta charset="UTF-8">
+
+    <!-- Primary Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <title>Chapter 3: Practical Exercises - Flex Your New Powers | DreamLab AI Workshops</title>
+    <meta name="title" content="Chapter 3: Practical Exercises - Flex Your New Powers | DreamLab AI Workshops">
+    <meta name="description" content="Chapter 3: Practical Exercises - Flex Your New Powers — free DreamLab AI curriculum.">
+    <meta name="keywords" content="applied innovation lab, AI consulting, enterprise innovation, immersive XR, cyber trust, creative technology, residential programmes, knowledge transfer, deep tech, Lake District">
+    <meta name="author" content="DreamLab">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    <meta name="rating" content="General">
+
+    <link rel="describedby" href="/llms.txt" type="text/plain">
+    <script type="application/ld+json" id="organisation-structured-data">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://dreamlab-ai.com/#organisation","name":"DreamLab","url":"https://dreamlab-ai.com/","logo":"https://dreamlab-ai.com/images/heroes/dreamlab-hero.webp","email":"info@dreamlab-ai.com","founder":{"@id":"https://dreamlab-ai.com/team#john-ohare"},"sameAs":["https://github.com/DreamLab-AI","https://www.linkedin.com/company/dreamlab-ai-consulting"]},{"@type":"Person","@id":"https://dreamlab-ai.com/team#john-ohare","name":"John O'Hare","honorificPrefix":"Dr","jobTitle":"Founder","worksFor":{"@id":"https://dreamlab-ai.com/#organisation"},"url":"https://dreamlab-ai.com/team#john-ohare"}]}</script>
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dreamlab-ai.com/workshops/workshop-01-morning-vscode-setup/03_exercises.md/">
+
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="msapplication-TileColor" content="#1a1a2e">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://dreamlab-ai.com/workshops/workshop-01-morning-vscode-setup/03_exercises.md/">
+    <meta property="og:title" content="Chapter 3: Practical Exercises - Flex Your New Powers | DreamLab AI Workshops">
+    <meta property="og:description" content="Chapter 3: Practical Exercises - Flex Your New Powers — free DreamLab AI curriculum.">
+    <meta property="og:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="DreamLab AI Workshop - Chapter 3: Practical Exercises - Flex Your New Powers">
+    <meta property="og:site_name" content="DreamLab">
+    <meta property="og:locale" content="en_GB">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://dreamlab-ai.com/workshops/workshop-01-morning-vscode-setup/03_exercises.md/">
+    <meta name="twitter:title" content="Chapter 3: Practical Exercises - Flex Your New Powers | DreamLab AI Workshops">
+    <meta name="twitter:description" content="Chapter 3: Practical Exercises - Flex Your New Powers — free DreamLab AI curriculum.">
+    <meta name="twitter:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta name="twitter:image:alt" content="DreamLab AI Workshop - Chapter 3: Practical Exercises - Flex Your New Powers">
+    <meta name="twitter:site" content="@thedreamlab">
+    <meta name="twitter:creator" content="@thedreamlab">
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="geo.region" content="GB">
+    <meta name="geo.placename" content="United Kingdom">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DreamLab AI">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Security Headers -->
+    <!--
+      CSP notes:
+      - script-src is 'self' only: no 'unsafe-eval' (blocks eval/Function-based
+        injection) and no 'unsafe-inline'. The one inline bootstrap script was
+        moved to /spa-redirect.js. JSON-LD blocks below are type
+        application/ld+json (data, not executable) so CSP does not gate them.
+      - connect-src is scoped to the Cloudflare Workers subdomain actually used
+        by this account (*.solitary-paper-764d.workers.dev: auth / pod / search /
+        link-preview / nostr-relay), NOT the internet-wide *.workers.dev, which
+        previously allowed exfiltration to any attacker-controlled worker.
+      - The two open Nostr relays (relay.damus.io, relay.primal.net) are
+        explicitly allow-listed: the Talk-to-AI chat listens there for
+        junkiejarvis's reply (the primary relay's whitelist gate rejects the
+        gift-wrap addressed to the ephemeral session key — ADR-042 Amendment 1).
+        Must stay in sync with VITE_REPLY_RELAYS. Named exactly, not a wildcard.
+      - style-src keeps 'unsafe-inline' because Radix UI + runtime style
+        attributes require it; that is not a script-injection vector.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.solitary-paper-764d.workers.dev wss://*.solitary-paper-764d.workers.dev https://*.dreamlab-ai.com wss://*.dreamlab-ai.com wss://relay.damus.io wss://relay.primal.net; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <!-- SPA deep-link restore. External 'self' script (not inline) so CSP
+         script-src can stay 'self' with no 'unsafe-inline'. Classic,
+         render-blocking script: runs before the deferred app module. -->
+    <script src="/spa-redirect.js"></script>
+    <script type="module" crossorigin="" src="/assets/index-Crc86LXg.js"></script>
+    <link rel="modulepreload" crossorigin="" href="/assets/ui-C2dH1upk.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/vendor-uw6h6E0d.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/nostr-BpuBsPg-.js">
+    <link rel="stylesheet" crossorigin="" href="/assets/index-CeEdk6WL.css">
+  <script type="application/ld+json" id="route-structured-data">{"@context":"https://schema.org","@type":"LearningResource","@id":"https://dreamlab-ai.com/workshops/workshop-01-morning-vscode-setup/03_exercises.md/#page","url":"https://dreamlab-ai.com/workshops/workshop-01-morning-vscode-setup/03_exercises.md/","name":"Chapter 3: Practical Exercises - Flex Your New Powers | DreamLab AI Workshops","description":"Chapter 3: Practical Exercises - Flex Your New Powers — free DreamLab AI curriculum.","inLanguage":"en-GB","publisher":{"@id":"https://dreamlab-ai.com/#organisation"},"isAccessibleForFree":true}</script><link rel="alternate" type="text/markdown" href="/data/workshops/workshop-01-morning-vscode-setup/03_exercises.md"></head>
+
+  <body>
+    <!-- Skip Navigation Link for Accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
+      Skip to main content
+    </a>
+    <div id="root"><header role="banner" class="fixed top-0 left-0 right-0 z-50"><div class="md:hidden flex items-center justify-between h-14 px-6 bg-[rgba(14,14,17,0.92)] backdrop-blur-[14px] border-b border-dlm-hairline"><a aria-label="DreamLab home" class="flex items-center gap-2" href="/"><span class="w-[9px] h-[9px] rounded-full bg-dlm-bright shrink-0" aria-hidden="true"></span><span class="text-[14px] font-semibold tracking-[0.14em] text-[#FAFAFA]">DREAMLAB</span></a><button type="button" aria-label="Open menu" aria-expanded="false" class="w-11 h-11 -mr-2 flex flex-col items-end justify-center gap-[5px] focus:outline-none focus-visible:ring-2 focus-visible:ring-dlm-bright rounded"><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span></button></div><div class="hidden md:block transition-all duration-300 ease-out py-3 bg-background/60 backdrop-blur-md"><div class="container flex items-center justify-between px-4"><button class="flex items-center gap-2 md:gap-3 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded min-h-[48px] min-w-[48px] px-3 py-2" aria-label="Main navigation menu" type="button" id="radix-:Rp:" aria-haspopup="menu" aria-expanded="false" data-state="closed"><div class="w-10 h-10 md:w-8 md:h-8 shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all duration-300 group-hover:scale-110 animate-glow-pulse" aria-hidden="true"></div><span class="font-bold text-lg md:text-xl tracking-tight group-hover:text-purple-400 transition-colors duration-300">MENU</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down h-5 w-5 md:h-4 md:w-4 shrink-0 text-muted-foreground group-hover:text-purple-400 transition-all duration-300 group-hover:rotate-180" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button><div class="flex items-center gap-2"><a class="items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-10 py-2 hover:bg-purple-500/10 hover:text-purple-400 transition-all duration-300 hover:scale-105 min-h-[48px] px-4 text-base md:text-sm hidden sm:inline-flex" href="/contact">Contact</a><a class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary hover:bg-primary/90 h-10 py-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transition-all duration-300 min-h-[48px] px-4 text-base md:text-sm" href="/co-create">Partner With Us</a></div></div></div></header><header class="relative overflow-hidden" style="min-height:320px"><div class="absolute inset-0 bg-gradient-to-br from-amber-500/30 via-orange-500/30 to-red-500/30" style="transform:translateY(0px);opacity:1"><div class="absolute top-0 -left-20 w-96 h-96 rounded-full blur-3xl opacity-40 animate-float bg-gradient-to-br from-amber-500 via-orange-500 to-red-500"></div><div class="absolute bottom-0 -right-20 w-[32rem] h-[32rem] rounded-full blur-3xl opacity-30 animate-float bg-gradient-to-br from-amber-500 via-orange-500 to-red-500" style="animation-delay:1s"></div><div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full blur-3xl opacity-20 animate-float bg-gradient-to-br from-amber-500 via-orange-500 to-red-500" style="animation-delay:2s"></div></div><div class="absolute inset-0 opacity-5" style="background-image:linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);background-size:50px 50px;transform:translateY(0px)"></div><div class="relative z-10 container px-4 pt-24 pb-8"><div class="mb-6 transition-all duration-500 transform opacity-0 translate-y-4"><nav aria-label="breadcrumb"><ol class="flex flex-wrap items-center gap-1.5 break-words text-sm sm:gap-2.5 text-white/70"><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/">Home</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/workshops">Workshops</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><span role="link" aria-disabled="true" aria-current="page" class="text-white font-medium">VS Code as AI Command Centre</span></li></ol></nav></div><div class="mb-4 transition-all duration-500 delay-100 transform opacity-0 translate-y-4"><div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20"><span class="text-orange-400"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings w-5 h-5" aria-hidden="true"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"></path><circle cx="12" cy="12" r="3"></circle></svg></span><span class="text-sm font-medium text-white/90">Software Engineering</span></div></div><h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 break-words transition-all duration-700 delay-200 transform opacity-0 translate-y-6"><span class="bg-gradient-to-r bg-clip-text text-transparent animate-gradient-shift bg-400% from-amber-400 via-orange-400 to-red-400">VS Code as AI Command Centre</span></h1><div class="flex flex-wrap items-center gap-3 mb-6 transition-all duration-700 delay-400 transform opacity-0 translate-y-4"><div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-white/10 border-white/20 text-white backdrop-blur-sm hover:bg-white/20"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-3.5 h-3.5 mr-1.5" aria-hidden="true"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>10<!-- --> <!-- -->Modules</div></div><div class="max-w-md transition-all duration-700 delay-500 transform opacity-0 translate-y-4"><div class="flex items-center justify-between text-sm text-white/70 mb-2"><span class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code w-4 h-4" aria-hidden="true"><path d="m16 18 6-6-6-6"></path><path d="m8 6-6 6 6 6"></path></svg><span>Chapter <!-- -->5<!-- -->: <!-- -->Chapter 3: Practical Exercises - Flex Your New Powers</span></span><span class="font-medium text-white">50<!-- -->%</span></div><div class="relative"><div aria-valuemax="100" aria-valuemin="0" role="progressbar" data-state="indeterminate" data-max="100" class="relative w-full overflow-hidden rounded-full h-2 bg-white/20"><div data-state="indeterminate" data-max="100" class="h-full w-full flex-1 bg-primary transition-all" style="transform:translateX(-50%)"></div></div><div class="absolute top-0 left-0 h-2 rounded-full blur-sm bg-gradient-to-r from-amber-500 via-orange-500 to-red-500" style="width:50%"></div></div><div class="relative mt-1 h-1"><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:10%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:20%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:30%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:40%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:50%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:60%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:70%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:80%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:90%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:100%"></div></div></div></div><div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent"></div></header><main class="container px-4 pt-8 pb-8 flex flex-col md:flex-row gap-x-8 min-h-screen" id="main-content"><aside class="w-full md:w-64 lg:w-72 md:sticky md:top-20 md:h-[calc(100vh-5rem-2rem)] mb-8 md:mb-0"><h2 class="text-xl font-semibold mb-4 break-words">VS Code as AI Command Centre</h2><div dir="ltr" class="relative overflow-hidden h-auto md:h-full pr-4 border-r md:border-r-0" style="position:relative;--radix-scroll-area-corner-width:0px;--radix-scroll-area-corner-height:0px"><style>[data-radix-scroll-area-viewport]{scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;}[data-radix-scroll-area-viewport]::-webkit-scrollbar{display:none}</style><div data-radix-scroll-area-viewport="" class="h-full w-full rounded-[inherit]" style="overflow-x:hidden;overflow-y:hidden"><div style="min-width:100%;display:table"><nav><ul><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-01-morning-vscode-setup/README.md"><span class="mr-2 text-xs opacity-60">1<!-- -->.</span>VS Code as AI Command Centre</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-01-morning-vscode-setup/00_introduction.md"><span class="mr-2 text-xs opacity-60">2<!-- -->.</span>Chapter 0: Introduction to VS Code as Your AI Command Centre</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-01-morning-vscode-setup/01_concepts.md"><span class="mr-2 text-xs opacity-60">3<!-- -->.</span>Chapter 1: Core Concepts - Understanding Your New Universe</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-01-morning-vscode-setup/02_hands_on.md"><span class="mr-2 text-xs opacity-60">4<!-- -->.</span>Chapter 2: Hands-On Setup - Building Your AI-Enhanced Command Centre</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors bg-primary text-primary-foreground font-semibold" href="/workshops/workshop-01-morning-vscode-setup/03_exercises.md"><span class="mr-2 text-xs opacity-60">5<!-- -->.</span>Chapter 3: Practical Exercises - Flex Your New Powers</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-01-morning-vscode-setup/04_project.md"><span class="mr-2 text-xs opacity-60">6<!-- -->.</span>Chapter 4: Real Project Application - Your First AI-Enhanced Deliverable</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-01-morning-vscode-setup/05_assessment.md"><span class="mr-2 text-xs opacity-60">7<!-- -->.</span>Chapter 5: Assessment - Validating Your Mastery</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-01-morning-vscode-setup/06_resources.md"><span class="mr-2 text-xs opacity-60">8<!-- -->.</span>Chapter 6: Resources &amp; Continued Learning</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-01-morning-vscode-setup/objectives.md"><span class="mr-2 text-xs opacity-60">9<!-- -->.</span>Learning Objectives - Workshop 01 Morning: VS Code Setup</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-01-morning-vscode-setup/prerequisites.md"><span class="mr-2 text-xs opacity-60">10<!-- -->.</span>Prerequisites - Workshop 01 Morning: VS Code Setup</a></li></ul></nav></div></div></div></aside><article class="flex-1 min-w-0 md:pl-0"><div class="prose max-w-none dark:prose-invert break-words [&amp;_table]:block [&amp;_table]:w-full [&amp;_table]:overflow-x-auto"><h1>Chapter 3: Practical Exercises - Flex Your New Powers</h1>
+<h2>30 Minutes to Transform Your Workflow</h2>
+<p>These exercises progress from basic to advanced, demonstrating the immediate power of your new AI command centre. Complete them in order for maximum learning.</p>
+<h2>Exercise 1: AI-Enhanced Document Creation (5 minutes)</h2>
+<h3>Objective</h3>
+<p>Experience the difference between traditional and AI-enhanced writing.</p>
+<h3>Steps</h3>
+<ol>
+<li>
+<p><strong>Create a new file</strong>: <code>meeting-notes.md</code></p>
+</li>
+<li>
+<p><strong>Type this starter</strong>:</p>
+<pre><code class="language-markdown"># Team Meeting - [Today's Date]
+
+## Attendees
+- Me
+
+## Agenda
+Meeting about project planning
+</code></pre>
+</li>
+<li>
+<p><strong>Select</strong> "Meeting about project planning"</p>
+</li>
+<li>
+<p><strong>Press</strong> <code>Ctrl+I</code> (or <code>Cmd+I</code>)</p>
+</li>
+<li>
+<p><strong>Type prompt</strong>: "Expand this into a detailed meeting agenda with 5 specific discussion points, time allocations, and action items"</p>
+</li>
+<li>
+<p><strong>Watch</strong> AI transform your basic notes into professional documentation</p>
+</li>
+</ol>
+<h3>Expected Result</h3>
+<p>A fully structured meeting agenda that would typically take 15-20 minutes to create manually.</p>
+<h3>Reflection</h3>
+<ul>
+<li>How much time would this normally take you?</li>
+<li>What other documents could benefit from this approach?</li>
+</ul>
+<h2>Exercise 2: Mermaid Diagram Magic (5 minutes)</h2>
+<h3>Objective</h3>
+<p>Create professional diagrams from simple descriptions.</p>
+<h3>Steps</h3>
+<ol>
+<li>
+<p><strong>Create file</strong>: <code>project-workflow.md</code></p>
+</li>
+<li>
+<p><strong>Type</strong>:</p>
+<pre><code class="language-markdown"># Project Workflow
+
+## Current Process
+We receive requests, review them, assign to team members, 
+complete work, review, and deliver to client.
+</code></pre>
+</li>
+<li>
+<p><strong>Place cursor</strong> after the description</p>
+</li>
+<li>
+<p><strong>Press</strong> <code>Ctrl+I</code> and prompt: "Create a Mermaid flowchart diagram of this workflow process"</p>
+</li>
+<li>
+<p><strong>AI generates</strong> something like:</p>
+<pre><code class="language-mermaid">graph TD
+    A[Receive Request] --&gt; B[Review Request]
+    B --&gt; C{Assign to Team}
+    C --&gt; D[Complete Work]
+    D --&gt; E[Internal Review]
+    E --&gt; F{Approved?}
+    F --&gt;|Yes| G[Deliver to Client]
+    F --&gt;|No| D
+</code></pre>
+</li>
+<li>
+<p><strong>Preview</strong>: Right-click file → "Open Preview"</p>
+</li>
+</ol>
+<h3>Success Criteria</h3>
+<ul>
+<li>Diagram renders correctly</li>
+<li>Flow makes logical sense</li>
+<li>You understand how to modify it</li>
+</ul>
+<h2>Exercise 3: Multi-Model Comparison (7 minutes)</h2>
+<h3>Objective</h3>
+<p>Understand different AI models' strengths.</p>
+<h3>Setup</h3>
+<p>If you only have one AI model configured, that's fine—compare different prompting styles instead.</p>
+<h3>Steps</h3>
+<ol>
+<li>
+<p><strong>Create</strong>: <code>ai-comparison.md</code></p>
+</li>
+<li>
+<p><strong>Add test content</strong>:</p>
+<pre><code class="language-markdown"># AI Model Comparison
+
+## Test Prompt
+Explain quantum computing to a business executive
+</code></pre>
+</li>
+<li>
+<p><strong>Test with different approaches</strong>:</p>
+<p><strong>Approach 1 - Direct</strong>:</p>
+<ul>
+<li>Select the prompt</li>
+<li><code>Ctrl+I</code>: "Answer this"</li>
+</ul>
+<p><strong>Approach 2 - Structured</strong>:</p>
+<ul>
+<li>Select the prompt</li>
+<li><code>Ctrl+I</code>: "Answer with: 1) One sentence summary 2) Business impact 3) Real example 4) Next steps"</li>
+</ul>
+<p><strong>Approach 3 - Creative</strong>:</p>
+<ul>
+<li>Select the prompt</li>
+<li><code>Ctrl+I</code>: "Explain using a restaurant analogy"</li>
+</ul>
+</li>
+<li>
+<p><strong>Compare</strong> the outputs for:</p>
+<ul>
+<li>Clarity</li>
+<li>Usefulness</li>
+<li>Creativity</li>
+<li>Length</li>
+</ul>
+</li>
+</ol>
+<h3>Key Learning</h3>
+<p>Different prompting styles yield dramatically different results. Structure often beats complexity.</p>
+<h2>Exercise 4: Batch Document Processing (8 minutes)</h2>
+<h3>Objective</h3>
+<p>Process multiple documents efficiently—a superpower unavailable in web AI tools.</p>
+<h3>Steps</h3>
+<ol>
+<li>
+<p><strong>Create folder</strong>: <code>reports/</code></p>
+</li>
+<li>
+<p><strong>Create 3 files</strong> with minimal content:</p>
+<ul>
+<li><code>q1-summary.md</code>: "Q1: Revenue was good"</li>
+<li><code>q2-summary.md</code>: "Q2: Challenges with supply chain"</li>
+<li><code>q3-summary.md</code>: "Q3: Strong recovery"</li>
+</ul>
+</li>
+<li>
+<p><strong>Open each file</strong> in tabs</p>
+</li>
+<li>
+<p><strong>For each file</strong>, select content and <code>Ctrl+I</code>:
+"Expand this into a professional quarterly business summary with sections for: Executive Summary, Key Metrics, Challenges, Opportunities, and Next Steps. Use realistic but generic numbers."</p>
+</li>
+<li>
+<p><strong>Create</strong> <code>annual-report.md</code></p>
+</li>
+<li>
+<p><strong>Prompt AI</strong>: "Based on the quarterly reports in this project, create an executive summary for the annual report"</p>
+</li>
+</ol>
+<h3>Power Demonstrated</h3>
+<ul>
+<li>Batch processing multiple files</li>
+<li>AI understanding project context</li>
+<li>Creating derivative documents</li>
+</ul>
+<h2>Exercise 5: Custom Workflow Automation (5 minutes)</h2>
+<h3>Objective</h3>
+<p>Build your first automated workflow.</p>
+<h3>Scenario</h3>
+<p>Automate your daily standup notes.</p>
+<h3>Steps</h3>
+<ol>
+<li>
+<p><strong>Create template</strong>: <code>templates/daily-standup.md</code></p>
+<pre><code class="language-markdown"># Daily Standup - {{DATE}}
+
+## Yesterday
+- 
+
+## Today
+- 
+
+## Blockers
+- None
+</code></pre>
+</li>
+<li>
+<p><strong>Create shortcut</strong>:</p>
+<ul>
+<li>Open Command Palette (<code>Ctrl+Shift+P</code>)</li>
+<li>Search: "Preferences: Configure User Snippets"</li>
+<li>Select "markdown"</li>
+<li>Add:</li>
+</ul>
+<pre><code class="language-json">{
+  "Daily Standup": {
+    "prefix": "standup",
+    "body": [
+      "# Daily Standup - ${CURRENT_YEAR}-${CURRENT_MONTH}-${CURRENT_DATE}",
+      "",
+      "## Yesterday",
+      "- $1",
+      "",
+      "## Today", 
+      "- $2",
+      "",
+      "## Blockers",
+      "- ${3:None}"
+    ]
+  }
+}
+</code></pre>
+</li>
+<li>
+<p><strong>Test it</strong>:</p>
+<ul>
+<li>New file: <code>standup-test.md</code></li>
+<li>Type: <code>standup</code> and press Tab</li>
+<li>Fill in the placeholders</li>
+</ul>
+</li>
+<li>
+<p><strong>Enhance with AI</strong>:</p>
+<ul>
+<li>Select your filled standup</li>
+<li><code>Ctrl+I</code>: "Make this more detailed and professional"</li>
+</ul>
+</li>
+</ol>
+<h3>Achievement</h3>
+<p>You've created a reusable automation that saves 5-10 minutes daily.</p>
+<h2>Challenge Exercise: Your Real Project (Optional)</h2>
+<h3>The Test</h3>
+<p>Apply these skills to your actual work.</p>
+<h3>Steps</h3>
+<ol>
+<li>
+<p><strong>Open</strong> a real document you're working on</p>
+</li>
+<li>
+<p><strong>Identify</strong> a section that needs improvement</p>
+</li>
+<li>
+<p><strong>Use AI</strong> to:</p>
+<ul>
+<li>Expand sparse notes</li>
+<li>Create visual diagrams</li>
+<li>Generate alternatives</li>
+<li>Check for completeness</li>
+</ul>
+</li>
+<li>
+<p><strong>Compare</strong> before and after</p>
+</li>
+<li>
+<p><strong>Calculate</strong> time saved</p>
+</li>
+</ol>
+<h2>Exercise Reflection Checklist</h2>
+<p>After completing exercises, you should be able to:</p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled=""> Create documents 5-10x faster</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Generate professional diagrams from text</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Process multiple files efficiently</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Build simple automations</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Feel confident with AI prompting</li>
+</ul>
+<h2>Common Patterns You've Learned</h2>
+<h3>The Enhancement Pattern</h3>
+<pre><code>Basic content → Select → AI Prompt → Professional output
+</code></pre>
+<h3>The Visualization Pattern</h3>
+<pre><code>Text description → Mermaid prompt → Instant diagram
+</code></pre>
+<h3>The Batch Pattern</h3>
+<pre><code>Multiple files → Similar prompts → Consistent outputs
+</code></pre>
+<h3>The Template Pattern</h3>
+<pre><code>Snippet → Quick entry → AI enhancement → Saved time
+</code></pre>
+<h2>Pro Tips from the Exercises</h2>
+<ol>
+<li><strong>Specific prompts</strong> beat vague requests</li>
+<li><strong>Structure</strong> in prompts yields structure in output</li>
+<li><strong>Context</strong> from your project improves AI responses</li>
+<li><strong>Templates + AI</strong> = Massive time savings</li>
+<li><strong>Multiple attempts</strong> often yield better results</li>
+</ol>
+<h2>What's Your Superpower?</h2>
+<p>By completing these exercises, you've discovered that VS Code + AI enables:</p>
+<ul>
+<li><strong>Speed</strong>: 10x faster document creation</li>
+<li><strong>Quality</strong>: Professional outputs every time</li>
+<li><strong>Consistency</strong>: Standardized formats automatically</li>
+<li><strong>Creativity</strong>: Instant visualizations and alternatives</li>
+<li><strong>Scale</strong>: Process many documents at once</li>
+</ul>
+<h2>Ready for Real Work?</h2>
+<p>These exercises barely scratch the surface. In the next section, you'll apply these skills to a complete project from your actual work.</p>
+<p>Remember: The goal isn't to use AI for everything—it's to use AI where it multiplies your unique expertise and creativity.</p>
+<hr>
+<p>Next: <a href="./04_project.md">Chapter 4: Real Project Application</a></p>
+<p><a href="./02_hands_on.md">Back to Hands-On</a> | <a href="README.md">Back to Workshop Overview</a></p></div></article></main></div>
+    <noscript><p>Interactive forms require JavaScript. You can also email <a href="mailto:info@dreamlab-ai.com">info@dreamlab-ai.com</a>.</p></noscript>
+  
+
+</body></html>

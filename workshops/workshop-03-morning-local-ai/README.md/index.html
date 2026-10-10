@@ -1,0 +1,281 @@
+<!DOCTYPE html><html lang="en" class="dark"><head>
+    <meta charset="UTF-8">
+
+    <!-- Primary Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <title>Phase 5: Local AI &amp; RAG Systems | DreamLab AI Workshops</title>
+    <meta name="title" content="Phase 5: Local AI &amp; RAG Systems | DreamLab AI Workshops">
+    <meta name="description" content="Phase 5: Local AI &amp; RAG Systems — free DreamLab AI curriculum.">
+    <meta name="keywords" content="applied innovation lab, AI consulting, enterprise innovation, immersive XR, cyber trust, creative technology, residential programmes, knowledge transfer, deep tech, Lake District">
+    <meta name="author" content="DreamLab">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    <meta name="rating" content="General">
+
+    <link rel="describedby" href="/llms.txt" type="text/plain">
+    <script type="application/ld+json" id="organisation-structured-data">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://dreamlab-ai.com/#organisation","name":"DreamLab","url":"https://dreamlab-ai.com/","logo":"https://dreamlab-ai.com/images/heroes/dreamlab-hero.webp","email":"info@dreamlab-ai.com","founder":{"@id":"https://dreamlab-ai.com/team#john-ohare"},"sameAs":["https://github.com/DreamLab-AI","https://www.linkedin.com/company/dreamlab-ai-consulting"]},{"@type":"Person","@id":"https://dreamlab-ai.com/team#john-ohare","name":"John O'Hare","honorificPrefix":"Dr","jobTitle":"Founder","worksFor":{"@id":"https://dreamlab-ai.com/#organisation"},"url":"https://dreamlab-ai.com/team#john-ohare"}]}</script>
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dreamlab-ai.com/workshops/workshop-03-morning-local-ai/README.md/">
+
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="msapplication-TileColor" content="#1a1a2e">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://dreamlab-ai.com/workshops/workshop-03-morning-local-ai/README.md/">
+    <meta property="og:title" content="Phase 5: Local AI &amp; RAG Systems | DreamLab AI Workshops">
+    <meta property="og:description" content="Phase 5: Local AI &amp; RAG Systems — free DreamLab AI curriculum.">
+    <meta property="og:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="DreamLab AI Workshop - Phase 5: Local AI &amp; RAG Systems">
+    <meta property="og:site_name" content="DreamLab">
+    <meta property="og:locale" content="en_GB">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://dreamlab-ai.com/workshops/workshop-03-morning-local-ai/README.md/">
+    <meta name="twitter:title" content="Phase 5: Local AI &amp; RAG Systems | DreamLab AI Workshops">
+    <meta name="twitter:description" content="Phase 5: Local AI &amp; RAG Systems — free DreamLab AI curriculum.">
+    <meta name="twitter:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta name="twitter:image:alt" content="DreamLab AI Workshop - Phase 5: Local AI &amp; RAG Systems">
+    <meta name="twitter:site" content="@thedreamlab">
+    <meta name="twitter:creator" content="@thedreamlab">
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="geo.region" content="GB">
+    <meta name="geo.placename" content="United Kingdom">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DreamLab AI">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Security Headers -->
+    <!--
+      CSP notes:
+      - script-src is 'self' only: no 'unsafe-eval' (blocks eval/Function-based
+        injection) and no 'unsafe-inline'. The one inline bootstrap script was
+        moved to /spa-redirect.js. JSON-LD blocks below are type
+        application/ld+json (data, not executable) so CSP does not gate them.
+      - connect-src is scoped to the Cloudflare Workers subdomain actually used
+        by this account (*.solitary-paper-764d.workers.dev: auth / pod / search /
+        link-preview / nostr-relay), NOT the internet-wide *.workers.dev, which
+        previously allowed exfiltration to any attacker-controlled worker.
+      - The two open Nostr relays (relay.damus.io, relay.primal.net) are
+        explicitly allow-listed: the Talk-to-AI chat listens there for
+        junkiejarvis's reply (the primary relay's whitelist gate rejects the
+        gift-wrap addressed to the ephemeral session key — ADR-042 Amendment 1).
+        Must stay in sync with VITE_REPLY_RELAYS. Named exactly, not a wildcard.
+      - style-src keeps 'unsafe-inline' because Radix UI + runtime style
+        attributes require it; that is not a script-injection vector.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.solitary-paper-764d.workers.dev wss://*.solitary-paper-764d.workers.dev https://*.dreamlab-ai.com wss://*.dreamlab-ai.com wss://relay.damus.io wss://relay.primal.net; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <!-- SPA deep-link restore. External 'self' script (not inline) so CSP
+         script-src can stay 'self' with no 'unsafe-inline'. Classic,
+         render-blocking script: runs before the deferred app module. -->
+    <script src="/spa-redirect.js"></script>
+    <script type="module" crossorigin="" src="/assets/index-Crc86LXg.js"></script>
+    <link rel="modulepreload" crossorigin="" href="/assets/ui-C2dH1upk.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/vendor-uw6h6E0d.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/nostr-BpuBsPg-.js">
+    <link rel="stylesheet" crossorigin="" href="/assets/index-CeEdk6WL.css">
+  <script type="application/ld+json" id="route-structured-data">{"@context":"https://schema.org","@type":"LearningResource","@id":"https://dreamlab-ai.com/workshops/workshop-03-morning-local-ai/README.md/#page","url":"https://dreamlab-ai.com/workshops/workshop-03-morning-local-ai/README.md/","name":"Phase 5: Local AI & RAG Systems | DreamLab AI Workshops","description":"Phase 5: Local AI & RAG Systems — free DreamLab AI curriculum.","inLanguage":"en-GB","publisher":{"@id":"https://dreamlab-ai.com/#organisation"},"isAccessibleForFree":true}</script><link rel="alternate" type="text/markdown" href="/data/workshops/workshop-03-morning-local-ai/README.md"></head>
+
+  <body>
+    <!-- Skip Navigation Link for Accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
+      Skip to main content
+    </a>
+    <div id="root"><header role="banner" class="fixed top-0 left-0 right-0 z-50"><div class="md:hidden flex items-center justify-between h-14 px-6 bg-[rgba(14,14,17,0.92)] backdrop-blur-[14px] border-b border-dlm-hairline"><a aria-label="DreamLab home" class="flex items-center gap-2" href="/"><span class="w-[9px] h-[9px] rounded-full bg-dlm-bright shrink-0" aria-hidden="true"></span><span class="text-[14px] font-semibold tracking-[0.14em] text-[#FAFAFA]">DREAMLAB</span></a><button type="button" aria-label="Open menu" aria-expanded="false" class="w-11 h-11 -mr-2 flex flex-col items-end justify-center gap-[5px] focus:outline-none focus-visible:ring-2 focus-visible:ring-dlm-bright rounded"><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span></button></div><div class="hidden md:block transition-all duration-300 ease-out py-3 bg-background/60 backdrop-blur-md"><div class="container flex items-center justify-between px-4"><button class="flex items-center gap-2 md:gap-3 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded min-h-[48px] min-w-[48px] px-3 py-2" aria-label="Main navigation menu" type="button" id="radix-:Rp:" aria-haspopup="menu" aria-expanded="false" data-state="closed"><div class="w-10 h-10 md:w-8 md:h-8 shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all duration-300 group-hover:scale-110 animate-glow-pulse" aria-hidden="true"></div><span class="font-bold text-lg md:text-xl tracking-tight group-hover:text-purple-400 transition-colors duration-300">MENU</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down h-5 w-5 md:h-4 md:w-4 shrink-0 text-muted-foreground group-hover:text-purple-400 transition-all duration-300 group-hover:rotate-180" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button><div class="flex items-center gap-2"><a class="items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-10 py-2 hover:bg-purple-500/10 hover:text-purple-400 transition-all duration-300 hover:scale-105 min-h-[48px] px-4 text-base md:text-sm hidden sm:inline-flex" href="/contact">Contact</a><a class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary hover:bg-primary/90 h-10 py-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transition-all duration-300 min-h-[48px] px-4 text-base md:text-sm" href="/co-create">Partner With Us</a></div></div></div></header><header class="relative overflow-hidden" style="min-height:320px"><div class="absolute inset-0 bg-gradient-to-br from-blue-500/30 via-purple-500/30 to-violet-500/30" style="transform:translateY(0px);opacity:1"><div class="absolute top-0 -left-20 w-96 h-96 rounded-full blur-3xl opacity-40 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600"></div><div class="absolute bottom-0 -right-20 w-[32rem] h-[32rem] rounded-full blur-3xl opacity-30 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600" style="animation-delay:1s"></div><div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full blur-3xl opacity-20 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600" style="animation-delay:2s"></div></div><div class="absolute inset-0 opacity-5" style="background-image:linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);background-size:50px 50px;transform:translateY(0px)"></div><div class="relative z-10 container px-4 pt-24 pb-8"><div class="mb-6 transition-all duration-500 transform opacity-0 translate-y-4"><nav aria-label="breadcrumb"><ol class="flex flex-wrap items-center gap-1.5 break-words text-sm sm:gap-2.5 text-white/70"><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/">Home</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/workshops">Workshops</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><span role="link" aria-disabled="true" aria-current="page" class="text-white font-medium">Phase 5: Local AI &amp; RAG Systems</span></li></ol></nav></div><div class="mb-4 transition-all duration-500 delay-100 transform opacity-0 translate-y-4"><div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20"><span class="text-purple-400"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cpu w-5 h-5" aria-hidden="true"><path d="M12 20v2"></path><path d="M12 2v2"></path><path d="M17 20v2"></path><path d="M17 2v2"></path><path d="M2 12h2"></path><path d="M2 17h2"></path><path d="M2 7h2"></path><path d="M20 12h2"></path><path d="M20 17h2"></path><path d="M20 7h2"></path><path d="M7 20v2"></path><path d="M7 2v2"></path><rect x="4" y="4" width="16" height="16" rx="2"></rect><rect x="8" y="8" width="8" height="8" rx="1"></rect></svg></span><span class="text-sm font-medium text-white/90">AI / Machine Learning</span></div></div><h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 break-words transition-all duration-700 delay-200 transform opacity-0 translate-y-6"><span class="bg-gradient-to-r bg-clip-text text-transparent animate-gradient-shift bg-400% from-blue-400 via-purple-400 to-violet-400">Phase 5: Local AI &amp; RAG Systems</span></h1><div class="flex flex-wrap items-center gap-3 mb-6 transition-all duration-700 delay-400 transform opacity-0 translate-y-4"><div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-white/10 border-white/20 text-white backdrop-blur-sm hover:bg-white/20"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-3.5 h-3.5 mr-1.5" aria-hidden="true"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>10<!-- --> <!-- -->Modules</div></div><div class="max-w-md transition-all duration-700 delay-500 transform opacity-0 translate-y-4"><div class="flex items-center justify-between text-sm text-white/70 mb-2"><span class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code w-4 h-4" aria-hidden="true"><path d="m16 18 6-6-6-6"></path><path d="m8 6-6 6 6 6"></path></svg><span>Chapter <!-- -->1<!-- -->: <!-- -->Phase 5: Local AI &amp; RAG Systems</span></span><span class="font-medium text-white">10<!-- -->%</span></div><div class="relative"><div aria-valuemax="100" aria-valuemin="0" role="progressbar" data-state="indeterminate" data-max="100" class="relative w-full overflow-hidden rounded-full h-2 bg-white/20"><div data-state="indeterminate" data-max="100" class="h-full w-full flex-1 bg-primary transition-all" style="transform:translateX(-90%)"></div></div><div class="absolute top-0 left-0 h-2 rounded-full blur-sm bg-gradient-to-r from-blue-600 via-purple-600 to-violet-600" style="width:10%"></div></div><div class="relative mt-1 h-1"><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:10%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:20%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:30%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:40%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:50%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:60%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:70%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:80%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:90%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:100%"></div></div></div></div><div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent"></div></header><main class="container px-4 pt-8 pb-8 flex flex-col md:flex-row gap-x-8 min-h-screen" id="main-content"><aside class="w-full md:w-64 lg:w-72 md:sticky md:top-20 md:h-[calc(100vh-5rem-2rem)] mb-8 md:mb-0"><h2 class="text-xl font-semibold mb-4 break-words">Phase 5: Local AI &amp; RAG Systems</h2><div dir="ltr" class="relative overflow-hidden h-auto md:h-full pr-4 border-r md:border-r-0" style="position:relative;--radix-scroll-area-corner-width:0px;--radix-scroll-area-corner-height:0px"><style>[data-radix-scroll-area-viewport]{scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;}[data-radix-scroll-area-viewport]::-webkit-scrollbar{display:none}</style><div data-radix-scroll-area-viewport="" class="h-full w-full rounded-[inherit]" style="overflow-x:hidden;overflow-y:hidden"><div style="min-width:100%;display:table"><nav><ul><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors bg-primary text-primary-foreground font-semibold" href="/workshops/workshop-03-morning-local-ai/README.md"><span class="mr-2 text-xs opacity-60">1<!-- -->.</span>Phase 5: Local AI &amp; RAG Systems</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-03-morning-local-ai/00_introduction.md"><span class="mr-2 text-xs opacity-60">2<!-- -->.</span>Introduction to Local AI Models</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-03-morning-local-ai/01_concepts.md"><span class="mr-2 text-xs opacity-60">3<!-- -->.</span>Core Concepts: Running AI Models Locally</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-03-morning-local-ai/02_hands_on.md"><span class="mr-2 text-xs opacity-60">4<!-- -->.</span>Hands-On Practice: Setting Up Local AI</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-03-morning-local-ai/03_exercises.md"><span class="mr-2 text-xs opacity-60">5<!-- -->.</span>Practical Exercises: Local AI in Action</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-03-morning-local-ai/04_project.md"><span class="mr-2 text-xs opacity-60">6<!-- -->.</span>Project: Build a Local AI Assistant</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-03-morning-local-ai/05_assessment.md"><span class="mr-2 text-xs opacity-60">7<!-- -->.</span>Assessment: Local AI Models Mastery</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-03-morning-local-ai/06_resources.md"><span class="mr-2 text-xs opacity-60">8<!-- -->.</span>Resources: Local AI Models</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-03-morning-local-ai/objectives.md"><span class="mr-2 text-xs opacity-60">9<!-- -->.</span>Learning Objectives — Phase 5: Local AI &amp; RAG Systems</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-03-morning-local-ai/prerequisites.md"><span class="mr-2 text-xs opacity-60">10<!-- -->.</span>Prerequisites — Phase 5: Local AI &amp; RAG Systems</a></li></ul></nav></div></div></div></aside><article class="flex-1 min-w-0 md:pl-0"><div class="prose max-w-none dark:prose-invert break-words [&amp;_table]:block [&amp;_table]:w-full [&amp;_table]:overflow-x-auto"><h1>Phase 5: Local AI &amp; RAG Systems</h1>
+<h2>Run AI on Your Own Machine — Private, Free, and Fully Under Your Control</h2>
+<p>Welcome to the session that puts real AI power directly into your hands. Over the next 3 hours you will install, run, and compare large language models on your own hardware — no cloud accounts, no API keys, no recurring fees, and no data leaving your machine.</p>
+<h2>Workshop Overview</h2>
+<p>This morning session takes you from "AI is a website I visit" to "AI is a tool running on my laptop." You will learn how local inference works, install the industry-standard Ollama runtime, explore models from Meta, Mistral, Microsoft and others, and build a simple AI assistant that works entirely offline.</p>
+<h2>Learning Outcomes</h2>
+<p>By completing this workshop, you will:</p>
+<h3>Core Capabilities</h3>
+<ul>
+<li>Install and configure Ollama on Windows, macOS, or Linux</li>
+<li>Download and run open-weight models (Llama 3.3, Mistral, Phi-4, Qwen 2.5, DeepSeek-R1)</li>
+<li>Understand quantisation formats (GGUF) and choose the right size for your hardware</li>
+<li>Interact with models through the terminal, the REST API, and Python scripts</li>
+<li>Compare model performance, quality, and speed on your own machine</li>
+</ul>
+<h3>Professional Skills</h3>
+<ul>
+<li>Evaluate the privacy, cost, and compliance advantages of local inference</li>
+<li>Match model families and sizes to real-world tasks</li>
+<li>Tune generation parameters (temperature, top-p, context length)</li>
+<li>Integrate local AI into existing workflows via the OpenAI-compatible API</li>
+<li>Set up a graphical alternative (LM Studio) for team members who prefer a GUI</li>
+</ul>
+<h3>Immediate Benefits</h3>
+<ul>
+<li>Run an AI chat session without internet access</li>
+<li>Benchmark models on your hardware and know exactly what to expect</li>
+<li>Build a working local AI assistant you can keep using after the workshop</li>
+<li>Make informed purchasing decisions about GPUs and Apple Silicon upgrades</li>
+</ul>
+<h2>Workshop Structure</h2>
+<h3>Chapter Navigation</h3>
+<ol>
+<li>
+<p><strong><a href="00_introduction.md">Introduction</a></strong> — Why Local AI Matters (15 min)</p>
+<ul>
+<li>Privacy, cost, and offline advantages</li>
+<li>The 2026 model landscape: families, formats, hardware</li>
+<li>What you will build today</li>
+</ul>
+</li>
+<li>
+<p><strong><a href="01_concepts.md">Core Concepts</a></strong> — How Local Inference Works (30 min)</p>
+<ul>
+<li>GGUF format and quantisation levels</li>
+<li>Hardware requirements: GPU, CPU, Apple Silicon</li>
+<li>Model selection guide for every budget</li>
+<li>Tool comparison: Ollama, LM Studio, llama.cpp, LocalAI, MLX</li>
+</ul>
+</li>
+<li>
+<p><strong><a href="02_hands_on.md">Hands-On Setup</a></strong> — Install and Run Models (60 min)</p>
+<ul>
+<li>Step-by-step Ollama installation</li>
+<li>Downloading and chatting with your first model</li>
+<li>REST API and Python integration</li>
+<li>Performance benchmarking</li>
+<li>LangChain chains and VS Code extensions</li>
+</ul>
+</li>
+<li>
+<p><strong><a href="03_exercises.md">Practical Exercises</a></strong> — Test Your Skills (30 min)</p>
+<ul>
+<li>Five progressive exercises from first chat to multi-model routing</li>
+<li>Timed challenges with clear success criteria</li>
+<li>Reflection prompts to connect learning to your own work</li>
+</ul>
+</li>
+<li>
+<p><strong><a href="04_project.md">Build Project</a></strong> — Local AI Assistant Application (45 min)</p>
+<ul>
+<li>Multi-model FastAPI backend with smart routing</li>
+<li>Web-based chat and code-assistance interface</li>
+<li>Session management with SQLite persistence</li>
+<li>Full source code you can extend</li>
+</ul>
+</li>
+<li>
+<p><strong><a href="05_assessment.md">Assessment</a></strong> — Validate Your Mastery (15 min)</p>
+<ul>
+<li>Conceptual questions on architecture and trade-offs</li>
+<li>Practical tasks: installation, Python integration, configuration</li>
+<li>Problem-solving scenarios: troubleshooting, system design, ethics</li>
+</ul>
+</li>
+<li>
+<p><strong><a href="06_resources.md">Resources</a></strong> — Continue Your Journey</p>
+<ul>
+<li>Official documentation and model sources</li>
+<li>Hardware buying guides and benchmark data</li>
+<li>Communities, papers, and advanced topics</li>
+</ul>
+</li>
+</ol>
+<h2>Who This Workshop Is For</h2>
+<h3>Perfect For:</h3>
+<ul>
+<li><strong>Privacy-conscious professionals</strong> who cannot send data to cloud services</li>
+<li><strong>Researchers and academics</strong> who need reproducible AI experiments</li>
+<li><strong>Business leaders</strong> evaluating on-premises AI for their organisation</li>
+<li><strong>Hobbyists and tinkerers</strong> who want to understand how LLMs actually run</li>
+<li><strong>Anyone</strong> curious about running AI without a subscription</li>
+</ul>
+<h3>You Will Succeed If You:</h3>
+<ul>
+<li>Can install software on your computer</li>
+<li>Are comfortable typing commands in a terminal (or willing to learn)</li>
+<li>Have a computer with at least 16 GB of RAM</li>
+<li>Have 50 GB of free disk space for model files</li>
+<li>Are open to experimenting and observing results</li>
+</ul>
+<h3>No Experience Required In:</h3>
+<ul>
+<li>Machine learning or data science</li>
+<li>Programming (Python basics are helpful but not essential)</li>
+<li>GPU hardware or driver configuration</li>
+<li>Prior use of AI tools</li>
+</ul>
+<h2>Technical Requirements</h2>
+<h3>Minimum System Requirements</h3>
+<ul>
+<li><strong>Operating System:</strong> Windows 10+, macOS 12+, or a modern Linux distribution</li>
+<li><strong>RAM:</strong> 16 GB (8 GB will work for the smallest models only)</li>
+<li><strong>Storage:</strong> 50 GB free disk space</li>
+<li><strong>Internet:</strong> Required for initial model downloads; offline thereafter</li>
+<li><strong>Python:</strong> 3.8 or newer (for API exercises)</li>
+</ul>
+<h3>Recommended for Best Experience</h3>
+<ul>
+<li><strong>RAM:</strong> 32 GB or more</li>
+<li><strong>GPU:</strong> NVIDIA with 8+ GB VRAM, or Apple M1 Pro / M2 / M3 / M4 with 16+ GB unified memory</li>
+<li><strong>Storage:</strong> SSD with 100 GB free</li>
+</ul>
+<h3>Software Installed During Workshop</h3>
+<ul>
+<li>Ollama (free, open source)</li>
+<li>Python packages: <code>requests</code>, <code>openai</code>, <code>ollama</code>, <code>langchain</code> (all free)</li>
+<li>LM Studio (free, optional GUI alternative)</li>
+</ul>
+<h2>Learning Approach</h2>
+<h3>Teaching Philosophy</h3>
+<ul>
+<li><strong>Hands-on first:</strong> Every concept is immediately practised on your own machine</li>
+<li><strong>Real hardware, real results:</strong> Performance numbers come from your computer, not a slide deck</li>
+<li><strong>Profession-agnostic:</strong> Whether you are a solicitor, nurse, teacher, or engineer, local AI serves you</li>
+<li><strong>No fluff:</strong> Direct, practical, results-focused</li>
+</ul>
+<h3>Workshop Timing</h3>
+<ul>
+<li><strong>Total Duration:</strong> 3 hours (morning half-day)</li>
+<li><strong>Format:</strong> Self-paced with suggested timings</li>
+<li><strong>Breaks:</strong> Coffee break at the midpoint (10:30-11:00)</li>
+<li><strong>Practice:</strong> 70% hands-on, 30% concepts</li>
+</ul>
+<h2>Quick Readiness Check</h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled=""> Computer with 16+ GB RAM and 50 GB free space</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Administrator access to install software</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Python 3.8+ installed (run <code>python3 --version</code> to verify)</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Basic comfort with the command line (or willingness to follow along)</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> 3 hours of focused time blocked in your calendar</li>
+</ul>
+<h3>Begin</h3>
+<p><strong><a href="00_introduction.md">Start with the Introduction →</a></strong></p>
+<p>Or jump directly to:</p>
+<ul>
+<li><a href="01_concepts.md">Core Concepts</a> — Understand the fundamentals</li>
+<li><a href="02_hands_on.md">Hands-On Setup</a> — Start installing immediately</li>
+<li><a href="prerequisites.md">Check Prerequisites</a> — Ensure you are ready</li>
+</ul>
+<h2>Support</h2>
+<ul>
+<li><strong>Questions?</strong> Use the workshop Discord channel</li>
+<li><strong>Stuck?</strong> Reference the <a href="02_hands_on.md#troubleshooting-guide">troubleshooting section</a></li>
+<li><strong>Share success:</strong> Post your benchmark results in the workshop channel</li>
+</ul>
+<hr>
+<p><strong><a href="00_introduction.md">Start Phase 5: Introduction →</a></strong></p></div></article></main></div>
+    <noscript><p>Interactive forms require JavaScript. You can also email <a href="mailto:info@dreamlab-ai.com">info@dreamlab-ai.com</a>.</p></noscript>
+  
+
+</body></html>

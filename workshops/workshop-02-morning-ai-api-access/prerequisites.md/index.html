@@ -1,0 +1,411 @@
+<!DOCTYPE html><html lang="en" class="dark"><head>
+    <meta charset="UTF-8">
+
+    <!-- Primary Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <title>Prerequisites - Workshop 02 Morning: Direct AI API Access | DreamLab AI Workshops</title>
+    <meta name="title" content="Prerequisites - Workshop 02 Morning: Direct AI API Access | DreamLab AI Workshops">
+    <meta name="description" content="Prerequisites - Workshop 02 Morning: Direct AI API Access — free DreamLab AI curriculum.">
+    <meta name="keywords" content="applied innovation lab, AI consulting, enterprise innovation, immersive XR, cyber trust, creative technology, residential programmes, knowledge transfer, deep tech, Lake District">
+    <meta name="author" content="DreamLab">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    <meta name="rating" content="General">
+
+    <link rel="describedby" href="/llms.txt" type="text/plain">
+    <script type="application/ld+json" id="organisation-structured-data">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://dreamlab-ai.com/#organisation","name":"DreamLab","url":"https://dreamlab-ai.com/","logo":"https://dreamlab-ai.com/images/heroes/dreamlab-hero.webp","email":"info@dreamlab-ai.com","founder":{"@id":"https://dreamlab-ai.com/team#john-ohare"},"sameAs":["https://github.com/DreamLab-AI","https://www.linkedin.com/company/dreamlab-ai-consulting"]},{"@type":"Person","@id":"https://dreamlab-ai.com/team#john-ohare","name":"John O'Hare","honorificPrefix":"Dr","jobTitle":"Founder","worksFor":{"@id":"https://dreamlab-ai.com/#organisation"},"url":"https://dreamlab-ai.com/team#john-ohare"}]}</script>
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dreamlab-ai.com/workshops/workshop-02-morning-ai-api-access/prerequisites.md/">
+
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="msapplication-TileColor" content="#1a1a2e">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://dreamlab-ai.com/workshops/workshop-02-morning-ai-api-access/prerequisites.md/">
+    <meta property="og:title" content="Prerequisites - Workshop 02 Morning: Direct AI API Access | DreamLab AI Workshops">
+    <meta property="og:description" content="Prerequisites - Workshop 02 Morning: Direct AI API Access — free DreamLab AI curriculum.">
+    <meta property="og:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="DreamLab AI Workshop - Prerequisites - Workshop 02 Morning: Direct AI API Access">
+    <meta property="og:site_name" content="DreamLab">
+    <meta property="og:locale" content="en_GB">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://dreamlab-ai.com/workshops/workshop-02-morning-ai-api-access/prerequisites.md/">
+    <meta name="twitter:title" content="Prerequisites - Workshop 02 Morning: Direct AI API Access | DreamLab AI Workshops">
+    <meta name="twitter:description" content="Prerequisites - Workshop 02 Morning: Direct AI API Access — free DreamLab AI curriculum.">
+    <meta name="twitter:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta name="twitter:image:alt" content="DreamLab AI Workshop - Prerequisites - Workshop 02 Morning: Direct AI API Access">
+    <meta name="twitter:site" content="@thedreamlab">
+    <meta name="twitter:creator" content="@thedreamlab">
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="geo.region" content="GB">
+    <meta name="geo.placename" content="United Kingdom">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DreamLab AI">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Security Headers -->
+    <!--
+      CSP notes:
+      - script-src is 'self' only: no 'unsafe-eval' (blocks eval/Function-based
+        injection) and no 'unsafe-inline'. The one inline bootstrap script was
+        moved to /spa-redirect.js. JSON-LD blocks below are type
+        application/ld+json (data, not executable) so CSP does not gate them.
+      - connect-src is scoped to the Cloudflare Workers subdomain actually used
+        by this account (*.solitary-paper-764d.workers.dev: auth / pod / search /
+        link-preview / nostr-relay), NOT the internet-wide *.workers.dev, which
+        previously allowed exfiltration to any attacker-controlled worker.
+      - The two open Nostr relays (relay.damus.io, relay.primal.net) are
+        explicitly allow-listed: the Talk-to-AI chat listens there for
+        junkiejarvis's reply (the primary relay's whitelist gate rejects the
+        gift-wrap addressed to the ephemeral session key — ADR-042 Amendment 1).
+        Must stay in sync with VITE_REPLY_RELAYS. Named exactly, not a wildcard.
+      - style-src keeps 'unsafe-inline' because Radix UI + runtime style
+        attributes require it; that is not a script-injection vector.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.solitary-paper-764d.workers.dev wss://*.solitary-paper-764d.workers.dev https://*.dreamlab-ai.com wss://*.dreamlab-ai.com wss://relay.damus.io wss://relay.primal.net; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <!-- SPA deep-link restore. External 'self' script (not inline) so CSP
+         script-src can stay 'self' with no 'unsafe-inline'. Classic,
+         render-blocking script: runs before the deferred app module. -->
+    <script src="/spa-redirect.js"></script>
+    <script type="module" crossorigin="" src="/assets/index-Crc86LXg.js"></script>
+    <link rel="modulepreload" crossorigin="" href="/assets/ui-C2dH1upk.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/vendor-uw6h6E0d.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/nostr-BpuBsPg-.js">
+    <link rel="stylesheet" crossorigin="" href="/assets/index-CeEdk6WL.css">
+  <script type="application/ld+json" id="route-structured-data">{"@context":"https://schema.org","@type":"LearningResource","@id":"https://dreamlab-ai.com/workshops/workshop-02-morning-ai-api-access/prerequisites.md/#page","url":"https://dreamlab-ai.com/workshops/workshop-02-morning-ai-api-access/prerequisites.md/","name":"Prerequisites - Workshop 02 Morning: Direct AI API Access | DreamLab AI Workshops","description":"Prerequisites - Workshop 02 Morning: Direct AI API Access — free DreamLab AI curriculum.","inLanguage":"en-GB","publisher":{"@id":"https://dreamlab-ai.com/#organisation"},"isAccessibleForFree":true}</script><link rel="alternate" type="text/markdown" href="/data/workshops/workshop-02-morning-ai-api-access/prerequisites.md"></head>
+
+  <body>
+    <!-- Skip Navigation Link for Accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
+      Skip to main content
+    </a>
+    <div id="root"><header role="banner" class="fixed top-0 left-0 right-0 z-50"><div class="md:hidden flex items-center justify-between h-14 px-6 bg-[rgba(14,14,17,0.92)] backdrop-blur-[14px] border-b border-dlm-hairline"><a aria-label="DreamLab home" class="flex items-center gap-2" href="/"><span class="w-[9px] h-[9px] rounded-full bg-dlm-bright shrink-0" aria-hidden="true"></span><span class="text-[14px] font-semibold tracking-[0.14em] text-[#FAFAFA]">DREAMLAB</span></a><button type="button" aria-label="Open menu" aria-expanded="false" class="w-11 h-11 -mr-2 flex flex-col items-end justify-center gap-[5px] focus:outline-none focus-visible:ring-2 focus-visible:ring-dlm-bright rounded"><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span></button></div><div class="hidden md:block transition-all duration-300 ease-out py-3 bg-background/60 backdrop-blur-md"><div class="container flex items-center justify-between px-4"><button class="flex items-center gap-2 md:gap-3 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded min-h-[48px] min-w-[48px] px-3 py-2" aria-label="Main navigation menu" type="button" id="radix-:Rp:" aria-haspopup="menu" aria-expanded="false" data-state="closed"><div class="w-10 h-10 md:w-8 md:h-8 shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all duration-300 group-hover:scale-110 animate-glow-pulse" aria-hidden="true"></div><span class="font-bold text-lg md:text-xl tracking-tight group-hover:text-purple-400 transition-colors duration-300">MENU</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down h-5 w-5 md:h-4 md:w-4 shrink-0 text-muted-foreground group-hover:text-purple-400 transition-all duration-300 group-hover:rotate-180" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button><div class="flex items-center gap-2"><a class="items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-10 py-2 hover:bg-purple-500/10 hover:text-purple-400 transition-all duration-300 hover:scale-105 min-h-[48px] px-4 text-base md:text-sm hidden sm:inline-flex" href="/contact">Contact</a><a class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary hover:bg-primary/90 h-10 py-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transition-all duration-300 min-h-[48px] px-4 text-base md:text-sm" href="/co-create">Partner With Us</a></div></div></div></header><header class="relative overflow-hidden" style="min-height:320px"><div class="absolute inset-0 bg-gradient-to-br from-blue-500/30 via-purple-500/30 to-violet-500/30" style="transform:translateY(0px);opacity:1"><div class="absolute top-0 -left-20 w-96 h-96 rounded-full blur-3xl opacity-40 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600"></div><div class="absolute bottom-0 -right-20 w-[32rem] h-[32rem] rounded-full blur-3xl opacity-30 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600" style="animation-delay:1s"></div><div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full blur-3xl opacity-20 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600" style="animation-delay:2s"></div></div><div class="absolute inset-0 opacity-5" style="background-image:linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);background-size:50px 50px;transform:translateY(0px)"></div><div class="relative z-10 container px-4 pt-24 pb-8"><div class="mb-6 transition-all duration-500 transform opacity-0 translate-y-4"><nav aria-label="breadcrumb"><ol class="flex flex-wrap items-center gap-1.5 break-words text-sm sm:gap-2.5 text-white/70"><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/">Home</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/workshops">Workshops</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><span role="link" aria-disabled="true" aria-current="page" class="text-white font-medium">Phase 3: Direct AI API Access</span></li></ol></nav></div><div class="mb-4 transition-all duration-500 delay-100 transform opacity-0 translate-y-4"><div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20"><span class="text-purple-400"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cpu w-5 h-5" aria-hidden="true"><path d="M12 20v2"></path><path d="M12 2v2"></path><path d="M17 20v2"></path><path d="M17 2v2"></path><path d="M2 12h2"></path><path d="M2 17h2"></path><path d="M2 7h2"></path><path d="M20 12h2"></path><path d="M20 17h2"></path><path d="M20 7h2"></path><path d="M7 20v2"></path><path d="M7 2v2"></path><rect x="4" y="4" width="16" height="16" rx="2"></rect><rect x="8" y="8" width="8" height="8" rx="1"></rect></svg></span><span class="text-sm font-medium text-white/90">AI / Machine Learning</span></div></div><h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 break-words transition-all duration-700 delay-200 transform opacity-0 translate-y-6"><span class="bg-gradient-to-r bg-clip-text text-transparent animate-gradient-shift bg-400% from-blue-400 via-purple-400 to-violet-400">Phase 3: Direct AI API Access</span></h1><div class="flex flex-wrap items-center gap-3 mb-6 transition-all duration-700 delay-400 transform opacity-0 translate-y-4"><div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-white/10 border-white/20 text-white backdrop-blur-sm hover:bg-white/20"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-3.5 h-3.5 mr-1.5" aria-hidden="true"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>10<!-- --> <!-- -->Modules</div></div><div class="max-w-md transition-all duration-700 delay-500 transform opacity-0 translate-y-4"><div class="flex items-center justify-between text-sm text-white/70 mb-2"><span class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code w-4 h-4" aria-hidden="true"><path d="m16 18 6-6-6-6"></path><path d="m8 6-6 6 6 6"></path></svg><span>Chapter <!-- -->10<!-- -->: <!-- -->Prerequisites - Workshop 02 Morning: Direct AI API Access</span></span><span class="font-medium text-white">100<!-- -->%</span></div><div class="relative"><div aria-valuemax="100" aria-valuemin="0" role="progressbar" data-state="indeterminate" data-max="100" class="relative w-full overflow-hidden rounded-full h-2 bg-white/20"><div data-state="indeterminate" data-max="100" class="h-full w-full flex-1 bg-primary transition-all" style="transform:translateX(-0%)"></div></div><div class="absolute top-0 left-0 h-2 rounded-full blur-sm bg-gradient-to-r from-blue-600 via-purple-600 to-violet-600" style="width:100%"></div></div><div class="relative mt-1 h-1"><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:10%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:20%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:30%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:40%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:50%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:60%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:70%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:80%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:90%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:100%"></div></div></div></div><div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent"></div></header><main class="container px-4 pt-8 pb-8 flex flex-col md:flex-row gap-x-8 min-h-screen" id="main-content"><aside class="w-full md:w-64 lg:w-72 md:sticky md:top-20 md:h-[calc(100vh-5rem-2rem)] mb-8 md:mb-0"><h2 class="text-xl font-semibold mb-4 break-words">Phase 3: Direct AI API Access</h2><div dir="ltr" class="relative overflow-hidden h-auto md:h-full pr-4 border-r md:border-r-0" style="position:relative;--radix-scroll-area-corner-width:0px;--radix-scroll-area-corner-height:0px"><style>[data-radix-scroll-area-viewport]{scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;}[data-radix-scroll-area-viewport]::-webkit-scrollbar{display:none}</style><div data-radix-scroll-area-viewport="" class="h-full w-full rounded-[inherit]" style="overflow-x:hidden;overflow-y:hidden"><div style="min-width:100%;display:table"><nav><ul><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-02-morning-ai-api-access/README.md"><span class="mr-2 text-xs opacity-60">1<!-- -->.</span>Phase 3: Direct AI API Access</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-02-morning-ai-api-access/00_introduction.md"><span class="mr-2 text-xs opacity-60">2<!-- -->.</span>Chapter 0: Introduction to Direct AI API Access</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-02-morning-ai-api-access/01_concepts.md"><span class="mr-2 text-xs opacity-60">3<!-- -->.</span>Chapter 1: Core Concepts - Understanding AI APIs in 2026</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-02-morning-ai-api-access/02_hands_on.md"><span class="mr-2 text-xs opacity-60">4<!-- -->.</span>Chapter 2: Hands-On API Setup - Building Your Multi-Model Command Centre (2026)</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-02-morning-ai-api-access/03_exercises.md"><span class="mr-2 text-xs opacity-60">5<!-- -->.</span>Chapter 3: Practical Exercises - Model Mastery</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-02-morning-ai-api-access/04_project.md"><span class="mr-2 text-xs opacity-60">6<!-- -->.</span>Chapter 4: Real Project — Multi-Model Content Pipeline</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-02-morning-ai-api-access/05_assessment.md"><span class="mr-2 text-xs opacity-60">7<!-- -->.</span>Chapter 5: Assessment — Validating Your AI API Mastery</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-02-morning-ai-api-access/06_resources.md"><span class="mr-2 text-xs opacity-60">8<!-- -->.</span>Chapter 6: Resources &amp; Continued Learning</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-02-morning-ai-api-access/objectives.md"><span class="mr-2 text-xs opacity-60">9<!-- -->.</span>Learning Objectives - Workshop 02 Morning: Direct AI API Access</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors bg-primary text-primary-foreground font-semibold" href="/workshops/workshop-02-morning-ai-api-access/prerequisites.md"><span class="mr-2 text-xs opacity-60">10<!-- -->.</span>Prerequisites - Workshop 02 Morning: Direct AI API Access</a></li></ul></nav></div></div></div></aside><article class="flex-1 min-w-0 md:pl-0"><div class="prose max-w-none dark:prose-invert break-words [&amp;_table]:block [&amp;_table]:w-full [&amp;_table]:overflow-x-auto"><h1>Prerequisites - Workshop 02 Morning: Direct AI API Access</h1>
+<h2>Before You Begin</h2>
+<p>This workshop connects you directly to AI model APIs. You'll create accounts, generate API keys, and start making calls within the first hour. Ensure you meet these requirements for a smooth experience.</p>
+<h2>Required Knowledge</h2>
+<h3>Essential Skills</h3>
+<ul>
+<li>
+<p>✅ <strong>Basic Computer Literacy</strong></p>
+<ul>
+<li>Can create online accounts and verify email addresses</li>
+<li>Comfortable navigating web browsers</li>
+<li>Can copy and paste text accurately</li>
+<li>Understands the concept of passwords and account security</li>
+</ul>
+</li>
+<li>
+<p>✅ <strong>VS Code Familiarity (from the Phase 1 workshop)</strong></p>
+<ul>
+<li>VS Code installed and launching correctly</li>
+<li>Can open files and folders</li>
+<li>Comfortable with the basic interface layout</li>
+<li>Have used at least one extension</li>
+</ul>
+</li>
+<li>
+<p>✅ <strong>No Coding Experience Required</strong></p>
+<ul>
+<li>We explain every API concept from first principles</li>
+<li>Code snippets are provided — you copy and paste, not write from scratch</li>
+<li>The focus is on understanding and using APIs, not programming</li>
+</ul>
+</li>
+</ul>
+<h3>Helpful (But Not Required)</h3>
+<ul>
+<li>📝 Experience with ChatGPT, Claude, or Gemini web interfaces</li>
+<li>📧 Familiarity with JSON format (we'll explain it)</li>
+<li>📁 Basic understanding of environment variables (we'll set them up together)</li>
+<li>💳 Previous experience with pay-as-you-go online services</li>
+</ul>
+<h2>Technical Requirements</h2>
+<h3>Hardware Specifications</h3>
+<p><strong>Minimum Requirements:</strong></p>
+<ul>
+<li><strong>Processor</strong>: Any modern CPU (2016 or newer)</li>
+<li><strong>RAM</strong>: 4GB minimum, 8GB recommended</li>
+<li><strong>Storage</strong>: 1GB free disk space</li>
+<li><strong>Display</strong>: 1280x720 resolution minimum</li>
+</ul>
+<p><strong>Recommended Specifications:</strong></p>
+<ul>
+<li><strong>Processor</strong>: Quad-core CPU</li>
+<li><strong>RAM</strong>: 8GB or more</li>
+<li><strong>Storage</strong>: 5GB free (for VS Code, extensions, and project files)</li>
+<li><strong>Display</strong>: 1920x1080 or higher</li>
+</ul>
+<h3>Operating System</h3>
+<p><strong>Supported Platforms:</strong></p>
+<ul>
+<li>✅ Windows 10 or 11 (64-bit)</li>
+<li>✅ macOS 10.15 (Catalina) or newer</li>
+<li>✅ Ubuntu 20.04+, Debian 10+, Fedora 36+</li>
+</ul>
+<p><strong>Administrator Access:</strong></p>
+<ul>
+<li>Ability to install VS Code extensions</li>
+<li>Permission to create <code>.env</code> files in your project folder</li>
+<li>No firewall restrictions blocking <code>api.openai.com</code>, <code>api.anthropic.com</code>, or <code>generativelanguage.googleapis.com</code></li>
+</ul>
+<h3>Internet Connection</h3>
+<p><strong>Requirements:</strong></p>
+<ul>
+<li><strong>Speed</strong>: 5 Mbps minimum (API calls are lightweight)</li>
+<li><strong>Stability</strong>: Consistent connection — API calls fail on dropouts</li>
+<li><strong>Data</strong>: Minimal (~50MB for the workshop; API responses are text)</li>
+<li><strong>Ports</strong>: Standard HTTPS (port 443) must be open</li>
+</ul>
+<h2>Software Prerequisites</h2>
+<h3>Must Have Before Starting</h3>
+<p><strong>1. VS Code (from the Phase 1 workshop)</strong></p>
+<ul>
+<li>Installed and running</li>
+<li>Markdown extensions configured</li>
+<li>If not yet installed, complete the Phase 1 workshop first or visit <a href="https://code.visualstudio.com">code.visualstudio.com</a></li>
+</ul>
+<p><strong>2. Modern Web Browser</strong></p>
+<ul>
+<li>Google Chrome (recommended)</li>
+<li>Firefox, Edge, or Safari</li>
+<li>Needed for creating provider accounts and viewing dashboards</li>
+</ul>
+<p><strong>3. Email Access</strong></p>
+<ul>
+<li>For account verification codes</li>
+<li>Ensure you can receive emails promptly during the session</li>
+</ul>
+<h3>Will Install During Workshop</h3>
+<p>We'll set up these together:</p>
+<ul>
+<li>Claude Code CLI (Anthropic's terminal AI agent)</li>
+<li>Continue extension for VS Code (optional multi-model switcher)</li>
+<li>Python 3 (optional — for running SDK examples)</li>
+</ul>
+<h2>Account &amp; Billing Setup</h2>
+<h3>What You'll Create</h3>
+<p>This workshop requires accounts with AI providers. Here is what to expect:</p>
+<p><strong>1. Anthropic Console (Claude models)</strong></p>
+<ul>
+<li>URL: <a href="https://console.anthropic.com">https://console.anthropic.com</a></li>
+<li>Requires: Email verification</li>
+<li>Billing: Prepaid credits — start with $5-10 (approximately £4-8)</li>
+<li>Models available: Fable 5, Opus 4.8, Sonnet 4.6, Haiku 4.5</li>
+<li>API key format: <code>sk-ant-api03-...</code></li>
+</ul>
+<p><strong>2. OpenAI Platform (GPT models)</strong></p>
+<ul>
+<li>URL: <a href="https://platform.openai.com">https://platform.openai.com</a></li>
+<li>Requires: Email verification + payment method</li>
+<li>Billing: Pay-as-you-go with monthly limits — start with $5-10</li>
+<li>Models available: GPT-4o, GPT-4o-mini, o3</li>
+<li>API key format: <code>sk-proj-...</code></li>
+</ul>
+<p><strong>3. Google AI Studio (Gemini models)</strong></p>
+<ul>
+<li>URL: <a href="https://aistudio.google.dev">https://aistudio.google.dev</a></li>
+<li>Requires: Google account</li>
+<li>Billing: <strong>Free tier</strong> — no credit card needed to start</li>
+<li>Models available: Gemini 2.5 Pro, Gemini 2.5 Flash</li>
+<li>API key format: <code>AIzaSy...</code></li>
+</ul>
+<p><strong>4. Groq Console (open-source models, optional)</strong></p>
+<ul>
+<li>URL: <a href="https://console.groq.com">https://console.groq.com</a></li>
+<li>Requires: Email verification</li>
+<li>Billing: <strong>Free</strong> — no payment required</li>
+<li>Models available: Llama 4 and other open models</li>
+<li>API key format: <code>gsk_...</code></li>
+</ul>
+<h3>Total Expected Spend</h3>
+<ul>
+<li><strong>During the workshop</strong>: £0-2 (most testing uses pennies of credit)</li>
+<li><strong>First month</strong>: £3-5 for typical professional usage</li>
+<li><strong>Compared to subscriptions</strong>: £57+/month for ChatGPT Plus + Claude Pro + Gemini Advanced</li>
+<li><strong>Savings</strong>: 90%+ from day one</li>
+</ul>
+<h3>Pre-Workshop Account Setup (Optional)</h3>
+<p>You can create accounts before the workshop to save time, or we'll walk through it together:</p>
+<ol>
+<li>Visit each provider's console URL listed above</li>
+<li>Create an account with your email</li>
+<li><strong>Do not generate API keys yet</strong> — we'll do that together with proper security steps</li>
+<li>Add payment methods where required (Anthropic, OpenAI)</li>
+<li>Set an initial spending limit of $10 on each paid provider</li>
+</ol>
+<h2>Project Preparation</h2>
+<h3>Bring Real Work</h3>
+<p><strong>Most Effective Learning:</strong>
+Have a real task in mind that you currently use AI for:</p>
+<ul>
+<li>A document you need to write or improve</li>
+<li>Research you need to summarise</li>
+<li>Content you need to generate</li>
+<li>Analysis you need to perform</li>
+</ul>
+<p><strong>Suggested Tasks for Testing:</strong></p>
+<ul>
+<li>Draft a professional email or proposal</li>
+<li>Summarise a lengthy report or article</li>
+<li>Generate social media posts or marketing copy</li>
+<li>Create a structured document from rough notes</li>
+<li>Analyse pros and cons of a business decision</li>
+</ul>
+<h3>Create Workshop Folder</h3>
+<p><strong>Before the workshop:</strong></p>
+<pre><code>Documents/
+  └── AI-Workshop/
+      └── day-2-morning/
+          ├── api-tests/
+          ├── model-comparisons/
+          └── my-project/
+</code></pre>
+<p>This structure helps you organise test outputs, comparison notes, and your final project.</p>
+<h2>Mental Preparation</h2>
+<h3>Set Expectations</h3>
+<p><strong>This Workshop IS:</strong></p>
+<ul>
+<li>✅ Hands-on: you'll make real API calls within the first hour</li>
+<li>✅ Cost-transparent: we track every penny spent</li>
+<li>✅ Multi-provider: you'll use at least 3 different AI services</li>
+<li>✅ Practical: everything applies to your real work immediately</li>
+<li>✅ Non-developer friendly: no programming background needed</li>
+</ul>
+<p><strong>This Workshop IS NOT:</strong></p>
+<ul>
+<li>❌ A programming course</li>
+<li>❌ About building software applications</li>
+<li>❌ Theory-heavy or academic</li>
+<li>❌ Limited to a single AI provider</li>
+<li>❌ Expensive (total workshop spend: under £2)</li>
+</ul>
+<h3>Time Commitment</h3>
+<p><strong>Workshop Duration:</strong> 3 hours</p>
+<p><strong>Schedule:</strong></p>
+<ul>
+<li>00:00-00:30: Core concepts (what APIs are, how they work)</li>
+<li>00:30-02:00: Hands-on setup (accounts, keys, configuration, testing)</li>
+<li>02:00-02:30: Practical exercises (model comparisons, workflows)</li>
+<li>02:30-02:50: Real project work (apply to your actual tasks)</li>
+<li>02:50-03:00: Assessment and reflection</li>
+</ul>
+<p><strong>Post-Workshop:</strong></p>
+<ul>
+<li>30 minutes: Review model comparison notes</li>
+<li>1 week: Track daily API costs vs old subscription costs</li>
+<li>1 month: Refine model preferences, cancel unnecessary subscriptions</li>
+</ul>
+<h2>What to Bring</h2>
+<h3>Physical Items</h3>
+<ul>
+<li>💻 Laptop (fully charged, with VS Code installed)</li>
+<li>🔌 Power adapter</li>
+<li>📓 Notebook and pen (for model comparison notes)</li>
+<li>💳 Credit or debit card (for Anthropic and OpenAI billing setup)</li>
+</ul>
+<h3>Digital Items</h3>
+<ul>
+<li>📧 Email access (for provider verification codes)</li>
+<li>🔑 Password manager or secure place to store API keys</li>
+<li>📁 Real project files to work on during the project chapter</li>
+<li>🌐 Browser bookmarks for provider consoles (optional)</li>
+</ul>
+<h2>Pre-Workshop Checklist</h2>
+<h3>One Day Before</h3>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled=""> Verify VS Code is installed and running</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Test internet connection and HTTPS access</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Charge laptop fully</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Create the workshop folder structure</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Identify a real task to use during the project chapter</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Clear calendar (3 uninterrupted hours)</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Have credit/debit card accessible</li>
+</ul>
+<h3>One Hour Before</h3>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled=""> Close unnecessary applications (free up RAM)</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Disable notifications</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Open VS Code</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Open web browser with provider console URLs bookmarked</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Have email inbox ready for verification codes</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Open this workshop page</li>
+</ul>
+<h2>Getting Help</h2>
+<h3>During the Workshop</h3>
+<p><strong>If you encounter issues:</strong></p>
+<ol>
+<li>Check the troubleshooting section in Chapter 2</li>
+<li>Raise your hand or ask in chat</li>
+<li>Note the issue for office hours if it's not blocking</li>
+</ol>
+<p><strong>Common Setup Issues:</strong></p>
+<ul>
+<li>"Can't create account" — Check email spam folder for verification</li>
+<li>"Payment declined" — Try a different card or use Google/Groq free tiers first</li>
+<li>"API key not working" — Check for trailing spaces when pasting</li>
+<li>"Firewall blocking requests" — Ask IT to whitelist the provider domains</li>
+</ul>
+<h3>After the Workshop</h3>
+<p><strong>Support Channels:</strong></p>
+<ul>
+<li>📧 Email: <a href="mailto:workshop@dreamlab.ai">workshop@dreamlab.ai</a></li>
+<li>💬 Discord: Workshop Channel</li>
+<li>📅 Office Hours: Fridays 2-3pm GMT</li>
+<li>📖 Documentation: Chapter 6 (Resources)</li>
+</ul>
+<h2>Accessibility</h2>
+<h3>Accommodations Available</h3>
+<p><strong>We support:</strong></p>
+<ul>
+<li>Screen readers (all instructions are text-based)</li>
+<li>Keyboard-only navigation</li>
+<li>High-contrast themes in VS Code</li>
+<li>Adjustable font sizes</li>
+<li>Step-by-step written instructions for every visual step</li>
+</ul>
+<p><strong>Request Accommodations:</strong></p>
+<ul>
+<li>Email: <a href="mailto:accessibility@dreamlab.ai">accessibility@dreamlab.ai</a></li>
+<li>Notice: 48 hours preferred</li>
+<li>Alternative formats available on request</li>
+</ul>
+<h2>FAQ: Prerequisites</h2>
+<h3>"I've never used an API before. Is this for me?"</h3>
+<p><strong>Yes.</strong> We explain APIs from scratch using everyday analogies. If you can order food at a restaurant, you can understand how an API works. Every step is guided.</p>
+<h3>"Do I have to spend money?"</h3>
+<p><strong>A small amount.</strong> Anthropic and OpenAI require prepaid credit (£4-8 each). Google and Groq are free. Your total spend during the workshop will be under £2. You'll save far more by reducing subscriptions.</p>
+<h3>"What if my organisation blocks these websites?"</h3>
+<p><strong>Contact IT in advance.</strong> Ask them to whitelist <code>api.openai.com</code>, <code>api.anthropic.com</code>, <code>generativelanguage.googleapis.com</code>, and <code>api.groq.com</code>. All traffic is HTTPS on port 443.</p>
+<h3>"Can I use my existing ChatGPT/Claude subscriptions instead?"</h3>
+<p><strong>This workshop uses the API, not the chat interface.</strong> Your subscription and your API account are separate. You'll create API-specific credentials. You can cancel subscriptions later once you see the savings.</p>
+<h3>"What if I only complete the Phase 1 workshop partially?"</h3>
+<p><strong>You'll be fine</strong> as long as VS Code is installed and launching. We'll configure everything else during this workshop.</p>
+<h3>"Do I need Python or any programming language?"</h3>
+<p><strong>No.</strong> All exercises can be completed using Claude Code and the Continue extension. Python examples are provided for reference but are entirely optional.</p>
+<h2>Ready to Transform Your AI Access?</h2>
+<p>If you meet these prerequisites, you're about to dramatically change how you use and pay for AI. Direct API access is simpler than it sounds, cheaper than you'd expect, and more powerful than any subscription.</p>
+<p><strong>See you in the workshop!</strong></p>
+<hr>
+<p><a href="./00_introduction.md">Proceed to Workshop --&gt;</a> | <a href="README.md">Back to Workshop Overview</a></p></div></article></main></div>
+    <noscript><p>Interactive forms require JavaScript. You can also email <a href="mailto:info@dreamlab-ai.com">info@dreamlab-ai.com</a>.</p></noscript>
+  
+
+</body></html>

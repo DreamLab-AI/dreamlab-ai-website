@@ -1,0 +1,455 @@
+<!DOCTYPE html><html lang="en" class="dark"><head>
+    <meta charset="UTF-8">
+
+    <!-- Primary Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <title>Chapter 2c: Setting Up AI API Keys (2026 Edition) | DreamLab AI Workshops</title>
+    <meta name="title" content="Chapter 2c: Setting Up AI API Keys (2026 Edition) | DreamLab AI Workshops">
+    <meta name="description" content="Chapter 2c: Setting Up AI API Keys (2026 Edition) — free DreamLab AI curriculum.">
+    <meta name="keywords" content="applied innovation lab, AI consulting, enterprise innovation, immersive XR, cyber trust, creative technology, residential programmes, knowledge transfer, deep tech, Lake District">
+    <meta name="author" content="DreamLab">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    <meta name="rating" content="General">
+
+    <link rel="describedby" href="/llms.txt" type="text/plain">
+    <script type="application/ld+json" id="organisation-structured-data">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://dreamlab-ai.com/#organisation","name":"DreamLab","url":"https://dreamlab-ai.com/","logo":"https://dreamlab-ai.com/images/heroes/dreamlab-hero.webp","email":"info@dreamlab-ai.com","founder":{"@id":"https://dreamlab-ai.com/team#john-ohare"},"sameAs":["https://github.com/DreamLab-AI","https://www.linkedin.com/company/dreamlab-ai-consulting"]},{"@type":"Person","@id":"https://dreamlab-ai.com/team#john-ohare","name":"John O'Hare","honorificPrefix":"Dr","jobTitle":"Founder","worksFor":{"@id":"https://dreamlab-ai.com/#organisation"},"url":"https://dreamlab-ai.com/team#john-ohare"}]}</script>
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dreamlab-ai.com/workshops/workshop-00-infra/02_c_gcp_api_key.md/">
+
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="msapplication-TileColor" content="#1a1a2e">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://dreamlab-ai.com/workshops/workshop-00-infra/02_c_gcp_api_key.md/">
+    <meta property="og:title" content="Chapter 2c: Setting Up AI API Keys (2026 Edition) | DreamLab AI Workshops">
+    <meta property="og:description" content="Chapter 2c: Setting Up AI API Keys (2026 Edition) — free DreamLab AI curriculum.">
+    <meta property="og:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="DreamLab AI Workshop - Chapter 2c: Setting Up AI API Keys (2026 Edition)">
+    <meta property="og:site_name" content="DreamLab">
+    <meta property="og:locale" content="en_GB">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://dreamlab-ai.com/workshops/workshop-00-infra/02_c_gcp_api_key.md/">
+    <meta name="twitter:title" content="Chapter 2c: Setting Up AI API Keys (2026 Edition) | DreamLab AI Workshops">
+    <meta name="twitter:description" content="Chapter 2c: Setting Up AI API Keys (2026 Edition) — free DreamLab AI curriculum.">
+    <meta name="twitter:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta name="twitter:image:alt" content="DreamLab AI Workshop - Chapter 2c: Setting Up AI API Keys (2026 Edition)">
+    <meta name="twitter:site" content="@thedreamlab">
+    <meta name="twitter:creator" content="@thedreamlab">
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="geo.region" content="GB">
+    <meta name="geo.placename" content="United Kingdom">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DreamLab AI">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Security Headers -->
+    <!--
+      CSP notes:
+      - script-src is 'self' only: no 'unsafe-eval' (blocks eval/Function-based
+        injection) and no 'unsafe-inline'. The one inline bootstrap script was
+        moved to /spa-redirect.js. JSON-LD blocks below are type
+        application/ld+json (data, not executable) so CSP does not gate them.
+      - connect-src is scoped to the Cloudflare Workers subdomain actually used
+        by this account (*.solitary-paper-764d.workers.dev: auth / pod / search /
+        link-preview / nostr-relay), NOT the internet-wide *.workers.dev, which
+        previously allowed exfiltration to any attacker-controlled worker.
+      - The two open Nostr relays (relay.damus.io, relay.primal.net) are
+        explicitly allow-listed: the Talk-to-AI chat listens there for
+        junkiejarvis's reply (the primary relay's whitelist gate rejects the
+        gift-wrap addressed to the ephemeral session key — ADR-042 Amendment 1).
+        Must stay in sync with VITE_REPLY_RELAYS. Named exactly, not a wildcard.
+      - style-src keeps 'unsafe-inline' because Radix UI + runtime style
+        attributes require it; that is not a script-injection vector.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.solitary-paper-764d.workers.dev wss://*.solitary-paper-764d.workers.dev https://*.dreamlab-ai.com wss://*.dreamlab-ai.com wss://relay.damus.io wss://relay.primal.net; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <!-- SPA deep-link restore. External 'self' script (not inline) so CSP
+         script-src can stay 'self' with no 'unsafe-inline'. Classic,
+         render-blocking script: runs before the deferred app module. -->
+    <script src="/spa-redirect.js"></script>
+    <script type="module" crossorigin="" src="/assets/index-Crc86LXg.js"></script>
+    <link rel="modulepreload" crossorigin="" href="/assets/ui-C2dH1upk.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/vendor-uw6h6E0d.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/nostr-BpuBsPg-.js">
+    <link rel="stylesheet" crossorigin="" href="/assets/index-CeEdk6WL.css">
+  <script type="application/ld+json" id="route-structured-data">{"@context":"https://schema.org","@type":"LearningResource","@id":"https://dreamlab-ai.com/workshops/workshop-00-infra/02_c_gcp_api_key.md/#page","url":"https://dreamlab-ai.com/workshops/workshop-00-infra/02_c_gcp_api_key.md/","name":"Chapter 2c: Setting Up AI API Keys (2026 Edition) | DreamLab AI Workshops","description":"Chapter 2c: Setting Up AI API Keys (2026 Edition) — free DreamLab AI curriculum.","inLanguage":"en-GB","publisher":{"@id":"https://dreamlab-ai.com/#organisation"},"isAccessibleForFree":true}</script><link rel="alternate" type="text/markdown" href="/data/workshops/workshop-00-infra/02_c_gcp_api_key.md"></head>
+
+  <body>
+    <!-- Skip Navigation Link for Accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
+      Skip to main content
+    </a>
+    <div id="root"><header role="banner" class="fixed top-0 left-0 right-0 z-50"><div class="md:hidden flex items-center justify-between h-14 px-6 bg-[rgba(14,14,17,0.92)] backdrop-blur-[14px] border-b border-dlm-hairline"><a aria-label="DreamLab home" class="flex items-center gap-2" href="/"><span class="w-[9px] h-[9px] rounded-full bg-dlm-bright shrink-0" aria-hidden="true"></span><span class="text-[14px] font-semibold tracking-[0.14em] text-[#FAFAFA]">DREAMLAB</span></a><button type="button" aria-label="Open menu" aria-expanded="false" class="w-11 h-11 -mr-2 flex flex-col items-end justify-center gap-[5px] focus:outline-none focus-visible:ring-2 focus-visible:ring-dlm-bright rounded"><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span></button></div><div class="hidden md:block transition-all duration-300 ease-out py-3 bg-background/60 backdrop-blur-md"><div class="container flex items-center justify-between px-4"><button class="flex items-center gap-2 md:gap-3 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded min-h-[48px] min-w-[48px] px-3 py-2" aria-label="Main navigation menu" type="button" id="radix-:Rp:" aria-haspopup="menu" aria-expanded="false" data-state="closed"><div class="w-10 h-10 md:w-8 md:h-8 shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all duration-300 group-hover:scale-110 animate-glow-pulse" aria-hidden="true"></div><span class="font-bold text-lg md:text-xl tracking-tight group-hover:text-purple-400 transition-colors duration-300">MENU</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down h-5 w-5 md:h-4 md:w-4 shrink-0 text-muted-foreground group-hover:text-purple-400 transition-all duration-300 group-hover:rotate-180" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button><div class="flex items-center gap-2"><a class="items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-10 py-2 hover:bg-purple-500/10 hover:text-purple-400 transition-all duration-300 hover:scale-105 min-h-[48px] px-4 text-base md:text-sm hidden sm:inline-flex" href="/contact">Contact</a><a class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary hover:bg-primary/90 h-10 py-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transition-all duration-300 min-h-[48px] px-4 text-base md:text-sm" href="/co-create">Partner With Us</a></div></div></div></header><header class="relative overflow-hidden" style="min-height:320px"><div class="absolute inset-0 bg-gradient-to-br from-slate-500/30 via-zinc-500/30 to-neutral-500/30" style="transform:translateY(0px);opacity:1"><div class="absolute top-0 -left-20 w-96 h-96 rounded-full blur-3xl opacity-40 animate-float bg-gradient-to-br from-slate-500 via-zinc-500 to-neutral-500"></div><div class="absolute bottom-0 -right-20 w-[32rem] h-[32rem] rounded-full blur-3xl opacity-30 animate-float bg-gradient-to-br from-slate-500 via-zinc-500 to-neutral-500" style="animation-delay:1s"></div><div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full blur-3xl opacity-20 animate-float bg-gradient-to-br from-slate-500 via-zinc-500 to-neutral-500" style="animation-delay:2s"></div></div><div class="absolute inset-0 opacity-5" style="background-image:linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);background-size:50px 50px;transform:translateY(0px)"></div><div class="relative z-10 container px-4 pt-24 pb-8"><div class="mb-6 transition-all duration-500 transform opacity-0 translate-y-4"><nav aria-label="breadcrumb"><ol class="flex flex-wrap items-center gap-1.5 break-words text-sm sm:gap-2.5 text-white/70"><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/">Home</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/workshops">Workshops</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><span role="link" aria-disabled="true" aria-current="page" class="text-white font-medium">A Creative Technologist's Guide to GitHub &amp; AI-Powered Workflows</span></li></ol></nav></div><div class="mb-4 transition-all duration-500 delay-100 transform opacity-0 translate-y-4"><div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20"><span class="text-slate-400"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-5 h-5" aria-hidden="true"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg></span><span class="text-sm font-medium text-white/90">Foundations</span></div></div><h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 break-words transition-all duration-700 delay-200 transform opacity-0 translate-y-6"><span class="bg-gradient-to-r bg-clip-text text-transparent animate-gradient-shift bg-400% from-slate-400 via-zinc-400 to-neutral-400">A Creative Technologist's Guide to GitHub &amp; AI-Powered Workflows</span></h1><div class="flex flex-wrap items-center gap-3 mb-6 transition-all duration-700 delay-400 transform opacity-0 translate-y-4"><div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-white/10 border-white/20 text-white backdrop-blur-sm hover:bg-white/20"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-3.5 h-3.5 mr-1.5" aria-hidden="true"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>17<!-- --> <!-- -->Modules</div></div><div class="max-w-md transition-all duration-700 delay-500 transform opacity-0 translate-y-4"><div class="flex items-center justify-between text-sm text-white/70 mb-2"><span class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code w-4 h-4" aria-hidden="true"><path d="m16 18 6-6-6-6"></path><path d="m8 6-6 6 6 6"></path></svg><span>Chapter <!-- -->6<!-- -->: <!-- -->Chapter 2c: Setting Up AI API Keys (2026 Edition)</span></span><span class="font-medium text-white">35<!-- -->%</span></div><div class="relative"><div aria-valuemax="100" aria-valuemin="0" role="progressbar" data-state="indeterminate" data-max="100" class="relative w-full overflow-hidden rounded-full h-2 bg-white/20"><div data-state="indeterminate" data-max="100" class="h-full w-full flex-1 bg-primary transition-all" style="transform:translateX(-65%)"></div></div><div class="absolute top-0 left-0 h-2 rounded-full blur-sm bg-gradient-to-r from-slate-500 via-zinc-500 to-neutral-500" style="width:35%"></div></div><div class="relative mt-1 h-1"><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:5.88235294117647%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:11.76470588235294%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:17.647058823529413%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:23.52941176470588%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:29.411764705882355%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:35.294117647058826%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:41.17647058823529%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:47.05882352941176%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:52.94117647058824%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:58.82352941176471%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:64.70588235294117%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:70.58823529411765%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:76.47058823529412%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:82.35294117647058%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:88.23529411764706%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:94.11764705882352%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:100%"></div></div></div></div><div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent"></div></header><main class="container px-4 pt-8 pb-8 flex flex-col md:flex-row gap-x-8 min-h-screen" id="main-content"><aside class="w-full md:w-64 lg:w-72 md:sticky md:top-20 md:h-[calc(100vh-5rem-2rem)] mb-8 md:mb-0"><h2 class="text-xl font-semibold mb-4 break-words">A Creative Technologist's Guide to GitHub &amp; AI-Powered Workflows</h2><div dir="ltr" class="relative overflow-hidden h-auto md:h-full pr-4 border-r md:border-r-0" style="position:relative;--radix-scroll-area-corner-width:0px;--radix-scroll-area-corner-height:0px"><style>[data-radix-scroll-area-viewport]{scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;}[data-radix-scroll-area-viewport]::-webkit-scrollbar{display:none}</style><div data-radix-scroll-area-viewport="" class="h-full w-full rounded-[inherit]" style="overflow-x:hidden;overflow-y:hidden"><div style="min-width:100%;display:table"><nav><ul><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/README.md"><span class="mr-2 text-xs opacity-60">1<!-- -->.</span>A Creative Technologist's Guide to GitHub &amp; AI-Powered Workflows</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/00_introduction.md"><span class="mr-2 text-xs opacity-60">2<!-- -->.</span>Chapter 0: Introduction &amp; Workshop Overview</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/01_why_git.md"><span class="mr-2 text-xs opacity-60">3<!-- -->.</span>Chapter 1: Why Git? Understanding Version Control</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/02_a_github_account.md"><span class="mr-2 text-xs opacity-60">4<!-- -->.</span>Chapter 2a: Creating Your GitHub Account</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/02_b_install_git_vscode.md"><span class="mr-2 text-xs opacity-60">5<!-- -->.</span>Chapter 2b: Installing Git &amp; VS Code</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors bg-primary text-primary-foreground font-semibold" href="/workshops/workshop-00-infra/02_c_gcp_api_key.md"><span class="mr-2 text-xs opacity-60">6<!-- -->.</span>Chapter 2c: Setting Up AI API Keys (2026 Edition)</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/02_d_roo_code_config.md"><span class="mr-2 text-xs opacity-60">7<!-- -->.</span>Chapter 2d: Configuring AI Coding Assistants in VS Code (2026 Edition)</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/02_setup_overview.md"><span class="mr-2 text-xs opacity-60">8<!-- -->.</span>Chapter 2: Essential Setup: Accounts &amp; Installations</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/03_core_workflow.md"><span class="mr-2 text-xs opacity-60">9<!-- -->.</span>Chapter 3: The Core Git Workflow</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/04_collaboration_recovery.md"><span class="mr-2 text-xs opacity-60">10<!-- -->.</span>Chapter 4: Collaboration &amp; Recovery</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/05_github_pages.md"><span class="mr-2 text-xs opacity-60">11<!-- -->.</span>Chapter 5: GitHub Pages: Your Free Portfolio Site</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/06_ai_workflows_roo_code.md"><span class="mr-2 text-xs opacity-60">12<!-- -->.</span>Chapter 6: AI-Powered Workflows with Claude Code</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/07_cheat_sheet.md"><span class="mr-2 text-xs opacity-60">13<!-- -->.</span>Chapter 7: Reference Cheat Sheet</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/08_latex_wsl_vscode.md"><span class="mr-2 text-xs opacity-60">14<!-- -->.</span>Chapter 8: Advanced Typesetting: LaTeX with WSL2, TeXLive, and VS Code</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/09_cheat_sheet.md"><span class="mr-2 text-xs opacity-60">15<!-- -->.</span>Chapter 9: Reference Cheat Sheet</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/09_context_management.md"><span class="mr-2 text-xs opacity-60">16<!-- -->.</span>Chapter 9: Context Management &amp; Advanced Agent Workflows</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/10_context_management.md"><span class="mr-2 text-xs opacity-60">17<!-- -->.</span>Chapter 10: Advanced Context Management &amp; Multi-Session Strategies</a></li></ul></nav></div></div></div></aside><article class="flex-1 min-w-0 md:pl-0"><div class="prose max-w-none dark:prose-invert break-words [&amp;_table]:block [&amp;_table]:w-full [&amp;_table]:overflow-x-auto"><h1>Chapter 2c: Setting Up AI API Keys (2026 Edition)</h1>
+<p><strong>Time:</strong> 15-20 minutes | <strong>Difficulty:</strong> Intermediate</p>
+<p>To use AI-powered features in modern coding tools, you may need API keys from AI providers. This chapter covers the major options available in 2026, their free tiers, and how to get started.</p>
+<blockquote>
+<p><strong>Good news:</strong> If you plan to use Claude Code with your claude.ai account, you do not need a separate API key -- Claude Code can authenticate directly through your existing claude.ai login. API keys are only needed if you want to use the API directly or configure third-party tools.</p>
+</blockquote>
+<h2>2c.1 Overview of AI API Options (2026)</h2>
+<p>In 2026, you have several excellent options for AI coding assistance:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Provider</th><th>Free Tier</th><th>Best For</th><th>Where to Sign Up</th></tr></thead><tbody><tr><td><strong>Anthropic (Claude)</strong></td><td>Claude.ai free tier; API credits for new users</td><td>Complex reasoning, long contexts, coding agents</td><td><a href="https://console.anthropic.com/">console.anthropic.com</a></td></tr><tr><td><strong>Google (Gemini)</strong></td><td>Generous free tier</td><td>Multimodal tasks, cost-effective</td><td><a href="https://aistudio.google.dev/">aistudio.google.dev</a></td></tr><tr><td><strong>OpenAI</strong></td><td>Free credits for new users</td><td>General purpose, widely supported</td><td><a href="https://platform.openai.com/">platform.openai.com</a></td></tr><tr><td><strong>GitHub Copilot</strong></td><td>Free for students/educators and OSS maintainers</td><td>Native VS Code integration</td><td><a href="https://github.com/features/copilot">github.com/features/copilot</a></td></tr></tbody></table>
+<blockquote>
+<p><strong>Tip:</strong> If you are a student, start with GitHub Copilot (completely free). For everyone else, Claude Code with a claude.ai account is the easiest path -- no API key management needed.</p>
+</blockquote>
+<h2>2c.2 Option 1: Anthropic Claude (Recommended)</h2>
+<h3>Why Claude?</h3>
+<ul>
+<li>Best-in-class reasoning and coding abilities</li>
+<li>Claude Code works as a standalone terminal tool, a desktop app, and inside VS Code</li>
+<li>Supports up to 200k token context windows</li>
+<li>Model Context Protocol (MCP) for connecting to external tools</li>
+<li>Strong safety and ethics focus</li>
+</ul>
+<h3>Getting Started with Claude Code (No API Key Needed)</h3>
+<p>The simplest path is to use Claude Code with your free claude.ai account:</p>
+<ol>
+<li>
+<p><strong>Create a claude.ai account:</strong></p>
+<ul>
+<li>Go to <a href="https://claude.ai/">https://claude.ai/</a></li>
+<li>Sign up with your email address</li>
+</ul>
+</li>
+<li>
+<p><strong>Install Claude Code:</strong></p>
+<pre><code class="language-bash">npm install -g @anthropic-ai/claude-code
+</code></pre>
+</li>
+<li>
+<p><strong>Authenticate:</strong></p>
+<pre><code class="language-bash">claude
+</code></pre>
+<ul>
+<li>Claude Code will open your browser to log in with your claude.ai account</li>
+<li>That is it -- no API key to copy or manage</li>
+</ul>
+</li>
+</ol>
+<h3>Getting an Anthropic API Key (For Advanced Use)</h3>
+<p>If you want to use the Claude API directly in your own scripts, or configure third-party tools like Continue.dev:</p>
+<ol>
+<li>
+<p><strong>Visit the Anthropic Console:</strong></p>
+<ul>
+<li>Go to <a href="https://console.anthropic.com/">https://console.anthropic.com/</a></li>
+<li>Sign up for an account</li>
+</ul>
+</li>
+<li>
+<p><strong>Create an API Key:</strong></p>
+<ul>
+<li>Navigate to "API Keys" in the sidebar</li>
+<li>Click "Create Key"</li>
+<li>Give it a descriptive name (e.g., "Workshop Projects")</li>
+<li>Copy your API key immediately</li>
+</ul>
+</li>
+<li>
+<p><strong>Check your credits:</strong></p>
+<ul>
+<li>New accounts receive starter credits</li>
+<li>Check <a href="https://console.anthropic.com/">console.anthropic.com</a> for current pricing and free-tier details</li>
+</ul>
+</li>
+</ol>
+<h3>Claude Models (2026)</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Model</th><th>Best For</th><th>Speed</th></tr></thead><tbody><tr><td><strong>Fable 5</strong></td><td>Latest and most capable -- creative and complex tasks</td><td>Moderate</td></tr><tr><td><strong>Opus 4.8</strong></td><td>Top-tier reasoning and analysis</td><td>Slower, most thorough</td></tr><tr><td><strong>Sonnet 4.6</strong></td><td>Best balance of speed, quality, and cost</td><td>Fast</td></tr><tr><td><strong>Haiku 4.5</strong></td><td>Quick tasks, high volume, lowest cost</td><td>Fastest</td></tr></tbody></table>
+<blockquote>
+<p><strong>Note:</strong> Claude Code uses Opus by default. Use the <code>/fast</code> command within Claude Code to switch to a faster model when you need quicker responses.</p>
+</blockquote>
+<h2>2c.3 Option 2: Google Gemini API</h2>
+<h3>Why Gemini?</h3>
+<ul>
+<li>Generous free tier -- excellent for experimentation</li>
+<li>Strong performance on coding tasks</li>
+<li>Supports multimodal inputs (text, images, code)</li>
+<li>Easy to set up</li>
+</ul>
+<h3>Steps to Get Your Gemini API Key</h3>
+<ol>
+<li>
+<p><strong>Visit Google AI Studio:</strong></p>
+<ul>
+<li>Go to <a href="https://aistudio.google.dev/">https://aistudio.google.dev/</a></li>
+<li>Click "Get API key"</li>
+</ul>
+</li>
+<li>
+<p><strong>Sign in with Google Account:</strong></p>
+<ul>
+<li>Use any Google account or create one</li>
+</ul>
+</li>
+<li>
+<p><strong>Create API Key:</strong></p>
+<ul>
+<li>Click "Create API key"</li>
+<li>Select an existing Google Cloud project or create a new one</li>
+<li>Copy your API key immediately</li>
+</ul>
+</li>
+<li>
+<p><strong>Test Your Key:</strong></p>
+<pre><code class="language-bash">curl "https://generativelanguage.googleapis.com/v1/models?key=YOUR_API_KEY"
+</code></pre>
+</li>
+</ol>
+<blockquote>
+<p><strong>Security Note:</strong> Never commit API keys to Git repositories. Store them in environment variables or <code>.env</code> files (add <code>.env</code> to <code>.gitignore</code>).</p>
+</blockquote>
+<details>
+<summary><strong>Advanced: Restricting Your API Key</strong></summary>
+<p>For production use, restrict your API key:</p>
+<ol>
+<li>Go to <a href="https://console.cloud.google.com/">Google Cloud Console</a></li>
+<li>Navigate to "APIs &amp; Services" &gt; "Credentials"</li>
+<li>Click on your API key</li>
+<li>Under "API restrictions," select "Restrict key"</li>
+<li>Choose only "Generative Language API"</li>
+<li>Optionally add application restrictions (HTTP referrers, IP addresses)</li>
+</ol>
+</details>
+<h2>2c.4 Option 3: OpenAI API</h2>
+<h3>Why OpenAI?</h3>
+<ul>
+<li>Industry standard with wide tool support</li>
+<li>GPT-4o and o3 models available</li>
+<li>Extensive ecosystem and documentation</li>
+</ul>
+<h3>Steps to Get Your OpenAI API Key</h3>
+<ol>
+<li>
+<p><strong>Visit the OpenAI Platform:</strong></p>
+<ul>
+<li>Go to <a href="https://platform.openai.com/">https://platform.openai.com/</a></li>
+<li>Sign up or log in</li>
+</ul>
+</li>
+<li>
+<p><strong>Create an API Key:</strong></p>
+<ul>
+<li>Navigate to "API keys" in the sidebar</li>
+<li>Click "Create new secret key"</li>
+<li>Copy and store securely</li>
+</ul>
+</li>
+<li>
+<p><strong>Set Usage Limits:</strong></p>
+<ul>
+<li>Go to "Billing" &gt; "Usage limits"</li>
+<li>Set a monthly budget limit</li>
+<li>Enable email alerts</li>
+</ul>
+</li>
+</ol>
+<blockquote>
+<p><strong>Tip:</strong> Check <a href="https://platform.openai.com/">platform.openai.com</a> for current free-tier details and pricing, as these change frequently.</p>
+</blockquote>
+<h2>2c.5 Option 4: GitHub Copilot (Best for Students)</h2>
+<h3>Why GitHub Copilot?</h3>
+<ul>
+<li><strong>Free for verified students, educators, and open-source maintainers</strong></li>
+<li>Native integration with VS Code</li>
+<li>No API key management needed</li>
+<li>Unlimited usage with subscription</li>
+</ul>
+<h3>Steps to Get GitHub Copilot Free</h3>
+<ol>
+<li>
+<p><strong>Verify Student Status:</strong></p>
+<ul>
+<li>Go to <a href="https://education.github.com/">GitHub Education</a></li>
+<li>Click "Get benefits"</li>
+<li>Verify with your student email or ID</li>
+</ul>
+</li>
+<li>
+<p><strong>Install Copilot Extension:</strong></p>
+<ul>
+<li>Open VS Code</li>
+<li>Install "GitHub Copilot" extension</li>
+<li>Sign in with your GitHub account</li>
+</ul>
+</li>
+<li>
+<p><strong>Start Coding:</strong></p>
+<ul>
+<li>Copilot will automatically suggest code as you type</li>
+<li>Press <code>Tab</code> to accept suggestions</li>
+</ul>
+</li>
+</ol>
+<blockquote>
+<p><strong>Tip:</strong> If you are not a student, GitHub Copilot starts from $10/month and includes Copilot Chat. Check <a href="https://github.com/features/copilot">github.com/features/copilot</a> for current pricing.</p>
+</blockquote>
+<h2>2c.6 Storing API Keys Securely</h2>
+<blockquote>
+<p><strong>Critical Security Warning:</strong> Never, ever commit API keys to Git repositories!</p>
+</blockquote>
+<h3>Best Practices for API Key Storage</h3>
+<p><strong>1. Use Environment Variables:</strong></p>
+<p>Create a <code>.env</code> file in your project root:</p>
+<pre><code class="language-bash"># .env (DO NOT COMMIT THIS FILE)
+ANTHROPIC_API_KEY=sk-ant-xxxxxxxxxxxxx
+OPENAI_API_KEY=sk-xxxxxxxxxxxxx
+GOOGLE_API_KEY=xxxxxxxxxxxxx
+</code></pre>
+<p><strong>2. Add <code>.env</code> to <code>.gitignore</code>:</strong></p>
+<pre><code class="language-bash"># .gitignore
+.env
+.env.local
+*.key
+credentials.json
+</code></pre>
+<p><strong>3. Create a <code>.env.example</code> Template:</strong></p>
+<pre><code class="language-bash"># .env.example (SAFE TO COMMIT)
+ANTHROPIC_API_KEY=your_key_here
+OPENAI_API_KEY=your_key_here
+GOOGLE_API_KEY=your_key_here
+</code></pre>
+<p><strong>4. Load Environment Variables in Code:</strong></p>
+<p>Python:</p>
+<pre><code class="language-python">import os
+from dotenv import load_dotenv
+
+load_dotenv()
+api_key = os.getenv('ANTHROPIC_API_KEY')
+</code></pre>
+<p>JavaScript/TypeScript:</p>
+<pre><code class="language-javascript">require('dotenv').config();
+const apiKey = process.env.ANTHROPIC_API_KEY;
+</code></pre>
+<details>
+<summary>Exercise: Set Up Your AI Tools</summary>
+<p><strong>Task:</strong> Choose your path and get set up.</p>
+<p><strong>Path A -- Claude Code (Recommended):</strong></p>
+<ol>
+<li>Create a claude.ai account at <a href="https://claude.ai/">claude.ai</a></li>
+<li>Install Claude Code: <code>npm install -g @anthropic-ai/claude-code</code></li>
+<li>Run <code>claude</code> in your terminal and log in when prompted</li>
+<li>Try a simple prompt: "What can you help me with?"</li>
+</ol>
+<p><strong>Path B -- API Key Setup:</strong></p>
+<ol>
+<li>Select a provider (Anthropic, Google, or OpenAI)</li>
+<li>Create your API key following the steps above</li>
+<li>Create a <code>.env</code> file in a test project</li>
+<li>Add your API key to <code>.env</code></li>
+<li>Add <code>.env</code> to <code>.gitignore</code></li>
+<li>Create a <code>.env.example</code> template</li>
+</ol>
+<p><strong>Verification:</strong></p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled=""> Tool installed or API key created successfully</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Authentication working</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> <code>.env</code> is in <code>.gitignore</code> (if using API keys)</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Test prompt works</li>
+</ul>
+</details>
+<details>
+<summary>Knowledge Check</summary>
+<ol>
+<li>What is the easiest way to start using Claude Code without an API key?</li>
+<li>Why should you never commit API keys to Git?</li>
+<li>What is the advantage of GitHub Copilot for students?</li>
+<li>Which file should contain API keys, and which file should be in <code>.gitignore</code>?</li>
+<li>Name two reasons you might want an API key even if you use Claude Code with claude.ai auth.</li>
+</ol>
+<p><strong>Answers:</strong></p>
+<ol>
+<li>Install Claude Code and authenticate with your claude.ai account -- no API key needed</li>
+<li>Anyone with access to your repository could steal and abuse your key</li>
+<li>It is completely free with unlimited usage for verified students and educators</li>
+<li><code>.env</code> file should contain keys; <code>.env</code> should be in <code>.gitignore</code></li>
+<li>To use the API in your own scripts/applications, or to configure third-party tools like Continue.dev</li>
+</ol>
+</details>
+<hr>
+<p><strong>Next</strong>: <a href="./02_d_roo_code_config.md">Chapter 2d: Configuring AI Coding Assistants in VS Code</a></p></div></article></main></div>
+    <noscript><p>Interactive forms require JavaScript. You can also email <a href="mailto:info@dreamlab-ai.com">info@dreamlab-ai.com</a>.</p></noscript>
+  
+
+</body></html>

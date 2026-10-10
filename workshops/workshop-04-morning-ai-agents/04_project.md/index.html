@@ -1,0 +1,458 @@
+<!DOCTYPE html><html lang="en" class="dark"><head>
+    <meta charset="UTF-8">
+
+    <!-- Primary Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <title>Final Project: Production Research Agent | DreamLab AI Workshops</title>
+    <meta name="title" content="Final Project: Production Research Agent | DreamLab AI Workshops">
+    <meta name="description" content="Final Project: Production Research Agent — free DreamLab AI curriculum.">
+    <meta name="keywords" content="applied innovation lab, AI consulting, enterprise innovation, immersive XR, cyber trust, creative technology, residential programmes, knowledge transfer, deep tech, Lake District">
+    <meta name="author" content="DreamLab">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    <meta name="rating" content="General">
+
+    <link rel="describedby" href="/llms.txt" type="text/plain">
+    <script type="application/ld+json" id="organisation-structured-data">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://dreamlab-ai.com/#organisation","name":"DreamLab","url":"https://dreamlab-ai.com/","logo":"https://dreamlab-ai.com/images/heroes/dreamlab-hero.webp","email":"info@dreamlab-ai.com","founder":{"@id":"https://dreamlab-ai.com/team#john-ohare"},"sameAs":["https://github.com/DreamLab-AI","https://www.linkedin.com/company/dreamlab-ai-consulting"]},{"@type":"Person","@id":"https://dreamlab-ai.com/team#john-ohare","name":"John O'Hare","honorificPrefix":"Dr","jobTitle":"Founder","worksFor":{"@id":"https://dreamlab-ai.com/#organisation"},"url":"https://dreamlab-ai.com/team#john-ohare"}]}</script>
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dreamlab-ai.com/workshops/workshop-04-morning-ai-agents/04_project.md/">
+
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="msapplication-TileColor" content="#1a1a2e">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://dreamlab-ai.com/workshops/workshop-04-morning-ai-agents/04_project.md/">
+    <meta property="og:title" content="Final Project: Production Research Agent | DreamLab AI Workshops">
+    <meta property="og:description" content="Final Project: Production Research Agent — free DreamLab AI curriculum.">
+    <meta property="og:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="DreamLab AI Workshop - Final Project: Production Research Agent">
+    <meta property="og:site_name" content="DreamLab">
+    <meta property="og:locale" content="en_GB">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://dreamlab-ai.com/workshops/workshop-04-morning-ai-agents/04_project.md/">
+    <meta name="twitter:title" content="Final Project: Production Research Agent | DreamLab AI Workshops">
+    <meta name="twitter:description" content="Final Project: Production Research Agent — free DreamLab AI curriculum.">
+    <meta name="twitter:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta name="twitter:image:alt" content="DreamLab AI Workshop - Final Project: Production Research Agent">
+    <meta name="twitter:site" content="@thedreamlab">
+    <meta name="twitter:creator" content="@thedreamlab">
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="geo.region" content="GB">
+    <meta name="geo.placename" content="United Kingdom">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DreamLab AI">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Security Headers -->
+    <!--
+      CSP notes:
+      - script-src is 'self' only: no 'unsafe-eval' (blocks eval/Function-based
+        injection) and no 'unsafe-inline'. The one inline bootstrap script was
+        moved to /spa-redirect.js. JSON-LD blocks below are type
+        application/ld+json (data, not executable) so CSP does not gate them.
+      - connect-src is scoped to the Cloudflare Workers subdomain actually used
+        by this account (*.solitary-paper-764d.workers.dev: auth / pod / search /
+        link-preview / nostr-relay), NOT the internet-wide *.workers.dev, which
+        previously allowed exfiltration to any attacker-controlled worker.
+      - The two open Nostr relays (relay.damus.io, relay.primal.net) are
+        explicitly allow-listed: the Talk-to-AI chat listens there for
+        junkiejarvis's reply (the primary relay's whitelist gate rejects the
+        gift-wrap addressed to the ephemeral session key — ADR-042 Amendment 1).
+        Must stay in sync with VITE_REPLY_RELAYS. Named exactly, not a wildcard.
+      - style-src keeps 'unsafe-inline' because Radix UI + runtime style
+        attributes require it; that is not a script-injection vector.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.solitary-paper-764d.workers.dev wss://*.solitary-paper-764d.workers.dev https://*.dreamlab-ai.com wss://*.dreamlab-ai.com wss://relay.damus.io wss://relay.primal.net; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <!-- SPA deep-link restore. External 'self' script (not inline) so CSP
+         script-src can stay 'self' with no 'unsafe-inline'. Classic,
+         render-blocking script: runs before the deferred app module. -->
+    <script src="/spa-redirect.js"></script>
+    <script type="module" crossorigin="" src="/assets/index-Crc86LXg.js"></script>
+    <link rel="modulepreload" crossorigin="" href="/assets/ui-C2dH1upk.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/vendor-uw6h6E0d.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/nostr-BpuBsPg-.js">
+    <link rel="stylesheet" crossorigin="" href="/assets/index-CeEdk6WL.css">
+  <script type="application/ld+json" id="route-structured-data">{"@context":"https://schema.org","@type":"LearningResource","@id":"https://dreamlab-ai.com/workshops/workshop-04-morning-ai-agents/04_project.md/#page","url":"https://dreamlab-ai.com/workshops/workshop-04-morning-ai-agents/04_project.md/","name":"Final Project: Production Research Agent | DreamLab AI Workshops","description":"Final Project: Production Research Agent — free DreamLab AI curriculum.","inLanguage":"en-GB","publisher":{"@id":"https://dreamlab-ai.com/#organisation"},"isAccessibleForFree":true}</script><link rel="alternate" type="text/markdown" href="/data/workshops/workshop-04-morning-ai-agents/04_project.md"></head>
+
+  <body>
+    <!-- Skip Navigation Link for Accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
+      Skip to main content
+    </a>
+    <div id="root"><header role="banner" class="fixed top-0 left-0 right-0 z-50"><div class="md:hidden flex items-center justify-between h-14 px-6 bg-[rgba(14,14,17,0.92)] backdrop-blur-[14px] border-b border-dlm-hairline"><a aria-label="DreamLab home" class="flex items-center gap-2" href="/"><span class="w-[9px] h-[9px] rounded-full bg-dlm-bright shrink-0" aria-hidden="true"></span><span class="text-[14px] font-semibold tracking-[0.14em] text-[#FAFAFA]">DREAMLAB</span></a><button type="button" aria-label="Open menu" aria-expanded="false" class="w-11 h-11 -mr-2 flex flex-col items-end justify-center gap-[5px] focus:outline-none focus-visible:ring-2 focus-visible:ring-dlm-bright rounded"><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span></button></div><div class="hidden md:block transition-all duration-300 ease-out py-3 bg-background/60 backdrop-blur-md"><div class="container flex items-center justify-between px-4"><button class="flex items-center gap-2 md:gap-3 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded min-h-[48px] min-w-[48px] px-3 py-2" aria-label="Main navigation menu" type="button" id="radix-:Rp:" aria-haspopup="menu" aria-expanded="false" data-state="closed"><div class="w-10 h-10 md:w-8 md:h-8 shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all duration-300 group-hover:scale-110 animate-glow-pulse" aria-hidden="true"></div><span class="font-bold text-lg md:text-xl tracking-tight group-hover:text-purple-400 transition-colors duration-300">MENU</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down h-5 w-5 md:h-4 md:w-4 shrink-0 text-muted-foreground group-hover:text-purple-400 transition-all duration-300 group-hover:rotate-180" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button><div class="flex items-center gap-2"><a class="items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-10 py-2 hover:bg-purple-500/10 hover:text-purple-400 transition-all duration-300 hover:scale-105 min-h-[48px] px-4 text-base md:text-sm hidden sm:inline-flex" href="/contact">Contact</a><a class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary hover:bg-primary/90 h-10 py-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transition-all duration-300 min-h-[48px] px-4 text-base md:text-sm" href="/co-create">Partner With Us</a></div></div></div></header><header class="relative overflow-hidden" style="min-height:320px"><div class="absolute inset-0 bg-gradient-to-br from-blue-500/30 via-purple-500/30 to-violet-500/30" style="transform:translateY(0px);opacity:1"><div class="absolute top-0 -left-20 w-96 h-96 rounded-full blur-3xl opacity-40 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600"></div><div class="absolute bottom-0 -right-20 w-[32rem] h-[32rem] rounded-full blur-3xl opacity-30 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600" style="animation-delay:1s"></div><div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full blur-3xl opacity-20 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600" style="animation-delay:2s"></div></div><div class="absolute inset-0 opacity-5" style="background-image:linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);background-size:50px 50px;transform:translateY(0px)"></div><div class="relative z-10 container px-4 pt-24 pb-8"><div class="mb-6 transition-all duration-500 transform opacity-0 translate-y-4"><nav aria-label="breadcrumb"><ol class="flex flex-wrap items-center gap-1.5 break-words text-sm sm:gap-2.5 text-white/70"><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/">Home</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/workshops">Workshops</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><span role="link" aria-disabled="true" aria-current="page" class="text-white font-medium">Workshop 04 - Morning Session: Specialised AI Agents</span></li></ol></nav></div><div class="mb-4 transition-all duration-500 delay-100 transform opacity-0 translate-y-4"><div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20"><span class="text-purple-400"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cpu w-5 h-5" aria-hidden="true"><path d="M12 20v2"></path><path d="M12 2v2"></path><path d="M17 20v2"></path><path d="M17 2v2"></path><path d="M2 12h2"></path><path d="M2 17h2"></path><path d="M2 7h2"></path><path d="M20 12h2"></path><path d="M20 17h2"></path><path d="M20 7h2"></path><path d="M7 20v2"></path><path d="M7 2v2"></path><rect x="4" y="4" width="16" height="16" rx="2"></rect><rect x="8" y="8" width="8" height="8" rx="1"></rect></svg></span><span class="text-sm font-medium text-white/90">AI / Machine Learning</span></div></div><h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 break-words transition-all duration-700 delay-200 transform opacity-0 translate-y-6"><span class="bg-gradient-to-r bg-clip-text text-transparent animate-gradient-shift bg-400% from-blue-400 via-purple-400 to-violet-400">Workshop 04 - Morning Session: Specialised AI Agents</span></h1><div class="flex flex-wrap items-center gap-3 mb-6 transition-all duration-700 delay-400 transform opacity-0 translate-y-4"><div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-white/10 border-white/20 text-white backdrop-blur-sm hover:bg-white/20"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-3.5 h-3.5 mr-1.5" aria-hidden="true"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>10<!-- --> <!-- -->Modules</div></div><div class="max-w-md transition-all duration-700 delay-500 transform opacity-0 translate-y-4"><div class="flex items-center justify-between text-sm text-white/70 mb-2"><span class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code w-4 h-4" aria-hidden="true"><path d="m16 18 6-6-6-6"></path><path d="m8 6-6 6 6 6"></path></svg><span>Chapter <!-- -->6<!-- -->: <!-- -->Final Project: Production Research Agent</span></span><span class="font-medium text-white">60<!-- -->%</span></div><div class="relative"><div aria-valuemax="100" aria-valuemin="0" role="progressbar" data-state="indeterminate" data-max="100" class="relative w-full overflow-hidden rounded-full h-2 bg-white/20"><div data-state="indeterminate" data-max="100" class="h-full w-full flex-1 bg-primary transition-all" style="transform:translateX(-40%)"></div></div><div class="absolute top-0 left-0 h-2 rounded-full blur-sm bg-gradient-to-r from-blue-600 via-purple-600 to-violet-600" style="width:60%"></div></div><div class="relative mt-1 h-1"><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:10%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:20%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:30%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:40%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:50%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:60%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:70%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:80%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:90%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:100%"></div></div></div></div><div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent"></div></header><main class="container px-4 pt-8 pb-8 flex flex-col md:flex-row gap-x-8 min-h-screen" id="main-content"><aside class="w-full md:w-64 lg:w-72 md:sticky md:top-20 md:h-[calc(100vh-5rem-2rem)] mb-8 md:mb-0"><h2 class="text-xl font-semibold mb-4 break-words">Workshop 04 - Morning Session: Specialised AI Agents</h2><div dir="ltr" class="relative overflow-hidden h-auto md:h-full pr-4 border-r md:border-r-0" style="position:relative;--radix-scroll-area-corner-width:0px;--radix-scroll-area-corner-height:0px"><style>[data-radix-scroll-area-viewport]{scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;}[data-radix-scroll-area-viewport]::-webkit-scrollbar{display:none}</style><div data-radix-scroll-area-viewport="" class="h-full w-full rounded-[inherit]" style="overflow-x:hidden;overflow-y:hidden"><div style="min-width:100%;display:table"><nav><ul><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-04-morning-ai-agents/README.md"><span class="mr-2 text-xs opacity-60">1<!-- -->.</span>Workshop 04 - Morning Session: Specialised AI Agents</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-04-morning-ai-agents/00_introduction.md"><span class="mr-2 text-xs opacity-60">2<!-- -->.</span>Introduction to AI Agents</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-04-morning-ai-agents/01_concepts.md"><span class="mr-2 text-xs opacity-60">3<!-- -->.</span>Core Agent Concepts (2026)</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-04-morning-ai-agents/02_hands_on.md"><span class="mr-2 text-xs opacity-60">4<!-- -->.</span>Hands-on Agent Development</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-04-morning-ai-agents/03_exercises.md"><span class="mr-2 text-xs opacity-60">5<!-- -->.</span>Practical Exercises</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors bg-primary text-primary-foreground font-semibold" href="/workshops/workshop-04-morning-ai-agents/04_project.md"><span class="mr-2 text-xs opacity-60">6<!-- -->.</span>Final Project: Production Research Agent</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-04-morning-ai-agents/05_assessment.md"><span class="mr-2 text-xs opacity-60">7<!-- -->.</span>Assessment: AI Agents Knowledge Check</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-04-morning-ai-agents/06_resources.md"><span class="mr-2 text-xs opacity-60">8<!-- -->.</span>Resources for AI Agents</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-04-morning-ai-agents/objectives.md"><span class="mr-2 text-xs opacity-60">9<!-- -->.</span>Learning Objectives - Workshop 04 Morning: Specialised AI Agents</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-04-morning-ai-agents/prerequisites.md"><span class="mr-2 text-xs opacity-60">10<!-- -->.</span>Prerequisites - Workshop 04 Morning: Specialised AI Agents</a></li></ul></nav></div></div></div></aside><article class="flex-1 min-w-0 md:pl-0"><div class="prose max-w-none dark:prose-invert break-words [&amp;_table]:block [&amp;_table]:w-full [&amp;_table]:overflow-x-auto"><h1>Final Project: Production Research Agent</h1>
+<h2>Project Overview</h2>
+<p>Build a production-ready research agent that autonomously researches topics, evaluates sources, and produces comprehensive reports with citations. You will use the Claude API with tool use, following the agent patterns covered in this morning's session.</p>
+<h2>Requirements</h2>
+<h3>Core Features</h3>
+<ol>
+<li><strong>Multi-Source Research</strong>: Search the web, read specific pages, and gather information from multiple sources</li>
+<li><strong>Source Evaluation</strong>: Track and attribute all sources used</li>
+<li><strong>Content Analysis</strong>: Extract key information and identify themes</li>
+<li><strong>Synthesis</strong>: Combine findings into a coherent report</li>
+<li><strong>Citation Management</strong>: Proper inline citations and bibliography</li>
+</ol>
+<h3>Technical Requirements</h3>
+<ul>
+<li>Python 3.10+</li>
+<li>Anthropic SDK (<code>anthropic</code> package)</li>
+<li>Web search capability (DuckDuckGo, Brave, or Tavily)</li>
+<li>Structured output format (Markdown)</li>
+</ul>
+<h2>Architecture</h2>
+<p><img src="/data/workshops/workshop-04-morning-ai-agents/diagrams/04-research-agent.svg" alt="Research agent pipeline: a user query drives the coordinator through plan, search, read and synthesise steps to produce a final markdown report"></p>
+<h2>Implementation Guide</h2>
+<h3>Step 1: Project Structure</h3>
+<pre><code>research_agent/
+    agent.py           # Main agent loop
+    tools.py           # Tool implementations
+    citations.py       # Citation management
+    config.py          # Configuration
+    requirements.txt   # Dependencies
+    test_agent.py      # Tests
+</code></pre>
+<h3>Step 2: Tool Definitions</h3>
+<pre><code class="language-python"># tools.py
+from duckduckgo_search import DDGS
+import urllib.request
+from typing import List, Dict
+from datetime import datetime
+
+class ResearchTools:
+    def __init__(self):
+        self.sources: List[Dict] = []
+
+    def web_search(self, query: str, max_results: int = 5) -&gt; str:
+        """Search the web and return formatted results with source tracking"""
+        with DDGS() as ddgs:
+            results = list(ddgs.text(query, max_results=max_results))
+
+        formatted = []
+        for i, r in enumerate(results):
+            source = {
+                "index": len(self.sources) + 1,
+                "title": r.get("title", ""),
+                "url": r.get("href", ""),
+                "snippet": r.get("body", ""),
+                "accessed": datetime.now().isoformat()
+            }
+            self.sources.append(source)
+            formatted.append(
+                f"[{source['index']}] {source['title']}\n"
+                f"{source['snippet']}\n"
+                f"URL: {source['url']}"
+            )
+
+        return "\n\n".join(formatted) if formatted else "No results found"
+
+    def read_url(self, url: str) -&gt; str:
+        """Read text content from a URL"""
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": "ResearchAgent/1.0"})
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                content = resp.read(15000).decode("utf-8", errors="ignore")
+            # Basic HTML tag stripping
+            import re
+            text = re.sub(r'&lt;[^&gt;]+&gt;', ' ', content)
+            text = re.sub(r'\s+', ' ', text).strip()
+            return text[:5000]
+        except Exception as e:
+            return f"Error reading URL: {e}"
+
+    def get_tool_schemas(self) -&gt; list:
+        """Return tool schemas for the Claude API"""
+        return [
+            {
+                "name": "web_search",
+                "description": "Search the web for information on a topic. Returns titles, snippets, and URLs.",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "query": {"type": "string", "description": "Search query"},
+                        "max_results": {"type": "integer", "description": "Max results (default 5)"}
+                    },
+                    "required": ["query"]
+                }
+            },
+            {
+                "name": "read_url",
+                "description": "Read the text content of a specific webpage for detailed information",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "url": {"type": "string", "description": "URL to read"}
+                    },
+                    "required": ["url"]
+                }
+            }
+        ]
+
+    def execute(self, tool_name: str, tool_input: dict) -&gt; str:
+        """Execute a tool by name"""
+        if tool_name == "web_search":
+            return self.web_search(
+                tool_input["query"],
+                tool_input.get("max_results", 5)
+            )
+        elif tool_name == "read_url":
+            return self.read_url(tool_input["url"])
+        return f"Unknown tool: {tool_name}"
+</code></pre>
+<h3>Step 3: Citation Management</h3>
+<pre><code class="language-python"># citations.py
+from typing import List, Dict
+
+class CitationManager:
+    def __init__(self, sources: List[Dict]):
+        self.sources = sources
+
+    def generate_bibliography(self) -&gt; str:
+        """Generate a numbered bibliography from tracked sources"""
+        if not self.sources:
+            return "No sources cited."
+
+        lines = ["## Sources\n"]
+        for s in self.sources:
+            lines.append(
+                f"{s['index']}. {s['title']}. "
+                f"Retrieved {s['accessed'][:10]} from {s['url']}"
+            )
+        return "\n".join(lines)
+</code></pre>
+<h3>Step 4: Main Agent</h3>
+<pre><code class="language-python"># agent.py
+import anthropic
+from tools import ResearchTools
+from citations import CitationManager
+from datetime import datetime
+
+client = anthropic.Anthropic()
+
+def research(topic: str, depth: str = "standard") -&gt; dict:
+    """
+    Conduct autonomous research on a topic.
+
+    Args:
+        topic: The research topic
+        depth: "quick" (3 iterations max), "standard" (10), or "deep" (20)
+
+    Returns:
+        dict with "report" (str) and "sources" (list)
+    """
+    max_iterations = {"quick": 5, "standard": 12, "deep": 20}.get(depth, 12)
+
+    tools = ResearchTools()
+
+    messages = [{
+        "role": "user",
+        "content": f"""You are a research analyst. Conduct thorough research on this topic:
+
+**{topic}**
+
+Instructions:
+1. Search for recent, authoritative information from multiple angles
+2. Read the most relevant sources for deeper detail
+3. Synthesise your findings into a well-structured report
+
+Your report must include:
+- An executive summary (2-3 paragraphs)
+- Key findings (bullet points)
+- Detailed analysis (multiple sections)
+- Inline citations using [number] format matching the source numbers from your searches
+- A conclusion
+
+Depth: {depth} -- {"brief overview" if depth == "quick" else "comprehensive analysis" if depth == "deep" else "balanced coverage"}"""
+    }]
+
+    for iteration in range(max_iterations):
+        response = client.messages.create(
+            model="claude-sonnet-4-6",
+            max_tokens=4096,
+            tools=tools.get_tool_schemas(),
+            messages=messages
+        )
+
+        messages.append({"role": "assistant", "content": response.content})
+
+        if response.stop_reason == "end_turn":
+            report_text = next(
+                (b.text for b in response.content if hasattr(b, "text")),
+                "No report generated"
+            )
+
+            # Append bibliography
+            citations = CitationManager(tools.sources)
+            full_report = (
+                f"# Research Report: {topic}\n"
+                f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M')}\n\n"
+                f"---\n\n"
+                f"{report_text}\n\n"
+                f"---\n\n"
+                f"{citations.generate_bibliography()}"
+            )
+
+            return {
+                "report": full_report,
+                "sources": tools.sources,
+                "iterations": iteration + 1
+            }
+
+        if response.stop_reason == "tool_use":
+            tool_results = []
+            for block in response.content:
+                if block.type == "tool_use":
+                    result = tools.execute(block.name, block.input)
+                    tool_results.append({
+                        "type": "tool_result",
+                        "tool_use_id": block.id,
+                        "content": result
+                    })
+            messages.append({"role": "user", "content": tool_results})
+
+    return {
+        "report": "Research incomplete -- iteration limit reached",
+        "sources": tools.sources,
+        "iterations": max_iterations
+    }
+
+
+if __name__ == "__main__":
+    result = research(
+        topic="Latest developments in AI agent frameworks and MCP protocol",
+        depth="standard"
+    )
+
+    # Save report
+    with open("research_report.md", "w") as f:
+        f.write(result["report"])
+
+    print(f"Research complete. {len(result['sources'])} sources, {result['iterations']} iterations.")
+    print("Report saved to research_report.md")
+</code></pre>
+<h3>Step 5: Tests</h3>
+<pre><code class="language-python"># test_agent.py
+import unittest
+from tools import ResearchTools
+from citations import CitationManager
+
+class TestResearchTools(unittest.TestCase):
+    def setUp(self):
+        self.tools = ResearchTools()
+
+    def test_tool_schemas(self):
+        """Verify tool schemas are well-formed"""
+        schemas = self.tools.get_tool_schemas()
+        self.assertEqual(len(schemas), 2)
+        names = {s["name"] for s in schemas}
+        self.assertIn("web_search", names)
+        self.assertIn("read_url", names)
+
+    def test_source_tracking(self):
+        """Verify sources are tracked after search"""
+        self.tools.web_search("Python programming", max_results=2)
+        self.assertGreater(len(self.tools.sources), 0)
+        self.assertIn("title", self.tools.sources[0])
+        self.assertIn("url", self.tools.sources[0])
+
+    def test_execute_unknown_tool(self):
+        """Unknown tools return error message"""
+        result = self.tools.execute("nonexistent", {})
+        self.assertIn("Unknown tool", result)
+
+
+class TestCitationManager(unittest.TestCase):
+    def test_empty_bibliography(self):
+        cm = CitationManager([])
+        self.assertIn("No sources", cm.generate_bibliography())
+
+    def test_bibliography_format(self):
+        sources = [
+            {"index": 1, "title": "Test Article", "url": "https://example.com", "accessed": "2026-06-22T10:00:00"}
+        ]
+        cm = CitationManager(sources)
+        bib = cm.generate_bibliography()
+        self.assertIn("Test Article", bib)
+        self.assertIn("https://example.com", bib)
+
+
+if __name__ == "__main__":
+    unittest.main()
+</code></pre>
+<h2>Evaluation Criteria</h2>
+<p>Your project will be evaluated on:</p>
+<ol>
+<li>
+<p><strong>Functionality</strong> (40%)</p>
+<ul>
+<li>Agent loop works correctly with tool use</li>
+<li>Research produces relevant results</li>
+<li>Citations are properly tracked</li>
+</ul>
+</li>
+<li>
+<p><strong>Code Quality</strong> (25%)</p>
+<ul>
+<li>Clean, readable code with type hints</li>
+<li>Proper error handling</li>
+<li>Tests pass</li>
+</ul>
+</li>
+<li>
+<p><strong>Research Quality</strong> (20%)</p>
+<ul>
+<li>Multiple sources consulted</li>
+<li>Coherent synthesis</li>
+<li>Accurate citations</li>
+</ul>
+</li>
+<li>
+<p><strong>Innovation</strong> (15%)</p>
+<ul>
+<li>Creative additions (e.g. source credibility scoring, parallel searches, export formats)</li>
+<li>Good user experience</li>
+</ul>
+</li>
+</ol>
+<h2>Stretch Goals</h2>
+<ol>
+<li><strong>Model routing</strong>: Use Haiku 4.5 for search queries and Sonnet 4.6 for synthesis to reduce cost</li>
+<li><strong>Parallel search</strong>: Use subagents (or async calls) to search multiple topics simultaneously</li>
+<li><strong>Export formats</strong>: Generate PDF or HTML alongside Markdown</li>
+<li><strong>Fact checking</strong>: Cross-reference claims across multiple sources</li>
+<li><strong>Claude Code integration</strong>: Wrap your agent as a Claude Code slash command</li>
+</ol>
+<h2>Submission</h2>
+<p>Submit:</p>
+<ol>
+<li>Complete source code</li>
+<li><code>requirements.txt</code> with dependencies</li>
+<li>At least one generated research report</li>
+<li>Test results</li>
+</ol>
+<h2>Navigation</h2>
+<ul>
+<li>Previous: <a href="03_exercises.md">Exercises</a></li>
+<li>Next: <a href="05_assessment.md">Assessment</a></li>
+<li><a href="README.md">Back to Workshop Overview</a></li>
+</ul></div></article></main></div>
+    <noscript><p>Interactive forms require JavaScript. You can also email <a href="mailto:info@dreamlab-ai.com">info@dreamlab-ai.com</a>.</p></noscript>
+  
+
+</body></html>

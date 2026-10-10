@@ -1,0 +1,286 @@
+<!DOCTYPE html><html lang="en" class="dark"><head>
+    <meta charset="UTF-8">
+
+    <!-- Primary Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <title>3.b: Project Configuration — CLAUDE.md and AGENTS.MD | DreamLab AI Workshops</title>
+    <meta name="title" content="3.b: Project Configuration — CLAUDE.md and AGENTS.MD | DreamLab AI Workshops">
+    <meta name="description" content="3.b: Project Configuration — CLAUDE.md and AGENTS.MD — free DreamLab AI curriculum.">
+    <meta name="keywords" content="applied innovation lab, AI consulting, enterprise innovation, immersive XR, cyber trust, creative technology, residential programmes, knowledge transfer, deep tech, Lake District">
+    <meta name="author" content="DreamLab">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    <meta name="rating" content="General">
+
+    <link rel="describedby" href="/llms.txt" type="text/plain">
+    <script type="application/ld+json" id="organisation-structured-data">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://dreamlab-ai.com/#organisation","name":"DreamLab","url":"https://dreamlab-ai.com/","logo":"https://dreamlab-ai.com/images/heroes/dreamlab-hero.webp","email":"info@dreamlab-ai.com","founder":{"@id":"https://dreamlab-ai.com/team#john-ohare"},"sameAs":["https://github.com/DreamLab-AI","https://www.linkedin.com/company/dreamlab-ai-consulting"]},{"@type":"Person","@id":"https://dreamlab-ai.com/team#john-ohare","name":"John O'Hare","honorificPrefix":"Dr","jobTitle":"Founder","worksFor":{"@id":"https://dreamlab-ai.com/#organisation"},"url":"https://dreamlab-ai.com/team#john-ohare"}]}</script>
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dreamlab-ai.com/workshops/workshop-06-codex/03_b_the_crucial_role_of_agents_md.md/">
+
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="msapplication-TileColor" content="#1a1a2e">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://dreamlab-ai.com/workshops/workshop-06-codex/03_b_the_crucial_role_of_agents_md.md/">
+    <meta property="og:title" content="3.b: Project Configuration — CLAUDE.md and AGENTS.MD | DreamLab AI Workshops">
+    <meta property="og:description" content="3.b: Project Configuration — CLAUDE.md and AGENTS.MD — free DreamLab AI curriculum.">
+    <meta property="og:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="DreamLab AI Workshop - 3.b: Project Configuration — CLAUDE.md and AGENTS.MD">
+    <meta property="og:site_name" content="DreamLab">
+    <meta property="og:locale" content="en_GB">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://dreamlab-ai.com/workshops/workshop-06-codex/03_b_the_crucial_role_of_agents_md.md/">
+    <meta name="twitter:title" content="3.b: Project Configuration — CLAUDE.md and AGENTS.MD | DreamLab AI Workshops">
+    <meta name="twitter:description" content="3.b: Project Configuration — CLAUDE.md and AGENTS.MD — free DreamLab AI curriculum.">
+    <meta name="twitter:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta name="twitter:image:alt" content="DreamLab AI Workshop - 3.b: Project Configuration — CLAUDE.md and AGENTS.MD">
+    <meta name="twitter:site" content="@thedreamlab">
+    <meta name="twitter:creator" content="@thedreamlab">
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="geo.region" content="GB">
+    <meta name="geo.placename" content="United Kingdom">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DreamLab AI">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Security Headers -->
+    <!--
+      CSP notes:
+      - script-src is 'self' only: no 'unsafe-eval' (blocks eval/Function-based
+        injection) and no 'unsafe-inline'. The one inline bootstrap script was
+        moved to /spa-redirect.js. JSON-LD blocks below are type
+        application/ld+json (data, not executable) so CSP does not gate them.
+      - connect-src is scoped to the Cloudflare Workers subdomain actually used
+        by this account (*.solitary-paper-764d.workers.dev: auth / pod / search /
+        link-preview / nostr-relay), NOT the internet-wide *.workers.dev, which
+        previously allowed exfiltration to any attacker-controlled worker.
+      - The two open Nostr relays (relay.damus.io, relay.primal.net) are
+        explicitly allow-listed: the Talk-to-AI chat listens there for
+        junkiejarvis's reply (the primary relay's whitelist gate rejects the
+        gift-wrap addressed to the ephemeral session key — ADR-042 Amendment 1).
+        Must stay in sync with VITE_REPLY_RELAYS. Named exactly, not a wildcard.
+      - style-src keeps 'unsafe-inline' because Radix UI + runtime style
+        attributes require it; that is not a script-injection vector.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.solitary-paper-764d.workers.dev wss://*.solitary-paper-764d.workers.dev https://*.dreamlab-ai.com wss://*.dreamlab-ai.com wss://relay.damus.io wss://relay.primal.net; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <!-- SPA deep-link restore. External 'self' script (not inline) so CSP
+         script-src can stay 'self' with no 'unsafe-inline'. Classic,
+         render-blocking script: runs before the deferred app module. -->
+    <script src="/spa-redirect.js"></script>
+    <script type="module" crossorigin="" src="/assets/index-Crc86LXg.js"></script>
+    <link rel="modulepreload" crossorigin="" href="/assets/ui-C2dH1upk.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/vendor-uw6h6E0d.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/nostr-BpuBsPg-.js">
+    <link rel="stylesheet" crossorigin="" href="/assets/index-CeEdk6WL.css">
+  <script type="application/ld+json" id="route-structured-data">{"@context":"https://schema.org","@type":"LearningResource","@id":"https://dreamlab-ai.com/workshops/workshop-06-codex/03_b_the_crucial_role_of_agents_md.md/#page","url":"https://dreamlab-ai.com/workshops/workshop-06-codex/03_b_the_crucial_role_of_agents_md.md/","name":"3.b: Project Configuration — CLAUDE.md and AGENTS.MD | DreamLab AI Workshops","description":"3.b: Project Configuration — CLAUDE.md and AGENTS.MD — free DreamLab AI curriculum.","inLanguage":"en-GB","publisher":{"@id":"https://dreamlab-ai.com/#organisation"},"isAccessibleForFree":true}</script><link rel="alternate" type="text/markdown" href="/data/workshops/workshop-06-codex/03_b_the_crucial_role_of_agents_md.md"></head>
+
+  <body>
+    <!-- Skip Navigation Link for Accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
+      Skip to main content
+    </a>
+    <div id="root"><header role="banner" class="fixed top-0 left-0 right-0 z-50"><div class="md:hidden flex items-center justify-between h-14 px-6 bg-[rgba(14,14,17,0.92)] backdrop-blur-[14px] border-b border-dlm-hairline"><a aria-label="DreamLab home" class="flex items-center gap-2" href="/"><span class="w-[9px] h-[9px] rounded-full bg-dlm-bright shrink-0" aria-hidden="true"></span><span class="text-[14px] font-semibold tracking-[0.14em] text-[#FAFAFA]">DREAMLAB</span></a><button type="button" aria-label="Open menu" aria-expanded="false" class="w-11 h-11 -mr-2 flex flex-col items-end justify-center gap-[5px] focus:outline-none focus-visible:ring-2 focus-visible:ring-dlm-bright rounded"><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span></button></div><div class="hidden md:block transition-all duration-300 ease-out py-3 bg-background/60 backdrop-blur-md"><div class="container flex items-center justify-between px-4"><button class="flex items-center gap-2 md:gap-3 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded min-h-[48px] min-w-[48px] px-3 py-2" aria-label="Main navigation menu" type="button" id="radix-:Rp:" aria-haspopup="menu" aria-expanded="false" data-state="closed"><div class="w-10 h-10 md:w-8 md:h-8 shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all duration-300 group-hover:scale-110 animate-glow-pulse" aria-hidden="true"></div><span class="font-bold text-lg md:text-xl tracking-tight group-hover:text-purple-400 transition-colors duration-300">MENU</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down h-5 w-5 md:h-4 md:w-4 shrink-0 text-muted-foreground group-hover:text-purple-400 transition-all duration-300 group-hover:rotate-180" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button><div class="flex items-center gap-2"><a class="items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-10 py-2 hover:bg-purple-500/10 hover:text-purple-400 transition-all duration-300 hover:scale-105 min-h-[48px] px-4 text-base md:text-sm hidden sm:inline-flex" href="/contact">Contact</a><a class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary hover:bg-primary/90 h-10 py-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transition-all duration-300 min-h-[48px] px-4 text-base md:text-sm" href="/co-create">Partner With Us</a></div></div></div></header><header class="relative overflow-hidden" style="min-height:320px"><div class="absolute inset-0 bg-gradient-to-br from-amber-500/30 via-orange-500/30 to-red-500/30" style="transform:translateY(0px);opacity:1"><div class="absolute top-0 -left-20 w-96 h-96 rounded-full blur-3xl opacity-40 animate-float bg-gradient-to-br from-amber-500 via-orange-500 to-red-500"></div><div class="absolute bottom-0 -right-20 w-[32rem] h-[32rem] rounded-full blur-3xl opacity-30 animate-float bg-gradient-to-br from-amber-500 via-orange-500 to-red-500" style="animation-delay:1s"></div><div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full blur-3xl opacity-20 animate-float bg-gradient-to-br from-amber-500 via-orange-500 to-red-500" style="animation-delay:2s"></div></div><div class="absolute inset-0 opacity-5" style="background-image:linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);background-size:50px 50px;transform:translateY(0px)"></div><div class="relative z-10 container px-4 pt-24 pb-8"><div class="mb-6 transition-all duration-500 transform opacity-0 translate-y-4"><nav aria-label="breadcrumb"><ol class="flex flex-wrap items-center gap-1.5 break-words text-sm sm:gap-2.5 text-white/70"><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/">Home</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/workshops">Workshops</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><span role="link" aria-disabled="true" aria-current="page" class="text-white font-medium">Workshop 06: Mastering AI-Powered Coding Agents (2026 Edition)</span></li></ol></nav></div><div class="mb-4 transition-all duration-500 delay-100 transform opacity-0 translate-y-4"><div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20"><span class="text-orange-400"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings w-5 h-5" aria-hidden="true"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"></path><circle cx="12" cy="12" r="3"></circle></svg></span><span class="text-sm font-medium text-white/90">Software Engineering</span></div></div><h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 break-words transition-all duration-700 delay-200 transform opacity-0 translate-y-6"><span class="bg-gradient-to-r bg-clip-text text-transparent animate-gradient-shift bg-400% from-amber-400 via-orange-400 to-red-400">Workshop 06: Mastering AI-Powered Coding Agents (2026 Edition)</span></h1><div class="flex flex-wrap items-center gap-3 mb-6 transition-all duration-700 delay-400 transform opacity-0 translate-y-4"><div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-white/10 border-white/20 text-white backdrop-blur-sm hover:bg-white/20"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-3.5 h-3.5 mr-1.5" aria-hidden="true"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>26<!-- --> <!-- -->Modules</div></div><div class="max-w-md transition-all duration-700 delay-500 transform opacity-0 translate-y-4"><div class="flex items-center justify-between text-sm text-white/70 mb-2"><span class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code w-4 h-4" aria-hidden="true"><path d="m16 18 6-6-6-6"></path><path d="m8 6-6 6 6 6"></path></svg><span>Chapter <!-- -->9<!-- -->: <!-- -->3.b: Project Configuration — CLAUDE.md and AGENTS.MD</span></span><span class="font-medium text-white">35<!-- -->%</span></div><div class="relative"><div aria-valuemax="100" aria-valuemin="0" role="progressbar" data-state="indeterminate" data-max="100" class="relative w-full overflow-hidden rounded-full h-2 bg-white/20"><div data-state="indeterminate" data-max="100" class="h-full w-full flex-1 bg-primary transition-all" style="transform:translateX(-65%)"></div></div><div class="absolute top-0 left-0 h-2 rounded-full blur-sm bg-gradient-to-r from-amber-500 via-orange-500 to-red-500" style="width:35%"></div></div><div class="relative mt-1 h-1"><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:3.8461538461538463%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:7.6923076923076925%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:11.538461538461538%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:15.384615384615385%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:19.230769230769234%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:23.076923076923077%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:26.923076923076923%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:30.76923076923077%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:34.61538461538461%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:38.46153846153847%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:42.30769230769231%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:46.15384615384615%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:50%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:53.84615384615385%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:57.692307692307686%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:61.53846153846154%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:65.38461538461539%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:69.23076923076923%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:73.07692307692307%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:76.92307692307693%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:80.76923076923077%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:84.61538461538461%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:88.46153846153845%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:92.3076923076923%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:96.15384615384616%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:100%"></div></div></div></div><div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent"></div></header><main class="container px-4 pt-8 pb-8 flex flex-col md:flex-row gap-x-8 min-h-screen" id="main-content"><aside class="w-full md:w-64 lg:w-72 md:sticky md:top-20 md:h-[calc(100vh-5rem-2rem)] mb-8 md:mb-0"><h2 class="text-xl font-semibold mb-4 break-words">Workshop 06: Mastering AI-Powered Coding Agents (2026 Edition)</h2><div dir="ltr" class="relative overflow-hidden h-auto md:h-full pr-4 border-r md:border-r-0" style="position:relative;--radix-scroll-area-corner-width:0px;--radix-scroll-area-corner-height:0px"><style>[data-radix-scroll-area-viewport]{scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;}[data-radix-scroll-area-viewport]::-webkit-scrollbar{display:none}</style><div data-radix-scroll-area-viewport="" class="h-full w-full rounded-[inherit]" style="overflow-x:hidden;overflow-y:hidden"><div style="min-width:100%;display:table"><nav><ul><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/README.md"><span class="mr-2 text-xs opacity-60">1<!-- -->.</span>Workshop 06: Mastering AI-Powered Coding Agents (2026 Edition)</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/00_introduction.md"><span class="mr-2 text-xs opacity-60">2<!-- -->.</span>Chapter 0: Introduction to AI-Powered Software Engineering</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/01_understanding_the_codex_ecosystem.md"><span class="mr-2 text-xs opacity-60">3<!-- -->.</span>Chapter 1: Understanding the Modern AI Coding Ecosystem</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/02_a_accessing_the_codex_cloud_agent.md"><span class="mr-2 text-xs opacity-60">4<!-- -->.</span>2.a: Web &amp; IDE Tools for AI-Powered Coding</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/02_b_setting_up_the_codex_cli.md"><span class="mr-2 text-xs opacity-60">5<!-- -->.</span>2.b: Setting Up Terminal-Based AI Coding Agents</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/02_c_api_keys_and_authentication.md"><span class="mr-2 text-xs opacity-60">6<!-- -->.</span>2.c: API Keys and Authentication</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/02_getting_started.md"><span class="mr-2 text-xs opacity-60">7<!-- -->.</span>Chapter 2: Getting Started — Setup and Initial Configuration</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/03_a_effective_prompting_strategies.md"><span class="mr-2 text-xs opacity-60">8<!-- -->.</span>3.a: Effective Prompting Strategies</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors bg-primary text-primary-foreground font-semibold" href="/workshops/workshop-06-codex/03_b_the_crucial_role_of_agents_md.md"><span class="mr-2 text-xs opacity-60">9<!-- -->.</span>3.b: Project Configuration — CLAUDE.md and AGENTS.MD</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/03_c_managing_tasks_efficiently.md"><span class="mr-2 text-xs opacity-60">10<!-- -->.</span>3.c: Managing Tasks Efficiently</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/03_d_advanced_techniques.md"><span class="mr-2 text-xs opacity-60">11<!-- -->.</span>3.d: Advanced Techniques</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/03_mastering_codex.md"><span class="mr-2 text-xs opacity-60">12<!-- -->.</span>Chapter 3: Mastering AI Coding Agents — From Basic Prompts to Advanced Workflows</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/04_a_beginner_tasks.md"><span class="mr-2 text-xs opacity-60">13<!-- -->.</span>4.a: Beginner Tasks — Quick Wins with AI Coding Agents</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/04_b_intermediate_tasks.md"><span class="mr-2 text-xs opacity-60">14<!-- -->.</span>4.b: Intermediate Tasks</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/04_c_advanced_scenarios.md"><span class="mr-2 text-xs opacity-60">15<!-- -->.</span>4.c: Advanced Scenarios</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/04_practical_codex.md"><span class="mr-2 text-xs opacity-60">16<!-- -->.</span>Chapter 4: Practical Applications — Real-World Examples and Walkthroughs</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/05_a_codex_vs_general_gpt_models.md"><span class="mr-2 text-xs opacity-60">17<!-- -->.</span>5.a: Agentic Tools vs. Chat Models for Coding</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/05_b_understanding_model_choices.md"><span class="mr-2 text-xs opacity-60">18<!-- -->.</span>5.b: Understanding Model &amp; Tool Choices (June 2026)</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/05_c_the_evolving_toolkit.md"><span class="mr-2 text-xs opacity-60">19<!-- -->.</span>5.c: The Evolving Toolkit: MCP, Agent Frameworks, and What Comes Next</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/05_the_broader_landscape.md"><span class="mr-2 text-xs opacity-60">20<!-- -->.</span>Chapter 5: The Broader Landscape — Models, Tools, and the Future of AI Coding</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/06_a_limitations_of_codex.md"><span class="mr-2 text-xs opacity-60">21<!-- -->.</span>6.a: Limitations of AI Coding Agents — What They Cannot Do (Yet)</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/06_b_security_implications.md"><span class="mr-2 text-xs opacity-60">22<!-- -->.</span>6.b: Security Implications of AI-Assisted Development</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/06_c_ethical_and_legal_considerations.md"><span class="mr-2 text-xs opacity-60">23<!-- -->.</span>6.c: Ethical and Legal Considerations</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/06_navigating_challenges.md"><span class="mr-2 text-xs opacity-60">24<!-- -->.</span>Chapter 6: Navigating Challenges and Considerations</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/07_best_practices_for_using_ai_agents.md"><span class="mr-2 text-xs opacity-60">25<!-- -->.</span>Chapter 7: Best Practices for Using AI Coding Agents (2026)</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-06-codex/08_conclusion.md"><span class="mr-2 text-xs opacity-60">26<!-- -->.</span>Chapter 8: Conclusion — AI Coding Agents as Your Co-Developers</a></li></ul></nav></div></div></div></aside><article class="flex-1 min-w-0 md:pl-0"><div class="prose max-w-none dark:prose-invert break-words [&amp;_table]:block [&amp;_table]:w-full [&amp;_table]:overflow-x-auto"><h1>3.b: Project Configuration — CLAUDE.md and AGENTS.MD</h1>
+<p>Both Claude Code and OpenAI Codex CLI support project-specific configuration files that provide persistent instructions to the AI agent. These files encode "tribal knowledge" — coding conventions, testing procedures, architectural decisions, and forbidden actions — into a machine-readable format that the agent consults on every task.</p>
+<p>This is one of the most impactful things you can do to improve agent output quality. A well-crafted configuration file eliminates the need to repeat project context in every prompt.</p>
+<h2>CLAUDE.md — Claude Code's Project Configuration</h2>
+<p>Claude Code reads <code>CLAUDE.md</code> files at startup and uses their contents to guide behaviour throughout the session. This is Claude Code's most distinctive feature: a persistent, hierarchical project configuration system.</p>
+<h3>Hierarchy and Merging</h3>
+<p>Claude Code looks for CLAUDE.md files in a specific order and merges their contents, with more specific files taking precedence:</p>
+<ol>
+<li><strong><code>~/.claude/CLAUDE.md</code></strong> — Personal, global guidance applicable across all projects</li>
+<li><strong><code>CLAUDE.md</code> at the repository root</strong> — Shared project-wide standards (commit this to Git)</li>
+<li><strong><code>CLAUDE.md</code> in subdirectories</strong> — Specific instructions for particular components</li>
+</ol>
+<p>This cascading system lets you set organisation-wide defaults, project standards, and component-specific overrides.</p>
+<h3>What to Include in CLAUDE.md</h3>
+<p><strong>Project Identity and Tech Stack:</strong></p>
+<pre><code class="language-markdown"># My Project
+
+## Tech Stack
+- Framework: React 18 + TypeScript 5.9
+- Build: Vite 5
+- Testing: Vitest + Testing Library
+- Styling: Tailwind CSS 3 + shadcn/ui
+- Backend: Node.js + Express + PostgreSQL
+</code></pre>
+<p><strong>Build and Test Commands:</strong></p>
+<pre><code class="language-markdown">## Commands
+- `npm run dev` — Start development server
+- `npm run build` — Production build
+- `npm run test` — Run unit tests
+- `npm run lint` — ESLint checks
+- Always run `npm run build &amp;&amp; npm run lint` before committing
+</code></pre>
+<p><strong>Coding Conventions:</strong></p>
+<pre><code class="language-markdown">## Conventions
+- Use functional components with hooks (no class components)
+- Prefer named exports over default exports
+- Use Zod schemas for all input validation
+- All public functions must have JSDoc comments
+- Error handling: never swallow errors silently
+</code></pre>
+<p><strong>Forbidden Actions:</strong></p>
+<pre><code class="language-markdown">## Forbidden
+- Do not modify files in src/generated/ (these are auto-generated)
+- Do not add new npm dependencies without asking first
+- Never disable ESLint rules with eslint-disable comments
+- Do not commit directly to main — always use feature branches
+- Never hardcode API keys, secrets, or credentials
+</code></pre>
+<p><strong>Architecture Notes:</strong></p>
+<pre><code class="language-markdown">## Architecture
+- src/lib/ contains shared utilities — prefer extending these over creating new ones
+- The auth middleware in src/middleware/auth.ts must not be modified without review
+- Database migrations live in db/migrations/ — use sequential numbering
+- API routes follow REST conventions: /api/v1/{resource}
+</code></pre>
+<h3>CLAUDE.md vs README</h3>
+<p>CLAUDE.md is specifically for the AI agent, not human readers. Key differences:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>CLAUDE.md</th><th>README.md</th></tr></thead><tbody><tr><td>Instructions for the AI agent</td><td>Documentation for human developers</td></tr><tr><td>Coding conventions and constraints</td><td>Project description and setup guide</td></tr><tr><td>Build/test commands to execute</td><td>How to get started</td></tr><tr><td>Forbidden actions</td><td>Feature overview</td></tr><tr><td>Architecture decisions</td><td>Contributing guidelines</td></tr></tbody></table>
+<p>There is deliberate overlap (both might mention the tech stack), but CLAUDE.md focuses on operational instructions: what to do, what not to do, and how to verify work.</p>
+<h3>Real-World CLAUDE.md Example</h3>
+<pre><code class="language-markdown"># E-Commerce API
+
+## Stack
+TypeScript 5.9, Express 4, PostgreSQL 16, Drizzle ORM, Vitest
+
+## Commands
+- `npm test` — Run all tests
+- `npm run test:unit` — Unit tests only
+- `npm run lint` — ESLint + Prettier check
+- `npm run db:migrate` — Run pending migrations
+- Run `npm test &amp;&amp; npm run lint` before every commit
+
+## Conventions
+- All endpoints return { data, error, meta } response envelope
+- Use Zod schemas for request validation (see src/schemas/)
+- Database queries go in src/repositories/, not in route handlers
+- Errors use the AppError class from src/lib/errors.ts
+- Logging via the logger instance from src/lib/logger.ts
+
+## Testing
+- Unit tests live alongside source: src/foo/__tests__/foo.test.ts
+- Integration tests in tests/integration/
+- Mock external services using msw (see tests/mocks/)
+- Database tests use the test database (see .env.test)
+
+## Forbidden
+- Never use raw SQL — always use Drizzle ORM
+- Do not add express middleware to app.ts — use the middleware/ directory
+- Do not modify the migration runner in db/migrate.ts
+- Never store passwords in plain text — use bcrypt
+- Do not import from src/internal/ outside of that directory
+
+## Current Focus
+- We are migrating from Sequelize to Drizzle ORM
+- Files in src/models/ are legacy Sequelize — do not extend them
+- New code should use src/repositories/ with Drizzle
+</code></pre>
+<h2>AGENTS.MD — Codex CLI's Project Configuration</h2>
+<p>The OpenAI Codex CLI reads <code>AGENTS.MD</code> files for project-specific instructions. The concept is similar to CLAUDE.md but with some differences in convention and hierarchy.</p>
+<h3>Hierarchy</h3>
+<ol>
+<li><strong><code>~/.codex/AGENTS.MD</code></strong> (or <code>~/.codex/instructions.md</code>) — Personal, global guidance</li>
+<li><strong><code>AGENTS.MD</code> at the repository root</strong> — Project-wide standards</li>
+<li><strong><code>AGENTS.MD</code> in subdirectories</strong> — Component-specific instructions</li>
+</ol>
+<h3>AGENTS.MD Example</h3>
+<pre><code class="language-markdown"># AGENTS.MD - Project Guidance
+
+## Code Style
+- Use Prettier for formatting: `npx prettier --write .`
+- Variable names in camelCase
+- JSDoc comments for all public functions
+
+## Testing
+- All new features must include unit tests using Jest
+- Run `npm test` before proposing changes
+- Ensure test coverage does not decrease
+- Mock external API calls using msw
+
+## PR Instructions
+- PR titles: `&lt;type&gt;(&lt;scope&gt;): &lt;subject&gt;` (e.g., `feat(api): Add user endpoint`)
+- PR body must include: summary, how to test, related issue numbers
+
+## Forbidden Actions
+- Do not commit to main or develop branches
+- Do not introduce new dependencies without approval
+- Never disable linting or type-checking rules
+- Do not write to src/generated/ by hand
+</code></pre>
+<h3>Why Separate Files? Why Not README?</h3>
+<p>Both CLAUDE.md and AGENTS.MD exist because AI agents need different information than human developers. A human reading a README wants to understand what the project does and how to set it up. An AI agent needs to know what conventions to follow, what commands to run, and what actions are forbidden.</p>
+<p>The non-branded name "AGENTS.MD" was chosen by OpenAI to be tool-agnostic — any AI coding tool can read it. Claude Code's "CLAUDE.md" is specific to Claude Code but offers deeper integration (hierarchical merging, hooks, etc.).</p>
+<h2>Cross-Tool Compatibility</h2>
+<p>If your team uses both Claude Code and Codex CLI (or expects different team members to use different tools), you can maintain both files:</p>
+<pre><code>project-root/
+  CLAUDE.md      # Claude Code reads this
+  AGENTS.MD      # Codex CLI reads this
+  README.md      # Humans read this
+</code></pre>
+<p>Alternatively, keep a single source of truth and symlink:</p>
+<pre><code class="language-bash"># Write your conventions in CLAUDE.md, symlink for Codex CLI
+ln -s CLAUDE.md AGENTS.MD
+</code></pre>
+<h2>Best Practices for Configuration Files</h2>
+<ol>
+<li><strong>Start simple:</strong> A few lines about your tech stack and test commands is enough to start. Add more as you discover what the agent gets wrong.</li>
+<li><strong>Be explicit about commands:</strong> Do not assume the agent knows how to run your tests. Spell out the exact command.</li>
+<li><strong>List forbidden actions:</strong> Agents will try to be helpful, which sometimes means doing things you do not want. Explicit "do not" instructions prevent this.</li>
+<li><strong>Update iteratively:</strong> When the agent makes a mistake that better instructions would have prevented, add that instruction to your configuration file.</li>
+<li><strong>Commit to version control:</strong> These files are part of your project. Commit them so the whole team benefits.</li>
+<li><strong>Keep it focused:</strong> Do not turn the file into a novel. A concise, well-organised file is more effective than a verbose one.</li>
+</ol>
+<hr>
+<p>Next: <a href="./03_c_managing_tasks_efficiently.md">3.c: Managing Tasks Efficiently</a></p></div></article></main></div>
+    <noscript><p>Interactive forms require JavaScript. You can also email <a href="mailto:info@dreamlab-ai.com">info@dreamlab-ai.com</a>.</p></noscript>
+  
+
+</body></html>

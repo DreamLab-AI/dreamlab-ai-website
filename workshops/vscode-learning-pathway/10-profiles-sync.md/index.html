@@ -1,0 +1,436 @@
+<!DOCTYPE html><html lang="en" class="dark"><head>
+    <meta charset="UTF-8">
+
+    <!-- Primary Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <title>Profile Management and Settings Sync | DreamLab AI Workshops</title>
+    <meta name="title" content="Profile Management and Settings Sync | DreamLab AI Workshops">
+    <meta name="description" content="Profile Management and Settings Sync — free DreamLab AI curriculum.">
+    <meta name="keywords" content="applied innovation lab, AI consulting, enterprise innovation, immersive XR, cyber trust, creative technology, residential programmes, knowledge transfer, deep tech, Lake District">
+    <meta name="author" content="DreamLab">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    <meta name="rating" content="General">
+
+    <link rel="describedby" href="/llms.txt" type="text/plain">
+    <script type="application/ld+json" id="organisation-structured-data">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://dreamlab-ai.com/#organisation","name":"DreamLab","url":"https://dreamlab-ai.com/","logo":"https://dreamlab-ai.com/images/heroes/dreamlab-hero.webp","email":"info@dreamlab-ai.com","founder":{"@id":"https://dreamlab-ai.com/team#john-ohare"},"sameAs":["https://github.com/DreamLab-AI","https://www.linkedin.com/company/dreamlab-ai-consulting"]},{"@type":"Person","@id":"https://dreamlab-ai.com/team#john-ohare","name":"John O'Hare","honorificPrefix":"Dr","jobTitle":"Founder","worksFor":{"@id":"https://dreamlab-ai.com/#organisation"},"url":"https://dreamlab-ai.com/team#john-ohare"}]}</script>
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dreamlab-ai.com/workshops/vscode-learning-pathway/10-profiles-sync.md/">
+
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="msapplication-TileColor" content="#1a1a2e">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://dreamlab-ai.com/workshops/vscode-learning-pathway/10-profiles-sync.md/">
+    <meta property="og:title" content="Profile Management and Settings Sync | DreamLab AI Workshops">
+    <meta property="og:description" content="Profile Management and Settings Sync — free DreamLab AI curriculum.">
+    <meta property="og:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="DreamLab AI Workshop - Profile Management and Settings Sync">
+    <meta property="og:site_name" content="DreamLab">
+    <meta property="og:locale" content="en_GB">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://dreamlab-ai.com/workshops/vscode-learning-pathway/10-profiles-sync.md/">
+    <meta name="twitter:title" content="Profile Management and Settings Sync | DreamLab AI Workshops">
+    <meta name="twitter:description" content="Profile Management and Settings Sync — free DreamLab AI curriculum.">
+    <meta name="twitter:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta name="twitter:image:alt" content="DreamLab AI Workshop - Profile Management and Settings Sync">
+    <meta name="twitter:site" content="@thedreamlab">
+    <meta name="twitter:creator" content="@thedreamlab">
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="geo.region" content="GB">
+    <meta name="geo.placename" content="United Kingdom">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DreamLab AI">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Security Headers -->
+    <!--
+      CSP notes:
+      - script-src is 'self' only: no 'unsafe-eval' (blocks eval/Function-based
+        injection) and no 'unsafe-inline'. The one inline bootstrap script was
+        moved to /spa-redirect.js. JSON-LD blocks below are type
+        application/ld+json (data, not executable) so CSP does not gate them.
+      - connect-src is scoped to the Cloudflare Workers subdomain actually used
+        by this account (*.solitary-paper-764d.workers.dev: auth / pod / search /
+        link-preview / nostr-relay), NOT the internet-wide *.workers.dev, which
+        previously allowed exfiltration to any attacker-controlled worker.
+      - The two open Nostr relays (relay.damus.io, relay.primal.net) are
+        explicitly allow-listed: the Talk-to-AI chat listens there for
+        junkiejarvis's reply (the primary relay's whitelist gate rejects the
+        gift-wrap addressed to the ephemeral session key — ADR-042 Amendment 1).
+        Must stay in sync with VITE_REPLY_RELAYS. Named exactly, not a wildcard.
+      - style-src keeps 'unsafe-inline' because Radix UI + runtime style
+        attributes require it; that is not a script-injection vector.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.solitary-paper-764d.workers.dev wss://*.solitary-paper-764d.workers.dev https://*.dreamlab-ai.com wss://*.dreamlab-ai.com wss://relay.damus.io wss://relay.primal.net; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <!-- SPA deep-link restore. External 'self' script (not inline) so CSP
+         script-src can stay 'self' with no 'unsafe-inline'. Classic,
+         render-blocking script: runs before the deferred app module. -->
+    <script src="/spa-redirect.js"></script>
+    <script type="module" crossorigin="" src="/assets/index-Crc86LXg.js"></script>
+    <link rel="modulepreload" crossorigin="" href="/assets/ui-C2dH1upk.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/vendor-uw6h6E0d.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/nostr-BpuBsPg-.js">
+    <link rel="stylesheet" crossorigin="" href="/assets/index-CeEdk6WL.css">
+  <script type="application/ld+json" id="route-structured-data">{"@context":"https://schema.org","@type":"LearningResource","@id":"https://dreamlab-ai.com/workshops/vscode-learning-pathway/10-profiles-sync.md/#page","url":"https://dreamlab-ai.com/workshops/vscode-learning-pathway/10-profiles-sync.md/","name":"Profile Management and Settings Sync | DreamLab AI Workshops","description":"Profile Management and Settings Sync — free DreamLab AI curriculum.","inLanguage":"en-GB","publisher":{"@id":"https://dreamlab-ai.com/#organisation"},"isAccessibleForFree":true}</script><link rel="alternate" type="text/markdown" href="/data/workshops/vscode-learning-pathway/10-profiles-sync.md"></head>
+
+  <body>
+    <!-- Skip Navigation Link for Accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
+      Skip to main content
+    </a>
+    <div id="root"><header role="banner" class="fixed top-0 left-0 right-0 z-50"><div class="md:hidden flex items-center justify-between h-14 px-6 bg-[rgba(14,14,17,0.92)] backdrop-blur-[14px] border-b border-dlm-hairline"><a aria-label="DreamLab home" class="flex items-center gap-2" href="/"><span class="w-[9px] h-[9px] rounded-full bg-dlm-bright shrink-0" aria-hidden="true"></span><span class="text-[14px] font-semibold tracking-[0.14em] text-[#FAFAFA]">DREAMLAB</span></a><button type="button" aria-label="Open menu" aria-expanded="false" class="w-11 h-11 -mr-2 flex flex-col items-end justify-center gap-[5px] focus:outline-none focus-visible:ring-2 focus-visible:ring-dlm-bright rounded"><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span></button></div><div class="hidden md:block transition-all duration-300 ease-out py-3 bg-background/60 backdrop-blur-md"><div class="container flex items-center justify-between px-4"><button class="flex items-center gap-2 md:gap-3 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded min-h-[48px] min-w-[48px] px-3 py-2" aria-label="Main navigation menu" type="button" id="radix-:Rp:" aria-haspopup="menu" aria-expanded="false" data-state="closed"><div class="w-10 h-10 md:w-8 md:h-8 shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all duration-300 group-hover:scale-110 animate-glow-pulse" aria-hidden="true"></div><span class="font-bold text-lg md:text-xl tracking-tight group-hover:text-purple-400 transition-colors duration-300">MENU</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down h-5 w-5 md:h-4 md:w-4 shrink-0 text-muted-foreground group-hover:text-purple-400 transition-all duration-300 group-hover:rotate-180" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button><div class="flex items-center gap-2"><a class="items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-10 py-2 hover:bg-purple-500/10 hover:text-purple-400 transition-all duration-300 hover:scale-105 min-h-[48px] px-4 text-base md:text-sm hidden sm:inline-flex" href="/contact">Contact</a><a class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary hover:bg-primary/90 h-10 py-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transition-all duration-300 min-h-[48px] px-4 text-base md:text-sm" href="/co-create">Partner With Us</a></div></div></div></header><header class="relative overflow-hidden" style="min-height:320px"><div class="absolute inset-0 bg-gradient-to-br from-cyan-500/30 via-teal-500/30 to-emerald-500/30" style="transform:translateY(0px);opacity:1"><div class="absolute top-0 -left-20 w-96 h-96 rounded-full blur-3xl opacity-40 animate-float bg-gradient-to-br from-cyan-500 via-teal-500 to-emerald-500"></div><div class="absolute bottom-0 -right-20 w-[32rem] h-[32rem] rounded-full blur-3xl opacity-30 animate-float bg-gradient-to-br from-cyan-500 via-teal-500 to-emerald-500" style="animation-delay:1s"></div><div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full blur-3xl opacity-20 animate-float bg-gradient-to-br from-cyan-500 via-teal-500 to-emerald-500" style="animation-delay:2s"></div></div><div class="absolute inset-0 opacity-5" style="background-image:linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);background-size:50px 50px;transform:translateY(0px)"></div><div class="relative z-10 container px-4 pt-24 pb-8"><div class="mb-6 transition-all duration-500 transform opacity-0 translate-y-4"><nav aria-label="breadcrumb"><ol class="flex flex-wrap items-center gap-1.5 break-words text-sm sm:gap-2.5 text-white/70"><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/">Home</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/workshops">Workshops</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><span role="link" aria-disabled="true" aria-current="page" class="text-white font-medium">Vscode Learning Pathway</span></li></ol></nav></div><div class="mb-4 transition-all duration-500 delay-100 transform opacity-0 translate-y-4"><div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20"><span class="text-teal-400"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layers w-5 h-5" aria-hidden="true"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"></path><path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"></path><path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"></path></svg></span><span class="text-sm font-medium text-white/90">XR / Virtual Reality</span></div></div><h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 break-words transition-all duration-700 delay-200 transform opacity-0 translate-y-6"><span class="bg-gradient-to-r bg-clip-text text-transparent animate-gradient-shift bg-400% from-cyan-400 via-teal-400 to-emerald-400">Vscode Learning Pathway</span></h1><div class="flex flex-wrap items-center gap-3 mb-6 transition-all duration-700 delay-400 transform opacity-0 translate-y-4"><div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-white/10 border-white/20 text-white backdrop-blur-sm hover:bg-white/20"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-3.5 h-3.5 mr-1.5" aria-hidden="true"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>13<!-- --> <!-- -->Modules</div></div><div class="max-w-md transition-all duration-700 delay-500 transform opacity-0 translate-y-4"><div class="flex items-center justify-between text-sm text-white/70 mb-2"><span class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code w-4 h-4" aria-hidden="true"><path d="m16 18 6-6-6-6"></path><path d="m8 6-6 6 6 6"></path></svg><span>Chapter <!-- -->10<!-- -->: <!-- -->Profile Management and Settings Sync</span></span><span class="font-medium text-white">77<!-- -->%</span></div><div class="relative"><div aria-valuemax="100" aria-valuemin="0" role="progressbar" data-state="indeterminate" data-max="100" class="relative w-full overflow-hidden rounded-full h-2 bg-white/20"><div data-state="indeterminate" data-max="100" class="h-full w-full flex-1 bg-primary transition-all" style="transform:translateX(-23%)"></div></div><div class="absolute top-0 left-0 h-2 rounded-full blur-sm bg-gradient-to-r from-cyan-500 via-teal-500 to-emerald-500" style="width:77%"></div></div><div class="relative mt-1 h-1"><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:7.6923076923076925%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:15.384615384615385%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:23.076923076923077%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:30.76923076923077%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:38.46153846153847%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:46.15384615384615%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:53.84615384615385%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:61.53846153846154%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:69.23076923076923%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:76.92307692307693%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:84.61538461538461%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:92.3076923076923%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:100%"></div></div></div></div><div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent"></div></header><main class="container px-4 pt-8 pb-8 flex flex-col md:flex-row gap-x-8 min-h-screen" id="main-content"><aside class="w-full md:w-64 lg:w-72 md:sticky md:top-20 md:h-[calc(100vh-5rem-2rem)] mb-8 md:mb-0"><h2 class="text-xl font-semibold mb-4 break-words">Vscode Learning Pathway</h2><div dir="ltr" class="relative overflow-hidden h-auto md:h-full pr-4 border-r md:border-r-0" style="position:relative;--radix-scroll-area-corner-width:0px;--radix-scroll-area-corner-height:0px"><style>[data-radix-scroll-area-viewport]{scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;}[data-radix-scroll-area-viewport]::-webkit-scrollbar{display:none}</style><div data-radix-scroll-area-viewport="" class="h-full w-full rounded-[inherit]" style="overflow-x:hidden;overflow-y:hidden"><div style="min-width:100%;display:table"><nav><ul><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/01-introduction.md"><span class="mr-2 text-xs opacity-60">1<!-- -->.</span>Introduction to VS Code as an AI-Powered IDE</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/02-keyboard-shortcuts.md"><span class="mr-2 text-xs opacity-60">2<!-- -->.</span>Essential Keyboard Shortcuts and Productivity</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/03-extension-ecosystem.md"><span class="mr-2 text-xs opacity-60">3<!-- -->.</span>Extension Ecosystem Mastery</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/04-settings-customization.md"><span class="mr-2 text-xs opacity-60">4<!-- -->.</span>Settings and Customisation</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/05-git-integration.md"><span class="mr-2 text-xs opacity-60">5<!-- -->.</span>Git Integration Deep Dive</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/06-remote-development.md"><span class="mr-2 text-xs opacity-60">6<!-- -->.</span>Remote Development (SSH, Containers, WSL)</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/07-debugging.md"><span class="mr-2 text-xs opacity-60">7<!-- -->.</span>Debugging Mastery</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/08-task-automation.md"><span class="mr-2 text-xs opacity-60">8<!-- -->.</span>Task Automation and Build Systems</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/09-ai-integration.md"><span class="mr-2 text-xs opacity-60">9<!-- -->.</span>AI Coding Assistants Integration</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors bg-primary text-primary-foreground font-semibold" href="/workshops/vscode-learning-pathway/10-profiles-sync.md"><span class="mr-2 text-xs opacity-60">10<!-- -->.</span>Profile Management and Settings Sync</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/11-workspaces.md"><span class="mr-2 text-xs opacity-60">11<!-- -->.</span>Multi-root Workspaces and Advanced Organization</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/12-advanced-editing.md"><span class="mr-2 text-xs opacity-60">12<!-- -->.</span>Advanced Editing Features</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/overview.md"><span class="mr-2 text-xs opacity-60">13<!-- -->.</span>VS Code Learning Pathway 2026: From Beginner to AI-Powered Master</a></li></ul></nav></div></div></div></aside><article class="flex-1 min-w-0 md:pl-0"><div class="prose max-w-none dark:prose-invert break-words [&amp;_table]:block [&amp;_table]:w-full [&amp;_table]:overflow-x-auto"><h1>Profile Management and Settings Sync</h1>
+<h2>Learning Objectives</h2>
+<ul>
+<li>Create and manage VS Code profiles for different workflows</li>
+<li>Sync settings, extensions, and keybindings across devices</li>
+<li>Share profiles with teams</li>
+<li>Optimise profile performance</li>
+<li>Troubleshoot sync issues</li>
+</ul>
+<h2>What are Profiles?</h2>
+<p><strong>Profiles = Complete VS Code Configurations</strong></p>
+<p>Each profile contains:</p>
+<ul>
+<li>Settings</li>
+<li>Extensions</li>
+<li>Keybindings</li>
+<li>UI state</li>
+<li>Snippets</li>
+</ul>
+<p><img src="/data/workshops/vscode-learning-pathway/diagrams/10-profiles.svg" alt="Profiles for different work: an all-purpose default plus tailored web development, Python and writing profiles"></p>
+<h2>Creating Profiles</h2>
+<h3>Method 1: UI</h3>
+<pre><code>1. Click gear icon (bottom left)
+2. "Profiles" → "Create Profile"
+3. Choose:
+   - Empty Profile
+   - Copy from current
+   - Profile template
+4. Name it (e.g., "Web Development")
+5. Select what to include
+</code></pre>
+<h3>Method 2: Command Palette</h3>
+<pre><code>Ctrl+Shift+P → "Profiles: Create Profile"
+</code></pre>
+<h2>Profile Templates</h2>
+<h3>Web Development</h3>
+<p><strong>Extensions:</strong></p>
+<ul>
+<li>ESLint</li>
+<li>Prettier</li>
+<li>GitLens</li>
+<li>Auto Rename Tag</li>
+<li>Live Server</li>
+<li>Copilot</li>
+</ul>
+<p><strong>Settings:</strong></p>
+<pre><code class="language-json">{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "eslint.autoFixOnSave": true
+}
+</code></pre>
+<h3>Python Data Science</h3>
+<p><strong>Extensions:</strong></p>
+<ul>
+<li>Python</li>
+<li>Pylance</li>
+<li>Jupyter</li>
+<li>Black Formatter</li>
+<li>autoDocstring</li>
+</ul>
+<p><strong>Settings:</strong></p>
+<pre><code class="language-json">{
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.rulers": [88]
+  },
+  "jupyter.askForKernelRestart": false
+}
+</code></pre>
+<h3>Writing &amp; Documentation</h3>
+<p><strong>Extensions:</strong></p>
+<ul>
+<li>Markdown All in One</li>
+<li>Grammarly</li>
+<li>Code Spell Checker</li>
+<li>Paste Image</li>
+</ul>
+<p><strong>Settings:</strong></p>
+<pre><code class="language-json">{
+  "workbench.activityBar.visible": false,
+  "workbench.statusBar.visible": false,
+  "editor.minimap.enabled": false,
+  "zenMode.centerLayout": true
+}
+</code></pre>
+<h3>Minimal Performance</h3>
+<p><strong>Extensions:</strong></p>
+<ul>
+<li>None or essential only (GitLens, language support)</li>
+</ul>
+<p><strong>Settings:</strong></p>
+<pre><code class="language-json">{
+  "editor.minimap.enabled": false,
+  "editor.suggest.enabled": false,
+  "extensions.autoUpdate": false,
+  "telemetry.telemetryLevel": "off"
+}
+</code></pre>
+<h2>Switching Profiles</h2>
+<p><strong>Quick Switch:</strong></p>
+<pre><code>Click gear icon → Profiles → Select profile
+Or: Ctrl+Shift+P → "Profiles: Switch Profile"
+</code></pre>
+<p><strong>Status Bar Indicator:</strong></p>
+<pre><code>Bottom left shows current profile name
+</code></pre>
+<h2>Profile Export &amp; Import</h2>
+<h3>Export Profile</h3>
+<pre><code>1. Gear icon → Profiles
+2. Select profile → "Export Profile"
+3. Choose what to include
+4. Save as .code-profile file
+</code></pre>
+<h3>Import Profile</h3>
+<pre><code>1. Gear icon → Profiles → "Import Profile"
+2. Select .code-profile file
+3. Review contents
+4. Import
+</code></pre>
+<h3>Share with Team</h3>
+<p><strong>Create .code-profile:</strong></p>
+<pre><code class="language-json">{
+  "name": "Company Standard",
+  "settings": "{...}",
+  "extensions": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode"
+  ],
+  "keybindings": "[...]"
+}
+</code></pre>
+<p><strong>Distribute:</strong></p>
+<pre><code>1. Save to shared location (Git repo, Google Drive)
+2. Team imports profile
+3. Everyone has same setup
+</code></pre>
+<h2>Settings Sync</h2>
+<h3>Enable Sync</h3>
+<pre><code>1. Click gear icon → "Turn on Settings Sync"
+2. Sign in (GitHub or Microsoft)
+3. Select what to sync:
+   ✅ Settings
+   ✅ Keyboard Shortcuts
+   ✅ Extensions
+   ✅ User Snippets
+   ✅ UI State
+   ✅ Profiles
+</code></pre>
+<h3>What Gets Synced</h3>
+<p><strong>Synced:</strong></p>
+<ul>
+<li>User settings.json</li>
+<li>Keybindings.json</li>
+<li>Extensions list</li>
+<li>Snippets</li>
+<li>UI state (sidebar, panel positions)</li>
+<li>Profiles</li>
+</ul>
+<p><strong>NOT Synced:</strong></p>
+<ul>
+<li>Workspace settings</li>
+<li>Extension data (varies by extension)</li>
+<li>Local files</li>
+</ul>
+<h3>Manual Sync</h3>
+<pre><code>Ctrl+Shift+P:
+- "Settings Sync: Show Synced Data"
+- "Settings Sync: Turn Off"
+- "Settings Sync: Configure"
+</code></pre>
+<h3>Sync Across Devices</h3>
+<p><strong>Scenario:</strong> Work desktop → Home laptop → Cloud VM</p>
+<pre><code>1. Enable sync on work desktop
+2. Install VS Code on laptop
+3. Sign in with same account
+4. Sync downloads automatically
+5. Repeat for cloud VM
+</code></pre>
+<p><strong>Updates propagate:</strong></p>
+<ul>
+<li>Change extension on desktop → Syncs to laptop</li>
+<li>Add snippet on laptop → Syncs to VM</li>
+<li>Install extension on VM → Syncs everywhere</li>
+</ul>
+<h2>Profile-Specific Settings</h2>
+<h3>Override Settings per Profile</h3>
+<pre><code class="language-json">// User settings.json (applies to all profiles unless overridden)
+{
+  "editor.fontSize": 14
+}
+
+// Web Dev profile settings
+{
+  "editor.fontSize": 12,  // Override
+  "editor.formatOnSave": true  // Profile-specific
+}
+</code></pre>
+<h3>Profile Icons</h3>
+<p><strong>Customise profile appearance:</strong></p>
+<pre><code>1. Click profile name
+2. "Edit Icon"
+3. Choose emoji or upload image
+</code></pre>
+<h2>Advanced Profile Management</h2>
+<h3>Profile Templates</h3>
+<p><strong>Create template for team:</strong></p>
+<pre><code class="language-json">// company-profile.json
+{
+  "name": "Company Standard",
+  "settings": {
+    "editor.tabSize": 2,
+    "files.eol": "\n",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "explicit"
+    }
+  },
+  "extensions": [
+    "dbaeumer.vscode-eslint@2.4.0",
+    "esbenp.prettier-vscode@10.0.0",
+    "eamodio.gitlens@14.0.0"
+  ]
+}
+</code></pre>
+<h3>Conditional Extensions</h3>
+<p><strong>Extensions per profile:</strong></p>
+<pre><code>Web Dev: Install ESLint, Prettier
+Python: Install Python, Jupyter (NOT ESLint)
+Writing: Install Markdown, Grammarly (NOTHING else)
+</code></pre>
+<p><strong>Result:</strong> Faster startup, less clutter</p>
+<h2>Troubleshooting</h2>
+<h3>Sync Not Working</h3>
+<p><strong>Check:</strong></p>
+<pre><code>1. Signed in? (gear icon → account name shown)
+2. Internet connection
+3. Sync enabled? (gear icon → Settings Sync: ON)
+4. Conflicts? (Ctrl+Shift+P → "Settings Sync: Show Synced Data")
+</code></pre>
+<p><strong>Reset Sync:</strong></p>
+<pre><code>Ctrl+Shift+P → "Settings Sync: Reset Local"
+Beware: Overwrites local with cloud
+</code></pre>
+<h3>Profile Not Switching</h3>
+<p><strong>Solution:</strong></p>
+<pre><code>1. Reload window (Ctrl+Shift+P → "Reload Window")
+2. Verify profile selected (bottom left)
+3. Check for extension conflicts
+</code></pre>
+<h3>Extensions Missing After Profile Switch</h3>
+<p><strong>Cause:</strong> Extensions installed locally, not in profile</p>
+<p><strong>Solution:</strong></p>
+<pre><code>1. Switch to correct profile
+2. Install extension
+3. It's now part of that profile
+</code></pre>
+<h2>Pro Tips</h2>
+<h3>Tip 1: Auto-Switch Profiles</h3>
+<p><strong>Use workspace settings:</strong></p>
+<pre><code class="language-json">// project/.vscode/settings.json
+{
+  "extensions.profileName": "Web Development"
+}
+</code></pre>
+<p>VS Code suggests switching when opening workspace.</p>
+<h3>Tip 2: Backup Profiles</h3>
+<p><strong>Export regularly:</strong></p>
+<pre><code>1. Export each profile monthly
+2. Save to Git repo or cloud storage
+3. Version control for rollback
+</code></pre>
+<h3>Tip 3: Minimal Profile for Performance</h3>
+<p><strong>Use when:</strong></p>
+<ul>
+<li>Low-powered device</li>
+<li>Large project</li>
+<li>Remote connection slow</li>
+</ul>
+<p><strong>Settings:</strong></p>
+<pre><code class="language-json">{
+  "extensions.autoUpdate": false,
+  "files.watcherExclude": {
+    "**/node_modules": true
+  },
+  "search.followSymlinks": false
+}
+</code></pre>
+<h3>Tip 4: Share Profiles via Git</h3>
+<p><strong>Workflow:</strong></p>
+<pre><code class="language-bash"># Export profile
+code --export-profile "Web Dev" &gt; web-dev-profile.code-profile
+
+# Commit to repo
+git add web-dev-profile.code-profile
+git commit -m "Add Web Dev profile"
+
+# Team imports
+code --import-profile web-dev-profile.code-profile
+</code></pre>
+<h3>Tip 5: Profile Per Project Type</h3>
+<p><strong>Structure:</strong></p>
+<pre><code>Default → General use
+Frontend → React, Vue, Angular
+Backend → Node.js, Python, Rust
+DevOps → Docker, Kubernetes, Terraform
+Data → Python, Jupyter, R
+</code></pre>
+<h2>Assessment</h2>
+<p><strong>Create Your Profile System:</strong></p>
+<ol>
+<li>Identify 3-5 workflows you have</li>
+<li>Create profile for each</li>
+<li>Configure extensions and settings</li>
+<li>Export profiles</li>
+<li>Enable Settings Sync</li>
+<li>Test switching between profiles</li>
+</ol>
+<p><strong>Success Criteria:</strong></p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled=""> Multiple functional profiles</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Settings sync working</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Profiles exported/backed up</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Faster workflow with right profile</li>
+</ul>
+<h2>Resources</h2>
+<ul>
+<li><a href="https://code.visualstudio.com/docs/editor/profiles">Profiles Documentation</a></li>
+<li><a href="https://code.visualstudio.com/docs/editor/settings-sync">Settings Sync</a></li>
+</ul>
+<hr>
+<p><strong>Time</strong>: 2 hours
+<strong>Difficulty</strong>: Beginner to Intermediate</p></div></article></main></div>
+    <noscript><p>Interactive forms require JavaScript. You can also email <a href="mailto:info@dreamlab-ai.com">info@dreamlab-ai.com</a>.</p></noscript>
+  
+
+</body></html>

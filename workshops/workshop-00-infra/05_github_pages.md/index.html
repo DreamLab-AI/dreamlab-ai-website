@@ -1,0 +1,555 @@
+<!DOCTYPE html><html lang="en" class="dark"><head>
+    <meta charset="UTF-8">
+
+    <!-- Primary Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <title>Chapter 5: GitHub Pages: Your Free Portfolio Site | DreamLab AI Workshops</title>
+    <meta name="title" content="Chapter 5: GitHub Pages: Your Free Portfolio Site | DreamLab AI Workshops">
+    <meta name="description" content="Chapter 5: GitHub Pages: Your Free Portfolio Site — free DreamLab AI curriculum.">
+    <meta name="keywords" content="applied innovation lab, AI consulting, enterprise innovation, immersive XR, cyber trust, creative technology, residential programmes, knowledge transfer, deep tech, Lake District">
+    <meta name="author" content="DreamLab">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    <meta name="rating" content="General">
+
+    <link rel="describedby" href="/llms.txt" type="text/plain">
+    <script type="application/ld+json" id="organisation-structured-data">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://dreamlab-ai.com/#organisation","name":"DreamLab","url":"https://dreamlab-ai.com/","logo":"https://dreamlab-ai.com/images/heroes/dreamlab-hero.webp","email":"info@dreamlab-ai.com","founder":{"@id":"https://dreamlab-ai.com/team#john-ohare"},"sameAs":["https://github.com/DreamLab-AI","https://www.linkedin.com/company/dreamlab-ai-consulting"]},{"@type":"Person","@id":"https://dreamlab-ai.com/team#john-ohare","name":"John O'Hare","honorificPrefix":"Dr","jobTitle":"Founder","worksFor":{"@id":"https://dreamlab-ai.com/#organisation"},"url":"https://dreamlab-ai.com/team#john-ohare"}]}</script>
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dreamlab-ai.com/workshops/workshop-00-infra/05_github_pages.md/">
+
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="msapplication-TileColor" content="#1a1a2e">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://dreamlab-ai.com/workshops/workshop-00-infra/05_github_pages.md/">
+    <meta property="og:title" content="Chapter 5: GitHub Pages: Your Free Portfolio Site | DreamLab AI Workshops">
+    <meta property="og:description" content="Chapter 5: GitHub Pages: Your Free Portfolio Site — free DreamLab AI curriculum.">
+    <meta property="og:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="DreamLab AI Workshop - Chapter 5: GitHub Pages: Your Free Portfolio Site">
+    <meta property="og:site_name" content="DreamLab">
+    <meta property="og:locale" content="en_GB">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://dreamlab-ai.com/workshops/workshop-00-infra/05_github_pages.md/">
+    <meta name="twitter:title" content="Chapter 5: GitHub Pages: Your Free Portfolio Site | DreamLab AI Workshops">
+    <meta name="twitter:description" content="Chapter 5: GitHub Pages: Your Free Portfolio Site — free DreamLab AI curriculum.">
+    <meta name="twitter:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta name="twitter:image:alt" content="DreamLab AI Workshop - Chapter 5: GitHub Pages: Your Free Portfolio Site">
+    <meta name="twitter:site" content="@thedreamlab">
+    <meta name="twitter:creator" content="@thedreamlab">
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="geo.region" content="GB">
+    <meta name="geo.placename" content="United Kingdom">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DreamLab AI">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Security Headers -->
+    <!--
+      CSP notes:
+      - script-src is 'self' only: no 'unsafe-eval' (blocks eval/Function-based
+        injection) and no 'unsafe-inline'. The one inline bootstrap script was
+        moved to /spa-redirect.js. JSON-LD blocks below are type
+        application/ld+json (data, not executable) so CSP does not gate them.
+      - connect-src is scoped to the Cloudflare Workers subdomain actually used
+        by this account (*.solitary-paper-764d.workers.dev: auth / pod / search /
+        link-preview / nostr-relay), NOT the internet-wide *.workers.dev, which
+        previously allowed exfiltration to any attacker-controlled worker.
+      - The two open Nostr relays (relay.damus.io, relay.primal.net) are
+        explicitly allow-listed: the Talk-to-AI chat listens there for
+        junkiejarvis's reply (the primary relay's whitelist gate rejects the
+        gift-wrap addressed to the ephemeral session key — ADR-042 Amendment 1).
+        Must stay in sync with VITE_REPLY_RELAYS. Named exactly, not a wildcard.
+      - style-src keeps 'unsafe-inline' because Radix UI + runtime style
+        attributes require it; that is not a script-injection vector.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.solitary-paper-764d.workers.dev wss://*.solitary-paper-764d.workers.dev https://*.dreamlab-ai.com wss://*.dreamlab-ai.com wss://relay.damus.io wss://relay.primal.net; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <!-- SPA deep-link restore. External 'self' script (not inline) so CSP
+         script-src can stay 'self' with no 'unsafe-inline'. Classic,
+         render-blocking script: runs before the deferred app module. -->
+    <script src="/spa-redirect.js"></script>
+    <script type="module" crossorigin="" src="/assets/index-Crc86LXg.js"></script>
+    <link rel="modulepreload" crossorigin="" href="/assets/ui-C2dH1upk.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/vendor-uw6h6E0d.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/nostr-BpuBsPg-.js">
+    <link rel="stylesheet" crossorigin="" href="/assets/index-CeEdk6WL.css">
+  <script type="application/ld+json" id="route-structured-data">{"@context":"https://schema.org","@type":"LearningResource","@id":"https://dreamlab-ai.com/workshops/workshop-00-infra/05_github_pages.md/#page","url":"https://dreamlab-ai.com/workshops/workshop-00-infra/05_github_pages.md/","name":"Chapter 5: GitHub Pages: Your Free Portfolio Site | DreamLab AI Workshops","description":"Chapter 5: GitHub Pages: Your Free Portfolio Site — free DreamLab AI curriculum.","inLanguage":"en-GB","publisher":{"@id":"https://dreamlab-ai.com/#organisation"},"isAccessibleForFree":true}</script><link rel="alternate" type="text/markdown" href="/data/workshops/workshop-00-infra/05_github_pages.md"></head>
+
+  <body>
+    <!-- Skip Navigation Link for Accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
+      Skip to main content
+    </a>
+    <div id="root"><header role="banner" class="fixed top-0 left-0 right-0 z-50"><div class="md:hidden flex items-center justify-between h-14 px-6 bg-[rgba(14,14,17,0.92)] backdrop-blur-[14px] border-b border-dlm-hairline"><a aria-label="DreamLab home" class="flex items-center gap-2" href="/"><span class="w-[9px] h-[9px] rounded-full bg-dlm-bright shrink-0" aria-hidden="true"></span><span class="text-[14px] font-semibold tracking-[0.14em] text-[#FAFAFA]">DREAMLAB</span></a><button type="button" aria-label="Open menu" aria-expanded="false" class="w-11 h-11 -mr-2 flex flex-col items-end justify-center gap-[5px] focus:outline-none focus-visible:ring-2 focus-visible:ring-dlm-bright rounded"><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span></button></div><div class="hidden md:block transition-all duration-300 ease-out py-3 bg-background/60 backdrop-blur-md"><div class="container flex items-center justify-between px-4"><button class="flex items-center gap-2 md:gap-3 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded min-h-[48px] min-w-[48px] px-3 py-2" aria-label="Main navigation menu" type="button" id="radix-:Rp:" aria-haspopup="menu" aria-expanded="false" data-state="closed"><div class="w-10 h-10 md:w-8 md:h-8 shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all duration-300 group-hover:scale-110 animate-glow-pulse" aria-hidden="true"></div><span class="font-bold text-lg md:text-xl tracking-tight group-hover:text-purple-400 transition-colors duration-300">MENU</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down h-5 w-5 md:h-4 md:w-4 shrink-0 text-muted-foreground group-hover:text-purple-400 transition-all duration-300 group-hover:rotate-180" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button><div class="flex items-center gap-2"><a class="items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-10 py-2 hover:bg-purple-500/10 hover:text-purple-400 transition-all duration-300 hover:scale-105 min-h-[48px] px-4 text-base md:text-sm hidden sm:inline-flex" href="/contact">Contact</a><a class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary hover:bg-primary/90 h-10 py-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transition-all duration-300 min-h-[48px] px-4 text-base md:text-sm" href="/co-create">Partner With Us</a></div></div></div></header><header class="relative overflow-hidden" style="min-height:320px"><div class="absolute inset-0 bg-gradient-to-br from-slate-500/30 via-zinc-500/30 to-neutral-500/30" style="transform:translateY(0px);opacity:1"><div class="absolute top-0 -left-20 w-96 h-96 rounded-full blur-3xl opacity-40 animate-float bg-gradient-to-br from-slate-500 via-zinc-500 to-neutral-500"></div><div class="absolute bottom-0 -right-20 w-[32rem] h-[32rem] rounded-full blur-3xl opacity-30 animate-float bg-gradient-to-br from-slate-500 via-zinc-500 to-neutral-500" style="animation-delay:1s"></div><div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full blur-3xl opacity-20 animate-float bg-gradient-to-br from-slate-500 via-zinc-500 to-neutral-500" style="animation-delay:2s"></div></div><div class="absolute inset-0 opacity-5" style="background-image:linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);background-size:50px 50px;transform:translateY(0px)"></div><div class="relative z-10 container px-4 pt-24 pb-8"><div class="mb-6 transition-all duration-500 transform opacity-0 translate-y-4"><nav aria-label="breadcrumb"><ol class="flex flex-wrap items-center gap-1.5 break-words text-sm sm:gap-2.5 text-white/70"><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/">Home</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/workshops">Workshops</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><span role="link" aria-disabled="true" aria-current="page" class="text-white font-medium">A Creative Technologist's Guide to GitHub &amp; AI-Powered Workflows</span></li></ol></nav></div><div class="mb-4 transition-all duration-500 delay-100 transform opacity-0 translate-y-4"><div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20"><span class="text-slate-400"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-5 h-5" aria-hidden="true"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg></span><span class="text-sm font-medium text-white/90">Foundations</span></div></div><h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 break-words transition-all duration-700 delay-200 transform opacity-0 translate-y-6"><span class="bg-gradient-to-r bg-clip-text text-transparent animate-gradient-shift bg-400% from-slate-400 via-zinc-400 to-neutral-400">A Creative Technologist's Guide to GitHub &amp; AI-Powered Workflows</span></h1><div class="flex flex-wrap items-center gap-3 mb-6 transition-all duration-700 delay-400 transform opacity-0 translate-y-4"><div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-white/10 border-white/20 text-white backdrop-blur-sm hover:bg-white/20"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-3.5 h-3.5 mr-1.5" aria-hidden="true"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>17<!-- --> <!-- -->Modules</div></div><div class="max-w-md transition-all duration-700 delay-500 transform opacity-0 translate-y-4"><div class="flex items-center justify-between text-sm text-white/70 mb-2"><span class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code w-4 h-4" aria-hidden="true"><path d="m16 18 6-6-6-6"></path><path d="m8 6-6 6 6 6"></path></svg><span>Chapter <!-- -->11<!-- -->: <!-- -->Chapter 5: GitHub Pages: Your Free Portfolio Site</span></span><span class="font-medium text-white">65<!-- -->%</span></div><div class="relative"><div aria-valuemax="100" aria-valuemin="0" role="progressbar" data-state="indeterminate" data-max="100" class="relative w-full overflow-hidden rounded-full h-2 bg-white/20"><div data-state="indeterminate" data-max="100" class="h-full w-full flex-1 bg-primary transition-all" style="transform:translateX(-35%)"></div></div><div class="absolute top-0 left-0 h-2 rounded-full blur-sm bg-gradient-to-r from-slate-500 via-zinc-500 to-neutral-500" style="width:65%"></div></div><div class="relative mt-1 h-1"><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:5.88235294117647%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:11.76470588235294%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:17.647058823529413%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:23.52941176470588%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:29.411764705882355%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:35.294117647058826%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:41.17647058823529%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:47.05882352941176%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:52.94117647058824%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:58.82352941176471%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:64.70588235294117%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:70.58823529411765%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:76.47058823529412%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:82.35294117647058%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:88.23529411764706%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:94.11764705882352%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:100%"></div></div></div></div><div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent"></div></header><main class="container px-4 pt-8 pb-8 flex flex-col md:flex-row gap-x-8 min-h-screen" id="main-content"><aside class="w-full md:w-64 lg:w-72 md:sticky md:top-20 md:h-[calc(100vh-5rem-2rem)] mb-8 md:mb-0"><h2 class="text-xl font-semibold mb-4 break-words">A Creative Technologist's Guide to GitHub &amp; AI-Powered Workflows</h2><div dir="ltr" class="relative overflow-hidden h-auto md:h-full pr-4 border-r md:border-r-0" style="position:relative;--radix-scroll-area-corner-width:0px;--radix-scroll-area-corner-height:0px"><style>[data-radix-scroll-area-viewport]{scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;}[data-radix-scroll-area-viewport]::-webkit-scrollbar{display:none}</style><div data-radix-scroll-area-viewport="" class="h-full w-full rounded-[inherit]" style="overflow-x:hidden;overflow-y:hidden"><div style="min-width:100%;display:table"><nav><ul><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/README.md"><span class="mr-2 text-xs opacity-60">1<!-- -->.</span>A Creative Technologist's Guide to GitHub &amp; AI-Powered Workflows</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/00_introduction.md"><span class="mr-2 text-xs opacity-60">2<!-- -->.</span>Chapter 0: Introduction &amp; Workshop Overview</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/01_why_git.md"><span class="mr-2 text-xs opacity-60">3<!-- -->.</span>Chapter 1: Why Git? Understanding Version Control</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/02_a_github_account.md"><span class="mr-2 text-xs opacity-60">4<!-- -->.</span>Chapter 2a: Creating Your GitHub Account</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/02_b_install_git_vscode.md"><span class="mr-2 text-xs opacity-60">5<!-- -->.</span>Chapter 2b: Installing Git &amp; VS Code</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/02_c_gcp_api_key.md"><span class="mr-2 text-xs opacity-60">6<!-- -->.</span>Chapter 2c: Setting Up AI API Keys (2026 Edition)</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/02_d_roo_code_config.md"><span class="mr-2 text-xs opacity-60">7<!-- -->.</span>Chapter 2d: Configuring AI Coding Assistants in VS Code (2026 Edition)</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/02_setup_overview.md"><span class="mr-2 text-xs opacity-60">8<!-- -->.</span>Chapter 2: Essential Setup: Accounts &amp; Installations</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/03_core_workflow.md"><span class="mr-2 text-xs opacity-60">9<!-- -->.</span>Chapter 3: The Core Git Workflow</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/04_collaboration_recovery.md"><span class="mr-2 text-xs opacity-60">10<!-- -->.</span>Chapter 4: Collaboration &amp; Recovery</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors bg-primary text-primary-foreground font-semibold" href="/workshops/workshop-00-infra/05_github_pages.md"><span class="mr-2 text-xs opacity-60">11<!-- -->.</span>Chapter 5: GitHub Pages: Your Free Portfolio Site</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/06_ai_workflows_roo_code.md"><span class="mr-2 text-xs opacity-60">12<!-- -->.</span>Chapter 6: AI-Powered Workflows with Claude Code</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/07_cheat_sheet.md"><span class="mr-2 text-xs opacity-60">13<!-- -->.</span>Chapter 7: Reference Cheat Sheet</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/08_latex_wsl_vscode.md"><span class="mr-2 text-xs opacity-60">14<!-- -->.</span>Chapter 8: Advanced Typesetting: LaTeX with WSL2, TeXLive, and VS Code</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/09_cheat_sheet.md"><span class="mr-2 text-xs opacity-60">15<!-- -->.</span>Chapter 9: Reference Cheat Sheet</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/09_context_management.md"><span class="mr-2 text-xs opacity-60">16<!-- -->.</span>Chapter 9: Context Management &amp; Advanced Agent Workflows</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/10_context_management.md"><span class="mr-2 text-xs opacity-60">17<!-- -->.</span>Chapter 10: Advanced Context Management &amp; Multi-Session Strategies</a></li></ul></nav></div></div></div></aside><article class="flex-1 min-w-0 md:pl-0"><div class="prose max-w-none dark:prose-invert break-words [&amp;_table]:block [&amp;_table]:w-full [&amp;_table]:overflow-x-auto"><h1>Chapter 5: GitHub Pages: Your Free Portfolio Site</h1>
+<p>One of the most exciting features of <a href="https://github.com/">GitHub</a> for creative technologists is <strong><a href="https://pages.github.com/">GitHub Pages</a></strong>. It allows you to host a static website directly from your GitHub repository, completely free. This is perfect for portfolios, project showcases, documentation sites, or simple blogs.</p>
+<p>The workshop highlighted this as "probably the most powerful bit from all of your point of view in terms of you can host your own stuff and it's free... everybody wants a free website, why wouldn't you?"</p>
+<h2>5.1 How GitHub Pages Works</h2>
+<p>GitHub Pages takes HTML, CSS, and JavaScript files (and Markdown files, which it can convert to HTML) from a specific branch and folder in your repository and publishes them as a website.</p>
+<ul>
+<li><strong>Static Sites:</strong> GitHub Pages is designed for static sites. This means the content is pre-built and served as-is to users. It doesn't support server-side languages like PHP, Python (e.g., Django/Flask), or Node.js backends directly in the way traditional web hosts do. However, you can build very rich interactive experiences using client-side JavaScript frameworks (like React, Vue, Angular) and then deploy the static build output to GitHub Pages.</li>
+<li><strong>URL Structure:</strong>
+<ul>
+<li><strong>User/Organization Site:</strong> If you name a repository <code>&lt;username&gt;.github.io</code> (where <code>&lt;username&gt;</code> is your GitHub username or organization name), the content from its <code>main</code> branch (usually from the root or a <code>/docs</code> folder) will be served at <code>https://&lt;username&gt;.github.io</code>. You can only have one such site per account/organization.</li>
+<li><strong>Project Site:</strong> For any other repository, you can enable GitHub Pages. The site will typically be available at <code>https://&lt;username&gt;.github.io/&lt;repository-name&gt;/</code>.</li>
+</ul>
+</li>
+</ul>
+<h2>5.2 Setting Up GitHub Pages for a Repository</h2>
+<p>Here's the general process, based on the <code>workshop.md</code> instructions:</p>
+<ol>
+<li>
+<p><strong>Prepare Your Website Files:</strong></p>
+<ul>
+<li>Your website needs at least an <code>index.html</code> file at the root of where it will be served from. You can also have CSS files, JavaScript files, images, etc.</li>
+<li>For simplicity, you can place all your website files in the root of your repository or, more commonly, in a dedicated folder named <code>/docs</code> within your repository.</li>
+</ul>
+</li>
+<li>
+<p><strong>Push Your Files to GitHub:</strong></p>
+<ul>
+<li>Ensure your website files (e.g., <code>index.html</code>, CSS, JS) are committed to your local Git repository and pushed to GitHub.</li>
+</ul>
+</li>
+<li>
+<p><strong>Configure GitHub Pages Settings:</strong></p>
+<ul>
+<li>On GitHub, navigate to your repository.</li>
+<li>Click on the "<strong>Settings</strong>" tab for that repository.</li>
+<li>In the left sidebar of the Settings page, scroll down and click on "<strong>Pages</strong>".</li>
+</ul>
+</li>
+<li>
+<p><strong>Choose a Source:</strong></p>
+<ul>
+<li>Under "Build and deployment", for "Source", select "<strong>Deploy from a branch</strong>".</li>
+<li><strong>Branch:</strong>
+<ul>
+<li>Select the branch you want to deploy from (usually <code>main</code>).</li>
+<li>Select the folder within that branch:
+<ul>
+<li>Choose <code>/(root)</code> if your website files are in the root of the branch.</li>
+<li>Choose <code>/docs</code> if your website files are in a folder named <code>docs</code> on that branch. This is a common and recommended practice.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Click "<strong>Save</strong>".</li>
+</ul>
+</li>
+<li>
+<p><strong>Wait for Deployment:</strong></p>
+<ul>
+<li>GitHub will start building and deploying your site. This might take a few minutes.</li>
+<li>The Pages settings page will update to show the URL where your site is published (e.g., <code>https://&lt;username&gt;.github.io/&lt;repository-name&gt;/</code>).</li>
+<li>"Push any HTML/Markdown file into <code>/docs</code> – site goes live at <code>https://&lt;username&gt;.github.io/&lt;repo&gt;/</code>."</li>
+</ul>
+</li>
+</ol>
+<h2>5.3 Example: Deploying a Simple Site</h2>
+<p>Let's imagine you have a repository named <code>my-portfolio</code>.</p>
+<ol>
+<li>Create a folder named <code>docs</code> in your local <code>my-portfolio</code> repository.</li>
+<li>Inside the <code>docs</code> folder, create an <code>index.html</code> file with simple content:
+<pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;My Awesome Portfolio&lt;/title&gt;
+    &lt;link rel="stylesheet" href="style.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Welcome to My Portfolio!&lt;/h1&gt;
+    &lt;p&gt;Check out my amazing projects.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+</li>
+<li>Also inside <code>docs</code>, create a <code>style.css</code> file:
+<pre><code class="language-css">body {
+    font-family: sans-serif;
+    margin: 20px;
+    background-color: #f0f0f0;
+}
+h1 {
+    color: navy;
+}
+</code></pre>
+</li>
+<li>Commit these files and push them to GitHub:
+<pre><code class="language-bash">git add docs/index.html docs/style.css
+git commit -m "Add initial website files for GitHub Pages"
+git push
+</code></pre>
+</li>
+<li>Go to your <code>my-portfolio</code> repository settings on GitHub, then to "Pages."</li>
+<li>Set the source to "Deploy from a branch," choose the <code>main</code> branch, and the <code>/docs</code> folder. Save.</li>
+<li>After a few minutes, your site should be live at <code>https://yourusername.github.io/my-portfolio/</code>.</li>
+</ol>
+<p>The <code>workshop.md</code> included an exercise: "&gt; <strong>Exercise</strong> – Use the provided <code>template‑site/</code> folder. Copy it into <code>/docs</code>, push, share the link!" This encourages hands-on practice.</p>
+<h2>5.4 Using Custom Domains with GitHub Pages</h2>
+<p>While the default <code>yourusername.github.io/repository-name</code> URL is functional, using a custom domain (e.g., <code>www.yourcreativeproject.com</code> or <code>portfolio.yourname.art</code>) lends a more professional touch to your GitHub Pages site. This section details how to configure a custom domain.</p>
+<h3>Prerequisites:</h3>
+<ul>
+<li><strong>A Registered Domain Name:</strong> You need to have already purchased a domain name from a domain registrar (e.g., Namecheap, GoDaddy, Google Domains, Cloudflare Registrar).</li>
+<li><strong>Access to DNS Settings:</strong> You must be able to manage the DNS (Domain Name System) records for your domain through your registrar's control panel.</li>
+</ul>
+<h3>Steps to Configure a Custom Domain:</h3>
+<p><strong>1. Add Your Custom Domain in GitHub Pages Settings:</strong></p>
+<ul>
+<li>Navigate to your repository on GitHub.</li>
+<li>Go to <code>Settings</code> → <code>Pages</code>.</li>
+<li>In the "Custom domain" section, type your full custom domain (e.g., <code>www.yourcreativeproject.com</code> or <code>yourcreativeproject.com</code> if you're using an apex domain) into the input field.</li>
+<li>Click <code>Save</code>.
+<ul>
+<li>GitHub may attempt to verify your domain and might show "DNS check in progress" or "DNS check successful."</li>
+<li>This step might also create a <code>CNAME</code> file in the root of your publishing source (e.g., your <code>main</code> branch's <code>/docs</code> folder or the <code>gh-pages</code> branch) containing your custom domain. If you manage your site files locally, ensure this <code>CNAME</code> file is pulled to your local repository and not accidentally overwritten or deleted.</li>
+</ul>
+</li>
+</ul>
+<p><strong>2. Configure DNS Records with Your Domain Registrar:</strong></p>
+<p>This is the most crucial and often trickiest part, as the interface varies between domain registrars. You'll need to add specific DNS records to point your domain to GitHub's servers.</p>
+<p><strong>Types of DNS Records for GitHub Pages:</strong></p>
+<ul>
+<li>
+<p><strong><code>A</code> Records (for Apex Domains):</strong></p>
+<ul>
+<li>An <strong>apex domain</strong> (also known as a root domain or naked domain) is like <code>yourcreativeproject.com</code> (without <code>www</code>).</li>
+<li>To configure an apex domain, you must use <code>A</code> records pointing to GitHub's IP addresses. GitHub provides specific IP addresses for this purpose.</li>
+<li><strong>GitHub's IP Addresses for <code>A</code> Records:</strong>
+<ul>
+<li><code>185.199.108.153</code></li>
+<li><code>185.199.109.153</code></li>
+<li><code>185.199.110.153</code></li>
+<li><code>185.199.111.153</code></li>
+</ul>
+</li>
+<li>You should create <strong>four</strong> <code>A</code> records, one for each of these IP addresses.</li>
+<li><strong>Example <code>A</code> Record Configuration (at your registrar):</strong>
+<ul>
+<li>Type: <code>A</code></li>
+<li>Host/Name: <code>@</code> (or leave blank, depending on your registrar – <code>@</code> usually signifies the apex domain)</li>
+<li>Value/Points to: <code>185.199.108.153</code></li>
+<li>TTL (Time To Live): Typically 1 hour (or 3600 seconds), or your registrar's default.</li>
+<li>(Repeat for the other three IP addresses)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><code>CNAME</code> Record (for Subdomains):</strong></p>
+<ul>
+<li>A <strong>subdomain</strong> is like <code>www.yourcreativeproject.com</code>, <code>blog.yourcreativeproject.com</code>, or <code>portfolio.yourname.art</code>.</li>
+<li>To configure a subdomain, you should use a <code>CNAME</code> (Canonical Name) record.</li>
+<li>The <code>CNAME</code> record should point to your default GitHub Pages domain (i.e., <code>yourusername.github.io</code>). <strong>Do not include the repository name here.</strong></li>
+<li><strong>Example <code>CNAME</code> Record Configuration (at your registrar):</strong>
+<ul>
+<li>Type: <code>CNAME</code></li>
+<li>Host/Name: <code>www</code> (or <code>blog</code>, <code>portfolio</code>, etc. – the part of the subdomain before your apex domain)</li>
+<li>Value/Points to: <code>yourusername.github.io</code> (replace <code>yourusername</code> with your actual GitHub username or organisation name)</li>
+<li>TTL: Typically 1 hour or default.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><code>ALIAS</code>, <code>ANAME</code>, or <code>FLATTENING</code> Records (Alternative for Apex Domains):</strong></p>
+<ul>
+<li>Some DNS providers offer special record types like <code>ALIAS</code> (e.g., DNSimple, Namecheap), <code>ANAME</code> (e.g., DNS Made Easy), or CNAME Flattening (e.g., Cloudflare).</li>
+<li>These records behave like <code>CNAME</code> records but can be used at the apex domain level. If your provider supports this, you can often point your apex domain (<code>yourcreativeproject.com</code>) directly to <code>yourusername.github.io</code>. This is generally preferred over <code>A</code> records if available, as GitHub's IP addresses could theoretically change (though rarely).</li>
+<li>Consult your DNS provider's documentation to see if they support this and how to configure it.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Which to Use?</strong></p>
+<ul>
+<li><strong>For <code>www.yourdomain.com</code> (or any other subdomain):</strong> Use a <code>CNAME</code> record pointing to <code>yourusername.github.io</code>.</li>
+<li><strong>For <code>yourdomain.com</code> (apex domain):</strong>
+<ul>
+<li><strong>Preferred:</strong> Use <code>ALIAS</code>, <code>ANAME</code>, or CNAME Flattening if your DNS provider supports it, pointing to <code>yourusername.github.io</code>.</li>
+<li><strong>Alternative:</strong> Use four <code>A</code> records pointing to the GitHub IP addresses listed above.</li>
+</ul>
+</li>
+<li><strong>Using both <code>www</code> and apex (e.g., redirect <code>yourdomain.com</code> to <code>www.yourdomain.com</code>):</strong>
+<ul>
+<li>Configure your apex domain with <code>A</code> records (or <code>ALIAS</code>/<code>ANAME</code>).</li>
+<li>Configure your <code>www</code> subdomain with a <code>CNAME</code> record.</li>
+<li>GitHub Pages will typically handle redirecting traffic from the apex to the <code>www</code> version (or vice-versa) if both are configured and one is set as primary in the GitHub Pages settings, but this can sometimes depend on your registrar's forwarding options too.</li>
+</ul>
+</li>
+</ul>
+<p><strong>3. Wait for DNS Propagation:</strong></p>
+<ul>
+<li>DNS changes are not instantaneous. They need to propagate across the internet, which can take anywhere from a few minutes to <strong>24-48 hours</strong> (though usually much faster).</li>
+<li>You can use online tools like <code>dnschecker.org</code> to see how your DNS records are propagating across different global DNS servers.</li>
+</ul>
+<p><strong>4. Verify and Enforce HTTPS:</strong></p>
+<ul>
+<li>Once your custom domain is correctly configured and DNS has propagated, GitHub will automatically attempt to provision an SSL/TLS certificate for your custom domain to enable HTTPS. This is provided by Let's Encrypt.</li>
+<li>In your repository's GitHub Pages settings (<code>Settings</code> → <code>Pages</code>), you should see a message indicating the status of your custom domain and HTTPS.</li>
+<li>Once HTTPS is enabled (you might see "Your site is published at <code>https://www.yourcreativeproject.com</code>" and a green checkmark), you should <strong>tick the "Enforce HTTPS" checkbox</strong>. This ensures all visitors are redirected to the secure <code>https://</code> version of your site.</li>
+</ul>
+<h3>Troubleshooting Custom Domains:</h3>
+<ul>
+<li><strong>DNS Check Fails in GitHub:</strong>
+<ul>
+<li>Wait longer for DNS propagation.</li>
+<li>Double-check your DNS records at your registrar for typos or incorrect values/types.</li>
+<li>Ensure the custom domain entered in GitHub Pages settings exactly matches what you're configuring (e.g., <code>www.domain.com</code> vs. <code>domain.com</code>).</li>
+</ul>
+</li>
+<li><strong>Site Not Loading or Certificate Errors:</strong>
+<ul>
+<li>Clear your browser cache or try an incognito window.</li>
+<li>Verify DNS propagation using an external tool.</li>
+<li>If HTTPS isn't enabling, ensure your DNS records are stable and correctly pointing to GitHub. Sometimes, removing and re-adding the custom domain in GitHub settings can trigger a new certificate provisioning attempt.</li>
+</ul>
+</li>
+<li><strong><code>CNAME</code> File Issues:</strong>
+<ul>
+<li>If GitHub created a <code>CNAME</code> file in your repository, ensure it's present and contains only your custom domain (e.g., <code>www.yourcreativeproject.com</code>).</li>
+</ul>
+</li>
+</ul>
+<h3>Using Claude Code for DNS and Custom Domains:</h3>
+<p>While Claude Code cannot directly configure your DNS settings (as that is done via your domain registrar's website), it can be a valuable assistant. Launch Claude Code and try:</p>
+<ul>
+<li><strong>Understanding DNS Concepts:</strong>
+<ul>
+<li>"Explain the difference between an A record and a CNAME record in DNS."</li>
+<li>"What is DNS propagation and why does it take time?"</li>
+<li>"What does TTL mean for a DNS record?"</li>
+</ul>
+</li>
+<li><strong>Generating Example Configurations:</strong>
+<ul>
+<li>"Show me an example of how to configure A records for an apex domain pointing to GitHub Pages IPs."</li>
+<li>"What should a CNAME record look like for pointing <code>blog.mydomain.com</code> to <code>myusername.github.io</code>?"</li>
+</ul>
+</li>
+<li><strong>Troubleshooting Guidance:</strong>
+<ul>
+<li>"My custom domain for GitHub Pages is not working. I have set up A records. What are common things to check?"</li>
+<li>"GitHub says 'DNS check failed' for my custom domain. What steps can I take to diagnose this?"</li>
+</ul>
+</li>
+<li><strong>Explaining Registrar-Specific Instructions:</strong>
+<ul>
+<li>If you copy instructions from your domain registrar's help pages, you could ask Claude Code: "My registrar says to 'create an A record pointing to an IP address'. Can you explain what 'Host' and 'Value' fields typically mean in this context?"</li>
+</ul>
+</li>
+</ul>
+<p>Setting up a custom domain adds a layer of professionalism to your GitHub Pages site. While it involves interacting with DNS settings outside of GitHub, following these steps carefully will lead to a successful configuration.</p>
+<h2>5.5 Advanced: Publishing from a Private Repository using GitHub Actions</h2>
+<p>While GitHub Pages is excellent for public repositories, you might have scenarios where your website's source code needs to remain private, but you still want to publish the built static site publicly. This can be achieved using GitHub Actions to deploy from your private repository to a separate public repository dedicated to hosting the GitHub Pages site.</p>
+<p>This approach ensures your source code, development history, and potentially sensitive information remain confidential, while the compiled static output (HTML, CSS, JavaScript) is made available to the world.</p>
+<h3>Approach Overview</h3>
+<p>The core idea is to:</p>
+<ol>
+<li>Keep your website's source code in a <strong>private</strong> GitHub repository.</li>
+<li>Create a <strong>public</strong> GitHub repository that will host the GitHub Pages site (e.g., <code>yourusername/public-blog-site</code>).</li>
+<li>Set up a GitHub Actions workflow in your private repository. This workflow will:
+<ul>
+<li>Trigger on pushes to your main branch (or any branch you designate).</li>
+<li>Build your static site (e.g., using Jekyll, Hugo, Next.js, or a simple HTML copy).</li>
+<li>Push the built static files to the <code>gh-pages</code> branch (or another designated branch) of your public repository.</li>
+</ul>
+</li>
+<li>Configure GitHub Pages in the public repository to serve from that <code>gh-pages</code> branch.</li>
+</ol>
+<h3>Step-by-Step Guide</h3>
+<p>Here’s how to set this up:</p>
+<p><strong>1. Create a Personal Access Token (PAT)</strong></p>
+<p>To allow your GitHub Actions workflow in the private repository to push to the public repository, it needs authentication. A Personal Access Token (PAT) with appropriate permissions is commonly used for this.</p>
+<ul>
+<li><strong>Navigate to PAT Settings:</strong> Go to your GitHub account settings (click your profile picture in the top-right) → Developer settings → Personal access tokens → Tokens (classic).
+<ul>
+<li><em>Alternatively, you can use Fine-grained personal access tokens, which offer more precise permission control, but "Tokens (classic)" are often simpler for this use case.</em></li>
+</ul>
+</li>
+<li><strong>Generate New Token:</strong> Click "Generate new token" (or "Generate new token (classic)").</li>
+<li><strong>Permissions (Scopes):</strong>
+<ul>
+<li>Give your token a descriptive note (e.g., "GH Pages Deploy Private to Public").</li>
+<li>Select an expiration period.</li>
+<li>Crucially, assign the correct scopes:
+<ul>
+<li><code>repo</code>: This grants full control of repositories, which is needed to push to your public repository.</li>
+<li><code>workflow</code>: This allows the token to be used in GitHub Actions workflows, specifically to update workflow files if your action does so (though less common for this specific deployment).</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Save the Token:</strong> Click "Generate token". <strong>Copy the token immediately and store it securely</strong> (e.g., in a password manager). You will not be able to see it again after navigating away from the page. Let's assume your token is <code>TOKENXXX</code>.</li>
+</ul>
+<p><strong>2. Configure the PAT in Your Private (Source) Repository</strong></p>
+<p>You must add this PAT as a secret in your private repository so the GitHub Actions workflow can access it securely.</p>
+<ul>
+<li>Go to your <strong>private</strong> repository on GitHub.</li>
+<li>Navigate to <code>Settings</code> → <code>Secrets and variables</code> → <code>Actions</code>.</li>
+<li>Click <code>New repository secret</code>.</li>
+<li><strong>Name:</strong> Choose a name for the secret, for example, <code>DEPLOY_TOKEN</code>.</li>
+<li><strong>Value:</strong> Paste the PAT (<code>TOKENXXX</code>) you copied earlier.</li>
+<li>Click <code>Add secret</code>.</li>
+</ul>
+<p><strong>3. Create the GitHub Actions Workflow File</strong></p>
+<p>In your <strong>private</strong> repository, create a YAML file for your workflow. For example, <code>.github/workflows/deploy-to-public-ghpages.yml</code>:</p>
+<pre><code class="language-yaml">name: Deploy Website to Public GitHub Pages
+
+on:
+  push:
+    branches:
+      - main # Or your default branch, e.g., master
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4 # Checks out your private repository's code
+
+      - name: Set up Node.js (Example for a Node-based SSG)
+        if: true # Condition this step if needed, e.g., for specific SSGs
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # Specify your Node.js version
+
+      - name: Build your static site
+        run: |
+          # Replace these commands with your actual build process
+          # For a simple HTML/CSS/JS site, you might just copy files
+          # mkdir ./public
+          # cp -r * ./public/
+          
+          # Example for a Node.js project (e.g., Next.js, Vue, React)
+          # npm install
+          # npm run build # Ensure your build output goes to a directory like 'public', 'dist', or 'build'
+
+          # Example for Hugo
+          # hugo --minify # Assumes Hugo is installed or use peaceiris/actions-hugo
+
+          echo "Build process complete. Files are in ./public" # Adjust if your output is elsewhere
+
+      - name: Deploy to public repository's gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          personal_token: ${{ secrets.DEPLOY_TOKEN }}
+          external_repository: yourusername/your-public-repo-name # IMPORTANT: Change this!
+          publish_branch: gh-pages # The branch in the public repo to deploy to
+          publish_dir: ./public # The directory containing your built static site
+          # user_name: 'github-actions[bot]' # Optional: Custom committer name
+          # user_email: 'github-actions[bot]@users.noreply.github.com' # Optional: Custom committer email
+          commit_message: ${{ github.event.head_commit.message }} # Uses the commit message from the trigger
+          # allow_empty_commit: false # Optional: Prevents empty commits if no changes
+          # force_orphan: true # Optional: Creates a fresh branch history each time
+</code></pre>
+<p><strong>Key Configuration Notes for the Workflow:</strong></p>
+<ul>
+<li><strong><code>external_repository</code></strong>: <strong>Crucially, replace <code>yourusername/your-public-repo-name</code></strong> with the actual path to your public repository (e.g., <code>CreativeTechUser/MyPublicPortfolio</code>).</li>
+<li><strong><code>publish_dir</code></strong>: Adjust <code>./public</code> to match the directory where your static site generator (SSG) or build process outputs the final static files (common alternatives include <code>./dist</code>, <code>./build</code>, <code>./_site</code> for Jekyll).</li>
+<li><strong>Build Steps</strong>: Customise the "Build your static site" step.
+<ul>
+<li>If you're using a specific SSG like Hugo, Jekyll, Next.js, Eleventy, etc., you'll need to include steps to install its dependencies and run its build command.</li>
+<li>For Hugo, you might use an action like <code>peaceiris/actions-hugo</code> before your build command.</li>
+<li>For Node.js based SSGs, ensure you have a <code>actions/setup-node@v4</code> step.</li>
+</ul>
+</li>
+</ul>
+<p><strong>4. Enable GitHub Pages in the Public Repository</strong></p>
+<p>Finally, configure your <strong>public</strong> repository to serve GitHub Pages from the branch your action deploys to:</p>
+<ul>
+<li>Go to your <strong>public</strong> repository on GitHub.</li>
+<li>Navigate to <code>Settings</code> → <code>Pages</code>.</li>
+<li>Under "Build and deployment":
+<ul>
+<li>For "Source", select "<strong>Deploy from a branch</strong>".</li>
+<li>For "Branch", select the <code>gh-pages</code> branch (or whatever <code>publish_branch</code> you specified in your workflow). Ensure the folder is set to <code>/(root)</code>.</li>
+</ul>
+</li>
+<li>Click <code>Save</code>.</li>
+</ul>
+<p>Your site should be live at <code>https://yourusername.github.io/your-public-repo-name/</code> after the first successful workflow run.</p>
+<h3>Leveraging Claude Code for This Workflow</h3>
+<p>Setting up GitHub Actions, especially for the first time, can be intricate. Here is how Claude Code can assist you:</p>
+<ul>
+<li><strong>Generating the Workflow File:</strong>
+<ul>
+<li>Ask Claude Code: "Create a GitHub Actions workflow to build a [Your SSG, e.g., Hugo, Next.js] site from this private repository and deploy it to the <code>gh-pages</code> branch of a public repository named <code>yourusername/public-repo-name</code> using a PAT stored as <code>DEPLOY_TOKEN</code>. The build output is in the <code>./build</code> directory."</li>
+<li>Claude Code can generate a well-structured starting point for your <code>deploy-to-public-ghpages.yml</code> file and write it directly to your project.</li>
+</ul>
+</li>
+<li><strong>Understanding YAML and Actions Syntax:</strong>
+<ul>
+<li>"Explain what <code>uses: actions/checkout@v4</code> does in the workflow file."</li>
+</ul>
+</li>
+<li><strong>Customising Build Steps:</strong>
+<ul>
+<li>If you are unsure about the build commands for your specific SSG, ask: "What are the typical build commands for a [Your SSG] project, and how do I ensure the output goes to a <code>./public</code> directory?"</li>
+</ul>
+</li>
+<li><strong>Finding Specific Actions:</strong>
+<ul>
+<li>"I need to use Hugo to build my site in a GitHub Action. Is there a recommended action for setting up Hugo?"</li>
+</ul>
+</li>
+<li><strong>Troubleshooting Workflow Failures:</strong>
+<ul>
+<li>If your GitHub Action fails, copy the error messages from the Actions log and ask Claude Code: "My GitHub Action failed with this error: <code>[paste error log]</code>. What could be the cause, and how can I fix it?"</li>
+<li>Claude Code can help decipher cryptic error messages related to PAT permissions, incorrect paths, or build failures.</li>
+</ul>
+</li>
+<li><strong>PAT Security and Scopes:</strong>
+<ul>
+<li>"What are the security best practices for using Personal Access Tokens in GitHub Actions?"</li>
+<li>"Explain the <code>repo</code> and <code>workflow</code> scopes for a GitHub PAT."</li>
+</ul>
+</li>
+</ul>
+<h3>Troubleshooting Common Issues</h3>
+<ul>
+<li><strong>Permission Errors:</strong>
+<ul>
+<li>Double-check that your PAT has the <code>repo</code> scope.</li>
+<li>Ensure the PAT was correctly copied and added as the <code>DEPLOY_TOKEN</code> secret in the private repository's Actions settings.</li>
+<li>Verify the <code>external_repository</code> name is exact.</li>
+</ul>
+</li>
+<li><strong>Empty Deployments or "File Not Found":</strong>
+<ul>
+<li>Confirm that the <code>publish_dir</code> in your workflow YAML correctly points to the directory where your build process outputs the static files. Inspect the build logs in your GitHub Actions run to see where files are being placed.</li>
+</ul>
+</li>
+<li><strong>Workflow Not Triggering:</strong>
+<ul>
+<li>Ensure the <code>on: push: branches:</code> section in your workflow correctly lists the branch you are pushing to in your private repository (e.g., <code>main</code>).</li>
+</ul>
+</li>
+<li><strong>SSH-based Deployments (Alternative):</strong>
+<ul>
+<li>For SSH key-based deployments (instead of PATs), you would use <code>deploy_key</code> in the <code>peaceiris/actions-gh-pages</code> action and configure SSH deploy keys. This is generally more complex to set up initially.</li>
+</ul>
+</li>
+</ul>
+<p>This advanced method provides a robust way to manage private source code while still leveraging the power and convenience of GitHub Pages for public-facing sites. Remember to commit your workflow file to your private repository to activate it. Subsequent pushes to your specified branch will then trigger the automated deployment.</p>
+<hr>
+<p>Next: <a href="./06_ai_workflows_roo_code.md">Chapter 6: AI-Powered Workflows with Claude Code</a></p></div></article></main></div>
+    <noscript><p>Interactive forms require JavaScript. You can also email <a href="mailto:info@dreamlab-ai.com">info@dreamlab-ai.com</a>.</p></noscript>
+  
+
+</body></html>

@@ -1,0 +1,390 @@
+<!DOCTYPE html><html lang="en" class="dark"><head>
+    <meta charset="UTF-8">
+
+    <!-- Primary Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <title>Core Concepts: Images, Containers, Volumes, Networks | DreamLab AI Workshops</title>
+    <meta name="title" content="Core Concepts: Images, Containers, Volumes, Networks | DreamLab AI Workshops">
+    <meta name="description" content="Core Concepts: Images, Containers, Volumes, Networks — free DreamLab AI curriculum.">
+    <meta name="keywords" content="applied innovation lab, AI consulting, enterprise innovation, immersive XR, cyber trust, creative technology, residential programmes, knowledge transfer, deep tech, Lake District">
+    <meta name="author" content="DreamLab">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    <meta name="rating" content="General">
+
+    <link rel="describedby" href="/llms.txt" type="text/plain">
+    <script type="application/ld+json" id="organisation-structured-data">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://dreamlab-ai.com/#organisation","name":"DreamLab","url":"https://dreamlab-ai.com/","logo":"https://dreamlab-ai.com/images/heroes/dreamlab-hero.webp","email":"info@dreamlab-ai.com","founder":{"@id":"https://dreamlab-ai.com/team#john-ohare"},"sameAs":["https://github.com/DreamLab-AI","https://www.linkedin.com/company/dreamlab-ai-consulting"]},{"@type":"Person","@id":"https://dreamlab-ai.com/team#john-ohare","name":"John O'Hare","honorificPrefix":"Dr","jobTitle":"Founder","worksFor":{"@id":"https://dreamlab-ai.com/#organisation"},"url":"https://dreamlab-ai.com/team#john-ohare"}]}</script>
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dreamlab-ai.com/workshops/workshop-07-docker-containers/01_concepts.md/">
+
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="msapplication-TileColor" content="#1a1a2e">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://dreamlab-ai.com/workshops/workshop-07-docker-containers/01_concepts.md/">
+    <meta property="og:title" content="Core Concepts: Images, Containers, Volumes, Networks | DreamLab AI Workshops">
+    <meta property="og:description" content="Core Concepts: Images, Containers, Volumes, Networks — free DreamLab AI curriculum.">
+    <meta property="og:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="DreamLab AI Workshop - Core Concepts: Images, Containers, Volumes, Networks">
+    <meta property="og:site_name" content="DreamLab">
+    <meta property="og:locale" content="en_GB">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://dreamlab-ai.com/workshops/workshop-07-docker-containers/01_concepts.md/">
+    <meta name="twitter:title" content="Core Concepts: Images, Containers, Volumes, Networks | DreamLab AI Workshops">
+    <meta name="twitter:description" content="Core Concepts: Images, Containers, Volumes, Networks — free DreamLab AI curriculum.">
+    <meta name="twitter:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta name="twitter:image:alt" content="DreamLab AI Workshop - Core Concepts: Images, Containers, Volumes, Networks">
+    <meta name="twitter:site" content="@thedreamlab">
+    <meta name="twitter:creator" content="@thedreamlab">
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="geo.region" content="GB">
+    <meta name="geo.placename" content="United Kingdom">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DreamLab AI">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Security Headers -->
+    <!--
+      CSP notes:
+      - script-src is 'self' only: no 'unsafe-eval' (blocks eval/Function-based
+        injection) and no 'unsafe-inline'. The one inline bootstrap script was
+        moved to /spa-redirect.js. JSON-LD blocks below are type
+        application/ld+json (data, not executable) so CSP does not gate them.
+      - connect-src is scoped to the Cloudflare Workers subdomain actually used
+        by this account (*.solitary-paper-764d.workers.dev: auth / pod / search /
+        link-preview / nostr-relay), NOT the internet-wide *.workers.dev, which
+        previously allowed exfiltration to any attacker-controlled worker.
+      - The two open Nostr relays (relay.damus.io, relay.primal.net) are
+        explicitly allow-listed: the Talk-to-AI chat listens there for
+        junkiejarvis's reply (the primary relay's whitelist gate rejects the
+        gift-wrap addressed to the ephemeral session key — ADR-042 Amendment 1).
+        Must stay in sync with VITE_REPLY_RELAYS. Named exactly, not a wildcard.
+      - style-src keeps 'unsafe-inline' because Radix UI + runtime style
+        attributes require it; that is not a script-injection vector.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.solitary-paper-764d.workers.dev wss://*.solitary-paper-764d.workers.dev https://*.dreamlab-ai.com wss://*.dreamlab-ai.com wss://relay.damus.io wss://relay.primal.net; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <!-- SPA deep-link restore. External 'self' script (not inline) so CSP
+         script-src can stay 'self' with no 'unsafe-inline'. Classic,
+         render-blocking script: runs before the deferred app module. -->
+    <script src="/spa-redirect.js"></script>
+    <script type="module" crossorigin="" src="/assets/index-Crc86LXg.js"></script>
+    <link rel="modulepreload" crossorigin="" href="/assets/ui-C2dH1upk.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/vendor-uw6h6E0d.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/nostr-BpuBsPg-.js">
+    <link rel="stylesheet" crossorigin="" href="/assets/index-CeEdk6WL.css">
+  <script type="application/ld+json" id="route-structured-data">{"@context":"https://schema.org","@type":"LearningResource","@id":"https://dreamlab-ai.com/workshops/workshop-07-docker-containers/01_concepts.md/#page","url":"https://dreamlab-ai.com/workshops/workshop-07-docker-containers/01_concepts.md/","name":"Core Concepts: Images, Containers, Volumes, Networks | DreamLab AI Workshops","description":"Core Concepts: Images, Containers, Volumes, Networks — free DreamLab AI curriculum.","inLanguage":"en-GB","publisher":{"@id":"https://dreamlab-ai.com/#organisation"},"isAccessibleForFree":true}</script><link rel="alternate" type="text/markdown" href="/data/workshops/workshop-07-docker-containers/01_concepts.md"></head>
+
+  <body>
+    <!-- Skip Navigation Link for Accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
+      Skip to main content
+    </a>
+    <div id="root"><header role="banner" class="fixed top-0 left-0 right-0 z-50"><div class="md:hidden flex items-center justify-between h-14 px-6 bg-[rgba(14,14,17,0.92)] backdrop-blur-[14px] border-b border-dlm-hairline"><a aria-label="DreamLab home" class="flex items-center gap-2" href="/"><span class="w-[9px] h-[9px] rounded-full bg-dlm-bright shrink-0" aria-hidden="true"></span><span class="text-[14px] font-semibold tracking-[0.14em] text-[#FAFAFA]">DREAMLAB</span></a><button type="button" aria-label="Open menu" aria-expanded="false" class="w-11 h-11 -mr-2 flex flex-col items-end justify-center gap-[5px] focus:outline-none focus-visible:ring-2 focus-visible:ring-dlm-bright rounded"><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span></button></div><div class="hidden md:block transition-all duration-300 ease-out py-3 bg-background/60 backdrop-blur-md"><div class="container flex items-center justify-between px-4"><button class="flex items-center gap-2 md:gap-3 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded min-h-[48px] min-w-[48px] px-3 py-2" aria-label="Main navigation menu" type="button" id="radix-:Rp:" aria-haspopup="menu" aria-expanded="false" data-state="closed"><div class="w-10 h-10 md:w-8 md:h-8 shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all duration-300 group-hover:scale-110 animate-glow-pulse" aria-hidden="true"></div><span class="font-bold text-lg md:text-xl tracking-tight group-hover:text-purple-400 transition-colors duration-300">MENU</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down h-5 w-5 md:h-4 md:w-4 shrink-0 text-muted-foreground group-hover:text-purple-400 transition-all duration-300 group-hover:rotate-180" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button><div class="flex items-center gap-2"><a class="items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-10 py-2 hover:bg-purple-500/10 hover:text-purple-400 transition-all duration-300 hover:scale-105 min-h-[48px] px-4 text-base md:text-sm hidden sm:inline-flex" href="/contact">Contact</a><a class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary hover:bg-primary/90 h-10 py-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transition-all duration-300 min-h-[48px] px-4 text-base md:text-sm" href="/co-create">Partner With Us</a></div></div></div></header><header class="relative overflow-hidden" style="min-height:320px"><div class="absolute inset-0 bg-gradient-to-br from-blue-500/30 via-purple-500/30 to-violet-500/30" style="transform:translateY(0px);opacity:1"><div class="absolute top-0 -left-20 w-96 h-96 rounded-full blur-3xl opacity-40 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600"></div><div class="absolute bottom-0 -right-20 w-[32rem] h-[32rem] rounded-full blur-3xl opacity-30 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600" style="animation-delay:1s"></div><div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full blur-3xl opacity-20 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600" style="animation-delay:2s"></div></div><div class="absolute inset-0 opacity-5" style="background-image:linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);background-size:50px 50px;transform:translateY(0px)"></div><div class="relative z-10 container px-4 pt-24 pb-8"><div class="mb-6 transition-all duration-500 transform opacity-0 translate-y-4"><nav aria-label="breadcrumb"><ol class="flex flex-wrap items-center gap-1.5 break-words text-sm sm:gap-2.5 text-white/70"><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/">Home</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/workshops">Workshops</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><span role="link" aria-disabled="true" aria-current="page" class="text-white font-medium">Docker &amp; Containers for AI Development</span></li></ol></nav></div><div class="mb-4 transition-all duration-500 delay-100 transform opacity-0 translate-y-4"><div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20"><span class="text-purple-400"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cpu w-5 h-5" aria-hidden="true"><path d="M12 20v2"></path><path d="M12 2v2"></path><path d="M17 20v2"></path><path d="M17 2v2"></path><path d="M2 12h2"></path><path d="M2 17h2"></path><path d="M2 7h2"></path><path d="M20 12h2"></path><path d="M20 17h2"></path><path d="M20 7h2"></path><path d="M7 20v2"></path><path d="M7 2v2"></path><rect x="4" y="4" width="16" height="16" rx="2"></rect><rect x="8" y="8" width="8" height="8" rx="1"></rect></svg></span><span class="text-sm font-medium text-white/90">AI / Machine Learning</span></div></div><h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 break-words transition-all duration-700 delay-200 transform opacity-0 translate-y-6"><span class="bg-gradient-to-r bg-clip-text text-transparent animate-gradient-shift bg-400% from-blue-400 via-purple-400 to-violet-400">Docker &amp; Containers for AI Development</span></h1><div class="flex flex-wrap items-center gap-3 mb-6 transition-all duration-700 delay-400 transform opacity-0 translate-y-4"><div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-white/10 border-white/20 text-white backdrop-blur-sm hover:bg-white/20"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-3.5 h-3.5 mr-1.5" aria-hidden="true"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>9<!-- --> <!-- -->Modules</div></div><div class="max-w-md transition-all duration-700 delay-500 transform opacity-0 translate-y-4"><div class="flex items-center justify-between text-sm text-white/70 mb-2"><span class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code w-4 h-4" aria-hidden="true"><path d="m16 18 6-6-6-6"></path><path d="m8 6-6 6 6 6"></path></svg><span>Chapter <!-- -->3<!-- -->: <!-- -->Core Concepts: Images, Containers, Volumes, Networks</span></span><span class="font-medium text-white">33<!-- -->%</span></div><div class="relative"><div aria-valuemax="100" aria-valuemin="0" role="progressbar" data-state="indeterminate" data-max="100" class="relative w-full overflow-hidden rounded-full h-2 bg-white/20"><div data-state="indeterminate" data-max="100" class="h-full w-full flex-1 bg-primary transition-all" style="transform:translateX(-67%)"></div></div><div class="absolute top-0 left-0 h-2 rounded-full blur-sm bg-gradient-to-r from-blue-600 via-purple-600 to-violet-600" style="width:33%"></div></div><div class="relative mt-1 h-1"><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:11.11111111111111%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:22.22222222222222%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:33.33333333333333%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:44.44444444444444%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:55.55555555555556%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:66.66666666666666%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:77.77777777777779%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:88.88888888888889%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:100%"></div></div></div></div><div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent"></div></header><main class="container px-4 pt-8 pb-8 flex flex-col md:flex-row gap-x-8 min-h-screen" id="main-content"><aside class="w-full md:w-64 lg:w-72 md:sticky md:top-20 md:h-[calc(100vh-5rem-2rem)] mb-8 md:mb-0"><h2 class="text-xl font-semibold mb-4 break-words">Docker &amp; Containers for AI Development</h2><div dir="ltr" class="relative overflow-hidden h-auto md:h-full pr-4 border-r md:border-r-0" style="position:relative;--radix-scroll-area-corner-width:0px;--radix-scroll-area-corner-height:0px"><style>[data-radix-scroll-area-viewport]{scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;}[data-radix-scroll-area-viewport]::-webkit-scrollbar{display:none}</style><div data-radix-scroll-area-viewport="" class="h-full w-full rounded-[inherit]" style="overflow-x:hidden;overflow-y:hidden"><div style="min-width:100%;display:table"><nav><ul><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-07-docker-containers/README.md"><span class="mr-2 text-xs opacity-60">1<!-- -->.</span>Docker &amp; Containers for AI Development</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-07-docker-containers/00_introduction.md"><span class="mr-2 text-xs opacity-60">2<!-- -->.</span>Introduction: Why Containers Matter for AI</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors bg-primary text-primary-foreground font-semibold" href="/workshops/workshop-07-docker-containers/01_concepts.md"><span class="mr-2 text-xs opacity-60">3<!-- -->.</span>Core Concepts: Images, Containers, Volumes, Networks</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-07-docker-containers/02_hands_on.md"><span class="mr-2 text-xs opacity-60">4<!-- -->.</span>Hands-On: Your First Containers</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-07-docker-containers/03_dev_containers.md"><span class="mr-2 text-xs opacity-60">5<!-- -->.</span>VS Code Dev Containers: Reproducible Environments</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-07-docker-containers/04_remote_docker.md"><span class="mr-2 text-xs opacity-60">6<!-- -->.</span>Remote Docker: Developing on Powerful Machines</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-07-docker-containers/05_ai_containers.md"><span class="mr-2 text-xs opacity-60">7<!-- -->.</span>Containerising AI Agents and Workflows</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-07-docker-containers/06_exercises.md"><span class="mr-2 text-xs opacity-60">8<!-- -->.</span>Practical Exercises</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-07-docker-containers/07_resources.md"><span class="mr-2 text-xs opacity-60">9<!-- -->.</span>Resources &amp; Next Steps</a></li></ul></nav></div></div></div></aside><article class="flex-1 min-w-0 md:pl-0"><div class="prose max-w-none dark:prose-invert break-words [&amp;_table]:block [&amp;_table]:w-full [&amp;_table]:overflow-x-auto"><h1>Core Concepts: Images, Containers, Volumes, Networks</h1>
+<h2>The Building Blocks</h2>
+<p>Docker has a handful of core concepts. Once you understand these, everything else clicks into place. Let's work through them one at a time.</p>
+<hr>
+<h2>Images</h2>
+<p>A Docker <strong>image</strong> is a read-only template that contains everything needed to run an application: the operating system base, installed software, application code, and configuration. Think of it as a blueprint or a recipe.</p>
+<p>Images are built in layers. Each instruction in a Dockerfile adds a new layer on top of the previous one:</p>
+<p><img src="/data/workshops/workshop-07-docker-containers/diagrams/01-image-layers.svg" alt="Docker image built as stacked layers: Ubuntu base, system packages, Python packages, then application code on top"></p>
+<p>This layering system is clever. If two images both start from Ubuntu 24.04, Docker stores that base layer only once on disk. Layers are shared and cached, which saves both space and download time.</p>
+<h3>Image Names and Tags</h3>
+<p>Images are identified by a name and a tag:</p>
+<pre><code>ollama/ollama:latest
+  |         |    |
+  |         |    +-- tag (version)
+  |         +------- image name
+  +----------------- publisher/namespace
+</code></pre>
+<p>Common tag conventions:</p>
+<ul>
+<li><code>latest</code> -- the most recent version (default if you don't specify a tag)</li>
+<li><code>3.11</code> -- a specific version</li>
+<li><code>3.11-slim</code> -- a smaller variant with fewer extras</li>
+<li><code>3.11-bookworm</code> -- tied to a specific Debian release</li>
+</ul>
+<blockquote>
+<p><strong>Tip:</strong> In production, always pin a specific tag rather than using <code>latest</code>. The <code>latest</code> tag can change without warning, breaking your setup.</p>
+</blockquote>
+<hr>
+<h2>Containers</h2>
+<p>A <strong>container</strong> is a running instance of an image. If an image is the blueprint, a container is the house built from that blueprint. You can run multiple containers from the same image, and each one is independent.</p>
+<p><img src="/data/workshops/workshop-07-docker-containers/diagrams/01-image-container-relationship.svg" alt="One image, python:3.11, spawning three independent running containers: an analysis script, a Jupyter notebook, and a test run"></p>
+<p>Containers are ephemeral by default. When you stop and remove a container, any changes made inside it are lost. This is a feature, not a bug -- it means you always start from a clean, known state. If you need to keep data, you use volumes (explained below).</p>
+<p><img src="/data/workshops/workshop-07-docker-containers/diagrams/01-image-container-registry.svg" alt="Flow from a registry such as Docker Hub, via docker pull, to a read-only layered image, via docker run, to three independent running containers"></p>
+<h3>Container Lifecycle</h3>
+<p><img src="/data/workshops/workshop-07-docker-containers/diagrams/01-container-lifecycle.svg" alt="Container lifecycle: image to created to running to stopped to removed, driven by docker create, run, stop, start and rm"></p>
+<p>Key points:</p>
+<ul>
+<li><strong>Created</strong> -- the container exists but isn't running</li>
+<li><strong>Running</strong> -- the container is executing its main process</li>
+<li><strong>Stopped</strong> -- the main process has exited, but the container still exists on disk</li>
+<li><strong>Removed</strong> -- the container is deleted entirely</li>
+</ul>
+<hr>
+<h2>Dockerfiles</h2>
+<p>A <strong>Dockerfile</strong> is a text file containing instructions for building an image. Each instruction creates a layer. Here's a simple example:</p>
+<pre><code class="language-dockerfile"># Start from a Python base image
+FROM python:3.11-slim
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy requirements file and install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy your application code
+COPY . .
+
+# Define the command to run when the container starts
+CMD ["python", "main.py"]
+</code></pre>
+<p>Common Dockerfile instructions:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Instruction</th><th>Purpose</th><th>Example</th></tr></thead><tbody><tr><td><code>FROM</code></td><td>Base image to build upon</td><td><code>FROM python:3.11-slim</code></td></tr><tr><td><code>WORKDIR</code></td><td>Set working directory</td><td><code>WORKDIR /app</code></td></tr><tr><td><code>COPY</code></td><td>Copy files from host into image</td><td><code>COPY . .</code></td></tr><tr><td><code>RUN</code></td><td>Execute a command during build</td><td><code>RUN pip install torch</code></td></tr><tr><td><code>CMD</code></td><td>Default command when container starts</td><td><code>CMD ["python", "app.py"]</code></td></tr><tr><td><code>EXPOSE</code></td><td>Document which port the app uses</td><td><code>EXPOSE 8080</code></td></tr><tr><td><code>ENV</code></td><td>Set environment variables</td><td><code>ENV MODEL_NAME=llama3</code></td></tr><tr><td><code>VOLUME</code></td><td>Declare a mount point for data</td><td><code>VOLUME /data</code></td></tr></tbody></table>
+<h3>Build Context and .dockerignore</h3>
+<p>When you build an image, Docker sends the entire directory (the "build context") to the engine. A <code>.dockerignore</code> file works like <code>.gitignore</code> -- it tells Docker which files to exclude:</p>
+<pre><code># .dockerignore
+.git
+__pycache__
+*.pyc
+.env
+node_modules
+.venv
+</code></pre>
+<p>Always create a <code>.dockerignore</code> to avoid sending large or sensitive files into your image.</p>
+<hr>
+<h2>Volumes</h2>
+<p><strong>Volumes</strong> are Docker's mechanism for persistent data. Since containers are ephemeral, anything stored inside a container's filesystem disappears when the container is removed. Volumes exist outside the container lifecycle.</p>
+<p>There are two types:</p>
+<h3>Named Volumes</h3>
+<p>Docker manages these. They're the simplest option and work well for databases, model files, and other data you want to persist.</p>
+<pre><code class="language-bash"># Create a named volume
+docker volume create my-models
+
+# Use it in a container
+docker run -v my-models:/root/.ollama ollama/ollama
+</code></pre>
+<h3>Bind Mounts</h3>
+<p>These map a specific directory on your host machine into the container. They're useful for development because changes you make on your host appear instantly in the container.</p>
+<pre><code class="language-bash"># Mount your current directory into the container
+docker run -v $(pwd):/app python:3.11 python /app/script.py
+</code></pre>
+<p><img src="/data/workshops/workshop-07-docker-containers/diagrams/01-bind-mount.svg" alt="Bind mount mapping the host directory ~/projects/ai/ directly into /app/ inside the container"></p>
+<blockquote>
+<p><strong>When to use which:</strong> Named volumes for data that should persist (databases, models). Bind mounts for source code during development.</p>
+</blockquote>
+<hr>
+<h2>Networks</h2>
+<p>Containers can communicate with each other over Docker <strong>networks</strong>. By default, Docker creates a bridge network, but you can create custom networks to control which containers can talk to each other.</p>
+<pre><code class="language-bash"># Create a custom network
+docker network create ai-network
+
+# Run containers on that network
+docker run --network ai-network --name ollama ollama/ollama
+docker run --network ai-network --name webui open-webui/open-webui
+</code></pre>
+<p>On a shared network, containers can reach each other by name. In the example above, the <code>webui</code> container can connect to <code>ollama</code> using the hostname <code>ollama</code> -- no IP addresses needed.</p>
+<p><img src="/data/workshops/workshop-07-docker-containers/diagrams/01-network-topology.svg" alt="Ollama and webui containers on a shared ai-network reaching each other by name, with webui's port 3000 published to the host"></p>
+<hr>
+<h2>Docker Compose</h2>
+<p><strong>Docker Compose</strong> is a tool for defining and running multi-container applications. Instead of typing long <code>docker run</code> commands, you describe your entire stack in a YAML file called <code>compose.yaml</code> (or <code>docker-compose.yml</code>).</p>
+<p>Here's an example running Ollama and Open WebUI together:</p>
+<pre><code class="language-yaml"># compose.yaml
+services:
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+
+  webui:
+    image: ghcr.io/open-webui/open-webui:main
+    ports:
+      - "3000:8080"
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+    depends_on:
+      - ollama
+
+volumes:
+  ollama-data:
+</code></pre>
+<p>Then you manage everything with simple commands:</p>
+<pre><code class="language-bash"># Start all services
+docker compose up -d
+
+# View logs
+docker compose logs -f
+
+# Stop everything
+docker compose down
+</code></pre>
+<p>Docker Compose is how most real-world multi-service applications are run locally. You'll use it extensively in this workshop.</p>
+<hr>
+<h2>Docker Desktop vs Alternatives</h2>
+<h3>Docker Desktop</h3>
+<p>The easiest way to get started. It provides:</p>
+<ul>
+<li>Docker Engine running in a lightweight Linux VM (on Windows/macOS)</li>
+<li>A graphical dashboard for managing containers</li>
+<li>Docker Compose built in</li>
+<li>Automatic updates</li>
+</ul>
+<p>Docker Desktop is free for personal use and small businesses (fewer than 250 employees and less than $10M revenue). Larger organisations need a paid subscription.</p>
+<h3>Alternatives</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Tool</th><th>Platform</th><th>Notes</th></tr></thead><tbody><tr><td><strong>Podman</strong></td><td>Linux, macOS, Windows</td><td>Drop-in Docker replacement, daemonless, rootless by default</td></tr><tr><td><strong>OrbStack</strong></td><td>macOS only</td><td>Faster and lighter than Docker Desktop on Mac</td></tr><tr><td><strong>Rancher Desktop</strong></td><td>All platforms</td><td>Open-source, uses containerd or dockerd</td></tr><tr><td><strong>Colima</strong></td><td>macOS, Linux</td><td>Lightweight CLI-based Docker runtime</td></tr></tbody></table>
+<p>For this workshop, we recommend Docker Desktop if you're new to containers. The graphical interface helps you understand what's happening. You can always switch to an alternative later -- the Docker CLI commands are the same regardless of which runtime you use.</p>
+<hr>
+<h2>Quick Reference</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Concept</th><th>What it is</th><th>Analogy</th></tr></thead><tbody><tr><td>Image</td><td>Read-only template</td><td>Recipe / Blueprint</td></tr><tr><td>Container</td><td>Running instance of an image</td><td>Cooked meal / Built house</td></tr><tr><td>Dockerfile</td><td>Instructions to build an image</td><td>Recipe card</td></tr><tr><td>Volume</td><td>Persistent storage</td><td>External hard drive</td></tr><tr><td>Network</td><td>Communication between containers</td><td>Local area network</td></tr><tr><td>Docker Compose</td><td>Multi-container orchestration</td><td>Recipe book for a full meal</td></tr><tr><td>Registry</td><td>Storage for images (e.g., Docker Hub)</td><td>App store</td></tr></tbody></table>
+<hr>
+<p><strong>Next:</strong> <a href="02_hands_on.md">Hands-On: Your First Containers</a></p></div></article></main></div>
+    <noscript><p>Interactive forms require JavaScript. You can also email <a href="mailto:info@dreamlab-ai.com">info@dreamlab-ai.com</a>.</p></noscript>
+  
+
+</body></html>

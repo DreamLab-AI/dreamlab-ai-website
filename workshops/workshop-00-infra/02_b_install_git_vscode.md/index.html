@@ -1,0 +1,349 @@
+<!DOCTYPE html><html lang="en" class="dark"><head>
+    <meta charset="UTF-8">
+
+    <!-- Primary Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <title>Chapter 2b: Installing Git &amp; VS Code | DreamLab AI Workshops</title>
+    <meta name="title" content="Chapter 2b: Installing Git &amp; VS Code | DreamLab AI Workshops">
+    <meta name="description" content="Chapter 2b: Installing Git &amp; VS Code — free DreamLab AI curriculum.">
+    <meta name="keywords" content="applied innovation lab, AI consulting, enterprise innovation, immersive XR, cyber trust, creative technology, residential programmes, knowledge transfer, deep tech, Lake District">
+    <meta name="author" content="DreamLab">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    <meta name="rating" content="General">
+
+    <link rel="describedby" href="/llms.txt" type="text/plain">
+    <script type="application/ld+json" id="organisation-structured-data">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://dreamlab-ai.com/#organisation","name":"DreamLab","url":"https://dreamlab-ai.com/","logo":"https://dreamlab-ai.com/images/heroes/dreamlab-hero.webp","email":"info@dreamlab-ai.com","founder":{"@id":"https://dreamlab-ai.com/team#john-ohare"},"sameAs":["https://github.com/DreamLab-AI","https://www.linkedin.com/company/dreamlab-ai-consulting"]},{"@type":"Person","@id":"https://dreamlab-ai.com/team#john-ohare","name":"John O'Hare","honorificPrefix":"Dr","jobTitle":"Founder","worksFor":{"@id":"https://dreamlab-ai.com/#organisation"},"url":"https://dreamlab-ai.com/team#john-ohare"}]}</script>
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dreamlab-ai.com/workshops/workshop-00-infra/02_b_install_git_vscode.md/">
+
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="msapplication-TileColor" content="#1a1a2e">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://dreamlab-ai.com/workshops/workshop-00-infra/02_b_install_git_vscode.md/">
+    <meta property="og:title" content="Chapter 2b: Installing Git &amp; VS Code | DreamLab AI Workshops">
+    <meta property="og:description" content="Chapter 2b: Installing Git &amp; VS Code — free DreamLab AI curriculum.">
+    <meta property="og:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="DreamLab AI Workshop - Chapter 2b: Installing Git &amp; VS Code">
+    <meta property="og:site_name" content="DreamLab">
+    <meta property="og:locale" content="en_GB">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://dreamlab-ai.com/workshops/workshop-00-infra/02_b_install_git_vscode.md/">
+    <meta name="twitter:title" content="Chapter 2b: Installing Git &amp; VS Code | DreamLab AI Workshops">
+    <meta name="twitter:description" content="Chapter 2b: Installing Git &amp; VS Code — free DreamLab AI curriculum.">
+    <meta name="twitter:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta name="twitter:image:alt" content="DreamLab AI Workshop - Chapter 2b: Installing Git &amp; VS Code">
+    <meta name="twitter:site" content="@thedreamlab">
+    <meta name="twitter:creator" content="@thedreamlab">
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="geo.region" content="GB">
+    <meta name="geo.placename" content="United Kingdom">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DreamLab AI">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Security Headers -->
+    <!--
+      CSP notes:
+      - script-src is 'self' only: no 'unsafe-eval' (blocks eval/Function-based
+        injection) and no 'unsafe-inline'. The one inline bootstrap script was
+        moved to /spa-redirect.js. JSON-LD blocks below are type
+        application/ld+json (data, not executable) so CSP does not gate them.
+      - connect-src is scoped to the Cloudflare Workers subdomain actually used
+        by this account (*.solitary-paper-764d.workers.dev: auth / pod / search /
+        link-preview / nostr-relay), NOT the internet-wide *.workers.dev, which
+        previously allowed exfiltration to any attacker-controlled worker.
+      - The two open Nostr relays (relay.damus.io, relay.primal.net) are
+        explicitly allow-listed: the Talk-to-AI chat listens there for
+        junkiejarvis's reply (the primary relay's whitelist gate rejects the
+        gift-wrap addressed to the ephemeral session key — ADR-042 Amendment 1).
+        Must stay in sync with VITE_REPLY_RELAYS. Named exactly, not a wildcard.
+      - style-src keeps 'unsafe-inline' because Radix UI + runtime style
+        attributes require it; that is not a script-injection vector.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.solitary-paper-764d.workers.dev wss://*.solitary-paper-764d.workers.dev https://*.dreamlab-ai.com wss://*.dreamlab-ai.com wss://relay.damus.io wss://relay.primal.net; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <!-- SPA deep-link restore. External 'self' script (not inline) so CSP
+         script-src can stay 'self' with no 'unsafe-inline'. Classic,
+         render-blocking script: runs before the deferred app module. -->
+    <script src="/spa-redirect.js"></script>
+    <script type="module" crossorigin="" src="/assets/index-Crc86LXg.js"></script>
+    <link rel="modulepreload" crossorigin="" href="/assets/ui-C2dH1upk.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/vendor-uw6h6E0d.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/nostr-BpuBsPg-.js">
+    <link rel="stylesheet" crossorigin="" href="/assets/index-CeEdk6WL.css">
+  <script type="application/ld+json" id="route-structured-data">{"@context":"https://schema.org","@type":"LearningResource","@id":"https://dreamlab-ai.com/workshops/workshop-00-infra/02_b_install_git_vscode.md/#page","url":"https://dreamlab-ai.com/workshops/workshop-00-infra/02_b_install_git_vscode.md/","name":"Chapter 2b: Installing Git & VS Code | DreamLab AI Workshops","description":"Chapter 2b: Installing Git & VS Code — free DreamLab AI curriculum.","inLanguage":"en-GB","publisher":{"@id":"https://dreamlab-ai.com/#organisation"},"isAccessibleForFree":true}</script><link rel="alternate" type="text/markdown" href="/data/workshops/workshop-00-infra/02_b_install_git_vscode.md"></head>
+
+  <body>
+    <!-- Skip Navigation Link for Accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
+      Skip to main content
+    </a>
+    <div id="root"><header role="banner" class="fixed top-0 left-0 right-0 z-50"><div class="md:hidden flex items-center justify-between h-14 px-6 bg-[rgba(14,14,17,0.92)] backdrop-blur-[14px] border-b border-dlm-hairline"><a aria-label="DreamLab home" class="flex items-center gap-2" href="/"><span class="w-[9px] h-[9px] rounded-full bg-dlm-bright shrink-0" aria-hidden="true"></span><span class="text-[14px] font-semibold tracking-[0.14em] text-[#FAFAFA]">DREAMLAB</span></a><button type="button" aria-label="Open menu" aria-expanded="false" class="w-11 h-11 -mr-2 flex flex-col items-end justify-center gap-[5px] focus:outline-none focus-visible:ring-2 focus-visible:ring-dlm-bright rounded"><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span></button></div><div class="hidden md:block transition-all duration-300 ease-out py-3 bg-background/60 backdrop-blur-md"><div class="container flex items-center justify-between px-4"><button class="flex items-center gap-2 md:gap-3 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded min-h-[48px] min-w-[48px] px-3 py-2" aria-label="Main navigation menu" type="button" id="radix-:Rp:" aria-haspopup="menu" aria-expanded="false" data-state="closed"><div class="w-10 h-10 md:w-8 md:h-8 shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all duration-300 group-hover:scale-110 animate-glow-pulse" aria-hidden="true"></div><span class="font-bold text-lg md:text-xl tracking-tight group-hover:text-purple-400 transition-colors duration-300">MENU</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down h-5 w-5 md:h-4 md:w-4 shrink-0 text-muted-foreground group-hover:text-purple-400 transition-all duration-300 group-hover:rotate-180" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button><div class="flex items-center gap-2"><a class="items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-10 py-2 hover:bg-purple-500/10 hover:text-purple-400 transition-all duration-300 hover:scale-105 min-h-[48px] px-4 text-base md:text-sm hidden sm:inline-flex" href="/contact">Contact</a><a class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary hover:bg-primary/90 h-10 py-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transition-all duration-300 min-h-[48px] px-4 text-base md:text-sm" href="/co-create">Partner With Us</a></div></div></div></header><header class="relative overflow-hidden" style="min-height:320px"><div class="absolute inset-0 bg-gradient-to-br from-slate-500/30 via-zinc-500/30 to-neutral-500/30" style="transform:translateY(0px);opacity:1"><div class="absolute top-0 -left-20 w-96 h-96 rounded-full blur-3xl opacity-40 animate-float bg-gradient-to-br from-slate-500 via-zinc-500 to-neutral-500"></div><div class="absolute bottom-0 -right-20 w-[32rem] h-[32rem] rounded-full blur-3xl opacity-30 animate-float bg-gradient-to-br from-slate-500 via-zinc-500 to-neutral-500" style="animation-delay:1s"></div><div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full blur-3xl opacity-20 animate-float bg-gradient-to-br from-slate-500 via-zinc-500 to-neutral-500" style="animation-delay:2s"></div></div><div class="absolute inset-0 opacity-5" style="background-image:linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);background-size:50px 50px;transform:translateY(0px)"></div><div class="relative z-10 container px-4 pt-24 pb-8"><div class="mb-6 transition-all duration-500 transform opacity-0 translate-y-4"><nav aria-label="breadcrumb"><ol class="flex flex-wrap items-center gap-1.5 break-words text-sm sm:gap-2.5 text-white/70"><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/">Home</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/workshops">Workshops</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><span role="link" aria-disabled="true" aria-current="page" class="text-white font-medium">A Creative Technologist's Guide to GitHub &amp; AI-Powered Workflows</span></li></ol></nav></div><div class="mb-4 transition-all duration-500 delay-100 transform opacity-0 translate-y-4"><div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20"><span class="text-slate-400"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-5 h-5" aria-hidden="true"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg></span><span class="text-sm font-medium text-white/90">Foundations</span></div></div><h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 break-words transition-all duration-700 delay-200 transform opacity-0 translate-y-6"><span class="bg-gradient-to-r bg-clip-text text-transparent animate-gradient-shift bg-400% from-slate-400 via-zinc-400 to-neutral-400">A Creative Technologist's Guide to GitHub &amp; AI-Powered Workflows</span></h1><div class="flex flex-wrap items-center gap-3 mb-6 transition-all duration-700 delay-400 transform opacity-0 translate-y-4"><div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-white/10 border-white/20 text-white backdrop-blur-sm hover:bg-white/20"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-3.5 h-3.5 mr-1.5" aria-hidden="true"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>17<!-- --> <!-- -->Modules</div></div><div class="max-w-md transition-all duration-700 delay-500 transform opacity-0 translate-y-4"><div class="flex items-center justify-between text-sm text-white/70 mb-2"><span class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code w-4 h-4" aria-hidden="true"><path d="m16 18 6-6-6-6"></path><path d="m8 6-6 6 6 6"></path></svg><span>Chapter <!-- -->5<!-- -->: <!-- -->Chapter 2b: Installing Git &amp; VS Code</span></span><span class="font-medium text-white">29<!-- -->%</span></div><div class="relative"><div aria-valuemax="100" aria-valuemin="0" role="progressbar" data-state="indeterminate" data-max="100" class="relative w-full overflow-hidden rounded-full h-2 bg-white/20"><div data-state="indeterminate" data-max="100" class="h-full w-full flex-1 bg-primary transition-all" style="transform:translateX(-71%)"></div></div><div class="absolute top-0 left-0 h-2 rounded-full blur-sm bg-gradient-to-r from-slate-500 via-zinc-500 to-neutral-500" style="width:29%"></div></div><div class="relative mt-1 h-1"><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:5.88235294117647%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:11.76470588235294%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:17.647058823529413%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:23.52941176470588%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:29.411764705882355%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:35.294117647058826%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:41.17647058823529%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:47.05882352941176%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:52.94117647058824%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:58.82352941176471%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:64.70588235294117%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:70.58823529411765%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:76.47058823529412%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:82.35294117647058%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:88.23529411764706%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:94.11764705882352%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:100%"></div></div></div></div><div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent"></div></header><main class="container px-4 pt-8 pb-8 flex flex-col md:flex-row gap-x-8 min-h-screen" id="main-content"><aside class="w-full md:w-64 lg:w-72 md:sticky md:top-20 md:h-[calc(100vh-5rem-2rem)] mb-8 md:mb-0"><h2 class="text-xl font-semibold mb-4 break-words">A Creative Technologist's Guide to GitHub &amp; AI-Powered Workflows</h2><div dir="ltr" class="relative overflow-hidden h-auto md:h-full pr-4 border-r md:border-r-0" style="position:relative;--radix-scroll-area-corner-width:0px;--radix-scroll-area-corner-height:0px"><style>[data-radix-scroll-area-viewport]{scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;}[data-radix-scroll-area-viewport]::-webkit-scrollbar{display:none}</style><div data-radix-scroll-area-viewport="" class="h-full w-full rounded-[inherit]" style="overflow-x:hidden;overflow-y:hidden"><div style="min-width:100%;display:table"><nav><ul><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/README.md"><span class="mr-2 text-xs opacity-60">1<!-- -->.</span>A Creative Technologist's Guide to GitHub &amp; AI-Powered Workflows</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/00_introduction.md"><span class="mr-2 text-xs opacity-60">2<!-- -->.</span>Chapter 0: Introduction &amp; Workshop Overview</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/01_why_git.md"><span class="mr-2 text-xs opacity-60">3<!-- -->.</span>Chapter 1: Why Git? Understanding Version Control</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/02_a_github_account.md"><span class="mr-2 text-xs opacity-60">4<!-- -->.</span>Chapter 2a: Creating Your GitHub Account</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors bg-primary text-primary-foreground font-semibold" href="/workshops/workshop-00-infra/02_b_install_git_vscode.md"><span class="mr-2 text-xs opacity-60">5<!-- -->.</span>Chapter 2b: Installing Git &amp; VS Code</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/02_c_gcp_api_key.md"><span class="mr-2 text-xs opacity-60">6<!-- -->.</span>Chapter 2c: Setting Up AI API Keys (2026 Edition)</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/02_d_roo_code_config.md"><span class="mr-2 text-xs opacity-60">7<!-- -->.</span>Chapter 2d: Configuring AI Coding Assistants in VS Code (2026 Edition)</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/02_setup_overview.md"><span class="mr-2 text-xs opacity-60">8<!-- -->.</span>Chapter 2: Essential Setup: Accounts &amp; Installations</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/03_core_workflow.md"><span class="mr-2 text-xs opacity-60">9<!-- -->.</span>Chapter 3: The Core Git Workflow</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/04_collaboration_recovery.md"><span class="mr-2 text-xs opacity-60">10<!-- -->.</span>Chapter 4: Collaboration &amp; Recovery</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/05_github_pages.md"><span class="mr-2 text-xs opacity-60">11<!-- -->.</span>Chapter 5: GitHub Pages: Your Free Portfolio Site</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/06_ai_workflows_roo_code.md"><span class="mr-2 text-xs opacity-60">12<!-- -->.</span>Chapter 6: AI-Powered Workflows with Claude Code</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/07_cheat_sheet.md"><span class="mr-2 text-xs opacity-60">13<!-- -->.</span>Chapter 7: Reference Cheat Sheet</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/08_latex_wsl_vscode.md"><span class="mr-2 text-xs opacity-60">14<!-- -->.</span>Chapter 8: Advanced Typesetting: LaTeX with WSL2, TeXLive, and VS Code</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/09_cheat_sheet.md"><span class="mr-2 text-xs opacity-60">15<!-- -->.</span>Chapter 9: Reference Cheat Sheet</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/09_context_management.md"><span class="mr-2 text-xs opacity-60">16<!-- -->.</span>Chapter 9: Context Management &amp; Advanced Agent Workflows</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-00-infra/10_context_management.md"><span class="mr-2 text-xs opacity-60">17<!-- -->.</span>Chapter 10: Advanced Context Management &amp; Multi-Session Strategies</a></li></ul></nav></div></div></div></aside><article class="flex-1 min-w-0 md:pl-0"><div class="prose max-w-none dark:prose-invert break-words [&amp;_table]:block [&amp;_table]:w-full [&amp;_table]:overflow-x-auto"><h1>Chapter 2b: Installing Git &amp; VS Code</h1>
+<p>⏱️ <strong>Time:</strong> 10-15 minutes | 🎯 <strong>Difficulty:</strong> 🟢 Beginner</p>
+<p>With your GitHub account created, the next step is to install the essential local tools: <a href="https://git-scm.com/">Git</a> and <a href="https://code.visualstudio.com/">Visual Studio Code (VS Code)</a>, our recommended code editor.</p>
+<h2>2b.1 Installing Git</h2>
+<p>Git is the version control system that operates locally on your computer. Even if you primarily use GitHub's web interface, Git must be installed locally for many operations, particularly when working with VS Code and AI coding assistants.</p>
+<h3>macOS Users</h3>
+<p>Git may already be installed on your Mac as part of the Xcode Command Line Tools. To check, open Terminal (Applications &gt; Utilities &gt; Terminal) and type:</p>
+<pre><code class="language-bash">git --version
+</code></pre>
+<p>If you see a version number, Git is already installed. If you get an error or a prompt to install developer tools, follow the on-screen instructions or install Git via <a href="https://brew.sh/">Homebrew</a>:</p>
+<pre><code class="language-bash">brew install git
+</code></pre>
+<h3>Windows Users</h3>
+<ol>
+<li>Download the official <strong>Git for Windows</strong> installer from <a href="https://gitforwindows.org">https://gitforwindows.org</a>.</li>
+<li>Run the installer. The default options are generally suitable, but pay attention to these settings:
+<ul>
+<li><strong>"Git from the command line and also from 3rd-party software"</strong> — ensure this is selected.</li>
+<li><strong>Default editor</strong> — if you are unsure, leave the default or select "Use Visual Studio Code as Git's default editor" if VS Code is already installed.</li>
+<li><strong>Line ending conversion</strong> — the default ("Checkout Windows-style, commit Unix-style line endings") is correct for most users.</li>
+</ul>
+</li>
+<li>After installation, restart any open command prompts or terminals.</li>
+</ol>
+<blockquote>
+<p><strong>💡 Tip for Windows users:</strong> The installer includes <strong>Git Bash</strong>, a terminal emulator that provides a Unix-like command-line experience on Windows. Many Git tutorials assume a Unix-style terminal, so Git Bash is useful for following along.</p>
+</blockquote>
+<h3>Linux Users</h3>
+<p>Git is available through your distribution's package manager:</p>
+<pre><code class="language-bash"># Debian/Ubuntu
+sudo apt update &amp;&amp; sudo apt install git
+
+# Fedora
+sudo dnf install git
+
+# Arch Linux
+sudo pacman -S git
+</code></pre>
+<h3>Verify Installation (All Operating Systems)</h3>
+<p>Open your terminal and type:</p>
+<pre><code class="language-bash">git --version
+</code></pre>
+<p>You should see a version number (ideally 2.40 or newer). If this command fails, revisit the installation steps for your operating system.</p>
+<h2>2b.2 Initial Git Configuration</h2>
+<p>After installing Git, configure your global settings. These settings identify you as the author of your commits and appear in your Git history. Run these commands in your terminal, replacing the placeholders with your actual details:</p>
+<pre><code class="language-bash">git config --global user.name "Your Full Name"
+git config --global user.email "your@email.com"
+git config --global init.defaultBranch main
+</code></pre>
+<ul>
+<li><strong><code>user.name</code></strong>: Your full name as you want it to appear in commit logs.</li>
+<li><strong><code>user.email</code></strong>: The email associated with your GitHub account. If you enabled email privacy in <a href="./02_a_github_account.md#2a3-email-privacy-settings">Chapter 2a</a>, use the <code>noreply</code> address GitHub provided.</li>
+<li><strong><code>init.defaultBranch main</code></strong>: Sets the default branch name for new repositories to <code>main</code> (the modern convention, replacing the older <code>master</code>).</li>
+</ul>
+<h3>Verifying Your Configuration</h3>
+<p>Check that your settings are correct:</p>
+<pre><code class="language-bash">git config --global --list
+</code></pre>
+<p>You should see your name, email, and default branch listed.</p>
+<h3>Optional but Helpful Settings</h3>
+<pre><code class="language-bash"># Colourful output makes Git status and diffs easier to read
+git config --global color.ui auto
+
+# Set VS Code as your default Git editor (for commit messages, rebase, etc.)
+git config --global core.editor "code --wait"
+
+# Set VS Code as your default diff/merge tool
+git config --global diff.tool vscode
+git config --global difftool.vscode.cmd 'code --wait --diff $LOCAL $REMOTE'
+</code></pre>
+<h2>2b.3 Installing Visual Studio Code (VS Code)</h2>
+<p>VS Code is a powerful, free, and widely-used source code editor developed by Microsoft. It integrates seamlessly with Git and GitHub and supports thousands of extensions — including AI coding assistants.</p>
+<h3>macOS Users</h3>
+<p>Install via Homebrew (recommended):</p>
+<pre><code class="language-bash">brew install --cask visual-studio-code
+</code></pre>
+<p>Alternatively, download directly from <a href="https://code.visualstudio.com">https://code.visualstudio.com</a>.</p>
+<p>After installation, open VS Code and enable the shell command: open the Command Palette (<code>Cmd+Shift+P</code>), type "Shell Command: Install 'code' command in PATH", and press Enter. This lets you open VS Code from the terminal by typing <code>code .</code> in any directory.</p>
+<h3>Windows Users</h3>
+<ol>
+<li>Download the installer from <a href="https://code.visualstudio.com">https://code.visualstudio.com</a>.</li>
+<li>Run the installer, accepting default options.</li>
+<li><strong>Recommended:</strong> Tick the following options during installation:
+<ul>
+<li>"Add 'Open with Code' action to Windows Explorer file context menu"</li>
+<li>"Add 'Open with Code' action to Windows Explorer directory context menu"</li>
+<li>"Add to PATH" (should be ticked by default)</li>
+</ul>
+</li>
+</ol>
+<h3>Linux Users</h3>
+<pre><code class="language-bash"># Debian/Ubuntu — install via .deb package
+# Download the .deb from https://code.visualstudio.com, then:
+sudo dpkg -i code_*.deb
+
+# Or via snap:
+sudo snap install code --classic
+</code></pre>
+<p>Launch VS Code after installation. You will see a welcome screen; you can explore the introductory materials or proceed directly to the next steps.</p>
+<h2>2b.4 Recommended VS Code Extensions</h2>
+<p>VS Code's functionality is significantly enhanced by extensions. Install extensions via the Extensions view — click the square icon in the Activity Bar on the left or press <code>Ctrl+Shift+X</code> (Windows/Linux) or <code>Cmd+Shift+X</code> (macOS).</p>
+<h3>Essential Extensions</h3>
+<p>These extensions are used throughout this workshop:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Extension</th><th>Purpose</th><th>How to Find It</th></tr></thead><tbody><tr><td><strong>Git Graph</strong></td><td>Visualise your repository's commit history, branches, and merges as a graph</td><td>Search "Git Graph" (by mhutchie)</td></tr><tr><td><strong>GitLens</strong></td><td>See who changed each line and when, inline blame annotations, rich history exploration</td><td>Search "GitLens" (by GitKraken)</td></tr><tr><td><strong>Markdown Preview Mermaid Support</strong></td><td>Render Mermaid diagrams in VS Code's built-in Markdown preview</td><td>Search "Markdown Preview Mermaid Support"</td></tr></tbody></table>
+<h3>AI-Related Extensions</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Extension</th><th>Purpose</th><th>How to Find It</th></tr></thead><tbody><tr><td><strong>Claude Code</strong></td><td>AI-powered coding assistant (terminal-based agent)</td><td>Install via terminal: <code>npm install -g @anthropic-ai/claude-code</code>. Optionally install the VS Code extension from the marketplace for an integrated panel. Full setup in <a href="./02_d_roo_code_config.md">Chapter 2d</a>.</td></tr><tr><td><strong>GitHub Copilot</strong></td><td>Inline AI code suggestions as you type</td><td>Search "GitHub Copilot" (free for students/educators)</td></tr><tr><td><strong>Continue</strong></td><td>Open-source AI assistant supporting multiple models</td><td>Search "Continue"</td></tr></tbody></table>
+<blockquote>
+<p><strong>📝 Note:</strong> You do not need all of these AI extensions. Claude Code alone is sufficient for this workshop. GitHub Copilot is a good complement if you are a student with free access. See <a href="./02_d_roo_code_config.md">Chapter 2d</a> for detailed setup of each tool.</p>
+</blockquote>
+<h3>Optional but Useful Extensions</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Extension</th><th>Purpose</th></tr></thead><tbody><tr><td><strong>Prettier</strong></td><td>Automatic code formatting for HTML, CSS, JavaScript, and more</td></tr><tr><td><strong>Live Server</strong></td><td>Launch a local development server with live reload for HTML files</td></tr><tr><td><strong>Error Lens</strong></td><td>Highlight errors and warnings inline in the editor</td></tr><tr><td><strong>Path Intellisense</strong></td><td>Autocomplete file names and paths</td></tr></tbody></table>
+<h2>2b.5 Verifying Your Setup</h2>
+<p>Let us confirm that everything is working together.</p>
+<p><strong>1. Check Git integration in VS Code:</strong></p>
+<p>Open VS Code, then open the integrated terminal (<code>Ctrl+`` </code> or <code>Cmd+`` </code>). Run:</p>
+<pre><code class="language-bash">git --version
+</code></pre>
+<p>If VS Code's terminal cannot find Git, you may need to restart VS Code or check that Git is on your system PATH.</p>
+<p><strong>2. Create a test repository:</strong></p>
+<p>In the terminal:</p>
+<pre><code class="language-bash">mkdir ~/git-test
+cd ~/git-test
+git init
+echo "# Test" &gt; README.md
+git add README.md
+git commit -m "Initial commit"
+</code></pre>
+<p><strong>3. Check Git Graph:</strong></p>
+<p>Open the <code>git-test</code> folder in VS Code (<code>File &gt; Open Folder</code>). Open the Command Palette (<code>Ctrl+Shift+P</code> / <code>Cmd+Shift+P</code>), type "Git Graph: View Git Graph", and press Enter. You should see your initial commit visualised.</p>
+<p><strong>4. Clean up (optional):</strong></p>
+<pre><code class="language-bash">rm -rf ~/git-test
+</code></pre>
+<details>
+<summary>Troubleshooting Common Issues</summary>
+<p><strong>"git is not recognised as an internal or external command" (Windows)</strong></p>
+<ul>
+<li>Restart your terminal or computer after installing Git.</li>
+<li>Check that Git was added to PATH during installation. If not, reinstall and ensure that option is ticked.</li>
+</ul>
+<p><strong>"code: command not found" (macOS/Linux)</strong></p>
+<ul>
+<li>Open VS Code, press <code>Cmd+Shift+P</code>, and run "Shell Command: Install 'code' command in PATH".</li>
+</ul>
+<p><strong>Extensions not appearing after installation</strong></p>
+<ul>
+<li>Reload VS Code: press <code>Ctrl+Shift+P</code> / <code>Cmd+Shift+P</code>, type "Developer: Reload Window", and press Enter.</li>
+</ul>
+<p><strong>Git commit fails with "Please tell me who you are"</strong></p>
+<ul>
+<li>You have not configured your Git identity. Run the <code>git config --global user.name</code> and <code>user.email</code> commands from section 2b.2.</li>
+</ul>
+</details>
+<details>
+<summary>🎯 Knowledge Check</summary>
+<p>Before moving forward, ensure you can answer:</p>
+<ol>
+<li>What command verifies that Git is installed?</li>
+<li>Why do you need to set <code>user.name</code> and <code>user.email</code> in Git configuration?</li>
+<li>What does the Git Graph extension show you?</li>
+<li>How do you open a terminal inside VS Code?</li>
+</ol>
+<p><strong>Answers:</strong></p>
+<ol>
+<li><code>git --version</code></li>
+<li>They identify you as the author of commits and link your commits to your GitHub account.</li>
+<li>A visual graph of your repository's commit history, branches, and merges.</li>
+<li>Press <code>Ctrl+`` </code> (Windows/Linux) or <code>Cmd+`` </code> (macOS), or go to Terminal &gt; New Terminal in the menu bar.</li>
+</ol>
+</details>
+<hr>
+<p><strong>Next</strong>: <a href="./02_c_gcp_api_key.md">Chapter 2c: Setting Up AI API Keys (2026 Edition)</a></p></div></article></main></div>
+    <noscript><p>Interactive forms require JavaScript. You can also email <a href="mailto:info@dreamlab-ai.com">info@dreamlab-ai.com</a>.</p></noscript>
+  
+
+</body></html>

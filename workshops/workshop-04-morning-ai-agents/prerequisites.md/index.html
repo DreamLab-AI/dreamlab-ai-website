@@ -1,0 +1,374 @@
+<!DOCTYPE html><html lang="en" class="dark"><head>
+    <meta charset="UTF-8">
+
+    <!-- Primary Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <title>Prerequisites - Workshop 04 Morning: Specialised AI Agents | DreamLab AI Workshops</title>
+    <meta name="title" content="Prerequisites - Workshop 04 Morning: Specialised AI Agents | DreamLab AI Workshops">
+    <meta name="description" content="Prerequisites - Workshop 04 Morning: Specialised AI Agents — free DreamLab AI curriculum.">
+    <meta name="keywords" content="applied innovation lab, AI consulting, enterprise innovation, immersive XR, cyber trust, creative technology, residential programmes, knowledge transfer, deep tech, Lake District">
+    <meta name="author" content="DreamLab">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    <meta name="rating" content="General">
+
+    <link rel="describedby" href="/llms.txt" type="text/plain">
+    <script type="application/ld+json" id="organisation-structured-data">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://dreamlab-ai.com/#organisation","name":"DreamLab","url":"https://dreamlab-ai.com/","logo":"https://dreamlab-ai.com/images/heroes/dreamlab-hero.webp","email":"info@dreamlab-ai.com","founder":{"@id":"https://dreamlab-ai.com/team#john-ohare"},"sameAs":["https://github.com/DreamLab-AI","https://www.linkedin.com/company/dreamlab-ai-consulting"]},{"@type":"Person","@id":"https://dreamlab-ai.com/team#john-ohare","name":"John O'Hare","honorificPrefix":"Dr","jobTitle":"Founder","worksFor":{"@id":"https://dreamlab-ai.com/#organisation"},"url":"https://dreamlab-ai.com/team#john-ohare"}]}</script>
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dreamlab-ai.com/workshops/workshop-04-morning-ai-agents/prerequisites.md/">
+
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="msapplication-TileColor" content="#1a1a2e">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://dreamlab-ai.com/workshops/workshop-04-morning-ai-agents/prerequisites.md/">
+    <meta property="og:title" content="Prerequisites - Workshop 04 Morning: Specialised AI Agents | DreamLab AI Workshops">
+    <meta property="og:description" content="Prerequisites - Workshop 04 Morning: Specialised AI Agents — free DreamLab AI curriculum.">
+    <meta property="og:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="DreamLab AI Workshop - Prerequisites - Workshop 04 Morning: Specialised AI Agents">
+    <meta property="og:site_name" content="DreamLab">
+    <meta property="og:locale" content="en_GB">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://dreamlab-ai.com/workshops/workshop-04-morning-ai-agents/prerequisites.md/">
+    <meta name="twitter:title" content="Prerequisites - Workshop 04 Morning: Specialised AI Agents | DreamLab AI Workshops">
+    <meta name="twitter:description" content="Prerequisites - Workshop 04 Morning: Specialised AI Agents — free DreamLab AI curriculum.">
+    <meta name="twitter:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta name="twitter:image:alt" content="DreamLab AI Workshop - Prerequisites - Workshop 04 Morning: Specialised AI Agents">
+    <meta name="twitter:site" content="@thedreamlab">
+    <meta name="twitter:creator" content="@thedreamlab">
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="geo.region" content="GB">
+    <meta name="geo.placename" content="United Kingdom">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DreamLab AI">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Security Headers -->
+    <!--
+      CSP notes:
+      - script-src is 'self' only: no 'unsafe-eval' (blocks eval/Function-based
+        injection) and no 'unsafe-inline'. The one inline bootstrap script was
+        moved to /spa-redirect.js. JSON-LD blocks below are type
+        application/ld+json (data, not executable) so CSP does not gate them.
+      - connect-src is scoped to the Cloudflare Workers subdomain actually used
+        by this account (*.solitary-paper-764d.workers.dev: auth / pod / search /
+        link-preview / nostr-relay), NOT the internet-wide *.workers.dev, which
+        previously allowed exfiltration to any attacker-controlled worker.
+      - The two open Nostr relays (relay.damus.io, relay.primal.net) are
+        explicitly allow-listed: the Talk-to-AI chat listens there for
+        junkiejarvis's reply (the primary relay's whitelist gate rejects the
+        gift-wrap addressed to the ephemeral session key — ADR-042 Amendment 1).
+        Must stay in sync with VITE_REPLY_RELAYS. Named exactly, not a wildcard.
+      - style-src keeps 'unsafe-inline' because Radix UI + runtime style
+        attributes require it; that is not a script-injection vector.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.solitary-paper-764d.workers.dev wss://*.solitary-paper-764d.workers.dev https://*.dreamlab-ai.com wss://*.dreamlab-ai.com wss://relay.damus.io wss://relay.primal.net; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <!-- SPA deep-link restore. External 'self' script (not inline) so CSP
+         script-src can stay 'self' with no 'unsafe-inline'. Classic,
+         render-blocking script: runs before the deferred app module. -->
+    <script src="/spa-redirect.js"></script>
+    <script type="module" crossorigin="" src="/assets/index-Crc86LXg.js"></script>
+    <link rel="modulepreload" crossorigin="" href="/assets/ui-C2dH1upk.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/vendor-uw6h6E0d.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/nostr-BpuBsPg-.js">
+    <link rel="stylesheet" crossorigin="" href="/assets/index-CeEdk6WL.css">
+  <script type="application/ld+json" id="route-structured-data">{"@context":"https://schema.org","@type":"LearningResource","@id":"https://dreamlab-ai.com/workshops/workshop-04-morning-ai-agents/prerequisites.md/#page","url":"https://dreamlab-ai.com/workshops/workshop-04-morning-ai-agents/prerequisites.md/","name":"Prerequisites - Workshop 04 Morning: Specialised AI Agents | DreamLab AI Workshops","description":"Prerequisites - Workshop 04 Morning: Specialised AI Agents — free DreamLab AI curriculum.","inLanguage":"en-GB","publisher":{"@id":"https://dreamlab-ai.com/#organisation"},"isAccessibleForFree":true}</script><link rel="alternate" type="text/markdown" href="/data/workshops/workshop-04-morning-ai-agents/prerequisites.md"></head>
+
+  <body>
+    <!-- Skip Navigation Link for Accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
+      Skip to main content
+    </a>
+    <div id="root"><header role="banner" class="fixed top-0 left-0 right-0 z-50"><div class="md:hidden flex items-center justify-between h-14 px-6 bg-[rgba(14,14,17,0.92)] backdrop-blur-[14px] border-b border-dlm-hairline"><a aria-label="DreamLab home" class="flex items-center gap-2" href="/"><span class="w-[9px] h-[9px] rounded-full bg-dlm-bright shrink-0" aria-hidden="true"></span><span class="text-[14px] font-semibold tracking-[0.14em] text-[#FAFAFA]">DREAMLAB</span></a><button type="button" aria-label="Open menu" aria-expanded="false" class="w-11 h-11 -mr-2 flex flex-col items-end justify-center gap-[5px] focus:outline-none focus-visible:ring-2 focus-visible:ring-dlm-bright rounded"><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span></button></div><div class="hidden md:block transition-all duration-300 ease-out py-3 bg-background/60 backdrop-blur-md"><div class="container flex items-center justify-between px-4"><button class="flex items-center gap-2 md:gap-3 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded min-h-[48px] min-w-[48px] px-3 py-2" aria-label="Main navigation menu" type="button" id="radix-:Rp:" aria-haspopup="menu" aria-expanded="false" data-state="closed"><div class="w-10 h-10 md:w-8 md:h-8 shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all duration-300 group-hover:scale-110 animate-glow-pulse" aria-hidden="true"></div><span class="font-bold text-lg md:text-xl tracking-tight group-hover:text-purple-400 transition-colors duration-300">MENU</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down h-5 w-5 md:h-4 md:w-4 shrink-0 text-muted-foreground group-hover:text-purple-400 transition-all duration-300 group-hover:rotate-180" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button><div class="flex items-center gap-2"><a class="items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-10 py-2 hover:bg-purple-500/10 hover:text-purple-400 transition-all duration-300 hover:scale-105 min-h-[48px] px-4 text-base md:text-sm hidden sm:inline-flex" href="/contact">Contact</a><a class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary hover:bg-primary/90 h-10 py-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transition-all duration-300 min-h-[48px] px-4 text-base md:text-sm" href="/co-create">Partner With Us</a></div></div></div></header><header class="relative overflow-hidden" style="min-height:320px"><div class="absolute inset-0 bg-gradient-to-br from-blue-500/30 via-purple-500/30 to-violet-500/30" style="transform:translateY(0px);opacity:1"><div class="absolute top-0 -left-20 w-96 h-96 rounded-full blur-3xl opacity-40 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600"></div><div class="absolute bottom-0 -right-20 w-[32rem] h-[32rem] rounded-full blur-3xl opacity-30 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600" style="animation-delay:1s"></div><div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full blur-3xl opacity-20 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600" style="animation-delay:2s"></div></div><div class="absolute inset-0 opacity-5" style="background-image:linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);background-size:50px 50px;transform:translateY(0px)"></div><div class="relative z-10 container px-4 pt-24 pb-8"><div class="mb-6 transition-all duration-500 transform opacity-0 translate-y-4"><nav aria-label="breadcrumb"><ol class="flex flex-wrap items-center gap-1.5 break-words text-sm sm:gap-2.5 text-white/70"><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/">Home</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/workshops">Workshops</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><span role="link" aria-disabled="true" aria-current="page" class="text-white font-medium">Workshop 04 - Morning Session: Specialised AI Agents</span></li></ol></nav></div><div class="mb-4 transition-all duration-500 delay-100 transform opacity-0 translate-y-4"><div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20"><span class="text-purple-400"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cpu w-5 h-5" aria-hidden="true"><path d="M12 20v2"></path><path d="M12 2v2"></path><path d="M17 20v2"></path><path d="M17 2v2"></path><path d="M2 12h2"></path><path d="M2 17h2"></path><path d="M2 7h2"></path><path d="M20 12h2"></path><path d="M20 17h2"></path><path d="M20 7h2"></path><path d="M7 20v2"></path><path d="M7 2v2"></path><rect x="4" y="4" width="16" height="16" rx="2"></rect><rect x="8" y="8" width="8" height="8" rx="1"></rect></svg></span><span class="text-sm font-medium text-white/90">AI / Machine Learning</span></div></div><h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 break-words transition-all duration-700 delay-200 transform opacity-0 translate-y-6"><span class="bg-gradient-to-r bg-clip-text text-transparent animate-gradient-shift bg-400% from-blue-400 via-purple-400 to-violet-400">Workshop 04 - Morning Session: Specialised AI Agents</span></h1><div class="flex flex-wrap items-center gap-3 mb-6 transition-all duration-700 delay-400 transform opacity-0 translate-y-4"><div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-white/10 border-white/20 text-white backdrop-blur-sm hover:bg-white/20"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-3.5 h-3.5 mr-1.5" aria-hidden="true"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>10<!-- --> <!-- -->Modules</div></div><div class="max-w-md transition-all duration-700 delay-500 transform opacity-0 translate-y-4"><div class="flex items-center justify-between text-sm text-white/70 mb-2"><span class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code w-4 h-4" aria-hidden="true"><path d="m16 18 6-6-6-6"></path><path d="m8 6-6 6 6 6"></path></svg><span>Chapter <!-- -->10<!-- -->: <!-- -->Prerequisites - Workshop 04 Morning: Specialised AI Agents</span></span><span class="font-medium text-white">100<!-- -->%</span></div><div class="relative"><div aria-valuemax="100" aria-valuemin="0" role="progressbar" data-state="indeterminate" data-max="100" class="relative w-full overflow-hidden rounded-full h-2 bg-white/20"><div data-state="indeterminate" data-max="100" class="h-full w-full flex-1 bg-primary transition-all" style="transform:translateX(-0%)"></div></div><div class="absolute top-0 left-0 h-2 rounded-full blur-sm bg-gradient-to-r from-blue-600 via-purple-600 to-violet-600" style="width:100%"></div></div><div class="relative mt-1 h-1"><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:10%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:20%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:30%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:40%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:50%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:60%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:70%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:80%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:90%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:100%"></div></div></div></div><div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent"></div></header><main class="container px-4 pt-8 pb-8 flex flex-col md:flex-row gap-x-8 min-h-screen" id="main-content"><aside class="w-full md:w-64 lg:w-72 md:sticky md:top-20 md:h-[calc(100vh-5rem-2rem)] mb-8 md:mb-0"><h2 class="text-xl font-semibold mb-4 break-words">Workshop 04 - Morning Session: Specialised AI Agents</h2><div dir="ltr" class="relative overflow-hidden h-auto md:h-full pr-4 border-r md:border-r-0" style="position:relative;--radix-scroll-area-corner-width:0px;--radix-scroll-area-corner-height:0px"><style>[data-radix-scroll-area-viewport]{scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;}[data-radix-scroll-area-viewport]::-webkit-scrollbar{display:none}</style><div data-radix-scroll-area-viewport="" class="h-full w-full rounded-[inherit]" style="overflow-x:hidden;overflow-y:hidden"><div style="min-width:100%;display:table"><nav><ul><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-04-morning-ai-agents/README.md"><span class="mr-2 text-xs opacity-60">1<!-- -->.</span>Workshop 04 - Morning Session: Specialised AI Agents</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-04-morning-ai-agents/00_introduction.md"><span class="mr-2 text-xs opacity-60">2<!-- -->.</span>Introduction to AI Agents</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-04-morning-ai-agents/01_concepts.md"><span class="mr-2 text-xs opacity-60">3<!-- -->.</span>Core Agent Concepts (2026)</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-04-morning-ai-agents/02_hands_on.md"><span class="mr-2 text-xs opacity-60">4<!-- -->.</span>Hands-on Agent Development</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-04-morning-ai-agents/03_exercises.md"><span class="mr-2 text-xs opacity-60">5<!-- -->.</span>Practical Exercises</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-04-morning-ai-agents/04_project.md"><span class="mr-2 text-xs opacity-60">6<!-- -->.</span>Final Project: Production Research Agent</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-04-morning-ai-agents/05_assessment.md"><span class="mr-2 text-xs opacity-60">7<!-- -->.</span>Assessment: AI Agents Knowledge Check</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-04-morning-ai-agents/06_resources.md"><span class="mr-2 text-xs opacity-60">8<!-- -->.</span>Resources for AI Agents</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-04-morning-ai-agents/objectives.md"><span class="mr-2 text-xs opacity-60">9<!-- -->.</span>Learning Objectives - Workshop 04 Morning: Specialised AI Agents</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors bg-primary text-primary-foreground font-semibold" href="/workshops/workshop-04-morning-ai-agents/prerequisites.md"><span class="mr-2 text-xs opacity-60">10<!-- -->.</span>Prerequisites - Workshop 04 Morning: Specialised AI Agents</a></li></ul></nav></div></div></div></aside><article class="flex-1 min-w-0 md:pl-0"><div class="prose max-w-none dark:prose-invert break-words [&amp;_table]:block [&amp;_table]:w-full [&amp;_table]:overflow-x-auto"><h1>Prerequisites - Workshop 04 Morning: Specialised AI Agents</h1>
+<h2>Before You Begin</h2>
+<p>This session moves quickly from concepts to working code. Arriving with your environment ready means you can focus entirely on building agents rather than troubleshooting installation. Allow 20-30 minutes for setup if you are starting from scratch.</p>
+<h2>Required Knowledge</h2>
+<h3>Essential Skills</h3>
+<ul>
+<li><strong>Basic Python or TypeScript</strong> -- you can write a function, assign variables, and run a script from the terminal. You do not need to be a developer; scripting-level comfort is sufficient.</li>
+<li><strong>API Basics</strong> -- you understand what an API call is, what request/response means, and you have used a REST endpoint or cloud service before (even via a web dashboard).</li>
+<li><strong>LLM Familiarity</strong> -- you have interacted with at least one Large Language Model (ChatGPT, Claude, Gemini, or similar). You understand prompts, responses, and that models can produce different outputs each time.</li>
+</ul>
+<h3>Helpful but Not Required</h3>
+<ul>
+<li>Experience with the command line or terminal (we provide exact commands to copy)</li>
+<li>Familiarity with JSON format (tool schemas use JSON)</li>
+<li>Previous exposure to VS Code or any code editor</li>
+<li>Completion of earlier workshop phases (Phases 1-5 cover foundational AI skills)</li>
+</ul>
+<h3>Not Required</h3>
+<ul>
+<li>No prior experience building AI agents or chatbots</li>
+<li>No knowledge of MCP, function calling, or tool-use protocols</li>
+<li>No experience with multi-agent frameworks (LangChain, CrewAI, AutoGen)</li>
+<li>No DevOps or deployment skills</li>
+</ul>
+<h2>Technical Requirements</h2>
+<h3>Hardware Specifications</h3>
+<p><strong>Minimum Requirements:</strong></p>
+<ul>
+<li><strong>Processor:</strong> Dual-core CPU (2018 or newer recommended)</li>
+<li><strong>RAM:</strong> 8 GB minimum</li>
+<li><strong>Storage:</strong> 5 GB free disk space (for packages, virtual environments, and project files)</li>
+<li><strong>Display:</strong> 1280x720 resolution minimum</li>
+</ul>
+<p><strong>Recommended Specifications:</strong></p>
+<ul>
+<li><strong>Processor:</strong> Quad-core CPU</li>
+<li><strong>RAM:</strong> 16 GB or more</li>
+<li><strong>Storage:</strong> 10 GB free</li>
+<li><strong>Display:</strong> 1920x1080 or higher (helpful for side-by-side terminal and editor)</li>
+</ul>
+<h3>Operating System</h3>
+<p><strong>Supported Platforms:</strong></p>
+<ul>
+<li>Windows 10 or 11 (64-bit) with WSL2 recommended for Python</li>
+<li>macOS 11 (Big Sur) or newer</li>
+<li>Ubuntu 20.04+, Debian 11+, Fedora 36+, or other mainstream Linux distributions</li>
+</ul>
+<p><strong>Administrator Access Required:</strong></p>
+<ul>
+<li>Ability to install packages via <code>pip</code> or <code>npm</code></li>
+<li>Permission to set environment variables</li>
+<li>Terminal or command-line access</li>
+</ul>
+<h3>Internet Connection</h3>
+<ul>
+<li><strong>Speed:</strong> 10 Mbps minimum (API calls and package downloads)</li>
+<li><strong>Stability:</strong> Consistent connection required throughout -- every agent exercise makes live API calls</li>
+<li><strong>Data:</strong> Approximately 200 MB for initial package installation; ongoing API traffic is lightweight</li>
+<li><strong>Firewalls:</strong> Ensure outbound HTTPS access to <code>api.anthropic.com</code>, <code>registry.npmjs.org</code>, and <code>pypi.org</code></li>
+</ul>
+<h2>Software Prerequisites</h2>
+<h3>Must Install Before the Workshop</h3>
+<p><strong>1. Python 3.10+ (recommended) or Node.js 18+</strong></p>
+<p>Most exercises use Python. TypeScript alternatives are noted where available.</p>
+<pre><code class="language-bash"># Check Python version
+python3 --version   # Should show 3.10 or higher
+
+# Check Node.js version (for Claude Code and MCP servers)
+node --version      # Should show 18 or higher
+</code></pre>
+<p><strong>Installing Python (if needed):</strong></p>
+<ul>
+<li><strong>Windows:</strong> Download from <a href="https://www.python.org/downloads/">https://www.python.org/downloads/</a> -- tick "Add to PATH" during installation</li>
+<li><strong>macOS:</strong> <code>brew install python@3.12</code> (requires Homebrew) or download from python.org</li>
+<li><strong>Linux:</strong> <code>sudo apt install python3 python3-pip python3-venv</code> (Debian/Ubuntu)</li>
+</ul>
+<p><strong>Installing Node.js (if needed):</strong></p>
+<ul>
+<li>All platforms: <a href="https://nodejs.org/">https://nodejs.org/</a> (LTS version recommended)</li>
+<li>Or use a version manager: <code>nvm install --lts</code></li>
+</ul>
+<p><strong>2. A Code Editor</strong></p>
+<ul>
+<li><strong>VS Code</strong> (recommended) -- <a href="https://code.visualstudio.com/">https://code.visualstudio.com/</a></li>
+<li>Any text editor with a built-in terminal will work (Cursor, Windsurf, Sublime Text, etc.)</li>
+</ul>
+<p><strong>3. A Terminal</strong></p>
+<ul>
+<li><strong>Windows:</strong> PowerShell, Windows Terminal, or WSL2 bash</li>
+<li><strong>macOS / Linux:</strong> The built-in Terminal application, or the VS Code integrated terminal</li>
+</ul>
+<h3>Will Install During the Workshop</h3>
+<p>We will install these together in the hands-on section:</p>
+<ul>
+<li><strong>Claude Code</strong> (Anthropic's terminal coding agent): <code>npm install -g @anthropic-ai/claude-code</code></li>
+<li><strong>Anthropic Python SDK</strong>: <code>pip install anthropic</code></li>
+<li><strong>Supporting packages</strong>: <code>python-dotenv</code>, <code>duckduckgo-search</code>, <code>tenacity</code></li>
+<li><strong>MCP servers</strong> (as needed): installed via <code>npx</code> on demand</li>
+</ul>
+<h2>Account Setup</h2>
+<h3>Required: Anthropic API Key</h3>
+<p>All core exercises use the Claude API. You need an API key before the session begins.</p>
+<ol>
+<li><strong>Create an account</strong> at <a href="https://console.anthropic.com">https://console.anthropic.com</a></li>
+<li><strong>Add billing</strong> -- a credit card is required for API access. Workshop exercises typically cost less than $2 in total.</li>
+<li><strong>Generate an API key</strong> from the console dashboard</li>
+<li><strong>Set the key in your environment:</strong></li>
+</ol>
+<pre><code class="language-bash"># macOS / Linux -- add to your shell profile (~/.bashrc, ~/.zshrc, or ~/.config/fish/config.fish)
+export ANTHROPIC_API_KEY="sk-ant-..."
+
+# Windows PowerShell
+$env:ANTHROPIC_API_KEY = "sk-ant-..."
+
+# Or create a .env file in your project folder (never commit this file)
+echo 'ANTHROPIC_API_KEY=sk-ant-...' &gt; .env
+</code></pre>
+<h3>Optional: Additional Accounts</h3>
+<p>These are not required but expand what you can explore:</p>
+<ul>
+<li><strong>Brave Search API</strong> (free tier) -- for real web search in research agents: <a href="https://brave.com/search/api/">https://brave.com/search/api/</a></li>
+<li><strong>GitHub Account</strong> (free) -- for MCP GitHub server integration: <a href="https://github.com/signup">https://github.com/signup</a></li>
+<li><strong>OpenAI API Key</strong> -- only if you want to compare with Codex CLI or GPT models: <a href="https://platform.openai.com">https://platform.openai.com</a></li>
+</ul>
+<h3>Cost Expectations</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Activity</th><th>Estimated Cost</th></tr></thead><tbody><tr><td>Core exercises (Sonnet 4.6)</td><td>$0.50-1.00</td></tr><tr><td>Project work (Sonnet 4.6)</td><td>$0.50-1.00</td></tr><tr><td>Claude Code usage</td><td>$0.50-1.50</td></tr><tr><td><strong>Total for the morning</strong></td><td><strong>$1.50-3.50</strong></td></tr></tbody></table>
+<p>Set a spending limit in the Anthropic console to avoid surprises. We recommend $10 for the full day (morning plus afternoon).</p>
+<h2>Environment Setup</h2>
+<h3>Recommended: Create a Workshop Project</h3>
+<pre><code class="language-bash"># Create and enter the workshop directory
+mkdir ai-agents-workshop
+cd ai-agents-workshop
+
+# Create a Python virtual environment (keeps packages isolated)
+python3 -m venv venv
+
+# Activate the virtual environment
+# macOS / Linux:
+source venv/bin/activate
+# Windows:
+venv\Scripts\activate
+
+# Install core packages
+pip install anthropic python-dotenv
+
+# Install optional packages (used in later exercises)
+pip install duckduckgo-search tenacity chromadb
+
+# Verify the Anthropic SDK
+python3 -c "import anthropic; print('Anthropic SDK ready')"
+</code></pre>
+<h3>Verify Claude Code Installation</h3>
+<pre><code class="language-bash"># Install Claude Code globally
+npm install -g @anthropic-ai/claude-code
+
+# Verify it works (this should start the interactive agent)
+claude-code --version
+</code></pre>
+<h3>Verify Your API Key</h3>
+<pre><code class="language-bash"># Quick test -- should return a response from Claude
+python3 -c "
+import anthropic, os
+client = anthropic.Anthropic()
+resp = client.messages.create(
+    model='claude-sonnet-4-6',
+    max_tokens=50,
+    messages=[{'role': 'user', 'content': 'Say hello in one sentence.'}]
+)
+print(resp.content[0].text)
+"
+</code></pre>
+<p>If you see a greeting from Claude, your setup is complete.</p>
+<h2>Project Preparation</h2>
+<h3>Bring a Real Use Case</h3>
+<p>The workshop is most valuable when you apply agent patterns to your own work. Think about a task you do regularly that involves:</p>
+<ul>
+<li><strong>Research</strong> -- gathering information from multiple sources and synthesising findings</li>
+<li><strong>Analysis</strong> -- reviewing documents, code, or data for patterns or issues</li>
+<li><strong>Content creation</strong> -- writing reports, proposals, summaries, or documentation</li>
+<li><strong>Automation</strong> -- repetitive multi-step workflows you currently do manually</li>
+</ul>
+<p>Examples from past participants:</p>
+<ul>
+<li>"I spend 3 hours per week compiling competitor analysis reports"</li>
+<li>"I review 20+ pull requests a week and always check for the same security patterns"</li>
+<li>"I write quarterly research summaries from dozens of journal articles"</li>
+</ul>
+<h3>Prepare a Test Topic</h3>
+<p>For the research agent exercises, have a topic ready:</p>
+<ul>
+<li>Something you genuinely want to research</li>
+<li>Specific enough to produce useful results (e.g. "EU AI Act compliance requirements for SMEs" rather than "AI regulation")</li>
+<li>Current enough that web search will find relevant sources</li>
+</ul>
+<h2>Pre-Workshop Checklist</h2>
+<h3>One Day Before</h3>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled=""> Python 3.10+ installed and working</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Node.js 18+ installed and working</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Anthropic API key created and set as environment variable</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Workshop project directory created</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> <code>pip install anthropic python-dotenv</code> completed successfully</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> API key verified with the quick test above</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Real use case or research topic identified</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> 3 uninterrupted hours blocked in your calendar</li>
+</ul>
+<h3>One Hour Before</h3>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled=""> Terminal or VS Code open and ready</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Virtual environment activated</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> API key accessible (check with <code>echo $ANTHROPIC_API_KEY</code>)</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Browser open to <a href="https://console.anthropic.com">https://console.anthropic.com</a> (for monitoring usage)</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Notifications silenced</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Water and refreshments to hand</li>
+</ul>
+<h2>Troubleshooting Common Setup Issues</h2>
+<h3>"pip: command not found"</h3>
+<p>Use <code>pip3</code> instead, or install pip: <code>python3 -m ensurepip --upgrade</code></p>
+<h3>"ModuleNotFoundError: No module named 'anthropic'"</h3>
+<p>Ensure your virtual environment is activated (<code>source venv/bin/activate</code>) before running <code>pip install</code>.</p>
+<h3>"AuthenticationError" from the API</h3>
+<p>Verify your key is set: <code>echo $ANTHROPIC_API_KEY</code>. If it shows nothing, re-export the key in your current terminal session.</p>
+<h3>"npm: command not found"</h3>
+<p>Install Node.js from <a href="https://nodejs.org/">https://nodejs.org/</a> -- the installer includes npm.</p>
+<h3>"Permission denied" when installing global npm packages</h3>
+<p>On macOS/Linux, either use <code>sudo npm install -g</code> or configure npm to use a user-level directory: <code>npm config set prefix ~/.npm-global</code> and add <code>~/.npm-global/bin</code> to your PATH.</p>
+<h3>Network or Firewall Issues</h3>
+<p>If your organisation blocks outbound traffic, ensure these domains are accessible: <code>api.anthropic.com</code>, <code>registry.npmjs.org</code>, <code>pypi.org</code>, <code>files.pythonhosted.org</code>.</p>
+<h2>Getting Help</h2>
+<h3>During the Workshop</h3>
+<ol>
+<li>Check the troubleshooting section above</li>
+<li>Ask in the workshop chat or Discord channel</li>
+<li>Flag the instructor -- setup issues are priority in the first 15 minutes</li>
+</ol>
+<h3>After the Workshop</h3>
+<ul>
+<li>Workshop Discord channel for ongoing support</li>
+<li>Email: <a href="mailto:workshop@dreamlab.ai">workshop@dreamlab.ai</a></li>
+<li>Office hours: Fridays 14:00-15:00 GMT</li>
+<li>All workshop materials remain available on this site</li>
+</ul>
+<h2>What Comes Next</h2>
+<p>Once your setup is verified, you are ready to begin. The session starts with the agent landscape and quickly moves to live coding.</p>
+<hr>
+<p><a href="00_introduction.md">Proceed to Workshop --&gt;</a> | <a href="objectives.md">View Objectives</a> | <a href="README.md">Back to Workshop Overview</a></p></div></article></main></div>
+    <noscript><p>Interactive forms require JavaScript. You can also email <a href="mailto:info@dreamlab-ai.com">info@dreamlab-ai.com</a>.</p></noscript>
+  
+
+</body></html>

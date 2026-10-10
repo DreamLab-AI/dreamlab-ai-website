@@ -1,0 +1,356 @@
+<!DOCTYPE html><html lang="en" class="dark"><head>
+    <meta charset="UTF-8">
+
+    <!-- Primary Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <title>Learning Objectives - Workshop 04 Afternoon: Agent Orchestration &amp; Safety | DreamLab AI Workshops</title>
+    <meta name="title" content="Learning Objectives - Workshop 04 Afternoon: Agent Orchestration &amp; Safety | DreamLab AI Workshops">
+    <meta name="description" content="Learning Objectives - Workshop 04 Afternoon: Agent Orchestration &amp; Safety — free DreamLab AI curriculum.">
+    <meta name="keywords" content="applied innovation lab, AI consulting, enterprise innovation, immersive XR, cyber trust, creative technology, residential programmes, knowledge transfer, deep tech, Lake District">
+    <meta name="author" content="DreamLab">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    <meta name="rating" content="General">
+
+    <link rel="describedby" href="/llms.txt" type="text/plain">
+    <script type="application/ld+json" id="organisation-structured-data">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://dreamlab-ai.com/#organisation","name":"DreamLab","url":"https://dreamlab-ai.com/","logo":"https://dreamlab-ai.com/images/heroes/dreamlab-hero.webp","email":"info@dreamlab-ai.com","founder":{"@id":"https://dreamlab-ai.com/team#john-ohare"},"sameAs":["https://github.com/DreamLab-AI","https://www.linkedin.com/company/dreamlab-ai-consulting"]},{"@type":"Person","@id":"https://dreamlab-ai.com/team#john-ohare","name":"John O'Hare","honorificPrefix":"Dr","jobTitle":"Founder","worksFor":{"@id":"https://dreamlab-ai.com/#organisation"},"url":"https://dreamlab-ai.com/team#john-ohare"}]}</script>
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dreamlab-ai.com/workshops/workshop-04-afternoon-orchestration/objectives.md/">
+
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="msapplication-TileColor" content="#1a1a2e">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://dreamlab-ai.com/workshops/workshop-04-afternoon-orchestration/objectives.md/">
+    <meta property="og:title" content="Learning Objectives - Workshop 04 Afternoon: Agent Orchestration &amp; Safety | DreamLab AI Workshops">
+    <meta property="og:description" content="Learning Objectives - Workshop 04 Afternoon: Agent Orchestration &amp; Safety — free DreamLab AI curriculum.">
+    <meta property="og:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="DreamLab AI Workshop - Learning Objectives - Workshop 04 Afternoon: Agent Orchestration &amp; Safety">
+    <meta property="og:site_name" content="DreamLab">
+    <meta property="og:locale" content="en_GB">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://dreamlab-ai.com/workshops/workshop-04-afternoon-orchestration/objectives.md/">
+    <meta name="twitter:title" content="Learning Objectives - Workshop 04 Afternoon: Agent Orchestration &amp; Safety | DreamLab AI Workshops">
+    <meta name="twitter:description" content="Learning Objectives - Workshop 04 Afternoon: Agent Orchestration &amp; Safety — free DreamLab AI curriculum.">
+    <meta name="twitter:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta name="twitter:image:alt" content="DreamLab AI Workshop - Learning Objectives - Workshop 04 Afternoon: Agent Orchestration &amp; Safety">
+    <meta name="twitter:site" content="@thedreamlab">
+    <meta name="twitter:creator" content="@thedreamlab">
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="geo.region" content="GB">
+    <meta name="geo.placename" content="United Kingdom">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DreamLab AI">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Security Headers -->
+    <!--
+      CSP notes:
+      - script-src is 'self' only: no 'unsafe-eval' (blocks eval/Function-based
+        injection) and no 'unsafe-inline'. The one inline bootstrap script was
+        moved to /spa-redirect.js. JSON-LD blocks below are type
+        application/ld+json (data, not executable) so CSP does not gate them.
+      - connect-src is scoped to the Cloudflare Workers subdomain actually used
+        by this account (*.solitary-paper-764d.workers.dev: auth / pod / search /
+        link-preview / nostr-relay), NOT the internet-wide *.workers.dev, which
+        previously allowed exfiltration to any attacker-controlled worker.
+      - The two open Nostr relays (relay.damus.io, relay.primal.net) are
+        explicitly allow-listed: the Talk-to-AI chat listens there for
+        junkiejarvis's reply (the primary relay's whitelist gate rejects the
+        gift-wrap addressed to the ephemeral session key — ADR-042 Amendment 1).
+        Must stay in sync with VITE_REPLY_RELAYS. Named exactly, not a wildcard.
+      - style-src keeps 'unsafe-inline' because Radix UI + runtime style
+        attributes require it; that is not a script-injection vector.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.solitary-paper-764d.workers.dev wss://*.solitary-paper-764d.workers.dev https://*.dreamlab-ai.com wss://*.dreamlab-ai.com wss://relay.damus.io wss://relay.primal.net; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <!-- SPA deep-link restore. External 'self' script (not inline) so CSP
+         script-src can stay 'self' with no 'unsafe-inline'. Classic,
+         render-blocking script: runs before the deferred app module. -->
+    <script src="/spa-redirect.js"></script>
+    <script type="module" crossorigin="" src="/assets/index-Crc86LXg.js"></script>
+    <link rel="modulepreload" crossorigin="" href="/assets/ui-C2dH1upk.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/vendor-uw6h6E0d.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/nostr-BpuBsPg-.js">
+    <link rel="stylesheet" crossorigin="" href="/assets/index-CeEdk6WL.css">
+  <script type="application/ld+json" id="route-structured-data">{"@context":"https://schema.org","@type":"LearningResource","@id":"https://dreamlab-ai.com/workshops/workshop-04-afternoon-orchestration/objectives.md/#page","url":"https://dreamlab-ai.com/workshops/workshop-04-afternoon-orchestration/objectives.md/","name":"Learning Objectives - Workshop 04 Afternoon: Agent Orchestration & Safety | DreamLab AI Workshops","description":"Learning Objectives - Workshop 04 Afternoon: Agent Orchestration & Safety — free DreamLab AI curriculum.","inLanguage":"en-GB","publisher":{"@id":"https://dreamlab-ai.com/#organisation"},"isAccessibleForFree":true}</script><link rel="alternate" type="text/markdown" href="/data/workshops/workshop-04-afternoon-orchestration/objectives.md"></head>
+
+  <body>
+    <!-- Skip Navigation Link for Accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
+      Skip to main content
+    </a>
+    <div id="root"><header role="banner" class="fixed top-0 left-0 right-0 z-50"><div class="md:hidden flex items-center justify-between h-14 px-6 bg-[rgba(14,14,17,0.92)] backdrop-blur-[14px] border-b border-dlm-hairline"><a aria-label="DreamLab home" class="flex items-center gap-2" href="/"><span class="w-[9px] h-[9px] rounded-full bg-dlm-bright shrink-0" aria-hidden="true"></span><span class="text-[14px] font-semibold tracking-[0.14em] text-[#FAFAFA]">DREAMLAB</span></a><button type="button" aria-label="Open menu" aria-expanded="false" class="w-11 h-11 -mr-2 flex flex-col items-end justify-center gap-[5px] focus:outline-none focus-visible:ring-2 focus-visible:ring-dlm-bright rounded"><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span></button></div><div class="hidden md:block transition-all duration-300 ease-out py-3 bg-background/60 backdrop-blur-md"><div class="container flex items-center justify-between px-4"><button class="flex items-center gap-2 md:gap-3 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded min-h-[48px] min-w-[48px] px-3 py-2" aria-label="Main navigation menu" type="button" id="radix-:Rp:" aria-haspopup="menu" aria-expanded="false" data-state="closed"><div class="w-10 h-10 md:w-8 md:h-8 shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all duration-300 group-hover:scale-110 animate-glow-pulse" aria-hidden="true"></div><span class="font-bold text-lg md:text-xl tracking-tight group-hover:text-purple-400 transition-colors duration-300">MENU</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down h-5 w-5 md:h-4 md:w-4 shrink-0 text-muted-foreground group-hover:text-purple-400 transition-all duration-300 group-hover:rotate-180" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button><div class="flex items-center gap-2"><a class="items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-10 py-2 hover:bg-purple-500/10 hover:text-purple-400 transition-all duration-300 hover:scale-105 min-h-[48px] px-4 text-base md:text-sm hidden sm:inline-flex" href="/contact">Contact</a><a class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary hover:bg-primary/90 h-10 py-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transition-all duration-300 min-h-[48px] px-4 text-base md:text-sm" href="/co-create">Partner With Us</a></div></div></div></header><header class="relative overflow-hidden" style="min-height:320px"><div class="absolute inset-0 bg-gradient-to-br from-amber-500/30 via-orange-500/30 to-red-500/30" style="transform:translateY(0px);opacity:1"><div class="absolute top-0 -left-20 w-96 h-96 rounded-full blur-3xl opacity-40 animate-float bg-gradient-to-br from-amber-500 via-orange-500 to-red-500"></div><div class="absolute bottom-0 -right-20 w-[32rem] h-[32rem] rounded-full blur-3xl opacity-30 animate-float bg-gradient-to-br from-amber-500 via-orange-500 to-red-500" style="animation-delay:1s"></div><div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full blur-3xl opacity-20 animate-float bg-gradient-to-br from-amber-500 via-orange-500 to-red-500" style="animation-delay:2s"></div></div><div class="absolute inset-0 opacity-5" style="background-image:linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);background-size:50px 50px;transform:translateY(0px)"></div><div class="relative z-10 container px-4 pt-24 pb-8"><div class="mb-6 transition-all duration-500 transform opacity-0 translate-y-4"><nav aria-label="breadcrumb"><ol class="flex flex-wrap items-center gap-1.5 break-words text-sm sm:gap-2.5 text-white/70"><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/">Home</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/workshops">Workshops</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><span role="link" aria-disabled="true" aria-current="page" class="text-white font-medium">Workshop 04 - Afternoon Session: Agent Orchestration &amp; Safety</span></li></ol></nav></div><div class="mb-4 transition-all duration-500 delay-100 transform opacity-0 translate-y-4"><div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20"><span class="text-orange-400"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings w-5 h-5" aria-hidden="true"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"></path><circle cx="12" cy="12" r="3"></circle></svg></span><span class="text-sm font-medium text-white/90">Software Engineering</span></div></div><h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 break-words transition-all duration-700 delay-200 transform opacity-0 translate-y-6"><span class="bg-gradient-to-r bg-clip-text text-transparent animate-gradient-shift bg-400% from-amber-400 via-orange-400 to-red-400">Workshop 04 - Afternoon Session: Agent Orchestration &amp; Safety</span></h1><div class="flex flex-wrap items-center gap-3 mb-6 transition-all duration-700 delay-400 transform opacity-0 translate-y-4"><div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-white/10 border-white/20 text-white backdrop-blur-sm hover:bg-white/20"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-3.5 h-3.5 mr-1.5" aria-hidden="true"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>10<!-- --> <!-- -->Modules</div></div><div class="max-w-md transition-all duration-700 delay-500 transform opacity-0 translate-y-4"><div class="flex items-center justify-between text-sm text-white/70 mb-2"><span class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code w-4 h-4" aria-hidden="true"><path d="m16 18 6-6-6-6"></path><path d="m8 6-6 6 6 6"></path></svg><span>Chapter <!-- -->9<!-- -->: <!-- -->Learning Objectives - Workshop 04 Afternoon: Agent Orchestration &amp; Safety</span></span><span class="font-medium text-white">90<!-- -->%</span></div><div class="relative"><div aria-valuemax="100" aria-valuemin="0" role="progressbar" data-state="indeterminate" data-max="100" class="relative w-full overflow-hidden rounded-full h-2 bg-white/20"><div data-state="indeterminate" data-max="100" class="h-full w-full flex-1 bg-primary transition-all" style="transform:translateX(-10%)"></div></div><div class="absolute top-0 left-0 h-2 rounded-full blur-sm bg-gradient-to-r from-amber-500 via-orange-500 to-red-500" style="width:90%"></div></div><div class="relative mt-1 h-1"><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:10%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:20%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:30%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:40%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:50%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:60%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:70%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:80%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:90%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:100%"></div></div></div></div><div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent"></div></header><main class="container px-4 pt-8 pb-8 flex flex-col md:flex-row gap-x-8 min-h-screen" id="main-content"><aside class="w-full md:w-64 lg:w-72 md:sticky md:top-20 md:h-[calc(100vh-5rem-2rem)] mb-8 md:mb-0"><h2 class="text-xl font-semibold mb-4 break-words">Workshop 04 - Afternoon Session: Agent Orchestration &amp; Safety</h2><div dir="ltr" class="relative overflow-hidden h-auto md:h-full pr-4 border-r md:border-r-0" style="position:relative;--radix-scroll-area-corner-width:0px;--radix-scroll-area-corner-height:0px"><style>[data-radix-scroll-area-viewport]{scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;}[data-radix-scroll-area-viewport]::-webkit-scrollbar{display:none}</style><div data-radix-scroll-area-viewport="" class="h-full w-full rounded-[inherit]" style="overflow-x:hidden;overflow-y:hidden"><div style="min-width:100%;display:table"><nav><ul><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-04-afternoon-orchestration/README.md"><span class="mr-2 text-xs opacity-60">1<!-- -->.</span>Workshop 04 - Afternoon Session: Agent Orchestration &amp; Safety</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-04-afternoon-orchestration/00_introduction.md"><span class="mr-2 text-xs opacity-60">2<!-- -->.</span>Introduction to Agent Orchestration &amp; Safety</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-04-afternoon-orchestration/01_concepts.md"><span class="mr-2 text-xs opacity-60">3<!-- -->.</span>Orchestration Concepts &amp; Safety Patterns</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-04-afternoon-orchestration/02_hands_on.md"><span class="mr-2 text-xs opacity-60">4<!-- -->.</span>Hands-on: Building Orchestrated Agent Systems</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-04-afternoon-orchestration/03_exercises.md"><span class="mr-2 text-xs opacity-60">5<!-- -->.</span>Orchestration Exercises</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-04-afternoon-orchestration/04_project.md"><span class="mr-2 text-xs opacity-60">6<!-- -->.</span>Final Project: Production Multi-Agent System</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-04-afternoon-orchestration/05_assessment.md"><span class="mr-2 text-xs opacity-60">7<!-- -->.</span>Assessment: Agent Orchestration &amp; Safety</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-04-afternoon-orchestration/06_resources.md"><span class="mr-2 text-xs opacity-60">8<!-- -->.</span>Resources for Agent Orchestration &amp; Safety</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors bg-primary text-primary-foreground font-semibold" href="/workshops/workshop-04-afternoon-orchestration/objectives.md"><span class="mr-2 text-xs opacity-60">9<!-- -->.</span>Learning Objectives - Workshop 04 Afternoon: Agent Orchestration &amp; Safety</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-04-afternoon-orchestration/prerequisites.md"><span class="mr-2 text-xs opacity-60">10<!-- -->.</span>Prerequisites - Workshop 04 Afternoon: Agent Orchestration &amp; Safety</a></li></ul></nav></div></div></div></aside><article class="flex-1 min-w-0 md:pl-0"><div class="prose max-w-none dark:prose-invert break-words [&amp;_table]:block [&amp;_table]:w-full [&amp;_table]:overflow-x-auto"><h1>Learning Objectives - Workshop 04 Afternoon: Agent Orchestration &amp; Safety</h1>
+<h2>Workshop Overview</h2>
+<p>Move beyond single agents to production multi-agent systems. By the end of this 3-hour session, you will be able to design, build, and deploy orchestrated agent workflows with proper safety controls, cost management, and observability -- the capabilities that make the difference between a demo and a production system.</p>
+<h2>Primary Learning Outcomes</h2>
+<p>By the end of this workshop, you will be able to:</p>
+<h3>1. Orchestration Architecture (Core Knowledge)</h3>
+<p><strong>You will be able to:</strong></p>
+<ul>
+<li>Explain why multi-agent orchestration is necessary for complex, real-world tasks</li>
+<li>Describe the four core orchestration patterns: subagent delegation, pipeline, fan-out/fan-in, and graph-based state machines</li>
+<li>Identify which pattern suits a given problem (e.g. parallel research vs sequential content creation vs branching workflows)</li>
+<li>Articulate the trade-offs between frameworks: Claude Code subagents, the Anthropic Agent SDK, LangGraph, and CrewAI</li>
+<li>Draw an architecture diagram for a multi-agent system, including orchestrator, subagents, safety layer, and result collector</li>
+</ul>
+<p><strong>Success Criteria:</strong></p>
+<ul>
+<li>Can compare at least three orchestration patterns with use cases and weaknesses</li>
+<li>Can recommend a framework for a given scenario with reasoning</li>
+<li>Can explain how subagent delegation works in Claude Code</li>
+<li>Can describe a fan-out/fan-in pattern and when to use it</li>
+</ul>
+<h3>2. Safety &amp; Guardrails (Core Skills)</h3>
+<p><strong>You will be able to:</strong></p>
+<ul>
+<li>Implement a token budget controller that tracks input and output tokens and raises an exception when the budget is exceeded</li>
+<li>Build an iteration limiter that prevents runaway agent loops</li>
+<li>Create a human-in-the-loop approval gate for sensitive tool calls (file writes, deployments, destructive actions)</li>
+<li>Design an audit logger that records every LLM call, tool invocation, and approval decision in structured JSON</li>
+<li>Configure Claude Code hooks (<code>PreToolUse</code>, <code>PostToolUse</code>) to enforce safety rules automatically</li>
+<li>Explain the role of sandboxed execution (Docker, E2B) in preventing agents from damaging the host system</li>
+</ul>
+<p><strong>Success Criteria:</strong></p>
+<ul>
+<li>Working token budget controller with tracking and enforcement</li>
+<li>Iteration limiter that stops agents after a configurable maximum</li>
+<li>Approval gate that blocks sensitive actions until a human approves</li>
+<li>Audit log file with structured JSON entries for a complete session</li>
+<li>Can explain five safety controls and what happens if each is missing</li>
+</ul>
+<h3>3. Cost Management (Core Skills)</h3>
+<p><strong>You will be able to:</strong></p>
+<ul>
+<li>Implement a model routing strategy that classifies task complexity and selects the cheapest suitable model</li>
+<li>Route simple tasks (classification, formatting, extraction) to Haiku 4.5</li>
+<li>Route moderate tasks (analysis, coding, synthesis) to Sonnet 4.6</li>
+<li>Reserve Opus 4.8 for complex reasoning and critical architectural decisions</li>
+<li>Use prompt caching to reduce costs on repeated system prompts</li>
+<li>Trim conversation context to avoid paying for stale messages</li>
+<li>Estimate the token cost of a multi-agent workflow before running it</li>
+<li>Compare the cost of a routed approach against a naive "all Sonnet" baseline</li>
+</ul>
+<p><strong>Success Criteria:</strong></p>
+<ul>
+<li>Working model router that classifies and dispatches to three model tiers</li>
+<li>Cost report showing tokens used per model with estimated savings</li>
+<li>Can estimate the token cost of a given multi-agent workflow on paper</li>
+<li>Can identify at least three cost reduction strategies</li>
+</ul>
+<h3>4. Parallel Execution &amp; Synthesis (Applied Skills)</h3>
+<p><strong>You will be able to:</strong></p>
+<ul>
+<li>Use Python's <code>concurrent.futures.ThreadPoolExecutor</code> to run subagents in parallel</li>
+<li>Implement a fan-out/fan-in pattern where multiple agents search independently and results are synthesised</li>
+<li>Handle partial failures: if one subagent fails, continue with the others and note the gap</li>
+<li>Build a synthesis agent that combines diverse subtask results into a coherent final output</li>
+<li>Deduplicate overlapping findings from parallel research agents</li>
+</ul>
+<p><strong>Success Criteria:</strong></p>
+<ul>
+<li>Orchestrator that runs at least 3 subtasks in parallel</li>
+<li>Synthesis output that is coherent and eliminates redundancy</li>
+<li>System handles one subagent failure without crashing</li>
+<li>Cost report shows parallel vs sequential comparison</li>
+</ul>
+<h3>5. Error Recovery &amp; Resilience (Applied Skills)</h3>
+<p><strong>You will be able to:</strong></p>
+<ul>
+<li>Implement exponential backoff for transient API failures (rate limits, network errors)</li>
+<li>Build model fallback logic: if the primary model fails, retry with a cheaper alternative</li>
+<li>Design a circuit breaker that stops retrying after consecutive failures</li>
+<li>Return partial results with clear indication of what succeeded and what failed</li>
+<li>Log all retries, failures, and fallbacks for post-incident review</li>
+</ul>
+<p><strong>Success Criteria:</strong></p>
+<ul>
+<li>Retry logic with configurable backoff (1s, 2s, 4s)</li>
+<li>Model fallback from Sonnet to Haiku on failure</li>
+<li>Partial results returned with status indicators</li>
+<li>Failure log with timestamps and error details</li>
+</ul>
+<h3>6. Production Deployment Patterns (Applied Knowledge)</h3>
+<p><strong>You will be able to:</strong></p>
+<ul>
+<li>Structure a multi-agent project with proper separation of concerns (<code>orchestrator.py</code>, <code>safety.py</code>, <code>router.py</code>, <code>agents.py</code>)</li>
+<li>Write tests for safety controllers, model routers, and orchestration logic</li>
+<li>Use observability tools (LangSmith, Helicone) to trace and debug agent workflows</li>
+<li>Configure Claude Code hooks for automated safety enforcement in real projects</li>
+<li>Design an approval-gated deployment pipeline with full audit trail</li>
+</ul>
+<p><strong>Success Criteria:</strong></p>
+<ul>
+<li>Modular project structure with separate safety, routing, and orchestration modules</li>
+<li>At least 3 passing tests covering safety and routing logic</li>
+<li>Can explain how to integrate LangSmith or Helicone for production monitoring</li>
+<li>Can describe the workflow for an approval-gated deployment</li>
+</ul>
+<h2>Detailed Skill Progression</h2>
+<h3>Hour 1: Concepts and Understanding (0:00--1:00)</h3>
+<p><strong>Knowledge:</strong></p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled=""> Understand why single agents are insufficient for complex tasks</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Know the four orchestration patterns and their trade-offs</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Understand the five core safety controls (budget, limits, sandboxing, approval, audit)</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Know the model routing strategy (Haiku / Sonnet / Opus)</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Understand prompt caching and context efficiency</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Recognise the risks of unguarded autonomous agents</li>
+</ul>
+<p><strong>Comprehension:</strong></p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled=""> Can explain subagent delegation with a concrete example</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Can describe when to use fan-out/fan-in vs pipeline</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Can articulate why audit logging is essential, not optional</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Can explain the cost difference between Haiku and Opus</li>
+</ul>
+<h3>Hour 2: Hands-On Building (1:00--2:00)</h3>
+<p><strong>Implementation:</strong></p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled=""> Build a subagent orchestrator with parallel execution</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Implement token budget tracking and enforcement</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Create an iteration limiter and test it</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Build an approval gate for sensitive tool calls</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Set up audit logging in structured JSON format</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Configure Claude Code hooks for automated safety</li>
+</ul>
+<p><strong>Practice:</strong></p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled=""> Run the orchestrator with a real task and observe parallel execution</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Trigger the token budget limit and observe the graceful stop</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Test the approval gate by attempting a sensitive action</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Review the audit log to trace what happened during a run</li>
+</ul>
+<h3>Hour 3: Exercises, Project &amp; Assessment (2:00--3:00)</h3>
+<p><strong>Application:</strong></p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled=""> Complete at least 3 of the 6 progressive exercises</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Build a model routing orchestrator with cost reporting</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Implement retry logic with exponential backoff</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Design and build the final project: a production multi-agent system</li>
+</ul>
+<p><strong>Evaluation:</strong></p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled=""> Answer conceptual questions about orchestration patterns</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Identify bugs and missing safety controls in sample code</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Design a multi-agent system for a given real-world scenario</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Estimate the token cost of a multi-agent workflow</li>
+</ul>
+<h2>Profession-Specific Outcomes</h2>
+<h3>For Technical Leads &amp; Architects</h3>
+<ul>
+<li>Design multi-agent architectures for your team's AI workflows</li>
+<li>Evaluate orchestration frameworks against your requirements</li>
+<li>Set cost budgets and safety policies for agent deployments</li>
+<li>Build observability into AI systems from the start</li>
+</ul>
+<h3>For AI/ML Practitioners</h3>
+<ul>
+<li>Implement production-grade agent orchestration in Python</li>
+<li>Build custom safety controllers and model routers</li>
+<li>Use LangGraph for complex workflows with branching and loops</li>
+<li>Test and debug multi-agent systems systematically</li>
+</ul>
+<h3>For Product Managers &amp; Strategists</h3>
+<ul>
+<li>Understand the cost structure of multi-agent systems</li>
+<li>Evaluate which tasks benefit from orchestration vs single agents</li>
+<li>Set realistic budgets for agent-powered features</li>
+<li>Communicate safety requirements to engineering teams</li>
+</ul>
+<h3>For Operations &amp; Compliance Teams</h3>
+<ul>
+<li>Understand audit logging and traceability for AI agents</li>
+<li>Design approval workflows for sensitive automated actions</li>
+<li>Set token budgets that balance capability with cost control</li>
+<li>Review audit trails to verify agent behaviour</li>
+</ul>
+<h2>Assessment Criteria</h2>
+<h3>Knowledge Assessment (40 points)</h3>
+<p><strong>You will demonstrate understanding of:</strong></p>
+<ul>
+<li>Orchestration patterns: subagent delegation, pipeline, fan-out/fan-in (10 points)</li>
+<li>Safety controls: budgets, limits, sandboxing, approval, audit (10 points)</li>
+<li>Model routing and cost optimisation (10 points)</li>
+<li>Error recovery: retries, fallbacks, circuit breakers (10 points)</li>
+</ul>
+<h3>Code Analysis (30 points)</h3>
+<p><strong>You will successfully:</strong></p>
+<ul>
+<li>Identify at least 4 issues in a flawed orchestrator (15 points)</li>
+<li>Design a safe orchestrator with budget handling and partial results (15 points)</li>
+</ul>
+<h3>System Design (30 points)</h3>
+<p><strong>You will:</strong></p>
+<ul>
+<li>Design a multi-agent system for a real-world scenario (15 points)</li>
+<li>Estimate and optimise the cost of a multi-agent workflow (15 points)</li>
+</ul>
+<h3>Bonus: Practical Implementation (20 points)</h3>
+<ul>
+<li>Build a working mini-orchestrator with parallel execution, token tracking, synthesis, and error handling</li>
+</ul>
+<p><strong>Passing Score:</strong> 70/100 (70%)</p>
+<h2>Success Indicators</h2>
+<h3>Immediate (End of Session)</h3>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled=""> Built a working multi-agent orchestrator</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Safety controls tested and operational</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Model routing producing cost savings</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Audit log capturing all agent actions</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Passed the assessment</li>
+</ul>
+<h3>Short-term (1 Week)</h3>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled=""> Applied orchestration patterns to a real work task</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Set up token budgets for an existing agent workflow</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Implemented audit logging in a project</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Shared learnings with a colleague</li>
+</ul>
+<h3>Long-term (1 Month)</h3>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled=""> Running a production multi-agent system with safety controls</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Cost management reducing agent spending measurably</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Audit trails supporting compliance or debugging needs</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Evaluating advanced frameworks (LangGraph, CrewAI) for team adoption</li>
+</ul>
+<h2>Post-Session Goals</h2>
+<h3>Immediate Next Steps</h3>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled=""> Review the <a href="06_resources.md">Resources</a> page for documentation links</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Complete any unfinished exercises from the session</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Apply the orchestration patterns to one real task at work</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Set up cost monitoring for your API usage</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Document your safety policy for agent deployments</li>
+</ul>
+<h3>Continuing Education</h3>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled=""> Explore LangGraph for complex stateful workflows</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Try CrewAI for role-based agent teams</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Read the MCP specification for building custom tool servers</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Build a production dashboard for agent observability</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Contribute to the workshop community with your experiences</li>
+</ul>
+<hr>
+<p><a href="./00_introduction.md">Begin Workshop --&gt;</a> | <a href="./prerequisites.md">Check Prerequisites</a> | <a href="README.md">Back to Workshop Overview</a></p></div></article></main></div>
+    <noscript><p>Interactive forms require JavaScript. You can also email <a href="mailto:info@dreamlab-ai.com">info@dreamlab-ai.com</a>.</p></noscript>
+  
+
+</body></html>

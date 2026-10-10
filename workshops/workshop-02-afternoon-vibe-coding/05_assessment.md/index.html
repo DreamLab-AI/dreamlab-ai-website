@@ -1,0 +1,453 @@
+<!DOCTYPE html><html lang="en" class="dark"><head>
+    <meta charset="UTF-8">
+
+    <!-- Primary Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <title>Chapter 5: Assessment — Validate Your Mastery | DreamLab AI Workshops</title>
+    <meta name="title" content="Chapter 5: Assessment — Validate Your Mastery | DreamLab AI Workshops">
+    <meta name="description" content="Chapter 5: Assessment — Validate Your Mastery — free DreamLab AI curriculum.">
+    <meta name="keywords" content="applied innovation lab, AI consulting, enterprise innovation, immersive XR, cyber trust, creative technology, residential programmes, knowledge transfer, deep tech, Lake District">
+    <meta name="author" content="DreamLab">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    <meta name="rating" content="General">
+
+    <link rel="describedby" href="/llms.txt" type="text/plain">
+    <script type="application/ld+json" id="organisation-structured-data">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://dreamlab-ai.com/#organisation","name":"DreamLab","url":"https://dreamlab-ai.com/","logo":"https://dreamlab-ai.com/images/heroes/dreamlab-hero.webp","email":"info@dreamlab-ai.com","founder":{"@id":"https://dreamlab-ai.com/team#john-ohare"},"sameAs":["https://github.com/DreamLab-AI","https://www.linkedin.com/company/dreamlab-ai-consulting"]},{"@type":"Person","@id":"https://dreamlab-ai.com/team#john-ohare","name":"John O'Hare","honorificPrefix":"Dr","jobTitle":"Founder","worksFor":{"@id":"https://dreamlab-ai.com/#organisation"},"url":"https://dreamlab-ai.com/team#john-ohare"}]}</script>
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dreamlab-ai.com/workshops/workshop-02-afternoon-vibe-coding/05_assessment.md/">
+
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="msapplication-TileColor" content="#1a1a2e">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://dreamlab-ai.com/workshops/workshop-02-afternoon-vibe-coding/05_assessment.md/">
+    <meta property="og:title" content="Chapter 5: Assessment — Validate Your Mastery | DreamLab AI Workshops">
+    <meta property="og:description" content="Chapter 5: Assessment — Validate Your Mastery — free DreamLab AI curriculum.">
+    <meta property="og:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="DreamLab AI Workshop - Chapter 5: Assessment — Validate Your Mastery">
+    <meta property="og:site_name" content="DreamLab">
+    <meta property="og:locale" content="en_GB">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://dreamlab-ai.com/workshops/workshop-02-afternoon-vibe-coding/05_assessment.md/">
+    <meta name="twitter:title" content="Chapter 5: Assessment — Validate Your Mastery | DreamLab AI Workshops">
+    <meta name="twitter:description" content="Chapter 5: Assessment — Validate Your Mastery — free DreamLab AI curriculum.">
+    <meta name="twitter:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta name="twitter:image:alt" content="DreamLab AI Workshop - Chapter 5: Assessment — Validate Your Mastery">
+    <meta name="twitter:site" content="@thedreamlab">
+    <meta name="twitter:creator" content="@thedreamlab">
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="geo.region" content="GB">
+    <meta name="geo.placename" content="United Kingdom">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DreamLab AI">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Security Headers -->
+    <!--
+      CSP notes:
+      - script-src is 'self' only: no 'unsafe-eval' (blocks eval/Function-based
+        injection) and no 'unsafe-inline'. The one inline bootstrap script was
+        moved to /spa-redirect.js. JSON-LD blocks below are type
+        application/ld+json (data, not executable) so CSP does not gate them.
+      - connect-src is scoped to the Cloudflare Workers subdomain actually used
+        by this account (*.solitary-paper-764d.workers.dev: auth / pod / search /
+        link-preview / nostr-relay), NOT the internet-wide *.workers.dev, which
+        previously allowed exfiltration to any attacker-controlled worker.
+      - The two open Nostr relays (relay.damus.io, relay.primal.net) are
+        explicitly allow-listed: the Talk-to-AI chat listens there for
+        junkiejarvis's reply (the primary relay's whitelist gate rejects the
+        gift-wrap addressed to the ephemeral session key — ADR-042 Amendment 1).
+        Must stay in sync with VITE_REPLY_RELAYS. Named exactly, not a wildcard.
+      - style-src keeps 'unsafe-inline' because Radix UI + runtime style
+        attributes require it; that is not a script-injection vector.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.solitary-paper-764d.workers.dev wss://*.solitary-paper-764d.workers.dev https://*.dreamlab-ai.com wss://*.dreamlab-ai.com wss://relay.damus.io wss://relay.primal.net; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <!-- SPA deep-link restore. External 'self' script (not inline) so CSP
+         script-src can stay 'self' with no 'unsafe-inline'. Classic,
+         render-blocking script: runs before the deferred app module. -->
+    <script src="/spa-redirect.js"></script>
+    <script type="module" crossorigin="" src="/assets/index-Crc86LXg.js"></script>
+    <link rel="modulepreload" crossorigin="" href="/assets/ui-C2dH1upk.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/vendor-uw6h6E0d.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/nostr-BpuBsPg-.js">
+    <link rel="stylesheet" crossorigin="" href="/assets/index-CeEdk6WL.css">
+  <script type="application/ld+json" id="route-structured-data">{"@context":"https://schema.org","@type":"LearningResource","@id":"https://dreamlab-ai.com/workshops/workshop-02-afternoon-vibe-coding/05_assessment.md/#page","url":"https://dreamlab-ai.com/workshops/workshop-02-afternoon-vibe-coding/05_assessment.md/","name":"Chapter 5: Assessment — Validate Your Mastery | DreamLab AI Workshops","description":"Chapter 5: Assessment — Validate Your Mastery — free DreamLab AI curriculum.","inLanguage":"en-GB","publisher":{"@id":"https://dreamlab-ai.com/#organisation"},"isAccessibleForFree":true}</script><link rel="alternate" type="text/markdown" href="/data/workshops/workshop-02-afternoon-vibe-coding/05_assessment.md"></head>
+
+  <body>
+    <!-- Skip Navigation Link for Accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
+      Skip to main content
+    </a>
+    <div id="root"><header role="banner" class="fixed top-0 left-0 right-0 z-50"><div class="md:hidden flex items-center justify-between h-14 px-6 bg-[rgba(14,14,17,0.92)] backdrop-blur-[14px] border-b border-dlm-hairline"><a aria-label="DreamLab home" class="flex items-center gap-2" href="/"><span class="w-[9px] h-[9px] rounded-full bg-dlm-bright shrink-0" aria-hidden="true"></span><span class="text-[14px] font-semibold tracking-[0.14em] text-[#FAFAFA]">DREAMLAB</span></a><button type="button" aria-label="Open menu" aria-expanded="false" class="w-11 h-11 -mr-2 flex flex-col items-end justify-center gap-[5px] focus:outline-none focus-visible:ring-2 focus-visible:ring-dlm-bright rounded"><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span></button></div><div class="hidden md:block transition-all duration-300 ease-out py-3 bg-background/60 backdrop-blur-md"><div class="container flex items-center justify-between px-4"><button class="flex items-center gap-2 md:gap-3 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded min-h-[48px] min-w-[48px] px-3 py-2" aria-label="Main navigation menu" type="button" id="radix-:Rp:" aria-haspopup="menu" aria-expanded="false" data-state="closed"><div class="w-10 h-10 md:w-8 md:h-8 shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all duration-300 group-hover:scale-110 animate-glow-pulse" aria-hidden="true"></div><span class="font-bold text-lg md:text-xl tracking-tight group-hover:text-purple-400 transition-colors duration-300">MENU</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down h-5 w-5 md:h-4 md:w-4 shrink-0 text-muted-foreground group-hover:text-purple-400 transition-all duration-300 group-hover:rotate-180" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button><div class="flex items-center gap-2"><a class="items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-10 py-2 hover:bg-purple-500/10 hover:text-purple-400 transition-all duration-300 hover:scale-105 min-h-[48px] px-4 text-base md:text-sm hidden sm:inline-flex" href="/contact">Contact</a><a class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary hover:bg-primary/90 h-10 py-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transition-all duration-300 min-h-[48px] px-4 text-base md:text-sm" href="/co-create">Partner With Us</a></div></div></div></header><header class="relative overflow-hidden" style="min-height:320px"><div class="absolute inset-0 bg-gradient-to-br from-blue-500/30 via-purple-500/30 to-violet-500/30" style="transform:translateY(0px);opacity:1"><div class="absolute top-0 -left-20 w-96 h-96 rounded-full blur-3xl opacity-40 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600"></div><div class="absolute bottom-0 -right-20 w-[32rem] h-[32rem] rounded-full blur-3xl opacity-30 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600" style="animation-delay:1s"></div><div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full blur-3xl opacity-20 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600" style="animation-delay:2s"></div></div><div class="absolute inset-0 opacity-5" style="background-image:linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);background-size:50px 50px;transform:translateY(0px)"></div><div class="relative z-10 container px-4 pt-24 pb-8"><div class="mb-6 transition-all duration-500 transform opacity-0 translate-y-4"><nav aria-label="breadcrumb"><ol class="flex flex-wrap items-center gap-1.5 break-words text-sm sm:gap-2.5 text-white/70"><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/">Home</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/workshops">Workshops</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><span role="link" aria-disabled="true" aria-current="page" class="text-white font-medium">Phase 3: Vibe Coding Mastery</span></li></ol></nav></div><div class="mb-4 transition-all duration-500 delay-100 transform opacity-0 translate-y-4"><div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20"><span class="text-purple-400"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cpu w-5 h-5" aria-hidden="true"><path d="M12 20v2"></path><path d="M12 2v2"></path><path d="M17 20v2"></path><path d="M17 2v2"></path><path d="M2 12h2"></path><path d="M2 17h2"></path><path d="M2 7h2"></path><path d="M20 12h2"></path><path d="M20 17h2"></path><path d="M20 7h2"></path><path d="M7 20v2"></path><path d="M7 2v2"></path><rect x="4" y="4" width="16" height="16" rx="2"></rect><rect x="8" y="8" width="8" height="8" rx="1"></rect></svg></span><span class="text-sm font-medium text-white/90">AI / Machine Learning</span></div></div><h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 break-words transition-all duration-700 delay-200 transform opacity-0 translate-y-6"><span class="bg-gradient-to-r bg-clip-text text-transparent animate-gradient-shift bg-400% from-blue-400 via-purple-400 to-violet-400">Phase 3: Vibe Coding Mastery</span></h1><div class="flex flex-wrap items-center gap-3 mb-6 transition-all duration-700 delay-400 transform opacity-0 translate-y-4"><div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-white/10 border-white/20 text-white backdrop-blur-sm hover:bg-white/20"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-3.5 h-3.5 mr-1.5" aria-hidden="true"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>10<!-- --> <!-- -->Modules</div></div><div class="max-w-md transition-all duration-700 delay-500 transform opacity-0 translate-y-4"><div class="flex items-center justify-between text-sm text-white/70 mb-2"><span class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code w-4 h-4" aria-hidden="true"><path d="m16 18 6-6-6-6"></path><path d="m8 6-6 6 6 6"></path></svg><span>Chapter <!-- -->7<!-- -->: <!-- -->Chapter 5: Assessment — Validate Your Mastery</span></span><span class="font-medium text-white">70<!-- -->%</span></div><div class="relative"><div aria-valuemax="100" aria-valuemin="0" role="progressbar" data-state="indeterminate" data-max="100" class="relative w-full overflow-hidden rounded-full h-2 bg-white/20"><div data-state="indeterminate" data-max="100" class="h-full w-full flex-1 bg-primary transition-all" style="transform:translateX(-30%)"></div></div><div class="absolute top-0 left-0 h-2 rounded-full blur-sm bg-gradient-to-r from-blue-600 via-purple-600 to-violet-600" style="width:70%"></div></div><div class="relative mt-1 h-1"><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:10%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:20%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:30%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:40%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:50%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:60%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:70%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:80%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:90%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:100%"></div></div></div></div><div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent"></div></header><main class="container px-4 pt-8 pb-8 flex flex-col md:flex-row gap-x-8 min-h-screen" id="main-content"><aside class="w-full md:w-64 lg:w-72 md:sticky md:top-20 md:h-[calc(100vh-5rem-2rem)] mb-8 md:mb-0"><h2 class="text-xl font-semibold mb-4 break-words">Phase 3: Vibe Coding Mastery</h2><div dir="ltr" class="relative overflow-hidden h-auto md:h-full pr-4 border-r md:border-r-0" style="position:relative;--radix-scroll-area-corner-width:0px;--radix-scroll-area-corner-height:0px"><style>[data-radix-scroll-area-viewport]{scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;}[data-radix-scroll-area-viewport]::-webkit-scrollbar{display:none}</style><div data-radix-scroll-area-viewport="" class="h-full w-full rounded-[inherit]" style="overflow-x:hidden;overflow-y:hidden"><div style="min-width:100%;display:table"><nav><ul><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-02-afternoon-vibe-coding/README.md"><span class="mr-2 text-xs opacity-60">1<!-- -->.</span>Phase 3: Vibe Coding Mastery</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-02-afternoon-vibe-coding/00_introduction.md"><span class="mr-2 text-xs opacity-60">2<!-- -->.</span>Chapter 0: Introduction to Vibe Coding Mastery</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-02-afternoon-vibe-coding/01_concepts.md"><span class="mr-2 text-xs opacity-60">3<!-- -->.</span>Chapter 1: Core Concepts - Understanding Vibe Coding</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-02-afternoon-vibe-coding/02_hands_on.md"><span class="mr-2 text-xs opacity-60">4<!-- -->.</span>Chapter 2: Hands-On - Building Your First Vibe Creation</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-02-afternoon-vibe-coding/03_exercises.md"><span class="mr-2 text-xs opacity-60">5<!-- -->.</span>Chapter 3: Creative Challenges — Progressive Exercises</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-02-afternoon-vibe-coding/04_project.md"><span class="mr-2 text-xs opacity-60">6<!-- -->.</span>Chapter 4: Capstone Project — Your Live Creation</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors bg-primary text-primary-foreground font-semibold" href="/workshops/workshop-02-afternoon-vibe-coding/05_assessment.md"><span class="mr-2 text-xs opacity-60">7<!-- -->.</span>Chapter 5: Assessment — Validate Your Mastery</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-02-afternoon-vibe-coding/06_resources.md"><span class="mr-2 text-xs opacity-60">8<!-- -->.</span>Chapter 6: Resources — Continue Creating</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-02-afternoon-vibe-coding/objectives.md"><span class="mr-2 text-xs opacity-60">9<!-- -->.</span>Learning Objectives - Phase 3: Vibe Coding Mastery</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-02-afternoon-vibe-coding/prerequisites.md"><span class="mr-2 text-xs opacity-60">10<!-- -->.</span>Prerequisites - Phase 3: Vibe Coding Mastery</a></li></ul></nav></div></div></div></aside><article class="flex-1 min-w-0 md:pl-0"><div class="prose max-w-none dark:prose-invert break-words [&amp;_table]:block [&amp;_table]:w-full [&amp;_table]:overflow-x-auto"><h1>Chapter 5: Assessment — Validate Your Mastery</h1>
+<h2>Introduction: Proving Your Creative Power</h2>
+<p>This assessment validates that you've mastered vibe coding — the ability to create real, deployed web pages through conversational AI. It combines knowledge checks, practical demonstrations, and reflection.</p>
+<p><strong>Time:</strong> 10 minutes
+<strong>Passing Score:</strong> 80% (24/30 points)
+<strong>Format:</strong> Multiple choice, practical tasks, and reflection</p>
+<h2>Part 1: Knowledge Check (10 points)</h2>
+<h3>Question 1: Vibe Coding Fundamentals (2 points)</h3>
+<p>What is the single most important factor in getting a good first draft from a vibe coding prompt?</p>
+<p>A) Using technical HTML/CSS terminology
+B) Writing a long prompt with many paragraphs
+C) Being specific and descriptive about what you want (colours, layout, content, responsiveness)
+D) Asking the AI to use the latest JavaScript framework</p>
+<p><strong>Answer:</strong> C — Specificity and descriptiveness beat length and technicality every time.</p>
+<hr>
+<h3>Question 2: The Iterative Loop (2 points)</h3>
+<p>What is the recommended approach when your AI-generated page doesn't look right?</p>
+<p>A) Delete everything and start from scratch
+B) Open the HTML file and manually fix the code
+C) Describe what's wrong in natural language and ask for targeted changes
+D) Try a completely different AI tool</p>
+<p><strong>Answer:</strong> C — The iterative refinement loop (describe the issue, request changes, review) is the core vibe coding workflow.</p>
+<hr>
+<h3>Question 3: Tool Selection (2 points)</h3>
+<p>When should you use Claude Code (or Cursor/Windsurf) instead of a browser chat interface like Claude.ai or ChatGPT?</p>
+<p>A) When you want prettier responses
+B) When you're building a multi-file project, need local file access, or want automated deployment
+C) Only when building complex applications with databases
+D) There's no meaningful difference</p>
+<p><strong>Answer:</strong> B — File-based AI agents excel when you need to manage files, run commands, and iterate on a real project structure. Chat interfaces work well for single-file prototypes.</p>
+<hr>
+<h3>Question 4: Prompt Writing (2 points)</h3>
+<p>Which of these prompts will produce a better result?</p>
+<p><strong>Prompt A:</strong></p>
+<pre><code>Make a nice website for my business.
+</code></pre>
+<p><strong>Prompt B:</strong></p>
+<pre><code>Create a landing page for a yoga studio called "Stillpoint". 
+Hero section with calming blue-green gradient, white text reading 
+"Find Your Centre". Below that, 3 class cards (Hatha, Vinyasa, 
+Yin) with descriptions and times. Contact form at the bottom. 
+Clean, minimal style with lots of white space. Responsive.
+</code></pre>
+<p>A) Prompt A — it gives the AI more creative freedom
+B) Prompt B — the specificity guides AI toward your vision
+C) Both produce similar results
+D) Neither — you should always provide a wireframe image instead</p>
+<p><strong>Answer:</strong> B — Specific prompts with named elements, colours, layout descriptions, and responsiveness requirements produce dramatically better first drafts.</p>
+<hr>
+<h3>Question 5: Deployment (2 points)</h3>
+<p>What is GitHub Pages?</p>
+<p>A) A premium web hosting service costing £10/month
+B) A free static site hosting service that serves files from a GitHub repository
+C) A tool for designing web pages visually
+D) A JavaScript framework for building websites</p>
+<p><strong>Answer:</strong> B — GitHub Pages serves static files (HTML, CSS, JavaScript) directly from a public repository, free of charge, with a URL like <code>username.github.io/repo-name</code>.</p>
+<hr>
+<h2>Part 2: Practical Skills (15 points)</h2>
+<h3>Task 1: The Cold Start (4 points)</h3>
+<p><strong>Instructions:</strong>
+Without any warm-up, write a single prompt and generate a complete web page. You have 3 minutes.</p>
+<p><strong>Requirements:</strong></p>
+<ul>
+<li>Page must have at least 3 distinct sections</li>
+<li>Specific colour palette mentioned</li>
+<li>Responsive behaviour requested</li>
+<li>At least one interactive element requested</li>
+</ul>
+<p><strong>Evaluation Criteria:</strong></p>
+<ul>
+<li>Prompt includes all required elements (1 point)</li>
+<li>Generated page displays correctly (1 point)</li>
+<li>Page is responsive (resize to phone width) (1 point)</li>
+<li>Interactive element functions (1 point)</li>
+</ul>
+<hr>
+<h3>Task 2: The Refinement Challenge (4 points)</h3>
+<p><strong>Instructions:</strong>
+Take the page from Task 1 and improve it through exactly 2 rounds of refinement. Each round should produce a visible improvement.</p>
+<p><strong>Round 1 — Describe and Fix:</strong>
+Look at the page and identify the most impactful change needed. Describe it naturally and have AI implement it.</p>
+<p><strong>Round 2 — Polish:</strong>
+Identify a second improvement — visual polish, animation, mobile fix, or content refinement. Describe and implement it.</p>
+<p><strong>Evaluation Criteria:</strong></p>
+<ul>
+<li>Round 1 description is clear and natural (1 point)</li>
+<li>Round 1 change is visibly implemented (1 point)</li>
+<li>Round 2 description addresses a different aspect (1 point)</li>
+<li>Final page is noticeably improved from the first draft (1 point)</li>
+</ul>
+<hr>
+<h3>Task 3: Debugging Through Conversation (3 points)</h3>
+<p><strong>Instructions:</strong>
+A page has the following issues. For each one, write the natural-language prompt you'd send to fix it (you don't need to actually run these — just write the prompts).</p>
+<p><strong>Issue 1:</strong> The navigation links at the top don't scroll to the right sections when clicked.</p>
+<p><strong>Issue 2:</strong> On mobile phones, the three feature cards overlap each other instead of stacking vertically.</p>
+<p><strong>Issue 3:</strong> The contact form's "Submit" button is almost invisible because the text colour matches the button background.</p>
+<p><strong>Evaluation Criteria:</strong></p>
+<ul>
+<li>Issue 1 prompt describes the problem clearly (1 point)</li>
+<li>Issue 2 prompt specifies the desired mobile behaviour (1 point)</li>
+<li>Issue 3 prompt identifies the colour conflict and requests a fix (1 point)</li>
+</ul>
+<p><strong>Example Good Answers:</strong></p>
+<p>Issue 1:</p>
+<pre><code>The navigation links don't work — when I click "About" or "Contact" 
+in the nav bar, nothing happens. They should smooth-scroll to the 
+matching section on the page.
+</code></pre>
+<p>Issue 2:</p>
+<pre><code>On phone screens, the three feature cards are overlapping and 
+unreadable. Make them stack into a single column with spacing 
+between each card on screens smaller than 768px.
+</code></pre>
+<p>Issue 3:</p>
+<pre><code>The Submit button text is invisible — the text colour is the 
+same as the button background. Change the text to white so it 
+contrasts clearly against the button colour.
+</code></pre>
+<hr>
+<h3>Task 4: Deployment Demonstration (4 points)</h3>
+<p><strong>Instructions:</strong>
+Deploy your page from Task 1 (or any page from today's session) to a live URL. Demonstrate that it's accessible from a web browser.</p>
+<p><strong>Evaluation Criteria:</strong></p>
+<ul>
+<li>Page is in a GitHub repository (1 point)</li>
+<li>GitHub Pages is enabled (1 point)</li>
+<li>Page loads at a live public URL (1 point)</li>
+<li>Page displays correctly at the live URL (1 point)</li>
+</ul>
+<p><strong>If time is short:</strong> Describe the exact steps you would take to deploy, even if you don't complete the process.</p>
+<hr>
+<h2>Part 3: Reflection and Application (5 points)</h2>
+<h3>Question 1: Personal Application (2 points)</h3>
+<p><strong>Describe a specific project you'll build using vibe coding in the next two weeks.</strong></p>
+<p>Be concrete:</p>
+<ul>
+<li>What will you build? (e.g., "a landing page for my consultancy")</li>
+<li>Who is it for? (e.g., "potential clients finding me via LinkedIn")</li>
+<li>What will it include? (e.g., "hero with value proposition, 3 service cards, testimonials, contact form")</li>
+<li>How will you deploy it? (e.g., "GitHub Pages, linked from my LinkedIn profile")</li>
+</ul>
+<p><strong>Evaluation:</strong></p>
+<ul>
+<li>Specific, realistic project identified (1 point)</li>
+<li>Clear plan for building and deploying (1 point)</li>
+</ul>
+<hr>
+<h3>Question 2: Teaching the Concept (3 points)</h3>
+<p><strong>Explain vibe coding to a colleague who has never heard of it.</strong></p>
+<p>Write 4-6 sentences that a non-technical person would understand. Cover:</p>
+<ul>
+<li>What it is</li>
+<li>How it works</li>
+<li>Why it matters</li>
+<li>What they could build with it</li>
+</ul>
+<p><strong>Your Explanation:</strong></p>
+<p>[Write here]</p>
+<p><strong>Evaluation Criteria:</strong></p>
+<ul>
+<li>Explains the concept without jargon (1 point)</li>
+<li>Mentions the conversational/iterative nature (1 point)</li>
+<li>Gives a concrete example of what can be built (1 point)</li>
+</ul>
+<p><strong>Example Strong Answer:</strong>
+"Vibe coding is a way to build websites and tools by describing what you want in plain English to an AI assistant. You say something like 'create a landing page for my business with a blue hero section and three service cards', and the AI writes all the code for you. You refine it through conversation — 'make the heading larger, add a contact form' — until it's exactly what you want. It means anyone with an idea can build a professional web page in under an hour, without learning to code. I built and deployed a live portfolio site this afternoon."</p>
+<hr>
+<h2>Scoring Guide</h2>
+<h3>Total Points: 30</h3>
+<p><strong>Scoring Breakdown:</strong></p>
+<ul>
+<li>
+<p><strong>27-30 points (90-100%): Master Level</strong></p>
+<ul>
+<li>You've fully grasped vibe coding as a creative tool</li>
+<li>Ready to build real projects independently</li>
+<li>Can teach others the approach</li>
+<li>Able to evaluate and select the right AI tools</li>
+</ul>
+</li>
+<li>
+<p><strong>24-26 points (80-89%): Proficient Level</strong></p>
+<ul>
+<li>Strong understanding of conversational creation</li>
+<li>Can work independently on most projects</li>
+<li>Minor areas to refine (likely prompt specificity or deployment)</li>
+<li>Ready for more ambitious projects</li>
+</ul>
+</li>
+<li>
+<p><strong>18-23 points (60-79%): Developing Level</strong></p>
+<ul>
+<li>Core concepts understood</li>
+<li>Need more practice with iteration and deployment</li>
+<li>Review weaker areas and repeat exercises</li>
+<li>Consider practising with simpler projects first</li>
+</ul>
+</li>
+<li>
+<p><strong>Below 18 points (&lt;60%): Needs Review</strong></p>
+<ul>
+<li>Revisit core concepts chapter</li>
+<li>Complete the hands-on exercises again</li>
+<li>Focus on prompt writing fundamentals</li>
+<li>Consider scheduling additional practice time</li>
+</ul>
+</li>
+</ul>
+<h2>Self-Assessment Checklist</h2>
+<p>Beyond the formal assessment, can you confidently say:</p>
+<p><strong>Creative Skills:</strong></p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled=""> I can describe a web page clearly enough for AI to build it</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> I iterate effectively — small changes, frequent reviews</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> I use references and comparisons to guide AI</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> I can describe interactivity in natural language</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> I know the difference between a good and a weak prompt</li>
+</ul>
+<p><strong>Technical Confidence:</strong></p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled=""> I can create and preview HTML files locally</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> I can deploy to GitHub Pages</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> I can update a deployed site</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> I understand what responsive design means</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> I can choose the right tool for a given task</li>
+</ul>
+<p><strong>Creative Ownership:</strong></p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled=""> I've built something I'm genuinely proud of</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> I can envision applying this to my real work</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> I feel confident saying "I can build a website"</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> I understand that the code belongs to me</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> I'm excited to build something new</li>
+</ul>
+<h2>Areas for Improvement</h2>
+<p>Based on your results, identify 2-3 areas to develop:</p>
+<ol>
+<li>
+<p><strong>Area:</strong> _____________
+<strong>Action:</strong> _____________
+<strong>Timeline:</strong> _____________</p>
+</li>
+<li>
+<p><strong>Area:</strong> _____________
+<strong>Action:</strong> _____________
+<strong>Timeline:</strong> _____________</p>
+</li>
+<li>
+<p><strong>Area:</strong> _____________
+<strong>Action:</strong> _____________
+<strong>Timeline:</strong> _____________</p>
+</li>
+</ol>
+<h2>Certification Statement</h2>
+<p>Upon achieving 80% or higher:</p>
+<pre><code>+--------------------------------------------+
+|                                            |
+|   CERTIFICATE OF COMPLETION                |
+|                                            |
+|   This certifies that                      |
+|                                            |
+|   [Your Name]                              |
+|                                            |
+|   has successfully completed               |
+|   Vibe Coding Mastery Workshop             |
+|                                            |
+|   and demonstrated the ability to:         |
+|   - Build web pages through conversation   |
+|   - Iterate designs using natural language  |
+|   - Deploy creations to the live internet  |
+|                                            |
+|   Score: ____ / 30                         |
+|   Date: ___________                        |
+|                                            |
++--------------------------------------------+
+</code></pre>
+<h2>Next Steps Based on Performance</h2>
+<h3>If You Scored 90%+</h3>
+<p><strong>You're Ready For:</strong></p>
+<ul>
+<li>Building multi-page websites</li>
+<li>Adding backend functionality (databases, APIs)</li>
+<li>Exploring frameworks (React, Svelte) through vibe coding</li>
+<li>Teaching others the approach</li>
+<li>Building tools and applications, not just pages</li>
+</ul>
+<p><strong>Recommended Actions:</strong></p>
+<ol>
+<li>Build a real project this week</li>
+<li>Experiment with Cursor or Windsurf if you used Claude Code (or vice versa)</li>
+<li>Try vibe coding a web application with JavaScript interactivity</li>
+<li>Share your live URL and help a colleague get started</li>
+</ol>
+<h3>If You Scored 80-89%</h3>
+<p><strong>You're Ready For:</strong></p>
+<ul>
+<li>Daily use for prototyping and building</li>
+<li>Single-page projects of any complexity</li>
+<li>Confident deployment to GitHub Pages</li>
+<li>Sharing the skill with colleagues</li>
+</ul>
+<p><strong>Recommended Actions:</strong></p>
+<ol>
+<li>Build one new page per week for the next month</li>
+<li>Focus on improving your prompt specificity</li>
+<li>Practise the refinement loop until it feels natural</li>
+<li>Deploy at least 3 different projects</li>
+</ol>
+<h3>If You Scored Below 80%</h3>
+<p><strong>You Should:</strong></p>
+<ul>
+<li>Review the core concepts chapter</li>
+<li>Repeat the hands-on exercises</li>
+<li>Practise writing detailed prompts</li>
+<li>Focus on one tool (Claude Code recommended)</li>
+</ul>
+<p><strong>Recommended Actions:</strong></p>
+<ol>
+<li>Redo Exercises 1-3 from Chapter 3</li>
+<li>Write 5 different opening prompts and compare results</li>
+<li>Complete one full build-and-deploy cycle</li>
+<li>Schedule practice time for the coming week</li>
+</ol>
+<h2>Continuous Improvement</h2>
+<h3>7-Day Challenge</h3>
+<p>Build something new each day for a week:</p>
+<ul>
+<li><strong>Day 1:</strong> Personal homepage</li>
+<li><strong>Day 2:</strong> Event invitation page</li>
+<li><strong>Day 3:</strong> Simple calculator or converter</li>
+<li><strong>Day 4:</strong> Photo gallery or portfolio</li>
+<li><strong>Day 5:</strong> Restaurant or business menu</li>
+<li><strong>Day 6:</strong> Interactive quiz or survey</li>
+<li><strong>Day 7:</strong> Your wildest idea</li>
+</ul>
+<h3>30-Day Goal</h3>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled=""> 5+ pages deployed to GitHub Pages</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Helped one other person try vibe coding</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Built something for real use (not just practice)</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Comfortable with the full workflow end to end</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Experimented with at least 2 different AI tools</li>
+</ul>
+<h2>Congratulations!</h2>
+<p>Whether you achieved a perfect score or identified areas for growth, you've crossed a meaningful threshold. You now know that building for the web is not reserved for developers. It belongs to anyone who can describe what they want.</p>
+<p><strong>The question is no longer "can I build this?" — it's "what shall I build next?"</strong></p>
+<hr>
+<p>Next: <a href="./06_resources.md">Chapter 6: Resources — Continue Creating</a></p>
+<p><a href="./04_project.md">Back to Project</a> | <a href="README.md">Back to Phase Overview</a></p></div></article></main></div>
+    <noscript><p>Interactive forms require JavaScript. You can also email <a href="mailto:info@dreamlab-ai.com">info@dreamlab-ai.com</a>.</p></noscript>
+  
+
+</body></html>

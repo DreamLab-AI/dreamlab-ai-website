@@ -1,0 +1,1430 @@
+<!DOCTYPE html><html lang="en" class="dark"><head>
+    <meta charset="UTF-8">
+
+    <!-- Primary Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <title>Hands-On Practice: Building Your RAG System | DreamLab AI Workshops</title>
+    <meta name="title" content="Hands-On Practice: Building Your RAG System | DreamLab AI Workshops">
+    <meta name="description" content="Hands-On Practice: Building Your RAG System — free DreamLab AI curriculum.">
+    <meta name="keywords" content="applied innovation lab, AI consulting, enterprise innovation, immersive XR, cyber trust, creative technology, residential programmes, knowledge transfer, deep tech, Lake District">
+    <meta name="author" content="DreamLab">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    <meta name="rating" content="General">
+
+    <link rel="describedby" href="/llms.txt" type="text/plain">
+    <script type="application/ld+json" id="organisation-structured-data">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://dreamlab-ai.com/#organisation","name":"DreamLab","url":"https://dreamlab-ai.com/","logo":"https://dreamlab-ai.com/images/heroes/dreamlab-hero.webp","email":"info@dreamlab-ai.com","founder":{"@id":"https://dreamlab-ai.com/team#john-ohare"},"sameAs":["https://github.com/DreamLab-AI","https://www.linkedin.com/company/dreamlab-ai-consulting"]},{"@type":"Person","@id":"https://dreamlab-ai.com/team#john-ohare","name":"John O'Hare","honorificPrefix":"Dr","jobTitle":"Founder","worksFor":{"@id":"https://dreamlab-ai.com/#organisation"},"url":"https://dreamlab-ai.com/team#john-ohare"}]}</script>
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dreamlab-ai.com/workshops/workshop-03-afternoon-rag-system/02_hands_on.md/">
+
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="msapplication-TileColor" content="#1a1a2e">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://dreamlab-ai.com/workshops/workshop-03-afternoon-rag-system/02_hands_on.md/">
+    <meta property="og:title" content="Hands-On Practice: Building Your RAG System | DreamLab AI Workshops">
+    <meta property="og:description" content="Hands-On Practice: Building Your RAG System — free DreamLab AI curriculum.">
+    <meta property="og:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="DreamLab AI Workshop - Hands-On Practice: Building Your RAG System">
+    <meta property="og:site_name" content="DreamLab">
+    <meta property="og:locale" content="en_GB">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://dreamlab-ai.com/workshops/workshop-03-afternoon-rag-system/02_hands_on.md/">
+    <meta name="twitter:title" content="Hands-On Practice: Building Your RAG System | DreamLab AI Workshops">
+    <meta name="twitter:description" content="Hands-On Practice: Building Your RAG System — free DreamLab AI curriculum.">
+    <meta name="twitter:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta name="twitter:image:alt" content="DreamLab AI Workshop - Hands-On Practice: Building Your RAG System">
+    <meta name="twitter:site" content="@thedreamlab">
+    <meta name="twitter:creator" content="@thedreamlab">
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="geo.region" content="GB">
+    <meta name="geo.placename" content="United Kingdom">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DreamLab AI">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Security Headers -->
+    <!--
+      CSP notes:
+      - script-src is 'self' only: no 'unsafe-eval' (blocks eval/Function-based
+        injection) and no 'unsafe-inline'. The one inline bootstrap script was
+        moved to /spa-redirect.js. JSON-LD blocks below are type
+        application/ld+json (data, not executable) so CSP does not gate them.
+      - connect-src is scoped to the Cloudflare Workers subdomain actually used
+        by this account (*.solitary-paper-764d.workers.dev: auth / pod / search /
+        link-preview / nostr-relay), NOT the internet-wide *.workers.dev, which
+        previously allowed exfiltration to any attacker-controlled worker.
+      - The two open Nostr relays (relay.damus.io, relay.primal.net) are
+        explicitly allow-listed: the Talk-to-AI chat listens there for
+        junkiejarvis's reply (the primary relay's whitelist gate rejects the
+        gift-wrap addressed to the ephemeral session key — ADR-042 Amendment 1).
+        Must stay in sync with VITE_REPLY_RELAYS. Named exactly, not a wildcard.
+      - style-src keeps 'unsafe-inline' because Radix UI + runtime style
+        attributes require it; that is not a script-injection vector.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.solitary-paper-764d.workers.dev wss://*.solitary-paper-764d.workers.dev https://*.dreamlab-ai.com wss://*.dreamlab-ai.com wss://relay.damus.io wss://relay.primal.net; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <!-- SPA deep-link restore. External 'self' script (not inline) so CSP
+         script-src can stay 'self' with no 'unsafe-inline'. Classic,
+         render-blocking script: runs before the deferred app module. -->
+    <script src="/spa-redirect.js"></script>
+    <script type="module" crossorigin="" src="/assets/index-Crc86LXg.js"></script>
+    <link rel="modulepreload" crossorigin="" href="/assets/ui-C2dH1upk.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/vendor-uw6h6E0d.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/nostr-BpuBsPg-.js">
+    <link rel="stylesheet" crossorigin="" href="/assets/index-CeEdk6WL.css">
+  <script type="application/ld+json" id="route-structured-data">{"@context":"https://schema.org","@type":"LearningResource","@id":"https://dreamlab-ai.com/workshops/workshop-03-afternoon-rag-system/02_hands_on.md/#page","url":"https://dreamlab-ai.com/workshops/workshop-03-afternoon-rag-system/02_hands_on.md/","name":"Hands-On Practice: Building Your RAG System | DreamLab AI Workshops","description":"Hands-On Practice: Building Your RAG System — free DreamLab AI curriculum.","inLanguage":"en-GB","publisher":{"@id":"https://dreamlab-ai.com/#organisation"},"isAccessibleForFree":true}</script><link rel="alternate" type="text/markdown" href="/data/workshops/workshop-03-afternoon-rag-system/02_hands_on.md"></head>
+
+  <body>
+    <!-- Skip Navigation Link for Accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
+      Skip to main content
+    </a>
+    <div id="root"><header role="banner" class="fixed top-0 left-0 right-0 z-50"><div class="md:hidden flex items-center justify-between h-14 px-6 bg-[rgba(14,14,17,0.92)] backdrop-blur-[14px] border-b border-dlm-hairline"><a aria-label="DreamLab home" class="flex items-center gap-2" href="/"><span class="w-[9px] h-[9px] rounded-full bg-dlm-bright shrink-0" aria-hidden="true"></span><span class="text-[14px] font-semibold tracking-[0.14em] text-[#FAFAFA]">DREAMLAB</span></a><button type="button" aria-label="Open menu" aria-expanded="false" class="w-11 h-11 -mr-2 flex flex-col items-end justify-center gap-[5px] focus:outline-none focus-visible:ring-2 focus-visible:ring-dlm-bright rounded"><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span></button></div><div class="hidden md:block transition-all duration-300 ease-out py-3 bg-background/60 backdrop-blur-md"><div class="container flex items-center justify-between px-4"><button class="flex items-center gap-2 md:gap-3 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded min-h-[48px] min-w-[48px] px-3 py-2" aria-label="Main navigation menu" type="button" id="radix-:Rp:" aria-haspopup="menu" aria-expanded="false" data-state="closed"><div class="w-10 h-10 md:w-8 md:h-8 shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all duration-300 group-hover:scale-110 animate-glow-pulse" aria-hidden="true"></div><span class="font-bold text-lg md:text-xl tracking-tight group-hover:text-purple-400 transition-colors duration-300">MENU</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down h-5 w-5 md:h-4 md:w-4 shrink-0 text-muted-foreground group-hover:text-purple-400 transition-all duration-300 group-hover:rotate-180" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button><div class="flex items-center gap-2"><a class="items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-10 py-2 hover:bg-purple-500/10 hover:text-purple-400 transition-all duration-300 hover:scale-105 min-h-[48px] px-4 text-base md:text-sm hidden sm:inline-flex" href="/contact">Contact</a><a class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary hover:bg-primary/90 h-10 py-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transition-all duration-300 min-h-[48px] px-4 text-base md:text-sm" href="/co-create">Partner With Us</a></div></div></div></header><header class="relative overflow-hidden" style="min-height:320px"><div class="absolute inset-0 bg-gradient-to-br from-blue-500/30 via-purple-500/30 to-violet-500/30" style="transform:translateY(0px);opacity:1"><div class="absolute top-0 -left-20 w-96 h-96 rounded-full blur-3xl opacity-40 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600"></div><div class="absolute bottom-0 -right-20 w-[32rem] h-[32rem] rounded-full blur-3xl opacity-30 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600" style="animation-delay:1s"></div><div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full blur-3xl opacity-20 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600" style="animation-delay:2s"></div></div><div class="absolute inset-0 opacity-5" style="background-image:linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);background-size:50px 50px;transform:translateY(0px)"></div><div class="relative z-10 container px-4 pt-24 pb-8"><div class="mb-6 transition-all duration-500 transform opacity-0 translate-y-4"><nav aria-label="breadcrumb"><ol class="flex flex-wrap items-center gap-1.5 break-words text-sm sm:gap-2.5 text-white/70"><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/">Home</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/workshops">Workshops</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><span role="link" aria-disabled="true" aria-current="page" class="text-white font-medium">RAG System Implementation</span></li></ol></nav></div><div class="mb-4 transition-all duration-500 delay-100 transform opacity-0 translate-y-4"><div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20"><span class="text-purple-400"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cpu w-5 h-5" aria-hidden="true"><path d="M12 20v2"></path><path d="M12 2v2"></path><path d="M17 20v2"></path><path d="M17 2v2"></path><path d="M2 12h2"></path><path d="M2 17h2"></path><path d="M2 7h2"></path><path d="M20 12h2"></path><path d="M20 17h2"></path><path d="M20 7h2"></path><path d="M7 20v2"></path><path d="M7 2v2"></path><rect x="4" y="4" width="16" height="16" rx="2"></rect><rect x="8" y="8" width="8" height="8" rx="1"></rect></svg></span><span class="text-sm font-medium text-white/90">AI / Machine Learning</span></div></div><h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 break-words transition-all duration-700 delay-200 transform opacity-0 translate-y-6"><span class="bg-gradient-to-r bg-clip-text text-transparent animate-gradient-shift bg-400% from-blue-400 via-purple-400 to-violet-400">RAG System Implementation</span></h1><div class="flex flex-wrap items-center gap-3 mb-6 transition-all duration-700 delay-400 transform opacity-0 translate-y-4"><div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-white/10 border-white/20 text-white backdrop-blur-sm hover:bg-white/20"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-3.5 h-3.5 mr-1.5" aria-hidden="true"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>10<!-- --> <!-- -->Modules</div></div><div class="max-w-md transition-all duration-700 delay-500 transform opacity-0 translate-y-4"><div class="flex items-center justify-between text-sm text-white/70 mb-2"><span class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code w-4 h-4" aria-hidden="true"><path d="m16 18 6-6-6-6"></path><path d="m8 6-6 6 6 6"></path></svg><span>Chapter <!-- -->4<!-- -->: <!-- -->Hands-On Practice: Building Your RAG System</span></span><span class="font-medium text-white">40<!-- -->%</span></div><div class="relative"><div aria-valuemax="100" aria-valuemin="0" role="progressbar" data-state="indeterminate" data-max="100" class="relative w-full overflow-hidden rounded-full h-2 bg-white/20"><div data-state="indeterminate" data-max="100" class="h-full w-full flex-1 bg-primary transition-all" style="transform:translateX(-60%)"></div></div><div class="absolute top-0 left-0 h-2 rounded-full blur-sm bg-gradient-to-r from-blue-600 via-purple-600 to-violet-600" style="width:40%"></div></div><div class="relative mt-1 h-1"><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:10%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:20%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:30%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:40%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:50%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:60%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:70%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:80%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:90%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:100%"></div></div></div></div><div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent"></div></header><main class="container px-4 pt-8 pb-8 flex flex-col md:flex-row gap-x-8 min-h-screen" id="main-content"><aside class="w-full md:w-64 lg:w-72 md:sticky md:top-20 md:h-[calc(100vh-5rem-2rem)] mb-8 md:mb-0"><h2 class="text-xl font-semibold mb-4 break-words">RAG System Implementation</h2><div dir="ltr" class="relative overflow-hidden h-auto md:h-full pr-4 border-r md:border-r-0" style="position:relative;--radix-scroll-area-corner-width:0px;--radix-scroll-area-corner-height:0px"><style>[data-radix-scroll-area-viewport]{scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;}[data-radix-scroll-area-viewport]::-webkit-scrollbar{display:none}</style><div data-radix-scroll-area-viewport="" class="h-full w-full rounded-[inherit]" style="overflow-x:hidden;overflow-y:hidden"><div style="min-width:100%;display:table"><nav><ul><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-03-afternoon-rag-system/README.md"><span class="mr-2 text-xs opacity-60">1<!-- -->.</span>RAG System Implementation</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-03-afternoon-rag-system/00_introduction.md"><span class="mr-2 text-xs opacity-60">2<!-- -->.</span>Introduction to RAG Systems</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-03-afternoon-rag-system/01_concepts.md"><span class="mr-2 text-xs opacity-60">3<!-- -->.</span>Core Concepts: RAG Systems</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors bg-primary text-primary-foreground font-semibold" href="/workshops/workshop-03-afternoon-rag-system/02_hands_on.md"><span class="mr-2 text-xs opacity-60">4<!-- -->.</span>Hands-On Practice: Building Your RAG System</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-03-afternoon-rag-system/03_exercises.md"><span class="mr-2 text-xs opacity-60">5<!-- -->.</span>Practical Exercises: RAG System Implementation</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-03-afternoon-rag-system/04_project.md"><span class="mr-2 text-xs opacity-60">6<!-- -->.</span>Project Work: Build a Personal Knowledge Base</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-03-afternoon-rag-system/05_assessment.md"><span class="mr-2 text-xs opacity-60">7<!-- -->.</span>Assessment: RAG System Implementation</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-03-afternoon-rag-system/06_resources.md"><span class="mr-2 text-xs opacity-60">8<!-- -->.</span>Resources: RAG System Implementation</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-03-afternoon-rag-system/objectives.md"><span class="mr-2 text-xs opacity-60">9<!-- -->.</span>Learning Objectives -- RAG System Implementation</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-03-afternoon-rag-system/prerequisites.md"><span class="mr-2 text-xs opacity-60">10<!-- -->.</span>Prerequisites -- RAG System Implementation</a></li></ul></nav></div></div></div></aside><article class="flex-1 min-w-0 md:pl-0"><div class="prose max-w-none dark:prose-invert break-words [&amp;_table]:block [&amp;_table]:w-full [&amp;_table]:overflow-x-auto"><h1>Hands-On Practice: Building Your RAG System</h1>
+<h2>Overview</h2>
+<p>This is the main practical session of the afternoon. Over the next 90 minutes, you will build a complete Retrieval-Augmented Generation system from scratch -- starting with a Python environment, progressing through document indexing and embedding, and finishing with a fully working question-answering pipeline that cites its sources.</p>
+<p><strong>What you will build:</strong></p>
+<ul>
+<li>A document ingestion pipeline that processes PDFs, markdown, and text files</li>
+<li>A ChromaDB vector store with embedded document chunks</li>
+<li>A query pipeline that retrieves relevant context and generates grounded answers</li>
+<li>Citation tracking that tells you exactly where each answer came from</li>
+</ul>
+<p><img src="/data/workshops/workshop-03-afternoon-rag-system/diagrams/02-build-architecture.svg" alt="Architecture of today's build: documents are loaded, chunked, embedded with all-MiniLM-L6-v2 and stored in ChromaDB; your question retrieves context from ChromaDB and a local Ollama model generates a cited answer"></p>
+<hr>
+<h2>Part 1: Environment Setup (15 minutes)</h2>
+<h3>Difficulty: Beginner</h3>
+<h3>Objective</h3>
+<p>Create a clean Python environment with all the libraries needed for RAG development.</p>
+<h3>Step 1: Create Your Project Folder</h3>
+<pre><code class="language-bash"># Create a dedicated workspace
+mkdir -p ~/rag-workshop
+cd ~/rag-workshop
+
+# Create sub-folders for organisation
+mkdir -p documents    # Your source documents go here
+mkdir -p scripts      # Python scripts
+mkdir -p data         # ChromaDB will store its data here
+</code></pre>
+<h3>Step 2: Set Up a Virtual Environment</h3>
+<pre><code class="language-bash"># Create virtual environment
+python3 -m venv venv
+
+# Activate it
+# Linux/macOS:
+source venv/bin/activate
+
+# Windows:
+# venv\Scripts\activate
+
+# Verify Python version (3.10+ required)
+python --version
+</code></pre>
+<h3>Step 3: Install Core Dependencies</h3>
+<pre><code class="language-bash"># Core RAG libraries
+pip install chromadb langchain langchain-community langchain-text-splitters
+
+# Document loaders
+pip install pypdf python-docx unstructured
+
+# Embedding models (local, free)
+pip install sentence-transformers
+
+# Ollama Python client (for local LLM)
+pip install ollama
+
+# OpenAI client (optional, for cloud embeddings)
+pip install openai
+
+# Utilities
+pip install python-dotenv rich tqdm
+</code></pre>
+<blockquote>
+<p><strong>Note:</strong> The full install takes 2-5 minutes depending on your connection. The <code>sentence-transformers</code> package downloads a model on first use (~90 MB).</p>
+</blockquote>
+<h3>Step 4: Verify Your Installation</h3>
+<p>Create <code>scripts/verify_setup.py</code>:</p>
+<pre><code class="language-python"># scripts/verify_setup.py
+"""Verify all RAG dependencies are installed correctly."""
+
+def check_imports():
+    checks = []
+
+    try:
+        import chromadb
+        checks.append(("ChromaDB", chromadb.__version__, True))
+    except ImportError:
+        checks.append(("ChromaDB", "Not installed", False))
+
+    try:
+        import langchain
+        checks.append(("LangChain", langchain.__version__, True))
+    except ImportError:
+        checks.append(("LangChain", "Not installed", False))
+
+    try:
+        from sentence_transformers import SentenceTransformer
+        checks.append(("Sentence Transformers", "OK", True))
+    except ImportError:
+        checks.append(("Sentence Transformers", "Not installed", False))
+
+    try:
+        import ollama
+        # Test connection to Ollama server
+        ollama.list()
+        checks.append(("Ollama", "Connected", True))
+    except Exception as e:
+        checks.append(("Ollama", f"Not running: {e}", False))
+
+    try:
+        import pypdf
+        checks.append(("PyPDF", "OK", True))
+    except ImportError:
+        checks.append(("PyPDF", "Not installed", False))
+
+    # Print results
+    print("\n=== RAG Workshop Setup Check ===\n")
+    all_ok = True
+    for name, version, ok in checks:
+        status = "PASS" if ok else "FAIL"
+        print(f"  [{status}] {name}: {version}")
+        if not ok:
+            all_ok = False
+
+    print()
+    if all_ok:
+        print("All checks passed. You are ready to build your RAG system!")
+    else:
+        print("Some checks failed. Review the errors above.")
+        print("Ollama not running? Start it with: ollama serve")
+
+if __name__ == "__main__":
+    check_imports()
+</code></pre>
+<p>Run it:</p>
+<pre><code class="language-bash">python scripts/verify_setup.py
+</code></pre>
+<h3>Expected Output</h3>
+<pre><code>=== RAG Workshop Setup Check ===
+
+  [PASS] ChromaDB: 0.5.x
+  [PASS] LangChain: 0.3.x
+  [PASS] Sentence Transformers: OK
+  [PASS] Ollama: Connected
+  [PASS] PyPDF: OK
+
+All checks passed. You are ready to build your RAG system!
+</code></pre>
+<h3>Troubleshooting</h3>
+<p><strong>Ollama not connected:</strong></p>
+<pre><code class="language-bash"># Start Ollama in a separate terminal
+ollama serve
+
+# Pull a model if you haven't already
+ollama pull llama3.3:8b
+
+# Pull the embedding model
+ollama pull nomic-embed-text
+</code></pre>
+<p><strong>pip install fails:</strong></p>
+<pre><code class="language-bash"># Ensure pip is up to date
+pip install --upgrade pip
+
+# If chromadb fails on older systems
+pip install chromadb --no-cache-dir
+</code></pre>
+<hr>
+<h2>Part 2: Prepare Your Documents (10 minutes)</h2>
+<h3>Difficulty: Beginner</h3>
+<h3>Objective</h3>
+<p>Gather and organise the documents that will form your personal knowledge base.</p>
+<h3>Step 1: Add Sample Documents</h3>
+<p>For the workshop, we will create a small collection of documents. In production, these would be your real files -- reports, policies, research papers, meeting notes.</p>
+<p>Create <code>documents/company_policy.md</code>:</p>
+<pre><code class="language-markdown"># Remote Working Policy
+
+## Overview
+All employees may work remotely up to 3 days per week, subject to
+manager approval. Core collaboration hours are 10:00-15:00 GMT.
+
+## Equipment
+The company provides a laptop, monitor, and ergonomic chair for home
+offices. Employees must complete a home workspace assessment within
+30 days of starting remote work.
+
+## Security
+All remote workers must use the company VPN when accessing internal
+systems. Two-factor authentication is mandatory for all accounts.
+Personal devices may not be used to access customer data.
+
+## Expenses
+Monthly broadband allowance: up to 50 GBP (receipts required).
+Co-working space day passes: up to 4 per month, pre-approved by manager.
+
+## Review
+This policy is reviewed quarterly. Last updated: January 2026.
+</code></pre>
+<p>Create <code>documents/project_handbook.md</code>:</p>
+<pre><code class="language-markdown"># Project Management Handbook
+
+## Project Lifecycle
+
+### 1. Initiation
+Every project begins with a Project Brief document. The brief must
+include: objectives, stakeholders, estimated budget, and timeline.
+The Steering Committee reviews briefs on the first Monday of each month.
+
+### 2. Planning
+The project manager creates a detailed plan using our standard template.
+Key milestones must be agreed with stakeholders within 2 weeks of
+approval. Risk registers are mandatory for projects over 50,000 GBP.
+
+### 3. Execution
+Weekly status reports are submitted every Friday by 16:00. The project
+dashboard is updated in real time. Change requests follow the CR-001
+process and require sponsor sign-off.
+
+### 4. Closure
+Projects conclude with a formal lessons-learned session. The final
+report includes budget variance, timeline adherence, and stakeholder
+satisfaction scores. All documentation is archived in the project vault.
+
+## Escalation Process
+- Level 1: Project Manager resolves within 2 business days
+- Level 2: Programme Director resolves within 5 business days
+- Level 3: Steering Committee reviews at next scheduled meeting
+</code></pre>
+<p>Create <code>documents/annual_report.md</code>:</p>
+<pre><code class="language-markdown"># Annual Report 2025
+
+## Financial Highlights
+- Revenue: 12.4 million GBP (up 18% year-on-year)
+- Operating profit: 2.1 million GBP (up 22%)
+- New customers: 340 (up 15%)
+- Customer retention rate: 94%
+
+## Key Achievements
+- Launched three new product lines in Q2
+- Expanded into European markets (Germany, France, Netherlands)
+- Achieved ISO 27001 certification in September
+- Employee satisfaction score: 8.2/10 (industry average: 7.1)
+
+## Strategic Priorities for 2026
+1. AI integration across all product lines
+2. Carbon neutrality by December 2026
+3. Launch North American operations
+4. Increase recurring revenue to 60% of total
+
+## Team Growth
+- Headcount: 185 (up from 142)
+- New hires in engineering: 28
+- Graduate programme intake: 12
+- Voluntary turnover: 8% (industry average: 14%)
+</code></pre>
+<h3>Step 2: Add a PDF (Optional)</h3>
+<p>If you have a PDF document you would like to use, copy it into the <code>documents/</code> folder:</p>
+<pre><code class="language-bash"># Copy your own PDF
+cp ~/Downloads/my-report.pdf documents/
+
+# Or download a sample
+curl -o documents/sample.pdf \
+  "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
+</code></pre>
+<h3>Step 3: Check Your Document Collection</h3>
+<pre><code class="language-bash">ls -la documents/
+</code></pre>
+<p>You should see at least 3 markdown files. The more documents you add, the more interesting your RAG system becomes.</p>
+<hr>
+<h2>Part 3: Document Chunking and Embedding (20 minutes)</h2>
+<h3>Difficulty: Intermediate</h3>
+<h3>Objective</h3>
+<p>Split your documents into chunks, convert them to embeddings, and store them in ChromaDB.</p>
+<h3>Step 1: Build the Document Loader</h3>
+<p>Create <code>scripts/load_documents.py</code>:</p>
+<pre><code class="language-python"># scripts/load_documents.py
+"""Load documents from the documents/ folder and split into chunks."""
+
+import os
+import glob
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain.docstore.document import Document
+
+
+def load_markdown_file(filepath):
+    """Load a single markdown file as a Document."""
+    with open(filepath, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    return Document(
+        page_content=content,
+        metadata={
+            "source": os.path.basename(filepath),
+            "full_path": filepath,
+            "file_type": "markdown",
+        }
+    )
+
+
+def load_pdf_file(filepath):
+    """Load a PDF file, returning one Document per page."""
+    from pypdf import PdfReader
+
+    reader = PdfReader(filepath)
+    documents = []
+
+    for i, page in enumerate(reader.pages):
+        text = page.extract_text()
+        if text.strip():
+            documents.append(Document(
+                page_content=text,
+                metadata={
+                    "source": os.path.basename(filepath),
+                    "full_path": filepath,
+                    "file_type": "pdf",
+                    "page_number": i + 1,
+                }
+            ))
+
+    return documents
+
+
+def load_all_documents(docs_dir="documents"):
+    """Load all supported documents from a directory."""
+    all_docs = []
+
+    # Load markdown files
+    for filepath in glob.glob(os.path.join(docs_dir, "*.md")):
+        doc = load_markdown_file(filepath)
+        all_docs.append(doc)
+        print(f"  Loaded: {os.path.basename(filepath)} "
+              f"({len(doc.page_content)} chars)")
+
+    # Load text files
+    for filepath in glob.glob(os.path.join(docs_dir, "*.txt")):
+        doc = load_markdown_file(filepath)  # Same loader works for .txt
+        doc.metadata["file_type"] = "text"
+        all_docs.append(doc)
+        print(f"  Loaded: {os.path.basename(filepath)} "
+              f"({len(doc.page_content)} chars)")
+
+    # Load PDF files
+    for filepath in glob.glob(os.path.join(docs_dir, "*.pdf")):
+        pdf_docs = load_pdf_file(filepath)
+        all_docs.extend(pdf_docs)
+        print(f"  Loaded: {os.path.basename(filepath)} "
+              f"({len(pdf_docs)} pages)")
+
+    return all_docs
+
+
+def chunk_documents(documents, chunk_size=500, chunk_overlap=100):
+    """Split documents into smaller chunks for embedding."""
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=chunk_size,
+        chunk_overlap=chunk_overlap,
+        separators=["\n\n", "\n", ". ", " ", ""],
+        length_function=len,
+    )
+
+    all_chunks = []
+    for doc in documents:
+        chunks = splitter.split_documents([doc])
+        # Add chunk index to metadata
+        for i, chunk in enumerate(chunks):
+            chunk.metadata["chunk_index"] = i
+            chunk.metadata["total_chunks"] = len(chunks)
+        all_chunks.extend(chunks)
+
+    return all_chunks
+
+
+if __name__ == "__main__":
+    print("Loading documents...\n")
+    docs = load_all_documents()
+    print(f"\nLoaded {len(docs)} documents total.\n")
+
+    print("Chunking documents...")
+    chunks = chunk_documents(docs)
+    print(f"Created {len(chunks)} chunks.\n")
+
+    # Preview first 3 chunks
+    for i, chunk in enumerate(chunks[:3]):
+        print(f"--- Chunk {i + 1} ---")
+        print(f"Source: {chunk.metadata['source']}")
+        print(f"Content: {chunk.page_content[:150]}...")
+        print()
+</code></pre>
+<p>Run it:</p>
+<pre><code class="language-bash">cd ~/rag-workshop
+python scripts/load_documents.py
+</code></pre>
+<h3>Expected Output</h3>
+<pre><code>Loading documents...
+
+  Loaded: company_policy.md (687 chars)
+  Loaded: project_handbook.md (1042 chars)
+  Loaded: annual_report.md (823 chars)
+
+Loaded 3 documents total.
+
+Chunking documents...
+Created 8 chunks.
+
+--- Chunk 1 ---
+Source: company_policy.md
+Content: # Remote Working Policy
+
+## Overview
+All employees may work remotely up to 3 days per week...
+</code></pre>
+<h3>Step 2: Create the Vector Store</h3>
+<p>Create <code>scripts/build_index.py</code>:</p>
+<pre><code class="language-python"># scripts/build_index.py
+"""Embed document chunks and store in ChromaDB."""
+
+import chromadb
+from chromadb.utils import embedding_functions
+from load_documents import load_all_documents, chunk_documents
+
+
+def create_vector_store(chunks, collection_name="workshop_docs",
+                        db_path="data/chromadb"):
+    """Create a ChromaDB collection and add document chunks."""
+
+    # Initialise ChromaDB with persistent storage
+    client = chromadb.PersistentClient(path=db_path)
+
+    # Use a local embedding model (free, no API key needed)
+    # all-MiniLM-L6-v2 produces 384-dimensional vectors
+    embedding_fn = embedding_functions.SentenceTransformerEmbeddingFunction(
+        model_name="all-MiniLM-L6-v2"
+    )
+
+    # Delete existing collection if re-running
+    try:
+        client.delete_collection(collection_name)
+    except ValueError:
+        pass
+
+    # Create collection
+    collection = client.create_collection(
+        name=collection_name,
+        embedding_function=embedding_fn,
+        metadata={"hnsw:space": "cosine"}  # Use cosine similarity
+    )
+
+    # Prepare data for insertion
+    ids = []
+    documents = []
+    metadatas = []
+
+    for i, chunk in enumerate(chunks):
+        ids.append(f"chunk_{i}")
+        documents.append(chunk.page_content)
+        metadatas.append({
+            "source": chunk.metadata.get("source", "unknown"),
+            "file_type": chunk.metadata.get("file_type", "unknown"),
+            "chunk_index": chunk.metadata.get("chunk_index", 0),
+        })
+
+    # Add to collection (ChromaDB handles embedding automatically)
+    print(f"Embedding and storing {len(documents)} chunks...")
+    collection.add(
+        ids=ids,
+        documents=documents,
+        metadatas=metadatas,
+    )
+
+    print(f"Vector store created with {collection.count()} entries.")
+    return collection
+
+
+def test_search(collection, query, n_results=3):
+    """Run a test search against the collection."""
+    results = collection.query(
+        query_texts=[query],
+        n_results=n_results,
+    )
+
+    print(f"\nQuery: '{query}'")
+    print(f"Top {n_results} results:\n")
+
+    for i in range(len(results["documents"][0])):
+        doc = results["documents"][0][i]
+        meta = results["metadatas"][0][i]
+        distance = results["distances"][0][i]
+
+        print(f"  Result {i + 1} (distance: {distance:.4f}):")
+        print(f"  Source: {meta['source']}")
+        print(f"  Content: {doc[:120]}...")
+        print()
+
+
+if __name__ == "__main__":
+    # Load and chunk documents
+    print("Step 1: Loading documents...")
+    docs = load_all_documents()
+
+    print("\nStep 2: Chunking documents...")
+    chunks = chunk_documents(docs, chunk_size=500, chunk_overlap=100)
+    print(f"  Created {len(chunks)} chunks.")
+
+    # Build vector store
+    print("\nStep 3: Building vector store...")
+    collection = create_vector_store(chunks)
+
+    # Test with sample queries
+    print("\n" + "=" * 60)
+    print("Testing search...")
+    print("=" * 60)
+
+    test_search(collection, "How many days can I work from home?")
+    test_search(collection, "What was the revenue last year?")
+    test_search(collection, "How do I escalate a project issue?")
+</code></pre>
+<p>Run it:</p>
+<pre><code class="language-bash">python scripts/build_index.py
+</code></pre>
+<h3>Expected Output</h3>
+<pre><code>Step 1: Loading documents...
+  Loaded: company_policy.md (687 chars)
+  Loaded: project_handbook.md (1042 chars)
+  Loaded: annual_report.md (823 chars)
+
+Step 2: Chunking documents...
+  Created 8 chunks.
+
+Step 3: Building vector store...
+Embedding and storing 8 chunks...
+Vector store created with 8 entries.
+
+============================================================
+Testing search...
+============================================================
+
+Query: 'How many days can I work from home?'
+Top 3 results:
+
+  Result 1 (distance: 0.3142):
+  Source: company_policy.md
+  Content: # Remote Working Policy
+
+## Overview
+All employees may work remotely up to 3 days per week...
+
+  Result 2 (distance: 0.6891):
+  Source: company_policy.md
+  Content: ## Security
+All remote workers must use the company VPN when accessing internal...
+
+  Result 3 (distance: 0.8234):
+  Source: annual_report.md
+  Content: ## Team Growth
+- Headcount: 185 (up from 142)...
+</code></pre>
+<blockquote>
+<p><strong>Key Insight:</strong> Notice how the search correctly returns the remote working policy as the most relevant result, even though the query uses different words ("work from home" vs "work remotely"). This is the power of semantic search -- it understands meaning, not just keywords.</p>
+</blockquote>
+<hr>
+<h2>Part 4: Build the RAG Query Pipeline (20 minutes)</h2>
+<h3>Difficulty: Intermediate</h3>
+<h3>Objective</h3>
+<p>Connect the vector store to a language model to create a complete question-answering system with source citations.</p>
+<h3>Step 1: Basic RAG Pipeline</h3>
+<p>Create <code>scripts/rag_pipeline.py</code>:</p>
+<pre><code class="language-python"># scripts/rag_pipeline.py
+"""Complete RAG pipeline: retrieve context, generate answer, cite sources."""
+
+import chromadb
+from chromadb.utils import embedding_functions
+import ollama
+
+
+def get_collection(db_path="data/chromadb",
+                   collection_name="workshop_docs"):
+    """Connect to the existing ChromaDB collection."""
+    client = chromadb.PersistentClient(path=db_path)
+    embedding_fn = embedding_functions.SentenceTransformerEmbeddingFunction(
+        model_name="all-MiniLM-L6-v2"
+    )
+    return client.get_collection(
+        name=collection_name,
+        embedding_function=embedding_fn,
+    )
+
+
+def retrieve(collection, query, n_results=3):
+    """Retrieve the most relevant document chunks for a query."""
+    results = collection.query(
+        query_texts=[query],
+        n_results=n_results,
+    )
+    return results
+
+
+def build_prompt(query, results):
+    """Build a prompt that includes retrieved context with source markers."""
+    context_parts = []
+
+    for i in range(len(results["documents"][0])):
+        doc = results["documents"][0][i]
+        source = results["metadatas"][0][i]["source"]
+        context_parts.append(f"[Source {i + 1}: {source}]\n{doc}")
+
+    context = "\n\n---\n\n".join(context_parts)
+
+    prompt = f"""You are a helpful assistant that answers questions based on
+the provided context. Use ONLY the information in the context below.
+If the context does not contain enough information to answer fully,
+say so clearly.
+
+When you use information from the context, cite your sources using
+the format [Source N] at the end of the relevant sentence.
+
+CONTEXT:
+{context}
+
+QUESTION: {query}
+
+ANSWER:"""
+
+    return prompt
+
+
+def generate_answer(prompt, model="llama3.3:8b"):
+    """Generate an answer using the local LLM via Ollama."""
+    response = ollama.chat(
+        model=model,
+        messages=[
+            {"role": "user", "content": prompt}
+        ],
+    )
+    return response["message"]["content"]
+
+
+def ask(query, collection=None, n_results=3, model="llama3.3:8b"):
+    """Full RAG pipeline: retrieve, build prompt, generate answer."""
+    if collection is None:
+        collection = get_collection()
+
+    # Step 1: Retrieve relevant chunks
+    results = retrieve(collection, query, n_results=n_results)
+
+    # Step 2: Build the augmented prompt
+    prompt = build_prompt(query, results)
+
+    # Step 3: Generate the answer
+    answer = generate_answer(prompt, model=model)
+
+    # Step 4: Collect source information
+    sources = []
+    for i in range(len(results["documents"][0])):
+        sources.append({
+            "index": i + 1,
+            "source": results["metadatas"][0][i]["source"],
+            "distance": results["distances"][0][i],
+            "excerpt": results["documents"][0][i][:100] + "...",
+        })
+
+    return {
+        "query": query,
+        "answer": answer,
+        "sources": sources,
+    }
+
+
+def print_result(result):
+    """Pretty-print a RAG result with sources."""
+    print(f"\n{'=' * 60}")
+    print(f"Question: {result['query']}")
+    print(f"{'=' * 60}")
+    print(f"\n{result['answer']}")
+    print(f"\n{'- ' * 30}")
+    print("Sources used:")
+    for src in result["sources"]:
+        relevance = 1 - src["distance"]  # Convert distance to similarity
+        print(f"  [{src['index']}] {src['source']} "
+              f"(relevance: {relevance:.0%})")
+    print()
+
+
+if __name__ == "__main__":
+    collection = get_collection()
+
+    # Test questions
+    questions = [
+        "How many days per week can employees work remotely?",
+        "What was the company's revenue in 2025?",
+        "What is the escalation process for project issues?",
+        "What equipment does the company provide for remote workers?",
+        "How many new customers did the company gain last year?",
+    ]
+
+    for q in questions:
+        result = ask(q, collection=collection)
+        print_result(result)
+</code></pre>
+<p>Run it:</p>
+<pre><code class="language-bash">python scripts/rag_pipeline.py
+</code></pre>
+<h3>Expected Output</h3>
+<pre><code>============================================================
+Question: How many days per week can employees work remotely?
+============================================================
+
+Employees may work remotely up to 3 days per week, subject to manager
+approval. Core collaboration hours are 10:00-15:00 GMT [Source 1].
+
+- - - - - - - - - - - - - - - - - -
+Sources used:
+  [1] company_policy.md (relevance: 69%)
+  [2] company_policy.md (relevance: 42%)
+  [3] annual_report.md (relevance: 18%)
+</code></pre>
+<blockquote>
+<p><strong>Congratulations!</strong> You now have a working RAG system. The model answers questions using your actual documents and tells you exactly where the information came from.</p>
+</blockquote>
+<h3>Step 2: Add an Interactive Chat Mode</h3>
+<p>Extend <code>scripts/rag_pipeline.py</code> by adding an interactive function at the end:</p>
+<pre><code class="language-python">def interactive_chat():
+    """Run an interactive Q&amp;A session."""
+    collection = get_collection()
+
+    print("\n=== RAG Document Q&amp;A ===")
+    print("Ask questions about your documents.")
+    print("Type 'quit' to exit, 'sources' to toggle source display.\n")
+
+    show_sources = True
+
+    while True:
+        query = input("You: ").strip()
+
+        if not query:
+            continue
+        if query.lower() == "quit":
+            print("Goodbye!")
+            break
+        if query.lower() == "sources":
+            show_sources = not show_sources
+            print(f"Source display: {'ON' if show_sources else 'OFF'}")
+            continue
+
+        result = ask(query, collection=collection)
+        print(f"\nAssistant: {result['answer']}")
+
+        if show_sources:
+            print("\n  Sources:")
+            for src in result["sources"]:
+                relevance = 1 - src["distance"]
+                print(f"    [{src['index']}] {src['source']} "
+                      f"({relevance:.0%} relevant)")
+        print()
+
+
+# Add this to the bottom of the file, replacing the existing __main__ block:
+if __name__ == "__main__":
+    import sys
+
+    if len(sys.argv) &gt; 1 and sys.argv[1] == "--chat":
+        interactive_chat()
+    else:
+        # Run test questions
+        collection = get_collection()
+        questions = [
+            "How many days per week can employees work remotely?",
+            "What was the company's revenue in 2025?",
+            "What is the escalation process for project issues?",
+        ]
+        for q in questions:
+            result = ask(q, collection=collection)
+            print_result(result)
+</code></pre>
+<p>Start the interactive chat:</p>
+<pre><code class="language-bash">python scripts/rag_pipeline.py --chat
+</code></pre>
+<p>Try asking questions in natural language:</p>
+<ul>
+<li>"What's the remote working policy?"</li>
+<li>"Tell me about last year's financial performance"</li>
+<li>"How do I raise an issue with a project?"</li>
+<li>"What are the strategic priorities?"</li>
+</ul>
+<hr>
+<h2>Part 5: Using Cloud Embedding Models (10 minutes)</h2>
+<h3>Difficulty: Intermediate</h3>
+<h3>Objective</h3>
+<p>Swap in a cloud embedding model (OpenAI or Ollama) for potentially higher-quality embeddings.</p>
+<h3>Option A: Ollama Embeddings (Free, Local)</h3>
+<pre><code class="language-python"># scripts/ollama_embeddings.py
+"""Use Ollama's nomic-embed-text for embeddings."""
+
+import chromadb
+from chromadb.utils import embedding_functions
+
+# Make sure you have pulled the model:
+#   ollama pull nomic-embed-text
+
+client = chromadb.PersistentClient(path="data/chromadb")
+
+# Ollama embedding function
+ollama_ef = embedding_functions.OllamaEmbeddingFunction(
+    url="http://localhost:11434/api/embeddings",
+    model_name="nomic-embed-text",
+)
+
+# Create a new collection with Ollama embeddings
+collection = client.get_or_create_collection(
+    name="docs_ollama_embed",
+    embedding_function=ollama_ef,
+)
+
+# Test it
+collection.add(
+    ids=["test_1"],
+    documents=["This is a test document about remote working policies."],
+)
+
+results = collection.query(
+    query_texts=["Can I work from home?"],
+    n_results=1,
+)
+
+print("Query: 'Can I work from home?'")
+print(f"Result: {results['documents'][0][0][:80]}...")
+print(f"Distance: {results['distances'][0][0]:.4f}")
+</code></pre>
+<h3>Option B: OpenAI Embeddings (Cloud, Paid)</h3>
+<pre><code class="language-python"># scripts/openai_embeddings.py
+"""Use OpenAI text-embedding-3-small for embeddings."""
+
+import os
+import chromadb
+from chromadb.utils import embedding_functions
+
+# Set your API key (or use .env file)
+# export OPENAI_API_KEY="sk-..."
+
+client = chromadb.PersistentClient(path="data/chromadb")
+
+openai_ef = embedding_functions.OpenAIEmbeddingFunction(
+    api_key=os.getenv("OPENAI_API_KEY"),
+    model_name="text-embedding-3-small",  # 1536 dimensions
+)
+
+collection = client.get_or_create_collection(
+    name="docs_openai_embed",
+    embedding_function=openai_ef,
+)
+
+# Add documents
+collection.add(
+    ids=["test_1"],
+    documents=["This is a test document about remote working policies."],
+)
+
+results = collection.query(
+    query_texts=["Can I work from home?"],
+    n_results=1,
+)
+
+print("Query: 'Can I work from home?'")
+print(f"Result: {results['documents'][0][0][:80]}...")
+print(f"Distance: {results['distances'][0][0]:.4f}")
+</code></pre>
+<h3>Comparing Embedding Models</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Feature</th><th>all-MiniLM-L6-v2</th><th>nomic-embed-text</th><th>text-embedding-3-small</th></tr></thead><tbody><tr><td>Provider</td><td>Local (HuggingFace)</td><td>Local (Ollama)</td><td>Cloud (OpenAI)</td></tr><tr><td>Dimensions</td><td>384</td><td>768</td><td>1536</td></tr><tr><td>Cost</td><td>Free</td><td>Free</td><td>~0.02 USD/1M tokens</td></tr><tr><td>Speed</td><td>Fast</td><td>Fast (GPU)</td><td>Network dependent</td></tr><tr><td>Quality</td><td>Good</td><td>Very Good</td><td>Excellent</td></tr><tr><td>Privacy</td><td>Full</td><td>Full</td><td>Data sent to API</td></tr><tr><td>Best for</td><td>Learning, prototyping</td><td>Production (local)</td><td>Production (cloud)</td></tr></tbody></table>
+<blockquote>
+<p><strong>Workshop recommendation:</strong> Start with <code>all-MiniLM-L6-v2</code> (it is already installed). Switch to <code>nomic-embed-text</code> via Ollama once you are comfortable -- it gives better results at no extra cost.</p>
+</blockquote>
+<hr>
+<h2>Part 6: Citation Tracking (15 minutes)</h2>
+<h3>Difficulty: Intermediate</h3>
+<h3>Objective</h3>
+<p>Build a proper citation system that tracks exactly which document and section each piece of information comes from.</p>
+<h3>Step 1: Enhanced Citation Pipeline</h3>
+<p>Create <code>scripts/rag_with_citations.py</code>:</p>
+<pre><code class="language-python"># scripts/rag_with_citations.py
+"""RAG pipeline with detailed citation tracking."""
+
+import chromadb
+from chromadb.utils import embedding_functions
+import ollama
+import json
+
+
+def get_collection():
+    client = chromadb.PersistentClient(path="data/chromadb")
+    embedding_fn = embedding_functions.SentenceTransformerEmbeddingFunction(
+        model_name="all-MiniLM-L6-v2"
+    )
+    return client.get_collection(
+        name="workshop_docs",
+        embedding_function=embedding_fn,
+    )
+
+
+def ask_with_citations(query, n_results=4):
+    """Ask a question and get an answer with detailed citations."""
+    collection = get_collection()
+
+    # Retrieve relevant chunks
+    results = collection.query(
+        query_texts=[query],
+        n_results=n_results,
+    )
+
+    # Build numbered context with clear source markers
+    context_parts = []
+    source_map = {}
+
+    for i in range(len(results["documents"][0])):
+        doc_text = results["documents"][0][i]
+        source_file = results["metadatas"][0][i]["source"]
+        distance = results["distances"][0][i]
+        ref_num = i + 1
+
+        context_parts.append(
+            f"[Reference {ref_num}] (from: {source_file})\n{doc_text}"
+        )
+        source_map[ref_num] = {
+            "file": source_file,
+            "relevance_score": round(1 - distance, 3),
+            "excerpt": doc_text[:200],
+        }
+
+    context = "\n\n---\n\n".join(context_parts)
+
+    prompt = f"""You are a precise research assistant. Answer the question
+using ONLY the provided references. Follow these rules:
+
+1. Cite every claim using [Reference N] notation
+2. If multiple references support a point, cite all of them
+3. If the references do not contain the answer, say "I could not find
+   this information in the provided documents."
+4. Quote key figures and facts exactly as they appear
+
+REFERENCES:
+{context}
+
+QUESTION: {query}
+
+ANSWER (with citations):"""
+
+    response = ollama.chat(
+        model="llama3.3:8b",
+        messages=[{"role": "user", "content": prompt}],
+    )
+
+    return {
+        "query": query,
+        "answer": response["message"]["content"],
+        "references": source_map,
+    }
+
+
+def display_cited_answer(result):
+    """Display an answer with a formatted reference list."""
+    print(f"\nQuestion: {result['query']}")
+    print(f"\n{result['answer']}")
+    print(f"\n{'- ' * 30}")
+    print("Reference List:")
+    for ref_num, ref_info in result["references"].items():
+        print(f"  [Reference {ref_num}]")
+        print(f"    File: {ref_info['file']}")
+        print(f"    Relevance: {ref_info['relevance_score']:.0%}")
+        print(f"    Excerpt: {ref_info['excerpt'][:80]}...")
+        print()
+
+
+if __name__ == "__main__":
+    queries = [
+        "What is the budget threshold for mandatory risk registers?",
+        "How did employee satisfaction compare to the industry average?",
+        "What security measures are required for remote workers?",
+    ]
+
+    for q in queries:
+        result = ask_with_citations(q)
+        display_cited_answer(result)
+</code></pre>
+<p>Run it:</p>
+<pre><code class="language-bash">python scripts/rag_with_citations.py
+</code></pre>
+<h3>Expected Output</h3>
+<pre><code>Question: What is the budget threshold for mandatory risk registers?
+
+Risk registers are mandatory for projects over 50,000 GBP [Reference 1].
+This requirement is part of the planning phase of the project lifecycle,
+where the project manager creates a detailed plan using the standard
+template [Reference 1].
+
+- - - - - - - - - - - - - - - - - -
+Reference List:
+  [Reference 1]
+    File: project_handbook.md
+    Relevance: 72%
+    Excerpt: ### 2. Planning
+The project manager creates a detailed plan using our standard template...
+</code></pre>
+<h3>Step 2: Export Citations as JSON</h3>
+<p>Add a function to save results for downstream use:</p>
+<pre><code class="language-python">def save_result(result, output_path="data/last_query.json"):
+    """Save the query result with citations to a JSON file."""
+    with open(output_path, "w", encoding="utf-8") as f:
+        json.dump(result, f, indent=2, ensure_ascii=False)
+    print(f"Result saved to {output_path}")
+</code></pre>
+<p>This is useful when you want to integrate your RAG system into other applications -- a web interface, a Slack bot, or an automated report generator.</p>
+<hr>
+<h2>Part 7: Adding New Documents (10 minutes)</h2>
+<h3>Difficulty: Beginner</h3>
+<h3>Objective</h3>
+<p>Learn how to incrementally add new documents to your existing knowledge base without rebuilding everything.</p>
+<h3>Step 1: Create an Incremental Indexer</h3>
+<p>Create <code>scripts/add_document.py</code>:</p>
+<pre><code class="language-python"># scripts/add_document.py
+"""Add a new document to the existing vector store."""
+
+import sys
+import os
+import chromadb
+from chromadb.utils import embedding_functions
+from load_documents import load_markdown_file, load_pdf_file, chunk_documents
+
+
+def add_to_store(filepath, collection_name="workshop_docs",
+                 db_path="data/chromadb"):
+    """Add a single document to the existing collection."""
+
+    # Connect to existing store
+    client = chromadb.PersistentClient(path=db_path)
+    embedding_fn = embedding_functions.SentenceTransformerEmbeddingFunction(
+        model_name="all-MiniLM-L6-v2"
+    )
+    collection = client.get_collection(
+        name=collection_name,
+        embedding_function=embedding_fn,
+    )
+
+    # Load the document
+    if filepath.endswith(".pdf"):
+        docs = load_pdf_file(filepath)
+    else:
+        docs = [load_markdown_file(filepath)]
+
+    # Chunk it
+    chunks = chunk_documents(docs)
+
+    # Generate unique IDs based on filename + chunk index
+    base_name = os.path.basename(filepath).replace(".", "_")
+    existing_count = collection.count()
+
+    ids = [f"{base_name}_chunk_{i + existing_count}" for i in range(len(chunks))]
+    documents = [c.page_content for c in chunks]
+    metadatas = [
+        {
+            "source": c.metadata.get("source", "unknown"),
+            "file_type": c.metadata.get("file_type", "unknown"),
+            "chunk_index": c.metadata.get("chunk_index", 0),
+        }
+        for c in chunks
+    ]
+
+    # Add to collection
+    collection.add(ids=ids, documents=documents, metadatas=metadatas)
+
+    print(f"Added {len(chunks)} chunks from '{os.path.basename(filepath)}'")
+    print(f"Collection now has {collection.count()} total entries.")
+
+
+if __name__ == "__main__":
+    if len(sys.argv) &lt; 2:
+        print("Usage: python add_document.py &lt;path-to-document&gt;")
+        sys.exit(1)
+
+    filepath = sys.argv[1]
+    if not os.path.exists(filepath):
+        print(f"File not found: {filepath}")
+        sys.exit(1)
+
+    add_to_store(filepath)
+</code></pre>
+<h3>Step 2: Try It</h3>
+<p>Create a new document and add it:</p>
+<pre><code class="language-bash"># Create a new document
+cat &gt; documents/meeting_notes.md &lt;&lt; 'EOF'
+# Board Meeting Notes - March 2026
+
+## Attendees
+CEO, CTO, CFO, Head of Product, Head of Engineering
+
+## Key Decisions
+1. Approved budget of 500,000 GBP for AI platform development
+2. Hired new VP of Engineering starting April 2026
+3. Postponed North American launch to Q3 (was Q2)
+4. Approved partnership with University of Edinburgh for research
+
+## Action Items
+- CTO to present AI roadmap by 15 April
+- CFO to finalise Q1 accounts by end of March
+- Head of Product to complete user research by 1 April
+EOF
+
+# Add it to the vector store
+python scripts/add_document.py documents/meeting_notes.md
+</code></pre>
+<h3>Step 3: Query the Updated Knowledge Base</h3>
+<pre><code class="language-bash">python scripts/rag_pipeline.py --chat
+</code></pre>
+<p>Try: "What was the approved budget for AI development?"</p>
+<p>The system should now find and cite the newly added meeting notes.</p>
+<hr>
+<h2>Part 8: Quality Check -- Testing Your RAG System (10 minutes)</h2>
+<h3>Difficulty: Intermediate</h3>
+<h3>Objective</h3>
+<p>Verify that your RAG system returns accurate, relevant answers.</p>
+<h3>Quick Evaluation Script</h3>
+<p>Create <code>scripts/evaluate_rag.py</code>:</p>
+<pre><code class="language-python"># scripts/evaluate_rag.py
+"""Simple evaluation: test known questions against expected answers."""
+
+from rag_pipeline import ask, get_collection
+
+
+def evaluate():
+    """Run test queries and check if key facts appear in answers."""
+    collection = get_collection()
+
+    test_cases = [
+        {
+            "query": "How many days can employees work remotely?",
+            "expected_facts": ["3 days", "manager approval"],
+            "expected_source": "company_policy.md",
+        },
+        {
+            "query": "What was the revenue in 2025?",
+            "expected_facts": ["12.4 million", "18%"],
+            "expected_source": "annual_report.md",
+        },
+        {
+            "query": "What is the escalation process?",
+            "expected_facts": ["Level 1", "Level 2", "Level 3"],
+            "expected_source": "project_handbook.md",
+        },
+    ]
+
+    results = []
+    for test in test_cases:
+        result = ask(test["query"], collection=collection)
+
+        # Check if expected facts appear in the answer
+        facts_found = []
+        for fact in test["expected_facts"]:
+            found = fact.lower() in result["answer"].lower()
+            facts_found.append((fact, found))
+
+        # Check if the right source was retrieved first
+        top_source = result["sources"][0]["source"]
+        source_correct = top_source == test["expected_source"]
+
+        passed = all(f[1] for f in facts_found) and source_correct
+
+        results.append({
+            "query": test["query"],
+            "passed": passed,
+            "facts": facts_found,
+            "source_correct": source_correct,
+            "top_source": top_source,
+        })
+
+        status = "PASS" if passed else "FAIL"
+        print(f"[{status}] {test['query']}")
+        for fact, found in facts_found:
+            print(f"  {'found' if found else 'MISSING'}: '{fact}'")
+        print(f"  Source: {top_source} "
+              f"({'correct' if source_correct else 'WRONG'})")
+        print()
+
+    passed = sum(1 for r in results if r["passed"])
+    total = len(results)
+    print(f"\nResults: {passed}/{total} tests passed "
+          f"({passed / total * 100:.0f}%)")
+
+
+if __name__ == "__main__":
+    evaluate()
+</code></pre>
+<p>Run it:</p>
+<pre><code class="language-bash">python scripts/evaluate_rag.py
+</code></pre>
+<h3>Expected Output</h3>
+<pre><code>[PASS] How many days can employees work remotely?
+  found: '3 days'
+  found: 'manager approval'
+  Source: company_policy.md (correct)
+
+[PASS] What was the revenue in 2025?
+  found: '12.4 million'
+  found: '18%'
+  Source: annual_report.md (correct)
+
+[PASS] What is the escalation process?
+  found: 'Level 1'
+  found: 'Level 2'
+  found: 'Level 3'
+  Source: project_handbook.md (correct)
+
+Results: 3/3 tests passed (100%)
+</code></pre>
+<hr>
+<h2>Summary of What You Built</h2>
+<pre><code>~/rag-workshop/
+├── documents/                    # Your source documents
+│   ├── company_policy.md
+│   ├── project_handbook.md
+│   ├── annual_report.md
+│   └── meeting_notes.md
+├── scripts/
+│   ├── verify_setup.py           # Installation checker
+│   ├── load_documents.py         # Document loading + chunking
+│   ├── build_index.py            # Vector store creation
+│   ├── rag_pipeline.py           # Core RAG Q&amp;A pipeline
+│   ├── rag_with_citations.py     # Citation-enhanced pipeline
+│   ├── add_document.py           # Incremental document addition
+│   ├── evaluate_rag.py           # Quality evaluation
+│   ├── ollama_embeddings.py      # Alternative: Ollama embeddings
+│   └── openai_embeddings.py      # Alternative: OpenAI embeddings
+├── data/
+│   └── chromadb/                 # Persistent vector store
+└── venv/                         # Python virtual environment
+</code></pre>
+<h3>Key Skills Acquired</h3>
+<ul>
+<li>Setting up a Python RAG environment from scratch</li>
+<li>Loading and chunking documents (markdown, text, PDF)</li>
+<li>Creating and querying a ChromaDB vector store</li>
+<li>Building a complete retrieve-then-generate pipeline</li>
+<li>Adding citation tracking to LLM-generated answers</li>
+<li>Incrementally updating a knowledge base</li>
+<li>Evaluating RAG system quality</li>
+</ul>
+<hr>
+<h2>Troubleshooting Guide</h2>
+<h3>Issue: ChromaDB "collection not found"</h3>
+<p><strong>Cause:</strong> The vector store was not built yet, or the path is wrong.
+<strong>Solution:</strong></p>
+<pre><code class="language-bash"># Rebuild the index
+python scripts/build_index.py
+</code></pre>
+<h3>Issue: Ollama connection refused</h3>
+<p><strong>Cause:</strong> Ollama server is not running.
+<strong>Solution:</strong></p>
+<pre><code class="language-bash">ollama serve   # Start in a separate terminal
+ollama list    # Verify models are available
+</code></pre>
+<h3>Issue: Out of memory during embedding</h3>
+<p><strong>Cause:</strong> Too many documents being embedded at once.
+<strong>Solution:</strong> Reduce batch size or use a smaller embedding model:</p>
+<pre><code class="language-python"># Process in batches of 50
+for i in range(0, len(documents), 50):
+    batch = documents[i:i+50]
+    collection.add(ids=ids[i:i+50], documents=batch, metadatas=metadatas[i:i+50])
+</code></pre>
+<h3>Issue: Poor retrieval quality</h3>
+<p><strong>Cause:</strong> Chunks are too large or too small, or overlap is insufficient.
+<strong>Solution:</strong> Experiment with chunk parameters:</p>
+<pre><code class="language-python"># Smaller chunks with more overlap for precise retrieval
+chunks = chunk_documents(docs, chunk_size=300, chunk_overlap=75)
+
+# Larger chunks for more context per result
+chunks = chunk_documents(docs, chunk_size=800, chunk_overlap=200)
+</code></pre>
+<h3>Issue: LLM ignores the retrieved context</h3>
+<p><strong>Cause:</strong> Prompt is not strong enough, or the model is relying on its own knowledge.
+<strong>Solution:</strong> Strengthen the system prompt:</p>
+<pre><code class="language-python">prompt = """You MUST answer using ONLY the provided context.
+Do NOT use any external knowledge.
+If the answer is not in the context, say 'Not found in documents.'
+..."""
+</code></pre>
+<hr>
+<h2>Navigation</h2>
+<ul>
+<li>Previous: <a href="01_concepts.md">Core Concepts</a></li>
+<li>Next: <a href="03_exercises.md">Exercises</a></li>
+<li><a href="README.md">Back to Workshop Overview</a></li>
+</ul></div></article></main></div>
+    <noscript><p>Interactive forms require JavaScript. You can also email <a href="mailto:info@dreamlab-ai.com">info@dreamlab-ai.com</a>.</p></noscript>
+  
+
+</body></html>

@@ -1,0 +1,857 @@
+<!DOCTYPE html><html lang="en" class="dark"><head>
+    <meta charset="UTF-8">
+
+    <!-- Primary Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <title>AI Coding Assistants Integration | DreamLab AI Workshops</title>
+    <meta name="title" content="AI Coding Assistants Integration | DreamLab AI Workshops">
+    <meta name="description" content="AI Coding Assistants Integration — free DreamLab AI curriculum.">
+    <meta name="keywords" content="applied innovation lab, AI consulting, enterprise innovation, immersive XR, cyber trust, creative technology, residential programmes, knowledge transfer, deep tech, Lake District">
+    <meta name="author" content="DreamLab">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    <meta name="rating" content="General">
+
+    <link rel="describedby" href="/llms.txt" type="text/plain">
+    <script type="application/ld+json" id="organisation-structured-data">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://dreamlab-ai.com/#organisation","name":"DreamLab","url":"https://dreamlab-ai.com/","logo":"https://dreamlab-ai.com/images/heroes/dreamlab-hero.webp","email":"info@dreamlab-ai.com","founder":{"@id":"https://dreamlab-ai.com/team#john-ohare"},"sameAs":["https://github.com/DreamLab-AI","https://www.linkedin.com/company/dreamlab-ai-consulting"]},{"@type":"Person","@id":"https://dreamlab-ai.com/team#john-ohare","name":"John O'Hare","honorificPrefix":"Dr","jobTitle":"Founder","worksFor":{"@id":"https://dreamlab-ai.com/#organisation"},"url":"https://dreamlab-ai.com/team#john-ohare"}]}</script>
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dreamlab-ai.com/workshops/vscode-learning-pathway/09-ai-integration.md/">
+
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="msapplication-TileColor" content="#1a1a2e">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://dreamlab-ai.com/workshops/vscode-learning-pathway/09-ai-integration.md/">
+    <meta property="og:title" content="AI Coding Assistants Integration | DreamLab AI Workshops">
+    <meta property="og:description" content="AI Coding Assistants Integration — free DreamLab AI curriculum.">
+    <meta property="og:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="DreamLab AI Workshop - AI Coding Assistants Integration">
+    <meta property="og:site_name" content="DreamLab">
+    <meta property="og:locale" content="en_GB">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://dreamlab-ai.com/workshops/vscode-learning-pathway/09-ai-integration.md/">
+    <meta name="twitter:title" content="AI Coding Assistants Integration | DreamLab AI Workshops">
+    <meta name="twitter:description" content="AI Coding Assistants Integration — free DreamLab AI curriculum.">
+    <meta name="twitter:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta name="twitter:image:alt" content="DreamLab AI Workshop - AI Coding Assistants Integration">
+    <meta name="twitter:site" content="@thedreamlab">
+    <meta name="twitter:creator" content="@thedreamlab">
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="geo.region" content="GB">
+    <meta name="geo.placename" content="United Kingdom">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DreamLab AI">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Security Headers -->
+    <!--
+      CSP notes:
+      - script-src is 'self' only: no 'unsafe-eval' (blocks eval/Function-based
+        injection) and no 'unsafe-inline'. The one inline bootstrap script was
+        moved to /spa-redirect.js. JSON-LD blocks below are type
+        application/ld+json (data, not executable) so CSP does not gate them.
+      - connect-src is scoped to the Cloudflare Workers subdomain actually used
+        by this account (*.solitary-paper-764d.workers.dev: auth / pod / search /
+        link-preview / nostr-relay), NOT the internet-wide *.workers.dev, which
+        previously allowed exfiltration to any attacker-controlled worker.
+      - The two open Nostr relays (relay.damus.io, relay.primal.net) are
+        explicitly allow-listed: the Talk-to-AI chat listens there for
+        junkiejarvis's reply (the primary relay's whitelist gate rejects the
+        gift-wrap addressed to the ephemeral session key — ADR-042 Amendment 1).
+        Must stay in sync with VITE_REPLY_RELAYS. Named exactly, not a wildcard.
+      - style-src keeps 'unsafe-inline' because Radix UI + runtime style
+        attributes require it; that is not a script-injection vector.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.solitary-paper-764d.workers.dev wss://*.solitary-paper-764d.workers.dev https://*.dreamlab-ai.com wss://*.dreamlab-ai.com wss://relay.damus.io wss://relay.primal.net; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <!-- SPA deep-link restore. External 'self' script (not inline) so CSP
+         script-src can stay 'self' with no 'unsafe-inline'. Classic,
+         render-blocking script: runs before the deferred app module. -->
+    <script src="/spa-redirect.js"></script>
+    <script type="module" crossorigin="" src="/assets/index-Crc86LXg.js"></script>
+    <link rel="modulepreload" crossorigin="" href="/assets/ui-C2dH1upk.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/vendor-uw6h6E0d.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/nostr-BpuBsPg-.js">
+    <link rel="stylesheet" crossorigin="" href="/assets/index-CeEdk6WL.css">
+  <script type="application/ld+json" id="route-structured-data">{"@context":"https://schema.org","@type":"LearningResource","@id":"https://dreamlab-ai.com/workshops/vscode-learning-pathway/09-ai-integration.md/#page","url":"https://dreamlab-ai.com/workshops/vscode-learning-pathway/09-ai-integration.md/","name":"AI Coding Assistants Integration | DreamLab AI Workshops","description":"AI Coding Assistants Integration — free DreamLab AI curriculum.","inLanguage":"en-GB","publisher":{"@id":"https://dreamlab-ai.com/#organisation"},"isAccessibleForFree":true}</script><link rel="alternate" type="text/markdown" href="/data/workshops/vscode-learning-pathway/09-ai-integration.md"></head>
+
+  <body>
+    <!-- Skip Navigation Link for Accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
+      Skip to main content
+    </a>
+    <div id="root"><header role="banner" class="fixed top-0 left-0 right-0 z-50"><div class="md:hidden flex items-center justify-between h-14 px-6 bg-[rgba(14,14,17,0.92)] backdrop-blur-[14px] border-b border-dlm-hairline"><a aria-label="DreamLab home" class="flex items-center gap-2" href="/"><span class="w-[9px] h-[9px] rounded-full bg-dlm-bright shrink-0" aria-hidden="true"></span><span class="text-[14px] font-semibold tracking-[0.14em] text-[#FAFAFA]">DREAMLAB</span></a><button type="button" aria-label="Open menu" aria-expanded="false" class="w-11 h-11 -mr-2 flex flex-col items-end justify-center gap-[5px] focus:outline-none focus-visible:ring-2 focus-visible:ring-dlm-bright rounded"><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span></button></div><div class="hidden md:block transition-all duration-300 ease-out py-3 bg-background/60 backdrop-blur-md"><div class="container flex items-center justify-between px-4"><button class="flex items-center gap-2 md:gap-3 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded min-h-[48px] min-w-[48px] px-3 py-2" aria-label="Main navigation menu" type="button" id="radix-:Rp:" aria-haspopup="menu" aria-expanded="false" data-state="closed"><div class="w-10 h-10 md:w-8 md:h-8 shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all duration-300 group-hover:scale-110 animate-glow-pulse" aria-hidden="true"></div><span class="font-bold text-lg md:text-xl tracking-tight group-hover:text-purple-400 transition-colors duration-300">MENU</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down h-5 w-5 md:h-4 md:w-4 shrink-0 text-muted-foreground group-hover:text-purple-400 transition-all duration-300 group-hover:rotate-180" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button><div class="flex items-center gap-2"><a class="items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-10 py-2 hover:bg-purple-500/10 hover:text-purple-400 transition-all duration-300 hover:scale-105 min-h-[48px] px-4 text-base md:text-sm hidden sm:inline-flex" href="/contact">Contact</a><a class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary hover:bg-primary/90 h-10 py-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transition-all duration-300 min-h-[48px] px-4 text-base md:text-sm" href="/co-create">Partner With Us</a></div></div></div></header><header class="relative overflow-hidden" style="min-height:320px"><div class="absolute inset-0 bg-gradient-to-br from-cyan-500/30 via-teal-500/30 to-emerald-500/30" style="transform:translateY(0px);opacity:1"><div class="absolute top-0 -left-20 w-96 h-96 rounded-full blur-3xl opacity-40 animate-float bg-gradient-to-br from-cyan-500 via-teal-500 to-emerald-500"></div><div class="absolute bottom-0 -right-20 w-[32rem] h-[32rem] rounded-full blur-3xl opacity-30 animate-float bg-gradient-to-br from-cyan-500 via-teal-500 to-emerald-500" style="animation-delay:1s"></div><div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full blur-3xl opacity-20 animate-float bg-gradient-to-br from-cyan-500 via-teal-500 to-emerald-500" style="animation-delay:2s"></div></div><div class="absolute inset-0 opacity-5" style="background-image:linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);background-size:50px 50px;transform:translateY(0px)"></div><div class="relative z-10 container px-4 pt-24 pb-8"><div class="mb-6 transition-all duration-500 transform opacity-0 translate-y-4"><nav aria-label="breadcrumb"><ol class="flex flex-wrap items-center gap-1.5 break-words text-sm sm:gap-2.5 text-white/70"><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/">Home</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/workshops">Workshops</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><span role="link" aria-disabled="true" aria-current="page" class="text-white font-medium">Vscode Learning Pathway</span></li></ol></nav></div><div class="mb-4 transition-all duration-500 delay-100 transform opacity-0 translate-y-4"><div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20"><span class="text-teal-400"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layers w-5 h-5" aria-hidden="true"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"></path><path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"></path><path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"></path></svg></span><span class="text-sm font-medium text-white/90">XR / Virtual Reality</span></div></div><h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 break-words transition-all duration-700 delay-200 transform opacity-0 translate-y-6"><span class="bg-gradient-to-r bg-clip-text text-transparent animate-gradient-shift bg-400% from-cyan-400 via-teal-400 to-emerald-400">Vscode Learning Pathway</span></h1><div class="flex flex-wrap items-center gap-3 mb-6 transition-all duration-700 delay-400 transform opacity-0 translate-y-4"><div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-white/10 border-white/20 text-white backdrop-blur-sm hover:bg-white/20"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-3.5 h-3.5 mr-1.5" aria-hidden="true"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>13<!-- --> <!-- -->Modules</div></div><div class="max-w-md transition-all duration-700 delay-500 transform opacity-0 translate-y-4"><div class="flex items-center justify-between text-sm text-white/70 mb-2"><span class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code w-4 h-4" aria-hidden="true"><path d="m16 18 6-6-6-6"></path><path d="m8 6-6 6 6 6"></path></svg><span>Chapter <!-- -->9<!-- -->: <!-- -->AI Coding Assistants Integration</span></span><span class="font-medium text-white">69<!-- -->%</span></div><div class="relative"><div aria-valuemax="100" aria-valuemin="0" role="progressbar" data-state="indeterminate" data-max="100" class="relative w-full overflow-hidden rounded-full h-2 bg-white/20"><div data-state="indeterminate" data-max="100" class="h-full w-full flex-1 bg-primary transition-all" style="transform:translateX(-31%)"></div></div><div class="absolute top-0 left-0 h-2 rounded-full blur-sm bg-gradient-to-r from-cyan-500 via-teal-500 to-emerald-500" style="width:69%"></div></div><div class="relative mt-1 h-1"><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:7.6923076923076925%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:15.384615384615385%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:23.076923076923077%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:30.76923076923077%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:38.46153846153847%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:46.15384615384615%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:53.84615384615385%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:61.53846153846154%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:69.23076923076923%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:76.92307692307693%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:84.61538461538461%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:92.3076923076923%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:100%"></div></div></div></div><div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent"></div></header><main class="container px-4 pt-8 pb-8 flex flex-col md:flex-row gap-x-8 min-h-screen" id="main-content"><aside class="w-full md:w-64 lg:w-72 md:sticky md:top-20 md:h-[calc(100vh-5rem-2rem)] mb-8 md:mb-0"><h2 class="text-xl font-semibold mb-4 break-words">Vscode Learning Pathway</h2><div dir="ltr" class="relative overflow-hidden h-auto md:h-full pr-4 border-r md:border-r-0" style="position:relative;--radix-scroll-area-corner-width:0px;--radix-scroll-area-corner-height:0px"><style>[data-radix-scroll-area-viewport]{scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;}[data-radix-scroll-area-viewport]::-webkit-scrollbar{display:none}</style><div data-radix-scroll-area-viewport="" class="h-full w-full rounded-[inherit]" style="overflow-x:hidden;overflow-y:hidden"><div style="min-width:100%;display:table"><nav><ul><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/01-introduction.md"><span class="mr-2 text-xs opacity-60">1<!-- -->.</span>Introduction to VS Code as an AI-Powered IDE</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/02-keyboard-shortcuts.md"><span class="mr-2 text-xs opacity-60">2<!-- -->.</span>Essential Keyboard Shortcuts and Productivity</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/03-extension-ecosystem.md"><span class="mr-2 text-xs opacity-60">3<!-- -->.</span>Extension Ecosystem Mastery</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/04-settings-customization.md"><span class="mr-2 text-xs opacity-60">4<!-- -->.</span>Settings and Customisation</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/05-git-integration.md"><span class="mr-2 text-xs opacity-60">5<!-- -->.</span>Git Integration Deep Dive</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/06-remote-development.md"><span class="mr-2 text-xs opacity-60">6<!-- -->.</span>Remote Development (SSH, Containers, WSL)</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/07-debugging.md"><span class="mr-2 text-xs opacity-60">7<!-- -->.</span>Debugging Mastery</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/08-task-automation.md"><span class="mr-2 text-xs opacity-60">8<!-- -->.</span>Task Automation and Build Systems</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors bg-primary text-primary-foreground font-semibold" href="/workshops/vscode-learning-pathway/09-ai-integration.md"><span class="mr-2 text-xs opacity-60">9<!-- -->.</span>AI Coding Assistants Integration</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/10-profiles-sync.md"><span class="mr-2 text-xs opacity-60">10<!-- -->.</span>Profile Management and Settings Sync</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/11-workspaces.md"><span class="mr-2 text-xs opacity-60">11<!-- -->.</span>Multi-root Workspaces and Advanced Organization</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/12-advanced-editing.md"><span class="mr-2 text-xs opacity-60">12<!-- -->.</span>Advanced Editing Features</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/vscode-learning-pathway/overview.md"><span class="mr-2 text-xs opacity-60">13<!-- -->.</span>VS Code Learning Pathway 2026: From Beginner to AI-Powered Master</a></li></ul></nav></div></div></div></aside><article class="flex-1 min-w-0 md:pl-0"><div class="prose max-w-none dark:prose-invert break-words [&amp;_table]:block [&amp;_table]:w-full [&amp;_table]:overflow-x-auto"><h1>AI Coding Assistants Integration</h1>
+<h2>Learning Objectives</h2>
+<ul>
+<li>Master multiple AI coding assistants in VS Code</li>
+<li>Understand when to use each AI tool and why</li>
+<li>Configure Claude Code, GitHub Copilot, and Continue.dev for maximum productivity</li>
+<li>Implement privacy-conscious AI workflows</li>
+<li>Build custom AI-powered development environments</li>
+<li>Integrate local and cloud AI models</li>
+</ul>
+<h2>The AI Landscape in VS Code (2026)</h2>
+<p><img src="/data/workshops/vscode-learning-pathway/diagrams/09-ai-landscape.svg" alt="Four AI approaches in VS Code: inline completion, agentic terminal tools, hybrid multi-model tools and local private models, with leading tools and pricing"></p>
+<h2>GitHub Copilot (Inline Completion Standard)</h2>
+<h3>Installation &amp; Setup</h3>
+<pre><code class="language-bash">code --install-extension GitHub.copilot
+code --install-extension GitHub.copilot-chat
+</code></pre>
+<p><strong>Authentication:</strong></p>
+<pre><code>1. Click Copilot icon in status bar
+2. Sign in with GitHub account
+3. Authorise VS Code
+4. Subscription required (from $10/month, free for students/OSS maintainers)
+5. Check github.com/features/copilot for current plans
+</code></pre>
+<h3>Core Features</h3>
+<h4>1. Inline Code Completion</h4>
+<p><strong>How it works:</strong></p>
+<pre><code class="language-javascript">// Start typing or write a comment:
+// Function to calculate fibonacci sequence
+
+// Copilot suggests:
+function fibonacci(n) {
+  if (n &lt;= 1) return n;
+  return fibonacci(n - 1) + fibonacci(n - 2);
+}
+
+// Press Tab to accept
+// Or Ctrl+→ to accept word-by-word
+</code></pre>
+<p><strong>Trigger Suggestions:</strong></p>
+<pre><code>- Type function name → Suggestions appear
+- Write comment → Implementation suggested
+- Start pattern → Continuation suggested
+</code></pre>
+<p><strong>Navigate Suggestions:</strong></p>
+<pre><code>Alt+] → Next suggestion
+Alt+[ → Previous suggestion
+Tab → Accept suggestion
+Ctrl+→ → Accept next word
+Esc → Dismiss
+</code></pre>
+<h4>2. Copilot Chat</h4>
+<p><strong>Open Chat:</strong></p>
+<pre><code>Ctrl+I → Inline chat
+Or: Sidebar → Copilot Chat icon
+</code></pre>
+<p><strong>Chat Commands:</strong></p>
+<pre><code>@workspace → Include workspace context
+/explain → Explain selected code
+/fix → Fix problems in code
+/tests → Generate tests
+/doc → Generate documentation
+/clear → Clear chat history
+</code></pre>
+<p><strong>Example Workflow:</strong></p>
+<pre><code>1. Select complex function
+2. Ctrl+I
+3. Type: "/explain in simple terms"
+4. Copilot explains the code
+5. Type: "/tests with edge cases"
+6. Copilot generates tests
+</code></pre>
+<h4>3. Generate Tests</h4>
+<pre><code class="language-javascript">// Select this function:
+function validateEmail(email) {
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return regex.test(email);
+}
+
+// Right-click → "Copilot: Generate Tests"
+// Or: Ctrl+I → "/tests"
+
+// Copilot generates:
+describe('validateEmail', () =&gt; {
+  it('should return true for valid email', () =&gt; {
+    expect(validateEmail('test@example.com')).toBe(true);
+  });
+
+  it('should return false for invalid email', () =&gt; {
+    expect(validateEmail('invalid')).toBe(false);
+  });
+
+  it('should handle email with subdomain', () =&gt; {
+    expect(validateEmail('user@mail.company.com')).toBe(true);
+  });
+});
+</code></pre>
+<h4>4. Documentation Generation</h4>
+<pre><code class="language-python"># Select function:
+def calculate_discount(price, discount_percent, is_member):
+    if is_member:
+        discount_percent += 5
+    return price * (1 - discount_percent / 100)
+
+# Ctrl+I → "/doc"
+
+# Copilot adds:
+def calculate_discount(price, discount_percent, is_member):
+    """
+    Calculate the final price after applying a discount.
+
+    Args:
+        price (float): The original price of the item
+        discount_percent (float): The discount percentage to apply
+        is_member (bool): Whether the customer is a member (adds 5% extra discount)
+
+    Returns:
+        float: The final price after discount
+
+    Example:
+        &gt;&gt;&gt; calculate_discount(100, 10, True)
+        85.0
+    """
+    if is_member:
+        discount_percent += 5
+    return price * (1 - discount_percent / 100)
+</code></pre>
+<h3>Copilot Configuration</h3>
+<pre><code class="language-json">{
+  // Enable/disable Copilot
+  "github.copilot.enable": {
+    "*": true,
+    "yaml": false,
+    "plaintext": false,
+    "markdown": false
+  },
+
+  // Inline suggestions
+  "github.copilot.editor.enableAutoCompletions": true,
+
+  // Advanced
+  "github.copilot.advanced": {
+    "debug.overrideEngine": "default",
+    "debug.testOverrideProxyUrl": "",
+    "debug.overrideProxyUrl": ""
+  }
+}
+</code></pre>
+<h2>Claude Code (Agentic Terminal Assistant)</h2>
+<h3>What is Claude Code?</h3>
+<p>Claude Code is Anthropic's agentic coding tool. Unlike traditional editor extensions, it runs in your terminal and operates on your entire codebase — reading files, making edits, running commands, and reasoning through complex multi-step tasks. It works brilliantly inside VS Code's integrated terminal.</p>
+<h3>Installation &amp; Setup</h3>
+<pre><code class="language-bash"># Install globally
+npm install -g @anthropic-ai/claude-code
+
+# Set your API key
+export ANTHROPIC_API_KEY="sk-ant-..."   # from console.anthropic.com
+
+# Start a session in your project
+cd your-project
+claude
+</code></pre>
+<p><strong>Also available as:</strong> desktop app (Mac/Windows), web app (claude.ai/code), and IDE extensions (VS Code, JetBrains).</p>
+<h3>Core Features</h3>
+<h4>1. Agentic Codebase Interaction</h4>
+<p>Claude Code reads your project structure, understands context, and makes changes directly:</p>
+<pre><code>You: "Add input validation to all API endpoints in src/routes/"
+
+Claude Code:
+1. Scans src/routes/ to find all endpoint files
+2. Analyses existing patterns
+3. Adds Zod validation schemas
+4. Updates each route handler
+5. Shows you a diff of every change
+</code></pre>
+<h4>2. Terminal Integration</h4>
+<pre><code># Run Claude Code in VS Code terminal (Ctrl+`)
+claude
+
+# Or give it a one-shot task
+claude "explain the authentication flow in this project"
+claude "find and fix the bug causing test failures"
+</code></pre>
+<h4>3. Project Configuration (CLAUDE.md)</h4>
+<p>Create a <code>CLAUDE.md</code> file in your project root to give Claude Code persistent context:</p>
+<pre><code class="language-markdown"># Project Context
+This is a React + Express application.
+Use TypeScript strict mode. Follow ESLint rules.
+Tests use Vitest. Run `npm test` to verify changes.
+</code></pre>
+<h4>4. Slash Commands and Workflows</h4>
+<pre><code>/fast         → Switch to faster model for quick tasks
+/compact      → Summarise conversation to save context
+/init         → Generate a CLAUDE.md for your project
+/review       → Review code changes
+</code></pre>
+<h4>5. MCP Server Integration</h4>
+<p>Claude Code supports the Model Context Protocol (MCP), allowing it to connect to external tools, databases, and services as context sources.</p>
+<h4>6. Subagents</h4>
+<p>For complex tasks, Claude Code can spawn focused subagents that work on specific subtasks in parallel, then synthesise the results.</p>
+<h3>When to Use Claude Code</h3>
+<pre><code>Complex refactoring across many files    → Claude Code
+Understanding unfamiliar codebase        → Claude Code
+Multi-step tasks (build feature + tests) → Claude Code
+Quick inline completion while typing     → Use Copilot instead
+</code></pre>
+<h3>Configuration</h3>
+<p><strong>Cost:</strong> Pay-per-use via the Anthropic API. Powered by Claude Opus by default; use <code>/fast</code> for quicker, cheaper responses with Claude Sonnet. Also included with the Max subscription plan. Check <a href="https://console.anthropic.com">console.anthropic.com</a> for current rates.</p>
+<hr>
+<h2>Continue.dev (Flexible &amp; Open Source)</h2>
+<h3>Installation</h3>
+<pre><code class="language-bash">code --install-extension Continue.continue
+</code></pre>
+<h3>Why Continue?</h3>
+<p><strong>Advantages:</strong></p>
+<ul>
+<li>Free and fully open-source</li>
+<li>Connect any model: Claude, GPT, Gemini, Ollama (local), and more</li>
+<li>Tab autocomplete with configurable models</li>
+<li>Full code context awareness with <code>@</code> references</li>
+<li>Local model support for complete privacy</li>
+<li>Customisable system prompts and slash commands</li>
+</ul>
+<h3>Configuration</h3>
+<p><strong>Access Config:</strong></p>
+<pre><code>Ctrl+Shift+P → "Continue: Open config.json"
+</code></pre>
+<p><strong>Multi-Model Setup (2026):</strong></p>
+<pre><code class="language-json">{
+  "models": [
+    {
+      "title": "Claude Sonnet 4.6",
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-6",
+      "apiKey": "sk-ant-..."
+    },
+    {
+      "title": "GPT-4o",
+      "provider": "openai",
+      "model": "gpt-4o",
+      "apiKey": "sk-..."
+    },
+    {
+      "title": "Gemini 2.5 Flash",
+      "provider": "gemini",
+      "model": "gemini-2.5-flash",
+      "apiKey": "AIza..."
+    },
+    {
+      "title": "Local Llama 3",
+      "provider": "ollama",
+      "model": "llama3:8b"
+    }
+  ],
+  "tabAutocompleteModel": {
+    "title": "Codestral",
+    "provider": "ollama",
+    "model": "codestral:latest"
+  },
+  "embeddingsProvider": {
+    "provider": "ollama",
+    "model": "nomic-embed-text"
+  }
+}
+</code></pre>
+<h3>Features</h3>
+<h4>1. Chat with Context</h4>
+<p><strong>Open Chat:</strong></p>
+<pre><code>Ctrl+L → Open Continue chat
+</code></pre>
+<p><strong>Add Context:</strong></p>
+<pre><code>@file → Reference specific file
+@folder → Reference entire folder
+@code → Reference selected code
+@docs → Search documentation
+@web → Search web
+</code></pre>
+<p><strong>Example:</strong></p>
+<pre><code>You: "Refactor @file UserController.ts to use async/await instead of promises"
+
+Continue: Shows refactored code with explanations
+</code></pre>
+<h4>2. Inline Editing</h4>
+<p><strong>Quick Edit:</strong></p>
+<pre><code>1. Select code
+2. Ctrl+I
+3. Type instruction
+4. Continue modifies code inline
+</code></pre>
+<p><strong>Example:</strong></p>
+<pre><code class="language-javascript">// Select this:
+function getUserData(userId) {
+  return fetch(`/api/users/${userId}`)
+    .then(res =&gt; res.json())
+    .catch(err =&gt; console.error(err));
+}
+
+// Ctrl+I → "Convert to async/await with error handling"
+
+// Result:
+async function getUserData(userId) {
+  try {
+    const res = await fetch(`/api/users/${userId}`);
+    return await res.json();
+  } catch (err) {
+    console.error('Failed to fetch user data:', err);
+    throw err;
+  }
+}
+</code></pre>
+<h4>3. Model Selection</h4>
+<p><strong>Switch Models Mid-Chat:</strong></p>
+<pre><code>1. In chat, click model dropdown
+2. Select different model
+3. Previous context maintained
+</code></pre>
+<p><strong>When to use which model:</strong></p>
+<pre><code>Claude Sonnet/Opus: Complex reasoning, refactoring, documentation
+GPT-4o: General coding, analysis
+Gemini: Research, large context windows
+Local (Ollama): Privacy, offline work, cost-free iteration
+</code></pre>
+<h4>4. Slash Commands</h4>
+<pre><code>/edit → Edit selected code
+/comment → Add comments
+/share → Share chat
+/cmd → Generate shell command
+</code></pre>
+<h2>Local AI with Ollama</h2>
+<h3>Setup Ollama</h3>
+<p><strong>Install Ollama:</strong></p>
+<pre><code class="language-bash"># macOS/Linux
+curl -fsSL https://ollama.com/install.sh | sh
+
+# Windows
+# Download from ollama.com
+</code></pre>
+<p><strong>Install Models:</strong></p>
+<pre><code class="language-bash"># Code completion
+ollama pull codestral
+ollama pull qwen2.5-coder:7b
+
+# Chat
+ollama pull llama3:8b
+ollama pull mistral:7b
+
+# Embeddings (for context)
+ollama pull nomic-embed-text
+</code></pre>
+<p><strong>Verify:</strong></p>
+<pre><code class="language-bash">ollama list
+# Should show installed models
+</code></pre>
+<h3>Configure Continue for Ollama</h3>
+<pre><code class="language-json">{
+  "models": [
+    {
+      "title": "Llama 3 8B",
+      "provider": "ollama",
+      "model": "llama3:8b"
+    },
+    {
+      "title": "Qwen 2.5 Coder",
+      "provider": "ollama",
+      "model": "qwen2.5-coder:7b"
+    }
+  ],
+  "tabAutocompleteModel": {
+    "title": "Codestral",
+    "provider": "ollama",
+    "model": "codestral:latest"
+  }
+}
+</code></pre>
+<p><strong>Benefits:</strong></p>
+<ul>
+<li>✅ Complete privacy (no data leaves your machine)</li>
+<li>✅ Works offline</li>
+<li>✅ No usage costs</li>
+<li>✅ Customisable models</li>
+</ul>
+<p><strong>Requirements:</strong></p>
+<ul>
+<li>16GB+ RAM</li>
+<li>GPU recommended (NVIDIA, Apple Silicon)</li>
+<li>~10GB disk space per model</li>
+</ul>
+<h2>Other Notable AI Tools (2026)</h2>
+<h3>Cursor AI</h3>
+<p>A VS Code fork with AI deeply integrated into every interaction. If you want AI built into the editor itself rather than added via extensions, Cursor is worth evaluating.</p>
+<pre><code>Type: Standalone editor (VS Code fork)
+Cost: From $20/month
+Best for: Developers who want AI-native editing
+Website: cursor.com
+</code></pre>
+<h3>Windsurf (formerly Codeium)</h3>
+<p>AI coding assistant with inline completions and chat, positioned as a more affordable Copilot alternative.</p>
+<pre><code>Type: VS Code extension + standalone editor
+Cost: From $10-15/month (free tier available)
+Best for: Budget-conscious developers wanting inline AI
+</code></pre>
+<h3>Aider</h3>
+<p>Free, open-source terminal-based AI pair programmer. Like Claude Code, it runs in the terminal and makes direct edits to your files.</p>
+<pre><code>Type: Terminal tool (open-source)
+Cost: Free (bring your own API key)
+Best for: Open-source enthusiasts, terminal-first developers
+Website: aider.chat
+</code></pre>
+<h3>OpenAI Codex CLI</h3>
+<p>OpenAI's open-source terminal coding agent, similar in concept to Claude Code.</p>
+<pre><code>Type: Terminal tool (open-source)
+Cost: Free (uses OpenAI API)
+Best for: Developers already using OpenAI APIs
+Repository: github.com/openai/codex
+</code></pre>
+<h3>Choosing Your AI Stack</h3>
+<p>There is no single "best" tool — the strongest approach combines complementary tools:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Need</th><th>Recommended Tool</th></tr></thead><tbody><tr><td>Inline completions while typing</td><td>GitHub Copilot</td></tr><tr><td>Complex multi-file tasks</td><td>Claude Code</td></tr><tr><td>Flexible model switching</td><td>Continue.dev</td></tr><tr><td>Complete privacy (offline)</td><td>Ollama + Continue</td></tr><tr><td>AI-native editor experience</td><td>Cursor</td></tr></tbody></table>
+<h2>AI-Powered Workflows</h2>
+<h3>Workflow 1: Feature Development</h3>
+<p><img src="/data/workshops/vscode-learning-pathway/diagrams/09-ai-workflow.svg" alt="AI-assisted workflow: write a comment, AI suggests an implementation, review and refine, generate tests, document, commit"></p>
+<p><strong>Steps:</strong></p>
+<pre><code>1. Write function signature + comment
+   // Function to validate user registration data
+
+2. Accept Copilot inline suggestion (Tab)
+
+3. Refine with Claude Code (in terminal):
+   claude "add phone number validation to the registration function"
+
+4. Generate tests with Copilot Chat:
+   Ctrl+I → "/tests with edge cases"
+
+5. Add docs:
+   Ctrl+I → "/doc in JSDoc format"
+
+6. Commit with AI-generated message:
+   In Source Control, click the sparkle icon for Copilot commit message
+</code></pre>
+<h3>Workflow 2: Code Review</h3>
+<pre><code>1. Select unfamiliar code
+2. Ctrl+I → "/explain"
+3. Ask follow-ups in chat
+4. Request improvements: "How can this be optimized?"
+5. Apply suggestions
+</code></pre>
+<h3>Workflow 3: Bug Fixing</h3>
+<pre><code>1. In Claude Code terminal: paste the error message or describe the bug
+2. Claude Code reads the relevant files and diagnoses the issue
+3. It proposes and applies a fix directly
+4. Or use Continue chat: Ctrl+L → "Why am I getting this error? @file ErrorComponent.tsx"
+5. Generate test to prevent regression
+</code></pre>
+<h3>Workflow 4: Learning New Technology</h3>
+<pre><code>1. Continue chat: "How do I use React hooks for state management?"
+2. Get explanation
+3. "Show me an example with @code MyComponent"
+4. Modify example for your use case
+5. "Add error handling"
+6. Iterate until working
+</code></pre>
+<h2>Privacy &amp; Security</h2>
+<h3>Data Handling by Provider</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Provider</th><th>Data Sent</th><th>Retained</th><th>Training</th><th>Privacy</th></tr></thead><tbody><tr><td><strong>GitHub Copilot</strong></td><td>Code snippets</td><td>For debugging only</td><td>No*</td><td>Medium</td></tr><tr><td><strong>Claude Code (API)</strong></td><td>Code + prompts</td><td>Not used for training by default</td><td>No (see data policy)</td><td>Medium-High</td></tr><tr><td><strong>Continue (Cloud)</strong></td><td>Code + prompts</td><td>Varies by model provider</td><td>Depends on API provider</td><td>Medium</td></tr><tr><td><strong>Continue (Ollama)</strong></td><td>Nothing</td><td>All local</td><td>Optional</td><td>High</td></tr></tbody></table>
+<p>*GitHub states they do not train on your code for Copilot Business/Enterprise plans. Check current policies for individual plans.</p>
+<h3>Best Practices</h3>
+<p><strong>For Sensitive Code:</strong></p>
+<pre><code class="language-json">// Disable AI for specific files/folders
+{
+  "github.copilot.enable": {
+    "*": true,
+    "**/.env": false,
+    "**/secrets/**": false,
+    "**/config/credentials.ts": false
+  }
+}
+</code></pre>
+<p><strong>Use .copilotignore:</strong></p>
+<pre><code># .copilotignore
+.env
+.env.*
+secrets/
+config/api-keys.json
+</code></pre>
+<p><strong>Local-First Setup:</strong></p>
+<pre><code class="language-json">// Use Ollama for maximum privacy
+{
+  "models": [
+    {
+      "title": "Local Only",
+      "provider": "ollama",
+      "model": "codellama:13b"
+    }
+  ]
+}
+</code></pre>
+<h2>Pro Tips</h2>
+<h3>Tip 1: Context is Everything</h3>
+<pre><code>Bad: "Fix this function"
+Good: "Refactor @file UserService.ts to use dependency injection pattern, ensuring compatibility with @file DIContainer.ts"
+</code></pre>
+<h3>Tip 2: Iterative Refinement</h3>
+<pre><code>Don't expect perfect code first time:
+1. Get initial suggestion
+2. Refine: "Add error handling"
+3. Refine: "Add logging"
+4. Refine: "Add type safety"
+5. Now it's production-ready
+</code></pre>
+<h3>Tip 3: Use Multiple AI Tools Together</h3>
+<pre><code>Copilot: Quick inline completions while typing
+Claude Code: Complex multi-file tasks, agentic workflows
+Continue: Flexible model switching, inline chat
+Local (Ollama): Sensitive code, offline work
+</code></pre>
+<h3>Tip 4: Custom Instructions</h3>
+<p><strong>Create .continuerc.json in project:</strong></p>
+<pre><code class="language-json">{
+  "systemMessage": "You are an expert in React, TypeScript, and Node.js. Always provide type-safe solutions with error handling. Follow the project's ESLint config."
+}
+</code></pre>
+<h3>Tip 5: Keyboard Shortcuts</h3>
+<pre><code class="language-json">// keybindings.json
+[
+  {
+    "key": "ctrl+shift+a",
+    "command": "github.copilot.generate"
+  },
+  {
+    "key": "ctrl+shift+c",
+    "command": "continue.continueGUIView.focus"
+  },
+  {
+    "key": "ctrl+shift+e",
+    "command": "continue.sendMainUserInput",
+    "args": "/explain"
+  }
+]
+</code></pre>
+<h2>Common Pitfalls</h2>
+<h3>Pitfall 1: Blindly Accepting Suggestions</h3>
+<p><strong>Problem</strong>: AI suggestions may have bugs or security issues
+<strong>Solution</strong>: Always review AI-generated code</p>
+<pre><code>✅ Do:
+- Read every line
+- Test thoroughly
+- Check for security issues
+- Verify logic
+
+❌ Don't:
+- Tab through without reading
+- Trust AI for security-critical code
+- Skip testing
+</code></pre>
+<h3>Pitfall 2: Over-Reliance on AI</h3>
+<p><strong>Problem</strong>: Not learning fundamentals
+<strong>Solution</strong>: Use AI as a teacher, not a crutch</p>
+<pre><code>Instead of: "Write entire authentication system"
+Do: "Explain JWT authentication flow"
+Then: Implement yourself, using AI for specific parts
+</code></pre>
+<h3>Pitfall 3: Privacy Leaks</h3>
+<p><strong>Problem</strong>: Sending API keys/secrets to AI
+<strong>Solution</strong>: Disable AI in sensitive files</p>
+<pre><code class="language-json">{
+  "github.copilot.enable": {
+    "**/.env": false,
+    "**/secrets": false
+  }
+}
+</code></pre>
+<h3>Pitfall 4: Conflicting AI Tools</h3>
+<p><strong>Problem</strong>: Multiple autocomplete tools fighting
+<strong>Solution</strong>: Choose one primary autocomplete</p>
+<pre><code>Either: Copilot autocomplete
+Or: Continue autocomplete
+Or: Cody autocomplete
+Not all three at once!
+</code></pre>
+<h3>Pitfall 5: Not Providing Context</h3>
+<p><strong>Problem</strong>: Generic, unhelpful responses
+<strong>Solution</strong>: Use @ mentions and context</p>
+<pre><code>Bad: "How do I handle errors?"
+Good: "How should I handle errors in @file PaymentService.ts following the pattern in @file ErrorHandler.ts?"
+</code></pre>
+<h2>Assessment</h2>
+<h3>Knowledge Check</h3>
+<p><strong>Question 1</strong>: What is the difference between GitHub Copilot, Claude Code, and Continue.dev?</p>
+<details>
+<summary>Answer</summary>
+- **Copilot**: Closed-source extension, from $10/month, best inline code completion, deep GitHub integration
+- **Claude Code**: Standalone terminal agent, pay-per-use API, best for complex multi-file reasoning and agentic tasks
+- **Continue.dev**: Open-source extension, free, supports multiple models (including local via Ollama), most flexible and customisable
+</details>
+<p><strong>Question 2</strong>: How do you prevent AI from seeing sensitive code?</p>
+<details>
+<summary>Answer</summary>
+1. Disable AI for specific patterns in settings
+2. Create .copilotignore file
+3. Use local AI (Ollama) for sensitive projects
+4. Review settings: `github.copilot.enable` with file patterns
+</details>
+<p><strong>Question 3</strong>: When should you use local AI vs cloud AI?</p>
+<details>
+<summary>Answer</summary>
+**Local (Ollama):**
+- Sensitive/proprietary code
+- Offline work
+- No ongoing costs
+- Have GPU/16GB+ RAM
+<p><strong>Cloud:</strong></p>
+<ul>
+<li>Need latest/best models</li>
+<li>Limited hardware</li>
+<li>Quick setup</li>
+<li>Collaborative work</li>
+</ul>
+</details>
+<h3>Practical Exercise</h3>
+<p><strong>Build an AI-Enhanced Feature:</strong></p>
+<ol>
+<li>
+<p><strong>Setup:</strong></p>
+<ul>
+<li>Install Copilot or Continue</li>
+<li>Configure for your language</li>
+</ul>
+</li>
+<li>
+<p><strong>Develop Feature:</strong></p>
+<ul>
+<li>Write comment describing feature</li>
+<li>Accept AI suggestion</li>
+<li>Refine with chat</li>
+</ul>
+</li>
+<li>
+<p><strong>Generate Tests:</strong></p>
+<ul>
+<li>Use <code>/tests</code> command</li>
+<li>Add edge cases manually</li>
+</ul>
+</li>
+<li>
+<p><strong>Document:</strong></p>
+<ul>
+<li>Generate docs with <code>/doc</code></li>
+<li>Review and improve</li>
+</ul>
+</li>
+<li>
+<p><strong>Review:</strong></p>
+<ul>
+<li>Explain code to yourself</li>
+<li>Ask AI to review</li>
+<li>Apply suggestions</li>
+</ul>
+</li>
+</ol>
+<p><strong>Success Criteria:</strong></p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled=""> Working, tested feature</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Complete documentation</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> No security issues</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> You understand every line</li>
+</ul>
+<h2>Next Steps</h2>
+<p>Master AI integration! Next:</p>
+<ul>
+<li><strong>Advanced Editing</strong>: Advanced editing with AI</li>
+<li><strong>Remote Development</strong>: Remote AI workflows</li>
+</ul>
+<h2>Additional Resources</h2>
+<ul>
+<li><a href="https://docs.github.com/en/copilot">GitHub Copilot Docs</a></li>
+<li><a href="https://docs.anthropic.com/en/docs/claude-code">Claude Code Documentation</a></li>
+<li><a href="https://continue.dev/docs">Continue.dev Documentation</a></li>
+<li><a href="https://ollama.com/library">Ollama Models</a></li>
+<li><a href="https://aider.chat/">Aider Documentation</a></li>
+<li><a href="https://cursor.com">Cursor AI</a></li>
+</ul>
+<hr>
+<p><strong>Estimated Time</strong>: 4-5 hours
+<strong>Difficulty</strong>: Intermediate to Advanced
+<strong>Prerequisites</strong>: Introduction through Settings &amp; Customisation, coding experience</p></div></article></main></div>
+    <noscript><p>Interactive forms require JavaScript. You can also email <a href="mailto:info@dreamlab-ai.com">info@dreamlab-ai.com</a>.</p></noscript>
+  
+
+</body></html>

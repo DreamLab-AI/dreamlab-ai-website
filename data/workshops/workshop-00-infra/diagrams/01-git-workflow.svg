@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" role="img" aria-labelledby="gwf-title gwf-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="gwf-title">The Git workflow</title>
+  <desc id="gwf-desc">Changes flow from the working directory through the staging area into the local repository and up to GitHub; pull brings remote changes back, and feature branches split from and merge into the local repository.</desc>
+
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="arr-sky" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#38BDF8" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- container -->
+  <rect x="8" y="8" width="944" height="384" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">THE GIT WORKFLOW</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <!-- main row -->
+  <g text-anchor="middle">
+    <rect x="48" y="140" width="180" height="80" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="138" y="174" font-size="15" font-weight="600" fill="#F5F5F5">Working Directory</text>
+    <text x="138" y="198" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">your files on disk</text>
+
+    <rect x="276" y="140" width="164" height="80" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="358" y="174" font-size="15" font-weight="600" fill="#F5F5F5">Staging Area</text>
+    <text x="358" y="198" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">changes to commit</text>
+
+    <rect x="488" y="140" width="180" height="80" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="578" y="174" font-size="15" font-weight="600" fill="#F5F5F5">Local Repository</text>
+    <text x="578" y="198" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">full history, offline</text>
+
+    <rect x="716" y="140" width="196" height="80" rx="8" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.35)"/>
+    <text x="814" y="174" font-size="15" font-weight="600" fill="#F5F5F5">Remote (GitHub)</text>
+    <text x="814" y="198" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">shared cloud copy</text>
+  </g>
+
+  <!-- forward arrows -->
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2">
+    <path d="M228,180 L268,180" marker-end="url(#arr)"/>
+    <path d="M440,180 L480,180" marker-end="url(#arr)"/>
+  </g>
+  <path d="M668,180 L708,180" fill="none" stroke="#38BDF8" stroke-width="1.2" marker-end="url(#arr-sky)"/>
+  <g font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF" text-anchor="middle">
+    <text x="248" y="168">add</text>
+    <text x="460" y="168">commit</text>
+    <text x="688" y="168" fill="#38BDF8">push</text>
+  </g>
+
+  <!-- pull back to working dir -->
+  <path d="M814,220 C814,300 300,300 148,232" fill="none" stroke="#38BDF8" stroke-width="1.2" marker-end="url(#arr-sky)"/>
+  <text x="480" y="284" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#38BDF8" text-anchor="middle">git pull / git clone</text>
+
+  <!-- feature branch -->
+  <rect x="488" y="308" width="180" height="60" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.20)" stroke-dasharray="4 3"/>
+  <text x="578" y="334" font-size="14" font-weight="600" fill="#F5F5F5" text-anchor="middle">Feature Branch</text>
+  <text x="578" y="356" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF" text-anchor="middle">safe experiments</text>
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2">
+    <path d="M540,220 C532,256 532,276 540,300" marker-end="url(#arr)"/>
+    <path d="M616,300 C624,276 624,256 616,228" marker-end="url(#arr)"/>
+  </g>
+  <g font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">
+    <text x="524" y="264" text-anchor="end">branch</text>
+    <text x="636" y="264">merge</text>
+  </g>
+</svg>

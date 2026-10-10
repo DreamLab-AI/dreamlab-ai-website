@@ -1,0 +1,589 @@
+<!DOCTYPE html><html lang="en" class="dark"><head>
+    <meta charset="UTF-8">
+
+    <!-- Primary Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <title>Practical Exercises: Local AI in Action | DreamLab AI Workshops</title>
+    <meta name="title" content="Practical Exercises: Local AI in Action | DreamLab AI Workshops">
+    <meta name="description" content="Practical Exercises: Local AI in Action — free DreamLab AI curriculum.">
+    <meta name="keywords" content="applied innovation lab, AI consulting, enterprise innovation, immersive XR, cyber trust, creative technology, residential programmes, knowledge transfer, deep tech, Lake District">
+    <meta name="author" content="DreamLab">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    <meta name="rating" content="General">
+
+    <link rel="describedby" href="/llms.txt" type="text/plain">
+    <script type="application/ld+json" id="organisation-structured-data">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://dreamlab-ai.com/#organisation","name":"DreamLab","url":"https://dreamlab-ai.com/","logo":"https://dreamlab-ai.com/images/heroes/dreamlab-hero.webp","email":"info@dreamlab-ai.com","founder":{"@id":"https://dreamlab-ai.com/team#john-ohare"},"sameAs":["https://github.com/DreamLab-AI","https://www.linkedin.com/company/dreamlab-ai-consulting"]},{"@type":"Person","@id":"https://dreamlab-ai.com/team#john-ohare","name":"John O'Hare","honorificPrefix":"Dr","jobTitle":"Founder","worksFor":{"@id":"https://dreamlab-ai.com/#organisation"},"url":"https://dreamlab-ai.com/team#john-ohare"}]}</script>
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dreamlab-ai.com/workshops/workshop-03-morning-local-ai/03_exercises.md/">
+
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="msapplication-TileColor" content="#1a1a2e">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://dreamlab-ai.com/workshops/workshop-03-morning-local-ai/03_exercises.md/">
+    <meta property="og:title" content="Practical Exercises: Local AI in Action | DreamLab AI Workshops">
+    <meta property="og:description" content="Practical Exercises: Local AI in Action — free DreamLab AI curriculum.">
+    <meta property="og:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="DreamLab AI Workshop - Practical Exercises: Local AI in Action">
+    <meta property="og:site_name" content="DreamLab">
+    <meta property="og:locale" content="en_GB">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://dreamlab-ai.com/workshops/workshop-03-morning-local-ai/03_exercises.md/">
+    <meta name="twitter:title" content="Practical Exercises: Local AI in Action | DreamLab AI Workshops">
+    <meta name="twitter:description" content="Practical Exercises: Local AI in Action — free DreamLab AI curriculum.">
+    <meta name="twitter:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta name="twitter:image:alt" content="DreamLab AI Workshop - Practical Exercises: Local AI in Action">
+    <meta name="twitter:site" content="@thedreamlab">
+    <meta name="twitter:creator" content="@thedreamlab">
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="geo.region" content="GB">
+    <meta name="geo.placename" content="United Kingdom">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DreamLab AI">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Security Headers -->
+    <!--
+      CSP notes:
+      - script-src is 'self' only: no 'unsafe-eval' (blocks eval/Function-based
+        injection) and no 'unsafe-inline'. The one inline bootstrap script was
+        moved to /spa-redirect.js. JSON-LD blocks below are type
+        application/ld+json (data, not executable) so CSP does not gate them.
+      - connect-src is scoped to the Cloudflare Workers subdomain actually used
+        by this account (*.solitary-paper-764d.workers.dev: auth / pod / search /
+        link-preview / nostr-relay), NOT the internet-wide *.workers.dev, which
+        previously allowed exfiltration to any attacker-controlled worker.
+      - The two open Nostr relays (relay.damus.io, relay.primal.net) are
+        explicitly allow-listed: the Talk-to-AI chat listens there for
+        junkiejarvis's reply (the primary relay's whitelist gate rejects the
+        gift-wrap addressed to the ephemeral session key — ADR-042 Amendment 1).
+        Must stay in sync with VITE_REPLY_RELAYS. Named exactly, not a wildcard.
+      - style-src keeps 'unsafe-inline' because Radix UI + runtime style
+        attributes require it; that is not a script-injection vector.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.solitary-paper-764d.workers.dev wss://*.solitary-paper-764d.workers.dev https://*.dreamlab-ai.com wss://*.dreamlab-ai.com wss://relay.damus.io wss://relay.primal.net; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <!-- SPA deep-link restore. External 'self' script (not inline) so CSP
+         script-src can stay 'self' with no 'unsafe-inline'. Classic,
+         render-blocking script: runs before the deferred app module. -->
+    <script src="/spa-redirect.js"></script>
+    <script type="module" crossorigin="" src="/assets/index-Crc86LXg.js"></script>
+    <link rel="modulepreload" crossorigin="" href="/assets/ui-C2dH1upk.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/vendor-uw6h6E0d.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/nostr-BpuBsPg-.js">
+    <link rel="stylesheet" crossorigin="" href="/assets/index-CeEdk6WL.css">
+  <script type="application/ld+json" id="route-structured-data">{"@context":"https://schema.org","@type":"LearningResource","@id":"https://dreamlab-ai.com/workshops/workshop-03-morning-local-ai/03_exercises.md/#page","url":"https://dreamlab-ai.com/workshops/workshop-03-morning-local-ai/03_exercises.md/","name":"Practical Exercises: Local AI in Action | DreamLab AI Workshops","description":"Practical Exercises: Local AI in Action — free DreamLab AI curriculum.","inLanguage":"en-GB","publisher":{"@id":"https://dreamlab-ai.com/#organisation"},"isAccessibleForFree":true}</script><link rel="alternate" type="text/markdown" href="/data/workshops/workshop-03-morning-local-ai/03_exercises.md"></head>
+
+  <body>
+    <!-- Skip Navigation Link for Accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
+      Skip to main content
+    </a>
+    <div id="root"><header role="banner" class="fixed top-0 left-0 right-0 z-50"><div class="md:hidden flex items-center justify-between h-14 px-6 bg-[rgba(14,14,17,0.92)] backdrop-blur-[14px] border-b border-dlm-hairline"><a aria-label="DreamLab home" class="flex items-center gap-2" href="/"><span class="w-[9px] h-[9px] rounded-full bg-dlm-bright shrink-0" aria-hidden="true"></span><span class="text-[14px] font-semibold tracking-[0.14em] text-[#FAFAFA]">DREAMLAB</span></a><button type="button" aria-label="Open menu" aria-expanded="false" class="w-11 h-11 -mr-2 flex flex-col items-end justify-center gap-[5px] focus:outline-none focus-visible:ring-2 focus-visible:ring-dlm-bright rounded"><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span></button></div><div class="hidden md:block transition-all duration-300 ease-out py-3 bg-background/60 backdrop-blur-md"><div class="container flex items-center justify-between px-4"><button class="flex items-center gap-2 md:gap-3 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded min-h-[48px] min-w-[48px] px-3 py-2" aria-label="Main navigation menu" type="button" id="radix-:Rp:" aria-haspopup="menu" aria-expanded="false" data-state="closed"><div class="w-10 h-10 md:w-8 md:h-8 shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all duration-300 group-hover:scale-110 animate-glow-pulse" aria-hidden="true"></div><span class="font-bold text-lg md:text-xl tracking-tight group-hover:text-purple-400 transition-colors duration-300">MENU</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down h-5 w-5 md:h-4 md:w-4 shrink-0 text-muted-foreground group-hover:text-purple-400 transition-all duration-300 group-hover:rotate-180" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button><div class="flex items-center gap-2"><a class="items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-10 py-2 hover:bg-purple-500/10 hover:text-purple-400 transition-all duration-300 hover:scale-105 min-h-[48px] px-4 text-base md:text-sm hidden sm:inline-flex" href="/contact">Contact</a><a class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary hover:bg-primary/90 h-10 py-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transition-all duration-300 min-h-[48px] px-4 text-base md:text-sm" href="/co-create">Partner With Us</a></div></div></div></header><header class="relative overflow-hidden" style="min-height:320px"><div class="absolute inset-0 bg-gradient-to-br from-blue-500/30 via-purple-500/30 to-violet-500/30" style="transform:translateY(0px);opacity:1"><div class="absolute top-0 -left-20 w-96 h-96 rounded-full blur-3xl opacity-40 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600"></div><div class="absolute bottom-0 -right-20 w-[32rem] h-[32rem] rounded-full blur-3xl opacity-30 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600" style="animation-delay:1s"></div><div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full blur-3xl opacity-20 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600" style="animation-delay:2s"></div></div><div class="absolute inset-0 opacity-5" style="background-image:linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);background-size:50px 50px;transform:translateY(0px)"></div><div class="relative z-10 container px-4 pt-24 pb-8"><div class="mb-6 transition-all duration-500 transform opacity-0 translate-y-4"><nav aria-label="breadcrumb"><ol class="flex flex-wrap items-center gap-1.5 break-words text-sm sm:gap-2.5 text-white/70"><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/">Home</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/workshops">Workshops</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><span role="link" aria-disabled="true" aria-current="page" class="text-white font-medium">Phase 5: Local AI &amp; RAG Systems</span></li></ol></nav></div><div class="mb-4 transition-all duration-500 delay-100 transform opacity-0 translate-y-4"><div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20"><span class="text-purple-400"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cpu w-5 h-5" aria-hidden="true"><path d="M12 20v2"></path><path d="M12 2v2"></path><path d="M17 20v2"></path><path d="M17 2v2"></path><path d="M2 12h2"></path><path d="M2 17h2"></path><path d="M2 7h2"></path><path d="M20 12h2"></path><path d="M20 17h2"></path><path d="M20 7h2"></path><path d="M7 20v2"></path><path d="M7 2v2"></path><rect x="4" y="4" width="16" height="16" rx="2"></rect><rect x="8" y="8" width="8" height="8" rx="1"></rect></svg></span><span class="text-sm font-medium text-white/90">AI / Machine Learning</span></div></div><h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 break-words transition-all duration-700 delay-200 transform opacity-0 translate-y-6"><span class="bg-gradient-to-r bg-clip-text text-transparent animate-gradient-shift bg-400% from-blue-400 via-purple-400 to-violet-400">Phase 5: Local AI &amp; RAG Systems</span></h1><div class="flex flex-wrap items-center gap-3 mb-6 transition-all duration-700 delay-400 transform opacity-0 translate-y-4"><div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-white/10 border-white/20 text-white backdrop-blur-sm hover:bg-white/20"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-3.5 h-3.5 mr-1.5" aria-hidden="true"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>10<!-- --> <!-- -->Modules</div></div><div class="max-w-md transition-all duration-700 delay-500 transform opacity-0 translate-y-4"><div class="flex items-center justify-between text-sm text-white/70 mb-2"><span class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code w-4 h-4" aria-hidden="true"><path d="m16 18 6-6-6-6"></path><path d="m8 6-6 6 6 6"></path></svg><span>Chapter <!-- -->5<!-- -->: <!-- -->Practical Exercises: Local AI in Action</span></span><span class="font-medium text-white">50<!-- -->%</span></div><div class="relative"><div aria-valuemax="100" aria-valuemin="0" role="progressbar" data-state="indeterminate" data-max="100" class="relative w-full overflow-hidden rounded-full h-2 bg-white/20"><div data-state="indeterminate" data-max="100" class="h-full w-full flex-1 bg-primary transition-all" style="transform:translateX(-50%)"></div></div><div class="absolute top-0 left-0 h-2 rounded-full blur-sm bg-gradient-to-r from-blue-600 via-purple-600 to-violet-600" style="width:50%"></div></div><div class="relative mt-1 h-1"><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:10%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:20%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:30%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:40%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:50%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:60%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:70%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:80%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:90%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:100%"></div></div></div></div><div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent"></div></header><main class="container px-4 pt-8 pb-8 flex flex-col md:flex-row gap-x-8 min-h-screen" id="main-content"><aside class="w-full md:w-64 lg:w-72 md:sticky md:top-20 md:h-[calc(100vh-5rem-2rem)] mb-8 md:mb-0"><h2 class="text-xl font-semibold mb-4 break-words">Phase 5: Local AI &amp; RAG Systems</h2><div dir="ltr" class="relative overflow-hidden h-auto md:h-full pr-4 border-r md:border-r-0" style="position:relative;--radix-scroll-area-corner-width:0px;--radix-scroll-area-corner-height:0px"><style>[data-radix-scroll-area-viewport]{scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;}[data-radix-scroll-area-viewport]::-webkit-scrollbar{display:none}</style><div data-radix-scroll-area-viewport="" class="h-full w-full rounded-[inherit]" style="overflow-x:hidden;overflow-y:hidden"><div style="min-width:100%;display:table"><nav><ul><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-03-morning-local-ai/README.md"><span class="mr-2 text-xs opacity-60">1<!-- -->.</span>Phase 5: Local AI &amp; RAG Systems</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-03-morning-local-ai/00_introduction.md"><span class="mr-2 text-xs opacity-60">2<!-- -->.</span>Introduction to Local AI Models</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-03-morning-local-ai/01_concepts.md"><span class="mr-2 text-xs opacity-60">3<!-- -->.</span>Core Concepts: Running AI Models Locally</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-03-morning-local-ai/02_hands_on.md"><span class="mr-2 text-xs opacity-60">4<!-- -->.</span>Hands-On Practice: Setting Up Local AI</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors bg-primary text-primary-foreground font-semibold" href="/workshops/workshop-03-morning-local-ai/03_exercises.md"><span class="mr-2 text-xs opacity-60">5<!-- -->.</span>Practical Exercises: Local AI in Action</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-03-morning-local-ai/04_project.md"><span class="mr-2 text-xs opacity-60">6<!-- -->.</span>Project: Build a Local AI Assistant</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-03-morning-local-ai/05_assessment.md"><span class="mr-2 text-xs opacity-60">7<!-- -->.</span>Assessment: Local AI Models Mastery</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-03-morning-local-ai/06_resources.md"><span class="mr-2 text-xs opacity-60">8<!-- -->.</span>Resources: Local AI Models</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-03-morning-local-ai/objectives.md"><span class="mr-2 text-xs opacity-60">9<!-- -->.</span>Learning Objectives — Phase 5: Local AI &amp; RAG Systems</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-03-morning-local-ai/prerequisites.md"><span class="mr-2 text-xs opacity-60">10<!-- -->.</span>Prerequisites — Phase 5: Local AI &amp; RAG Systems</a></li></ul></nav></div></div></div></aside><article class="flex-1 min-w-0 md:pl-0"><div class="prose max-w-none dark:prose-invert break-words [&amp;_table]:block [&amp;_table]:w-full [&amp;_table]:overflow-x-auto"><h1>Practical Exercises: Local AI in Action</h1>
+<h2>30 Minutes to Prove You Own Your AI</h2>
+<p>These five exercises progress from basic to advanced. Each one builds on the previous, so work through them in order. By the end you will have chatted with a model, queried it from code, benchmarked its speed, compared multiple models, and built a simple multi-model router — all running entirely on your own hardware.</p>
+<hr>
+<h2>Exercise 1: Your First Local Conversation (5 minutes)</h2>
+<h3>Objective</h3>
+<p>Verify that Ollama is working and experience an interactive chat session with a model running on your machine.</p>
+<h3>Difficulty: Beginner</h3>
+<h3>Steps</h3>
+<p><strong>1. Start a chat session</strong></p>
+<pre><code class="language-bash">ollama run llama3.3:8b
+</code></pre>
+<p><strong>2. Try these prompts</strong> (type each one, press Enter, and read the response):</p>
+<pre><code>What are three benefits of running AI models locally instead of using cloud APIs?
+</code></pre>
+<pre><code>Summarise the plot of Romeo and Juliet in exactly 50 words.
+</code></pre>
+<pre><code>Write a short thank-you email to a colleague who helped with a project.
+</code></pre>
+<p><strong>3. Observe the output</strong></p>
+<ul>
+<li>How fast do tokens appear? (This is your baseline inference speed.)</li>
+<li>Does the model follow your instructions accurately?</li>
+<li>Is the language natural and useful?</li>
+</ul>
+<p><strong>4. Exit the chat</strong></p>
+<pre><code>/bye
+</code></pre>
+<h3>Success Criteria</h3>
+<ul>
+<li>The model responded to all three prompts</li>
+<li>You exited cleanly with <code>/bye</code></li>
+<li>You have a rough sense of how fast the model generates text</li>
+</ul>
+<h3>Reflection</h3>
+<ul>
+<li>How does the response quality compare to cloud AI tools you have used?</li>
+<li>How does the speed compare?</li>
+<li>What tasks from your own work could you run through this model?</li>
+</ul>
+<hr>
+<h2>Exercise 2: API Integration with Python (7 minutes)</h2>
+<h3>Objective</h3>
+<p>Move beyond the chat interface and control Ollama programmatically — the foundation for building any local AI application.</p>
+<h3>Difficulty: Intermediate</h3>
+<h3>Steps</h3>
+<p><strong>1. Create a new file</strong> called <code>local_query.py</code>:</p>
+<pre><code class="language-python">"""Query Ollama from Python and display the response."""
+
+import requests
+import json
+
+def ask_local_ai(prompt, model="llama3.3:8b"):
+    """Send a prompt to the local Ollama API and return the response."""
+    url = "http://localhost:11434/api/generate"
+    payload = {
+        "model": model,
+        "prompt": prompt,
+        "stream": False
+    }
+
+    response = requests.post(url, json=payload)
+    result = response.json()
+
+    return result["response"]
+
+# Test with a simple question
+answer = ask_local_ai("Explain what quantisation means for AI models, in two sentences.")
+print("Model says:")
+print(answer)
+</code></pre>
+<p><strong>2. Run the script</strong></p>
+<pre><code class="language-bash">python3 local_query.py
+</code></pre>
+<p><strong>3. Now add streaming</strong> — create <code>local_stream.py</code>:</p>
+<pre><code class="language-python">"""Stream tokens from Ollama in real time."""
+
+import requests
+import json
+
+def stream_local_ai(prompt, model="llama3.3:8b"):
+    """Stream a response token by token."""
+    url = "http://localhost:11434/api/generate"
+    payload = {
+        "model": model,
+        "prompt": prompt,
+        "stream": True
+    }
+
+    with requests.post(url, json=payload, stream=True) as response:
+        for line in response.iter_lines():
+            if line:
+                chunk = json.loads(line)
+                if not chunk.get("done"):
+                    print(chunk["response"], end="", flush=True)
+        print()  # Final newline
+
+stream_local_ai("Write a four-line poem about privacy in the digital age.")
+</code></pre>
+<p><strong>4. Run the streaming script</strong></p>
+<pre><code class="language-bash">python3 local_stream.py
+</code></pre>
+<p>Watch the tokens appear one by one, exactly as they do in a cloud AI chat — but everything is happening on your machine.</p>
+<p><strong>5. Try the OpenAI-compatible endpoint</strong> — create <code>local_openai.py</code>:</p>
+<pre><code class="language-python">"""Use the OpenAI Python SDK with a local Ollama model."""
+
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="http://localhost:11434/v1",
+    api_key="ollama"  # Required by the SDK but not used locally
+)
+
+response = client.chat.completions.create(
+    model="llama3.3:8b",
+    messages=[
+        {"role": "system", "content": "You are a concise assistant. Answer in under 50 words."},
+        {"role": "user", "content": "What is the GGUF file format?"}
+    ]
+)
+
+print(response.choices[0].message.content)
+</code></pre>
+<pre><code class="language-bash">pip install openai  # If not already installed
+python3 local_openai.py
+</code></pre>
+<h3>Success Criteria</h3>
+<ul>
+<li><code>local_query.py</code> printed a coherent response</li>
+<li><code>local_stream.py</code> streamed tokens to the terminal in real time</li>
+<li><code>local_openai.py</code> worked using the standard OpenAI SDK against your local model</li>
+</ul>
+<h3>Key Learning</h3>
+<p>Any tool or library that supports the OpenAI API can be pointed at your local Ollama server by changing a single URL. Your existing code and workflows transfer directly.</p>
+<hr>
+<h2>Exercise 3: Benchmark Your Hardware (7 minutes)</h2>
+<h3>Objective</h3>
+<p>Measure exactly how fast your machine runs a model, so you can make informed decisions about which models to use for different tasks.</p>
+<h3>Difficulty: Intermediate</h3>
+<h3>Steps</h3>
+<p><strong>1. Create <code>benchmark.py</code>:</strong></p>
+<pre><code class="language-python">"""Benchmark local model inference speed."""
+
+import requests
+import time
+import json
+
+def benchmark(model, prompt, runs=3):
+    """Run a prompt multiple times and measure performance."""
+    url = "http://localhost:11434/api/generate"
+    times = []
+    speeds = []
+
+    print(f"\nBenchmarking {model} ({runs} runs)...")
+
+    for i in range(runs):
+        start = time.time()
+        response = requests.post(url, json={
+            "model": model,
+            "prompt": prompt,
+            "stream": False
+        })
+        elapsed = time.time() - start
+        result = response.json()
+
+        tokens = result.get("eval_count", 0)
+        tps = tokens / elapsed if elapsed &gt; 0 else 0
+
+        times.append(elapsed)
+        speeds.append(tps)
+        print(f"  Run {i + 1}: {elapsed:.1f}s, {tokens} tokens, {tps:.1f} tok/s")
+
+    avg_time = sum(times) / len(times)
+    avg_speed = sum(speeds) / len(speeds)
+
+    print(f"\n  Average: {avg_time:.1f}s, {avg_speed:.1f} tokens/second")
+    return {"model": model, "avg_time": avg_time, "avg_speed": avg_speed}
+
+
+# Standard test prompt
+prompt = "Explain the difference between a CPU and a GPU in exactly 100 words."
+
+# Benchmark the model you have downloaded
+results = []
+results.append(benchmark("llama3.3:8b", prompt))
+
+# Uncomment additional models as you download them:
+# results.append(benchmark("mistral", prompt))
+# results.append(benchmark("phi3", prompt))
+# results.append(benchmark("qwen2.5:7b", prompt))
+
+# Summary
+print("\n" + "=" * 50)
+print("BENCHMARK SUMMARY")
+print("=" * 50)
+for r in results:
+    print(f"  {r['model']:20s}  {r['avg_speed']:6.1f} tok/s  {r['avg_time']:5.1f}s avg")
+</code></pre>
+<p><strong>2. Run the benchmark</strong></p>
+<pre><code class="language-bash">python3 benchmark.py
+</code></pre>
+<p><strong>3. Record your results</strong></p>
+<p>Write down your tokens-per-second figure. This is your hardware baseline.</p>
+<p><strong>Reference ranges</strong> (Llama 3.3 8B Q4_K_M):</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Hardware</th><th>Expected tok/s</th></tr></thead><tbody><tr><td>CPU only (modern i7/Ryzen 7)</td><td>3-8</td></tr><tr><td>NVIDIA RTX 3060 (12 GB)</td><td>25-35</td></tr><tr><td>NVIDIA RTX 4070 (12 GB)</td><td>35-50</td></tr><tr><td>NVIDIA RTX 4090 (24 GB)</td><td>55-80</td></tr><tr><td>Apple M1 Pro (16 GB)</td><td>12-18</td></tr><tr><td>Apple M2 Max (32 GB)</td><td>22-30</td></tr><tr><td>Apple M3 Max (64 GB)</td><td>30-40</td></tr></tbody></table>
+<h3>Success Criteria</h3>
+<ul>
+<li>Benchmark ran to completion without errors</li>
+<li>You recorded your tokens-per-second figure</li>
+<li>You can locate your hardware in the reference table and compare</li>
+</ul>
+<h3>Reflection</h3>
+<ul>
+<li>Is your speed fast enough for interactive use (above ~10 tok/s)?</li>
+<li>Would a smaller model (Phi-3) give acceptable quality at higher speed?</li>
+<li>What hardware upgrade would give the biggest improvement for your setup?</li>
+</ul>
+<hr>
+<h2>Exercise 4: Multi-Model Taste Test (7 minutes)</h2>
+<h3>Objective</h3>
+<p>Download a second model and compare how different models handle the same prompts. This builds your intuition for when to use which model.</p>
+<h3>Steps</h3>
+<p><strong>1. Download an additional model</strong></p>
+<p>Choose one based on your available resources:</p>
+<pre><code class="language-bash"># Lightweight and fast (recommended if disk/RAM is limited)
+ollama pull phi3
+
+# Good all-rounder (if you have room for another ~5 GB download)
+ollama pull mistral
+
+# Code specialist (if you are interested in programming tasks)
+ollama pull qwen2.5-coder:7b
+
+# Reasoning specialist
+ollama pull deepseek-r1:7b
+</code></pre>
+<p><strong>2. Create <code>taste_test.py</code>:</strong></p>
+<pre><code class="language-python">"""Compare two models on the same set of prompts."""
+
+import requests
+import time
+
+def query(model, prompt):
+    """Query a model and return the response with timing."""
+    start = time.time()
+    response = requests.post("http://localhost:11434/api/generate", json={
+        "model": model,
+        "prompt": prompt,
+        "stream": False
+    })
+    elapsed = time.time() - start
+    result = response.json()
+    return {
+        "text": result["response"][:300],  # First 300 characters
+        "time": elapsed,
+        "tokens": result.get("eval_count", 0)
+    }
+
+# Models to compare (adjust to match what you downloaded)
+models = ["llama3.3:8b", "phi3"]
+
+# Test prompts covering different skills
+tests = {
+    "Factual": "Name the four largest planets in our solar system and give one fact about each.",
+    "Creative": "Write a haiku about a computer learning to think.",
+    "Reasoning": "If it takes 5 machines 5 minutes to make 5 widgets, how long would it take 100 machines to make 100 widgets? Explain your reasoning.",
+    "Summarisation": "Summarise the key idea behind open-source software in exactly two sentences."
+}
+
+# Run comparisons
+for test_name, prompt in tests.items():
+    print(f"\n{'=' * 60}")
+    print(f"TEST: {test_name}")
+    print(f"PROMPT: {prompt}")
+    print("=" * 60)
+
+    for model in models:
+        try:
+            result = query(model, prompt)
+            print(f"\n  [{model}] ({result['time']:.1f}s, {result['tokens']} tokens)")
+            print(f"  {result['text']}")
+        except Exception as e:
+            print(f"\n  [{model}] Error: {e}")
+</code></pre>
+<p><strong>3. Run the taste test</strong></p>
+<pre><code class="language-bash">python3 taste_test.py
+</code></pre>
+<p><strong>4. Evaluate the results</strong></p>
+<p>For each test, note:</p>
+<ul>
+<li>Which model gave a better answer?</li>
+<li>Which model was faster?</li>
+<li>Was the speed difference worth the quality difference?</li>
+</ul>
+<h3>Success Criteria</h3>
+<ul>
+<li>Two models produced responses for all four test categories</li>
+<li>You can articulate which model you prefer for which type of task</li>
+<li>You understand the speed/quality trade-off between a larger and smaller model</li>
+</ul>
+<h3>Key Learning</h3>
+<p>There is no single "best" model. The right choice depends on the task, your speed requirements, and your hardware. A smaller model that answers in one second may be more useful for quick lookups than a larger model that takes ten seconds.</p>
+<hr>
+<h2>Exercise 5: Build a Simple Model Router (7 minutes)</h2>
+<h3>Objective</h3>
+<p>Combine everything you have learned into a script that automatically selects the best model for each query — the core pattern behind production local AI systems.</p>
+<h3>Difficulty: Advanced</h3>
+<h3>Steps</h3>
+<p><strong>1. Create <code>smart_router.py</code>:</strong></p>
+<pre><code class="language-python">"""A simple router that picks the best local model for each query."""
+
+import requests
+import time
+
+# Configure available models (adjust to match your downloads)
+MODELS = {
+    "general": "llama3.3:8b",
+    "fast": "phi3",
+    # Uncomment if downloaded:
+    # "code": "qwen2.5-coder:7b",
+    # "reasoning": "deepseek-r1:7b",
+}
+
+# Keywords that signal a specific category
+CODE_KEYWORDS = ["code", "function", "script", "debug", "python", "javascript", "programme"]
+FAST_KEYWORDS = ["define", "what is", "who is", "translate", "spell"]
+REASONING_KEYWORDS = ["why", "explain", "compare", "analyse", "prove", "reason"]
+
+
+def classify(query):
+    """Classify a query into a model category."""
+    lower = query.lower()
+
+    if any(kw in lower for kw in CODE_KEYWORDS) and "code" in MODELS:
+        return "code"
+
+    if len(query.split()) &lt; 12 and any(kw in lower for kw in FAST_KEYWORDS):
+        return "fast"
+
+    if any(kw in lower for kw in REASONING_KEYWORDS) and "reasoning" in MODELS:
+        return "reasoning"
+
+    return "general"
+
+
+def ask(query):
+    """Route a query to the best model and return the result."""
+    category = classify(query)
+    model = MODELS[category]
+
+    print(f"\n[Router] Category: {category} -&gt; Model: {model}")
+    print(f"[Router] Query: {query}")
+
+    start = time.time()
+    response = requests.post("http://localhost:11434/api/generate", json={
+        "model": model,
+        "prompt": query,
+        "stream": False
+    })
+    elapsed = time.time() - start
+    result = response.json()
+
+    print(f"[Router] Response time: {elapsed:.1f}s")
+    print(f"\n{result['response'][:400]}\n")
+    return result["response"]
+
+
+# Test the router with varied queries
+test_queries = [
+    "What is the capital of Japan?",
+    "Explain why the sky appears blue at sunset compared to midday.",
+    "Write a Python function that checks whether a string is a palindrome.",
+    "Summarise three advantages of local AI models for healthcare organisations.",
+]
+
+print("=" * 60)
+print("SMART MODEL ROUTER — LOCAL AI")
+print("=" * 60)
+
+for q in test_queries:
+    ask(q)
+    print("-" * 60)
+</code></pre>
+<p><strong>2. Run the router</strong></p>
+<pre><code class="language-bash">python3 smart_router.py
+</code></pre>
+<p><strong>3. Observe the routing decisions</strong></p>
+<ul>
+<li>Did the router pick the expected category for each query?</li>
+<li>Was the fast model noticeably quicker on simple lookups?</li>
+<li>How would you improve the classification logic?</li>
+</ul>
+<p><strong>4. Extend the router (optional challenge)</strong></p>
+<p>If time permits, try adding:</p>
+<ul>
+<li>A "creative" category that uses a higher temperature setting</li>
+<li>User input via <code>input()</code> so you can test your own queries interactively</li>
+<li>Timing comparison: run the same query through both models and show which is faster</li>
+</ul>
+<h3>Success Criteria</h3>
+<ul>
+<li>The router classified all four test queries into appropriate categories</li>
+<li>Different models were used for different query types</li>
+<li>The script ran without errors</li>
+</ul>
+<h3>Key Learning</h3>
+<p>Smart routing is the pattern behind every production local AI system. Instead of picking one model for everything, you match the task to the model's strengths. This gives you the best balance of quality, speed, and resource usage.</p>
+<hr>
+<h2>Exercise Reflection Checklist</h2>
+<p>After completing these exercises, you should be able to:</p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled=""> Chat with a local model and exit cleanly</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Query the Ollama API from a Python script</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Stream responses token by token</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Use the OpenAI-compatible endpoint with existing SDK code</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Benchmark a model and state your tokens-per-second figure</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Compare two models on the same prompt and justify a preference</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Build a simple model router that classifies queries and selects models</li>
+</ul>
+<h2>Patterns You Have Learned</h2>
+<h3>The API Pattern</h3>
+<pre><code>Python script -&gt; HTTP POST to localhost:11434 -&gt; Model response -&gt; Your application
+</code></pre>
+<h3>The Benchmark Pattern</h3>
+<pre><code>Same prompt -&gt; Multiple runs -&gt; Average time and tokens/second -&gt; Hardware baseline
+</code></pre>
+<h3>The Comparison Pattern</h3>
+<pre><code>Same prompt -&gt; Two models -&gt; Evaluate quality and speed -&gt; Informed choice
+</code></pre>
+<h3>The Router Pattern</h3>
+<pre><code>User query -&gt; Classify by keywords -&gt; Select model -&gt; Generate response
+</code></pre>
+<h2>Tips from the Exercises</h2>
+<ol>
+<li><strong>Start small.</strong> Use <code>phi3</code> for quick experiments, <code>llama3.3:8b</code> for quality.</li>
+<li><strong>Measure everything.</strong> Tokens per second is your single most important metric.</li>
+<li><strong>Stream for UX.</strong> Streaming makes even slow models feel responsive.</li>
+<li><strong>The OpenAI endpoint is your migration path.</strong> Existing cloud code works locally with one URL change.</li>
+<li><strong>Routing beats brute force.</strong> A small model answering fast is often better than a large model answering slowly.</li>
+</ol>
+<h2>Ready for the Project?</h2>
+<p>You now have all the building blocks. In the next section, you will combine them into a complete local AI assistant with a web interface, session management, and multi-model routing.</p>
+<hr>
+<h2>Navigation</h2>
+<ul>
+<li>Previous: <a href="02_hands_on.md">Hands-On Practice</a></li>
+<li>Next: <a href="04_project.md">Project: Build a Local AI Assistant</a></li>
+<li><a href="README.md">Back to Workshop Overview</a></li>
+</ul></div></article></main></div>
+    <noscript><p>Interactive forms require JavaScript. You can also email <a href="mailto:info@dreamlab-ai.com">info@dreamlab-ai.com</a>.</p></noscript>
+  
+
+</body></html>

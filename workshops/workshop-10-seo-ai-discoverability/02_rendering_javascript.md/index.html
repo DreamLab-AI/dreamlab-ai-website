@@ -1,0 +1,215 @@
+<!DOCTYPE html><html lang="en" class="dark"><head>
+    <meta charset="UTF-8">
+
+    <!-- Primary Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <title>Chapter 2: Rendering JavaScript Sites | DreamLab AI Workshops</title>
+    <meta name="title" content="Chapter 2: Rendering JavaScript Sites | DreamLab AI Workshops">
+    <meta name="description" content="Chapter 2: Rendering JavaScript Sites — free DreamLab AI curriculum.">
+    <meta name="keywords" content="applied innovation lab, AI consulting, enterprise innovation, immersive XR, cyber trust, creative technology, residential programmes, knowledge transfer, deep tech, Lake District">
+    <meta name="author" content="DreamLab">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    <meta name="rating" content="General">
+
+    <link rel="describedby" href="/llms.txt" type="text/plain">
+    <script type="application/ld+json" id="organisation-structured-data">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://dreamlab-ai.com/#organisation","name":"DreamLab","url":"https://dreamlab-ai.com/","logo":"https://dreamlab-ai.com/images/heroes/dreamlab-hero.webp","email":"info@dreamlab-ai.com","founder":{"@id":"https://dreamlab-ai.com/team#john-ohare"},"sameAs":["https://github.com/DreamLab-AI","https://www.linkedin.com/company/dreamlab-ai-consulting"]},{"@type":"Person","@id":"https://dreamlab-ai.com/team#john-ohare","name":"John O'Hare","honorificPrefix":"Dr","jobTitle":"Founder","worksFor":{"@id":"https://dreamlab-ai.com/#organisation"},"url":"https://dreamlab-ai.com/team#john-ohare"}]}</script>
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dreamlab-ai.com/workshops/workshop-10-seo-ai-discoverability/02_rendering_javascript.md/">
+
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="msapplication-TileColor" content="#1a1a2e">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://dreamlab-ai.com/workshops/workshop-10-seo-ai-discoverability/02_rendering_javascript.md/">
+    <meta property="og:title" content="Chapter 2: Rendering JavaScript Sites | DreamLab AI Workshops">
+    <meta property="og:description" content="Chapter 2: Rendering JavaScript Sites — free DreamLab AI curriculum.">
+    <meta property="og:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="DreamLab AI Workshop - Chapter 2: Rendering JavaScript Sites">
+    <meta property="og:site_name" content="DreamLab">
+    <meta property="og:locale" content="en_GB">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://dreamlab-ai.com/workshops/workshop-10-seo-ai-discoverability/02_rendering_javascript.md/">
+    <meta name="twitter:title" content="Chapter 2: Rendering JavaScript Sites | DreamLab AI Workshops">
+    <meta name="twitter:description" content="Chapter 2: Rendering JavaScript Sites — free DreamLab AI curriculum.">
+    <meta name="twitter:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta name="twitter:image:alt" content="DreamLab AI Workshop - Chapter 2: Rendering JavaScript Sites">
+    <meta name="twitter:site" content="@thedreamlab">
+    <meta name="twitter:creator" content="@thedreamlab">
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="geo.region" content="GB">
+    <meta name="geo.placename" content="United Kingdom">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DreamLab AI">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Security Headers -->
+    <!--
+      CSP notes:
+      - script-src is 'self' only: no 'unsafe-eval' (blocks eval/Function-based
+        injection) and no 'unsafe-inline'. The one inline bootstrap script was
+        moved to /spa-redirect.js. JSON-LD blocks below are type
+        application/ld+json (data, not executable) so CSP does not gate them.
+      - connect-src is scoped to the Cloudflare Workers subdomain actually used
+        by this account (*.solitary-paper-764d.workers.dev: auth / pod / search /
+        link-preview / nostr-relay), NOT the internet-wide *.workers.dev, which
+        previously allowed exfiltration to any attacker-controlled worker.
+      - The two open Nostr relays (relay.damus.io, relay.primal.net) are
+        explicitly allow-listed: the Talk-to-AI chat listens there for
+        junkiejarvis's reply (the primary relay's whitelist gate rejects the
+        gift-wrap addressed to the ephemeral session key — ADR-042 Amendment 1).
+        Must stay in sync with VITE_REPLY_RELAYS. Named exactly, not a wildcard.
+      - style-src keeps 'unsafe-inline' because Radix UI + runtime style
+        attributes require it; that is not a script-injection vector.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.solitary-paper-764d.workers.dev wss://*.solitary-paper-764d.workers.dev https://*.dreamlab-ai.com wss://*.dreamlab-ai.com wss://relay.damus.io wss://relay.primal.net; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <!-- SPA deep-link restore. External 'self' script (not inline) so CSP
+         script-src can stay 'self' with no 'unsafe-inline'. Classic,
+         render-blocking script: runs before the deferred app module. -->
+    <script src="/spa-redirect.js"></script>
+    <script type="module" crossorigin="" src="/assets/index-Crc86LXg.js"></script>
+    <link rel="modulepreload" crossorigin="" href="/assets/ui-C2dH1upk.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/vendor-uw6h6E0d.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/nostr-BpuBsPg-.js">
+    <link rel="stylesheet" crossorigin="" href="/assets/index-CeEdk6WL.css">
+  <script type="application/ld+json" id="route-structured-data">{"@context":"https://schema.org","@type":"LearningResource","@id":"https://dreamlab-ai.com/workshops/workshop-10-seo-ai-discoverability/02_rendering_javascript.md/#page","url":"https://dreamlab-ai.com/workshops/workshop-10-seo-ai-discoverability/02_rendering_javascript.md/","name":"Chapter 2: Rendering JavaScript Sites | DreamLab AI Workshops","description":"Chapter 2: Rendering JavaScript Sites — free DreamLab AI curriculum.","inLanguage":"en-GB","publisher":{"@id":"https://dreamlab-ai.com/#organisation"},"isAccessibleForFree":true}</script><link rel="alternate" type="text/markdown" href="/data/workshops/workshop-10-seo-ai-discoverability/02_rendering_javascript.md"></head>
+
+  <body>
+    <!-- Skip Navigation Link for Accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
+      Skip to main content
+    </a>
+    <div id="root"><header role="banner" class="fixed top-0 left-0 right-0 z-50"><div class="md:hidden flex items-center justify-between h-14 px-6 bg-[rgba(14,14,17,0.92)] backdrop-blur-[14px] border-b border-dlm-hairline"><a aria-label="DreamLab home" class="flex items-center gap-2" href="/"><span class="w-[9px] h-[9px] rounded-full bg-dlm-bright shrink-0" aria-hidden="true"></span><span class="text-[14px] font-semibold tracking-[0.14em] text-[#FAFAFA]">DREAMLAB</span></a><button type="button" aria-label="Open menu" aria-expanded="false" class="w-11 h-11 -mr-2 flex flex-col items-end justify-center gap-[5px] focus:outline-none focus-visible:ring-2 focus-visible:ring-dlm-bright rounded"><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span></button></div><div class="hidden md:block transition-all duration-300 ease-out py-3 bg-background/60 backdrop-blur-md"><div class="container flex items-center justify-between px-4"><button class="flex items-center gap-2 md:gap-3 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded min-h-[48px] min-w-[48px] px-3 py-2" aria-label="Main navigation menu" type="button" id="radix-:Rp:" aria-haspopup="menu" aria-expanded="false" data-state="closed"><div class="w-10 h-10 md:w-8 md:h-8 shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all duration-300 group-hover:scale-110 animate-glow-pulse" aria-hidden="true"></div><span class="font-bold text-lg md:text-xl tracking-tight group-hover:text-purple-400 transition-colors duration-300">MENU</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down h-5 w-5 md:h-4 md:w-4 shrink-0 text-muted-foreground group-hover:text-purple-400 transition-all duration-300 group-hover:rotate-180" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button><div class="flex items-center gap-2"><a class="items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-10 py-2 hover:bg-purple-500/10 hover:text-purple-400 transition-all duration-300 hover:scale-105 min-h-[48px] px-4 text-base md:text-sm hidden sm:inline-flex" href="/contact">Contact</a><a class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary hover:bg-primary/90 h-10 py-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transition-all duration-300 min-h-[48px] px-4 text-base md:text-sm" href="/co-create">Partner With Us</a></div></div></div></header><header class="relative overflow-hidden" style="min-height:320px"><div class="absolute inset-0 bg-gradient-to-br from-blue-500/30 via-purple-500/30 to-violet-500/30" style="transform:translateY(0px);opacity:1"><div class="absolute top-0 -left-20 w-96 h-96 rounded-full blur-3xl opacity-40 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600"></div><div class="absolute bottom-0 -right-20 w-[32rem] h-[32rem] rounded-full blur-3xl opacity-30 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600" style="animation-delay:1s"></div><div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full blur-3xl opacity-20 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600" style="animation-delay:2s"></div></div><div class="absolute inset-0 opacity-5" style="background-image:linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);background-size:50px 50px;transform:translateY(0px)"></div><div class="relative z-10 container px-4 pt-24 pb-8"><div class="mb-6 transition-all duration-500 transform opacity-0 translate-y-4"><nav aria-label="breadcrumb"><ol class="flex flex-wrap items-center gap-1.5 break-words text-sm sm:gap-2.5 text-white/70"><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/">Home</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/workshops">Workshops</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><span role="link" aria-disabled="true" aria-current="page" class="text-white font-medium">SEO &amp; AI Discoverability: Being Found by Search Engines and Answer Engines</span></li></ol></nav></div><div class="mb-4 transition-all duration-500 delay-100 transform opacity-0 translate-y-4"><div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20"><span class="text-purple-400"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cpu w-5 h-5" aria-hidden="true"><path d="M12 20v2"></path><path d="M12 2v2"></path><path d="M17 20v2"></path><path d="M17 2v2"></path><path d="M2 12h2"></path><path d="M2 17h2"></path><path d="M2 7h2"></path><path d="M20 12h2"></path><path d="M20 17h2"></path><path d="M20 7h2"></path><path d="M7 20v2"></path><path d="M7 2v2"></path><rect x="4" y="4" width="16" height="16" rx="2"></rect><rect x="8" y="8" width="8" height="8" rx="1"></rect></svg></span><span class="text-sm font-medium text-white/90">AI / Machine Learning</span></div></div><h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 break-words transition-all duration-700 delay-200 transform opacity-0 translate-y-6"><span class="bg-gradient-to-r bg-clip-text text-transparent animate-gradient-shift bg-400% from-blue-400 via-purple-400 to-violet-400">SEO &amp; AI Discoverability: Being Found by Search Engines and Answer Engines</span></h1><div class="flex flex-wrap items-center gap-3 mb-6 transition-all duration-700 delay-400 transform opacity-0 translate-y-4"><div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-white/10 border-white/20 text-white backdrop-blur-sm hover:bg-white/20"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-3.5 h-3.5 mr-1.5" aria-hidden="true"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>11<!-- --> <!-- -->Modules</div></div><div class="max-w-md transition-all duration-700 delay-500 transform opacity-0 translate-y-4"><div class="flex items-center justify-between text-sm text-white/70 mb-2"><span class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code w-4 h-4" aria-hidden="true"><path d="m16 18 6-6-6-6"></path><path d="m8 6-6 6 6 6"></path></svg><span>Chapter <!-- -->4<!-- -->: <!-- -->Chapter 2: Rendering JavaScript Sites</span></span><span class="font-medium text-white">36<!-- -->%</span></div><div class="relative"><div aria-valuemax="100" aria-valuemin="0" role="progressbar" data-state="indeterminate" data-max="100" class="relative w-full overflow-hidden rounded-full h-2 bg-white/20"><div data-state="indeterminate" data-max="100" class="h-full w-full flex-1 bg-primary transition-all" style="transform:translateX(-64%)"></div></div><div class="absolute top-0 left-0 h-2 rounded-full blur-sm bg-gradient-to-r from-blue-600 via-purple-600 to-violet-600" style="width:36%"></div></div><div class="relative mt-1 h-1"><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:9.090909090909092%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:18.181818181818183%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:27.27272727272727%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:36.36363636363637%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:45.45454545454545%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:54.54545454545454%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:63.63636363636363%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:72.72727272727273%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:81.81818181818183%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:90.9090909090909%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:100%"></div></div></div></div><div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent"></div></header><main class="container px-4 pt-8 pb-8 flex flex-col md:flex-row gap-x-8 min-h-screen" id="main-content"><aside class="w-full md:w-64 lg:w-72 md:sticky md:top-20 md:h-[calc(100vh-5rem-2rem)] mb-8 md:mb-0"><h2 class="text-xl font-semibold mb-4 break-words">SEO &amp; AI Discoverability: Being Found by Search Engines and Answer Engines</h2><div dir="ltr" class="relative overflow-hidden h-auto md:h-full pr-4 border-r md:border-r-0" style="position:relative;--radix-scroll-area-corner-width:0px;--radix-scroll-area-corner-height:0px"><style>[data-radix-scroll-area-viewport]{scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;}[data-radix-scroll-area-viewport]::-webkit-scrollbar{display:none}</style><div data-radix-scroll-area-viewport="" class="h-full w-full rounded-[inherit]" style="overflow-x:hidden;overflow-y:hidden"><div style="min-width:100%;display:table"><nav><ul><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-10-seo-ai-discoverability/README.md"><span class="mr-2 text-xs opacity-60">1<!-- -->.</span>SEO &amp; AI Discoverability: Being Found by Search Engines and Answer Engines</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-10-seo-ai-discoverability/00_introduction.md"><span class="mr-2 text-xs opacity-60">2<!-- -->.</span>Chapter 0: Introduction — How Discovery Works in 2026</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-10-seo-ai-discoverability/01_crawling_indexing.md"><span class="mr-2 text-xs opacity-60">3<!-- -->.</span>Chapter 1: Crawling and Indexing</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors bg-primary text-primary-foreground font-semibold" href="/workshops/workshop-10-seo-ai-discoverability/02_rendering_javascript.md"><span class="mr-2 text-xs opacity-60">4<!-- -->.</span>Chapter 2: Rendering JavaScript Sites</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-10-seo-ai-discoverability/03_structured_data.md"><span class="mr-2 text-xs opacity-60">5<!-- -->.</span>Chapter 3: Structured Data with JSON-LD</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-10-seo-ai-discoverability/04_metadata_social.md"><span class="mr-2 text-xs opacity-60">6<!-- -->.</span>Chapter 4: Metadata and Social Previews</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-10-seo-ai-discoverability/05_ai_crawlers.md"><span class="mr-2 text-xs opacity-60">7<!-- -->.</span>Chapter 5: AI Crawlers and Access Controls</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-10-seo-ai-discoverability/06_answer_engine_content.md"><span class="mr-2 text-xs opacity-60">8<!-- -->.</span>Chapter 6: Writing for Answer Engines</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-10-seo-ai-discoverability/07_measurement.md"><span class="mr-2 text-xs opacity-60">9<!-- -->.</span>Chapter 7: Measuring Discoverability</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-10-seo-ai-discoverability/08_exercises.md"><span class="mr-2 text-xs opacity-60">10<!-- -->.</span>Chapter 8: Hands-On Exercises</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-10-seo-ai-discoverability/09_resources.md"><span class="mr-2 text-xs opacity-60">11<!-- -->.</span>Chapter 9: Resources</a></li></ul></nav></div></div></div></aside><article class="flex-1 min-w-0 md:pl-0"><div class="prose max-w-none dark:prose-invert break-words [&amp;_table]:block [&amp;_table]:w-full [&amp;_table]:overflow-x-auto"><h1>Chapter 2: Rendering JavaScript Sites</h1>
+<blockquote>
+<p>If your content only exists after JavaScript runs, assume some of your most important readers never see it.</p>
+</blockquote>
+<h2>The Single-Page App Problem</h2>
+<p>A typical React, Vue or Svelte app built with Vite ships an <code>index.html</code> that looks like this:</p>
+<pre><code class="language-html">&lt;body&gt;
+  &lt;div id="root"&gt;&lt;/div&gt;
+  &lt;script type="module" src="/assets/index-a1b2c3.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+</code></pre>
+<p>A browser downloads the script, runs it, and paints the page. A reader that does not run JavaScript sees an empty <code>&lt;div&gt;</code>.</p>
+<p>Who runs JavaScript?</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Reader</th><th>Executes JavaScript?</th></tr></thead><tbody><tr><td>Googlebot</td><td>Yes — pages are queued for rendering after the initial fetch, which can add delay</td></tr><tr><td>Bingbot</td><td>Yes, with some limitations</td></tr><tr><td>AI training and search crawlers (<code>GPTBot</code>, <code>ClaudeBot</code>, <code>PerplexityBot</code>, …)</td><td>Not documented by their vendors; do not assume it</td></tr><tr><td>Link-preview fetchers (Slack, LinkedIn, Facebook, X)</td><td>No — they read the raw HTML <code>&lt;head&gt;</code></td></tr><tr><td>Screen readers and text browsers</td><td>Varies</td></tr></tbody></table>
+<p>Google itself recommends server-side rendering, static rendering or prerendering where practical, rather than relying solely on its renderer. For AI fetchers, it is the only safe assumption.</p>
+<h2>Test What a Crawler Sees</h2>
+<p>You do not need special tools. <code>curl</code> fetches the raw HTML exactly as a non-rendering bot would:</p>
+<pre><code class="language-bash"># Raw HTML, as a non-rendering crawler receives it
+curl -s https://example.com/workshops | sed -n '/&lt;body/,/&lt;\/body&gt;/p' | head -40
+
+# Count visible words in the raw HTML (rough but useful)
+curl -s https://example.com/workshops \
+  | sed -e 's/&lt;script[^&gt;]*&gt;.*&lt;\/script&gt;//g' -e 's/&lt;[^&gt;]*&gt;/ /g' \
+  | wc -w
+
+# Fetch with a bot's user agent, in case your CDN treats bots differently
+curl -s -A "Mozilla/5.0 (compatible; ClaudeBot/1.0; +claudebot@anthropic.com)" \
+  -o /dev/null -w "%{http_code}\n" https://example.com/
+</code></pre>
+<p>Then compare with what Google rendered, using <strong>URL Inspection → View crawled page → HTML</strong> in Search Console.</p>
+<p>If the raw HTML has a few dozen words and the rendered page has a few thousand, you have the SPA problem.</p>
+<h2>The Fixes, From Heaviest to Lightest</h2>
+<h3>1. Server-side rendering (SSR)</h3>
+<p>A server renders each request to full HTML, then the client "hydrates" it. Next.js, Nuxt, SvelteKit, Remix and Astro offer this. It needs a server or edge runtime, which static hosts like GitHub Pages do not provide.</p>
+<h3>2. Static site generation / prerendering</h3>
+<p>At build time, render every route to its own HTML file. The output is still static, so it works on GitHub Pages, Netlify, Cloudflare Pages or an S3 bucket. On load, the client app takes over.</p>
+<pre><code>dist/
+  index.html                         ← full homepage HTML
+  workshops/index.html               ← full workshop index HTML
+  workshops/workshop-10-.../README.md/index.html
+</code></pre>
+<p>This is usually the best fit for marketing sites and documentation. The route list should come from the same data as the app's router so new pages are prerendered automatically.</p>
+<h3>3. A static fallback inside <code>index.html</code></h3>
+<p>The lightest fix, and the one DreamLab used first. Put meaningful HTML — headings, a summary, key links, a call to action — inside <code>#root</code>. React replaces it when it mounts, so users never see it, but non-rendering readers get real content.</p>
+<pre><code class="language-html">&lt;div id="root"&gt;
+  &lt;header&gt;
+    &lt;h1&gt;DreamLab AI — residential AI training in the Lake District&lt;/h1&gt;
+    &lt;p&gt;Applied innovation lab offering residential programmes, R&amp;amp;D residencies
+       and free self-guided AI courses.&lt;/p&gt;
+    &lt;nav&gt;
+      &lt;a href="/programmes"&gt;Programmes&lt;/a&gt;
+      &lt;a href="/workshops"&gt;Free self-guided workshops&lt;/a&gt;
+      &lt;a href="/contact"&gt;Book a discovery call&lt;/a&gt;
+    &lt;/nav&gt;
+  &lt;/header&gt;
+&lt;/div&gt;
+</code></pre>
+<p>Its limitation is that it is one block for the whole site: every route serves the homepage's fallback. It is a sensible first step, not a finish line. In ADR-043 we measured the effect: the server-delivered homepage went from roughly 110 words to over 800, including an FAQ that is mirrored in <code>FAQPage</code> JSON-LD.</p>
+<h3>4. Dynamic rendering (avoid)</h3>
+<p>Serving pre-rendered HTML to bots and the JavaScript app to people. Google describes this as a workaround rather than a recommended long-term solution. It is fragile, and it creates the risk of showing bots different content from users.</p>
+<h2>Rendering Pitfalls That Survive the Fix</h2>
+<ul>
+<li><strong>Links that are not links.</strong> <code>&lt;div onClick={() =&gt; navigate('/x')}&gt;</code> is invisible to crawlers. Use real <code>&lt;a href&gt;</code> elements (React Router's <code>&lt;Link&gt;</code> renders one).</li>
+<li><strong>Content behind interactions.</strong> Text that appears only after a click, a tab change or infinite scroll may never be rendered by a crawler.</li>
+<li><strong>Fetched content without fallbacks.</strong> If a page fetches its body from <code>/data/page.md</code> at runtime, prerendering must wait for that fetch or inline the content at build time.</li>
+<li><strong>Hash routing.</strong> URLs like <code>/#/workshops</code> are treated as one page. Use history-based routes.</li>
+<li><strong>Per-route <code>&lt;head&gt;</code> set only in the browser.</strong> Titles and Open Graph tags set by JavaScript are invisible to link-preview fetchers. Prerendering solves this too (Chapter 4).</li>
+</ul>
+<h2>Worked Example: Markdown-Backed Lessons</h2>
+<p>The workshop you are reading is stored as Markdown under <code>public/data/workshops/</code> and fetched by the React app at runtime. That has a pleasant side effect for discoverability: the Markdown files are themselves static, readable, plain-text resources at stable URLs, for example:</p>
+<pre><code>https://dreamlab-ai.com/data/workshops/workshop-10-seo-ai-discoverability/README.md
+</code></pre>
+<p>Clean Markdown copies of important pages are exactly what the <code>llms.txt</code> proposal (Chapter 6) recommends offering to language models. If your content already lives in Markdown, exposing it costs nothing.</p>
+<h2>Chapter Checklist</h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled=""> You have compared raw HTML (<code>curl</code>) with rendered HTML (URL Inspection) for your key pages</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Important text, headings and links exist in the HTML before JavaScript runs</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Navigation uses real <code>&lt;a href&gt;</code> links and history-based URLs</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Each route has its own HTML, or you have a plan to prerender</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> You are not serving bots different content from people</li>
+</ul>
+<hr>
+<p><strong>Next:</strong> <a href="./03_structured_data.md">Chapter 3: Structured Data with JSON-LD</a></p></div></article></main></div>
+    <noscript><p>Interactive forms require JavaScript. You can also email <a href="mailto:info@dreamlab-ai.com">info@dreamlab-ai.com</a>.</p></noscript>
+  
+
+</body></html>

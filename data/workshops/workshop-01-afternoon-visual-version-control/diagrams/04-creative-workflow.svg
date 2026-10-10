@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" role="img" aria-labelledby="d4f-title d4f-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="d4f-title">Creative workflow</title>
+  <desc id="d4f-desc">From brief through research and ideation to concept development; client review loops revisions back to ideation, approval leads to production, quality check and delivery, then post-launch review.</desc>
+  <defs>
+    <marker id="arr4f" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect x="8" y="8" width="944" height="384" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">CREATIVE WORKFLOW</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <g text-anchor="middle">
+    <rect x="48" y="112" width="112" height="64" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="104" y="140" font-size="14" font-weight="600" fill="#F5F5F5">Brief</text>
+    <text x="104" y="160" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">client input</text>
+
+    <rect x="200" y="112" width="184" height="64" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="292" y="140" font-size="14" font-weight="600" fill="#F5F5F5">Research &amp; Ideation</text>
+    <text x="292" y="160" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">explore directions</text>
+
+    <rect x="424" y="112" width="168" height="64" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="508" y="140" font-size="14" font-weight="600" fill="#F5F5F5">Concept Dev</text>
+    <text x="508" y="160" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">shape the idea</text>
+
+    <rect x="648" y="116" width="56" height="56" rx="4" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)" transform="rotate(45 676 144)"/>
+    <text x="676" y="148" font-size="10" font-weight="600" fill="#F5F5F5">Review</text>
+
+    <rect x="588" y="264" width="176" height="64" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="676" y="292" font-size="15" font-weight="600" fill="#F5F5F5">Production</text>
+    <text x="676" y="312" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">make the work</text>
+
+    <rect x="332" y="264" width="192" height="64" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="428" y="292" font-size="14" font-weight="600" fill="#F5F5F5">QC &amp; Delivery</text>
+    <text x="428" y="312" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">check · hand over</text>
+
+    <rect x="96" y="264" width="176" height="64" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="184" y="292" font-size="14" font-weight="600" fill="#F5F5F5">Post-launch</text>
+    <text x="184" y="312" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">review outcomes</text>
+  </g>
+
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2">
+    <path d="M160,144 L196,144" marker-end="url(#arr4f)"/>
+    <path d="M384,144 L420,144" marker-end="url(#arr4f)"/>
+    <path d="M592,144 L632,144" marker-end="url(#arr4f)"/>
+    <path d="M676,188 L676,260" marker-end="url(#arr4f)"/>
+    <path d="M676,100 C676,88 340,84 296,108" stroke-dasharray="4 3" marker-end="url(#arr4f)"/>
+    <path d="M584,296 L528,296" marker-end="url(#arr4f)"/>
+    <path d="M328,296 L276,296" marker-end="url(#arr4f)"/>
+  </g>
+  <g font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">
+    <text x="688" y="220">approved</text>
+    <text x="452" y="96">revisions</text>
+  </g>
+</svg>

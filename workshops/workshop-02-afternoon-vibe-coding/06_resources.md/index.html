@@ -1,0 +1,632 @@
+<!DOCTYPE html><html lang="en" class="dark"><head>
+    <meta charset="UTF-8">
+
+    <!-- Primary Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <title>Chapter 6: Resources — Continue Creating | DreamLab AI Workshops</title>
+    <meta name="title" content="Chapter 6: Resources — Continue Creating | DreamLab AI Workshops">
+    <meta name="description" content="Chapter 6: Resources — Continue Creating — free DreamLab AI curriculum.">
+    <meta name="keywords" content="applied innovation lab, AI consulting, enterprise innovation, immersive XR, cyber trust, creative technology, residential programmes, knowledge transfer, deep tech, Lake District">
+    <meta name="author" content="DreamLab">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    <meta name="rating" content="General">
+
+    <link rel="describedby" href="/llms.txt" type="text/plain">
+    <script type="application/ld+json" id="organisation-structured-data">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://dreamlab-ai.com/#organisation","name":"DreamLab","url":"https://dreamlab-ai.com/","logo":"https://dreamlab-ai.com/images/heroes/dreamlab-hero.webp","email":"info@dreamlab-ai.com","founder":{"@id":"https://dreamlab-ai.com/team#john-ohare"},"sameAs":["https://github.com/DreamLab-AI","https://www.linkedin.com/company/dreamlab-ai-consulting"]},{"@type":"Person","@id":"https://dreamlab-ai.com/team#john-ohare","name":"John O'Hare","honorificPrefix":"Dr","jobTitle":"Founder","worksFor":{"@id":"https://dreamlab-ai.com/#organisation"},"url":"https://dreamlab-ai.com/team#john-ohare"}]}</script>
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dreamlab-ai.com/workshops/workshop-02-afternoon-vibe-coding/06_resources.md/">
+
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="msapplication-TileColor" content="#1a1a2e">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://dreamlab-ai.com/workshops/workshop-02-afternoon-vibe-coding/06_resources.md/">
+    <meta property="og:title" content="Chapter 6: Resources — Continue Creating | DreamLab AI Workshops">
+    <meta property="og:description" content="Chapter 6: Resources — Continue Creating — free DreamLab AI curriculum.">
+    <meta property="og:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="DreamLab AI Workshop - Chapter 6: Resources — Continue Creating">
+    <meta property="og:site_name" content="DreamLab">
+    <meta property="og:locale" content="en_GB">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://dreamlab-ai.com/workshops/workshop-02-afternoon-vibe-coding/06_resources.md/">
+    <meta name="twitter:title" content="Chapter 6: Resources — Continue Creating | DreamLab AI Workshops">
+    <meta name="twitter:description" content="Chapter 6: Resources — Continue Creating — free DreamLab AI curriculum.">
+    <meta name="twitter:image" content="https://dreamlab-ai.com/images/heroes/creative-technology-fundamentals.webp">
+    <meta name="twitter:image:alt" content="DreamLab AI Workshop - Chapter 6: Resources — Continue Creating">
+    <meta name="twitter:site" content="@thedreamlab">
+    <meta name="twitter:creator" content="@thedreamlab">
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="geo.region" content="GB">
+    <meta name="geo.placename" content="United Kingdom">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DreamLab AI">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Security Headers -->
+    <!--
+      CSP notes:
+      - script-src is 'self' only: no 'unsafe-eval' (blocks eval/Function-based
+        injection) and no 'unsafe-inline'. The one inline bootstrap script was
+        moved to /spa-redirect.js. JSON-LD blocks below are type
+        application/ld+json (data, not executable) so CSP does not gate them.
+      - connect-src is scoped to the Cloudflare Workers subdomain actually used
+        by this account (*.solitary-paper-764d.workers.dev: auth / pod / search /
+        link-preview / nostr-relay), NOT the internet-wide *.workers.dev, which
+        previously allowed exfiltration to any attacker-controlled worker.
+      - The two open Nostr relays (relay.damus.io, relay.primal.net) are
+        explicitly allow-listed: the Talk-to-AI chat listens there for
+        junkiejarvis's reply (the primary relay's whitelist gate rejects the
+        gift-wrap addressed to the ephemeral session key — ADR-042 Amendment 1).
+        Must stay in sync with VITE_REPLY_RELAYS. Named exactly, not a wildcard.
+      - style-src keeps 'unsafe-inline' because Radix UI + runtime style
+        attributes require it; that is not a script-injection vector.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.solitary-paper-764d.workers.dev wss://*.solitary-paper-764d.workers.dev https://*.dreamlab-ai.com wss://*.dreamlab-ai.com wss://relay.damus.io wss://relay.primal.net; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <!-- SPA deep-link restore. External 'self' script (not inline) so CSP
+         script-src can stay 'self' with no 'unsafe-inline'. Classic,
+         render-blocking script: runs before the deferred app module. -->
+    <script src="/spa-redirect.js"></script>
+    <script type="module" crossorigin="" src="/assets/index-Crc86LXg.js"></script>
+    <link rel="modulepreload" crossorigin="" href="/assets/ui-C2dH1upk.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/vendor-uw6h6E0d.js">
+    <link rel="modulepreload" crossorigin="" href="/assets/nostr-BpuBsPg-.js">
+    <link rel="stylesheet" crossorigin="" href="/assets/index-CeEdk6WL.css">
+  <script type="application/ld+json" id="route-structured-data">{"@context":"https://schema.org","@type":"LearningResource","@id":"https://dreamlab-ai.com/workshops/workshop-02-afternoon-vibe-coding/06_resources.md/#page","url":"https://dreamlab-ai.com/workshops/workshop-02-afternoon-vibe-coding/06_resources.md/","name":"Chapter 6: Resources — Continue Creating | DreamLab AI Workshops","description":"Chapter 6: Resources — Continue Creating — free DreamLab AI curriculum.","inLanguage":"en-GB","publisher":{"@id":"https://dreamlab-ai.com/#organisation"},"isAccessibleForFree":true}</script><link rel="alternate" type="text/markdown" href="/data/workshops/workshop-02-afternoon-vibe-coding/06_resources.md"></head>
+
+  <body>
+    <!-- Skip Navigation Link for Accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
+      Skip to main content
+    </a>
+    <div id="root"><header role="banner" class="fixed top-0 left-0 right-0 z-50"><div class="md:hidden flex items-center justify-between h-14 px-6 bg-[rgba(14,14,17,0.92)] backdrop-blur-[14px] border-b border-dlm-hairline"><a aria-label="DreamLab home" class="flex items-center gap-2" href="/"><span class="w-[9px] h-[9px] rounded-full bg-dlm-bright shrink-0" aria-hidden="true"></span><span class="text-[14px] font-semibold tracking-[0.14em] text-[#FAFAFA]">DREAMLAB</span></a><button type="button" aria-label="Open menu" aria-expanded="false" class="w-11 h-11 -mr-2 flex flex-col items-end justify-center gap-[5px] focus:outline-none focus-visible:ring-2 focus-visible:ring-dlm-bright rounded"><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span><span class="block w-5 h-[1.5px] bg-[#FAFAFA] rounded-full" aria-hidden="true"></span></button></div><div class="hidden md:block transition-all duration-300 ease-out py-3 bg-background/60 backdrop-blur-md"><div class="container flex items-center justify-between px-4"><button class="flex items-center gap-2 md:gap-3 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded min-h-[48px] min-w-[48px] px-3 py-2" aria-label="Main navigation menu" type="button" id="radix-:Rp:" aria-haspopup="menu" aria-expanded="false" data-state="closed"><div class="w-10 h-10 md:w-8 md:h-8 shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all duration-300 group-hover:scale-110 animate-glow-pulse" aria-hidden="true"></div><span class="font-bold text-lg md:text-xl tracking-tight group-hover:text-purple-400 transition-colors duration-300">MENU</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down h-5 w-5 md:h-4 md:w-4 shrink-0 text-muted-foreground group-hover:text-purple-400 transition-all duration-300 group-hover:rotate-180" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button><div class="flex items-center gap-2"><a class="items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-10 py-2 hover:bg-purple-500/10 hover:text-purple-400 transition-all duration-300 hover:scale-105 min-h-[48px] px-4 text-base md:text-sm hidden sm:inline-flex" href="/contact">Contact</a><a class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary hover:bg-primary/90 h-10 py-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transition-all duration-300 min-h-[48px] px-4 text-base md:text-sm" href="/co-create">Partner With Us</a></div></div></div></header><header class="relative overflow-hidden" style="min-height:320px"><div class="absolute inset-0 bg-gradient-to-br from-blue-500/30 via-purple-500/30 to-violet-500/30" style="transform:translateY(0px);opacity:1"><div class="absolute top-0 -left-20 w-96 h-96 rounded-full blur-3xl opacity-40 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600"></div><div class="absolute bottom-0 -right-20 w-[32rem] h-[32rem] rounded-full blur-3xl opacity-30 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600" style="animation-delay:1s"></div><div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full blur-3xl opacity-20 animate-float bg-gradient-to-br from-blue-600 via-purple-600 to-violet-600" style="animation-delay:2s"></div></div><div class="absolute inset-0 opacity-5" style="background-image:linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);background-size:50px 50px;transform:translateY(0px)"></div><div class="relative z-10 container px-4 pt-24 pb-8"><div class="mb-6 transition-all duration-500 transform opacity-0 translate-y-4"><nav aria-label="breadcrumb"><ol class="flex flex-wrap items-center gap-1.5 break-words text-sm sm:gap-2.5 text-white/70"><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/">Home</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><a class="transition-colors hover:text-foreground hover:text-white transition-colors" href="/workshops">Workshops</a></li><li role="presentation" aria-hidden="true" class="[&amp;>svg]:size-3.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-white/50" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></li><li class="inline-flex items-center gap-1.5"><span role="link" aria-disabled="true" aria-current="page" class="text-white font-medium">Phase 3: Vibe Coding Mastery</span></li></ol></nav></div><div class="mb-4 transition-all duration-500 delay-100 transform opacity-0 translate-y-4"><div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20"><span class="text-purple-400"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cpu w-5 h-5" aria-hidden="true"><path d="M12 20v2"></path><path d="M12 2v2"></path><path d="M17 20v2"></path><path d="M17 2v2"></path><path d="M2 12h2"></path><path d="M2 17h2"></path><path d="M2 7h2"></path><path d="M20 12h2"></path><path d="M20 17h2"></path><path d="M20 7h2"></path><path d="M7 20v2"></path><path d="M7 2v2"></path><rect x="4" y="4" width="16" height="16" rx="2"></rect><rect x="8" y="8" width="8" height="8" rx="1"></rect></svg></span><span class="text-sm font-medium text-white/90">AI / Machine Learning</span></div></div><h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 break-words transition-all duration-700 delay-200 transform opacity-0 translate-y-6"><span class="bg-gradient-to-r bg-clip-text text-transparent animate-gradient-shift bg-400% from-blue-400 via-purple-400 to-violet-400">Phase 3: Vibe Coding Mastery</span></h1><div class="flex flex-wrap items-center gap-3 mb-6 transition-all duration-700 delay-400 transform opacity-0 translate-y-4"><div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-white/10 border-white/20 text-white backdrop-blur-sm hover:bg-white/20"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-3.5 h-3.5 mr-1.5" aria-hidden="true"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>10<!-- --> <!-- -->Modules</div></div><div class="max-w-md transition-all duration-700 delay-500 transform opacity-0 translate-y-4"><div class="flex items-center justify-between text-sm text-white/70 mb-2"><span class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code w-4 h-4" aria-hidden="true"><path d="m16 18 6-6-6-6"></path><path d="m8 6-6 6 6 6"></path></svg><span>Chapter <!-- -->8<!-- -->: <!-- -->Chapter 6: Resources — Continue Creating</span></span><span class="font-medium text-white">80<!-- -->%</span></div><div class="relative"><div aria-valuemax="100" aria-valuemin="0" role="progressbar" data-state="indeterminate" data-max="100" class="relative w-full overflow-hidden rounded-full h-2 bg-white/20"><div data-state="indeterminate" data-max="100" class="h-full w-full flex-1 bg-primary transition-all" style="transform:translateX(-20%)"></div></div><div class="absolute top-0 left-0 h-2 rounded-full blur-sm bg-gradient-to-r from-blue-600 via-purple-600 to-violet-600" style="width:80%"></div></div><div class="relative mt-1 h-1"><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:10%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:20%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:30%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:40%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:50%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:60%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:70%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white scale-100" style="left:80%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:90%"></div><div class="absolute w-1.5 h-1.5 rounded-full -top-0.5 transform -translate-x-1/2 transition-all duration-300 bg-white/30 scale-75" style="left:100%"></div></div></div></div><div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent"></div></header><main class="container px-4 pt-8 pb-8 flex flex-col md:flex-row gap-x-8 min-h-screen" id="main-content"><aside class="w-full md:w-64 lg:w-72 md:sticky md:top-20 md:h-[calc(100vh-5rem-2rem)] mb-8 md:mb-0"><h2 class="text-xl font-semibold mb-4 break-words">Phase 3: Vibe Coding Mastery</h2><div dir="ltr" class="relative overflow-hidden h-auto md:h-full pr-4 border-r md:border-r-0" style="position:relative;--radix-scroll-area-corner-width:0px;--radix-scroll-area-corner-height:0px"><style>[data-radix-scroll-area-viewport]{scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;}[data-radix-scroll-area-viewport]::-webkit-scrollbar{display:none}</style><div data-radix-scroll-area-viewport="" class="h-full w-full rounded-[inherit]" style="overflow-x:hidden;overflow-y:hidden"><div style="min-width:100%;display:table"><nav><ul><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-02-afternoon-vibe-coding/README.md"><span class="mr-2 text-xs opacity-60">1<!-- -->.</span>Phase 3: Vibe Coding Mastery</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-02-afternoon-vibe-coding/00_introduction.md"><span class="mr-2 text-xs opacity-60">2<!-- -->.</span>Chapter 0: Introduction to Vibe Coding Mastery</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-02-afternoon-vibe-coding/01_concepts.md"><span class="mr-2 text-xs opacity-60">3<!-- -->.</span>Chapter 1: Core Concepts - Understanding Vibe Coding</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-02-afternoon-vibe-coding/02_hands_on.md"><span class="mr-2 text-xs opacity-60">4<!-- -->.</span>Chapter 2: Hands-On - Building Your First Vibe Creation</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-02-afternoon-vibe-coding/03_exercises.md"><span class="mr-2 text-xs opacity-60">5<!-- -->.</span>Chapter 3: Creative Challenges — Progressive Exercises</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-02-afternoon-vibe-coding/04_project.md"><span class="mr-2 text-xs opacity-60">6<!-- -->.</span>Chapter 4: Capstone Project — Your Live Creation</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-02-afternoon-vibe-coding/05_assessment.md"><span class="mr-2 text-xs opacity-60">7<!-- -->.</span>Chapter 5: Assessment — Validate Your Mastery</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors bg-primary text-primary-foreground font-semibold" href="/workshops/workshop-02-afternoon-vibe-coding/06_resources.md"><span class="mr-2 text-xs opacity-60">8<!-- -->.</span>Chapter 6: Resources — Continue Creating</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-02-afternoon-vibe-coding/objectives.md"><span class="mr-2 text-xs opacity-60">9<!-- -->.</span>Learning Objectives - Phase 3: Vibe Coding Mastery</a></li><li class="mb-1"><a class="block p-2 rounded-md text-sm hover:bg-muted transition-colors hover:bg-muted/50" href="/workshops/workshop-02-afternoon-vibe-coding/prerequisites.md"><span class="mr-2 text-xs opacity-60">10<!-- -->.</span>Prerequisites - Phase 3: Vibe Coding Mastery</a></li></ul></nav></div></div></div></aside><article class="flex-1 min-w-0 md:pl-0"><div class="prose max-w-none dark:prose-invert break-words [&amp;_table]:block [&amp;_table]:w-full [&amp;_table]:overflow-x-auto"><h1>Chapter 6: Resources — Continue Creating</h1>
+<h2>Introduction: Your Vibe Coding Toolkit</h2>
+<p>This resource collection supports your ongoing journey as a vibe coder. Everything is organised by what you need, when you need it — from your first solo project after the workshop to advanced techniques you'll explore over the coming months.</p>
+<h2>AI Coding Tools Directory</h2>
+<h3>Claude Code (Recommended for Vibe Coding)</h3>
+<p><strong>What It Is:</strong> Anthropic's AI coding agent. Describe what you want in the terminal or desktop app; it reads your files, writes code, runs commands, and iterates based on your feedback.</p>
+<p><strong>Links:</strong></p>
+<ul>
+<li><a href="https://docs.anthropic.com/en/docs/claude-code/overview">Claude Code Documentation</a> — official guide</li>
+<li><a href="https://claude.ai">Claude.ai</a> — browser-based chat (artifacts for quick prototypes)</li>
+<li><a href="https://console.anthropic.com">Anthropic Console</a> — API key management and usage dashboard</li>
+<li><a href="https://marketplace.visualstudio.com/items?itemName=anthropic.claude-code">Claude Code VS Code Extension</a> — use Claude Code inside VS Code</li>
+</ul>
+<p><strong>Getting Started:</strong></p>
+<pre><code class="language-bash"># Install Claude Code
+npm install -g @anthropic-ai/claude-code
+
+# Start a vibe coding session
+mkdir my-project &amp;&amp; cd my-project
+claude
+
+# Useful commands inside Claude Code
+/cost          # Check how much you've spent this session
+/compact       # Summarise conversation to free up context
+</code></pre>
+<p><strong>Cost Tips:</strong></p>
+<ul>
+<li>Use <code>/cost</code> regularly to monitor spending</li>
+<li>Set a monthly budget in the Anthropic Console</li>
+<li>Shorter, focused sessions are more cost-effective than marathon ones</li>
+<li>The <code>/compact</code> command helps manage context on long sessions</li>
+</ul>
+<h3>Cursor AI</h3>
+<p><strong>What It Is:</strong> A VS Code fork with deep AI integration. Chat with your codebase, get inline suggestions, and make multi-file changes through conversation.</p>
+<p><strong>Links:</strong></p>
+<ul>
+<li><a href="https://cursor.com">cursor.com</a> — download and pricing</li>
+<li><a href="https://docs.cursor.com">Cursor Documentation</a> — getting started guide</li>
+</ul>
+<p><strong>Best For:</strong> People who want a familiar VS Code experience with built-in AI. Good middle ground between Claude Code's terminal approach and browser-based tools.</p>
+<p><strong>Pricing:</strong> Free tier available; Pro from $20/month with increased usage.</p>
+<h3>Windsurf</h3>
+<p><strong>What It Is:</strong> An AI-native code editor (formerly Codeium). Its "Flow" mode can complete multi-step tasks autonomously.</p>
+<p><strong>Links:</strong></p>
+<ul>
+<li><a href="https://windsurf.com">windsurf.com</a> — download and documentation</li>
+</ul>
+<p><strong>Best For:</strong> Autonomous multi-step tasks. Good at understanding larger project context.</p>
+<p><strong>Pricing:</strong> Free tier available; Pro from $10/month.</p>
+<h3>GitHub Copilot</h3>
+<p><strong>What It Is:</strong> Microsoft/GitHub's AI coding assistant. Works inside VS Code with inline suggestions, chat, and workspace-level understanding.</p>
+<p><strong>Links:</strong></p>
+<ul>
+<li><a href="https://github.com/features/copilot">GitHub Copilot</a> — features and pricing</li>
+<li><a href="https://docs.github.com/en/copilot">Copilot Documentation</a> — setup guide</li>
+<li><a href="https://github.com/education/students">Free for Students and Open Source</a> — apply here</li>
+</ul>
+<p><strong>Best For:</strong> Inline code suggestions and chat within VS Code. Excellent if you already have a GitHub account.</p>
+<p><strong>Pricing:</strong> Free for verified students and OSS maintainers; Individual from $10/month.</p>
+<h3>Browser-Based Chat Tools</h3>
+<p>For quick prototyping without installing anything:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Tool</th><th>Best For</th><th>Link</th></tr></thead><tbody><tr><td><strong>Claude.ai</strong> (Artifacts)</td><td>Single-file prototypes with live preview</td><td><a href="https://claude.ai">claude.ai</a></td></tr><tr><td><strong>ChatGPT</strong> (Canvas mode)</td><td>Conversational code generation with visual editing</td><td><a href="https://chatgpt.com">chatgpt.com</a></td></tr><tr><td><strong>Google AI Studio</strong></td><td>Large context window for big projects</td><td><a href="https://aistudio.google.com">aistudio.google.com</a></td></tr></tbody></table>
+<h3>Free and Open Source Options</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Tool</th><th>What It Is</th><th>Link</th></tr></thead><tbody><tr><td><strong>Continue.dev</strong></td><td>Free, open-source AI extension for VS Code</td><td><a href="https://continue.dev">continue.dev</a></td></tr><tr><td><strong>Aider</strong></td><td>Free terminal-based pair programmer</td><td><a href="https://aider.chat">aider.chat</a></td></tr><tr><td><strong>Ollama</strong></td><td>Run AI models locally, completely free</td><td><a href="https://ollama.com">ollama.com</a></td></tr></tbody></table>
+<h2>Deployment and Hosting</h2>
+<h3>GitHub Pages (Free — Used in This Workshop)</h3>
+<p><strong>Links:</strong></p>
+<ul>
+<li><a href="https://docs.github.com/en/pages">GitHub Pages Documentation</a> — complete guide</li>
+<li><a href="https://docs.github.com/en/pages/quickstart">Quickstart Guide</a> — get a site live in minutes</li>
+<li><a href="https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site">Custom Domain Setup</a> — use your own domain name</li>
+</ul>
+<p><strong>Quick Reference:</strong></p>
+<pre><code class="language-bash"># Deploy a page to GitHub Pages using Claude Code:
+# 1. Create repo
+gh repo create my-site --public
+
+# 2. Push your files
+git init
+git add index.html
+git commit -m "Initial site"
+git remote add origin https://github.com/USERNAME/my-site.git
+git push -u origin main
+
+# 3. Enable Pages in Settings → Pages → Source: main branch
+
+# Your site: https://USERNAME.github.io/my-site/
+</code></pre>
+<h3>Other Free Hosting Options</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Service</th><th>Best For</th><th>Limit</th><th>Link</th></tr></thead><tbody><tr><td><strong>Netlify</strong></td><td>Static sites with forms and serverless functions</td><td>100GB bandwidth/month</td><td><a href="https://netlify.com">netlify.com</a></td></tr><tr><td><strong>Vercel</strong></td><td>React/Next.js projects and static sites</td><td>100GB bandwidth/month</td><td><a href="https://vercel.com">vercel.com</a></td></tr><tr><td><strong>Cloudflare Pages</strong></td><td>Global CDN, very fast</td><td>Unlimited bandwidth</td><td><a href="https://pages.cloudflare.com">pages.cloudflare.com</a></td></tr><tr><td><strong>Render</strong></td><td>Static sites and simple backends</td><td>100GB bandwidth/month</td><td><a href="https://render.com">render.com</a></td></tr></tbody></table>
+<h3>Custom Domain Names</h3>
+<p>If you want a professional URL (e.g., <code>www.yourname.com</code>):</p>
+<ul>
+<li><strong>Registrars:</strong> <a href="https://namecheap.com">Namecheap</a>, <a href="https://www.cloudflare.com/products/registrar/">Cloudflare Registrar</a>, <a href="https://domains.google">Google Domains</a></li>
+<li><strong>Cost:</strong> Typically £8-15/year for a <code>.com</code> or <code>.co.uk</code> domain</li>
+<li><strong>Setup:</strong> All the free hosting options above support custom domains</li>
+</ul>
+<h2>Prompt Writing Resources</h2>
+<h3>Prompt Libraries and Examples</h3>
+<p><strong>General Prompt Engineering:</strong></p>
+<ul>
+<li><a href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview">Anthropic Prompt Engineering Guide</a> — official Claude prompting guide</li>
+<li><a href="https://www.promptingguide.ai/">Prompt Engineering Guide</a> — comprehensive community resource</li>
+</ul>
+<h3>Vibe Coding Prompt Templates</h3>
+<p><strong>Landing Page Template:</strong></p>
+<pre><code>Create a landing page for [BUSINESS/PROJECT].
+
+Hero: [heading text], [subheading], [call-to-action button text], 
+[background description].
+
+Features: [number] cards showing [what each card contains].
+
+Social proof: [testimonials / stats / logos].
+
+Call to action: [final CTA section description].
+
+Footer: [what to include].
+
+Style: [mood — professional/playful/minimal/bold]. 
+Colours: [primary], [secondary], [accent].
+Responsive. Single HTML file.
+</code></pre>
+<p><strong>Portfolio Template:</strong></p>
+<pre><code>Create a personal portfolio for [NAME], a [PROFESSION].
+
+Sections: Hero with name and tagline, About with bio and photo 
+placeholder, Work with [number] project cards, Skills as tags, 
+Contact form, Footer.
+
+Style: [aesthetic]. Colours: [palette].
+Include: dark mode toggle, smooth scroll navigation, 
+fade-in animations on scroll. Responsive. Single HTML file.
+</code></pre>
+<p><strong>Dashboard Template:</strong></p>
+<pre><code>Create a data dashboard titled "[TITLE]".
+
+Metrics row: [list cards with values and accent colours].
+Chart: [type] showing [data points].
+Table: [columns and sample data].
+Activity feed: [recent events].
+
+Style: clean dashboard, white background, card shadows.
+Responsive. Single HTML file, CSS-only charts.
+</code></pre>
+<h2>Learning and Reference</h2>
+<h3>Web Design Fundamentals (No Code Required)</h3>
+<p>Understanding design principles helps you describe what you want more effectively:</p>
+<ul>
+<li><a href="https://www.refactoringui.com/">Refactoring UI</a> — design tips that non-designers can apply immediately</li>
+<li><a href="https://lawsofux.com/">Laws of UX</a> — simple, visual explanations of user experience principles</li>
+<li><a href="https://typescale.com/">Typescale</a> — choose font sizes that work together harmoniously</li>
+<li><a href="https://coolors.co/">Coolors</a> — generate colour palettes to reference in your prompts</li>
+<li><a href="https://www.realtimecolors.com/">Realtime Colors</a> — preview colour combinations on a live page layout</li>
+</ul>
+<h3>CSS and HTML Reference (When Curiosity Strikes)</h3>
+<p>You don't need to learn these, but knowing they exist helps you understand what AI generates:</p>
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/">MDN Web Docs</a> — the definitive web reference</li>
+<li><a href="https://css-tricks.com/">CSS-Tricks</a> — practical examples and guides</li>
+<li><a href="https://caniuse.com/">Can I Use</a> — check what browsers support which features</li>
+</ul>
+<h3>Responsive Design</h3>
+<p>Understanding responsive concepts helps you describe mobile behaviour:</p>
+<ul>
+<li><a href="https://web.dev/responsive-web-design-basics/">Responsive Design Basics</a> — Google's guide</li>
+<li><a href="https://ui.dev/amiresponsive">Am I Responsive?</a> — preview your site at multiple screen sizes</li>
+<li><a href="https://responsively.app/">Responsively App</a> — free tool to view your page on many devices at once</li>
+</ul>
+<h3>Free Assets for Your Projects</h3>
+<p><strong>Images:</strong></p>
+<ul>
+<li><a href="https://unsplash.com/">Unsplash</a> — free high-quality photographs</li>
+<li><a href="https://pexels.com/">Pexels</a> — free stock photos and videos</li>
+<li><a href="https://undraw.co/">Undraw</a> — free, customisable illustrations</li>
+</ul>
+<p><strong>Icons:</strong></p>
+<ul>
+<li><a href="https://heroicons.com/">Heroicons</a> — clean SVG icons (by the Tailwind CSS team)</li>
+<li><a href="https://lucide.dev/">Lucide</a> — beautiful, consistent icon set</li>
+<li><a href="https://fontawesome.com/">Font Awesome (free tier)</a> — massive icon library</li>
+</ul>
+<p><strong>Fonts:</strong></p>
+<ul>
+<li><a href="https://fonts.google.com/">Google Fonts</a> — free web fonts, easy to include</li>
+<li><a href="https://fontsource.org/">Fontsource</a> — self-hosted open source fonts</li>
+</ul>
+<h2>Community and Continued Learning</h2>
+<h3>Communities for Vibe Coders</h3>
+<ul>
+<li><a href="https://discord.gg/anthropic">Anthropic Discord</a> — Claude Code discussions and help</li>
+<li><a href="https://reddit.com/r/vibecoding">Reddit r/vibecoding</a> — community of conversational coders</li>
+<li><a href="https://reddit.com/r/ClaudeAI">Reddit r/ClaudeAI</a> — Claude-specific tips and showcases</li>
+<li><a href="https://www.indiehackers.com/">Indie Hackers</a> — entrepreneurs building with AI tools</li>
+</ul>
+<h3>Newsletters and Blogs</h3>
+<ul>
+<li><a href="https://www.anthropic.com/blog">Anthropic Blog</a> — Claude updates and capabilities</li>
+<li><a href="https://simonwillison.net/">Simon Willison's Weblog</a> — prolific AI tools commentary</li>
+<li><a href="https://www.smashingmagazine.com/">Smashing Magazine</a> — web design and development</li>
+<li><a href="https://css-weekly.com/">CSS Weekly</a> — stay current with web design trends</li>
+</ul>
+<h3>Video Learning</h3>
+<ul>
+<li><a href="https://www.youtube.com/@Fireship">Fireship</a> — fast, clear web technology explainers</li>
+<li><a href="https://www.youtube.com/@KevinPowell">Kevin Powell</a> — CSS techniques explained simply</li>
+<li><a href="https://www.youtube.com/@WebDevSimplified">Web Dev Simplified</a> — beginner-friendly web development</li>
+</ul>
+<h2>Troubleshooting Guide</h2>
+<h3>Common Issues and Solutions</h3>
+<p><strong>Problem: AI generates code but it doesn't display correctly</strong></p>
+<pre><code>Solution: Ensure your file is saved as .html (not .txt). Open 
+it directly in a browser — File → Open, or drag the file onto 
+a browser window. If using Live Server in VS Code, right-click 
+the file and select "Open with Live Server".
+</code></pre>
+<p><strong>Problem: Page looks fine on desktop but broken on mobile</strong></p>
+<pre><code>Solution: In your next prompt, describe specifically what breaks:
+"On phone screens, the three columns overlap. Make them stack 
+into a single column on screens narrower than 768px."
+
+Check mobile view by resizing your browser window, or use 
+Chrome DevTools (F12 → toggle device toolbar).
+</code></pre>
+<p><strong>Problem: GitHub Pages shows a 404 error</strong></p>
+<pre><code>Solution: 
+1. Ensure your file is called index.html (lowercase)
+2. Check Settings → Pages — is it enabled?
+3. Wait 2-3 minutes after enabling (first deploy takes time)
+4. Verify the URL: https://USERNAME.github.io/REPO-NAME/
+5. Ensure you pushed to the correct branch (usually main)
+</code></pre>
+<p><strong>Problem: Claude Code says "I can't access the internet"</strong></p>
+<pre><code>Solution: Claude Code generates code locally — it doesn't need 
+internet for code generation. For deployment, use git commands 
+which Claude Code can run. If API calls fail, check your API 
+key and credit balance at console.anthropic.com.
+</code></pre>
+<p><strong>Problem: The AI keeps changing things I already liked</strong></p>
+<pre><code>Solution: Be specific about what to keep:
+"Change only the footer — everything else should stay exactly 
+as it is. In the footer, make the text smaller and add a 
+second row with privacy and terms links."
+
+In Claude Code, you can also use /compact to summarise the 
+conversation and reduce context confusion.
+</code></pre>
+<p><strong>Problem: I've run out of free API credits</strong></p>
+<pre><code>Solution: 
+- Switch to Claude.ai free tier (limited but functional)
+- Use ChatGPT free tier as a fallback
+- Try Continue.dev with free Groq or Gemini API access
+- Consider adding $5-10 credit — a full workshop session 
+  typically costs under $2
+</code></pre>
+<h2>Cost Management</h2>
+<h3>Typical Vibe Coding Costs</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Activity</th><th>Approximate Cost</th></tr></thead><tbody><tr><td>Building a single-page site (30 min session)</td><td>$0.50-2.00</td></tr><tr><td>Full workshop session (3 hours)</td><td>$2.00-5.00</td></tr><tr><td>Complex multi-page project (2-3 hours)</td><td>$3.00-8.00</td></tr><tr><td>Quick refinement session (10 minutes)</td><td>$0.10-0.50</td></tr></tbody></table>
+<h3>Keeping Costs Low</h3>
+<ol>
+<li><strong>Write detailed first prompts</strong> — fewer iterations means less cost</li>
+<li><strong>Use <code>/compact</code> in Claude Code</strong> — reduces context and token usage</li>
+<li><strong>Use <code>/cost</code> to monitor</strong> — check spending regularly</li>
+<li><strong>Set budget alerts</strong> — configure at console.anthropic.com</li>
+<li><strong>Use free tiers for experimentation</strong> — save paid access for real projects</li>
+<li><strong>Use Claude.ai artifacts</strong> for quick single-file prototypes (often free)</li>
+</ol>
+<h2>Cheat Sheets</h2>
+<h3>Vibe Coding Quick Reference</h3>
+<pre><code>+-----------------------------------------------+
+|           VIBE CODING QUICK REFERENCE          |
++-----------------------------------------------+
+|                                                |
+| START A PROJECT                                |
+|   mkdir project &amp;&amp; cd project &amp;&amp; claude        |
+|                                                |
+| FIRST PROMPT CHECKLIST                         |
+|   [ ] What is the page for?                    |
+|   [ ] What sections does it need?              |
+|   [ ] What colours and style?                  |
+|   [ ] Responsive? (almost always yes)          |
+|   [ ] Any interactivity?                       |
+|   [ ] Single HTML file? (simplest to start)    |
+|                                                |
+| REFINEMENT PHRASES                             |
+|   "Make it more [spacious/bold/subtle/clean]"  |
+|   "The [X] feels too [big/small/bright/dark]"  |
+|   "Add [animation/hover effect/transition]"    |
+|   "On mobile, [stack/hide/resize/simplify]"    |
+|   "Like [website.com]'s [feature/layout]"      |
+|                                                |
+| DEPLOY TO GITHUB PAGES                         |
+|   1. Push to GitHub repository                 |
+|   2. Settings &gt; Pages &gt; Source: main           |
+|   3. Wait 2 min &gt; visit the URL                |
+|                                                |
+| USEFUL CLAUDE CODE COMMANDS                    |
+|   /cost     - check session spending           |
+|   /compact  - summarise conversation           |
+|   /clear    - start fresh context              |
+|                                                |
++-----------------------------------------------+
+</code></pre>
+<h3>Describing Colours</h3>
+<p>Instead of memorising hex codes, use these descriptive approaches:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>What You Say</th><th>What You Get</th></tr></thead><tbody><tr><td>"Corporate navy"</td><td>Dark blue, trustworthy</td></tr><tr><td>"Sunset gradient"</td><td>Orange-to-pink blend</td></tr><tr><td>"Sage green"</td><td>Soft, muted green</td></tr><tr><td>"Warm cream background"</td><td>Off-white, cosy</td></tr><tr><td>"Electric blue accent"</td><td>Bright, energetic blue</td></tr><tr><td>"Charcoal text"</td><td>Dark grey, softer than black</td></tr></tbody></table>
+<p>Or provide specific hex codes from <a href="https://coolors.co/">Coolors</a> for precision.</p>
+<h3>Describing Layout</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>What You Say</th><th>What You Get</th></tr></thead><tbody><tr><td>"Three cards in a row"</td><td>Horizontal grid</td></tr><tr><td>"Stack vertically on mobile"</td><td>Responsive column</td></tr><tr><td>"Centred narrow column"</td><td>Medium-style layout</td></tr><tr><td>"Full-width hero"</td><td>Edge-to-edge section</td></tr><tr><td>"Sticky navigation"</td><td>Nav stays on scroll</td></tr><tr><td>"Lots of breathing room"</td><td>Generous padding/margins</td></tr></tbody></table>
+<h2>Next Steps</h2>
+<h3>This Week</h3>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled=""> Build one new page using vibe coding</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Deploy it to GitHub Pages</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Share the URL with someone</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Try a different AI tool than you used in the workshop</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Bookmark this resources page for reference</li>
+</ul>
+<h3>This Month</h3>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled=""> Complete the 7-day challenge from Chapter 5</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Build something for real use (business, portfolio, personal)</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Explore adding a custom domain to your GitHub Pages site</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Help a colleague or friend try vibe coding</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Join one of the communities listed above</li>
+</ul>
+<h3>This Quarter</h3>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled=""> Maintain 3+ live web pages on GitHub Pages</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Try building a multi-page site</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Experiment with adding a backend (forms that email you, databases)</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Consider using Tailwind CSS through vibe coding for more polished designs</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Explore building simple web applications, not just static pages</li>
+</ul>
+<h2>Getting Help</h2>
+<h3>Workshop Support</h3>
+<ul>
+<li><strong>Email:</strong> <a href="mailto:workshop@dreamlab.ai">workshop@dreamlab.ai</a></li>
+<li><strong>Discord:</strong> Workshop Channel</li>
+<li><strong>Office Hours:</strong> Fridays 2-3pm GMT</li>
+</ul>
+<h3>AI Tool Support</h3>
+<ul>
+<li><strong>Claude Code:</strong> <a href="https://support.anthropic.com">Anthropic Support</a></li>
+<li><strong>Cursor:</strong> <a href="https://forum.cursor.com">Cursor Forum</a></li>
+<li><strong>GitHub Pages:</strong> <a href="https://github.com/community">GitHub Community</a></li>
+</ul>
+<h2>Final Thought</h2>
+<p>Vibe coding is not a workaround or a hack. It is a genuine paradigm shift in who gets to create on the web. The tools will keep improving, the possibilities will keep expanding, and the skills you practised today — describing clearly, iterating thoughtfully, deploying confidently — will remain valuable regardless of which AI tool you use.</p>
+<p>The web is now your canvas. Go create something.</p>
+<hr>
+<p><strong>Workshop Complete!</strong></p>
+<p><a href="./05_assessment.md">Back to Assessment</a> | <a href="README.md">Back to Phase Overview</a> | <a href="../workshop-02-morning-ai-api-access/README.md">Return to Phase 2</a></p></div></article></main></div>
+    <noscript><p>Interactive forms require JavaScript. You can also email <a href="mailto:info@dreamlab-ai.com">info@dreamlab-ai.com</a>.</p></noscript>
+  
+
+</body></html>

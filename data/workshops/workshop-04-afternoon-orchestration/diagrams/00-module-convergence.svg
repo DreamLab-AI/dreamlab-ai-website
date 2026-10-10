@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="dg-title dg-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="dg-title">How the modules fit together</title>
+  <desc id="dg-desc">Orchestration patterns, safety and guardrails, cost management and deployment patterns converge into a reliable multi-agent production system.</desc>
+
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- container -->
+  <rect x="8" y="8" width="944" height="404" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">HOW THE MODULES FIT TOGETHER</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <!-- module nodes -->
+  <g text-anchor="middle">
+    <rect x="48" y="104" width="192" height="88" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="144" y="142" font-size="15" font-weight="600" fill="#F5F5F5">Orchestration</text>
+    <text x="144" y="166" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">patterns</text>
+
+    <rect x="272" y="104" width="192" height="88" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="368" y="142" font-size="15" font-weight="600" fill="#F5F5F5">Safety</text>
+    <text x="368" y="166" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">guardrails</text>
+
+    <rect x="496" y="104" width="192" height="88" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="592" y="142" font-size="15" font-weight="600" fill="#F5F5F5">Cost Management</text>
+    <text x="592" y="166" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">budgets · routing</text>
+
+    <rect x="720" y="104" width="192" height="88" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="816" y="142" font-size="15" font-weight="600" fill="#F5F5F5">Deployment</text>
+    <text x="816" y="166" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">patterns</text>
+  </g>
+
+  <!-- converging arrows -->
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2">
+    <path d="M144,192 C144,252 380,244 424,282" marker-end="url(#arr)"/>
+    <path d="M368,192 C368,236 428,244 452,274" marker-end="url(#arr)"/>
+    <path d="M592,192 C592,236 532,244 508,274" marker-end="url(#arr)"/>
+    <path d="M816,192 C816,252 580,244 536,282" marker-end="url(#arr)"/>
+  </g>
+
+  <!-- focal node -->
+  <g text-anchor="middle">
+    <rect x="360" y="288" width="240" height="84" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="480" y="324" font-size="16" font-weight="600" fill="#F5F5F5">Production System</text>
+    <text x="480" y="348" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">reliable multi-agent app</text>
+  </g>
+</svg>
