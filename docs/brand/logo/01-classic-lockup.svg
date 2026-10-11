@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 521 96" width="521" height="96" role="img" aria-label="DreamLab">
+  <title>DreamLab</title>
+  <defs>
+    <linearGradient id="cl-g" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#22D3EE"/><stop offset=".55" stop-color="#6366F1"/><stop offset="1" stop-color="#A855F7"/>
+    </linearGradient>
+    <linearGradient id="cl-w" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#A855F7"/><stop offset="1" stop-color="#E879F9"/>
+    </linearGradient>
+    <filter id="cl-glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="1.6" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <g transform="translate(0,-2) scale(1.55)"><g filter="url(#cl-glow)" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path class="bowl" d="M7,37 H57 M10,37 C12,52 22,57 32,57 C42,57 52,52 54,37" stroke="url(#cl-g)" stroke-width="3.5"/>
+    <path d="M24,60 H40" stroke="url(#cl-g)" stroke-width="3"/>
+    <g stroke="url(#cl-g)" stroke-width="1.6"><line class="edge e0" x1="21" y1="27" x2="29" y2="18"/><line class="edge e1" x1="29" y1="18" x2="38" y2="24"/><line class="edge e2" x1="38" y1="24" x2="46" y2="13"/><line class="edge e3" x1="21" y1="27" x2="38" y2="24"/><line class="edge e9" x1="32" y1="37" x2="21" y2="27"/></g>
+    <g fill="#22D3EE" stroke="none"><circle class="node n0" cx="21" cy="27" r="2.8"/><circle class="node n1" cx="29" cy="18" r="2.8"/><circle class="node n2" cx="38" cy="24" r="2.8"/><circle class="node n3" cx="46" cy="13" r="3.4"/></g>
+    <path class="wisp" d="M46,13 C51,10 47,7 51,5 C54,3 58,5 56,8" stroke="url(#cl-w)" stroke-width="2.4"/>
+  </g></g>
+  <g transform="translate(129.2,0) skewX(-12)">
+    <path d="M0,60 a20,20 0 1,0 40,0 a20,20 0 1,0 -40,0 M40,12 V80 M55,80 V54 Q55,40 75,40 M90,60 H130 A20,20 0 1,0 125.32,72.86 M145,60 a20,20 0 1,0 40,0 a20,20 0 1,0 -40,0 M185,40 V80 M200,80 V52 a12,12 0 0,1 24,0 V80 M224,52 a12,12 0 0,1 24,0 V80 M263,12 V80 M278,60 a20,20 0 1,0 40,0 a20,20 0 1,0 -40,0 M318,40 V80 M333,12 V80 M333,60 a20,20 0 1,0 40,0 a20,20 0 1,0 -40,0" fill="none" stroke="url(#cl-g)" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>
