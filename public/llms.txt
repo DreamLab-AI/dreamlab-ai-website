@@ -26,6 +26,8 @@ BBS client at /community/bbs/.
 
 ## Optional
 
+- [Full site text](https://dreamlab-ai.com/llms-full.txt): Every main page as plain text in one file
+- [Security contact](https://dreamlab-ai.com/.well-known/security.txt): How to report a security issue
 - [Ventures](https://dreamlab-ai.com/ventures/): Venture-building activity
 - [Privacy](https://dreamlab-ai.com/privacy/): Privacy policy (no-database, E2E-encrypted contact ingress)
 - [Community forum](https://dreamlab-ai.com/community/): Nostr-based community forum
