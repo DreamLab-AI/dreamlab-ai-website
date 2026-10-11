@@ -67,21 +67,21 @@ export function WorkshopCard({
         className="flex items-center gap-[14px] min-h-[64px] py-[14px] border-t border-dlm-hairline"
         aria-label={`${title} — ${difficultyStyle.label}${isCompleted ? ', completed' : ''}`}
       >
-        <span className="w-[30px] shrink-0 font-mono text-[22px] leading-none text-white/35 tabular-nums">
+        <span className="w-[30px] shrink-0 font-mono text-[22px] leading-none text-white/55 tabular-nums">
           {moduleNumber}
         </span>
         <span className="flex-1 min-w-0">
           <span className="block text-[16px] text-[#FAFAFA] leading-tight">{title}</span>
-          <span className="block mt-[3px] text-[13px] text-white/45">
+          <span className="block mt-[3px] text-[13px] text-white/55">
             {difficultyStyle.label} · {duration}
           </span>
         </span>
         {isCompleted ? (
-          <span className="font-mono text-[11px] tracking-[0.12em] text-white/35 shrink-0">
+          <span className="font-mono text-[11px] tracking-[0.12em] text-white/55 shrink-0">
             DONE
           </span>
         ) : (
-          <ChevronRight className="w-[15px] h-[15px] text-white/35 shrink-0" aria-hidden="true" />
+          <ChevronRight className="w-[15px] h-[15px] text-white/55 shrink-0" aria-hidden="true" />
         )}
       </Link>
     );

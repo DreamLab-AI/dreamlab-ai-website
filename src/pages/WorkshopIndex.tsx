@@ -565,7 +565,7 @@ const WorkshopIndexMobile = () => {
       <main className="bg-dlm-base min-h-screen pb-16 pt-14">
         {/* Header */}
         <header className="pt-11 px-6">
-          <p className="text-m-meta font-mono uppercase text-white/45 mb-5">
+          <p className="text-m-meta font-mono uppercase text-white/55 mb-5">
             Free · No account needed
           </p>
           <h1 className="text-m-h1s text-[#FAFAFA] [text-wrap:pretty]">
@@ -609,19 +609,19 @@ const WorkshopIndexMobile = () => {
                 to={w.path}
                 className="flex items-center gap-[14px] min-h-[64px] py-[14px] border-t border-dlm-hairline"
               >
-                <span className="w-[30px] shrink-0 font-mono text-[22px] leading-none text-white/35 tabular-nums">
+                <span className="w-[30px] shrink-0 font-mono text-[22px] leading-none text-white/55 tabular-nums">
                   {w.meta.module}
                 </span>
                 <span className="flex-1 min-w-0">
                   <span className="block text-[16px] text-[#FAFAFA] leading-tight">
                     {w.meta.title}
                   </span>
-                  <span className="block mt-[3px] text-[13px] text-white/45">
+                  <span className="block mt-[3px] text-[13px] text-white/55">
                     {workshopRowMeta(w.meta)}
                   </span>
                 </span>
                 {isDone ? (
-                  <span className="font-mono text-[11px] tracking-[0.12em] text-white/35 shrink-0">
+                  <span className="font-mono text-[11px] tracking-[0.12em] text-white/55 shrink-0">
                     DONE
                   </span>
                 ) : isResume ? (

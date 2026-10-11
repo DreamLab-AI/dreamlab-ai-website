@@ -178,7 +178,7 @@ const ContactMobile = ({ form, onSubmit, isSubmitting, selectedTeam }: ContactVi
             {isSubmitting ? "Sending…" : "Send enquiry"}
           </button>
 
-          <p className="text-[13px] leading-[1.5] text-white/[0.42]">
+          <p className="text-[13px] leading-[1.5] text-white/55">
             Sent end-to-end encrypted. Only we can read it, and we don't store it anywhere else.
           </p>
         </div>
@@ -426,9 +426,6 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground pt-14 md:pt-0">
-      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-primary focus:text-primary-foreground">
-        Skip to main content
-      </a>
       <Header />
       {isMobile ? <ContactMobile {...viewProps} /> : <ContactDesktop {...viewProps} />}
     </div>

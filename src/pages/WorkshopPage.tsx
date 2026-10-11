@@ -349,11 +349,11 @@ const WorkshopPage = ({ initialManifest = null, initialContent = '' }: {
             </Link>
             <span className="flex-1 min-w-0 truncate text-[14px] text-[#FAFAFA]">
               {meta?.module ? (
-                <span className="font-mono text-white/45 mr-1.5">{meta.module}</span>
+                <span className="font-mono text-white/55 mr-1.5">{meta.module}</span>
               ) : null}
               {label}
             </span>
-            <span className="font-mono text-[12px] text-white/45 tabular-nums shrink-0">
+            <span className="font-mono text-[12px] text-white/55 tabular-nums shrink-0">
               {currentChapterIndex}/{totalChapters}
             </span>
           </div>
@@ -373,7 +373,7 @@ const WorkshopPage = ({ initialManifest = null, initialContent = '' }: {
           {/* Eyebrow + module title */}
           <div className="px-6 pt-8">
             {meta ? (
-              <p className="text-m-meta font-mono uppercase text-white/45 mb-3">
+              <p className="text-m-meta font-mono uppercase text-white/55 mb-3">
                 {workshopEyebrow(meta)}
               </p>
             ) : null}
@@ -385,7 +385,7 @@ const WorkshopPage = ({ initialManifest = null, initialContent = '' }: {
           {/* Prose — full gutter width, no max-width games at 390px. */}
           <div className="px-6 mt-6">
             {isLoadingContent && (
-              <p className="text-[15px] text-white/45">Loading content…</p>
+              <p className="text-[15px] text-white/55">Loading content…</p>
             )}
             {error && !isLoadingContent && (
               <p className="text-[15px] text-red-400">{error}</p>
@@ -444,7 +444,7 @@ const WorkshopPage = ({ initialManifest = null, initialContent = '' }: {
               </div>
             )}
             {!isLoadingContent && !error && !currentPageContent && (
-              <p className="text-[15px] text-white/45">
+              <p className="text-[15px] text-white/55">
                 No content to display for this page.
               </p>
             )}

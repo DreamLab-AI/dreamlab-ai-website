@@ -401,7 +401,7 @@ const ProgrammesListMobile = () => (
               <span className="text-[18px] font-semibold text-[#FAFAFA] leading-snug">
                 {cat.title}
               </span>
-              <span className="text-[13px] font-mono tabular-nums text-white/45 shrink-0">
+              <span className="text-[13px] font-mono tabular-nums text-white/55 shrink-0">
                 {count}
               </span>
             </div>
@@ -455,7 +455,7 @@ const TrackDetailMobile = ({ track }: { track: (typeof outcomeCategories)[number
               {prog.title}
             </h2>
             <p className="text-[14px] leading-[1.55] text-white/55 mt-1">{prog.description}</p>
-            <p className="text-[11px] font-mono uppercase tracking-[0.12em] text-white/40 mt-2">
+            <p className="text-[11px] font-mono uppercase tracking-[0.12em] text-white/55 mt-2">
               {prog.duration} · {prog.format} · Price on application
             </p>
           </div>

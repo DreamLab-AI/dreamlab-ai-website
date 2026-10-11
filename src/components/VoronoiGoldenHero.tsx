@@ -327,6 +327,8 @@ export const VoronoiGoldenHero = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const animationRef = useRef<number>(0);
+  // The loop runs only while the hero is on screen and the tab is visible.
+  const runningRef = useRef(false);
   const lastFrameTimeRef = useRef<number>(0);
   const canvasSizeRef = useRef<{ width: number; height: number; dpr: number }>({
     width: 0,
@@ -458,7 +460,9 @@ export const VoronoiGoldenHero = ({
     if (!canvas) return;
 
     const handleResize = () => {
-      const dpr = window.devicePixelRatio || 1;
+      // Cap the backing store: a decorative field gains nothing visible above
+      // 1.5x, and on a 2x screen that alone halves the pixels drawn per frame.
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       const rect = canvas.getBoundingClientRect();
 
       if (
@@ -540,7 +544,7 @@ export const VoronoiGoldenHero = ({
       if (throttle30fps) {
         const delta = time - lastFrameTimeRef.current;
         if (delta < 33.33) {
-          animationRef.current = requestAnimationFrame(render);
+          if (runningRef.current) animationRef.current = requestAnimationFrame(render);
           return;
         }
         lastFrameTimeRef.current = time;
@@ -833,19 +837,65 @@ export const VoronoiGoldenHero = ({
         }
       }
 
-      // Continue animation
-      animationRef.current = requestAnimationFrame(render);
+      // Continue animation (unless paused, or reduced motion wants one frame)
+      if (runningRef.current && !prefersReducedMotion) {
+        animationRef.current = requestAnimationFrame(render);
+      }
     },
     [colorPalette, getEdgeColor, prefersReducedMotion, throttle30fps]
   );
 
-  // Start animation loop
+  // Animation lifecycle. The field is decoration, so it waits for the browser
+  // to go idle after load (keeping the main thread free while the page becomes
+  // interactive), runs only while the hero is in view and the tab is visible,
+  // and draws a single still frame under prefers-reduced-motion.
   useEffect(() => {
-    animationRef.current = requestAnimationFrame(render);
-    return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    let inView = true;
+    let started = false;
+
+    const stop = () => {
+      runningRef.current = false;
+      if (animationRef.current) cancelAnimationFrame(animationRef.current);
+      animationRef.current = 0;
+    };
+    const sync = () => {
+      if (!started) return;
+      const shouldRun = inView && document.visibilityState === "visible";
+      if (shouldRun && !runningRef.current) {
+        runningRef.current = true;
+        animationRef.current = requestAnimationFrame(render);
+      } else if (!shouldRun && runningRef.current) {
+        stop();
       }
+    };
+
+    const io = new IntersectionObserver(([entry]) => {
+      inView = entry.isIntersecting;
+      sync();
+    });
+    io.observe(canvas);
+    document.addEventListener("visibilitychange", sync);
+
+    const begin = () => {
+      started = true;
+      sync();
+    };
+    const w = window as Window & {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+      cancelIdleCallback?: (id: number) => void;
+    };
+    const idleId = w.requestIdleCallback
+      ? w.requestIdleCallback(begin, { timeout: 2000 })
+      : window.setTimeout(begin, 400);
+
+    return () => {
+      io.disconnect();
+      document.removeEventListener("visibilitychange", sync);
+      if (w.cancelIdleCallback) w.cancelIdleCallback(idleId);
+      else window.clearTimeout(idleId);
+      stop();
     };
   }, [render]);
 

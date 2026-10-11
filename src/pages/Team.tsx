@@ -321,9 +321,6 @@ const Team = ({ initialMembers = [] }: { initialMembers?: TeamMemberData[] }) =>
 
   return (
     <div className="min-h-screen bg-background text-foreground pt-14 md:pt-0">
-      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-primary focus:text-primary-foreground">
-        Skip to main content
-      </a>
       <Header />
       {isMobile ? <TeamMobile {...viewProps} /> : <TeamDesktop {...viewProps} />}
     </div>

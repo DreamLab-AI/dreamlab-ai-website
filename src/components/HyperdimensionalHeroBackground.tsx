@@ -63,7 +63,7 @@ export const HyperdimensionalHeroBackground = () => {
           height: '150%',
         }}
       >
-        <VoronoiGoldenHero seedCount={104} goldMode={true} className="w-full h-full" />
+        <VoronoiGoldenHero seedCount={104} goldMode={true} throttle30fps className="w-full h-full" />
       </div>
 
       {/* Minimal mathematical grid - geometric precision, not blur */}

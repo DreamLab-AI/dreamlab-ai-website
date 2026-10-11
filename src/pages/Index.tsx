@@ -1,4 +1,5 @@
 import { lazy, Suspense, useRef, useState, useEffect } from "react";
+import { FadeCarousel } from "@/components/FadeCarousel";
 import { Link } from "react-router-dom";
 // Sprint v9 D8: defer the Voronoi hero to a separate chunk so the landing
 // route's initial JS payload shrinks on first paint.
@@ -149,8 +150,8 @@ const MobileTrackRow = ({ to, title, count }: { to: string; title: string; count
   >
     <span className="w-1.5 h-1.5 rounded-full bg-dlm-bright shrink-0" aria-hidden="true" />
     <span className="flex-1 text-[16px] text-[#FAFAFA]">{title}</span>
-    <span className="text-[13px] text-white/45">{count}</span>
-    <ChevronRight className="w-[15px] h-[15px] text-white/35 shrink-0" aria-hidden="true" />
+    <span className="text-[13px] text-white/55">{count}</span>
+    <ChevronRight className="w-[15px] h-[15px] text-white/55 shrink-0" aria-hidden="true" />
   </Link>
 );
 
@@ -177,6 +178,7 @@ const statQuad = [
 
 const IndexMobile = () => (
   <>
+    <main>
     {/* Hero */}
     <section id="main-content" className="pt-11 px-6 pb-9" aria-label="Hero">
       <p className="text-m-meta font-mono uppercase text-dlm-bright mb-5">
@@ -293,6 +295,9 @@ const IndexMobile = () => (
       </Link>
     </section>
 
+    <HomeFaq variant="mobile" />
+    </main>
+
     {/* Footer */}
     <footer className="bg-dlm-sunken pt-7 px-6 pb-[130px]" role="contentinfo">
       <div className="flex flex-wrap gap-x-5 gap-y-3 text-[14px] text-white/60">
@@ -302,7 +307,7 @@ const IndexMobile = () => (
         <a href="https://www.linkedin.com/company/dreamlab-ai-consulting/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
         <a href="https://bsky.app/profile/thedreamlab.bsky.social" target="_blank" rel="noopener noreferrer">Bluesky</a>
       </div>
-      <p className="text-[12px] text-white/35 mt-6">
+      <p className="text-[12px] text-white/55 mt-6">
         © {new Date().getFullYear()} DreamLab AI Consulting Ltd. All rights reserved.
       </p>
     </footer>
@@ -334,6 +339,7 @@ const IndexDesktop = () => {
 
   return (
     <>
+      <main>
       {/* Section 1: Hero */}
       <section
         id="main-content"
@@ -428,16 +434,7 @@ const IndexDesktop = () => {
             </div>
 
             <div className="relative aspect-video rounded-xl overflow-hidden shadow-2xl shadow-purple-500/10">
-              {facilityImages.map((src, index) => (
-                <img
-                  key={src}
-                  src={src}
-                  alt="DreamLab Innovation Facility, Lake District"
-                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${
-                    index === facilityIndex ? "opacity-100" : "opacity-0"
-                  }`}
-                />
-              ))}
+              <FadeCarousel images={facilityImages} index={facilityIndex} alt="DreamLab Innovation Facility, Lake District" />
             </div>
           </div>
         </div>
@@ -626,26 +623,7 @@ const IndexDesktop = () => {
         </div>
       </section>
 
-      {/* FAQ: answer-shaped text for search and AI answer engines */}
-      <section className="py-16 md:py-20" aria-labelledby="faq-heading">
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: FAQ_JSON_LD }} />
-        <div className="container max-w-3xl mx-auto px-5 md:px-4">
-          <h2 id="faq-heading" className="text-2xl sm:text-3xl md:text-4xl font-bold mb-8 text-center">
-            Frequently asked questions
-          </h2>
-          <div className="space-y-3">
-            {FAQS.map(({ q, a }) => (
-              <details key={q} className="group bg-background/50 border border-purple-500/20 rounded-xl p-5 open:border-purple-500/40">
-                <summary className="cursor-pointer font-semibold list-none flex justify-between gap-4">
-                  {q}
-                  <span aria-hidden="true" className="text-purple-400 group-open:rotate-45 transition-transform">+</span>
-                </summary>
-                <p className="mt-3 text-sm md:text-base text-muted-foreground leading-relaxed">{a}</p>
-              </details>
-            ))}
-          </div>
-        </div>
-      </section>
+      <HomeFaq variant="desktop" />
 
       {/* Section 8: Dual CTA Footer */}
       <section className="py-16 md:py-20" aria-label="Get started">
@@ -717,6 +695,7 @@ const IndexDesktop = () => {
           </div>
         </div>
       </section>
+      </main>
 
       {/* Footer */}
       <footer className="relative py-10 md:py-12 overflow-hidden" role="contentinfo">
@@ -789,6 +768,50 @@ const FAQS: { q: string; a: string }[] = [
   },
 ];
 
+/**
+ * The homepage FAQ, rendered on both layouts with its FAQPage JSON-LD inside,
+ * so the structured data can never ship without the visible answers it
+ * describes (Google indexes the mobile rendering).
+ */
+const HomeFaq = ({ variant }: { variant: "mobile" | "desktop" }) => {
+  const mobile = variant === "mobile";
+  return (
+    <section className={mobile ? "px-6 pb-11" : "py-16 md:py-20"} aria-labelledby={`faq-heading-${variant}`}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: FAQ_JSON_LD }} />
+      <div className={mobile ? "" : "container max-w-3xl mx-auto px-5 md:px-4"}>
+        <h2
+          id={`faq-heading-${variant}`}
+          className={mobile ? "text-m-h2 text-[#FAFAFA] mb-4" : "text-2xl sm:text-3xl md:text-4xl font-bold mb-8 text-center"}
+        >
+          Frequently asked questions
+        </h2>
+        <div className={mobile ? "space-y-2" : "space-y-3"}>
+          {FAQS.map(({ q, a }) => (
+            <details
+              key={q}
+              className={
+                mobile
+                  ? "group rounded-[10px] border border-dlm-hairline2 px-4 py-3"
+                  : "group bg-background/50 border border-purple-500/20 rounded-xl p-5 open:border-purple-500/40"
+              }
+            >
+              <summary
+                className={`cursor-pointer list-none flex justify-between gap-4 ${
+                  mobile ? "min-h-[44px] items-center text-[15px] font-medium text-[#FAFAFA]" : "font-semibold"
+                }`}
+              >
+                {q}
+                <span aria-hidden="true" className={`${mobile ? "text-dlm-bright" : "text-purple-400"} group-open:rotate-45 transition-transform`}>+</span>
+              </summary>
+              <p className={mobile ? "mt-2 text-[15px] leading-[1.6] text-white/70" : "mt-3 text-sm md:text-base text-muted-foreground leading-relaxed"}>{a}</p>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
 const FAQ_JSON_LD = JSON.stringify({
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -805,9 +828,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-hidden pt-14 md:pt-0">
-      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-primary focus:text-primary-foreground">
-        Skip to main content
-      </a>
       <Header />
       {isMobile ? <IndexMobile /> : <IndexDesktop />}
     </div>

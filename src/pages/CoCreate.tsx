@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { FadeCarousel } from "@/components/FadeCarousel";
 import { Link } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
@@ -90,7 +91,7 @@ const CoCreateMobile = () => (
             </span>
           </div>
           <p className="text-[15px] leading-[1.65] text-white/[0.62] mt-2">{b.description}</p>
-          <p className="text-[11px] font-mono tracking-[0.12em] text-white/45 mt-3">{b.outcome}</p>
+          <p className="text-[11px] font-mono tracking-[0.12em] text-white/55 mt-3">{b.outcome}</p>
           <Link
             to="/contact"
             className="inline-flex items-center gap-1 min-h-[44px] mt-1 text-[15px] text-dlm-bright"
@@ -120,7 +121,7 @@ const CoCreateMobile = () => (
         <a href="https://www.linkedin.com/company/dreamlab-ai-consulting/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
         <a href="https://bsky.app/profile/thedreamlab.bsky.social" target="_blank" rel="noopener noreferrer">Bluesky</a>
       </div>
-      <p className="text-[12px] text-white/35 mt-6">
+      <p className="text-[12px] text-white/55 mt-6">
         © {new Date().getFullYear()} DreamLab AI Consulting Ltd. All rights reserved.
       </p>
     </footer>
@@ -308,16 +309,7 @@ const CoCreateDesktop = () => {
               </div>
             </div>
             <div className="order-1 lg:order-2 relative aspect-video rounded-xl overflow-hidden shadow-2xl shadow-purple-500/10">
-              {facilityImages.map((src, index) => (
-                <img
-                  key={src}
-                  src={src}
-                  alt="DreamLab Innovation Facility"
-                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${
-                    index === imgIndex ? "opacity-100" : "opacity-0"
-                  }`}
-                />
-              ))}
+              <FadeCarousel images={facilityImages} index={imgIndex} alt="DreamLab Innovation Facility" />
             </div>
           </div>
         </div>

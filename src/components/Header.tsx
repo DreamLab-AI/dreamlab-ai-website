@@ -70,7 +70,7 @@ const MenuRow = ({ link, onNavigate }: { link: MenuLink; onNavigate: () => void 
           className={
             link.action
               ? "text-[11px] font-mono tracking-[0.14em] text-dlm-bright uppercase"
-              : "text-[13px] text-white/40"
+              : "text-[13px] text-white/55"
           }
         >
           {link.count}
@@ -122,12 +122,12 @@ const MobileMenu = ({ open, onOpenChange }: { open: boolean; onOpenChange: (v: b
           </div>
 
           <nav className="flex-1 px-6 pb-8">
-            <p className="text-m-meta uppercase text-white/40 mt-6 mb-2">The lab</p>
+            <p className="text-m-meta uppercase text-white/55 mt-6 mb-2">The lab</p>
             {LAB_LINKS.map((l) => (
               <MenuRow key={l.to} link={l} onNavigate={close} />
             ))}
 
-            <p className="text-m-meta uppercase text-white/40 mt-6 mb-2">The people</p>
+            <p className="text-m-meta uppercase text-white/55 mt-6 mb-2">The people</p>
             {PEOPLE_LINKS.map((l) => (
               <MenuRow key={l.to} link={l} onNavigate={close} />
             ))}

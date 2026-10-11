@@ -165,7 +165,7 @@ const TestimonialsMobile = () => {
                 {t.name} · {t.role}
               </p>
               {context && (
-                <p className="text-[11px] font-mono tracking-[0.12em] text-white/40 mt-1.5">
+                <p className="text-[11px] font-mono tracking-[0.12em] text-white/55 mt-1.5">
                   {context}
                 </p>
               )}
@@ -182,7 +182,7 @@ const TestimonialsMobile = () => {
           <a href="https://www.linkedin.com/company/dreamlab-ai-consulting/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
           <a href="https://bsky.app/profile/thedreamlab.bsky.social" target="_blank" rel="noopener noreferrer">Bluesky</a>
         </div>
-        <p className="text-[12px] text-white/35 mt-6">
+        <p className="text-[12px] text-white/55 mt-6">
           © {new Date().getFullYear()} DreamLab AI Consulting Ltd. All rights reserved.
         </p>
       </footer>
