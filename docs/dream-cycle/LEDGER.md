@@ -52,3 +52,4 @@
 | 2026-10-09 | site-build-content | predev/prebuild generator parity check + bench smoke test for inventory | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/58 | yes | ACCEPT |  | 6f0b0a79ae4e |  |  |  |
 | 2026-10-10 | operator-overlay | webauthn+mesh TOML-to-wrangler mirrors unenumerated; bench test now enforces | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/59 | yes | ACCEPT |  | 919165feba7e |  |  |  |
 | 2026-10-11 | ci-workflows | deploy.yml missed prebuild generator scripts in push paths; now scripts/** | NONE | PERSIST-LOCAL | yes | ACCEPT |  | e5ac9e35711c |  |  |  |
+| 2026-10-11 | ci-workflows | rust-ci.yml KIT_REF comment restated beta.14 (canonical beta.15); removed | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/60 | yes | ACCEPT |  | 0d42a5e9ef90 |  |  |  |
