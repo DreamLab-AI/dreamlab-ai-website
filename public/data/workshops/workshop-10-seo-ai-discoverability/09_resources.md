@@ -71,6 +71,8 @@ This module completes the self-guided curriculum. If you want to apply it to you
 
 **Get in touch:** [dreamlab-ai.com/contact](https://dreamlab-ai.com/contact)
 
+**Next:** [Assessment](10_assessment.md)
+
 ---
 
 *A DreamLab AI Self-Guided Workshop | Last Updated: October 2026*

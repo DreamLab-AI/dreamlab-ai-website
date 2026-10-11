@@ -87,6 +87,7 @@ This field attracts confident claims. Where something is documented by the engin
 8. [Measuring Discoverability](./07_measurement.md)
 9. [Hands-On Exercises](./08_exercises.md)
 10. [Resources](./09_resources.md)
+11. [Assessment](./10_assessment.md): 15 questions, 80% to pass
 
 ### Recommended Learning Path
 
