@@ -18,8 +18,13 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - 'vite.config.*'
-      - 'scripts/prerender.mjs'
-      - 'scripts/check-discovery.mjs'
+      # The build runs more of scripts/ than these two entries: postbuild does
+      # prerender + discovery check, and since PR #58 (2026-10-09) prebuild
+      # runs the content generators too. Enumerating build scripts one by one
+      # is the drift trap ci.yml's `scripts/**` entry exists to avoid — a
+      # generator-only commit would rebuild different content that never ships
+      # (same class as the lockfile gap closed by d3ecd05).
+      - 'scripts/**'
       - '.github/workflows/deploy.yml'
   workflow_dispatch:
 
