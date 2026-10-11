@@ -220,13 +220,13 @@ files['03-header-constellation-on-light.svg'] = header('hl', false, C.ink);
 
 // 4. Freer: a golden-angle field (the hero's Voronoi seeds) gathering into a
 // glowing core, the "dream" forming in the lab. Seeds twinkle in spiral order.
-function phyllotaxis(id, animated) {
-  const n = 89, golden = Math.PI * (3 - Math.sqrt(5));
+function phyllotaxis(id, animated, { n = 89, spread = 3.1, seed = 1.9, core = 9 } = {}) {
+  const golden = Math.PI * (3 - Math.sqrt(5));
   let dots = '';
   for (let i = 1; i <= n; i++) {
-    const r = 3.1 * Math.sqrt(i), t = i * golden;
+    const r = spread * Math.sqrt(i), t = i * golden;
     const x = (32 + r * Math.cos(t)).toFixed(2), y = (32 + r * Math.sin(t)).toFixed(2);
-    const size = (1.9 - i / n).toFixed(2);
+    const size = (seed - i / n).toFixed(2);
     const delay = animated ? ` style="animation-delay:${((i * 0.045) % 4).toFixed(2)}s"` : '';
     dots += `<circle class="s" cx="${x}" cy="${y}" r="${size}"${delay}/>`;
   }
@@ -243,7 +243,7 @@ function phyllotaxis(id, animated) {
     @media (prefers-reduced-motion:reduce){*{animation:none!important}}
   </style>` : ''}
   <g class="field" fill="url(#${id}-f)">${dots}</g>
-  <circle class="core" cx="32" cy="32" r="9" fill="url(#${id}-core)"/>`;
+  <circle class="core" cx="32" cy="32" r="${core}" fill="url(#${id}-core)"/>`;
   return body;
 }
 files['04-golden-field.svg'] = svg(64, 64, phyllotaxis('gf', false), 'DreamLab AI golden field');
@@ -255,7 +255,17 @@ files['04-golden-field-animated.svg'] = svg(64, 64, phyllotaxis('gfa', true), 'D
     <path d="${wm.d}" fill="none" stroke="${C.paper}" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
   </g>`;
   files['04-golden-field-lockup-animated.svg'] = svg(Math.ceil(markW + 26 + wm.width + 30), 96, body, 'DreamLab AI');
+  files['04-golden-field-lockup.svg'] = svg(Math.ceil(markW + 26 + wm.width + 30), 96,
+    body.replace(phyllotaxis('gfl', true), phyllotaxis('gfls', false)), 'DreamLab AI');
 }
+// Small sizes: 34 larger seeds and a bigger core so the mark survives 16px.
+files['04-golden-field-favicon.svg'] = svg(64, 64,
+  `<rect width="64" height="64" rx="14" fill="${C.ink}"/><g transform="translate(-3.2,-3.2) scale(1.1)">${phyllotaxis('gff', false, { n: 34, spread: 4.6, seed: 3.2, core: 10 })}</g>`,
+  'DreamLab AI');
+// App icons: full bleed (maskable needs the mark inside the central 80%).
+files['04-golden-field-app-icon.svg'] = svg(64, 64,
+  `<rect width="64" height="64" fill="${C.ink}"/><g transform="translate(6.4,6.4) scale(.8)">${phyllotaxis('gfi', false)}</g>`,
+  'DreamLab AI');
 
 // 5. The LinkedIn diamond, redrawn: an outlined diamond around a smaller
 // ring and a solid gem, violet to blue. Wordmark DREAMLAB in heavy capitals

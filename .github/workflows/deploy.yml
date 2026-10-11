@@ -111,7 +111,7 @@ env:
   BBS_TAGLINE: 'private secure forums'
   BBS_LOCATION: 'Lake District, UK'
   BBS_BANNER_URL: ''
-  BBS_LOGO_URL: 'https://dreamlab-ai.com/assets/logo.svg'
+  BBS_LOGO_URL: 'https://dreamlab-ai.com/brand/mark.svg'
   KIT_REPO: 'https://github.com/DreamLab-AI/nostr-rust-forum.git'
   # Pinned to the exact commit resolved in forum-config/Cargo.lock.
   # Do NOT float on `main`: a breaking upstream push would silently ship untested

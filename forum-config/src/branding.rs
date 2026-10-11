@@ -12,10 +12,9 @@ use nostr_bbs_config::schema::Branding;
 pub fn dreamlab_branding() -> Branding {
     Branding {
         theme: Some("amber".into()),
-        // dreamlab.toml [branding].logo_url is empty: no SVG logo exists yet
-        // (that file's comment records /assets/logo.svg as a 404). Do not
-        // point the overlay at a dead asset.
-        logo_url: None,
+        // Mirrors dreamlab.toml [branding].logo_url: the golden-field mark,
+        // shipped by the main site at public/brand/mark.svg.
+        logo_url: Some("/brand/mark.svg".into()),
         welcome_copy: Some(
             "Welcome to the DreamLab AI Community Forum — \
              a private space for trainers, builders, and the curious."
@@ -59,7 +58,7 @@ mod tests {
         // programmatic overlay cannot silently contradict it again.
         let b = dreamlab_branding();
         assert_eq!(b.node_name.as_deref(), Some("MINIMOONOIR"));
-        assert_eq!(b.logo_url, None); // no SVG logo exists yet
+        assert_eq!(b.logo_url.as_deref(), Some("/brand/mark.svg"));
         assert_eq!(b.location.as_deref(), Some("Lake District, UK"));
     }
 

@@ -21,9 +21,9 @@ const LINKEDIN_URL = "https://www.linkedin.com/company/dreamlab-ai-consulting";
 const BLUESKY_URL = "https://bsky.app/profile/thedreamlab.bsky.social";
 
 /**
- * Wordmark used on the mobile nav bar and in the menu overlay. A 9px cyan dot
- * plus DREAMLAB — replaces the shipped "MENU" label that sat where the brand
- * belongs. Links home.
+ * Wordmark used on the mobile nav bar and in the menu overlay: the golden-field
+ * mark plus DREAMLAB AI. Links home. The animated SVG respects
+ * prefers-reduced-motion on its own.
  */
 const Wordmark = ({ onClick }: { onClick?: () => void }) => (
   <Link
@@ -32,8 +32,8 @@ const Wordmark = ({ onClick }: { onClick?: () => void }) => (
     aria-label="DreamLab home"
     className="flex items-center gap-2"
   >
-    <span className="w-[9px] h-[9px] rounded-full bg-dlm-bright shrink-0" aria-hidden="true" />
-    <span className="text-[14px] font-semibold tracking-[0.14em] text-[#FAFAFA]">DREAMLAB</span>
+    <img src="/brand/mark-animated.svg" alt="" width={24} height={24} className="w-6 h-6 shrink-0" />
+    <span className="text-[14px] font-semibold tracking-[0.14em] text-[#FAFAFA]">DREAMLAB AI</span>
   </Link>
 );
 
@@ -240,8 +240,8 @@ export const Header = () => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className="flex items-center gap-2 md:gap-3 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded min-h-[48px] min-w-[48px] px-3 py-2" aria-label="Main navigation menu">
-                <div className="w-10 h-10 md:w-8 md:h-8 shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all duration-300 group-hover:scale-110 animate-glow-pulse" aria-hidden="true"></div>
-                <span className="font-bold text-lg md:text-xl tracking-tight group-hover:text-purple-400 transition-colors duration-300">MENU</span>
+                <img src="/brand/mark-animated.svg" alt="" width={36} height={36} className="w-9 h-9 shrink-0 transition-transform duration-300 group-hover:scale-110" />
+                <span className="font-semibold text-lg tracking-[0.12em] group-hover:text-purple-400 transition-colors duration-300">DREAMLAB AI</span>
                 <ChevronDown className="h-5 w-5 md:h-4 md:w-4 shrink-0 text-muted-foreground group-hover:text-purple-400 transition-all duration-300 group-hover:rotate-180" aria-hidden="true" />
               </button>
             </DropdownMenuTrigger>
