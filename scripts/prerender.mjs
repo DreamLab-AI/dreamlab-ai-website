@@ -4,8 +4,46 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { createServer } from 'vite';
 import { JSDOM } from 'jsdom';
+import { execFileSync } from 'node:child_process';
 
 const origin = 'https://dreamlab-ai.com';
+
+// Retired URLs. GitHub Pages cannot send a server-side 301, so each gets a
+// static page with an instant meta refresh (Google treats that as a permanent
+// redirect) and a canonical naming the destination. Mirrors the <Navigate>
+// routes in src/App.tsx, plus /bbs for the Rust BBS client.
+const legacyRedirects = {
+  '/residential-training': '/programmes/',
+  '/masterclass': '/programmes/',
+  '/system-design': '/research/',
+  '/research-paper': '/research/',
+  '/work': '/research/',
+  '/bbs': '/community/bbs/',
+};
+const escapeHtml = value => value.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+const redirectStub = target => {
+  const url = escapeHtml(origin + target);
+  return `<!doctype html>\n<html lang="en-GB">\n<head>\n<meta charset="utf-8">\n<title>Moved to ${url}</title>\n<link rel="canonical" href="${url}">\n<meta name="robots" content="noindex">\n<meta http-equiv="refresh" content="0; url=${escapeHtml(target)}">\n</head>\n<body><p>This page has moved to <a href="${escapeHtml(target)}">${url}</a>.</p></body>\n</html>\n`;
+};
+
+// <lastmod> comes from the last commit touching a page's own source. A shallow
+// clone would date every page to the newest commit, which teaches crawlers to
+// ignore the field, so it is omitted rather than faked.
+const marketingSources = {
+  '/': ['src/pages/Index.tsx', 'src/data/site-facts.ts'], '/programmes': ['src/pages/Programmes.tsx', 'src/data/site-facts.ts'],
+  '/co-create': ['src/pages/CoCreate.tsx'], '/research': ['src/pages/Research.tsx'], '/ecosystem': ['src/pages/Ecosystem.tsx'],
+  '/team': ['src/pages/Team.tsx', 'public/data/team'], '/workshops': ['src/pages/WorkshopIndex.tsx', 'src/data/workshop-meta.ts'],
+  '/testimonials': ['src/pages/Testimonials.tsx', 'content/site-content.yaml'], '/ventures': ['src/pages/Ventures.tsx'],
+  '/contact': ['src/pages/Contact.tsx'], '/privacy': ['src/pages/Privacy.tsx'],
+};
+const git = args => execFileSync('git', args, { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim();
+let fullHistory = false;
+try { fullHistory = git(['rev-parse', '--is-shallow-repository']) === 'false'; } catch { /* not a git checkout */ }
+if (!fullHistory) console.warn('prerender: shallow or missing git history; sitemap written without <lastmod>');
+const lastModified = sources => {
+  if (!fullHistory || !sources) return null;
+  try { return git(['log', '-1', '--format=%cs', '--', ...sources]) || null; } catch { return null; }
+};
 // Vite's SSR server compiles JSX with the dev runtime (jsxDEV); an inherited
 // NODE_ENV=production would load React's production build, which lacks it.
 delete process.env.NODE_ENV;
@@ -15,6 +53,7 @@ try {
   const { marketingPaths, renderPage } = await vite.ssrLoadModule('/src/prerender.tsx');
   const workshops = JSON.parse(await fs.readFile('src/data/workshop-list.json', 'utf8'));
   const routes = [...marketingPaths];
+  const routeSources = new Map(Object.entries(marketingSources));
   const aliases = [];
   const curriculum = ['# DreamLab curriculum', '', '> Free self-guided lessons. Follow the source links for Markdown; each lesson also has a readable HTML page.', ''];
   for (const workshop of workshops) {
@@ -24,6 +63,7 @@ try {
     curriculum.push(`## ${manifest.title}`, '');
     for (const lesson of manifest.pages) {
       routes.push(`${workshop.path}/${lesson.slug}`);
+      routeSources.set(`${workshop.path}/${lesson.slug}`, [`public/data/workshops/${workshop.id}/${lesson.slug}`]);
       curriculum.push(`- [${lesson.title}](${origin}/data/workshops/${workshop.id}/${lesson.slug}): [Read online](${origin}${workshop.path}/${lesson.slug}/)`);
     }
     curriculum.push('');
@@ -90,10 +130,18 @@ try {
     await fs.mkdir(directory, { recursive: true });
     await fs.writeFile(path.join(directory, 'index.html'), html);
   }
-  // No deployment-time lastmod: a rebuild is not a content revision.
-  await fs.writeFile('dist/sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${routes.map(route => `  <url><loc>${pageUrl(route)}</loc></url>`).join('\n')}\n</urlset>\n`);
+  for (const [from, to] of Object.entries(legacyRedirects)) {
+    if (outputs.has(from)) throw new Error(`Redirect would overwrite a real page: ${from}`);
+    await fs.mkdir(path.join('dist', from), { recursive: true });
+    await fs.writeFile(path.join('dist', from, 'index.html'), redirectStub(to));
+  }
+  const sitemapEntry = route => {
+    const lastmod = lastModified(routeSources.get(route));
+    return `  <url><loc>${pageUrl(route)}</loc>${lastmod ? `<lastmod>${lastmod}</lastmod>` : ''}</url>`;
+  };
+  await fs.writeFile('dist/sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${routes.map(sitemapEntry).join('\n')}\n</urlset>\n`);
   await fs.writeFile('dist/workshops/llms.txt', curriculum.join('\n'));
-  console.log(`Prerendered ${routes.length} canonical pages and ${aliases.length} workshop entry points.`);
+  console.log(`Prerendered ${routes.length} canonical pages, ${aliases.length} workshop entry points and ${Object.keys(legacyRedirects).length} legacy redirects.`);
 } finally {
   await vite.close();
 }
