@@ -456,7 +456,7 @@ const TrackDetailMobile = ({ track }: { track: (typeof outcomeCategories)[number
             </h2>
             <p className="text-[14px] leading-[1.55] text-white/55 mt-1">{prog.description}</p>
             <p className="text-[11px] font-mono uppercase tracking-[0.12em] text-white/40 mt-2">
-              {prog.duration} · {prog.format}
+              {prog.duration} · {prog.format} · Price on application
             </p>
           </div>
         ))}
@@ -537,6 +537,7 @@ const ProgrammesDesktop = () => {
             </p>
             <p className="text-sm text-muted-foreground/60 mb-8">
               We're outcome driven, able to combine modules across categories to fit your needs.
+              Pricing is on application (POA), quoted per engagement.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center px-4">
               <Button size="lg" asChild className="min-h-[44px]">
@@ -844,6 +845,35 @@ const ProgrammesDesktop = () => {
 // Page component — shared shell, gates the mobile/desktop surface
 // ──────────────────────────────────────────────────────────────
 
+// Course list for search engines; mirrors the visible catalogue. Price is POA,
+// so offers carry no amount.
+const COURSES_JSON_LD = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  itemListElement: programmes.map((p, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    item: {
+      '@type': 'Course',
+      name: p.title,
+      description: p.description,
+      url: 'https://dreamlab-ai.com/programmes/',
+      provider: { '@type': 'Organization', name: 'DreamLab AI Consulting Ltd', sameAs: 'https://dreamlab-ai.com/' },
+      offers: { '@type': 'Offer', category: 'Paid', availability: 'https://schema.org/InStock', description: 'Price on application (POA)' },
+      hasCourseInstance: {
+        '@type': 'CourseInstance',
+        courseMode: 'Onsite',
+        courseWorkload: p.duration,
+        location: {
+          '@type': 'Place',
+          name: 'DreamLab, Lake District',
+          address: { '@type': 'PostalAddress', addressRegion: 'Cumbria', addressCountry: 'GB' },
+        },
+      },
+    },
+  })),
+}).replaceAll('<', '\\u003c');
+
 const Programmes = () => {
   useOGMeta({
     title: "Programmes | DreamLab Applied Innovation Lab",
@@ -855,6 +885,7 @@ const Programmes = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground pt-14 md:pt-0">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: COURSES_JSON_LD }} />
       <Header />
       {isMobile ? <ProgrammesMobile /> : <ProgrammesDesktop />}
     </div>

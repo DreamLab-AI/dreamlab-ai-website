@@ -3,7 +3,7 @@
  * Updates document meta tags on mount and when config changes
  */
 
-import { useEffect } from 'react';
+import { createContext, useContext, useEffect } from 'react';
 import { updateOGMetaTags, OGMetaConfig } from '@/lib/og-meta';
 
 /**
@@ -19,7 +19,12 @@ import { updateOGMetaTags, OGMetaConfig } from '@/lib/og-meta';
  * };
  * ```
  */
+// Build-time rendering captures the same metadata used by the browser.
+export const StaticMetaContext = createContext<((config: Partial<OGMetaConfig>) => void) | null>(null);
+
 export function useOGMeta(config: Partial<OGMetaConfig>): void {
+  const collect = useContext(StaticMetaContext);
+  collect?.(config);
   // Callers pass inline object literals, so the effect keys on the serialised
   // config: it re-runs when any field changes, not on every render.
   const serialised = JSON.stringify(config);

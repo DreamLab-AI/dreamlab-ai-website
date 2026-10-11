@@ -1,6 +1,9 @@
 import { Header } from "@/components/Header";
+import { useOGMeta } from '@/hooks/useOGMeta';
+import { PAGE_OG_CONFIGS } from '@/lib/og-meta';
 
 const Privacy = () => {
+  useOGMeta(PAGE_OG_CONFIGS.privacy);
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Header />
@@ -10,7 +13,7 @@ const Privacy = () => {
 
         <div className="prose prose-invert max-w-none">
           <p className="text-muted-foreground mb-8">
-            Last updated: {new Date().toLocaleDateString()}
+            Last updated: 8 October 2026
           </p>
 
           <section className="mb-8">

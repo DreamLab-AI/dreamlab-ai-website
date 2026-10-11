@@ -49,6 +49,7 @@ export const WORKSHOP_META: Record<string, WorkshopMeta> = {
   'workshop-06-codex': { order: 13, module: '06', title: 'AI coding ecosystem', period: '', difficulty: 'advanced', hours: 4 },
   'workshop-05-morning-qa-automation': { order: 14, module: '05', title: 'QA & automation', period: 'Morning', difficulty: 'intermediate', hours: 3 },
   'workshop-05-afternoon-publishing': { order: 15, module: '05', title: 'Professional output suite', period: 'Afternoon', difficulty: 'intermediate', hours: 3 },
+  'workshop-10-seo-ai-discoverability': { order: 16, module: '10', title: 'SEO & AI discoverability', period: '', difficulty: 'intermediate', hours: 6 },
 };
 
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);

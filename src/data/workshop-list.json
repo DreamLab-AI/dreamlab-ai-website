@@ -73,5 +73,10 @@
     "id": "workshop-08-claude-code",
     "name": "08 - Claude Code",
     "path": "/workshops/workshop-08-claude-code"
+  },
+  {
+    "id": "workshop-10-seo-ai-discoverability",
+    "name": "10 - Seo Ai Discoverability",
+    "path": "/workshops/workshop-10-seo-ai-discoverability"
   }
 ]

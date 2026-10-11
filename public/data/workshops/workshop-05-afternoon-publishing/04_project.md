@@ -360,7 +360,7 @@ Your project is complete when:
 1. **Monitoring:** Add Sentry error tracking
 2. **Analytics:** Integrate Vercel Analytics
 3. **Performance:** Add Redis caching layer
-4. **SEO:** Implement meta tags and Open Graph
+4. **SEO:** Implement meta tags and Open Graph — covered in depth in [Phase 10: SEO & AI Discoverability](/workshops/workshop-10-seo-ai-discoverability)
 5. **PWA:** Make frontend installable
 
 ---

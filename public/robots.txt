@@ -1,26 +1,21 @@
+# Public marketing and curriculum are available to search and user retrieval.
+# These rules also preserve access for other crawlers under our existing policy.
+# robots.txt is not access control; private services require authentication.
 User-agent: *
 Allow: /
 Disallow: /api/
 Disallow: /admin/
-Disallow: /*.json$
 
-User-agent: Googlebot
+# Search and user-directed agents have the same public access as other readers.
+# Training choices are independent; this change does not introduce a training block.
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: PerplexityBot
+User-agent: Perplexity-User
+User-agent: Claude-SearchBot
+User-agent: Claude-User
 Allow: /
+Disallow: /api/
+Disallow: /admin/
 
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
-# Crawl-delay
-Crawl-delay: 1
-
-# Sitemap
 Sitemap: https://dreamlab-ai.com/sitemap.xml
-
-# AI assistant guide
-# llms.txt: https://dreamlab-ai.com/llms.txt

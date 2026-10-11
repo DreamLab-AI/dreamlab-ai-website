@@ -10,7 +10,7 @@ import { WORKSHOP_META, workshopRowMeta } from '@/data/workshop-meta';
 import {
   BookOpen, Code, Terminal, Users, FileText, Clock, CheckCircle2,
   PlayCircle, ChevronDown, Zap, Target, ArrowRight,
-  Sparkles, Database, Box, Layers, Rocket, Check, RotateCcw,
+  Sparkles, Database, Box, Layers, Rocket, Check, RotateCcw, Search,
 } from 'lucide-react';
 
 interface WorkshopModule {
@@ -167,6 +167,20 @@ const PHASES: CurriculumPhase[] = [
       { id: 'workshop-05-afternoon-publishing', name: 'Professional Output Suite', path: '/workshops/workshop-05-afternoon-publishing', description: 'Publish and deploy your AI-enhanced work professionally', estimatedHours: 3 },
     ],
   },
+  {
+    id: 'discoverability',
+    number: 10,
+    title: 'SEO & AI Discoverability',
+    subtitle: 'Be Found by Search Engines and Answer Engines',
+    description: 'Make what you publish findable and citable. Audit crawling and rendering, write valid JSON-LD, set a deliberate policy for AI crawlers, and structure content so answer engines quote it accurately.',
+    difficulty: 'Intermediate',
+    estimatedHours: 6,
+    category: 'engineering',
+    icon: Search,
+    workshops: [
+      { id: 'workshop-10-seo-ai-discoverability', name: 'SEO & AI Discoverability', path: '/workshops/workshop-10-seo-ai-discoverability', description: 'Technical SEO, structured data, AI crawler controls and answer-engine content', estimatedHours: 6 },
+    ],
+  },
 ];
 
 const ALL_WORKSHOP_IDS = PHASES.flatMap(p => p.workshops.map(w => w.id));
@@ -244,13 +258,13 @@ const WorkshopIndexDesktop = () => {
             </h1>
 
             <p className="text-xl md:text-2xl text-muted-foreground/90 mb-12 max-w-3xl animate-slide-up font-light" style={{ animationDelay: '0.2s' }}>
-              Master AI tools across 9 structured phases &mdash; from first setup to production deployment
+              Master AI tools across {PHASES.length} structured phases &mdash; from first setup to being found online
             </p>
 
             <div className="flex flex-wrap items-center justify-center gap-6 mb-12 animate-scale-in" style={{ animationDelay: '0.3s' }}>
               {[
                 { Icon: Target, label: '9 Phases', sub: 'Structured Path' },
-                { Icon: BookOpen, label: '15 Workshops', sub: 'Hands-On Content' },
+                { Icon: BookOpen, label: `${ALL_WORKSHOP_IDS.length} Workshops`, sub: 'Hands-On Content' },
                 { Icon: Clock, label: `${TOTAL_HOURS}+ Hours`, sub: 'Self-Paced' },
               ].map(stat => (
                 <div key={stat.label} className="flex items-center gap-2 px-6 py-3 rounded-xl bg-background/40 backdrop-blur-xl border border-purple-500/20 hover:border-purple-500/40 transition-all duration-300 hover:scale-105">
@@ -337,7 +351,7 @@ const WorkshopIndexDesktop = () => {
               Your Learning Journey
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              9 phases from foundations to production. Click any phase to begin.
+              {PHASES.length} phases from foundations to discoverability. Click any phase to begin.
             </p>
           </div>
           <LearningPathDiagram
@@ -558,7 +572,7 @@ const WorkshopIndexMobile = () => {
             The VS Code learning pathway.
           </h1>
           <p className="text-[16px] leading-[1.6] text-white/[0.62] mt-4">
-            Fifteen modules, roughly a morning or an afternoon each.
+            {total} modules, roughly a morning or an afternoon each.
           </p>
         </header>
 

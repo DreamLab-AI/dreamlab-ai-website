@@ -49,14 +49,17 @@ const markdownRehypePlugins: import('react-markdown').Options['rehypePlugins'] =
   [rehypeSanitize, markdownSanitizeSchema],
 ];
 
-const WorkshopPage = () => {
+const WorkshopPage = ({ initialManifest = null, initialContent = '' }: {
+  initialManifest?: WorkshopManifest | null;
+  initialContent?: string;
+}) => {
   const { workshopId, pageSlug } = useParams<{ workshopId: string; pageSlug?: string }>();
   const navigate = useNavigate();
   const isMobile = useIsMobileSync();
   const { isCompleted, toggleComplete } = useWorkshopProgress();
-  const [manifest, setManifest] = useState<WorkshopManifest | null>(null);
-  const [currentPageContent, setCurrentPageContent] = useState<string>('');
-  const [isLoadingManifest, setIsLoadingManifest] = useState(true);
+  const [manifest, setManifest] = useState<WorkshopManifest | null>(initialManifest);
+  const [currentPageContent, setCurrentPageContent] = useState<string>(initialContent);
+  const [isLoadingManifest, setIsLoadingManifest] = useState(!initialManifest);
   const [isLoadingContent, setIsLoadingContent] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -182,19 +185,13 @@ const WorkshopPage = () => {
   }, [workshopId, currentActualSlug, manifest, isLoadingManifest]);
 
   // Update OG meta tags when manifest loads
-  useEffect(() => {
-    if (manifest && workshopId) {
-      const ogConfig = getWorkshopOGConfig(
-        workshopId,
-        manifest.title,
-        manifest.description || `${manifest.title} - DreamLab AI Workshop`
-      );
-      // Dynamically import to avoid circular dependencies
-      import('@/lib/og-meta').then(({ updateOGMetaTags }) => {
-        updateOGMetaTags(ogConfig);
-      });
-    }
-  }, [manifest, workshopId]);
+  const lessonTitle = manifest?.pages.find(page => page.slug === currentActualSlug)?.title;
+  useOGMeta(getWorkshopOGConfig(
+    workshopId || '',
+    lessonTitle || manifest?.title || 'Workshop',
+    manifest?.description || `${lessonTitle || manifest?.title || 'Self-guided learning'} — free DreamLab AI curriculum.`,
+    currentActualSlug,
+  ));
 
   // Effect to render Mermaid diagrams after content is loaded and DOM updated
   useEffect(() => {

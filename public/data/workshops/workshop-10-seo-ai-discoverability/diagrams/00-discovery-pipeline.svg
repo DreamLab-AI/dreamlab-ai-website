@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 280" role="img" aria-labelledby="dp-title dp-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="dp-title">The discovery pipeline</title>
+  <desc id="dp-desc">A URL is discovered, fetched, rendered, understood, indexed, then ranked or retrieved, and finally shown as a link or cited in an AI answer. Failing an early step makes every later step irrelevant.</desc>
+
+  <defs>
+    <marker id="dp-arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <rect x="8" y="8" width="944" height="264" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">THE DISCOVERY PIPELINE</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <g text-anchor="middle">
+    <rect x="48.0" y="112" width="111.4" height="84" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="103.7" y="150" font-size="14" font-weight="600" fill="#F5F5F5">Discover</text>
+    <text x="103.7" y="172" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10.5" fill="#9CA3AF">link · sitemap</text>
+    <line x1="160.4" y1="154" x2="172.4" y2="154" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#dp-arr)"/>
+    <rect x="173.4" y="112" width="111.4" height="84" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="229.1" y="150" font-size="14" font-weight="600" fill="#F5F5F5">Fetch</text>
+    <text x="229.1" y="172" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10.5" fill="#9CA3AF">robots.txt · CDN</text>
+    <line x1="285.9" y1="154" x2="297.9" y2="154" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#dp-arr)"/>
+    <rect x="298.9" y="112" width="111.4" height="84" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="354.6" y="150" font-size="14" font-weight="600" fill="#F5F5F5">Render</text>
+    <text x="354.6" y="172" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10.5" fill="#9CA3AF">JavaScript</text>
+    <line x1="411.3" y1="154" x2="423.3" y2="154" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#dp-arr)"/>
+    <rect x="424.3" y="112" width="111.4" height="84" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="480.0" y="150" font-size="14" font-weight="600" fill="#F5F5F5">Understand</text>
+    <text x="480.0" y="172" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10.5" fill="#9CA3AF">text · JSON-LD</text>
+    <line x1="536.7" y1="154" x2="548.7" y2="154" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#dp-arr)"/>
+    <rect x="549.7" y="112" width="111.4" height="84" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="605.4" y="150" font-size="14" font-weight="600" fill="#F5F5F5">Index</text>
+    <text x="605.4" y="172" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10.5" fill="#9CA3AF">store</text>
+    <line x1="662.1" y1="154" x2="674.1" y2="154" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#dp-arr)"/>
+    <rect x="675.1" y="112" width="111.4" height="84" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="730.9" y="150" font-size="14" font-weight="600" fill="#F5F5F5">Rank</text>
+    <text x="730.9" y="172" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10.5" fill="#9CA3AF">or retrieve</text>
+    <line x1="787.6" y1="154" x2="799.6" y2="154" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#dp-arr)"/>
+    <rect x="800.6" y="112" width="111.4" height="84" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="856.3" y="150" font-size="14" font-weight="600" fill="#F5F5F5">Show / cite</text>
+    <text x="856.3" y="172" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10.5" fill="#9CA3AF">link · answer</text>
+  </g>
+  <text x="48" y="238" font-size="12.5" fill="#9CA3AF">Shared by search engines and answer engines. A page that fails an early step never reaches the later ones.</text>
+</svg>

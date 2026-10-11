@@ -20,6 +20,7 @@ const Research = lazy(() => import("./pages/Research"));
 const Ecosystem = lazy(() => import("./pages/Ecosystem"));
 const Testimonials = lazy(() => import("./pages/Testimonials"));
 const Ventures = lazy(() => import("./pages/Ventures"));
+const ChainMirror = lazy(() => import("./pages/ChainMirror"));
 
 /**
  * The root application component.
@@ -61,6 +62,7 @@ const App = () => (
 
             {/* Venture Lab — unlinked, direct URL only */}
             <Route path="/ventures" element={<Ventures />} />
+            <Route path="/chain" element={<ChainMirror />} />
 
             <Route path="/contact" element={<Contact />} />
             <Route path="/privacy" element={<Privacy />} />

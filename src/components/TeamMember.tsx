@@ -28,6 +28,7 @@ export const TeamMember = memo(({
 
   return (
     <div
+      id={id === '04' ? 'john-ohare' : `team-${id}`}
       className="group relative overflow-hidden rounded-xl bg-background/50 backdrop-blur-sm border border-purple-500/20 shadow-lg transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/20 hover:scale-[1.02] hover:border-purple-500/40"
       onClick={(e) => {
         // Only toggle selection when clicking on the image

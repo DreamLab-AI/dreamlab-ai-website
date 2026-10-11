@@ -626,6 +626,27 @@ const IndexDesktop = () => {
         </div>
       </section>
 
+      {/* FAQ: answer-shaped text for search and AI answer engines */}
+      <section className="py-16 md:py-20" aria-labelledby="faq-heading">
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: FAQ_JSON_LD }} />
+        <div className="container max-w-3xl mx-auto px-5 md:px-4">
+          <h2 id="faq-heading" className="text-2xl sm:text-3xl md:text-4xl font-bold mb-8 text-center">
+            Frequently asked questions
+          </h2>
+          <div className="space-y-3">
+            {FAQS.map(({ q, a }) => (
+              <details key={q} className="group bg-background/50 border border-purple-500/20 rounded-xl p-5 open:border-purple-500/40">
+                <summary className="cursor-pointer font-semibold list-none flex justify-between gap-4">
+                  {q}
+                  <span aria-hidden="true" className="text-purple-400 group-open:rotate-45 transition-transform">+</span>
+                </summary>
+                <p className="mt-3 text-sm md:text-base text-muted-foreground leading-relaxed">{a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Section 8: Dual CTA Footer */}
       <section className="py-16 md:py-20" aria-label="Get started">
         <div className="container max-w-5xl mx-auto px-5 md:px-4">
@@ -733,6 +754,50 @@ const IndexDesktop = () => {
     </>
   );
 };
+
+// Visible Q&A mirrored word-for-word in FAQPage JSON-LD (ADR-043 FAQ layer).
+// Rendered in the page body so the prerender captures it and it unmounts on
+// client navigation instead of leaking into other routes' structured data.
+const FAQS: { q: string; a: string }[] = [
+  {
+    q: 'Does DreamLab run AI and agentic training in the Lake District?',
+    a: 'Yes. DreamLab runs residential AI and agents training from its facility in the Lake District, Cumbria. Teams work with specialists on agentic workflows, AI integration and rapid prototyping, scoped to their own projects, and can continue with the free self-guided curriculum afterwards.',
+  },
+  {
+    q: 'What is DreamLab?',
+    a: 'DreamLab is an Applied Innovation Lab in the UK Lake District. Teams work alongside a network of 44+ deep-tech specialists on AI, immersive XR, cyber trust and creative technology through residential programmes and embedded R&D residencies.',
+  },
+  {
+    q: 'Where is DreamLab located?',
+    a: 'DreamLab operates from a residential facility in the Lake District, Cumbria, United Kingdom. Programmes are residential: participants stay on site, combining focused technical work with the setting of a UNESCO World Heritage landscape.',
+  },
+  {
+    q: 'What do the residential programmes involve?',
+    a: "Residential programmes are intensive deep-tech training for enterprise and SME teams. Each programme pairs a team with relevant specialists from the DreamLab network to transfer applied skills in AI, XR, virtual production or cyber trust, scoped to the team's real projects.",
+  },
+  {
+    q: 'Are the self-guided courses free?',
+    a: 'Yes. DreamLab publishes a free 10-phase, 57+ hour self-guided curriculum covering AI foundations, AI APIs, Claude Code, local AI and RAG, Docker, AI agents and orchestration, QA and publishing, and SEO and AI discoverability. No registration is required.',
+  },
+  {
+    q: 'Who are DreamLab programmes for?',
+    a: 'DreamLab serves enterprise and SME teams that need applied capability, not just theory: engineering groups adopting AI, studios moving into virtual production, and organisations building trustworthy, secure systems. Programmes are scoped per team rather than sold as fixed courses.',
+  },
+  {
+    q: 'How do I book a discovery call with DreamLab?',
+    a: "Use the contact form at dreamlab-ai.com/contact or email info@dreamlab-ai.com. The contact form is end-to-end encrypted and stores nothing in a database. A discovery call scopes your team's goals before any programme is proposed.",
+  },
+];
+
+const FAQ_JSON_LD = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: FAQS.map(({ q, a }) => ({
+    '@type': 'Question',
+    name: q,
+    acceptedAnswer: { '@type': 'Answer', text: a },
+  })),
+}).replaceAll('<', '\\u003c');
 
 const Index = () => {
   useOGMeta(PAGE_OG_CONFIGS.home);

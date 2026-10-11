@@ -54,6 +54,7 @@ const MobileTeamCard = ({
   const { name, role } = splitHeadline(member.headline);
   return (
     <button
+      id={member.id === '04' ? 'john-ohare' : `team-${member.id}`}
       type="button"
       aria-pressed={isSelected}
       aria-label={`Select ${name}`}
@@ -221,13 +222,13 @@ const TeamDesktop = ({ teamMembers, loading, selectedMembers, onToggle, onEnquir
   </>
 );
 
-const Team = () => {
+const Team = ({ initialMembers = [] }: { initialMembers?: TeamMemberData[] }) => {
   // Set OG meta tags for team page
   useOGMeta(PAGE_OG_CONFIGS.team);
 
-  const [teamMembers, setTeamMembers] = useState<TeamMemberData[]>([]);
+  const [teamMembers, setTeamMembers] = useState<TeamMemberData[]>(initialMembers);
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(initialMembers.length === 0);
   const isMobile = useIsMobileSync();
 
   useEffect(() => {
