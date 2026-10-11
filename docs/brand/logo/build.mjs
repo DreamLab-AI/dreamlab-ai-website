@@ -14,8 +14,10 @@ const C = {
 };
 
 // ---------------------------------------------------------------- wordmark
-// Geometric lowercase "dreamlab": bowl radius 20, x-height 40, ascender 68,
+// Geometric "DreamLab AI": capitals 68 high, x-height 40, bowl radius 20,
 // baseline y=80. Stroked paths with round caps; italicised by a skew.
+// (Lowercase "dreamlab" is the North West collective's own name and logo;
+// this company's mark is DreamLab AI.)
 const B = 80, X = 40, A = 12, R = 20, CY = 60;
 const circle = (cx, cy, r) =>
   `M${cx - r},${cy} a${r},${r} 0 1,0 ${2 * r},0 a${r},${r} 0 1,0 ${-2 * r},0`;
@@ -34,20 +36,25 @@ const glyphs = {
   }),
   l: (x) => ({ d: `M${x},${A} V${B}`, w: 0 }),
   b: (x) => ({ d: `M${x},${A} V${B} ${circle(x + R, CY, R)}`, w: 2 * R }),
+  D: (x) => ({ d: `M${x},${A} H${x + 12} A34,34 0 0,1 ${x + 12},${B} H${x} Z`, w: 46 }),
+  L: (x) => ({ d: `M${x},${A} V${B} H${x + 30}`, w: 30 }),
+  A: (x) => ({ d: `M${x},${B} L${x + 21},${A} L${x + 42},${B} M${x + 9},${B - 22} H${x + 33}`, w: 42 }),
+  I: (x) => ({ d: `M${x},${A} V${B}`, w: 0 }),
+  ' ': () => ({ d: '', w: 8 }),
 };
-function wordmark(word = 'dreamlab', gap = 15) {
+function wordmark(word = 'DreamLab AI', gap = 15) {
   let x = 0;
   const parts = [];
   for (const ch of word) {
     const g = glyphs[ch](x);
-    parts.push(g.d);
+    if (g.d) parts.push(g.d);
     x += g.w + gap;
   }
   return { d: parts.join(' '), width: x - gap };
 }
 
 // --------------------------------------------------------- spaced capitals
-// The current header wordmark (DREAMLAB, wide tracking) as paths. Cap height 20.
+// The current header wordmark in wide-tracked capitals, as paths. Cap height 20.
 const caps = {
   D: (x) => ({ d: `M${x},0 H${x + 5} A10,10 0 0,1 ${x + 5},20 H${x} Z`, w: 15 }),
   R: (x) => ({ d: `M${x},20 V0 H${x + 8} A5.5,5.5 0 0,1 ${x + 8},11 H${x} M${x + 7},11 L${x + 13},20`, w: 13.5 }),
@@ -56,13 +63,22 @@ const caps = {
   M: (x) => ({ d: `M${x},20 V0 L${x + 8},12 L${x + 16},0 V20`, w: 16 }),
   L: (x) => ({ d: `M${x},0 V20 H${x + 11}`, w: 8.5 }),
   B: (x) => ({ d: `M${x},10 V0 H${x + 7} A5,5 0 0,1 ${x + 7},10 H${x} V20 H${x + 8} A5,5 0 0,0 ${x + 8},10`, w: 13.5 }),
+  I: (x) => ({ d: `M${x},0 V20`, w: 0 }),
+  C: (x) => ({ d: `M${x + 15},3.5 A10,10 0 1,0 ${x + 15},16.5`, w: 15 }),
+  O: (x) => ({ d: circle(x + 10, 10, 10), w: 20 }),
+  N: (x) => ({ d: `M${x},20 V0 L${x + 14},20 V0`, w: 14 }),
+  S: (x) => ({ d: `M${x + 12},3 Q${x + 6},-1 ${x + 1.5},4 Q${x - 1},9 ${x + 6},10 Q${x + 13},11 ${x + 11},16.5 Q${x + 7},21 ${x},17`, w: 12 }),
+  U: (x) => ({ d: `M${x},0 V13 A6,6 0 0,0 ${x + 12},13 V0`, w: 12 }),
+  T: (x) => ({ d: `M${x},0 H${x + 14} M${x + 7},0 V20`, w: 14 }),
+  G: (x) => ({ d: `M${x + 15},3.5 A10,10 0 1,0 ${x + 19},11 H${x + 12}`, w: 19 }),
+  ' ': () => ({ d: '', w: 10 }),
 };
-function spaced(word = 'DREAMLAB', track = 7) {
+function spaced(word = 'DREAMLAB AI', track = 7) {
   let x = 0;
   const parts = [];
   for (const ch of word) {
     const g = caps[ch](x);
-    parts.push(g.d);
+    if (g.d) parts.push(g.d);
     x += g.w + track;
   }
   return { d: parts.join(' '), width: x - track };
@@ -142,36 +158,45 @@ const files = {};
 // 1. Faithful: bowl mark + italic gradient wordmark (static and animated).
 const wm = wordmark();
 const SKEW = -12;
-function lockup(id, animated, mono) {
+// Company line set under the wordmark in small spaced capitals.
+const desc = spaced('CONSULTING', 9);
+function lockup(id, animated, mono, descriptor = false) {
   const markScale = 1.55;
   const markW = 64 * markScale;
   const wx = markW + 18;
   const w = Math.ceil(wx + wm.width + 30);
+  const h = descriptor ? 122 : 96;
+  const ds = 0.62;
+  const descLine = descriptor
+    ? `<g transform="translate(${wx + 6 + wm.width - desc.width * ds},98) scale(${ds})"><path d="${desc.d}" fill="none" stroke="${mono ?? C.paper}" stroke-opacity="${mono ? 1 : 0.8}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></g>`
+    : '';
   const body = `${mono ? '' : defs(id)}${animated ? ANIM : ''}
-  <g transform="translate(0,-2) scale(${markScale})">${markGroup(id, { animated, mono })}</g>
+  <g transform="translate(0,${descriptor ? 10 : -2}) scale(${markScale})">${markGroup(id, { animated, mono })}</g>
   <g transform="translate(${wx + 12},0) skewX(${SKEW})">
     <path d="${wm.d}" fill="none" stroke="${mono ?? `url(#${id}-g)`}" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
-  </g>`;
-  return svg(w, 96, body, 'DreamLab');
+  </g>${descLine}`;
+  return svg(w, h, body, descriptor ? 'DreamLab AI Consulting' : 'DreamLab AI');
 }
 files['01-classic-lockup.svg'] = lockup('cl', false, null);
 files['01-classic-lockup-animated.svg'] = lockup('cla', true, null);
 files['01-classic-lockup-mono-light.svg'] = lockup('clm', false, C.paper);
 files['01-classic-lockup-mono-dark.svg'] = lockup('cld', false, C.ink);
+files['01-classic-lockup-consulting.svg'] = lockup('clc', false, null, true);
+files['01-classic-lockup-consulting-mono-dark.svg'] = lockup('clcd', false, C.ink, true);
 
 // 2. Mark only: full detail, and a simplified version for favicons (16/32px).
-files['02-mark.svg'] = svg(64, 64, `${defs('mk')}${markGroup('mk')}`, 'DreamLab mark');
-files['02-mark-animated.svg'] = svg(64, 64, `${defs('mka')}${ANIM}${markGroup('mka', { animated: true })}`, 'DreamLab mark');
+files['02-mark.svg'] = svg(64, 64, `${defs('mk')}${markGroup('mk')}`, 'DreamLab AI mark');
+files['02-mark-animated.svg'] = svg(64, 64, `${defs('mka')}${ANIM}${markGroup('mka', { animated: true })}`, 'DreamLab AI mark');
 files['02-mark-favicon.svg'] = svg(
   64, 64,
   `${defs('fv')}<rect width="64" height="64" rx="14" fill="${C.ink}"/><g transform="translate(-6.5,-6) scale(1.2)">${markGroup('fv', { simple: true })}</g>`,
-  'DreamLab',
+  'DreamLab AI',
 );
-files['02-mark-mono-light.svg'] = svg(64, 64, markGroup('mml', { mono: C.paper }), 'DreamLab mark');
-files['02-mark-mono-dark.svg'] = svg(64, 64, markGroup('mmd', { mono: C.ink }), 'DreamLab mark');
+files['02-mark-mono-light.svg'] = svg(64, 64, markGroup('mml', { mono: C.paper }), 'DreamLab AI mark');
+files['02-mark-mono-dark.svg'] = svg(64, 64, markGroup('mmd', { mono: C.ink }), 'DreamLab AI mark');
 
 // 3. The current header, evolved: the cyan dot becomes a three-node
-// constellation; DREAMLAB in wide-tracked capitals, as paths.
+// constellation; DREAMLAB AI in wide-tracked capitals, as paths.
 const sp = spaced();
 function header(id, animated, ink) {
   const body = `${animated ? `<style>
@@ -187,7 +212,7 @@ function header(id, animated, ink) {
   </g>
   <g fill="${C.cyan}"><circle class="hn" cx="5" cy="18" r="3"/><circle class="hn hn2" cx="12" cy="8" r="3.6"/><circle class="hn hn3" cx="19" cy="17" r="2.6"/></g>
   <g transform="translate(34,3)"><path d="${sp.d}" fill="none" stroke="${ink}" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/></g>`;
-  return svg(Math.ceil(34 + sp.width + 4), 26, body, 'DreamLab');
+  return svg(Math.ceil(34 + sp.width + 4), 26, body, 'DreamLab AI');
 }
 files['03-header-constellation.svg'] = header('h', false, C.paper);
 files['03-header-constellation-animated.svg'] = header('ha', true, C.paper);
@@ -221,15 +246,15 @@ function phyllotaxis(id, animated) {
   <circle class="core" cx="32" cy="32" r="9" fill="url(#${id}-core)"/>`;
   return body;
 }
-files['04-golden-field.svg'] = svg(64, 64, phyllotaxis('gf', false), 'DreamLab golden field');
-files['04-golden-field-animated.svg'] = svg(64, 64, phyllotaxis('gfa', true), 'DreamLab golden field');
+files['04-golden-field.svg'] = svg(64, 64, phyllotaxis('gf', false), 'DreamLab AI golden field');
+files['04-golden-field-animated.svg'] = svg(64, 64, phyllotaxis('gfa', true), 'DreamLab AI golden field');
 {
   const markW = 96;
   const body = `<g transform="scale(1.5)">${phyllotaxis('gfl', true)}</g>
   <g transform="translate(${markW + 26},4) skewX(${SKEW})">
     <path d="${wm.d}" fill="none" stroke="${C.paper}" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
   </g>`;
-  files['04-golden-field-lockup-animated.svg'] = svg(Math.ceil(markW + 26 + wm.width + 30), 96, body, 'DreamLab');
+  files['04-golden-field-lockup-animated.svg'] = svg(Math.ceil(markW + 26 + wm.width + 30), 96, body, 'DreamLab AI');
 }
 
 for (const [name, content] of Object.entries(files)) writeFileSync(join(OUT, name), content);

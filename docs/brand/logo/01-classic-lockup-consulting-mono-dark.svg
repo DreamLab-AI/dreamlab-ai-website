@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 652 122" width="652" height="122" role="img" aria-label="DreamLab AI Consulting">
+  <title>DreamLab AI Consulting</title>
+  
+  <g transform="translate(0,10) scale(1.55)"><g  stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path class="bowl" d="M7,37 H57 M10,37 C12,52 22,57 32,57 C42,57 52,52 54,37" stroke="#0E0E11" stroke-width="3.5"/>
+    <path d="M24,60 H40" stroke="#0E0E11" stroke-width="3"/>
+    <g stroke="#0E0E11" stroke-width="1.6"><line class="edge e0" x1="21" y1="27" x2="29" y2="18"/><line class="edge e1" x1="29" y1="18" x2="38" y2="24"/><line class="edge e2" x1="38" y1="24" x2="46" y2="13"/><line class="edge e3" x1="21" y1="27" x2="38" y2="24"/><line class="edge e9" x1="32" y1="37" x2="21" y2="27"/></g>
+    <g fill="#0E0E11" stroke="none"><circle class="node n0" cx="21" cy="27" r="2.8"/><circle class="node n1" cx="29" cy="18" r="2.8"/><circle class="node n2" cx="38" cy="24" r="2.8"/><circle class="node n3" cx="46" cy="13" r="3.4"/></g>
+    <path class="wisp" d="M46,13 C51,10 47,7 51,5 C54,3 58,5 56,8" stroke="#0E0E11" stroke-width="2.4"/>
+  </g></g>
+  <g transform="translate(129.2,0) skewX(-12)">
+    <path d="M0,12 H12 A34,34 0 0,1 12,80 H0 Z M61,80 V54 Q61,40 81,40 M96,60 H136 A20,20 0 1,0 131.32,72.86 M151,60 a20,20 0 1,0 40,0 a20,20 0 1,0 -40,0 M191,40 V80 M206,80 V52 a12,12 0 0,1 24,0 V80 M230,52 a12,12 0 0,1 24,0 V80 M269,12 V80 H299 M314,60 a20,20 0 1,0 40,0 a20,20 0 1,0 -40,0 M354,40 V80 M369,12 V80 M369,60 a20,20 0 1,0 40,0 a20,20 0 1,0 -40,0 M447,80 L468,12 L489,80 M456,58 H480 M504,12 V80" fill="none" stroke="#0E0E11" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+  </g><g transform="translate(497.31000000000006,98) scale(0.62)"><path d="M15,3.5 A10,10 0 1,0 15,16.5 M24,10 a10,10 0 1,0 20,0 a10,10 0 1,0 -20,0 M53,20 V0 L67,20 V0 M88,3 Q82,-1 77.5,4 Q75,9 82,10 Q89,11 87,16.5 Q83,21 76,17 M97,0 V13 A6,6 0 0,0 109,13 V0 M118,0 V20 H129 M135.5,0 H149.5 M142.5,0 V20 M158.5,0 V20 M167.5,20 V0 L181.5,20 V0 M205.5,3.5 A10,10 0 1,0 209.5,11 H202.5" fill="none" stroke="#0E0E11" stroke-opacity="1" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></g>
+</svg>

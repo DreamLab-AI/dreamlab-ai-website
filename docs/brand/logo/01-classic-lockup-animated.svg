@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 521 96" width="521" height="96" role="img" aria-label="DreamLab">
-  <title>DreamLab</title>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 652 96" width="652" height="96" role="img" aria-label="DreamLab AI">
+  <title>DreamLab AI</title>
   <defs>
     <linearGradient id="cla-g" x1="0" y1="1" x2="1" y2="0">
       <stop offset="0" stop-color="#22D3EE"/><stop offset=".55" stop-color="#6366F1"/><stop offset="1" stop-color="#A855F7"/>
@@ -31,6 +31,6 @@
     <path class="wisp" d="M46,13 C51,10 47,7 51,5 C54,3 58,5 56,8" stroke="url(#cla-w)" stroke-width="2.4"/>
   </g></g>
   <g transform="translate(129.2,0) skewX(-12)">
-    <path d="M0,60 a20,20 0 1,0 40,0 a20,20 0 1,0 -40,0 M40,12 V80 M55,80 V54 Q55,40 75,40 M90,60 H130 A20,20 0 1,0 125.32,72.86 M145,60 a20,20 0 1,0 40,0 a20,20 0 1,0 -40,0 M185,40 V80 M200,80 V52 a12,12 0 0,1 24,0 V80 M224,52 a12,12 0 0,1 24,0 V80 M263,12 V80 M278,60 a20,20 0 1,0 40,0 a20,20 0 1,0 -40,0 M318,40 V80 M333,12 V80 M333,60 a20,20 0 1,0 40,0 a20,20 0 1,0 -40,0" fill="none" stroke="url(#cla-g)" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M0,12 H12 A34,34 0 0,1 12,80 H0 Z M61,80 V54 Q61,40 81,40 M96,60 H136 A20,20 0 1,0 131.32,72.86 M151,60 a20,20 0 1,0 40,0 a20,20 0 1,0 -40,0 M191,40 V80 M206,80 V52 a12,12 0 0,1 24,0 V80 M230,52 a12,12 0 0,1 24,0 V80 M269,12 V80 H299 M314,60 a20,20 0 1,0 40,0 a20,20 0 1,0 -40,0 M354,40 V80 M369,12 V80 M369,60 a20,20 0 1,0 40,0 a20,20 0 1,0 -40,0 M447,80 L468,12 L489,80 M456,58 H480 M504,12 V80" fill="none" stroke="url(#cla-g)" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
   </g>
 </svg>
