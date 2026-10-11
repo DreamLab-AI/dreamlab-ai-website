@@ -24,36 +24,11 @@
     "featured": true
   },
   {
-    "id": "james-harrison",
-    "name": "James Harrison",
-    "role": "Operations Director, FinTech",
-    "quote": "In one day, we built an AI agent that now handles 40% of our customer queries. The hands-on approach meant I left with something real, not just slides.",
-    "location_detail": "On-site at our London office",
-    "programme": "1-Day Workshop",
+    "id": "peter-woodbridge",
+    "name": "Peter Woodbridge",
+    "role": "CTO, DreamLab AI (trained by DreamLab)",
+    "quote": "If you want to move past the superficial hype of prompt engineering and actually learn how to architect autonomous systems, Dr. John O'Hare's training is the gold standard. He quite literally taught me everything I know about Agentic AI, taking me from a conceptual understanding to being able to build and deploy sophisticated, multi-agent frameworks.",
+    "location_detail": "Google review, October 2026",
     "featured": true
-  },
-  {
-    "id": "elena-rodriguez",
-    "name": "Elena Rodriguez",
-    "role": "Founder, Creative Agency",
-    "quote": "The residential programme gave us space to think differently. By day three, we'd prototyped three AI tools that are now core to our client offering.",
-    "location_detail": "Lake District retreat with fell views",
-    "programme": "Residential Training"
-  },
-  {
-    "id": "david-okonkwo",
-    "name": "David Okonkwo",
-    "role": "Head of Innovation",
-    "quote": "JJ and the team don't just teach—they build alongside you. The multi-agent system we created together is now saving us 20 hours per week.",
-    "location_detail": "Private residential venue",
-    "programme": "Advanced Workshop"
-  },
-  {
-    "id": "samira-velasco",
-    "name": "Samira Velasco",
-    "role": "Motion Graphics Designer",
-    "quote": "Real-time rendering clicked while rain drummed on the roof. I stopped overthinking everything and started making work that moves.",
-    "location_detail": "Converted mill with waterwheel views",
-    "programme": "1-Day Workshop"
   }
 ]
