@@ -324,3 +324,116 @@ export function checkConfigMirrors(root) {
 
   return { ok: errors.length === 0, errors, mirrors };
 }
+
+/**
+ * Operator var mirrors not enumerated by `checkConfigMirrors` (ADR-2005 gap):
+ * dreamlab.toml sections hand-projected into wrangler `[vars]` that the mirror
+ * set skipped when it was written: [webauthn] into the auth-worker and [mesh]
+ * into the relay-worker.
+ *
+ *   [webauthn].rp_id            <-> auth-worker  [vars].RP_ID
+ *   [webauthn].expected_origin  <-> auth-worker  [vars].EXPECTED_ORIGIN
+ *   [mesh].mode                 <-> relay-worker [vars].MESH_MODE
+ *   [mesh].peer_relays          <-> relay-worker [vars].MESH_PEER_RELAYS
+ *   [mesh].allowed_remote_dids  <-> relay-worker [vars].MESH_ALLOWED_REMOTE_DIDS
+ *
+ * Each datum has two hand-maintained sites; before this check, editing one
+ * without the other shipped silently - e.g. populating [mesh].peer_relays
+ * (post-Sprint-v12) while the relay var stayed empty, or an rp_id rename that
+ * missed the auth worker and broke WebAuthn origin checks in production.
+ *
+ * Deliberately NOT folded into `checkConfigMirrors` itself: that would
+ * re-baseline its fixtures in config-mirrors.test.mjs and extend the
+ * MIRROR_BEARING_KEYS sweep in the same stroke; deferred until a dream night
+ * can see that test file. Also not yet compared: [mesh].federated_kinds <->
+ * MESH_FEDERATED_KINDS (toml-lite integer-array fidelity unconfirmed) and
+ * [nip05] (its dreamlab.toml section is still elided from source views).
+ */
+export function checkOperatorVarMirrors(root) {
+  const errors = [];
+
+  const tomlText = readText(root, TOML_PATH);
+  if (!tomlText) return { ok: false, errors: [`${TOML_PATH} missing`] };
+  const toml = parseToml(tomlText);
+
+  const varsFor = (worker) => {
+    const text = readText(root, WRANGLER[worker]);
+    if (!text) {
+      errors.push(`${WRANGLER[worker]} missing`);
+      return {};
+    }
+    return parseToml(text).vars ?? {};
+  };
+  const authVars = varsFor("auth");
+  const relayVars = varsFor("relay");
+
+  const asString = (v) => (v === undefined || v === null ? null : String(v).trim());
+  const asCsv = (v) => {
+    if (v === undefined || v === null) return null;
+    const parts = Array.isArray(v) ? v.map(String) : String(v).split(",");
+    return parts.map((s) => s.trim()).filter(Boolean).sort().join(",");
+  };
+
+  const compareVar = (
+    id,
+    authored,
+    projected,
+    whereAuthored,
+    whereProjected,
+    normalise = asString,
+  ) => {
+    const a = normalise(authored);
+    const p = normalise(projected);
+    if (a === null) {
+      errors.push(`${id}: ${whereAuthored} has no value - it is the authored source of truth`);
+    } else if (p === null) {
+      errors.push(`${id}: ${whereProjected} has no value for this governed datum`);
+    } else if (a !== p) {
+      errors.push(
+        `${id}: MIRROR DRIFT between ${whereAuthored} and ${whereProjected}\n` +
+          `    ${whereAuthored}: ${a}\n` +
+          `    ${whereProjected}: ${p}`,
+      );
+    }
+  };
+
+  compareVar(
+    "webauthn-rp-id",
+    toml.webauthn?.rp_id,
+    authVars.RP_ID,
+    `${TOML_PATH} [webauthn].rp_id`,
+    `${WRANGLER.auth} [vars].RP_ID`,
+  );
+  compareVar(
+    "webauthn-expected-origin",
+    toml.webauthn?.expected_origin,
+    authVars.EXPECTED_ORIGIN,
+    `${TOML_PATH} [webauthn].expected_origin`,
+    `${WRANGLER.auth} [vars].EXPECTED_ORIGIN`,
+  );
+  compareVar(
+    "mesh-mode",
+    toml.mesh?.mode,
+    relayVars.MESH_MODE,
+    `${TOML_PATH} [mesh].mode`,
+    `${WRANGLER.relay} [vars].MESH_MODE`,
+  );
+  compareVar(
+    "mesh-peer-relays",
+    toml.mesh?.peer_relays,
+    relayVars.MESH_PEER_RELAYS,
+    `${TOML_PATH} [mesh].peer_relays`,
+    `${WRANGLER.relay} [vars].MESH_PEER_RELAYS`,
+    asCsv,
+  );
+  compareVar(
+    "mesh-allowed-remote-dids",
+    toml.mesh?.allowed_remote_dids,
+    relayVars.MESH_ALLOWED_REMOTE_DIDS,
+    `${TOML_PATH} [mesh].allowed_remote_dids`,
+    `${WRANGLER.relay} [vars].MESH_ALLOWED_REMOTE_DIDS`,
+    asCsv,
+  );
+
+  return { ok: errors.length === 0, errors };
+}
