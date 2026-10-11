@@ -100,6 +100,28 @@ export function parseLockfileResolved(text) {
 }
 
 /**
+ * Count how many [[package]] blocks the lockfile carries for each kit crate.
+ * Cargo admits several versions of one crate name in a single lockfile (the
+ * live lock's dependency lists carry `syn` 2.0.119 and 3.0.3 side by side),
+ * and pre-release versions like 1.0.0-beta.14 vs 1.0.0-beta.15 are mutually
+ * semver-incompatible, so a stale transitive requirement can resolve a SECOND
+ * copy of a kit crate alongside the pinned one. parseLockfileResolved keeps
+ * only the LAST block per name, so without this count such a second copy is
+ * invisible to the gate.
+ */
+export function countKitPackageBlocks(text) {
+  const counts = new Map();
+  if (!text) return counts;
+  const blocks = text.split(/^\[\[package\]\]\s*$/m).slice(1);
+  for (const block of blocks) {
+    const name = block.match(/^\s*name\s*=\s*"([^"]+)"\s*$/m)?.[1];
+    if (!name || !KIT_CRATES.includes(name)) continue;
+    counts.set(name, (counts.get(name) ?? 0) + 1);
+  }
+  return counts;
+}
+
+/**
  * Parse the machine-readable fields of the compatibility record:
  *   CANONICAL_KIT_SHA / CANONICAL_KIT_VERSION, and the per-crate
  *   `RESOLVED <crate> <version> <sha256>` lines under pin-check:resolved-packages.
@@ -210,6 +232,21 @@ export function checkKitPins(root) {
   const lockText = read(root, LOCKFILE_PATH);
   if (lockText === null) errors.push(`lockfile missing: ${LOCKFILE_PATH}`);
   const resolved = parseLockfileResolved(lockText);
+
+  // A second [[package]] block for a kit crate means the dependency graph
+  // resolved two kit versions side by side (Cargo permits this for
+  // semver-incompatible pre-releases). parseLockfileResolved keeps only the
+  // last block per name, so the earlier copy would otherwise drift unseen.
+  const blockCounts = countKitPackageBlocks(lockText);
+  for (const crate of KIT_CRATES) {
+    if ((blockCounts.get(crate) ?? 0) > 1) {
+      errors.push(
+        `${LOCKFILE_PATH}: ${crate} is resolved ${blockCounts.get(crate)} times — ` +
+          `the exact pin must select one version; a second resolved copy means ` +
+          `a transitive requirement still pulls another kit version`,
+      );
+    }
+  }
 
   for (const crate of KIT_CRATES) {
     const lock = resolved.get(crate);
