@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="DreamLab AI mark">
+  <title>DreamLab AI mark</title>
+  <defs>
+    <linearGradient id="cd-d" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A855F7"/><stop offset="1" stop-color="#3B82F6"/></linearGradient>
+    <linearGradient id="cd-w" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#A855F7"/><stop offset="1" stop-color="#6366F1"/></linearGradient>
+    <filter id="cd-glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs><g filter="url(#cd-glow)">
+    <g stroke="url(#cd-d)" stroke-width="3.2" stroke-linecap="round"><line class="" style="" x1="32" y1="7" x2="57" y2="32"/><line class="" style="" x1="57" y1="32" x2="32" y2="57"/><line class="" style="" x1="32" y1="57" x2="7" y2="32"/><line class="" style="" x1="7" y1="32" x2="32" y2="7"/></g>
+    <g stroke="#38BDF8" stroke-width="1.6" stroke-linecap="round" opacity=".75"><line class="" style="" x1="32" y1="7" x2="32" y2="21.5"/><line class="" style="" x1="57" y1="32" x2="42.5" y2="32"/><line class="" style="" x1="32" y1="57" x2="32" y2="42.5"/><line class="" style="" x1="7" y1="32" x2="21.5" y2="32"/></g>
+    <path class="" d="M32,23.5 L40.5,32 L32,40.5 L23.5,32 Z" fill="url(#cd-d)"/>
+    <circle class="" style="" cx="32" cy="7" r="5" fill="#E879F9"/><circle class="" style="" cx="57" cy="32" r="4" fill="#22D3EE"/><circle class="" style="" cx="32" cy="57" r="4" fill="#E879F9"/><circle class="" style="" cx="7" cy="32" r="4" fill="#22D3EE"/>
+  </g>
+</svg>

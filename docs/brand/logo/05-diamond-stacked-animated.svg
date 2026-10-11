@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 212" width="300" height="212" role="img" aria-label="DreamLab AI Consulting Ltd">
+  <title>DreamLab AI Consulting Ltd</title>
+  <defs>
+    <linearGradient id="dsa-d" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A855F7"/><stop offset="1" stop-color="#3B82F6"/></linearGradient>
+    <linearGradient id="dsa-w" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#A855F7"/><stop offset="1" stop-color="#6366F1"/></linearGradient>
+    <filter id="dsa-glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs><style>
+    .df{stroke-dasharray:150;stroke-dashoffset:150;animation:dd 1.4s cubic-bezier(.6,0,.2,1) forwards}
+    .dr{stroke-dasharray:80;stroke-dashoffset:80;animation:dd 1s .6s cubic-bezier(.6,0,.2,1) forwards}
+    .dg{transform-box:fill-box;transform-origin:center;opacity:0;animation:pop .5s 1.2s ease-out forwards,turn 4s 2s ease-in-out infinite}
+    @keyframes dd{to{stroke-dashoffset:0}}
+    @keyframes pop{from{opacity:0;transform:scale(.2)}to{opacity:1;transform:scale(1)}}
+    @keyframes turn{0%,60%,100%{transform:scaleX(1)}75%{transform:scaleX(.15)}90%{transform:scaleX(1)}}
+    @media (prefers-reduced-motion:reduce){*{animation:none!important;stroke-dashoffset:0!important;opacity:1!important}}
+  </style>
+  <g transform="translate(82.8,6) scale(2.1)"><g filter="url(#dsa-glow)">
+    <path class="df" d="M32,7 L57,32 L32,57 L7,32 Z" fill="none" stroke="url(#dsa-d)" stroke-width="6.5" stroke-linejoin="round"/>
+    <path class="dr" d="M32,18.5 L45.5,32 L32,45.5 L18.5,32 Z" fill="none" stroke="url(#dsa-d)" stroke-width="3" stroke-linejoin="round"/>
+    <path class="dg" d="M32,25.5 L38.5,32 L32,38.5 L25.5,32 Z" fill="url(#dsa-d)"/>
+  </g></g>
+  <g transform="translate(31.19999999999999,152) scale(1.6)"><path d="M0,0 H5 A10,10 0 0,1 5,20 H0 Z M21,20 V0 H29 A5.5,5.5 0 0,1 29,11 H21 M28,11 L34,20 M52.5,0 H40.5 V20 H52.5 M40.5,10 H49.5 M58.5,20 L65.5,0 L72.5,20 M61.3,13 H69.7 M78.5,20 V0 L86.5,12 L94.5,0 V20 M100.5,0 V20 H111.5 M115,20 L122,0 L129,20 M117.8,13 H126.2 M135,10 V0 H142 A5,5 0 0,1 142,10 H135 V20 H143 A5,5 0 0,0 143,10" fill="none" stroke="url(#dsa-w)" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round"/></g>
+  <g transform="translate(61.34,194) scale(0.62)"><path d="M0,20 L7,0 L14,20 M2.8,13 H11.2 M20,0 V20 M52,3.5 A10,10 0 1,0 52,16.5 M58,10 a10,10 0 1,0 20,0 a10,10 0 1,0 -20,0 M84,20 V0 L98,20 V0 M116,3 Q110,-1 105.5,4 Q103,9 110,10 Q117,11 115,16.5 Q111,21 104,17 M122,0 V13 A6,6 0 0,0 134,13 V0 M140,0 V20 H151 M154.5,0 H168.5 M161.5,0 V20 M174.5,0 V20 M180.5,20 V0 L194.5,20 V0 M215.5,3.5 A10,10 0 1,0 219.5,11 H212.5 M236.5,0 V20 H247.5 M251,0 H265 M258,0 V20 M271,0 H276 A10,10 0 0,1 276,20 H271 Z" fill="none" stroke="#38BDF8" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></g>
+</svg>

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="DreamLab AI mark">
+  <title>DreamLab AI mark</title>
+  <defs>
+    <linearGradient id="dma-d" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A855F7"/><stop offset="1" stop-color="#3B82F6"/></linearGradient>
+    <linearGradient id="dma-w" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#A855F7"/><stop offset="1" stop-color="#6366F1"/></linearGradient>
+    <filter id="dma-glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs><style>
+    .df{stroke-dasharray:150;stroke-dashoffset:150;animation:dd 1.4s cubic-bezier(.6,0,.2,1) forwards}
+    .dr{stroke-dasharray:80;stroke-dashoffset:80;animation:dd 1s .6s cubic-bezier(.6,0,.2,1) forwards}
+    .dg{transform-box:fill-box;transform-origin:center;opacity:0;animation:pop .5s 1.2s ease-out forwards,turn 4s 2s ease-in-out infinite}
+    @keyframes dd{to{stroke-dashoffset:0}}
+    @keyframes pop{from{opacity:0;transform:scale(.2)}to{opacity:1;transform:scale(1)}}
+    @keyframes turn{0%,60%,100%{transform:scaleX(1)}75%{transform:scaleX(.15)}90%{transform:scaleX(1)}}
+    @media (prefers-reduced-motion:reduce){*{animation:none!important;stroke-dashoffset:0!important;opacity:1!important}}
+  </style><g filter="url(#dma-glow)">
+    <path class="df" d="M32,7 L57,32 L32,57 L7,32 Z" fill="none" stroke="url(#dma-d)" stroke-width="6.5" stroke-linejoin="round"/>
+    <path class="dr" d="M32,18.5 L45.5,32 L32,45.5 L18.5,32 Z" fill="none" stroke="url(#dma-d)" stroke-width="3" stroke-linejoin="round"/>
+    <path class="dg" d="M32,25.5 L38.5,32 L32,38.5 L25.5,32 Z" fill="url(#dma-d)"/>
+  </g>
+</svg>

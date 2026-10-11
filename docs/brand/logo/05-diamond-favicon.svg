@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="DreamLab AI">
+  <title>DreamLab AI</title>
+  <defs>
+    <linearGradient id="dfv-d" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A855F7"/><stop offset="1" stop-color="#3B82F6"/></linearGradient>
+    <linearGradient id="dfv-w" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#A855F7"/><stop offset="1" stop-color="#6366F1"/></linearGradient>
+    <filter id="dfv-glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs><rect width="64" height="64" rx="14" fill="#0E0E11"/><g transform="translate(-3.2,-3.2) scale(1.1)"><path d="M32,8 L56,32 L32,56 L8,32 Z" fill="none" stroke="url(#dfv-d)" stroke-width="8" stroke-linejoin="round"/><path d="M32,23 L41,32 L32,41 L23,32 Z" fill="url(#dfv-d)"/></g>
+</svg>

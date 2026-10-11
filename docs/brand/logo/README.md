@@ -10,6 +10,8 @@ geometry there and run `node docs/brand/logo/build.mjs`.
 | 2 · Mark | `02-mark*.svg` | The bowl on its own, including a simplified favicon cut that reads at 16px (to replace the current white heart). |
 | 3 · Header, evolved | `03-header-constellation*.svg` | Today's spaced capitals, now DREAMLAB AI; the cyan dot becomes a three-node constellation. |
 | 4 · Golden field | `04-golden-field*.svg` | The hero's golden-angle seeds spiralling into a glowing core, the "dream" forming in the lab. |
+| 5 · Diamond | `05-diamond-*.svg` | The LinkedIn company mark redrawn as vectors: nested diamonds, violet to blue, DREAMLAB over AI CONSULTING LTD. Stacked and horizontal, animated (frame draws, gem turns), mono, and a favicon that holds up at 16px. |
+| 6 · Constellation diamond | `06-constellation-diamond*.svg` | Hybrid of 5 and 3: the diamond's corners are linked nodes around a central gem. Animated (links draw, nodes light in turn). Busier than 5 at 16px. |
 
 Every letter is a vector path, so no font is needed. Each file is
 self-contained with no scripts or external references. Animated files use CSS

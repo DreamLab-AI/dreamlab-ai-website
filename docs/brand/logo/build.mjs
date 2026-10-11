@@ -71,7 +71,7 @@ const caps = {
   U: (x) => ({ d: `M${x},0 V13 A6,6 0 0,0 ${x + 12},13 V0`, w: 12 }),
   T: (x) => ({ d: `M${x},0 H${x + 14} M${x + 7},0 V20`, w: 14 }),
   G: (x) => ({ d: `M${x + 15},3.5 A10,10 0 1,0 ${x + 19},11 H${x + 12}`, w: 19 }),
-  ' ': () => ({ d: '', w: 10 }),
+  ' ': () => ({ d: '', w: 5 }),
 };
 function spaced(word = 'DREAMLAB AI', track = 7) {
   let x = 0;
@@ -256,6 +256,121 @@ files['04-golden-field-animated.svg'] = svg(64, 64, phyllotaxis('gfa', true), 'D
   </g>`;
   files['04-golden-field-lockup-animated.svg'] = svg(Math.ceil(markW + 26 + wm.width + 30), 96, body, 'DreamLab AI');
 }
+
+// 5. The LinkedIn diamond, redrawn: an outlined diamond around a smaller
+// ring and a solid gem, violet to blue. Wordmark DREAMLAB in heavy capitals
+// over AI CONSULTING LTD in cyan. Animated: the frame draws itself, the ring
+// follows, and the gem turns like a facet catching light.
+const dia = (r, cx = 32, cy = 32) => `M${cx},${cy - r} L${cx + r},${cy} L${cx},${cy + r} L${cx - r},${cy} Z`;
+function diamondDefs(id) {
+  return `<defs>
+    <linearGradient id="${id}-d" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${C.violet}"/><stop offset="1" stop-color="#3B82F6"/></linearGradient>
+    <linearGradient id="${id}-w" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${C.violet}"/><stop offset="1" stop-color="${C.indigo}"/></linearGradient>
+    <filter id="${id}-glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>`;
+}
+const DIAMOND_ANIM = `<style>
+    .df{stroke-dasharray:150;stroke-dashoffset:150;animation:dd 1.4s cubic-bezier(.6,0,.2,1) forwards}
+    .dr{stroke-dasharray:80;stroke-dashoffset:80;animation:dd 1s .6s cubic-bezier(.6,0,.2,1) forwards}
+    .dg{transform-box:fill-box;transform-origin:center;opacity:0;animation:pop .5s 1.2s ease-out forwards,turn 4s 2s ease-in-out infinite}
+    @keyframes dd{to{stroke-dashoffset:0}}
+    @keyframes pop{from{opacity:0;transform:scale(.2)}to{opacity:1;transform:scale(1)}}
+    @keyframes turn{0%,60%,100%{transform:scaleX(1)}75%{transform:scaleX(.15)}90%{transform:scaleX(1)}}
+    @media (prefers-reduced-motion:reduce){*{animation:none!important;stroke-dashoffset:0!important;opacity:1!important}}
+  </style>`;
+function diamondMark(id, { animated = false, mono = null } = {}) {
+  const ink = mono ?? `url(#${id}-d)`;
+  return `<g${mono ? '' : ` filter="url(#${id}-glow)"`}>
+    <path class="${animated ? 'df' : ''}" d="${dia(25)}" fill="none" stroke="${ink}" stroke-width="6.5" stroke-linejoin="round"/>
+    <path class="${animated ? 'dr' : ''}" d="${dia(13.5)}" fill="none" stroke="${ink}" stroke-width="3" stroke-linejoin="round"/>
+    <path class="${animated ? 'dg' : ''}" d="${dia(6.5)}" fill="${ink}"/>
+  </g>`;
+}
+const DL = spaced('DREAMLAB', 6);
+const SUB = spaced('AI CONSULTING LTD', 6);
+function diamondStacked(id, animated, mono) {
+  const W = 300, markS = 2.1, markW = 64 * markS;
+  const wS = 1.6, wW = DL.width * wS, sS = 0.62, sW = SUB.width * sS;
+  const body = `${mono ? '' : diamondDefs(id)}${animated ? DIAMOND_ANIM : ''}
+  <g transform="translate(${(W - markW) / 2},6) scale(${markS})">${diamondMark(id, { animated, mono })}</g>
+  <g transform="translate(${(W - wW) / 2},152) scale(${wS})"><path d="${DL.d}" fill="none" stroke="${mono ?? `url(#${id}-w)`}" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round"/></g>
+  <g transform="translate(${(W - sW) / 2},194) scale(${sS})"><path d="${SUB.d}" fill="none" stroke="${mono ?? C.sky}" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></g>`;
+  return svg(W, 212, body, 'DreamLab AI Consulting Ltd');
+}
+function diamondHorizontal(id, animated, mono) {
+  const markS = 1.25, wS = 1.55, sS = 0.6;
+  const tx = 64 * markS + 18;
+  const w = Math.ceil(tx + Math.max(DL.width * wS, SUB.width * sS) + 6);
+  const body = `${mono ? '' : diamondDefs(id)}${animated ? DIAMOND_ANIM : ''}
+  <g transform="scale(${markS})">${diamondMark(id, { animated, mono })}</g>
+  <g transform="translate(${tx},14) scale(${wS})"><path d="${DL.d}" fill="none" stroke="${mono ?? `url(#${id}-w)`}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></g>
+  <g transform="translate(${tx + 1},52) scale(${sS})"><path d="${SUB.d}" fill="none" stroke="${mono ?? C.sky}" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></g>`;
+  return svg(w, 80, body, 'DreamLab AI Consulting Ltd');
+}
+files['05-diamond-stacked.svg'] = diamondStacked('ds', false, null);
+files['05-diamond-stacked-animated.svg'] = diamondStacked('dsa', true, null);
+files['05-diamond-stacked-mono-dark.svg'] = diamondStacked('dsm', false, C.ink);
+files['05-diamond-horizontal.svg'] = diamondHorizontal('dh', false, null);
+files['05-diamond-horizontal-animated.svg'] = diamondHorizontal('dha', true, null);
+files['05-diamond-mark-animated.svg'] = svg(64, 64, `${diamondDefs('dma')}${DIAMOND_ANIM}${diamondMark('dma', { animated: true })}`, 'DreamLab AI mark');
+files['05-diamond-favicon.svg'] = svg(64, 64,
+  `${diamondDefs('dfv')}<rect width="64" height="64" rx="14" fill="${C.ink}"/><g transform="translate(-3.2,-3.2) scale(1.1)"><path d="${dia(24)}" fill="none" stroke="url(#dfv-d)" stroke-width="8" stroke-linejoin="round"/><path d="${dia(9)}" fill="url(#dfv-d)"/></g>`,
+  'DreamLab AI');
+
+// 6. Hybrid: the diamond's corners become the lab network. Four nodes sit on
+// the vertices, linked round the edge and in to a glowing gem at the centre,
+// so the company mark and the constellation are one shape. Animated: links
+// draw in, nodes light in turn, the gem breathes.
+const HN = [[32, 7], [57, 32], [32, 57], [7, 32]];
+const HYB_ANIM = `<style>
+    .hl{stroke-dasharray:40;stroke-dashoffset:40;animation:hd .7s ease-out forwards}
+    .hs{stroke-dasharray:16;stroke-dashoffset:16;animation:hd .6s ease-out forwards}
+    .hn{transform-box:fill-box;transform-origin:center;animation:np 3.2s ease-in-out infinite}
+    .hc{transform-box:fill-box;transform-origin:center;animation:br 4s ease-in-out infinite}
+    @keyframes hd{to{stroke-dashoffset:0}}
+    @keyframes np{0%,100%{transform:scale(1);opacity:.8}15%{transform:scale(1.45);opacity:1}30%{transform:scale(1);opacity:.8}}
+    @keyframes br{0%,100%{transform:scale(.9) rotate(0deg)}50%{transform:scale(1.12) rotate(90deg)}}
+    @media (prefers-reduced-motion:reduce){*{animation:none!important;stroke-dashoffset:0!important}}
+  </style>`;
+function hybridMark(id, { animated = false, mono = null } = {}) {
+  const ink = mono ?? `url(#${id}-d)`;
+  const edges = HN.map((a, i) => {
+    const b = HN[(i + 1) % 4];
+    return `<line class="${animated ? 'hl' : ''}" style="${animated ? `animation-delay:${i * 0.18}s` : ''}" x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}"/>`;
+  }).join('');
+  const spokes = HN.map(([x, y], i) => {
+    const ex = 32 + (x - 32) * 0.42, ey = 32 + (y - 32) * 0.42;
+    return `<line class="${animated ? 'hs' : ''}" style="${animated ? `animation-delay:${0.8 + i * 0.1}s` : ''}" x1="${x}" y1="${y}" x2="${ex}" y2="${ey}"/>`;
+  }).join('');
+  const nodes = HN.map(([x, y], i) =>
+    `<circle class="${animated ? 'hn' : ''}" style="${animated ? `animation-delay:${1.2 + i * 0.8}s` : ''}" cx="${x}" cy="${y}" r="${i === 0 ? 5 : 4}" fill="${mono ?? (i % 2 ? C.cyan : C.magenta)}"/>`).join('');
+  return `<g${mono ? '' : ` filter="url(#${id}-glow)"`}>
+    <g stroke="${ink}" stroke-width="3.2" stroke-linecap="round">${edges}</g>
+    <g stroke="${mono ?? C.sky}" stroke-width="1.6" stroke-linecap="round" opacity=".75">${spokes}</g>
+    <path class="${animated ? 'hc' : ''}" d="${dia(8.5)}" fill="${ink}"/>
+    ${nodes}
+  </g>`;
+}
+const DLAI = spaced('DREAMLAB AI', 6);
+function hybridLockup(id, animated, mono) {
+  const markS = 1.25, wS = 1.5, sS = 0.6;
+  const tx = 64 * markS + 18;
+  const sub = spaced('CONSULTING', 6);
+  const w = Math.ceil(tx + DLAI.width * wS + 6);
+  const body = `${mono ? '' : diamondDefs(id)}${animated ? HYB_ANIM : ''}
+  <g transform="scale(${markS})">${hybridMark(id, { animated, mono })}</g>
+  <g transform="translate(${tx},14) scale(${wS})"><path d="${DLAI.d}" fill="none" stroke="${mono ?? `url(#${id}-w)`}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></g>
+  <g transform="translate(${tx + 1},52) scale(${sS})"><path d="${sub.d}" fill="none" stroke="${mono ?? C.sky}" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></g>`;
+  return svg(w, 80, body, 'DreamLab AI Consulting');
+}
+files['06-constellation-diamond.svg'] = svg(64, 64, `${diamondDefs('cd')}${hybridMark('cd')}`, 'DreamLab AI mark');
+files['06-constellation-diamond-animated.svg'] = svg(64, 64, `${diamondDefs('cda')}${HYB_ANIM}${hybridMark('cda', { animated: true })}`, 'DreamLab AI mark');
+files['06-constellation-diamond-lockup.svg'] = hybridLockup('cdl', false, null);
+files['06-constellation-diamond-lockup-animated.svg'] = hybridLockup('cdla', true, null);
+files['06-constellation-diamond-lockup-mono-dark.svg'] = hybridLockup('cdlm', false, C.ink);
+files['06-constellation-diamond-favicon.svg'] = svg(64, 64,
+  `${diamondDefs('cdf')}<rect width="64" height="64" rx="14" fill="${C.ink}"/><g transform="translate(-3.2,-3.2) scale(1.1)">${hybridMark('cdf')}</g>`,
+  'DreamLab AI');
 
 for (const [name, content] of Object.entries(files)) writeFileSync(join(OUT, name), content);
 console.log(`wrote ${Object.keys(files).length} files to ${OUT}`);
