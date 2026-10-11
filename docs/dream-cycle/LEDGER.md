@@ -1,7 +1,6 @@
 | Date | Deep | Finding | Issue | PR | Evaluated? | Verdict | Effect | Witness | Prior-night fates |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 2026-08-15 | ci-workflows | INCONCLUSIVE — see report | NONE | NONE | yes | INCONCLUSIVE |  | e958dd021289 |  |
-| 2026-08-15 | ci-workflows | INCONCLUSIVE — see report | NONE | NONE | yes | INCONCLUSIVE |  | e958dd021289 |  |
 | 2026-08-15 | ci-workflows | Given `pin-parity` reports PIN-DRIFT with KIT_REF `9cec2222afefecde2bfe69f110b7b | NONE | NONE | yes | INCONCLUSIVE |  | 3c8fb07dfcaa |  |
 | 2026-08-16 | kit-pin-integrity | Given evaluator `pin-parity` in-session reports `KIT_REF 9cec2222afefecde2bfe69f | NONE | NONE | yes | INCONCLUSIVE |  | c016f62572b4 |  |
 | 2026-08-16 | kit-pin-integrity | Given pin-parity (2026-08-15 receipt) reports KIT_REF `9cec2222afefecde2bfe69f11 | NONE | NONE | yes | INCONCLUSIVE |  | 5cc073d4979f |  |
@@ -48,5 +47,7 @@
 | 2026-10-06 | operator-overlay | Given forum-config/dreamlab.toml [branding] (the authored source of truth per .. | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/55 | yes | ACCEPT |  | 794f3a1f8887 |  |  |  |
 | 2026-10-07 | ci-workflows | Workflow KIT_REF comments restated beta.14 (canonical beta.15); prose removed | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/56 | yes | ACCEPT |  | ed8fe02af35d |  |  |  |
 | 2026-10-08 | kit-pin-integrity | Cargo.lock: kit crate resolved twice is now PIN-DRIFT (last-wins parser hid it) | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/57 | yes | ACCEPT |  | 24015ee35b0b |  |  |  |
+| 2026-10-09 | site-build-content | ACCEPT vetoed → BLOCKED-ENV: candidate: candidate patch did not apply to the… | NONE | NONE | yes | BLOCKED-ENV |  | dfbb4a24cca9 |  |  |  |
+| 2026-10-10 | operator-overlay | VETOED: [branding] vs branding.rs parity now witnessed by new vitest bench test | NONE | VETOED | yes | REJECT |  | fe7f5eae30af |  |  |  |
 | 2026-10-09 | site-build-content | predev/prebuild generator parity check + bench smoke test for inventory | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/58 | yes | ACCEPT |  | 6f0b0a79ae4e |  |  |  |
 | 2026-10-10 | operator-overlay | webauthn+mesh TOML-to-wrangler mirrors unenumerated; bench test now enforces | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/59 | yes | ACCEPT |  | 919165feba7e |  |  |  |
