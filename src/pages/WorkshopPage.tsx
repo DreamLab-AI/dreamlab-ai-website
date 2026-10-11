@@ -23,6 +23,8 @@ import { ChevronLeft } from "lucide-react";
 interface WorkshopPageItem {
   slug: string; // e.g., 00_introduction.md
   title: string; // e.g., "Introduction & Workshop Overview"
+  /** Set by the generator only when `title` collides with another page. */
+  pageTitle?: string;
 }
 
 interface WorkshopManifest {
@@ -48,6 +50,7 @@ const markdownRehypePlugins: import('react-markdown').Options['rehypePlugins'] =
   rehypeRaw,
   [rehypeSanitize, markdownSanitizeSchema],
 ];
+
 
 const WorkshopPage = ({ initialManifest = null, initialContent = '' }: {
   initialManifest?: WorkshopManifest | null;
@@ -184,11 +187,18 @@ const WorkshopPage = ({ initialManifest = null, initialContent = '' }: {
     return () => { cancelled = true; };
   }, [workshopId, currentActualSlug, manifest, isLoadingManifest]);
 
+  // A lesson that opens with its own `# Heading` supplies the page's one H1;
+  // the template's workshop title then renders as a paragraph.
+  const contentHasH1 = /^\s*#\s/.test(currentPageContent ?? '');
+  const TitleTag = contentHasH1 ? 'p' : 'h1';
+
   // Update OG meta tags when manifest loads
-  const lessonTitle = manifest?.pages.find(page => page.slug === currentActualSlug)?.title;
+  const lessonPage = manifest?.pages.find(page => page.slug === currentActualSlug);
+  const lessonTitle = lessonPage?.title;
   useOGMeta(getWorkshopOGConfig(
     workshopId || '',
-    lessonTitle || manifest?.title || 'Workshop',
+    // pageTitle is set by the generator only where a heading collides.
+    lessonPage?.pageTitle || lessonTitle || manifest?.title || 'Workshop',
     manifest?.description || `${lessonTitle || manifest?.title || 'Self-guided learning'} — free DreamLab AI curriculum.`,
     currentActualSlug,
   ));
@@ -377,9 +387,9 @@ const WorkshopPage = ({ initialManifest = null, initialContent = '' }: {
                 {workshopEyebrow(meta)}
               </p>
             ) : null}
-            <h1 className="text-[28px] font-semibold leading-[1.15] text-[#FAFAFA] [text-wrap:pretty]">
+            <TitleTag className="text-[28px] font-semibold leading-[1.15] text-[#FAFAFA] [text-wrap:pretty]">
               {meta?.title ?? manifest.title}
-            </h1>
+            </TitleTag>
           </div>
 
           {/* Prose — full gutter width, no max-width games at 390px. */}
@@ -470,6 +480,7 @@ const WorkshopPage = ({ initialManifest = null, initialContent = '' }: {
         <WorkshopHeader
           title={manifest.title || workshopId.replace('workshop-', '').replace(/-/g, ' ')}
           workshopId={workshopId}
+          titleAs={TitleTag}
           category={manifest.category}
           currentChapter={currentChapterIndex}
           totalChapters={manifest.pages.length || 1}

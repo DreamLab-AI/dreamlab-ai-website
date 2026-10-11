@@ -3,6 +3,8 @@
  * Generates dynamic OG and Twitter Card meta tags for social sharing
  */
 
+import { SITE_FACTS } from "@/data/site-facts";
+
 export interface OGMetaConfig {
   title: string;
   description: string;
@@ -54,7 +56,7 @@ const OG_IMAGES = {
 export const PAGE_OG_CONFIGS: Record<string, OGMetaConfig> = {
   home: {
     title: 'AI & Agents Residential Training in the Lake District | DreamLab',
-    description: 'Residential AI and agentic training in the Lake District, Cumbria. DreamLab is an Applied Innovation Lab: teams build with 44+ specialists in AI, XR, cyber trust and creative technology. Free self-guided AI curriculum.',
+    description: `Residential AI and agentic training in the Lake District, Cumbria. DreamLab is an Applied Innovation Lab: teams build with ${SITE_FACTS.specialists} specialists in AI, XR, cyber trust and creative technology. Free self-guided AI curriculum.`,
     url: `${BASE_URL}/`,
     image: OG_IMAGES.default,
     imageAlt: 'DreamLab AI residential training facility in the Lake District',

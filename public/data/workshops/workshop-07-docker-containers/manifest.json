@@ -31,7 +31,8 @@
     },
     {
       "slug": "06_exercises.md",
-      "title": "Practical Exercises"
+      "title": "Practical Exercises",
+      "pageTitle": "Practical Exercises · Docker & Containers for AI Development"
     },
     {
       "slug": "07_resources.md",

@@ -78,7 +78,7 @@ pages:
       - id: "jess-symons"
         name: "Dr Jessica Symons"
         role: "Visioning Lab"
-        quote: "I just used Claude Code to create an new version of a Unity project that had been gathering dust for years. Is was so satisfying to see it rise again. Thank you thank you John for setting me up. I am having so much fun 🙏 thanks 🙏."
+        quote: "I just used Claude Code to create a new version of a Unity project that had been gathering dust for years. It was so satisfying to see it rise again. Thank you thank you John for setting me up. I am having so much fun 🙏 thanks 🙏."
         location_detail: "Walking through that bog!"
         featured: true
       - id: "viv-andrews"
@@ -117,7 +117,7 @@ pages:
     section_badge: "The Collective"
     section_title: "Learn From Those Who Ship"
     section_description: "Our instructors aren't academics who lecture from slides. They're active practitioners who return from production to teach."
-    bottom_note: "Part of our 43+ specialist collective. Each programme features 3-4 complementary instructors."
+    bottom_note: "Part of our 40+ specialist collective. Each programme features 3-4 complementary instructors."
     items:
       - id: "marcus-chen"
         name: "Marcus Chen"
@@ -176,14 +176,14 @@ pages:
     hero:
       badge: "Residential Training"
       headline: "Deep learning with no distractions"
-      description: "Train with the DreamLab collective: 43+ specialists including Emmy nominees, PhD researchers, and BAFTA-recognised talent. Multi-instructor delivery at our Lake District residential facility."
+      description: "Train with the DreamLab collective: 40+ specialists including Emmy nominees, PhD researchers, and BAFTA-recognised talent. Multi-instructor delivery at our Lake District residential facility."
       cta_primary: "Book Your Training"
       cta_secondary: "Download Brochure"
 
     facility_features:
       - icon: "zap"
         title: "The Dream Team"
-        description: "43+ specialists: Emmy nominees, PhDs, BAFTA talent on every programme"
+        description: "40+ specialists: Emmy nominees, PhDs, BAFTA talent on every programme"
       - icon: "users"
         title: "Enterprise Tech Stack"
         description: "LED volume, motion capture, 8×RTX GPU cluster, Dolby Atmos studio"
@@ -192,11 +192,11 @@ pages:
         description: "Sustainable infrastructure with production-grade connectivity"
       - icon: "home"
         title: "Lake District Residential"
-        description: "5-bedroom luxury accommodation with stunning mountain views"
+        description: "3-bedroom accommodation (4 beds) with stunning mountain views"
 
     programs_section:
       headline: "Immersive Training Programs"
-      description: "Multi-instructor delivery from our 43+ specialist collective. Each programme combines complementary expertise for thorough, hands-on skill transfer."
+      description: "Multi-instructor delivery from our 40+ specialist collective. Each programme combines complementary expertise for thorough, hands-on skill transfer."
       categories:
         - id: "all"
           label: "All"
@@ -428,7 +428,7 @@ pages:
 
     accommodation:
       headline: "Premium Lake District Accommodation"
-      description: "Experience the perfect blend of focused learning and natural inspiration. Our 5-bedroom luxury facility provides an ideal environment for intensive training, networking, and creative breakthroughs."
+      description: "Experience the perfect blend of focused learning and natural inspiration. Our 3-bedroom facility provides an ideal environment for intensive training, networking, and creative breakthroughs."
       features:
         - icon: "map-pin"
           title: "Prime Location"
@@ -449,7 +449,7 @@ pages:
 
   team:
     headline: "Our Team"
-    description: "43+ specialists including Emmy nominees, PhD researchers, and BAFTA-recognised talent. Click on a team member to select them for your project."
+    description: "40+ specialists including Emmy nominees, PhD researchers, and BAFTA-recognised talent. Click on a team member to select them for your project."
     selection_label: "{count} team member{s} selected"
     enquire_button: "Enquire About Availability"
 

@@ -1,4 +1,5 @@
 import { lazy, Suspense, useState, useRef } from "react";
+import { SITE_FACTS } from "@/data/site-facts";
 import { Link } from "react-router-dom";
 import { Header } from "@/components/Header";
 // Sprint v9 D8: defer the Voronoi hero chunk.
@@ -36,7 +37,7 @@ import {
  * Tiered engagement model:
  *   1. Discovery Session (free, 2 hours)
  *   2. Build Sprint (1 day, at your location or ours)
- *   3. Residency (2-5 days, Lake District facility)
+ *   3. Residency (1-3 days, Lake District facility)
  *   4. Venture Partner (ongoing fractional CTO + specialist access)
  *
  * Unlinked from main navigation — accessible only via direct URL.
@@ -72,7 +73,7 @@ const tiers = [
     name: "Build Sprint",
     tagline: "One day. One prototype. Real validation.",
     duration: "1 day",
-    price: "From £2,500",
+    price: `From ${SITE_FACTS.priceSprintFrom}`,
     priceSub: "per startup, up to 4 people",
     accentColor: "text-cyan-400",
     borderColor: "border-cyan-500/30",
@@ -95,8 +96,8 @@ const tiers = [
     id: "residency",
     name: "Venture Residency",
     tagline: "Immersive co-creation at our Lake District lab",
-    duration: "2-5 days",
-    price: "From £995",
+    duration: SITE_FACTS.residentialDays,
+    price: `From ${SITE_FACTS.priceResidentialFrom}`,
     priceSub: "per person/day, full-board included",
     accentColor: "text-purple-400",
     borderColor: "border-purple-500/30",
@@ -190,7 +191,7 @@ const partnerBenefits = [
 
 // Social proof / evidence
 const evidence = [
-  { stat: "44+", label: "Deep Tech Specialists" },
+  { stat: SITE_FACTS.specialists, label: "Deep Tech Specialists" },
   { stat: "£8M+", label: "Research Heritage" },
   { stat: "30 Years", label: "R&D Experience" },
   { stat: "18", label: "Programme Tracks" },
@@ -227,7 +228,7 @@ const faqItems = [
 const Ventures = () => {
   useOGMeta({
     title: "Venture Lab | DreamLab Applied Innovation",
-    description: "Deep tech accelerator for startups and scaleups. Access 43+ specialists, enterprise infrastructure, and 30 years of R&D heritage through structured build sprints, residencies, and ongoing partnership.",
+    description: `Deep tech accelerator for startups and scaleups. Access ${SITE_FACTS.specialists} specialists, enterprise infrastructure, and 30 years of R&D heritage through structured build sprints, residencies, and ongoing partnership.`,
     url: "https://dreamlab-ai.com/ventures",
   });
 
@@ -273,7 +274,7 @@ const Ventures = () => {
             className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mb-8 animate-slide-up"
             style={{ animationDelay: "0.15s" }}
           >
-            Access 43+ specialists, enterprise infrastructure, and 30 years of R&D heritage, without building it all yourself.
+            Access {SITE_FACTS.specialists} specialists, enterprise infrastructure, and 30 years of R&D heritage, without building it all yourself.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 animate-scale-in mb-8 w-full sm:w-auto" style={{ animationDelay: "0.2s" }}>
@@ -368,7 +369,7 @@ const Ventures = () => {
             <div className="bg-background/60 backdrop-blur-xl rounded-xl border border-green-500/20 p-6">
               <h3 className="font-semibold text-green-400 mb-2">With Venture Lab</h3>
               <ul className="space-y-2 text-sm text-foreground/70">
-                <li>Working prototype in 1-5 days</li>
+                <li>Working prototype in {SITE_FACTS.residentialDays}</li>
                 <li>Architecture validated by specialists</li>
                 <li>Technical narrative for investors</li>
                 <li>Innovate UK applications positioned</li>
@@ -577,7 +578,7 @@ const Ventures = () => {
               {
                 step: 2,
                 title: "Scoping & Specialist Matching",
-                description: "We define the build target, success criteria, and match specialists from our network of 43+ experts. You'll know exactly who you're working with and what you'll walk away with.",
+                description: `We define the build target, success criteria, and match specialists from our network of ${SITE_FACTS.specialists} experts. You'll know exactly who you're working with and what you'll walk away with.`,
                 color: "bg-cyan-500",
                 lineColor: "bg-cyan-500/30",
               },

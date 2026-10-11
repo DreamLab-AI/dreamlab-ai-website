@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { SITE_FACTS } from "@/data/site-facts";
 import { FadeCarousel } from "@/components/FadeCarousel";
 import { Link } from "react-router-dom";
 import { Header } from "@/components/Header";
@@ -74,7 +75,7 @@ const CoCreateMobile = () => (
     <section id="main-content" className="pt-11 px-6 pb-2" aria-label="Co-create">
       <h1 className="text-m-h1s text-[#FAFAFA] [text-wrap:pretty]">Embed in our lab.</h1>
       <p className="text-[16px] leading-[1.6] text-white/[0.62] mt-4">
-        Bring your toughest challenge to our Lake District lab. Your team works alongside 43+ deep
+        Bring your toughest challenge to our Lake District lab. Your team works alongside {SITE_FACTS.specialists} deep
         tech specialists in an environment designed for focused, intensive co-creation. We do not
         just advise. We build with you.
       </p>
@@ -147,7 +148,7 @@ const CoCreateDesktop = () => {
               Co-Create With Us
             </h1>
             <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-8 max-w-3xl mx-auto px-4">
-              Bring your toughest challenge to our Lake District lab. Your team works alongside 43+ deep tech specialists in an environment designed for focused, intensive co-creation. We do not just advise. We build with you.
+              Bring your toughest challenge to our Lake District lab. Your team works alongside {SITE_FACTS.specialists} deep tech specialists in an environment designed for focused, intensive co-creation. We do not just advise. We build with you.
             </p>
             <Button size="lg" asChild className="min-h-[44px]">
               <Link to="/contact">Book a Discovery Call <ArrowRight className="ml-2 w-4 h-4" /></Link>
@@ -286,7 +287,7 @@ const CoCreateDesktop = () => {
                   { icon: Sun, label: "Solar-Powered", detail: "6.3kW sustainable energy" },
                   { icon: Wifi, label: "10G Network", detail: "Enterprise connectivity" },
                   { icon: Monitor, label: "GPU Cluster", detail: "8x RTX compute" },
-                  { icon: Users, label: "Residential", detail: "5-bed, full-board" },
+                  { icon: Users, label: "Residential", detail: `${SITE_FACTS.accommodation}, full-board` },
                 ].map((item) => {
                   const Icon = item.icon;
                   return (
@@ -361,7 +362,6 @@ const CoCreateDesktop = () => {
               {[
                 { title: "Knowledge Transfer Partnerships", detail: "12-36 month embedded graduate associates, up to 67% funded for SMEs" },
                 { title: "Technology Missions Fund", detail: "Collaborative R&D aligned with UKRI priority areas including AI assurance and net zero" },
-                { title: "AI Assurance Innovation Fund", detail: "Spring 2026 call for trustworthy AI, responsible innovation, and AI safety tooling" },
                 { title: "Digital Catapult Programmes", detail: "We partner with Digital Catapult as the natural Catapult for our creative and immersive tech work" },
               ].map((item) => (
                 <div key={item.title} className="p-4 bg-green-500/5 border border-green-500/15 rounded-lg">

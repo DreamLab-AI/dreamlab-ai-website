@@ -416,7 +416,7 @@ async def chat_stream(request: ChatRequest, history: List[Dict] = None) -> Async
 
 ### Code Handler (`app/handlers/code.py`)
 
-```python
+````python
 """Code assistance handler."""
 
 import ollama
@@ -511,7 +511,7 @@ Provide:
         language=request.language,
         model=model
     )
-```
+````
 
 ### Main Application (`app/main.py`)
 

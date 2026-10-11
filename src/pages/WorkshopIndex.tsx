@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { SITE_FACTS } from "@/data/site-facts";
 import { Header } from '@/components/Header';
 import { LearningPathDiagram } from '@/components/LearningPathDiagram';
 import { useOGMeta } from '@/hooks/useOGMeta';
@@ -492,8 +493,8 @@ const WorkshopIndexDesktop = () => {
                 Ready to Transform Your Workflow?
               </h2>
               <p className="text-lg text-muted-foreground/90 mb-10">
-                Our residential training programme delivers this entire curriculum with expert guidance
-                over 5 intensive days. Or work through it at your own pace online.
+                Our residential training programme delivers this curriculum, shaped to your team, with
+                expert guidance over {SITE_FACTS.residentialDays}. Or work through it at your own pace online.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link

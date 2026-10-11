@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { SITE_FACTS } from "@/data/site-facts";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -56,7 +57,7 @@ const LAB_LINKS: MenuLink[] = [
 ];
 
 const PEOPLE_LINKS: MenuLink[] = [
-  { label: "Team", to: "/team", count: "44+" },
+  { label: "Team", to: "/team", count: SITE_FACTS.specialists },
   { label: "Impact stories", to: "/testimonials" },
   { label: "Community forum", to: "/community/", external: true, count: "SIGN IN", action: true },
 ];

@@ -1,4 +1,5 @@
 import { lazy, Suspense, useRef, useState, useEffect } from "react";
+import { SITE_FACTS } from "@/data/site-facts";
 import { FadeCarousel } from "@/components/FadeCarousel";
 import { Link } from "react-router-dom";
 // Sprint v9 D8: defer the Voronoi hero to a separate chunk so the landing
@@ -125,7 +126,7 @@ const outcomeCards = [
 const featuredTeam = [
   { name: "Dr John O'Hare", domain: "AI & Immersive Systems", role: "Chief Hallucination Officer", image: "/images/team/04.webp" },
   { name: "Pete Woodbridge", domain: "CTO, DREAMLAB", role: "CTO", image: "/images/team/02.webp" },
-  { name: "Steve Moyler", domain: "Chief Creative Officer, DREAMLAB", role: "Creative Lead", image: "/images/team/03.webp" },
+  { name: "Ste Moyler", domain: "Chief Creative Officer, DREAMLAB", role: "Creative Lead", image: "/images/team/03.webp" },
 ];
 
 // Facility images for the desktop carousel
@@ -172,7 +173,7 @@ const labChips = [
 const statQuad = [
   { fig: "£8M+", label: "research heritage" },
   { fig: "30 yrs", label: "deep tech R&D" },
-  { fig: "44+", label: "specialists" },
+  { fig: SITE_FACTS.specialists, label: "specialists" },
   { fig: "6.3kW", label: "solar powered" },
 ];
 
@@ -284,8 +285,8 @@ const IndexMobile = () => (
         ))}
       </div>
       <p className="text-[15px] leading-[1.6] text-white/60 mt-5">
-        A 44-strong team of Emmy nominees, PhD researchers and BAFTA-recognised talent shares the
-        lab with you.
+        {SITE_FACTS.specialists} specialists, including Emmy nominees, PhD researchers and
+        BAFTA-recognised talent, share the lab with you.
       </p>
       <Link
         to="/team"
@@ -417,7 +418,7 @@ const IndexDesktop = () => {
                   { label: "GPU Cluster", detail: "8x RTX for ML workloads" },
                   { label: "LED Volume", detail: "Virtual production stage" },
                   { label: "Spatial Sound", detail: "24-speaker custom system" },
-                  { label: "2 Bedrooms", detail: "Full-board residential, local rooms for larger groups" },
+                  { label: "3 Bedrooms", detail: `${SITE_FACTS.beds} beds, full-board residential, local rooms for larger groups` },
                 ].map((item) => (
                   <div key={item.label} className="p-3 bg-background/50 border border-purple-500/15 rounded-lg">
                     <div className="font-semibold text-sm text-foreground">{item.label}</div>
@@ -447,7 +448,7 @@ const IndexDesktop = () => {
             {[
               { stat: "£8M+", label: "Research Heritage" },
               { stat: "30 Years", label: "Deep Tech R&D" },
-              { stat: "44+", label: "Specialists" },
+              { stat: SITE_FACTS.specialists, label: "Specialists" },
               { stat: "Lake District", label: "Residential Facility" },
             ].map((item) => (
               <div key={item.label} className="text-center px-4 py-2">
@@ -587,7 +588,7 @@ const IndexDesktop = () => {
               Multi-Disciplinary Expertise
             </h2>
             <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-              43+ specialists spanning AI, XR, cyber, audio, and creative technology. Every programme draws on complementary expertise, so your team leaves with more than one discipline's worth of knowledge.
+              {SITE_FACTS.specialists} specialists spanning AI, XR, cyber, audio, and creative technology. Every programme draws on complementary expertise, so your team leaves with more than one discipline's worth of knowledge.
             </p>
           </div>
 
@@ -744,7 +745,7 @@ const FAQS: { q: string; a: string }[] = [
   },
   {
     q: 'What is DreamLab?',
-    a: 'DreamLab is an Applied Innovation Lab in the UK Lake District. Teams work alongside a network of 44+ deep-tech specialists on AI, immersive XR, cyber trust and creative technology through residential programmes and embedded R&D residencies.',
+    a: `DreamLab is an Applied Innovation Lab in the UK Lake District. Teams work alongside a network of ${SITE_FACTS.specialists} deep-tech specialists on AI, immersive XR, cyber trust and creative technology through residential programmes and embedded R&D residencies.`,
   },
   {
     q: 'Where is DreamLab located?',

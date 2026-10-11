@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { SITE_FACTS } from "@/data/site-facts";
 import { Header } from "@/components/Header";
 import { TeamMember } from "@/components/TeamMember";
 import { parseTeamMarkdown } from "@/lib/markdown";
@@ -90,7 +91,7 @@ const TeamMobile = ({ teamMembers, loading, selectedMembers, onToggle, onEnquire
   return (
     <>
       <section id="main-content" className="pt-11 px-6 pb-6" aria-label="Team intro">
-        <h1 className="text-m-h1s text-[#FAFAFA] [text-wrap:pretty]">44+ specialists, one lab.</h1>
+        <h1 className="text-m-h1s text-[#FAFAFA] [text-wrap:pretty]">{SITE_FACTS.specialists} specialists, one lab.</h1>
         <p className="text-m-body text-white/[0.62] mt-3">
           Emmy nominees, PhD researchers and BAFTA-recognised talent. Tap anyone you'd want on your
           project.
@@ -139,7 +140,7 @@ const TeamDesktop = ({ teamMembers, loading, selectedMembers, onToggle, onEnquir
       <div className="container">
         <h1 className="text-3xl md:text-4xl font-bold mb-4">Our Team</h1>
         <p className="text-lg text-muted-foreground max-w-3xl mb-4">
-          43+ specialists including Emmy nominees, PhD researchers, and BAFTA-recognised talent.
+          {SITE_FACTS.specialists} specialists including Emmy nominees, PhD researchers, and BAFTA-recognised talent.
           Click on a team member to select them for your project.
         </p>
 

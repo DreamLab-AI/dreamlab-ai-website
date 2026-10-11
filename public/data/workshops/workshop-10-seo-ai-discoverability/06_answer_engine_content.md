@@ -79,7 +79,7 @@ DreamLab publishes one. Here is its opening:
 # DreamLab
 
 > DreamLab is an Applied Innovation Lab in the UK Lake District. Teams co-create
-> with 44+ deep tech specialists across AI, immersive XR, cyber trust and
+> with 40+ deep tech specialists across AI, immersive XR, cyber trust and
 > creative technology through residential programmes, embedded R&D residencies
 > and free self-guided courses.
 

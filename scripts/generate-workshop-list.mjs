@@ -26,6 +26,7 @@ async function extractTitleFromMd(filePath) {
 
 async function generateWorkshopData() {
   const mainWorkshopList = [];
+  const pendingManifests = [];
 
   try {
     await fs.access(workshopsBaseDir); // Check if base directory exists
@@ -82,14 +83,34 @@ async function generateWorkshopData() {
             return a.slug.localeCompare(b.slug);
         });
 
-        const workshopManifest = {
-            title: workshopTitle,
-            pages: pageItems
-        };
-        const manifestOutputPath = path.join(workshopDirPath, 'manifest.json');
-        await fs.writeFile(manifestOutputPath, JSON.stringify(workshopManifest, null, 2));
-        console.log(`Manifest generated for ${workshopId}: ${manifestOutputPath}`);
+        pendingManifests.push({
+          workshopId,
+          path: path.join(workshopDirPath, 'manifest.json'),
+          manifest: { title: workshopTitle, pages: pageItems },
+        });
       }
+    }
+
+    // Page titles must be unique across the curriculum: lesson headings repeat
+    // ("Chapter 6: Resources & Continued Learning" in three workshops) and an
+    // introduction often reuses its workshop's name. Only colliding lessons get
+    // a `pageTitle`, so most titles stay short.
+    const lessonPages = pendingManifests.flatMap(({ manifest }) =>
+      manifest.pages.filter((p) => p.slug.toLowerCase() !== 'readme.md'));
+    const seen = new Map();
+    for (const p of lessonPages) seen.set(p.title, (seen.get(p.title) || 0) + 1);
+    for (const { workshopId, path: manifestOutputPath, manifest } of pendingManifests) {
+      for (const page of manifest.pages) {
+        if (page.slug.toLowerCase() === 'readme.md') continue;
+        if (page.title.trim() === manifest.title.trim()) {
+          const part = page.slug.replace(/\.md$/i, '').replace(/^\d+[-_]/, '').replace(/[-_]+/g, ' ');
+          page.pageTitle = `${manifest.title}: ${part.charAt(0).toUpperCase()}${part.slice(1)}`;
+        } else if (seen.get(page.title) > 1) {
+          page.pageTitle = `${page.title} · ${manifest.title}`;
+        }
+      }
+      await fs.writeFile(manifestOutputPath, JSON.stringify(manifest, null, 2));
+      console.log(`Manifest generated for ${workshopId}: ${manifestOutputPath}`);
     }
 
     // Ensure src/data directory exists

@@ -1,7 +1,7 @@
 # DreamLab
 
 > DreamLab is an Applied Innovation Lab in the UK Lake District. Teams co-create
-> with 44+ deep tech specialists across AI, immersive XR, cyber trust and
+> with 40+ deep tech specialists across AI, immersive XR, cyber trust and
 > creative technology through residential programmes, embedded R&D residencies
 > and free self-guided courses. Primary calls to action: explore programmes at
 > /programmes or book a discovery call via /contact (info@dreamlab-ai.com).
@@ -16,7 +16,7 @@ BBS client at /community/bbs/.
 - [Co-Create](https://dreamlab-ai.com/co-create/): Embedded R&D sprints and co-creation residencies at the Lake District facility
 - [Research](https://dreamlab-ai.com/research/): Research output, system design work and demonstration videos
 - [Ecosystem](https://dreamlab-ai.com/ecosystem/): The open-source VisionFlow ecosystem DreamLab builds and operates
-- [Team](https://dreamlab-ai.com/team/): The 44+ specialist network with biographies
+- [Team](https://dreamlab-ai.com/team/): The 40+ specialist network with biographies
 - [Contact](https://dreamlab-ai.com/contact/): Enquiries and discovery-call booking (E2E-encrypted form)
 
 ## Self-guided courses

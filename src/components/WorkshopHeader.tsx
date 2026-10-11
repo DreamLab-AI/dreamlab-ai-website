@@ -45,6 +45,11 @@ export interface WorkshopHeaderProps {
   estimatedTime?: string;
   difficulty?: DifficultyLevel;
   description?: string;
+  /**
+   * Element for the workshop title. A lesson whose markdown opens with its own
+   * `# Heading` passes "p", so the page carries one H1 and it names the lesson.
+   */
+  titleAs?: 'h1' | 'p';
 }
 
 interface CategoryConfig {
@@ -227,7 +232,9 @@ export const WorkshopHeader = ({
   estimatedTime,
   difficulty,
   description,
+  titleAs = 'h1',
 }: WorkshopHeaderProps) => {
+  const TitleTag = titleAs;
   const [scrollY, setScrollY] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const headerRef = useRef<HTMLDivElement>(null);
@@ -376,7 +383,7 @@ export const WorkshopHeader = ({
         </div>
 
         {/* Animated Workshop Title */}
-        <h1
+        <TitleTag
           className={cn(
             'text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 break-words',
             'transition-all duration-700 delay-200 transform',
@@ -391,7 +398,7 @@ export const WorkshopHeader = ({
           >
             {title}
           </span>
-        </h1>
+        </TitleTag>
 
         {/* Description */}
         {description && (

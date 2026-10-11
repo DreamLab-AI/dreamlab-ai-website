@@ -1,4 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
+import workshopList from '@/data/workshop-list.json';
+import { SITE_FACTS } from "@/data/site-facts";
 import { Link, useLocation } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Badge } from "@/components/ui/badge";
@@ -533,11 +535,11 @@ const ProgrammesDesktop = () => {
               Co-design your learning path.
             </h1>
             <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-4 max-w-3xl mx-auto px-4">
-              Every course is bespoke, built for you around deep tech modules. {visibleCount} residential programmes delivered by 43+ specialists at our Lake District facility, each mapped to Innovate UK Technology Readiness Levels.
+              Every course is bespoke, built for you around deep tech modules. {visibleCount} residential programmes delivered by {SITE_FACTS.specialists} specialists at our Lake District facility, each mapped to Innovate UK Technology Readiness Levels.
             </p>
             <p className="text-sm text-muted-foreground/60 mb-8">
               We're outcome driven, able to combine modules across categories to fit your needs.
-              Pricing is on application (POA), quoted per engagement.
+              {SITE_FACTS.pricingNote}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center px-4">
               <Button size="lg" asChild className="min-h-[44px]">
@@ -791,7 +793,7 @@ const ProgrammesDesktop = () => {
         <div className="container max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Looking for Self-Guided Learning?</h2>
           <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-            Our self-paced workshop catalogue covers AI-powered knowledge work across 14 modules. An accessible entry point for individuals and small teams.
+            Our self-paced workshop catalogue covers AI-powered knowledge work across {workshopList.length} modules. An accessible entry point for individuals and small teams.
           </p>
           <Button size="lg" variant="outline" asChild className="min-h-[44px]">
             <Link to="/workshops">
@@ -859,7 +861,7 @@ const COURSES_JSON_LD = JSON.stringify({
       description: p.description,
       url: 'https://dreamlab-ai.com/programmes/',
       provider: { '@type': 'Organization', name: 'DreamLab AI Consulting Ltd', sameAs: 'https://dreamlab-ai.com/' },
-      offers: { '@type': 'Offer', category: 'Paid', availability: 'https://schema.org/InStock', description: 'Price on application (POA)' },
+      offers: { '@type': 'Offer', category: 'Paid', availability: 'https://schema.org/InStock', description: SITE_FACTS.pricingNote },
       hasCourseInstance: {
         '@type': 'CourseInstance',
         courseMode: 'Onsite',
