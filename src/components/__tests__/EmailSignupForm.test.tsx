@@ -13,8 +13,8 @@ globalThis.ResizeObserver =
 // --- Mocks (must be set up before importing EmailSignupForm) ---
 // vi.mock factories are hoisted above all imports, so locals referenced inside
 // them must be created via vi.hoisted to be hoisted alongside. We mock the
-// dependency boundary (`@/lib/nostr`) rather than the raw WebSocket, mirroring
-// the Contact test's approach of mocking `@/lib/supabase`.
+// dependency boundary (`@/lib/nostr`) rather than the raw WebSocket, as the
+// Contact test does.
 const {
   generateEphemeralIdentityMock,
   buildContactRumorMock,

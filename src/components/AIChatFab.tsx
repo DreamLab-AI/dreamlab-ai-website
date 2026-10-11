@@ -31,8 +31,8 @@ const TIER_CONFIG: Record<Tier, { label: string; color: string; dot: string; des
 // Transport config (ADR-042). The chat rides a client-side Nostr DM conversation
 // with the junkiejarvis agent: the browser gift-wraps kind-14 rumors to
 // VITE_JARVIS_PUBKEY and publishes the kind-1059 wrap directly to VITE_RELAY_URL.
-// If either is unset the panel degrades to an offline message (mirroring the
-// EmailSignupForm `!supabase` guard) rather than silently failing.
+// If either is unset the panel degrades to an offline message (as EmailSignupForm
+// does when its env is unset) rather than silently failing.
 const RELAY_URL = import.meta.env.VITE_RELAY_URL || "";
 const JARVIS_PUBKEY = import.meta.env.VITE_JARVIS_PUBKEY || "";
 

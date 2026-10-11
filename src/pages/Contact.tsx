@@ -22,6 +22,7 @@ import {
   wrapDm,
   publishGiftWrap,
 } from "@/lib/nostr";
+import { npubEncode } from "nostr-tools/nip19";
 import { useOGMeta } from "@/hooks/useOGMeta";
 import { PAGE_OG_CONFIGS } from "@/lib/og-meta";
 import { useIsMobileSync } from "@/hooks/use-mobile";
@@ -43,7 +44,7 @@ const ENQUIRY_SUBJECT = "DreamLab website enquiry";
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
   email: z.string().email({ message: "Please enter a valid email address" }),
-  projectType: z.string().min(1, { message: "Please select a project type" }),
+  projectType: z.string().min(1, { message: "Please choose what this is about" }),
   teamMembers: z.string().optional(),
   message: z.string().min(10, { message: "Message must be at least 10 characters" })
 });
@@ -64,11 +65,95 @@ interface ContactViewProps {
    line below is now literally true.
    ============================================================ */
 
-const ENGAGEMENTS = [
-  { value: "enterprise", label: "Enterprise" },
-  { value: "sme", label: "SME" },
-  { value: "ktp", label: "KTP" },
-];
+/**
+ * What an enquiry is about, shared by both layouts. These are the services the
+ * site sells (Programmes, Co-Create, Ventures) plus a privacy route; the value
+ * travels in the encrypted DM as `engagement_type` and is read by a person.
+ * Links can pre-select one with `/contact?type=<value>`.
+ */
+const ENQUIRY_TYPES = [
+  { value: "residential", label: "Residential programme" },
+  { value: "sme-sprint", label: "SME sprint" },
+  { value: "ktp", label: "KTP partnership" },
+  { value: "lab-visit", label: "Lab visit" },
+  { value: "venture-lab", label: "Venture Lab" },
+  { value: "privacy", label: "Privacy or data request" },
+  { value: "other", label: "Something else" },
+] as const;
+
+const REPLY_TIME = "We usually reply within two working days.";
+
+/** DreamLab's public Nostr identity: the key the form already encrypts to. */
+const ADMIN_NPUB = (() => {
+  try {
+    return import.meta.env.VITE_ADMIN_PUBKEY ? npubEncode(import.meta.env.VITE_ADMIN_PUBKEY) : "";
+  } catch {
+    return "";
+  }
+})();
+
+/**
+ * Every contact route runs over Nostr: the form above (a one-off encrypted
+ * DM), a direct message from the visitor's own Nostr client, or the
+ * community forum. Nothing is stored in a database.
+ */
+const OtherChannels = ({ variant }: { variant: "mobile" | "desktop" }) => {
+  const [copied, setCopied] = useState(false);
+  const mobile = variant === "mobile";
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(ADMIN_NPUB);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      /* clipboard blocked: the npub stays visible to select by hand */
+    }
+  };
+  return (
+    <section
+      aria-labelledby={`channels-${variant}`}
+      className={mobile ? "px-6 pb-16" : "pb-16"}
+    >
+      <div className={mobile ? "" : "container max-w-2xl"}>
+        <h2
+          id={`channels-${variant}`}
+          className={mobile ? "text-m-h2 text-[#FAFAFA] mb-4" : "text-xl font-semibold mb-4"}
+        >
+          Other ways to reach us
+        </h2>
+        <ul className={mobile ? "space-y-4 text-[15px] text-white/75" : "space-y-4 text-muted-foreground"}>
+          {ADMIN_NPUB && (
+            <li>
+              <span className={mobile ? "block text-[#FAFAFA] font-medium" : "block text-foreground font-medium"}>
+                Message us on Nostr
+              </span>
+              Send an encrypted direct message from any Nostr app (Amethyst, Damus, Primal and others) to:
+              <span className="mt-2 flex flex-wrap items-center gap-2">
+                <code className="break-all rounded bg-white/[0.06] px-2 py-1 text-[13px]">{ADMIN_NPUB}</code>
+                <button
+                  type="button"
+                  onClick={copy}
+                  className={mobile ? "min-h-[40px] px-3 rounded-[10px] border border-dlm-hairline2 text-[14px] text-dlm-bright" : "text-sm text-primary hover:underline"}
+                >
+                  {copied ? "Copied" : "Copy"}
+                </button>
+                <a href={`nostr:${ADMIN_NPUB}`} className={mobile ? "text-[14px] text-dlm-bright underline" : "text-sm text-primary hover:underline"}>
+                  Open in your Nostr app
+                </a>
+              </span>
+            </li>
+          )}
+          <li>
+            <span className={mobile ? "block text-[#FAFAFA] font-medium" : "block text-foreground font-medium"}>
+              Join the community
+            </span>
+            Ask in the open on the <a href="/community/" className={mobile ? "text-dlm-bright underline" : "text-primary hover:underline"}>DreamLab community forum</a>, which also runs on Nostr.
+          </li>
+        </ul>
+      </div>
+    </section>
+  );
+};
 
 const fieldClass =
   "w-full h-[52px] rounded-[10px] border border-white/[0.14] bg-white/[0.03] px-4 text-[16px] text-[#FAFAFA] placeholder-white/30 focus:border-dlm-bright focus:outline-none transition-colors";
@@ -80,10 +165,10 @@ const ContactMobile = ({ form, onSubmit, isSubmitting, selectedTeam }: ContactVi
   const { errors } = form.formState;
   const projectType = form.watch("projectType");
 
-  // Engagement defaults to Enterprise (§10) without touching the shared form
-  // defaults the desktop view relies on.
+  // Engagement defaults to a residential programme (§10) unless a link
+  // pre-selected one, without touching the shared form defaults.
   useEffect(() => {
-    if (!form.getValues("projectType")) form.setValue("projectType", "enterprise");
+    if (!form.getValues("projectType")) form.setValue("projectType", "residential");
   }, [form]);
 
   return (
@@ -93,7 +178,7 @@ const ContactMobile = ({ form, onSubmit, isSubmitting, selectedTeam }: ContactVi
           Tell us what you're working on.
         </h1>
         <p className="text-m-body text-white/[0.62] mt-3">
-          We'll come back with dates and a shaped outline — usually within two working days.
+          We'll come back with dates and a shaped outline. {REPLY_TIME}
         </p>
       </section>
 
@@ -134,7 +219,7 @@ const ContactMobile = ({ form, onSubmit, isSubmitting, selectedTeam }: ContactVi
           <div>
             <span className={labelClass}>Engagement</span>
             <div className="flex flex-wrap gap-2" role="group" aria-label="Engagement type">
-              {ENGAGEMENTS.map((e) => {
+              {ENQUIRY_TYPES.map((e) => {
                 const on = projectType === e.value;
                 return (
                   <button
@@ -183,6 +268,7 @@ const ContactMobile = ({ form, onSubmit, isSubmitting, selectedTeam }: ContactVi
           </p>
         </div>
       </form>
+      <OtherChannels variant="mobile" />
     </>
   );
 };
@@ -198,7 +284,7 @@ const ContactDesktop = ({ form, onSubmit, isSubmitting, selectedTeam }: ContactV
       <div className="container">
         <h1 className="text-3xl md:text-4xl font-bold mb-4">Contact Us</h1>
         <p className="text-lg text-muted-foreground max-w-3xl">
-          Have a project in mind? Fill out the form below and we'll get back to you.
+          Tell us what you're working on and we'll come back with dates and a shaped outline. {REPLY_TIME}
         </p>
       </div>
     </section>
@@ -241,19 +327,17 @@ const ContactDesktop = ({ form, onSubmit, isSubmitting, selectedTeam }: ContactV
               name="projectType"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Project Type</FormLabel>
+                  <FormLabel>What is this about?</FormLabel>
                   <FormControl>
                     <select
                       className="w-full h-10 px-3 py-2 rounded-md border border-input bg-background text-sm"
                       {...field}
                       disabled={isSubmitting}
                     >
-                      <option value="" disabled>Select a project type</option>
-                      <option value="consultation">Consultation</option>
-                      <option value="development">Development</option>
-                      <option value="training">Training</option>
-                      <option value="research">Research</option>
-                      <option value="other">Other</option>
+                      <option value="" disabled>Select what this is about</option>
+                      {ENQUIRY_TYPES.map((t) => (
+                        <option key={t.value} value={t.value}>{t.label}</option>
+                      ))}
                     </select>
                   </FormControl>
                   <FormMessage />
@@ -305,10 +389,15 @@ const ContactDesktop = ({ form, onSubmit, isSubmitting, selectedTeam }: ContactV
             <Button type="submit" className="w-full md:w-auto" disabled={isSubmitting}>
               {isSubmitting ? "Sending..." : "Send Message"}
             </Button>
+            <p className="text-sm text-muted-foreground">
+              Sent end-to-end encrypted over Nostr. Only we can read it, and we don't store it anywhere else.
+            </p>
           </form>
         </Form>
       </div>
     </section>
+
+    <OtherChannels variant="desktop" />
 
     {/* Footer */}
     <footer className="py-8 bg-background" role="contentinfo">
@@ -371,6 +460,14 @@ const Contact = () => {
       message: ""
     }
   });
+
+  // Pre-select the enquiry type a link asked for (e.g. "Schedule a lab visit").
+  useEffect(() => {
+    const type = new URLSearchParams(location.search).get("type");
+    if (type && ENQUIRY_TYPES.some((t) => t.value === type)) {
+      form.setValue("projectType", type, { shouldValidate: false });
+    }
+  }, [location, form]);
 
   // Update team members field when selectedTeam changes
   useEffect(() => {

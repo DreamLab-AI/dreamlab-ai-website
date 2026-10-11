@@ -124,8 +124,6 @@ jobs:
       - name: Build React site
         run: npm run build
         env:
-          VITE_SUPABASE_URL: 'https://stub.invalid'
-          VITE_SUPABASE_ANON_KEY: 'stub'
           # Nostr transport for the contact form + Talk-to-AI chat (ADR-041/042).
           # Build-only stubs — the components read these at runtime and degrade
           # gracefully when unset; the build never contacts the relay.

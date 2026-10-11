@@ -527,9 +527,9 @@ const WorkshopIndexDesktop = () => {
               <Link to="/privacy" className="text-sm text-muted-foreground hover:text-purple-400 transition-colors">
                 Privacy Policy
               </Link>
-              <a href="mailto:info@dreamlab-ai.com" className="text-sm text-muted-foreground hover:text-purple-400 transition-colors">
+              <Link to="/contact" className="text-sm text-muted-foreground hover:text-purple-400 transition-colors">
                 Contact
-              </a>
+              </Link>
             </div>
           </div>
         </div>

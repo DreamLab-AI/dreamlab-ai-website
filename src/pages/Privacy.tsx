@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { useOGMeta } from '@/hooks/useOGMeta';
 import { PAGE_OG_CONFIGS } from '@/lib/og-meta';
@@ -63,21 +64,27 @@ const Privacy = () => {
               Under GDPR Article 17, you have the right to request erasure of your personal data.
               Because both signup and enquiry messages are end-to-end-encrypted direct messages —
               not database records — there is nothing for us to auto-delete on a server. To have a
-              message erased, email us at{" "}
+              message erased, send a{" "}
+              <Link to="/contact?type=privacy" className="text-primary hover:underline">
+                privacy or data request
+              </Link>{" "}
+              through the encrypted contact form and the site operator will purge it manually. If
+              you cannot use the form (it needs JavaScript), email{" "}
               <a href="mailto:info@dreamlab-ai.com" className="text-primary hover:underline">
                 info@dreamlab-ai.com
-              </a>{" "}
-              and the site operator will purge it manually.
+              </a>
+              .
             </p>
           </section>
 
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">Contact Us</h2>
             <p>
-              If you have any questions about this privacy policy or our data practices, please contact us at{" "}
-              <a href="mailto:info@dreamlab-ai.com" className="text-primary hover:underline">
-                info@dreamlab-ai.com
-              </a>
+              If you have any questions about this privacy policy or our data practices, please{" "}
+              <Link to="/contact?type=privacy" className="text-primary hover:underline">
+                send us a privacy request
+              </Link>{" "}
+              (or email info@dreamlab-ai.com if the form is unavailable to you).
             </p>
           </section>
         </div>

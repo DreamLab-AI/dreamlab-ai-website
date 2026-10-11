@@ -22,8 +22,8 @@ const SUBMITTING_TEXT = "Submitting...";
 const SUBMIT_TEXT = "Sign Up";
 
 // Signup submissions are delivered to the site operator as an anonymous,
-// end-to-end-encrypted NIP-17 gift-wrapped DM (ADR-041). No Supabase row is
-// written. Relay + admin recipient are read from the build env, mirroring the
+// end-to-end-encrypted NIP-17 gift-wrapped DM (ADR-041). Nothing is written
+// to a database. Relay + admin recipient are read from the build env, mirroring the
 // old module-level env pattern; if either is unset the form degrades gracefully.
 const RELAY_URL = import.meta.env.VITE_RELAY_URL || "";
 const ADMIN_PUBKEY = import.meta.env.VITE_ADMIN_PUBKEY || "";

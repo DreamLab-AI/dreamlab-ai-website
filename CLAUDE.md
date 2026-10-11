@@ -80,9 +80,10 @@ src/
   pages/               # Route pages (lazy-loaded) + __tests__/
   components/          # React components (shadcn/ui primitives in ui/)
   hooks/               # use-mobile, use-toast, useOGMeta
-  lib/                 # supabase, utils, og-meta, image-utils, markdown,
-                       # gdpr-erasure + __tests__/
-  data/                # skills.json + GENERATED: workshop-list.json,
+  lib/                 # nostr (NIP-17 ingress), chat-turns, utils, og-meta,
+                       # image-utils, markdown + __tests__/
+  data/                # site-facts.ts (every figure the site states),
+                       # skills.json + GENERATED: workshop-list.json,
                        # testimonials.json (do not hand-edit generated files)
   styles/              # design-tokens.css
   test/                # vitest setup

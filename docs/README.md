@@ -413,8 +413,6 @@ graph LR
 
 | Variable | Context | Description |
 |----------|---------|-------------|
-| `VITE_SUPABASE_URL` | React `.env` | Supabase project URL (marketing site) |
-| `VITE_SUPABASE_ANON_KEY` | React `.env` | Supabase anonymous key (marketing site) |
 | `VITE_AUTH_API_URL` | Both `.env` | auth-worker URL (e.g., `https://api.dreamlab-ai.com`) |
 | `RP_ID` | Worker `wrangler.toml` | WebAuthn relying party ID (`dreamlab-ai.com` or `localhost`) |
 | `EXPECTED_ORIGIN` | Worker `wrangler.toml` | Allowed origin for WebAuthn ceremonies |

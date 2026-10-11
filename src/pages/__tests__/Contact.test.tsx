@@ -4,7 +4,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 // vi.mock factories are hoisted above all imports, so locals referenced inside
 // them must be created via vi.hoisted to be hoisted alongside. We mock the
 // dependency boundary (`@/lib/nostr`) — the enquiry form now submits over the
-// NIP-17 end-to-end-encrypted gift-wrap ingress, not Supabase.
+// NIP-17 end-to-end-encrypted gift-wrap ingress.
 const {
   generateEphemeralIdentityMock,
   buildEnquiryRumorMock,
@@ -94,7 +94,7 @@ type FireEvent = Awaited<ReturnType<typeof mountContact>>["fireEvent"];
 const fillValidForm = (screen: Screen, fireEvent: FireEvent) => {
   fireEvent.change(screen.getByLabelText(/^name$/i), { target: { value: "Alice Tester" } });
   fireEvent.change(screen.getByLabelText(/^email$/i), { target: { value: "alice@example.com" } });
-  fireEvent.change(screen.getByLabelText(/project type/i), { target: { value: "training" } });
+  fireEvent.change(screen.getByLabelText(/what is this about/i), { target: { value: "residential" } });
   fireEvent.change(screen.getByLabelText(/^message$/i), {
     target: { value: "We would like to enquire about a residential AI agent training cohort." },
   });
@@ -122,10 +122,32 @@ describe("Contact page", () => {
 
     expect(await screen.findByText(/name must be at least 2 characters/i)).toBeInTheDocument();
     expect(await screen.findByText(/please enter a valid email address/i)).toBeInTheDocument();
-    expect(await screen.findByText(/please select a project type/i)).toBeInTheDocument();
+    expect(await screen.findByText(/please choose what this is about/i)).toBeInTheDocument();
     expect(await screen.findByText(/message must be at least 10 characters/i)).toBeInTheDocument();
 
     expect(publishGiftWrapMock).not.toHaveBeenCalled();
+  });
+
+  it("pre-selects the enquiry type a link asks for", async () => {
+    window.history.pushState({}, "", "/contact?type=lab-visit");
+    const { screen } = await mountContact();
+    expect((screen.getByLabelText(/what is this about/i) as HTMLSelectElement).value).toBe("lab-visit");
+    window.history.pushState({}, "", "/contact");
+  });
+
+  it("ignores an unknown ?type= value", async () => {
+    window.history.pushState({}, "", "/contact?type=bogus");
+    const { screen } = await mountContact();
+    expect((screen.getByLabelText(/what is this about/i) as HTMLSelectElement).value).toBe("");
+    window.history.pushState({}, "", "/contact");
+  });
+
+  it("offers a direct Nostr DM to the same key the form encrypts to", async () => {
+    const { screen } = await mountContact();
+    const { npubEncode } = await import("nostr-tools/nip19");
+    const npub = npubEncode(ADMIN);
+    expect(screen.getByText(npub)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /open in your nostr app/i })).toHaveAttribute("href", `nostr:${npub}`);
   });
 
   it("shows an email-specific error for malformed addresses", async () => {
@@ -133,7 +155,7 @@ describe("Contact page", () => {
 
     fireEvent.change(screen.getByLabelText(/^name$/i), { target: { value: "Alice Tester" } });
     fireEvent.change(screen.getByLabelText(/^email$/i), { target: { value: "not-an-email" } });
-    fireEvent.change(screen.getByLabelText(/project type/i), { target: { value: "consultation" } });
+    fireEvent.change(screen.getByLabelText(/what is this about/i), { target: { value: "sme-sprint" } });
     fireEvent.change(screen.getByLabelText(/^message$/i), {
       target: { value: "This is a sufficiently long enquiry message." },
     });
@@ -157,7 +179,7 @@ describe("Contact page", () => {
       expect.objectContaining({
         name: "Alice Tester",
         email: "alice@example.com",
-        engagementType: "training",
+        engagementType: "residential",
         message: expect.stringMatching(/residential AI agent training/i),
       })
     );
@@ -213,7 +235,7 @@ describe("Contact page", () => {
     expect(screen.getByRole("heading", { name: /contact us/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/^name$/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/^email$/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/project type/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/what is this about/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/^message$/i)).toBeInTheDocument();
   });
 });

@@ -192,7 +192,7 @@ const IndexMobile = () => (
         One to three days in a solar-powered deep-tech lab, shaped around your challenge.
       </p>
       <Link
-        to="/contact"
+        to="/contact?type=lab-visit"
         className="flex items-center justify-center h-[52px] rounded-[10px] bg-dlm-action text-dlm-ink text-[16px] font-semibold transition-colors active:bg-[#0891B2]"
       >
         Schedule a lab visit
@@ -315,7 +315,7 @@ const IndexMobile = () => (
 
     {/* Sticky action bar */}
     <MobileActionBar>
-      <BarPrimary label="Schedule a lab visit" to="/contact" />
+      <BarPrimary label="Schedule a lab visit" to="/contact?type=lab-visit" />
       <BarIconButton label="Email us" to="/contact">
         <Mail className="w-5 h-5" aria-hidden="true" />
       </BarIconButton>
@@ -427,7 +427,7 @@ const IndexDesktop = () => {
                 ))}
               </div>
               <Link
-                to="/contact"
+                to="/contact?type=lab-visit"
                 className="inline-flex items-center text-cyan-400 hover:text-cyan-300 font-medium text-sm hover:underline gap-1"
               >
                 Schedule a lab visit <ArrowRight className="w-3.5 h-3.5" />
