@@ -115,6 +115,8 @@ scripts/
   generate-workshop-list.mjs   # Pre-build: workshops → src/data/workshop-list.json
   generate-testimonials.mjs    # Pre-build: content YAML → src/data/testimonials.json
   seed/                        # Zone seeding + relay/calendar/pod probes (live ops)
+  seo-watch/                   # Nightly SEO + agent-searchability watch (ADR-2010):
+                               #   crontab, config.json, run.mjs, lib/ — alongside the dream engine
   embeddings/                  # Search embedding tooling
   optimize-images.sh, generate-heroes.sh, optimize-team-portraits.sh
 

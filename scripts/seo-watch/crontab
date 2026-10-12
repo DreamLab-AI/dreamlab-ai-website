@@ -1,0 +1,10 @@
+# SEO & agent-searchability watch (website ADR-2010) — consumed by the agentbox
+# [program:seo-watch-cron] supercronic service. Editable live: supercronic
+# re-reads this file from the workspace mount; no image rebuild needed.
+#
+# 05:40 UTC nightly: after the dream window (01:00–05:00), the forum backup
+# (03:10) and the diagram review (05:17), so the browser sidecar and the Z.AI
+# budget are not shared with another nightly job. flock makes an overlong run
+# skip the next slot rather than overlap it; timeout (90 min) bounds the whole
+# night: GLM at max reasoning effort alone may take up to 30 min.
+40 5 * * * mkdir -p /home/devuser/workspace/.agentbox/seo-watch && cd /home/devuser/workspace/dreamlab-ai-website && flock -n /home/devuser/workspace/.agentbox/seo-watch/.lock timeout 5400 node scripts/seo-watch/run.mjs nightly 2>&1

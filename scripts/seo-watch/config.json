@@ -1,0 +1,123 @@
+{
+  "origin": "https://dreamlab-ai.com",
+  "hosting": "github-pages",
+  "always_pages": [
+    "/",
+    "/programmes/",
+    "/co-create/",
+    "/research/",
+    "/ecosystem/",
+    "/team/",
+    "/workshops/",
+    "/testimonials/",
+    "/ventures/",
+    "/contact/",
+    "/privacy/"
+  ],
+  "pages_per_night": 30,
+  "parity_pages": 4,
+  "concurrency": 4,
+  "fetch_timeout_ms": 20000,
+  "sitemap_min_urls": 20,
+  "llms_link_cap": 60,
+  "agents": [
+    {
+      "token": "Googlebot",
+      "ua": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
+    },
+    {
+      "token": "Bingbot",
+      "ua": "Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)"
+    },
+    {
+      "token": "GPTBot",
+      "ua": "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); compatible; GPTBot/1.2; +https://openai.com/gptbot"
+    },
+    {
+      "token": "OAI-SearchBot",
+      "ua": "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); compatible; OAI-SearchBot/1.0; +https://openai.com/searchbot"
+    },
+    {
+      "token": "ChatGPT-User",
+      "ua": "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); compatible; ChatGPT-User/1.0; +https://openai.com/bot"
+    },
+    {
+      "token": "ClaudeBot",
+      "ua": "Mozilla/5.0 (compatible; ClaudeBot/1.0; +claudebot@anthropic.com)"
+    },
+    {
+      "token": "Claude-SearchBot",
+      "ua": "Mozilla/5.0 (compatible; Claude-SearchBot/1.0; +https://www.anthropic.com)"
+    },
+    {
+      "token": "PerplexityBot",
+      "ua": "Mozilla/5.0 (compatible; PerplexityBot/1.0; +https://perplexity.ai/perplexitybot)"
+    }
+  ],
+  "browser": {
+    "enabled": true,
+    "mcp_url": "http://browsercontainer:8931",
+    "tool_timeout_ms": 90000,
+    "lighthouse_timeout_ms": 180000,
+    "lighthouse_device": "mobile",
+    "lighthouse_pages_per_night": 3,
+    "settle_ms": 2500,
+    "regression": {
+      "drop": 5,
+      "nights": 2,
+      "floor": {
+        "seo": 90,
+        "accessibility": 90,
+        "best-practices": 90,
+        "agentic-browsing": 90
+      }
+    }
+  },
+  "presence": {
+    "weekday": 1,
+    "model": "sonar",
+    "queries": [
+      "residential AI training courses in the Lake District UK",
+      "DreamLab AI consulting Cumbria",
+      "free self-guided AI agents curriculum Claude Code workshops",
+      "applied innovation lab AI XR cyber trust UK team training"
+    ]
+  },
+  "glm": {
+    "model": "glm-5.3",
+    "max_tokens": 131072,
+    "thinking_budget": null,
+    "timeout_ms": 1800000,
+    "max_input_chars": 120000,
+    "monthly_token_budget": 6000000,
+    "weekly_digest_weekday": 1,
+    "_note": "glm-5.3 is Z.AI's strongest tier and runs at max reasoning effort when no thinking budget is named (an explicit budget only lowers it); max_tokens is the model's full output so a hard night never returns empty content; the timeout matches diagram-review. Measured 2026-10-12: 7.2k in / 18.7k out, 193 s."
+  },
+  "propose": {
+    "mode": "pr",
+    "label": "seo-watch",
+    "branch_prefix": "seo/",
+    "cooldown_days": 14,
+    "max_changed_lines": 60,
+    "allowlist": [
+      "public/robots.txt",
+      "public/llms.txt"
+    ],
+    "report_dir": "docs/seo/nightly",
+    "build_env": {
+      "VITE_RELAY_URL": "wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev",
+      "VITE_AUTH_API_URL": "https://dreamlab-auth-api.solitary-paper-764d.workers.dev",
+      "VITE_POD_API_URL": "https://dreamlab-pod-api.solitary-paper-764d.workers.dev",
+      "VITE_SEARCH_API_URL": "https://dreamlab-search-api.solitary-paper-764d.workers.dev",
+      "VITE_LINK_PREVIEW_API_URL": "https://dreamlab-link-preview.solitary-paper-764d.workers.dev",
+      "VITE_ADMIN_PUBKEY": "11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c",
+      "VITE_JARVIS_PUBKEY": "2de44d5622eef79519ac078f6e227a85aecbaefd561e4e50c5f51dfadbf916e9",
+      "VITE_REPLY_RELAYS": "wss://relay.damus.io,wss://relay.primal.net"
+    },
+    "reference_files": [
+      "src/lib/og-meta.ts",
+      "index.html"
+    ],
+    "_note": "The allowlist is text the build never executes. Source files that the build or tests import (og-meta.ts, index.html) are offered read-only: the model cites line numbers in the report and a human makes the edit."
+  }
+}
