@@ -30,5 +30,21 @@
     "quote": "If you want to move past the superficial hype of prompt engineering and actually learn how to architect autonomous systems, Dr. John O'Hare's training is the gold standard. He quite literally taught me everything I know about Agentic AI, taking me from a conceptual understanding to being able to build and deploy sophisticated, multi-agent frameworks.",
     "location_detail": "Google review, October 2026",
     "featured": true
+  },
+  {
+    "id": "google-local-guide-2026-10",
+    "name": "Google reviewer",
+    "role": "Course attendee, Local Guide",
+    "quote": "A thoroughly enjoyable few days getting familiar with Claude, GitHub and basic principles of utilising AI for engineering. I've since built, tested and released a superb desktop UI to support complex trading platform integration. As if having a mainline of functional information wasn't enough it was all delivered in their incredibly beautiful premises in the lakes. Thanks DreamLab. Dreamy.",
+    "location_detail": "Google review, October 2026",
+    "featured": true
+  },
+  {
+    "id": "andy-mills",
+    "name": "Andy Mills",
+    "role": "Google reviewer",
+    "quote": "Excellent and innovative AI training.",
+    "location_detail": "Google review",
+    "featured": true
   }
 ]
