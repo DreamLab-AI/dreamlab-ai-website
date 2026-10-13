@@ -85,6 +85,18 @@ if (existsSync(workshopsDir)) {
         ? `missing=[${missing.join(",")}] stale=[${extra.join(",")}]`
         : "exact",
     );
+    // `path` feeds prerender's routes/aliases and check-discovery's expected
+    // sitemap URLs, but both re-read the same field, so nothing re-derives it:
+    // a hand-edited or half-regenerated workshop-list.json keeps green ids
+    // while rotting every link built from `path`.
+    const badPaths = list.filter((w) => w.path !== `/workshops/${w.id}`);
+    check(
+      badPaths.length === 0,
+      "workshop paths match ids",
+      badPaths.length
+        ? badPaths.map((w) => `${w.id}->${w.path}`).join(",")
+        : "all paths are /workshops/<id>",
+    );
   }
 
   let manifests = 0;
