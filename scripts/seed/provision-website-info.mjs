@@ -12,8 +12,9 @@
 //
 // It never grants cohorts. `register` is used, not `provision`, because
 // provision merges cohorts and the `agent` cohort receives the zone-4 key. The
-// relay whitelist row must already exist (contact copies are refused without
-// it); if it is missing this stops and says so rather than adding one.
+// recipient must already be admitted (a whitelist row or a declared [[ingress]]
+// entry, else contact copies are refused); if not, this stops and says so rather
+// than adding one.
 //
 // Keys are read, never printed. RE-RUN HAZARD: POST /api/admin/reset-db drops
 // the whitelist and registry rows; the nightly inbox watch flags both.
@@ -48,9 +49,9 @@ console.log(`identity: ${pubkey.slice(0, 12)}…${dryRun ? '  (dry run: no write
 // 0. The recipient gate row must exist and must carry no privilege.
 const checkWhitelist = async () => (await fetch(`${RELAY_HTTP}/api/check-whitelist?pubkey=${pubkey}`)).json();
 const wlBefore = privilegeProblem(await checkWhitelist());
-if (wlBefore === 'not whitelisted on the relay') fail('not whitelisted; run scripts/seed/whitelist-admin-recipient.mjs --pubkey=<monitor> first');
+if (wlBefore === 'not whitelisted on the relay') fail('neither whitelisted nor a declared ingress recipient; declare it under [[ingress]] in dreamlab.toml (or run scripts/seed/whitelist-admin-recipient.mjs --pubkey=<monitor>)');
 if (wlBefore) fail(`${wlBefore}; remove it before adopting the identity`);
-console.log('whitelist: present, no cohorts, not admin');
+console.log('relay row: admitted, no cohorts, not admin');
 
 // 1. kind-0 profile, published by the identity itself.
 const kind0 = finalizeEvent({ kind: 0, created_at: now(), tags: [], content: buildProfileContent() }, monitorSk);
@@ -113,7 +114,7 @@ if (before.listed) {
 // 3. Read it back, and prove nothing above granted privilege.
 const wlAfter = privilegeProblem(await checkWhitelist());
 if (wlAfter) fail(`after provisioning: ${wlAfter}`);
-console.log('whitelist after: still no cohorts, not admin');
+console.log('relay row after: still no cohorts, not admin');
 const after = classifyDisclosure(await (await fetch(disclosureUrl)).json(), pubkey);
 if (!after.listed) fail('registered but not visible in /api/agents/disclosure');
 console.log(`verified: ${after.name}, registered_by ${String(after.registeredBy).slice(0, 12)}…`);

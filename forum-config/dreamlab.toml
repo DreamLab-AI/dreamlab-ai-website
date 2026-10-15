@@ -411,6 +411,34 @@ role          = "Website Information — recipient of the marketing sites' encry
 cohorts       = []   # deliberate: the `agent` cohort would receive the zone4 key (agent_keys = true)
 authorised_by = "6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425a"  # operator-jjohare (human admin)
 
+# ─── Ingress recipients (kit ADR-2022, website ADR-2011) ─────────────────────
+# Pubkeys the relay admits gift-wrapped (kind-1059) form traffic for WITHOUT a
+# whitelist row, so contact, signup and chat survive POST /api/admin/reset-db.
+# Hand-mirrored into the relay's INGRESS_RECIPIENTS var
+# (deploy/relay-worker.wrangler.toml) and the VITE_*_PUBKEY build env in
+# deploy.yml; tests/ingress_mirror.rs fails if they drift. Declaring a key here
+# grants NO cohort, admin right or zone key: never roster these into `agent`.
+[[ingress]]
+label         = "site-inbox"
+pubkey        = "11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c"
+role          = "primary"
+description   = "Contact-form and signup inbox: the key behind VITE_ADMIN_PUBKEY (visionclaw-server; ADR-040 D3 key split pending)."
+authorised_by = "6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425a"  # operator-jjohare (human admin)
+
+[[ingress]]
+label         = "junkiejarvis"
+pubkey        = "2de44d5622eef79519ac078f6e227a85aecbaefd561e4e50c5f51dfadbf916e9"
+role          = "agent"
+description   = "Talk-to-AI agent: the key behind VITE_JARVIS_PUBKEY (ADR-2008)."
+authorised_by = "6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425a"  # operator-jjohare (human admin)
+
+[[ingress]]
+label         = "website-info"
+pubkey        = "4ed429aa7f30d6e63c41be50685cffeb03cd7b07e37d37a0c4ae5321e642aad7"
+role          = "copy"
+description   = "Monitor copy of every contact, signup and chat message, read by the nightly inbox watch: the key behind VITE_MONITOR_PUBKEY (ADR-2011)."
+authorised_by = "6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425a"  # operator-jjohare (human admin)
+
 # ─── Test users ──────────────────────────────────────────────────────────────
 [[test_users]]
 label    = "test-trainer-alice"

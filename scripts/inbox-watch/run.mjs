@@ -32,7 +32,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { finalizeEvent, generateSecretKey, getPublicKey, verifyEvent } from "nostr-tools/pure";
 import * as nip17 from "nostr-tools/nip17";
-import { disclosureProblem } from "../lib/website-info.mjs";
+import { disclosureProblem, ingressProblem } from "../lib/website-info.mjs";
 import { digestLines } from "../lib/digest.mjs";
 import * as nip44 from "nostr-tools/nip44";
 
@@ -207,13 +207,16 @@ async function checkWhitelist(label, pk) {
   try {
     const r = await fetch(`${RELAY_HTTP}/api/check-whitelist?pubkey=${pk}`, { signal: AbortSignal.timeout(10000) });
     const j = await r.json();
-    return j.isWhitelisted ? null : `${label} pubkey is NOT whitelisted on the relay (reset-db hazard?)`;
+    // Admitted either way: a whitelist row, or a config-declared ingress recipient
+    // (kit ADR-2022), which survives reset-db. Report the declaration separately.
+    const admitted = j.isWhitelisted || j.ingressRecipient === true;
+    if (!admitted) return `${label} pubkey is NOT whitelisted on the relay (reset-db hazard?)`;
+    return ingressProblem(label, j);
   } catch (e) {
     return `whitelist check for ${label} failed: ${e.message}`;
   }
 }
 
-/** The deployed bundle must carry the relay + all three pubkeys. */
 async function checkDeployedBundle(monitorPk) {
   const problems = [];
   try {

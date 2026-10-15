@@ -135,6 +135,11 @@ contact, signup and chat copies for the nightly inbox watch. It is labelled, not
 cohorts (the `agent` cohort would receive the zone4 key), no admin rights, no posting.
 Adopt or repair it with `scripts/seed/provision-website-info.mjs`.
 
+The three form recipients (the admin inbox, `junkiejarvis` and `website-info`) are declared under
+`[[ingress]]` in `dreamlab.toml` (kit ADR-2022) and mirrored into the relay's `INGRESS_RECIPIENTS` binding, so
+the relay admits wraps addressed to them without a whitelist row and a `reset-db` cannot silence the forms.
+`forum-config/tests/ingress_mirror.rs` keeps the TOML, the binding and the `VITE_*_PUBKEY` build env equal.
+
 ### Pod & NIP-05 posture
 
 Solid pods are provisioned Worker-native on Cloudflare R2; private keys are
@@ -181,7 +186,9 @@ cohorts via `[native_pod]` (`dreamlab.toml:245`).
    surfaces desync.
 6. The `website-info` identity holds no cohort, never `agent`, and no admin or zone
    key; the monitor pubkey is mirrored in `deploy.yml`, `contact-embed/entry.ts`,
-   `dreamlab.toml` and `.well-known/nostr.json` (guarded by `website-info.test.mjs`).
+   `dreamlab.toml` and `.well-known/nostr.json` (guarded by `website-info.test.mjs`), and every
+   `[[ingress]]` entry is equal in the TOML, the relay `INGRESS_RECIPIENTS` var and `deploy.yml`
+   (`forum-config/tests/ingress_mirror.rs`).
 
 ## Change process
 

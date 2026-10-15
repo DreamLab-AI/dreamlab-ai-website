@@ -93,14 +93,30 @@ export function disclosureProblem(doc, pubkey) {
 
 /**
  * Problem string when a relay /api/check-whitelist answer shows the identity
- * holding any privilege (admin, or any cohort), else null. Run before AND after
+ * holding any privilege (admin, or any cohort), else null. A key that is neither
+ * whitelisted nor a declared ingress recipient is also a problem. Run before AND after
  * provisioning so "never privileged" is checked against live state.
  */
 export function privilegeProblem(wl) {
-  if (!wl || wl.isWhitelisted !== true) return 'not whitelisted on the relay';
+  if (!wl) return 'not whitelisted on the relay';
+  // A config-declared ingress recipient (kit ADR-2022) needs no whitelist row,
+  // but being one never excuses privilege: the checks below still apply.
+  if (wl.isWhitelisted !== true && wl.ingressRecipient !== true) return 'not whitelisted on the relay';
   const cohorts = Array.isArray(wl.cohorts) ? wl.cohorts : [];
   if (wl.isAdmin || cohorts.length) {
     return `unexpected privilege (isAdmin=${Boolean(wl.isAdmin)}, cohorts=${JSON.stringify(cohorts)})`;
   }
   return null;
+}
+
+/**
+ * Nightly-watch problem string unless the relay reports `pubkey` as a
+ * config-declared ingress recipient (`ingressRecipient: true` from
+ * /api/check-whitelist). This checks the declaration is effective on the live
+ * relay, not merely present in dreamlab.toml.
+ */
+export function ingressProblem(label, wl) {
+  return wl && wl.ingressRecipient === true
+    ? null
+    : `${label} is not an effective ingress recipient (INGRESS_RECIPIENTS missing or stale on the relay)`;
 }

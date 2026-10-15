@@ -837,9 +837,9 @@ dependencies = [
 
 [[package]]
 name = "nostr-bbs-config"
-version = "1.0.0-beta.15"
+version = "1.0.0-beta.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "420df79b8528c8e85aacef413213771264fbc2ed22d607a770ff4e9b1675a79f"
+checksum = "d987ddf6af27346a3d63e2c41838d3a0426549817588a3b000a9ef7937e02310"
 dependencies = [
  "schemars",
  "serde",
@@ -851,9 +851,9 @@ dependencies = [
 
 [[package]]
 name = "nostr-bbs-core"
-version = "1.0.0-beta.15"
+version = "1.0.0-beta.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5511e94d7d1387285f66cd6c4359177f9c4332255a212a6351c3761cabe15684"
+checksum = "9d8b1f835945b38962d6b7e7aa35c22ea2da36051029a42ce8f9d656ce53e9cf"
 dependencies = [
  "aes",
  "async-trait",
@@ -880,9 +880,9 @@ dependencies = [
 
 [[package]]
 name = "nostr-bbs-mesh"
-version = "1.0.0-beta.15"
+version = "1.0.0-beta.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a3c1726b54a293b945d457458fb830e29b20fa17cf57a718bbee259c12dc17b2"
+checksum = "02d36dc55b5e121b8bcb7682981d2945275bc0d976f30bc3c697049f80aea8fc"
 dependencies = [
  "async-trait",
  "hex",
@@ -897,9 +897,9 @@ dependencies = [
 
 [[package]]
 name = "nostr-bbs-rate-limit"
-version = "1.0.0-beta.15"
+version = "1.0.0-beta.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0a96b9f90ad7c43c9fb057ceb21a0d3afd196769adb24402b985269cbcf94d89"
+checksum = "81bc01aa6b3a5ddcbd2a59d841eafd89aacc408c0ce8170596518bd1873782f1"
 dependencies = [
  "async-trait",
  "hex",
@@ -1360,9 +1360,9 @@ checksum = "8ed6a63f02c8539c91a8685a86f4099661ba3da017932f6ebbea6de3f0fa7c90"
 
 [[package]]
 name = "solid-pod-rs"
-version = "0.5.0-alpha.12"
+version = "0.5.0-alpha.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4f1d9628ede063b8b657df1d67e6805059ee9a2caceeb513a8a5de9b30a1b4cd"
+checksum = "42f9bf7552d00addc7085acb23d60811d9349aa17329af7414ada71abbd146da"
 dependencies = [
  "async-trait",
  "base64",

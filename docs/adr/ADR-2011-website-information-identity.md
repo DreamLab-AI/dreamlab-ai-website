@@ -3,13 +3,13 @@ id: ADR-2011
 title: Name the monitor key as the "website information" identity, labelled but never privileged
 date: 2026-10-15
 decision_status: accepted
-implementation_status: partial
+implementation_status: complete
 activation_status: live
 supersedes: []
 superseded_by: []
 verified_commit: b7b7fe46
 owner: jjohare
-review_trigger: the kit gains a config-declared ingress recipient list (Phase 1 below), or the monitor key is rotated
+review_trigger: a browser library for form ingress is added to the kit, or the monitor key is rotated
 repo: dreamlab-ai-website
 domain: IDENTITY-zones.md
 lineage: extends ADR-2008 (website to agent DM routing) and the monitor co-recipient added in 08628f06.
@@ -39,10 +39,15 @@ name it, but zone4 sets `agent_keys = true`, so that cohort receives the zone ke
    whitelist row carries privilege. The nightly inbox watch fails if the registry row is missing.
 4. The existing key is kept. Rotating it would touch the deploy env, the vendored embeds on two
    other sites and the key custody, for no gain while the row is clean.
-5. Generalising this into the kit is recorded as the target but is not done here (Phase 1):
-   a config-declared `[[ingress]]` recipient list read by the relay gate (so `reset-db` cannot
-   drop it), a config-to-registry seed export (closing P2-REC-12), and projection into
-   `window.__ENV__`. Forum behaviour changes belong upstream.
+5. The kit generalisation shipped as kit ADR-2022 (nostr-rust-forum `aee1997`, crates at 1.0.0-beta.16):
+   `[[ingress]]` in `dreamlab.toml` declares the admin inbox, the Talk-to-AI agent and `website-info`; the relay
+   admits kind-1059 wraps for them from its `INGRESS_RECIPIENTS` binding with no whitelist row, so a `reset-db`
+   cannot silence the forms; `check-whitelist` reports `ingressRecipient`; and `/api/agents/disclosure` merges
+   declared recipients that carry `authorised_by` (a registry row wins). `tests/ingress_mirror.rs` keeps the TOML,
+   the relay binding and the build env equal, and the nightly watch fails unless the live relay reports each key
+   as an effective ingress recipient. Left out on purpose: projecting the list into `window.__ENV__` (nothing in the
+   kit client reads it), a shared browser library for building the wraps (still `src/lib/nostr.ts`), and the
+   admin Agents roster, which the auth worker serves.
 
 ## Consequences
 
@@ -60,8 +65,8 @@ name it, but zone4 sets `agent_keys = true`, so that cohort receives the zone ke
 
 ## Verification
 
-Implementation is `partial`: Phase 0 (this ADR, decisions 1 to 4) is complete and live; decision 5, the
-kit-side generalisation, is not started.
+Implementation is `complete` for decisions 1 to 5 as amended: decisions 1 to 4 are live (Phase 0, below) and decision 5
+is the kit release described there, verified by the second note.
 
 Live check, 2026-10-15 at `b7b7fe46`, by `scripts/seed/provision-website-info.mjs`: the monitor row had no
 cohorts and was not admin before and after; the kind-0 was accepted and read back from the relay with a
@@ -73,3 +78,8 @@ Not observed: the forum's admin members view, whose data source was not traced.
 `npx vitest run scripts/__tests__/website-info.test.mjs scripts/__tests__/inbox-digest.test.mjs` covers the
 profile, the registration body (no `cohorts`), NIP-98 signing, the disclosure and privilege checks, the
 mirror agreement, the no-`agent`-cohort counter-example, and the sanitised, bounded digest.
+
+Kit move, 2026-10-15: kit `aee1997` (ADR-2022) is pinned in `deploy.yml`, `workers-deploy.yml`, `rust-ci.yml`, the
+`forum-config` crate pins and the compatibility record. `cd forum-config && cargo test` includes
+`tests/ingress_mirror.rs`; `npx vitest run scripts/__tests__/website-info.test.mjs` covers the ingress-aware
+privilege and effectiveness checks. The live result of the redeploy is recorded in the note below once checked.

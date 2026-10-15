@@ -36,6 +36,12 @@ ZONE_CONFIG = '[{"id":"zone1","slug":"welcome","display_name":"Welcome","require
 # seeded without already being admin). Keep in sync with [admin].static_pubkeys.
 ADMIN_PUBKEYS = "11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c,6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425a,5d80b5facd2d746689d7d2e400db6acce5843456967054adcf6956e4c734c54c,be92ccf53d9d535fd21f3388201fd83b49588552fff5a1395fb60b6998df2243,d5194639ee3560204a1b5584a0714a6dd2a6c59953d0869b483e72ee185ada26"
 
+# Gift-wrap recipients admitted without a whitelist row (kit ADR-2022): JSON array
+# rendered from dreamlab.toml [[ingress]] by nostr_bbs_config::ingress::ingress_relay_var.
+# Absent or malformed => the relay admits only whitelisted recipients, as before.
+# tests/ingress_mirror.rs keeps this equal to the TOML.
+INGRESS_RECIPIENTS = '[{"label":"site-inbox","pubkey":"11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c","role":"primary","authorised_by":"6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425a"},{"label":"junkiejarvis","pubkey":"2de44d5622eef79519ac078f6e227a85aecbaefd561e4e50c5f51dfadbf916e9","role":"agent","authorised_by":"6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425a"},{"label":"website-info","pubkey":"4ed429aa7f30d6e63c41be50685cffeb03cd7b07e37d37a0c4ae5321e642aad7","role":"copy","authorised_by":"6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425a"}]'
+
 # Mesh federation (PRD-010 Phase 3 / ADR-073)
 MESH_MODE               = "standalone"
 MESH_PEER_RELAYS        = ""

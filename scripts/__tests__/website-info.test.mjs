@@ -27,6 +27,7 @@ import {
   classifyDisclosure,
   disclosureProblem,
   privilegeProblem,
+  ingressProblem,
 } from '../lib/website-info.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -120,6 +121,25 @@ describe('E2 live privilege check', () => {
     [null, /not whitelisted/],
   ])('flags %j', (wl, re) => {
     expect(privilegeProblem(wl)).toMatch(re);
+  });
+});
+
+describe('ingress recipient (kit ADR-2022)', () => {
+  test('an ingress-only key with no privilege is healthy', () => {
+    expect(privilegeProblem({ isWhitelisted: false, isAdmin: false, cohorts: [], ingressRecipient: true })).toBeNull();
+  });
+  test('COUNTER-EXAMPLE: being an ingress recipient never excuses privilege', () => {
+    expect(privilegeProblem({ isWhitelisted: true, isAdmin: false, cohorts: ['agent'], ingressRecipient: true })).toMatch(/privilege/);
+    expect(privilegeProblem({ isWhitelisted: true, isAdmin: true, cohorts: [], ingressRecipient: true })).toMatch(/isAdmin=true/);
+  });
+  test('without ingress a missing whitelist row is still a problem', () => {
+    expect(privilegeProblem({ isWhitelisted: false, ingressRecipient: false })).toMatch(/not whitelisted/);
+  });
+  test('ingressProblem is null only when the relay reports the key as an ingress recipient', () => {
+    expect(ingressProblem('monitor', { ingressRecipient: true })).toBeNull();
+    for (const wl of [{}, { ingressRecipient: false }, { ingressRecipient: 'true' }, null]) {
+      expect(ingressProblem('monitor', wl)).toMatch(/monitor.*not an effective ingress recipient.*INGRESS_RECIPIENTS/);
+    }
   });
 });
 
