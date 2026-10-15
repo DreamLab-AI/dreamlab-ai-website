@@ -19,7 +19,8 @@ path = "src/lib.rs"
 # integrity + graduated escalation, REC-6 escalation-default projection. Consumed by this deployment as a thin
 # overlay (D1/D2, ADR-040). Cutover provenance is recorded in docs/architecture/kit-compatibility-record.md.
 # All four library crates are pinned at 1.0.0-beta.16 (see the CRATES.IO note below);
-# the current client-only KIT_REF bumps do not move these versions. Superseded pin history:
+# a client-only KIT_REF bump does not move these versions, a library change does (aee1997
+# moved all four to beta.16 together). Superseded pin history:
 # a149da4 (v1.0.0-beta.3, BBS control-plane + live Chat/Code + pod-url clarity);
 # overhaul — de-wildcat menu IA (agent control plane -> #1 AGENTS), the BBS write
 # path (signer + relay publish + NIP-42 AUTH, governance ActionResponse signing,

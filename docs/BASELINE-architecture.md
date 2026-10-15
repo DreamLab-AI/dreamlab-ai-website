@@ -3,7 +3,7 @@ title: DreamLab AI Website — Deployment & Build Baseline
 doc_id: DLW-BASELINE
 version: 0.1.0
 status: draft-for-ratification
-verified_commit: d852f61
+verified_commit: e02c95d0
 sources:
   - .github/workflows/deploy.yml
   - .github/workflows/workers-deploy.yml
@@ -106,13 +106,17 @@ comment and CI assertion rather than the handler code.
 
 Two pin mechanisms coexist:
 
-- **Config crates** are consumed from crates.io with a **version requirement**, not a git
-  rev: `nostr-bbs-{core,config,mesh,rate-limit} = "1.0.0-beta.9"`
-  (`forum-config/Cargo.toml`, `forum-config/Cargo.lock`).
+- **Config crates** are consumed from crates.io with an **exact** version pin, not a git
+  rev: `nostr-bbs-{core,config,mesh,rate-limit} = "=1.0.0-beta.16"`
+  (`forum-config/Cargo.toml`, `forum-config/Cargo.lock`). The pin guard
+  (`scripts/lib/pin-parity.mjs`) demands **one** version across all four, equal to
+  `CANONICAL_KIT_VERSION`, and each crate's registry checksum recorded in
+  `docs/architecture/kit-compatibility-record.md`; a crate released alone (core's
+  ER-22 beta.16) means the other three are republished to match.
 - **Client + workers** are built by cloning the kit repo at a pinned **git SHA**
-  `KIT_REF = a7544687b4d1c09807862d749b27f8c8da307a12`, present identically in
-  `deploy.yml` and `workers-deploy.yml`. It tracks `nostr-rust-forum
-  v1.0.0-beta.9`.
+  `KIT_REF = aee1997a769e127ae8250f69be1090e39ceb7608`, present identically in
+  `deploy.yml`, `workers-deploy.yml` and `rust-ci.yml`. It is the kit commit that
+  released `nostr-rust-forum` 1.0.0-beta.16 and added `[[ingress]]` (kit ADR-2022).
 
 `workers-deploy.yml:` fires on `forum-config/Cargo.lock` and `KIT_REF` changes
 precisely so a kit re-pin never ships a new client against old workers — the
