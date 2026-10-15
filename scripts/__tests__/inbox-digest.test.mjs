@@ -4,7 +4,7 @@
 // characters into the operator's DM, and the digest size is bounded however
 // many wraps arrive (deepsec findings, 2026-10-15).
 import { describe, test, expect } from 'vitest';
-import { cleanField, digestLines, deliveryOutcome } from '../lib/digest.mjs';
+import { cleanField, digestLines, deliveryOutcome, nextUntil } from '../lib/digest.mjs';
 
 describe('cleanField', () => {
   test('collapses newlines and tabs to single spaces', () => {
@@ -69,5 +69,26 @@ describe('deliveryOutcome', () => {
   });
   test('an unattempted send is treated as not delivered', () => {
     expect(deliveryOutcome(op, null).persist).toBe(false);
+  });
+});
+
+describe('nextUntil', () => {
+  const page = (...ts) => ts.map((created_at) => ({ created_at }));
+  test('a short page ends paging', () => {
+    expect(nextUntil(page(50, 40), 3, 1, 10)).toBeNull();
+    expect(nextUntil([], 3, 1, 10)).toBeNull();
+  });
+  test('a full page continues just below its oldest event', () => {
+    expect(nextUntil(page(50, 40, 45), 3, 1, 10)).toBe(39);
+  });
+  test('COUNTER-EXAMPLE: the page cap stops an unbounded flood', () => {
+    expect(nextUntil(page(50, 40, 45), 3, 10, 10)).toBeNull();
+  });
+  test('COUNTER-EXAMPLE: a cursor that does not move ends paging instead of looping', () => {
+    expect(nextUntil(page(50, 40, 45), 3, 2, 10, 39)).toBeNull();
+    expect(nextUntil(page(50, 40, 45), 3, 2, 10, 30)).toBeNull();
+  });
+  test('malformed timestamps end paging', () => {
+    expect(nextUntil([{ created_at: NaN }, { created_at: 1 }, { created_at: 2 }], 3, 1, 10)).toBeNull();
   });
 });

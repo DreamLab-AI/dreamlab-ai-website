@@ -33,7 +33,7 @@ import path from "node:path";
 import { finalizeEvent, generateSecretKey, getPublicKey, verifyEvent } from "nostr-tools/pure";
 import * as nip17 from "nostr-tools/nip17";
 import { disclosureProblem, ingressProblem } from "../lib/website-info.mjs";
-import { digestLines, deliveryOutcome } from "../lib/digest.mjs";
+import { digestLines, deliveryOutcome, nextUntil } from "../lib/digest.mjs";
 import * as nip44 from "nostr-tools/nip44";
 
 const DRY = process.argv.includes("--dry-run");
@@ -133,23 +133,53 @@ async function publish(url, event, sk) {
   }
 }
 
+const PAGE_SIZE = 500;
+const MAX_PAGES = 10;
+
+/** One REQ page of wraps addressed to `pk`, newest first. */
+async function fetchWrapPage(conn, pk, since, until) {
+  const events = [];
+  await new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error("timed out waiting for EOSE")), 15000);
+    conn.on((f) => {
+      if (f[0] === "EVENT" && f[1] === "iw") events.push(f[2]);
+      else if (f[0] === "EOSE" && f[1] === "iw") { clearTimeout(timer); resolve(); }
+      else if (f[0] === "CLOSED" && f[1] === "iw") { clearTimeout(timer); reject(new Error(`subscription closed: ${f[2] || ""}`)); }
+    });
+    const filter = { kinds: [1059], "#p": [pk], since, limit: PAGE_SIZE };
+    if (until !== null) filter.until = until;
+    conn.ws.send(JSON.stringify(["REQ", "iw", filter]));
+  });
+  conn.ws.send(JSON.stringify(["CLOSE", "iw"]));
+  return events;
+}
+
+/**
+ * Every wrap since `since`, paged newest to oldest. The monitor key is public, so
+ * anyone can flood it; a single window would let a flood push real messages out
+ * of the digest. Capped at MAX_PAGES so a flood cannot make the job unbounded.
+ */
 async function fetchWraps(url, sk, pk, since) {
   const conn = await openAuthed(url, sk);
-  const events = [];
+  const all = new Map();
   try {
-    await new Promise((resolve, reject) => {
-      const timer = setTimeout(() => reject(new Error("timed out waiting for EOSE")), 15000);
-      conn.on((f) => {
-        if (f[0] === "EVENT" && f[1] === "iw") events.push(f[2]);
-        else if (f[0] === "EOSE" && f[1] === "iw") { clearTimeout(timer); resolve(); }
-        else if (f[0] === "CLOSED" && f[1] === "iw") { clearTimeout(timer); reject(new Error(`subscription closed: ${f[2] || ""}`)); }
-      });
-      conn.ws.send(JSON.stringify(["REQ", "iw", { kinds: [1059], "#p": [pk], since, limit: 500 }]));
-    });
+    let until = null;
+    for (let pages = 1; ; pages++) {
+      const page = await fetchWrapPage(conn, pk, since, until);
+      for (const e of page) all.set(e.id, e);
+      const next = nextUntil(page, PAGE_SIZE, pages, MAX_PAGES, until);
+      if (next === null) {
+        if (pages >= MAX_PAGES && page.length >= PAGE_SIZE) {
+          console.error(`inbox-watch: stopped at ${MAX_PAGES} pages of ${PAGE_SIZE} wraps; older ones are still in the relay`);
+        }
+        break;
+      }
+      until = next;
+    }
   } finally {
     try { conn.ws.close(); } catch { /* ignore */ }
   }
-  return events;
+  return [...all.values()];
 }
 
 /** NIP-59 unwrap with the trust chain nostr-tools' own unwrap skips. */
@@ -223,7 +253,7 @@ async function checkDeployedBundle(monitorPk) {
     const html = await (await fetch(`${SITE}/`, { signal: AbortSignal.timeout(15000) })).text();
     const entry = html.match(/assets\/index-[\w-]+\.js/)?.[0];
     if (!entry) return ["deployed homepage references no index bundle"];
-    const bodies = [await (await fetch(`${SITE}/${entry}`)).text()];
+    const bodies = [await (await fetch(`${SITE}/${entry}`, { signal: AbortSignal.timeout(15000) })).text()];
     const want = /(?:Contact|Index|EmailSignupForm)-[\w-]+\.js/g;
     const seen = new Set();
     for (let depth = 0; depth < 2; depth++) {
@@ -231,7 +261,7 @@ async function checkDeployedBundle(monitorPk) {
       for (const n of names) {
         if (seen.has(n)) continue;
         seen.add(n);
-        bodies.push(await (await fetch(`${SITE}/assets/${n}`)).text());
+        bodies.push(await (await fetch(`${SITE}/assets/${n}`, { signal: AbortSignal.timeout(15000) })).text());
       }
     }
     const all = bodies.join("\n");

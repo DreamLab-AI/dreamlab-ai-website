@@ -49,3 +49,26 @@ export function deliveryOutcome(operator, result) {
   }
   return { persist: true, exitCode: 0, alert: "sent" };
 }
+
+/**
+ * Cursor for the next (older) page of wraps, or null when paging is done.
+ *
+ * A relay returns the newest `limit` events, so a flood to the public monitor
+ * key could push real messages out of a single window. A full page means there
+ * may be more: continue below the oldest `created_at` seen. A short page, an
+ * empty page, a cursor that did not move, or `maxPages` reached ends paging.
+ *
+ * @param {{created_at:number}[]} page events of the page just fetched
+ * @param {number} limit the page size requested
+ * @param {number} pagesFetched pages fetched so far, including this one
+ * @param {number} maxPages hard cap on pages per run
+ * @param {number|null} previousUntil the `until` this page was fetched with
+ */
+export function nextUntil(page, limit, pagesFetched, maxPages, previousUntil = null) {
+  if (page.length < limit || pagesFetched >= maxPages) return null;
+  const oldest = Math.min(...page.map((e) => e.created_at));
+  if (!Number.isFinite(oldest)) return null;
+  // `until` is inclusive; step below the oldest so the same events are not refetched.
+  const next = oldest - 1;
+  return previousUntil !== null && next >= previousUntil ? null : next;
+}
