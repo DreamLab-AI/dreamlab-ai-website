@@ -7,7 +7,7 @@ implementation_status: complete
 activation_status: live
 supersedes: []
 superseded_by: []
-verified_commit: b7b7fe46
+verified_commit: 8293c444
 owner: jjohare
 review_trigger: a browser library for form ingress is added to the kit, or the monitor key is rotated
 repo: dreamlab-ai-website
@@ -82,4 +82,10 @@ mirror agreement, the no-`agent`-cohort counter-example, and the sanitised, boun
 Kit move, 2026-10-15: kit `aee1997` (ADR-2022) is pinned in `deploy.yml`, `workers-deploy.yml`, `rust-ci.yml`, the
 `forum-config` crate pins and the compatibility record. `cd forum-config && cargo test` includes
 `tests/ingress_mirror.rs`; `npx vitest run scripts/__tests__/website-info.test.mjs` covers the ingress-aware
-privilege and effectiveness checks. The live result of the redeploy is recorded in the note below once checked.
+privilege and effectiveness checks. 
+Live check after the kit move, 2026-10-15 at `8293c444`: workers deploy succeeded; `/api/check-whitelist` reports
+`ingressRecipient: true` for the admin inbox, `junkiejarvis` and `website-info`, and `website-info` still has no cohorts
+and is not admin; `/api/agents/disclosure` still lists exactly `agentbox-operator`, `junkiejarvis`, `website-info`;
+`inbox-watch --dry-run` reports `problems: []` (its probe round trip covers relay writes on the new schema creation);
+`/community/` returns 200. Not run: `reset-db` (the unit tests are the evidence that declared recipients survive it) and
+a fresh browser form submission after the redeploy.
