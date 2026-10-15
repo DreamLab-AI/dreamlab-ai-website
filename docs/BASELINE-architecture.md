@@ -114,7 +114,7 @@ Two pin mechanisms coexist:
   `docs/architecture/kit-compatibility-record.md`; a crate released alone (core's
   ER-22 beta.16) means the other three are republished to match.
 - **Client + workers** are built by cloning the kit repo at a pinned **git SHA**
-  `KIT_REF = aee1997a769e127ae8250f69be1090e39ceb7608`, present identically in
+  `KIT_REF = ea7d95e7ca70833217ab543fee91b8344304a32d`, present identically in
   `deploy.yml`, `workers-deploy.yml` and `rust-ci.yml`. It is the kit commit that
   released `nostr-rust-forum` 1.0.0-beta.16 and added `[[ingress]]` (kit ADR-2022).
 
