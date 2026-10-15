@@ -151,7 +151,7 @@ export const EmailSignupForm = () => {
             htmlFor="consent"
             className="text-xs text-muted-foreground/80 leading-tight cursor-pointer hover:text-muted-foreground transition-colors"
           >
-            I agree to receive emails from DreamLab about projects, opportunities, and news. You can unsubscribe at any time. See our <a href="/privacy" className="underline hover:text-purple-400 transition-colors">Privacy Policy</a> for more information.
+            I agree to receive emails from DreamLab about projects, opportunities, and news. You can unsubscribe at any time. See our <a href="/privacy/" className="underline hover:text-purple-400 transition-colors">Privacy Policy</a> for more information.
           </Label>
         </div>
       </div>

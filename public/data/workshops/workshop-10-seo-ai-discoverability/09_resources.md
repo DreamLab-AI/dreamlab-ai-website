@@ -49,10 +49,10 @@ If a link has moved, search the vendor's site for "crawler" or the bot name; eve
 
 ## Related Workshops in This Curriculum
 
-- **[Professional Output Suite](/workshops/workshop-05-afternoon-publishing)** — publish the site you will audit here.
-- **[RAG System Implementation](/workshops/workshop-03-afternoon-rag-system)** — the retrieve-then-generate pattern answer engines are built on.
-- **[Agent Orchestration & Safety](/workshops/workshop-04-afternoon-orchestration)** — why prompt injection in web content is an attack, not a tactic.
-- **[Claude Code Mastery](/workshops/workshop-08-claude-code)** — automate the audits in Chapter 8.
+- **[Professional Output Suite](/workshops/workshop-05-afternoon-publishing/)** — publish the site you will audit here.
+- **[RAG System Implementation](/workshops/workshop-03-afternoon-rag-system/)** — the retrieve-then-generate pattern answer engines are built on.
+- **[Agent Orchestration & Safety](/workshops/workshop-04-afternoon-orchestration/)** — why prompt injection in web content is an attack, not a tactic.
+- **[Claude Code Mastery](/workshops/workshop-08-claude-code/)** — automate the audits in Chapter 8.
 
 ## The DreamLab Case Study
 

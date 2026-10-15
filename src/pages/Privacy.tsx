@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "@/components/SlashLink";
 import { Header } from "@/components/Header";
 import { useOGMeta } from '@/hooks/useOGMeta';
 import { PAGE_OG_CONFIGS } from '@/lib/og-meta';
@@ -106,7 +106,7 @@ const Privacy = () => {
                   LinkedIn
                 </a>
               </div>
-              <a href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <a href="/privacy/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Privacy Policy
               </a>
             </div>

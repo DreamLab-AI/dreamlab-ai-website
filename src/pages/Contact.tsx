@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { useLocation, Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import { Link } from "@/components/SlashLink";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -423,7 +424,7 @@ const ContactDesktop = ({ form, onSubmit, isSubmitting, selectedTeam }: ContactV
                 </li>
               </ul>
             </nav>
-            <a href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <a href="/privacy/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Privacy Policy
             </a>
           </div>

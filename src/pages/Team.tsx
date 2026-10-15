@@ -213,7 +213,7 @@ const TeamDesktop = ({ teamMembers, loading, selectedMembers, onToggle, onEnquir
                 </li>
               </ul>
             </nav>
-            <a href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <a href="/privacy/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Privacy Policy
             </a>
           </div>

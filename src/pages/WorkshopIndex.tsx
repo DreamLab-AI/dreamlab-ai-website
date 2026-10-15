@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link } from '@/components/SlashLink';
 import { SITE_FACTS } from "@/data/site-facts";
 import { Header } from '@/components/Header';
 import { LearningPathDiagram } from '@/components/LearningPathDiagram';

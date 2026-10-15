@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { SITE_FACTS } from "@/data/site-facts";
 import { FadeCarousel } from "@/components/FadeCarousel";
-import { Link } from "react-router-dom";
+import { Link } from "@/components/SlashLink";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import {

@@ -1,6 +1,6 @@
 import { lazy, Suspense, useState, useRef } from "react";
 import { SITE_FACTS } from "@/data/site-facts";
-import { Link } from "react-router-dom";
+import { Link } from "@/components/SlashLink";
 import { Header } from "@/components/Header";
 // Sprint v9 D8: defer the Voronoi hero chunk.
 const HyperdimensionalHeroBackground = lazy(
