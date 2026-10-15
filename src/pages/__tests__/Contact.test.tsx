@@ -26,6 +26,7 @@ vi.mock("@/lib/nostr", () => ({
   buildEnquiryRumor: buildEnquiryRumorMock,
   wrapDm: wrapDmMock,
   publishGiftWrap: publishGiftWrapMock,
+  publishMonitorCopy: vi.fn().mockResolvedValue(undefined),
 }));
 
 // useOGMeta is a side-effect hook; stub it so we don't touch document head.

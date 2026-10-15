@@ -212,7 +212,15 @@ VITE_LINK_PREVIEW_API_URL=https://dreamlab-link-preview.solitary-paper-764d.work
 VITE_ADMIN_PUBKEY=11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c
 VITE_JARVIS_PUBKEY=2de44d5622eef79519ac078f6e227a85aecbaefd561e4e50c5f51dfadbf916e9
 VITE_REPLY_RELAYS=wss://relay.damus.io,wss://relay.primal.net
+VITE_MONITOR_PUBKEY=4ed429aa7f30d6e63c41be50685cffeb03cd7b07e37d37a0c4ae5321e642aad7
 ```
+
+`VITE_MONITOR_PUBKEY` is the nightly inbox-watch co-recipient (`scripts/inbox-watch/`,
+cron in `scripts/seo-watch/crontab`): every contact, signup and chat message is also
+wrapped to it, because the relay only serves kind-1059 wraps to their addressee. Its
+secret lives in `.agentbox/inbox-watch/monitor.key`. The static sites (VisionFlow,
+narrativegoldmine.com) vendor `scripts/contact-embed/` output; rebuild with
+`node scripts/contact-embed/build.mjs`.
 
 `VITE_REPLY_RELAYS` are the open relays the Talk-to-AI chat listens on for the
 agent's kind-1059 reply (the primary relay's whitelist gate rejects wraps

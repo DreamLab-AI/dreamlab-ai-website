@@ -72,6 +72,12 @@ env:
   # for it) — extending the split to a five-location atomic change.
   VITE_ADMIN_PUBKEY: '11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c'
   VITE_JARVIS_PUBKEY: '2de44d5622eef79519ac078f6e227a85aecbaefd561e4e50c5f51dfadbf916e9'  # junkiejarvis — dreamlab.toml [[agents]]
+  # Nightly inbox-watch co-recipient (scripts/inbox-watch). The relay's kind-1059
+  # read gate only serves wraps addressed to the authenticated viewer, so every
+  # contact / signup / chat message is also wrapped to this key. Public key only;
+  # the secret lives in .agentbox/inbox-watch/monitor.key. Whitelist it with
+  # scripts/seed/whitelist-admin-recipient.mjs after any relay reseed.
+  VITE_MONITOR_PUBKEY: '4ed429aa7f30d6e63c41be50685cffeb03cd7b07e37d37a0c4ae5321e642aad7'
   # Open relays the Talk-to-AI chat listens on for junkiejarvis's reply (ADR-042
   # amendment): the primary relay's whitelist gate rejects kind-1059 wraps
   # addressed to the ephemeral session key, so replies are only readable from
@@ -178,6 +184,7 @@ jobs:
           VITE_RELAY_URL: ${{ env.VITE_RELAY_URL }}
           VITE_ADMIN_PUBKEY: ${{ env.VITE_ADMIN_PUBKEY }}
           VITE_JARVIS_PUBKEY: ${{ env.VITE_JARVIS_PUBKEY }}
+          VITE_MONITOR_PUBKEY: ${{ env.VITE_MONITOR_PUBKEY }}
           VITE_REPLY_RELAYS: ${{ env.VITE_REPLY_RELAYS }}
 
       # ── Rust/WASM forum client ─────────────────────────────────────────

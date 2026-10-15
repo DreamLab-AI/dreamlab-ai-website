@@ -36,6 +36,7 @@ vi.mock("@/lib/nostr", () => ({
   buildContactRumor: buildContactRumorMock,
   wrapDm: wrapDmMock,
   publishGiftWrap: publishGiftWrapMock,
+  publishMonitorCopy: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock("sonner", () => ({

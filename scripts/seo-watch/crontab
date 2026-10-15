@@ -8,3 +8,10 @@
 # skip the next slot rather than overlap it; timeout (90 min) bounds the whole
 # night: GLM at max reasoning effort alone may take up to 30 min.
 40 5 * * * mkdir -p /home/devuser/workspace/.agentbox/seo-watch && cd /home/devuser/workspace/dreamlab-ai-website && flock -n /home/devuser/workspace/.agentbox/seo-watch/.lock timeout 5400 node scripts/seo-watch/run.mjs nightly 2>&1
+
+# Inbox watch (contact form, email signup, Talk-to-AI chat → Nostr): 07:15 UTC,
+# after the seo-watch window, so the digest is waiting in Amethyst in the morning.
+# Reads the monitor-key copies of every submission, probes the relay round trip,
+# checks whitelist + deployed bundle, and DMs the operator only when there is
+# something new or something broken. State: .agentbox/inbox-watch/.
+15 7 * * * mkdir -p /home/devuser/workspace/.agentbox/inbox-watch && cd /home/devuser/workspace/dreamlab-ai-website && flock -n /home/devuser/workspace/.agentbox/inbox-watch/.lock timeout 300 node scripts/inbox-watch/run.mjs >> /home/devuser/workspace/.agentbox/inbox-watch/cron.log 2>&1

@@ -21,6 +21,7 @@ import {
   buildEnquiryRumor,
   wrapDm,
   publishGiftWrap,
+  publishMonitorCopy,
 } from "@/lib/nostr";
 import { npubEncode } from "nostr-tools/nip19";
 import { useOGMeta } from "@/hooks/useOGMeta";
@@ -38,6 +39,7 @@ const ERROR_MESSAGE_UNAVAILABLE = "Service temporarily unavailable. Please try a
 // rejected publish never shows a false success.
 const RELAY_URL = import.meta.env.VITE_RELAY_URL || "";
 const ADMIN_PUBKEY = import.meta.env.VITE_ADMIN_PUBKEY || "";
+const MONITOR_PUBKEY = import.meta.env.VITE_MONITOR_PUBKEY || "";
 const ENQUIRY_SUBJECT = "DreamLab website enquiry";
 
 // Define form schema with Zod
@@ -510,6 +512,7 @@ const Contact = () => {
         return;
       }
 
+      void publishMonitorCopy(RELAY_URL, rumor.content, identity.sk, MONITOR_PUBKEY, ADMIN_PUBKEY, ENQUIRY_SUBJECT);
       toast.success(SUCCESS_MESSAGE, { duration: 5000 });
       form.reset();
     } catch {
