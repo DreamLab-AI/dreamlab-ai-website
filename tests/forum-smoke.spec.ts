@@ -90,7 +90,7 @@ test.describe('Forum WASM app', () => {
     console.log('Screenshot: /tmp/forum-homepage.png');
 
     const fatalErrors = errors.filter(e =>
-      !e.includes('ServiceWorker') && !e.includes('aborted') && !e.includes('supabase')
+      !e.includes('ServiceWorker') && !e.includes('aborted')
     );
     console.log('Page errors:', errors.length, 'Fatal:', fatalErrors.length);
     if (fatalErrors.length > 0) console.log('Fatal errors:', fatalErrors);
