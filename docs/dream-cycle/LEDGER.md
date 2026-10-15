@@ -55,3 +55,4 @@
 | 2026-10-11 | ci-workflows | rust-ci.yml KIT_REF comment restated beta.14 (canonical beta.15); removed | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/60 | yes | ACCEPT |  | 0d42a5e9ef90 |  |  |  |
 | 2026-10-13 | site-build-content | inventory now enforces workshop-list path === /workshops/<id> (was unguarded) | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/61 | yes | ACCEPT |  | 51db9bdd2a01 |  |  |  |
 | 2026-10-14 | operator-overlay | workers.rs POD/RELAY URL constants mirror TOML unguarded; bench enforces | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/62 | yes | ACCEPT |  | 183dbd87fb1f |  |  |  |
+| 2026-10-15 | ci-workflows | VETOED: deploy/workers push paths ⊆ ci.yml now enforced by guard script+test+ci… | NONE | VETOED | yes | REJECT |  | 4436a9d056fa |  |  |  |
