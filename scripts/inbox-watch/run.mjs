@@ -33,6 +33,7 @@ import path from "node:path";
 import { finalizeEvent, generateSecretKey, getPublicKey, verifyEvent } from "nostr-tools/pure";
 import * as nip17 from "nostr-tools/nip17";
 import { disclosureProblem } from "../lib/website-info.mjs";
+import { digestLines } from "../lib/digest.mjs";
 import * as nip44 from "nostr-tools/nip44";
 
 const DRY = process.argv.includes("--dry-run");
@@ -313,10 +314,8 @@ async function main() {
     const lines = [`DreamLab inbox watch · ${new Date().toISOString().slice(0, 10)}`];
     if (fresh.length) {
       lines.push("", `${fresh.length} new: ${Object.entries(counts).map(([k, n]) => `${n} ${k}`).join(", ")}`);
-      for (const f of fresh) {
-        const who = [f.name, f.email].filter(Boolean).join(" <") + (f.email && f.name ? ">" : "");
-        lines.push(`• [${f.kind}${f.source ? " · " + f.source : ""}] ${who || "(anonymous)"}${f.detail ? " · " + f.detail : ""}${f.excerpt ? `\n  “${f.excerpt}”` : ""}`);
-      }
+      // Sender-controlled text: flattened, capped and bounded (lib/digest.mjs).
+      lines.push(...digestLines(fresh));
     } else {
       lines.push("", "No new messages.");
     }

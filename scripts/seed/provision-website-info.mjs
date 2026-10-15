@@ -58,18 +58,19 @@ function publishKind0() {
   return new Promise((resolve, reject) => {
     const ws = new WebSocket(RELAY_WS);
     const timer = setTimeout(() => { ws.close(); reject(new Error('relay timeout')); }, 20000);
-    let authed = false;
-    const send = () => ws.send(JSON.stringify(['EVENT', kind0]));
-    ws.onopen = send;
+    // Never send before the relay's NIP-42 challenge has been answered; if the
+    // relay sends none within 1.5s it does not want AUTH, so send anyway. One
+    // EVENT only: no retry path to race against the challenge.
+    let sent = false;
+    const sendOnce = () => { if (!sent) { sent = true; ws.send(JSON.stringify(['EVENT', kind0])); } };
+    ws.onopen = () => setTimeout(sendOnce, 1500);
     ws.onmessage = (m) => {
       const d = JSON.parse(m.data);
-      if (d[0] === 'AUTH' && !authed) {
-        authed = true;
+      if (d[0] === 'AUTH') {
         const auth = finalizeEvent({ kind: 22242, created_at: now(), tags: [['relay', RELAY_WS], ['challenge', d[1]]], content: '' }, monitorSk);
         ws.send(JSON.stringify(['AUTH', auth]));
-        setTimeout(send, 400);
+        setTimeout(sendOnce, 400);
       } else if (d[0] === 'OK' && d[1] === kind0.id) {
-        if (!d[2] && /auth/i.test(d[3] || '') && !authed) return; // wait for the AUTH frame, then retry
         clearTimeout(timer);
         ws.close();
         d[2] ? resolve() : reject(new Error(`relay rejected kind-0: ${d[3] || 'no reason'}`));
