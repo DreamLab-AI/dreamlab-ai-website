@@ -32,6 +32,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { finalizeEvent, generateSecretKey, getPublicKey, verifyEvent } from "nostr-tools/pure";
 import * as nip17 from "nostr-tools/nip17";
+import { disclosureProblem } from "../lib/website-info.mjs";
 import * as nip44 from "nostr-tools/nip44";
 
 const DRY = process.argv.includes("--dry-run");
@@ -190,6 +191,17 @@ function classify(rumor) {
   return { kind: "other", source: "unknown", excerpt: text.replace(/\s+/g, " ").slice(0, 160) };
 }
 
+/** The monitor must stay labelled in the agent registry (ADR-2011); reset-db drops the row. */
+async function checkRegistry(pk) {
+  try {
+    const r = await fetch(`${RELAY_HTTP}/api/agents/disclosure`, { signal: AbortSignal.timeout(10000) });
+    if (!r.ok) return `agent registry check returned ${r.status}`;
+    return disclosureProblem(await r.json(), pk);
+  } catch (e) {
+    return `agent registry check failed: ${e.message}`;
+  }
+}
+
 async function checkWhitelist(label, pk) {
   try {
     const r = await fetch(`${RELAY_HTTP}/api/check-whitelist?pubkey=${pk}`, { signal: AbortSignal.timeout(10000) });
@@ -241,6 +253,8 @@ async function main() {
     const p = await checkWhitelist(label, pk);
     if (p) problems.push(p);
   }
+  const registryProblem = await checkRegistry(monitorPk);
+  if (registryProblem) problems.push(registryProblem);
   problems.push(...(await checkDeployedBundle(monitorPk)));
 
   // 2. Probe round trip (to the monitor only)

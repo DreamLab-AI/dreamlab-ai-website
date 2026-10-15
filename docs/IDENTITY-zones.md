@@ -126,6 +126,15 @@ publishes to (`AIChatFab.tsx:31-35,269`; legacy ADR-042 Amendment 1). The
 contact form uses the same gift-wrap transport to `VITE_ADMIN_PUBKEY` (legacy
 ADR-041). Both pubkeys are hand-synced mirrors of `dreamlab.toml`.
 
+### Website information identity (`website-info`)
+
+The key behind `VITE_MONITOR_PUBKEY` (`4ed429aa…aad7`) is a declared service identity
+(ADR-2011): kind-0 profile, `website@dreamlab-ai.com` in `public/.well-known/nostr.json`, an
+`agent_registry` row and a `[[agents]]` entry with `cohorts = []`. It receives the encrypted
+contact, signup and chat copies for the nightly inbox watch. It is labelled, not privileged: no
+cohorts (the `agent` cohort would receive the zone4 key), no admin rights, no posting.
+Adopt or repair it with `scripts/seed/provision-website-info.mjs`.
+
 ### Pod & NIP-05 posture
 
 Solid pods are provisioned Worker-native on Cloudflare R2; private keys are
@@ -170,6 +179,9 @@ cohorts via `[native_pod]` (`dreamlab.toml:245`).
 5. Admin pubkeys, the Jarvis pubkey, and `ZONE_CONFIG` are hand-mirrored between
    `dreamlab.toml` and `deploy.yml`; a rotation touches every mirror or the
    surfaces desync.
+6. The `website-info` identity holds no cohort, never `agent`, and no admin or zone
+   key; the monitor pubkey is mirrored in `deploy.yml`, `contact-embed/entry.ts`,
+   `dreamlab.toml` and `.well-known/nostr.json` (guarded by `website-info.test.mjs`).
 
 ## Change process
 

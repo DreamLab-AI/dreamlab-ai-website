@@ -404,6 +404,13 @@ role          = "Poker House Seat (BLAKES7) — deals BLAKES7 hands at /communit
 cohorts       = ["dreamlab", "agent"]
 authorised_by = "6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425a"  # operator-jjohare (human admin)
 
+[[agents]]
+label         = "website-info"
+pubkey        = "4ed429aa7f30d6e63c41be50685cffeb03cd7b07e37d37a0c4ae5321e642aad7"
+role          = "Website Information — recipient of the marketing sites' encrypted contact, signup and chat copies (VITE_MONITOR_PUBKEY); read by the nightly inbox watch. Labelled, not privileged: NO cohorts, so no zone keys (ADR-2011)"
+cohorts       = []   # deliberate: the `agent` cohort would receive the zone4 key (agent_keys = true)
+authorised_by = "6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425a"  # operator-jjohare (human admin)
+
 # ─── Test users ──────────────────────────────────────────────────────────────
 [[test_users]]
 label    = "test-trainer-alice"
