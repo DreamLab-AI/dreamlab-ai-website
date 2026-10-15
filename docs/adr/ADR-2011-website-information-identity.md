@@ -4,10 +4,10 @@ title: Name the monitor key as the "website information" identity, labelled but 
 date: 2026-10-15
 decision_status: accepted
 implementation_status: partial
-activation_status: staged
+activation_status: live
 supersedes: []
 superseded_by: []
-verified_commit: bd02fb6
+verified_commit: b7b7fe46
 owner: jjohare
 review_trigger: the kit gains a config-declared ingress recipient list (Phase 1 below), or the monitor key is rotated
 repo: dreamlab-ai-website
@@ -60,8 +60,16 @@ name it, but zone4 sets `agent_keys = true`, so that cohort receives the zone ke
 
 ## Verification
 
-Implementation is `partial` (Phase 0 only) and activation `staged` until the provisioning script has
-run against the live relay and `/api/agents/disclosure` lists the key; see the dated note below.
-`npx vitest run scripts/__tests__/website-info.test.mjs` covers the profile, the registration body
-(no `cohorts`), NIP-98 signing, the disclosure check, the mirror agreement and the no-`agent`-cohort
-counter-example.
+Implementation is `partial`: Phase 0 (this ADR, decisions 1 to 4) is complete and live; decision 5, the
+kit-side generalisation, is not started.
+
+Live check, 2026-10-15 at `b7b7fe46`, by `scripts/seed/provision-website-info.mjs`: the monitor row had no
+cohorts and was not admin before and after; the kind-0 was accepted and read back from the relay with a
+valid signature (`name website-info`, `nip05 website@dreamlab-ai.com`, `bot true`); `register` returned 201
+and `/api/agents/disclosure` lists `website-info`; `/.well-known/nostr.json` resolves the handle with
+`access-control-allow-origin: *`; `inbox-watch --dry-run` reports no problems.
+Not observed: the forum's admin members view, whose data source was not traced.
+
+`npx vitest run scripts/__tests__/website-info.test.mjs scripts/__tests__/inbox-digest.test.mjs` covers the
+profile, the registration body (no `cohorts`), NIP-98 signing, the disclosure and privilege checks, the
+mirror agreement, the no-`agent`-cohort counter-example, and the sanitised, bounded digest.
