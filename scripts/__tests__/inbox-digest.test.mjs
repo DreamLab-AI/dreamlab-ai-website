@@ -4,7 +4,7 @@
 // characters into the operator's DM, and the digest size is bounded however
 // many wraps arrive (deepsec findings, 2026-10-15).
 import { describe, test, expect } from 'vitest';
-import { cleanField, digestLines } from '../lib/digest.mjs';
+import { cleanField, digestLines, deliveryOutcome } from '../lib/digest.mjs';
 
 describe('cleanField', () => {
   test('collapses newlines and tabs to single spaces', () => {
@@ -49,5 +49,25 @@ describe('digestLines', () => {
   });
   test('anonymous sender is labelled', () => {
     expect(digestLines([item({ name: '', email: '' })])[0]).toContain('(anonymous)');
+  });
+});
+
+describe('deliveryOutcome', () => {
+  const op = 'a'.repeat(64);
+  test('persists the seen-set only after a successful send', () => {
+    expect(deliveryOutcome(op, { ok: true })).toEqual({ persist: true, exitCode: 0, alert: 'sent' });
+  });
+  test('COUNTER-EXAMPLE: no operator pubkey must not mark messages seen', () => {
+    const o = deliveryOutcome(null, null);
+    expect(o.persist).toBe(false);
+    expect(o.exitCode).toBe(1);
+    expect(o.alert).toMatch(/no operator pubkey/);
+  });
+  test('COUNTER-EXAMPLE: a relay rejection must not mark messages seen', () => {
+    const o = deliveryOutcome(op, { ok: false, message: 'blocked' });
+    expect(o).toEqual({ persist: false, exitCode: 1, alert: 'relay rejected digest: blocked' });
+  });
+  test('an unattempted send is treated as not delivered', () => {
+    expect(deliveryOutcome(op, null).persist).toBe(false);
   });
 });

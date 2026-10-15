@@ -33,7 +33,7 @@ import path from "node:path";
 import { finalizeEvent, generateSecretKey, getPublicKey, verifyEvent } from "nostr-tools/pure";
 import * as nip17 from "nostr-tools/nip17";
 import { disclosureProblem, ingressProblem } from "../lib/website-info.mjs";
-import { digestLines } from "../lib/digest.mjs";
+import { digestLines, deliveryOutcome } from "../lib/digest.mjs";
 import * as nip44 from "nostr-tools/nip44";
 
 const DRY = process.argv.includes("--dry-run");
@@ -328,19 +328,20 @@ async function main() {
     const operator = operatorPubkey();
     if (DRY) {
       log("dry-run, digest not sent:\n" + body);
-    } else if (!operator) {
-      summary.alert = "no operator pubkey (AGENTBOX_PUBKEY) — digest not sent";
-      log(summary.alert);
     } else {
-      const sk = generateSecretKey();
-      const wrap = nip17.wrapEvent(sk, { publicKey: operator }, body, "DreamLab inbox watch");
-      const res = await publish(RELAY, wrap, sk);
-      summary.alert = res.ok ? "sent" : `relay rejected digest: ${res.message}`;
+      let res = null;
+      if (operator) {
+        const sk = generateSecretKey();
+        const wrap = nip17.wrapEvent(sk, { publicKey: operator }, body, "DreamLab inbox watch");
+        res = await publish(RELAY, wrap, sk);
+      }
+      const outcome = deliveryOutcome(operator, res);
+      summary.alert = outcome.alert;
       log(`digest ${summary.alert}`);
-      if (!res.ok) {
+      if (!outcome.persist) {
         // State is deliberately NOT persisted: the operator was never told, so
         // the same messages must surface again on the next run.
-        process.exitCode = 1;
+        process.exitCode = outcome.exitCode;
         fs.writeFileSync(STATUS_FILE, JSON.stringify(summary, null, 2));
         return;
       }

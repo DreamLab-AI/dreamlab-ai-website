@@ -28,3 +28,24 @@ export function digestLines(fresh, maxItems = 25) {
   if (fresh.length > maxItems) lines.push(`… and ${fresh.length - maxItems} more (still in the relay inbox)`);
   return lines;
 }
+
+/**
+ * What to do with the seen-set after trying to deliver a digest.
+ *
+ * Messages are marked seen only once the operator has actually been told. With
+ * no operator pubkey, or a relay that rejected the digest, the same messages
+ * must surface again on the next run and the job must exit non-zero, otherwise
+ * enquiries vanish without anyone being notified (deepsec HIGH_BUG, 2026-10-15).
+ *
+ * @param {string|null} operator resolved operator pubkey, or null
+ * @param {{ok: boolean, message?: string}|null} result publish result, null if not attempted
+ */
+export function deliveryOutcome(operator, result) {
+  if (!operator) {
+    return { persist: false, exitCode: 1, alert: "no operator pubkey (AGENTBOX_PUBKEY) — digest not sent" };
+  }
+  if (!result || !result.ok) {
+    return { persist: false, exitCode: 1, alert: `relay rejected digest: ${result?.message ?? "not sent"}` };
+  }
+  return { persist: true, exitCode: 0, alert: "sent" };
+}
