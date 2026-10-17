@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" role="img" aria-labelledby="d4a-title d4a-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="d4a-title">Mixed-methods research methodology</title>
+  <desc id="d4a-desc">Research question and literature review split into qualitative and quantitative strands whose analyses converge at integration and triangulation, leading to conclusions.</desc>
+  <defs>
+    <marker id="arr4a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect x="8" y="8" width="944" height="384" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">RESEARCH METHODOLOGY — MIXED METHODS</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <g text-anchor="middle">
+    <rect x="48" y="152" width="140" height="64" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="118" y="180" font-size="14" font-weight="600" fill="#F5F5F5">Question</text>
+    <text x="118" y="200" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">research aim</text>
+
+    <rect x="228" y="152" width="144" height="64" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="300" y="180" font-size="14" font-weight="600" fill="#F5F5F5">Lit Review</text>
+    <text x="300" y="200" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">scope · gaps</text>
+
+    <rect x="412" y="88" width="220" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="522" y="118" font-size="14" font-weight="600" fill="#F5F5F5">Qualitative Strand</text>
+    <text x="522" y="140" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">interviews → thematic analysis</text>
+
+    <rect x="412" y="208" width="220" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="522" y="238" font-size="14" font-weight="600" fill="#F5F5F5">Quantitative Strand</text>
+    <text x="522" y="260" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">survey → statistical analysis</text>
+
+    <rect x="672" y="112" width="240" height="72" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="792" y="142" font-size="15" font-weight="600" fill="#F5F5F5">Integration</text>
+    <text x="792" y="164" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">triangulate both strands</text>
+
+    <rect x="672" y="256" width="240" height="64" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="792" y="284" font-size="14" font-weight="600" fill="#F5F5F5">Conclusions</text>
+    <text x="792" y="304" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">findings &amp; discussion</text>
+  </g>
+
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2">
+    <path d="M188,184 L224,184" marker-end="url(#arr4a)"/>
+    <path d="M372,184 C392,184 392,124 408,124" marker-end="url(#arr4a)"/>
+    <path d="M372,184 C392,184 392,244 408,244" marker-end="url(#arr4a)"/>
+    <path d="M632,124 C652,124 652,148 668,148" marker-end="url(#arr4a)"/>
+    <path d="M632,244 C652,244 652,168 668,164" marker-end="url(#arr4a)"/>
+    <path d="M792,184 L792,252" marker-end="url(#arr4a)"/>
+  </g>
+</svg>

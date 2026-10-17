@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 320" role="img" aria-labelledby="hk-title hk-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="hk-title">Hook events across a session</title>
+  <desc id="hk-desc">Timeline of hook events: SessionStart, then per turn UserPromptSubmit, a repeating tool loop of PreToolUse (which can block), the tool run, and PostToolUse, then Stop when Claude finishes, and SessionEnd at termination.</desc>
+
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <rect x="8" y="8" width="944" height="304" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">HOOK LIFECYCLE</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <g text-anchor="middle">
+    <rect x="48" y="120" width="136" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="116" y="152" font-size="14" font-weight="600" fill="#F5F5F5">SessionStart</text>
+    <text x="116" y="174" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">setup · logging</text>
+
+    <rect x="224" y="120" width="152" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="300" y="152" font-size="14" font-weight="600" fill="#F5F5F5">UserPromptSubmit</text>
+    <text x="300" y="174" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">once per turn</text>
+
+    <!-- tool loop group -->
+    <rect x="408" y="96" width="336" height="128" rx="8" fill="none" stroke="rgba(255,255,255,0.20)" stroke-dasharray="4 3"/>
+    <text x="472" y="116" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#6B7280">EVERY TOOL CALL</text>
+
+    <rect x="424" y="132" width="128" height="60" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="488" y="158" font-size="14" font-weight="600" fill="#F5F5F5">PreToolUse</text>
+    <text x="488" y="178" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">can block</text>
+
+    <rect x="584" y="132" width="64" height="60" rx="8" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.35)"/>
+    <text x="616" y="166" font-size="14" font-weight="600" fill="#F5F5F5">Tool</text>
+
+    <rect x="672" y="132" width="56" height="60" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="700" y="158" font-size="13" font-weight="600" fill="#F5F5F5">Post</text>
+    <text x="700" y="178" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">format</text>
+
+    <rect x="424" y="248" width="136" height="48" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="492" y="278" font-size="14" font-weight="600" fill="#F5F5F5">Stop</text>
+
+    <rect x="608" y="248" width="136" height="48" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="676" y="278" font-size="14" font-weight="600" fill="#F5F5F5">SessionEnd</text>
+  </g>
+
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2">
+    <path d="M184,156 C196,156 208,156 220,156" marker-end="url(#arr)"/>
+    <path d="M376,156 C388,158 404,160 420,162" marker-end="url(#arr)"/>
+    <path d="M552,162 C562,162 570,162 580,162" marker-end="url(#arr)"/>
+    <path d="M648,162 C654,162 660,162 668,162" marker-end="url(#arr)"/>
+    <path d="M700,132 C700,100 512,100 492,128" marker-end="url(#arr)"/>
+    <path d="M576,224 C548,232 520,238 500,244" marker-end="url(#arr)"/>
+    <path d="M560,272 C574,272 590,272 604,272" marker-end="url(#arr)"/>
+  </g>
+  <text x="556" y="92" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF" text-anchor="middle">repeats</text>
+  <text x="300" y="252" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">response finished</text>
+</svg>

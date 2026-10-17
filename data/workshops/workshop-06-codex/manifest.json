@@ -1,0 +1,109 @@
+{
+  "title": "Workshop 06: Mastering AI-Powered Coding Agents (2026 Edition)",
+  "pages": [
+    {
+      "slug": "README.md",
+      "title": "Workshop 06: Mastering AI-Powered Coding Agents (2026 Edition)"
+    },
+    {
+      "slug": "00_introduction.md",
+      "title": "Chapter 0: Introduction to AI-Powered Software Engineering"
+    },
+    {
+      "slug": "01_understanding_the_codex_ecosystem.md",
+      "title": "Chapter 1: Understanding the Modern AI Coding Ecosystem"
+    },
+    {
+      "slug": "02_a_accessing_the_codex_cloud_agent.md",
+      "title": "2.a: Web & IDE Tools for AI-Powered Coding"
+    },
+    {
+      "slug": "02_b_setting_up_the_codex_cli.md",
+      "title": "2.b: Setting Up Terminal-Based AI Coding Agents"
+    },
+    {
+      "slug": "02_c_api_keys_and_authentication.md",
+      "title": "2.c: API Keys and Authentication"
+    },
+    {
+      "slug": "02_getting_started.md",
+      "title": "Chapter 2: Getting Started — Setup and Initial Configuration"
+    },
+    {
+      "slug": "03_a_effective_prompting_strategies.md",
+      "title": "3.a: Effective Prompting Strategies"
+    },
+    {
+      "slug": "03_b_the_crucial_role_of_agents_md.md",
+      "title": "3.b: Project Configuration — CLAUDE.md and AGENTS.MD"
+    },
+    {
+      "slug": "03_c_managing_tasks_efficiently.md",
+      "title": "3.c: Managing Tasks Efficiently"
+    },
+    {
+      "slug": "03_d_advanced_techniques.md",
+      "title": "3.d: Advanced Techniques"
+    },
+    {
+      "slug": "03_mastering_codex.md",
+      "title": "Chapter 3: Mastering AI Coding Agents — From Basic Prompts to Advanced Workflows"
+    },
+    {
+      "slug": "04_a_beginner_tasks.md",
+      "title": "4.a: Beginner Tasks — Quick Wins with AI Coding Agents"
+    },
+    {
+      "slug": "04_b_intermediate_tasks.md",
+      "title": "4.b: Intermediate Tasks"
+    },
+    {
+      "slug": "04_c_advanced_scenarios.md",
+      "title": "4.c: Advanced Scenarios"
+    },
+    {
+      "slug": "04_practical_codex.md",
+      "title": "Chapter 4: Practical Applications — Real-World Examples and Walkthroughs"
+    },
+    {
+      "slug": "05_a_codex_vs_general_gpt_models.md",
+      "title": "5.a: Agentic Tools vs. Chat Models for Coding"
+    },
+    {
+      "slug": "05_b_understanding_model_choices.md",
+      "title": "5.b: Understanding Model & Tool Choices (June 2026)"
+    },
+    {
+      "slug": "05_c_the_evolving_toolkit.md",
+      "title": "5.c: The Evolving Toolkit: MCP, Agent Frameworks, and What Comes Next"
+    },
+    {
+      "slug": "05_the_broader_landscape.md",
+      "title": "Chapter 5: The Broader Landscape — Models, Tools, and the Future of AI Coding"
+    },
+    {
+      "slug": "06_a_limitations_of_codex.md",
+      "title": "6.a: Limitations of AI Coding Agents — What They Cannot Do (Yet)"
+    },
+    {
+      "slug": "06_b_security_implications.md",
+      "title": "6.b: Security Implications of AI-Assisted Development"
+    },
+    {
+      "slug": "06_c_ethical_and_legal_considerations.md",
+      "title": "6.c: Ethical and Legal Considerations"
+    },
+    {
+      "slug": "06_navigating_challenges.md",
+      "title": "Chapter 6: Navigating Challenges and Considerations"
+    },
+    {
+      "slug": "07_best_practices_for_using_ai_agents.md",
+      "title": "Chapter 7: Best Practices for Using AI Coding Agents (2026)"
+    },
+    {
+      "slug": "08_conclusion.md",
+      "title": "Chapter 8: Conclusion — AI Coding Agents as Your Co-Developers"
+    }
+  ]
+}

@@ -1,0 +1,1121 @@
+# DreamLab AI — full site text
+
+> The main pages of https://dreamlab-ai.com as plain text, generated at build time from the published HTML. The short index is https://dreamlab-ai.com/llms.txt; every free lesson has a Markdown source listed in https://dreamlab-ai.com/workshops/llms.txt.
+
+## Home
+
+Source: https://dreamlab-ai.com/
+
+## DREAMLAB AI
+
+AI & Agents Residential Training in the Lake District
+
+### The Lab: Lake District Innovation Facility
+
+A residential deep tech facility in the Lake District combining focused R&D environments with the clarity that comes from working away from the office. Solar-powered, production-grade, and purpose-built for intensive co-creation.
+
+### Bespoke learning pathways
+
+Agentics, spatial computing, rapid prototyping & secure distributed systems.
+
+18 residential ideas to spark your own. Every course is unique: we shape each one around your team and your challenge.
+
+#### Scale Innovation
+
+Build internal capability to drive sustained innovation across your organisation.
+
+#### Operationalise AI
+
+Deploy autonomous systems that power real operations.
+
+#### Data-Driven Decisions
+
+Transform spatial, earth observation, and location data into competitive intelligence.
+
+#### Immersive Experiences
+
+Build XR, virtual production, and digital twin capabilities that captivate.
+
+#### Secure Infrastructure
+
+Build cyber-resilient, zero-trust foundations that scale with confidence.
+
+#### Agent Control Surface
+
+AI agents publish interactive control panels for human-in-the-loop governance of autonomous systems.
+
+#### Sovereign Identity
+
+Federated NIP-05 verification, pod-provisioned signup keys, full data portability, and git-versioned pods — your forum identity lives on your own pod.
+
+#### Creative Production
+
+Future-proof creative workflows with spatial audio, neural rendering, and emerging tech.
+
+### Embed in Our Lab
+
+Three pathways for enterprises and SMEs to access deep tech expertise, from intensive sprints to long-term knowledge transfer.
+
+#### Enterprise Training + Retainer
+
+1-3 days
+
+Your team embeds in the lab alongside our specialists for intensive R&D sprints. Bring a real challenge, leave with a validated prototype and deployment roadmap.
+
+Outcome: Working prototype at TRL 4-6
+
+#### SME Innovation Sprint
+
+Structured programmes for smaller companies ready to apply deep tech. Hands-on building with expert guidance, designed to deliver immediate capability.
+
+Outcome: Deployable MVP and team upskilling
+
+#### KTP Partnership
+
+12-36 months
+
+Innovate UK-funded Knowledge Transfer Partnerships embedding a graduate associate in your organisation, co-supervised by our research team.
+
+Outcome: Long-term capability transfer, grant-funded
+
+### Multi-Disciplinary Expertise
+
+40+ specialists spanning AI, XR, cyber, audio, and creative technology. Every programme draws on complementary expertise, so your team leaves with more than one discipline's worth of knowledge.
+
+#### Dr John O'Hare
+
+Chief Hallucination Officer
+
+AI & Immersive Systems
+
+#### Pete Woodbridge
+
+CTO
+
+CTO, DREAMLAB
+
+#### Ste Moyler
+
+Creative Lead
+
+Chief Creative Officer, DREAMLAB
+
+### Frequently asked questions
+
+Does DreamLab run AI and agentic training in the Lake District?
+
+Yes. DreamLab runs residential AI and agents training from its facility in the Lake District, Cumbria. Teams work with specialists on agentic workflows, AI integration and rapid prototyping, scoped to their own projects, and can continue with the free self-guided curriculum afterwards.
+
+What is DreamLab?
+
+DreamLab is an Applied Innovation Lab in the UK Lake District. Teams work alongside a network of 40+ deep-tech specialists on AI, immersive XR, cyber trust and creative technology through residential programmes and embedded R&D residencies.
+
+Where is DreamLab located?
+
+DreamLab operates from a residential facility in the Lake District, Cumbria, United Kingdom. Programmes are residential: participants stay on site, combining focused technical work with the setting of a UNESCO World Heritage landscape.
+
+What do the residential programmes involve?
+
+Residential programmes are intensive deep-tech training for enterprise and SME teams. Each programme pairs a team with relevant specialists from the DreamLab network to transfer applied skills in AI, XR, virtual production or cyber trust, scoped to the team's real projects.
+
+Are the self-guided courses free?
+
+Yes. DreamLab publishes a free 10-phase, 57+ hour self-guided curriculum covering AI foundations, AI APIs, Claude Code, local AI and RAG, Docker, AI agents and orchestration, QA and publishing, and SEO and AI discoverability. No registration is required.
+
+Who are DreamLab programmes for?
+
+DreamLab serves enterprise and SME teams that need applied capability, not just theory: engineering groups adopting AI, studios moving into virtual production, and organisations building trustworthy, secure systems. Programmes are scoped per team rather than sold as fixed courses.
+
+How do I book a discovery call with DreamLab?
+
+Use the contact form at dreamlab-ai.com/contact or email info@dreamlab-ai.com. The contact form is end-to-end encrypted and stores nothing in a database. A discovery call scopes your team's goals before any programme is proposed.
+
+#### Enterprise
+
+Bring your team to the lab for intensive co-creation. Schedule a visit to scope your engagement.
+
+#### SME
+
+Start with our self-guided workshops or enquire about a structured innovation sprint.
+
+### Stay in the loop
+
+Lab updates, programme announcements, and applied innovation insights.
+
+## Programmes
+
+Source: https://dreamlab-ai.com/programmes/
+
+## Co-design your learning path.
+
+Every course is bespoke, built for you around deep tech modules. 17 residential programmes delivered by 40+ specialists at our Lake District facility, each mapped to Innovate UK Technology Readiness Levels.
+
+We're outcome driven, able to combine modules across categories to fit your needs.Every engagement is scoped and priced for your team. As a guide, residential programmes start from £995 per person per day, full-board, and one-day build sprints from £2,500.
+
+#### Scale Innovation Organisation-Wide
+
+Build internal capability to drive sustained innovation across your teams.
+
+#### Operationalise AI Workflows
+
+Move beyond pilots — deploy autonomous systems that power real operations.
+
+#### Unlock Data-Driven Decisions
+
+Transform spatial, earth observation, and location data into competitive intelligence.
+
+#### Create Immersive Experiences
+
+Build XR, virtual production, and digital twin capabilities that captivate.
+
+#### Secure Infrastructure & Trust
+
+Build cyber-resilient, zero-trust foundations that scale with confidence.
+
+#### Modernise Creative Production
+
+Future-proof creative workflows with spatial audio, neural rendering, and emerging tech.
+
+### How It Works
+
+#### Choose your outcome
+
+Pick the business result you need. Programmes span multiple outcomes, so start wherever feels right.
+
+#### Select programmes
+
+Mix and match across categories. We will recommend combinations that fit your team size, timeline, and challenge.
+
+#### Residential delivery
+
+1-3 days at our Lake District facility. Your team works alongside our specialists in a focused, distraction-free environment.
+
+### Looking for Self-Guided Learning?
+
+Our self-paced workshop catalogue covers AI-powered knowledge work across 16 modules. An accessible entry point for individuals and small teams.
+
+### Not sure where to start?
+
+Every engagement starts with a conversation. We will scope the right combination of outcomes, programmes, and team composition for your challenge.
+
+## Co-create
+
+Source: https://dreamlab-ai.com/co-create/
+
+## Co-Create With Us
+
+Bring your toughest challenge to our Lake District lab. Your team works alongside 40+ deep tech specialists in an environment designed for focused, intensive co-creation. We do not just advise. We build with you.
+
+### Three Ways to Engage
+
+Whether you are a multinational scoping an innovation programme or an SME with a specific technical challenge, there is a pathway that fits.
+
+#### Enterprise Residency
+
+1-3 days, bespoke
+
+Your team embeds in the lab for intensive R&D sprints. We assign a dedicated multi-disciplinary team from our specialist collective, matched to your domain and challenge.
+
+Typical outcome: Validated prototype at TRL 4-6 with deployment roadmap
+
+#### SME Innovation Sprint
+
+1-3 days, structured
+
+Structured programmes for smaller companies ready to apply deep tech. You arrive with a challenge and leave with a working solution and the skills to maintain it.
+
+Typical outcome: Deployable MVP and team upskilling
+
+#### KTP Partnership
+
+12-36 months, Innovate UK funded
+
+Knowledge Transfer Partnerships place a graduate associate in your organisation, co-supervised by our research team. Innovate UK funds up to 67% of the cost for SMEs, making this the most cost-effective route to long-term capability transfer.
+
+Typical outcome: Embedded capability, new products/processes, academic publications
+
+### Lab Environment
+
+Our Lake District facility is purpose-built for intensive co-creation. Teams work in a residential setting with production-grade infrastructure, surrounded by the natural environment that research consistently links to creative problem-solving and sustained focus.
+
+Additional capabilities: LED volume stage, Dolby Atmos studio, motion capture suite, dedicated training rooms, and social spaces for informal knowledge exchange.
+
+### How It Works
+
+Every engagement follows a structured process from discovery through deployment, with clear milestones and deliverables at each stage.
+
+#### Discovery
+
+We map your challenge, assess technology readiness, and identify the right combination of expertise. No commitment required.
+
+#### Scope
+
+Define deliverables, team composition, timeline, and success criteria. We identify funding opportunities including Innovate UK grants and KTP schemes.
+
+#### Build
+
+Your team embeds in the lab alongside our specialists. Hands-on co-creation with daily standups and working prototypes from day one.
+
+#### Validate
+
+Test against real data, real users, and real constraints. We apply the AREA Responsible Innovation framework to anticipate downstream impacts.
+
+#### Deploy
+
+Handover of validated prototype, documentation, and deployment roadmap. Post-engagement support ensures continuity.
+
+### UK Innovation Funding
+
+We actively support grant applications and help position your engagement within the UK innovation landscape. Our programmes target the TRL 4-7 sweet spot where Innovate UK funding has the greatest impact.
+
+##### Knowledge Transfer Partnerships
+
+12-36 month embedded graduate associates, up to 67% funded for SMEs
+
+##### Technology Missions Fund
+
+Collaborative R&D aligned with UKRI priority areas including AI assurance and net zero
+
+##### Digital Catapult Programmes
+
+We partner with Digital Catapult as the natural Catapult for our creative and immersive tech work
+
+We have experience with Innovate UK applications and can advise on framing your project within the Technology Missions Fund language and the AREA Responsible Innovation framework.
+
+### Start With a Conversation
+
+Book a 30-minute discovery call. We will map your challenge, identify the right engagement model, and explore funding options. No commitment, no pitch deck required.
+
+## Venture Lab
+
+Source: https://dreamlab-ai.com/ventures/
+
+## VENTURE LAB
+
+Deep tech expertise on demand.
+
+Access 40+ specialists, enterprise infrastructure, and 30 years of R&D heritage, without building it all yourself.
+
+### Building deep tech is hard. It doesn't have to be slow.
+
+Most startups either hire expensive specialists they can't fully utilise, or try to build everything with a generalist team and burn months on the wrong approach. Venture Lab gives you targeted access to the right expertise at the right moment.
+
+#### Without us
+
+- 6+ months hiring a specialist
+
+- Wrong architecture decisions compound
+
+- Investor questions you can't answer
+
+- Grant applications miss the mark
+
+#### With Venture Lab
+
+- Working prototype in 1–3 days
+
+- Architecture validated by specialists
+
+- Technical narrative for investors
+
+- Innovate UK applications positioned
+
+### Four ways in. One conversation to start.
+
+Start with a free discovery session. Progress through structured tiers as your needs grow. No lock-in at any stage.
+
+#### Discovery Session
+
+Understand what's possible
+
+- Technical assessment of your product and stack
+
+- Identify 2-3 deep tech opportunities
+
+- Funding landscape briefing (Innovate UK, UKRI, EIS/SEIS)
+
+- Written summary with recommended next steps
+
+Outcome: Clarity on where deep tech accelerates your roadmap
+
+#### Build Sprint
+
+One day. One prototype. Real validation.
+
+- Pre-sprint scoping call to define the build target
+
+- Full-day co-creation with 2-3 matched specialists
+
+- Working prototype connected to your stack
+
+- Architecture review and scaling recommendations
+
+- 2 weeks async follow-up support
+
+Outcome: A validated proof-of-concept and the confidence to invest further
+
+#### Venture Residency
+
+Immersive co-creation at our Lake District lab
+
+- Dedicated multi-disciplinary specialist team (3-8 people)
+
+- Full residential accommodation with meals
+
+- Enterprise GPU cluster, LED volume, and lab access
+
+- Production-grade prototypes, not just demos
+
+- Strategic roadmap and deployment architecture
+
+- 4 weeks post-residency support
+
+- IP ownership retained by your company
+
+Outcome: A production-ready prototype, strategic roadmap, and a team that knows how to build on it
+
+#### Venture Partner
+
+Ongoing deep tech advisory and build capacity
+
+- Fractional CTO and specialist access on demand
+
+- Monthly architecture reviews and technical advisory
+
+- Priority scheduling for build sprints and residencies
+
+- Investor-ready technical due diligence support
+
+- Introductions to our VC and accelerator network
+
+- Grant application support (Innovate UK, UKRI)
+
+Outcome: A deep tech bench that scales with you, without the overhead of building it in-house
+
+### Who Venture Lab is for
+
+Founders, CTOs, and technical leaders building products where deep tech is the differentiator.
+
+#### Pre-Seed & Seed Startups
+
+Validating a deep tech product thesis. You need specialist expertise to build the first version properly.
+
+#### Series A-B Scaleups
+
+Growing fast and hitting technical ceilings. You need architecture, AI capabilities, or infrastructure that your team hasn't built before.
+
+#### VC Portfolio Companies
+
+Portfolio-wide access to deep tech specialists. We partner with funds to provide structured technical support across investments.
+
+#### Accelerator Cohorts
+
+Cohort-based build sprints and demo day preparation. We integrate with your programme timeline.
+
+### What you get access to
+
+Six deep tech domains, each backed by specialists with decades of combined experience. We match the right people to your problem.
+
+#### AI & Agentic Systems
+
+Multi-agent orchestration, LLM integration, RAG pipelines, autonomous workflows
+
+#### Distributed Infrastructure
+
+Zero-trust architecture, edge computing, decentralised identity, cryptographic protocols
+
+#### XR & Spatial Computing
+
+Apple Vision Pro, Meta Quest, digital twins, virtual production, 3D reconstruction
+
+#### Geospatial Intelligence
+
+Satellite imagery, drone survey, location analytics, environmental monitoring
+
+#### Cyber & Compliance
+
+Enterprise security, SOC 2 readiness, industrial control systems, secure remote operations
+
+#### Neural Rendering & Creative Tech
+
+Gaussian splatting, NeRF, spatial audio, motion capture, real-time compositing
+
+### Portfolio-wide deep tech support
+
+We partner with venture capital firms and accelerator programmes to provide structured deep tech access across their portfolio. Your companies get specialist expertise. You get stronger technical outcomes and a differentiated value-add programme.
+
+#### Partner Benefits
+
+- Portfolio-wide discovery sessions at no cost
+
+- Preferential rates on build sprints and residencies
+
+- Quarterly deep tech briefings for your investment team
+
+- Co-branded demo days at our Lake District facility
+
+- Grant and funding pathway guidance for portfolio companies
+
+- Technical due diligence support for prospective investments
+
+### How it works
+
+Free 2-hour call. We map your technical landscape, identify where deep tech accelerates your roadmap, and recommend the right engagement model. No pitch deck required.
+
+#### Scoping & Specialist Matching
+
+We define the build target, success criteria, and match specialists from our network of 40+ experts. You'll know exactly who you're working with and what you'll walk away with.
+
+#### Build Together
+
+Whether it's a 1-day sprint or a 5-day residency, we co-create alongside your team. Working prototypes from day one, not slide decks.
+
+#### Deploy & Support
+
+Handover of code, architecture documentation, and deployment roadmap. Post-engagement async support ensures continuity. The IP is yours.
+
+### Funding & Grant Support
+
+We help startups make sense of the UK innovation funding landscape. Many of our engagements are partially funded through grants, and we actively support applications.
+
+##### Innovate UK Smart Grants
+
+For disruptive R&D projects with strong commercial potential
+
+##### Knowledge Transfer Partnerships
+
+Up to 67% funded for SMEs: embed a graduate in your team, co-supervised by our PhDs
+
+##### SEIS/EIS Alignment
+
+We help structure engagements to maintain EIS/SEIS eligibility for your investors
+
+##### Technology Missions Fund
+
+Collaborative R&D aligned with UKRI priority areas including AI assurance and net zero
+
+### Common questions
+
+What kind of startups are the best fit?
+
+We're pre-revenue. Can we still engage?
+
+How do VC partnerships work?
+
+What happens after a Build Sprint?
+
+Can you work remotely or do we need to come to the Lake District?
+
+What does 'fractional CTO' mean in the Venture Partner tier?
+
+### Start with a conversation
+
+Book a free discovery session. We'll map your technical landscape, identify the highest-impact opportunities, and recommend the right engagement. No commitment, no pitch required.
+
+## Free self-guided workshops
+
+Source: https://dreamlab-ai.com/workshops/
+
+## AI-Powered Knowledge Work
+
+Master AI tools across 10 structured phases — from first setup to being found online
+
+### Your Learning Journey
+
+10 phases from foundations to discoverability. Click any phase to begin.
+
+### Complete Curriculum
+
+#### Foundations
+
+Tools, Environment & First Steps
+
+Set up your AI development environment with VS Code, Git, GitHub, and essential extensions. Three complementary workshops cover infrastructure basics, IDE configuration, and a comprehensive VS Code reference.
+
+#### Visual Documentation & Version Control
+
+Diagrams, Git Mastery & Professional Workflows
+
+Master Mermaid diagrams for flowcharts, Gantt charts, and sequence diagrams. Deepen your Git skills with visual tools, branching strategies, and collaborative workflows.
+
+#### AI APIs & Vibe Coding
+
+Connect, Create & Converse with AI
+
+Connect directly to AI APIs from Anthropic, OpenAI, and Google. Then master conversational programming — building applications through natural language dialogue with AI.
+
+#### Claude Code Mastery
+
+Anthropic’s Agentic Coding Tool
+
+Master Claude Code CLI from installation through CLAUDE.md project configuration, MCP server integration, hooks, subagents, and workflow orchestration.
+
+#### Local AI & RAG Systems
+
+Private Models & Knowledge Pipelines
+
+Run AI models locally with Ollama for complete data privacy. Then build retrieval-augmented generation systems that make AI an expert on your own documents.
+
+#### Docker & Containers
+
+Reproducible, Portable Environments
+
+Master Docker fundamentals and containerisation. Use VS Code Dev Containers for reproducible environments and remote Docker for GPU-accelerated development.
+
+#### AI Agents & Orchestration
+
+Specialised Agents & Multi-Agent Systems
+
+Create specialised AI agents using the ReAct pattern. Then coordinate multi-agent workflows with cost controls, safety measures, and approval chains.
+
+#### AI Coding Ecosystem
+
+Tools, Security & Professional Practice
+
+Survey the full AI coding landscape — Claude Code, Codex CLI, GitHub Copilot, Cursor, Windsurf. Understand security implications, ethical considerations, and professional practice.
+
+#### QA, Publishing & Capstone
+
+Ship Confidently, Deliver Professionally
+
+Build automated testing pipelines with AI-powered quality engineering tools including Agentic QE Fleet. Then master professional publishing workflows for deployment and documentation.
+
+#### SEO & AI Discoverability
+
+Be Found by Search Engines and Answer Engines
+
+Make what you publish findable and citable. Audit crawling and rendering, write valid JSON-LD, set a deliberate policy for AI crawlers, and structure content so answer engines quote it accurately.
+
+### Ready to Transform Your Workflow?
+
+Our residential training programme delivers this curriculum, shaped to your team, with expert guidance over 1–3 days. Or work through it at your own pace online.
+
+## Research
+
+Source: https://dreamlab-ai.com/research/
+
+## 16 Years of Deep Tech Research
+
+The Octave laboratory (2007-2023) produced world-first collaborative immersive systems worth over £8M in research value. That research heritage now forms the foundation of our Applied Innovation Lab, commercialising deep tech for real-world impact.
+
+#### Multi-Viewpoint Immersive AI Research Platform
+
+### Core Innovation
+
+#### Collaborative Immersion
+
+Multiple specialists work together in a single immersive space with individual stereoscopic viewpoints, a world first in collaborative VR.
+
+#### AI-Assisted Telepresence
+
+Remote collaborators are brought into the space with full body presence and spatial audio. AI observes all communication channels in real-time.
+
+#### Wave Field Synthesis
+
+Spatial audio and volumetric telepresence enable natural, trust-based interaction, critical for multi-disciplinary problem solving.
+
+### Flow State Advantage
+
+#### Focused Data Presentation
+
+Each expert sees only their relevant data: no overload, no context switching. Domain-specific views reduce cognitive load.
+
+#### Natural Interaction
+
+Spatial interaction and communication are preserved. Professionals reach peak performance rapidly because the technology gets out of the way.
+
+#### AI Learns from the Best
+
+AI captures what each expert sees, says, and does, building a multi-viewpoint knowledge graph richer than any single perspective. It learns from the best, not the confused.
+
+### Real-World Impact
+
+#### Nuclear Decommissioning Case Study
+
+Planning time reduced from 8 hours to 2 hours
+
+With improved safety outcomes and reduced specialist fatigue
+
+AI learned and propagated emergent protocols (including 3D gesture languages and risk communication systems) across teams and domains. This is the kind of applied innovation that our lab now commercialises for industry.
+
+### Technical Summary
+
+### From Research to Applied Innovation
+
+#### 2007-2015
+
+Foundation research: multi-viewpoint stereo, wave field synthesis, gesture tracking. Building the core immersive collaboration platform.
+
+#### 2015-2019
+
+AI observation and mediation. Nuclear decommissioning case study. Team ontology emergence mapping.
+
+#### 2019-2023
+
+Expansion to larger teams and new domains. Standards development. Commercialisation groundwork.
+
+#### 2024+
+
+Applied Innovation Lab. Research heritage deployed as co-creation capability for enterprises and SMEs.
+
+### Research Demonstrations
+
+Capability demonstrations from the Octave laboratory, spanning VR collaboration, nuclear robotics, spatial interaction, and large-scale data visualisation.
+
+#### Immersive VR Collaboration
+
+Multi-viewpoint virtual reality system enabling natural spatial collaboration between specialists in a shared immersive environment.
+
+#### Nuclear Decommissioning
+
+Real-world application that reduced planning time from 8 hours to 2 hours with improved safety outcomes for specialist teams.
+
+#### Interactive Technologies
+
+##### Hand Tracking
+
+Natural gesture recognition and spatial manipulation
+
+##### Object Manipulation
+
+3D object placement and spatial reasoning
+
+##### Multi-Perspective
+
+Advanced camera systems and viewpoint control
+
+##### Robotic Control
+
+Precise manipulation and automation systems
+
+#### Large-Scale Applications
+
+##### Traffic & Infrastructure
+
+Large-scale traffic simulation and urban planning systems
+
+##### Data Visualisation
+
+Immersive big data analysis and pattern recognition
+
+##### Facility Design
+
+Virtual facility layout and collaborative planning
+
+#### From Octave to the Applied Innovation Lab
+
+The Octave project represents one of the longest-running collaborative VR research programmes in the UK, continuously evolving from 2007 to 2023. That 16-year body of work (multi-user systems, real-world nuclear applications, and AI-mediated teamwork) now forms the research foundation of the DreamLab Applied Innovation Lab.
+
+Research presentation (2015)
+
+### Why the UK Must Lead
+
+Unique convergence of technical, human factors, and research excellence positions the UK to lead in collaborative intelligence.
+
+Addresses critical national challenges: nuclear legacy, complex infrastructure, and safety-critical systems that demand multi-disciplinary collaboration.
+
+Draws on the UK's collaborative culture, world-class AI research, and Responsible Innovation frameworks to set global standards.
+
+The technology is ready, the need is critical, and the payoff could reshape how safety-critical industries plan and train.
+
+### Apply Our Research to Your Challenge
+
+The research heritage of the Octave laboratory is now available through our Applied Innovation Lab. Bring your team to co-create with deep tech.
+
+## Team
+
+Source: https://dreamlab-ai.com/team/
+
+## Our Team
+
+40+ specialists including Emmy nominees, PhD researchers, and BAFTA-recognised talent. Click on a team member to select them for your project.
+
+#### JunkieJarvis - Agentic Chief Operating Officer
+
+#### Pete Woodbridge - Chief Technical Officer
+
+#### Ste Moyler - Chief Creative Officer
+
+#### Dr John O'Hare - Founder & Chief Hallucination Officer
+
+#### Jing Li - Creative AI Eurasia Pacific
+
+#### Marco E. Ghilardi - Simulation and Modelling Expert
+
+#### Jon Cooke - Senior Dev: Full Stack
+
+#### Kriss Dunk - Researcher in AI and Computer Vision. Creative coder. Artist.
+
+#### Nick Tipping - Guided Gamified Team Building
+
+#### Roger McKinley – Creative Technology and Content Manager
+
+#### Arpana Nandakumar – Alternate Realities Sorceress & Public Engagement
+
+#### Bradley Harris – Metahuman Specialist
+
+#### Daniel Maktabi – Technical Artist & Creative Technologist
+
+#### Haydn Secker – Animation Producer
+
+#### Garth Williams – Motion Capture Super Hero & Creative Director
+
+#### David Afolabi – Cyber Compliance Analyst
+
+#### Christian G H Frost – Immersive Technical Artist (“Master of Puppets”)
+
+#### Dr Derek Hales - Cyberphysical Pataphysicist
+
+#### Noelle Nurdin - Immersive Hyperpop Producer & Spatial Audio
+
+#### Annabeth Robinson - Creative Technologist
+
+#### Lewis Hackett - Blockchain Advisor & AR/VR Developer
+
+#### Dr Umran Ali - Creative Media
+
+#### James Spiers - Partnerships & Business Development
+
+#### Dr Natasha Stott - Researcher & Artistic Producer
+
+#### Chris Croft - Video Producer & Director
+
+#### Thadeous Matthews - Technical Artist & Broadcast Operator
+
+#### Dr. David Tully - Unreal Engine / XR Specialist
+
+#### Cheryl Blake - Stop-Motion Animator & Community Musician
+
+#### Bernard Steer - Spatial Audio Consultant
+
+#### Dr Sean LCM Hill - Robotics, XR, Bespoke Electronics, Audio
+
+#### Dr Andy Bennett - Partnerships, funding and development
+
+#### Stephen Prince - Web, SEO, Marketing Specialist
+
+#### Will Lewis-Clarke - Delivery Manager & QA
+
+#### Anthony Ashton - Drones, Scanning, Edge Vision Systems
+
+#### Lawrance Butterworth - Platform install specialist
+
+#### Dr Toby Duckworth - Embedded Systems Specialist.
+
+#### John Donlon - Network, Cloud, Infra, Cyber.
+
+#### Magnus Kemp - Large Scale Mixed Media Systems.
+
+#### Kat Cook - Outdoor Design and Integration Specialist
+
+#### Dr Jessica Symons - Emerging Technologies
+
+#### Mandy Wang - Creative Project Management
+
+#### Pip Rustage – Advertising Photographer & Creative Producer
+
+#### Simon Graham – Creative Technology & Immersive Experiences
+
+#### Our Physical Labs – Global AI Development Network
+
+## Testimonials
+
+Source: https://dreamlab-ai.com/testimonials/
+
+## Success Stories
+
+When the setting and the learning align, something shifts. Our alumni speak of breakthroughs that happened between sessions as much as during them.
+
+"Never mind OpenClaw. This is Gryffindoooor!"
+
+Ste Moyler
+
+THG - Ingenuity
+
+"I just used Claude Code to create a new version of a Unity project that had been gathering dust for years. It was so satisfying to see it rise again. Thank you thank you John for setting me up. I am having so much fun 🙏 thanks 🙏."
+
+Dr Jessica Symons
+
+Visioning Lab
+
+"Half an hour with DreamLab produced three years of practicable strategy. Previously unfathomable depths of planning achieved in the blink of an eye."
+
+Viv Andrews
+
+Gorton Monastery
+
+"If you want to move past the superficial hype of prompt engineering and actually learn how to architect autonomous systems, Dr. John O'Hare's training is the gold standard. He quite literally taught me everything I know about Agentic AI, taking me from a conceptual understanding to being able to build and deploy sophisticated, multi-agent frameworks."
+
+Peter Woodbridge
+
+CTO, DreamLab AI (trained by DreamLab)
+
+"A thoroughly enjoyable few days getting familiar with Claude, GitHub and basic principles of utilising AI for engineering. I've since built, tested and released a superb desktop UI to support complex trading platform integration. As if having a mainline of functional information wasn't enough it was all delivered in their incredibly beautiful premises in the lakes. Thanks DreamLab. Dreamy."
+
+Google reviewer
+
+Course attendee, Local Guide
+
+"Excellent and innovative AI training."
+
+Andy Mills
+
+### Ready to Write Your Success Story?
+
+Join our next cohort and leave with working AI solutions, not just theory.
+
+## Contact
+
+Source: https://dreamlab-ai.com/contact/
+
+## Contact Us
+
+Tell us what you're working on and we'll come back with dates and a shaped outline. We usually reply within two working days.
+
+Sent end-to-end encrypted over Nostr. Only we can read it, and we don't store it anywhere else.
+
+### Other ways to reach us
+
+- Message us on NostrSend an encrypted direct message from any Nostr app (Amethyst, Damus, Primal and others) to:npub1z8kkggja6h3vtcv0vxk584ddjfedppee6w3qm5jcscvhkpecvc7q0wqa88CopyOpen in your Nostr app
+
+- Join the communityAsk in the open on the DreamLab community forum, which also runs on Nostr.
+
+## Curriculum index
+
+> Free self-guided lessons. Follow the source links for Markdown; each lesson also has a readable HTML page.
+
+## Vscode Learning Pathway
+
+- [Introduction to VS Code as an AI-Powered IDE](https://dreamlab-ai.com/data/workshops/vscode-learning-pathway/01-introduction.md): [Read online](https://dreamlab-ai.com/workshops/vscode-learning-pathway/01-introduction.md/)
+- [Essential Keyboard Shortcuts and Productivity](https://dreamlab-ai.com/data/workshops/vscode-learning-pathway/02-keyboard-shortcuts.md): [Read online](https://dreamlab-ai.com/workshops/vscode-learning-pathway/02-keyboard-shortcuts.md/)
+- [Extension Ecosystem Mastery](https://dreamlab-ai.com/data/workshops/vscode-learning-pathway/03-extension-ecosystem.md): [Read online](https://dreamlab-ai.com/workshops/vscode-learning-pathway/03-extension-ecosystem.md/)
+- [Settings and Customisation](https://dreamlab-ai.com/data/workshops/vscode-learning-pathway/04-settings-customization.md): [Read online](https://dreamlab-ai.com/workshops/vscode-learning-pathway/04-settings-customization.md/)
+- [Git Integration Deep Dive](https://dreamlab-ai.com/data/workshops/vscode-learning-pathway/05-git-integration.md): [Read online](https://dreamlab-ai.com/workshops/vscode-learning-pathway/05-git-integration.md/)
+- [Remote Development (SSH, Containers, WSL)](https://dreamlab-ai.com/data/workshops/vscode-learning-pathway/06-remote-development.md): [Read online](https://dreamlab-ai.com/workshops/vscode-learning-pathway/06-remote-development.md/)
+- [Debugging Mastery](https://dreamlab-ai.com/data/workshops/vscode-learning-pathway/07-debugging.md): [Read online](https://dreamlab-ai.com/workshops/vscode-learning-pathway/07-debugging.md/)
+- [Task Automation and Build Systems](https://dreamlab-ai.com/data/workshops/vscode-learning-pathway/08-task-automation.md): [Read online](https://dreamlab-ai.com/workshops/vscode-learning-pathway/08-task-automation.md/)
+- [AI Coding Assistants Integration](https://dreamlab-ai.com/data/workshops/vscode-learning-pathway/09-ai-integration.md): [Read online](https://dreamlab-ai.com/workshops/vscode-learning-pathway/09-ai-integration.md/)
+- [Profile Management and Settings Sync](https://dreamlab-ai.com/data/workshops/vscode-learning-pathway/10-profiles-sync.md): [Read online](https://dreamlab-ai.com/workshops/vscode-learning-pathway/10-profiles-sync.md/)
+- [Multi-root Workspaces and Advanced Organization](https://dreamlab-ai.com/data/workshops/vscode-learning-pathway/11-workspaces.md): [Read online](https://dreamlab-ai.com/workshops/vscode-learning-pathway/11-workspaces.md/)
+- [Advanced Editing Features](https://dreamlab-ai.com/data/workshops/vscode-learning-pathway/12-advanced-editing.md): [Read online](https://dreamlab-ai.com/workshops/vscode-learning-pathway/12-advanced-editing.md/)
+- [VS Code Learning Pathway 2026: From Beginner to AI-Powered Master](https://dreamlab-ai.com/data/workshops/vscode-learning-pathway/overview.md): [Read online](https://dreamlab-ai.com/workshops/vscode-learning-pathway/overview.md/)
+
+## A Creative Technologist's Guide to GitHub & AI-Powered Workflows
+
+- [A Creative Technologist's Guide to GitHub & AI-Powered Workflows](https://dreamlab-ai.com/data/workshops/workshop-00-infra/README.md): [Read online](https://dreamlab-ai.com/workshops/workshop-00-infra/README.md/)
+- [Chapter 0: Introduction & Workshop Overview](https://dreamlab-ai.com/data/workshops/workshop-00-infra/00_introduction.md): [Read online](https://dreamlab-ai.com/workshops/workshop-00-infra/00_introduction.md/)
+- [Chapter 1: Why Git? Understanding Version Control](https://dreamlab-ai.com/data/workshops/workshop-00-infra/01_why_git.md): [Read online](https://dreamlab-ai.com/workshops/workshop-00-infra/01_why_git.md/)
+- [Chapter 2a: Creating Your GitHub Account](https://dreamlab-ai.com/data/workshops/workshop-00-infra/02_a_github_account.md): [Read online](https://dreamlab-ai.com/workshops/workshop-00-infra/02_a_github_account.md/)
+- [Chapter 2b: Installing Git & VS Code](https://dreamlab-ai.com/data/workshops/workshop-00-infra/02_b_install_git_vscode.md): [Read online](https://dreamlab-ai.com/workshops/workshop-00-infra/02_b_install_git_vscode.md/)
+- [Chapter 2c: Setting Up AI API Keys (2026 Edition)](https://dreamlab-ai.com/data/workshops/workshop-00-infra/02_c_gcp_api_key.md): [Read online](https://dreamlab-ai.com/workshops/workshop-00-infra/02_c_gcp_api_key.md/)
+- [Chapter 2d: Configuring AI Coding Assistants in VS Code (2026 Edition)](https://dreamlab-ai.com/data/workshops/workshop-00-infra/02_d_roo_code_config.md): [Read online](https://dreamlab-ai.com/workshops/workshop-00-infra/02_d_roo_code_config.md/)
+- [Chapter 2: Essential Setup: Accounts & Installations](https://dreamlab-ai.com/data/workshops/workshop-00-infra/02_setup_overview.md): [Read online](https://dreamlab-ai.com/workshops/workshop-00-infra/02_setup_overview.md/)
+- [Chapter 3: The Core Git Workflow](https://dreamlab-ai.com/data/workshops/workshop-00-infra/03_core_workflow.md): [Read online](https://dreamlab-ai.com/workshops/workshop-00-infra/03_core_workflow.md/)
+- [Chapter 4: Collaboration & Recovery](https://dreamlab-ai.com/data/workshops/workshop-00-infra/04_collaboration_recovery.md): [Read online](https://dreamlab-ai.com/workshops/workshop-00-infra/04_collaboration_recovery.md/)
+- [Chapter 5: GitHub Pages: Your Free Portfolio Site](https://dreamlab-ai.com/data/workshops/workshop-00-infra/05_github_pages.md): [Read online](https://dreamlab-ai.com/workshops/workshop-00-infra/05_github_pages.md/)
+- [Chapter 6: AI-Powered Workflows with Claude Code](https://dreamlab-ai.com/data/workshops/workshop-00-infra/06_ai_workflows_roo_code.md): [Read online](https://dreamlab-ai.com/workshops/workshop-00-infra/06_ai_workflows_roo_code.md/)
+- [Chapter 7: Reference Cheat Sheet](https://dreamlab-ai.com/data/workshops/workshop-00-infra/07_cheat_sheet.md): [Read online](https://dreamlab-ai.com/workshops/workshop-00-infra/07_cheat_sheet.md/)
+- [Chapter 8: Advanced Typesetting: LaTeX with WSL2, TeXLive, and VS Code](https://dreamlab-ai.com/data/workshops/workshop-00-infra/08_latex_wsl_vscode.md): [Read online](https://dreamlab-ai.com/workshops/workshop-00-infra/08_latex_wsl_vscode.md/)
+- [Chapter 9: Reference Cheat Sheet](https://dreamlab-ai.com/data/workshops/workshop-00-infra/09_cheat_sheet.md): [Read online](https://dreamlab-ai.com/workshops/workshop-00-infra/09_cheat_sheet.md/)
+- [Chapter 9: Context Management & Advanced Agent Workflows](https://dreamlab-ai.com/data/workshops/workshop-00-infra/09_context_management.md): [Read online](https://dreamlab-ai.com/workshops/workshop-00-infra/09_context_management.md/)
+- [Chapter 10: Advanced Context Management & Multi-Session Strategies](https://dreamlab-ai.com/data/workshops/workshop-00-infra/10_context_management.md): [Read online](https://dreamlab-ai.com/workshops/workshop-00-infra/10_context_management.md/)
+
+## Phase 2: Visual Tools & Version Control
+
+- [Phase 2: Visual Tools & Version Control](https://dreamlab-ai.com/data/workshops/workshop-01-afternoon-visual-version-control/README.md): [Read online](https://dreamlab-ai.com/workshops/workshop-01-afternoon-visual-version-control/README.md/)
+- [Chapter 0: Introduction to Visual Tools & Version Control](https://dreamlab-ai.com/data/workshops/workshop-01-afternoon-visual-version-control/00_introduction.md): [Read online](https://dreamlab-ai.com/workshops/workshop-01-afternoon-visual-version-control/00_introduction.md/)
+- [Chapter 1: Core Concepts - Visual Thinking & Version Control](https://dreamlab-ai.com/data/workshops/workshop-01-afternoon-visual-version-control/01_concepts.md): [Read online](https://dreamlab-ai.com/workshops/workshop-01-afternoon-visual-version-control/01_concepts.md/)
+- [Chapter 2: Hands-On Visual Version Control - Mastering Git the Modern Way](https://dreamlab-ai.com/data/workshops/workshop-01-afternoon-visual-version-control/02_hands_on.md): [Read online](https://dreamlab-ai.com/workshops/workshop-01-afternoon-visual-version-control/02_hands_on.md/)
+- [Chapter 3: Practical Exercises — Sharpen Your Visual Version Control Skills](https://dreamlab-ai.com/data/workshops/workshop-01-afternoon-visual-version-control/03_exercises.md): [Read online](https://dreamlab-ai.com/workshops/workshop-01-afternoon-visual-version-control/03_exercises.md/)
+- [Chapter 4: Real Project Application — Your First Visual, Version-Controlled Deliverable](https://dreamlab-ai.com/data/workshops/workshop-01-afternoon-visual-version-control/04_project.md): [Read online](https://dreamlab-ai.com/workshops/workshop-01-afternoon-visual-version-control/04_project.md/)
+- [Chapter 5: Assessment — Validating Your Visual Version Control Mastery](https://dreamlab-ai.com/data/workshops/workshop-01-afternoon-visual-version-control/05_assessment.md): [Read online](https://dreamlab-ai.com/workshops/workshop-01-afternoon-visual-version-control/05_assessment.md/)
+- [Chapter 6: Resources & Continued Learning](https://dreamlab-ai.com/data/workshops/workshop-01-afternoon-visual-version-control/06_resources.md): [Read online](https://dreamlab-ai.com/workshops/workshop-01-afternoon-visual-version-control/06_resources.md/)
+- [Learning Objectives - Workshop 01 Afternoon: Visual Tools & Version Control](https://dreamlab-ai.com/data/workshops/workshop-01-afternoon-visual-version-control/objectives.md): [Read online](https://dreamlab-ai.com/workshops/workshop-01-afternoon-visual-version-control/objectives.md/)
+- [Prerequisites - Workshop 01 Afternoon: Visual Tools & Version Control](https://dreamlab-ai.com/data/workshops/workshop-01-afternoon-visual-version-control/prerequisites.md): [Read online](https://dreamlab-ai.com/workshops/workshop-01-afternoon-visual-version-control/prerequisites.md/)
+
+## VS Code as AI Command Centre
+
+- [VS Code as AI Command Centre](https://dreamlab-ai.com/data/workshops/workshop-01-morning-vscode-setup/README.md): [Read online](https://dreamlab-ai.com/workshops/workshop-01-morning-vscode-setup/README.md/)
+- [Chapter 0: Introduction to VS Code as Your AI Command Centre](https://dreamlab-ai.com/data/workshops/workshop-01-morning-vscode-setup/00_introduction.md): [Read online](https://dreamlab-ai.com/workshops/workshop-01-morning-vscode-setup/00_introduction.md/)
+- [Chapter 1: Core Concepts - Understanding Your New Universe](https://dreamlab-ai.com/data/workshops/workshop-01-morning-vscode-setup/01_concepts.md): [Read online](https://dreamlab-ai.com/workshops/workshop-01-morning-vscode-setup/01_concepts.md/)
+- [Chapter 2: Hands-On Setup - Building Your AI-Enhanced Command Centre](https://dreamlab-ai.com/data/workshops/workshop-01-morning-vscode-setup/02_hands_on.md): [Read online](https://dreamlab-ai.com/workshops/workshop-01-morning-vscode-setup/02_hands_on.md/)
+- [Chapter 3: Practical Exercises - Flex Your New Powers](https://dreamlab-ai.com/data/workshops/workshop-01-morning-vscode-setup/03_exercises.md): [Read online](https://dreamlab-ai.com/workshops/workshop-01-morning-vscode-setup/03_exercises.md/)
+- [Chapter 4: Real Project Application - Your First AI-Enhanced Deliverable](https://dreamlab-ai.com/data/workshops/workshop-01-morning-vscode-setup/04_project.md): [Read online](https://dreamlab-ai.com/workshops/workshop-01-morning-vscode-setup/04_project.md/)
+- [Chapter 5: Assessment - Validating Your Mastery](https://dreamlab-ai.com/data/workshops/workshop-01-morning-vscode-setup/05_assessment.md): [Read online](https://dreamlab-ai.com/workshops/workshop-01-morning-vscode-setup/05_assessment.md/)
+- [Chapter 6: Resources & Continued Learning](https://dreamlab-ai.com/data/workshops/workshop-01-morning-vscode-setup/06_resources.md): [Read online](https://dreamlab-ai.com/workshops/workshop-01-morning-vscode-setup/06_resources.md/)
+- [Learning Objectives - Workshop 01 Morning: VS Code Setup](https://dreamlab-ai.com/data/workshops/workshop-01-morning-vscode-setup/objectives.md): [Read online](https://dreamlab-ai.com/workshops/workshop-01-morning-vscode-setup/objectives.md/)
+- [Prerequisites - Workshop 01 Morning: VS Code Setup](https://dreamlab-ai.com/data/workshops/workshop-01-morning-vscode-setup/prerequisites.md): [Read online](https://dreamlab-ai.com/workshops/workshop-01-morning-vscode-setup/prerequisites.md/)
+
+## Phase 3: Vibe Coding Mastery
+
+- [Phase 3: Vibe Coding Mastery](https://dreamlab-ai.com/data/workshops/workshop-02-afternoon-vibe-coding/README.md): [Read online](https://dreamlab-ai.com/workshops/workshop-02-afternoon-vibe-coding/README.md/)
+- [Chapter 0: Introduction to Vibe Coding Mastery](https://dreamlab-ai.com/data/workshops/workshop-02-afternoon-vibe-coding/00_introduction.md): [Read online](https://dreamlab-ai.com/workshops/workshop-02-afternoon-vibe-coding/00_introduction.md/)
+- [Chapter 1: Core Concepts - Understanding Vibe Coding](https://dreamlab-ai.com/data/workshops/workshop-02-afternoon-vibe-coding/01_concepts.md): [Read online](https://dreamlab-ai.com/workshops/workshop-02-afternoon-vibe-coding/01_concepts.md/)
+- [Chapter 2: Hands-On - Building Your First Vibe Creation](https://dreamlab-ai.com/data/workshops/workshop-02-afternoon-vibe-coding/02_hands_on.md): [Read online](https://dreamlab-ai.com/workshops/workshop-02-afternoon-vibe-coding/02_hands_on.md/)
+- [Chapter 3: Creative Challenges — Progressive Exercises](https://dreamlab-ai.com/data/workshops/workshop-02-afternoon-vibe-coding/03_exercises.md): [Read online](https://dreamlab-ai.com/workshops/workshop-02-afternoon-vibe-coding/03_exercises.md/)
+- [Chapter 4: Capstone Project — Your Live Creation](https://dreamlab-ai.com/data/workshops/workshop-02-afternoon-vibe-coding/04_project.md): [Read online](https://dreamlab-ai.com/workshops/workshop-02-afternoon-vibe-coding/04_project.md/)
+- [Chapter 5: Assessment — Validate Your Mastery](https://dreamlab-ai.com/data/workshops/workshop-02-afternoon-vibe-coding/05_assessment.md): [Read online](https://dreamlab-ai.com/workshops/workshop-02-afternoon-vibe-coding/05_assessment.md/)
+- [Chapter 6: Resources — Continue Creating](https://dreamlab-ai.com/data/workshops/workshop-02-afternoon-vibe-coding/06_resources.md): [Read online](https://dreamlab-ai.com/workshops/workshop-02-afternoon-vibe-coding/06_resources.md/)
+- [Learning Objectives - Phase 3: Vibe Coding Mastery](https://dreamlab-ai.com/data/workshops/workshop-02-afternoon-vibe-coding/objectives.md): [Read online](https://dreamlab-ai.com/workshops/workshop-02-afternoon-vibe-coding/objectives.md/)
+- [Prerequisites - Phase 3: Vibe Coding Mastery](https://dreamlab-ai.com/data/workshops/workshop-02-afternoon-vibe-coding/prerequisites.md): [Read online](https://dreamlab-ai.com/workshops/workshop-02-afternoon-vibe-coding/prerequisites.md/)
+
+## Phase 3: Direct AI API Access
+
+- [Phase 3: Direct AI API Access](https://dreamlab-ai.com/data/workshops/workshop-02-morning-ai-api-access/README.md): [Read online](https://dreamlab-ai.com/workshops/workshop-02-morning-ai-api-access/README.md/)
+- [Chapter 0: Introduction to Direct AI API Access](https://dreamlab-ai.com/data/workshops/workshop-02-morning-ai-api-access/00_introduction.md): [Read online](https://dreamlab-ai.com/workshops/workshop-02-morning-ai-api-access/00_introduction.md/)
+- [Chapter 1: Core Concepts - Understanding AI APIs in 2026](https://dreamlab-ai.com/data/workshops/workshop-02-morning-ai-api-access/01_concepts.md): [Read online](https://dreamlab-ai.com/workshops/workshop-02-morning-ai-api-access/01_concepts.md/)
+- [Chapter 2: Hands-On API Setup - Building Your Multi-Model Command Centre (2026)](https://dreamlab-ai.com/data/workshops/workshop-02-morning-ai-api-access/02_hands_on.md): [Read online](https://dreamlab-ai.com/workshops/workshop-02-morning-ai-api-access/02_hands_on.md/)
+- [Chapter 3: Practical Exercises - Model Mastery](https://dreamlab-ai.com/data/workshops/workshop-02-morning-ai-api-access/03_exercises.md): [Read online](https://dreamlab-ai.com/workshops/workshop-02-morning-ai-api-access/03_exercises.md/)
+- [Chapter 4: Real Project — Multi-Model Content Pipeline](https://dreamlab-ai.com/data/workshops/workshop-02-morning-ai-api-access/04_project.md): [Read online](https://dreamlab-ai.com/workshops/workshop-02-morning-ai-api-access/04_project.md/)
+- [Chapter 5: Assessment — Validating Your AI API Mastery](https://dreamlab-ai.com/data/workshops/workshop-02-morning-ai-api-access/05_assessment.md): [Read online](https://dreamlab-ai.com/workshops/workshop-02-morning-ai-api-access/05_assessment.md/)
+- [Chapter 6: Resources & Continued Learning](https://dreamlab-ai.com/data/workshops/workshop-02-morning-ai-api-access/06_resources.md): [Read online](https://dreamlab-ai.com/workshops/workshop-02-morning-ai-api-access/06_resources.md/)
+- [Learning Objectives - Workshop 02 Morning: Direct AI API Access](https://dreamlab-ai.com/data/workshops/workshop-02-morning-ai-api-access/objectives.md): [Read online](https://dreamlab-ai.com/workshops/workshop-02-morning-ai-api-access/objectives.md/)
+- [Prerequisites - Workshop 02 Morning: Direct AI API Access](https://dreamlab-ai.com/data/workshops/workshop-02-morning-ai-api-access/prerequisites.md): [Read online](https://dreamlab-ai.com/workshops/workshop-02-morning-ai-api-access/prerequisites.md/)
+
+## RAG System Implementation
+
+- [RAG System Implementation](https://dreamlab-ai.com/data/workshops/workshop-03-afternoon-rag-system/README.md): [Read online](https://dreamlab-ai.com/workshops/workshop-03-afternoon-rag-system/README.md/)
+- [Introduction to RAG Systems](https://dreamlab-ai.com/data/workshops/workshop-03-afternoon-rag-system/00_introduction.md): [Read online](https://dreamlab-ai.com/workshops/workshop-03-afternoon-rag-system/00_introduction.md/)
+- [Core Concepts: RAG Systems](https://dreamlab-ai.com/data/workshops/workshop-03-afternoon-rag-system/01_concepts.md): [Read online](https://dreamlab-ai.com/workshops/workshop-03-afternoon-rag-system/01_concepts.md/)
+- [Hands-On Practice: Building Your RAG System](https://dreamlab-ai.com/data/workshops/workshop-03-afternoon-rag-system/02_hands_on.md): [Read online](https://dreamlab-ai.com/workshops/workshop-03-afternoon-rag-system/02_hands_on.md/)
+- [Practical Exercises: RAG System Implementation](https://dreamlab-ai.com/data/workshops/workshop-03-afternoon-rag-system/03_exercises.md): [Read online](https://dreamlab-ai.com/workshops/workshop-03-afternoon-rag-system/03_exercises.md/)
+- [Project Work: Build a Personal Knowledge Base](https://dreamlab-ai.com/data/workshops/workshop-03-afternoon-rag-system/04_project.md): [Read online](https://dreamlab-ai.com/workshops/workshop-03-afternoon-rag-system/04_project.md/)
+- [Assessment: RAG System Implementation](https://dreamlab-ai.com/data/workshops/workshop-03-afternoon-rag-system/05_assessment.md): [Read online](https://dreamlab-ai.com/workshops/workshop-03-afternoon-rag-system/05_assessment.md/)
+- [Resources: RAG System Implementation](https://dreamlab-ai.com/data/workshops/workshop-03-afternoon-rag-system/06_resources.md): [Read online](https://dreamlab-ai.com/workshops/workshop-03-afternoon-rag-system/06_resources.md/)
+- [Learning Objectives -- RAG System Implementation](https://dreamlab-ai.com/data/workshops/workshop-03-afternoon-rag-system/objectives.md): [Read online](https://dreamlab-ai.com/workshops/workshop-03-afternoon-rag-system/objectives.md/)
+- [Prerequisites -- RAG System Implementation](https://dreamlab-ai.com/data/workshops/workshop-03-afternoon-rag-system/prerequisites.md): [Read online](https://dreamlab-ai.com/workshops/workshop-03-afternoon-rag-system/prerequisites.md/)
+
+## Phase 5: Local AI & RAG Systems
+
+- [Phase 5: Local AI & RAG Systems](https://dreamlab-ai.com/data/workshops/workshop-03-morning-local-ai/README.md): [Read online](https://dreamlab-ai.com/workshops/workshop-03-morning-local-ai/README.md/)
+- [Introduction to Local AI Models](https://dreamlab-ai.com/data/workshops/workshop-03-morning-local-ai/00_introduction.md): [Read online](https://dreamlab-ai.com/workshops/workshop-03-morning-local-ai/00_introduction.md/)
+- [Core Concepts: Running AI Models Locally](https://dreamlab-ai.com/data/workshops/workshop-03-morning-local-ai/01_concepts.md): [Read online](https://dreamlab-ai.com/workshops/workshop-03-morning-local-ai/01_concepts.md/)
+- [Hands-On Practice: Setting Up Local AI](https://dreamlab-ai.com/data/workshops/workshop-03-morning-local-ai/02_hands_on.md): [Read online](https://dreamlab-ai.com/workshops/workshop-03-morning-local-ai/02_hands_on.md/)
+- [Practical Exercises: Local AI in Action](https://dreamlab-ai.com/data/workshops/workshop-03-morning-local-ai/03_exercises.md): [Read online](https://dreamlab-ai.com/workshops/workshop-03-morning-local-ai/03_exercises.md/)
+- [Project: Build a Local AI Assistant](https://dreamlab-ai.com/data/workshops/workshop-03-morning-local-ai/04_project.md): [Read online](https://dreamlab-ai.com/workshops/workshop-03-morning-local-ai/04_project.md/)
+- [Assessment: Local AI Models Mastery](https://dreamlab-ai.com/data/workshops/workshop-03-morning-local-ai/05_assessment.md): [Read online](https://dreamlab-ai.com/workshops/workshop-03-morning-local-ai/05_assessment.md/)
+- [Resources: Local AI Models](https://dreamlab-ai.com/data/workshops/workshop-03-morning-local-ai/06_resources.md): [Read online](https://dreamlab-ai.com/workshops/workshop-03-morning-local-ai/06_resources.md/)
+- [Learning Objectives — Phase 5: Local AI & RAG Systems](https://dreamlab-ai.com/data/workshops/workshop-03-morning-local-ai/objectives.md): [Read online](https://dreamlab-ai.com/workshops/workshop-03-morning-local-ai/objectives.md/)
+- [Prerequisites — Phase 5: Local AI & RAG Systems](https://dreamlab-ai.com/data/workshops/workshop-03-morning-local-ai/prerequisites.md): [Read online](https://dreamlab-ai.com/workshops/workshop-03-morning-local-ai/prerequisites.md/)
+
+## Workshop 04 - Afternoon Session: Agent Orchestration & Safety
+
+- [Workshop 04 - Afternoon Session: Agent Orchestration & Safety](https://dreamlab-ai.com/data/workshops/workshop-04-afternoon-orchestration/README.md): [Read online](https://dreamlab-ai.com/workshops/workshop-04-afternoon-orchestration/README.md/)
+- [Introduction to Agent Orchestration & Safety](https://dreamlab-ai.com/data/workshops/workshop-04-afternoon-orchestration/00_introduction.md): [Read online](https://dreamlab-ai.com/workshops/workshop-04-afternoon-orchestration/00_introduction.md/)
+- [Orchestration Concepts & Safety Patterns](https://dreamlab-ai.com/data/workshops/workshop-04-afternoon-orchestration/01_concepts.md): [Read online](https://dreamlab-ai.com/workshops/workshop-04-afternoon-orchestration/01_concepts.md/)
+- [Hands-on: Building Orchestrated Agent Systems](https://dreamlab-ai.com/data/workshops/workshop-04-afternoon-orchestration/02_hands_on.md): [Read online](https://dreamlab-ai.com/workshops/workshop-04-afternoon-orchestration/02_hands_on.md/)
+- [Orchestration Exercises](https://dreamlab-ai.com/data/workshops/workshop-04-afternoon-orchestration/03_exercises.md): [Read online](https://dreamlab-ai.com/workshops/workshop-04-afternoon-orchestration/03_exercises.md/)
+- [Final Project: Production Multi-Agent System](https://dreamlab-ai.com/data/workshops/workshop-04-afternoon-orchestration/04_project.md): [Read online](https://dreamlab-ai.com/workshops/workshop-04-afternoon-orchestration/04_project.md/)
+- [Assessment: Agent Orchestration & Safety](https://dreamlab-ai.com/data/workshops/workshop-04-afternoon-orchestration/05_assessment.md): [Read online](https://dreamlab-ai.com/workshops/workshop-04-afternoon-orchestration/05_assessment.md/)
+- [Resources for Agent Orchestration & Safety](https://dreamlab-ai.com/data/workshops/workshop-04-afternoon-orchestration/06_resources.md): [Read online](https://dreamlab-ai.com/workshops/workshop-04-afternoon-orchestration/06_resources.md/)
+- [Learning Objectives - Workshop 04 Afternoon: Agent Orchestration & Safety](https://dreamlab-ai.com/data/workshops/workshop-04-afternoon-orchestration/objectives.md): [Read online](https://dreamlab-ai.com/workshops/workshop-04-afternoon-orchestration/objectives.md/)
+- [Prerequisites - Workshop 04 Afternoon: Agent Orchestration & Safety](https://dreamlab-ai.com/data/workshops/workshop-04-afternoon-orchestration/prerequisites.md): [Read online](https://dreamlab-ai.com/workshops/workshop-04-afternoon-orchestration/prerequisites.md/)
+
+## Workshop 04 - Morning Session: Specialised AI Agents
+
+- [Workshop 04 - Morning Session: Specialised AI Agents](https://dreamlab-ai.com/data/workshops/workshop-04-morning-ai-agents/README.md): [Read online](https://dreamlab-ai.com/workshops/workshop-04-morning-ai-agents/README.md/)
+- [Introduction to AI Agents](https://dreamlab-ai.com/data/workshops/workshop-04-morning-ai-agents/00_introduction.md): [Read online](https://dreamlab-ai.com/workshops/workshop-04-morning-ai-agents/00_introduction.md/)
+- [Core Agent Concepts (2026)](https://dreamlab-ai.com/data/workshops/workshop-04-morning-ai-agents/01_concepts.md): [Read online](https://dreamlab-ai.com/workshops/workshop-04-morning-ai-agents/01_concepts.md/)
+- [Hands-on Agent Development](https://dreamlab-ai.com/data/workshops/workshop-04-morning-ai-agents/02_hands_on.md): [Read online](https://dreamlab-ai.com/workshops/workshop-04-morning-ai-agents/02_hands_on.md/)
+- [Practical Exercises](https://dreamlab-ai.com/data/workshops/workshop-04-morning-ai-agents/03_exercises.md): [Read online](https://dreamlab-ai.com/workshops/workshop-04-morning-ai-agents/03_exercises.md/)
+- [Final Project: Production Research Agent](https://dreamlab-ai.com/data/workshops/workshop-04-morning-ai-agents/04_project.md): [Read online](https://dreamlab-ai.com/workshops/workshop-04-morning-ai-agents/04_project.md/)
+- [Assessment: AI Agents Knowledge Check](https://dreamlab-ai.com/data/workshops/workshop-04-morning-ai-agents/05_assessment.md): [Read online](https://dreamlab-ai.com/workshops/workshop-04-morning-ai-agents/05_assessment.md/)
+- [Resources for AI Agents](https://dreamlab-ai.com/data/workshops/workshop-04-morning-ai-agents/06_resources.md): [Read online](https://dreamlab-ai.com/workshops/workshop-04-morning-ai-agents/06_resources.md/)
+- [Learning Objectives - Workshop 04 Morning: Specialised AI Agents](https://dreamlab-ai.com/data/workshops/workshop-04-morning-ai-agents/objectives.md): [Read online](https://dreamlab-ai.com/workshops/workshop-04-morning-ai-agents/objectives.md/)
+- [Prerequisites - Workshop 04 Morning: Specialised AI Agents](https://dreamlab-ai.com/data/workshops/workshop-04-morning-ai-agents/prerequisites.md): [Read online](https://dreamlab-ai.com/workshops/workshop-04-morning-ai-agents/prerequisites.md/)
+
+## Phase 9: QA, Publishing & Capstone
+
+- [Phase 9: QA, Publishing & Capstone](https://dreamlab-ai.com/data/workshops/workshop-05-afternoon-publishing/README.md): [Read online](https://dreamlab-ai.com/workshops/workshop-05-afternoon-publishing/README.md/)
+- [Introduction to Modern Publishing & Deployment](https://dreamlab-ai.com/data/workshops/workshop-05-afternoon-publishing/00_introduction.md): [Read online](https://dreamlab-ai.com/workshops/workshop-05-afternoon-publishing/00_introduction.md/)
+- [Core Concepts: Modern Deployment & Publishing](https://dreamlab-ai.com/data/workshops/workshop-05-afternoon-publishing/01_concepts.md): [Read online](https://dreamlab-ai.com/workshops/workshop-05-afternoon-publishing/01_concepts.md/)
+- [Hands-On: Deploy to Production](https://dreamlab-ai.com/data/workshops/workshop-05-afternoon-publishing/02_hands_on.md): [Read online](https://dreamlab-ai.com/workshops/workshop-05-afternoon-publishing/02_hands_on.md/)
+- [Advanced Deployment Exercises](https://dreamlab-ai.com/data/workshops/workshop-05-afternoon-publishing/03_exercises.md): [Read online](https://dreamlab-ai.com/workshops/workshop-05-afternoon-publishing/03_exercises.md/)
+- [Final Project: Full-Stack Deployment Pipeline](https://dreamlab-ai.com/data/workshops/workshop-05-afternoon-publishing/04_project.md): [Read online](https://dreamlab-ai.com/workshops/workshop-05-afternoon-publishing/04_project.md/)
+- [Assessment: Publishing & Deployment Mastery](https://dreamlab-ai.com/data/workshops/workshop-05-afternoon-publishing/05_assessment.md): [Read online](https://dreamlab-ai.com/workshops/workshop-05-afternoon-publishing/05_assessment.md/)
+- [Additional Resources: Publishing & Deployment](https://dreamlab-ai.com/data/workshops/workshop-05-afternoon-publishing/06_resources.md): [Read online](https://dreamlab-ai.com/workshops/workshop-05-afternoon-publishing/06_resources.md/)
+- [Learning Objectives - Publishing & Deployment](https://dreamlab-ai.com/data/workshops/workshop-05-afternoon-publishing/objectives.md): [Read online](https://dreamlab-ai.com/workshops/workshop-05-afternoon-publishing/objectives.md/)
+- [Prerequisites - Publishing & Deployment](https://dreamlab-ai.com/data/workshops/workshop-05-afternoon-publishing/prerequisites.md): [Read online](https://dreamlab-ai.com/workshops/workshop-05-afternoon-publishing/prerequisites.md/)
+
+## Quality Assurance & Automation
+
+- [Quality Assurance & Automation](https://dreamlab-ai.com/data/workshops/workshop-05-morning-qa-automation/README.md): [Read online](https://dreamlab-ai.com/workshops/workshop-05-morning-qa-automation/README.md/)
+- [AI-Powered QA Automation](https://dreamlab-ai.com/data/workshops/workshop-05-morning-qa-automation/00_introduction.md): [Read online](https://dreamlab-ai.com/workshops/workshop-05-morning-qa-automation/00_introduction.md/)
+- [Testing Concepts & Best Practices](https://dreamlab-ai.com/data/workshops/workshop-05-morning-qa-automation/01_concepts.md): [Read online](https://dreamlab-ai.com/workshops/workshop-05-morning-qa-automation/01_concepts.md/)
+- [Hands-On: Setting Up Your Testing Environment](https://dreamlab-ai.com/data/workshops/workshop-05-morning-qa-automation/02_hands_on.md): [Read online](https://dreamlab-ai.com/workshops/workshop-05-morning-qa-automation/02_hands_on.md/)
+- [Exercises: Build Your Testing Pipeline](https://dreamlab-ai.com/data/workshops/workshop-05-morning-qa-automation/03_exercises.md): [Read online](https://dreamlab-ai.com/workshops/workshop-05-morning-qa-automation/03_exercises.md/)
+- [Project: Complete QA Automation Pipeline](https://dreamlab-ai.com/data/workshops/workshop-05-morning-qa-automation/04_project.md): [Read online](https://dreamlab-ai.com/workshops/workshop-05-morning-qa-automation/04_project.md/)
+- [Assessment: QA Automation Knowledge Check](https://dreamlab-ai.com/data/workshops/workshop-05-morning-qa-automation/05_assessment.md): [Read online](https://dreamlab-ai.com/workshops/workshop-05-morning-qa-automation/05_assessment.md/)
+- [Resources: QA Automation Tools & Learning](https://dreamlab-ai.com/data/workshops/workshop-05-morning-qa-automation/06_resources.md): [Read online](https://dreamlab-ai.com/workshops/workshop-05-morning-qa-automation/06_resources.md/)
+- [Learning Objectives - AI-Powered QA Automation](https://dreamlab-ai.com/data/workshops/workshop-05-morning-qa-automation/objectives.md): [Read online](https://dreamlab-ai.com/workshops/workshop-05-morning-qa-automation/objectives.md/)
+- [Prerequisites - AI-Powered QA Automation](https://dreamlab-ai.com/data/workshops/workshop-05-morning-qa-automation/prerequisites.md): [Read online](https://dreamlab-ai.com/workshops/workshop-05-morning-qa-automation/prerequisites.md/)
+
+## Workshop 06: Mastering AI-Powered Coding Agents (2026 Edition)
+
+- [Workshop 06: Mastering AI-Powered Coding Agents (2026 Edition)](https://dreamlab-ai.com/data/workshops/workshop-06-codex/README.md): [Read online](https://dreamlab-ai.com/workshops/workshop-06-codex/README.md/)
+- [Chapter 0: Introduction to AI-Powered Software Engineering](https://dreamlab-ai.com/data/workshops/workshop-06-codex/00_introduction.md): [Read online](https://dreamlab-ai.com/workshops/workshop-06-codex/00_introduction.md/)
+- [Chapter 1: Understanding the Modern AI Coding Ecosystem](https://dreamlab-ai.com/data/workshops/workshop-06-codex/01_understanding_the_codex_ecosystem.md): [Read online](https://dreamlab-ai.com/workshops/workshop-06-codex/01_understanding_the_codex_ecosystem.md/)
+- [2.a: Web & IDE Tools for AI-Powered Coding](https://dreamlab-ai.com/data/workshops/workshop-06-codex/02_a_accessing_the_codex_cloud_agent.md): [Read online](https://dreamlab-ai.com/workshops/workshop-06-codex/02_a_accessing_the_codex_cloud_agent.md/)
+- [2.b: Setting Up Terminal-Based AI Coding Agents](https://dreamlab-ai.com/data/workshops/workshop-06-codex/02_b_setting_up_the_codex_cli.md): [Read online](https://dreamlab-ai.com/workshops/workshop-06-codex/02_b_setting_up_the_codex_cli.md/)
+- [2.c: API Keys and Authentication](https://dreamlab-ai.com/data/workshops/workshop-06-codex/02_c_api_keys_and_authentication.md): [Read online](https://dreamlab-ai.com/workshops/workshop-06-codex/02_c_api_keys_and_authentication.md/)
+- [Chapter 2: Getting Started — Setup and Initial Configuration](https://dreamlab-ai.com/data/workshops/workshop-06-codex/02_getting_started.md): [Read online](https://dreamlab-ai.com/workshops/workshop-06-codex/02_getting_started.md/)
+- [3.a: Effective Prompting Strategies](https://dreamlab-ai.com/data/workshops/workshop-06-codex/03_a_effective_prompting_strategies.md): [Read online](https://dreamlab-ai.com/workshops/workshop-06-codex/03_a_effective_prompting_strategies.md/)
+- [3.b: Project Configuration — CLAUDE.md and AGENTS.MD](https://dreamlab-ai.com/data/workshops/workshop-06-codex/03_b_the_crucial_role_of_agents_md.md): [Read online](https://dreamlab-ai.com/workshops/workshop-06-codex/03_b_the_crucial_role_of_agents_md.md/)
+- [3.c: Managing Tasks Efficiently](https://dreamlab-ai.com/data/workshops/workshop-06-codex/03_c_managing_tasks_efficiently.md): [Read online](https://dreamlab-ai.com/workshops/workshop-06-codex/03_c_managing_tasks_efficiently.md/)
+- [3.d: Advanced Techniques](https://dreamlab-ai.com/data/workshops/workshop-06-codex/03_d_advanced_techniques.md): [Read online](https://dreamlab-ai.com/workshops/workshop-06-codex/03_d_advanced_techniques.md/)
+- [Chapter 3: Mastering AI Coding Agents — From Basic Prompts to Advanced Workflows](https://dreamlab-ai.com/data/workshops/workshop-06-codex/03_mastering_codex.md): [Read online](https://dreamlab-ai.com/workshops/workshop-06-codex/03_mastering_codex.md/)
+- [4.a: Beginner Tasks — Quick Wins with AI Coding Agents](https://dreamlab-ai.com/data/workshops/workshop-06-codex/04_a_beginner_tasks.md): [Read online](https://dreamlab-ai.com/workshops/workshop-06-codex/04_a_beginner_tasks.md/)
+- [4.b: Intermediate Tasks](https://dreamlab-ai.com/data/workshops/workshop-06-codex/04_b_intermediate_tasks.md): [Read online](https://dreamlab-ai.com/workshops/workshop-06-codex/04_b_intermediate_tasks.md/)
+- [4.c: Advanced Scenarios](https://dreamlab-ai.com/data/workshops/workshop-06-codex/04_c_advanced_scenarios.md): [Read online](https://dreamlab-ai.com/workshops/workshop-06-codex/04_c_advanced_scenarios.md/)
+- [Chapter 4: Practical Applications — Real-World Examples and Walkthroughs](https://dreamlab-ai.com/data/workshops/workshop-06-codex/04_practical_codex.md): [Read online](https://dreamlab-ai.com/workshops/workshop-06-codex/04_practical_codex.md/)
+- [5.a: Agentic Tools vs. Chat Models for Coding](https://dreamlab-ai.com/data/workshops/workshop-06-codex/05_a_codex_vs_general_gpt_models.md): [Read online](https://dreamlab-ai.com/workshops/workshop-06-codex/05_a_codex_vs_general_gpt_models.md/)
+- [5.b: Understanding Model & Tool Choices (June 2026)](https://dreamlab-ai.com/data/workshops/workshop-06-codex/05_b_understanding_model_choices.md): [Read online](https://dreamlab-ai.com/workshops/workshop-06-codex/05_b_understanding_model_choices.md/)
+- [5.c: The Evolving Toolkit: MCP, Agent Frameworks, and What Comes Next](https://dreamlab-ai.com/data/workshops/workshop-06-codex/05_c_the_evolving_toolkit.md): [Read online](https://dreamlab-ai.com/workshops/workshop-06-codex/05_c_the_evolving_toolkit.md/)
+- [Chapter 5: The Broader Landscape — Models, Tools, and the Future of AI Coding](https://dreamlab-ai.com/data/workshops/workshop-06-codex/05_the_broader_landscape.md): [Read online](https://dreamlab-ai.com/workshops/workshop-06-codex/05_the_broader_landscape.md/)
+- [6.a: Limitations of AI Coding Agents — What They Cannot Do (Yet)](https://dreamlab-ai.com/data/workshops/workshop-06-codex/06_a_limitations_of_codex.md): [Read online](https://dreamlab-ai.com/workshops/workshop-06-codex/06_a_limitations_of_codex.md/)
+- [6.b: Security Implications of AI-Assisted Development](https://dreamlab-ai.com/data/workshops/workshop-06-codex/06_b_security_implications.md): [Read online](https://dreamlab-ai.com/workshops/workshop-06-codex/06_b_security_implications.md/)
+- [6.c: Ethical and Legal Considerations](https://dreamlab-ai.com/data/workshops/workshop-06-codex/06_c_ethical_and_legal_considerations.md): [Read online](https://dreamlab-ai.com/workshops/workshop-06-codex/06_c_ethical_and_legal_considerations.md/)
+- [Chapter 6: Navigating Challenges and Considerations](https://dreamlab-ai.com/data/workshops/workshop-06-codex/06_navigating_challenges.md): [Read online](https://dreamlab-ai.com/workshops/workshop-06-codex/06_navigating_challenges.md/)
+- [Chapter 7: Best Practices for Using AI Coding Agents (2026)](https://dreamlab-ai.com/data/workshops/workshop-06-codex/07_best_practices_for_using_ai_agents.md): [Read online](https://dreamlab-ai.com/workshops/workshop-06-codex/07_best_practices_for_using_ai_agents.md/)
+- [Chapter 8: Conclusion — AI Coding Agents as Your Co-Developers](https://dreamlab-ai.com/data/workshops/workshop-06-codex/08_conclusion.md): [Read online](https://dreamlab-ai.com/workshops/workshop-06-codex/08_conclusion.md/)
+
+## Docker & Containers for AI Development
+
+- [Docker & Containers for AI Development](https://dreamlab-ai.com/data/workshops/workshop-07-docker-containers/README.md): [Read online](https://dreamlab-ai.com/workshops/workshop-07-docker-containers/README.md/)
+- [Introduction: Why Containers Matter for AI](https://dreamlab-ai.com/data/workshops/workshop-07-docker-containers/00_introduction.md): [Read online](https://dreamlab-ai.com/workshops/workshop-07-docker-containers/00_introduction.md/)
+- [Core Concepts: Images, Containers, Volumes, Networks](https://dreamlab-ai.com/data/workshops/workshop-07-docker-containers/01_concepts.md): [Read online](https://dreamlab-ai.com/workshops/workshop-07-docker-containers/01_concepts.md/)
+- [Hands-On: Your First Containers](https://dreamlab-ai.com/data/workshops/workshop-07-docker-containers/02_hands_on.md): [Read online](https://dreamlab-ai.com/workshops/workshop-07-docker-containers/02_hands_on.md/)
+- [VS Code Dev Containers: Reproducible Environments](https://dreamlab-ai.com/data/workshops/workshop-07-docker-containers/03_dev_containers.md): [Read online](https://dreamlab-ai.com/workshops/workshop-07-docker-containers/03_dev_containers.md/)
+- [Remote Docker: Developing on Powerful Machines](https://dreamlab-ai.com/data/workshops/workshop-07-docker-containers/04_remote_docker.md): [Read online](https://dreamlab-ai.com/workshops/workshop-07-docker-containers/04_remote_docker.md/)
+- [Containerising AI Agents and Workflows](https://dreamlab-ai.com/data/workshops/workshop-07-docker-containers/05_ai_containers.md): [Read online](https://dreamlab-ai.com/workshops/workshop-07-docker-containers/05_ai_containers.md/)
+- [Practical Exercises](https://dreamlab-ai.com/data/workshops/workshop-07-docker-containers/06_exercises.md): [Read online](https://dreamlab-ai.com/workshops/workshop-07-docker-containers/06_exercises.md/)
+- [Resources & Next Steps](https://dreamlab-ai.com/data/workshops/workshop-07-docker-containers/07_resources.md): [Read online](https://dreamlab-ai.com/workshops/workshop-07-docker-containers/07_resources.md/)
+
+## Claude Code Mastery: From First Command to Autonomous Agents
+
+- [Claude Code Mastery: From First Command to Autonomous Agents](https://dreamlab-ai.com/data/workshops/workshop-08-claude-code/README.md): [Read online](https://dreamlab-ai.com/workshops/workshop-08-claude-code/README.md/)
+- [Chapter 0: Introduction — What Is Claude Code?](https://dreamlab-ai.com/data/workshops/workshop-08-claude-code/00_introduction.md): [Read online](https://dreamlab-ai.com/workshops/workshop-08-claude-code/00_introduction.md/)
+- [Chapter 1: Getting Started — Installation and First Run](https://dreamlab-ai.com/data/workshops/workshop-08-claude-code/01_getting_started.md): [Read online](https://dreamlab-ai.com/workshops/workshop-08-claude-code/01_getting_started.md/)
+- [Chapter 2: Core Features — Commands, Slash Commands, and Tools](https://dreamlab-ai.com/data/workshops/workshop-08-claude-code/02_core_features.md): [Read online](https://dreamlab-ai.com/workshops/workshop-08-claude-code/02_core_features.md/)
+- [Chapter 3: CLAUDE.md — Teaching Claude About Your Project](https://dreamlab-ai.com/data/workshops/workshop-08-claude-code/03_claude_md.md): [Read online](https://dreamlab-ai.com/workshops/workshop-08-claude-code/03_claude_md.md/)
+- [Chapter 4: MCP Servers — Extending Claude's Capabilities](https://dreamlab-ai.com/data/workshops/workshop-08-claude-code/04_mcp_servers.md): [Read online](https://dreamlab-ai.com/workshops/workshop-08-claude-code/04_mcp_servers.md/)
+- [Chapter 5: Hooks and Automation — Event-Driven Workflows](https://dreamlab-ai.com/data/workshops/workshop-08-claude-code/05_hooks_automation.md): [Read online](https://dreamlab-ai.com/workshops/workshop-08-claude-code/05_hooks_automation.md/)
+- [Chapter 6: Subagents and Workflows — Multi-Agent Orchestration](https://dreamlab-ai.com/data/workshops/workshop-08-claude-code/06_subagents_workflows.md): [Read online](https://dreamlab-ai.com/workshops/workshop-08-claude-code/06_subagents_workflows.md/)
+- [Chapter 7: Practical Patterns — Real-World Use Cases](https://dreamlab-ai.com/data/workshops/workshop-08-claude-code/07_practical_patterns.md): [Read online](https://dreamlab-ai.com/workshops/workshop-08-claude-code/07_practical_patterns.md/)
+- [Chapter 8: Hands-On Exercises](https://dreamlab-ai.com/data/workshops/workshop-08-claude-code/08_exercises.md): [Read online](https://dreamlab-ai.com/workshops/workshop-08-claude-code/08_exercises.md/)
+- [Chapter 9: Resources & Community](https://dreamlab-ai.com/data/workshops/workshop-08-claude-code/09_resources.md): [Read online](https://dreamlab-ai.com/workshops/workshop-08-claude-code/09_resources.md/)
+
+## SEO & AI Discoverability: Being Found by Search Engines and Answer Engines
+
+- [SEO & AI Discoverability: Being Found by Search Engines and Answer Engines](https://dreamlab-ai.com/data/workshops/workshop-10-seo-ai-discoverability/README.md): [Read online](https://dreamlab-ai.com/workshops/workshop-10-seo-ai-discoverability/README.md/)
+- [Chapter 0: Introduction — How Discovery Works in 2026](https://dreamlab-ai.com/data/workshops/workshop-10-seo-ai-discoverability/00_introduction.md): [Read online](https://dreamlab-ai.com/workshops/workshop-10-seo-ai-discoverability/00_introduction.md/)
+- [Chapter 1: Crawling and Indexing](https://dreamlab-ai.com/data/workshops/workshop-10-seo-ai-discoverability/01_crawling_indexing.md): [Read online](https://dreamlab-ai.com/workshops/workshop-10-seo-ai-discoverability/01_crawling_indexing.md/)
+- [Chapter 2: Rendering JavaScript Sites](https://dreamlab-ai.com/data/workshops/workshop-10-seo-ai-discoverability/02_rendering_javascript.md): [Read online](https://dreamlab-ai.com/workshops/workshop-10-seo-ai-discoverability/02_rendering_javascript.md/)
+- [Chapter 3: Structured Data with JSON-LD](https://dreamlab-ai.com/data/workshops/workshop-10-seo-ai-discoverability/03_structured_data.md): [Read online](https://dreamlab-ai.com/workshops/workshop-10-seo-ai-discoverability/03_structured_data.md/)
+- [Chapter 4: Metadata and Social Previews](https://dreamlab-ai.com/data/workshops/workshop-10-seo-ai-discoverability/04_metadata_social.md): [Read online](https://dreamlab-ai.com/workshops/workshop-10-seo-ai-discoverability/04_metadata_social.md/)
+- [Chapter 5: AI Crawlers and Access Controls](https://dreamlab-ai.com/data/workshops/workshop-10-seo-ai-discoverability/05_ai_crawlers.md): [Read online](https://dreamlab-ai.com/workshops/workshop-10-seo-ai-discoverability/05_ai_crawlers.md/)
+- [Chapter 6: Writing for Answer Engines](https://dreamlab-ai.com/data/workshops/workshop-10-seo-ai-discoverability/06_answer_engine_content.md): [Read online](https://dreamlab-ai.com/workshops/workshop-10-seo-ai-discoverability/06_answer_engine_content.md/)
+- [Chapter 7: Measuring Discoverability](https://dreamlab-ai.com/data/workshops/workshop-10-seo-ai-discoverability/07_measurement.md): [Read online](https://dreamlab-ai.com/workshops/workshop-10-seo-ai-discoverability/07_measurement.md/)
+- [Chapter 8: Hands-On Exercises](https://dreamlab-ai.com/data/workshops/workshop-10-seo-ai-discoverability/08_exercises.md): [Read online](https://dreamlab-ai.com/workshops/workshop-10-seo-ai-discoverability/08_exercises.md/)
+- [Chapter 9: Resources](https://dreamlab-ai.com/data/workshops/workshop-10-seo-ai-discoverability/09_resources.md): [Read online](https://dreamlab-ai.com/workshops/workshop-10-seo-ai-discoverability/09_resources.md/)
+- [Chapter 10: Assessment](https://dreamlab-ai.com/data/workshops/workshop-10-seo-ai-discoverability/10_assessment.md): [Read online](https://dreamlab-ai.com/workshops/workshop-10-seo-ai-discoverability/10_assessment.md/)

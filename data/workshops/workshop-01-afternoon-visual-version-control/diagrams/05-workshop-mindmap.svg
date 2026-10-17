@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 328" role="img" aria-labelledby="d5b-title d5b-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="d5b-title">Workshop topics mind map</title>
+  <desc id="d5b-desc">Four topic groups from the workshop: Mermaid diagram types, Git version control concepts, visual tools in VS Code, and GitHub for backup, collaboration and portfolio.</desc>
+  <rect x="8" y="8" width="944" height="312" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">TODAY'S WORKSHOP — KEY TOPICS</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <g font-family="ui-monospace, 'SF Mono', Menlo, monospace">
+    <rect x="48" y="96" width="200" height="192" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="68" y="126" font-size="11" font-weight="500" letter-spacing="0.14em" fill="#F59E0B">MERMAID</text>
+    <text x="68" y="158" font-size="12" fill="#F5F5F5">flowcharts</text>
+    <text x="68" y="186" font-size="12" fill="#F5F5F5">gantt charts</text>
+    <text x="68" y="214" font-size="12" fill="#F5F5F5">sequence diagrams</text>
+    <text x="68" y="242" font-size="12" fill="#F5F5F5">mind maps</text>
+
+    <rect x="272" y="96" width="200" height="192" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="292" y="126" font-size="11" font-weight="500" letter-spacing="0.14em" fill="#9CA3AF">GIT</text>
+    <text x="292" y="158" font-size="12" fill="#F5F5F5">commits</text>
+    <text x="292" y="186" font-size="12" fill="#F5F5F5">branches</text>
+    <text x="292" y="214" font-size="12" fill="#F5F5F5">merging</text>
+    <text x="292" y="242" font-size="12" fill="#F5F5F5">history</text>
+
+    <rect x="496" y="96" width="200" height="192" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="516" y="126" font-size="11" font-weight="500" letter-spacing="0.14em" fill="#9CA3AF">VISUAL TOOLS</text>
+    <text x="516" y="158" font-size="12" fill="#F5F5F5">GitLens</text>
+    <text x="516" y="186" font-size="12" fill="#F5F5F5">source control panel</text>
+    <text x="516" y="214" font-size="12" fill="#F5F5F5">commit graph</text>
+    <text x="516" y="242" font-size="12" fill="#F5F5F5">markdown preview</text>
+
+    <rect x="720" y="96" width="192" height="192" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="740" y="126" font-size="11" font-weight="500" letter-spacing="0.14em" fill="#9CA3AF">GITHUB</text>
+    <text x="740" y="158" font-size="12" fill="#F5F5F5">cloud backup</text>
+    <text x="740" y="186" font-size="12" fill="#F5F5F5">collaboration</text>
+    <text x="740" y="214" font-size="12" fill="#F5F5F5">portfolio</text>
+  </g>
+</svg>

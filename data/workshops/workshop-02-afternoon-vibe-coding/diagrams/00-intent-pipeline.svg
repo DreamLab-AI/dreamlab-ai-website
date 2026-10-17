@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 300" role="img" aria-labelledby="ip-title ip-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="ip-title">How AI understands your intent</title>
+  <desc id="ip-desc">Your description passes through natural language processing and intent recognition into code generation, producing working code.</desc>
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect x="8" y="8" width="944" height="284" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">FROM DESCRIPTION TO WORKING CODE</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+  <g text-anchor="middle">
+    <rect x="48" y="112" width="192" height="80" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="144" y="148" font-size="15" font-weight="600" fill="#F5F5F5">Your Description</text>
+    <text x="144" y="172" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">natural language</text>
+
+    <rect x="272" y="112" width="192" height="80" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="368" y="148" font-size="15" font-weight="600" fill="#F5F5F5">Intent Recognition</text>
+    <text x="368" y="172" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">what you mean</text>
+
+    <rect x="496" y="112" width="192" height="80" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="592" y="148" font-size="15" font-weight="600" fill="#F5F5F5">Code Generation</text>
+    <text x="592" y="172" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">HTML · CSS · JS</text>
+
+    <rect x="720" y="112" width="192" height="80" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="816" y="148" font-size="15" font-weight="600" fill="#F5F5F5">Working Code</text>
+    <text x="816" y="172" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">optimised, ready to run</text>
+  </g>
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2">
+    <path d="M240,152 L268,152" marker-end="url(#arr)"/>
+    <path d="M464,152 L492,152" marker-end="url(#arr)"/>
+    <path d="M688,152 L716,152" marker-end="url(#arr)"/>
+  </g>
+  <text x="480" y="248" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">"a blue button that sparkles"  →  an actual sparkling button</text>
+</svg>

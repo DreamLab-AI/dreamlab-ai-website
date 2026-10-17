@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" role="img" aria-labelledby="dg-title dg-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="dg-title">The extension marketplace</title>
+  <desc id="dg-desc">A 20 MB core connects to a marketplace of over 70,000 extensions across languages, AI assistants, themes and productivity tools.</desc>
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect x="8" y="8" width="944" height="384" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">EXTENSION MARKETPLACE</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <g text-anchor="middle">
+    <rect x="48" y="200" width="176" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="136" y="232" font-size="14" font-weight="600" fill="#F5F5F5">VS Code Core</text>
+    <text x="136" y="256" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">~20 MB download</text>
+
+    <rect x="320" y="200" width="224" height="72" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="432" y="232" font-size="15" font-weight="600" fill="#F5F5F5">Marketplace</text>
+    <text x="432" y="256" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">70,000+ · 1bn+ installs</text>
+  </g>
+
+  <g text-anchor="middle">
+    <rect x="656" y="96" width="256" height="60" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="784" y="122" font-size="14" font-weight="600" fill="#F5F5F5">Language Support</text>
+    <text x="784" y="144" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">TypeScript · Python · Rust · Go</text>
+
+    <rect x="656" y="172" width="256" height="60" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="784" y="198" font-size="14" font-weight="600" fill="#F5F5F5">AI Assistants</text>
+    <text x="784" y="220" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">Copilot · Claude Code · Continue</text>
+
+    <rect x="656" y="248" width="256" height="60" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="784" y="274" font-size="14" font-weight="600" fill="#F5F5F5">Themes &amp; Icons</text>
+    <text x="784" y="296" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">One Dark Pro · Material</text>
+
+    <rect x="656" y="324" width="256" height="60" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="784" y="350" font-size="14" font-weight="600" fill="#F5F5F5">Productivity</text>
+    <text x="784" y="372" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">GitLens · Todo Tree · debuggers</text>
+  </g>
+
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2">
+    <path d="M224,236 C256,236 284,236 316,236" marker-end="url(#arr)"/>
+    <path d="M544,212 C588,180 608,152 652,132" marker-end="url(#arr)"/>
+    <path d="M544,226 C580,216 616,210 652,204" marker-end="url(#arr)"/>
+    <path d="M544,250 C580,260 616,266 652,272" marker-end="url(#arr)"/>
+    <path d="M544,260 C588,292 608,320 652,344" marker-end="url(#arr)"/>
+  </g>
+</svg>
