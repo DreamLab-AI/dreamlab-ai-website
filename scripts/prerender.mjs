@@ -48,7 +48,15 @@ const lastModified = sources => {
 // NODE_ENV=production would load React's production build, which lacks it.
 delete process.env.NODE_ENV;
 const template = await fs.readFile('dist/index.html', 'utf8');
-const vite = await createServer({ server: { middlewareMode: true }, appType: 'custom', mode: 'production' });
+const vite = await createServer({
+  server: { middlewareMode: true },
+  appType: 'custom',
+  mode: 'production',
+  // SSR externalises deps, so the client dep optimiser is never needed here; its
+  // background esbuild scan was still running at vite.close(), which logged
+  // "✘ [ERROR] The build was canceled" into every build.
+  optimizeDeps: { noDiscovery: true, include: [] },
+});
 try {
   const { marketingPaths, renderPage } = await vite.ssrLoadModule('/src/prerender.tsx');
   const workshops = JSON.parse(await fs.readFile('src/data/workshop-list.json', 'utf8'));
