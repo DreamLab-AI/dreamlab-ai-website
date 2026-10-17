@@ -558,3 +558,43 @@ html {
 .delay-4d-4 { animation-delay: 4.5s; }
 .delay-4d-5 { animation-delay: 6s; }
 .delay-4d-6 { animation-delay: 7.5s; }
+
+/* -- Click Through × DreamLab landing page (src/pages/ClickThrough.tsx) ----
+ * Poppins is the partner's typeface. Subset (Latin-1 + punctuation) and
+ * self-hosted so the page makes no third-party font request. */
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/poppins/poppins-regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/poppins/poppins-medium.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/poppins/poppins-semibold.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/poppins/poppins-bold.woff2") format("woff2");
+}
+
+/* The one DreamLab band on that page: our mesh glow, held still. */
+.dl-glow {
+  background:
+    radial-gradient(ellipse at 15% 30%, rgba(34, 211, 238, 0.14) 0%, transparent 45%),
+    radial-gradient(ellipse at 85% 70%, rgba(168, 85, 247, 0.12) 0%, transparent 45%),
+    radial-gradient(ellipse at 60% 10%, rgba(245, 158, 11, 0.06) 0%, transparent 40%);
+}

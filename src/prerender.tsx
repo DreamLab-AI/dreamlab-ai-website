@@ -20,14 +20,18 @@ import Testimonials from './pages/Testimonials';
 import Ventures from './pages/Ventures';
 import Contact from './pages/Contact';
 import Privacy from './pages/Privacy';
+import ClickThrough from './pages/ClickThrough';
 
 const marketing = {
   '/': Index, '/programmes': Programmes, '/co-create': CoCreate,
   '/research': Research, '/ecosystem': Ecosystem, '/team': Team,
   '/workshops': Workshops, '/testimonials': Testimonials, '/ventures': Ventures,
-  '/contact': Contact, '/privacy': Privacy,
+  '/contact': Contact, '/privacy': Privacy, '/clickthrough': ClickThrough,
 };
 export const marketingPaths = Object.keys(marketing);
+// Prerendered so the printed QR code lands on a 200, but kept out of the
+// sitemap and marked noindex: these pages are reached by link or QR only.
+export const hiddenPaths = new Set(['/clickthrough']);
 
 export function renderPage(url: string) {
   let config: Partial<OGMetaConfig> | undefined;

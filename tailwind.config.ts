@@ -89,6 +89,24 @@ export default {
 			colors: {
 				// Mobile surface palette (≤767px). Desktop uses the shipped
 				// --primary / --dl-accent-* tokens; these are mobile-only and explicit.
+				// Click Through partner palette (src/pages/ClickThrough.tsx only), lifted
+				// from clickthrough.digital's own CSS custom properties.
+				ct: {
+					navy:          '#18406C',
+					orange:        '#EF7A52',
+					'orange-deep': '#DA6D48',
+					teal:          '#49B0B4',
+					'teal-deep':   '#359093',
+					// Darkened for WCAG AA on cream/white where the brand tones fall short:
+					// small kicker text, error copy and button fills.
+					'teal-ink':    '#277578',
+					'orange-ink':  '#B9532E',
+					green:         '#4E9492',
+					yellow:        '#FBC168',
+					bone:          '#E2D8CC',
+					cream:         '#FCFBFA',
+					line:          '#E3E3E3',
+				},
 				dlm: {
 					base:      '#0E0E11',
 					sunken:    '#0B0B0E',
@@ -148,6 +166,9 @@ export default {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)'
+			},
+			fontFamily: {
+				poppins: ['Poppins', 'ui-sans-serif', 'system-ui', 'sans-serif'],
 			},
 			keyframes: {
 				'accordion-down': {

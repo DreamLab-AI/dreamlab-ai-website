@@ -35,6 +35,7 @@ const marketingSources = {
   '/team': ['src/pages/Team.tsx', 'public/data/team'], '/workshops': ['src/pages/WorkshopIndex.tsx', 'src/data/workshop-meta.ts'],
   '/testimonials': ['src/pages/Testimonials.tsx', 'content/site-content.yaml'], '/ventures': ['src/pages/Ventures.tsx'],
   '/contact': ['src/pages/Contact.tsx'], '/privacy': ['src/pages/Privacy.tsx'],
+  '/clickthrough': ['src/pages/ClickThrough.tsx', 'src/data/site-facts.ts'],
 };
 const git = args => execFileSync('git', args, { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim();
 let fullHistory = false;
@@ -50,7 +51,7 @@ delete process.env.NODE_ENV;
 const template = await fs.readFile('dist/index.html', 'utf8');
 const vite = await createServer({ server: { middlewareMode: true }, appType: 'custom', mode: 'production' });
 try {
-  const { marketingPaths, renderPage } = await vite.ssrLoadModule('/src/prerender.tsx');
+  const { marketingPaths, hiddenPaths, renderPage } = await vite.ssrLoadModule('/src/prerender.tsx');
   const workshops = JSON.parse(await fs.readFile('src/data/workshop-list.json', 'utf8'));
   const routes = [...marketingPaths];
   const routeSources = new Map(Object.entries(marketingSources));
@@ -98,6 +99,12 @@ try {
       tag.setAttribute('content', value || '');
     }
     doc.querySelector('link[rel="canonical"]').href = url;
+    if (hiddenPaths.has(route)) {
+      // Replace the template's index,follow directive rather than adding a second one.
+      let robots = doc.querySelector('meta[name="robots"]');
+      if (!robots) { robots = doc.createElement('meta'); robots.setAttribute('name', 'robots'); doc.head.append(robots); }
+      robots.setAttribute('content', 'noindex, nofollow');
+    }
     const schema = doc.createElement('script');
     schema.type = 'application/ld+json';
     schema.id = 'route-structured-data';
@@ -139,7 +146,7 @@ try {
     const lastmod = lastModified(routeSources.get(route));
     return `  <url><loc>${pageUrl(route)}</loc>${lastmod ? `<lastmod>${lastmod}</lastmod>` : ''}</url>`;
   };
-  await fs.writeFile('dist/sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${routes.map(sitemapEntry).join('\n')}\n</urlset>\n`);
+  await fs.writeFile('dist/sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${routes.filter(route => !hiddenPaths.has(route)).map(sitemapEntry).join('\n')}\n</urlset>\n`);
   await fs.writeFile('dist/workshops/llms.txt', curriculum.join('\n'));
   console.log(`Prerendered ${routes.length} canonical pages, ${aliases.length} workshop entry points and ${Object.keys(legacyRedirects).length} legacy redirects.`);
 } finally {
