@@ -21,6 +21,7 @@ const Ecosystem = lazy(() => import("./pages/Ecosystem"));
 const Testimonials = lazy(() => import("./pages/Testimonials"));
 const Ventures = lazy(() => import("./pages/Ventures"));
 const ChainMirror = lazy(() => import("./pages/ChainMirror"));
+const ClickThrough = lazy(() => import("./pages/ClickThrough"));
 
 /**
  * The root application component.
@@ -63,6 +64,8 @@ const App = () => (
             {/* Venture Lab — unlinked, direct URL only */}
             <Route path="/ventures" element={<Ventures />} />
             <Route path="/chain" element={<ChainMirror />} />
+            {/* Click Through partner landing — reached from the printed flyer's QR code; noindex, not in the sitemap */}
+            <Route path="/clickthrough" element={<ClickThrough />} />
 
             <Route path="/contact" element={<Contact />} />
             <Route path="/privacy" element={<Privacy />} />
