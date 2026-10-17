@@ -9,8 +9,9 @@
 // 3. Rasterises page 1 to preview.png with pdftoppm when it is available, so the
 //    result can be eyeballed without a PDF viewer.
 //
-// Fonts are the same subset woff2 files the landing page ships; images are the
-// site's own venue photography. Pricing on the flyer is hand-written: check it
+// Estate edition: Space Grotesk subsets under fonts/, the Blender isometric
+// diorama (mini-lab.png), the ComfyUI studio render (studio.jpg) and the SVG
+// lockup. The earlier corporate layout is kept under legacy/ for reference. Pricing on the flyer is hand-written: check it
 // against src/data/site-facts.ts before a reprint (the test in
 // src/data/__tests__ does this for the website, not for this file).
 import { execFileSync } from 'node:child_process';
@@ -33,7 +34,7 @@ await QRCode.toFile(join(here, 'qr.svg'), landing, {
 });
 
 mkdirSync(out, { recursive: true });
-execFileSync('weasyprint', ['--base-url', here, '--optimize-images', '--jpeg-quality', '88', '--dpi', '220', join(here, 'flyer.html'), pdf], { stdio: 'inherit' });
+execFileSync('weasyprint', ['--base-url', here, '--optimize-images', '--jpeg-quality', '90', '--dpi', '220', join(here, 'flyer.html'), pdf], { stdio: 'inherit' });
 console.log(`wrote ${pdf}`);
 
 try {
