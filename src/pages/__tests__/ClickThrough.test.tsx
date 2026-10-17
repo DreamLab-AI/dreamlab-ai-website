@@ -63,13 +63,14 @@ const renderPage = () =>
 
 const fillForm = async (user: ReturnType<typeof userEvent.setup>) => {
   await user.type(screen.getByLabelText(/your name/i), "Alice Example");
-  await user.type(screen.getByLabelText(/company/i), "Example Ltd");
+  await user.type(screen.getByLabelText(/^company$/i), "Example Ltd");
   await user.type(screen.getByLabelText(/work email/i), "Alice@Example.com");
   await user.selectOptions(screen.getByLabelText(/how many people/i), "3–4");
   await user.type(
     screen.getByLabelText(/what should ai do/i),
     "Automate our quoting process end to end.",
   );
+  await user.click(screen.getByLabelText(/pass this enquiry/i));
 };
 
 describe("ClickThrough landing page", () => {
@@ -154,6 +155,17 @@ describe("ClickThrough landing page", () => {
     expect(screen.getByLabelText(/your name/i)).toHaveValue("Alice Example");
     // The relay's reason must never surface to the visitor.
     expect(toastErrorMock.mock.calls[0][0]).not.toMatch(/whitelist/);
+  });
+
+  it("will not publish without explicit consent to share with Click Through", async () => {
+    const user = userEvent.setup();
+    renderPage();
+    await fillForm(user);
+    await user.click(screen.getByLabelText(/pass this enquiry/i)); // untick
+    await user.click(screen.getByRole("button", { name: /send enquiry/i }));
+    expect(await screen.findByText(/tick the box/i)).toBeInTheDocument();
+    expect(publishGiftWrapMock).not.toHaveBeenCalled();
+    expect(screen.getByLabelText(/pass this enquiry/i)).toHaveAttribute("aria-invalid", "true");
   });
 
   it("does not publish anything when a required field is missing", async () => {

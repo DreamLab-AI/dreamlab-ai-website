@@ -28,10 +28,11 @@
   .page { position: relative; width: 210mm; height: 297mm; padding: 11mm 13mm 15mm; overflow: hidden; }
 
   /* Click Through's bone circle, bleeding off the top-right corner */
-  .orb { position: absolute; top: -52mm; right: -48mm; width: 150mm; height: 150mm; border-radius: 50%;
+  .orb { position: absolute; z-index: 0; top: -60mm; right: -54mm; width: 164mm; height: 164mm; border-radius: 50%;
          background: rgba(226, 216, 204, 0.55); }
 
   /* Partner bar */
+  .bar, .hero, .benefits, .lab, .bottom { position: relative; z-index: 1; }
   .bar { display: flex; justify-content: space-between; align-items: center; position: relative; }
   .bar .ct { height: 7mm; }
   .bar .x { color: rgba(24,64,108,.4); font-weight: 300; font-size: 12pt; margin: 0 4mm; }
@@ -49,7 +50,7 @@
   .hero ul.facts { list-style: none; margin-top: 4mm; display: flex; flex-wrap: wrap; gap: 2mm 3mm; font-size: 7.6pt; color: rgba(24,64,108,.7); }
   .hero ul.facts li::before { content: ""; display: inline-block; width: 1.6mm; height: 1.6mm; border-radius: 50%; background: var(--orange); margin-right: 1.6mm; vertical-align: middle; }
   .hero figure { width: 76mm; position: relative; }
-  .hero figure img { width: 76mm; height: 55mm; object-fit: cover; border-radius: 4mm; display: block; }
+  .hero figure img { width: 76mm; height: 55mm; object-fit: cover; object-position: 50% 25%; border-radius: 4mm; display: block; }
   .hero figcaption { position: absolute; left: 3mm; bottom: 3mm; background: rgba(255,255,255,.92); border-radius: 99mm;
                      padding: 1.3mm 3mm; font-size: 6.8pt; font-weight: 600; }
 
@@ -89,7 +90,9 @@
   ol.how h3 { font-size: 8.2pt; font-weight: 600; margin-top: .4mm; }
   ol.how p { font-size: 7pt; color: rgba(24,64,108,.76); margin-top: 1mm; }
 
-  .pricing { margin-top: 4mm; display: flex; gap: 3mm; }
+  .journey { margin-top: 2mm; }
+  .journey svg { display: block; width: 100%; height: 28mm; }
+  .pricing { margin-top: 3mm; display: flex; gap: 3mm; }
   .pricing article { flex: 1; background: #fff; border: .35mm solid var(--line); border-radius: 3mm; padding: 2.5mm 3mm; }
   .pricing article.hero-price { border: .6mm solid var(--orange); }
   .pricing .k { font-size: 6.4pt; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--teal-ink); }
@@ -139,8 +142,8 @@
       </ul>
     </div>
     <figure>
-      <img src="../../public/images/heroes/lake-district-dawn.webp" alt="Dawn over a Lake District valley">
-      <figcaption>The Lake District, Cumbria</figcaption>
+      <img src="hero-fells.jpg" alt="Lake District fells at dawn with a glowing network above the valley">
+      <figcaption>Built in the Lake District, Cumbria</figcaption>
     </figure>
   </section>
 
@@ -169,11 +172,44 @@
   <section class="bottom">
     <div class="left">
       <h2 class="sec">How it works<span class="stop">.</span></h2>
-      <ol class="how">
-        <li><div class="n">01</div><div class="who">Click Through</div><h3>Scope the problem</h3><p>A free call with Stephen to find the one process where AI would move the needle.</p></li>
-        <li><div class="n">02</div><div class="who">DreamLab</div><h3>Design the residential</h3><p>Specialists, modules and length matched to your team and your challenge.</p></li>
-        <li><div class="n">03</div><div class="who">Together</div><h3>Build it, keep it going</h3><p>Your team builds at the lab. Click Through carries the result into your business.</p></li>
-      </ol>
+      <div class="journey">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="40 20 1760 300" width="100%" height="28mm" preserveAspectRatio="xMidYMid meet" font-family="Poppins, sans-serif">
+  <defs>
+    <linearGradient id="glow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#22d3ee"/>
+      <stop offset="1" stop-color="#a855f7"/>
+    </linearGradient>
+  </defs>
+    <!-- connecting line -->
+  <line x1="364" y1="100" x2="856" y2="100" stroke="#e3e3e3" stroke-width="6" stroke-linecap="round"/>
+  <line x1="984" y1="100" x2="1476" y2="100" stroke="#e3e3e3" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="610" cy="100" r="9" fill="#ef7a52"/>
+  <circle cx="1230" cy="100" r="9" fill="#ef7a52"/>
+  <!-- node 1 -->
+  <circle cx="300" cy="100" r="62" fill="#18406c"/>
+  <text x="300" y="119" text-anchor="middle" font-size="52" font-weight="700" fill="#fcfbfa">01</text>
+  <!-- node 2 -->
+  <circle cx="920" cy="100" r="62" fill="#18406c"/>
+  <text x="920" y="119" text-anchor="middle" font-size="52" font-weight="700" fill="#fcfbfa">02</text>
+  <!-- node 3 with DreamLab glow ring -->
+  <circle cx="1540" cy="100" r="82" fill="none" stroke="url(#glow)" stroke-width="3" opacity="0.35"/>
+  <circle cx="1540" cy="100" r="73" fill="none" stroke="url(#glow)" stroke-width="5"/>
+  <circle cx="1540" cy="100" r="62" fill="#18406c"/>
+  <text x="1540" y="119" text-anchor="middle" font-size="52" font-weight="700" fill="#fcfbfa">03</text>
+  <!-- labels -->
+  <g text-anchor="middle" font-family="Poppins, DejaVu Sans, sans-serif">
+    <text x="300" y="212" font-size="27" font-weight="600" letter-spacing="3" fill="#277578">CLICK THROUGH</text>
+    <text x="300" y="257" font-size="41" font-weight="700" fill="#18406c">Scope the problem<tspan fill="#ef7a52">.</tspan></text>
+    <text font-family="Poppins, DejaVu Sans, sans-serif" x="300" y="298" font-size="29" fill="#18406c">A free 45-minute call</text>
+    <text x="920" y="212" font-size="27" font-weight="600" letter-spacing="3" fill="#277578">DREAMLAB</text>
+    <text x="920" y="257" font-size="41" font-weight="700" fill="#18406c">Design the residential<tspan fill="#ef7a52">.</tspan></text>
+    <text font-family="Poppins, DejaVu Sans, sans-serif" x="920" y="298" font-size="29" fill="#18406c">Specialists, modules, length</text>
+    <text x="1540" y="212" font-size="27" font-weight="600" letter-spacing="3" fill="#277578">TOGETHER</text>
+    <text x="1540" y="257" font-size="41" font-weight="700" fill="#18406c">Build it, keep it going<tspan fill="#ef7a52">.</tspan></text>
+    <text font-family="Poppins, DejaVu Sans, sans-serif" x="1540" y="298" font-size="29" fill="#18406c">Built at the lab, carried on</text>
+  </g>
+</svg>
+      </div>
 
       <div class="pricing">
         <article><div class="k">Discovery call</div><div class="v">Free</div><div class="u">45 minutes with Click Through</div></article>
@@ -189,18 +225,17 @@
       <p>Pricing, the lab, and a two-minute enquiry form.</p>
       <div class="url">dreamlab-ai.com/clickthrough</div>
       <div class="contact">
-        <strong>Click Through</strong>
+        <strong>Stephen Prince, Click Through</strong>
         Multi-award-winning Yorkshire digital agency
         <span class="tel">01609 590035</span>
-        hello@clickthrough.digital<br>
-        Crabtree Hall, Little Holtby, Northallerton DL7 9NY
+        hello@clickthrough.digital
       </div>
     </aside>
   </section>
 
   <footer>
     <span>Click Through Digital × DreamLab AI Consulting Ltd</span>
-    <span>Delivered at DreamLab, Lake District · dreamlab-ai.com · clickthrough.digital</span>
+    <span>Click Through, Crabtree Hall, Little Holtby, Northallerton DL7 9NY · clickthrough.digital · dreamlab-ai.com</span>
   </footer>
 </div>
 </body>
