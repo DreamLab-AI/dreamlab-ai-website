@@ -57,6 +57,7 @@ const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
   teamSize: z.string().min(1, { message: "Roughly how many people?" }),
   message: z.string().min(10, { message: "A sentence or two on what you want AI to do for you" }),
+  consent: z.literal(true, { errorMap: () => ({ message: "Please tick the box so we can pass your enquiry to Click Through" }) }),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -89,8 +90,8 @@ const Pill = ({
   const tones = {
     // Navy and teal-ink fills keep white button text above 4.5:1; the brand
     // orange is reserved for the headline, the full stop and decoration.
-    orange: "bg-ct-navy text-white hover:bg-ct-orange-deep shadow-[0_8px_24px_-8px_rgba(24,64,108,0.5)]",
-    teal: "bg-ct-teal-ink text-white hover:bg-ct-teal-deep",
+    orange: "bg-ct-navy text-white hover:bg-ct-orange-ink shadow-[0_8px_24px_-8px_rgba(24,64,108,0.5)]",
+    teal: "bg-ct-teal-ink text-white hover:bg-ct-navy",
     ghost: "border border-ct-navy/20 text-ct-navy hover:border-ct-navy/50",
   };
   return (
@@ -104,7 +105,7 @@ const Pill = ({
 };
 
 const inputClass =
-  "w-full rounded-xl border border-ct-line bg-white px-4 py-3 text-[15px] text-ct-navy placeholder:text-ct-navy/40 focus:border-ct-orange focus:outline-none focus:ring-2 focus:ring-ct-orange/30 disabled:opacity-60";
+  "w-full rounded-xl border border-ct-navy/40 bg-white px-4 py-3 text-[15px] text-ct-navy placeholder:text-ct-navy/50 focus:border-ct-navy focus:outline-none focus:ring-2 focus:ring-ct-navy/60 disabled:opacity-60 aria-[invalid=true]:border-ct-orange-ink";
 
 const ClickThrough = () => {
   useOGMeta({
@@ -112,8 +113,8 @@ const ClickThrough = () => {
     description:
       "AI training that pays for itself: 1–3 day residential programmes at DreamLab's Lake District lab, scoped and sold through Click Through. Pricing and enquiry.",
     url: "https://dreamlab-ai.com/clickthrough/",
-    image: "https://dreamlab-ai.com/images/heroes/lake-district-dawn.webp",
-    imageAlt: "Dawn over a Lake District valley",
+    image: "https://dreamlab-ai.com/images/heroes/clickthrough-fells-og.webp",
+    imageAlt: "Lake District fells at dawn with a glowing network above the valley",
   });
 
   // Reached by QR code only: keep it out of search results and the sitemap.
@@ -136,7 +137,7 @@ const ClickThrough = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: { name: "", company: "", email: "", teamSize: "", message: "" },
+    defaultValues: { name: "", company: "", email: "", teamSize: "", message: "", consent: undefined as unknown as true },
   });
   const { register, handleSubmit, formState: { errors }, reset } = form;
 
@@ -157,7 +158,7 @@ const ClickThrough = () => {
         email: data.email,
         engagementType: CLICKTHROUGH_ENGAGEMENT_TYPE,
         teamMembers: `Partner: Click Through (Stephen Prince) · Company: ${data.company.trim()} · Team size: ${data.teamSize}`,
-        hasConsent: true,
+        hasConsent: data.consent,
         message: data.message,
         source: CLICKTHROUGH_SOURCE,
         pageUrl: window.location.href,
@@ -179,14 +180,14 @@ const ClickThrough = () => {
   };
 
   return (
-    <div className="ct-page min-h-screen bg-ct-cream text-ct-navy font-poppins antialiased">
+    <div className="min-h-screen bg-ct-cream text-ct-navy font-poppins antialiased">
       {/* Partner bar */}
       <header className="sticky top-0 z-20 border-b border-ct-line/70 bg-ct-cream/90 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
           <Logos />
           <a
             href="#enquire"
-            className="hidden rounded-full bg-ct-navy px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-ct-orange-deep sm:inline-flex"
+            className="hidden rounded-full bg-ct-navy px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-ct-orange-ink sm:inline-flex"
           >
             Enquire
           </a>
@@ -227,15 +228,15 @@ const ClickThrough = () => {
             </div>
             <figure className="relative md:self-start">
               <img
-                src="/images/heroes/lake-district-dawn.webp"
-                alt="Dawn light over a Lake District valley and lake"
+                src="/images/heroes/clickthrough-fells.webp"
+                alt="Lake District fells at dawn with a glowing network of nodes above the valley"
                 width={1920}
-                height={1080}
+                height={1280}
                 className="aspect-[4/3] w-full rounded-2xl object-cover shadow-[0_30px_60px_-30px_rgba(24,64,108,0.5)]"
                 loading="eager"
               />
               <figcaption className="absolute bottom-4 left-4 rounded-full bg-white/90 px-4 py-2 text-xs font-semibold text-ct-navy shadow">
-                The Lake District, Cumbria
+                Built in the Lake District, Cumbria
               </figcaption>
             </figure>
           </div>
@@ -273,7 +274,7 @@ const ClickThrough = () => {
         </section>
 
         {/* The lab — DreamLab's dark motif, one band only */}
-        <section className="dl-band relative overflow-hidden bg-[#0E0E11] text-[#FAFAFA]" aria-labelledby="lab-title">
+        <section className="relative overflow-hidden bg-[#0E0E11] text-[#FAFAFA]" aria-labelledby="lab-title">
           <div aria-hidden="true" className="dl-glow pointer-events-none absolute inset-0" />
           <div className="relative mx-auto grid max-w-6xl gap-10 px-5 py-16 md:grid-cols-2 md:py-24">
             <div>
@@ -355,7 +356,7 @@ const ClickThrough = () => {
         </section>
 
         {/* Pricing */}
-        <section id="pricing" className="bg-white border-y border-ct-line" aria-labelledby="pricing-title">
+        <section id="pricing" className="scroll-mt-20 bg-white border-y border-ct-line" aria-labelledby="pricing-title">
           <div className="mx-auto max-w-6xl px-5 py-14 md:py-20">
             <h2 id="pricing-title" className="text-3xl font-bold md:text-4xl">
               Pricing<Stop />
@@ -365,7 +366,7 @@ const ClickThrough = () => {
               <article className="rounded-2xl border border-ct-line p-7">
                 <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-ct-teal-ink">Discovery call</h3>
                 <p className="mt-3 text-4xl font-bold">Free</p>
-                <p className="mt-1 text-sm text-ct-navy/60">45 minutes with Click Through</p>
+                <p className="mt-1 text-sm text-ct-navy/75">45 minutes with Click Through</p>
                 <p className="mt-4 text-ct-navy/75">Where AI genuinely helps your business, where it doesn't, and what to do first.</p>
               </article>
               <article className="rounded-2xl border-2 border-ct-orange p-7 shadow-[0_24px_48px_-24px_rgba(239,122,82,0.45)]">
@@ -373,7 +374,7 @@ const ClickThrough = () => {
                 <p className="mt-3 text-4xl font-bold">
                   From {SITE_FACTS.priceResidentialFrom}
                 </p>
-                <p className="mt-1 text-sm text-ct-navy/60">{SITE_FACTS.priceResidentialUnit}</p>
+                <p className="mt-1 text-sm text-ct-navy/75">{SITE_FACTS.priceResidentialUnit}</p>
                 <p className="mt-4 text-ct-navy/75">
                   {SITE_FACTS.residentialDays} at the lab for teams of up to 8. Accommodation, meals, studio time and
                   specialists included.
@@ -382,7 +383,7 @@ const ClickThrough = () => {
               <article className="rounded-2xl border border-ct-line p-7">
                 <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-ct-teal-ink">One-day build sprint</h3>
                 <p className="mt-3 text-4xl font-bold">From {SITE_FACTS.priceSprintFrom}</p>
-                <p className="mt-1 text-sm text-ct-navy/60">per team, at the lab or at yours</p>
+                <p className="mt-1 text-sm text-ct-navy/75">per team, at the lab or at yours</p>
                 <p className="mt-4 text-ct-navy/75">One day, one process, one working prototype. The fastest way to find out if a residential is worth it.</p>
               </article>
             </div>
@@ -390,7 +391,7 @@ const ClickThrough = () => {
         </section>
 
         {/* Enquiry */}
-        <section id="enquire" className="mx-auto max-w-6xl px-5 py-14 md:py-20" aria-labelledby="enquire-title">
+        <section id="enquire" className="scroll-mt-20 mx-auto max-w-6xl px-5 py-14 md:py-20" aria-labelledby="enquire-title">
           <div className="grid gap-10 md:grid-cols-[0.9fr_1.1fr]">
             <div>
               <h2 id="enquire-title" className="text-3xl font-bold md:text-4xl">
@@ -404,16 +405,16 @@ const ClickThrough = () => {
                 <strong className="block text-ct-navy">Click Through</strong>
                 Stephen Prince's multi-award-winning Yorkshire digital agency
                 <br />
-                <a className="hover:text-ct-orange" href={PARTNER.phoneHref}>{PARTNER.phone}</a>
+                <a className="hover:text-ct-orange-ink" href={PARTNER.phoneHref}>{PARTNER.phone}</a>
                 <br />
-                <a className="hover:text-ct-orange" href={`mailto:${PARTNER.email}`}>{PARTNER.email}</a>
+                <a className="hover:text-ct-orange-ink" href={`mailto:${PARTNER.email}`}>{PARTNER.email}</a>
                 <br />
                 {PARTNER.address}
               </address>
               <address className="mt-6 not-italic text-sm leading-relaxed text-ct-navy/75">
                 <strong className="block text-ct-navy">DreamLab AI Consulting Ltd</strong>
                 Lake District, Cumbria ·{" "}
-                <a className="hover:text-ct-orange" href="/">dreamlab-ai.com</a>
+                <a className="hover:text-ct-orange-ink" href="/">dreamlab-ai.com</a>
               </address>
               <a
                 href="/downloads/clickthrough-dreamlab-residential-a4.pdf"
@@ -424,51 +425,67 @@ const ClickThrough = () => {
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} noValidate className="rounded-2xl border border-ct-line bg-white p-6 md:p-8">
-              <p className="mb-5 text-sm text-ct-navy/60">
+              <p className="mb-5 text-sm text-ct-navy/75">
                 Enquiry about the <strong className="text-ct-navy">Click Through × DreamLab residential</strong>.
               </p>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <label htmlFor="ct-name" className="mb-1.5 block text-sm font-medium">Your name</label>
-                  <input id="ct-name" className={inputClass} autoComplete="name" disabled={isSubmitting} {...register("name")} />
-                  {errors.name && <p role="alert" className="mt-1 text-xs text-ct-orange-ink">{errors.name.message}</p>}
+                  <input id="ct-name" className={inputClass} autoComplete="name" disabled={isSubmitting} aria-invalid={errors.name ? true : undefined} aria-describedby={errors.name ? "ct-name-error" : undefined} {...register("name")} />
+                  {errors.name && <p id="ct-name-error" role="alert" className="mt-1 text-xs text-ct-orange-ink">{errors.name.message}</p>}
                 </div>
                 <div>
                   <label htmlFor="ct-company" className="mb-1.5 block text-sm font-medium">Company</label>
-                  <input id="ct-company" className={inputClass} autoComplete="organization" disabled={isSubmitting} {...register("company")} />
-                  {errors.company && <p role="alert" className="mt-1 text-xs text-ct-orange-ink">{errors.company.message}</p>}
+                  <input id="ct-company" className={inputClass} autoComplete="organization" disabled={isSubmitting} aria-invalid={errors.company ? true : undefined} aria-describedby={errors.company ? "ct-company-error" : undefined} {...register("company")} />
+                  {errors.company && <p id="ct-company-error" role="alert" className="mt-1 text-xs text-ct-orange-ink">{errors.company.message}</p>}
                 </div>
                 <div>
                   <label htmlFor="ct-email" className="mb-1.5 block text-sm font-medium">Work email</label>
-                  <input id="ct-email" type="email" className={inputClass} autoComplete="email" disabled={isSubmitting} {...register("email")} />
-                  {errors.email && <p role="alert" className="mt-1 text-xs text-ct-orange-ink">{errors.email.message}</p>}
+                  <input id="ct-email" type="email" className={inputClass} autoComplete="email" disabled={isSubmitting} aria-invalid={errors.email ? true : undefined} aria-describedby={errors.email ? "ct-email-error" : undefined} {...register("email")} />
+                  {errors.email && <p id="ct-email-error" role="alert" className="mt-1 text-xs text-ct-orange-ink">{errors.email.message}</p>}
                 </div>
                 <div>
                   <label htmlFor="ct-team" className="mb-1.5 block text-sm font-medium">How many people?</label>
-                  <select id="ct-team" className={inputClass} disabled={isSubmitting} {...register("teamSize")}>
+                  <select id="ct-team" className={inputClass} disabled={isSubmitting} aria-invalid={errors.teamSize ? true : undefined} aria-describedby={errors.teamSize ? "ct-team-error" : undefined} {...register("teamSize")}>
                     <option value="">Choose…</option>
                     {TEAM_SIZES.map((s) => (
                       <option key={s} value={s}>{s}</option>
                     ))}
                   </select>
-                  {errors.teamSize && <p role="alert" className="mt-1 text-xs text-ct-orange-ink">{errors.teamSize.message}</p>}
+                  {errors.teamSize && <p id="ct-team-error" role="alert" className="mt-1 text-xs text-ct-orange-ink">{errors.teamSize.message}</p>}
                 </div>
                 <div className="sm:col-span-2">
                   <label htmlFor="ct-message" className="mb-1.5 block text-sm font-medium">What should AI do for your business?</label>
-                  <textarea id="ct-message" rows={5} className={inputClass} disabled={isSubmitting} {...register("message")} />
-                  {errors.message && <p role="alert" className="mt-1 text-xs text-ct-orange-ink">{errors.message.message}</p>}
+                  <textarea id="ct-message" rows={5} className={inputClass} disabled={isSubmitting} aria-invalid={errors.message ? true : undefined} aria-describedby={errors.message ? "ct-message-error" : undefined} {...register("message")} />
+                  {errors.message && <p id="ct-message-error" role="alert" className="mt-1 text-xs text-ct-orange-ink">{errors.message.message}</p>}
                 </div>
               </div>
+              <div className="mt-5 flex items-start gap-3">
+                <input
+                  id="ct-consent"
+                  type="checkbox"
+                  className="mt-1 h-4 w-4 shrink-0 rounded border-ct-navy/40 accent-ct-navy"
+                  disabled={isSubmitting}
+                  aria-invalid={errors.consent ? true : undefined}
+                  aria-describedby={errors.consent ? "ct-consent-error" : undefined}
+                  {...register("consent")}
+                />
+                <label htmlFor="ct-consent" className="text-sm leading-relaxed text-ct-navy/90">
+                  I agree that DreamLab may pass this enquiry, including my name, company and email, to Click Through
+                  (Stephen Prince) so that one of us can arrange the call.
+                </label>
+              </div>
+              {errors.consent && <p id="ct-consent-error" role="alert" className="mt-1 text-xs text-ct-orange-ink">{errors.consent.message}</p>}
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="mt-6 inline-flex min-h-[48px] w-full items-center justify-center rounded-full bg-ct-navy px-7 text-[15px] font-semibold text-white transition-colors hover:bg-ct-orange-deep disabled:opacity-60 sm:w-auto"
+                className="mt-6 inline-flex min-h-[48px] w-full items-center justify-center rounded-full bg-ct-navy px-7 text-[15px] font-semibold text-white transition-colors hover:bg-ct-orange-ink disabled:opacity-60 sm:w-auto"
               >
                 {isSubmitting ? "Sending…" : "Send enquiry"}
               </button>
-              <p className="mt-4 text-xs leading-relaxed text-ct-navy/55">
-                Sent end-to-end encrypted to DreamLab and shared with Click Through to arrange your call. Nothing is
-                stored in a database. <a className="underline hover:text-ct-orange" href="/privacy/">Privacy</a>.
+              <p className="mt-4 text-xs leading-relaxed text-ct-navy/75">
+                Sent end-to-end encrypted to DreamLab. Nothing is stored in a database.{" "}
+                <a className="underline hover:text-ct-orange-ink" href="/privacy/">Privacy</a>.
               </p>
             </form>
           </div>
@@ -476,7 +493,7 @@ const ClickThrough = () => {
       </main>
 
       <footer className="border-t border-ct-line" role="contentinfo">
-        <div className="mx-auto flex max-w-6xl flex-col gap-4 px-5 py-8 text-xs text-ct-navy/60 md:flex-row md:items-center md:justify-between">
+        <div className="mx-auto flex max-w-6xl flex-col gap-4 px-5 py-8 text-xs text-ct-navy/75 md:flex-row md:items-center md:justify-between">
           <Logos />
           <p>
             © {new Date().getFullYear()} Click Through Digital and DreamLab AI Consulting Ltd. Delivered at DreamLab,
