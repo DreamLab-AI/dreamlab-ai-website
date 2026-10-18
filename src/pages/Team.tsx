@@ -1,14 +1,23 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { SITE_FACTS } from "@/data/site-facts";
 import { Header } from "@/components/Header";
 import { TeamMember } from "@/components/TeamMember";
 import { parseTeamMarkdown } from "@/lib/markdown";
 import { Button } from "@/components/ui/button";
-import { Send, Check } from "lucide-react";
+import { Send, Check, Plus, Minus } from "lucide-react";
 import { useOGMeta } from "@/hooks/useOGMeta";
 import { PAGE_OG_CONFIGS } from "@/lib/og-meta";
 import { useIsMobileSync } from "@/hooks/use-mobile";
 import { MobileActionBar, BarPrimary } from "@/components/MobileActionBar";
+import { useLongPress } from "@/hooks/useLongPress";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 
 interface TeamMemberData {
   id: string;
@@ -43,6 +52,14 @@ interface TeamViewProps {
    MOBILE TEAM (≤767px) — SCREENS.md §08
    ============================================================ */
 
+const MOBILE_HINT_ID = "team-gesture-hint";
+
+/**
+ * One card in the mobile grid. A tap opens the member's bio in a bottom
+ * drawer; press-and-hold toggles them on the roster for the enquiry. The
+ * drawer carries an explicit roster button so keyboard and screen-reader users
+ * reach the same action without the gesture.
+ */
 const MobileTeamCard = ({
   member,
   isSelected,
@@ -53,36 +70,106 @@ const MobileTeamCard = ({
   onToggle: () => void;
 }) => {
   const { name, role } = splitHeadline(member.headline);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const cardRef = useRef<HTMLButtonElement>(null);
+  const openDetails = useCallback(() => setDetailsOpen(true), []);
+  const { pressing, handlers } = useLongPress({ onLongPress: onToggle, onClick: openDetails });
+  const paragraphs = member.fullDetails.split("\n\n").filter((p) => p.trim() !== "");
+
   return (
-    <button
-      id={member.id === '04' ? 'john-ohare' : `team-${member.id}`}
-      type="button"
-      aria-pressed={isSelected}
-      aria-label={`Select ${name}`}
-      onClick={onToggle}
-      className={`relative block text-left overflow-hidden rounded-[14px] transition-colors ${
-        isSelected
-          ? "border-2 border-dlm-bright"
-          : "border border-white/10 bg-white/[0.03]"
-      }`}
-    >
-      {isSelected && (
-        <span className="absolute top-2.5 right-2.5 z-10 flex items-center justify-center w-6 h-6 rounded-full bg-dlm-bright">
-          <Check className="w-3.5 h-3.5 text-dlm-ink" aria-hidden="true" />
-        </span>
-      )}
-      <img
-        src={member.imageSrc}
-        alt={`Portrait of ${name}`}
-        loading="lazy"
-        decoding="async"
-        className="w-full h-[120px] object-cover"
-      />
-      <div className="pt-3 px-3 pb-3.5">
-        <div className="text-[15px] font-semibold text-[#FAFAFA] leading-tight">{name}</div>
-        {role && <div className="text-[13px] text-white/50 mt-0.5 leading-snug">{role}</div>}
-      </div>
-    </button>
+    <>
+      <button
+        ref={cardRef}
+        id={member.id === "04" ? "john-ohare" : `team-${member.id}`}
+        type="button"
+        aria-label={`Read about ${name}${isSelected ? ", on your roster" : ""}`}
+        aria-describedby={MOBILE_HINT_ID}
+        aria-haspopup="dialog"
+        aria-expanded={detailsOpen}
+        {...handlers}
+        className={`relative block text-left overflow-hidden rounded-[14px] select-none [-webkit-touch-callout:none] transition-[transform,colors] duration-150 ${
+          pressing ? "scale-[0.96]" : ""
+        } ${
+          isSelected
+            ? "border-2 border-dlm-bright"
+            : "border border-white/10 bg-white/[0.03]"
+        }`}
+      >
+        {isSelected && (
+          <span className="absolute top-2.5 right-2.5 z-10 flex items-center justify-center w-6 h-6 rounded-full bg-dlm-bright">
+            <Check className="w-3.5 h-3.5 text-dlm-ink" aria-hidden="true" />
+          </span>
+        )}
+        <img
+          src={member.imageSrc}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          draggable={false}
+          className="w-full h-[120px] object-cover pointer-events-none"
+        />
+        <div className="pt-3 px-3 pb-3.5">
+          <div className="text-[15px] font-semibold text-[#FAFAFA] leading-tight">{name}</div>
+          {role && <div className="text-[13px] text-white/50 mt-0.5 leading-snug">{role}</div>}
+        </div>
+      </button>
+
+      <Drawer open={detailsOpen} onOpenChange={setDetailsOpen}>
+        <DrawerContent
+          className="max-h-[85dvh] border-white/10 bg-dlm-sunken text-[#FAFAFA]"
+          // No DrawerTrigger is used, so Radix would otherwise drop focus to
+          // <body> on close; return it to the card the reader was on.
+          onCloseAutoFocus={(e) => {
+            e.preventDefault();
+            cardRef.current?.focus();
+          }}
+        >
+          <DrawerHeader className="text-left flex gap-4 items-start">
+            <img
+              src={member.imageSrc}
+              alt={`Portrait of ${name}`}
+              draggable={false}
+              className="w-16 h-16 rounded-xl object-cover shrink-0"
+            />
+            <div className="min-w-0">
+              <DrawerTitle className="text-[18px] text-[#FAFAFA]">{name}</DrawerTitle>
+              <DrawerDescription className="text-white/60">
+                {role || "DreamLab specialist"}
+              </DrawerDescription>
+            </div>
+          </DrawerHeader>
+          <div className="px-4 overflow-y-auto space-y-3 text-[15px] leading-relaxed text-white/[0.78]">
+            {paragraphs.length > 0 ? (
+              paragraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)
+            ) : (
+              <p>No further details yet.</p>
+            )}
+          </div>
+          <DrawerFooter className="pb-[calc(16px+env(safe-area-inset-bottom))]">
+            <button
+              type="button"
+              aria-pressed={isSelected}
+              onClick={onToggle}
+              className={`flex items-center justify-center gap-2 h-[50px] rounded-[10px] text-[16px] font-semibold transition-colors ${
+                isSelected
+                  ? "border border-white/[0.16] text-[#FAFAFA] active:bg-white/[0.05]"
+                  : "bg-dlm-action text-dlm-ink active:bg-[#0891B2]"
+              }`}
+            >
+              {isSelected ? (
+                <>
+                  <Minus className="w-4 h-4" aria-hidden="true" /> Remove from roster
+                </>
+              ) : (
+                <>
+                  <Plus className="w-4 h-4" aria-hidden="true" /> Add to roster
+                </>
+              )}
+            </button>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+    </>
   );
 };
 
@@ -93,8 +180,10 @@ const TeamMobile = ({ teamMembers, loading, selectedMembers, onToggle, onEnquire
       <section id="main-content" className="pt-11 px-6 pb-6" aria-label="Team intro">
         <h1 className="text-m-h1s text-[#FAFAFA] [text-wrap:pretty]">{SITE_FACTS.specialists} specialists, one lab.</h1>
         <p className="text-m-body text-white/[0.62] mt-3">
-          Emmy nominees, PhD researchers and BAFTA-recognised talent. Tap anyone you'd want on your
-          project.
+          Emmy nominees, PhD researchers and BAFTA-recognised talent.
+        </p>
+        <p id={MOBILE_HINT_ID} className="text-[13px] text-white/50 mt-2">
+          Tap anyone to read about them. Press and hold to add them to your roster.
         </p>
       </section>
 
@@ -234,7 +323,8 @@ const Team = ({ initialMembers = [] }: { initialMembers?: TeamMemberData[] }) =>
 
   useEffect(() => {
     const loadTeamMembers = async () => {
-      setLoading(true);
+      // `loading` is already true only when no initialMembers were supplied;
+      // callers that pass them keep them on screen while the manifest refreshes.
       try {
         const manifestResponse = await fetch('/data/team/manifest.json');
         if (!manifestResponse.ok) {
@@ -277,9 +367,12 @@ const Team = ({ initialMembers = [] }: { initialMembers?: TeamMemberData[] }) =>
         const validMembers = loadedMembers.filter(Boolean) as TeamMemberData[];
         validMembers.sort((a, b) => parseInt(a.id) - parseInt(b.id));
 
-        setTeamMembers(validMembers);
+        // Every per-member fetch failing yields an empty list; treat that like
+        // a failed load rather than replacing members passed in as props.
+        if (validMembers.length > 0) setTeamMembers(validMembers);
       } catch (error) {
-        setTeamMembers([]);
+        // A failed refresh must not discard members we were handed as props;
+        // leave whatever is on screen in place.
       } finally {
         setLoading(false);
       }
