@@ -342,12 +342,21 @@ export function checkConfigMirrors(root) {
  * (post-Sprint-v12) while the relay var stayed empty, or an rp_id rename that
  * missed the auth worker and broke WebAuthn origin checks in production.
  *
+ *   [mesh].federated_kinds      <-> relay-worker [vars].MESH_FEDERATED_KINDS
+ *   [features].poker            <-> deploy.yml   env POKER ('on' when true)
+ *   [poker]                     <-> deploy.yml   env POKER_CONFIG_JSON
+ *
  * Deliberately NOT folded into `checkConfigMirrors` itself: that would
  * re-baseline its fixtures in config-mirrors.test.mjs and extend the
- * MIRROR_BEARING_KEYS sweep in the same stroke; deferred until a dream night
- * can see that test file. Also not yet compared: [mesh].federated_kinds <->
- * MESH_FEDERATED_KINDS (toml-lite integer-array fidelity unconfirmed) and
- * [nip05] (its dreamlab.toml section is still elided from source views).
+ * MIRROR_BEARING_KEYS sweep in the same stroke. The CLI runs both, so CI gates
+ * on both (estate register ER-23). toml-lite reads the integer array and the
+ * `citizens` inline table faithfully, so federated_kinds and [poker] are now
+ * compared. Still not compared: [nip05] (its dreamlab.toml section is still
+ * elided from source views).
+ *
+ * The federated-kinds and poker comparisons apply when either side carries the
+ * datum, so a tree without them (a minimal fixture) is not an error, but a
+ * datum on one side only is.
  */
 export function checkOperatorVarMirrors(root) {
   const errors = [];
@@ -434,6 +443,60 @@ export function checkOperatorVarMirrors(root) {
     `${WRANGLER.relay} [vars].MESH_ALLOWED_REMOTE_DIDS`,
     asCsv,
   );
+
+  // [mesh].federated_kinds is a set of integers; the relay var is its CSV.
+  if (toml.mesh?.federated_kinds !== undefined || relayVars.MESH_FEDERATED_KINDS !== undefined) {
+    compareVar(
+      "mesh-federated-kinds",
+      toml.mesh?.federated_kinds,
+      relayVars.MESH_FEDERATED_KINDS,
+      `${TOML_PATH} [mesh].federated_kinds`,
+      `${WRANGLER.relay} [vars].MESH_FEDERATED_KINDS`,
+      (v) => {
+        const csv = asCsv(v);
+        return csv === null ? null : csv.split(",").map(Number).sort((a, b) => a - b).join(",");
+      },
+    );
+  }
+
+  // [poker] is projected by hand into deploy.yml as POKER_CONFIG_JSON, and
+  // [features].poker into POKER. Compared as canonical JSON (keys sorted).
+  const deployText = readText(root, DEPLOY_PATH);
+  const deployEnv = deployText ? parseWorkflowEnv(deployText) : new Map();
+  const canonical = (v) => {
+    if (Array.isArray(v)) return v.map(canonical);
+    if (v && typeof v === "object") {
+      return Object.fromEntries(Object.keys(v).sort().map((k) => [k, canonical(v[k])]));
+    }
+    return v;
+  };
+  if (toml.poker !== undefined || deployEnv.has("POKER_CONFIG_JSON")) {
+    let projected = null;
+    const raw = deployEnv.get("POKER_CONFIG_JSON");
+    if (raw !== undefined) {
+      try {
+        projected = JSON.stringify(canonical(JSON.parse(raw)));
+      } catch (e) {
+        errors.push(`poker-config: ${DEPLOY_PATH} env POKER_CONFIG_JSON is not valid JSON: ${e.message}`);
+      }
+    }
+    compareVar(
+      "poker-config",
+      toml.poker === undefined ? undefined : JSON.stringify(canonical(toml.poker)),
+      raw === undefined ? undefined : projected,
+      `${TOML_PATH} [poker]`,
+      `${DEPLOY_PATH} env POKER_CONFIG_JSON`,
+    );
+  }
+  if (toml.features?.poker !== undefined || deployEnv.has("POKER")) {
+    compareVar(
+      "poker-feature",
+      toml.features?.poker === undefined ? undefined : toml.features.poker ? "on" : "off",
+      deployEnv.has("POKER") ? (deployEnv.get("POKER") === "on" ? "on" : "off") : undefined,
+      `${TOML_PATH} [features].poker`,
+      `${DEPLOY_PATH} env POKER`,
+    );
+  }
 
   return { ok: errors.length === 0, errors };
 }
