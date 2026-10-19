@@ -290,6 +290,12 @@ export function checkConfigMirrors(root) {
   compare("relay-url", "Nostr relay endpoint", [
     { where: `${TOML_PATH} [relay].url`, value: toml.relay?.url ?? null },
     { where: `${DEPLOY_PATH} env.VITE_RELAY_URL`, value: deployEnv.get("VITE_RELAY_URL") ?? null },
+    // The relay's own URL, which NIP-42 binds signed AUTH events to. Blank
+    // disables that check (the kit default), so it must track the endpoint.
+    {
+      where: `${WRANGLER.relay} [vars].RELAY_URL`,
+      value: wrangler.relay?.doc.vars?.RELAY_URL ?? null,
+    },
   ]);
   compare("pod-base-url", "Solid pod API base", [
     { where: `${TOML_PATH} [pod].base_url`, value: toml.pod?.base_url ?? null },
