@@ -42,6 +42,16 @@ ADMIN_PUBKEYS = "11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663
 # tests/ingress_mirror.rs keeps this equal to the TOML.
 INGRESS_RECIPIENTS = '[{"label":"site-inbox","pubkey":"11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c","role":"primary","authorised_by":"6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425a"},{"label":"junkiejarvis","pubkey":"2de44d5622eef79519ac078f6e227a85aecbaefd561e4e50c5f51dfadbf916e9","role":"agent","authorised_by":"6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425a"},{"label":"website-info","pubkey":"4ed429aa7f30d6e63c41be50685cffeb03cd7b07e37d37a0c4ae5321e642aad7","role":"copy","authorised_by":"6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425a"}]'
 
+# Content-free Web Push for the PWA (kit ADR-2023). STAGED: off until the operator
+# has generated a VAPID pair (cargo run -p nostr-bbs-relay-worker --example
+# vapid_keygen in the kit), set PUSH_ENABLED = "true" and VAPID_PUBLIC_KEY here, and
+# stored the private half as a Worker secret (`wrangler secret put VAPID_PRIVATE_KEY`
+# against dreamlab-nostr-relay). The private key never goes in this file.
+PUSH_ENABLED     = "false"
+VAPID_PUBLIC_KEY = ""
+VAPID_SUBJECT    = "https://dreamlab-ai.com"
+PUSH_MAX_FANOUT  = "100"
+
 # Mesh federation (PRD-010 Phase 3 / ADR-073)
 MESH_MODE               = "standalone"
 MESH_PEER_RELAYS        = ""
