@@ -15,6 +15,10 @@ command = "worker-build --release"
 # dreamlab.toml [encryption].enabled and window.__ENV__.ENCRYPTION_ENABLED in deploy.yml.
 ENCRYPTION_ENABLED = "true"
 RELAY_NAME       = "DreamLab Nostr Relay"
+# NIP-42 relay-tag scoping. The kit ships RELAY_URL = "" and the check is skipped
+# when blank, so a signed AUTH captured for another relay could be replayed here.
+# REQUIRED in nip42 mode (the kit's default); must be this relay's own wss URL.
+RELAY_URL        = "wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev"
 ALLOWED_ORIGIN   = "https://dreamlab-ai.com"
 ALLOWED_ORIGINS  = "https://dreamlab-ai.com,https://thedreamlab.uk,https://dreamlab-ai.github.io"
 
