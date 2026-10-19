@@ -58,3 +58,4 @@
 | 2026-10-15 | ci-workflows | VETOED: deploy/workers push paths ⊆ ci.yml now enforced by guard script+test+ci… | NONE | VETOED | yes | REJECT |  | 4436a9d056fa |  |  |  |
 | 2026-10-17 | site-build-content | WORKSHOP_META ids vs generated workshop-list unguarded; bench enforces equality | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/63 | yes | ACCEPT |  | 93e394e052da |  |  |  |
 | 2026-10-18 | operator-overlay | VETOED: branding.rs <-> dreamlab.toml [branding] parity unguarded at bench; now… | NONE | VETOED | yes | REJECT |  | f51542f545de |  |  |  |
+| 2026-10-19 | ci-workflows | VETOED: test-and-lint.yml gate-step/Summary-loop link unguarded; bench now… | NONE | NONE | yes | REJECT |  | 7e40e670da57 |  |  |  |
