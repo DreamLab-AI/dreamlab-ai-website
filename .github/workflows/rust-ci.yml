@@ -17,7 +17,7 @@ env:
   KIT_REPO: 'https://github.com/DreamLab-AI/nostr-rust-forum.git'
   # Pinned kit SHA — keep in lockstep with workers-deploy.yml/deploy.yml KIT_REF.
   # Cutover provenance: docs/architecture/kit-compatibility-record.md.
-  KIT_REF: '631c09f0352f60bd36cb654f9a81c96ca97bc63c'
+  KIT_REF: 'dfab37266fec84e00b3f9cab5720ec49038a5778'
 
 jobs:
   fmt:
