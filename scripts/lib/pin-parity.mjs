@@ -77,6 +77,26 @@ export function parseManifestRequirements(text) {
 }
 
 /**
+ * Every `nostr-bbs-*` crate the manifest carries a requirement line for — the
+ * kit family the overlay actually consumes, derived from the manifest itself
+ * rather than from the hand-maintained KIT_CRATES list. This is the inward
+ * direction of invariant 6: the gate checks every crate KIT_CRATES names
+ * against the manifest, lockfile and record, but nothing verified the list
+ * itself, so a kit crate added to the overlay without updating KIT_CRATES
+ * escaped the entire invariant — unpinned, unverified, silently. Comment
+ * prose mentioning a crate mid-sentence cannot match: only a `name =`
+ * requirement line counts, in any requirement form (string or inline table).
+ */
+export function parseManifestKitCrates(text) {
+  const out = new Set();
+  if (!text) return out;
+  const re = /^\s*(nostr-bbs-[a-z0-9-]+)\s*=/gm;
+  let m;
+  while ((m = re.exec(text)) !== null) out.add(m[1]);
+  return out;
+}
+
+/**
  * Parse the EXACT resolved version + registry checksum of each kit crate from
  * forum-config/Cargo.lock. This is the fact the old check never looked at: a
  * requirement range says what is *allowed*, the lockfile says what is *built*.
@@ -188,6 +208,24 @@ export function checkKitPins(root) {
   const reqs = parseManifestRequirements(manifestText);
   for (const crate of KIT_CRATES) {
     if (!reqs.has(crate)) errors.push(`${MANIFEST_PATH}: no requirement for ${crate}`);
+  }
+  // ── 3c. No kit-family crate may escape the KIT_CRATES enumeration ─────────
+  // The loop above is the outward direction (every governed crate must be
+  // required by the manifest); this is the inward one: every kit-family crate
+  // the manifest requires must be governed. The kit family is wider than the
+  // four governed crates (the manifest's own provenance names nostr-bbs-ascii),
+  // so a fifth dependency added in a repin without updating KIT_CRATES would
+  // otherwise drift through every check below unexamined.
+  if (manifestText !== null) {
+    for (const crate of parseManifestKitCrates(manifestText)) {
+      if (!KIT_CRATES.includes(crate)) {
+        errors.push(
+          `${MANIFEST_PATH}: kit-family crate ${crate} is required by the manifest ` +
+            `but absent from KIT_CRATES in scripts/lib/pin-parity.mjs — a crate the ` +
+            `gate does not enumerate is a crate the gate does not check`,
+        );
+      }
+    }
   }
   const exactPins = new Map();
   for (const [crate, req] of reqs) {
