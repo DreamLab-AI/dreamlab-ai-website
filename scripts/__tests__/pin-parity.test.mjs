@@ -13,6 +13,7 @@ import {
   findTagPinnedUses,
   parseKitRef,
   parseLockfileResolved,
+  parseManifestKitCrates,
   parseManifestRequirements,
   parseRecord,
 } from "../lib/pin-parity.mjs";
@@ -46,6 +47,18 @@ describe("parsers", () => {
     );
     expect(reqs.get("nostr-bbs-core")).toBe("=1.0.0-beta.10");
     expect(reqs.get("nostr-bbs-mesh")).toBe("1.0.0-beta.10");
+  });
+
+  it("enumerates every nostr-bbs-* requirement line, ignoring prose mentions", () => {
+    const names = parseManifestKitCrates(
+      [
+        "# server-side ASCII rendering (nostr-bbs-ascii + /ascii routes)",
+        'nostr-bbs-core = "=1.0.0-beta.16"',
+        'serde = "1"',
+        'nostr-bbs-mesh = { git = "https://example.invalid/kit" }',
+      ].join("\n"),
+    );
+    expect([...names].sort()).toEqual(["nostr-bbs-core", "nostr-bbs-mesh"]);
   });
 
   it("reads resolved version, checksum and source per package block", () => {
@@ -160,6 +173,21 @@ describe("deliberately inconsistent pins are rejected", () => {
       );
     });
     expectDrift(checkKitPins(root), "floating requirement range");
+  });
+
+  // Invariant 6 ran one way only: every KIT_CRATES entry must appear in the
+  // manifest. A kit-family crate the manifest consumes that the list does not
+  // name was invisible to every check below — the enumeration itself was the
+  // unguarded seam.
+  it("rejects a kit-family crate the manifest requires but KIT_CRATES does not govern", () => {
+    const root = makeFixtureRepo((r) => {
+      r.replaceOnce(
+        "forum-config/Cargo.toml",
+        `nostr-bbs-rate-limit = "=${LIVE_VERSION}"`,
+        `nostr-bbs-rate-limit = "=${LIVE_VERSION}"\nnostr-bbs-ascii = "=${LIVE_VERSION}"`,
+      );
+    });
+    expectDrift(checkKitPins(root), "absent from KIT_CRATES");
   });
 
   // Prose rot — the 2026-09-28 defect class (hand-fixed in e4c22c7): the
