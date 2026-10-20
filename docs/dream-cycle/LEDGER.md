@@ -59,3 +59,4 @@
 | 2026-10-17 | site-build-content | WORKSHOP_META ids vs generated workshop-list unguarded; bench enforces equality | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/63 | yes | ACCEPT |  | 93e394e052da |  |  |  |
 | 2026-10-18 | operator-overlay | VETOED: branding.rs <-> dreamlab.toml [branding] parity unguarded at bench; now… | NONE | VETOED | yes | REJECT |  | f51542f545de |  |  |  |
 | 2026-10-19 | ci-workflows | VETOED: test-and-lint.yml gate-step/Summary-loop link unguarded; bench now… | NONE | NONE | yes | REJECT |  | 7e40e670da57 |  |  |  |
+| 2026-10-20 | kit-pin-integrity | KIT_CRATES never checked vs manifest kit deps; ungoverned nostr-bbs-* now fails | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/71 | yes | ACCEPT |  | 77f79bcde0d7 |  |  |  |
