@@ -60,3 +60,4 @@
 | 2026-10-18 | operator-overlay | VETOED: branding.rs <-> dreamlab.toml [branding] parity unguarded at bench; now… | NONE | VETOED | yes | REJECT |  | f51542f545de |  |  |  |
 | 2026-10-19 | ci-workflows | VETOED: test-and-lint.yml gate-step/Summary-loop link unguarded; bench now… | NONE | NONE | yes | REJECT |  | 7e40e670da57 |  |  |  |
 | 2026-10-20 | kit-pin-integrity | KIT_CRATES never checked vs manifest kit deps; ungoverned nostr-bbs-* now fails | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/71 | yes | ACCEPT |  | 77f79bcde0d7 |  |  |  |
+| 2026-10-22 | operator-overlay | branding.rs and deploy.yml BBS_* branding unguarded; bench now binds the pair | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/73 | yes | ACCEPT |  | 73e6009b4a4f |  |  |  |
