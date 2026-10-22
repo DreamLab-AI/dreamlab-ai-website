@@ -350,7 +350,10 @@ jobs:
           FAILED_WORKERS=()
           for worker in dreamlab-auth-api dreamlab-pod-api dreamlab-search-api dreamlab-nostr-relay dreamlab-link-preview; do
             URL="https://${worker}.${{ env.CF_SUBDOMAIN }}.workers.dev/health"
-            STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 "$URL" || echo "000")
+            # Retry: a worker's Durable Object is cold right after a deploy and the
+            # first request can take longer than one probe allows; a 000 here was
+            # a connection that never completed, not an unhealthy answer.
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 --retry 3 --retry-all-errors --retry-delay 5 "$URL" || echo "000")
             echo "${worker}: HTTP ${STATUS}"
             if [ "$STATUS" = "200" ]; then
               echo "  PASS"
