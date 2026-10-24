@@ -140,6 +140,24 @@ export function parseRecord(text) {
 }
 
 /**
+ * Count how many RESOLVED lines the record carries per crate. parseRecord
+ * keeps only the LAST line per crate, so a repin that appends the fresh
+ * RESOLVED line without deleting the previous one hides the stale line from
+ * every comparison in checkKitPins — the record-side twin of the duplicate
+ * [[package]] block that countKitPackageBlocks guards on the lockfile side.
+ */
+export function countRecordResolvedLines(text) {
+  const counts = new Map();
+  if (!text) return counts;
+  const re = /^RESOLVED\s+(\S+)\s+\S+\s+[0-9a-f]{64}\s*$/gm;
+  let m;
+  while ((m = re.exec(text)) !== null) {
+    counts.set(m[1], (counts.get(m[1]) ?? 0) + 1);
+  }
+  return counts;
+}
+
+/**
  * Run the full dual-pin invariant against a repository root.
  * Returns { ok, errors: string[], summary: string[] } — never throws for a
  * drift condition, so callers can render every problem at once.
@@ -300,6 +318,22 @@ export function checkKitPins(root) {
   for (const crate of record.resolved.keys()) {
     if (!KIT_CRATES.includes(crate)) {
       errors.push(`${RECORD_PATH}: RESOLVED line for unknown crate ${crate}`);
+    }
+  }
+
+  // A second RESOLVED line for one crate is the record-side twin of the
+  // lockfile's duplicate [[package]] block: parseRecord keeps only the LAST
+  // line per crate, so a stale line a repin left behind is invisible to
+  // every comparison above. Exactly one RESOLVED line per crate is the
+  // record's own invariant; the duplicate-block guard covers the lockfile.
+  const resolvedCounts = countRecordResolvedLines(recordText);
+  for (const crate of resolvedCounts.keys()) {
+    if (resolvedCounts.get(crate) > 1) {
+      errors.push(
+        `${RECORD_PATH}: ${crate} has ${resolvedCounts.get(crate)} RESOLVED lines — ` +
+          `exactly one per crate; only the last line is compared, so an ` +
+          `earlier stale line drifts unseen`,
+      );
     }
   }
 

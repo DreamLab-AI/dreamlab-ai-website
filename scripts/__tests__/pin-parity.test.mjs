@@ -10,6 +10,7 @@ import {
   checkActionPins,
   checkKitPins,
   countKitPackageBlocks,
+  countRecordResolvedLines,
   findTagPinnedUses,
   parseKitRef,
   parseLockfileResolved,
@@ -100,6 +101,25 @@ dependencies = [
     expect(rec.sha).toBe("deadbeef");
     expect(rec.version).toBe("1.0.0");
     expect(rec.resolved.get("nostr-bbs-core")).toEqual({
+      version: "1.0.0",
+      checksum: "b".repeat(64),
+    });
+  });
+
+  it("counts duplicate RESOLVED lines the resolved map collapses", () => {
+    const record = [
+      "CANONICAL_KIT_SHA=deadbeef",
+      "CANONICAL_KIT_VERSION=1.0.0",
+      `RESOLVED nostr-bbs-core 1.0.0-beta.8 ${"d".repeat(64)}`,
+      `RESOLVED nostr-bbs-core 1.0.0 ${"b".repeat(64)}`,
+      `RESOLVED nostr-bbs-mesh 1.0.0 ${"c".repeat(64)}`,
+    ].join("\n");
+    const counts = countRecordResolvedLines(record);
+    expect(counts.get("nostr-bbs-core")).toBe(2);
+    expect(counts.get("nostr-bbs-mesh")).toBe(1);
+    // The resolved map keeps only the LAST line per crate — the fact that
+    // makes the count necessary rather than redundant.
+    expect(parseRecord(record).resolved.get("nostr-bbs-core")).toEqual({
       version: "1.0.0",
       checksum: "b".repeat(64),
     });
@@ -247,6 +267,23 @@ describe("deliberately inconsistent pins are rejected", () => {
       );
     });
     expectDrift(checkKitPins(root), "cannot be pin-verified");
+  });
+
+  // The record-side twin of the lockfile duplicate-block guard: a repin that
+  // appends the fresh RESOLVED line without deleting the previous one leaves
+  // a stale line that last-wins parsing hides from every comparison. The
+  // stale line is inserted FIRST so that, without the duplicate count, this
+  // fixture would pass exactly as the live repository does today.
+  it("rejects a record carrying two RESOLVED lines for one crate", () => {
+    const root = makeFixtureRepo((r) => {
+      r.edit("docs/architecture/kit-compatibility-record.md", (t) =>
+        t.replace(
+          /^(RESOLVED\s+nostr-bbs-core\s+\S+\s+[0-9a-f]{64})\s*$/m,
+          `RESOLVED nostr-bbs-core 1.0.0-beta.8 ${"d".repeat(64)}\n$1`,
+        ),
+      );
+    });
+    expectDrift(checkKitPins(root), "nostr-bbs-core has 2 RESOLVED lines");
   });
 
   it("rejects a record missing a RESOLVED line for a consumed crate", () => {
