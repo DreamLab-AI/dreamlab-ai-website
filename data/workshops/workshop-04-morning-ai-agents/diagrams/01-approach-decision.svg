@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 416" role="img" aria-labelledby="dg-title dg-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="dg-title">Choosing your agent approach</title>
+  <desc id="dg-desc">Decision tree: a coding agent points to Claude Code, Codex CLI or Aider (or the Agent SDK for custom builds); tool integration points to MCP servers with the Claude API; multi-agent orchestration points to workflow frameworks; otherwise use the direct API with tool use.</desc>
+
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- container -->
+  <rect x="8" y="8" width="944" height="400" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">CHOOSING YOUR APPROACH</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <!-- decision diamonds -->
+  <g text-anchor="middle">
+    <rect x="92" y="124" width="104" height="104" rx="4" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)" transform="rotate(45 144 176)"/>
+    <text x="144" y="172" font-size="12" font-weight="600" fill="#F5F5F5">Coding</text>
+    <text x="144" y="188" font-size="12" font-weight="600" fill="#F5F5F5">agent?</text>
+
+    <rect x="348" y="124" width="104" height="104" rx="4" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)" transform="rotate(45 400 176)"/>
+    <text x="400" y="172" font-size="12" font-weight="600" fill="#F5F5F5">Need</text>
+    <text x="400" y="188" font-size="12" font-weight="600" fill="#F5F5F5">tools?</text>
+
+    <rect x="604" y="124" width="104" height="104" rx="4" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)" transform="rotate(45 656 176)"/>
+    <text x="656" y="172" font-size="12" font-weight="600" fill="#F5F5F5">Multi-</text>
+    <text x="656" y="188" font-size="12" font-weight="600" fill="#F5F5F5">agent?</text>
+  </g>
+
+  <!-- edges -->
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2">
+    <path d="M220,176 L320,176" marker-end="url(#arr)"/>
+    <path d="M476,176 L576,176" marker-end="url(#arr)"/>
+    <path d="M144,252 L144,292" marker-end="url(#arr)"/>
+    <path d="M400,252 C400,272 380,280 372,292" marker-end="url(#arr)"/>
+    <path d="M656,252 C656,272 616,280 600,292" marker-end="url(#arr)"/>
+    <path d="M732,176 C788,180 808,252 816,288" marker-end="url(#arr)"/>
+  </g>
+  <g font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF" text-anchor="middle">
+    <text x="270" y="168">no</text>
+    <text x="526" y="168">no</text>
+    <text x="160" y="276">yes</text>
+    <text x="412" y="276">yes</text>
+    <text x="648" y="280">yes</text>
+    <text x="792" y="212">no</text>
+  </g>
+
+  <!-- outcome cards -->
+  <g text-anchor="middle">
+    <rect x="48" y="296" width="192" height="88" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="144" y="332" font-size="14" font-weight="600" fill="#F5F5F5">Claude Code · Aider</text>
+    <text x="144" y="356" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">custom → Agent SDK</text>
+
+    <rect x="272" y="296" width="192" height="88" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="368" y="332" font-size="14" font-weight="600" fill="#F5F5F5">MCP + Claude API</text>
+    <text x="368" y="356" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">MCP servers</text>
+
+    <rect x="496" y="296" width="192" height="88" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="592" y="332" font-size="14" font-weight="600" fill="#F5F5F5">Agent Frameworks</text>
+    <text x="592" y="356" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">workflows · LangGraph</text>
+
+    <rect x="720" y="296" width="192" height="88" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="816" y="332" font-size="14" font-weight="600" fill="#F5F5F5">Direct API</text>
+    <text x="816" y="356" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">tool use, no framework</text>
+  </g>
+</svg>

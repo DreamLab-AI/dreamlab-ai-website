@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Redirecting...</title>
+<script>
+  (function(){
+    var loc = window.location;
+    var path = loc.pathname;
+    if (path === '/bbs' || path.startsWith('/bbs/')) {
+      loc.replace(loc.protocol + '//' + loc.host + '/community/bbs/');
+    } else if (path.startsWith('/community')) {
+      var sub = path.slice('/community'.length) || '/';
+      loc.replace(
+        loc.protocol + '//' + loc.host +
+        '/community/?__p=' + encodeURIComponent(sub + loc.search + loc.hash)
+      );
+    } else {
+      loc.replace(
+        loc.protocol + '//' + loc.host +
+        '/?__p=' + encodeURIComponent(path + loc.search + loc.hash)
+      );
+    }
+  })();
+</script>
+</head><body></body></html>

@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 592" role="img" aria-labelledby="dg-title dg-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="dg-title">Cost-aware model routing</title>
+  <desc id="dg-desc">The orchestrator, guarded by a safety layer of token budget, iteration limiter and audit logger, classifies task complexity and routes simple work to Haiku, moderate work to Sonnet and complex work to Opus; a synthesis agent merges the results into the final output with a cost report.</desc>
+
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- container -->
+  <rect x="8" y="8" width="944" height="576" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">COST-AWARE MODEL ROUTING</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <!-- orchestrator (focal) -->
+  <g text-anchor="middle">
+    <rect x="384" y="96" width="192" height="56" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="480" y="120" font-size="15" font-weight="600" fill="#F5F5F5">Orchestrator</text>
+    <text x="480" y="140" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">receives user task</text>
+  </g>
+
+  <!-- safety layer (dashed) -->
+  <g text-anchor="middle">
+    <rect x="688" y="96" width="224" height="136" rx="8" fill="none" stroke="rgba(255,255,255,0.20)" stroke-dasharray="4 3"/>
+    <text x="800" y="124" font-size="14" font-weight="600" fill="#F5F5F5">Safety Layer</text>
+    <text x="800" y="152" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">token budget</text>
+    <text x="800" y="176" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">iteration limiter</text>
+    <text x="800" y="200" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">audit logger</text>
+  </g>
+  <path d="M576,124 L684,124" fill="none" stroke="rgba(255,255,255,0.20)" stroke-dasharray="4 3"/>
+
+  <!-- classifier -->
+  <g text-anchor="middle">
+    <rect x="384" y="184" width="192" height="56" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="480" y="208" font-size="14" font-weight="600" fill="#F5F5F5">Complexity Classifier</text>
+    <text x="480" y="228" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">route by difficulty</text>
+  </g>
+
+  <!-- model subagents -->
+  <g text-anchor="middle">
+    <rect x="112" y="296" width="208" height="80" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="216" y="330" font-size="14" font-weight="600" fill="#F5F5F5">Haiku Subagent</text>
+    <text x="216" y="354" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">cheap · fast</text>
+
+    <rect x="376" y="296" width="208" height="80" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="480" y="330" font-size="14" font-weight="600" fill="#F5F5F5">Sonnet Subagent</text>
+    <text x="480" y="354" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">balanced</text>
+
+    <rect x="640" y="296" width="208" height="80" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="744" y="330" font-size="14" font-weight="600" fill="#F5F5F5">Opus Subagent</text>
+    <text x="744" y="354" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">deep reasoning</text>
+  </g>
+
+  <!-- routing arrows + labels -->
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2">
+    <path d="M432,240 C368,260 280,268 232,292" marker-end="url(#arr)"/>
+    <path d="M480,240 L480,292" marker-end="url(#arr)"/>
+    <path d="M528,240 C592,260 680,268 728,292" marker-end="url(#arr)"/>
+  </g>
+  <g font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF" text-anchor="middle">
+    <text x="300" y="264">simple</text>
+    <text x="504" y="268">moderate</text>
+    <text x="660" y="264">complex</text>
+  </g>
+
+  <!-- synthesis -->
+  <g text-anchor="middle">
+    <rect x="384" y="424" width="192" height="56" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="480" y="448" font-size="14" font-weight="600" fill="#F5F5F5">Synthesis Agent</text>
+    <text x="480" y="468" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">merge results</text>
+  </g>
+
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2">
+    <path d="M216,376 C280,400 384,404 432,420" marker-end="url(#arr)"/>
+    <path d="M480,376 L480,420" marker-end="url(#arr)"/>
+    <path d="M744,376 C680,400 576,404 528,420" marker-end="url(#arr)"/>
+    <path d="M480,480 L480,508" marker-end="url(#arr)"/>
+  </g>
+
+  <!-- output -->
+  <g text-anchor="middle">
+    <rect x="336" y="512" width="288" height="56" rx="8" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.35)"/>
+    <text x="480" y="536" font-size="14" font-weight="600" fill="#F5F5F5">Final Output</text>
+    <text x="480" y="556" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">+ cost report</text>
+  </g>
+</svg>

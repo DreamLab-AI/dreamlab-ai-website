@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 608" role="img" aria-labelledby="dg-title dg-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="dg-title">Production multi-agent system</title>
+  <desc id="dg-desc">A user request enters the orchestrator, passes the safety layer of cost controller, approval gate and audit logger, and is dispatched to research, code and review agents — each on its own model and MCP server — whose results are collected into the final output.</desc>
+
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- container -->
+  <rect x="8" y="8" width="944" height="592" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">PRODUCTION MULTI-AGENT SYSTEM</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <!-- orchestrator (focal) -->
+  <g text-anchor="middle">
+    <rect x="384" y="96" width="192" height="64" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="480" y="124" font-size="15" font-weight="600" fill="#F5F5F5">Orchestrator</text>
+    <text x="480" y="146" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">handles user requests</text>
+  </g>
+
+  <!-- safety layer (dashed) -->
+  <g text-anchor="middle">
+    <rect x="688" y="96" width="224" height="152" rx="8" fill="none" stroke="rgba(255,255,255,0.20)" stroke-dasharray="4 3"/>
+    <text x="800" y="128" font-size="14" font-weight="600" fill="#F5F5F5">Safety Layer</text>
+    <text x="800" y="156" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">cost controller</text>
+    <text x="800" y="180" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">approval gate</text>
+    <text x="800" y="204" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">audit logger</text>
+  </g>
+  <path d="M576,128 L684,128" fill="none" stroke="rgba(255,255,255,0.20)" stroke-dasharray="4 3"/>
+
+  <!-- dispatcher -->
+  <g text-anchor="middle">
+    <rect x="384" y="192" width="192" height="56" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="480" y="216" font-size="14" font-weight="600" fill="#F5F5F5">Task Dispatcher</text>
+    <text x="480" y="236" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">within budget</text>
+  </g>
+
+  <!-- agents -->
+  <g text-anchor="middle">
+    <rect x="112" y="288" width="224" height="88" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="224" y="324" font-size="14" font-weight="600" fill="#F5F5F5">Research Agent</text>
+    <text x="224" y="348" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">sonnet · search MCP</text>
+
+    <rect x="368" y="288" width="224" height="88" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="480" y="324" font-size="14" font-weight="600" fill="#F5F5F5">Code Agent</text>
+    <text x="480" y="348" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">sonnet · filesystem MCP</text>
+
+    <rect x="624" y="288" width="224" height="88" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="736" y="324" font-size="14" font-weight="600" fill="#F5F5F5">Review Agent</text>
+    <text x="736" y="348" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">haiku · github MCP</text>
+  </g>
+
+  <!-- collector -->
+  <g text-anchor="middle">
+    <rect x="384" y="416" width="192" height="56" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="480" y="440" font-size="14" font-weight="600" fill="#F5F5F5">Result Collector</text>
+    <text x="480" y="460" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">approve · audit</text>
+  </g>
+
+  <!-- output -->
+  <g text-anchor="middle">
+    <rect x="352" y="512" width="256" height="64" rx="8" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.35)"/>
+    <text x="480" y="540" font-size="15" font-weight="600" fill="#F5F5F5">Final Output</text>
+    <text x="480" y="562" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">approved &amp; logged</text>
+  </g>
+
+  <!-- arrows -->
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2">
+    <path d="M480,160 L480,188" marker-end="url(#arr)"/>
+    <path d="M432,248 C384,264 288,268 240,284" marker-end="url(#arr)"/>
+    <path d="M480,248 L480,284" marker-end="url(#arr)"/>
+    <path d="M528,248 C576,264 672,268 720,284" marker-end="url(#arr)"/>
+    <path d="M240,376 C288,396 384,400 432,414" marker-end="url(#arr)"/>
+    <path d="M480,376 L480,412" marker-end="url(#arr)"/>
+    <path d="M720,376 C672,396 576,400 528,414" marker-end="url(#arr)"/>
+    <path d="M480,472 L480,508" marker-end="url(#arr)"/>
+  </g>
+</svg>

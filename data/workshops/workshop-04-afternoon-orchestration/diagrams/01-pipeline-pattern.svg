@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 240" role="img" aria-labelledby="dg-title dg-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="dg-title">Pipeline pattern</title>
+  <desc id="dg-desc">Input flows through four sequential stages — extract, transform, validate, output — each stage feeding the next.</desc>
+
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- container -->
+  <rect x="8" y="8" width="944" height="224" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">PIPELINE PATTERN</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <!-- input chip -->
+  <g text-anchor="middle">
+    <rect x="48" y="120" width="112" height="56" rx="8" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.35)"/>
+    <text x="104" y="152" font-size="13" font-weight="600" fill="#F5F5F5">Input</text>
+  </g>
+
+  <!-- stages -->
+  <g text-anchor="middle" font-size="13" font-weight="600" fill="#F5F5F5">
+    <rect x="200" y="112" width="152" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="276" y="152">1 · Extract</text>
+
+    <rect x="384" y="112" width="152" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="460" y="152">2 · Transform</text>
+
+    <rect x="568" y="112" width="152" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="644" y="152">3 · Validate</text>
+
+    <rect x="752" y="112" width="152" height="72" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="828" y="152">4 · Output</text>
+  </g>
+
+  <!-- arrows -->
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2">
+    <path d="M160,148 L196,148" marker-end="url(#arr)"/>
+    <path d="M352,148 L380,148" marker-end="url(#arr)"/>
+    <path d="M536,148 L564,148" marker-end="url(#arr)"/>
+    <path d="M720,148 L748,148" marker-end="url(#arr)"/>
+  </g>
+</svg>
