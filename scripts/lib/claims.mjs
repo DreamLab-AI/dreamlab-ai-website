@@ -93,6 +93,12 @@ export async function checkClaims(claims, register, opts = {}) {
   let jev = "flag-off";
   try {
     const r = resolveJev(env, { prefix: FLAG_PREFIX, localOnly: false });
+    // Jev may only judge a claim against operator-authored evidence. With no
+    // feature notes it would be ungrounded model opinion, so do not ask.
+    if (r.ok && !(register?.features?.length > 0)) {
+      jevLog(log, QUESTION_SET, "no-evidence");
+      return { results, advisory, jev: "no-evidence" };
+    }
     if (!r.ok) {
       jev = r.reason;
       if (r.reason !== "flag-off") jevLog(log, QUESTION_SET, r.reason);
@@ -108,7 +114,7 @@ export async function checkClaims(claims, register, opts = {}) {
       const s = readChoice(out.answers, "status", keys);
       const e = readNoul(out.answers, "evidence_sufficient");
       if (!s || e === null) { jevLog(log, QUESTION_SET, "malformed"); jev = "malformed"; continue; }
-      if (s.confidence < floor) { jevLog(log, QUESTION_SET, "low-confidence"); continue; }
+      if (s.confidence < floor || e < 0.5) { jevLog(log, QUESTION_SET, "low-confidence"); continue; }
       const disagrees = res.status !== "unclassified" && res.status !== s.key;
       if (res.status === "unclassified" || disagrees) {
         advisory.push({

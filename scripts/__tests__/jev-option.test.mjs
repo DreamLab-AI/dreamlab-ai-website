@@ -221,6 +221,24 @@ describe('DW-06 claim checker', () => {
     expect(report).toContain('advisory only, never a verdict');
   });
 
+  test('no feature notes in the register => no request is made (ungrounded)', async () => {
+    const env = { DREAMLAB_JEV: '1', DREAMLAB_JEV_ENDPOINT: 'http://x' };
+    const spy = [];
+    const answers = { status: { type: 'choice', choice: 'supported_here', confidence: 0.9 }, evidence_sufficient: { type: 'noul', noul: 0.9 } };
+    const r = await checkClaims(claims, { features: [], claims: register.claims }, { env, fetchImpl: okFetch(answers, spy) });
+    expect(spy).toHaveLength(0);
+    expect(r.advisory).toEqual([]);
+    expect(r.jev).toBe('no-evidence');
+    expect(r.results).toEqual((await checkClaims(claims, { features: [], claims: register.claims }, { env: {} })).results);
+  });
+
+  test('insufficient evidence suppresses the advisory', async () => {
+    const env = { DREAMLAB_JEV: '1', DREAMLAB_JEV_ENDPOINT: 'http://x' };
+    const answers = { status: { type: 'choice', choice: 'supported_here', confidence: 0.9 }, evidence_sufficient: { type: 'noul', noul: 0.2 } };
+    const r = await checkClaims(claims, register, { env, fetchImpl: okFetch(answers) });
+    expect(r.advisory).toEqual([]);
+  });
+
   test('agreement with the register produces no note', async () => {
     const env = { DREAMLAB_JEV: '1', DREAMLAB_JEV_ENDPOINT: 'http://x' };
     const answers = { status: { type: 'choice', choice: 'upstream_only', confidence: 0.9 }, evidence_sufficient: { type: 'noul', noul: 0.7 } };
