@@ -23,7 +23,9 @@ export function digestLines(fresh, maxItems = 25) {
     const source = cleanField(f.source, 40);
     const detail = cleanField(f.detail, 60);
     const excerpt = cleanField(f.excerpt, 160);
-    return `• [${cleanField(f.kind, 20)}${source ? ' · ' + source : ''}] ${who || '(anonymous)'}${detail ? ' · ' + detail : ''}${excerpt ? `\n  “${excerpt}”` : ''}`;
+    // Optional Jev annotation (scripts/lib/enquiry-topic.mjs). Absent => unchanged output.
+    const topic = cleanField(f.topic, 40);
+    return `• [${cleanField(f.kind, 20)}${source ? ' · ' + source : ''}] ${who || '(anonymous)'}${detail ? ' · ' + detail : ''}${topic ? ' · ~' + topic : ''}${excerpt ? `\n  “${excerpt}”` : ''}`;
   });
   if (fresh.length > maxItems) lines.push(`… and ${fresh.length - maxItems} more (still in the relay inbox)`);
   return lines;

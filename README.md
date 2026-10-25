@@ -114,6 +114,18 @@ These repository screenshots show earlier branding, zone labels and UI states. T
 
 Use [the baseline](docs/BASELINE-architecture.md), [identity/zones](docs/IDENTITY-zones.md), [security overview](docs/security/SECURITY_OVERVIEW.md), [deployment guide](docs/deployment/README.md) and [decision ledger](docs/adr/README.md) for their respective contracts. Older July maturity tables and pin values do not describe current source.
 
+## Jev option (experimental, off by default)
+
+Two operator-side uses of TypeSafe System One typed decisions (Choice / Score / Noul). Both are **proposed research candidates with no measured uplift**; confidence floors are unfitted. Neither runs in the browser bundle, so the vendor key never reaches a visitor. Neither is part of `build`, `postbuild` or CI.
+
+Flag: `DREAMLAB_JEV=1` (default off; with it unset no request is built and nothing leaves the process). Endpoint, first match wins, otherwise Jev is unavailable and behaviour is unchanged: `DREAMLAB_JEV_ENDPOINT` (+ `DREAMLAB_JEV_MODEL`, `DREAMLAB_JEV_KEY_ENV` naming the variable that holds a bearer token); the agentbox loopback proxy (`AGENTBOX_SYSTEM_ONE_PROXY=1`, `AGENTBOX_SYSTEM_ONE_ENDPOINT`, `AGENTBOX_SYSTEM_ONE_MODEL`, no auth header); `https://api.typesafe.ai/v1/systemone` with `TYPESAFE_API_KEY`. Hard 4 s deadline, no retries. Fallback reasons (logged, never request content): `flag-off`, `no-endpoint`, `timeout`, `http-<code>`, `malformed`, `low-confidence`.
+
+**DW-02-S1-01, enquiry topic tag (local-only).** The contact form has no server: the browser gift-wraps the enquiry straight to the relay (`src/pages/Contact.tsx`, `src/lib/nostr.ts`). The only operator-side code holding decrypted enquiries is the nightly inbox watch, so that is where this sits. For `enquiry` entries only, `scripts/lib/enquiry-topic.mjs` asks Jev for one topic from the form's own catalogue (`ENQUIRY_TYPES`, kept in step by a test) and whether a needed fact is missing, and the digest line gains ` · ~<topic>[ · needs-info]`. What leaves: the message text (first 1,500 characters) and the type the sender picked; never name or email. Because this is decrypted private mail it is local-only: the public vendor endpoint is never used, an explicit endpoint needs `DREAMLAB_JEV_LOCAL=1`, the proxy needs `AGENTBOX_SYSTEM_ONE_BACKEND_LOCAL=1`. At most 10 enquiries are tagged per run; floor `DREAMLAB_JEV_TOPIC_MIN_CONFIDENCE` (default 0.5). Delivery, the sender's own choice, consent, state persistence and the exit code are untouched, and nothing is sent to a CRM or replied to. Note the form's consent wording does not mention a third-party model; enable this only against a local backend.
+
+**DW-06-S1-01, claim evidence checker (public data).** `npm run check:claims [-- --json] [-- file.md ...]` extracts list-item claims from `README.md` and classifies each against the deterministic register `docs/claims-register.json` (`{features:[{id,owner,summary}], claims:[{match,status,evidence}]}`, statuses `supported_here | upstream_only | planned | stale | unsupported`). The register is authoritative; there is no register file in this commit, so until one is authored every claim reports `unclassified`. With `DREAMLAB_JEV=1` Jev adds *advisory* notes: a suggestion for an unclassified claim, or a disagreement with the register above `DREAMLAB_JEV_CLAIM_MIN_CONFIDENCE` (default 0.6). It never edits copy, never fails the build (always exits 0), and is not deployment evidence. At most 25 claims per run.
+
+Tests: `npx vitest run scripts/__tests__/jev-option.test.mjs` (transport mocked; no network).
+
 ## Licence
 
 This repository is **dual-licensed by surface**:

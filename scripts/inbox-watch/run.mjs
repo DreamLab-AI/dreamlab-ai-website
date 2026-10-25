@@ -34,6 +34,7 @@ import { finalizeEvent, generateSecretKey, getPublicKey, verifyEvent } from "nos
 import * as nip17 from "nostr-tools/nip17";
 import { disclosureProblem, ingressProblem } from "../lib/website-info.mjs";
 import { digestLines, deliveryOutcome, nextUntil } from "../lib/digest.mjs";
+import { tagEnquiries } from "../lib/enquiry-topic.mjs";
 import * as nip44 from "nostr-tools/nip44";
 
 const DRY = process.argv.includes("--dry-run");
@@ -209,6 +210,8 @@ function classify(rumor) {
           email: p.email || "",
           detail: p.engagement_type || "",
           excerpt: String(p.message || "").replace(/\s+/g, " ").slice(0, 160),
+          // Longer copy for the optional Jev topic tag only; never rendered.
+          excerptFull: String(p.message || "").replace(/\s+/g, " ").slice(0, 1500),
         };
       }
     } catch {
@@ -348,7 +351,9 @@ async function main() {
     if (fresh.length) {
       lines.push("", `${fresh.length} new: ${Object.entries(counts).map(([k, n]) => `${n} ${k}`).join(", ")}`);
       // Sender-controlled text: flattened, capped and bounded (lib/digest.mjs).
-      lines.push(...digestLines(fresh));
+      // Jev option (off by default, DREAMLAB_JEV=1): adds a topic tag to enquiry
+      // lines only. Never throws; unchanged output on any fallback.
+      lines.push(...digestLines(await tagEnquiries(fresh)));
     } else {
       lines.push("", "No new messages.");
     }
