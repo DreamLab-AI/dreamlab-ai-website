@@ -62,3 +62,4 @@
 | 2026-10-20 | kit-pin-integrity | KIT_CRATES never checked vs manifest kit deps; ungoverned nostr-bbs-* now fails | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/71 | yes | ACCEPT |  | 77f79bcde0d7 |  |  |  |
 | 2026-10-22 | operator-overlay | branding.rs and deploy.yml BBS_* branding unguarded; bench now binds the pair | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/73 | yes | ACCEPT |  | 73e6009b4a4f |  |  |  |
 | 2026-10-24 | kit-pin-integrity | duplicate RESOLVED record lines collapsed last-wins; gate now fails naming them | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/77 | yes | ACCEPT |  | 3456a87f4126 |  |  |  |
+| 2026-10-25 | site-build-content | hand-written course index workshop links unguarded; inventory now binds them | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/78 | yes | ACCEPT |  | e3a61ff1ac2b |  |  |  |
