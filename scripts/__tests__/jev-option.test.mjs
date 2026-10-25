@@ -246,3 +246,38 @@ describe('DW-06 claim checker', () => {
     expect(on.advisory).toEqual([]);
   });
 });
+
+describe('DW-06 seeded claims register (real README + docs/claims-register.json)', () => {
+  const rd = (f) => fs.readFileSync(f, 'utf8'); // vitest runs from the repo root
+  const register = JSON.parse(rd('docs/claims-register.json'));
+  const claims = extractClaims(rd('README.md'), 'README.md');
+  const env = { DREAMLAB_JEV: '1', DREAMLAB_JEV_ENDPOINT: 'http://x' };
+
+  test('every register evidence citation resolves to an existing file and line', () => {
+    for (const c of register.claims) {
+      for (const m of c.evidence.matchAll(/([\w./-]+\.(?:toml|mjs)):(\d+)/g)) {
+        const lines = rd(m[1]).split('\n');
+        expect(lines.length).toBeGreaterThanOrEqual(Number(m[2]));
+      }
+    }
+  });
+
+  test('flag-off: only the two cited claims classify; verdicts and report are stable', async () => {
+    const off = await checkClaims(claims, register, { env: {} });
+    expect(off.jev).toBe('flag-off');
+    expect(off.advisory).toEqual([]);
+    expect(off.results.filter((r) => r.status === 'supported_here').map((r) => r.line)).toEqual([80, 83]);
+    expect(off.results.filter((r) => r.status === 'unclassified')).toHaveLength(claims.length - 2);
+  });
+
+  test('accept path via mocked transport: advisory on an uncited claim, verdicts unchanged', async () => {
+    const off = await checkClaims(claims, register, { env: {} });
+    const answers = { status: { type: 'choice', choice: 'upstream_only', confidence: 0.9 }, evidence_sufficient: { type: 'noul', noul: 0.8 } };
+    const spy = [];
+    const on = await checkClaims(claims, register, { env, fetchImpl: okFetch(answers, spy) });
+    expect(spy.length).toBeGreaterThan(0);
+    expect(on.results).toEqual(off.results);
+    expect(on.advisory.some((a) => a.kind === 'suggestion' && a.jev === 'upstream_only')).toBe(true);
+    expect(on.advisory.some((a) => a.kind === 'disagreement' && a.register === 'supported_here')).toBe(true);
+  });
+});
