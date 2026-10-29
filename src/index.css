@@ -598,3 +598,28 @@ html {
     radial-gradient(ellipse at 85% 70%, rgba(168, 85, 247, 0.12) 0%, transparent 45%),
     radial-gradient(ellipse at 60% 10%, rgba(245, 158, 11, 0.06) 0%, transparent 40%);
 }
+
+/* Workshop diagrams, rendered by Pele (src/components/Diagram.tsx). Pele draws
+   every colour from these variables, so the dark lesson panel needs no re-render
+   and no per-diagram theme. Mermaid's light default theme on this panel left
+   titles and section labels near-invisible; these keep text at >= 7:1. */
+.dl-diagram {
+  --pele-bg: #08080a;
+  --pele-fg: #e6edf3;
+  --pele-muted: #a1a7b0;
+  --pele-line: #c9d1d9;
+  --pele-surface: #16161b;
+  --pele-surface-alt: #202027;
+  --pele-border: #4a4a55;
+  --pele-accent: #22d3ee;
+  --pele-radius: 6px;
+  --pele-font: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+  display: block;
+  background: #08080a;
+  border: 1px solid rgb(255 255 255 / 0.08);
+  border-radius: 10px;
+  padding: 16px;
+  font-family: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+  font-size: 14px;
+  color: #e6edf3;
+}

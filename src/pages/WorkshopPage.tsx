@@ -1,15 +1,13 @@
 // src/pages/WorkshopPage.tsx
-import { useEffect, useState, useMemo, useRef } from 'react';
+import { useEffect, useState, useMemo, isValidElement, type ReactNode } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Link } from '@/components/SlashLink';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
-// Dynamic import for mermaid to reduce initial bundle size (679KB → loaded on demand)
-import type mermaidAPI from 'mermaid';
-import DOMPurify from 'dompurify';
 import { fetchMarkdown, getDataPath } from '@/lib/markdown';
+import { Diagram } from '@/components/Diagram';
 import { Header } from '@/components/Header';
 import { WorkshopHeader, WorkshopCategory, DifficultyLevel } from '@/components/WorkshopHeader';
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -20,6 +18,12 @@ import { useWorkshopProgress } from "@/hooks/useWorkshopProgress";
 import { WORKSHOP_META, workshopEyebrow } from "@/data/workshop-meta";
 import { MobileActionBar, BarPrimary, BarIconButton } from "@/components/MobileActionBar";
 import { ChevronLeft } from "lucide-react";
+
+/** A markdown `pre` whose code child is a mermaid block renders as a diagram. */
+function isDiagramBlock(children: ReactNode): boolean {
+  const child = Array.isArray(children) ? children[0] : children;
+  return isValidElement<{ className?: string }>(child) && child.props.className === 'language-mermaid';
+}
 
 interface WorkshopPageItem {
   slug: string; // e.g., 00_introduction.md
@@ -73,32 +77,6 @@ const WorkshopPage = ({ initialManifest = null, initialContent = '' }: {
     if (manifest && Array.isArray(manifest.pages) && manifest.pages.length > 0) return manifest.pages[0].slug;
     return 'README.md'; // Default fallback
   }, [pageSlug, manifest]);
-
-  // Dynamic mermaid import ref (reduces initial bundle by ~679KB)
-  const mermaidRef = useRef<typeof mermaidAPI | null>(null);
-  const [mermaidReady, setMermaidReady] = useState(false);
-
-  // Initialize Mermaid.js lazily (only when needed)
-  useEffect(() => {
-    let cancelled = false;
-    const loadMermaid = async () => {
-      if (!mermaidRef.current) {
-        const mermaidModule = await import('mermaid');
-        if (cancelled) return;
-        mermaidRef.current = mermaidModule.default;
-        mermaidRef.current.initialize({
-          startOnLoad: false,
-          theme: 'default',
-          // P2-11: securityLevel 'strict' disables click events, javascript:
-          // URIs, and all interactive callbacks inside Mermaid diagrams.
-          securityLevel: 'strict',
-        });
-      }
-      if (!cancelled) setMermaidReady(true);
-    };
-    loadMermaid();
-    return () => { cancelled = true; };
-  }, []);
 
   // Effect to load the workshop manifest (with cancellation support)
   useEffect(() => {
@@ -203,83 +181,6 @@ const WorkshopPage = ({ initialManifest = null, initialContent = '' }: {
     manifest?.description || `${lessonTitle || manifest?.title || 'Self-guided learning'} — free DreamLab AI curriculum.`,
     currentActualSlug,
   ));
-
-  // Effect to render Mermaid diagrams after content is loaded and DOM updated
-  useEffect(() => {
-    if (!isLoadingContent && currentPageContent && mermaidReady && mermaidRef.current) {
-      const renderTimer = setTimeout(() => {
-        try {
-          const mermaidElements = document.querySelectorAll('code.language-mermaid');
-          if (mermaidElements.length > 0) {
-            mermaidElements.forEach((el, i) => {
-              const id = `mermaid-diagram-${Date.now()}-${i}`;
-              const graphDefinition = (el as HTMLElement).textContent || '';
-              if (document.body.contains(el) && !el.getAttribute('data-mermaid-processed')) {
-                try {
-                  // P2-11: Sanitize Mermaid definition to prevent XSS vectors.
-                  // Strip <script> tags, click callbacks (Mermaid click/href
-                  // interactivity), javascript: URIs, and on* event handlers.
-                  const sanitizedDefinition = graphDefinition
-                    .replace(/<script[\s>]/gi, '&lt;script')
-                    .replace(/\bclick\s+\S+\s+(call|href)\b/gi, '%% click removed %%')
-                    .replace(/\bhref\s*\(\s*["']javascript:/gi, 'href("about:blank')
-                    .replace(/\bon\w+\s*=/gi, 'data-removed=');
-                  // Use dynamically loaded mermaid (guaranteed non-null by guard above)
-                  if (!mermaidRef.current) return;
-                  mermaidRef.current.render(id, sanitizedDefinition).then(({ svg, bindFunctions: _bindFunctions }) => {
-                    if (document.body.contains(el)) {
-                      // Sanitize SVG output with DOMPurify to prevent XSS
-                      const sanitizedSvg = DOMPurify.sanitize(svg, {
-                        USE_PROFILES: { svg: true, svgFilters: true },
-                        ADD_TAGS: ['use'],
-                        ADD_ATTR: ['xlink:href']
-                      });
-                      const wrapper = document.createElement('div');
-                      wrapper.innerHTML = sanitizedSvg;
-                      el.textContent = '';
-                      el.appendChild(wrapper);
-                      // P2-11: Do NOT call _bindFunctions — it re-attaches
-                      // click handlers that could bypass DOMPurify sanitisation.
-                      // With securityLevel:'strict', Mermaid should not produce
-                      // any interactive bindings anyway.
-                      el.setAttribute('data-mermaid-processed', 'true');
-                    }
-                  }).catch(caughtRenderError => {
-                    if (import.meta.env.DEV) {
-                      console.warn(`Mermaid render failed for ${id}:`, caughtRenderError);
-                    }
-                    if (document.body.contains(el)) {
-                      // Security: Use textContent instead of innerHTML for error messages
-                      const errorMsg = `Error rendering Mermaid diagram: ${caughtRenderError instanceof Error ? caughtRenderError.message : String(caughtRenderError)}`;
-                      const pre = document.createElement('pre');
-                      pre.textContent = errorMsg;
-                      el.textContent = '';
-                      el.appendChild(pre);
-                    }
-                  });
-                } catch (initError) {
-                  if (import.meta.env.DEV) {
-                    console.warn(`Mermaid initial render error for ${id}:`, initError);
-                  }
-                  if (document.body.contains(el)) {
-                    // Security: Use textContent instead of innerHTML for error messages
-                    const errorMsg = `Error rendering Mermaid diagram: ${initError instanceof Error ? initError.message : String(initError)}`;
-                    const pre = document.createElement('pre');
-                    pre.textContent = errorMsg;
-                    el.textContent = '';
-                    el.appendChild(pre);
-                  }
-                }
-              }
-            });
-          }
-        } catch (e) {
-          if (import.meta.env.DEV) console.warn("Mermaid rendering error:", e);
-        }
-      }, 100);
-      return () => clearTimeout(renderTimer);
-    }
-  }, [isLoadingContent, currentPageContent, mermaidReady, currentActualSlug]);
 
   // Calculate current chapter index for progress tracking
   const currentChapterIndex = useMemo(() => {
@@ -424,18 +325,22 @@ const WorkshopPage = ({ initialManifest = null, initialContent = '' }: {
                   remarkPlugins={[remarkGfm]}
                   rehypePlugins={markdownRehypePlugins}
                   components={{
-                    pre: ({ children }) => (
-                      <pre className="bg-[#08080A] border border-white/[0.08] rounded-[10px] p-4 text-[13px] leading-[1.7] font-mono text-[#C9D1D9] overflow-x-auto my-4">
-                        {children}
-                      </pre>
-                    ),
+                    pre: ({ children }) =>
+                      isDiagramBlock(children) ? (
+                        <div className="my-4">{children}</div>
+                      ) : (
+                        <pre className="bg-[#08080A] border border-white/[0.08] rounded-[10px] p-4 text-[13px] leading-[1.7] font-mono text-[#C9D1D9] overflow-x-auto my-4">
+                          {children}
+                        </pre>
+                      ),
                     code: ({ className, children, ...props }) => {
                       const isBlock =
                         (typeof className === 'string' && className.startsWith('language-')) ||
                         String(children).includes('\n');
+                      if (className === 'language-mermaid') {
+                        return <Diagram source={String(children).replace(/\n$/, '')} />;
+                      }
                       if (isBlock) {
-                        // Preserve className (e.g. language-mermaid) so the shared
-                        // Mermaid effect can still find and render it.
                         return (
                           <code className={className} {...props}>
                             {children}
