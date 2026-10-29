@@ -65,3 +65,4 @@
 | 2026-10-25 | site-build-content | hand-written course index workshop links unguarded; inventory now binds them | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/78 | yes | ACCEPT |  | e3a61ff1ac2b |  |  |  |
 | 2026-10-26 | operator-overlay | nip05 resolver_mode/pod_base_url unguarded vs auth vars; bench binds them | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/79 | yes | ACCEPT |  | 153b4ac73cf2 |  |  |  |
 | 2026-10-28 | kit-pin-integrity | nostr-bbs-* crate resolved in Cargo.lock but off KIT_CRATES now fails the gate | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/80 | yes | ACCEPT |  | c24ff859c033 |  |  |  |
+| 2026-10-29 | site-build-content | manifest slug-sets vs *.md files only count-checked; inventory now binds sets | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/81 | yes | ACCEPT |  | df5568923000 |  |  |  |
