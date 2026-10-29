@@ -2,7 +2,7 @@
 import { useEffect, useState, useMemo, isValidElement, type ReactNode } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Link } from '@/components/SlashLink';
-import ReactMarkdown from 'react-markdown';
+import ReactMarkdown, { type Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
@@ -24,6 +24,18 @@ function isDiagramBlock(children: ReactNode): boolean {
   const child = Array.isArray(children) ? children[0] : children;
   return isValidElement<{ className?: string }>(child) && child.props.className === 'language-mermaid';
 }
+
+/** Desktop prose rendering: default elements, except mermaid blocks become diagrams. */
+const desktopMarkdownComponents: Components = {
+  pre: ({ children, node: _node, ...props }) =>
+    isDiagramBlock(children) ? <div className="my-4 not-prose">{children}</div> : <pre {...props}>{children}</pre>,
+  code: ({ className, children, node: _node, ...props }) =>
+    className === 'language-mermaid' ? (
+      <Diagram source={String(children).replace(/\n$/, '')} />
+    ) : (
+      <code className={className} {...props}>{children}</code>
+    ),
+};
 
 interface WorkshopPageItem {
   slug: string; // e.g., 00_introduction.md
@@ -439,7 +451,11 @@ const WorkshopPage = ({ initialManifest = null, initialContent = '' }: {
           {/* --- To show real content, use ReactMarkdown below. For debugging, the <p>Test Content.../> is fine --- */}
           {!isLoadingContent && !error && currentPageContent && (
             <div className="prose max-w-none dark:prose-invert break-words [&_table]:block [&_table]:w-full [&_table]:overflow-x-auto">
-              <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={markdownRehypePlugins}>
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                rehypePlugins={markdownRehypePlugins}
+                components={desktopMarkdownComponents}
+              >
                 {currentPageContent}
               </ReactMarkdown>
             </div>

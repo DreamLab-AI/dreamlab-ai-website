@@ -622,4 +622,16 @@ html {
   font-family: 'Poppins', ui-sans-serif, system-ui, sans-serif;
   font-size: 14px;
   color: #e6edf3;
+  /* Pele's zoom buttons appear when a diagram is shrunk to fit. By default they
+     sit top-right over the chart (they hid gantt bars at 390 px); keep them in a
+     strip under the diagram instead, laid out in a row. */
+  position: relative;
+  padding-bottom: 52px;
+  --pele-zoom-top: auto;
+  --pele-zoom-bottom: 8px;
+  --pele-zoom-right: 8px;
+}
+
+.dl-diagram [style*='pele-zoom-top'] {
+  flex-direction: row !important;
 }
