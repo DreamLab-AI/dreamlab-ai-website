@@ -4,29 +4,38 @@
     {
       "id": "web-push-relay",
       "owner": "overlay",
-      "summary": "forum-config/deploy/relay-worker.wrangler.toml:49-57 sets PUSH_ENABLED=\"true\" with VAPID_PUBLIC_KEY, VAPID_SUBJECT and PUSH_MAX_FANOUT for content-free Web Push; the private key is a GitHub secret, not in the file."
+      "summary": "forum-config/deploy/relay-worker.wrangler.toml:57-65 sets PUSH_ENABLED=\"true\" with VAPID_PUBLIC_KEY, VAPID_SUBJECT and PUSH_MAX_FANOUT for content-free Web Push; the private key is a GitHub secret, not in the file.",
+      "evidence": [
+        "forum-config/deploy/relay-worker.wrangler.toml"
+      ]
     },
     {
       "id": "ingress-recipients",
       "owner": "overlay",
-      "summary": "forum-config/deploy/relay-worker.wrangler.toml:47 declares INGRESS_RECIPIENTS (site-inbox primary, junkiejarvis agent, website-info copy)."
+      "summary": "forum-config/deploy/relay-worker.wrangler.toml:55 declares INGRESS_RECIPIENTS (site-inbox primary, junkiejarvis agent, website-info copy).",
+      "evidence": [
+        "forum-config/deploy/relay-worker.wrangler.toml"
+      ]
     },
     {
       "id": "inbox-watch",
       "owner": "overlay",
-      "summary": "scripts/inbox-watch/run.mjs:1-2 is the nightly inbox watch for the contact form, email signup and Talk-to-AI chat channels."
+      "summary": "scripts/inbox-watch/run.mjs:1-2 is the nightly inbox watch for the contact form, email signup and Talk-to-AI chat channels.",
+      "evidence": [
+        "scripts/inbox-watch/run.mjs"
+      ]
     }
   ],
   "claims": [
     {
       "match": "web push enabled in the operator overlay",
       "status": "supported_here",
-      "evidence": "forum-config/deploy/relay-worker.wrangler.toml:54 (PUSH_ENABLED = \"true\"), comment block :49-53"
+      "evidence": "forum-config/deploy/relay-worker.wrangler.toml:62 (PUSH_ENABLED = \"true\"), comment block :57-61"
     },
     {
       "match": "declared recipients and an inbox-watch path",
       "status": "supported_here",
-      "evidence": "forum-config/deploy/relay-worker.wrangler.toml:47 (INGRESS_RECIPIENTS); scripts/inbox-watch/run.mjs:1-2"
+      "evidence": "forum-config/deploy/relay-worker.wrangler.toml:55 (INGRESS_RECIPIENTS); scripts/inbox-watch/run.mjs:1-2"
     }
   ]
 }

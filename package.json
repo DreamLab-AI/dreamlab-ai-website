@@ -29,7 +29,7 @@
     "test:ui": "vitest --ui",
     "test:e2e": "playwright test",
     "check:claims": "node scripts/check-claims.mjs",
-    "postbuild": "node scripts/prerender.mjs && node scripts/generate-llms-full.mjs && node scripts/check-discovery.mjs"
+    "postbuild": "node scripts/prerender.mjs && node scripts/generate-llms-full.mjs && node scripts/check-discovery.mjs && node scripts/check-claims.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

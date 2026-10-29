@@ -43,6 +43,16 @@ describe('resolveJev', () => {
     const e = resolveJev({ DREAMLAB_JEV: '1', DREAMLAB_JEV_ENDPOINT: 'http://e', DREAMLAB_JEV_KEY_ENV: 'K', K: 's', TYPESAFE_API_KEY: 'k' }, o);
     expect(e.cfg).toMatchObject({ endpoint: 'http://e', bearer: 's' });
   });
+  test('accepts the boot projector aliases without leaking vendor credentials', () => {
+    const env = { DREAMLAB_JEV: '1', AGENTBOX_SYSTEM_ONE_PROXY: '1',
+      AGENTBOX_SKILL_ROUTE_API: 'http://127.0.0.1:8094/v1/systemone',
+      AGENTBOX_SKILL_ROUTE_MODEL: 'subq-snap-preview', TYPESAFE_API_KEY: 'unused' };
+    const result = resolveJev(env, { prefix: 'DREAMLAB_JEV', localOnly: false });
+    expect(result.cfg.endpoint).toBe(env.AGENTBOX_SKILL_ROUTE_API);
+    expect(result.cfg.model).toBe('subq-snap-preview');
+    expect(result.cfg.bearer).toBeUndefined();
+    expect(resolveJev(env, { prefix: 'DREAMLAB_JEV', localOnly: true }).ok).toBe(false);
+  });
   test('deadline is capped at 4 s', () => {
     expect(resolveJev({ ...LOCAL, DREAMLAB_JEV_TIMEOUT_MS: '60000' }, { prefix: 'DREAMLAB_JEV', localOnly: true }).cfg.timeoutMs).toBe(4000);
   });
@@ -280,4 +290,29 @@ describe('DW-06 seeded claims register (real README + docs/claims-register.json)
     expect(on.advisory.some((a) => a.kind === 'suggestion' && a.jev === 'upstream_only')).toBe(true);
     expect(on.advisory.some((a) => a.kind === 'disagreement' && a.register === 'supported_here')).toBe(true);
   });
+});
+
+test('shipped claims register cites files and classifies the README claims', () => {
+  const register = JSON.parse(fs.readFileSync('docs/claims-register.json', 'utf8'));
+  expect(register.features.length).toBeGreaterThan(0);
+  for (const feature of register.features) {
+    expect(feature.evidence.length).toBeGreaterThan(0);
+    for (const path of feature.evidence) expect(fs.existsSync(path), path).toBe(true);
+  }
+  const claims = extractClaims(fs.readFileSync('README.md', 'utf8'));
+  for (const entry of register.claims) {
+    const claim = claims.find((c) => c.text.toLowerCase().includes(entry.match.toLowerCase()));
+    expect(claim, entry.match).toBeDefined();
+    expect(classifyDeterministic(claim, register).status).toBe(entry.status);
+  }
+});
+
+test('reads native System One answers without redundant type discriminators', () => {
+  expect(readChoice({ pick: { choice: 'a', confidence: 0.8 } }, 'pick', ['a', 'b']))
+    .toEqual({ key: 'a', confidence: 0.8 });
+  expect(readNoul({ support: { noul: 0.7 } }, 'support')).toBe(0.7);
+  expect(readChoice({ pick: { type: 'noul', choice: 'a', confidence: 0.8 } }, 'pick', ['a', 'b'])).toBeNull();
+  expect(readNoul({ support: { type: 'choice', noul: 0.7 } }, 'support')).toBeNull();
+  expect(readChoice({ pick: { choice: 'outside', confidence: 0.8 } }, 'pick', ['a', 'b'])).toBeNull();
+  expect(readNoul({ support: { noul: 1.1 } }, 'support')).toBeNull();
 });

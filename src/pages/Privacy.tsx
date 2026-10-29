@@ -14,13 +14,25 @@ const Privacy = () => {
 
         <div className="prose prose-invert max-w-none">
           <p className="text-muted-foreground mb-8">
-            Last updated: 8 October 2026
+            Last updated: 29 October 2026
           </p>
 
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">Data Collection and Processing</h2>
             <p>
-              When you contact us — through the signup form or the enquiry form — your details are delivered to the site operator as an end-to-end-encrypted direct message (a NIP-17 gift-wrapped message over the Nostr protocol). Only the operator can decrypt and read it, and it is not stored as a record in any database of ours. This is done on the basis of your explicit consent, which you provide when submitting the form.
+              When you contact us — through the signup form or the enquiry form — your details are delivered to the site operator as an end-to-end-encrypted direct message (a NIP-17 gift-wrapped message over the Nostr protocol). The configured operator and inbox-monitor recipients can decrypt their copies. This is done on the basis of your explicit consent, which you provide when submitting the form.
+            </p>
+          </section>
+
+          <section className="mb-8">
+            <h2 className="text-2xl font-semibold mb-4">Local AI topic tagging</h2>
+            <p>
+              Our inbox monitor may use a locally hosted AI model to suggest a topic for an enquiry
+              and flag missing information for the team. It sends a bounded excerpt of your message
+              and your selected topic to that local model, without adding the name or email fields.
+              Information you include in the message itself may appear in the excerpt. The result
+              is advice for the operator; it does not send a reply or change your selected topic.
+              This tagging does not send your enquiry to a public AI service.
             </p>
           </section>
 
@@ -34,7 +46,7 @@ const Privacy = () => {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">Data Storage and Security</h2>
             <p>
-              Both signup and enquiry messages are end-to-end encrypted in transit and at rest and can be read only by the site operator; they are not held as records in any database of ours. We implement appropriate technical and organisational measures to protect your personal data against unauthorised access, alteration, disclosure, or destruction.
+              Signup and enquiry messages are delivered as encrypted copies to our configured recipients. The inbox monitor decrypts its copy to prepare an operator digest. We implement appropriate technical and organisational measures to protect your personal data against unauthorised access, alteration, disclosure, or destruction.
             </p>
           </section>
 

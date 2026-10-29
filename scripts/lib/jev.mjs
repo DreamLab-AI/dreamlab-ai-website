@@ -50,8 +50,8 @@ export function resolveJev(env, { prefix, localOnly }) {
     };
   }
   if (val(env, "AGENTBOX_SYSTEM_ONE_PROXY") === "1") {
-    const endpoint = val(env, "AGENTBOX_SYSTEM_ONE_ENDPOINT");
-    const model = val(env, "AGENTBOX_SYSTEM_ONE_MODEL");
+    const endpoint = val(env, "AGENTBOX_SYSTEM_ONE_ENDPOINT") ?? val(env, "AGENTBOX_SKILL_ROUTE_API");
+    const model = val(env, "AGENTBOX_SYSTEM_ONE_MODEL") ?? val(env, "AGENTBOX_SKILL_ROUTE_MODEL");
     if (endpoint && model && (!localOnly || val(env, "AGENTBOX_SYSTEM_ONE_BACKEND_LOCAL") === "1")) {
       return { ok: true, cfg: { endpoint, model, timeoutMs } }; // proxy holds the key
     }
@@ -101,7 +101,7 @@ const unit = (x) => (typeof x === "number" && Number.isFinite(x) && x >= 0 && x 
 /** Choice answer -> {key, confidence} or null. Key must be in `allowed`. */
 export function readChoice(answers, id, allowed) {
   const a = answers?.[id];
-  if (!a || a.type !== "choice" || typeof a.choice !== "string" || !allowed.includes(a.choice)) return null;
+  if (!a || (a.type !== undefined && a.type !== "choice") || typeof a.choice !== "string" || !allowed.includes(a.choice)) return null;
   let confidence = unit(a.confidence);
   if (confidence === null) {
     const p = unit(a.probabilities?.[a.choice]);
@@ -115,7 +115,7 @@ export function readChoice(answers, id, allowed) {
 /** Noul answer -> probability of yes, or null. */
 export function readNoul(answers, id) {
   const a = answers?.[id];
-  return a && a.type === "noul" ? unit(a.noul) : null;
+  return a && (a.type === undefined || a.type === "noul") ? unit(a.noul) : null;
 }
 
 /** One log line, reason only, never request content. */

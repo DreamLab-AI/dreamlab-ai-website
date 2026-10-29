@@ -41,7 +41,7 @@ env:
   # in docs/architecture/kit-compatibility-record.md, which pin-parity verifies
   # against this exact SHA. Never restate the kit version or release notes here;
   # the prose rots on every repin (beta.9 / rc11 / beta.14 all went stale).
-  KIT_REF: 'ebcfaa2c600f61a69ca4e84befc55a2f7518df4a'
+  KIT_REF: '8a5cf817e81b20e2b761899eab753768c0cb4988'
 
 jobs:
   gate:
@@ -284,6 +284,20 @@ jobs:
       # the WebAuthn PRF salt from PRF_SERVER_SECRET; absent, register/login 500
       # on the first request. R-09: surface this as a deploy blocker instead.
       # Secrets are operator data — this only checks presence, never sets values.
+      - name: Validate public System One credential
+        if: matrix.config == 'search-worker' || matrix.config == 'relay-worker'
+        working-directory: kit/crates/${{ matrix.kit_crate }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          wrangler secret list > /tmp/system-one-secret-names.json
+          if ! jq -e 'any(.[]; .name == "SUBQ_API_KEY")' /tmp/system-one-secret-names.json > /dev/null; then
+            echo "::error::SUBQ_API_KEY Worker secret missing. Run set-worker-secrets.yml before deploying the enabled System One consumers." >&2
+            exit 1
+          fi
+
       - name: Validate required auth-worker secrets are set
         if: matrix.config == 'auth-worker'
         working-directory: kit/crates/${{ matrix.kit_crate }}

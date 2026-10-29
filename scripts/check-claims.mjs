@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Advisory content/feature-claim check (DW-06-S1-01). Always exits 0: it is not
-// a gate and must never fail a build. Not wired into `postbuild` or CI.
+// a gate and must never fail a build. Runs after the deterministic postbuild checks.
 //
 //   node scripts/check-claims.mjs [--json] [--register docs/claims-register.json] [file.md ...]
 //

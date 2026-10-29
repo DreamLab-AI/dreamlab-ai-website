@@ -253,7 +253,7 @@ const ContactMobile = ({ form, onSubmit, isSubmitting, selectedTeam }: ContactVi
               className="w-[22px] h-[22px] mt-0.5 shrink-0 accent-[#06B6D4]"
             />
             <span className="text-[14px] leading-[1.5] text-white/65">
-              I'm happy for DreamLab to use these details to reply to my enquiry. See our{" "}
+              I'm happy for DreamLab to use these details to reply to my enquiry, including local AI topic tagging to help the team review it. See our{" "}
               <Link to="/privacy" className="text-dlm-bright underline">privacy policy</Link>.
             </span>
           </label>
@@ -393,7 +393,7 @@ const ContactDesktop = ({ form, onSubmit, isSubmitting, selectedTeam }: ContactV
               {isSubmitting ? "Sending..." : "Send Message"}
             </Button>
             <p className="text-sm text-muted-foreground">
-              Sent end-to-end encrypted over Nostr. Only we can read it, and we don't store it anywhere else.
+              By sending, you agree that DreamLab may use your details to reply. Your encrypted message reaches our operator and inbox monitor; local AI may suggest a topic to help the team review it.
             </p>
           </form>
         </Form>
