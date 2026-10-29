@@ -113,6 +113,34 @@ if (existsSync(workshopsDir)) {
   }
   check(manifests === sourceDirs.length, "manifest coverage", `${manifests}/${sourceDirs.length} dirs`);
   check(pageDrift.length === 0, "manifest pages match *.md", pageDrift.join(",") || "all aligned");
+
+  // The hand-written course index is the human-facing directory of the same
+  // workshops; nothing regenerates it, so a workshop added or removed without
+  // editing the index leaves a served, silently stale file behind (a dead
+  // link or a missing entry). Its relative directory links must be exactly
+  // the source dirs.
+  const indexPath = join(workshopsDir, "ai-powered-knowledge-work-index.md");
+  if (existsSync(indexPath)) {
+    const linked = new Set(
+      readFileSync(indexPath, "utf-8")
+        .split("](./")
+        .slice(1)
+        .map((rest) => rest.slice(0, rest.indexOf(")")))
+        .filter((target) => target.endsWith("/"))
+        .map((target) => target.slice(0, -1)),
+    );
+    const unlisted = sourceDirs.filter((d) => !linked.has(d));
+    const dead = [...linked].filter((d) => !sourceDirs.includes(d));
+    check(
+      unlisted.length === 0 && dead.length === 0,
+      "course index links match workshop dirs",
+      unlisted.length || dead.length
+        ? `unlisted=[${unlisted.join(",")}] dead=[${dead.join(",")}]`
+        : `${sourceDirs.length} dirs, all linked`,
+    );
+  } else {
+    check(false, "course index present", `absent: ${indexPath.replace(`${root}/`, "")}`);
+  }
 } else {
   check(false, "workshops source dir", `absent: ${workshopsDir.replace(`${root}/`, "")}`);
 }
