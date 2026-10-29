@@ -293,8 +293,8 @@ jobs:
         run: |
           set -euo pipefail
           wrangler secret list > /tmp/system-one-secret-names.json
-          if ! jq -e 'any(.[]; .name == "SUBQ_API_KEY")' /tmp/system-one-secret-names.json > /dev/null; then
-            echo "::error::SUBQ_API_KEY Worker secret missing. Run set-worker-secrets.yml before deploying the enabled System One consumers." >&2
+          if ! jq -e 'any(.[]; .name == "TYPESAFE_API_KEY")' /tmp/system-one-secret-names.json > /dev/null; then
+            echo "::error::TYPESAFE_API_KEY Worker secret missing. Run set-worker-secrets.yml before deploying the enabled System One consumers." >&2
             exit 1
           fi
 

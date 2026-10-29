@@ -18,11 +18,12 @@ fn public_consumers_use_authenticated_cloud_judge() {
         assert_eq!(vars[flag].as_str(), Some("1"));
         assert_eq!(
             vars["JEV_ENDPOINT"].as_str(),
-            Some("https://api.subq.ai/v1/systemone")
+            Some("https://api.typesafe.ai/v1/systemone")
         );
-        assert_eq!(vars["JEV_API_KEY_NAME"].as_str(), Some("SUBQ_API_KEY"));
+        assert_eq!(vars["JEV_MODEL"].as_str(), Some("jev-latest"));
+        assert_eq!(vars["JEV_API_KEY_NAME"].as_str(), Some("TYPESAFE_API_KEY"));
         assert!(
-            !vars.contains_key("SUBQ_API_KEY"),
+            !vars.contains_key("TYPESAFE_API_KEY"),
             "secret values must not be committed"
         );
         assert!(
