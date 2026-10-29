@@ -101,18 +101,30 @@ if (existsSync(workshopsDir)) {
 
   let manifests = 0;
   let pageDrift = [];
+  let slugDrift = [];
   for (const id of sourceDirs) {
     const manifestPath = join(workshopsDir, id, "manifest.json");
     if (!existsSync(manifestPath)) continue;
     manifests += 1;
     const manifest = readJson(manifestPath);
-    const mdCount = readdirSync(join(workshopsDir, id)).filter((f) => f.endsWith(".md")).length;
+    const mdFiles = readdirSync(join(workshopsDir, id)).filter((f) => f.endsWith(".md"));
+    const mdCount = mdFiles.length;
     if ((manifest.pages?.length ?? -1) !== mdCount) {
       pageDrift.push(`${id}(${manifest.pages?.length ?? "?"}!=${mdCount})`);
+    }
+    // Count equality is not set equality: a stale manifest that duplicates one
+    // slug while dropping a renamed file keeps the count green, yet every link
+    // prerender and check-discovery build from the missing slug rots silently.
+    const slugs = (manifest.pages ?? []).map((p) => p.slug);
+    const unlisted = mdFiles.filter((f) => !slugs.includes(f));
+    const stale = slugs.filter((s) => !mdFiles.includes(s));
+    if (unlisted.length || stale.length) {
+      slugDrift.push(`${id}(unlisted=[${unlisted.join(",")}] stale=[${stale.join(",")}])`);
     }
   }
   check(manifests === sourceDirs.length, "manifest coverage", `${manifests}/${sourceDirs.length} dirs`);
   check(pageDrift.length === 0, "manifest pages match *.md", pageDrift.join(",") || "all aligned");
+  check(slugDrift.length === 0, "manifest slugs match *.md filenames", slugDrift.join(", ") || "exact");
 
   // The hand-written course index is the human-facing directory of the same
   // workshops; nothing regenerates it, so a workshop added or removed without
