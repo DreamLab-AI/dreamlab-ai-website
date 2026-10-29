@@ -18,6 +18,9 @@
 //      recorded in the compatibility record.
 //   6. The crate set is identical across manifest, lockfile and record — a crate
 //      added to one and forgotten in another is drift, not a silent pass.
+//   7. No `nostr-bbs-*` crate resolves in forum-config/Cargo.lock outside the
+//      governed set — a kit-family crate arriving only transitively is drift,
+//      not a silent pass.
 //
 // Every function here is pure over an explicit `root`, so the tests drive it
 // against fixture trees rather than mutating the live repo.
@@ -39,6 +42,9 @@ export const KIT_CRATES = [
   "nostr-bbs-mesh",
   "nostr-bbs-rate-limit",
 ];
+
+/** Every crate whose name carries this prefix belongs to the upstream kit. */
+const KIT_FAMILY_PREFIX = "nostr-bbs-";
 
 export const MANIFEST_PATH = "forum-config/Cargo.toml";
 export const LOCKFILE_PATH = "forum-config/Cargo.lock";
@@ -119,6 +125,25 @@ export function countKitPackageBlocks(text) {
     counts.set(name, (counts.get(name) ?? 0) + 1);
   }
   return counts;
+}
+
+/**
+ * Collect the name of every [[package]] block carrying the kit-family prefix
+ * (`nostr-bbs-`), governed or not. parseLockfileResolved and
+ * countKitPackageBlocks are both keyed on KIT_CRATES, so a kit-family crate
+ * that arrives only through the lockfile — a new crate the kit starts
+ * shipping, pulled in transitively — would be invisible to every check they
+ * feed; this sweep is what makes it legible to the gate.
+ */
+export function findKitFamilyPackages(text) {
+  const names = [];
+  if (!text) return names;
+  const blocks = text.split(/^\[\[package\]\]\s*$/m).slice(1);
+  for (const block of blocks) {
+    const name = block.match(/^\s*name\s*=\s*"([^"]+)"\s*$/m)?.[1];
+    if (name?.startsWith(KIT_FAMILY_PREFIX)) names.push(name);
+  }
+  return names;
 }
 
 /**
@@ -250,6 +275,22 @@ export function checkKitPins(root) {
   const lockText = read(root, LOCKFILE_PATH);
   if (lockText === null) errors.push(`lockfile missing: ${LOCKFILE_PATH}`);
   const resolved = parseLockfileResolved(lockText);
+
+  // A kit-family crate resolved here but absent from KIT_CRATES is ungoverned:
+  // no exact-pin, checksum or record comparison covers it, because every
+  // check below is keyed on KIT_CRATES. A new kit crate the kit starts
+  // shipping — arriving only transitively, never named in the manifest —
+  // would otherwise ship silently.
+  const kitFamily = findKitFamilyPackages(lockText);
+  for (const name of kitFamily) {
+    if (!KIT_CRATES.includes(name)) {
+      errors.push(
+        `${LOCKFILE_PATH}: kit-family crate ${name} is resolved in the ` +
+          `lockfile but is not on the governed crate list (KIT_CRATES) — ` +
+          `govern it or remove it`,
+      );
+    }
+  }
 
   // A second [[package]] block for a kit crate means the dependency graph
   // resolved two kit versions side by side (Cargo permits this for

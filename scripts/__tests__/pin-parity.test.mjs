@@ -11,6 +11,7 @@ import {
   checkKitPins,
   countKitPackageBlocks,
   countRecordResolvedLines,
+  findKitFamilyPackages,
   findTagPinnedUses,
   parseKitRef,
   parseLockfileResolved,
@@ -123,6 +124,34 @@ dependencies = [
       version: "1.0.0",
       checksum: "b".repeat(64),
     });
+  });
+
+  it("collects every kit-family package block, governed or not", () => {
+    const lock = [
+      "[[package]]",
+      'name = "nostr"',
+      'version = "0.44.8"',
+      "",
+      "[[package]]",
+      'name = "nostr-bbs-core"',
+      'version = "1.0.0-beta.16"',
+      "",
+      "[[package]]",
+      'name = "nostr-bbs-agent-tools"',
+      'version = "1.0.0-beta.16"',
+      "",
+      "[[package]]",
+      'name = "serde"',
+      'version = "1.0.219"',
+      'dependencies = [',
+      ' "nostr-bbs-mesh",',
+      "]",
+    ].join("\n");
+    const names = findKitFamilyPackages(lock);
+    expect(names).toEqual(["nostr-bbs-core", "nostr-bbs-agent-tools"]);
+    // A crate named only inside another package's `dependencies` list is not
+    // a resolved package of its own, so it is not family drift either.
+    expect(names).not.toContain("nostr-bbs-mesh");
   });
 });
 
@@ -298,6 +327,32 @@ describe("deliberately inconsistent pins are rejected", () => {
   it("rejects a missing compatibility record outright", () => {
     const root = makeFixtureRepo((r) => r.remove("docs/architecture/kit-compatibility-record.md"));
     expectDrift(checkKitPins(root), "compatibility record missing");
+  });
+
+  // A kit-family crate that arrives only through the lockfile — the kit
+  // starts shipping a new crate, pulled in transitively, never named in the
+  // manifest — is invisible to every check keyed on KIT_CRATES. The fixture
+  // inserts one ahead of the governed nostr-bbs-config block; without the
+  // family sweep this fixture passes exactly as the live repository does.
+  it("rejects a kit-family crate resolved in the lockfile but not on KIT_CRATES", () => {
+    const root = makeFixtureRepo((r) => {
+      r.edit("forum-config/Cargo.lock", (t) =>
+        t.replace(
+          '[[package]]\nname = "nostr-bbs-config"',
+          [
+            "[[package]]",
+            'name = "nostr-bbs-agent-tools"',
+            'version = "1.0.0-beta.16"',
+            'source = "registry+https://github.com/rust-lang/crates.io-index"',
+            `checksum = "${"e".repeat(64)}"`,
+            "",
+            "[[package]]",
+            'name = "nostr-bbs-config"',
+          ].join("\n"),
+        ),
+      );
+    });
+    expectDrift(checkKitPins(root), "kit-family crate nostr-bbs-agent-tools");
   });
 });
 
