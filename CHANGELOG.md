@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-30 — kit pin 9c36b60: Jev consumers cloud by default, local-only per consumer
+
+- `KIT_REF` moved from `8a5cf81` to forum `9c36b60`. Auth worker (rationale check), relay and search workers; no D1 migration.
+- **Why:** the kit hard-coded the rationale check as local-only, so on Cloudflare (TypeSafe direct) it never ran. Each consumer's switch is now env-driven and off by default (`JEV_RATIONALE_CHECK_LOCAL_ONLY`, `JEV_TRIAGE_LOCAL_ONLY`, `JEV_SEARCH_RERANK_LOCAL_ONLY`); a local-only consumer still refuses cloud endpoints.
+- The inbox-watch enquiry tag follows the same rule: `DREAMLAB_JEV_TOPIC_LOCAL_ONLY` (default off). `set-worker-secrets.yml` now also provisions `TYPESAFE_API_KEY` into the auth Worker.
+
 ## 2026-09-29 — kit pin 7def3e4: relay read cost no longer scales with delivered events (nostr-bbs-core/mesh 1.0.0-beta.11, unchanged)
 
 - `KIT_REF` moved from `36d3850` to forum `7def3e4`. Relay worker only; the client rebuilds from the same source unchanged.

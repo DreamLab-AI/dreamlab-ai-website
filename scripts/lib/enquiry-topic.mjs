@@ -22,6 +22,14 @@ import { resolveJev, callSystemOne, readChoice, readNoul, jevLog } from "./jev.m
 
 export const QUESTION_SET = "dw02-enquiry-topic-v1";
 export const FLAG_PREFIX = "DREAMLAB_JEV";
+
+/** Env switch that makes the topic tag local-only (default off). */
+export const LOCAL_ONLY_VAR = "DREAMLAB_JEV_TOPIC_LOCAL_ONLY";
+
+/** Local-only only when the operator sets `DREAMLAB_JEV_TOPIC_LOCAL_ONLY=1`. */
+export function topicLocalOnly(env) {
+  return String(env?.[LOCAL_ONLY_VAR] ?? "").trim() === "1";
+}
 /** Most enquiries tagged per run (one request each, sequential, <= 4 s each). */
 export const MAX_TAGGED_PER_RUN = 10;
 /** Unfitted default; annotation-only so a permissive floor is acceptable. */
@@ -75,7 +83,7 @@ export async function tagEnquiries(fresh, opts = {}) {
   try {
     const targets = fresh.map((f, i) => (f.kind === "enquiry" ? i : -1)).filter((i) => i >= 0);
     if (targets.length === 0) return fresh.slice();
-    const r = resolveJev(env, { prefix: FLAG_PREFIX, localOnly: true });
+    const r = resolveJev(env, { prefix: FLAG_PREFIX, localOnly: topicLocalOnly(env) });
     if (!r.ok) {
       if (r.reason !== "flag-off") jevLog(log, QUESTION_SET, r.reason);
       return fresh.slice();

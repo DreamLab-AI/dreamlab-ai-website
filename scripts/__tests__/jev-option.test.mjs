@@ -119,8 +119,8 @@ describe('DW-02 enquiry topic tag', () => {
     const cases = [
       { env: {}, fetchImpl: okFetch(good) },
       { env: { DREAMLAB_JEV: '1' }, fetchImpl: okFetch(good) },
-      { env: { DREAMLAB_JEV: '1', DREAMLAB_JEV_ENDPOINT: 'http://x' }, fetchImpl: okFetch(good) }, // not declared local
-      { env: { DREAMLAB_JEV: '1', TYPESAFE_API_KEY: 'k' }, fetchImpl: okFetch(good) }, // vendor refused
+      { env: { DREAMLAB_JEV: '1', DREAMLAB_JEV_ENDPOINT: 'http://x', DREAMLAB_JEV_TOPIC_LOCAL_ONLY: '1' }, fetchImpl: okFetch(good) }, // local-only, not declared local
+      { env: { DREAMLAB_JEV: '1', TYPESAFE_API_KEY: 'k', DREAMLAB_JEV_TOPIC_LOCAL_ONLY: '1' }, fetchImpl: okFetch(good) }, // local-only refuses the vendor
       { env: LOCAL, fetchImpl: statusFetch(500) },
       { env: LOCAL, fetchImpl: statusFetch(429) },
       { env: LOCAL, fetchImpl: throwingFetch },
@@ -135,6 +135,24 @@ describe('DW-02 enquiry topic tag', () => {
       expect(out).toEqual(fresh);
       expect(digestLines(out)).toEqual(baseline);
     }
+  });
+
+  test('default is not local-only: proxy and vendor are used; DREAMLAB_JEV_TOPIC_LOCAL_ONLY=1 refuses them', async () => {
+    const proxy = { DREAMLAB_JEV: '1', AGENTBOX_SYSTEM_ONE_PROXY: '1', AGENTBOX_SYSTEM_ONE_ENDPOINT: 'http://agentbox:8094/v1/systemone', AGENTBOX_SYSTEM_ONE_MODEL: 'jev-latest', AGENTBOX_SYSTEM_ONE_BACKEND_LOCAL: '0' };
+    let spy = [];
+    let out = await tagEnquiries(fresh, { env: proxy, fetchImpl: okFetch(good, spy) });
+    expect(spy).toHaveLength(2);
+    expect(spy[0].url).toBe('http://agentbox:8094/v1/systemone');
+    expect(out[0].topic).toBe('ktp · needs-info');
+    spy = [];
+    await tagEnquiries(fresh, { env: { DREAMLAB_JEV: '1', TYPESAFE_API_KEY: 'k' }, fetchImpl: okFetch(good, spy) });
+    expect(spy).toHaveLength(2);
+    spy = [];
+    out = await tagEnquiries(fresh, { env: { ...proxy, DREAMLAB_JEV_TOPIC_LOCAL_ONLY: '1' }, fetchImpl: okFetch(good, spy) });
+    expect(spy).toHaveLength(0);
+    expect(digestLines(out)).toEqual(baseline);
+    await tagEnquiries(fresh, { env: { DREAMLAB_JEV: '1', TYPESAFE_API_KEY: 'k', DREAMLAB_JEV_TOPIC_LOCAL_ONLY: '1' }, fetchImpl: okFetch(good, spy) });
+    expect(spy).toHaveLength(0);
   });
 
   test('flag off makes no request at all', async () => {
