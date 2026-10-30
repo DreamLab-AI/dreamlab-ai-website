@@ -4,7 +4,7 @@ title: A nightly SEO and agent-searchability watch runs alongside the dream engi
 date: 2026-10-12
 decision_status: accepted
 implementation_status: complete
-activation_status: staged
+activation_status: live
 supersedes: []
 superseded_by: []
 verified_commit: 5a6ac5fe
@@ -122,3 +122,12 @@ best-practices 100 / agentic-browsing 100 for `/programmes/`. Agentbox:
 `[seo_watch]` in `agentbox.toml`, `seoWatchEnabled` and
 `[program:seo-watch-cron]` in `flake.nix` (staged until the next
 `./agentbox.sh rebuild`).
+
+## Close-out 2026-10-30
+
+`activation_status` staged → live, on runtime evidence executed today in the agentbox that supervises the job:
+
+- `supervisorctl status seo-watch-cron` → `RUNNING pid 989`; `agentbox.toml` `[seo_watch]` carries `enabled = true`.
+- `~/workspace/.agentbox/seo-watch/ledger.jsonl` holds 17 nightly rows, 2026-10-13 to 2026-10-30 (no row for 2026-10-27). Today's row is run `f36e444db922` at 05:40:57Z: 30 pages audited, 0 high / 0 medium / 18 low findings, user-agent parity clean across 8 agents, mobile Lighthouse SEO 100 on `/`, `/programmes/` and `/co-create/`, no model call ("findings unchanged since last night"), no patch proposed.
+
+`implementation_status` stays complete and `verified_commit` is unchanged: this note certifies the running job, not a new source revision.
