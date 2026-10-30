@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 456" role="img" aria-labelledby="d4b-title d4b-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="d4b-title">Research project timeline</title>
+  <desc id="d4b-desc">Twenty-two-week Gantt: ethics and literature review, participant recruitment, interviews and survey, transcription, analysis, integration on the critical path, then drafting, revision and submission.</desc>
+  <rect x="8" y="8" width="944" height="440" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">RESEARCH PROJECT — TIMELINE</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <!-- grid: 22 weeks x 28px from x=272; ticks every 4 weeks -->
+  <g stroke="rgba(255,255,255,0.06)">
+    <line x1="272" y1="88" x2="272" y2="400"/>
+    <line x1="384" y1="88" x2="384" y2="400"/>
+    <line x1="496" y1="88" x2="496" y2="400"/>
+    <line x1="608" y1="88" x2="608" y2="400"/>
+    <line x1="720" y1="88" x2="720" y2="400"/>
+    <line x1="832" y1="88" x2="832" y2="400"/>
+  </g>
+  <g font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#6B7280" text-anchor="middle">
+    <text x="272" y="424">W0</text><text x="384" y="424">W4</text><text x="496" y="424">W8</text>
+    <text x="608" y="424">W12</text><text x="720" y="424">W16</text><text x="832" y="424">W20</text>
+  </g>
+
+  <g font-size="13" fill="#F5F5F5" text-anchor="end">
+    <text x="256" y="118">Ethics &amp; lit review</text>
+    <text x="256" y="154">Recruit participants</text>
+    <text x="256" y="190">Interviews &amp; survey</text>
+    <text x="256" y="226">Transcription</text>
+    <text x="256" y="262">Analysis</text>
+    <text x="256" y="298">Integration</text>
+    <text x="256" y="334">Draft &amp; revision</text>
+    <text x="256" y="370">Submission</text>
+  </g>
+
+  <g stroke="rgba(255,255,255,0.28)" fill="rgba(255,255,255,0.08)">
+    <rect x="272" y="104" width="108" height="20" rx="4"/>
+    <rect x="384" y="140" width="52" height="20" rx="4"/>
+    <rect x="440" y="176" width="80" height="20" rx="4"/>
+    <rect x="524" y="212" width="52" height="20" rx="4"/>
+    <rect x="580" y="248" width="80" height="20" rx="4"/>
+    <rect x="664" y="284" width="52" height="20" rx="4" fill="rgba(245,158,11,0.12)" stroke="#F59E0B" stroke-width="1.2"/>
+    <rect x="720" y="320" width="164" height="20" rx="4"/>
+  </g>
+  <rect x="878" y="350" width="20" height="20" rx="2" fill="rgba(245,158,11,0.12)" stroke="#F59E0B" stroke-width="1.2" transform="rotate(45 888 360)"/>
+  <text x="690" y="278" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#F59E0B" text-anchor="middle">critical</text>
+</svg>

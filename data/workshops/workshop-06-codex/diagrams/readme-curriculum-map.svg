@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 392" role="img" aria-labelledby="dg-title dg-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="dg-title">Workshop learning path</title>
+  <desc id="dg-desc">Nine modules in sequence: introduction, the AI coding ecosystem, getting started, mastering AI agents, practical applications, the broader landscape, challenges, best practices and conclusion.</desc>
+
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <rect x="8" y="8" width="944" height="376" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">LEARNING PATH</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <g text-anchor="middle">
+    <rect x="48" y="104" width="152" height="96" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="124" y="140" font-size="13" font-weight="600" fill="#F5F5F5">00 · Intro</text>
+    <text x="124" y="164" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">why agents now</text>
+
+    <rect x="224" y="104" width="152" height="96" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="300" y="140" font-size="13" font-weight="600" fill="#F5F5F5">01 · Ecosystem</text>
+    <text x="300" y="164" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">the tool landscape</text>
+
+    <rect x="400" y="104" width="152" height="96" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="476" y="140" font-size="13" font-weight="600" fill="#F5F5F5">02 · Setup</text>
+    <text x="476" y="164" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">web · terminal</text>
+    <text x="476" y="182" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">authentication</text>
+
+    <rect x="576" y="104" width="152" height="96" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="652" y="140" font-size="13" font-weight="600" fill="#F5F5F5">03 · Mastery</text>
+    <text x="652" y="164" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">prompting · context</text>
+    <text x="652" y="182" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">advanced technique</text>
+
+    <rect x="752" y="104" width="152" height="96" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="828" y="140" font-size="13" font-weight="600" fill="#F5F5F5">04 · Practice</text>
+    <text x="828" y="164" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">beginner → advanced</text>
+
+    <rect x="720" y="248" width="184" height="96" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="812" y="284" font-size="13" font-weight="600" fill="#F5F5F5">05 · Landscape</text>
+    <text x="812" y="308" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">models · trends</text>
+
+    <rect x="496" y="248" width="184" height="96" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="588" y="284" font-size="13" font-weight="600" fill="#F5F5F5">06 · Challenges</text>
+    <text x="588" y="308" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">limits · security · ethics</text>
+
+    <rect x="272" y="248" width="184" height="96" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="364" y="284" font-size="13" font-weight="600" fill="#F5F5F5">07 · Best Practices</text>
+    <text x="364" y="308" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">working habits</text>
+
+    <rect x="48" y="248" width="184" height="96" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="140" y="284" font-size="13" font-weight="600" fill="#F5F5F5">08 · Conclusion</text>
+    <text x="140" y="308" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#F59E0B">your agentic toolkit</text>
+  </g>
+
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2">
+    <path d="M200,152 C208,152 208,152 216,152" marker-end="url(#arr)"/>
+    <path d="M376,152 C384,152 384,152 392,152" marker-end="url(#arr)"/>
+    <path d="M552,152 C560,152 560,152 568,152" marker-end="url(#arr)"/>
+    <path d="M728,152 C736,152 736,152 744,152" marker-end="url(#arr)"/>
+    <path d="M828,200 C828,220 816,228 812,240" marker-end="url(#arr)"/>
+    <path d="M720,296 C708,296 700,296 688,296" marker-end="url(#arr)"/>
+    <path d="M496,296 C484,296 476,296 464,296" marker-end="url(#arr)"/>
+    <path d="M272,296 C260,296 252,296 240,296" marker-end="url(#arr)"/>
+  </g>
+</svg>
