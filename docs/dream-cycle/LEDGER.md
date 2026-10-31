@@ -67,3 +67,4 @@
 | 2026-10-28 | kit-pin-integrity | nostr-bbs-* crate resolved in Cargo.lock but off KIT_CRATES now fails the gate | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/80 | yes | ACCEPT |  | c24ff859c033 |  |  |  |
 | 2026-10-29 | site-build-content | manifest slug-sets vs *.md files only count-checked; inventory now binds sets | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/81 | yes | ACCEPT |  | df5568923000 |  |  |  |
 | 2026-10-30 | operator-overlay | dreamlab.toml [branding] vs branding.rs overlay unguarded; bench now binds them | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/83 | yes | ACCEPT |  | 843d075a63fe |  |  |  |
+| 2026-10-31 | ci-workflows | ci-pass needs list vs verdict loop unguarded; bench now binds both directions | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/84 | yes | ACCEPT |  | 0fc35c34410b |  |  |  |
