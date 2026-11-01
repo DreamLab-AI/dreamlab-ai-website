@@ -35,6 +35,7 @@ const TIER_CONFIG: Record<Tier, { label: string; color: string; dot: string; des
 // does when its env is unset) rather than silently failing.
 const RELAY_URL = import.meta.env.VITE_RELAY_URL || "";
 const JARVIS_PUBKEY = import.meta.env.VITE_JARVIS_PUBKEY || "";
+const MONITOR_PUBKEY = import.meta.env.VITE_MONITOR_PUBKEY || "";
 
 // Reply listeners (ADR-042 amendment). The primary relay's whitelist gate
 // rejects any kind-1059 addressed to the session's ephemeral key, so the
@@ -347,6 +348,7 @@ export const AIChatFab = () => {
       // third party could plant phishing text as an "assistant" message.
       expectedSenderPk: JARVIS_PUBKEY,
       onReplyChannelStatus: handleReplyChannelStatus,
+      monitorPk: MONITOR_PUBKEY,
     });
     sessionRef.current = session;
     addSystemMessage(CONNECTING_MESSAGE);

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '@/components/SlashLink';
 import { Check, ArrowRight, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useIsMobileSync } from '@/hooks/use-mobile';

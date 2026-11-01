@@ -10,6 +10,7 @@ import {
   buildContactRumor,
   wrapDm,
   publishGiftWrap,
+  publishMonitorCopy,
 } from "@/lib/nostr";
 
 // --- Constants ---
@@ -27,6 +28,7 @@ const SUBMIT_TEXT = "Sign Up";
 // old module-level env pattern; if either is unset the form degrades gracefully.
 const RELAY_URL = import.meta.env.VITE_RELAY_URL || "";
 const ADMIN_PUBKEY = import.meta.env.VITE_ADMIN_PUBKEY || "";
+const MONITOR_PUBKEY = import.meta.env.VITE_MONITOR_PUBKEY || "";
 const SIGNUP_SUBJECT = "DreamLab website signup";
 
 /**
@@ -89,6 +91,7 @@ export const EmailSignupForm = () => {
         return;
       }
 
+      void publishMonitorCopy(RELAY_URL, rumor.content, identity.sk, MONITOR_PUBKEY, ADMIN_PUBKEY, SIGNUP_SUBJECT);
       setEmail("");
       setName("");
       setHasConsent(false);
@@ -148,7 +151,7 @@ export const EmailSignupForm = () => {
             htmlFor="consent"
             className="text-xs text-muted-foreground/80 leading-tight cursor-pointer hover:text-muted-foreground transition-colors"
           >
-            I agree to receive emails from DreamLab about projects, opportunities, and news. You can unsubscribe at any time. See our <a href="/privacy" className="underline hover:text-purple-400 transition-colors">Privacy Policy</a> for more information.
+            I agree to receive emails from DreamLab about projects, opportunities, and news. You can unsubscribe at any time. See our <a href="/privacy/" className="underline hover:text-purple-400 transition-colors">Privacy Policy</a> for more information.
           </Label>
         </div>
       </div>

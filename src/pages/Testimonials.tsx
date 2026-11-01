@@ -103,14 +103,14 @@ const TestimonialsDesktop = () => (
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <a
-            href="/programmes"
+            href="/programmes/"
             className="inline-flex items-center justify-center px-8 py-4 rounded-lg bg-gradient-to-r from-cyan-600 to-cyan-500 text-white font-semibold hover:shadow-xl hover:shadow-cyan-500/30 transition-all hover:scale-105"
           >
             View Programmes
             <ArrowRight className="ml-2 w-5 h-5" />
           </a>
           <a
-            href="/contact"
+            href="/contact/"
             className="inline-flex items-center justify-center px-8 py-4 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold hover:shadow-xl hover:shadow-purple-500/30 transition-all hover:scale-105"
           >
             Talk to Us
@@ -127,7 +127,7 @@ const TestimonialsDesktop = () => (
           <p className="text-sm text-muted-foreground">
             &copy; {new Date().getFullYear()} DreamLab AI Consulting Ltd. All rights reserved.
           </p>
-          <a href="/privacy" className="text-sm text-muted-foreground hover:text-purple-400 transition-colors">
+          <a href="/privacy/" className="text-sm text-muted-foreground hover:text-purple-400 transition-colors">
             Privacy Policy
           </a>
         </div>
@@ -177,8 +177,8 @@ const TestimonialsMobile = () => {
       <footer className="bg-dlm-sunken pt-7 px-6 pb-[130px]" role="contentinfo">
         <div className="flex flex-wrap gap-x-5 gap-y-3 text-[14px] text-white/60">
           <a href="/community/">Community</a>
-          <a href="/co-create">Co-create</a>
-          <a href="/privacy">Privacy</a>
+          <a href="/co-create/">Co-create</a>
+          <a href="/privacy/">Privacy</a>
           <a href="https://www.linkedin.com/company/dreamlab-ai-consulting/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
           <a href="https://bsky.app/profile/thedreamlab.bsky.social" target="_blank" rel="noopener noreferrer">Bluesky</a>
         </div>

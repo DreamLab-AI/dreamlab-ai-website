@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { useLocation, Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import { Link } from "@/components/SlashLink";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,6 +22,7 @@ import {
   buildEnquiryRumor,
   wrapDm,
   publishGiftWrap,
+  publishMonitorCopy,
 } from "@/lib/nostr";
 import { npubEncode } from "nostr-tools/nip19";
 import { useOGMeta } from "@/hooks/useOGMeta";
@@ -38,6 +40,7 @@ const ERROR_MESSAGE_UNAVAILABLE = "Service temporarily unavailable. Please try a
 // rejected publish never shows a false success.
 const RELAY_URL = import.meta.env.VITE_RELAY_URL || "";
 const ADMIN_PUBKEY = import.meta.env.VITE_ADMIN_PUBKEY || "";
+const MONITOR_PUBKEY = import.meta.env.VITE_MONITOR_PUBKEY || "";
 const ENQUIRY_SUBJECT = "DreamLab website enquiry";
 
 // Define form schema with Zod
@@ -250,7 +253,7 @@ const ContactMobile = ({ form, onSubmit, isSubmitting, selectedTeam }: ContactVi
               className="w-[22px] h-[22px] mt-0.5 shrink-0 accent-[#06B6D4]"
             />
             <span className="text-[14px] leading-[1.5] text-white/65">
-              I'm happy for DreamLab to use these details to reply to my enquiry. See our{" "}
+              I'm happy for DreamLab to use these details to reply to my enquiry, including local AI topic tagging to help the team review it. See our{" "}
               <Link to="/privacy" className="text-dlm-bright underline">privacy policy</Link>.
             </span>
           </label>
@@ -390,7 +393,7 @@ const ContactDesktop = ({ form, onSubmit, isSubmitting, selectedTeam }: ContactV
               {isSubmitting ? "Sending..." : "Send Message"}
             </Button>
             <p className="text-sm text-muted-foreground">
-              Sent end-to-end encrypted over Nostr. Only we can read it, and we don't store it anywhere else.
+              By sending, you agree that DreamLab may use your details to reply. Your encrypted message reaches our operator and inbox monitor; local AI may suggest a topic to help the team review it.
             </p>
           </form>
         </Form>
@@ -421,7 +424,7 @@ const ContactDesktop = ({ form, onSubmit, isSubmitting, selectedTeam }: ContactV
                 </li>
               </ul>
             </nav>
-            <a href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <a href="/privacy/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Privacy Policy
             </a>
           </div>
@@ -510,6 +513,7 @@ const Contact = () => {
         return;
       }
 
+      void publishMonitorCopy(RELAY_URL, rumor.content, identity.sk, MONITOR_PUBKEY, ADMIN_PUBKEY, ENQUIRY_SUBJECT);
       toast.success(SUCCESS_MESSAGE, { duration: 5000 });
       form.reset();
     } catch {

@@ -18,6 +18,9 @@
 //      recorded in the compatibility record.
 //   6. The crate set is identical across manifest, lockfile and record — a crate
 //      added to one and forgotten in another is drift, not a silent pass.
+//   7. No `nostr-bbs-*` crate resolves in forum-config/Cargo.lock outside the
+//      governed set — a kit-family crate arriving only transitively is drift,
+//      not a silent pass.
 //
 // Every function here is pure over an explicit `root`, so the tests drive it
 // against fixture trees rather than mutating the live repo.
@@ -39,6 +42,9 @@ export const KIT_CRATES = [
   "nostr-bbs-mesh",
   "nostr-bbs-rate-limit",
 ];
+
+/** Every crate whose name carries this prefix belongs to the upstream kit. */
+const KIT_FAMILY_PREFIX = "nostr-bbs-";
 
 export const MANIFEST_PATH = "forum-config/Cargo.toml";
 export const LOCKFILE_PATH = "forum-config/Cargo.lock";
@@ -122,6 +128,25 @@ export function countKitPackageBlocks(text) {
 }
 
 /**
+ * Collect the name of every [[package]] block carrying the kit-family prefix
+ * (`nostr-bbs-`), governed or not. parseLockfileResolved and
+ * countKitPackageBlocks are both keyed on KIT_CRATES, so a kit-family crate
+ * that arrives only through the lockfile — a new crate the kit starts
+ * shipping, pulled in transitively — would be invisible to every check they
+ * feed; this sweep is what makes it legible to the gate.
+ */
+export function findKitFamilyPackages(text) {
+  const names = [];
+  if (!text) return names;
+  const blocks = text.split(/^\[\[package\]\]\s*$/m).slice(1);
+  for (const block of blocks) {
+    const name = block.match(/^\s*name\s*=\s*"([^"]+)"\s*$/m)?.[1];
+    if (name?.startsWith(KIT_FAMILY_PREFIX)) names.push(name);
+  }
+  return names;
+}
+
+/**
  * Parse the machine-readable fields of the compatibility record:
  *   CANONICAL_KIT_SHA / CANONICAL_KIT_VERSION, and the per-crate
  *   `RESOLVED <crate> <version> <sha256>` lines under pin-check:resolved-packages.
@@ -137,6 +162,24 @@ export function parseRecord(text) {
     out.resolved.set(m[1], { version: m[2], checksum: m[3] });
   }
   return out;
+}
+
+/**
+ * Count how many RESOLVED lines the record carries per crate. parseRecord
+ * keeps only the LAST line per crate, so a repin that appends the fresh
+ * RESOLVED line without deleting the previous one hides the stale line from
+ * every comparison in checkKitPins — the record-side twin of the duplicate
+ * [[package]] block that countKitPackageBlocks guards on the lockfile side.
+ */
+export function countRecordResolvedLines(text) {
+  const counts = new Map();
+  if (!text) return counts;
+  const re = /^RESOLVED\s+(\S+)\s+\S+\s+[0-9a-f]{64}\s*$/gm;
+  let m;
+  while ((m = re.exec(text)) !== null) {
+    counts.set(m[1], (counts.get(m[1]) ?? 0) + 1);
+  }
+  return counts;
 }
 
 /**
@@ -233,6 +276,22 @@ export function checkKitPins(root) {
   if (lockText === null) errors.push(`lockfile missing: ${LOCKFILE_PATH}`);
   const resolved = parseLockfileResolved(lockText);
 
+  // A kit-family crate resolved here but absent from KIT_CRATES is ungoverned:
+  // no exact-pin, checksum or record comparison covers it, because every
+  // check below is keyed on KIT_CRATES. A new kit crate the kit starts
+  // shipping — arriving only transitively, never named in the manifest —
+  // would otherwise ship silently.
+  const kitFamily = findKitFamilyPackages(lockText);
+  for (const name of kitFamily) {
+    if (!KIT_CRATES.includes(name)) {
+      errors.push(
+        `${LOCKFILE_PATH}: kit-family crate ${name} is resolved in the ` +
+          `lockfile but is not on the governed crate list (KIT_CRATES) — ` +
+          `govern it or remove it`,
+      );
+    }
+  }
+
   // A second [[package]] block for a kit crate means the dependency graph
   // resolved two kit versions side by side (Cargo permits this for
   // semver-incompatible pre-releases). parseLockfileResolved keeps only the
@@ -300,6 +359,22 @@ export function checkKitPins(root) {
   for (const crate of record.resolved.keys()) {
     if (!KIT_CRATES.includes(crate)) {
       errors.push(`${RECORD_PATH}: RESOLVED line for unknown crate ${crate}`);
+    }
+  }
+
+  // A second RESOLVED line for one crate is the record-side twin of the
+  // lockfile's duplicate [[package]] block: parseRecord keeps only the LAST
+  // line per crate, so a stale line a repin left behind is invisible to
+  // every comparison above. Exactly one RESOLVED line per crate is the
+  // record's own invariant; the duplicate-block guard covers the lockfile.
+  const resolvedCounts = countRecordResolvedLines(recordText);
+  for (const crate of resolvedCounts.keys()) {
+    if (resolvedCounts.get(crate) > 1) {
+      errors.push(
+        `${RECORD_PATH}: ${crate} has ${resolvedCounts.get(crate)} RESOLVED lines — ` +
+          `exactly one per crate; only the last line is compared, so an ` +
+          `earlier stale line drifts unseen`,
+      );
     }
   }
 

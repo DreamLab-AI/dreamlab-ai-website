@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "@/components/SlashLink";
 import { verifyEvent, type Event } from "nostr-tools/pure";
 import { ArrowLeft, ArrowUpRight, GitBranch, Radio } from "lucide-react";
 import { Header } from "@/components/Header";

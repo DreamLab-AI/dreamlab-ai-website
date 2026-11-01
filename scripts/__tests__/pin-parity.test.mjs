@@ -10,6 +10,8 @@ import {
   checkActionPins,
   checkKitPins,
   countKitPackageBlocks,
+  countRecordResolvedLines,
+  findKitFamilyPackages,
   findTagPinnedUses,
   parseKitRef,
   parseLockfileResolved,
@@ -103,6 +105,53 @@ dependencies = [
       version: "1.0.0",
       checksum: "b".repeat(64),
     });
+  });
+
+  it("counts duplicate RESOLVED lines the resolved map collapses", () => {
+    const record = [
+      "CANONICAL_KIT_SHA=deadbeef",
+      "CANONICAL_KIT_VERSION=1.0.0",
+      `RESOLVED nostr-bbs-core 1.0.0-beta.8 ${"d".repeat(64)}`,
+      `RESOLVED nostr-bbs-core 1.0.0 ${"b".repeat(64)}`,
+      `RESOLVED nostr-bbs-mesh 1.0.0 ${"c".repeat(64)}`,
+    ].join("\n");
+    const counts = countRecordResolvedLines(record);
+    expect(counts.get("nostr-bbs-core")).toBe(2);
+    expect(counts.get("nostr-bbs-mesh")).toBe(1);
+    // The resolved map keeps only the LAST line per crate — the fact that
+    // makes the count necessary rather than redundant.
+    expect(parseRecord(record).resolved.get("nostr-bbs-core")).toEqual({
+      version: "1.0.0",
+      checksum: "b".repeat(64),
+    });
+  });
+
+  it("collects every kit-family package block, governed or not", () => {
+    const lock = [
+      "[[package]]",
+      'name = "nostr"',
+      'version = "0.44.8"',
+      "",
+      "[[package]]",
+      'name = "nostr-bbs-core"',
+      'version = "1.0.0-beta.16"',
+      "",
+      "[[package]]",
+      'name = "nostr-bbs-agent-tools"',
+      'version = "1.0.0-beta.16"',
+      "",
+      "[[package]]",
+      'name = "serde"',
+      'version = "1.0.219"',
+      'dependencies = [',
+      ' "nostr-bbs-mesh",',
+      "]",
+    ].join("\n");
+    const names = findKitFamilyPackages(lock);
+    expect(names).toEqual(["nostr-bbs-core", "nostr-bbs-agent-tools"]);
+    // A crate named only inside another package's `dependencies` list is not
+    // a resolved package of its own, so it is not family drift either.
+    expect(names).not.toContain("nostr-bbs-mesh");
   });
 });
 
@@ -249,6 +298,23 @@ describe("deliberately inconsistent pins are rejected", () => {
     expectDrift(checkKitPins(root), "cannot be pin-verified");
   });
 
+  // The record-side twin of the lockfile duplicate-block guard: a repin that
+  // appends the fresh RESOLVED line without deleting the previous one leaves
+  // a stale line that last-wins parsing hides from every comparison. The
+  // stale line is inserted FIRST so that, without the duplicate count, this
+  // fixture would pass exactly as the live repository does today.
+  it("rejects a record carrying two RESOLVED lines for one crate", () => {
+    const root = makeFixtureRepo((r) => {
+      r.edit("docs/architecture/kit-compatibility-record.md", (t) =>
+        t.replace(
+          /^(RESOLVED\s+nostr-bbs-core\s+\S+\s+[0-9a-f]{64})\s*$/m,
+          `RESOLVED nostr-bbs-core 1.0.0-beta.8 ${"d".repeat(64)}\n$1`,
+        ),
+      );
+    });
+    expectDrift(checkKitPins(root), "nostr-bbs-core has 2 RESOLVED lines");
+  });
+
   it("rejects a record missing a RESOLVED line for a consumed crate", () => {
     const root = makeFixtureRepo((r) => {
       r.edit("docs/architecture/kit-compatibility-record.md", (t) =>
@@ -261,6 +327,32 @@ describe("deliberately inconsistent pins are rejected", () => {
   it("rejects a missing compatibility record outright", () => {
     const root = makeFixtureRepo((r) => r.remove("docs/architecture/kit-compatibility-record.md"));
     expectDrift(checkKitPins(root), "compatibility record missing");
+  });
+
+  // A kit-family crate that arrives only through the lockfile — the kit
+  // starts shipping a new crate, pulled in transitively, never named in the
+  // manifest — is invisible to every check keyed on KIT_CRATES. The fixture
+  // inserts one ahead of the governed nostr-bbs-config block; without the
+  // family sweep this fixture passes exactly as the live repository does.
+  it("rejects a kit-family crate resolved in the lockfile but not on KIT_CRATES", () => {
+    const root = makeFixtureRepo((r) => {
+      r.edit("forum-config/Cargo.lock", (t) =>
+        t.replace(
+          '[[package]]\nname = "nostr-bbs-config"',
+          [
+            "[[package]]",
+            'name = "nostr-bbs-agent-tools"',
+            'version = "1.0.0-beta.16"',
+            'source = "registry+https://github.com/rust-lang/crates.io-index"',
+            `checksum = "${"e".repeat(64)}"`,
+            "",
+            "[[package]]",
+            'name = "nostr-bbs-config"',
+          ].join("\n"),
+        ),
+      );
+    });
+    expectDrift(checkKitPins(root), "kit-family crate nostr-bbs-agent-tools");
   });
 });
 

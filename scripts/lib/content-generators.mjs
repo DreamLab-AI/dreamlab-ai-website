@@ -85,22 +85,74 @@ if (existsSync(workshopsDir)) {
         ? `missing=[${missing.join(",")}] stale=[${extra.join(",")}]`
         : "exact",
     );
+    // `path` feeds prerender's routes/aliases and check-discovery's expected
+    // sitemap URLs, but both re-read the same field, so nothing re-derives it:
+    // a hand-edited or half-regenerated workshop-list.json keeps green ids
+    // while rotting every link built from `path`.
+    const badPaths = list.filter((w) => w.path !== `/workshops/${w.id}`);
+    check(
+      badPaths.length === 0,
+      "workshop paths match ids",
+      badPaths.length
+        ? badPaths.map((w) => `${w.id}->${w.path}`).join(",")
+        : "all paths are /workshops/<id>",
+    );
   }
 
   let manifests = 0;
   let pageDrift = [];
+  let slugDrift = [];
   for (const id of sourceDirs) {
     const manifestPath = join(workshopsDir, id, "manifest.json");
     if (!existsSync(manifestPath)) continue;
     manifests += 1;
     const manifest = readJson(manifestPath);
-    const mdCount = readdirSync(join(workshopsDir, id)).filter((f) => f.endsWith(".md")).length;
+    const mdFiles = readdirSync(join(workshopsDir, id)).filter((f) => f.endsWith(".md"));
+    const mdCount = mdFiles.length;
     if ((manifest.pages?.length ?? -1) !== mdCount) {
       pageDrift.push(`${id}(${manifest.pages?.length ?? "?"}!=${mdCount})`);
+    }
+    // Count equality is not set equality: a stale manifest that duplicates one
+    // slug while dropping a renamed file keeps the count green, yet every link
+    // prerender and check-discovery build from the missing slug rots silently.
+    const slugs = (manifest.pages ?? []).map((p) => p.slug);
+    const unlisted = mdFiles.filter((f) => !slugs.includes(f));
+    const stale = slugs.filter((s) => !mdFiles.includes(s));
+    if (unlisted.length || stale.length) {
+      slugDrift.push(`${id}(unlisted=[${unlisted.join(",")}] stale=[${stale.join(",")}])`);
     }
   }
   check(manifests === sourceDirs.length, "manifest coverage", `${manifests}/${sourceDirs.length} dirs`);
   check(pageDrift.length === 0, "manifest pages match *.md", pageDrift.join(",") || "all aligned");
+  check(slugDrift.length === 0, "manifest slugs match *.md filenames", slugDrift.join(", ") || "exact");
+
+  // The hand-written course index is the human-facing directory of the same
+  // workshops; nothing regenerates it, so a workshop added or removed without
+  // editing the index leaves a served, silently stale file behind (a dead
+  // link or a missing entry). Its relative directory links must be exactly
+  // the source dirs.
+  const indexPath = join(workshopsDir, "ai-powered-knowledge-work-index.md");
+  if (existsSync(indexPath)) {
+    const linked = new Set(
+      readFileSync(indexPath, "utf-8")
+        .split("](./")
+        .slice(1)
+        .map((rest) => rest.slice(0, rest.indexOf(")")))
+        .filter((target) => target.endsWith("/"))
+        .map((target) => target.slice(0, -1)),
+    );
+    const unlisted = sourceDirs.filter((d) => !linked.has(d));
+    const dead = [...linked].filter((d) => !sourceDirs.includes(d));
+    check(
+      unlisted.length === 0 && dead.length === 0,
+      "course index links match workshop dirs",
+      unlisted.length || dead.length
+        ? `unlisted=[${unlisted.join(",")}] dead=[${dead.join(",")}]`
+        : `${sourceDirs.length} dirs, all linked`,
+    );
+  } else {
+    check(false, "course index present", `absent: ${indexPath.replace(`${root}/`, "")}`);
+  }
 } else {
   check(false, "workshops source dir", `absent: ${workshopsDir.replace(`${root}/`, "")}`);
 }

@@ -12,7 +12,7 @@
 
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { checkConfigMirrors } from "./lib/config-mirrors.mjs";
+import { checkConfigMirrors, checkOperatorVarMirrors } from "./lib/config-mirrors.mjs";
 
 const argv = process.argv.slice(2);
 const value = (name) => {
@@ -23,7 +23,16 @@ const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const root = resolve(value("--root") ?? repoRoot);
 const github = argv.includes("--github");
 
-const result = checkConfigMirrors(root);
+// Both checks gate: the operator var mirrors (webauthn, mesh, poker) were
+// bench-tested but never run here, so CI did not enforce them (ER-23).
+const enumerated = checkConfigMirrors(root);
+const operator = checkOperatorVarMirrors(root);
+const result = {
+  ...enumerated,
+  ok: enumerated.ok && operator.ok,
+  errors: [...enumerated.errors, ...operator.errors],
+  operator,
+};
 
 if (argv.includes("--json")) {
   console.log(JSON.stringify({ ...result, root }, null, 2));
@@ -33,6 +42,7 @@ if (argv.includes("--json")) {
     console.log(`${m.id.padEnd(28)} ${String(m.sites.length).padStart(2)} site(s)  ${state}`);
     for (const site of m.sites) console.log(`    - ${site}`);
   }
+  console.log(`${"operator-var-mirrors".padEnd(28)}     ${operator.ok ? "in sync" : "DRIFT"}`);
   for (const err of result.errors) {
     console.error(github ? `::error::${err.replace(/\n/g, "%0A")}` : `ERROR: ${err}`);
   }

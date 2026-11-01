@@ -339,6 +339,34 @@ export function publishGiftWrap(
   });
 }
 
+/**
+ * Best-effort second copy of a message, gift-wrapped to the nightly inbox
+ * monitor's pubkey (VITE_MONITOR_PUBKEY). The relay's kind-1059 read gate
+ * rewrites every REQ to the authenticated viewer's own `#p`, so a monitor can
+ * only read wraps addressed to it; hence a co-recipient copy rather than a
+ * second look at the admin's. Call this only AFTER the primary publish returned
+ * OK-true so a rejected message is never mirrored. It never rejects and never
+ * affects what the visitor sees. A no-op when `monitorPk` is empty or equals
+ * the primary recipient.
+ */
+export async function publishMonitorCopy(
+  relayUrl: string,
+  content: string,
+  senderSk: Uint8Array,
+  monitorPk: string | undefined,
+  primaryRecipientPk: string,
+  subject?: string,
+  opts: Pick<PublishOptions, "wsFactory" | "timeoutMs"> = {},
+): Promise<void> {
+  if (!monitorPk || monitorPk === primaryRecipientPk) return;
+  try {
+    const wrap = wrapDm(content, senderSk, monitorPk, subject);
+    await publishGiftWrap(relayUrl, wrap, { ...opts, authSk: senderSk });
+  } catch {
+    /* monitoring is best-effort — never surface to the visitor */
+  }
+}
+
 interface UnwrappedRumor {
   pubkey: string;
   content: string;
@@ -413,6 +441,12 @@ export interface DmSessionOptions {
    * until the timeout.
    */
   onReplyChannelStatus?: (status: ReplyChannelStatus) => void;
+  /**
+   * Nightly inbox monitor's pubkey. When set, each accepted question is also
+   * gift-wrapped to it (publishMonitorCopy) so incoming chat is visible to the
+   * monitor despite the relay's own-`#p` read gate.
+   */
+  monitorPk?: string;
 }
 
 /** Why an inbound wrap was not delivered as a reply. */
@@ -468,6 +502,10 @@ export class DmSession {
   private keepaliveSeq = 0;
 
   private readonly pendingOk = new Map<string, PendingSend>();
+  // Plaintext + recipient of in-flight questions, keyed by wrap id, so the
+  // monitor copy can be sent once (and only if) the relay accepts the original.
+  private readonly pendingText = new Map<string, string>();
+  private readonly pendingRecipient = new Map<string, string>();
 
   private readonly replyRelays: string[];
   private readonly replySockets = new Map<string, WebSocket>();
@@ -483,6 +521,7 @@ export class DmSession {
   private readonly seenWrapIds = new Set<string>();
 
   private readonly expectedSenderPk?: string;
+  private readonly monitorPk?: string;
   private readonly onRejectedReply: (reason: ReplyRejection, event: Event) => void;
   private readonly onReplyChannelStatus: (status: ReplyChannelStatus) => void;
   // Freshness floor for replies: rumors authored before the session existed
@@ -501,7 +540,8 @@ export class DmSession {
       (url) => url && url !== this.relayUrl,
     );
     this.expectedSenderPk = opts.expectedSenderPk;
-    this.onRejectedReply = opts.onRejectedReply ?? (() => {});
+    this.monitorPk = opts.monitorPk;
+    this.onRejectedReply =opts.onRejectedReply ?? (() => {});
     this.onReplyChannelStatus = opts.onReplyChannelStatus ?? (() => {});
   }
 
@@ -578,14 +618,22 @@ export class DmSession {
     return new Promise<void>((resolve, reject) => {
       const timer = setTimeout(() => {
         this.pendingOk.delete(wrap.id);
+        this.pendingText.delete(wrap.id);
+        this.pendingRecipient.delete(wrap.id);
         reject(new Error("Timed out waiting for the relay to accept the message."));
       }, SEND_OK_TIMEOUT_MS);
       this.pendingOk.set(wrap.id, { resolve, reject, timer });
+      if (this.monitorPk) {
+        this.pendingText.set(wrap.id, text);
+        this.pendingRecipient.set(wrap.id, recipientPk);
+      }
       try {
         this.ws!.send(JSON.stringify(["EVENT", wrap]));
       } catch (err) {
         clearTimeout(timer);
         this.pendingOk.delete(wrap.id);
+        this.pendingText.delete(wrap.id);
+        this.pendingRecipient.delete(wrap.id);
         reject(new Error(`Failed to send message: ${errMsg(err)}`));
       }
     });
@@ -681,9 +729,25 @@ export class DmSession {
         clearTimeout(pending.timer);
         if (frame[2]) {
           pending.resolve();
+          if (this.pendingText.has(id)) {
+            // Mirror only questions the primary relay accepted.
+            void publishMonitorCopy(
+              this.relayUrl,
+              this.pendingText.get(id) as string,
+              this.identity.sk,
+              this.monitorPk,
+              this.pendingRecipient.get(id) as string,
+              undefined,
+              { wsFactory: this.wsFactory },
+            );
+          }
+          this.pendingText.delete(id);
+          this.pendingRecipient.delete(id);
         } else {
           const msg = typeof frame[3] === "string" ? frame[3] : "";
           pending.reject(new Error(msg || "Relay rejected the message."));
+          this.pendingText.delete(id);
+          this.pendingRecipient.delete(id);
         }
         break;
       }
@@ -879,5 +943,7 @@ export class DmSession {
       pending.reject(new Error(reason));
     }
     this.pendingOk.clear();
+    this.pendingText.clear();
+    this.pendingRecipient.clear();
   }
 }

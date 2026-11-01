@@ -321,7 +321,7 @@ Code blocks
 
 ### Mermaid Diagram Quick Reference
 
-```mermaid
+```text
 # Flowchart
 graph TD
     A --> B

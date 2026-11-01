@@ -7,6 +7,7 @@ import {
   buildEnquiryRumor,
   generateEphemeralIdentity,
   publishGiftWrap,
+  publishMonitorCopy,
   wrapDm,
   DmSession,
   NIP44_MAX_PLAINTEXT,
@@ -782,6 +783,84 @@ describe("DmSession reply rejection and channel health", () => {
   it("never reports allDown when no reply relays are configured", async () => {
     const { session } = await connect({});
     expect(session.replyChannelStatus().allDown).toBe(false);
+    session.close();
+  });
+});
+
+describe("publishMonitorCopy", () => {
+  const admin = generateEphemeralIdentity();
+  const monitor = generateEphemeralIdentity();
+
+  async function run(monitorPk: string | undefined, primaryPk = admin.pk) {
+    const { wsFactory, sockets } = trackedFactory();
+    const sender = generateEphemeralIdentity();
+    const pending = publishMonitorCopy(RELAY, "hello", sender.sk, monitorPk, primaryPk, "subj", {
+      wsFactory,
+      timeoutMs: 50,
+    });
+    sockets[0]?.fireOpen();
+    await pending;
+    return { sockets, sender };
+  }
+
+  it("wraps a second copy to the monitor pubkey", async () => {
+    const { sockets, sender } = await run(monitor.pk);
+    expect(sockets).toHaveLength(1);
+    const event = sockets[0].frames().find((f) => f[0] === "EVENT")![1] as Parameters<
+      typeof nip59.unwrapEvent
+    >[0];
+    const rumor = nip59.unwrapEvent(event, monitor.sk);
+    expect(rumor.content).toBe("hello");
+    expect(rumor.pubkey).toBe(sender.pk);
+  });
+
+  it("is a no-op without a monitor key or when it equals the primary recipient", async () => {
+    expect((await run(undefined)).sockets).toHaveLength(0);
+    expect((await run("")).sockets).toHaveLength(0);
+    expect((await run(admin.pk)).sockets).toHaveLength(0);
+  });
+
+  it("never rejects when the relay is unreachable", async () => {
+    const failing = (): WebSocket => {
+      throw new Error("blocked");
+    };
+    await expect(
+      publishMonitorCopy(RELAY, "x", generateEphemeralIdentity().sk, monitor.pk, admin.pk, undefined, {
+        wsFactory: failing,
+      }),
+    ).resolves.toBeUndefined();
+  });
+});
+
+describe("DmSession monitor copy", () => {
+  it("mirrors an accepted question to the monitor and drops a rejected one", async () => {
+    const monitor = generateEphemeralIdentity();
+    const agent = generateEphemeralIdentity();
+    const { wsFactory, sockets } = trackedFactory();
+    const session = new DmSession(RELAY, generateEphemeralIdentity(), {
+      wsFactory,
+      onReply: () => {},
+      monitorPk: monitor.pk,
+    });
+    const connecting = session.connect();
+    const main = sockets[0];
+    main.fireOpen();
+    main.emit(["AUTH", "challenge"]);
+    main.emit(["EOSE", "inbox"]);
+    await connecting;
+
+    const accepted = session.sendQuestion("first", agent.pk);
+    const wrap1 = main.frames().filter((f) => f[0] === "EVENT").at(-1)![1] as { id: string };
+    main.emit(["OK", wrap1.id, true, ""]);
+    await accepted;
+    expect(sockets.length).toBe(2); // monitor copy opened its own socket
+    expect(sockets[1].url).toBe(RELAY);
+
+    const rejected = session.sendQuestion("second", agent.pk);
+    const wrap2 = main.frames().filter((f) => f[0] === "EVENT").at(-1)![1] as { id: string };
+    main.emit(["OK", wrap2.id, false, "blocked"]);
+    await expect(rejected).rejects.toThrow();
+    expect(sockets.length).toBe(2); // no second monitor copy
     session.close();
   });
 });

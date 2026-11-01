@@ -56,6 +56,15 @@ binding     = "PODS"
 bucket_name = "dreamlab-pods"
 
 [vars]
+
+# System One advisory integration. Errors retain the existing result.
+JEV_RATIONALE_CHECK = "1"
+# Cloud by default: TypeSafe direct with the TYPESAFE_API_KEY Worker secret.
+# For a private route set JEV_RATIONALE_CHECK_LOCAL_ONLY = "1" and configure
+# JEV_ENDPOINT, JEV_MODEL and JEV_LOCAL=1 for an authenticated, Worker-reachable
+# sovereign inference ingress; until then it reports unavailable. Never point it
+# at an unreachable container/loopback URL.
+
 RP_ID                = "dreamlab-ai.com"
 RP_NAME              = "DreamLab Community"
 EXPECTED_ORIGIN      = "https://dreamlab-ai.com"

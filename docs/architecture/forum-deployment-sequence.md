@@ -79,7 +79,7 @@ sequenceDiagram
 
     Note over GH: React main site build
     GH->>GH: npm ci && npm run build<br/>deploy.yml:91-99
-    Note right of GH: Secrets baked into React bundle at build time:<br/>  VITE_SUPABASE_URL → ${{ secrets.VITE_SUPABASE_URL }}<br/>  VITE_SUPABASE_ANON_KEY → ${{ secrets.VITE_SUPABASE_ANON_KEY }}<br/>  VITE_AUTH_API_URL → env.VITE_AUTH_API_URL (workers.dev URL)<br/>Output: dist/ (React SPA)
+    Note right of GH: Secrets baked into React bundle at build time:<br/>  VITE_AUTH_API_URL → env.VITE_AUTH_API_URL (workers.dev URL)<br/>Output: dist/ (React SPA)
 
     Note over GH: Rust/WASM forum client build
     GH->>GH: Install Rust 1.90.0 + wasm32-unknown-unknown<br/>deploy.yml:102-105

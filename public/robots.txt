@@ -5,6 +5,7 @@ User-agent: *
 Allow: /
 Disallow: /api/
 Disallow: /admin/
+Disallow: /downloads/
 
 # Search and user-directed agents have the same public access as other readers.
 # Training choices are independent; this change does not introduce a training block.
@@ -17,5 +18,6 @@ User-agent: Claude-User
 Allow: /
 Disallow: /api/
 Disallow: /admin/
+Disallow: /downloads/
 
 Sitemap: https://dreamlab-ai.com/sitemap.xml

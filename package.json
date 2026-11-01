@@ -28,7 +28,8 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:e2e": "playwright test",
-    "postbuild": "node scripts/prerender.mjs && node scripts/generate-llms-full.mjs && node scripts/check-discovery.mjs"
+    "check:claims": "node scripts/check-claims.mjs",
+    "postbuild": "node scripts/prerender.mjs && node scripts/generate-llms-full.mjs && node scripts/check-discovery.mjs && node scripts/check-claims.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
@@ -68,9 +69,9 @@
     "embla-carousel-react": "^8.6.0",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.563.0",
-    "mermaid": "^11.12.2",
     "next-themes": "^0.3.0",
     "nostr-tools": "^2.23.3",
+    "pele": "1.12.0",
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.3.1",
@@ -111,6 +112,7 @@
     "jsdom": "^25.0.1",
     "lovable-tagger": "^1.1.13",
     "postcss": "^8.5.6",
+    "qrcode": "^1.5.4",
     "tailwindcss": "^3.4.11",
     "terser": "^5.46.0",
     "typescript": "^5.9.3",

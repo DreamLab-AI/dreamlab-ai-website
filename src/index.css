@@ -558,3 +558,80 @@ html {
 .delay-4d-4 { animation-delay: 4.5s; }
 .delay-4d-5 { animation-delay: 6s; }
 .delay-4d-6 { animation-delay: 7.5s; }
+
+/* -- Click Through × DreamLab landing page (src/pages/ClickThrough.tsx) ----
+ * Poppins is the partner's typeface. Subset (Latin-1 + punctuation) and
+ * self-hosted so the page makes no third-party font request. */
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/poppins/poppins-regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/poppins/poppins-medium.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/poppins/poppins-semibold.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/poppins/poppins-bold.woff2") format("woff2");
+}
+
+/* The one DreamLab band on that page: our mesh glow, held still. */
+.dl-glow {
+  background:
+    radial-gradient(ellipse at 15% 30%, rgba(34, 211, 238, 0.14) 0%, transparent 45%),
+    radial-gradient(ellipse at 85% 70%, rgba(168, 85, 247, 0.12) 0%, transparent 45%),
+    radial-gradient(ellipse at 60% 10%, rgba(245, 158, 11, 0.06) 0%, transparent 40%);
+}
+
+/* Workshop diagrams, rendered by Pele (src/components/Diagram.tsx). Pele draws
+   every colour from these variables, so the dark lesson panel needs no re-render
+   and no per-diagram theme. Mermaid's light default theme on this panel left
+   titles and section labels near-invisible; these keep text at >= 7:1. */
+.dl-diagram {
+  --pele-bg: #08080a;
+  --pele-fg: #e6edf3;
+  --pele-muted: #a1a7b0;
+  --pele-line: #c9d1d9;
+  --pele-surface: #16161b;
+  --pele-surface-alt: #202027;
+  --pele-border: #4a4a55;
+  --pele-accent: #22d3ee;
+  --pele-radius: 6px;
+  --pele-font: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+  display: block;
+  background: #08080a;
+  border: 1px solid rgb(255 255 255 / 0.08);
+  border-radius: 10px;
+  padding: 16px;
+  font-family: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+  font-size: 14px;
+  color: #e6edf3;
+  /* Pele's zoom buttons appear when a diagram is shrunk to fit. By default they
+     sit top-right over the chart (they hid gantt bars at 390 px); keep them in a
+     strip under the diagram instead, laid out in a row. */
+  position: relative;
+  padding-bottom: 52px;
+  --pele-zoom-top: auto;
+  --pele-zoom-bottom: 8px;
+  --pele-zoom-right: 8px;
+}
+
+.dl-diagram [style*='pele-zoom-top'] {
+  flex-direction: row !important;
+}

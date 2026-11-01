@@ -38,13 +38,13 @@ flowchart LR
 
     subgraph "auth-worker"
         ROUTER[Router]
-        REG_OPT[/auth/register/options]
-        REG_VER[/auth/register/verify]
-        LOG_OPT[/auth/login/options]
-        LOG_VER[/auth/login/verify]
-        LOOKUP[/auth/lookup]
-        PROFILE[/api/profile]
-        HEALTH[/health]
+        REG_OPT["/auth/register/options"]
+        REG_VER["/auth/register/verify"]
+        LOG_OPT["/auth/login/options"]
+        LOG_VER["/auth/login/verify"]
+        LOOKUP["/auth/lookup"]
+        PROFILE["/api/profile"]
+        HEALTH["/health"]
     end
 
     subgraph "Storage"

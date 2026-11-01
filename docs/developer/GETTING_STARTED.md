@@ -118,8 +118,6 @@ cargo fmt --workspace --check
 
 Main site `.env` (never commit):
 ```
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key
 VITE_AUTH_API_URL=http://localhost:8787
 ```
 

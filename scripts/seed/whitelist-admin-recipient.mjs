@@ -16,6 +16,10 @@
 // OK-false "blocked: gift-wrap recipient not whitelisted", and ADR-041
 // Decision 4's OK-gated success surfaces that as a visible failure.
 //
+// NOTE (kit ADR-2022): a recipient declared under [[ingress]] in dreamlab.toml is
+// admitted without this row and survives reset-db; this script is now only for a
+// recipient that is NOT declared there.
+//
 // RE-RUN HAZARD: the NIP-98-gated POST /api/admin/reset-db (relay lib.rs) silently
 // deletes this row. Any relay reseed drops operator-jjohare again and this step
 // MUST be re-run; the form's OK-gated success is the canary that catches it.

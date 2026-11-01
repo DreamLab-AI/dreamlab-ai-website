@@ -75,11 +75,11 @@ Web Access Control (WAC) governs all pod operations. ACL resolution (`find_effec
 
 ```mermaid
 flowchart TD
-    REQ[Incoming Request<br/>GET/PUT/DELETE /pods/pubkey/path] --> EXTRACT[Extract pubkey + path<br/>from URL]
+    REQ["Incoming Request<br/>GET/PUT/DELETE /pods/pubkey/path"] --> EXTRACT["Extract pubkey + path<br/>from URL"]
     EXTRACT --> LOAD_ACL["Resolve effective ACL:<br/>KV acl:pubkey fast path,<br/>then R2 .acl sidecar walk-up"]
     LOAD_ACL --> ACL_EXISTS{ACL exists?}
-    ACL_EXISTS -- No --> DENY[403 Forbidden<br/>Secure default]
-    ACL_EXISTS -- Yes --> MAP_METHOD[Map HTTP method<br/>to access mode]
+    ACL_EXISTS -- No --> DENY["403 Forbidden<br/>Secure default"]
+    ACL_EXISTS -- Yes --> MAP_METHOD["Map HTTP method<br/>to access mode"]
     MAP_METHOD --> CHECK_PUBLIC{foaf:Agent entry<br/>grants required mode?}
     CHECK_PUBLIC -- Yes --> ALLOW[Allow request]
     CHECK_PUBLIC -- No --> HAS_AUTH{Authorization<br/>header present?}
@@ -132,10 +132,10 @@ The auth-worker creates the following ACL during pod provisioning:
 graph TD
     subgraph "R2 Bucket: dreamlab-pods"
         subgraph "pods/{pubkey}/"
-            PROFILE[profile/card<br/>JSON-LD profile]
-            PUB_MEDIA[media/public/{file}<br/>Publicly readable images]
-            PRIV_MEDIA[media/private/{file}<br/>Owner-only media]
-            DATA[data/{arbitrary}<br/>App-specific data]
+            PROFILE["profile/card<br/>JSON-LD profile"]
+            PUB_MEDIA["media/public/{file}<br/>Publicly readable images"]
+            PRIV_MEDIA["media/private/{file}<br/>Owner-only media"]
+            DATA["data/{arbitrary}<br/>App-specific data"]
         end
     end
 
