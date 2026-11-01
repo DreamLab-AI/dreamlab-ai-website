@@ -135,6 +135,7 @@ const facilityImages = [
   "/images/venue/fairfield-front.webp",
   "/images/venue/fairfield-back.webp",
   "/images/venue/view.webp",
+  "/images/venue/steam-train.webp",
   "/images/venue/labview2.webp",
   "/images/venue/labview3.webp",
   "/images/venue/remarkable2.webp",
