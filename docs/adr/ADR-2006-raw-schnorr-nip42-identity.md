@@ -17,6 +17,12 @@ lineage: distils legacy 027-canonical-identity-stack (the deferred fe70102 Multi
 
 # ADR-2006 — Identify principals by raw-hex Schnorr pubkey over NIP-42; defer DID/Multikey to the kit
 
+## External review qualification — 2026-11-02
+
+The [dated source reconciliation](external-review-2026-11-02.md) records the current
+implementation evidence, open acceptance gaps and limits of the external review.
+It supplements this decision without changing its adoption or activation status.
+
 ## Context
 
 Legacy ADR-027 documents a converged `did:nostr` document form with a `fe70102`

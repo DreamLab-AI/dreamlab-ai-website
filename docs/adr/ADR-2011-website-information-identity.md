@@ -17,6 +17,12 @@ lineage: extends ADR-2008 (website to agent DM routing) and the monitor co-recip
 
 # ADR-2011 — Name the monitor key as the "website information" identity, labelled but never privileged
 
+## External review qualification — 2026-11-02
+
+The [dated source reconciliation](external-review-2026-11-02.md) records the current
+implementation evidence, open acceptance gaps and limits of the external review.
+It supplements this decision without changing its adoption or activation status.
+
 ## Context
 
 Every contact, signup and chat message is gift-wrapped to a recipient the relay admits, plus a

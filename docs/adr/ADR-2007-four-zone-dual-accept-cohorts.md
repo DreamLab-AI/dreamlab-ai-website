@@ -17,6 +17,12 @@ lineage: distils legacy 022-nip29-group-access-model, 033-multi-admin-moderation
 
 # ADR-2007 — Gate access with four zones on dual-accept cohorts and a single encrypted zone
 
+## External review qualification — 2026-11-02
+
+The [dated source reconciliation](external-review-2026-11-02.md) records the current
+implementation evidence, open acceptance gaps and limits of the external review.
+It supplements this decision without changing its adoption or activation status.
+
 ## Context
 
 Access could gate on a single cohort key per zone. It does not: a 2026-07-20

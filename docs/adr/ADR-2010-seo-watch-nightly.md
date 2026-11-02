@@ -15,6 +15,12 @@ repo: dreamlab-ai-website
 
 # ADR-2010 — A nightly SEO and agent-searchability watch runs alongside the dream engine and proposes through draft PRs
 
+## External review qualification — 2026-11-02
+
+The [dated source reconciliation](external-review-2026-11-02.md) records the current
+implementation evidence, open acceptance gaps and limits of the external review.
+It supplements this decision without changing its adoption or activation status.
+
 ## Context
 The site is a prerendered React SPA on GitHub Pages whose discoverability
 surface (canonicals, Open Graph, JSON-LD, `robots.txt`, `llms.txt`,

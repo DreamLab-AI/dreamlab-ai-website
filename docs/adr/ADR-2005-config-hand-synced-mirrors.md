@@ -17,6 +17,12 @@ lineage: distils legacy 037-config-single-source-of-truth (whose single-source c
 
 # ADR-2005 — Accept hand-synced config mirrors; defer the single-source generator
 
+## External review qualification — 2026-11-02
+
+The [dated source reconciliation](external-review-2026-11-02.md) records the current
+implementation evidence, open acceptance gaps and limits of the external review.
+It supplements this decision without changing its adoption or activation status.
+
 ## Context
 
 Legacy ADR-037 declared `forum-config/dreamlab.toml` the single source of truth
