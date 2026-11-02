@@ -69,3 +69,4 @@
 | 2026-10-30 | operator-overlay | dreamlab.toml [branding] vs branding.rs overlay unguarded; bench now binds them | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/83 | yes | ACCEPT |  | 843d075a63fe |  |  |  |
 | 2026-10-31 | ci-workflows | ci-pass needs list vs verdict loop unguarded; bench now binds both directions | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/84 | yes | ACCEPT |  | 0fc35c34410b |  |  |  |
 | 2026-11-01 | site-build-content | llms-full.txt omitted ecosystem+privacy; both added, set now bound to routes | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/85 | yes | ACCEPT |  | 23fae1be2c9d |  |  |  |
+| 2026-11-02 | operator-overlay | BBS window.__ENV__ injection not bound to guarded BBS_* vars; bench binds seam | NONE | https://github.com/DreamLab-AI/dreamlab-ai-website/pull/86 | yes | ACCEPT |  | 74d2999e949b |  |  |  |
