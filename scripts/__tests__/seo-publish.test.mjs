@@ -3,7 +3,7 @@ import { mkdtemp, mkdir, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { publish } from '../seo-watch/lib/propose.mjs';
+import { publish, applyAndVerify } from '../seo-watch/lib/propose.mjs';
 
 let scratch;
 afterEach(async () => {
@@ -37,4 +37,14 @@ test('publishes the verified patch and report after committing, with an empty in
   expect(git('diff', '--cached', '--name-only')).toBe('');
   expect(git('diff-tree', '--no-commit-id', '--name-only', '-r', 'HEAD').split('\n')).toEqual(['llms.txt', 'reports/test.md']);
   expect(git('ls-remote', 'origin', 'refs/heads/seo-watch/test').split(/\s/)[0]).toBe(git('rev-parse', 'HEAD'));
+});
+
+test('the apply boundary independently enforces Git changed-line counts', async () => {
+  scratch = await mkdtemp(path.join(tmpdir(), 'seo-cap-'));
+  execFileSync('git', ['-C', scratch, 'init', '-q']);
+  await writeFile(path.join(scratch, 'llms.txt'), 'old\n');
+  const diff = `diff --git a/llms.txt b/llms.txt\n--- a/llms.txt\n+++ b/llms.txt\n@@ -1 +1,71 @@\n-old\n+new\n${'+++ b/llms.txt\n'.repeat(70)}`;
+  const result = await applyAndVerify({ wt: scratch, diff, allowlist: ['llms.txt'], maxChangedLines: 60 });
+  expect(result).toMatchObject({ ok: false, stage: 'numstat' });
+  expect(result.log).toMatch(/72 changed lines/);
 });

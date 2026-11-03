@@ -31,6 +31,7 @@ async function generateWorkshopData() {
   try {
     await fs.access(workshopsBaseDir); // Check if base directory exists
     const workshopDirs = await fs.readdir(workshopsBaseDir, { withFileTypes: true });
+    workshopDirs.sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
 
     for (const dirEntry of workshopDirs) {
       if (dirEntry.isDirectory() && !dirEntry.name.startsWith('.')) {

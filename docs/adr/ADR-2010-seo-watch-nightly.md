@@ -31,6 +31,14 @@ errors are scrubbed before truncation, logging and ledger construction. The
 website script suite passes 225 tests. This is source/test evidence, not a live
 nightly publication receipt.
 
+Independent review identified a pre-existing diff-counter gap: content resembling
+`+++ b/path` inside a hunk was counted as a header. Hunk content now counts normally,
+and the apply boundary independently enforces Git's `--numstat` totals. The claimed
+unconditional generator/integrity failure did not reproduce: both generators left
+the committed tree unchanged. Workshop discovery is now sorted explicitly to remove
+filesystem iteration order as a source of churn. Unexpected generated changes still
+fail the exact-tree gate; they are not silently discarded or allowed into a proposal.
+
 ## Context
 The site is a prerendered React SPA on GitHub Pages whose discoverability
 surface (canonicals, Open Graph, JSON-LD, `robots.txt`, `llms.txt`,

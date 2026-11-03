@@ -42,8 +42,15 @@ export function validatePatch(diff, { allowlist, maxChangedLines = 60, cooldown 
   let changed = 0;
   const lines = diff.split('\n');
   let sawHeader = false;
+  let inHunk = false;
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
+    if (line.startsWith('diff --git ')) inHunk = false;
+    if (line.startsWith('@@ ')) { inHunk = true; continue; }
+    if (inHunk) {
+      if (/^[+-]/.test(line)) changed++;
+      continue;
+    }
     if (/^(rename (from|to)|similarity index|new mode|old mode|deleted file mode|new file mode|GIT binary patch|Binary files|copy (from|to))/.test(line)) return { ok: false, reason: `forbidden hunk header: ${line.slice(0, 40)}`, files, changed };
     const g = /^diff --git a\/(.+?) b\/(.+)$/.exec(line);
     if (g) {
@@ -140,11 +147,18 @@ export async function prepareWorktree({ repo, dir, log = () => {} }) {
   return { dir, head: head.stdout.trim() };
 }
 
-export async function applyAndVerify({ wt, diff, allowlist, buildEnv, timeoutMs = 900_000, log = () => {} }) {
+export async function applyAndVerify({ wt, diff, allowlist, buildEnv, maxChangedLines = 60, timeoutMs = 900_000, log = () => {} }) {
   const patchFile = path.join(wt, '.seo-watch.patch');
   await fs.writeFile(patchFile, diff);
   const stat = await git(wt, ['apply', '--numstat', patchFile]);
   if (stat.code !== 0) return { ok: false, stage: 'numstat', log: tail(stat.stderr) };
+  const changedLines = stat.stdout.trim().split('\n').filter(Boolean).reduce((sum, line) => {
+    const [added, removed] = line.split('\t');
+    return sum + Number(added) + Number(removed);
+  }, 0);
+  if (!Number.isSafeInteger(changedLines) || changedLines > maxChangedLines) {
+    return { ok: false, stage: 'numstat', log: `git counts ${changedLines} changed lines; limit ${maxChangedLines}` };
+  }
   const touched = stat.stdout.trim().split('\n').filter(Boolean).map((l) => l.split('\t')[2]);
   const outside = touched.filter((f) => !pathAllowed(f, allowlist));
   if (outside.length) return { ok: false, stage: 'allowlist', log: `git sees paths outside the allowlist: ${outside.join(', ')}` };

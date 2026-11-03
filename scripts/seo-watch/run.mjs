@@ -208,7 +208,7 @@ async function main() {
         try {
           const wt = await P.prepareWorktree({ repo: REPO, dir: wtDir, log });
           if (wt.head !== base) log(`origin/main moved during the run (${base.slice(0, 12)} → ${wt.head.slice(0, 12)}); applying anyway, git apply decides`);
-          const result = await P.applyAndVerify({ wt: wt.dir, diff: patch, allowlist: config.propose.allowlist, buildEnv: config.propose.build_env, log });
+          const result = await P.applyAndVerify({ wt: wt.dir, diff: patch, allowlist: config.propose.allowlist, buildEnv: config.propose.build_env, maxChangedLines: config.propose.max_changed_lines, log });
           if (!result.ok) proposal = { status: 'failed-verification', reason: `${result.stage}: ${scrubSecrets(result.log).slice(0, 600)}`, files: result.files };
           else if (config.propose.mode === 'branch' || config.propose.mode === 'pr') {
             const branch = `${config.propose.branch_prefix}nightly-${date}`;

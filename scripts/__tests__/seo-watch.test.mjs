@@ -187,6 +187,10 @@ describe('patch extraction and validation', () => {
     expect(validatePatch(diff('public/llms.txt'), { allowlist, cooldown: { 'public/llms.txt': '2026-10-30' } }).reason).toMatch(/cool-down/);
     expect(validatePatch(`diff --git a/public/llms.txt b/public/llms.txt\n--- a/public/llms.txt\n+++ b/public/llms.txt\n@@ -1,2 +1,2 @@\n-++x\n+--y\n`, { allowlist }).changed).toBe(2);
   });
+  test('counts hunk content that resembles a diff header', () => {
+    const patch = `diff --git a/public/llms.txt b/public/llms.txt\n--- a/public/llms.txt\n+++ b/public/llms.txt\n@@ -1 +1,71 @@\n-old\n+new\n${'+++ b/public/llms.txt\n'.repeat(70)}`;
+    expect(validatePatch(patch, { allowlist, maxChangedLines: 60 })).toMatchObject({ ok: false, changed: 72 });
+  });
 });
 
 describe('secrets and environment hygiene', () => {
