@@ -10,12 +10,19 @@
 // and embeddings/overrides/isolates (U+2028-202E, U+2066-2069), BOM.
 const UNSAFE = /[\u0000-\u001f\u007f-\u009f\u200b-\u200f\u2028-\u202e\u2066-\u2069\ufeff]+/g;
 
+const MAX_DIGEST_ITEMS = 25;
+
+/** Acknowledge only itemised messages after successful digest delivery. */
+export function markDisplayedSeen(seen, fresh, timestamp, maxItems = MAX_DIGEST_ITEMS) {
+  for (const item of fresh.slice(0, maxItems)) seen[item.id] = timestamp;
+}
+
 export function cleanField(value, max = 80) {
   return String(value ?? '').replace(UNSAFE, ' ').replace(/\s+/g, ' ').trim().slice(0, max);
 }
 
 /** Bullet lines for `fresh` messages, at most `maxItems` of them plus a summary line. */
-export function digestLines(fresh, maxItems = 25) {
+export function digestLines(fresh, maxItems = MAX_DIGEST_ITEMS) {
   const lines = fresh.slice(0, maxItems).map((f) => {
     const name = cleanField(f.name);
     const email = cleanField(f.email);

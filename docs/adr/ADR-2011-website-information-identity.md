@@ -23,6 +23,19 @@ The [dated source reconciliation](external-review-2026-11-02.md) records the cur
 implementation evidence, open acceptance gaps and limits of the external review.
 It supplements this decision without changing its adoption or activation status.
 
+## Repair evidence — 2026-11-03
+
+Provisioning and the nightly registry check now require the disclosure response's
+explicit `registered: true` field. Configured ingress disclosure alone cannot
+prove that a D1 row survived reset. This requires adoption of the matching forum
+response; an older response fails the registry check rather than silently
+skipping registration. The monitor health check also enforces the existing
+no-admin/no-cohort predicate. Only the 25 itemised messages are marked seen after
+successful digest delivery; overflow and unverifiable wraps remain unread.
+Regression coverage includes config-only disclosure and a 30-message batch
+draining across two digests. The script suite passes 225 tests; no provisioning
+or live messaging was performed by this repair.
+
 ## Context
 
 Every contact, signup and chat message is gift-wrapped to a recipient the relay admits, plus a

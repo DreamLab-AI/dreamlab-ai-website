@@ -92,9 +92,15 @@ describe('nip98Header', () => {
 
 describe('E4 disclosure check', () => {
   const doc = (agents) => ({ agents });
+  test('configured disclosure alone does not prove a database registry row survived', () => {
+    const configured = doc([{ pubkey: PK, name: 'website-info', registered: false, source: 'ingress' }]);
+    expect(disclosureProblem(configured, PK)).toMatch(/not.*registered/);
+    expect(classifyDisclosure(configured, PK).registered).toBe(false);
+    expect(disclosureProblem(doc([{ pubkey: PK, registered: true }]), PK)).toBeNull();
+  });
   test('classifies a listed agent, case-insensitively', () => {
-    const c = classifyDisclosure(doc([{ name: 'website-info', pubkey: PK.toUpperCase(), registered_by: 'abc' }]), PK);
-    expect(c).toEqual({ listed: true, name: 'website-info', registeredBy: 'abc' });
+    const c = classifyDisclosure(doc([{ name: 'website-info', pubkey: PK.toUpperCase(), registered_by: 'abc', registered: true }]), PK);
+    expect(c).toEqual({ listed: true, registered: true, name: 'website-info', registeredBy: 'abc' });
   });
   test('classifies an absent agent', () => {
     expect(classifyDisclosure(doc([{ name: 'x', pubkey: 'f'.repeat(64), registered_by: 'a' }]), PK).listed).toBe(false);
@@ -105,7 +111,7 @@ describe('E4 disclosure check', () => {
     }
   });
   test('problem is null when listed and names the hazard when not', () => {
-    expect(disclosureProblem(doc([{ name: 'website-info', pubkey: PK, registered_by: 'a' }]), PK)).toBeNull();
+    expect(disclosureProblem(doc([{ name: 'website-info', pubkey: PK, registered_by: 'a', registered: true }]), PK)).toBeNull();
     expect(disclosureProblem(doc([]), PK)).toMatch(/website-info.*not.*registered.*reset-db/i);
   });
 });

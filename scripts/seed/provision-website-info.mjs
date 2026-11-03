@@ -87,14 +87,14 @@ const before = classifyDisclosure(await (await fetch(disclosureUrl)).json(), pub
 
 if (dryRun) {
   console.log(`would publish kind-0 (${buildProfileContent().length} bytes)`);
-  console.log(before.listed ? 'registry: already listed, would skip' : 'would register via /api/governance/agents/register (no cohorts)');
+  console.log(before.registered ? 'registry: already registered, would skip' : 'would register via /api/governance/agents/register (no cohorts)');
   process.exit(0);
 }
 
 await publishKind0().catch((e) => fail(e.message));
 console.log('kind-0: accepted');
 
-if (before.listed) {
+if (before.registered) {
   console.log(`registry: already listed as ${before.name}, skipped`);
 } else {
   const env = readFileSync(ADMIN_ENV, 'utf8');
@@ -116,5 +116,5 @@ const wlAfter = privilegeProblem(await checkWhitelist());
 if (wlAfter) fail(`after provisioning: ${wlAfter}`);
 console.log('relay row after: still no cohorts, not admin');
 const after = classifyDisclosure(await (await fetch(disclosureUrl)).json(), pubkey);
-if (!after.listed) fail('registered but not visible in /api/agents/disclosure');
+if (!after.registered) fail('no registry row confirmed by /api/agents/disclosure (requires the registered field)');
 console.log(`verified: ${after.name}, registered_by ${String(after.registeredBy).slice(0, 12)}…`);

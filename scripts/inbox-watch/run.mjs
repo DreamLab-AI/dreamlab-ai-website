@@ -32,8 +32,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { finalizeEvent, generateSecretKey, getPublicKey, verifyEvent } from "nostr-tools/pure";
 import * as nip17 from "nostr-tools/nip17";
-import { disclosureProblem, ingressProblem } from "../lib/website-info.mjs";
-import { digestLines, deliveryOutcome, nextUntil } from "../lib/digest.mjs";
+import { disclosureProblem, ingressProblem, privilegeProblem } from "../lib/website-info.mjs";
+import { digestLines, deliveryOutcome, nextUntil, markDisplayedSeen } from "../lib/digest.mjs";
 import { tagEnquiries } from "../lib/enquiry-topic.mjs";
 import * as nip44 from "nostr-tools/nip44";
 
@@ -244,6 +244,8 @@ async function checkWhitelist(label, pk) {
     // (kit ADR-2022), which survives reset-db. Report the declaration separately.
     const admitted = j.isWhitelisted || j.ingressRecipient === true;
     if (!admitted) return `${label} pubkey is NOT whitelisted on the relay (reset-db hazard?)`;
+    const privilege = label === "monitor" ? privilegeProblem(j) : null;
+    if (privilege) return `${label}: ${privilege}`;
     return ingressProblem(label, j);
   } catch (e) {
     return `whitelist check for ${label} failed: ${e.message}`;
@@ -325,12 +327,14 @@ async function main() {
   let undecryptable = 0;
   for (const w of wraps) {
     if (state.seen[w.id]) continue;
-    state.seen[w.id] = now();
     let rumor;
     try { rumor = unwrapVerified(w, monitorSk); } catch { undecryptable++; continue; }
     const c = classify(rumor);
-    if (c.kind === "probe") continue;
-    fresh.push({ ...c, at: rumor.created_at });
+    if (c.kind === "probe") {
+      state.seen[w.id] = now();
+      continue;
+    }
+    fresh.push({ ...c, id: w.id, at: rumor.created_at });
   }
   for (const [id, t] of Object.entries(state.seen)) if (now() - t > SEEN_TTL_SEC) delete state.seen[id];
   if (undecryptable) problems.push(`${undecryptable} wrap(s) in the monitor inbox failed verification`);
@@ -380,6 +384,7 @@ async function main() {
         fs.writeFileSync(STATUS_FILE, JSON.stringify(summary, null, 2));
         return;
       }
+      markDisplayedSeen(state.seen, fresh, now());
     }
   } else {
     log("quiet night, all channels healthy");

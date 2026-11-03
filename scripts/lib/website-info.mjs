@@ -80,13 +80,13 @@ export function classifyDisclosure(doc, pubkey) {
   const agents = doc && Array.isArray(doc.agents) ? doc.agents : [];
   const hit = agents.find((a) => a && typeof a.pubkey === 'string' && a.pubkey.toLowerCase() === want);
   return hit
-    ? { listed: true, name: hit.name, registeredBy: hit.registered_by }
-    : { listed: false };
+    ? { listed: true, registered: hit.registered === true, name: hit.name, registeredBy: hit.registered_by }
+    : { listed: false, registered: false };
 }
 
 /** Nightly-watch problem string, or null when the identity is registered. */
 export function disclosureProblem(doc, pubkey) {
-  return classifyDisclosure(doc, pubkey).listed
+  return classifyDisclosure(doc, pubkey).registered
     ? null
     : `${WEBSITE_INFO.name} is not registered in the agent registry (reset-db hazard? re-run scripts/seed/provision-website-info.mjs)`;
 }

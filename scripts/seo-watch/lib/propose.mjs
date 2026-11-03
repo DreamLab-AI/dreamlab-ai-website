@@ -295,9 +295,11 @@ export async function publish({ wt, branch, title, body, files, appliedDiff, rep
     if (r.code !== 0) throw new Error(`git ${s.filter((x) => !x.startsWith('-c') && !x.startsWith('user.')).slice(0, 2).join(' ')} failed: ${tail(r.stderr, 3)}`);
   }
   // Credentials come from gh's helper at push time: nothing lands in .git/config.
-  const staged = (await git(wt, ['diff', '--cached', '--name-only'])).stdout.trim().split('\n').filter(Boolean).sort();
+  const committed = await git(wt, ['diff-tree', '--no-commit-id', '--name-only', '-z', '-r', 'HEAD']);
+  if (committed.code !== 0) throw new Error(`cannot inspect proposal commit: ${tail(committed.stderr, 3)}`);
+  const staged = committed.stdout.split('\0').filter(Boolean).sort();
   const want = [...files, reportRel].sort();
-  if (JSON.stringify(staged) !== JSON.stringify(want)) throw new Error(`staged set ${staged.join(', ')} differs from ${want.join(', ')}`);
+  if (JSON.stringify(staged) !== JSON.stringify(want)) throw new Error(`committed set ${staged.join(', ')} differs from ${want.join(', ')}`);
   const push = await git(wt, [...noHooks, '-c', 'credential.helper=', '-c', 'credential.helper=!gh auth git-credential', 'push', '--quiet', '-u', 'origin', branch], { timeoutMs: 120_000 });
   if (push.code !== 0) throw new Error(`git push failed: ${tail(push.stderr, 3)}`);
   const labelled = await gh(['label', 'create', label, '--color', '0E8A16', '--description', 'Nightly SEO / agent-searchability proposal (human merge)', '--force'], { cwd: wt });

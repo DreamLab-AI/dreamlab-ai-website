@@ -21,6 +21,16 @@ The [dated source reconciliation](external-review-2026-11-02.md) records the cur
 implementation evidence, open acceptance gaps and limits of the external review.
 It supplements this decision without changing its adoption or activation status.
 
+## Repair evidence — 2026-11-03
+
+The publisher checks the files in the new commit with `git diff-tree -z` before
+pushing; it no longer inspects the empty post-commit staging index. A regression
+uses a real scratch repository and local bare remote, with only GitHub mocked,
+and verifies the pushed commit contains exactly the patch and report. Provider
+errors are scrubbed before truncation, logging and ledger construction. The
+website script suite passes 225 tests. This is source/test evidence, not a live
+nightly publication receipt.
+
 ## Context
 The site is a prerendered React SPA on GitHub Pages whose discoverability
 surface (canonicals, Open Graph, JSON-LD, `robots.txt`, `llms.txt`,

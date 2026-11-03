@@ -187,8 +187,9 @@ async function main() {
       if (parsed.flag === 'YES' && parsed.patch) patch = parsed.patch;
       log(`advise: ${r.usage.input}+${r.usage.output} tokens, PROPOSE ${parsed.flag ?? 'unstated'}${patch ? ', patch present' : ''}`);
     } catch (err) {
-      advice = { called: true, reason: decision.reason, text: null, error: err.message.slice(0, 300), tokens: null };
-      log(`advise failed: ${err.message.slice(0, 200)}`);
+      const safeError = scrubSecrets(err.message);
+      advice = { called: true, reason: decision.reason, text: null, error: safeError.slice(0, 300), tokens: null };
+      log(`advise failed: ${safeError.slice(0, 200)}`);
     }
   } else {
     log(`advise: skipped (${decision.reason}${opts.dryRun ? ', dry run' : ''})`);

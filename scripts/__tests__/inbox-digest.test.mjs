@@ -4,7 +4,19 @@
 // characters into the operator's DM, and the digest size is bounded however
 // many wraps arrive (deepsec findings, 2026-10-15).
 import { describe, test, expect } from 'vitest';
-import { cleanField, digestLines, deliveryOutcome, nextUntil } from '../lib/digest.mjs';
+import { cleanField, digestLines, deliveryOutcome, nextUntil, markDisplayedSeen } from '../lib/digest.mjs';
+
+test('overflow messages remain unread for the next digest', () => {
+  const fresh = Array.from({ length: 30 }, (_, id) => ({ id: `wrap-${id}`, kind: 'enquiry' }));
+  const seen = {};
+  const delivered = digestLines(fresh).filter((line) => line.startsWith('•'));
+  markDisplayedSeen(seen, fresh, 100);
+  expect(Object.keys(seen)).toHaveLength(delivered.length);
+  const next = fresh.filter((item) => !seen[item.id]);
+  expect(next.map((item) => item.id)).toEqual(['wrap-25', 'wrap-26', 'wrap-27', 'wrap-28', 'wrap-29']);
+  markDisplayedSeen(seen, next, 101);
+  expect(Object.keys(seen)).toHaveLength(30);
+});
 
 describe('cleanField', () => {
   test('collapses newlines and tabs to single spaces', () => {
