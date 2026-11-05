@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 240" role="img" aria-labelledby="tr dr" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="tr">Multi-model writing pipeline</title>
+  <desc id="dr">Research with Gemini 2.5 Pro, structure with GPT-4o, draft with Claude Sonnet, then edit with a cheap fast model.</desc>
+  <defs>
+    <marker id="arrr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="arrsr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#38BDF8" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect x="8" y="8" width="944" height="224" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">ONE PROJECT · FOUR MODELS</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+  <rect x="48" y="112" width="192" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+  <text x="144" y="143" text-anchor="middle" font-size="14" font-weight="600" fill="#F5F5F5">Research</text>
+  <text x="144" y="165" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">Gemini 2.5 Pro</text>
+  <path d="M240,148 C256,148 264,148 284,148" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arrr)"/>
+  <rect x="288" y="112" width="192" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+  <text x="384" y="143" text-anchor="middle" font-size="14" font-weight="600" fill="#F5F5F5">Structure</text>
+  <text x="384" y="165" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">GPT-4o</text>
+  <path d="M480,148 C496,148 504,148 524,148" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arrr)"/>
+  <rect x="528" y="112" width="192" height="72" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+  <text x="624" y="143" text-anchor="middle" font-size="14" font-weight="600" fill="#F5F5F5">Draft</text>
+  <text x="624" y="165" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">Claude Sonnet</text>
+  <path d="M720,148 C736,148 744,148 764,148" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arrr)"/>
+  <rect x="768" y="112" width="192" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+  <text x="864" y="143" text-anchor="middle" font-size="14" font-weight="600" fill="#F5F5F5">Edit</text>
+  <text x="864" y="165" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">Haiku · 4o-mini</text>
+</svg>

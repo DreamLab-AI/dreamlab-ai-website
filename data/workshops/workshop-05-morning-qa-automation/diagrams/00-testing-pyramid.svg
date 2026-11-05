@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 360" role="img" aria-labelledby="dg-title dg-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="dg-title">The testing pyramid</title>
+  <desc id="dg-desc">A pyramid of test types: a small layer of slow, expensive end-to-end tests on top, a middle layer of integration tests, and a broad base of fast, cheap unit tests.</desc>
+
+  <rect x="8" y="8" width="944" height="344" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">THE TESTING PYRAMID</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <g text-anchor="middle">
+    <rect x="384" y="104" width="192" height="64" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="480" y="132" font-size="15" font-weight="600" fill="#F5F5F5">E2E Tests</text>
+    <text x="480" y="154" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">10% · slow, expensive</text>
+
+    <rect x="288" y="184" width="384" height="64" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="480" y="212" font-size="15" font-weight="600" fill="#F5F5F5">Integration Tests</text>
+    <text x="480" y="234" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">30% · medium speed</text>
+
+    <rect x="192" y="264" width="576" height="64" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="480" y="292" font-size="15" font-weight="600" fill="#F5F5F5">Unit Tests</text>
+    <text x="480" y="314" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">60% · fast, cheap</text>
+  </g>
+</svg>

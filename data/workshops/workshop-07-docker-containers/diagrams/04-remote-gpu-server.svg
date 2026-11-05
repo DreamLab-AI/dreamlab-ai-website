@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 280" role="img" aria-labelledby="rg-title rg-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="rg-title">Editing local, running remote</title>
+  <desc id="rg-desc">A lightweight laptop running only the VS Code editor connects over SSH or a tunnel to a powerful, always-on remote GPU server that holds the RAM, GPU, storage and Docker containers.</desc>
+
+  <defs>
+    <marker id="arr-sky" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#38BDF8" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <rect x="8" y="8" width="944" height="264" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">EDITING LOCAL, RUNNING REMOTE</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <g text-anchor="middle">
+    <rect x="76"  y="108" width="332" height="112" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="242" y="140" font-size="15" font-weight="600" fill="#F5F5F5">Your Laptop</text>
+    <text x="242" y="162" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">VS Code (editor only)</text>
+    <text x="242" y="180" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">lightweight, portable</text>
+
+    <rect x="552" y="108" width="332" height="112" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="718" y="140" font-size="15" font-weight="600" fill="#F5F5F5">Remote GPU Server</text>
+    <text x="718" y="162" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">64GB RAM · RTX 4090 · 2TB SSD</text>
+    <text x="718" y="180" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">Docker + containers</text>
+  </g>
+
+  <path d="M408,164 C460,150 500,150 552,164" fill="none" stroke="#38BDF8" stroke-width="1.2" marker-end="url(#arr-sky)"/>
+  <text x="480" y="148" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#38BDF8">SSH / tunnel</text>
+</svg>

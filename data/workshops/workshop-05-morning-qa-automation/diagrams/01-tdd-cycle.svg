@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 320" role="img" aria-labelledby="dg-title dg-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="dg-title">The test-driven development cycle</title>
+  <desc id="dg-desc">Red: write a failing test. Green: write minimal code to make it pass. Refactor: clean up while tests stay green — then loop back to red.</desc>
+
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <rect x="8" y="8" width="944" height="304" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">THE TDD CYCLE</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <g text-anchor="middle">
+    <rect x="80" y="152" width="224" height="88" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="192" y="190" font-size="15" font-weight="600" fill="#F5F5F5">Red</text>
+    <text x="192" y="214" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">write a failing test</text>
+
+    <rect x="368" y="152" width="224" height="88" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="480" y="190" font-size="15" font-weight="600" fill="#F5F5F5">Green</text>
+    <text x="480" y="214" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">minimal code to pass</text>
+
+    <rect x="656" y="152" width="224" height="88" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="768" y="190" font-size="15" font-weight="600" fill="#F5F5F5">Refactor</text>
+    <text x="768" y="214" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">clean up, stay green</text>
+  </g>
+
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2">
+    <path d="M304,196 C324,196 344,196 360,196" marker-end="url(#arr)"/>
+    <path d="M592,196 C612,196 632,196 648,196" marker-end="url(#arr)"/>
+    <path d="M768,152 C768,112 192,112 192,144" marker-end="url(#arr)"/>
+  </g>
+  <text x="480" y="124" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">repeat</text>
+</svg>
