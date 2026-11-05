@@ -54,6 +54,15 @@ const bbs = {
   logoUrl: bbsEnv("BBS_LOGO_URL", /^[ \t]*BBS_LOGO_URL:[ \t]*'([^']*)'/m),
 };
 
+/** The single shell line that renders the served BBS window.__ENV__ script. */
+const bbsEnvLine = (() => {
+  const m = deployYml.match(/^[ \t]*BBS_ENV='<script>window\.__ENV__=.*$/m);
+  if (!m) {
+    throw new Error("deploy.yml: BBS_ENV injection line not found (workflow drifted)");
+  }
+  return m[0];
+})();
+
 describe("deploy.yml BBS_* branding mirrors branding.rs", () => {
   it("BBS_THEME equals the overlay theme", () => {
     expect(bbs.theme).toBe(overlay.theme);
@@ -80,5 +89,31 @@ describe("deploy.yml BBS_* branding mirrors branding.rs", () => {
     // against the Pages origin (cname: dreamlab-ai.com, set lower in this
     // same workflow file).
     expect(bbs.logoUrl).toBe(`https://dreamlab-ai.com${overlay.logoUrl}`);
+  });
+});
+
+describe("the served BBS window.__ENV__ consumes the guarded BBS_* env vars", () => {
+  // The env-block parity above only matters while the injected <script> keeps
+  // interpolating those variables: swapping THEME:"'"$BBS_THEME"'" for a
+  // literal passes every other check and ships a hardcoded brand.
+  it("each branding key interpolates its BBS_* env var, not a literal", () => {
+    for (const [key, name] of [
+      ["THEME", "BBS_THEME"],
+      ["NODE_NAME", "BBS_NODE_NAME"],
+      ["TAGLINE", "BBS_TAGLINE"],
+      ["LOCATION", "BBS_LOCATION"],
+      ["BANNER_URL", "BBS_BANNER_URL"],
+      ["LOGO_URL", "BBS_LOGO_URL"],
+    ]) {
+      expect(bbsEnvLine.includes(`${key}:"'"$${name}"'"`), key).toBe(true);
+    }
+  });
+
+  it("FORUM_NAME is the same literal in the forum and BBS injections", () => {
+    const forum = deployYml.match(/ENV_SCRIPT=.*FORUM_NAME:"([^"]*)"/);
+    const bbsName = bbsEnvLine.match(/FORUM_NAME:"([^"]*)"/);
+    expect(forum, "forum ENV_SCRIPT FORUM_NAME").not.toBeNull();
+    expect(bbsName, "BBS_ENV FORUM_NAME").not.toBeNull();
+    expect(bbsName[1]).toBe(forum[1]);
   });
 });
