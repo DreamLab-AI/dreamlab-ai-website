@@ -180,6 +180,40 @@ if (existsSync(yamlPath) && existsSync(testimonialsPath)) {
   check(false, "testimonial inputs", "content/site-content.yaml or src/data/testimonials.json absent");
 }
 
+// --- generate-llms-full.mjs ------------------------------------------------
+// llms.txt advertises llms-full.txt as "Every main page as plain text in one
+// file", but PAGES is a hand-maintained list: a marketing route added to
+// src/prerender.tsx (or a hidden route un-hidden) silently drops out of the
+// agent bundle. Re-derive the expected set from prerender's own marketing map
+// minus its hiddenPaths and require PAGES to equal it.
+{
+  const prerenderSrc = readFileSync(at("src", "prerender.tsx"), "utf-8");
+  const marketingBlock = prerenderSrc.match(/const marketing = \{([\s\S]*?)\n\};/)?.[1] ?? "";
+  const marketingRoutes = [...marketingBlock.matchAll(/'([^']+)':/g)].map((m) => m[1]);
+  const hiddenBlock = prerenderSrc.match(/new Set\(\[([\s\S]*?)\]\)/)?.[1] ?? "";
+  const hidden = [...hiddenBlock.matchAll(/'([^']+)'/g)].map((m) => m[1]);
+  const norm = (r) => (r === "/" ? "/" : r.replace(/\/+$/, ""));
+  const expected = marketingRoutes.filter((r) => !hidden.includes(r)).map(norm).sort();
+
+  const generatorSrc = readFileSync(at("scripts", "generate-llms-full.mjs"), "utf-8");
+  const pagesBlock = generatorSrc.match(/const PAGES = \[([\s\S]*?)\n\];/)?.[1] ?? "";
+  const listed = [...pagesBlock.matchAll(/\['([^']+)',/g)].map((m) => norm(m[1])).sort();
+  check(
+    marketingRoutes.length > 0 && pagesBlock.length > 0,
+    "llms-full page inputs readable",
+    `${marketingRoutes.length} prerender marketing routes, ${listed.length} PAGES entries`,
+  );
+  const missing = expected.filter((r) => !listed.includes(r));
+  const extra = listed.filter((r) => !expected.includes(r));
+  check(
+    missing.length === 0 && extra.length === 0,
+    "llms-full PAGES match public marketing routes",
+    missing.length || extra.length
+      ? `missing=[${missing.join(",")}] extra=[${extra.join(",")}]`
+      : `${expected.length} routes, exact`,
+  );
+}
+
 console.log(lines.join("\n"));
 console.log(
   failures.length === 0
