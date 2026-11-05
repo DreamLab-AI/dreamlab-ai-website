@@ -16,9 +16,11 @@ const PAGES = [
   ['/ventures/', 'Venture Lab'],
   ['/workshops/', 'Free self-guided workshops'],
   ['/research/', 'Research'],
+  ['/ecosystem/', 'Ecosystem'],
   ['/team/', 'Team'],
   ['/testimonials/', 'Testimonials'],
   ['/contact/', 'Contact'],
+  ['/privacy/', 'Privacy'],
 ];
 const MAX_BYTES = 400_000;
 
