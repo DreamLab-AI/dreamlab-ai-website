@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 260" role="img" aria-labelledby="d01m-title d01m-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="d01m-title">Subscription versus pay-per-use cost</title>
+  <desc id="d01m-desc">A traditional fixed AI subscription costs twenty to forty pounds a month; VS Code with direct API access is pay-per-use, typically two to five pounds a month.</desc>
+  <rect x="8" y="8" width="944" height="244" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">COST TRANSPARENCY</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <g text-anchor="middle">
+    <text x="264" y="112" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" letter-spacing="0.18em" fill="#6B7280">TRADITIONAL</text>
+    <rect x="112" y="124" width="304" height="88" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="264" y="160" font-size="15" font-weight="600" fill="#F5F5F5">Fixed subscription</text>
+    <text x="264" y="188" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">£20–40 / month, used or not</text>
+
+    <text x="696" y="112" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" letter-spacing="0.18em" fill="#6B7280">VS CODE + APIS</text>
+    <rect x="544" y="124" width="304" height="88" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="696" y="160" font-size="15" font-weight="600" fill="#F5F5F5">Pay per use</text>
+    <text x="696" y="188" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">£2–5 / month typical</text>
+  </g>
+</svg>

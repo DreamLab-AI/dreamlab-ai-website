@@ -1,0 +1,8 @@
+# Security contact for dreamlab-ai.com (RFC 9116).
+# Reports go through the end-to-end-encrypted contact form; choose
+# "Something else" and start the message with "Security".
+Contact: https://dreamlab-ai.com/contact/?type=other
+Expires: 2027-10-11T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://dreamlab-ai.com/.well-known/security.txt
+Policy: https://dreamlab-ai.com/privacy/

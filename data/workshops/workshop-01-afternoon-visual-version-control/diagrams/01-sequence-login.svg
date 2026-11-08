@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 456" role="img" aria-labelledby="01-sequence-login-t 01-sequence-login-d" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="01-sequence-login-t">Sequence diagram of a login flow</title>
+  <desc id="01-sequence-login-d">User, app, API and database lifelines: the login request is validated, the user checked in the database, a token generated and login success returned to the user.</desc>
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="arr-accent" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#F59E0B" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="arr-sky" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#38BDF8" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect x="8" y="8" width="944" height="440" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">SEQUENCE · INTERACTION FLOWS</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+    <rect x="72" y="96" width="144" height="48" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="144" y="125" text-anchor="middle" font-size="14" font-weight="600" fill="#F5F5F5">User</text>
+    <line x1="144" y1="144" x2="144" y2="416" stroke="rgba(255,255,255,0.20)" stroke-dasharray="4 3"/>
+    <rect x="312" y="96" width="144" height="48" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="384" y="125" text-anchor="middle" font-size="14" font-weight="600" fill="#F5F5F5">App</text>
+    <line x1="384" y1="144" x2="384" y2="416" stroke="rgba(255,255,255,0.20)" stroke-dasharray="4 3"/>
+    <rect x="552" y="96" width="144" height="48" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="624" y="125" text-anchor="middle" font-size="14" font-weight="600" fill="#F5F5F5">API</text>
+    <line x1="624" y1="144" x2="624" y2="416" stroke="rgba(255,255,255,0.20)" stroke-dasharray="4 3"/>
+    <rect x="792" y="96" width="144" height="48" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="864" y="125" text-anchor="middle" font-size="14" font-weight="600" fill="#F5F5F5">Database</text>
+    <line x1="864" y1="144" x2="864" y2="416" stroke="rgba(255,255,255,0.20)" stroke-dasharray="4 3"/>
+    <path d="M144,184 L378,184" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arr)"/>
+    <text x="264" y="176" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">login request</text>
+    <path d="M384,224 L618,224" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arr)"/>
+    <text x="504" y="216" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">validate credentials</text>
+    <path d="M624,264 L858,264" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arr)"/>
+    <text x="744" y="256" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">check user</text>
+    <path d="M864,304 L630,304" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+    <text x="744" y="296" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">user found</text>
+    <path d="M624,344 L390,344" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+    <text x="504" y="336" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">token generated</text>
+    <path d="M384,384 L150,384" fill="none" stroke="#F59E0B" stroke-width="1.2" marker-end="url(#arr-accent)"/>
+    <text x="264" y="376" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">login success</text>
+
+</svg>

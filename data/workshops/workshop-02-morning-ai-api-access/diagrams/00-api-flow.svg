@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 264" role="img" aria-labelledby="tc dc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="tc">How an API request reaches your document</title>
+  <desc id="dc">From you in VS Code, an AI extension sends your prompt with an API key to the model, and the response lands directly in your document.</desc>
+  <defs>
+    <marker id="arrc" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="arrsc" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#38BDF8" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect x="8" y="8" width="944" height="248" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">FROM PROMPT TO DOCUMENT</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+  <rect x="48" y="120" width="192" height="84" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+  <text x="144" y="167" text-anchor="middle" font-size="15" font-weight="600" fill="#F5F5F5">You in VS Code</text>
+  <path d="M240,162 C256,162 264,162 284,162" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arrc)"/>
+  <rect x="288" y="120" width="192" height="84" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+  <text x="384" y="167" text-anchor="middle" font-size="15" font-weight="600" fill="#F5F5F5">AI Extension</text>
+  <path d="M480,162 C496,162 504,162 524,162" fill="none" stroke="#38BDF8" stroke-width="1.2" marker-end="url(#arrsc)"/>
+  <rect x="528" y="120" width="192" height="84" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+  <text x="624" y="157" text-anchor="middle" font-size="15" font-weight="600" fill="#F5F5F5">AI Model</text>
+  <text x="624" y="179" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">api key · https</text>
+  <path d="M720,162 C736,162 744,162 764,162" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arrc)"/>
+  <rect x="768" y="120" width="192" height="84" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+  <text x="864" y="167" text-anchor="middle" font-size="15" font-weight="600" fill="#F5F5F5">Your Document</text>
+</svg>

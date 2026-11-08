@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 416" role="img" aria-labelledby="il-title il-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="il-title">VS Code interface layout</title>
+  <desc id="il-desc">The VS Code window: a menu and tab bar on top, an Activity Bar and Side Bar on the left, a central Editor Area, a Panel for terminal/output/debug below it, and a Status Bar along the bottom.</desc>
+
+  <!-- container -->
+  <rect x="8" y="8" width="944" height="400" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">VS CODE INTERFACE LAYOUT</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <!-- menu/tab bar -->
+  <rect x="48" y="88" width="864" height="28" rx="6" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+  <text x="480" y="106" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF" text-anchor="middle">Menu &amp; Tab Bar</text>
+
+  <!-- activity bar -->
+  <rect x="48" y="128" width="80" height="180" rx="6" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+  <text x="88" y="218" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF" text-anchor="middle" transform="rotate(-90 88 218)">Activity Bar</text>
+
+  <!-- side bar -->
+  <rect x="136" y="128" width="160" height="180" rx="6" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+  <text x="216" y="222" font-size="14" font-weight="600" fill="#F5F5F5" text-anchor="middle">Side Bar</text>
+
+  <!-- editor area (focal) -->
+  <rect x="304" y="128" width="608" height="180" rx="6" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+  <text x="608" y="214" font-size="16" font-weight="600" fill="#F5F5F5" text-anchor="middle">Editor Area</text>
+  <text x="608" y="236" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B" text-anchor="middle">your code here</text>
+
+  <!-- panel -->
+  <rect x="48" y="316" width="864" height="56" rx="6" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+  <text x="480" y="340" font-size="14" font-weight="600" fill="#F5F5F5" text-anchor="middle">Panel</text>
+  <text x="480" y="360" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF" text-anchor="middle">Terminal · Output · Debug</text>
+
+  <!-- status bar -->
+  <rect x="48" y="380" width="864" height="20" rx="4" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.35)"/>
+  <text x="480" y="394" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF" text-anchor="middle">Status Bar — branch · errors · line/column · language</text>
+</svg>
