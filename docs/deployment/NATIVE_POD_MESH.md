@@ -2,6 +2,14 @@
 
 **Last updated:** 2026-05-17 | [Back to Documentation Index](../README.md)
 
+> **Status, 2026-11-22: not live.** `pods-native.dreamlab-ai.com` has no DNS
+> record, so the tunnel in Step 1 is not in place (never created, or removed),
+> while `forum-config/dreamlab.toml` still has `[native_pod] enabled = true`. The
+> forum's Pod Browser therefore reports the mesh pod server as unreachable. The
+> pod server in the agentbox is running. Parked by the owner; the open item and
+> the two ways to close it are in
+> [ADR-2002](../adr/ADR-2002-split-hosting-pages-workers.md).
+
 ---
 
 ## Table of Contents

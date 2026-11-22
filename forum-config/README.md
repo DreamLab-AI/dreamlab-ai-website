@@ -7,7 +7,7 @@ generic `nostr-bbs-*` kit crates living in the `nostr-rust-forum` repo.
 
 | Path                                | Purpose                                                              |
 |-------------------------------------|----------------------------------------------------------------------|
-| `Cargo.toml`                        | Git-pinned deps on `nostr-bbs-{core,config,mesh,rate-limit}` (NRF, rev `6986276`, gap-close/2026-07 HEAD) |
+| `Cargo.toml`                        | Exact crates.io pins on `nostr-bbs-{core,config,mesh,rate-limit}` (`=1.0.0-beta.20`); the kit commit the workers and clients build from is `KIT_REF` in the workflows |
 | `dreamlab.toml`                     | Operator-supplied config consumed by `nostr_bbs_config::load_from_*` |
 | `src/branding.rs`                   | DreamLab `BrandingConfig` populator (theme, logos, copy, zones)      |
 | `src/workers.rs`                    | Per-worker entry shims + rate-limit wiring (overlay applied at the wrangler routing level — there is no kit `dispatch` API; see the module doc comment) |
@@ -174,9 +174,10 @@ agent_pubkeys = [
 
 ## JSS / Solid features
 
-The overlay is pinned to `nostr-rust-forum` commit `6986276` (gap-close/2026-07
-HEAD), which includes the JSS Solid surface from `solid-pod-rs` `0.5.0-alpha.4`
-plus the DreamLab `POD_BASE_URL` integration fix. On Cloudflare Workers the live pieces
+The workers and clients build from the `nostr-rust-forum` commit pinned as
+`KIT_REF` (see `docs/architecture/kit-compatibility-record.md` for the current
+one), which includes the JSS Solid surface from `solid-pod-rs` (`0.5.0-alpha.24`
+as of 2026-11-22) plus the DreamLab `POD_BASE_URL` integration fix. On Cloudflare Workers the live pieces
 are authenticated pod creation, federated NIP-05, TypeIndex/media provisioning,
 Solid browser headers, and correct public WebID URLs. Native-only export,
 pod-stored key provisioning, and git-init remain disabled here.

@@ -73,12 +73,9 @@ function walk(dir, acc) {
   for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
     const p = path.join(dir, ent.name);
     if (ent.isDirectory()) walk(p, acc);
-    else if (
-      ent.isFile() &&
-      ent.name.endsWith('.md') &&
-      ent.name !== 'README.md' &&
-      ent.name !== 'PREAMBLE.md'
-    )
+    // Only decision records and the template are indexed. Other notes kept
+    // beside them (e.g. external-review-*.md) carry no frontmatter and are not ADRs.
+    else if (ent.isFile() && (/^ADR-\d+.*\.md$/.test(ent.name) || ent.name === 'TEMPLATE.md'))
       acc.push(p);
   }
   return acc;
