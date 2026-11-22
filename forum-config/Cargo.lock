@@ -850,6 +850,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "json-event-parser"
+version = "0.2.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "574b0cd5e90ee2ba03a66d0611fc9a09c9a0c28b2ecc2dc8a181dd31a53ca5d7"
+
+[[package]]
 name = "k256"
 version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -937,9 +943,9 @@ dependencies = [
 
 [[package]]
 name = "nostr-bbs-config"
-version = "1.0.0-beta.19"
+version = "1.0.0-beta.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d0379e7e6ad56ace7f61d87e5a4cfce0e3fd5cb1452c74f64598ca78392e5b1c"
+checksum = "270c55337b014ab39f7fba6cc5c28355b513cb4292ab9c81e9430514ef614729"
 dependencies = [
  "schemars",
  "serde",
@@ -951,9 +957,9 @@ dependencies = [
 
 [[package]]
 name = "nostr-bbs-core"
-version = "1.0.0-beta.19"
+version = "1.0.0-beta.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4284883374fa556052b3fd61b995113ff1fb8f65cff98db3ac99a5871df79da8"
+checksum = "1c9e7e210c49d1d6d4debe0116a40ae434f508405c4af0009a10581d52a2b3a2"
 dependencies = [
  "aes",
  "async-trait",
@@ -980,9 +986,9 @@ dependencies = [
 
 [[package]]
 name = "nostr-bbs-mesh"
-version = "1.0.0-beta.19"
+version = "1.0.0-beta.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3b5e4e0303d079567305e3d3e62fa4a11e84a453045b050257223ea2b31ee9c9"
+checksum = "53df42297ce45375713b48a0d5a23f7b10a62eb736835a6d8fdcb1ef56cf1d2c"
 dependencies = [
  "async-trait",
  "hex",
@@ -997,9 +1003,9 @@ dependencies = [
 
 [[package]]
 name = "nostr-bbs-rate-limit"
-version = "1.0.0-beta.19"
+version = "1.0.0-beta.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3d8555e11f06bb182a6fcb1b840cbdae1471cf05643cb474730743491c91943a"
+checksum = "463c962a786ae700e358f8f5826f2ff63322265151b8bf8926d13bfe944b2fa1"
 dependencies = [
  "async-trait",
  "hex",
@@ -1046,6 +1052,18 @@ name = "oxiri"
 version = "0.2.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "54b4ed3a7192fa19f5f48f99871f2755047fabefd7f222f12a1df1773796a102"
+
+[[package]]
+name = "oxjsonld"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "13a1a66dc569350f3f4e5eff8a8e1a72b0c9e6ad395bb5805493cb7a2fda185f"
+dependencies = [
+ "json-event-parser",
+ "oxiri",
+ "oxrdf",
+ "thiserror 2.0.19",
+]
 
 [[package]]
 name = "oxrdf"
@@ -1528,9 +1546,9 @@ checksum = "8ed6a63f02c8539c91a8685a86f4099661ba3da017932f6ebbea6de3f0fa7c90"
 
 [[package]]
 name = "solid-pod-rs"
-version = "0.5.0-alpha.20"
+version = "0.5.0-alpha.24"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "90977009e21f4c42014bc89f70a248fcee74f739ae2072f65afd37973dea4f72"
+checksum = "6963bb94d769a503385cf7e40b9ca5348a28572ec8b0b7f455f2821d1d3f7702"
 dependencies = [
  "async-trait",
  "base64",
@@ -1542,12 +1560,14 @@ dependencies = [
  "js-sys",
  "k256",
  "mime_guess",
+ "oxjsonld",
  "oxrdf",
  "oxttl",
  "serde",
  "serde_json",
  "sha2 0.10.9",
  "spargebra",
+ "subtle",
  "thiserror 1.0.69",
  "tracing",
  "url",
