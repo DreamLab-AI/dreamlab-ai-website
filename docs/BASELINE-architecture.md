@@ -156,7 +156,9 @@ token. Deployment publishers use full commit SHAs; checkout, Node setup and cach
 - **Native pod tier advertised but unreachable.** `[native_pod] enabled = true`
   points at `pods-native.dreamlab-ai.com`, which has no DNS record, so the Pod
   Browser's mesh card reports the server as unreachable (observed 2026-11-22).
-  Parked by the owner; the two ways to close it are in ADR-2002.
+  Parked by the owner; the two ways to close it are in ADR-2002. The card is
+  shown because the `NATIVE_POD_URL` build secret is set, not because of the
+  `enabled` flag.
 - **Branded worker domains undeployed.** The end-state DNS
   (`relay./api./pods./…dreamlab-ai.com`) does not resolve; the build points at
   `workers.dev` hosts as the shipped reality (`deploy.yml:41-52`).
@@ -167,10 +169,13 @@ token. Deployment publishers use full commit SHAs; checkout, Node setup and cach
 
 ## Invariants (must not silently change)
 
-1. `KIT_REF` in `deploy.yml` and `workers-deploy.yml` and the pinned kit version
-   in `forum-config/Cargo.{toml,lock}` must move together. A client built at a
-   kit SHA the workers were not deployed from is the documented forum-wipe
-   failure mode.
+1. `KIT_REF` must be identical in `deploy.yml`, `workers-deploy.yml` and
+   `rust-ci.yml`, and equal to `CANONICAL_KIT_SHA` in the compatibility record:
+   a client built at a kit SHA the workers were not deployed from is the
+   documented forum-wipe failure mode. The four library crates in
+   `forum-config/Cargo.toml` are exact crates.io versions (no git rev) and move
+   together, to the kit's latest published release; the SHA may run ahead of
+   that version when the commits between change only workers and clients.
 2. The privileged deploy job must download **no unverified artefact**: every
    external tool stays version-pinned and SHA256-checked (`deploy.yml` install
    steps). Full commit-SHA pinning remains required by this invariant but is not yet universal.

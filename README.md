@@ -62,7 +62,7 @@ There are **three independently built frontends**, as recorded in [ADR-2003](doc
 | [Kit compatibility record](docs/architecture/kit-compatibility-record.md) | Canonical source SHA, library versions and pin history |
 | [Deploy workflow](.github/workflows/deploy.yml) and [worker workflow](.github/workflows/workers-deploy.yml) | Source checkout, builds, environment projection and publication |
 
-The workflows pin kit source `8a5cf81…`, which includes the Jev Worker consumers. Library version pins are independent of client-only source changes; use the compatibility record and manifests rather than an old beta number copied into a README. Pin/mirror checks guard agreement among the declared sites, not the freshness of a live deployment.
+The workflows pin a kit source commit as `KIT_REF` (the current one is `CANONICAL_KIT_SHA` in the compatibility record). Library version pins are independent of client-only source changes; use the compatibility record and manifests rather than an old beta number copied into a README. Pin/mirror checks guard agreement among the declared sites, not the freshness of a live deployment.
 
 ## Community and contact flows
 
