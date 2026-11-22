@@ -131,8 +131,8 @@ have moved:
   exact requirement, from crates.io. The kit published all four at 1.0.0-beta.20
   on 2026-11-22 from its tag `v1.0.0-beta.20`. `forum-config/Cargo.toml` carries no
   git `rev` pin.
-- **SHA pin:** `KIT_REF = 3c48e2656d7cabefa894a59b827f5f0d3a8b32b7` (kit `main`, tag
-  `v1.0.0-beta.21-rc.2`), held identically in `deploy.yml`, `workers-deploy.yml`
+- **SHA pin:** `KIT_REF = fd31193090a29471972bd408e07a7e5b8654f087` (kit `main`, tag
+  `v1.0.0-beta.21-rc.3`), held identically in `deploy.yml`, `workers-deploy.yml`
   and `rust-ci.yml`.
 - **Fourth site:** `CANONICAL_KIT_SHA` (with `CANONICAL_KIT_VERSION` and the
   `RESOLVED` registry checksums) in `docs/architecture/kit-compatibility-record.md`,

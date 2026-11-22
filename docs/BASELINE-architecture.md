@@ -115,10 +115,10 @@ Two pin mechanisms coexist:
   ER-22 beta.16) means the other three are republished to match. The kit's
   1.0.0-beta.20 release (2026-11-22) published all four together.
 - **Client + workers** are built by cloning the kit repo at a pinned **git SHA**
-  `KIT_REF = 3c48e2656d7cabefa894a59b827f5f0d3a8b32b7`, present identically in
+  `KIT_REF = fd31193090a29471972bd408e07a7e5b8654f087`, present identically in
   `deploy.yml`, `workers-deploy.yml` and `rust-ci.yml`, and recorded as
   `CANONICAL_KIT_SHA` in the compatibility record. As of 2026-11-22 it is kit
-  `main` tagged `v1.0.0-beta.21-rc.2`: the 1.0.0-beta.20 release plus relay and
+  `main` tagged `v1.0.0-beta.21-rc.3`: the 1.0.0-beta.20 release plus relay and
   client fixes whose library crates are unchanged, so the SHA runs ahead of the
   published crate version until the kit's next release. The compatibility record
   is the running history of every pin and what it brought; this paragraph is a
