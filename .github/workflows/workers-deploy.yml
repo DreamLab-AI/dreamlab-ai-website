@@ -11,8 +11,8 @@ on:
       # Deploy-config overrides (wrangler bindings, ZONE_CONFIG, migrations).
       - 'forum-config/deploy/**'
       # A kit re-pin moves the worker code too: the workers build from the kit
-      # cloned at KIT_REF (this file) and the canonical pin is recorded in
-      # forum-config/Cargo.lock. Without these paths, a re-pin commit that does
+      # cloned at KIT_REF (this file) and the canonical pin is recorded in the
+      # compatibility record. Without these paths, a re-pin commit that does
       # not touch deploy/** ships a new CLIENT (deploy.yml fires on any push)
       # while leaving the WORKERS on the old kit — the exact client/worker skew
       # that wiped the forum on 2026-06-15. Treat any pin move as a worker deploy.
@@ -33,10 +33,11 @@ env:
   WRANGLER_VERSION: '3.114.17'
   CF_SUBDOMAIN: 'solitary-paper-764d'
   KIT_REPO: 'https://github.com/DreamLab-AI/nostr-rust-forum.git'
-  # Pinned to the exact commit resolved in forum-config/Cargo.lock.
-  # Do NOT float on `main`: a breaking upstream push would silently ship untested
-  # worker code while the lockfile stays at this tested revision. Keep this SHA in
-  # sync with the `rev = "..."` in forum-config/Cargo.lock when bumping the kit.
+  # The kit commit the workers and clients build from. Do NOT float on `main`: a
+  # breaking upstream push would silently ship untested worker code. It must be
+  # identical in deploy.yml, workers-deploy.yml and rust-ci.yml and equal
+  # CANONICAL_KIT_SHA in the compatibility record (scripts/lib/pin-parity.mjs).
+  # forum-config/Cargo.lock holds no git rev: the library crates come from crates.io.
   # Cutover provenance (crate versions, release notes, registry checksums) lives
   # in docs/architecture/kit-compatibility-record.md, which pin-parity verifies
   # against this exact SHA. Never restate the kit version or release notes here;

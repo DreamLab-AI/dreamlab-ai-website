@@ -136,8 +136,11 @@ have moved:
   and `rust-ci.yml`.
 - **Fourth site:** `CANONICAL_KIT_SHA` (with `CANONICAL_KIT_VERSION` and the
   `RESOLVED` registry checksums) in `docs/architecture/kit-compatibility-record.md`,
-  enforced by `scripts/lib/pin-parity.mjs` and
-  `scripts/__tests__/kit-ref-sites.test.mjs`.
+  enforced by `scripts/lib/pin-parity.mjs` (`KIT_REF` equals `CANONICAL_KIT_SHA`;
+  exact version pins; `RESOLVED` checksums match the lockfile).
+  `scripts/__tests__/kit-ref-sites.test.mjs` covers the other half: that the
+  three workflow `KIT_REF` sites agree with each other. It does not read the
+  compatibility record.
 
 The SHA may run ahead of the published version when the commits between them
 change only the workers and clients, which build from kit source; the overlay's

@@ -32,8 +32,10 @@ CANONICAL_KIT_VERSION=1.0.0-beta.20
 ```
 
 The `CANONICAL_KIT_SHA` line above is the machine-readable field the `pin-check`
-job extracts and compares against the workflow `KIT_REF`s and Cargo revs. Keep it
-byte-identical to `KIT_REF` when bumping the kit.
+job extracts and compares against the workflow `KIT_REF`s. Keep it
+byte-identical to `KIT_REF` when bumping the kit. (`forum-config/Cargo.toml` no
+longer carries git revs: the library crates are exact crates.io versions, checked
+against `CANONICAL_KIT_VERSION` and the `RESOLVED` lines below.)
 
 The 2026-11-22 late pin (`3c48e26`, tag `v1.0.0-beta.21-rc.2`) adds five kit PRs to rc.1. Relay: #90 records a tombstone on every route that deletes on purpose (report resolved as delete, admin purge, user purge) and ignores `a`-ref deletions for kinds that are not replaceable; #94 refuses a member's kind-5 unless every target is their own (closing a hole where any member could hide a post the relay held no row for), refuses members' deletions of migrated (sealed) posts, and makes a moderator's deletion of one remove its envelope. Client: #92 stores zone keys, bookmarks and drafts per identity and stops minting under epochs it cannot vouch for; #91 decides "not found" only from an answer that followed the relay's acceptance of AUTH, with bounded AUTH and REQ timers; #93 fetches only deletions newer than a marker and honours a deletion of a migrated post only from its author or an admin. Behaviour changes for members: authors cannot delete their own pre-migration posts without a moderator; unsent drafts and bookmark previews from before this pin are dropped once. The three client PRs were not browser-tested before merge; the live test follows this deploy. Rollback: restore `da08b53` at the three KIT_REF sites and in `CANONICAL_KIT_SHA` (relay tables are additive. The older client reads every stored key row, the per-identity ones included, so a rollback loses no key but makes keys stored since this pin visible to every account on a shared browser again; where two accounts hold different keys for one slot it uses whichever it reads last.)
 
@@ -362,8 +364,11 @@ All render from the pinned kit at deploy time; this repo adds only branding
 ## Bump procedure
 
 1. Re-pin `KIT_REF` in `deploy.yml`, `workers-deploy.yml`, `rust-ci.yml`.
-2. Re-pin the four `rev=` in `forum-config/Cargo.toml` (bump each crate `version`
-   to match the crate version at the new rev).
+2. Only when the kit has published a new library release: set the four exact
+   version pins in `forum-config/Cargo.toml` to it, run `cargo update` for those
+   crates, and regenerate the `RESOLVED` lines with
+   `node scripts/pin-parity.mjs --print-resolved`. A re-pin that changes only
+   workers and clients leaves them alone.
 3. Update `CANONICAL_KIT_SHA` above and add/adjust the deployment row.
 4. Run the overlay build (`cargo test --manifest-path forum-config/Cargo.toml`) and
    the `pin-check` gate locally; both must be green before pushing.
@@ -372,7 +377,7 @@ All render from the pinned kit at deploy time; this repo adds only branding
 
 | SHA | Branch/context | Notes |
 |---|---|---|
-| `931898a` | `main` (tag `v1.0.0-beta.10`) | Current (canonical — matches `CANONICAL_KIT_SHA` above and the `KIT_REF` pins). **Kit release `1.0.0-beta.10`** (2026-09-06): governance receipts — every accepted kind-3140x event is recorded in a new `governance_receipts` D1 table with stage, projection outcome and replay count (`migrations/0005`; the relay worker applies the schema idempotently at startup through its `CREATE TABLE IF NOT EXISTS` migration path, so this deploy needs no manual `wrangler d1 migrations apply`); typed feature gate; identity subkey derivation vectors; forum-client bootstrap, per-channel freshness and reconcile; relay trust sweep; the `a754468` event_tags indexed lookups this deployment previously pinned three commits past `beta.9`; rustfmt, clippy and rustdoc hygiene on the landing. All 14 crates versioned `1.0.0-beta.10`; the six registry crates (`core`, `config`, `mesh`, `rate-limit`, `ascii`, `setup-skill`) published to crates.io at `1.0.0-beta.10` (superseded `beta.9` yanked once this pin deployed). |
+| `931898a` | `main` (tag `v1.0.0-beta.10`) | Superseded (was canonical at the 1.0.0-beta.10 release; the current pin is the first row of the deployment table above). **Kit release `1.0.0-beta.10`** (2026-09-06): governance receipts — every accepted kind-3140x event is recorded in a new `governance_receipts` D1 table with stage, projection outcome and replay count (`migrations/0005`; the relay worker applies the schema idempotently at startup through its `CREATE TABLE IF NOT EXISTS` migration path, so this deploy needs no manual `wrangler d1 migrations apply`); typed feature gate; identity subkey derivation vectors; forum-client bootstrap, per-channel freshness and reconcile; relay trust sweep; the `a754468` event_tags indexed lookups this deployment previously pinned three commits past `beta.9`; rustfmt, clippy and rustdoc hygiene on the landing. All 14 crates versioned `1.0.0-beta.10`; the six registry crates (`core`, `config`, `mesh`, `rate-limit`, `ascii`, `setup-skill`) published to crates.io at `1.0.0-beta.10` (superseded `beta.9` yanked once this pin deployed). |
 | `90ffe74` | `main` (tag `v1.0.0-beta.9`) | Superseded (was canonical, with `KIT_REF` held three commits ahead at `a754468` for the event_tags fix). **Kit release `1.0.0-beta.9`**: NIP-98 canonical_url preserves query strings (fixes admin-route verification across auth/relay/search/preview), nip44 `PlaintextTooLong` mapping + `nostr 0.44.7` exact pin, pod ACL `preserves_owner_control` invariant + dead `pod_git_anchor.rs` removed, CI hardening (clippy/test/coverage hard gates, security-audit.sh, validate-forum-config). All 14 crates versioned `1.0.0-beta.9`; the four library crates published to crates.io at `1.0.0-beta.9` (superseded `beta.8` yanked once this pin deployed). |
 | `9de950a` | `main` (admin consolidation + onboarding fixes) | Superseded. Admin panel consolidated from 12 to 8 tabs (Members unified, Settings→Configuration, NativePods folded in, dead stats.rs removed). Onboarding deduplication (skip /setup redirect) + recovery sheet Blob download. Library crates unchanged at `1.0.0-beta.8`. |
 | `1fa99db` | `main` (NIP-25 reactions + profile popover + DM fix) | Superseded. Three community-requested features: NIP-25 emoji reactions with a reactive ReactionStore, profile popover with Send DM on avatar/name click, and DM list mobile alignment. Library crates unchanged at `1.0.0-beta.8`. |

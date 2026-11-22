@@ -252,7 +252,9 @@ commit, or client/worker/test skew ships:
 2. `KIT_REF` in `.github/workflows/workers-deploy.yml`
 3. `KIT_REF` in `.github/workflows/rust-ci.yml`
 4. `CANONICAL_KIT_SHA` in `docs/architecture/kit-compatibility-record.md`
-   (checked by `scripts/lib/pin-parity.mjs` and `scripts/__tests__/kit-ref-sites.test.mjs`)
+   (`scripts/lib/pin-parity.mjs` checks it equals `KIT_REF`;
+   `scripts/__tests__/kit-ref-sites.test.mjs` checks the three workflow sites
+   agree with each other)
 
 `forum-config/Cargo.toml` no longer pins the kit by `rev`: it links the four
 library crates (`nostr-bbs-core`, `-config`, `-mesh`, `-rate-limit`) from

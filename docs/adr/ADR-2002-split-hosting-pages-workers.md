@@ -153,9 +153,14 @@ tier (kit ADR-089) and needs nothing.
    auth-worker secrets and the client build variable (Steps 3 and 4), then check
    `curl https://pods-native.dreamlab-ai.com/.well-known/solid`. This needs the
    Cloudflare account and the host shell.
-2. **Turn the card off** until then: `[native_pod] enabled = false` in
-   `forum-config/dreamlab.toml` (and its hand-synced mirrors, ADR-2005). Config
-   only; nothing else changes.
+2. **Turn the card off** until then. *Corrected 2026-11-22, same day:* the card
+   is not controlled by `[native_pod] enabled`. The forum client renders it
+   whenever the build-time variable `NATIVE_POD_URL` is non-empty (kit
+   `pod_browser.rs`, `option_env!("NATIVE_POD_URL")`), and `deploy.yml` passes
+   that from the `NATIVE_POD_URL` repository secret. Nothing outside the config
+   schema reads `enabled`. So: clear the `NATIVE_POD_URL` secret (or stop
+   passing it to the client build) and redeploy; set `enabled = false` as well
+   so the config states the truth. Not tested.
 
 *Also worth doing either way (kit, not here):* the card's Details text should show
 the first line of the error, not the whole stack trace.
