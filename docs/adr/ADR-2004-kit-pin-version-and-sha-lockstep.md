@@ -120,3 +120,26 @@ provenance remain unexercised here.
 `docs/architecture/kit-compatibility-record.md`, `scripts/pin-parity.mjs` (new),
 `scripts/lib/pin-parity.mjs` (new), `scripts/pin-parity-check.sh`,
 `.github/workflows/{ci,deploy,workers-deploy,rust-ci,test-and-lint,docs-update}.yml`.
+
+## Pin state — 2026-11-22
+
+The Decision above quotes the pins as they stood when it was verified
+(`1.0.0-beta.9`, `a754468`). The rule is unchanged; the values and the pin sites
+have moved:
+
+- **Version pin:** `nostr-bbs-{core,config,mesh,rate-limit} = "=1.0.0-beta.20"`, an
+  exact requirement, from crates.io. The kit published all four at 1.0.0-beta.20
+  on 2026-11-22 from its tag `v1.0.0-beta.20`. `forum-config/Cargo.toml` carries no
+  git `rev` pin.
+- **SHA pin:** `KIT_REF = 3c48e2656d7cabefa894a59b827f5f0d3a8b32b7` (kit `main`, tag
+  `v1.0.0-beta.21-rc.2`), held identically in `deploy.yml`, `workers-deploy.yml`
+  and `rust-ci.yml`.
+- **Fourth site:** `CANONICAL_KIT_SHA` (with `CANONICAL_KIT_VERSION` and the
+  `RESOLVED` registry checksums) in `docs/architecture/kit-compatibility-record.md`,
+  enforced by `scripts/lib/pin-parity.mjs` and
+  `scripts/__tests__/kit-ref-sites.test.mjs`.
+
+The SHA may run ahead of the published version when the commits between them
+change only the workers and clients, which build from kit source; the overlay's
+library crates then stay at the last release. That is the case now. The
+compatibility record holds the history of each pin; `CLAUDE.md` states the rule.

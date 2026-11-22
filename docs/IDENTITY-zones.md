@@ -147,7 +147,8 @@ generated on-device and never written to R2 (`dreamlab.toml` `[provision]`,
 `keys_at_signup = false`). NIP-05 resolution is `federated` — D1 cache first,
 pod `/.well-known/nostr.json` on miss (`dreamlab.toml:206-208`). A second
 native-pod backend (agentbox tier, git-enabled) is advertised to `zone2/3/4`
-cohorts via `[native_pod]` (`dreamlab.toml:245`).
+cohorts via `[native_pod]` (`dreamlab.toml:253`). As of 2026-11-22 it is
+advertised but not reachable: its host has no DNS record (open item in ADR-2002).
 
 ## Known divergences & open items
 

@@ -126,3 +126,39 @@ observing publication actually denied on a failed check in a real run.
 `.github/workflows/deploy.yml`, `.github/workflows/workers-deploy.yml`,
 `.github/workflows/ci.yml`, `scripts/check-effective-endpoints.mjs` (new),
 `scripts/lib/effective-endpoints.mjs` (new).
+
+## Open item — 2026-11-22: the native pod tier is configured but not reachable
+
+**To do later; parked by the owner on 2026-11-22.** The forum advertises a second,
+git-capable pod backend on the agentbox: `[native_pod] enabled = true`,
+`base_url = "https://pods-native.dreamlab-ai.com"` (`forum-config/dreamlab.toml:253-258`).
+That host is a third plane beside the two this ADR decides (GitHub Pages origin,
+Cloudflare Workers backend), reached through a Cloudflare Tunnel into the agentbox.
+
+*Observed.* `pods-native.dreamlab-ai.com` has no DNS record (public DNS answers
+NXDOMAIN), so the Pod Browser's mesh card fails its fetch and shows "The git-backed
+mesh pod server isn't reachable right now", with a raw browser stack trace under
+Details. The standard pod on the Workers tier is unaffected. The pod server itself
+is running in the agentbox (`supervisorctl status solid-pod`); no tunnel connector
+runs in that container, and the host was not inspected. Either the tunnel and its
+DNS record were never created or they were removed. The separate "Git HTTP not
+available on this deployment" line on the same page is expected on the Workers
+tier (kit ADR-089) and needs nothing.
+
+*To close it, one of:*
+
+1. **Wire it up.** Follow `docs/deployment/NATIVE_POD_MESH.md`: create the
+   Cloudflare Zero Trust tunnel and the `pods-native` public hostname (Step 1),
+   start the connector beside the agentbox pod server (Step 2), set the
+   auth-worker secrets and the client build variable (Steps 3 and 4), then check
+   `curl https://pods-native.dreamlab-ai.com/.well-known/solid`. This needs the
+   Cloudflare account and the host shell.
+2. **Turn the card off** until then: `[native_pod] enabled = false` in
+   `forum-config/dreamlab.toml` (and its hand-synced mirrors, ADR-2005). Config
+   only; nothing else changes.
+
+*Also worth doing either way (kit, not here):* the card's Details text should show
+the first line of the error, not the whole stack trace.
+
+This note records a gap between configuration and deployment. It does not change
+the Decision or `verified_commit` above.

@@ -107,16 +107,22 @@ comment and CI assertion rather than the handler code.
 Two pin mechanisms coexist:
 
 - **Config crates** are consumed from crates.io with an **exact** version pin, not a git
-  rev: `nostr-bbs-{core,config,mesh,rate-limit} = "=1.0.0-beta.16"`
+  rev: `nostr-bbs-{core,config,mesh,rate-limit} = "=1.0.0-beta.20"`
   (`forum-config/Cargo.toml`, `forum-config/Cargo.lock`). The pin guard
   (`scripts/lib/pin-parity.mjs`) demands **one** version across all four, equal to
   `CANONICAL_KIT_VERSION`, and each crate's registry checksum recorded in
   `docs/architecture/kit-compatibility-record.md`; a crate released alone (core's
-  ER-22 beta.16) means the other three are republished to match.
+  ER-22 beta.16) means the other three are republished to match. The kit's
+  1.0.0-beta.20 release (2026-11-22) published all four together.
 - **Client + workers** are built by cloning the kit repo at a pinned **git SHA**
-  `KIT_REF = ea7d95e7ca70833217ab543fee91b8344304a32d`, present identically in
-  `deploy.yml`, `workers-deploy.yml` and `rust-ci.yml`. It is the kit commit that
-  released `nostr-rust-forum` 1.0.0-beta.16 and added `[[ingress]]` (kit ADR-2022).
+  `KIT_REF = 3c48e2656d7cabefa894a59b827f5f0d3a8b32b7`, present identically in
+  `deploy.yml`, `workers-deploy.yml` and `rust-ci.yml`, and recorded as
+  `CANONICAL_KIT_SHA` in the compatibility record. As of 2026-11-22 it is kit
+  `main` tagged `v1.0.0-beta.21-rc.2`: the 1.0.0-beta.20 release plus relay and
+  client fixes whose library crates are unchanged, so the SHA runs ahead of the
+  published crate version until the kit's next release. The compatibility record
+  is the running history of every pin and what it brought; this paragraph is a
+  snapshot.
 
 `workers-deploy.yml:` fires on `forum-config/Cargo.lock` and `KIT_REF` changes
 precisely so a kit re-pin never ships a new client against old workers — the
@@ -147,9 +153,10 @@ token. Deployment publishers use full commit SHAs; checkout, Node setup and cach
   generated" (`deploy.yml:56`). Only the O3 fail-closed KV guard shipped; the
   O1/O2 single-source generator is deferred. Any pubkey/zone rotation is a
   multi-location manual change.
-- **`forum-config/README.md` pin note is stale.** It describes the kit dep as a
-  git `rev` (e.g. `6986276`); the actual dependency is now a crates.io version
-  (`1.0.0-beta.9`) with the git SHA carried separately as `KIT_REF`.
+- **Native pod tier advertised but unreachable.** `[native_pod] enabled = true`
+  points at `pods-native.dreamlab-ai.com`, which has no DNS record, so the Pod
+  Browser's mesh card reports the server as unreachable (observed 2026-11-22).
+  Parked by the owner; the two ways to close it are in ADR-2002.
 - **Branded worker domains undeployed.** The end-state DNS
   (`relay./api./pods./…dreamlab-ai.com`) does not resolve; the build points at
   `workers.dev` hosts as the shipped reality (`deploy.yml:41-52`).
