@@ -256,7 +256,7 @@ commit, or client/worker/test skew ships:
 
 `forum-config/Cargo.toml` no longer pins the kit by `rev`: it links the four
 library crates (`nostr-bbs-core`, `-config`, `-mesh`, `-rate-limit`) from
-crates.io at an exact version (`=1.0.0-beta.19`). The workers and clients
+crates.io at an exact version (`=1.0.0-beta.20`). The workers and clients
 build from kit source at `KIT_REF`, so those versions move only when the kit
 publishes a release and the overlay is updated to it.
 
