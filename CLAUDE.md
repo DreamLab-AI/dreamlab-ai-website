@@ -251,8 +251,14 @@ commit, or client/worker/test skew ships:
 1. `KIT_REF` in `.github/workflows/deploy.yml`
 2. `KIT_REF` in `.github/workflows/workers-deploy.yml`
 3. `KIT_REF` in `.github/workflows/rust-ci.yml`
-4. The `rev = "..."` pins on every `nostr-bbs-*` dependency in `forum-config/Cargo.toml`
-   (and the resolved full SHA in `forum-config/Cargo.lock`)
+4. `CANONICAL_KIT_SHA` in `docs/architecture/kit-compatibility-record.md`
+   (checked by `scripts/lib/pin-parity.mjs` and `scripts/__tests__/kit-ref-sites.test.mjs`)
+
+`forum-config/Cargo.toml` no longer pins the kit by `rev`: it links the four
+library crates (`nostr-bbs-core`, `-config`, `-mesh`, `-rate-limit`) from
+crates.io at an exact version (`=1.0.0-beta.19`). The workers and clients
+build from kit source at `KIT_REF`, so those versions move only when the kit
+publishes a release and the overlay is updated to it.
 
 ### Zones
 
