@@ -42,7 +42,7 @@ env:
   # in docs/architecture/kit-compatibility-record.md, which pin-parity verifies
   # against this exact SHA. Never restate the kit version or release notes here;
   # the prose rots on every repin (beta.9 / rc11 / beta.14 all went stale).
-  KIT_REF: 'fd31193090a29471972bd408e07a7e5b8654f087'
+  KIT_REF: '8a0ca418b9f129b219431880d9fa5a81603428fc'
 
 jobs:
   gate:
@@ -286,7 +286,7 @@ jobs:
       # on the first request. R-09: surface this as a deploy blocker instead.
       # Secrets are operator data — this only checks presence, never sets values.
       - name: Validate public System One credential
-        if: matrix.config == 'search-worker' || matrix.config == 'relay-worker'
+        if: matrix.config == 'search-worker' || matrix.config == 'relay-worker' || matrix.config == 'auth-worker'
         working-directory: kit/crates/${{ matrix.kit_crate }}
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
