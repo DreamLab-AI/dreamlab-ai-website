@@ -24,7 +24,7 @@ corpus 013–044, frozen precisely because it drifted from the code).
 governing document **in the same change**, and regenerate this index
 (`node scripts/adr-index-gen.cjs docs/adr` — it fails CI on invalid frontmatter).
 
-_11 record(s). Regenerate with_ `node scripts/adr-index-gen.cjs docs/adr`.
+_12 record(s). Regenerate with_ `node scripts/adr-index-gen.cjs docs/adr`.
 
 | ID | Title | Date | Decision | Impl | Activation | Supersedes | Superseded by | Owner | Repo |
 |----|-------|------|----------|------|------------|------------|---------------|-------|------|
@@ -39,3 +39,4 @@ _11 record(s). Regenerate with_ `node scripts/adr-index-gen.cjs docs/adr`.
 | [ADR-2009](ADR-2009-dream-poker-table-house-seat.md) | Run the poker table's house seat as a DreamLab agent, settle hands in DREAM on sidestr:dreamlab, and schedule games on the calendar | 2026-10-03 | accepted | complete | live | — | — | jjohare | dreamlab-ai-website |
 | [ADR-2010](ADR-2010-seo-watch-nightly.md) | A nightly SEO and agent-searchability watch runs alongside the dream engine and proposes through draft PRs | 2026-10-12 | accepted | complete | live | — | — | jjohare | dreamlab-ai-website |
 | [ADR-2011](ADR-2011-website-information-identity.md) | Name the monitor key as the "website information" identity, labelled but never privileged | 2026-10-15 | accepted | complete | live | — | — | jjohare | dreamlab-ai-website |
+| [ADR-2012](ADR-2012-dreamlab-first-agent-board-is-ontology-review-behind-key-split-and-panel-binding.md) | DreamLab's first agent board is ontology review, activated only after the admin key split and panel binding | 2026-11-23 | proposed | none | inactive | — | — | jjohare | dreamlab-ai-website |
