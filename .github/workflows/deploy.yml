@@ -128,7 +128,7 @@ env:
   # in docs/architecture/kit-compatibility-record.md, which pin-parity verifies
   # against this exact SHA. Never restate the kit version or release notes here;
   # the prose rots on every repin (beta.9 / rc11 / beta.14 all went stale).
-  KIT_REF: '8a0ca418b9f129b219431880d9fa5a81603428fc'
+  KIT_REF: 'c8b8c4eac328157f2a95c98f91a2b082f41f1535'
 
 jobs:
   gate:
