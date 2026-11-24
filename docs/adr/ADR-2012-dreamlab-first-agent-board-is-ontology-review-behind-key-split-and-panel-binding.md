@@ -27,15 +27,17 @@ acceptance_boundary:
 1. DreamLab's first agent board is **ontology review**: one board whose agent column names `knowledge-enrichment-agent` and whose approval column carries operator-declared `tp-verifiability`, `tp-reversibility` and `tp-stakes`. The board is authored by the operator key, never the agent. It reuses the ADR-2013 panel's Promote, Demote and expiry semantics for what an approval means.
 2. Activation needs all of these, in order:
    (a) the admin key split has been run, so no agent service key holds admin authority;
-   (b) forum ADR-2024 runs at `enforce`, with the ontology panel published by the operator key and bound to the agent;
+   (b) forum ADR-2024 runs at `enforce`, with the ontology panel published by the operator key and bound to the agent. ADR-2024 is still proposed on the unmerged forum branch `docs/adr-2024-panel-binding`, so it must land in the kit first;
    (c) the forum findings AB-INTENT-ACTOR-FROM-CARD-DTAG and FORUM-KANBAN-APPROVAL-COL-CLIENT-ONLY are closed, and the kit pin contains ADR-2035;
-   (d) a probe agent distinct from `knowledge-enrichment-agent` is registered on the panel (`probe-agent`), with the calibration rate left at the 0.1 default;
-   (e) at least one named `reviewer` exists besides the admin, so cases can be delegated.
+   (d) a probe agent distinct from `knowledge-enrichment-agent` is registered on the panel (`probe-agent`), and the panel is first published with `calibration-sample-rate` 1.0, so every case is reviewed. The operator lowers the rate toward the 0.1 default by republishing the panel (forum ADR-2011 Decision 6), only on probe-catch evidence; a missed probe returns it to 1.0;
+   (e) at least one named `reviewer` exists besides the admin, so cases can be delegated;
+   (f) the board's approval criteria exist as `EvalCase` resources (solid-pod-rs ADR-2012) linked to the agent's production `PromptVersion`, so what counts as a good ontology change is written down for the agent to apply before it runs.
 3. The board lives in the `family` zone unless the agent is granted the `dreamlab` zone key. Choosing the zone is part of activation, not this record.
 4. Prompt versions and run records go in the agent's pod on the native tier (`[native_pod]`, `git_enabled = true`), so each write carries a git-mark (solid-pod-rs ADR-2012).
-5. Success is one ontology change that runs end to end from a card move to an `applied` receipt (ADR-2010 stages), with the probe catch rate reported for the first 30 days. Until then nothing on the website claims that DreamLab runs governed agent workflows.
+5. Success is one ontology change that runs end to end from a card move to an `applied` receipt (ADR-2010 stages), with three figures reported weekly for the first 30 days: the probe catch rate, the median decision time and the peak review backlog (forum ADR-2035 Decision 6). Until then nothing on the website claims that DreamLab runs governed agent workflows.
 
 ## Consequences
+- Reviewing every case at first costs reviewer time while trust is lowest, which is when that cost is worth paying. Each step down in the sample rate is earned from evidence, not assumed. The study behind this (Anthropic Economics, "Working with AI", 23 November 2026) found review to be the bottleneck in agent deployments.
 - DreamLab becomes the first real deployment of the forum's agent-workflow loop, on the governance consumer that is already documented (ontology review).
 - Activation depends on the key split, which only an operator can run, so this record can't go live from CI.
 - Config changes on activation touch the four synced locations (ADR-2005: hand-synced mirrors). They land in one pull request with the runbook evidence.
