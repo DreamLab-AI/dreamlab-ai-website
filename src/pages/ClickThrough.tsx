@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import type { z } from "zod";
+import { clickThroughFormSchema as formSchema } from "@/lib/formSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { SITE_FACTS } from "@/data/site-facts";
@@ -50,15 +51,6 @@ const PARTNER = {
 } as const;
 
 const TEAM_SIZES = ["1–2", "3–4", "5–8", "More than 8"] as const;
-
-const formSchema = z.object({
-  name: z.string().min(2, { message: "Please tell us your name" }),
-  company: z.string().min(2, { message: "Please tell us your company" }),
-  email: z.string().email({ message: "Please enter a valid email address" }),
-  teamSize: z.string().min(1, { message: "Roughly how many people?" }),
-  message: z.string().min(10, { message: "A sentence or two on what you want AI to do for you" }),
-  consent: z.literal(true, { errorMap: () => ({ message: "Please tick the box so we can pass your enquiry to Click Through" }) }),
-});
 
 type FormValues = z.infer<typeof formSchema>;
 

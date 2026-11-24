@@ -14,7 +14,8 @@ import {
   FormMessage
 } from "@/components/ui/form";
 import { useForm, type UseFormReturn } from "react-hook-form";
-import { z } from "zod";
+import type { z } from "zod";
+import { contactFormSchema as formSchema } from "@/lib/formSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import {
@@ -42,15 +43,6 @@ const RELAY_URL = import.meta.env.VITE_RELAY_URL || "";
 const ADMIN_PUBKEY = import.meta.env.VITE_ADMIN_PUBKEY || "";
 const MONITOR_PUBKEY = import.meta.env.VITE_MONITOR_PUBKEY || "";
 const ENQUIRY_SUBJECT = "DreamLab website enquiry";
-
-// Define form schema with Zod
-const formSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters" }),
-  email: z.string().email({ message: "Please enter a valid email address" }),
-  projectType: z.string().min(1, { message: "Please choose what this is about" }),
-  teamMembers: z.string().optional(),
-  message: z.string().min(10, { message: "Message must be at least 10 characters" })
-});
 
 type FormValues = z.infer<typeof formSchema>;
 
