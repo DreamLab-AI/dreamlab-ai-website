@@ -380,12 +380,12 @@ jobs:
                 var sub = path.slice('/community'.length) || '/';
                 loc.replace(
                   loc.protocol + '//' + loc.host +
-                  '/community/?__p=' + encodeURIComponent(sub + loc.search + loc.hash)
+                  '/community/?__p=' + encodeURIComponent(sub + loc.search) + loc.hash
                 );
               } else {
                 loc.replace(
                   loc.protocol + '//' + loc.host +
-                  '/?__p=' + encodeURIComponent(path + loc.search + loc.hash)
+                  '/?__p=' + encodeURIComponent(path + loc.search) + loc.hash
                 );
               }
             })();
