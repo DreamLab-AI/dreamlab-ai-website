@@ -297,7 +297,7 @@ jobs:
           # script restores the original sub-path BEFORE the WASM app reads
           # window.location — note it re-prepends /community (the 404.html strips
           # it into __p), mirroring the React pickup injected into dist/index.html.
-          FORUM_PICKUP='<script>(function(){var q=new URLSearchParams(window.location.search);var r=q.get("__p");if(r){q.delete("__p");var s=q.toString();history.replaceState(null,"","/community"+r+(s?"?"+s:""));}})();</script>'
+          FORUM_PICKUP='<script>(function(){var q=new URLSearchParams(window.location.search);var r=q.get("__p");if(r){q.delete("__p");var s=q.toString();history.replaceState(null,"","/community"+r+(s?"?"+s:"")+window.location.hash);}})();</script>'
           sed -i "s|</head>|${FORUM_PICKUP}</head>|" dist/community/index.html
           echo "Injected SPA __p deep-link pickup into forum index.html"
           # Per-deploy service-worker cache name so a new build evicts the old
