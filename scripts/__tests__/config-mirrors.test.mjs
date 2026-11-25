@@ -105,9 +105,10 @@ describe("the live repository", () => {
     );
   });
 
-  it("compares the zone model across all four sites", () => {
+  it("compares the zone model across all five sites", () => {
     const zones = result.mirrors.find((m) => m.id === "zone-model");
-    expect(zones.sites).toHaveLength(4);
+    // TOML, deploy.yml, relay, auth and (since the v2 switch) the pod worker's ZONE_CONFIG.
+    expect(zones.sites).toHaveLength(5);
     expect(zones.agreed).toBe(true);
   });
 
@@ -128,8 +129,8 @@ describe("a rotation that misses a mirror is rejected", () => {
     const root = makeFixtureRepo((r) => {
       r.replaceOnce(
         "forum-config/dreamlab.toml",
-        '"6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425a"',
-        `"${ROTATED}"`,
+        '  "bfcf20d472f0fb143b23cb5be3fa0a040d42176b71f73ca272f6912b1d62a452",',
+        `  "${ROTATED}",`,
       );
     });
     expectDrift(root, "admin-pubkeys: MIRROR DRIFT");
@@ -138,7 +139,7 @@ describe("a rotation that misses a mirror is rejected", () => {
   it("catches an admin key rotated in the relay worker but not the search worker", () => {
     const root = makeFixtureRepo((r) => {
       r.edit("forum-config/deploy/relay-worker.wrangler.toml", (t) =>
-        t.replace("6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425a", ROTATED),
+        t.replace("bfcf20d472f0fb143b23cb5be3fa0a040d42176b71f73ca272f6912b1d62a452", ROTATED),
       );
     });
     expectDrift(root, "admin-pubkeys: MIRROR DRIFT");
@@ -198,7 +199,7 @@ describe("a rotation that misses a mirror is rejected", () => {
     const root = makeFixtureRepo((r) => {
       r.replaceOnce(
         "forum-config/dreamlab.toml",
-        'url             = "wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev"',
+        'url             = "wss://dreamlab-nostr-relay-v2.solitary-paper-764d.workers.dev"',
         'url             = "wss://relay.dreamlab-ai.com"',
       );
     });
@@ -209,8 +210,8 @@ describe("a rotation that misses a mirror is rejected", () => {
     const root = makeFixtureRepo((r) => {
       r.edit("forum-config/deploy/pod-worker.wrangler.toml", (t) =>
         t.replace(
-          'POD_BASE_URL     = "https://dreamlab-pod-api.solitary-paper-764d.workers.dev"',
-          'POD_BASE_URL     = "https://pods.dreamlab-ai.com"',
+          'POD_BASE_URL = "https://dreamlab-pod-api-v2.solitary-paper-764d.workers.dev"',
+          'POD_BASE_URL = "https://pods.dreamlab-ai.com"',
         ),
       );
     });

@@ -1,46 +1,36 @@
-# search-worker wrangler manifest for the DreamLab deployment.
-
-name = "dreamlab-search-api"
+# v2 search worker — OPTIONAL. The pilot-kit client no longer calls /embed or /search (c03d736: sealed search runs in the browser from
+# pod objects), and both endpoints are NIP-98-admin-only (d3bef5b). Deploy only if something else needs it. No [ai] binding (no Workers
+# AI), no JEV rerank, no EMBED_URL (the LAN Xinference is not reachable from Cloudflare): the worker falls back to its hash backend.
+name = "dreamlab-search-api-v2"
 main = "build/worker/shim.mjs"
 compatibility_date = "2025-09-01"
 
 [build]
 command = "worker-build --release"
 
-# Workers AI binding — semantic embeddings via @cf/baai/bge-small-en-v1.5 (384-dim).
-[ai]
-binding = "AI"
-
 [[r2_buckets]]
-binding     = "VECTORS"
-bucket_name = "dreamlab-vectors"
+binding = "VECTORS"
+bucket_name = "dreamlab-vectors-v2"
 
 [[kv_namespaces]]
 binding = "SEARCH_CONFIG"
-id      = "440b1f07ff224fb8ad644e094c6766c0"
+id = "<SEARCH_CONFIG_V2_KV_ID>"
 
-# D1 database for NIP-98 replay protection (atomic INSERT OR IGNORE).
-# Shares the auth-worker's D1 database so cross-worker replay is detected.
-# (Legacy NIP98_REPLAY KV binding removed — D1 INSERT OR IGNORE is atomic.)
 [[d1_databases]]
-binding       = "REPLAY_DB"
-database_name = "dreamlab-auth"
-database_id   = "e3981999-e8f0-4c07-9e4b-2e50859b8524"
+binding = "REPLAY_DB"
+database_name = "dreamlab-auth-v2"
+database_id = "a53a49db-beec-4ee5-b09b-a2573923d21f"
 
 [vars]
-
-# System One advisory integration. Errors retain the existing result.
 JEV_SEARCH_RERANK = "1"
 JEV_ENDPOINT = "https://api.typesafe.ai/v1/systemone"
 JEV_MODEL = "jev-latest"
 JEV_API_KEY_NAME = "TYPESAFE_API_KEY"
 # Supply TYPESAFE_API_KEY as a Worker secret; never put its value in this file.
+ALLOWED_ORIGIN = "https://dreamlab-ai.com"
+ALLOWED_ORIGINS = "https://dreamlab-ai.com,https://thedreamlab.uk"
+RVF_STORE_KEY = "dreamlab-v2.rvf"
+ADMIN_PUBKEYS = "bfcf20d472f0fb143b23cb5be3fa0a040d42176b71f73ca272f6912b1d62a452"
 
-ALLOWED_ORIGIN   = "https://dreamlab-ai.com"
-ALLOWED_ORIGINS  = "https://dreamlab-ai.com,https://thedreamlab.uk,https://dreamlab-ai.github.io"
-RVF_STORE_KEY    = "dreamlab.rvf"
-# Full operator admin set — kept in lockstep with relay-worker.wrangler.toml and
-# dreamlab.toml [admin].static_pubkeys (power-user, operator-jjohare,
-# moderation-bot, calendar-bot, search-indexer). The search-indexer must be admin
-# to administer the worker it feeds (e.g. RVF reindex).
-ADMIN_PUBKEYS    = "11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c,6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425a,5d80b5facd2d746689d7d2e400db6acce5843456967054adcf6956e4c734c54c,be92ccf53d9d535fd21f3388201fd83b49588552fff5a1395fb60b6998df2243,d5194639ee3560204a1b5584a0714a6dd2a6c59953d0869b483e72ee185ada26"
+[triggers]
+crons = []

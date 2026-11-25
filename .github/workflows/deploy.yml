@@ -54,11 +54,11 @@ env:
   # live on workers.dev and already send Access-Control-Allow-Origin for
   # https://dreamlab-ai.com. When the operator provisions the custom domains,
   # flip these back in one commit.
-  VITE_RELAY_URL: 'wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev'
-  VITE_AUTH_API_URL: 'https://dreamlab-auth-api.solitary-paper-764d.workers.dev'
-  VITE_POD_API_URL: 'https://dreamlab-pod-api.solitary-paper-764d.workers.dev'
-  VITE_SEARCH_API_URL: 'https://dreamlab-search-api.solitary-paper-764d.workers.dev'
-  VITE_LINK_PREVIEW_API_URL: 'https://dreamlab-link-preview.solitary-paper-764d.workers.dev'
+  VITE_RELAY_URL: 'wss://dreamlab-nostr-relay-v2.solitary-paper-764d.workers.dev'
+  VITE_AUTH_API_URL: 'https://dreamlab-auth-api-v2.solitary-paper-764d.workers.dev'
+  VITE_POD_API_URL: 'https://dreamlab-pod-api-v2.solitary-paper-764d.workers.dev'
+  VITE_SEARCH_API_URL: 'https://dreamlab-search-api-v2.solitary-paper-764d.workers.dev'
+  VITE_LINK_PREVIEW_API_URL: 'https://dreamlab-link-preview-v2.solitary-paper-764d.workers.dev'
   # Nostr DM recipients for the React site (contact form → admin, Talk-to-AI →
   # junkiejarvis). Canonical source is forum-config/dreamlab.toml (admin at :59,
   # junkiejarvis in [[agents]]). These are HAND-SYNCED mirrors, not generated —
@@ -70,7 +70,7 @@ env:
   # step). The ADR-040 D3 key-split runbook MUST re-point this to the newly minted
   # operator key when executed (and run scripts/seed/whitelist-admin-recipient.mjs
   # for it) — extending the split to a five-location atomic change.
-  VITE_ADMIN_PUBKEY: '11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c'
+  VITE_ADMIN_PUBKEY: 'bfcf20d472f0fb143b23cb5be3fa0a040d42176b71f73ca272f6912b1d62a452'
   VITE_JARVIS_PUBKEY: '2de44d5622eef79519ac078f6e227a85aecbaefd561e4e50c5f51dfadbf916e9'  # junkiejarvis — dreamlab.toml [[agents]]
   # Nightly inbox-watch co-recipient (scripts/inbox-watch). The relay's kind-1059
   # read gate only serves wraps addressed to the authenticated viewer, so every
@@ -78,6 +78,11 @@ env:
   # the secret lives in .agentbox/inbox-watch/monitor.key. Whitelist it with
   # scripts/seed/whitelist-admin-recipient.mjs after any relay reseed.
   VITE_MONITOR_PUBKEY: '4ed429aa7f30d6e63c41be50685cffeb03cd7b07e37d37a0c4ae5321e642aad7'
+  # v2 forum switch (golive RUNBOOK §17, operator decision): the React contact form and
+  # Talk-to-AI STAY on the old relay and the old site inbox until v2 has INGRESS_RECIPIENTS.
+  # The forum client (window.__ENV__) uses the v2 VITE_* values above.
+  REACT_RELAY_URL: 'wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev'
+  REACT_ADMIN_PUBKEY: '11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c'
   # Open relays the Talk-to-AI chat listens on for junkiejarvis's reply (ADR-042
   # amendment): the primary relay's whitelist gate rejects kind-1059 wraps
   # addressed to the ephemeral session key, so replies are only readable from
@@ -128,7 +133,7 @@ env:
   # in docs/architecture/kit-compatibility-record.md, which pin-parity verifies
   # against this exact SHA. Never restate the kit version or release notes here;
   # the prose rots on every repin (beta.9 / rc11 / beta.14 all went stale).
-  KIT_REF: 'de31aaa6e6c6b672cc310a2659cf33fd4887602c'
+  KIT_REF: 'f2fb910f3787499eaf3e6f2ecdd70b437058ae91'
 
 jobs:
   gate:
@@ -182,8 +187,8 @@ jobs:
           # Nostr transport for the contact form + Talk-to-AI chat (ADR-041/042).
           # VITE_RELAY_URL already exists at workflow level; the pubkeys are the
           # hand-synced dreamlab.toml mirrors declared above.
-          VITE_RELAY_URL: ${{ env.VITE_RELAY_URL }}
-          VITE_ADMIN_PUBKEY: ${{ env.VITE_ADMIN_PUBKEY }}
+          VITE_RELAY_URL: ${{ env.REACT_RELAY_URL }}
+          VITE_ADMIN_PUBKEY: ${{ env.REACT_ADMIN_PUBKEY }}
           VITE_JARVIS_PUBKEY: ${{ env.VITE_JARVIS_PUBKEY }}
           VITE_MONITOR_PUBKEY: ${{ env.VITE_MONITOR_PUBKEY }}
           VITE_REPLY_RELAYS: ${{ env.VITE_REPLY_RELAYS }}
@@ -286,7 +291,7 @@ jobs:
           # operator can tell whether a deployed build contains a given fix.
           BUILD_HASH="${GITHUB_SHA:0:7}"
           BUILD_VERSION="$(date -u +%Y.%m.%d)"
-          ENV_SCRIPT='<script>window.__ENV__={BBS_PWA_ENABLED:"true",BRAND_LABEL:"Community",FORUM_NAME:"Community Forums",VITE_RELAY_URL:"'"$VITE_RELAY_URL"'",VITE_AUTH_API_URL:"'"$VITE_AUTH_API_URL"'",VITE_POD_API_URL:"'"$VITE_POD_API_URL"'",VITE_SEARCH_API_URL:"'"$VITE_SEARCH_API_URL"'",VITE_LINK_PREVIEW_API_URL:"'"$VITE_LINK_PREVIEW_API_URL"'",SIDESTR_WALLET:"'"$SIDESTR_WALLET"'",SIDESTR_CHAINS:'"$SIDESTR_CHAINS_JSON"',BUILD_VERSION:"'"$BUILD_VERSION"'",BUILD_HASH:"'"$BUILD_HASH"'",ENCRYPTION_ENABLED:"'"$ENCRYPTION_ENABLED"'",ZONE_CONFIG:'"$ZONE_CONFIG_JSON"',POKER:"'"$POKER"'",POKER_CONFIG:'"$POKER_CONFIG_JSON"'};</script>'
+          ENV_SCRIPT='<script>window.__ENV__={BBS_PWA_ENABLED:"true",BRAND_LABEL:"Community",FORUM_NAME:"Community Forums",VITE_RELAY_URL:"'"$VITE_RELAY_URL"'",VITE_AUTH_API_URL:"'"$VITE_AUTH_API_URL"'",VITE_POD_API_URL:"'"$VITE_POD_API_URL"'",VITE_SEARCH_API_URL:"'"$VITE_SEARCH_API_URL"'",VITE_LINK_PREVIEW_API_URL:"'"$VITE_LINK_PREVIEW_API_URL"'",SEARCH_PUBLISHERS:"5ec4b75971fd029374e321b581850606071f64ae06df838d80c80808e3059b07,bfcf20d472f0fb143b23cb5be3fa0a040d42176b71f73ca272f6912b1d62a452",DEVICE_KEYS_ENABLED:"false",VITE_RELAY_EPOCH:"v2-2026-11",SIDESTR_WALLET:"'"$SIDESTR_WALLET"'",SIDESTR_CHAINS:'"$SIDESTR_CHAINS_JSON"',BUILD_VERSION:"'"$BUILD_VERSION"'",BUILD_HASH:"'"$BUILD_HASH"'",ENCRYPTION_ENABLED:"'"$ENCRYPTION_ENABLED"'",ZONE_CONFIG:'"$ZONE_CONFIG_JSON"',POKER:"'"$POKER"'",POKER_CONFIG:'"$POKER_CONFIG_JSON"'};</script>'
           sed -i "s|</head>|${ENV_SCRIPT}</head>|" dist/community/index.html
           echo "Injected window.__ENV__ into forum index.html (build $BUILD_VERSION $BUILD_HASH)"
           # SPA deep-link pickup for the forum. A hard load of /community/login

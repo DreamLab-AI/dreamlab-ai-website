@@ -152,24 +152,24 @@ pub fn client_ip(req: &Request) -> String {
 pub mod deployed_urls {
     /// Auth Worker: WebAuthn registration/login, NIP-98, admin resolution.
     /// Deployed via `deploy/auth-worker.wrangler.toml` as `dreamlab-auth-api`.
-    pub const AUTH_WORKER: &str = "https://dreamlab-auth-api.solitary-paper-764d.workers.dev";
+    pub const AUTH_WORKER: &str = "https://dreamlab-auth-api-v2.solitary-paper-764d.workers.dev";
 
     /// Pod Worker: Solid pod CRUD, quota management, /pay/ payment routes.
     /// Deployed via `deploy/pod-worker.wrangler.toml` as `dreamlab-pod-api`.
-    pub const POD_WORKER: &str = "https://dreamlab-pod-api.solitary-paper-764d.workers.dev";
+    pub const POD_WORKER: &str = "https://dreamlab-pod-api-v2.solitary-paper-764d.workers.dev";
 
     /// Relay Worker: Nostr relay (WebSocket), NIP event handling, whitelist.
     /// Deployed via `deploy/relay-worker.wrangler.toml` as `dreamlab-nostr-relay`.
-    pub const RELAY_WORKER: &str = "wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev";
+    pub const RELAY_WORKER: &str = "wss://dreamlab-nostr-relay-v2.solitary-paper-764d.workers.dev";
 
     /// Search Worker: full-text + vector search over relay events.
     /// Deployed via `deploy/search-worker.wrangler.toml` as `dreamlab-search-api`.
-    pub const SEARCH_WORKER: &str = "https://dreamlab-search-api.solitary-paper-764d.workers.dev";
+    pub const SEARCH_WORKER: &str = "https://dreamlab-search-api-v2.solitary-paper-764d.workers.dev";
 
     /// Preview Worker: link preview / Open Graph unfurling.
     /// Deployed via `deploy/preview-worker.wrangler.toml` as `dreamlab-link-preview`.
     pub const PREVIEW_WORKER: &str =
-        "https://dreamlab-link-preview.solitary-paper-764d.workers.dev";
+        "https://dreamlab-link-preview-v2.solitary-paper-764d.workers.dev";
 }
 
 /// Auth Worker entry shim.
