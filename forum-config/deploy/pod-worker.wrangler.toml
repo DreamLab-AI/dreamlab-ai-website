@@ -1,9 +1,6 @@
-# pod-worker wrangler manifest for the DreamLab deployment.
-#
-# CF resource IDs originally provisioned for the legacy community-forum-rs tree;
-# now consumed by the nostr-rust-forum kit workers.
-
-name = "dreamlab-pod-api"
+# v2 pod worker. Secret: MASTER_SECRET (new random). New bucket dreamlab-pods-v2; the OLD dreamlab-pod-api + dreamlab-pods stay up
+# (8 verbatim zone2 posts link the old host; 19 old objects are also copied bucket-to-bucket to the identical key, RUNBOOK §12).
+name = "dreamlab-pod-api-v2"
 main = "build/worker/shim.mjs"
 compatibility_date = "2025-09-01"
 
@@ -11,47 +8,41 @@ compatibility_date = "2025-09-01"
 command = "worker-build --release"
 
 [[r2_buckets]]
-binding     = "PODS"
-bucket_name = "dreamlab-pods"
+binding = "PODS"
+bucket_name = "dreamlab-pods-v2"
 
-# Read-only ADMIN_KV view (split per audit H6 — pod-worker reads admin
-# flags but cannot mutate them; auth-worker is the write authority).
-# TODO(ops): provision via `wrangler kv:namespace create dreamlab-admin-kv`
-# and grant pod-worker read-only access (or share the same id and rely on
-# code-level read/write split).
 [[kv_namespaces]]
 binding = "ADMIN_KV_RO"
-id      = "REPLACE_WITH_NEW_ADMIN_KV_ID"
+id = "36c5f8d2157b4b3e8ef53c47c7fb68f1"
 
 [[kv_namespaces]]
 binding = "POD_META"
-id      = "8ec8759ab40d4709a831bf6b0e5241eb"
+id = "d4c2d7bc103e4ce697340fa6962d2728"
 
-# D1 database for NIP-98 replay protection (atomic INSERT OR IGNORE),
-# payment/quota tables (webledger_accounts, txo_deposits, quota_usage),
-# and admin checks (members.is_admin / whitelist.is_admin).
-# Shares the auth-worker's D1 database so cross-worker replay is detected.
-# (Legacy NIP98_REPLAY KV binding removed — D1 INSERT OR IGNORE is atomic.)
 [[d1_databases]]
-binding       = "REPLAY_DB"
-database_name = "dreamlab-auth"
-database_id   = "e3981999-e8f0-4c07-9e4b-2e50859b8524"
+binding = "REPLAY_DB"
+database_name = "dreamlab-auth-v2"
+database_id = "a53a49db-beec-4ee5-b09b-a2573923d21f"
 
-# The relay's DB (dreamlab-relay) holds the CANONICAL whitelist + is_admin flag
-# (set by the relay's dynamic-admin / set-admin flow). The pod-worker needs it to
-# authorise admin-gated pod ops (e.g. POST /pods/{pk}/.deprovision, admin
-# provisioning); its own REPLAY_DB (dreamlab-auth) does not carry is_admin for
-# relay-side admins, so without this binding those ops 403 for every admin.
 [[d1_databases]]
-binding       = "RELAY_DB"
-database_name = "dreamlab-relay"
-database_id   = "97c77d23-0e24-4325-ada7-1747eab4095b"
+binding = "RELAY_DB"
+database_name = "dreamlab-relay-v2"
+database_id = "eb33cf2f-44db-433c-9771-6db850d8b64c"
 
 [vars]
-EXPECTED_ORIGIN  = "https://dreamlab-ai.com"
-POD_BASE_URL     = "https://dreamlab-pod-api.solitary-paper-764d.workers.dev"
-PAY_ENABLED      = "true"
-PAY_COST_SATS    = "1"
+EXPECTED_ORIGIN = "https://dreamlab-ai.com"
+POD_BASE_URL = "https://dreamlab-pod-api-v2.solitary-paper-764d.workers.dev"
+# Zone-restricted media (media/zones/<zone>/): CORS allow-list for restricted reads, zone map, admin list, device-key switch.
+ALLOWED_ORIGINS = "https://dreamlab-ai.com,https://thedreamlab.uk"
+ZONE_CONFIG = '[{"id":"zone1","slug":"welcome","display_name":"Welcome","required_cohorts":[],"write_cohorts":["members","agent"],"banner_image_url":"/images/heroes/lake-district-dawn.webp","visibility":"public","encrypted":false,"accent_hex":"#22c55e"},{"id":"zone2","slug":"minimoonoir","display_name":"Minimoonoir","required_cohorts":["zone2","minimoonoir"],"banner_image_url":"/images/heroes/minimoonoir-hero.webp","visibility":"locked","encrypted":true,"accent_hex":"#3b82f6","section_order":["zone2-rants"]},{"id":"zone3","kanban":true,"slug":"family","display_name":"Family","required_cohorts":["zone3","family"],"banner_image_url":"/images/heroes/family-hero.webp","visibility":"locked","encrypted":true,"accent_hex":"#f59e0b"},{"id":"zone4","kanban":true,"slug":"dreamlab","display_name":"DreamLab","required_cohorts":["zone4","dreamlab"],"banner_image_url":"/images/heroes/business-hero.webp","visibility":"locked","encrypted":true,"accent_hex":"#a855f7","agent_keys":true}]'
+ADMIN_PUBKEYS = "bfcf20d472f0fb143b23cb5be3fa0a040d42176b71f73ca272f6912b1d62a452"
+DEVICE_KEYS_ENABLED = "false"
+# Per-pod default in MiB (kit default 50). Largest imported pod needs POD_QUOTA_MB_NEEDED (RUNBOOK §6 prints it); 2048 as on the pilot.
+POD_QUOTA_MB = "2048"
+# Sealed search index publisher besides admins (pods/<archivist>/media/zones/zone2/search/).
+SEARCH_ARCHIVISTS = "5ec4b75971fd029374e321b581850606071f64ae06df838d80c80808e3059b07,bfcf20d472f0fb143b23cb5be3fa0a040d42176b71f73ca272f6912b1d62a452"
+PAY_ENABLED = "true"
+PAY_COST_SATS = "1"
 PAY_TOKEN_TICKER = "DREAM"
-PAY_TOKEN_RATE   = "10"
+PAY_TOKEN_RATE = "10"
 PAY_TOKEN_SUPPLY = "1000000"

@@ -1,10 +1,7 @@
-# auth-worker wrangler manifest for the DreamLab deployment.
-#
-# CF resource IDs originally provisioned for the legacy community-forum-rs tree;
-# now consumed by the nostr-rust-forum kit workers. Preserving them keeps the D2
-# zero-downtime route handover on the same D1, KV, and R2 bindings.
-
-name = "dreamlab-auth-api"
+# v2 auth worker. Secrets (RUNBOOK §9, wrangler secret put --name dreamlab-auth-api-v2): PRF_SERVER_SECRET (NEW random 32 bytes:
+# 0 passkeys exist on live, nothing to preserve), ADMIN_PUBKEYS (= bfcf20d472f0fb143b23cb5be3fa0a040d42176b71f73ca272f6912b1d62a452; secret ONLY, never also a plaintext var),
+# WELCOME_MASTER_KEY (new random). No TYPESAFE_API_KEY (no JEV). NATIVE_POD_* optional (native tier not used).
+name = "dreamlab-auth-api-v2"
 main = "build/worker/shim.mjs"
 compatibility_date = "2025-09-01"
 
@@ -12,88 +9,45 @@ compatibility_date = "2025-09-01"
 command = "worker-build --release"
 
 [[d1_databases]]
-binding         = "DB"
-database_name   = "dreamlab-auth"
-database_id     = "e3981999-e8f0-4c07-9e4b-2e50859b8524"
-migrations_dir  = "migrations"
+binding = "DB"
+database_name = "dreamlab-auth-v2"
+database_id = "a53a49db-beec-4ee5-b09b-a2573923d21f"
+migrations_dir = "migrations"
 
-# Cross-D1 binding: relay worker's D1 for admin/whitelist lookups.
-# The relay-worker is the authority for admin flags (via /api/whitelist/set-admin).
-# The auth-worker needs read access to check admin status for governance APIs.
 [[d1_databases]]
-binding       = "RELAY_DB"
-database_name = "dreamlab-relay"
-database_id   = "97c77d23-0e24-4325-ada7-1747eab4095b"
+binding = "RELAY_DB"
+database_name = "dreamlab-relay-v2"
+database_id = "eb33cf2f-44db-433c-9771-6db850d8b64c"
 
 [[kv_namespaces]]
 binding = "SESSIONS"
-id      = "901345296c2848788066686aa67d5909"
+id = "40fdb0ce2d814f77b3db9d7b922ff579"
 
-# Retained for backwards-compat reads. Admin-flag writes go to ADMIN_KV
-# (split per audit H6).
-[[kv_namespaces]]
-binding = "POD_META"
-id      = "8ec8759ab40d4709a831bf6b0e5241eb"
-
-# Admin KV (auth-worker is the read/write authority).
-# TODO(ops): provision via `wrangler kv:namespace create dreamlab-admin-kv`.
-[[kv_namespaces]]
-binding = "ADMIN_KV"
-id      = "REPLACE_WITH_NEW_ADMIN_KV_ID"
-
-# NIP-98 replay protection uses the shared D1 database (dreamlab-auth, bound
-# as "DB" above). The nip98_replay table is created at startup via
-# nostr_bbs_rate_limit::ensure_replay_schema(). No separate KV namespace needed.
-# (Legacy NIP98_REPLAY KV binding removed — D1 INSERT OR IGNORE is atomic.)
-
-# Legacy alias used by admins.rs cache.
 [[kv_namespaces]]
 binding = "KV"
-id      = "901345296c2848788066686aa67d5909"
+id = "40fdb0ce2d814f77b3db9d7b922ff579"
+
+[[kv_namespaces]]
+binding = "POD_META"
+id = "d4c2d7bc103e4ce697340fa6962d2728"
+
+[[kv_namespaces]]
+binding = "ADMIN_KV"
+id = "36c5f8d2157b4b3e8ef53c47c7fb68f1"
 
 [[r2_buckets]]
-binding     = "PODS"
-bucket_name = "dreamlab-pods"
+binding = "PODS"
+bucket_name = "dreamlab-pods-v2"
 
 [vars]
-
-# System One advisory integration. Errors retain the existing result.
-JEV_RATIONALE_CHECK = "1"
-# Cloud by default: TypeSafe direct with the TYPESAFE_API_KEY Worker secret.
-# For a private route set JEV_RATIONALE_CHECK_LOCAL_ONLY = "1" and configure
-# JEV_ENDPOINT, JEV_MODEL and JEV_LOCAL=1 for an authenticated, Worker-reachable
-# sovereign inference ingress; until then it reports unavailable. Never point it
-# at an unreachable container/loopback URL.
-
-RP_ID                = "dreamlab-ai.com"
-RP_NAME              = "DreamLab Community"
-EXPECTED_ORIGIN      = "https://dreamlab-ai.com"
-
-# Per-zone auto-approval of new joiners (username-claim path, src/zone_approval.rs).
-# A new user is auto-whitelisted with the base `members` cohort PLUS the
-# `required_cohorts` of every zone flagged `"auto_approve":true` here — so an
-# operator opens a zone to new joiners from config. Mirror of the relay's
-# ZONE_CONFIG (keep in sync with relay-worker.wrangler.toml + dreamlab.toml).
-# minimoonoir is opted in (new joiners auto-granted `friends`); others manual.
+JEV_RATIONALE_CHECK = "1"   # System One advisory, as on live; cloud route needs the TYPESAFE_API_KEY secret
+RP_ID = "dreamlab-ai.com"
+RP_NAME = "DreamLab Community"
+# ONE origin for CORS and the WebAuthn origin check (http.rs:22, webauthn.rs:1323). Test: forum-v2. At the switch: https://dreamlab-ai.com
+# and redeploy this worker (RUNBOOK §18, [WRITE]).
+EXPECTED_ORIGIN = "https://dreamlab-ai.com"
 ZONE_CONFIG = '[{"id":"zone1","slug":"welcome","display_name":"Welcome","required_cohorts":[],"write_cohorts":["members","agent"],"banner_image_url":"/images/heroes/lake-district-dawn.webp","visibility":"public","encrypted":false,"accent_hex":"#22c55e"},{"id":"zone2","slug":"minimoonoir","display_name":"Minimoonoir","required_cohorts":["zone2","minimoonoir"],"banner_image_url":"/images/heroes/minimoonoir-hero.webp","visibility":"locked","encrypted":true,"accent_hex":"#3b82f6","section_order":["zone2-rants"]},{"id":"zone3","kanban":true,"slug":"family","display_name":"Family","required_cohorts":["zone3","family"],"banner_image_url":"/images/heroes/family-hero.webp","visibility":"locked","encrypted":true,"accent_hex":"#f59e0b"},{"id":"zone4","kanban":true,"slug":"dreamlab","display_name":"DreamLab","required_cohorts":["zone4","dreamlab"],"banner_image_url":"/images/heroes/business-hero.webp","visibility":"locked","encrypted":true,"accent_hex":"#a855f7","agent_keys":true}]'
-
-# JSS Phase 1 — federated NIP-05 resolution (ADR-086 §9, NRF commit 1fe95fd).
-# auth-worker reads these to drive the resolve(env, name) D1→pod-HTTP fallback
-# under GET /api/username/resolve. Must mirror dreamlab.toml [nip05].
-NIP05_RESOLVER_MODE  = "federated"
-POD_BASE_URL         = "https://dreamlab-pod-api.solitary-paper-764d.workers.dev"
-
-# Native pod tier (agentbox solid-pod-rs via CF Tunnel). The kit auth-worker's
-# /api/native-pod/provision handler reads NATIVE_POD_URL and constructs
-# POST {NATIVE_POD_URL}/_admin/provision/{pubkey}; absent it returns 503
-# "native pod not configured" (Gap 3). Value = dreamlab.toml [native_pod].base_url
-# (the worker owns the /_admin/provision path segment, so this is the base URL,
-# = [native_pod].admin_provision_url minus the /_admin/provision suffix).
-#
-# NATIVE_POD_URL and NATIVE_POD_ADMIN_KEY are BOTH operator-provided CF secrets
-# (set via set-worker-secrets.yml). NATIVE_POD_URL is deliberately NOT declared
-# here as a [vars] plaintext binding: a same-named [vars] and secret conflict —
-# `wrangler deploy` re-asserts the plaintext var on every deploy, clobbering the
-# secret. Keeping it a secret gives a single source of truth. NATIVE_POD_ADMIN_KEY
-# = SOLID_ADMIN_KEY on the agentbox side. Both are gated at deploy time in
-# workers-deploy.yml and by forum-config deploy_config::REQUIRED_AUTH_SECRETS.
+NIP05_RESOLVER_MODE = "federated"
+POD_BASE_URL = "https://dreamlab-pod-api-v2.solitary-paper-764d.workers.dev"
+DEVICE_KEYS_ENABLED = "false"
+RECIPIENT_KEYS_ENABLED = "false"

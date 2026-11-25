@@ -6,10 +6,12 @@
 # forum-client read this rather than hardcoding values. To switch hostnames /
 # rebrand / change cohort taxonomy / federate, edit THIS file (not the kit).
 
+search_archivists = ["5ec4b75971fd029374e321b581850606071f64ae06df838d80c80808e3059b07", "bfcf20d472f0fb143b23cb5be3fa0a040d42176b71f73ca272f6912b1d62a452"]   # the Keybase archivist publishes the zone2 sealed index
+
 # ─── Deployment ──────────────────────────────────────────────────────────────
 [deployment]
 name     = "DreamLab Community Forum"
-hostname = "https://dreamlab-ai.com"
+hostname = "https://dreamlab-ai.com"   # unchanged at the switch; test origin https://forum-v2.dreamlab-ai.com
 
 # ─── WebAuthn ────────────────────────────────────────────────────────────────
 [webauthn]
@@ -18,13 +20,13 @@ expected_origin  = "https://dreamlab-ai.com"
 
 # ─── Solid Pod backend (Cloudflare R2) ───────────────────────────────────────
 [pod]
-base_url        = "https://dreamlab-pod-api.solitary-paper-764d.workers.dev"
+base_url        = "https://dreamlab-pod-api-v2.solitary-paper-764d.workers.dev"
 storage_backend = "cf-r2"
-r2_bucket       = "dreamlab-pods"
+r2_bucket       = "dreamlab-pods-v2"
 
 # ─── Nostr Relay ─────────────────────────────────────────────────────────────
 [relay]
-url             = "wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev"
+url             = "wss://dreamlab-nostr-relay-v2.solitary-paper-764d.workers.dev"
 ingress_policy  = "allowlist"
 
 # ─── Admin pubkey resolution ─────────────────────────────────────────────────
@@ -39,36 +41,8 @@ enabled = true
 [admin]
 mode            = "static"
 static_pubkeys  = [
-  # ⚠ KEY-SPLIT PENDING (ADR-040 D3 / WP-3 AC2 — blocked-operational) ─────────────
-  # The pubkey below is the visionclaw-server key — the SAME pubkey used under
-  # [governance].agent_pubkeys as a BrokerActor governance publisher. It is a
-  # non-admin service identity (forum-config/README.md: "Admin: no"), yet it is
-  # still listed here as the PRIMARY forum admin and mirrored into the relay-worker
-  # / search-worker ADMIN_PUBKEYS and the auth-worker ADMIN_PUBKEYS CF secret.
-  #
-  # The fix (mint a distinct operator/admin key; leave visionclaw-server only in
-  # [governance]) is a FOUR-location atomic change that includes the auth-worker
-  # ADMIN_PUBKEYS CF secret, which cannot be rotated from CI or this repo. The
-  # split therefore stays staged, not applied: doing it here alone would desync
-  # the CF secret and lock out admins. It is deliberately held until an operator
-  # runs the rotation. Exact steps + the target ADMIN_PUBKEYS layout for all four
-  # locations are in docs/deployment/admin-key-split-runbook.md.
-  #
-  # Placeholder for the new key the operator will mint (documentation only — NOT a
-  # real key, do NOT deploy as-is): OPERATOR_ADMIN_PUBKEY = "<64-hex minted by operator>".
-  # When the runbook is executed, this visionclaw-server pubkey is REPLACED by that
-  # minted key across [admin] here + relay/search ADMIN_PUBKEYS + the CF secret in
-  # one change, and admin-pubkeys-sync stays green because all mirrors move together.
-  # ────────────────────────────────────────────────────────────────────────────────
-  "11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c",
-  # operator-jjohare — human admin (Dr John O'Hare)
-  "6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425a",
-  # moderation-bot — automated moderation agent
-  "5d80b5facd2d746689d7d2e400db6acce5843456967054adcf6956e4c734c54c",
-  # calendar-bot — cross-zone NIP-52 scheduling (needs all zones)
-  "be92ccf53d9d535fd21f3388201fd83b49588552fff5a1395fb60b6998df2243",
-  # search-indexer — indexes all zones for search
-  "d5194639ee3560204a1b5584a0714a6dd2a6c59953d0869b483e72ee185ada26",
+  # beema (operator), v2 go-live 2026-11: the only static admin
+  "bfcf20d472f0fb143b23cb5be3fa0a040d42176b71f73ca272f6912b1d62a452",
 ]
 
 # ─── Branding ────────────────────────────────────────────────────────────────
@@ -213,7 +187,7 @@ privkey_filename  = "privkey.jsonld"        # NIP-19 bech32 keypair filename
 #               and POD_BASE_URL [vars] in deploy/auth-worker.wrangler.toml.
 [nip05]
 resolver_mode = "federated"                # live as of NRF 1fe95fd
-pod_base_url  = "https://dreamlab-pod-api.solitary-paper-764d.workers.dev"
+pod_base_url  = "https://dreamlab-pod-api-v2.solitary-paper-764d.workers.dev"
 
 # ─── Pod data export (JSS Phase 1) ──────────────────────────────────────────
 # The native solid-pod-rs export surface is tokio/Storage based and is not

@@ -1,6 +1,6 @@
-# preview-worker wrangler manifest for the DreamLab deployment.
-
-name = "dreamlab-link-preview"
+# v2 link preview — needed for the test origin: the live dreamlab-link-preview allows only https://dreamlab-ai.com.
+# At the switch set ALLOWED_ORIGIN = "https://dreamlab-ai.com" and redeploy, or point the client back at the live preview worker.
+name = "dreamlab-link-preview-v2"
 main = "build/worker/shim.mjs"
 compatibility_date = "2025-09-01"
 
@@ -12,4 +12,4 @@ ALLOWED_ORIGIN = "https://dreamlab-ai.com"
 
 [[kv_namespaces]]
 binding = "RATE_LIMIT"
-id      = "c56bfb95f0984b3a8822866b094f3a61"
+id = "f6292a604f994b269a8135b8311a8dc1"

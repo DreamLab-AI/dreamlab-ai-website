@@ -265,32 +265,14 @@ mod tests {
         std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("deploy")
     }
 
-    /// The shipped manifests still carry the ADMIN_KV placeholder. This test
-    /// pins the *detection* (so the validator provably catches it) while the
-    /// real id remains operator-provided. When ops resolves the placeholder,
-    /// flip this assertion to `validate_deploy_dir(...).is_ok()`.
+    /// The v2 switch resolved every ADMIN_KV placeholder (real v2 namespace ids), so the shipped
+    /// manifests must now validate cleanly.
     #[test]
-    fn validator_detects_admin_kv_placeholder_in_shipped_manifests() {
+    fn validator_accepts_shipped_manifests_with_resolved_admin_kv() {
         let result = validate_deploy_dir(&deploy_dir());
-        let errors = result.expect_err(
-            "ADMIN_KV placeholder is still present in deploy/*.wrangler.toml — \
-             if ops has resolved it, update this test to assert is_ok()",
-        );
-        // Both auth-worker and pod-worker carry the ADMIN_KV / ADMIN_KV_RO placeholder.
-        let placeholders: Vec<_> = errors
-            .iter()
-            .filter(|e| matches!(e, DeployConfigError::UnresolvedPlaceholder { .. }))
-            .collect();
         assert!(
-            placeholders.len() >= 2,
-            "expected ADMIN_KV placeholders in at least auth+pod workers, got: {errors:?}"
-        );
-        // No manifest should be missing/unreadable — only placeholders are open.
-        assert!(
-            errors
-                .iter()
-                .all(|e| matches!(e, DeployConfigError::UnresolvedPlaceholder { .. })),
-            "unexpected non-placeholder defect: {errors:?}"
+            result.is_ok(),
+            "shipped deploy/*.wrangler.toml must validate: {result:?}"
         );
     }
 

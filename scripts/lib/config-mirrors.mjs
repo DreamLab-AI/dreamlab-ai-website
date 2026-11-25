@@ -169,7 +169,7 @@ export function checkConfigMirrors(root) {
     {
       where: `${WRANGLER.search} [vars].ADMIN_PUBKEYS`,
       value: wrangler.search ? normaliseKeyCsv(wrangler.search.doc.vars?.ADMIN_PUBKEYS ?? "") : null,
-    },
+    },    ...(wrangler.pod?.doc.vars?.ADMIN_PUBKEYS !== undefined ? [{ where: `${WRANGLER.pod} [vars].ADMIN_PUBKEYS`, value: normaliseKeyCsv(wrangler.pod.doc.vars.ADMIN_PUBKEYS) }] : []),
   ]);
 
   // 1b. The auth-worker's ADMIN_PUBKEYS is a Cloudflare secret: not readable
@@ -244,6 +244,7 @@ export function checkConfigMirrors(root) {
       where: `${WRANGLER.auth} [vars].ZONE_CONFIG`,
       json: wrangler.auth?.doc.vars?.ZONE_CONFIG,
     },
+    ...(wrangler.pod?.doc.vars?.ZONE_CONFIG !== undefined ? [{ where: `${WRANGLER.pod} [vars].ZONE_CONFIG`, json: wrangler.pod.doc.vars.ZONE_CONFIG }] : []),
   ].map((site) => {
     if (site.raw) return { where: site.where, value: canonicaliseZones(site.raw) };
     if (site.json === undefined || site.json === null) return { where: site.where, value: null };
