@@ -164,7 +164,8 @@ pub mod deployed_urls {
 
     /// Search Worker: full-text + vector search over relay events.
     /// Deployed via `deploy/search-worker.wrangler.toml` as `dreamlab-search-api`.
-    pub const SEARCH_WORKER: &str = "https://dreamlab-search-api-v2.solitary-paper-764d.workers.dev";
+    pub const SEARCH_WORKER: &str =
+        "https://dreamlab-search-api-v2.solitary-paper-764d.workers.dev";
 
     /// Preview Worker: link preview / Open Graph unfurling.
     /// Deployed via `deploy/preview-worker.wrangler.toml` as `dreamlab-link-preview`.
