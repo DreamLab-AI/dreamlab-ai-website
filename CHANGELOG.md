@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-11-26 — inbox-watch enquiry tag is local-only, unconditionally (audit C-1)
+
+- **Why:** the privacy page and contact notice promise that enquiry topic tagging "does not send your enquiry to a public AI service", but `scripts/lib/enquiry-topic.mjs` was local-only only when `DREAMLAB_JEV_TOPIC_LOCAL_ONLY=1`. With `DREAMLAB_JEV=1` and a vendor key or the agentbox proxy configured, up to 1,500 characters of decrypted enquiry text could leave the box.
+- **What changed:** `DREAMLAB_JEV_TOPIC_LOCAL_ONLY` is removed. Enquiry tagging never uses the TypeSafe endpoint or the agentbox System One proxy (even with `AGENTBOX_SYSTEM_ONE_BACKEND_LOCAL=1`), and an explicit endpoint needs `DREAMLAB_JEV_LOCAL=1` plus a literal loopback or RFC 1918 host. Enquiries filed as `privacy` are never sent to a model. No endpoint, no tag; the digest is otherwise unchanged.
+
 ## 2026-10-30 — kit pin 9c36b60: Jev consumers cloud by default, local-only per consumer
 
 - `KIT_REF` moved from `8a5cf81` to forum `9c36b60`. Auth worker (rationale check), relay and search workers; no D1 migration.

@@ -15,21 +15,57 @@
 // delivery/exit-code/state logic. With the option off, unavailable or unsure,
 // the digest is byte-identical to the pre-change digest.
 //
-// LOCAL-ONLY consumer: decrypted enquiry text is private mail. The public
-// vendor endpoint is never used; an explicit endpoint needs DREAMLAB_JEV_LOCAL=1;
-// the agentbox proxy needs AGENTBOX_SYSTEM_ONE_BACKEND_LOCAL=1.
+// LOCAL-ONLY, unconditionally (audit 2026-11-26 C-1): decrypted enquiry text
+// is private mail, and src/pages/Privacy.tsx promises this tagging "does not
+// send your enquiry to a public AI service". No env switch can widen that:
+//   - the public vendor endpoint is never used;
+//   - the agentbox System One proxy is never used, even with
+//     AGENTBOX_SYSTEM_ONE_BACKEND_LOCAL=1, because the proxy sits on loopback
+//     while its backend (which holds the vendor key) is opaque from here;
+//   - an explicit <PREFIX>_ENDPOINT needs DREAMLAB_JEV_LOCAL=1 AND a literal
+//     loopback or RFC 1918 host (see isLocalEndpoint); any other DNS name fails
+//     closed. callSystemOne sets redirect:"error", so a local endpoint cannot
+//     bounce the request elsewhere.
+// No usable local endpoint => no tagging. Enquiries the sender filed as
+// `privacy` (GDPR requests) are never sent to a model at all.
 import { resolveJev, callSystemOne, readChoice, readNoul, jevLog } from "./jev.mjs";
 
 export const QUESTION_SET = "dw02-enquiry-topic-v1";
 export const FLAG_PREFIX = "DREAMLAB_JEV";
 
-/** Env switch that makes the topic tag local-only (default off). */
-export const LOCAL_ONLY_VAR = "DREAMLAB_JEV_TOPIC_LOCAL_ONLY";
+/** Declared enquiry type that is never sent to a model (GDPR/privacy requests). */
+export const NEVER_TAGGED_TYPE = "privacy";
 
-/** Local-only only when the operator sets `DREAMLAB_JEV_TOPIC_LOCAL_ONLY=1`. */
-export function topicLocalOnly(env) {
-  return String(env?.[LOCAL_ONLY_VAR] ?? "").trim() === "1";
+/** Env keys that select the agentbox System One proxy; stripped for enquiries. */
+const PROXY_KEY = /^AGENTBOX_(SYSTEM_ONE|SKILL_ROUTE)_/;
+
+/**
+ * True when `endpoint` is http(s) to a literal loopback or RFC 1918 address,
+ * or `localhost`. Parsed with WHATWG URL so numeric forms such as
+ * `http://2130706433/` normalise to their dotted form before the check; any
+ * other DNS name is rejected because it could resolve anywhere.
+ * @param {string} endpoint
+ */
+export function isLocalEndpoint(endpoint) {
+  let u;
+  try { u = new URL(endpoint); } catch { return false; }
+  if (u.protocol !== "http:" && u.protocol !== "https:") return false;
+  const h = u.hostname;
+  if (h === "localhost" || h === "[::1]") return true;
+  const m = h.match(/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/);
+  if (!m) return false;
+  const [a, b] = [Number(m[1]), Number(m[2])];
+  return a === 127 || a === 10 || (a === 192 && b === 168) || (a === 172 && b >= 16 && b <= 31);
 }
+
+/** Resolve a local-only endpoint for enquiry text, or { ok:false, reason }. */
+export function resolveLocalTopicEndpoint(env) {
+  const scoped = Object.fromEntries(Object.entries(env ?? {}).filter(([k]) => !PROXY_KEY.test(k)));
+  const r = resolveJev(scoped, { prefix: FLAG_PREFIX, localOnly: true });
+  if (r.ok && !isLocalEndpoint(r.cfg.endpoint)) return { ok: false, reason: "no-endpoint" };
+  return r;
+}
+
 /** Most enquiries tagged per run (one request each, sequential, <= 4 s each). */
 export const MAX_TAGGED_PER_RUN = 10;
 /** Unfitted default; annotation-only so a permissive floor is acceptable. */
@@ -81,9 +117,10 @@ export function buildTopicRequest(enquiry) {
 export async function tagEnquiries(fresh, opts = {}) {
   const { env = process.env, fetchImpl, log } = opts;
   try {
-    const targets = fresh.map((f, i) => (f.kind === "enquiry" ? i : -1)).filter((i) => i >= 0);
+    const isPrivacy = (f) => String(f.detail ?? "").trim().toLowerCase() === NEVER_TAGGED_TYPE;
+    const targets = fresh.map((f, i) => (f.kind === "enquiry" && !isPrivacy(f) ? i : -1)).filter((i) => i >= 0);
     if (targets.length === 0) return fresh.slice();
-    const r = resolveJev(env, { prefix: FLAG_PREFIX, localOnly: topicLocalOnly(env) });
+    const r = resolveLocalTopicEndpoint(env);
     if (!r.ok) {
       if (r.reason !== "flag-off") jevLog(log, QUESTION_SET, r.reason);
       return fresh.slice();
