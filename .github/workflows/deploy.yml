@@ -39,6 +39,14 @@ env:
   CARGO_TERM_COLOR: always
   RUST_TOOLCHAIN: '1.90.0'
   TRUNK_VERSION: '0.21.12'
+  # Sealed-search Web Worker (on-device search of encrypted zones): wasm-bindgen CLI matching the kit's
+  # wasm-bindgen crate (Cargo.lock 0.2.128), and the browser model pinned by the zone's signed search manifest
+  # (release sealed-search-model-v1; the client re-verifies both sha256 values before use).
+  WASM_BINDGEN_VERSION: '0.2.128'
+  WASM_BINDGEN_SHA256: 'b51f0208fdff83515a787bd8ab9ac5865ed84dabb66d0c709957bb59793c645f'
+  SEARCH_MODEL_RELEASE: 'sealed-search-model-v1'
+  SEARCH_MODEL_SHA256: '75dc300568876df6e4b6b4a919b16ed5b971d2b1239e2a688f3f8cd18f149f3f'
+  SEARCH_VOCAB_SHA256: '07eced375cec144d27c900241f3e339478dec958f92fddbc551f295c992038a3'
   TRUNK_SHA256: 'e5261930aab979dc5d0388fdc71bc32bedf0a15211ef8c8703fa2b7a2016394b'
   # Pinned tool versions + sha256 of the exact release artifact each step fetches.
   # A privileged (CF-token-bearing) job must never execute an unverified download.
@@ -78,11 +86,6 @@ env:
   # the secret lives in .agentbox/inbox-watch/monitor.key. Whitelist it with
   # scripts/seed/whitelist-admin-recipient.mjs after any relay reseed.
   VITE_MONITOR_PUBKEY: '4ed429aa7f30d6e63c41be50685cffeb03cd7b07e37d37a0c4ae5321e642aad7'
-  # v2 forum switch (golive RUNBOOK §17, operator decision): the React contact form and
-  # Talk-to-AI STAY on the old relay and the old site inbox until v2 has INGRESS_RECIPIENTS.
-  # The forum client (window.__ENV__) uses the v2 VITE_* values above.
-  REACT_RELAY_URL: 'wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev'
-  REACT_ADMIN_PUBKEY: '11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c'
   # Open relays the Talk-to-AI chat listens on for junkiejarvis's reply (ADR-042
   # amendment): the primary relay's whitelist gate rejects kind-1059 wraps
   # addressed to the ephemeral session key, so replies are only readable from
@@ -187,8 +190,8 @@ jobs:
           # Nostr transport for the contact form + Talk-to-AI chat (ADR-041/042).
           # VITE_RELAY_URL already exists at workflow level; the pubkeys are the
           # hand-synced dreamlab.toml mirrors declared above.
-          VITE_RELAY_URL: ${{ env.REACT_RELAY_URL }}
-          VITE_ADMIN_PUBKEY: ${{ env.REACT_ADMIN_PUBKEY }}
+          VITE_RELAY_URL: ${{ env.VITE_RELAY_URL }}
+          VITE_ADMIN_PUBKEY: ${{ env.VITE_ADMIN_PUBKEY }}
           VITE_JARVIS_PUBKEY: ${{ env.VITE_JARVIS_PUBKEY }}
           VITE_MONITOR_PUBKEY: ${{ env.VITE_MONITOR_PUBKEY }}
           VITE_REPLY_RELAYS: ${{ env.VITE_REPLY_RELAYS }}
@@ -283,6 +286,29 @@ jobs:
 
           echo "=== Forum (community/) ==="
           ls dist/community/
+
+      - name: Ship the sealed-search worker, loader and pinned model
+        # Encrypted-zone (sealed) search runs entirely on the member's device: the forum loads
+        # /community/sealed-search/loader.js as a Web Worker, which embeds the query with this model.
+        env:
+          RUSTFLAGS: '-C link-arg=--max-memory=268435456 -C target-feature=+simd128 --cfg getrandom_backend="wasm_js"'
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          ( cd kit && cargo build --locked -p nostr-bbs-sealed-search-worker --target wasm32-unknown-unknown --release )
+          WB="wasm-bindgen-${WASM_BINDGEN_VERSION}-x86_64-unknown-linux-musl"
+          curl -fsSL -o wb.tar.gz "https://github.com/rustwasm/wasm-bindgen/releases/download/${WASM_BINDGEN_VERSION}/${WB}.tar.gz"
+          echo "${WASM_BINDGEN_SHA256}  wb.tar.gz" | sha256sum -c -
+          tar xzf wb.tar.gz && rm -f wb.tar.gz
+          W=dist/community/sealed-search; mkdir -p "$W"
+          "./${WB}/wasm-bindgen" --target no-modules --no-typescript --out-dir "$W" \
+            kit/target/wasm32-unknown-unknown/release/nostr-bbs-sealed-search-worker.wasm
+          rm -rf "./${WB}"
+          cp kit/crates/nostr-bbs-sealed-search-worker/loader.js "$W/"
+          gh release download "${SEARCH_MODEL_RELEASE}" --repo "${GITHUB_REPOSITORY}" --dir "$W" \
+            --pattern bge-small-en-v1.5-q8_0.gguf --pattern vocab.txt
+          ( cd "$W" && printf '%s  %s\n%s  %s\n' "${SEARCH_MODEL_SHA256}" bge-small-en-v1.5-q8_0.gguf "${SEARCH_VOCAB_SHA256}" vocab.txt | sha256sum -c - )
+          ls -la "$W"
 
       - name: Inject runtime env config into forum
         run: |

@@ -394,9 +394,9 @@ authorised_by = "6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425
 # grants NO cohort, admin right or zone key: never roster these into `agent`.
 [[ingress]]
 label         = "site-inbox"
-pubkey        = "11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c"
+pubkey        = "bfcf20d472f0fb143b23cb5be3fa0a040d42176b71f73ca272f6912b1d62a452"
 role          = "primary"
-description   = "Contact-form and signup inbox: the key behind VITE_ADMIN_PUBKEY (visionclaw-server; ADR-040 D3 key split pending)."
+description   = "Contact-form and signup inbox: the key behind VITE_ADMIN_PUBKEY (beema, the v2 operator key; moved to v2 at the forum switch 2026-11-25)."
 authorised_by = "6407eed80e2a8646e41a5ddba0ae6619425fc54af40e2b30482b9623c682425a"  # operator-jjohare (human admin)
 
 [[ingress]]
