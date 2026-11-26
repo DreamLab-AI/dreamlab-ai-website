@@ -41,10 +41,12 @@ const DRY = process.argv.includes("--dry-run");
 const ALWAYS = process.argv.includes("--always");
 
 const DIR = process.env.INBOX_WATCH_DIR || "/home/devuser/workspace/.agentbox/inbox-watch";
-const RELAY = process.env.RELAY_URL || "wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev";
+// Defaults track the live v2 forum (cutover 2026-11-26); CI checks them against
+// forum-config/dreamlab.toml via scripts/check-config-mirrors.mjs.
+const RELAY = process.env.RELAY_URL || "wss://dreamlab-nostr-relay-v2.solitary-paper-764d.workers.dev";
 const RELAY_HTTP = RELAY.replace(/^wss:/, "https:").replace(/^ws:/, "http:");
 const SITE = process.env.SITE_ORIGIN || "https://dreamlab-ai.com";
-const ADMIN = process.env.ADMIN_PUBKEY || "11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c";
+const ADMIN = process.env.ADMIN_PUBKEY || "bfcf20d472f0fb143b23cb5be3fa0a040d42176b71f73ca272f6912b1d62a452";
 const JARVIS = process.env.JARVIS_PUBKEY || "2de44d5622eef79519ac078f6e227a85aecbaefd561e4e50c5f51dfadbf916e9";
 const LOOKBACK_SEC = 3 * 86400;
 const SEEN_TTL_SEC = 7 * 86400;

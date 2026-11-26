@@ -12,7 +12,11 @@
 
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { checkConfigMirrors, checkOperatorVarMirrors } from "./lib/config-mirrors.mjs";
+import {
+  checkConfigMirrors,
+  checkOperationalMirrors,
+  checkOperatorVarMirrors,
+} from "./lib/config-mirrors.mjs";
 
 const argv = process.argv.slice(2);
 const value = (name) => {
@@ -27,11 +31,15 @@ const github = argv.includes("--github");
 // bench-tested but never run here, so CI did not enforce them (ER-23).
 const enumerated = checkConfigMirrors(root);
 const operator = checkOperatorVarMirrors(root);
+// Operational surfaces (backup, inbox-watch, contact embed, worker workflows)
+// that stayed on v1 through the v2 cutover with every gate green (audit C-2..C-5).
+const operational = checkOperationalMirrors(root);
 const result = {
   ...enumerated,
-  ok: enumerated.ok && operator.ok,
-  errors: [...enumerated.errors, ...operator.errors],
+  ok: enumerated.ok && operator.ok && operational.ok,
+  errors: [...enumerated.errors, ...operator.errors, ...operational.errors],
   operator,
+  operational,
 };
 
 if (argv.includes("--json")) {
@@ -43,6 +51,7 @@ if (argv.includes("--json")) {
     for (const site of m.sites) console.log(`    - ${site}`);
   }
   console.log(`${"operator-var-mirrors".padEnd(28)}     ${operator.ok ? "in sync" : "DRIFT"}`);
+  console.log(`${"operational-mirrors".padEnd(28)}     ${operational.ok ? "in sync" : "DRIFT"}`);
   for (const err of result.errors) {
     console.error(github ? `::error::${err.replace(/\n/g, "%0A")}` : `ERROR: ${err}`);
   }

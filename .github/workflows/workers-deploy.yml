@@ -1,8 +1,17 @@
 name: Deploy Cloudflare Workers
 
-# Deploys all 5 Rust Workers from the nostr-bbs kit (nostr-rust-forum).
-# Source is cloned at build time; DreamLab-specific wrangler.toml configs
-# from forum-config/deploy/ override the kit defaults.
+# Deploys the CI-managed v2 Rust Workers from the nostr-bbs kit (nostr-rust-forum):
+# dreamlab-auth-api-v2, dreamlab-pod-api-v2, dreamlab-link-preview-v2. Source is
+# cloned at build time; DreamLab-specific wrangler.toml configs from
+# forum-config/deploy/ override the kit defaults (the deployed name is the toml's
+# `name`, so matrix.worker_name must equal it; check-config-mirrors.mjs enforces it).
+#
+# NOT deployed here, by design:
+#   - relay-worker (dreamlab-nostr-relay-v2): operator-deployed by hand from the
+#     container with a scoped token (relay-worker.wrangler.toml header, RUNBOOK §9).
+#   - search-worker (dreamlab-search-api-v2): not provisioned on v2 (no worker, no
+#     dreamlab-vectors-v2 bucket, no SEARCH_CONFIG namespace); its manifest fails
+#     the deploy_config validator until the operator provisions it.
 
 on:
   # push trigger removed for the v2 switch (golive RUNBOOK §17): workers are deployed by hand only.
@@ -40,60 +49,9 @@ jobs:
     permissions:
       contents: read
 
-  # Provision the SINGLE shared admin KV namespace exactly once, before the
-  # per-worker matrix runs. Both the auth-worker (ADMIN_KV, read/write) and the
-  # pod-worker (ADMIN_KV_RO, read-only) must bind the SAME namespace or moderation
-  # state (bans/mutes) written by the auth-worker is invisible to the pod-worker.
-  # Doing this in a dedicated pre-job (not per-matrix) also avoids the create race
-  # two parallel matrix jobs would hit when resolving the same title concurrently.
-  provision-kv:
-    name: Provision shared admin KV
-    needs: [gate]
-    # Require the gate's verdict, not merely its completion (see deploy.yml).
-    if: |
-      github.repository == 'DreamLab-AI/dreamlab-ai-website'
-      && needs.gate.outputs.passed == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    permissions:
-      contents: read
-    outputs:
-      admin_kv_id: ${{ steps.kv.outputs.admin_kv_id }}
-    steps:
-      - name: Resolve or create dreamlab-admin-kv
-        id: kv
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: |
-          set -euo pipefail
-          API_BASE="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/storage/kv/namespaces"
-          AUTH=(-H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" -H "Content-Type: application/json")
-          # Fixed shared title — NOT per-worker/matrix-generated.
-          TITLE="dreamlab-admin-kv"
-          listing=$(curl -fsSL "${API_BASE}?per_page=100" "${AUTH[@]}" || echo '{"result":[]}')
-          id=$(echo "$listing" | jq -r --arg t "$TITLE" \
-            '.result[]? | select(.title == $t) | .id' | head -n 1)
-          if [ -z "$id" ] || [ "$id" = "null" ]; then
-            create_resp=$(curl -fsSL -X POST "${API_BASE}" "${AUTH[@]}" \
-              --data "{\"title\":\"${TITLE}\"}" || echo '{}')
-            id=$(echo "$create_resp" | jq -r '.result.id // empty' | head -n 1)
-            if [ -z "$id" ] || [ "$id" = "null" ]; then
-              listing=$(curl -fsSL "${API_BASE}?per_page=100" "${AUTH[@]}" || echo '{"result":[]}')
-              id=$(echo "$listing" | jq -r --arg t "$TITLE" \
-                '.result[]? | select(.title == $t) | .id' | head -n 1)
-            fi
-          fi
-          if [ -z "$id" ] || [ "$id" = "null" ]; then
-            echo "::error::failed to provision shared KV namespace $TITLE" >&2
-            exit 1
-          fi
-          echo "admin_kv_id=$id" >> "$GITHUB_OUTPUT"
-          echo "[kv] $TITLE -> $id (shared)"
-
   deploy-rust:
     name: Deploy Rust Workers
-    needs: [gate, provision-kv]
+    needs: [gate]
     if: |
       github.repository == 'DreamLab-AI/dreamlab-ai-website'
       && needs.gate.outputs.passed == 'true'
@@ -108,19 +66,13 @@ jobs:
         include:
           - kit_crate: nostr-bbs-auth-worker
             config: auth-worker
-            worker_name: dreamlab-auth-api
+            worker_name: dreamlab-auth-api-v2
           - kit_crate: nostr-bbs-pod-worker
             config: pod-worker
-            worker_name: dreamlab-pod-api
+            worker_name: dreamlab-pod-api-v2
           - kit_crate: nostr-bbs-preview-worker
             config: preview-worker
-            worker_name: dreamlab-link-preview
-          - kit_crate: nostr-bbs-relay-worker
-            config: relay-worker
-            worker_name: dreamlab-nostr-relay
-          - kit_crate: nostr-bbs-search-worker
-            config: search-worker
-            worker_name: dreamlab-search-api
+            worker_name: dreamlab-link-preview-v2
 
     steps:
       - name: Checkout consumer repo
@@ -132,7 +84,25 @@ jobs:
           git -C kit checkout --detach ${{ env.KIT_REF }}
 
       - name: Override wrangler.toml with DreamLab config
-        run: cp forum-config/deploy/${{ matrix.config }}.wrangler.toml kit/crates/${{ matrix.kit_crate }}/wrangler.toml
+        env:
+          CONFIG: ${{ matrix.config }}
+          KIT_CRATE: ${{ matrix.kit_crate }}
+          WORKER_NAME: ${{ matrix.worker_name }}
+        run: |
+          set -euo pipefail
+          cp "forum-config/deploy/${CONFIG}.wrangler.toml" "kit/crates/${KIT_CRATE}/wrangler.toml"
+          # Every binding id must be real: no REPLACE_WITH_* or <...> placeholder
+          # (the v2 manifests carry resolved ids; nothing is provisioned here).
+          if grep -nE '(REPLACE_WITH_|"<[^"]*>")' "kit/crates/${KIT_CRATE}/wrangler.toml"; then
+            echo "::error::${CONFIG}.wrangler.toml still carries a placeholder binding id; refusing to deploy." >&2
+            exit 1
+          fi
+          # The matrix label must name the worker wrangler will actually deploy.
+          deployed=$(grep -m1 -oP '^name\s*=\s*"\K[^"]+' "kit/crates/${KIT_CRATE}/wrangler.toml")
+          if [ "$deployed" != "$WORKER_NAME" ]; then
+            echo "::error::matrix worker_name ${WORKER_NAME} != wrangler name ${deployed}" >&2
+            exit 1
+          fi
 
       - name: Setup Rust toolchain ${{ env.RUST_TOOLCHAIN }}
         # Pinned to the commit the `1.90.0` branch resolves to (that branch's
@@ -201,80 +171,13 @@ jobs:
       - name: Install wrangler ${{ env.WRANGLER_VERSION }}
         run: npm install -g wrangler@${{ env.WRANGLER_VERSION }}
 
-      - name: Bind KV namespaces
-        working-directory: kit/crates/${{ matrix.kit_crate }}
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          # Single shared admin KV id, provisioned once in the provision-kv job.
-          ADMIN_KV_ID: ${{ needs.provision-kv.outputs.admin_kv_id }}
-        run: |
-          set -euo pipefail
-          API_BASE="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/storage/kv/namespaces"
-          AUTH=(-H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" -H "Content-Type: application/json")
-
-          # Shared admin KV — the auth-worker (ADMIN_KV) and pod-worker (ADMIN_KV_RO)
-          # bind the SAME id so moderation writes propagate. The id comes from the
-          # provision-kv pre-job, never re-created per worker (a per-worker title
-          # would split the namespace and silently drop bans/mutes).
-          if grep -q "REPLACE_WITH_NEW_ADMIN_KV_ID" wrangler.toml; then
-            if [ -z "${ADMIN_KV_ID}" ] || [ "${ADMIN_KV_ID}" = "null" ]; then
-              echo "::error::shared admin KV id missing from provision-kv job output" >&2
-              exit 1
-            fi
-            sed -i "s/REPLACE_WITH_NEW_ADMIN_KV_ID/${ADMIN_KV_ID}/g" wrangler.toml
-            echo "[kv] bound ADMIN_KV(_RO) -> ${ADMIN_KV_ID} (shared dreamlab-admin-kv)" >&2
-          fi
-
-          # Any remaining per-worker KV placeholder (e.g. NIP-98 replay) is
-          # resolved/created per worker by title. Not present in the current
-          # manifests (NIP-98 replay moved to D1) but kept for forward-compat.
-          resolve_or_create() {
-            local title="$1"
-            local listing existing
-            listing=$(curl -fsSL "${API_BASE}?per_page=100" "${AUTH[@]}" || echo '{"result":[]}')
-            existing=$(echo "$listing" | jq -r --arg t "$title" \
-              '.result[]? | select(.title == $t) | .id' | head -n 1)
-            if [ -n "$existing" ] && [ "$existing" != "null" ]; then
-              echo "[kv] $title -> $existing (existing)" >&2
-              echo "$existing"
-              return 0
-            fi
-            local create_resp
-            create_resp=$(curl -fsSL -X POST "${API_BASE}" "${AUTH[@]}" \
-              --data "{\"title\":\"${title}\"}" || echo '{}')
-            local id
-            id=$(echo "$create_resp" | jq -r '.result.id // empty' | head -n 1)
-            if [ -z "$id" ] || [ "$id" = "null" ]; then
-              listing=$(curl -fsSL "${API_BASE}?per_page=100" "${AUTH[@]}" || echo '{"result":[]}')
-              id=$(echo "$listing" | jq -r --arg t "$title" \
-                '.result[]? | select(.title == $t) | .id' | head -n 1)
-            fi
-            echo "[kv] $title -> $id (created)" >&2
-            echo "$id"
-          }
-          for placeholder in REPLACE_WITH_NEW_NIP98_REPLAY_KV_ID; do
-            if grep -q "$placeholder" wrangler.toml; then
-              case "$placeholder" in
-                REPLACE_WITH_NEW_NIP98_REPLAY_KV_ID)  title="${{ matrix.config }}-nip98-replay" ;;
-              esac
-              real_id=$(resolve_or_create "$title")
-              if [ -z "$real_id" ] || [ "$real_id" = "null" ]; then
-                echo "::error::failed to provision KV namespace $title" >&2
-                exit 1
-              fi
-              sed -i "s/$placeholder/$real_id/g" wrangler.toml
-              echo "[kv] substituted $placeholder -> $real_id" >&2
-            fi
-          done
-
       # Fail fast (deploy time, not request time) when an operator-provided
       # server secret is missing on the auth-worker. The kit auth-worker derives
       # the WebAuthn PRF salt from PRF_SERVER_SECRET; absent, register/login 500
       # on the first request. R-09: surface this as a deploy blocker instead.
       # Secrets are operator data — this only checks presence, never sets values.
       - name: Validate public System One credential
-        if: matrix.config == 'search-worker' || matrix.config == 'relay-worker' || matrix.config == 'auth-worker'
+        if: matrix.config == 'auth-worker'
         working-directory: kit/crates/${{ matrix.kit_crate }}
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -312,7 +215,7 @@ jobs:
           done
           if [ "${#MISSING[@]}" -gt 0 ]; then
             echo "::error::auth-worker is missing required secret(s): ${MISSING[*]}." \
-                 "Set them with 'wrangler secret put <NAME> --name dreamlab-auth-api'" \
+                 "Set them with 'wrangler secret put <NAME> --name dreamlab-auth-api-v2'" \
                  "(or run set-worker-secrets.yml) before deploying. These are" \
                  "operator-provided values — the pipeline never generates them." >&2
             exit 1
@@ -351,7 +254,9 @@ jobs:
           PASS=0
           FAIL=0
           FAILED_WORKERS=()
-          for worker in dreamlab-auth-api dreamlab-pod-api dreamlab-search-api dreamlab-nostr-relay dreamlab-link-preview; do
+          # Only the workers this workflow deploys; the manually deployed relay is
+          # checked by its own runbook.
+          for worker in dreamlab-auth-api-v2 dreamlab-pod-api-v2 dreamlab-link-preview-v2 ; do
             URL="https://${worker}.${{ env.CF_SUBDOMAIN }}.workers.dev/health"
             # Retry: a worker's Durable Object is cold right after a deploy and the
             # first request can take longer than one probe allows; a 000 here was
@@ -382,11 +287,11 @@ jobs:
 
           | Worker | Kit Crate | URL |
           |--------|-----------|-----|
-          | dreamlab-auth-api | nostr-bbs-auth-worker | \`dreamlab-auth-api.${{ env.CF_SUBDOMAIN }}.workers.dev\` |
-          | dreamlab-pod-api | nostr-bbs-pod-worker | \`dreamlab-pod-api.${{ env.CF_SUBDOMAIN }}.workers.dev\` |
-          | dreamlab-link-preview | nostr-bbs-preview-worker | \`dreamlab-link-preview.${{ env.CF_SUBDOMAIN }}.workers.dev\` |
-          | dreamlab-nostr-relay | nostr-bbs-relay-worker | \`dreamlab-nostr-relay.${{ env.CF_SUBDOMAIN }}.workers.dev\` |
-          | dreamlab-search-api | nostr-bbs-search-worker | \`dreamlab-search-api.${{ env.CF_SUBDOMAIN }}.workers.dev\` |
+          | dreamlab-auth-api-v2 | nostr-bbs-auth-worker | \`dreamlab-auth-api-v2.${{ env.CF_SUBDOMAIN }}.workers.dev\` |
+          | dreamlab-pod-api-v2 | nostr-bbs-pod-worker | \`dreamlab-pod-api-v2.${{ env.CF_SUBDOMAIN }}.workers.dev\` |
+          | dreamlab-link-preview-v2 | nostr-bbs-preview-worker | \`dreamlab-link-preview-v2.${{ env.CF_SUBDOMAIN }}.workers.dev\` |
+
+          Not deployed by this workflow: \`dreamlab-nostr-relay-v2\` (manual, RUNBOOK §9), \`dreamlab-search-api-v2\` (not provisioned).
 
           - **Kit**: \`nostr-rust-forum@${{ env.KIT_REF }}\`
           - **Wrangler**: \`${{ env.WRANGLER_VERSION }}\`

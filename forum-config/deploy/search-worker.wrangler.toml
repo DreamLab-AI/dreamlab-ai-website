@@ -1,4 +1,9 @@
-# v2 search worker — OPTIONAL. The pilot-kit client no longer calls /embed or /search (c03d736: sealed search runs in the browser from
+# v2 search worker — OPTIONAL and NOT PROVISIONED (Cloudflare listing 2026-11-26: no dreamlab-search-api-v2 worker, no
+# dreamlab-vectors-v2 bucket, no v2 SEARCH_CONFIG namespace). The SEARCH_CONFIG id below is a deliberate placeholder: it FAILS
+# forum-config's deploy_config validator and workers-deploy.yml's placeholder guard, and the worker is out of the CI deploy
+# matrix and the nightly backup. To provision: create the bucket and namespace, paste the 32-hex id here, then add the worker to
+# workers-deploy.yml and its bindings to scripts/backup/forum-backup.sh (check-config-mirrors.mjs will demand both).
+# The pilot-kit client no longer calls /embed or /search (c03d736: sealed search runs in the browser from
 # pod objects), and both endpoints are NIP-98-admin-only (d3bef5b). Deploy only if something else needs it. No [ai] binding (no Workers
 # AI), no JEV rerank, no EMBED_URL (the LAN Xinference is not reachable from Cloudflare): the worker falls back to its hash backend.
 name = "dreamlab-search-api-v2"

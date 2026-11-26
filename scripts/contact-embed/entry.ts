@@ -11,8 +11,11 @@ import {
   wrapDm,
 } from "../../src/lib/nostr";
 
-const RELAY_URL = "wss://dreamlab-nostr-relay.solitary-paper-764d.workers.dev";
-const ADMIN_PUBKEY = "11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c";
+// Live v2 forum relay and admin recipient (cutover 2026-11-26). CI checks both
+// against forum-config/dreamlab.toml (scripts/check-config-mirrors.mjs); a change
+// here only reaches the sibling sites once they re-vendor the build.
+const RELAY_URL = "wss://dreamlab-nostr-relay-v2.solitary-paper-764d.workers.dev";
+const ADMIN_PUBKEY = "bfcf20d472f0fb143b23cb5be3fa0a040d42176b71f73ca272f6912b1d62a452";
 const MONITOR_PUBKEY = "4ed429aa7f30d6e63c41be50685cffeb03cd7b07e37d37a0c4ae5321e642aad7";
 
 export interface SendEnquiryParams {
