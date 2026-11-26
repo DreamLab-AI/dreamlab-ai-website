@@ -100,6 +100,9 @@ accent_hex        = "#3b82f6"
 # tile (the client honours this; other sections fall to alphabetical after it).
 # Projected into ZONE_CONFIG; ignored by relay/auth workers.
 section_order     = ["zone2-rants"]
+# The whole Minimoonoir history is sealed at epoch 5 (the v2 re-seal); earlier
+# epochs are a previous deployment's keys and are never granted.
+history_from_epoch = 5
 
 [[zones]]
 id                = "zone3"
