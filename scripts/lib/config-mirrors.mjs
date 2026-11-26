@@ -93,6 +93,7 @@ function tomlZones(toml) {
       "section_order",
       "kanban",
       "agent_keys",
+      "history_from_epoch",
     ]) {
       if (z[key] !== undefined) out[key] = z[key];
     }
