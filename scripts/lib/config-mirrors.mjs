@@ -467,6 +467,33 @@ export function checkOperatorVarMirrors(root) {
     );
   }
 
+  // [preview].allowed_hosts is the link-preview worker's egress allow-list; the
+  // worker var is its CSV. Each entry must be a bare public hostname: the worker
+  // matches an entry and its subdomains, so a scheme, path, port, wildcard or a
+  // single label would either never match or match far too much.
+  const previewHosts = toml.preview?.allowed_hosts;
+  const previewText = readText(root, WRANGLER.preview);
+  const previewVars = previewText ? (parseToml(previewText).vars ?? {}) : {};
+  if (previewHosts !== undefined || previewVars.PREVIEW_ALLOWED_HOSTS !== undefined) {
+    compareVar(
+      "preview-allowed-hosts",
+      previewHosts,
+      previewVars.PREVIEW_ALLOWED_HOSTS,
+      `${TOML_PATH} [preview].allowed_hosts`,
+      `${WRANGLER.preview} [vars].PREVIEW_ALLOWED_HOSTS`,
+      asCsv,
+    );
+    const hostShape = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/;
+    for (const host of Array.isArray(previewHosts) ? previewHosts : []) {
+      if (!hostShape.test(String(host)) || /\.\d+$/.test(String(host))) {
+        errors.push(
+          `preview-allowed-hosts: ${TOML_PATH} [preview].allowed_hosts entry "${host}" is not a bare ` +
+            `lower-case hostname (no scheme, path, port, wildcard or IP address)`,
+        );
+      }
+    }
+  }
+
   // [poker] is projected by hand into deploy.yml as POKER_CONFIG_JSON, and
   // [features].poker into POKER. Compared as canonical JSON (keys sorted).
   const deployText = readText(root, DEPLOY_PATH);
