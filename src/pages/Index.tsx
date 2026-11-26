@@ -1,10 +1,11 @@
-import { lazy, Suspense, useRef, useState, useEffect } from "react";
+import { Suspense, useRef, useState, useEffect } from "react";
+import { lazyWithReload } from "@/lib/lazy-reload";
 import { SITE_FACTS } from "@/data/site-facts";
 import { FadeCarousel } from "@/components/FadeCarousel";
 import { Link } from "@/components/SlashLink";
 // Sprint v9 D8: defer the Voronoi hero to a separate chunk so the landing
 // route's initial JS payload shrinks on first paint.
-const HyperdimensionalHeroBackground = lazy(
+const HyperdimensionalHeroBackground = lazyWithReload(
   () => import("@/components/HyperdimensionalHeroBackground")
 );
 import { Header } from "@/components/Header";
@@ -36,7 +37,7 @@ import { useOGMeta } from "@/hooks/useOGMeta";
 import { PAGE_OG_CONFIGS } from "@/lib/og-meta";
 import { useIsMobileSync } from "@/hooks/use-mobile";
 
-const EmailSignupForm = lazy(() => import("@/components/EmailSignupForm").then(m => ({ default: m.EmailSignupForm })));
+const EmailSignupForm = lazyWithReload(() => import("@/components/EmailSignupForm").then(m => ({ default: m.EmailSignupForm })));
 
 // Outcome-based programme categories
 const outcomeCards = [

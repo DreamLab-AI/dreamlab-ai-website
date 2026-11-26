@@ -1,4 +1,5 @@
-import { lazy, Suspense } from "react";
+import { Suspense } from "react";
+import { lazyWithReload } from "@/lib/lazy-reload";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router";
@@ -7,21 +8,21 @@ import { AIChatFab } from "@/components/AIChatFab";
 import { RouteErrorBoundary } from "@/components/ErrorBoundary";
 
 // Lazy load all route components for code splitting
-const Index = lazy(() => import("./pages/Index"));
-const NotFound = lazy(() => import("./pages/NotFound"));
-const Privacy = lazy(() => import("./pages/Privacy"));
-const Team = lazy(() => import("./pages/Team"));
-const Contact = lazy(() => import("./pages/Contact"));
-const WorkshopPage = lazy(() => import("./pages/WorkshopPage"));
-const WorkshopIndex = lazy(() => import("./pages/WorkshopIndex"));
-const Programmes = lazy(() => import("./pages/Programmes"));
-const CoCreate = lazy(() => import("./pages/CoCreate"));
-const Research = lazy(() => import("./pages/Research"));
-const Ecosystem = lazy(() => import("./pages/Ecosystem"));
-const Testimonials = lazy(() => import("./pages/Testimonials"));
-const Ventures = lazy(() => import("./pages/Ventures"));
-const ChainMirror = lazy(() => import("./pages/ChainMirror"));
-const ClickThrough = lazy(() => import("./pages/ClickThrough"));
+const Index = lazyWithReload(() => import("./pages/Index"));
+const NotFound = lazyWithReload(() => import("./pages/NotFound"));
+const Privacy = lazyWithReload(() => import("./pages/Privacy"));
+const Team = lazyWithReload(() => import("./pages/Team"));
+const Contact = lazyWithReload(() => import("./pages/Contact"));
+const WorkshopPage = lazyWithReload(() => import("./pages/WorkshopPage"));
+const WorkshopIndex = lazyWithReload(() => import("./pages/WorkshopIndex"));
+const Programmes = lazyWithReload(() => import("./pages/Programmes"));
+const CoCreate = lazyWithReload(() => import("./pages/CoCreate"));
+const Research = lazyWithReload(() => import("./pages/Research"));
+const Ecosystem = lazyWithReload(() => import("./pages/Ecosystem"));
+const Testimonials = lazyWithReload(() => import("./pages/Testimonials"));
+const Ventures = lazyWithReload(() => import("./pages/Ventures"));
+const ChainMirror = lazyWithReload(() => import("./pages/ChainMirror"));
+const ClickThrough = lazyWithReload(() => import("./pages/ClickThrough"));
 
 /**
  * The root application component.
