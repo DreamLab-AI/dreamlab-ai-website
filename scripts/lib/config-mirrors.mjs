@@ -197,7 +197,7 @@ export function checkConfigMirrors(root) {
     description: "auth-worker ADMIN_PUBKEYS (Cloudflare secret - not readable from the repo)",
     verifiable: false,
     agreed: null,
-    sites: [`${SECRETS_WORKFLOW} (push path)`, "cloudflare:dreamlab-auth-api secret ADMIN_PUBKEYS"],
+    sites: [`${SECRETS_WORKFLOW} (push path)`, "cloudflare:dreamlab-auth-api-v2 secret ADMIN_PUBKEYS"],
   });
 
   // 2. Client admin pubkey mirror - must be a member of the authored admin set.
@@ -504,6 +504,206 @@ export function checkOperatorVarMirrors(root) {
       `${TOML_PATH} [features].poker`,
       `${DEPLOY_PATH} env POKER`,
     );
+  }
+
+  return { ok: errors.length === 0, errors };
+}
+
+/** Operational surfaces outside the wrangler/deploy mirror set (audit 2026-11-26). */
+export const OPERATIONAL = {
+  inboxWatch: "scripts/inbox-watch/run.mjs",
+  contactEmbed: "scripts/contact-embed/entry.ts",
+  backup: "scripts/backup/forum-backup.sh",
+  backupCrontab: "scripts/backup/crontab",
+  workersDeploy: ".github/workflows/workers-deploy.yml",
+};
+
+const KV_ID = /^[0-9a-f]{32}$/;
+const D1_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+/** Deployed by the operator by hand (relay-worker.wrangler.toml header); never by CI. */
+const MANUAL_ONLY_CONFIGS = new Set(["relay-worker"]);
+/** Workers whose data the nightly backup must hold. Preview carries only RATE_LIMIT. */
+const DATA_WORKERS = ["auth", "pod", "relay", "search"];
+/** Bindings that hold no state worth restoring. */
+const EPHEMERAL_BINDINGS = new Set(["RATE_LIMIT"]);
+/** Worker base names; a reference without the -v2 suffix is a dead v1 worker. */
+const WORKER_REF = /\bdreamlab-(?:auth-api|pod-api|link-preview|nostr-relay|search-api)(?:-v2)?\b/g;
+
+/**
+ * A worker is provisioned when every KV/D1 binding id in its manifest is well
+ * formed. The v2 search worker carries a placeholder KV id (nothing exists for it
+ * on Cloudflare), so it is unprovisioned: excluded from the backup set and
+ * forbidden from the automated deploy matrix until the operator provisions it.
+ */
+function bindingsOf(doc) {
+  const kv = (doc.kv_namespaces ?? []).map((b) => ({ binding: b.binding, id: b.id }));
+  const d1 = (doc.d1_databases ?? []).map((b) => ({ name: b.database_name, id: b.database_id }));
+  const r2 = (doc.r2_buckets ?? []).map((b) => b.bucket_name);
+  const provisioned = kv.every((b) => KV_ID.test(b.id ?? "")) && d1.every((b) => D1_ID.test(b.id ?? ""));
+  return { kv, d1, r2, provisioned };
+}
+
+/** `declare -A NAME=( [k]="v" ... )` from a bash script, as a Map. */
+function bashAssoc(text, name) {
+  const block = text.match(new RegExp(`declare -A ${name}=\\(([\\s\\S]*?)\\n\\)`));
+  if (!block) return null;
+  return new Map([...block[1].matchAll(/\[([^\]]+)\]="([^"]*)"/g)].map((m) => [m[1], m[2]]));
+}
+
+/**
+ * Operational mirrors the v2 cutover proved were unchecked (audit 2026-11-26
+ * C-2..C-5): every gate stayed green while these still named v1 resources.
+ *
+ *   inbox-watch / contact-embed relay default  <-> dreamlab.toml [relay].url
+ *   inbox-watch / contact-embed admin default  <-> deploy.yml VITE_ADMIN_PUBKEY (in [admin].static_pubkeys)
+ *   inbox-watch jarvis default                 <-> dreamlab.toml [[agents]] junkiejarvis
+ *   forum-backup.sh D1/R2/KV set               <-> every D1/R2/KV binding of the provisioned data workers
+ *   backup crontab                             bounded by timeout
+ *   workflows                                  no v1 worker name; deploy matrix excludes manual-only
+ *                                              and unprovisioned workers
+ */
+export function checkOperationalMirrors(root) {
+  const errors = [];
+  const toml = parseToml(readText(root, TOML_PATH) ?? "");
+  const deployEnv = parseWorkflowEnv(readText(root, DEPLOY_PATH) ?? "");
+  const relayUrl = toml.relay?.url;
+  const adminSet = (toml.admin?.static_pubkeys ?? []).map((k) => k.toLowerCase());
+  const clientAdmin = deployEnv.get("VITE_ADMIN_PUBKEY")?.toLowerCase();
+  const jarvis = (toml.agents ?? []).find((a) => a.label === "junkiejarvis")?.pubkey?.toLowerCase();
+
+  const expectEq = (id, where, got, want, wantWhere) => {
+    if (got === undefined || got === null) {
+      errors.push(`${id}: could not find the value in ${where} (fail closed: update this check if it moved)`);
+    } else if (got.toLowerCase() !== String(want).toLowerCase()) {
+      errors.push(`${id}: MIRROR DRIFT - ${where} has ${got}, ${wantWhere} has ${want}`);
+    }
+  };
+  const expectAdmin = (id, where, got) => {
+    expectEq(id, where, got, clientAdmin, `${DEPLOY_PATH} env.VITE_ADMIN_PUBKEY`);
+    if (got && !adminSet.includes(got.toLowerCase())) {
+      errors.push(`${id}: ${where} admin ${got} is not in ${TOML_PATH} [admin].static_pubkeys`);
+    }
+  };
+
+  // C-3 inbox-watch defaults (the crontab sets no env overrides).
+  const iw = readText(root, OPERATIONAL.inboxWatch);
+  if (!iw) errors.push(`${OPERATIONAL.inboxWatch} missing`);
+  else {
+    const def = (env) => iw.match(new RegExp(`process\\.env\\.${env} \\|\\| "([^"]+)"`))?.[1];
+    expectEq("inbox-watch-relay", `${OPERATIONAL.inboxWatch} RELAY default`, def("RELAY_URL"), relayUrl, `${TOML_PATH} [relay].url`);
+    expectAdmin("inbox-watch-admin", `${OPERATIONAL.inboxWatch} ADMIN default`, def("ADMIN_PUBKEY"));
+    expectEq("inbox-watch-jarvis", `${OPERATIONAL.inboxWatch} JARVIS default`, def("JARVIS_PUBKEY"), jarvis, `${TOML_PATH} [[agents]] junkiejarvis`);
+  }
+
+  // C-4 contact embed constants (vendored into the sibling static sites).
+  const ce = readText(root, OPERATIONAL.contactEmbed);
+  if (!ce) errors.push(`${OPERATIONAL.contactEmbed} missing`);
+  else {
+    const c = (name) => ce.match(new RegExp(`^const ${name} = "([^"]+)";`, "m"))?.[1];
+    expectEq("contact-embed-relay", `${OPERATIONAL.contactEmbed} RELAY_URL`, c("RELAY_URL"), relayUrl, `${TOML_PATH} [relay].url`);
+    expectAdmin("contact-embed-admin", `${OPERATIONAL.contactEmbed} ADMIN_PUBKEY`, c("ADMIN_PUBKEY"));
+    expectEq(
+      "contact-embed-monitor",
+      `${OPERATIONAL.contactEmbed} MONITOR_PUBKEY`,
+      c("MONITOR_PUBKEY"),
+      deployEnv.get("VITE_MONITOR_PUBKEY"),
+      `${DEPLOY_PATH} env.VITE_MONITOR_PUBKEY`,
+    );
+  }
+
+  // Manifests: provisioned state per worker config.
+  const manifests = {};
+  for (const name of Object.keys(WRANGLER)) {
+    const text = readText(root, WRANGLER[name]);
+    if (!text) {
+      errors.push(`${WRANGLER[name]} missing`);
+      continue;
+    }
+    const doc = parseToml(text);
+    manifests[name] = { ...bindingsOf(doc), workerName: doc.name };
+  }
+
+  // C-2 backup resource set == bindings of the provisioned data workers.
+  const bk = readText(root, OPERATIONAL.backup);
+  if (!bk) errors.push(`${OPERATIONAL.backup} missing`);
+  else {
+    const wantD1 = new Map();
+    const wantR2 = new Set();
+    const wantKv = new Set();
+    for (const name of DATA_WORKERS) {
+      const m = manifests[name];
+      if (!m || !m.provisioned) continue;
+      for (const d of m.d1) wantD1.set(d.name, d.id);
+      for (const b of m.r2) wantR2.add(b);
+      for (const k of m.kv) if (!EPHEMERAL_BINDINGS.has(k.binding)) wantKv.add(k.id);
+    }
+    const d1 = bashAssoc(bk, "D1");
+    const kv = bashAssoc(bk, "KV");
+    const r2 = bk.match(/^R2_BUCKETS=\(([^)]*)\)/m)?.[1].trim().split(/\s+/).filter(Boolean);
+    if (!d1 || !kv || !r2) {
+      errors.push(`backup-resources: could not parse D1 / R2_BUCKETS / KV in ${OPERATIONAL.backup}`);
+    } else {
+      const fmt = (map) => JSON.stringify([...map].sort());
+      const wantD1s = fmt(wantD1);
+      if (fmt(d1) !== wantD1s) {
+        errors.push(`backup-resources: D1 set drift - ${OPERATIONAL.backup} has ${fmt(d1)}, provisioned workers bind ${wantD1s}`);
+      }
+      const haveR2 = JSON.stringify([...new Set(r2)].sort());
+      const wantR2s = JSON.stringify([...wantR2].sort());
+      if (haveR2 !== wantR2s) {
+        errors.push(`backup-resources: R2 set drift - ${OPERATIONAL.backup} has ${haveR2}, provisioned workers bind ${wantR2s}`);
+      }
+      const haveKv = new Set(kv.values());
+      for (const id of wantKv) {
+        if (!haveKv.has(id)) errors.push(`backup-resources: KV namespace ${id} is bound by a provisioned worker but not backed up`);
+      }
+      for (const id of haveKv) {
+        if (!wantKv.has(id)) errors.push(`backup-resources: KV namespace ${id} in ${OPERATIONAL.backup} is bound by no provisioned worker (dead resource?)`);
+      }
+    }
+  }
+
+  // H-11 the backup cron is time-bounded.
+  const cron = readText(root, OPERATIONAL.backupCrontab);
+  if (!cron) errors.push(`${OPERATIONAL.backupCrontab} missing`);
+  else {
+    const line = cron.split("\n").find((l) => l.includes("forum-backup.sh") && !l.trim().startsWith("#"));
+    if (!line || !/\btimeout\b/.test(line)) {
+      errors.push(`backup-crontab: ${OPERATIONAL.backupCrontab} runs forum-backup.sh without a timeout bound`);
+    }
+  }
+
+  // C-5 workflow worker targets.
+  const workerNames = new Set(Object.values(manifests).map((m) => m.workerName));
+  for (const rel of [SECRETS_WORKFLOW, OPERATIONAL.workersDeploy]) {
+    const text = readText(root, rel);
+    if (!text) {
+      errors.push(`${rel} missing`);
+      continue;
+    }
+    for (const ref of new Set(text.match(WORKER_REF) ?? [])) {
+      if (!workerNames.has(ref)) {
+        errors.push(`workflow-workers: ${rel} names ${ref}, which is not the name of any forum-config/deploy worker (dead v1 worker?)`);
+      }
+    }
+  }
+  const wd = readText(root, OPERATIONAL.workersDeploy);
+  if (wd) {
+    const entries = [...wd.matchAll(/^\s*config:\s*([a-z-]+)\s*\n\s*worker_name:\s*(\S+)/gm)];
+    if (entries.length === 0) errors.push(`workflow-workers: no deploy matrix entries found in ${OPERATIONAL.workersDeploy}`);
+    for (const [, config, workerName] of entries) {
+      const key = config.replace(/-worker$/, "");
+      const m = manifests[key];
+      if (MANUAL_ONLY_CONFIGS.has(config)) {
+        errors.push(`workflow-workers: ${config} is operator-deployed by hand and must not be in the ${OPERATIONAL.workersDeploy} matrix`);
+      } else if (!m) {
+        errors.push(`workflow-workers: matrix config ${config} has no manifest`);
+      } else if (!m.provisioned) {
+        errors.push(`workflow-workers: ${config} is not provisioned (placeholder binding id) and must not be in the deploy matrix`);
+      } else if (m.workerName !== workerName) {
+        errors.push(`workflow-workers: matrix worker_name ${workerName} != ${WRANGLER[key]} name ${m.workerName}`);
+      }
+    }
   }
 
   return { ok: errors.length === 0, errors };

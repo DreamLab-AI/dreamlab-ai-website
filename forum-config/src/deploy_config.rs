@@ -16,7 +16,13 @@
 //!    secret was never `wrangler secret put`, registration/login 500s on the
 //!    first request rather than refusing to deploy.
 //!
-//! This module turns both into a **fail-closed, init-time** check. The real KV
+//! A third class surfaced after the v2 cutover (audit 2026-11-26 C-6): a
+//! placeholder that is NOT `REPLACE_WITH_*` (e.g. `<SEARCH_CONFIG_V2_KV_ID>`)
+//! passed the check, and `database_id` was never inspected at all. Binding ids
+//! are therefore also format-checked: a KV `id` must be 32 lower-case hex
+//! characters and a D1 `database_id` a lower-case UUID.
+//!
+//! This module turns all three into a **fail-closed, init-time** check. The real KV
 //! namespace id and the secret values are *operator data* — this code never
 //! generates or guesses them; it only verifies they were supplied and rejects
 //! the known placeholder sentinels.
@@ -89,6 +95,17 @@ pub enum DeployConfigError {
         /// The placeholder value found.
         value: String,
     },
+    /// A KV `id` or D1 `database_id` is absent or not in Cloudflare's id format.
+    MalformedId {
+        /// Manifest file name.
+        manifest: String,
+        /// Binding name the id belongs to.
+        binding: String,
+        /// The field checked: `id` (KV namespace) or `database_id` (D1).
+        field: String,
+        /// The offending value (empty when the field is absent).
+        value: String,
+    },
     /// A required operator-provided secret was not supplied.
     MissingSecret {
         /// The secret name that must be `wrangler secret put`.
@@ -117,10 +134,16 @@ impl std::fmt::Display for DeployConfigError {
                  Provision the real namespace (e.g. `wrangler kv:namespace create dreamlab-admin-kv`) \
                  and paste the returned id. This value is operator data — it is not generated here."
             ),
+            DeployConfigError::MalformedId { manifest, binding, field, value } => write!(
+                f,
+                "deploy config: {manifest} binding `{binding}` has malformed `{field}` `{value}` \
+                 (expected {}). Paste the real id from the Cloudflare dashboard or `wrangler` output.",
+                if field == "id" { "32 lower-case hex characters" } else { "a lower-case UUID" }
+            ),
             DeployConfigError::MissingSecret { name } => write!(
                 f,
                 "deploy config: required secret `{name}` was not supplied. Set it with \
-                 `wrangler secret put {name} --name dreamlab-auth-api` (or via set-worker-secrets.yml) \
+                 `wrangler secret put {name} --name dreamlab-auth-api-v2` (or via set-worker-secrets.yml) \
                  before deploying. This value is operator data — it is not generated here."
             ),
             DeployConfigError::MissingManifest { manifest } => {
@@ -135,17 +158,101 @@ impl std::fmt::Display for DeployConfigError {
 
 impl std::error::Error for DeployConfigError {}
 
-/// Scan a parsed wrangler manifest for any binding `id` still set to a
-/// `REPLACE_WITH_*` placeholder.
+/// Scan a parsed wrangler manifest for unresolved or malformed binding ids.
 ///
-/// Returns one [`DeployConfigError::UnresolvedPlaceholder`] per offending
-/// binding. Operates on the parsed TOML so it catches the placeholder in any
-/// binding array (`kv_namespaces`, `d1_databases`, `r2_buckets`, …), not just
-/// `ADMIN_KV`.
+/// Returns one error per offending binding:
+/// - [`DeployConfigError::UnresolvedPlaceholder`] for any `id` set to a
+///   `REPLACE_WITH_*` sentinel (in any binding array), and for a `<...>`
+///   placeholder in a KV `id` or D1 `database_id`;
+/// - [`DeployConfigError::MalformedId`] for a `kv_namespaces` entry whose `id`
+///   is absent or not 32 lower-case hex, or a `d1_databases` entry whose
+///   `database_id` is absent or not a lower-case UUID.
+///
+/// The format checks apply only inside `kv_namespaces` / `d1_databases` (at any
+/// depth, so `[env.*]` overrides are covered); an `id` in another table is not a
+/// Cloudflare resource id and is left alone.
 pub fn scan_manifest_value(manifest: &str, value: &toml::Value) -> Vec<DeployConfigError> {
     let mut errors = Vec::new();
     collect_placeholder_ids(manifest, value, None, &mut errors);
+    collect_malformed_ids(manifest, value, &mut errors);
     errors
+}
+
+/// `true` for a Cloudflare KV namespace id: exactly 32 lower-case hex characters.
+pub fn is_kv_namespace_id(id: &str) -> bool {
+    id.len() == 32
+        && id
+            .bytes()
+            .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+}
+
+/// `true` for a Cloudflare D1 database id: a lower-case 8-4-4-4-12 hex UUID.
+pub fn is_d1_database_id(id: &str) -> bool {
+    let groups: Vec<&str> = id.split('-').collect();
+    groups.len() == 5
+        && groups.iter().zip([8usize, 4, 4, 4, 12]).all(|(g, n)| {
+            g.len() == n
+                && g.bytes()
+                    .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+        })
+}
+
+fn is_placeholder(value: &str) -> bool {
+    value.starts_with(PLACEHOLDER_PREFIX) || (value.starts_with('<') && value.ends_with('>'))
+}
+
+fn collect_malformed_ids(manifest: &str, value: &toml::Value, out: &mut Vec<DeployConfigError>) {
+    match value {
+        toml::Value::Table(table) => {
+            for (key, field, valid) in [
+                (
+                    "kv_namespaces",
+                    "id",
+                    is_kv_namespace_id as fn(&str) -> bool,
+                ),
+                ("d1_databases", "database_id", is_d1_database_id),
+            ] {
+                let Some(toml::Value::Array(entries)) = table.get(key) else {
+                    continue;
+                };
+                for entry in entries {
+                    let binding = entry
+                        .get("binding")
+                        .and_then(toml::Value::as_str)
+                        .unwrap_or("<unknown>")
+                        .to_string();
+                    let id = entry.get(field).and_then(toml::Value::as_str).unwrap_or("");
+                    if id.starts_with(PLACEHOLDER_PREFIX) && field == "id" {
+                        // Already reported by collect_placeholder_ids.
+                        continue;
+                    }
+                    if is_placeholder(id) {
+                        out.push(DeployConfigError::UnresolvedPlaceholder {
+                            manifest: manifest.to_string(),
+                            binding,
+                            value: id.to_string(),
+                        });
+                    } else if !valid(id) {
+                        out.push(DeployConfigError::MalformedId {
+                            manifest: manifest.to_string(),
+                            binding,
+                            field: field.to_string(),
+                            value: id.to_string(),
+                        });
+                    }
+                }
+            }
+            for v in table.values() {
+                collect_malformed_ids(manifest, v, out);
+            }
+        }
+        toml::Value::Array(items) => {
+            for v in items {
+                collect_malformed_ids(manifest, v, out);
+            }
+        }
+        _ => {}
+    }
 }
 
 fn collect_placeholder_ids(
@@ -184,7 +291,8 @@ fn collect_placeholder_ids(
 }
 
 /// Validate every required wrangler manifest under `deploy_dir`, failing fast
-/// on missing files, parse errors, and unresolved `REPLACE_WITH_*` placeholders.
+/// on missing files, parse errors, unresolved placeholders and malformed
+/// KV / D1 ids (see [`scan_manifest_value`]).
 ///
 /// This is the deploy-time gate: call it before `wrangler deploy`. The CI test
 /// runs it against the checked-in `deploy/` directory so an unresolved
@@ -265,15 +373,130 @@ mod tests {
         std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("deploy")
     }
 
-    /// The v2 switch resolved every ADMIN_KV placeholder (real v2 namespace ids), so the shipped
-    /// manifests must now validate cleanly.
+    /// The v2 switch resolved every binding id except the search worker's SEARCH_CONFIG namespace:
+    /// the v2 search worker is not provisioned (no worker, no `dreamlab-vectors-v2` bucket, no KV
+    /// namespace, per the Cloudflare listing of 2026-11-26). Its manifest must therefore FAIL the
+    /// validator, and nothing else may.
     #[test]
-    fn validator_accepts_shipped_manifests_with_resolved_admin_kv() {
-        let result = validate_deploy_dir(&deploy_dir());
-        assert!(
-            result.is_ok(),
-            "shipped deploy/*.wrangler.toml must validate: {result:?}"
+    fn validator_fails_closed_only_on_the_unprovisioned_search_worker() {
+        let errors = validate_deploy_dir(&deploy_dir()).expect_err(
+            "search-worker.wrangler.toml carries a placeholder KV id and must not validate",
         );
+        assert_eq!(errors.len(), 1, "exactly one defect expected: {errors:?}");
+        match &errors[0] {
+            DeployConfigError::UnresolvedPlaceholder {
+                manifest, binding, ..
+            } => {
+                assert_eq!(manifest, "search-worker.wrangler.toml");
+                assert_eq!(binding, "SEARCH_CONFIG");
+            }
+            other => panic!("wrong error: {other:?}"),
+        }
+    }
+
+    #[test]
+    fn angle_bracket_placeholder_is_unresolved() {
+        let v: toml::Value = r#"
+            [[kv_namespaces]]
+            binding = "SEARCH_CONFIG"
+            id      = "<SEARCH_CONFIG_V2_KV_ID>"
+        "#
+        .parse()
+        .unwrap();
+        let errors = scan_manifest_value("test.toml", &v);
+        assert_eq!(errors.len(), 1, "{errors:?}");
+        assert!(matches!(
+            &errors[0],
+            DeployConfigError::UnresolvedPlaceholder { binding, .. } if binding == "SEARCH_CONFIG"
+        ));
+    }
+
+    #[test]
+    fn malformed_kv_id_is_rejected() {
+        for bad in [
+            "40fdb0ce2d814f77b3db9d7b922ff57",   // 31 chars
+            "40fdb0ce2d814f77b3db9d7b922ff5799", // 33 chars
+            "40FDB0CE2D814F77B3DB9D7B922FF579",  // upper case (Cloudflare ids are lower-case)
+            "40fdb0ce-2d81-4f77-b3db-9d7b922ff579",
+            "not-a-namespace-id",
+            "",
+        ] {
+            let v: toml::Value = format!("[[kv_namespaces]]\nbinding = \"KV\"\nid = \"{bad}\"\n")
+                .parse()
+                .unwrap();
+            let errors = scan_manifest_value("test.toml", &v);
+            assert!(
+                matches!(errors.as_slice(), [DeployConfigError::MalformedId { field, .. }] if field == "id"),
+                "{bad:?} must be rejected as a malformed KV id: {errors:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn malformed_d1_database_id_is_rejected() {
+        for bad in [
+            "eb33cf2f44db433c97716db850d8b64c", // no hyphens
+            "eb33cf2f-44db-433c-9771-6db850d8b64",
+            "EB33CF2F-44DB-433C-9771-6DB850D8B64C",
+            "<RELAY_DB_ID>",
+            "",
+        ] {
+            let v: toml::Value = format!(
+                "[[d1_databases]]\nbinding = \"DB\"\ndatabase_name = \"x\"\ndatabase_id = \"{bad}\"\n"
+            )
+            .parse()
+            .unwrap();
+            let errors = scan_manifest_value("test.toml", &v);
+            assert_eq!(errors.len(), 1, "{bad:?} must be rejected: {errors:?}");
+            match &errors[0] {
+                DeployConfigError::MalformedId { field, binding, .. } => {
+                    assert_eq!(field, "database_id");
+                    assert_eq!(binding, "DB");
+                }
+                DeployConfigError::UnresolvedPlaceholder { binding, .. } => {
+                    assert_eq!(binding, "DB")
+                }
+                other => panic!("wrong error: {other:?}"),
+            }
+        }
+    }
+
+    #[test]
+    fn missing_binding_id_is_rejected() {
+        let v: toml::Value = r#"
+            [[kv_namespaces]]
+            binding = "POD_META"
+
+            [[d1_databases]]
+            binding = "DB"
+            database_name = "dreamlab-relay-v2"
+        "#
+        .parse()
+        .unwrap();
+        assert_eq!(scan_manifest_value("test.toml", &v).len(), 2);
+    }
+
+    #[test]
+    fn well_formed_ids_pass_and_format_checks_stay_scoped() {
+        let v: toml::Value = r#"
+            [[kv_namespaces]]
+            binding = "ADMIN_KV"
+            id      = "36c5f8d2157b4b3e8ef53c47c7fb68f1"
+
+            [[d1_databases]]
+            binding = "DB"
+            database_name = "dreamlab-relay-v2"
+            database_id = "eb33cf2f-44db-433c-9771-6db850d8b64c"
+
+            # An `id` outside kv_namespaces is not a KV id and is not format-checked.
+            [[durable_objects.bindings]]
+            name = "RELAY"
+            class_name = "NostrRelayDO"
+            id = "anything"
+        "#
+        .parse()
+        .unwrap();
+        assert!(scan_manifest_value("test.toml", &v).is_empty());
     }
 
     #[test]

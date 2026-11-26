@@ -32,6 +32,10 @@ const FIXTURE_FILES = [
   "forum-config/deploy/relay-worker.wrangler.toml",
   "forum-config/deploy/search-worker.wrangler.toml",
   "docs/architecture/kit-compatibility-record.md",
+  "scripts/inbox-watch/run.mjs",
+  "scripts/contact-embed/entry.ts",
+  "scripts/backup/forum-backup.sh",
+  "scripts/backup/crontab",
 ];
 
 const created = [];
