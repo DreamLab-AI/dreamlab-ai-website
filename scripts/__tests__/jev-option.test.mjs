@@ -119,8 +119,8 @@ describe('DW-02 enquiry topic tag', () => {
     const cases = [
       { env: {}, fetchImpl: okFetch(good) },
       { env: { DREAMLAB_JEV: '1' }, fetchImpl: okFetch(good) },
-      { env: { DREAMLAB_JEV: '1', DREAMLAB_JEV_ENDPOINT: 'http://x', DREAMLAB_JEV_TOPIC_LOCAL_ONLY: '1' }, fetchImpl: okFetch(good) }, // local-only, not declared local
-      { env: { DREAMLAB_JEV: '1', TYPESAFE_API_KEY: 'k', DREAMLAB_JEV_TOPIC_LOCAL_ONLY: '1' }, fetchImpl: okFetch(good) }, // local-only refuses the vendor
+      { env: { DREAMLAB_JEV: '1', DREAMLAB_JEV_ENDPOINT: 'http://x' }, fetchImpl: okFetch(good) }, // not declared local
+      { env: { DREAMLAB_JEV: '1', TYPESAFE_API_KEY: 'k' }, fetchImpl: okFetch(good) }, // vendor is never used
       { env: LOCAL, fetchImpl: statusFetch(500) },
       { env: LOCAL, fetchImpl: statusFetch(429) },
       { env: LOCAL, fetchImpl: throwingFetch },
@@ -137,22 +137,70 @@ describe('DW-02 enquiry topic tag', () => {
     }
   });
 
-  test('default is not local-only: proxy and vendor are used; DREAMLAB_JEV_TOPIC_LOCAL_ONLY=1 refuses them', async () => {
-    const proxy = { DREAMLAB_JEV: '1', AGENTBOX_SYSTEM_ONE_PROXY: '1', AGENTBOX_SYSTEM_ONE_ENDPOINT: 'http://agentbox:8094/v1/systemone', AGENTBOX_SYSTEM_ONE_MODEL: 'jev-latest', AGENTBOX_SYSTEM_ONE_BACKEND_LOCAL: '0' };
-    let spy = [];
-    let out = await tagEnquiries(fresh, { env: proxy, fetchImpl: okFetch(good, spy) });
-    expect(spy).toHaveLength(2);
-    expect(spy[0].url).toBe('http://agentbox:8094/v1/systemone');
-    expect(out[0].topic).toBe('ktp · needs-info');
-    spy = [];
-    await tagEnquiries(fresh, { env: { DREAMLAB_JEV: '1', TYPESAFE_API_KEY: 'k' }, fetchImpl: okFetch(good, spy) });
-    expect(spy).toHaveLength(2);
-    spy = [];
-    out = await tagEnquiries(fresh, { env: { ...proxy, DREAMLAB_JEV_TOPIC_LOCAL_ONLY: '1' }, fetchImpl: okFetch(good, spy) });
+  // C-1 (audit 2026-11-26): Privacy.tsx promises enquiry tagging "does not send
+  // your enquiry to a public AI service". Local-only is unconditional: no env
+  // switch reaches the vendor, the agentbox proxy (its backend is opaque), or
+  // any endpoint whose host is not loopback / RFC 1918.
+  const LOCAL_HOSTS = /^(localhost|127\.\d+\.\d+\.\d+|\[::1\]|10\.\d+\.\d+\.\d+|192\.168\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+)$/;
+  const proxyEnv = { DREAMLAB_JEV: '1', AGENTBOX_SYSTEM_ONE_PROXY: '1', AGENTBOX_SYSTEM_ONE_ENDPOINT: 'http://127.0.0.1:8094/v1/systemone', AGENTBOX_SYSTEM_ONE_MODEL: 'jev-latest' };
+  const neverCalled = [
+    ['vendor key, default env', { DREAMLAB_JEV: '1', TYPESAFE_API_KEY: 'k' }],
+    ['vendor key, TOPIC_LOCAL_ONLY=0', { DREAMLAB_JEV: '1', TYPESAFE_API_KEY: 'k', DREAMLAB_JEV_TOPIC_LOCAL_ONLY: '0' }],
+    ['proxy, backend not declared local', proxyEnv],
+    ['proxy, BACKEND_LOCAL=1', { ...proxyEnv, AGENTBOX_SYSTEM_ONE_BACKEND_LOCAL: '1' }],
+    ['proxy via boot aliases, BACKEND_LOCAL=1', { DREAMLAB_JEV: '1', AGENTBOX_SYSTEM_ONE_PROXY: '1', AGENTBOX_SKILL_ROUTE_API: 'http://127.0.0.1:8094/v1/systemone', AGENTBOX_SKILL_ROUTE_MODEL: 'm', AGENTBOX_SYSTEM_ONE_BACKEND_LOCAL: '1' }],
+    ['explicit endpoint without _LOCAL', { DREAMLAB_JEV: '1', DREAMLAB_JEV_ENDPOINT: 'http://127.0.0.1:9/v1/systemone' }],
+    ['vendor URL declared _LOCAL=1', { DREAMLAB_JEV: '1', DREAMLAB_JEV_ENDPOINT: 'https://api.typesafe.ai/v1/systemone', DREAMLAB_JEV_LOCAL: '1' }],
+    ['public hostname declared _LOCAL=1', { DREAMLAB_JEV: '1', DREAMLAB_JEV_ENDPOINT: 'https://llm.example.com/v1/systemone', DREAMLAB_JEV_LOCAL: '1' }],
+    ['DNS name that is not localhost, _LOCAL=1', { DREAMLAB_JEV: '1', DREAMLAB_JEV_ENDPOINT: 'http://loom:8080/v1/systemone', DREAMLAB_JEV_LOCAL: '1' }],
+    ['public IP declared _LOCAL=1', { DREAMLAB_JEV: '1', DREAMLAB_JEV_ENDPOINT: 'http://8.8.8.8/v1/systemone', DREAMLAB_JEV_LOCAL: '1' }],
+    ['non-http scheme declared _LOCAL=1', { DREAMLAB_JEV: '1', DREAMLAB_JEV_ENDPOINT: 'file:///etc/passwd', DREAMLAB_JEV_LOCAL: '1' }],
+  ];
+  for (const [name, env] of neverCalled) {
+    test(`local-only is unconditional: ${name} => no request, digest unchanged`, async () => {
+      const spy = [];
+      const out = await tagEnquiries(fresh, { env, fetchImpl: okFetch(good, spy) });
+      expect(spy).toHaveLength(0);
+      expect(out).toEqual(fresh);
+      expect(digestLines(out)).toEqual(baseline);
+    });
+  }
+
+  test('a declared-local loopback or RFC 1918 endpoint is used (normalised forms included)', async () => {
+    for (const endpoint of ['http://127.0.0.1:9/v1/systemone', 'http://localhost:9/v1/systemone', 'http://[::1]:9/v1/systemone', 'http://192.168.2.132:8085/v1/systemone', 'http://10.0.0.5/v1/systemone', 'http://172.20.0.2/v1/systemone', 'http://2130706433/v1/systemone']) {
+      const spy = [];
+      const out = await tagEnquiries(fresh, { env: { DREAMLAB_JEV: '1', DREAMLAB_JEV_ENDPOINT: endpoint, DREAMLAB_JEV_LOCAL: '1' }, fetchImpl: okFetch(good, spy) });
+      expect(spy, endpoint).toHaveLength(2);
+      expect(out[0].topic).toBe('ktp · needs-info');
+      for (const s of spy) expect(new URL(s.url).hostname).toMatch(LOCAL_HOSTS);
+    }
+    for (const endpoint of ['http://172.32.0.1/v1/systemone', 'http://192.169.0.1/v1/systemone', 'http://11.0.0.1/v1/systemone']) {
+      const spy = [];
+      await tagEnquiries(fresh, { env: { DREAMLAB_JEV: '1', DREAMLAB_JEV_ENDPOINT: endpoint, DREAMLAB_JEV_LOCAL: '1' }, fetchImpl: okFetch(good, spy) });
+      expect(spy, endpoint).toHaveLength(0);
+    }
+  });
+
+  test('privacy enquiries are never AI-tagged, even with a local endpoint', async () => {
+    const items = [
+      { ...fresh[0], detail: 'privacy', excerptFull: 'Please delete my data' },
+      { ...fresh[0], detail: ' Privacy ', excerptFull: 'Subject access request' },
+      fresh[1],
+    ];
+    const spy = [];
+    const out = await tagEnquiries(items, { env: LOCAL, fetchImpl: okFetch(good, spy) });
     expect(spy).toHaveLength(0);
-    expect(digestLines(out)).toEqual(baseline);
-    await tagEnquiries(fresh, { env: { DREAMLAB_JEV: '1', TYPESAFE_API_KEY: 'k', DREAMLAB_JEV_TOPIC_LOCAL_ONLY: '1' }, fetchImpl: okFetch(good, spy) });
-    expect(spy).toHaveLength(0);
+    expect(out[0]).toBe(items[0]);
+    expect(out[1]).toBe(items[1]);
+    for (const s of spy) expect(JSON.stringify(s.body)).not.toContain('delete my data');
+  });
+
+  test('privacy items do not use up the per-run budget', async () => {
+    const items = [...Array.from({ length: 12 }, () => ({ ...fresh[0], detail: 'privacy' })), fresh[0]];
+    const spy = [];
+    const out = await tagEnquiries(items, { env: LOCAL, fetchImpl: okFetch(good, spy) });
+    expect(spy).toHaveLength(1);
+    expect(out[12].topic).toBe('ktp · needs-info');
   });
 
   test('flag off makes no request at all', async () => {
