@@ -11,11 +11,12 @@ import { describe, expect, it } from "vitest";
 
 const require_text = (p) => readFileSync(p, "utf8");
 import { DEPLOY_PATH, TOML_PATH, WRANGLER, checkOperatorVarMirrors } from "../lib/config-mirrors.mjs";
+import { parseToml } from "../lib/toml-lite.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 
 /** Minimal operator tree carrying the sections checkOperatorVarMirrors reads. */
-const writeFixture = ({ relayVars, extraToml = [], deployEnv = null }) => {
+const writeFixture = ({ relayVars, extraToml = [], deployEnv = null, previewVars = null }) => {
   const dir = mkdtempSync(join(tmpdir(), "operator-var-mirrors-"));
   mkdirSync(join(dir, "forum-config", "deploy"), { recursive: true });
   writeFileSync(
@@ -47,6 +48,7 @@ const writeFixture = ({ relayVars, extraToml = [], deployEnv = null }) => {
     varsBlock({ RP_ID: "example.com", EXPECTED_ORIGIN: "https://example.com" }),
   );
   writeFileSync(join(dir, WRANGLER.relay), varsBlock(relayVars));
+  if (previewVars) writeFileSync(join(dir, WRANGLER.preview), varsBlock(previewVars));
   return dir;
 };
 
@@ -55,6 +57,52 @@ describe("checkOperatorVarMirrors", () => {
     const result = checkOperatorVarMirrors(ROOT);
     expect(result.errors).toEqual([]);
     expect(result.ok).toBe(true);
+  });
+
+  const quietRelay = { MESH_MODE: "standalone", MESH_PEER_RELAYS: "", MESH_ALLOWED_REMOTE_DIDS: "" };
+  const previewErrors = (hosts, previewVars) => {
+    const dir = writeFixture({
+      relayVars: quietRelay,
+      extraToml: hosts === null ? [] : ["[preview]", `allowed_hosts = ${JSON.stringify(hosts)}`],
+      previewVars,
+    });
+    try {
+      return checkOperatorVarMirrors(dir).errors.join("\n");
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  };
+
+  it("the checked-in preview worker has a non-empty allow-list", () => {
+    const vars = parseToml(readFileSync(join(ROOT, WRANGLER.preview), "utf8")).vars ?? {};
+    expect(String(vars.PREVIEW_ALLOWED_HOSTS ?? "").trim()).not.toBe("");
+  });
+
+  it("accepts a preview allow-list that matches the worker var in any order", () => {
+    expect(
+      previewErrors(["youtube.com", "bbc.co.uk"], { PREVIEW_ALLOWED_HOSTS: "bbc.co.uk, youtube.com" }),
+    ).toBe("");
+  });
+
+  it("flags a preview allow-list that drifted from the worker var", () => {
+    const errors = previewErrors(["youtube.com", "bbc.co.uk"], { PREVIEW_ALLOWED_HOSTS: "youtube.com" });
+    expect(errors).toMatch(/preview-allowed-hosts: MIRROR DRIFT/);
+    expect(errors).toContain("bbc.co.uk");
+  });
+
+  it("flags a preview allow-list present on one side only", () => {
+    expect(previewErrors(["youtube.com"], { ALLOWED_ORIGIN: "https://example.com" })).toMatch(
+      /preview-allowed-hosts: .* has no value/,
+    );
+    expect(previewErrors(null, { PREVIEW_ALLOWED_HOSTS: "youtube.com" })).toMatch(
+      /preview-allowed-hosts: .* has no value/,
+    );
+  });
+
+  it("refuses preview entries that are not bare hostnames", () => {
+    for (const bad of ["https://github.com", "github.com/x", "*.github.com", "GitHub.com", "com", "10.0.0.1", "a.com:443"]) {
+      expect(previewErrors([bad], { PREVIEW_ALLOWED_HOSTS: bad })).toMatch(/not a bare\s+lower-case hostname/);
+    }
   });
 
   it("flags a relay MESH_MODE that drifted from [mesh].mode", () => {

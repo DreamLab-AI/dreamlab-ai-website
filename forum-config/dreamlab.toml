@@ -296,6 +296,27 @@ coach_pubkey   = "032f0527f308f4b3336f3335a8a106277799af864dd0b0122f26ed4a06f0ea
 # Mirror any change into deploy.yml POKER_CONFIG_JSON.
 citizens       = { "sidestr:dreamlab" = "d4bda43addb1419ad2930401322403c774bc30a141a6eb8fdba0314ee4086df9", "sidestr:dreamlab-txbt4" = "bc86ce5f26997fa57d8cadae14fc438082ab01375eae8c02a21fc4d8a7c2a17f" }
 
+# ─── Link previews ───────────────────────────────────────────────────────────
+# Sites the link-preview worker may fetch when a member posts a link. Each entry
+# is a bare hostname and covers its subdomains; a link to any other site shows
+# as a plain link. Redirects are checked too, so list both ends (youtu.be and
+# youtube.com). To allow another site, add it here AND to PREVIEW_ALLOWED_HOSTS
+# in deploy/preview-worker.wrangler.toml (CI fails if the two differ), then
+# redeploy the preview worker. Typed by the kit as [preview] from kit #116.
+[preview]
+allowed_hosts = [
+  # DreamLab's own sites
+  "dreamlab-ai.com", "narrativegoldmine.com",
+  # code and research
+  "github.com", "arxiv.org", "huggingface.co", "wikipedia.org",
+  # video
+  "youtube.com", "youtu.be", "vimeo.com",
+  # social
+  "twitter.com", "x.com", "linkedin.com", "reddit.com",
+  # news and writing
+  "bbc.co.uk", "theguardian.com", "medium.com", "substack.com",
+]
+
 # ─── Registered agents ───────────────────────────────────────────────────────
 # Agent roster for relay whitelist seeding and documentation.
 # Private keys are in .nostr-identities.env (git-ignored).
