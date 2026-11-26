@@ -122,6 +122,14 @@ fi
 STAMP=$(date -u +%Y-%m-%d)
 DEST="$DEST_ROOT/$STAMP"
 mkdir -p "$DEST_ROOT"
+# We hold the lock, so any work directory left behind belongs to a run that was
+# killed outright (timeout's SIGKILL skips the EXIT trap). It may hold session
+# data: keep it as a failed run (bounded below) rather than leave it to pile up.
+for stale in "$DEST_ROOT"/.inprogress-*; do
+  [ -d "$stale" ] || continue
+  log "WARNING: found abandoned work dir $stale; keeping it as a failed run."
+  mv "$stale" "$DEST_ROOT/failed-$(date -u +%Y-%m-%dT%H%M%SZ)-abandoned-${stale##*-}" || rm -rf "$stale"
+done
 WORK=$(mktemp -d "$DEST_ROOT/.inprogress-$STAMP-XXXXXX")
 mkdir -p "$WORK"/{d1,r2,kv}
 FAIL=0
@@ -164,7 +172,8 @@ safe_name() {
   local s
   s=$(printf %s "$1" | jq -sRr @uri)
   case "$s" in
-    ""|.|..) s=$(printf %s "$s" | sed 's/\./%2E/g'); s="${s:-%00empty}" ;;
+    # Parameter expansion, not sed: sed is not on the cron program's pinned PATH.
+    ""|.|..) s="${s//./%2E}"; s="${s:-%00empty}" ;;
   esac
   printf %s "$s"
 }
@@ -254,5 +263,8 @@ rm -rf "$DEST"
 mv "$WORK" "$DEST"
 ls -1d "$DEST_ROOT"/20* 2>/dev/null | sort | head -n -"$KEEP_NIGHTS" | while read -r old; do
   log "retention: pruning $old"; rm -rf "$old"
+done
+ls -1d "$DEST_ROOT"/failed-* 2>/dev/null | sort | head -n -"$KEEP_FAILED" | while read -r old; do
+  rm -rf "$old"
 done
 log "backup complete: $DEST"
