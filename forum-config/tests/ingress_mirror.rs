@@ -16,7 +16,7 @@ fn config() -> nostr_bbs_config::ForumConfig {
         .expect("dreamlab.toml loads and validates")
 }
 
-const ADMIN: &str = "11ed64225dd5e2c5e18f61ad43d5ad9272d08739d3a20dd25886197b0738663c";
+const ADMIN: &str = "bfcf20d472f0fb143b23cb5be3fa0a040d42176b71f73ca272f6912b1d62a452";
 const JARVIS: &str = "2de44d5622eef79519ac078f6e227a85aecbaefd561e4e50c5f51dfadbf916e9";
 const MONITOR: &str = "4ed429aa7f30d6e63c41be50685cffeb03cd7b07e37d37a0c4ae5321e642aad7";
 
@@ -61,15 +61,8 @@ fn relay_binding_mirrors_the_toml() {
 fn build_env_names_the_same_keys() {
     let deploy = std::fs::read_to_string(root().join("../.github/workflows/deploy.yml"))
         .expect("deploy.yml");
-    // The React build (contact form, signup, Talk-to-AI) receives the site inbox through
-    // REACT_ADMIN_PUBKEY since the v2 forum switch: workflow-level VITE_ADMIN_PUBKEY is the
-    // forum's static admin (a [admin].static_pubkeys mirror), not an ingress recipient.
-    assert!(
-        deploy.contains("VITE_ADMIN_PUBKEY: ${{ env.REACT_ADMIN_PUBKEY }}"),
-        "the React build must take its contact inbox from REACT_ADMIN_PUBKEY"
-    );
     for (var, pk) in [
-        ("REACT_ADMIN_PUBKEY", ADMIN),
+        ("VITE_ADMIN_PUBKEY", ADMIN),
         ("VITE_JARVIS_PUBKEY", JARVIS),
         ("VITE_MONITOR_PUBKEY", MONITOR),
     ] {
