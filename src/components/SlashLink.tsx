@@ -1,5 +1,5 @@
 import { forwardRef } from "react";
-import { Link as RouterLink, type LinkProps } from "react-router-dom";
+import { Link as RouterLink, type LinkProps } from "react-router";
 import { withTrailingSlash } from "@/lib/trailing-slash";
 
 export const Link = forwardRef<HTMLAnchorElement, LinkProps>(function Link({ to, ...props }, ref) {

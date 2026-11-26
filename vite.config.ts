@@ -59,7 +59,7 @@ export default defineConfig({
         // an empty chunk on every build. The packages are still in
         // package.json deps but never bundled.
         manualChunks: {
-          'vendor': ['react', 'react-dom', 'react-router-dom'],
+          'vendor': ['react', 'react-dom', 'react-router'],
           'nostr': ['nostr-tools'],
           'ui': ['@radix-ui/react-accordion', '@radix-ui/react-alert-dialog',
                  '@radix-ui/react-avatar', '@radix-ui/react-checkbox', '@radix-ui/react-dialog',

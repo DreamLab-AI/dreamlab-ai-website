@@ -1,7 +1,7 @@
 import { lazy, Suspense } from "react";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router";
 import { RouteLoader } from "@/components/RouteLoader";
 import { AIChatFab } from "@/components/AIChatFab";
 import { RouteErrorBoundary } from "@/components/ErrorBoundary";
@@ -31,16 +31,9 @@ const ClickThrough = lazy(() => import("./pages/ClickThrough"));
 const App = () => (
   <TooltipProvider>
     <Sonner />
-    {/* React Router v7 future flags (dream-cycle 2026-09-05 finding). Opting in
-        early converts a future breaking change into one we control today and
-        clears the two warnings every bench trace has carried since 09-01.
-        Audited before landing: the sole splat route (`path="*"` -> NotFound) is a
-        leaf whose links are all absolute, so v7_relativeSplatPath is a no-op here;
-        v7_startTransition only means a navigation to a not-yet-loaded lazy chunk
-        holds the outgoing page instead of flashing the Suspense RouteLoader. */}
-    <BrowserRouter
-      future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
-    >
+    {/* React Router 7: the v6 future flags (v7_startTransition, v7_relativeSplatPath)
+        are now the default behaviour and the props no longer exist. */}
+    <BrowserRouter>
       {/* Sprint v9 D3: RouteErrorBoundary contains route-level crashes so a
           single failed lazy chunk does not white-screen the entire SPA. */}
       <RouteErrorBoundary>

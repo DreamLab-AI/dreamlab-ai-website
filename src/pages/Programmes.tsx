@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import workshopList from '@/data/workshop-list.json';
 import { SITE_FACTS } from "@/data/site-facts";
-import { useLocation } from "react-router-dom";
+import { useLocation } from "react-router";
 import { Link } from "@/components/SlashLink";
 import { Header } from "@/components/Header";
 import { Badge } from "@/components/ui/badge";

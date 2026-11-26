@@ -61,7 +61,7 @@ const WRAP = { id: "wrap-id", kind: 1059 };
 
 // Contact reads VITE_RELAY_URL / VITE_ADMIN_PUBKEY into module-level consts at
 // import time, so we stub env, reset the module registry, then dynamically
-// import the component AND @testing-library/react + react-router-dom from the
+// import the component AND @testing-library/react + react-router from the
 // SAME fresh registry (a different React instance than the component would break
 // hooks). Auto-cleanup does not survive resetModules, so we unmount per test.
 let activeCleanup: (() => void) | null = null;
@@ -73,17 +73,11 @@ async function mountContact(opts: { relay?: string; admin?: string } = {}) {
 
   const React = await import("react");
   const rtl = await import("@testing-library/react");
-  const { BrowserRouter } = await import("react-router-dom");
+  const { BrowserRouter } = await import("react-router");
   const Contact = (await import("../Contact")).default;
 
   rtl.render(
-    // Same v7 opt-in as src/App.tsx, so the harness exercises the router
-    // semantics the app actually ships (and stops emitting the warnings).
-    React.createElement(
-      BrowserRouter,
-      { future: { v7_startTransition: true, v7_relativeSplatPath: true } },
-      React.createElement(Contact)
-    )
+    React.createElement(BrowserRouter, null, React.createElement(Contact))
   );
   activeCleanup = rtl.cleanup;
   return { screen: rtl.screen, fireEvent: rtl.fireEvent, waitFor: rtl.waitFor };

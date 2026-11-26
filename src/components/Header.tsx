@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import * as Dialog from "@radix-ui/react-dialog";
 import { ChevronDown } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { useLocation } from "react-router";
 import { Link } from "@/components/SlashLink";
 
 const SCROLL_THRESHOLD = 50;

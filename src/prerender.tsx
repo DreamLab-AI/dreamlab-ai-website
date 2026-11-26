@@ -2,8 +2,7 @@
 // This module is loaded by Vite's SSR transform, never imported by the client.
 import { readFileSync, existsSync } from 'node:fs';
 import { renderToString } from 'react-dom/server';
-import { StaticRouter } from 'react-router-dom/server';
-import { Routes, Route } from 'react-router-dom';
+import { StaticRouter, Routes, Route } from 'react-router';
 import { TooltipProvider } from './components/ui/tooltip';
 import { StaticMetaContext } from './hooks/useOGMeta';
 import { mergeOGConfig, type OGMetaConfig } from './lib/og-meta';
