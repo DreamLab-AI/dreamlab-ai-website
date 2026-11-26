@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, act, cleanup } from "@testing-library/react";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter } from "react-router";
 import Team from "../Team";
 import { LONG_PRESS_MS } from "@/hooks/useLongPress";
 
@@ -64,7 +64,7 @@ function mount() {
   // initialMembers we passed stay in place.
   vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("offline")));
   return render(
-    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+    <BrowserRouter>
       <Team initialMembers={MEMBERS} />
     </BrowserRouter>,
   );

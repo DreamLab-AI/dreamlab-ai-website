@@ -1,6 +1,6 @@
 // src/pages/WorkshopPage.tsx
 import { useEffect, useState, useMemo, isValidElement, type ReactNode } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router';
 import { Link } from '@/components/SlashLink';
 import ReactMarkdown, { type Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';

@@ -32,7 +32,7 @@
     "postbuild": "node scripts/prerender.mjs && node scripts/generate-llms-full.mjs && node scripts/check-discovery.mjs && node scripts/check-claims.mjs"
   },
   "dependencies": {
-    "@hookform/resolvers": "^3.9.0",
+    "@hookform/resolvers": "^5.9.2",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
     "@radix-ui/react-aspect-ratio": "^1.1.8",
@@ -78,7 +78,7 @@
     "react-hook-form": "^7.71.1",
     "react-markdown": "^10.1.0",
     "react-resizable-panels": "^2.1.3",
-    "react-router-dom": "^6.26.2",
+    "react-router": "^7.18.7",
     "recharts": "^2.12.7",
     "rehype-raw": "^7.0.0",
     "rehype-sanitize": "^6.0.0",
@@ -88,7 +88,7 @@
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^0.9.3",
     "yaml": "^2.8.2",
-    "zod": "^3.23.8"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
