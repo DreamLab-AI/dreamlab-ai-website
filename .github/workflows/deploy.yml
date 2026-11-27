@@ -136,7 +136,7 @@ env:
   # in docs/architecture/kit-compatibility-record.md, which pin-parity verifies
   # against this exact SHA. Never restate the kit version or release notes here;
   # the prose rots on every repin (beta.9 / rc11 / beta.14 all went stale).
-  KIT_REF: '07963129ad26bb484324a209f930da7fb5bb6412'
+  KIT_REF: '1a8a42be1508a5090157895663d0efe0e1de6d9f'
 
 jobs:
   gate:
@@ -361,6 +361,11 @@ jobs:
       - name: Build retro ASCII/BBS client with Trunk
         working-directory: kit/crates/nostr-bbs-bbs-client
         run: trunk build --release
+        env:
+          # Since kit ADR-2036 the BBS runs on nostr-bbs-client-core, which reads
+          # the same compile-time option_env! values as the forum (the VITE_* and
+          # FORUM_BASE come from the workflow env; this one is step-scoped).
+          NOSTR_BBS_NIP05_DOMAIN: 'dreamlab-ai.com'
 
       - name: Merge + configure BBS at /community/bbs/
         run: |
@@ -379,14 +384,19 @@ jobs:
             sed -i "s/\"name\": \"BBS\"/\"name\": \"${BBS_NODE_NAME}\"/; s/\"short_name\": \"BBS\"/\"short_name\": \"${BBS_NODE_NAME}\"/" dist/community/bbs/manifest.webmanifest
           fi
           sed -i "s|\(apple-mobile-web-app-title\" content=\"\)BBS|\1${BBS_NODE_NAME}|" dist/community/bbs/index.html || true
+          # Since kit ADR-2036 the BBS connection, relay scope, sealed search and
+          # wallet come from nostr-bbs-client-core and read the forum's keys
+          # (VITE_RELAY_URL, VITE_RELAY_EPOCH, SEARCH_PUBLISHERS, SIDESTR_*): keep
+          # them identical to the forum's ENV_SCRIPT, or the two clients compute
+          # different relay scopes over the same origin storage.
           # The BBS reads RELAY_URL/POD_API/PREVIEW_API (not the forum's VITE_*
           # names) plus THEME/NODE_NAME/LOCATION/BANNER_URL/LOGO_URL/ZONE_CONFIG —
           # the forum-config/dreamlab.toml [branding] projection. PREVIEW_API is
           # the preview-worker base for the BBS ASCII image endpoint (/ascii).
-          BBS_ENV='<script>window.__ENV__={BBS_PWA_ENABLED:"true",THEME:"'"$BBS_THEME"'",NODE_NAME:"'"$BBS_NODE_NAME"'",TAGLINE:"'"$BBS_TAGLINE"'",LOCATION:"'"$BBS_LOCATION"'",BANNER_URL:"'"$BBS_BANNER_URL"'",LOGO_URL:"'"$BBS_LOGO_URL"'",FORUM_NAME:"Community Forums",RELAY_URL:"'"$VITE_RELAY_URL"'",POD_API:"'"$VITE_POD_API_URL"'",PREVIEW_API:"'"$VITE_LINK_PREVIEW_API_URL"'",SEARCH_API:"'"$VITE_SEARCH_API_URL"'",JARVIS_PUBKEY:"'"$VITE_JARVIS_PUBKEY"'",VITE_AUTH_API_URL:"'"$VITE_AUTH_API_URL"'",VITE_SEARCH_API_URL:"'"$VITE_SEARCH_API_URL"'",VITE_LINK_PREVIEW_API_URL:"'"$VITE_LINK_PREVIEW_API_URL"'",BUILD_VERSION:"'"$BUILD_VERSION"'",BUILD_HASH:"'"$BUILD_HASH"'",ENCRYPTION_ENABLED:"'"$ENCRYPTION_ENABLED"'",ZONE_CONFIG:'"$ZONE_CONFIG_JSON"',POKER:"'"$POKER"'",POKER_CONFIG:'"$POKER_CONFIG_JSON"'};</script>'
+          BBS_ENV='<script>window.__ENV__={BBS_PWA_ENABLED:"true",BRAND_LABEL:"Community",VITE_RELAY_URL:"'"$VITE_RELAY_URL"'",VITE_POD_API_URL:"'"$VITE_POD_API_URL"'",VITE_RELAY_EPOCH:"v2-2026-11",SEARCH_PUBLISHERS:"5ec4b75971fd029374e321b581850606071f64ae06df838d80c80808e3059b07,bfcf20d472f0fb143b23cb5be3fa0a040d42176b71f73ca272f6912b1d62a452",DEVICE_KEYS_ENABLED:"false",SIDESTR_WALLET:"'"$SIDESTR_WALLET"'",SIDESTR_CHAINS:'"$SIDESTR_CHAINS_JSON"',THEME:"'"$BBS_THEME"'",NODE_NAME:"'"$BBS_NODE_NAME"'",TAGLINE:"'"$BBS_TAGLINE"'",LOCATION:"'"$BBS_LOCATION"'",BANNER_URL:"'"$BBS_BANNER_URL"'",LOGO_URL:"'"$BBS_LOGO_URL"'",FORUM_NAME:"Community Forums",RELAY_URL:"'"$VITE_RELAY_URL"'",POD_API:"'"$VITE_POD_API_URL"'",PREVIEW_API:"'"$VITE_LINK_PREVIEW_API_URL"'",SEARCH_API:"'"$VITE_SEARCH_API_URL"'",JARVIS_PUBKEY:"'"$VITE_JARVIS_PUBKEY"'",VITE_AUTH_API_URL:"'"$VITE_AUTH_API_URL"'",VITE_SEARCH_API_URL:"'"$VITE_SEARCH_API_URL"'",VITE_LINK_PREVIEW_API_URL:"'"$VITE_LINK_PREVIEW_API_URL"'",BUILD_VERSION:"'"$BUILD_VERSION"'",BUILD_HASH:"'"$BUILD_HASH"'",ENCRYPTION_ENABLED:"'"$ENCRYPTION_ENABLED"'",ZONE_CONFIG:'"$ZONE_CONFIG_JSON"',POKER:"'"$POKER"'",POKER_CONFIG:'"$POKER_CONFIG_JSON"'};</script>'
           sed -i "s|</head>|${BBS_ENV}</head>|" dist/community/bbs/index.html
-          # The BBS is a single-screen terminal (no URL sub-routes); a hard load of
-          # /community/bbs/ serves this file directly. Provide a 404 fallback too.
+          # The BBS routes with #/ hashes (ADR-2036), so every route is a hard load
+          # of /community/bbs/ and needs no rewrite. Provide a 404 fallback too.
           cp dist/community/bbs/index.html dist/community/bbs/404.html
           echo "Built + configured BBS at /community/bbs/ ($(ls dist/community/bbs | tr '\n' ' '))"
 
