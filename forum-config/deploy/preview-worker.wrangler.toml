@@ -13,7 +13,19 @@ ALLOWED_ORIGIN = "https://dreamlab-ai.com"
 # worker refuses every fetch and previews answer 503. Mirror of
 # forum-config/dreamlab.toml [preview].allowed_hosts; CI fails if they differ.
 PREVIEW_ALLOWED_HOSTS = "arxiv.org, bbc.co.uk, dreamlab-ai.com, dreamlab-pod-api-v2.solitary-paper-764d.workers.dev, dreamlab-pod-api.solitary-paper-764d.workers.dev, github.com, huggingface.co, linkedin.com, medium.com, narrativegoldmine.com, reddit.com, substack.com, theguardian.com, twitter.com, vimeo.com, wikipedia.org, x.com, youtu.be, youtube.com"
+# The forum's own pod Workers are reached through service bindings: a Worker
+# cannot fetch another Worker on the same zone by URL (the request 404s), so
+# without these the retro BBS cannot turn pod-hosted pictures into text art.
+PREVIEW_SERVICE_BINDINGS = "dreamlab-pod-api.solitary-paper-764d.workers.dev=POD_V1, dreamlab-pod-api-v2.solitary-paper-764d.workers.dev=POD_V2"
 
 [[kv_namespaces]]
 binding = "RATE_LIMIT"
 id = "f6292a604f994b269a8135b8311a8dc1"
+
+[[services]]
+binding = "POD_V1"
+service = "dreamlab-pod-api"
+
+[[services]]
+binding = "POD_V2"
+service = "dreamlab-pod-api-v2"
