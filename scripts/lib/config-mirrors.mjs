@@ -276,8 +276,10 @@ export function checkConfigMirrors(root) {
     },
   ]);
   for (const [label, needle] of [
-    ["forum", "window.__ENV__={BBS_PWA_ENABLED:\"true\",BRAND_LABEL"],
-    ["BBS", "window.__ENV__={BBS_PWA_ENABLED:\"true\",THEME"],
+    // Found by the shell variable each script is assigned to, not by key order:
+    // since kit ADR-2036 the BBS carries the forum's keys too.
+    ["forum", "ENV_SCRIPT='<script>window.__ENV__={"],
+    ["BBS", "BBS_ENV='<script>window.__ENV__={"],
   ]) {
     const line = deployText.split("\n").find((l) => l.includes(needle));
     if (!line || !line.includes('ENCRYPTION_ENABLED:"\'"$ENCRYPTION_ENABLED"\'"')) {
