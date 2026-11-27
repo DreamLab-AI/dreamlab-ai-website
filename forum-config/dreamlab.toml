@@ -309,6 +309,10 @@ citizens       = { "sidestr:dreamlab" = "d4bda43addb1419ad2930401322403c774bc30a
 allowed_hosts = [
   # DreamLab's own sites
   "dreamlab-ai.com", "narrativegoldmine.com",
+  # The forum's own pod storage (member-uploaded pictures; the retro BBS turns
+  # them into text art through this worker). The first host still serves media
+  # referenced by posts written before the v2 move.
+  "dreamlab-pod-api.solitary-paper-764d.workers.dev", "dreamlab-pod-api-v2.solitary-paper-764d.workers.dev",
   # code and research
   "github.com", "arxiv.org", "huggingface.co", "wikipedia.org",
   # video

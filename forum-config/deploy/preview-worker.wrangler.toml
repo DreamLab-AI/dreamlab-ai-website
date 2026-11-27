@@ -12,7 +12,7 @@ ALLOWED_ORIGIN = "https://dreamlab-ai.com"
 # Sites the worker may fetch (each covers its subdomains). Unset or blank, the
 # worker refuses every fetch and previews answer 503. Mirror of
 # forum-config/dreamlab.toml [preview].allowed_hosts; CI fails if they differ.
-PREVIEW_ALLOWED_HOSTS = "arxiv.org, bbc.co.uk, dreamlab-ai.com, github.com, huggingface.co, linkedin.com, medium.com, narrativegoldmine.com, reddit.com, substack.com, theguardian.com, twitter.com, vimeo.com, wikipedia.org, x.com, youtu.be, youtube.com"
+PREVIEW_ALLOWED_HOSTS = "arxiv.org, bbc.co.uk, dreamlab-ai.com, dreamlab-pod-api-v2.solitary-paper-764d.workers.dev, dreamlab-pod-api.solitary-paper-764d.workers.dev, github.com, huggingface.co, linkedin.com, medium.com, narrativegoldmine.com, reddit.com, substack.com, theguardian.com, twitter.com, vimeo.com, wikipedia.org, x.com, youtu.be, youtube.com"
 
 [[kv_namespaces]]
 binding = "RATE_LIMIT"
