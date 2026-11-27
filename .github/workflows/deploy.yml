@@ -136,7 +136,7 @@ env:
   # in docs/architecture/kit-compatibility-record.md, which pin-parity verifies
   # against this exact SHA. Never restate the kit version or release notes here;
   # the prose rots on every repin (beta.9 / rc11 / beta.14 all went stale).
-  KIT_REF: 'a0d49f6753420e71bdc5e2152c441fb477fa6b74'
+  KIT_REF: '084b077f36a095e783c98519c2b3277e665ff9f0'
 
 jobs:
   gate:
@@ -320,17 +320,11 @@ jobs:
           ENV_SCRIPT='<script>window.__ENV__={BBS_PWA_ENABLED:"true",BRAND_LABEL:"Community",FORUM_NAME:"Community Forums",VITE_RELAY_URL:"'"$VITE_RELAY_URL"'",VITE_AUTH_API_URL:"'"$VITE_AUTH_API_URL"'",VITE_POD_API_URL:"'"$VITE_POD_API_URL"'",VITE_SEARCH_API_URL:"'"$VITE_SEARCH_API_URL"'",VITE_LINK_PREVIEW_API_URL:"'"$VITE_LINK_PREVIEW_API_URL"'",SEARCH_PUBLISHERS:"5ec4b75971fd029374e321b581850606071f64ae06df838d80c80808e3059b07,bfcf20d472f0fb143b23cb5be3fa0a040d42176b71f73ca272f6912b1d62a452",DEVICE_KEYS_ENABLED:"false",VITE_RELAY_EPOCH:"v2-2026-11",SIDESTR_WALLET:"'"$SIDESTR_WALLET"'",SIDESTR_CHAINS:'"$SIDESTR_CHAINS_JSON"',BUILD_VERSION:"'"$BUILD_VERSION"'",BUILD_HASH:"'"$BUILD_HASH"'",ENCRYPTION_ENABLED:"'"$ENCRYPTION_ENABLED"'",ZONE_CONFIG:'"$ZONE_CONFIG_JSON"',POKER:"'"$POKER"'",POKER_CONFIG:'"$POKER_CONFIG_JSON"'};</script>'
           sed -i "s|</head>|${ENV_SCRIPT}</head>|" dist/community/index.html
           echo "Injected window.__ENV__ into forum index.html (build $BUILD_VERSION $BUILD_HASH)"
-          # SPA deep-link pickup for the forum. A hard load of /community/login
-          # hits GitHub Pages' root 404.html, which redirects to
-          # /community/?__p=%2Flogin. The Leptos router never reads __p, so the
-          # app booted at the landing and the login route never rendered ("login
-          # does nothing unless you enter from the top"). This synchronous head
-          # script restores the original sub-path BEFORE the WASM app reads
-          # window.location — note it re-prepends /community (the 404.html strips
-          # it into __p), mirroring the React pickup injected into dist/index.html.
-          FORUM_PICKUP='<script>(function(){var q=new URLSearchParams(window.location.search);var r=q.get("__p");if(r){q.delete("__p");var s=q.toString();history.replaceState(null,"","/community"+r+(s?"?"+s:"")+window.location.hash);}})();</script>'
-          sed -i "s|</head>|${FORUM_PICKUP}</head>|" dist/community/index.html
-          echo "Injected SPA __p deep-link pickup into forum index.html"
+          # SPA deep-link pickup for the forum: a hard load of /community/login hits
+          # GitHub Pages' root 404.html, which redirects to /community/?__p=%2Flogin.
+          # The kit's own index.html restores the sub-path (validated to stay under
+          # /community/) before the WASM app reads window.location, so nothing is
+          # injected here any more (audit 2026-11-26, NRF-H2).
           # Per-deploy service-worker cache name so a new build evicts the old
           # cache on activate (the SW already network-firsts the HTML; this just
           # isolates static-asset caches per build). No-op if the token is absent.
