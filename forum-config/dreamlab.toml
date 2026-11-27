@@ -77,7 +77,9 @@ id                = "zone1"
 slug              = "welcome"
 display_name      = "Welcome"
 required_cohorts  = []
-write_cohorts     = ["members", "agent"]
+# Anyone approved for any zone may post here (Support lives in this zone);
+# migrated Minimoonoir members carry only their zone cohorts.
+write_cohorts     = ["members", "agent", "minimoonoir", "family", "dreamlab"]
 visibility        = "public"
 banner_image_url  = "/images/heroes/lake-district-dawn.webp"
 encrypted         = false
