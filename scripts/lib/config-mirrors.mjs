@@ -94,6 +94,7 @@ function tomlZones(toml) {
       "kanban",
       "agent_keys",
       "history_from_epoch",
+      "channels",
     ]) {
       if (z[key] !== undefined) out[key] = z[key];
     }

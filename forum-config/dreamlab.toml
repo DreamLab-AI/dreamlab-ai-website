@@ -129,6 +129,21 @@ agent_keys        = true   # JunkieJarvis holds the zone4 key (ADR-2016)
 accent_hex        = "#a855f7"
 kanban            = true   # per-zone collaborative task board (kinds 30301/30302)
 
+# Admins and agent accounts only (operator decision 2026-11-28). The existing
+# "chat with agents" section is pinned here by its kind-40 id (kit ADR-2037);
+# its signed section tag still reads zone4-chat-with-agents and no stored event
+# changes. Posts made before the pin stay under the zone4 key.
+[[zones]]
+id                = "chat-with-agents"
+slug              = "chat-with-agents"
+display_name      = "Chat with agents"
+required_cohorts  = ["chat-with-agents"]
+visibility        = "locked"
+banner_image_url  = "/images/heroes/business-hero.webp"
+encrypted         = true
+agent_keys        = true   # agent accounts in the cohort are granted the zone key
+accent_hex        = "#06b6d4"
+
 # ─── Trust thresholds ────────────────────────────────────────────────────────
 [trust]
 join_threshold  = 0     # any whitelisted user can join open channels
