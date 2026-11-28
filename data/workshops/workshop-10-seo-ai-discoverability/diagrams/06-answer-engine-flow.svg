@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 280" role="img" aria-labelledby="ae-title ae-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="ae-title">How an answer engine uses your page</title>
+  <desc id="ae-desc">A user question triggers search and retrieval of candidate pages, which are split into passages; the most relevant passages are selected and a model writes an answer with citations.</desc>
+
+  <defs>
+    <marker id="ae-arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <rect x="8" y="8" width="944" height="264" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">RETRIEVE, THEN WRITE</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <g text-anchor="middle">
+    <rect x="48.0" y="112" width="132.3" height="84" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="114.2" y="150" font-size="14" font-weight="600" fill="#F5F5F5">Question</text>
+    <text x="114.2" y="172" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10.5" fill="#9CA3AF">user asks</text>
+    <line x1="181.3" y1="154" x2="193.3" y2="154" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#ae-arr)"/>
+    <rect x="194.3" y="112" width="132.3" height="84" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="260.5" y="150" font-size="14" font-weight="600" fill="#F5F5F5">Retrieve</text>
+    <text x="260.5" y="172" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10.5" fill="#9CA3AF">candidate pages</text>
+    <line x1="327.7" y1="154" x2="339.7" y2="154" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#ae-arr)"/>
+    <rect x="340.7" y="112" width="132.3" height="84" rx="8" fill="rgba(255,255,255,0.03)" stroke="#A78BFA"/>
+    <text x="406.8" y="150" font-size="14" font-weight="600" fill="#F5F5F5">Split</text>
+    <text x="406.8" y="172" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10.5" fill="#9CA3AF">into passages</text>
+    <line x1="474.0" y1="154" x2="486.0" y2="154" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#ae-arr)"/>
+    <rect x="487.0" y="112" width="132.3" height="84" rx="8" fill="rgba(255,255,255,0.03)" stroke="#A78BFA"/>
+    <text x="553.2" y="150" font-size="14" font-weight="600" fill="#F5F5F5">Select</text>
+    <text x="553.2" y="172" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10.5" fill="#9CA3AF">best passages</text>
+    <line x1="620.3" y1="154" x2="632.3" y2="154" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#ae-arr)"/>
+    <rect x="633.3" y="112" width="132.3" height="84" rx="8" fill="rgba(255,255,255,0.03)" stroke="#A78BFA"/>
+    <text x="699.5" y="150" font-size="14" font-weight="600" fill="#F5F5F5">Write</text>
+    <text x="699.5" y="172" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10.5" fill="#9CA3AF">model drafts</text>
+    <line x1="766.7" y1="154" x2="778.7" y2="154" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#ae-arr)"/>
+    <rect x="779.7" y="112" width="132.3" height="84" rx="8" fill="rgba(255,255,255,0.03)" stroke="#A78BFA"/>
+    <text x="845.8" y="150" font-size="14" font-weight="600" fill="#F5F5F5">Cite</text>
+    <text x="845.8" y="172" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10.5" fill="#9CA3AF">answer + links</text>
+  </g>
+  <text x="48" y="238" font-size="12.5" fill="#9CA3AF">Highlighted steps work on passages, not whole pages: each passage you write should make sense on its own.</text>
+</svg>

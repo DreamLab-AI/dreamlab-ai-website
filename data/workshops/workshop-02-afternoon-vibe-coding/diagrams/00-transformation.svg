@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 320" role="img" aria-labelledby="tf-title tf-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="tf-title">The transformation ahead</title>
+  <desc id="tf-desc">Beliefs held right now — can't build websites, coding is hard, needs experts, too expensive — become, in three hours, I just built three, I didn't code at all, I am the expert, it cost me nothing.</desc>
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect x="8" y="8" width="944" height="304" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">THE MAGIC MOMENT</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <g text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11">
+    <rect x="96" y="104" width="320" height="176" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="256" y="140" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="15" font-weight="600" fill="#F5F5F5">Right Now</text>
+    <text x="256" y="172" fill="#9CA3AF">"I can't build websites"</text>
+    <text x="256" y="200" fill="#9CA3AF">"coding is too hard"</text>
+    <text x="256" y="228" fill="#9CA3AF">"this takes experts"</text>
+    <text x="256" y="256" fill="#9CA3AF">"it's too expensive"</text>
+
+    <rect x="544" y="104" width="320" height="176" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="704" y="140" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="15" font-weight="600" fill="#F5F5F5">In 3 Hours</text>
+    <text x="704" y="172" fill="#F59E0B">"I just built three!"</text>
+    <text x="704" y="200" fill="#F59E0B">"I didn't code at all"</text>
+    <text x="704" y="228" fill="#F59E0B">"I am the expert now"</text>
+    <text x="704" y="256" fill="#F59E0B">"it cost me nothing"</text>
+  </g>
+  <path d="M416,192 C456,192 496,192 536,192" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arr)"/>
+</svg>

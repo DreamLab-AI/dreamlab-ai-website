@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 352" role="img" aria-labelledby="dg-title dg-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="dg-title">Cloud AI versus local AI</title>
+  <desc id="dg-desc">Your data can flow to cloud AI on external servers, with third-party storage and compliance risks, or stay on your own hardware with local AI for complete control, zero leakage and offline operation.</desc>
+
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="arr-accent" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#F59E0B" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- container -->
+  <rect x="8" y="8" width="944" height="336" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">WHERE DOES YOUR DATA GO?</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <!-- source node -->
+  <g text-anchor="middle">
+    <rect x="48" y="168" width="176" height="88" rx="8" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.35)"/>
+    <text x="136" y="208" font-size="15" font-weight="600" fill="#F5F5F5">Your Data</text>
+    <text x="136" y="232" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">prompts · documents</text>
+  </g>
+
+  <!-- arrows -->
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2">
+    <path d="M224,192 C280,168 312,156 348,152" marker-end="url(#arr)"/>
+  </g>
+  <g fill="none" stroke="#F59E0B" stroke-width="1.2">
+    <path d="M224,232 C280,256 312,268 348,272" marker-end="url(#arr-accent)"/>
+  </g>
+  <text x="276" y="152" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF" text-anchor="middle">cloud AI</text>
+  <text x="276" y="284" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#F59E0B" text-anchor="middle">local AI</text>
+
+  <!-- cloud card -->
+  <g text-anchor="middle">
+    <rect x="352" y="96" width="400" height="104" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="552" y="132" font-size="15" font-weight="600" fill="#F5F5F5">External Servers</text>
+    <text x="552" y="156" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">third-party storage · data collection</text>
+    <text x="552" y="176" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">compliance risks</text>
+  </g>
+
+  <!-- local card (focal) -->
+  <g text-anchor="middle">
+    <rect x="352" y="224" width="400" height="104" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="552" y="260" font-size="15" font-weight="600" fill="#F5F5F5">Your Hardware</text>
+    <text x="552" y="284" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">complete control · zero data leakage</text>
+    <text x="552" y="304" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">offline operation</text>
+  </g>
+</svg>

@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" role="img" aria-labelledby="sa-title sa-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="sa-title">Subagent fan-out and synthesis</title>
+  <desc id="sa-desc">The main Claude Code session fans a task out to three isolated subagents running in parallel; their reports flow back and are synthesised into one unified result.</desc>
+
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <rect x="8" y="8" width="944" height="384" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">SUBAGENT FAN-OUT</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <g text-anchor="middle">
+    <rect x="64" y="160" width="200" height="88" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="164" y="196" font-size="16" font-weight="600" fill="#F5F5F5">Main session</text>
+    <text x="164" y="220" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">delegates · synthesises</text>
+
+    <rect x="392" y="96" width="208" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="496" y="128" font-size="15" font-weight="600" fill="#F5F5F5">Subagent A</text>
+    <text x="496" y="150" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">review auth module</text>
+
+    <rect x="392" y="200" width="208" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="496" y="232" font-size="15" font-weight="600" fill="#F5F5F5">Subagent B</text>
+    <text x="496" y="254" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">review payments</text>
+
+    <rect x="392" y="304" width="208" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="496" y="336" font-size="15" font-weight="600" fill="#F5F5F5">Subagent C</text>
+    <text x="496" y="358" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">review user mgmt</text>
+
+    <rect x="712" y="164" width="200" height="80" rx="8" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.35)"/>
+    <text x="812" y="200" font-size="15" font-weight="600" fill="#F5F5F5">Unified report</text>
+    <text x="812" y="222" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">merged · deduplicated</text>
+  </g>
+
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2">
+    <path d="M264,180 C312,164 340,148 388,140" marker-end="url(#arr)"/>
+    <path d="M264,204 C304,212 348,224 388,232" marker-end="url(#arr)"/>
+    <path d="M264,228 C312,264 340,312 388,332" marker-end="url(#arr)"/>
+    <path d="M600,140 C656,152 668,164 708,180" marker-end="url(#arr)"/>
+    <path d="M600,236 C636,232 672,224 708,216" marker-end="url(#arr)"/>
+    <path d="M600,332 C656,312 668,264 708,228" marker-end="url(#arr)"/>
+  </g>
+  <text x="288" y="128" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">parallel · isolated context</text>
+  <text x="628" y="288" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">reports back</text>
+</svg>

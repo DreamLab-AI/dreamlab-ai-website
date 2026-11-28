@@ -1,0 +1,1752 @@
+/* ============================================================================
+ * nostr-bbs-bbs-client — Modern TUI Workspace Design System
+ *
+ * Phosphor CRT aesthetics (4 themes: amber, green, purple, sky) + crisp TUI
+ * borders + ASCII image art — engineered for both wide desktop workspaces
+ * (collapsible sidebar + main pane) and mobile phones (native vertical scroll,
+ * slide-out drawer, sticky bottom nav, >=44px targets, 0px horizontal overflow).
+ * ============================================================================ */
+
+:root {
+  --bg: #08090a;
+  --bg-elevated: #0e1012;
+  --bg-panel: #121417;
+  --bg-hover: #191c20;
+  --bg-input: #0b0c0e;
+
+  --fg: #ffb000;
+  --fg-bright: #ffe19c;
+  --fg-dim: #c48c2c;
+  --fg-muted: #8f6b2a;
+
+  --accent: #ffb000;
+  --accent-soft: color-mix(in srgb, var(--accent) 14%, transparent);
+  --border: #3d2c0b;
+  --border-bright: #7a5816;
+  --select-bg: #ffb000;
+  --select-fg: #08090a;
+
+  --ok: #4ade80;
+  --warn: #facc15;
+  --danger: #f87171;
+  --info: #60a5fa;
+
+  --font: "Cascadia Mono", "JetBrains Mono", "Fira Code", "DejaVu Sans Mono",
+    Menlo, Consolas, ui-monospace, monospace;
+  --radius: 4px;
+  --sidebar-w: 272px;
+  --topbar-h: 50px;
+  --footer-h: 32px;
+  --bottomnav-h: 58px;
+}
+
+/* ── Phosphor theme palettes (all pass WCAG 2.1 AA on --bg) ─────────────── */
+.theme-amber {
+  --fg: #ffb000;
+  --fg-bright: #ffe19c;
+  --fg-dim: #c99235;
+  --fg-muted: #987131;
+  --accent: #ffb000;
+  --border: #46320c;
+  --border-bright: #8a6219;
+  --select-bg: #ffb000;
+}
+.theme-green {
+  --fg: #33ff66;
+  --fg-bright: #c2ffd1;
+  --fg-dim: #4ac96e;
+  --fg-muted: #34914f;
+  --accent: #33ff66;
+  --border: #144723;
+  --border-bright: #258742;
+  --select-bg: #33ff66;
+}
+.theme-purple {
+  --fg: #d19eff;
+  --fg-bright: #eee0ff;
+  --fg-dim: #ab84cf;
+  --fg-muted: #8464a3;
+  --accent: #c792ea;
+  --border: #3c2957;
+  --border-bright: #704ca6;
+  --select-bg: #c792ea;
+}
+.theme-sky {
+  --fg: #5cc8ff;
+  --fg-bright: #c9edff;
+  --fg-dim: #5ea9d1;
+  --fg-muted: #4683a6;
+  --accent: #56c2ff;
+  --border: #17415c;
+  --border-bright: #2c78a8;
+  --select-bg: #56c2ff;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+/* ── Text size: one root ladder ─────────────────────────────────────────────
+ * Every size in this sheet is in rem (or em), so the root font-size alone
+ * scales the whole BBS. It is a percentage of the browser's own default,
+ * which respects the member's browser text-size setting, times three factors:
+ *   --fs-pref   the shared client preference (`data-font-size`, also used by
+ *               the forum: small 14px, medium 16px, large 18px at default);
+ *   --fs-bbs    the BBS's own TEXT SIZE setting (large = 17/16);
+ *   --fs-mobile 2 on phones (see the media query below), else 1.
+ * `html:root` (0,1,1) outranks the `:root{font-size:…px}` that client-core
+ * injects at runtime (`nostrbbs-prefs-style`), which would otherwise pin the
+ * root in px and silently disable all three. */
+html {
+  --fs-pref: 1;
+  --fs-bbs: 1;
+  --fs-mobile: 1;
+}
+html[data-font-size="small"] {
+  --fs-pref: 0.875;
+}
+html[data-font-size="large"] {
+  --fs-pref: 1.125;
+}
+html.bbs-text-large {
+  --fs-bbs: 1.0625;
+}
+html:root {
+  font-size: calc(100% * var(--fs-pref) * var(--fs-bbs) * var(--fs-mobile));
+}
+body {
+  /* 15px at the default 16px root. */
+  font-size: 0.9375rem;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+a:hover {
+  color: var(--fg-bright);
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ── Pure-CSS CRT scanlines + radial phosphor glow (zero JS overhead) ───── */
+.bbs-crt {
+  position: relative;
+  min-height: 100dvh;
+  background: radial-gradient(
+      ellipse 120% 90% at 50% 35%,
+      color-mix(in srgb, var(--accent) 6%, var(--bg)) 0%,
+      var(--bg) 72%
+    );
+}
+
+.bbs-crt::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 900;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 2px,
+    rgba(0, 0, 0, 0.13) 3px,
+    rgba(0, 0, 0, 0.13) 4px
+  );
+}
+
+.bbs-crt::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 899;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 58%,
+    rgba(0, 0, 0, 0.5) 100%
+  );
+}
+
+html.bbs-crt-off .bbs-crt::before,
+html.bbs-crt-off .bbs-crt::after,
+html.bbs-reduced-motion .bbs-crt::before,
+@media (prefers-reduced-motion: reduce) {
+  .bbs-crt::before {
+    display: none;
+  }
+}
+html.bbs-crt-off .bbs-crt::before,
+html.bbs-crt-off .bbs-crt::after {
+  display: none;
+}
+
+/* ── Workspace Shell Layout (Desktop >=900px, Mobile <900px) ────────────── */
+.tui-app {
+  height: 100dvh;
+  display: grid;
+  grid-template-rows: var(--topbar-h) minmax(0, 1fr) auto;
+  overflow: hidden;
+}
+
+/* Top bar */
+.tui-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0 0.85rem;
+  padding-top: env(safe-area-inset-top, 0px);
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border);
+  z-index: 40;
+  min-width: 0;
+}
+
+.tui-topbar-left,
+.tui-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.tui-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg-bright);
+  text-shadow: 0 0 6px color-mix(in srgb, var(--accent) 55%, transparent);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  padding: 0.25rem 0.35rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tui-crumb-sep {
+  color: var(--fg-muted);
+}
+
+.tui-route-title {
+  color: var(--fg-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.9rem;
+}
+
+.tui-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.15rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.78rem;
+  white-space: nowrap;
+  background: var(--bg-panel);
+}
+.tui-status-pill.ok {
+  color: var(--ok);
+  border-color: color-mix(in srgb, var(--ok) 45%, var(--border));
+}
+.tui-status-pill.warn {
+  color: var(--warn);
+  border-color: color-mix(in srgb, var(--warn) 45%, var(--border));
+  cursor: pointer;
+}
+.tui-status-pill.bad {
+  color: var(--danger);
+  border-color: color-mix(in srgb, var(--danger) 45%, var(--border));
+}
+
+/* Main workspace body */
+.tui-body {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
+  overflow: hidden;
+  position: relative;
+}
+
+.tui-body.sidebar-collapsed {
+  grid-template-columns: minmax(0, 1fr);
+}
+.tui-body.sidebar-collapsed .tui-sidebar {
+  display: none;
+}
+
+/* Collapsible Sidebar */
+.tui-sidebar {
+  background: var(--bg-elevated);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0.65rem 0.55rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.tui-side-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.tui-side-heading {
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  padding: 0.25rem 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tui-side-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 36px;
+  padding: 0.35rem 0.55rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--fg);
+  text-align: left;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.88rem;
+}
+
+.tui-side-item:hover {
+  background: var(--bg-hover);
+  border-color: var(--border);
+  color: var(--fg-bright);
+}
+
+.tui-side-item.active {
+  background: var(--select-bg);
+  color: var(--select-fg);
+  font-weight: 700;
+}
+
+.tui-side-item.active .tui-side-sub,
+.tui-side-item.active .tui-side-glyph {
+  color: var(--select-fg);
+}
+
+.tui-side-sub-item {
+  padding-left: 1.4rem;
+  min-height: 32px;
+  font-size: 0.83rem;
+  color: var(--fg-dim);
+}
+
+.tui-side-glyph {
+  flex: 0 0 auto;
+  width: 1.15rem;
+  text-align: center;
+  color: var(--accent);
+}
+
+.tui-side-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tui-side-pill {
+  flex: 0 0 auto;
+  background: var(--accent);
+  color: var(--select-fg);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+}
+
+/* Main Workspace Content Pane */
+.tui-main {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 1.1rem 1.4rem 2.2rem;
+  min-width: 0;
+}
+
+.tui-container {
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  min-width: 0;
+}
+
+.tui-container.wide {
+  max-width: 1320px;
+}
+
+/* Desktop Footer + Command Bar */
+.tui-footer {
+  background: var(--bg-elevated);
+  border-top: 1px solid var(--border);
+  padding: 0.3rem 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.78rem;
+  color: var(--fg-dim);
+  z-index: 30;
+}
+
+.tui-fkeys {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.tui-fk {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.tui-cmdline {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.85rem;
+  background: var(--bg-panel);
+  border-top: 1px solid var(--border-bright);
+}
+
+.tui-cmdline-prompt {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.tui-cmdline input {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 36px;
+  background: transparent;
+  border: 0;
+  outline: none;
+  color: var(--fg-bright);
+  font: inherit;
+  font-size: max(16px, 1rem);
+}
+
+/* Mobile bottom nav & drawer backdrop (hidden on desktop) */
+.tui-bottomnav {
+  display: none;
+}
+
+.tui-drawer-backdrop {
+  display: none;
+}
+
+/* ── Shared TUI Components ──────────────────────────────────────────────── */
+.tui-page-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.tui-page-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--fg-bright);
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 6px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+.tui-page-sub {
+  margin: 0.2rem 0 0;
+  color: var(--fg-dim);
+  font-size: 0.86rem;
+}
+
+.tui-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.tui-crumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.86rem;
+  color: var(--fg-dim);
+}
+
+.tui-card {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.85rem 1rem;
+  min-width: 0;
+}
+
+.tui-card-accent {
+  border-left: 3px solid var(--accent);
+}
+
+.tui-card-interactive {
+  cursor: pointer;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+.tui-card-interactive:hover {
+  border-color: var(--border-bright);
+  background: var(--bg-hover);
+}
+
+.tui-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.75rem;
+}
+
+.tui-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.tui-row {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.tui-row-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.tui-muted {
+  color: var(--fg-dim);
+  margin: 0;
+}
+
+.tui-empty {
+  text-align: center;
+  padding: 1.6rem 1rem;
+}
+.tui-empty-title {
+  color: var(--fg-bright);
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+
+/* Buttons */
+.bbs-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 36px;
+  padding: 0.35rem 0.75rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius);
+  color: var(--fg);
+  cursor: pointer;
+  white-space: nowrap;
+  font-size: 0.86rem;
+  text-decoration: none;
+}
+.bbs-btn:hover:not(:disabled) {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--fg-bright);
+}
+.bbs-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.bbs-btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--select-fg);
+  font-weight: 700;
+}
+.bbs-btn-primary:hover:not(:disabled) {
+  background: var(--fg-bright);
+  border-color: var(--fg-bright);
+  color: var(--select-fg);
+}
+
+.bbs-btn-danger {
+  border-color: color-mix(in srgb, var(--danger) 70%, var(--border));
+  color: var(--danger);
+}
+.bbs-btn-danger:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--danger) 18%, transparent);
+  color: #fecaca;
+}
+
+.bbs-btn-ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--fg-dim);
+}
+.bbs-btn-ghost:hover:not(:disabled) {
+  background: var(--bg-hover);
+  border-color: var(--border);
+  color: var(--fg-bright);
+}
+
+.bbs-btn-sm {
+  min-height: 30px;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.8rem;
+}
+
+.bbs-btn-block {
+  width: 100%;
+  min-height: 44px;
+}
+
+.bbs-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  min-height: 36px;
+  padding: 0 0.45rem;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--fg);
+  cursor: pointer;
+  position: relative;
+}
+.bbs-icon-btn:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--fg-bright);
+}
+
+/* Badges */
+.bbs-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.1rem 0.45rem;
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.bbs-badge-ok {
+  color: var(--ok);
+  border-color: color-mix(in srgb, var(--ok) 55%, var(--border));
+}
+.bbs-badge-warn {
+  color: var(--warn);
+  border-color: color-mix(in srgb, var(--warn) 55%, var(--border));
+}
+.bbs-badge-danger {
+  color: var(--danger);
+  border-color: color-mix(in srgb, var(--danger) 55%, var(--border));
+}
+.bbs-badge-info {
+  color: var(--info);
+  border-color: color-mix(in srgb, var(--info) 55%, var(--border));
+}
+.bbs-badge-accent {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--select-fg);
+}
+
+/* Inputs & Form Controls */
+.bbs-input,
+.bbs-textarea,
+.bbs-select {
+  width: 100%;
+  min-height: 42px;
+  padding: 0.5rem 0.7rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius);
+  color: var(--fg-bright);
+  font: inherit;
+  font-size: max(16px, 1rem); /* never below 16px: prevents iOS focus-zoom */
+}
+.bbs-input:focus,
+.bbs-textarea:focus,
+.bbs-select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+.bbs-textarea {
+  min-height: 84px;
+  resize: vertical;
+  line-height: 1.45;
+}
+.bbs-label {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--fg-dim);
+  margin-bottom: 0.25rem;
+}
+
+/* Tabs */
+.tui-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.45rem;
+}
+.tui-tab {
+  min-height: 36px;
+  padding: 0.3rem 0.75rem;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--fg-dim);
+  cursor: pointer;
+  font-size: 0.84rem;
+}
+.tui-tab:hover {
+  color: var(--fg-bright);
+  border-color: var(--border-bright);
+}
+.tui-tab.active {
+  background: var(--select-bg);
+  color: var(--select-fg);
+  border-color: var(--select-bg);
+  font-weight: 700;
+}
+
+/* Author chips & copy buttons */
+.bbs-author-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.bbs-author-btn {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--accent);
+  font-weight: 700;
+  cursor: pointer;
+}
+.bbs-author-btn:hover {
+  color: var(--fg-bright);
+  text-decoration: underline;
+}
+.bbs-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.1rem 0.45rem;
+  font-size: 0.78rem;
+  color: var(--fg-dim);
+  cursor: copy;
+}
+.bbs-copy-btn:hover {
+  border-color: var(--accent);
+  color: var(--fg-bright);
+}
+
+/* ── Markdown prose inside posts/knowledge/DMs ──────────────────────────── */
+.bbs-md {
+  color: var(--fg);
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  line-height: 1.55;
+}
+.bbs-md p {
+  margin: 0.35rem 0;
+}
+.bbs-md p:first-child {
+  margin-top: 0;
+}
+.bbs-md p:last-child {
+  margin-bottom: 0;
+}
+.bbs-md h1,
+.bbs-md h2,
+.bbs-md h3 {
+  color: var(--fg-bright);
+  margin: 0.65rem 0 0.35rem;
+  font-size: 1.05rem;
+}
+.bbs-md pre {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.6rem 0.75rem;
+  overflow-x: auto;
+  max-width: 100%;
+  font-size: 0.86rem;
+}
+.bbs-md code {
+  background: var(--bg-input);
+  padding: 0.08rem 0.3rem;
+  border-radius: 3px;
+  color: var(--fg-bright);
+}
+.bbs-md pre code {
+  padding: 0;
+  background: none;
+}
+.bbs-md blockquote {
+  margin: 0.45rem 0;
+  padding: 0.2rem 0.7rem;
+  border-left: 2px solid var(--accent);
+  color: var(--fg-dim);
+  background: color-mix(in srgb, var(--accent) 5%, transparent);
+}
+.bbs-md ul,
+.bbs-md ol {
+  margin: 0.35rem 0;
+  padding-left: 1.35rem;
+}
+
+/* ── Thread & Post Cards ────────────────────────────────────────────────── */
+.bbs-post {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.75rem 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+.bbs-post-root {
+  border-left: 3px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 4%, var(--bg-panel));
+}
+.bbs-post-reply-indent {
+  margin-left: 1.15rem;
+  border-left: 2px solid var(--border-bright);
+}
+.bbs-post-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+  font-size: 0.84rem;
+}
+.bbs-post-meta {
+  color: var(--fg-muted);
+  font-size: 0.78rem;
+}
+.bbs-post-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  padding-top: 0.3rem;
+  border-top: 1px dashed var(--border);
+}
+
+.bbs-react-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: 28px;
+  padding: 0.1rem 0.45rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg-elevated);
+  color: var(--fg-dim);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.bbs-react-pill:hover {
+  border-color: var(--accent);
+  color: var(--fg-bright);
+}
+.bbs-react-pill.active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--fg-bright);
+}
+
+.bbs-composer {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius);
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.bbs-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  border: 0;
+}
+
+/* ── On-theme ASCII Art Images ──────────────────────────────────────────── */
+.bbs-ascii-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-input);
+  padding: 0.45rem 0.6rem;
+  max-width: 100%;
+  overflow: hidden;
+}
+.bbs-ascii-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+  font-size: 0.74rem;
+  color: var(--fg-dim);
+}
+.ascii-img-wrap {
+  overflow-x: auto;
+  max-width: 100%;
+}
+.ascii-img {
+  margin: 0;
+  font-family: var(--font);
+  font-size: 0.58rem;
+  /* Fit the grid to its container rather than scaling glyphs with the text:
+   * `--cols` (set by the component) characters of ~0.62em each fill 100cqi.
+   * Never larger than the desktop size; browsers without container queries
+   * keep the line above. */
+  font-size: min(0.58rem, calc(100cqi / (var(--cols, 80) * 0.62)));
+  line-height: 1;
+  white-space: pre;
+  text-shadow: 0 0 2px currentColor;
+}
+/* Status lines and placeholders share the class for its colours but are
+ * text, sized and wrapped as text (never at glyph size). */
+.ascii-img.ascii-img-status,
+.ascii-img-status {
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--fg-dim);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  text-shadow: none;
+}
+
+/* ── Tap-to-see-original image toggle ───────────────────────────────────── */
+.bbs-img {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+  max-width: 100%;
+}
+.bbs-img-toggle {
+  /* The art fits inside the toggle's padding, so it is the container. */
+  container-type: inline-size;
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  padding: 0.15rem;
+  border: 1px dashed transparent;
+  border-radius: var(--radius);
+  color: inherit;
+  cursor: pointer;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+.bbs-img-toggle:hover {
+  border-color: var(--border-bright);
+}
+.bbs-img-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.bbs-img-cue {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: 0.78rem;
+  color: var(--accent);
+}
+.bbs-img-orig {
+  display: block;
+  max-width: 100%;
+  max-height: min(70vh, 40rem);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.bbs-img-hint,
+.bbs-img-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  font-size: 0.78rem;
+  color: var(--fg-muted);
+  overflow-wrap: anywhere;
+}
+
+/* A reply's quote line: a long word or link wraps rather than widening the
+ * thread. */
+.bbs-quote {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Settings / Help helpers that keep long values inside the pane. */
+.bbs-truncate {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bbs-mono-xs {
+  font-size: 0.75rem;
+}
+.bbs-pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+/* Key/value rows (Help commands, Settings diagnostics): a gap between the
+ * two, wrapping when narrow. */
+.bbs-kv-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.15rem 0.75rem;
+  min-width: 0;
+}
+.ascii-img .p0 { color: color-mix(in srgb, var(--fg-bright) 6%, var(--bg)); }
+.ascii-img .p1 { color: color-mix(in srgb, var(--fg-bright) 13%, var(--bg)); }
+.ascii-img .p2 { color: color-mix(in srgb, var(--fg-bright) 22%, var(--bg)); }
+.ascii-img .p3 { color: color-mix(in srgb, var(--fg-bright) 34%, var(--bg)); }
+.ascii-img .p4 { color: color-mix(in srgb, var(--fg-bright) 48%, var(--bg)); }
+.ascii-img .p5 { color: color-mix(in srgb, var(--fg-bright) 64%, var(--bg)); }
+.ascii-img .p6 { color: color-mix(in srgb, var(--fg-bright) 82%, var(--bg)); }
+.ascii-img .p7 { color: var(--fg-bright); }
+
+.bbs-raw-img {
+  max-width: 100%;
+  max-height: 360px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  display: block;
+}
+
+/* ── Direct Messages Split Layout ───────────────────────────────────────── */
+.bbs-dm-bubbles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+.bbs-dm-bubble {
+  max-width: min(82%, 640px);
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-panel);
+  align-self: flex-start;
+  overflow-wrap: anywhere;
+}
+.bbs-dm-bubble.mine {
+  align-self: flex-end;
+  border-color: var(--border-bright);
+  background: color-mix(in srgb, var(--accent) 9%, var(--bg-panel));
+  color: var(--fg-bright);
+}
+
+/* ── Kanban Board ───────────────────────────────────────────────────────── */
+.bbs-kanban-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 0.75rem;
+  align-items: start;
+}
+.bbs-kanban-col {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.65rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  min-width: 0;
+}
+.bbs-kanban-col-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--border);
+  font-weight: 700;
+  color: var(--fg-bright);
+}
+.bbs-kanban-card {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.6rem 0.7rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+/* ── Terminal Poker Table ───────────────────────────────────────────────── */
+.bbs-felt {
+  background: radial-gradient(
+    ellipse at center,
+    color-mix(in srgb, var(--accent) 10%, var(--bg-panel)) 0%,
+    var(--bg-input) 85%
+  );
+  border: 2px solid var(--border-bright);
+  border-radius: 10px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+.bbs-cards-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+}
+.bbs-playing-card {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 3.1rem;
+  height: 4.3rem;
+  border: 1.5px solid var(--accent);
+  border-radius: 5px;
+  background: var(--bg-elevated);
+  color: var(--fg-bright);
+  font-weight: 700;
+  font-size: 1.05rem;
+  box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 20%, transparent);
+}
+.bbs-playing-card.red {
+  color: #fb7185;
+  border-color: #fb7185;
+}
+.bbs-playing-card.back {
+  color: var(--fg-muted);
+  border-style: dashed;
+  background: repeating-linear-gradient(
+    45deg,
+    var(--bg-input),
+    var(--bg-input) 4px,
+    var(--bg-panel) 4px,
+    var(--bg-panel) 8px
+  );
+}
+.bbs-poker-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 0.5rem;
+}
+
+/* ── Calendar Grid ──────────────────────────────────────────────────────── */
+.bbs-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 2px;
+  text-align: center;
+  font-size: 0.78rem;
+}
+.bbs-cal-day {
+  padding: 0.35rem 0.1rem;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: var(--bg-input);
+  cursor: pointer;
+}
+.bbs-cal-day.has-event {
+  border-color: var(--accent);
+  color: var(--fg-bright);
+  font-weight: 700;
+}
+.bbs-cal-day.selected {
+  background: var(--select-bg);
+  color: var(--select-fg);
+}
+
+/* ── Global Search Overlay ──────────────────────────────────────────────── */
+.bbs-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  display: flex;
+  justify-content: center;
+  padding: 7vh 0.75rem 1rem;
+  overflow-y: auto;
+}
+.bbs-modal {
+  width: 100%;
+  max-width: 680px;
+  height: max-content;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius);
+  box-shadow: 0 0 28px color-mix(in srgb, var(--accent) 22%, transparent);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.bbs-modal-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-elevated);
+}
+.bbs-modal-body {
+  padding: 0.6rem 0.8rem;
+  max-height: 65vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+/* ── Toasts ─────────────────────────────────────────────────────────────── */
+.bbs-toasts {
+  position: fixed;
+  bottom: 2.75rem;
+  right: 1rem;
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  max-width: min(380px, calc(100vw - 2rem));
+}
+.bbs-toast {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.75rem;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.55);
+  font-size: 0.85rem;
+}
+.bbs-toast-ok { border-left: 3px solid var(--ok); }
+.bbs-toast-err { border-left: 3px solid var(--danger); }
+.bbs-toast-warn { border-left: 3px solid var(--warn); }
+.bbs-toast-info { border-left: 3px solid var(--info); }
+.bbs-toast-glyph { font-weight: 700; flex: 0 0 auto; }
+.bbs-toast-msg { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+
+/* ── QR & Code Blocks ───────────────────────────────────────────────────── */
+.bbs-qr-wrap {
+  display: inline-block;
+  padding: 0.5rem;
+  background: #ffffff;
+  border-radius: var(--radius);
+  max-width: 100%;
+}
+.bbs-id-block {
+  font-size: 0.84rem;
+  word-break: break-all;
+  overflow-wrap: anywhere;
+}
+
+/* ── UA 571-C Sentry Door Game Overlay ──────────────────────────────────── */
+.sentry {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  display: none;
+  flex-direction: column;
+  overflow: auto;
+  padding: 1rem;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font);
+  text-shadow: 0 0 4px var(--accent);
+}
+.sentry.open { display: flex; }
+.sentry-inner { position: relative; z-index: 3; max-width: 96ch; width: 100%; margin: 0 auto; }
+.sentry-boot { white-space: pre-wrap; color: var(--fg-bright); min-height: 8rem; }
+.sentry-close {
+  position: fixed; top: 0.6rem; right: 1rem; z-index: 4; cursor: pointer;
+  background: var(--bg-elevated); color: var(--fg-bright); border: 1px solid var(--border-bright);
+  padding: 0.35rem 0.65rem; min-height: 40px; border-radius: var(--radius);
+}
+.sentry-close:hover { background: var(--accent); color: var(--bg); text-shadow: none; }
+.sentry-title {
+  text-align: center; color: var(--fg-bright); letter-spacing: 0.14em;
+  border: 1px solid var(--border); padding: 0.5rem; margin-bottom: 0.6rem;
+}
+.sentry-modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-bottom: 0.6rem; }
+.sentry-cell { border: 1px solid var(--border); padding: 0.45rem 0.55rem; }
+.sentry-cell .lab { color: var(--fg-dim); font-size: 0.76rem; letter-spacing: 0.08em; }
+.sentry-opts { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.35rem; }
+.sentry-opt {
+  padding: 0.25rem 0.5rem; border: 1px solid var(--border); cursor: pointer;
+  background: transparent; color: var(--fg); min-height: 36px;
+}
+.sentry-opt.sel { background: var(--accent); color: var(--bg); text-shadow: none; font-weight: 700; }
+.sentry-opt.danger.sel { background: #ff5555; color: #0a0a0a; }
+.sentry-status { display: grid; grid-template-columns: 1.4fr 1fr 0.8fr auto; gap: 0.6rem; align-items: stretch; }
+.sentry-box { border: 1px solid var(--border); padding: 0.45rem 0.55rem; display: flex; flex-direction: column; justify-content: center; }
+.sentry-box .lab { color: var(--fg-dim); font-size: 0.76rem; }
+.sentry-rounds { font-size: 2.3rem; line-height: 1; color: var(--fg-bright); }
+.sentry-time { font-size: 1.5rem; color: var(--fg-bright); }
+.sentry-critical { border: 2px solid #ff5555; color: #ff5555; text-align: center; padding: 0.4rem; opacity: 0.22; letter-spacing: 0.2em; }
+.sentry-critical.on { opacity: 1; animation: sentry-flash 0.5s step-end infinite; }
+@keyframes sentry-flash { 50% { opacity: 0.3; } }
+.sentry-gaugewrap { display: flex; gap: 0.5rem; align-items: flex-end; }
+.sentry-gauge { width: 1.4rem; height: 5rem; border: 1px solid var(--border); position: relative; }
+.sentry-gauge .fill { position: absolute; left: 0; right: 0; bottom: 0; background: var(--accent); transition: height 0.4s linear; }
+.sentry-gauge.hot .fill { background: #ff5555; }
+.sentry-gauge .gl { position: absolute; top: -1rem; left: 0; color: var(--fg-dim); font-size: 0.7rem; }
+.sentry-radar { width: 5.5rem; height: 5.5rem; border-radius: 50%; border: 1px solid var(--border); position: relative; overflow: hidden; align-self: center; }
+.sentry-radar::before {
+  content: ""; position: absolute; inset: 0; border-radius: 50%;
+  background: conic-gradient(from 0deg, color-mix(in srgb, var(--accent) 45%, transparent) 0deg, transparent 60deg);
+  animation: sentry-sweep 2.6s linear infinite;
+}
+.sentry-radar.fast::before { animation-duration: 0.9s; }
+.sentry-radar .ring { position: absolute; inset: 22%; border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent); border-radius: 50%; }
+.sentry-radar .ring.r2 { inset: 40%; }
+@keyframes sentry-sweep { to { transform: rotate(360deg); } }
+.sentry-actions { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin: 0.7rem 0; }
+.sentry-btn {
+  border: 1px solid var(--accent); color: var(--accent); background: transparent;
+  padding: 0.5rem 1rem; min-height: 44px; cursor: pointer; letter-spacing: 0.06em;
+}
+.sentry-btn:hover { background: var(--accent); color: var(--bg); text-shadow: none; }
+.sentry-btn.armed { border-color: #ff5555; color: #ff5555; }
+.sentry-log { border: 1px solid var(--border); padding: 0.45rem 0.55rem; margin-top: 0.4rem; min-height: 3.5rem; max-height: 8rem; overflow-y: auto; color: var(--fg-dim); font-size: 0.84rem; white-space: pre-wrap; }
+.sentry-log .hi { color: var(--fg-bright); }
+.sentry-hint { text-align: center; color: var(--fg-dim); font-size: 0.78rem; margin-top: 0.4rem; }
+
+/* ── First-Class Mobile Phone Surface (<900px) ──────────────────────────── */
+@media (max-width: 899px) {
+  .tui-app {
+    grid-template-rows: var(--topbar-h) minmax(0, 1fr) auto;
+  }
+
+  .tui-body,
+  .tui-body.sidebar-collapsed {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Slide-out drawer sidebar on phones/tablets */
+  .tui-sidebar,
+  .tui-body.sidebar-collapsed .tui-sidebar {
+    display: flex;
+    position: fixed;
+    top: var(--topbar-h);
+    bottom: var(--bottomnav-h);
+    left: 0;
+    width: min(84vw, 310px);
+    z-index: 120;
+    transform: translateX(-105%);
+    transition: transform 180ms ease;
+    box-shadow: 8px 0 32px rgba(0, 0, 0, 0.7);
+  }
+  .tui-sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  .tui-drawer-backdrop.mobile-open {
+    display: block;
+    position: fixed;
+    inset: var(--topbar-h) 0 var(--bottomnav-h) 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 110;
+  }
+
+  .tui-main {
+    padding: 0.85rem 0.75rem 1.4rem;
+  }
+
+  .tui-footer {
+    display: none;
+  }
+
+  .tui-bottomnav {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    background: var(--bg-elevated);
+    border-top: 1px solid var(--border);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    z-index: 60;
+  }
+
+  .tui-bnav-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.12rem;
+    min-height: 54px;
+    padding: 0.25rem 0.15rem;
+    background: transparent;
+    border: 0;
+    color: var(--fg-dim);
+    cursor: pointer;
+    position: relative;
+    font-size: 0.72rem;
+  }
+  .tui-bnav-btn .ico {
+    font-size: 1.15rem;
+    line-height: 1;
+    color: var(--accent);
+  }
+  .tui-bnav-btn.active {
+    background: var(--select-bg);
+    color: var(--select-fg);
+    font-weight: 700;
+  }
+  .tui-bnav-btn.active .ico {
+    color: var(--select-fg);
+  }
+  .tui-bnav-badge {
+    position: absolute;
+    top: 4px;
+    right: calc(50% - 20px);
+    min-width: 1.1rem;
+    height: 1.1rem;
+    padding: 0 0.25rem;
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--select-fg);
+    font-size: 0.68rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .tui-bnav-btn.active .tui-bnav-badge {
+    background: var(--select-fg);
+    color: var(--select-bg);
+  }
+
+  /* Guarantee >=44px tap targets on mobile */
+  .bbs-btn,
+  .bbs-icon-btn,
+  .tui-tab,
+  .tui-side-item {
+    min-height: 44px;
+  }
+
+  .tui-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .bbs-post-reply-indent {
+    margin-left: 0.55rem;
+  }
+
+  .bbs-dm-bubble {
+    max-width: 92%;
+  }
+
+  .bbs-toasts {
+    bottom: calc(var(--bottomnav-h) + 0.75rem);
+    left: 0.75rem;
+    right: 0.75rem;
+    max-width: none;
+  }
+
+  .bbs-overlay {
+    padding: 0;
+  }
+  .bbs-modal {
+    max-width: none;
+    min-height: 100dvh;
+    border-radius: 0;
+  }
+  .bbs-modal-body {
+    max-height: none;
+    flex: 1 1 auto;
+  }
+
+  .ascii-img {
+    font-size: clamp(6.5px, 2.15vw, 9.5px);
+    font-size: min(0.58rem, calc(100cqi / (var(--cols, 80) * 0.62)));
+  }
+
+  .sentry { padding: 0.55rem; }
+  .sentry-modes { grid-template-columns: 1fr; }
+  .sentry-status { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sentry-critical.on,
+  .sentry-radar::before {
+    animation: none;
+  }
+}
+html.bbs-reduced-motion .sentry-critical.on,
+html.bbs-reduced-motion .sentry-radar::before {
+  animation: none;
+}
+
+/* A post opened from a link (notification, search, bookmark): outlined once. */
+.bbs-post.bbs-post-focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ── Phones: every piece of text at twice the size ──────────────────────────
+ * Phone-width screens, and touch devices in portrait inside the drawer
+ * layout (<900px). Doubling the root doubles every rem size in the sheet;
+ * what follows keeps the layout working at 2x: gutters that would otherwise
+ * double too are pulled back so a 360px screen still holds ~20 columns of
+ * text, fixed px heights become text-relative, and the top bar keeps only
+ * what fits (the rest is in the drawer and Settings). Art glyphs are
+ * container-sized (above), not doubled. */
+@media (max-width: 640px),
+  (pointer: coarse) and (orientation: portrait) and (max-width: 899px) {
+  html {
+    --fs-mobile: 2;
+    --topbar-h: calc(2.25rem + env(safe-area-inset-top, 0px));
+    --bottomnav-h: calc(1.9rem + 7.5vw + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Top bar: menu, brand glyph, search, notifications, profile. */
+  .tui-topbar {
+    gap: 0.25rem;
+    padding: env(safe-area-inset-top, 0px) 0.25rem 0;
+  }
+  .tui-topbar-left,
+  .tui-topbar-right {
+    gap: 0.2rem;
+  }
+  .tui-topbar-right {
+    flex: 0 1 auto;
+    min-width: 0;
+  }
+  .tui-topbar-left {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .tui-route-title {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 0.8rem;
+  }
+  .tui-brand,
+  .tui-crumb-sep,
+  .tui-status-pill.ok,
+  .tui-status-pill.warn,
+  .tui-theme-btn {
+    display: none;
+  }
+  .bbs-icon-btn {
+    min-width: 44px;
+    padding: 0 0.2rem;
+  }
+  .bbs-btn.tui-signin-btn {
+    white-space: nowrap;
+    flex: 0 0 auto;
+  }
+  input[type="checkbox"],
+  input[type="radio"] {
+    width: 1.4rem;
+    height: 1.4rem;
+  }
+  .bbs-btn.tui-profile-btn {
+    white-space: nowrap;
+    max-width: 4.5em;
+    min-width: 44px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+  }
+  .tui-bnav-badge {
+    font-size: 0.6rem;
+  }
+
+  /* Drawer wide enough for doubled labels. */
+  .tui-sidebar,
+  .tui-body.sidebar-collapsed .tui-sidebar {
+    width: min(92vw, 30rem);
+  }
+
+  /* Bottom nav: icons double; the five labels are fitted to their column
+   * (a 6-letter label at 2x would not fit 72px), still larger than before. */
+  .tui-bnav-btn {
+    font-size: min(0.72rem, 5vw);
+    padding: 0.15rem 0.05rem;
+  }
+  .tui-bnav-btn .ico {
+    font-size: 1.15rem;
+  }
+
+  /* Gutters: keep roughly the 1x pixel spacing. */
+  .tui-main {
+    padding: 0.4rem 0.3rem 0.8rem;
+  }
+  .tui-container,
+  .tui-stack,
+  .bbs-composer {
+    gap: 0.4rem;
+  }
+  .tui-card {
+    padding: 0.4rem 0.4rem;
+  }
+  .bbs-post {
+    padding: 0.35rem 0.4rem;
+    gap: 0.3rem;
+  }
+  .bbs-post-reply-indent {
+    margin-left: 0.25rem;
+  }
+  .bbs-composer {
+    padding: 0.35rem;
+  }
+  .bbs-ascii-card {
+    padding: 0.25rem 0.3rem;
+  }
+  .bbs-md pre {
+    padding: 0.3rem 0.35rem;
+  }
+  .bbs-md ul,
+  .bbs-md ol {
+    padding-left: 0.8rem;
+  }
+  .bbs-md blockquote {
+    padding: 0.1rem 0.35rem;
+  }
+  .bbs-input,
+  .bbs-textarea,
+  .bbs-select {
+    padding: 0.25rem 0.35rem;
+  }
+  .bbs-textarea {
+    min-height: 4.5rem;
+  }
+  .bbs-modal-head,
+  .bbs-modal-body {
+    padding: 0.3rem 0.4rem;
+  }
+  .bbs-toast {
+    padding: 0.3rem 0.4rem;
+  }
+
+  /* Controls wrap instead of running off the edge. */
+  .bbs-btn,
+  .tui-tab,
+  .bbs-pill,
+  .bbs-badge {
+    white-space: normal;
+    max-width: 100%;
+    text-align: center;
+    /* Break only a word too long for the line (never "al|l"). */
+    overflow-wrap: break-word;
+  }
+  .bbs-btn {
+    padding: 0.2rem 0.4rem;
+  }
+  .tui-tab {
+    padding: 0.15rem 0.4rem;
+  }
+  .bbs-pill,
+  .bbs-copy-btn,
+  .bbs-react-pill,
+  .bbs-author-btn {
+    min-height: 44px;
+  }
+  .bbs-img-links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  .tui-page-title,
+  .tui-empty-title,
+  .bbs-post-header,
+  .tui-crumb {
+    overflow-wrap: anywhere;
+  }
+  .bbs-dm-bubble {
+    max-width: 96%;
+    padding: 0.3rem 0.4rem;
+  }
+  .bbs-kanban-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .bbs-playing-card {
+    width: 2.6rem;
+    height: 3.6rem;
+  }
+  .sentry-rounds {
+    font-size: 1.6rem;
+  }
+}

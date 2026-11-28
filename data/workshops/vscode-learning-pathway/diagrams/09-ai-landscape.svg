@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 320" role="img" aria-labelledby="dg-title dg-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="dg-title">AI approaches in VS Code</title>
+  <desc id="dg-desc">Four approaches to AI coding: inline completion, agentic terminal tools, hybrid multi-model tools, and local private models — each with a leading tool and pricing.</desc>
+  <rect x="8" y="8" width="944" height="304" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">AI IN VS CODE — FOUR APPROACHES</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <g text-anchor="middle">
+    <rect x="48" y="104" width="200" height="168" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="148" y="140" font-size="14" font-weight="600" fill="#F5F5F5">Inline Completion</text>
+    <text x="148" y="168" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">Copilot · Windsurf</text>
+    <text x="148" y="216" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#6B7280">from $10/month</text>
+    <text x="148" y="240" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#6B7280">best: inline flow</text>
+
+    <rect x="264" y="104" width="200" height="168" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="364" y="140" font-size="14" font-weight="600" fill="#F5F5F5">Agentic</text>
+    <text x="364" y="168" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">Claude Code · Codex CLI</text>
+    <text x="364" y="216" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#6B7280">pay-per-use API</text>
+    <text x="364" y="240" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#6B7280">best: complex reasoning</text>
+
+    <rect x="480" y="104" width="200" height="168" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="580" y="140" font-size="14" font-weight="600" fill="#F5F5F5">Hybrid</text>
+    <text x="580" y="168" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">Continue.dev</text>
+    <text x="580" y="216" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#6B7280">free, open source</text>
+    <text x="580" y="240" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#6B7280">best: flexibility</text>
+
+    <rect x="696" y="104" width="216" height="168" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="804" y="140" font-size="14" font-weight="600" fill="#F5F5F5">Local</text>
+    <text x="804" y="168" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">Ollama · LM Studio</text>
+    <text x="804" y="216" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#6B7280">free</text>
+    <text x="804" y="240" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#6B7280">best: privacy</text>
+  </g>
+</svg>

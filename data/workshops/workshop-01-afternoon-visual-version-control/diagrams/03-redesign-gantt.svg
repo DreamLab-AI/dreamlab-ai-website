@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 448" role="img" aria-labelledby="d3b-title d3b-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="d3b-title">Website redesign Gantt chart</title>
+  <desc id="d3b-desc">Eight-week timeline: research and interviews in weeks one to two, wireframes then visual design and content in weeks two to four, development on the critical path in weeks five to six, testing in week seven, go-live milestone at week eight.</desc>
+  <rect x="8" y="8" width="944" height="432" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">WEBSITE REDESIGN — TIMELINE</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <!-- week grid: 8 weeks x 80px from x=272 -->
+  <g stroke="rgba(255,255,255,0.06)">
+    <line x1="272" y1="88" x2="272" y2="392"/>
+    <line x1="352" y1="88" x2="352" y2="392"/>
+    <line x1="432" y1="88" x2="432" y2="392"/>
+    <line x1="512" y1="88" x2="512" y2="392"/>
+    <line x1="592" y1="88" x2="592" y2="392"/>
+    <line x1="672" y1="88" x2="672" y2="392"/>
+    <line x1="752" y1="88" x2="752" y2="392"/>
+    <line x1="832" y1="88" x2="832" y2="392"/>
+    <line x1="912" y1="88" x2="912" y2="392"/>
+  </g>
+  <g font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#6B7280" text-anchor="middle">
+    <text x="312" y="416">W1</text><text x="392" y="416">W2</text><text x="472" y="416">W3</text><text x="552" y="416">W4</text>
+    <text x="632" y="416">W5</text><text x="712" y="416">W6</text><text x="792" y="416">W7</text><text x="872" y="416">W8</text>
+  </g>
+
+  <!-- task labels -->
+  <g font-size="13" fill="#F5F5F5" text-anchor="end">
+    <text x="256" y="118">Research</text>
+    <text x="256" y="154">User interviews</text>
+    <text x="256" y="190">Wireframes</text>
+    <text x="256" y="226">Visual design</text>
+    <text x="256" y="262">Content writing</text>
+    <text x="256" y="298">Development</text>
+    <text x="256" y="334">Testing &amp; QA</text>
+    <text x="256" y="370">Go live</text>
+  </g>
+
+  <!-- bars -->
+  <g stroke="rgba(255,255,255,0.28)" fill="rgba(255,255,255,0.08)">
+    <rect x="272" y="104" width="76" height="20" rx="4"/>
+    <rect x="296" y="140" width="60" height="20" rx="4"/>
+    <rect x="352" y="176" width="76" height="20" rx="4"/>
+    <rect x="432" y="212" width="156" height="20" rx="4"/>
+    <rect x="432" y="248" width="156" height="20" rx="4"/>
+    <rect x="592" y="284" width="156" height="20" rx="4" fill="rgba(245,158,11,0.12)" stroke="#F59E0B" stroke-width="1.2"/>
+    <rect x="752" y="320" width="76" height="20" rx="4"/>
+  </g>
+  <!-- milestone diamond at week 8 end -->
+  <rect x="822" y="350" width="20" height="20" rx="2" fill="rgba(245,158,11,0.12)" stroke="#F59E0B" stroke-width="1.2" transform="rotate(45 832 360)"/>
+  <text x="700" y="278" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#F59E0B" text-anchor="middle">critical path</text>
+</svg>

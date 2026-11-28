@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 424" role="img" aria-labelledby="dg-title dg-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="dg-title">A CI/CD deployment workflow</title>
+  <desc id="dg-desc">A push to GitHub triggers the workflow: tests run, a passing build deploys to staging, then the main branch goes to production while feature branches get a preview URL. Failures trigger a notification.</desc>
+
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <rect x="8" y="8" width="944" height="408" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">CI/CD DEPLOYMENT WORKFLOW</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <g text-anchor="middle">
+    <rect x="48" y="104" width="160" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="128" y="136" font-size="15" font-weight="600" fill="#F5F5F5">Push</text>
+    <text x="128" y="158" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">workflow triggers</text>
+
+    <path d="M320,96 L364,140 L320,184 L276,140 Z" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)" stroke-linejoin="round"/>
+    <text x="320" y="136" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">tests</text>
+    <text x="320" y="150" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">pass?</text>
+
+    <rect x="432" y="104" width="176" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="520" y="136" font-size="15" font-weight="600" fill="#F5F5F5">Build</text>
+    <text x="520" y="158" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">production bundle</text>
+
+    <rect x="688" y="104" width="176" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="776" y="136" font-size="15" font-weight="600" fill="#F5F5F5">Staging</text>
+    <text x="776" y="158" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">deploy + smoke test</text>
+
+    <path d="M776,252 L820,296 L776,340 L732,296 Z" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)" stroke-linejoin="round"/>
+    <text x="776" y="292" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">on main</text>
+    <text x="776" y="306" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">branch?</text>
+
+    <rect x="432" y="240" width="208" height="64" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="536" y="268" font-size="15" font-weight="600" fill="#F5F5F5">Production</text>
+    <text x="536" y="290" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">live for users</text>
+
+    <rect x="432" y="328" width="208" height="56" rx="8" fill="none" stroke="rgba(255,255,255,0.20)" stroke-dasharray="4 3"/>
+    <text x="536" y="352" font-size="13" font-weight="600" fill="#9CA3AF">Preview URL</text>
+    <text x="536" y="372" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#6B7280">per-branch preview</text>
+
+    <rect x="240" y="240" width="160" height="52" rx="8" fill="none" stroke="rgba(255,255,255,0.20)" stroke-dasharray="4 3"/>
+    <text x="320" y="262" font-size="13" font-weight="600" fill="#9CA3AF">Notify failure</text>
+    <text x="320" y="282" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#6B7280">fix and re-push</text>
+  </g>
+
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2">
+    <path d="M208,140 C228,140 252,140 268,140" marker-end="url(#arr)"/>
+    <path d="M364,140 C388,140 408,140 424,140" marker-end="url(#arr)"/>
+    <path d="M608,140 C632,140 664,140 680,140" marker-end="url(#arr)"/>
+    <path d="M776,176 C776,204 776,224 776,244" marker-end="url(#arr)"/>
+    <path d="M732,296 C700,296 680,280 648,272" marker-end="url(#arr)"/>
+    <path d="M732,296 C700,296 680,328 648,348" marker-end="url(#arr)"/>
+    <path d="M320,184 C320,204 320,216 320,232" stroke="rgba(255,255,255,0.20)" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+  </g>
+  <g font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">
+    <text x="380" y="132">yes</text>
+    <text x="672" y="264">yes</text>
+    <text x="672" y="344">no</text>
+    <text x="328" y="212" fill="#6B7280">fail</text>
+  </g>
+</svg>

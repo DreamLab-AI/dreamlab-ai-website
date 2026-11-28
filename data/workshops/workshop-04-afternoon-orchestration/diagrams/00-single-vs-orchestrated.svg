@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 384" role="img" aria-labelledby="dg-title dg-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="dg-title">Single agent versus orchestrated system</title>
+  <desc id="dg-desc">The morning's single agent calls its tools directly; the afternoon's orchestrator delegates to research, code and review agents, each with its own MCP server.</desc>
+
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- container -->
+  <rect x="8" y="8" width="944" height="368" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">FROM ONE AGENT TO A TEAM</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <!-- left group: single agent -->
+  <rect x="48" y="96" width="336" height="248" rx="8" fill="none" stroke="rgba(255,255,255,0.20)" stroke-dasharray="4 3"/>
+  <text x="64" y="120" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" letter-spacing="0.12em" fill="#9CA3AF">MORNING · SINGLE AGENT</text>
+
+  <g text-anchor="middle">
+    <rect x="112" y="144" width="208" height="64" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="216" y="172" font-size="14" font-weight="600" fill="#F5F5F5">One Agent</text>
+    <text x="216" y="192" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">does everything</text>
+
+    <rect x="80" y="256" width="272" height="56" rx="8" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.35)"/>
+    <text x="216" y="290" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#9CA3AF">tool 1 · tool 2 · tool 3</text>
+  </g>
+  <path d="M216,208 L216,252" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arr)"/>
+
+  <!-- right group: orchestrated -->
+  <rect x="432" y="96" width="480" height="248" rx="8" fill="none" stroke="rgba(255,255,255,0.20)" stroke-dasharray="4 3"/>
+  <text x="448" y="120" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" letter-spacing="0.12em" fill="#9CA3AF">AFTERNOON · ORCHESTRATED SYSTEM</text>
+
+  <g text-anchor="middle">
+    <rect x="560" y="136" width="224" height="56" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="672" y="160" font-size="14" font-weight="600" fill="#F5F5F5">Orchestrator</text>
+    <text x="672" y="180" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#F59E0B">delegates subtasks</text>
+
+    <rect x="456" y="240" width="128" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="520" y="272" font-size="13" font-weight="600" fill="#F5F5F5">Research</text>
+    <text x="520" y="294" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">search MCP</text>
+
+    <rect x="608" y="240" width="128" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="672" y="272" font-size="13" font-weight="600" fill="#F5F5F5">Code</text>
+    <text x="672" y="294" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">filesystem MCP</text>
+
+    <rect x="760" y="240" width="128" height="72" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="824" y="272" font-size="13" font-weight="600" fill="#F5F5F5">Review</text>
+    <text x="824" y="294" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">github MCP</text>
+  </g>
+
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2">
+    <path d="M624,192 C584,212 548,220 528,236" marker-end="url(#arr)"/>
+    <path d="M672,192 L672,236" marker-end="url(#arr)"/>
+    <path d="M720,192 C760,212 796,220 816,236" marker-end="url(#arr)"/>
+  </g>
+</svg>

@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 460" role="img" aria-labelledby="sl-title sl-desc" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <title id="sl-title">The core interaction loop</title>
+  <desc id="sl-desc">Sequence of a Claude Code session: start with CLAUDE.md loaded, send a task, receive code, review and commit with Git, compact or clear when context grows, then continue with the next task.</desc>
+
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="arr-accent" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0.5 L7.5,4 L0,7.5" fill="none" stroke="#F59E0B" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- container -->
+  <rect x="8" y="8" width="944" height="444" rx="12" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="56" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="500" letter-spacing="0.18em" fill="#9CA3AF">THE CORE INTERACTION LOOP</text>
+  <line x1="48" y1="72" x2="912" y2="72" stroke="rgba(255,255,255,0.10)"/>
+
+  <!-- actor chips -->
+  <g text-anchor="middle">
+    <rect x="216" y="96" width="128" height="44" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.28)"/>
+    <text x="280" y="124" font-size="15" font-weight="600" fill="#F5F5F5">You</text>
+
+    <rect x="616" y="96" width="128" height="44" rx="8" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="1.2"/>
+    <text x="680" y="124" font-size="15" font-weight="600" fill="#F5F5F5">Claude Code</text>
+  </g>
+
+  <!-- lifelines -->
+  <g stroke="rgba(255,255,255,0.20)" stroke-width="1.2" stroke-dasharray="4 3">
+    <line x1="280" y1="140" x2="280" y2="428"/>
+    <line x1="680" y1="140" x2="680" y2="428"/>
+  </g>
+
+  <!-- messages -->
+  <g fill="none" stroke="#9CA3AF" stroke-width="1.2">
+    <path d="M280,172 L672,172" marker-end="url(#arr)"/>
+    <path d="M280,220 L672,220" marker-end="url(#arr)"/>
+    <path d="M680,268 L288,268" marker-end="url(#arr)" stroke-dasharray="4 3"/>
+  </g>
+
+  <!-- self step: review + commit -->
+  <path d="M280,296 C216,296 216,336 272,336" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arr)"/>
+
+  <!-- conditional compact/clear -->
+  <path d="M280,372 L672,372" fill="none" stroke="#F59E0B" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#arr-accent)"/>
+  <!-- next task -->
+  <path d="M280,412 L672,412" fill="none" stroke="#9CA3AF" stroke-width="1.2" marker-end="url(#arr)"/>
+
+  <!-- labels -->
+  <g font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF" text-anchor="middle">
+    <text x="480" y="164">start session — CLAUDE.md loads automatically</text>
+    <text x="480" y="212">specific task or question</text>
+    <text x="480" y="260">code · explanation · files</text>
+    <text x="480" y="404">next task</text>
+  </g>
+  <text x="308" y="324" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#9CA3AF">review changes, commit with Git, check context</text>
+  <text x="480" y="364" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#F59E0B" text-anchor="middle">if context large: /compact or /clear</text>
+</svg>
